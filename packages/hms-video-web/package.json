@@ -1,0 +1,34 @@
+{
+  "name": "hmsvideo-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "typescript": "^4.2.3"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "prettier": "^2.2.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/100mslive/hmsvideo-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/100mslive/hmsvideo-web/issues"
+  },
+  "homepage": "https://github.com/100mslive/hmsvideo-web#readme"
+}
