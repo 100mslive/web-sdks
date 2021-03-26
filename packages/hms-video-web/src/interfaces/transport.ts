@@ -1,26 +1,38 @@
+import { IHMSTrack } from "./track"
+
+type Json = {
+  [key: string] : string | number | boolean | null | Json | any[]
+}
+
 type JoiningParams = {
   roomId: string;
   token: string;
   endpoint?: string;
 };
-type SuccessCallback = () => void;
 
-type ErrorCallback = () => void;
+type MsgParams = {
+  [method: string]: Json
+}
 
-type HMSTrack = {};
+type HMSError = {
+  code: number;
+  reason: string
+}
+
+type Callback = (error: HMSError, isSuccess: boolean) => void
 
 type HMSTrackSettings = {};
 
-export interface Transport {
-  join(joiningParams: JoiningParams, onSucess: SuccessCallback, onError: ErrorCallback): void;
+export interface IHMSTransport {
+  join(joiningParams: JoiningParams, callback: Callback): void;
 
-  leave(roomId: string, onSucess: SuccessCallback, onError: ErrorCallback): void;
+  leave(roomId: string, callback: Callback): void;
 
-  getLocalTracks(settings: HMSTrackSettings, onError: ErrorCallback): HMSTrack[];
+  getLocalTracks(settings: HMSTrackSettings, callback: Callback): IHMSTrack[];
 
-  publish(tracks: HMSTrack[], onSucess: SuccessCallback, onError: ErrorCallback): void;
+  publish(tracks: IHMSTrack[], callback: Callback): void;
 
-  unpublish(tracks: HMSTrack[], onSucess: SuccessCallback, onError: ErrorCallback): void;
+  unpublish(tracks: IHMSTrack[], callback: Callback): void;
 
-  sendMessage(onSucess: SuccessCallback, onError: ErrorCallback): void;
+  sendMessage(msgParams: MsgParams, callback: Callback): void;
 }
