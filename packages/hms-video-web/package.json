@@ -1,34 +1,55 @@
 {
-  "name": "hmsvideo-web",
-  "version": "2.0.0",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {},
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "files": [
-    "lib/**/*"
+    "dist",
+    "src"
   ],
-  "devDependencies": {
-    "@tsconfig/recommended": "^1.0.1",
-    "@types/node": "^14.14.37",
-    "prettier": "^2.2.1",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.2.3"
+  "engines": {
+    "node": ">=10"
   },
   "scripts": {
-    "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/100mslive/hmsvideo-web.git"
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
   },
-  "keywords": [],
-  "author": "Praveen <praveen@100ms.live>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/100mslive/hmsvideo-web/issues"
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
-  "homepage": "https://github.com/100mslive/hmsvideo-web#readme"
+  "name": "sdk",
+  "author": "Praveen",
+  "module": "dist/sdk.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/sdk.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/sdk.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.10.2",
+    "husky": "^6.0.0",
+    "size-limit": "^4.10.2",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.1.0",
+    "typescript": "^4.2.3"
+  }
 }
