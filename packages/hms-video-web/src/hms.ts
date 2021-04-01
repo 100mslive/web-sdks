@@ -1,10 +1,13 @@
 import HMSConfig from "./interfaces/config";
-import HMSInterface from "./interfaces/hms"
+import HMSInterface, { HMSAnalyticsLevel, HMSlogLevel } from "./interfaces/hms"
 import HMSMessage, { HMSMessageListener } from "./interfaces/message";
 import HMSPeer from "./interfaces/peer";
 import HMSUpdateListener from "./interfaces/update-listener";
 
 export default class HMS implements HMSInterface {
+  logLevel: HMSlogLevel = HMSlogLevel.OFF
+  analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF
+  
   join(config: HMSConfig, listener: HMSUpdateListener) {
     console.log(config,listener)
     throw "Yet to implement"
