@@ -5,7 +5,6 @@ interface SignalRequest {
   id?: string;
   params: string
 }
-interface SignalResponse {}
 
 export default interface Signal extends EventEmitter {
   send(request: SignalRequest): void;

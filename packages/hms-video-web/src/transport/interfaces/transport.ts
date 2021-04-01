@@ -11,7 +11,7 @@ export type JoiningParams = {
 };
 
 export type MsgParams = {
-  [method: string]: Json;
+  [method: string]: any;
 };
 
 export type HMSError = {
@@ -34,7 +34,7 @@ export default interface Transport {
 
   call(msgParams: MsgParams, callback: Callback): void;
 
-  notify(msgParams: MsgParams): void;
+  notify(method: string, params: any): void;
 
   on(event: string, listener: Function): void;
 }
