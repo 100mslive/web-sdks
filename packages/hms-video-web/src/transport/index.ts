@@ -4,10 +4,19 @@ import { Callback } from './interfaces/transport';
 
 export default class HMSTransport extends EventEmitter {
   protected signal;
+  pc: RTCPeerConnection
 
   constructor(signal) {
     super();
     this.signal = signal;
+  }
+
+  publish(tracks, cb) {
+
+  }
+
+  unpublish(tracks, cb) {
+
   }
 
   call(method: string, params: any, cb: Callback) {

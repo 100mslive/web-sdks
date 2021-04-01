@@ -1,10 +1,10 @@
 export default interface HMSDevice {
-  videoInputs: IHMSVideoDevice[];
-  videoOutputs: IHMSVideoDevice[];
-  audioInputs: IHMSAudioDevice[];
-  audioOutputs: IHMSAudioDevice[];
+  videoInputs: HMSVideoDevice[];
+  videoOutputs: HMSVideoDevice[];
+  audioInputs: HMSAudioDevice[];
+  audioOutputs: HMSAudioDevice[];
 }
 
-interface IHMSVideoDevice extends HMSDevice {}
+interface HMSVideoDevice extends HMSDevice {}
 
-interface IHMSAudioDevice extends HMSDevice {}
+interface HMSAudioDevice extends HMSDevice {}
