@@ -7,7 +7,7 @@ type Json = {
 export type JoiningParams = {
   roomId: string;
   token: string;
-  endpoint?: string;
+  endpoint?: string
 };
 
 export type MsgParams = {
@@ -19,7 +19,7 @@ export type HMSError = {
   reason: string;
 };
 
-export type Callback = (error: HMSError, isSuccess: boolean) => void;
+export type Callback = (error: HMSError | null, result: any) => void;
 
 export default interface Transport {
   join(joiningParams: JoiningParams, callback: Callback): void;

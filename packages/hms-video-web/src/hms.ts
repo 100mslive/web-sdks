@@ -3,14 +3,30 @@ import HMSInterface, { HMSAnalyticsLevel, HMSlogLevel } from "./interfaces/hms"
 import HMSMessage, { HMSMessageListener } from "./interfaces/message";
 import HMSPeer from "./interfaces/peer";
 import HMSUpdateListener from "./interfaces/update-listener";
+import HMSTransport from "./transport/interfaces/transport";
+import log from "loglevel"
 
-export default class HMS implements HMSInterface {
+export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF
+  transport: HMSTransport
+
+  constructor(transport: HMSTransport) {
+    this.transport = transport
+    log.setLevel(log.levels.DEBUG)
+  }
   
   join(config: HMSConfig, listener: HMSUpdateListener) {
-    console.log(config,listener)
-    throw "Yet to implement"
+    log.debug(config, listener)
+    
+    this.transport.join({
+      roomId: config.roomId,
+      token: config.authToken
+    }, (error, result) => {
+      if(error) throw error
+      
+      log.debug(result)
+    })
   }
   
   leave() {

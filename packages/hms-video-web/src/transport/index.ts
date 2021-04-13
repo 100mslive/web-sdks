@@ -1,52 +1,64 @@
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
-import { Callback } from './interfaces/transport';
+// import { v4 as uuidv4 } from 'uuid';
+import { Callback, JoiningParams } from './interfaces/transport';
+import log from "loglevel"
+import fetch from "node-fetch"
+
+type InitConfig = {
+  endpoint: string,
+  rtcConfiguration: any
+}
 
 export default class HMSTransport extends EventEmitter {
-  protected signal;
-  pc: RTCPeerConnection
+  // protected signal;
+  // pc: RTCPeerConnection
 
-  constructor(signal) {
-    super();
-    this.signal = signal;
+  join(joiningParams: JoiningParams, cb: Callback) {
+    this.init().then(config => {
+      const { roomId, token } = joiningParams
+      const endpoint = config.endpoint
+      log.debug({roomId, token, endpoint})
+      cb(null , config)
+    })
   }
 
-  publish(tracks, cb) {
+  // call(method: string, params: any, cb: Callback) {
+  //   const id = uuidv4();
 
-  }
+  //   this.signal.send(
+  //     JSON.stringify({
+  //       method,
+  //       params,
+  //       id,
+  //     })
+  //   );
 
-  unpublish(tracks, cb) {
+  //   const messageHandler = (event: MessageEvent) => {
+  //     const response = JSON.parse(event.data);
+  //     if (response.id === id) {
+  //       cb(response.error, response.result);
+  //       this.signal.off('message', messageHandler);
+  //     }
+  //   };
 
-  }
+  //   this.signal.on('message', messageHandler);
+  // }
 
-  call(method: string, params: any, cb: Callback) {
-    const id = uuidv4();
+  // notify(method: string, params: any): void {
+  //   this.signal.send(
+  //     JSON.stringify({
+  //       method,
+  //       params,
+  //     })
+  //   );
+  // }
 
-    this.signal.send(
-      JSON.stringify({
-        method,
-        params,
-        id,
-      })
-    );
+  private async init() {
+    const REST_ENDPOINT = "https://qa2-us.100ms.live/init" // @TODO: move to env var?
 
-    const messageHandler = (event: MessageEvent) => {
-      const response = JSON.parse(event.data);
-      if (response.id === id) {
-        cb(response.error, response.result);
-        this.signal.off('message', messageHandler);
-      }
-    };
-
-    this.signal.on('message', messageHandler);
-  }
-
-  notify(method: string, params: any): void {
-    this.signal.send(
-      JSON.stringify({
-        method,
-        params,
-      })
-    );
+    const initResponse = await fetch(REST_ENDPOINT)
+    const config: InitConfig = await initResponse.json()
+    
+    return config
   }
 }
