@@ -17,16 +17,24 @@ export default class HMSTransport extends EventEmitter {
 
   constructor() {
     super();
-    this.signal = new Signal();
+    this.signal = new Signal(); // @TODO: How do we pass the endpoint?
   }
 
   join(joiningParams: JoiningParams, cb: Callback) {
-    this.init().then(config => {
+    this.init().then(async config => {
       const { roomId, token } = joiningParams;
       const endpoint = config.endpoint;
-      log.debug(`Joining with room ${roomId} to endpoint ${endpoint} with token ${token}`);
+      
+      const offer = await this.createOffer()
 
-      cb(null, config);
+      log.debug(`Joining with room ${roomId} to endpoint ${endpoint} with token ${token} with offer ${offer}`);
+
+      this.call("join",{
+        offer,
+        name: "",
+        data: {}
+      }, cb)
+      
       throw "Yet to implement"
     });
   }
@@ -85,5 +93,13 @@ export default class HMSTransport extends EventEmitter {
     const config: InitConfig = await initResponse.json();
 
     return config;
+  }
+
+  private async createOffer() {
+    const pc = new RTCPeerConnection({})
+    return pc.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true
+    })
   }
 }
