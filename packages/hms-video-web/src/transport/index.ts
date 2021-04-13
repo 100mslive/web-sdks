@@ -1,105 +1,80 @@
-import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
-import { Callback, JoiningParams } from './interfaces/transport';
-import log from 'loglevel';
-import fetch from 'node-fetch';
-import HMSSignal from './interfaces/hms-signal';
-import HMSTrack, {HMSTrackSettings} from "./interfaces/hms-track"
-import Signal from "./jsonrpc-signal"
+import ITransportObserver from "./ITransportObserver";
+import ITransport from "./ITransport";
+import HMSPublishConnection from "../connection/publish";
+import HMSSubscribeConnection from "../connection/subscribe";
+import InitService from "../signal/init";
+import {ISignal} from "../signal/ISignal";
+import {ISignalEventsObserver} from "../signal/ISignalEventsObserver";
+import JsonRpcSignal from "../signal/jsonrpc";
+import {HMSTrickle} from "../connection/model";
+import HMSException from "../error/HMSException";
+import {IPublishConnectionObserver} from "../connection/publish/IPublishConnectionObserver";
+import ISubscribeConnectionObserver from "../connection/subscribe/ISubscribeConnectionObserver";
+import HMSTrack from "../media/tracks/HMSTrack";
 
-type InitConfig = {
-  endpoint: string;
-  rtcConfiguration: any;
-};
+export default class HMSTransport implements ITransport {
+  private readonly observer: ITransportObserver;
+  private publishConnection: HMSPublishConnection | null = null
+  private subscribeConnection: HMSSubscribeConnection | null = null
+  private readonly signal: ISignal;
 
-export default class HMSTransport extends EventEmitter {
-  protected signal: HMSSignal;
+  private signalObserver: ISignalEventsObserver;
+  private publishConnectionObserver: IPublishConnectionObserver;
+  private subscribeConnectionObserver: ISubscribeConnectionObserver;
 
-  constructor() {
-    super();
-    this.signal = new Signal(); // @TODO: How do we pass the endpoint?
-  }
+  constructor(observer: ITransportObserver) {
+    this.observer = observer;
+    this.signal = new JsonRpcSignal(<ISignalEventsObserver>{
 
-  join(joiningParams: JoiningParams, cb: Callback) {
-    this.init().then(async config => {
-      const { roomId, token } = joiningParams;
-      const endpoint = config.endpoint;
-      
-      const offer = await this.createOffer()
-
-      log.debug(`Joining with room ${roomId} to endpoint ${endpoint} with token ${token} with offer ${offer}`);
-
-      this.call("join",{
-        offer,
-        name: "",
-        data: {}
-      }, cb)
-      
-      throw "Yet to implement"
-    });
-  }
-
-  leave(cb: Callback) {
-    log.debug(cb)
-    throw "Yet to implement"
-  }
-
-  getLocalTracks(settings: HMSTrackSettings, cb: Callback) {
-    log.debug(settings, cb)
-    throw "Yet to implement"
-  }
-
-  publish(tracks: HMSTrack[], cb: Callback) {
-    log.debug(tracks, cb)
-    throw "Yet to implement"
-  }
-
-  unpublish(tracks: HMSTrack[], cb: Callback) {
-    log.debug(tracks, cb)
-    throw "Yet to implement"
-  }
-
-  call(method: string, params: any, cb: Callback) {
-    const id = uuidv4();
-
-    this.signal.send({
-      method,
-      params,
-      id,
-    });
-
-    const messageHandler = (event: MessageEvent) => {
-      const response = JSON.parse(event.data);
-      if (response.id === id) {
-        cb(response.error, response.result);
-        this.signal.off('message', messageHandler);
+      onOffer: (jsep: RTCSessionDescriptionInit) => {
+      },
+      onTrickle: (trickle: HMSTrickle) => {
+      },
+      onNotification: (message: Object) => {
+      },
+      onFailure: (exception: HMSException) => {
       }
-    };
-
-    this.signal.on('message', messageHandler);
-  }
-
-  notify(method: string, params: any): void {
-    this.signal.send({
-      method,
-      params,
-    });
-  }
-
-  private async init() {
-    const REST_ENDPOINT = 'https://qa2-us.100ms.live/init'; // @TODO: move to env var?
-
-    const initResponse = await fetch(REST_ENDPOINT);
-    const config: InitConfig = await initResponse.json();
-
-    return config;
-  }
-
-  private async createOffer() {
-    const pc = new RTCPeerConnection({})
-    return pc.createOffer({
-      offerToReceiveAudio: true,
-      offerToReceiveVideo: true
     })
+  }
+
+  async join(authToken: string, roomId: string, peerId: string, customData: Object): Promise<void> {
+    const config = await InitService.fetchInitConfig(authToken);
+    await this.signal.open(config.endpoint)
+
+    this.publishConnection = new HMSPublishConnection(
+        this.signal,
+        config.rtcConfiguration,
+        this.publishConnectionObserver
+    )
+
+    this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        config.rtcConfiguration,
+        this.subscribeConnectionObserver
+    )
+
+    const offer = await this.publishConnection.createOffer();
+    await this.publishConnection.setLocalDescription(offer);
+    const answer = await this.signal.join(roomId, peerId, offer, customData);
+    await this.publishConnection.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection.candidates) {
+      await this.publishConnection!.addIceCandidate(candidate);
+    }
+
+    // TODO: Handle exceptions raised - wrap them in HMSException
+  }
+
+  async leave(): Promise<void> {
+    await this.publishConnection!.close();
+    await this.subscribeConnection!.close();
+    await this.signal.close();
+  }
+
+  publish(tracks: Array<HMSTrack>): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  unpublish(tracks: Array<HMSTrack>): Promise<void> {
+    return Promise.resolve(undefined);
   }
 }
