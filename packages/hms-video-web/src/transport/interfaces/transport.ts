@@ -1,4 +1,4 @@
-import Track, { TrackSettings } from './track';
+import HMSTrack, { HMSTrackSettings } from './hms-track';
 
 type Json = {
   [key: string]: string | number | boolean | null | Json | any[];
@@ -26,11 +26,11 @@ export default interface Transport {
 
   leave(roomId: string, callback: Callback): void;
 
-  getLocalTracks(settings: TrackSettings, callback: Callback): Track[];
+  getLocalTracks(settings: HMSTrackSettings, callback: Callback): HMSTrack[];
 
-  publish(tracks: Track[], callback: Callback): void;
+  publish(tracks: HMSTrack[], callback: Callback): void;
 
-  unpublish(tracks: Track[], callback: Callback): void;
+  unpublish(tracks: HMSTrack[], callback: Callback): void;
 
   call(msgParams: MsgParams, callback: Callback): void;
 
@@ -39,4 +39,4 @@ export default interface Transport {
   on(event: string, listener: Function): void;
 }
 
-export { Track, TrackSettings };
+export { HMSTrack, HMSTrackSettings };

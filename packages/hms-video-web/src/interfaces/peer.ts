@@ -1,4 +1,4 @@
-import HMSTrack from '../transport/interfaces/track';
+import HMSTrack from '../transport/interfaces/hms-track';
 import HMSRole from './role';
 
 export default interface HMSPeer {

@@ -1,11 +1,11 @@
-export type TrackSettings = {};
+export type HMSTrackSettings = {};
 
-export default interface Track {
+export default interface HMSTrack {
   layer: 1; // @TODO: Define this
   trackId: string;
   isEnabled: boolean;
   isLocal: boolean;
-  hmsTrackSettings: TrackSettings;
+  hmsTrackSettings: HMSTrackSettings;
 
   addSink(): void;
   removeSink(): void;

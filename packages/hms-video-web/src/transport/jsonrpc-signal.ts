@@ -1,7 +1,7 @@
-import Signal from './interfaces/signal';
+import Signal from './interfaces/hms-signal';
 import { EventEmitter } from 'events';
 
-export class WebsocketSignal extends EventEmitter implements Signal {
+export default class JsonRPCSignal extends EventEmitter implements Signal {
   
   constructor() {
     super()

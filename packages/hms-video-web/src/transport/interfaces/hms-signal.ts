@@ -6,7 +6,7 @@ interface SignalRequest {
   params: string
 }
 
-export default interface Signal extends EventEmitter {
+export default interface HMSSignal extends EventEmitter {
   send(request: SignalRequest): void;
   on(message: "message", handler:Function): this
 }

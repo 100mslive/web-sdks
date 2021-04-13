@@ -11,8 +11,7 @@ describe('bleh', () => {
         done(error)
       }
       
-      console.log(result)
-      expect(result).toEqual(2);
+      expect(result.endpoint).toEqual("wss://qa2-us.100ms.live/v2/ws"); // Not an actual test but just to check our init
       done()
     })
   });
