@@ -1,4 +1,4 @@
-import HMSPeer from './peer';
+import HMSPeer from './hms-peer';
 
 export enum HMSRoomType {
   DEFAULT,

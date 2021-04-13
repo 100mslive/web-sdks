@@ -1,15 +1,19 @@
 import HMSConfig from "./interfaces/config";
 import HMSInterface, { HMSAnalyticsLevel, HMSlogLevel } from "./interfaces/hms"
 import HMSMessage, { HMSMessageListener } from "./interfaces/message";
-import HMSPeer from "./interfaces/peer";
+import HMSPeer from "./interfaces/hms-peer";
 import HMSUpdateListener from "./interfaces/update-listener";
 import HMSTransport from "./transport/interfaces/transport";
 import log from "loglevel"
+import Peer from "./peer";
+import { getRoomId } from "./utils";
 
 export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF
   transport: HMSTransport
+  roomId!: string
+  localPeer!: HMSPeer
 
   constructor(transport: HMSTransport) {
     this.transport = transport
@@ -18,23 +22,36 @@ export default class HMSSdk implements HMSInterface {
   
   join(config: HMSConfig, listener: HMSUpdateListener) {
     log.debug(config, listener)
+
+    const roomId = getRoomId(config.authToken)
     
     this.transport.join({
-      roomId: config.roomId,
+      roomId: roomId,
       token: config.authToken
     }, (error, result) => {
       if(error) throw error
+
+      this.roomId = roomId
+      this.localPeer = new Peer({
+        name: config.userName,
+        isLocal: true
+      })
       
       log.debug(result)
     })
   }
   
   leave() {
-    throw "Yet to implement"
+    if(this.roomId) {
+      this.transport.leave(this.roomId, (error, result) => {
+        if(error) log.error(error)
+        else log.debug(result)
+      })
+    }
   }
   
   getLocalPeer():HMSPeer {
-    throw "Yet to implement"
+    return this.localPeer
   }
   
   getPeers(): HMSPeer[] {

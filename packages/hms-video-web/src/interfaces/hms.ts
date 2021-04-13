@@ -1,6 +1,6 @@
 import HMSConfig from './config';
 import HMSUpdateListener from './update-listener';
-import HMSPeer from './peer';
+import HMSPeer from './hms-peer';
 import HMSMessage, { HMSMessageListener } from './message';
 
 export enum HMSlogLevel {
