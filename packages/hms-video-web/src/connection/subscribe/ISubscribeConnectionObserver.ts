@@ -7,9 +7,9 @@ export default interface ISubscribeConnectionObserver extends IConnectionObserve
    * which is internally.
    *
    * TODO: Notify about all the other data channels to the sdk-layer */
-  onDataChannel(channel: RTCDataChannel): void
+  // onDataChannel(channel: RTCDataChannel): void
 
-  onApiChannelMessage(message: String): void;
+  onApiChannelMessage(message: string): void;
 
   /** Triggered when media is received on a new streams from remote peer. */
   onTrackAdd(track: HMSTrack): void;

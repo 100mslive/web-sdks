@@ -4,11 +4,7 @@ import {ISignalEventsObserver} from "../ISignalEventsObserver";
 import {HMSTrickle} from "../../connection/model";
 import {JsonRpcRequest} from "./models";
 import HMSException from "../../error/HMSException";
-
-interface PromiseCallbacks {
-  resolve: (value: string) => void;
-  reject: (reason?: any) => void;
-}
+import {PromiseCallbacks} from "../../utils/promise";
 
 export default class JsonRpcSignal implements ISignal {
   readonly observer: ISignalEventsObserver;
@@ -26,7 +22,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private socket: WebSocket | null = null
 
-  private callbacks = new Map<string, PromiseCallbacks>();
+  private callbacks = new Map<string, PromiseCallbacks<string>>();
 
   constructor(observer: ISignalEventsObserver) {
     this.observer = observer;

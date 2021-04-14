@@ -19,15 +19,20 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
-    if ('setCodecPreferences' in transceiver) {
-      const cap = RTCRtpSender.getCapabilities(kind);
-      if (!cap)
-        return;
-      const selCodec = cap.codecs.find((c) => c.mimeType.toLowerCase() === `video/${this.constraints.codec.toLowerCase()}` ||
-          c.mimeType.toLowerCase() === `audio/opus`);
-      if (selCodec) {
-        transceiver.setCodecPreferences([selCodec]);
+    // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
+  }
+
+  removeSender(connection: HMSConnection, track: HMSTrack) {
+    connection.getSenders().forEach(sender => {
+      if (sender.track == track.nativeTrack) {
+        connection.removeTrack(sender);
+
+        // Remove the local reference as well
+        const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
+        if (toRemoveLocalTrackIdx !== -1) {
+          this.tracks.splice(toRemoveLocalTrackIdx, 1);
+        } else throw Error(`Cannot find ${track} in locally stored tracks`);
       }
-    } // TODO: Some browsers don't support this, resort to SDPMunging?
+    });
   }
 }

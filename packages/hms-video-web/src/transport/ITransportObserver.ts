@@ -1,5 +1,5 @@
-import HMSTrack from "./interfaces/hms-track";
 import HMSException from "../error/HMSException";
+import HMSTrack from "../media/tracks/HMSTrack";
 
 export default interface ITransportObserver {
   /**

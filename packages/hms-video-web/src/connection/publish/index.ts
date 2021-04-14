@@ -2,24 +2,29 @@ import HMSConnection from "../index";
 import {ISignal} from "../../signal/ISignal";
 import {IPublishConnectionObserver} from "./IPublishConnectionObserver";
 import {HMSConnectionRole} from "../model";
+import {API_DATA_CHANNEL} from "../../utils/constants";
 
 export default class HMSPublishConnection extends HMSConnection {
   private readonly observer: IPublishConnectionObserver;
-  private readonly nativeConnection: RTCPeerConnection;
+  readonly nativeConnection: RTCPeerConnection;
 
   constructor(signal: ISignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.PUBLISH, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
-    this.nativeConnection.createDataChannel("ion-sfu");
+    this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
+      protocol: "SCTP"
+    });
+
     this.nativeConnection.onicecandidate = ({candidate}) => {
       if (candidate) {
         signal.trickle({target: this.role, candidate});
       }
     };
+
     this.nativeConnection.oniceconnectionstatechange = () => {
-      observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
+      this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
   }
 }

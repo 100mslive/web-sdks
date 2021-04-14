@@ -3,7 +3,7 @@ import {ISignal} from "../signal/ISignal";
 
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
-  readonly signal: ISignal;
+  protected readonly signal: ISignal;
 
   abstract readonly nativeConnection: RTCPeerConnection;
   /**
@@ -18,7 +18,7 @@ export default abstract class HMSConnection {
    */
   readonly candidates = new Array<RTCIceCandidateInit>()
 
-  constructor(role: HMSConnectionRole, signal: ISignal) {
+  protected constructor(role: HMSConnectionRole, signal: ISignal) {
     this.role = role;
     this.signal = signal;
   }
@@ -31,6 +31,10 @@ export default abstract class HMSConnection {
     return await this.nativeConnection.createOffer(options)
   }
 
+  async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
+    return await this.nativeConnection.createAnswer(options);
+  }
+
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
     await this.nativeConnection.setLocalDescription(description)
   }
@@ -41,6 +45,18 @@ export default abstract class HMSConnection {
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
     await this.nativeConnection.addIceCandidate(candidate)
+  }
+
+  public get remoteDescription(): RTCSessionDescription | null {
+    return this.nativeConnection.remoteDescription;
+  }
+
+  getSenders(): Array<RTCRtpSender> {
+    return this.nativeConnection.getSenders();
+  }
+
+  removeTrack(sender: RTCRtpSender) {
+    this.nativeConnection.removeTrack(sender);
   }
 
   async close() {
