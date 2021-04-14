@@ -54,3 +54,7 @@ export default class HMSTrackSettings {
     }
   }
 }
+
+namespace HMSoTrackSettings {
+  export type Builder = InstanceType<typeof HMSTrackSettings.Builder>;
+}

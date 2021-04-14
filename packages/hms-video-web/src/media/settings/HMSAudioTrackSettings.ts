@@ -18,6 +18,12 @@ export default class HMSAudioTrackSettings {
     this.deviceId = deviceId;
   }
 
+  toConstraints(): MediaTrackConstraints {
+    return {
+      deviceId: this.deviceId
+    }
+  }
+
   static Builder = class {
     private _volume: number = 1.0;
     private _codec: HMSAudioCodec = HMSAudioCodec.OPUS;
@@ -56,5 +62,8 @@ export default class HMSAudioTrackSettings {
       );
     }
   }
+}
 
+namespace HMSAudioTrackSettings {
+  export type Builder = InstanceType<typeof HMSAudioTrackSettings.Builder>;
 }

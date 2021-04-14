@@ -22,6 +22,15 @@ export default class HMSVideoTrackSettings {
     this.deviceId = deviceId;
   }
 
+  toConstraints(): MediaTrackConstraints {
+    return {
+      width: this.resolution.width,
+      height: this.resolution.height,
+      frameRate: this.maxFrameRate,
+      deviceId: this.deviceId,
+    }
+  }
+
   static Builder = class {
     private _resolution: HMSVideoResolution = new HMSVideoResolution(320, 180);
     private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
@@ -67,5 +76,8 @@ export default class HMSVideoTrackSettings {
       );
     }
   }
+}
 
+namespace HMSVideoTrackSettings {
+  export type Builder = InstanceType<typeof HMSVideoTrackSettings.Builder>;
 }

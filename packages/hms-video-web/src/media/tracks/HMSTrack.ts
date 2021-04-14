@@ -4,7 +4,11 @@ import {HMSTrackType} from "./HMSTrackType";
 export default abstract class HMSTrack {
   readonly trackId: string;
   readonly stream: HMSMediaStream;
-  readonly nativeTrack: MediaStreamTrack;
+
+  /** Changes only when un-muting the local track
+   * i.e replacing the nativeTrack with different `deviceId`
+   * track. */
+  nativeTrack: MediaStreamTrack;
 
   readonly abstract type: HMSTrackType
 

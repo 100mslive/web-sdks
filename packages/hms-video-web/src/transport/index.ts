@@ -134,7 +134,8 @@ export default class HMSTransport implements ITransport {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {resolve, reject});
     });
     const stream = <HMSLocalStream>track.stream;
-    stream.addTransceiver(this.publishConnection!, track);
+    stream.setConnection(this.publishConnection!);
+    stream.addTransceiver(track);
     await p;
   }
 
@@ -143,7 +144,7 @@ export default class HMSTransport implements ITransport {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {resolve, reject});
     });
     const stream = <HMSLocalStream>track.stream;
-    stream.removeSender(this.publishConnection!, track);
+    stream.removeSender(track);
     await p;
   }
 
