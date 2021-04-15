@@ -25,76 +25,34 @@ export default abstract class HMSConnection {
     this.signal = signal;
   }
 
-  addTransceiver(
-    track: MediaStreamTrack,
-    init: RTCRtpTransceiverInit
-  ): RTCRtpTransceiver {
+  addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  async createOffer(
-    options: RTCOfferOptions | undefined = undefined
-  ): Promise<RTCSessionDescriptionInit> {
+  async createOffer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
     const offer = await this.nativeConnection.createOffer(options);
-    HMSLogger.d(
-      TAG,
-      `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`
-    );
+    HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
     return offer;
   }
 
-  async createAnswer(
-    options: RTCOfferOptions | undefined = undefined
-  ): Promise<RTCSessionDescriptionInit> {
+  async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
     const answer = await this.nativeConnection.createAnswer(options);
-    HMSLogger.d(
-      TAG,
-      `[role=${this.role}] createAnswer answer=${JSON.stringify(
-        answer,
-        null,
-        1
-      )}`
-    );
+    HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
     return answer;
   }
 
-  async setLocalDescription(
-    description: RTCSessionDescriptionInit
-  ): Promise<void> {
-    HMSLogger.d(
-      TAG,
-      `[role=${this.role}] setLocalDescription description=${JSON.stringify(
-        description,
-        null,
-        1
-      )}`
-    );
+  async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
     await this.nativeConnection.setLocalDescription(description);
   }
 
-  async setRemoteDescription(
-    description: RTCSessionDescriptionInit
-  ): Promise<void> {
-    HMSLogger.d(
-      TAG,
-      `[role=${this.role}] setRemoteDescription description=${JSON.stringify(
-        description,
-        null,
-        1
-      )}`
-    );
+  async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
     await this.nativeConnection.setRemoteDescription(description);
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
-    HMSLogger.d(
-      TAG,
-      `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(
-        candidate,
-        null,
-        1
-      )}`
-    );
+    HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate);
   }
 

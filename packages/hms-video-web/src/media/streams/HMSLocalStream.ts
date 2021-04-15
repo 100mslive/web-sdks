@@ -4,6 +4,7 @@ import HMSTrackSettings from '../settings/HMSTrackSettings';
 import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
+import log from 'loglevel';
 
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
@@ -55,13 +56,12 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
+    log.debug(transceiver, kind);
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
   }
 
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection!.getSenders().find(
-      sender => sender.track && sender.track!.id === track.trackId
-    );
+    const sender = this.connection!.getSenders().find((sender) => sender.track && sender.track!.id === track.trackId);
     if (sender === undefined) throw Error(`No sender found for track=${track}`);
     sender.track!.stop();
     await sender.replaceTrack(withTrack);

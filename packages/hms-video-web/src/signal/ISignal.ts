@@ -12,12 +12,7 @@ export interface ISignal {
   /** Closes the connection to the `uri` passed in [open] */
   close(): Promise<void>;
 
-  join(
-    roomId: string,
-    uid: string,
-    offer: RTCSessionDescriptionInit,
-    info: Object
-  ): Promise<RTCSessionDescriptionInit>;
+  join(roomId: string, uid: string, offer: RTCSessionDescriptionInit, info: Object): Promise<RTCSessionDescriptionInit>;
 
   offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>;
 

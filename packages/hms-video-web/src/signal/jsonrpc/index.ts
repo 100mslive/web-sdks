@@ -50,7 +50,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   open(uri: string): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.socket = new WebSocket(uri);
       const openHandler = () => {
         resolve();
@@ -58,14 +58,12 @@ export default class JsonRpcSignal implements ISignal {
       };
 
       this.socket.addEventListener('open', openHandler);
-      this.socket.addEventListener('message', event =>
-        this.onMessageHandler(event.data)
-      );
+      this.socket.addEventListener('message', (event) => this.onMessageHandler(event.data));
     });
   }
 
   async close(): Promise<void> {
-    const p = new Promise<void>(resolve => {
+    const p = new Promise<void>((resolve) => {
       this.socket!.addEventListener('close', () => resolve());
     });
 
@@ -78,28 +76,20 @@ export default class JsonRpcSignal implements ISignal {
     sid: string,
     uid: string,
     offer: RTCSessionDescriptionInit,
-    info: Object
+    info: Object,
   ): Promise<RTCSessionDescriptionInit> {
     const params = { sid, uid, offer, info };
-    const response = (await this.call(
-      'join',
-      params
-    )) as RTCSessionDescriptionInit;
+    const response = (await this.call('join', params)) as RTCSessionDescriptionInit;
 
     this.isJoinCompleted = true;
-    this.pendingTrickle.forEach(trickle => this.trickle(trickle));
+    this.pendingTrickle.forEach((trickle) => this.trickle(trickle));
     this.pendingTrickle.length = 0;
 
-    HMSLogger.d(
-      this.TAG,
-      `join: response=${JSON.stringify(response, null, 1)}`
-    );
+    HMSLogger.d(this.TAG, `join: response=${JSON.stringify(response, null, 1)}`);
     return response;
   }
 
-  async offer(
-    offer: RTCSessionDescriptionInit
-  ): Promise<RTCSessionDescriptionInit> {
+  async offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
     return (await this.call('offer', {
       desc: offer,
     })) as RTCSessionDescriptionInit;
@@ -144,9 +134,6 @@ export default class JsonRpcSignal implements ISignal {
       } else {
         this.observer.onNotification(response);
       }
-    } else
-      throw Error(
-        `WebSocket message has no 'method' or 'id' field, message=${response}`
-      );
+    } else throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
   }
 }

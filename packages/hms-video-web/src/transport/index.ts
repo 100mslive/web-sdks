@@ -43,9 +43,7 @@ export default class HMSTransport implements ITransport {
     },
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
-        trickle.target === HMSConnectionRole.PUBLISH
-          ? this.publishConnection!
-          : this.subscribeConnection!;
+        trickle.target === HMSConnectionRole.PUBLISH ? this.publishConnection! : this.subscribeConnection!;
       if (connection.remoteDescription === null) {
         // ICE candidates can't be added without any remote session description
         connection.candidates.push(trickle.candidate);
@@ -108,28 +106,21 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(
-    authToken: string,
-    roomId: string,
-    peerId: string,
-    customData: Object
-  ): Promise<void> {
+  async join(authToken: string, roomId: string, peerId: string, customData: Object): Promise<void> {
     const config = await InitService.fetchInitConfig(authToken);
-    await this.signal.open(
-      `${config.endpoint}?peer=${peerId}&token=${authToken}`
-    );
+    await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`);
     HMSLogger.d(this.TAG, 'join: connected to ws endpoint');
 
     this.publishConnection = new HMSPublishConnection(
       this.signal,
       config.rtcConfiguration,
-      this.publishConnectionObserver
+      this.publishConnectionObserver,
     );
 
     this.subscribeConnection = new HMSSubscribeConnection(
       this.signal,
       config.rtcConfiguration,
-      this.subscribeConnectionObserver
+      this.subscribeConnectionObserver,
     );
 
     HMSLogger.d(this.TAG, 'join: Negotiating over PUBLISH connection ⏰');

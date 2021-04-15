@@ -18,20 +18,13 @@ export default class HMSDataChannel {
     return this.nativeChannel.label;
   }
 
-  constructor(
-    nativeChannel: RTCDataChannel,
-    observer: DataChannelObserver,
-    metadata: string = ''
-  ) {
+  constructor(nativeChannel: RTCDataChannel, observer: DataChannelObserver, metadata: string = '') {
     this.nativeChannel = nativeChannel;
     this.observer = observer;
     this.metadata = metadata;
 
-    nativeChannel.onmessage = e => {
-      HMSLogger.d(
-        this.TAG,
-        `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`
-      );
+    nativeChannel.onmessage = (e) => {
+      HMSLogger.d(this.TAG, `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`);
 
       // Right now we only receive an array
       this.observer.onMessage(e.data);
@@ -44,10 +37,7 @@ export default class HMSDataChannel {
       throw Error(`Channel ${this.label} not yet ready`);
     }
 
-    HMSLogger.d(
-      this.TAG,
-      `[${this.metadata}] Sending [size=${message.length}] message=${message}`
-    );
+    HMSLogger.d(this.TAG, `[${this.metadata}] Sending [size=${message.length}] message=${message}`);
     this.nativeChannel.send(message);
   }
 

@@ -23,12 +23,10 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
-      this.observer.onIceConnectionChange(
-        this.nativeConnection.iceConnectionState
-      );
+      this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
 
-    this.nativeConnection.ondatachannel = e => {
+    this.nativeConnection.ondatachannel = (e) => {
       if (e.channel.label !== API_DATA_CHANNEL) {
         // TODO: this.observer.onDataChannel(e.channel);
         return;
@@ -41,11 +39,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
             this.observer.onApiChannelMessage(value);
           },
         },
-        `role=${this.role}`
+        `role=${this.role}`,
       );
     };
 
-    this.nativeConnection.onicecandidate = e => {
+    this.nativeConnection.onicecandidate = (e) => {
       if (e.candidate !== null) {
         this.signal.trickle({
           candidate: e.candidate,
@@ -54,16 +52,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
     };
 
-    this.nativeConnection.ontrack = e => {
+    this.nativeConnection.ontrack = (e) => {
       const stream = e.streams[0];
       if (!this.remoteStreams.has(stream.id)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(stream.id, remote);
 
-        stream.onremovetrack = e => {
-          const toRemoveTrackIdx = remote.tracks.findIndex(
-            track => track.trackId === e.track.id
-          );
+        stream.onremovetrack = (e) => {
+          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === e.track.id);
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
@@ -78,19 +74,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
 
       const remote = this.remoteStreams.get(stream.id)!;
-      const TrackCls =
-        e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
+      const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
       remote.tracks.push(track);
       this.observer.onTrackAdd(track);
     };
   }
 
-  constructor(
-    signal: ISignal,
-    config: RTCConfiguration,
-    observer: ISubscribeConnectionObserver
-  ) {
+  constructor(signal: ISignal, config: RTCConfiguration, observer: ISubscribeConnectionObserver) {
     super(HMSConnectionRole.SUBSCRIBE, signal);
     this.observer = observer;
 

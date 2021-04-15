@@ -1,7 +1,8 @@
+import log from 'loglevel';
 import { InitConfig } from './models';
-import HMSLogger from '../../utils/logger';
+// import HMSLogger from '../../utils/logger';
 
-const INIT_API_ENDPOINT = 'https://qa2-us.100ms.live/init';
+// const INIT_API_ENDPOINT = 'https://qa2-us.100ms.live/init';
 
 const CORS_HACKY_FIX = {
   // endpoint: "wss://qa2-us.100ms.live/v2/ws",
@@ -20,10 +21,8 @@ const CORS_HACKY_FIX = {
 export default class InitService {
   private static readonly TAG = 'InitService';
 
-  static async fetchInitConfig(
-    token: string,
-    region: string = ''
-  ): Promise<InitConfig> {
+  static async fetchInitConfig(token: string, region: string = ''): Promise<InitConfig> {
+    log.debug(this.TAG, token, region);
     /* let url = `${INIT_API_ENDPOINT}?token=${token}`
     if (region.length > 0) {
       url += `&region=${region}`;

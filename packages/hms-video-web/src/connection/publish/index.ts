@@ -11,11 +11,7 @@ export default class HMSPublishConnection extends HMSConnection {
   private readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
 
-  constructor(
-    signal: ISignal,
-    config: RTCConfiguration,
-    observer: IPublishConnectionObserver
-  ) {
+  constructor(signal: ISignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.PUBLISH, signal);
     this.observer = observer;
 
@@ -31,9 +27,7 @@ export default class HMSPublishConnection extends HMSConnection {
     };
 
     this.nativeConnection.oniceconnectionstatechange = () => {
-      this.observer.onIceConnectionChange(
-        this.nativeConnection.iceConnectionState
-      );
+      this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
   }
 

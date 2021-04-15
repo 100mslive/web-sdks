@@ -1,7 +1,5 @@
 import HMSVideoTrackSettings from './HMSVideoTrackSettings';
-import HMSAudioTrackSettings, {
-  HMSAudioTrackSettingsBuilder,
-} from './HMSAudioTrackSettings';
+import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
 import { DefaultVideoSettings } from './index';
 
 export class HMSTrackSettingsBuilder {
@@ -26,15 +24,11 @@ export class HMSTrackSettingsBuilder {
 
   build() {
     if (this._audio === null && this._video === null) {
-      throw Error(
-        'There is no media to return. Please select either video or audio or both'
-      );
+      throw Error('There is no media to return. Please select either video or audio or both');
     }
 
     if (this._video === null && this._simulcast) {
-      throw Error(
-        'Cannot enable simulcast when no video settings are provided'
-      );
+      throw Error('Cannot enable simulcast when no video settings are provided');
     }
 
     return new HMSTrackSettings(this._video, this._audio, this._simulcast);
@@ -46,11 +40,7 @@ export default class HMSTrackSettings {
   readonly audio: HMSAudioTrackSettings | null;
   readonly simulcast: boolean;
 
-  constructor(
-    video: HMSVideoTrackSettings | null,
-    audio: HMSAudioTrackSettings | null,
-    simulcast: boolean
-  ) {
+  constructor(video: HMSVideoTrackSettings | null, audio: HMSAudioTrackSettings | null, simulcast: boolean) {
     this.video = video;
     this.audio = audio;
     this.simulcast = simulcast;

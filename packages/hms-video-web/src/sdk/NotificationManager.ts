@@ -2,7 +2,13 @@ import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks/HMSTrackType';
 import Peer from '../peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
-import { Peer as PeerNotification, Stream, StreamInternal, HMSNotifications, PeerList } from './models/HMSNotifications';
+import {
+  Peer as PeerNotification,
+  Stream,
+  StreamInternal,
+  HMSNotifications,
+  PeerList,
+} from './models/HMSNotifications';
 import log from 'loglevel';
 
 export default class NotificationManager {
@@ -98,9 +104,9 @@ export default class NotificationManager {
   private handlePeerJoin = (peer: PeerNotification) => {
     const hmsPeer = new Peer({
       peerId: peer.uid,
-      name: (peer.info && peer.info.userName)? peer.info.userName: "",
+      name: peer.info && peer.info.userName ? peer.info.userName : '',
       isLocal: false,
-      customerDescription: (peer.info && peer.info.metadata)? peer.info.metadata: "",
+      customerDescription: peer.info && peer.info.metadata ? peer.info.metadata : '',
     });
     this.hmsPeerList.push(hmsPeer);
   };
@@ -115,26 +121,26 @@ export default class NotificationManager {
     const peers = peerList.peers;
     const streams = peerList.streams;
 
-    peers && peers.forEach(peer => this.handlePeerJoin(peer));
+    peers && peers.forEach((peer) => this.handlePeerJoin(peer));
 
-    streams && streams.forEach(stream => this.handleStreamAdd(stream));
+    streams && streams.forEach((stream) => this.handleStreamAdd(stream));
   };
 
   private handleStreamAdd = (stream: StreamInternal) => {
     this.streamIdToUIDMap.set(stream.streamId, stream.uid);
     // Check if onTrackAdd event already came before this
     if (this.streamIdToTrackMap.has(stream.streamId)) {
-        const hmsPeer = this.findPeerByUID(stream.uid);
-        const hmsTrack = this.streamIdToTrackMap.get(stream.streamId);
-        if (hmsTrack && hmsPeer) {
-            switch(hmsTrack.type) {
-                case HMSTrackType.AUDIO:
-                    hmsPeer.audioTrack = hmsTrack;
-                    break;
-                case HMSTrackType.VIDEO:
-                    hmsPeer.videoTrack = hmsTrack;
-            }
+      const hmsPeer = this.findPeerByUID(stream.uid);
+      const hmsTrack = this.streamIdToTrackMap.get(stream.streamId);
+      if (hmsTrack && hmsPeer) {
+        switch (hmsTrack.type) {
+          case HMSTrackType.AUDIO:
+            hmsPeer.audioTrack = hmsTrack;
+            break;
+          case HMSTrackType.VIDEO:
+            hmsPeer.videoTrack = hmsTrack;
         }
+      }
     }
   };
 }

@@ -1,4 +1,4 @@
-import HMSLogger from '../utils/logger';
+// import HMSLogger from '../utils/logger';
 
 export interface CodeMessage {
   code: number;
@@ -22,7 +22,7 @@ export class HMSExceptionBuilder {
 }
 
 export default class HMSException extends Error {
-  private code: number;
+  readonly code: number;
 
   constructor(code: number, message: string) {
     super(message);

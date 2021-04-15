@@ -12,9 +12,10 @@ import { getNotification, HMSNotifications, Peer as PeerNotification } from './s
 import NotificationManager from './sdk/NotificationManager';
 import HMSTrack from './media/tracks/HMSTrack';
 import HMSException from './error/HMSException';
-import HMSTrackSettings, {HMSTrackSettingsBuilder} from './media/settings/HMSTrackSettings';
+import HMSTrackSettings, { HMSTrackSettingsBuilder } from './media/settings/HMSTrackSettings';
 import { HMSTrackType } from './media/tracks/HMSTrackType';
 import HMSRoom from './sdk/models/HMSRoom';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -70,15 +71,14 @@ export default class HMSSdk implements HMSInterface {
     this.listener = listener;
 
     const roomId = getRoomId(config.authToken);
-    const peerId = uuidv4()
+    const peerId = uuidv4();
 
-    this.transport.join(config.authToken,roomId,peerId, config.metaData )
-      .then(this.publishLocalTracks)
+    this.transport.join(config.authToken, roomId, peerId, config.metaData).then(this.publishLocalTracks);
   }
 
   leave() {
     if (this.roomId) {
-      this.transport.leave()
+      this.transport.leave();
     }
   }
 
@@ -127,11 +127,10 @@ export default class HMSSdk implements HMSInterface {
         break;
       case HMSNotificationMethod.PEER_LIST:
         // TODO: Move getLocalTracks to immediate after `transportLayer.join`
-        this.transport.getLocalTracks(this.hmsSettings)
-        .then(hmsTracks => {
-          hmsTracks.forEach(hmsTrack => {
+        this.transport.getLocalTracks(this.hmsSettings).then((hmsTracks) => {
+          hmsTracks.forEach((hmsTrack) => {
             switch (hmsTrack.type) {
-              case HMSTrackType.AUDIO: 
+              case HMSTrackType.AUDIO:
                 this.localPeer.audioTrack = hmsTrack;
                 break;
               case HMSTrackType.VIDEO:
@@ -143,21 +142,21 @@ export default class HMSSdk implements HMSInterface {
           this.transport.publish(hmsTracks);
         });
         break;
-      case HMSNotificationMethod.STREAM_ADD:  // TODO: Write code for this
+      case HMSNotificationMethod.STREAM_ADD: // TODO: Write code for this
         return;
       case HMSNotificationMethod.ACTIVE_SPEAKERS: // TODO: Write code for this
         return;
     }
-  };
+  }
 
   createRoom() {
     const hmsPeerList = this.getPeers();
-    this.hmsRoom = new HMSRoom(this.localPeer.peerId, "", hmsPeerList);
+    this.hmsRoom = new HMSRoom(this.localPeer.peerId, '', hmsPeerList);
     return this.hmsRoom;
-  };
+  }
 
   private async publishLocalTracks() {
-    const tracks = await this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build())
-    await this.transport.publish(tracks)
+    const tracks = await this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build());
+    await this.transport.publish(tracks);
   }
 }

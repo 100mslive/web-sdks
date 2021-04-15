@@ -19,8 +19,7 @@ export class HMSAudioTrackSettingsBuilder {
   ];
 
   volume(volume: number) {
-    if (!(0.0 <= volume && volume <= 1.0))
-      throw Error('volume can only be in range [0.0, 1.0]');
+    if (!(0.0 <= volume && volume <= 1.0)) throw Error('volume can only be in range [0.0, 1.0]');
     this._volume = volume;
     return this;
   }
@@ -48,13 +47,7 @@ export class HMSAudioTrackSettingsBuilder {
   }
 
   build() {
-    return new HMSAudioTrackSettings(
-      this._volume,
-      this._codec,
-      this._maxBitRate,
-      this._deviceId,
-      this._advanced
-    );
+    return new HMSAudioTrackSettings(this._volume, this._codec, this._maxBitRate, this._deviceId, this._advanced);
   }
 }
 
@@ -70,7 +63,7 @@ export default class HMSAudioTrackSettings {
     codec: HMSAudioCodec,
     maxBitRate: number,
     deviceId: string,
-    advanced: Array<MediaTrackConstraintSet>
+    advanced: Array<MediaTrackConstraintSet>,
   ) {
     this.volume = volume;
     this.codec = codec;

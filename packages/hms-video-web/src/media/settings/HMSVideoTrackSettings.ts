@@ -49,7 +49,7 @@ export class HMSVideoTrackSettingsBuilder {
       this._maxFrameRate,
       this._maxBitRate,
       this._deviceId,
-      this._advanced
+      this._advanced,
     );
   }
 }
@@ -68,7 +68,7 @@ export default class HMSVideoTrackSettings {
     maxFrameRate: number,
     maxBitRate: number,
     deviceId: string,
-    advanced: Array<MediaTrackConstraintSet>
+    advanced: Array<MediaTrackConstraintSet>,
   ) {
     this.resolution = resolution;
     this.codec = codec;

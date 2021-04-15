@@ -30,12 +30,7 @@ export default class HMSLogger {
     this.log(HMSLogLevel.ERROR, tag, message, optionalParams);
   }
 
-  private static log(
-    level: HMSLogLevel,
-    tag: string,
-    message: string,
-    ...optionalParams: any[]
-  ) {
+  private static log(level: HMSLogLevel, tag: string, message: string, ...optionalParams: any[]) {
     if (this.level.valueOf() > level.valueOf()) {
       return;
     }

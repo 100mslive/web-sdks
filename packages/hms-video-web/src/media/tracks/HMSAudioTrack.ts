@@ -7,7 +7,6 @@ export default class HMSAudioTrack extends HMSTrack {
 
   protected constructor(stream: HMSMediaStream, track: MediaStreamTrack) {
     super(stream, track);
-    if (track.kind !== 'audio')
-      throw new Error("Expected 'track' kind = 'audio'");
+    if (track.kind !== 'audio') throw new Error("Expected 'track' kind = 'audio'");
   }
 }
