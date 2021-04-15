@@ -1,3 +1,5 @@
+import HMSTrack from '../media/tracks/HMSTrack';
+import HMSPeer from './hms-peer';
 import HMSRoom from './room';
 import { HMSError } from './types';
 
@@ -13,19 +15,24 @@ export enum HMSRoomUpdate {
 }
 
 export enum HMSPeerUpdate {
-  VIDEO_TRACK_ADDED,
-  VIDEO_TRACK_REMOVED,
-  AUDIO_TRACK_ADDED,
-  AUDIO_TRACK_REMOVED,
+  PEER_JOINED,
+  PEER_LEFT,
   AUDIO_TOGGLED,
   VIDEO_TOGGLED,
-  ROLE_UPDATED,
-  DEFAULT_UPDATE,
+}
+
+export enum HMSTrackUpdate {
+  TRACK_ADDED,
+  TRACK_REMOVED,
+  TRACK_MUTED,
+  TRACK_UNMUTED,
+  TRACK_DESCRIPTION_CHANGED
 }
 
 export default interface HMSUpdateListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
-  onPeerUpdate(type: HMSPeerUpdate, room: HMSRoom): void;
-  onerror(error: HMSError): void;
+  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer): void;
+  onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
+  onError(error: HMSError): void;
 }

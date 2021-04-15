@@ -15,12 +15,12 @@ export enum HMSAnalyticsLevel {
   OFF,
   ERROR,
   INFO,
-  VERBOSE
+  VERBOSE,
 }
 
 export default interface HMS {
-  logLevel: HMSlogLevel
-  analyticsLevel: HMSAnalyticsLevel
+  logLevel: HMSlogLevel;
+  analyticsLevel: HMSAnalyticsLevel;
   join(config: HMSConfig, callback: HMSUpdateListener): void;
   leave(): void;
   getLocalPeer(): HMSPeer;

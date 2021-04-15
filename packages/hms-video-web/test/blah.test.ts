@@ -1,5 +1,5 @@
 describe('test', () => {
   it('works', () => {
-    expect(1+1).toEqual(2);
+    expect(1 + 1).toEqual(2);
   });
 });

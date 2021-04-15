@@ -26,7 +26,7 @@ export default class InitService {
   ): Promise<InitConfig> {
     /* let url = `${INIT_API_ENDPOINT}?token=${token}`
     if (region.length > 0) {
-      url += `&region=${region}`
+      url += `&region=${region}`;
     }
 
     // TODO: Add user-agent, handle error status codes

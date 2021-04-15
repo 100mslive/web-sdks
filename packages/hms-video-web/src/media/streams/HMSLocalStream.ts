@@ -70,7 +70,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   removeSender(track: HMSTrack) {
-    this.connection!.getSenders().forEach(sender => {
+    this.connection!.getSenders().forEach((sender) => {
       if (sender.track && sender.track.id === track.trackId) {
         this.connection!.removeTrack(sender);
 
