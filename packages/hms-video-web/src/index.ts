@@ -7,11 +7,13 @@ import ITransportObserver from './transport/ITransportObserver';
 import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from './interfaces/update-listener';
 import log from 'loglevel';
 import Peer from './peer';
-import { getRoomId } from './utils';
+import { getRoomId } from './utils/room';
 import { getNotificationMethod, HMSNotificationMethod } from './sdk/models/enums/HMSNotificationMethod';
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './sdk/models/HMSNotifications';
 import NotificationManager from './sdk/NotificationManager';
 import HMSTrack from './media/tracks/HMSTrack';
+import {v4 as uuidv4} from "uuid"
+import {HMSTrackSettingsBuilder} from './media/settings/HMSTrackSettings';
 
 export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -30,37 +32,18 @@ export default class HMSSdk implements HMSInterface {
   }
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
-    log.debug(config, listener);
+    this.listener = listener;
 
     const roomId = getRoomId(config.authToken);
+    const peerId = uuidv4()
 
-    this.transport.join(
-      {
-        roomId: roomId,
-        token: config.authToken,
-      },
-      (error, result) => {
-        if (error) throw error;
-
-        this.roomId = roomId;
-        this.localPeer = new Peer({
-          name: config.userName,
-          isLocal: true,
-        });
-
-        log.debug(result);
-      },
-    );
-
-    this.listener = listener;
+    this.transport.join(config.authToken,roomId,peerId, config.metaData )
+      .then(this.publishLocalTracks)
   }
 
   leave() {
     if (this.roomId) {
-      this.transport.leave(this.roomId, (error, result) => {
-        if (error) log.error(error);
-        else log.debug(result);
-      });
+      this.transport.leave()
     }
   }
 
@@ -145,4 +128,9 @@ export default class HMSSdk implements HMSInterface {
 
     onFailure: () => {},
   };
+
+  private async publishLocalTracks() {
+    const tracks = await this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build())
+    await this.transport.publish(tracks)
+  }
 }

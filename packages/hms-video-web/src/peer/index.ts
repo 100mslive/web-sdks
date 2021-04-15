@@ -1,5 +1,4 @@
 import HMSPeer from '../interfaces/hms-peer';
-import { v4 as uuidv4 } from 'uuid';
 import HMSTrack from '../media/tracks/HMSTrack';
 
 type HMSPeerInit = {
@@ -10,7 +9,7 @@ type HMSPeerInit = {
 };
 
 export default class Peer implements HMSPeer {
-  peerId: string = uuidv4();
+  peerId: string;
   isLocal: boolean;
   name: string;
   customerDescription: string = '';
