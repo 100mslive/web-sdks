@@ -35,27 +35,33 @@ export default class HMSLogger {
       return;
     }
 
+    let method;
     switch (level) {
       case HMSLogLevel.VERBOSE: {
-        console.log(`${tag}: ${message}`, ...optionalParams);
+        method = console.log;
         break;
       }
       case HMSLogLevel.DEBUG: {
-        console.debug(`${tag}: ${message}`, ...optionalParams);
+        method = console.debug;
         break;
       }
       case HMSLogLevel.INFO: {
-        console.info(`${tag}: ${message}`, ...optionalParams);
+        method = console.info;
         break;
       }
       case HMSLogLevel.WARN: {
-        console.warn(`${tag}: ${message}`, ...optionalParams);
+        method = console.warn;
         break;
       }
       case HMSLogLevel.ERROR: {
-        console.error(`${tag}: ${message}`, ...optionalParams);
+        method = console.error;
         break;
       }
+    }
+    if (optionalParams.length > 0) {
+      method && method(`${tag}: ${message}`, ...optionalParams);
+    } else {
+      method && method(`${tag}: ${message}`, ...optionalParams);
     }
   }
 };

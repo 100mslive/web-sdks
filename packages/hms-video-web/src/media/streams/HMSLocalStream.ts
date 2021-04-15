@@ -1,5 +1,4 @@
 import HMSMediaStream from "./HMSMediaStream";
-import HMSConnection from "../../connection";
 import HMSTrack from "../tracks/HMSTrack";
 import HMSTrackSettings from "../settings/HMSTrackSettings";
 import HMSLocalAudioTrack from "../tracks/HMSLocalAudioTrack";
@@ -23,6 +22,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       audio: (settings.audio != null ? settings.audio!.toConstraints() : false),
       video: (settings.video != null ? settings.video!.toConstraints() : false),
     });
+
     // TODO: Handle error cases, wrap in `HMSException` and throw it
     const local = new HMSLocalStream(stream);
     const tracks: Array<HMSTrack> = [];
@@ -63,7 +63,7 @@ export default class HMSLocalStream extends HMSMediaStream {
         .getSenders()
         .find((sender) => sender.track && sender.track!.id === track.trackId);
     if (sender === undefined) throw Error(`No sender found for track=${track}`)
-    sender.track.stop();
+    sender.track!.stop();
     await sender.replaceTrack(withTrack);
 
     track.nativeTrack = withTrack;

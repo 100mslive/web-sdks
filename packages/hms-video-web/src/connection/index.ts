@@ -1,6 +1,8 @@
 import {HMSConnectionRole} from "./model";
 import {ISignal} from "../signal/ISignal";
+import HMSLogger from "../utils/logger";
 
+const TAG = "HMSConnection";
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;
@@ -28,22 +30,29 @@ export default abstract class HMSConnection {
   }
 
   async createOffer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
-    return await this.nativeConnection.createOffer(options)
+    const offer = await this.nativeConnection.createOffer(options)
+    HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
+    return offer;
   }
 
   async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
-    return await this.nativeConnection.createAnswer(options);
+    const answer = await this.nativeConnection.createAnswer(options);
+    HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
+    return answer;
   }
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
     await this.nativeConnection.setLocalDescription(description)
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
     await this.nativeConnection.setRemoteDescription(description)
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
+    HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate)
   }
 

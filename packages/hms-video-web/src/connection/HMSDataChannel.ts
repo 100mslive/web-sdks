@@ -25,7 +25,9 @@ export default class HMSDataChannel {
 
     nativeChannel.onmessage = (e) => {
       HMSLogger.d(this.TAG, `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`);
-      this.observer.onMessage(JSON.parse(e.data));
+
+      // Right now we only receive an array
+      this.observer.onMessage(e.data);
     };
   }
 

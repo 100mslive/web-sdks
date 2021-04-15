@@ -3,10 +3,12 @@ import {ISignal} from "../ISignal";
 import {ISignalEventsObserver} from "../ISignalEventsObserver";
 import {HMSTrickle} from "../../connection/model";
 import {JsonRpcRequest} from "./models";
-import HMSException from "../../error/HMSException";
+import {HMSExceptionBuilder} from "../../error/HMSException";
 import {PromiseCallbacks} from "../../utils/promise";
+import HMSLogger from "../../utils/logger";
 
 export default class JsonRpcSignal implements ISignal {
+  private readonly TAG = "JsonRpcSignal";
   readonly observer: ISignalEventsObserver;
 
   /**
@@ -32,7 +34,6 @@ export default class JsonRpcSignal implements ISignal {
     const id = v4();
     const message = {method, params, id} as JsonRpcRequest;
 
-    console.debug(`%c[jsonrpc] Received ws message: ${JSON.stringify(message, null, 1)}`, 'color: SkyBlue');
     this.socket!.send(JSON.stringify(message));
 
     const response = await new Promise<string>((resolve, reject) => {
@@ -45,7 +46,6 @@ export default class JsonRpcSignal implements ISignal {
   private notify(method: string, params: any) {
     const message = {method, params};
 
-    console.debug(`%c[jsonrpc] Received ws message: ${JSON.stringify(message, null, 1)}`, 'color: SkyBlue');
     this.socket!.send(JSON.stringify(message));
   }
 
@@ -54,9 +54,10 @@ export default class JsonRpcSignal implements ISignal {
       this.socket = new WebSocket(uri);
       const openHandler = () => {
         resolve();
-        this.socket?.removeEventListener("open", openHandler);
+        this.socket!.removeEventListener("open", openHandler);
       }
 
+      this.socket.addEventListener("open", openHandler);
       this.socket.addEventListener("message", (event) => this.onMessageHandler(event.data));
     }))
   }
@@ -79,15 +80,16 @@ export default class JsonRpcSignal implements ISignal {
     this.pendingTrickle.forEach((trickle) => this.trickle(trickle));
     this.pendingTrickle.length = 0;
 
+    HMSLogger.d(this.TAG, `join: response=${JSON.stringify(response, null, 1)}`);
     return response;
   }
 
   async offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
-    return await this.call("offer", offer) as RTCSessionDescriptionInit;
+    return await this.call("offer", {desc: offer}) as RTCSessionDescriptionInit;
   }
 
   answer(answer: RTCSessionDescriptionInit) {
-    this.notify("answer", answer);
+    this.notify("answer", {desc: answer});
   }
 
   trickle(trickle: HMSTrickle) {
@@ -99,10 +101,9 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private onMessageHandler(text: string) {
-    console.debug(`%c[jsonrpc] Received ws message: ${JSON.stringify(text, null, 1)}`, 'color: SkyBlue');
     const response = JSON.parse(text);
 
-    if (response.id) {
+    if (response.hasOwnProperty("id")) {
       /** This is a response to [call] */
       const id: string = response.id;
       if (this.callbacks.has(id)) {
@@ -111,13 +112,14 @@ export default class JsonRpcSignal implements ISignal {
         if (response.result) {
           cb.resolve(JSON.stringify(response.result));
         } else {
-          const ex = new HMSException.Builder(response.code, response.message).build();
+          const error = response.error;
+          const ex = new HMSExceptionBuilder(error.code, error.message).build();
           cb.reject(ex);
         }
       } else {
         this.observer.onNotification(response);
       }
-    } else if (response.method) {
+    } else if (response.hasOwnProperty("method")) {
       if (response.method === "offer") {
         this.observer.onOffer(response.params)
       } else if (response.method === "trickle") {
@@ -127,4 +129,4 @@ export default class JsonRpcSignal implements ISignal {
       }
     } else throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`)
   }
-}
+};

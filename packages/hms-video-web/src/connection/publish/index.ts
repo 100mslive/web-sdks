@@ -3,6 +3,9 @@ import {ISignal} from "../../signal/ISignal";
 import {IPublishConnectionObserver} from "./IPublishConnectionObserver";
 import {HMSConnectionRole} from "../model";
 import {API_DATA_CHANNEL} from "../../utils/constants";
+import HMSLogger from "../../utils/logger";
+
+const TAG = "HMSPublishConnection";
 
 export default class HMSPublishConnection extends HMSConnection {
   private readonly observer: IPublishConnectionObserver;
@@ -26,5 +29,12 @@ export default class HMSPublishConnection extends HMSConnection {
     this.nativeConnection.oniceconnectionstatechange = () => {
       this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
+  }
+
+  initAfterJoin() {
+    this.nativeConnection.onnegotiationneeded = async () => {
+      HMSLogger.d(TAG, `onnegotiationneeded`)
+      await this.observer.onRenegotiationNeeded();
+    }
   }
 }
