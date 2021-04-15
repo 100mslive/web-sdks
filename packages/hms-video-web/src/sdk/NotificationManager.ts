@@ -2,7 +2,7 @@ import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks/HMSTrackType';
 import Peer from '../peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
-import { Peer as PeerNotification, HMSNotifications } from './models/HMSNotifications';
+import { Peer as PeerNotification, Stream, StreamInternal, HMSNotifications, PeerList } from './models/HMSNotifications';
 import log from 'loglevel';
 
 export default class NotificationManager {
@@ -13,23 +13,30 @@ export default class NotificationManager {
   private streamIdToTrackMap: Map<string, HMSTrack> = new Map<string, HMSTrack>();
 
   handleNotification = (method: HMSNotificationMethod, notification: HMSNotifications) => {
+    let peer: PeerNotification;
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN:
-        log.debug(this.TAG, `PEER_JOIN event :: ${notification}`);
-        this.handlePeerJoin(notification as PeerNotification);
+        peer = notification as PeerNotification;
+        log.debug(this.TAG, `PEER_JOIN event :: ${peer}`);
+        this.handlePeerJoin(peer);
         break;
       case HMSNotificationMethod.PEER_LEAVE:
-        log.debug(this.TAG, `PEER_LEAVE event :: ${notification}`);
-        this.handlePeerLeave(notification as PeerNotification);
+        peer = notification as PeerNotification;
+        log.debug(this.TAG, `PEER_LEAVE event :: ${peer}`);
+        this.handlePeerLeave(peer);
         break;
-
       case HMSNotificationMethod.PEER_LIST:
-
+        const peerList = notification as PeerList;
+        log.debug(this.TAG, `PEER_LIST event :: ${peerList}`);
+        this.handlePeerList(peerList);
+        break;
       case HMSNotificationMethod.STREAM_ADD:
-
+        const stream = notification as Stream;
+        log.debug(this.TAG, `STREAM_ADD event :: ${stream}`);
+        this.handleStreamAdd(stream.stream);
+        break;
       case HMSNotificationMethod.ACTIVE_SPEAKERS: //TODO: Write code for this
         return;
-
       default:
         return;
     }
@@ -84,12 +91,16 @@ export default class NotificationManager {
     return hmsPeer;
   };
 
+  findPeerByUID = (uid: string) => {
+    return this.hmsPeerList.find((hmsPeer) => hmsPeer.peerId === uid);
+  };
+
   private handlePeerJoin = (peer: PeerNotification) => {
     const hmsPeer = new Peer({
       peerId: peer.uid,
-      name: peer.info!.userName!,
+      name: (peer.info && peer.info.userName)? peer.info.userName: "",
       isLocal: false,
-      customerDescription: peer.info!.metadata!,
+      customerDescription: (peer.info && peer.info.metadata)? peer.info.metadata: "",
     });
     this.hmsPeerList.push(hmsPeer);
   };
@@ -100,7 +111,30 @@ export default class NotificationManager {
     peerIdx && peerIdx > -1 && this.hmsPeerList.splice(peerIdx, 1);
   };
 
-  findPeerByUID = (uid: string) => {
-    return this.hmsPeerList.find((hmsPeer) => hmsPeer.peerId === uid);
+  private handlePeerList = (peerList: PeerList) => {
+    const peers = peerList.peers;
+    const streams = peerList.streams;
+
+    peers && peers.forEach(peer => this.handlePeerJoin(peer));
+
+    streams && streams.forEach(stream => this.handleStreamAdd(stream));
+  };
+
+  private handleStreamAdd = (stream: StreamInternal) => {
+    this.streamIdToUIDMap.set(stream.streamId, stream.uid);
+    // Check if onTrackAdd event already came before this
+    if (this.streamIdToTrackMap.has(stream.streamId)) {
+        const hmsPeer = this.findPeerByUID(stream.uid);
+        const hmsTrack = this.streamIdToTrackMap.get(stream.streamId);
+        if (hmsTrack && hmsPeer) {
+            switch(hmsTrack.type) {
+                case HMSTrackType.AUDIO:
+                    hmsPeer.audioTrack = hmsTrack;
+                    break;
+                case HMSTrackType.VIDEO:
+                    hmsPeer.videoTrack = hmsTrack;
+            }
+        }
+    }
   };
 }

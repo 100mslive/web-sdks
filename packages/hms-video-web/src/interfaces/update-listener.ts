@@ -1,7 +1,7 @@
+import HMSException from '../error/HMSException';
 import HMSTrack from '../media/tracks/HMSTrack';
 import HMSPeer from './hms-peer';
 import HMSRoom from './room';
-import { HMSError } from './types';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -34,5 +34,5 @@ export default interface HMSUpdateListener {
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer): void;
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
-  onError(error: HMSError): void;
+  onError(error: HMSException): void;
 }
