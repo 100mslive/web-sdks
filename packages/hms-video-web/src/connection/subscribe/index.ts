@@ -9,7 +9,7 @@ import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
 import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
 
 export default class HMSSubscribeConnection extends HMSConnection {
-  private readonly remoteStreams = new <string, HMSRemoteStream>();
+  private readonly remoteStreams = new Map<string, HMSRemoteStream>();
 
   private readonly observer: ISubscribeConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
