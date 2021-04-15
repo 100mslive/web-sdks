@@ -1,13 +1,13 @@
-import HMSMediaStream from "./HMSMediaStream";
-import HMSTrack from "../tracks/HMSTrack";
-import HMSTrackSettings from "../settings/HMSTrackSettings";
-import HMSLocalAudioTrack from "../tracks/HMSLocalAudioTrack";
-import HMSLocalVideoTrack from "../tracks/HMSLocalVideoTrack";
-import HMSPublishConnection from "../../connection/publish";
+import HMSMediaStream from './HMSMediaStream';
+import HMSTrack from '../tracks/HMSTrack';
+import HMSTrackSettings from '../settings/HMSTrackSettings';
+import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
+import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
+import HMSPublishConnection from '../../connection/publish';
 
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
-  private connection: HMSPublishConnection | null = null
+  private connection: HMSPublishConnection | null = null;
 
   setConnection(connection: HMSPublishConnection) {
     this.connection = connection;
@@ -19,8 +19,8 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   static async getLocalTracks(settings: HMSTrackSettings) {
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: (settings.audio != null ? settings.audio!.toConstraints() : false),
-      video: (settings.video != null ? settings.video!.toConstraints() : false),
+      audio: settings.audio != null ? settings.audio!.toConstraints() : false,
+      video: settings.video != null ? settings.video!.toConstraints() : false,
     });
 
     // TODO: Handle error cases, wrap in `HMSException` and throw it
@@ -47,8 +47,8 @@ export default class HMSLocalStream extends HMSMediaStream {
     // TODO: Add support for simulcast
     const transceiver = this.connection!.addTransceiver(track.nativeTrack, {
       streams: [this.nativeStream],
-      direction: "sendonly",
-      sendEncodings: undefined // TODO
+      direction: 'sendonly',
+      sendEncodings: undefined, // TODO
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     return transceiver;
@@ -59,10 +59,10 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection!
-        .getSenders()
-        .find((sender) => sender.track && sender.track!.id === track.trackId);
-    if (sender === undefined) throw Error(`No sender found for track=${track}`)
+    const sender = this.connection!.getSenders().find(
+      sender => sender.track && sender.track!.id === track.trackId
+    );
+    if (sender === undefined) throw Error(`No sender found for track=${track}`);
     sender.track!.stop();
     await sender.replaceTrack(withTrack);
 

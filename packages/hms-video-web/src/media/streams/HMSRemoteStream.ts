@@ -1,6 +1,6 @@
-import HMSSubscribeConnection from "../../connection/subscribe";
-import HMSMediaStream from "./HMSMediaStream";
-import {HMSSimulcastLayer} from "../settings";
+import HMSSubscribeConnection from '../../connection/subscribe';
+import HMSMediaStream from './HMSMediaStream';
+import { HMSSimulcastLayer } from '../settings';
 
 export default class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
@@ -19,7 +19,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
   }
 
   async setVideo(enabled: boolean) {
-    this.video = (enabled ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE);
+    this.video = enabled ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     await this.syncWithApiChannel();
   }
 
@@ -28,7 +28,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
       streamId: this.nativeStream.id,
       video: this.video,
       audio: this.audio,
-      framerate: this.frameRate
+      framerate: this.frameRate,
     };
     await this.connection.apiChannel.send(JSON.stringify(data));
   }

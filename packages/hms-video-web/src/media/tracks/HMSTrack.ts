@@ -1,5 +1,5 @@
-import HMSMediaStream from "../streams/HMSMediaStream";
-import {HMSTrackType} from "./HMSTrackType";
+import HMSMediaStream from '../streams/HMSMediaStream';
+import { HMSTrackType } from './HMSTrackType';
 
 export default abstract class HMSTrack {
   readonly trackId: string;
@@ -10,7 +10,7 @@ export default abstract class HMSTrack {
    * track. */
   nativeTrack: MediaStreamTrack;
 
-  readonly abstract type: HMSTrackType
+  abstract readonly type: HMSTrackType;
 
   public get enabled(): boolean {
     return this.nativeTrack.enabled;

@@ -1,7 +1,5 @@
 function getRoomId(token: string) {
-  return `${token}`
+  return `${token}`;
 }
 
-export {
-  getRoomId
-}
+export { getRoomId };

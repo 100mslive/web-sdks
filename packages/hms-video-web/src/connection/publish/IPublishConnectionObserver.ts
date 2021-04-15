@@ -1,4 +1,4 @@
-import IConnectionObserver from "../IConnectionObserver";
+import IConnectionObserver from '../IConnectionObserver';
 
 export interface IPublishConnectionObserver extends IConnectionObserver {
   /** Triggered when renegotiation is necessary.

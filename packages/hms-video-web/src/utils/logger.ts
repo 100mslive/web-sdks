@@ -8,7 +8,7 @@ export enum HMSLogLevel {
 }
 
 export default class HMSLogger {
-  static level: HMSLogLevel = HMSLogLevel.VERBOSE
+  static level: HMSLogLevel = HMSLogLevel.VERBOSE;
 
   static v(tag: string, message: string, ...optionalParams: any[]) {
     this.log(HMSLogLevel.VERBOSE, tag, message, optionalParams);
@@ -30,7 +30,12 @@ export default class HMSLogger {
     this.log(HMSLogLevel.ERROR, tag, message, optionalParams);
   }
 
-  private static log(level: HMSLogLevel, tag: string, message: string, ...optionalParams: any[]) {
+  private static log(
+    level: HMSLogLevel,
+    tag: string,
+    message: string,
+    ...optionalParams: any[]
+  ) {
     if (this.level.valueOf() > level.valueOf()) {
       return;
     }
@@ -64,4 +69,4 @@ export default class HMSLogger {
       method && method(`${tag}: ${message}`, ...optionalParams);
     }
   }
-};
+}

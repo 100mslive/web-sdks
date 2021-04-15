@@ -1,28 +1,29 @@
-import {InitConfig} from "./models";
-import HMSLogger from "../../utils/logger";
+import { InitConfig } from './models';
+import HMSLogger from '../../utils/logger';
 
-const INIT_API_ENDPOINT = "https://qa2-us.100ms.live/init"
+const INIT_API_ENDPOINT = 'https://qa2-us.100ms.live/init';
 
 const CORS_HACKY_FIX = {
   // endpoint: "wss://qa2-us.100ms.live/v2/ws",
-  endpoint: "wss://100ms-grpc.100ms.live:8443/ws",
+  endpoint: 'wss://100ms-grpc.100ms.live:8443/ws',
   rtcConfiguration: {
     iceServers: [
       {
-        urls: [
-          "stun:stun.stunprotocol.org:3478"
-        ]
-      }
-    ]
+        urls: ['stun:stun.stunprotocol.org:3478'],
+      },
+    ],
   },
-  policy: "",
-  log_level: "",
+  policy: '',
+  log_level: '',
 } as InitConfig;
 
 export default class InitService {
-  private static readonly TAG = "InitService";
+  private static readonly TAG = 'InitService';
 
-  static async fetchInitConfig(token: string, region: string = ""): Promise<InitConfig> {
+  static async fetchInitConfig(
+    token: string,
+    region: string = ''
+  ): Promise<InitConfig> {
     /* let url = `${INIT_API_ENDPOINT}?token=${token}`
     if (region.length > 0) {
       url += `&region=${region}`

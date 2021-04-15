@@ -1,8 +1,8 @@
-import HMSTrack from "../tracks/HMSTrack";
+import HMSTrack from '../tracks/HMSTrack';
 
 export default class HMSMediaStream {
   readonly nativeStream: MediaStream;
-  readonly id: string
+  readonly id: string;
 
   readonly tracks = new Array<HMSTrack>();
 

@@ -1,12 +1,12 @@
-import HMSConnection from "../index";
-import {ISignal} from "../../signal/ISignal";
-import ISubscribeConnectionObserver from "./ISubscribeConnectionObserver";
-import {HMSConnectionRole} from "../model";
-import HMSRemoteStream from "../../media/streams/HMSRemoteStream";
-import HMSDataChannel from "../HMSDataChannel";
-import {API_DATA_CHANNEL} from "../../utils/constants";
-import HMSRemoteAudioTrack from "../../media/tracks/HMSRemoteAudioTrack";
-import HMSRemoteVideoTrack from "../../media/tracks/HMSRemoteVideoTrack";
+import HMSConnection from '../index';
+import { ISignal } from '../../signal/ISignal';
+import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
+import { HMSConnectionRole } from '../model';
+import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
+import HMSDataChannel from '../HMSDataChannel';
+import { API_DATA_CHANNEL } from '../../utils/constants';
+import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
+import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
@@ -14,7 +14,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private readonly observer: ISubscribeConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
 
-  private _apiChannel: HMSDataChannel | null = null
+  private _apiChannel: HMSDataChannel | null = null;
 
   public get apiChannel(): HMSDataChannel {
     // TODO: Wait for the channel to be open;
@@ -23,40 +23,47 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
-      this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
+      this.observer.onIceConnectionChange(
+        this.nativeConnection.iceConnectionState
+      );
     };
 
-    this.nativeConnection.ondatachannel = (e) => {
+    this.nativeConnection.ondatachannel = e => {
       if (e.channel.label !== API_DATA_CHANNEL) {
         // TODO: this.observer.onDataChannel(e.channel);
         return;
       }
 
-      this._apiChannel = new HMSDataChannel(e.channel, {
-        onMessage: (value: string) => {
-          this.observer.onApiChannelMessage(value);
-        }
-      }, `role=${this.role}`)
-    }
+      this._apiChannel = new HMSDataChannel(
+        e.channel,
+        {
+          onMessage: (value: string) => {
+            this.observer.onApiChannelMessage(value);
+          },
+        },
+        `role=${this.role}`
+      );
+    };
 
-    this.nativeConnection.onicecandidate = (e) => {
+    this.nativeConnection.onicecandidate = e => {
       if (e.candidate !== null) {
         this.signal.trickle({
           candidate: e.candidate,
           target: this.role,
         });
       }
-    }
+    };
 
-    this.nativeConnection.ontrack = (e) => {
+    this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       if (!this.remoteStreams.has(stream.id)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(stream.id, remote);
 
-        stream.onremovetrack = (e) => {
-          const toRemoveTrackIdx = remote.tracks
-              .findIndex(track => track.trackId === e.track.id);
+        stream.onremovetrack = e => {
+          const toRemoveTrackIdx = remote.tracks.findIndex(
+            track => track.trackId === e.track.id
+          );
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
@@ -71,14 +78,19 @@ export default class HMSSubscribeConnection extends HMSConnection {
       }
 
       const remote = this.remoteStreams.get(stream.id)!;
-      const TrackCls = (e.track.kind === "audio" ? HMSRemoteAudioTrack : HMSRemoteVideoTrack);
+      const TrackCls =
+        e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
       remote.tracks.push(track);
       this.observer.onTrackAdd(track);
-    }
+    };
   }
 
-  constructor(signal: ISignal, config: RTCConfiguration, observer: ISubscribeConnectionObserver) {
+  constructor(
+    signal: ISignal,
+    config: RTCConfiguration,
+    observer: ISubscribeConnectionObserver
+  ) {
     super(HMSConnectionRole.SUBSCRIBE, signal);
     this.observer = observer;
 

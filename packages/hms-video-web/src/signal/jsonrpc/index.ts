@@ -1,14 +1,14 @@
-import {v4} from "uuid";
-import {ISignal} from "../ISignal";
-import {ISignalEventsObserver} from "../ISignalEventsObserver";
-import {HMSTrickle} from "../../connection/model";
-import {JsonRpcRequest} from "./models";
-import {HMSExceptionBuilder} from "../../error/HMSException";
-import {PromiseCallbacks} from "../../utils/promise";
-import HMSLogger from "../../utils/logger";
+import { v4 } from 'uuid';
+import { ISignal } from '../ISignal';
+import { ISignalEventsObserver } from '../ISignalEventsObserver';
+import { HMSTrickle } from '../../connection/model';
+import { JsonRpcRequest } from './models';
+import { HMSExceptionBuilder } from '../../error/HMSException';
+import { PromiseCallbacks } from '../../utils/promise';
+import HMSLogger from '../../utils/logger';
 
 export default class JsonRpcSignal implements ISignal {
-  private readonly TAG = "JsonRpcSignal";
+  private readonly TAG = 'JsonRpcSignal';
   readonly observer: ISignalEventsObserver;
 
   /**
@@ -22,7 +22,7 @@ export default class JsonRpcSignal implements ISignal {
   private isJoinCompleted: boolean = false;
   private pendingTrickle: Array<HMSTrickle> = [];
 
-  private socket: WebSocket | null = null
+  private socket: WebSocket | null = null;
 
   private callbacks = new Map<string, PromiseCallbacks<string>>();
 
@@ -32,69 +32,86 @@ export default class JsonRpcSignal implements ISignal {
 
   private async call<T>(method: string, params: any): Promise<T> {
     const id = v4();
-    const message = {method, params, id} as JsonRpcRequest;
+    const message = { method, params, id } as JsonRpcRequest;
 
     this.socket!.send(JSON.stringify(message));
 
     const response = await new Promise<string>((resolve, reject) => {
-      this.callbacks.set(id, {resolve, reject});
+      this.callbacks.set(id, { resolve, reject });
     });
 
     return JSON.parse(response);
   }
 
   private notify(method: string, params: any) {
-    const message = {method, params};
+    const message = { method, params };
 
     this.socket!.send(JSON.stringify(message));
   }
 
   open(uri: string): Promise<void> {
-    return new Promise(((resolve) => {
+    return new Promise(resolve => {
       this.socket = new WebSocket(uri);
       const openHandler = () => {
         resolve();
-        this.socket!.removeEventListener("open", openHandler);
-      }
+        this.socket!.removeEventListener('open', openHandler);
+      };
 
-      this.socket.addEventListener("open", openHandler);
-      this.socket.addEventListener("message", (event) => this.onMessageHandler(event.data));
-    }))
+      this.socket.addEventListener('open', openHandler);
+      this.socket.addEventListener('message', event =>
+        this.onMessageHandler(event.data)
+      );
+    });
   }
 
   async close(): Promise<void> {
-    const p = new Promise<void>((resolve) => {
-      this.socket!.addEventListener("close", () => resolve());
+    const p = new Promise<void>(resolve => {
+      this.socket!.addEventListener('close', () => resolve());
     });
 
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
-    this.socket!.close(1000, "Normal Close");
+    this.socket!.close(1000, 'Normal Close');
     return p;
   }
 
-  async join(sid: string, uid: string, offer: RTCSessionDescriptionInit, info: Object): Promise<RTCSessionDescriptionInit> {
-    const params = {sid, uid, offer, info};
-    const response = await this.call("join", params) as RTCSessionDescriptionInit;
+  async join(
+    sid: string,
+    uid: string,
+    offer: RTCSessionDescriptionInit,
+    info: Object
+  ): Promise<RTCSessionDescriptionInit> {
+    const params = { sid, uid, offer, info };
+    const response = (await this.call(
+      'join',
+      params
+    )) as RTCSessionDescriptionInit;
 
     this.isJoinCompleted = true;
-    this.pendingTrickle.forEach((trickle) => this.trickle(trickle));
+    this.pendingTrickle.forEach(trickle => this.trickle(trickle));
     this.pendingTrickle.length = 0;
 
-    HMSLogger.d(this.TAG, `join: response=${JSON.stringify(response, null, 1)}`);
+    HMSLogger.d(
+      this.TAG,
+      `join: response=${JSON.stringify(response, null, 1)}`
+    );
     return response;
   }
 
-  async offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
-    return await this.call("offer", {desc: offer}) as RTCSessionDescriptionInit;
+  async offer(
+    offer: RTCSessionDescriptionInit
+  ): Promise<RTCSessionDescriptionInit> {
+    return (await this.call('offer', {
+      desc: offer,
+    })) as RTCSessionDescriptionInit;
   }
 
   answer(answer: RTCSessionDescriptionInit) {
-    this.notify("answer", {desc: answer});
+    this.notify('answer', { desc: answer });
   }
 
   trickle(trickle: HMSTrickle) {
     if (this.isJoinCompleted) {
-      this.notify("trickle", trickle);
+      this.notify('trickle', trickle);
     } else {
       this.pendingTrickle.push(trickle);
     }
@@ -103,7 +120,7 @@ export default class JsonRpcSignal implements ISignal {
   private onMessageHandler(text: string) {
     const response = JSON.parse(text);
 
-    if (response.hasOwnProperty("id")) {
+    if (response.hasOwnProperty('id')) {
       /** This is a response to [call] */
       const id: string = response.id;
       if (this.callbacks.has(id)) {
@@ -119,14 +136,17 @@ export default class JsonRpcSignal implements ISignal {
       } else {
         this.observer.onNotification(response);
       }
-    } else if (response.hasOwnProperty("method")) {
-      if (response.method === "offer") {
-        this.observer.onOffer(response.params)
-      } else if (response.method === "trickle") {
-        this.observer.onTrickle(response.params)
+    } else if (response.hasOwnProperty('method')) {
+      if (response.method === 'offer') {
+        this.observer.onOffer(response.params);
+      } else if (response.method === 'trickle') {
+        this.observer.onTrickle(response.params);
       } else {
         this.observer.onNotification(response);
       }
-    } else throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`)
+    } else
+      throw Error(
+        `WebSocket message has no 'method' or 'id' field, message=${response}`
+      );
   }
-};
+}

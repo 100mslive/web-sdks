@@ -1,12 +1,16 @@
-import HMSVideoTrack from "./HMSVideoTrack";
-import HMSLocalStream from "../streams/HMSLocalStream";
-import HMSVideoTrackSettings from "../settings/HMSVideoTrackSettings";
-import {getVideoTrack} from "../../utils/track";
+import HMSVideoTrack from './HMSVideoTrack';
+import HMSLocalStream from '../streams/HMSLocalStream';
+import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
+import { getVideoTrack } from '../../utils/track';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   private settings: HMSVideoTrackSettings;
 
-  constructor(stream: HMSLocalStream, track: MediaStreamTrack, settings: HMSVideoTrackSettings) {
+  constructor(
+    stream: HMSLocalStream,
+    track: MediaStreamTrack,
+    settings: HMSVideoTrackSettings
+  ) {
     super(stream, track);
     stream.tracks.push(this);
 
@@ -40,4 +44,3 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     this.settings = newSettings;
   }
 }
-

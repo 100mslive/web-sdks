@@ -1,5 +1,5 @@
-import {HMSTrickle} from "../connection/model";
-import {ISignalEventsObserver} from "./ISignalEventsObserver";
+import { HMSTrickle } from '../connection/model';
+import { ISignalEventsObserver } from './ISignalEventsObserver';
 
 export interface ISignal {
   readonly observer: ISignalEventsObserver;
@@ -13,10 +13,10 @@ export interface ISignal {
   close(): Promise<void>;
 
   join(
-      roomId: string,
-      uid: string,
-      offer: RTCSessionDescriptionInit,
-      info: Object
+    roomId: string,
+    uid: string,
+    offer: RTCSessionDescriptionInit,
+    info: Object
   ): Promise<RTCSessionDescriptionInit>;
 
   offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>;

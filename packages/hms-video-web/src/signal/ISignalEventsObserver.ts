@@ -1,8 +1,8 @@
-import {HMSTrickle} from "../connection/model";
-import HMSException from "../error/HMSException";
+import { HMSTrickle } from '../connection/model';
+import HMSException from '../error/HMSException';
 
 export interface ISignalEventsObserver {
-  onOffer(jsep: RTCSessionDescriptionInit): void
+  onOffer(jsep: RTCSessionDescriptionInit): void;
 
   onTrickle(trickle: HMSTrickle): void;
 

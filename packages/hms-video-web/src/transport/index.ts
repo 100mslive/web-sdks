@@ -1,27 +1,27 @@
-import ITransportObserver from "./ITransportObserver";
-import ITransport from "./ITransport";
-import HMSPublishConnection from "../connection/publish";
-import HMSSubscribeConnection from "../connection/subscribe";
-import InitService from "../signal/init";
-import {ISignal} from "../signal/ISignal";
-import {ISignalEventsObserver} from "../signal/ISignalEventsObserver";
-import JsonRpcSignal from "../signal/jsonrpc";
-import {HMSConnectionRole, HMSTrickle} from "../connection/model";
-import {IPublishConnectionObserver} from "../connection/publish/IPublishConnectionObserver";
-import ISubscribeConnectionObserver from "../connection/subscribe/ISubscribeConnectionObserver";
-import HMSTrack from "../media/tracks/HMSTrack";
-import HMSException from "../error/HMSException";
-import {PromiseCallbacks} from "../utils/promise";
-import {RENEGOTIATION_CALLBACK_ID} from "../utils/constants";
-import HMSLocalStream from "../media/streams/HMSLocalStream";
-import HMSTrackSettings from "../media/settings/HMSTrackSettings";
-import HMSLogger from "../utils/logger";
+import ITransportObserver from './ITransportObserver';
+import ITransport from './ITransport';
+import HMSPublishConnection from '../connection/publish';
+import HMSSubscribeConnection from '../connection/subscribe';
+import InitService from '../signal/init';
+import { ISignal } from '../signal/ISignal';
+import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
+import JsonRpcSignal from '../signal/jsonrpc';
+import { HMSConnectionRole, HMSTrickle } from '../connection/model';
+import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
+import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
+import HMSTrack from '../media/tracks/HMSTrack';
+import HMSException from '../error/HMSException';
+import { PromiseCallbacks } from '../utils/promise';
+import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import HMSTrackSettings from '../media/settings/HMSTrackSettings';
+import HMSLogger from '../utils/logger';
 
 export default class HMSTransport implements ITransport {
-  private readonly TAG = "HMSTransport";
+  private readonly TAG = 'HMSTransport';
   private readonly observer: ITransportObserver;
-  private publishConnection: HMSPublishConnection | null = null
-  private subscribeConnection: HMSSubscribeConnection | null = null
+  private publishConnection: HMSPublishConnection | null = null;
+  private subscribeConnection: HMSSubscribeConnection | null = null;
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -42,7 +42,10 @@ export default class HMSTransport implements ITransport {
       this.signal.answer(answer);
     },
     onTrickle: async (trickle: HMSTrickle) => {
-      const connection = (trickle.target === HMSConnectionRole.PUBLISH ? this.publishConnection! : this.subscribeConnection!);
+      const connection =
+        trickle.target === HMSConnectionRole.PUBLISH
+          ? this.publishConnection!
+          : this.subscribeConnection!;
       if (connection.remoteDescription === null) {
         // ICE candidates can't be added without any remote session description
         connection.candidates.push(trickle.candidate);
@@ -54,7 +57,7 @@ export default class HMSTransport implements ITransport {
     onFailure: (exception: HMSException) => {
       // TODO: Init the reconnecting logic
       this.observer.onFailure(exception);
-    }
+    },
   };
 
   private readonly signal: ISignal = new JsonRpcSignal(this.signalObserver);
@@ -75,15 +78,15 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
-      if (newState === "failed") {
+      if (newState === 'failed') {
         // TODO: Handle `failed` event, initiate restartIce/reconnection
       }
-    }
+    },
   };
 
   private subscribeConnectionObserver: ISubscribeConnectionObserver = {
     onApiChannelMessage: (message: string) => {
-      const data = {method: "active-speakers", params: JSON.parse(message)};
+      const data = { method: 'active-speakers', params: JSON.parse(message) };
       this.observer.onNotification(data);
     },
 
@@ -91,10 +94,10 @@ export default class HMSTransport implements ITransport {
     onTrackRemove: (track: HMSTrack) => this.observer.onTrackRemove(track),
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
-      if (newState === "failed") {
+      if (newState === 'failed') {
         // TODO: Handle `failed` event, initiate restartIce/reconnection
       }
-    }
+    },
   };
 
   constructor(observer: ITransportObserver) {
@@ -105,24 +108,31 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(authToken: string, roomId: string, peerId: string, customData: Object): Promise<void> {
+  async join(
+    authToken: string,
+    roomId: string,
+    peerId: string,
+    customData: Object
+  ): Promise<void> {
     const config = await InitService.fetchInitConfig(authToken);
-    await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`)
-    HMSLogger.d(this.TAG, "join: connected to ws endpoint");
+    await this.signal.open(
+      `${config.endpoint}?peer=${peerId}&token=${authToken}`
+    );
+    HMSLogger.d(this.TAG, 'join: connected to ws endpoint');
 
     this.publishConnection = new HMSPublishConnection(
-        this.signal,
-        config.rtcConfiguration,
-        this.publishConnectionObserver
-    )
+      this.signal,
+      config.rtcConfiguration,
+      this.publishConnectionObserver
+    );
 
     this.subscribeConnection = new HMSSubscribeConnection(
-        this.signal,
-        config.rtcConfiguration,
-        this.subscribeConnectionObserver
-    )
+      this.signal,
+      config.rtcConfiguration,
+      this.subscribeConnectionObserver
+    );
 
-    HMSLogger.d(this.TAG, "join: Negotiating over PUBLISH connection ⏰");
+    HMSLogger.d(this.TAG, 'join: Negotiating over PUBLISH connection ⏰');
     const offer = await this.publishConnection.createOffer();
     await this.publishConnection.setLocalDescription(offer);
     const answer = await this.signal.join(roomId, peerId, offer, customData);
@@ -131,7 +141,7 @@ export default class HMSTransport implements ITransport {
       await this.publishConnection!.addIceCandidate(candidate);
     }
     this.publishConnection!.initAfterJoin();
-    HMSLogger.d(this.TAG, "join: Negotiating over PUBLISH connection ✅");
+    HMSLogger.d(this.TAG, 'join: Negotiating over PUBLISH connection ✅');
 
     // TODO: Handle exceptions raised - wrap them in HMSException
   }
@@ -145,7 +155,7 @@ export default class HMSTransport implements ITransport {
   private async publishTrack(track: HMSTrack): Promise<void> {
     HMSLogger.d(this.TAG, `publishTrack: trackId=${track.trackId} ⏰`);
     const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {resolve, reject});
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
     const stream = <HMSLocalStream>track.stream;
     stream.setConnection(this.publishConnection!);
@@ -156,7 +166,7 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {
     const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {resolve, reject});
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
     const stream = <HMSLocalStream>track.stream;
     stream.removeSender(track);
