@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "0.0.1",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -30,7 +30,7 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "name": "hmsvideo-web",
+  "name": "100ms-web-sdk",
   "author": "Praveen <praveen@100ms.live>",
   "module": "dist/hmsvideo-web.esm.js",
   "size-limit": [
