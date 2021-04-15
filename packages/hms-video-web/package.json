@@ -30,7 +30,7 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "name": "100ms-web-sdk",
+  "name": "@100mslive/100ms-web-sdk",
   "author": "Praveen <praveen@100ms.live>",
   "module": "dist/hmsvideo-web.esm.js",
   "size-limit": [
