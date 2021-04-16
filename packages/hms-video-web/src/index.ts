@@ -12,10 +12,11 @@ import { getNotification, HMSNotifications, Peer as PeerNotification } from './s
 import NotificationManager from './sdk/NotificationManager';
 import HMSTrack from './media/tracks/HMSTrack';
 import HMSException from './error/HMSException';
-import HMSTrackSettings, { HMSTrackSettingsBuilder } from './media/settings/HMSTrackSettings';
-import { HMSTrackType } from './media/tracks/HMSTrackType';
+import { HMSTrackSettingsBuilder } from './media/settings/HMSTrackSettings';
+// import { HMSTrackType } from './media/tracks/HMSTrackType';
 import HMSRoom from './sdk/models/HMSRoom';
 import { v4 as uuidv4 } from 'uuid';
+import Peer from './peer';
 
 export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -27,7 +28,6 @@ export default class HMSSdk implements HMSInterface {
   private TAG: string = 'HMSSdk';
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener;
-  private hmsSettings!: HMSTrackSettings;
   private hmsRoom?: HMSRoom;
 
   private observer: ITransportObserver = {
@@ -73,7 +73,11 @@ export default class HMSSdk implements HMSInterface {
     const roomId = getRoomId(config.authToken);
     const peerId = uuidv4();
 
-    this.transport.join(config.authToken, roomId, peerId, config.metaData).then(this.publishLocalTracks);
+    this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
+
+    this.transport
+      .join(config.authToken, roomId, peerId, { name: config.userName })
+      .then(this.publishLocalTracks.bind(this));
   }
 
   leave() {
@@ -127,20 +131,20 @@ export default class HMSSdk implements HMSInterface {
         break;
       case HMSNotificationMethod.PEER_LIST:
         // TODO: Move getLocalTracks to immediate after `transportLayer.join`
-        this.transport.getLocalTracks(this.hmsSettings).then((hmsTracks) => {
-          hmsTracks.forEach((hmsTrack) => {
-            switch (hmsTrack.type) {
-              case HMSTrackType.AUDIO:
-                this.localPeer.audioTrack = hmsTrack;
-                break;
-              case HMSTrackType.VIDEO:
-                this.localPeer.videoTrack = hmsTrack;
-            }
-          });
+        // this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then((hmsTracks) => {
+        // hmsTracks.forEach((hmsTrack) => {
+        //   switch (hmsTrack.type) {
+        //     case HMSTrackType.AUDIO:
+        //       this.localPeer.audioTrack = hmsTrack;
+        //       break;
+        //     case HMSTrackType.VIDEO:
+        //       this.localPeer.videoTrack = hmsTrack;
+        //   }
+        // });
 
-          this.listener.onJoin(this.createRoom());
-          this.transport.publish(hmsTracks);
-        });
+        // this.listener.onJoin(this.createRoom());
+        // this.transport.publish(hmsTracks);
+        // });
         break;
       case HMSNotificationMethod.STREAM_ADD: // TODO: Write code for this
         return;

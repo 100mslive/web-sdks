@@ -12,7 +12,7 @@ import {
 import log from 'loglevel';
 
 export default class NotificationManager {
-  hmsPeerList!: Peer[];
+  hmsPeerList: Peer[] = [];
 
   private TAG: string = 'NotificationManager';
   private streamIdToUIDMap: Map<string, string> = new Map<string, string>();
