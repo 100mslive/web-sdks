@@ -18,6 +18,7 @@ import { HMSTrackSettingsBuilder } from './media/settings/HMSTrackSettings';
 import HMSRoom from './sdk/models/HMSRoom';
 import { v4 as uuidv4 } from 'uuid';
 import Peer from './peer';
+import { HMSVideoTrackSettingsBuilder } from './media/settings/HMSVideoTrackSettings';
 
 export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -105,12 +106,22 @@ export default class HMSSdk implements HMSInterface {
     throw 'Yet to implement';
   }
 
-  startScreenShare() {
-    throw 'Yet to implement';
+  async startScreenShare() {
+    if ((this.localPeer.auxiliaryTracks?.length || 0) > 0) {
+      throw Error('Cannot share multiple screens');
+    }
+
+    const track = await this.transport.getLocalScreen(new HMSVideoTrackSettingsBuilder().build(), () =>
+      this.stopScreenShare(),
+    );
+    await this.transport.publish([track]);
+    this.localPeer.auxiliaryTracks = [track];
   }
 
-  stopScreenShare() {
-    throw 'Yet to implement';
+  async stopScreenShare() {
+    // TODO: Right now we assume for now that there is only one aux track -- screen-share
+    this.transport.unpublish(this.localPeer.auxiliaryTracks!);
+    this.localPeer.auxiliaryTracks!.length = 0;
   }
 
   onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {

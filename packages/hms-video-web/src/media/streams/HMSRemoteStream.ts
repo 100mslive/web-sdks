@@ -2,6 +2,7 @@ import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
 import { HMSSimulcastLayer } from '../settings';
 
+/** @internal */
 export default class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;

@@ -4,8 +4,12 @@ import HMSTrackSettings from '../settings/HMSTrackSettings';
 import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
-import log from 'loglevel';
+import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
+import HMSLogger from '../../utils/logger';
 
+const TAG = 'HMSLocalStream';
+
+/** @internal */
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
   private connection: HMSPublishConnection | null = null;
@@ -16,6 +20,21 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   constructor(nativeStream: MediaStream) {
     super(nativeStream);
+  }
+
+  static async getLocalScreen(settings: HMSVideoTrackSettings) {
+    const constraints = {
+      video: settings.toConstraints(),
+      audio: false,
+    } as MediaStreamConstraints;
+    // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
+    const stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+    const local = new HMSLocalStream(stream);
+    const nativeTrack = stream.getVideoTracks()[0];
+    const track = new HMSLocalVideoTrack(local, nativeTrack, settings);
+
+    HMSLogger.v(TAG, 'getLocalScreen', track);
+    return track;
   }
 
   static async getLocalTracks(settings: HMSTrackSettings) {
@@ -39,6 +58,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       tracks.push(track);
     }
 
+    HMSLogger.v(TAG, 'getLocalTracks', tracks);
     return tracks;
   }
 
@@ -55,24 +75,30 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
+  // @ts-ignore
   setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
-    log.debug(transceiver, kind);
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
   }
 
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
     const sender = this.connection!.getSenders().find((sender) => sender.track && sender.track!.id === track.trackId);
-    if (sender === undefined) throw Error(`No sender found for track=${track}`);
-    sender.track!.stop();
+
+    if (sender === undefined) throw Error(`No sender found for trackId=${track.trackId}`);
+    this.nativeStream.removeTrack(track.nativeTrack);
+    sender.track!.stop(); // If the track is already stopped, this does not throw any error. 😉
+
     await sender.replaceTrack(withTrack);
+    this.nativeStream.addTrack(withTrack);
 
     track.nativeTrack = withTrack;
   }
 
   removeSender(track: HMSTrack) {
+    let removedSenderCount = 0;
     this.connection!.getSenders().forEach((sender) => {
       if (sender.track && sender.track.id === track.trackId) {
         this.connection!.removeTrack(sender);
+        removedSenderCount += 1;
 
         // Remove the local reference as well
         const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
@@ -81,5 +107,8 @@ export default class HMSLocalStream extends HMSMediaStream {
         } else throw Error(`Cannot find ${track} in locally stored tracks`);
       }
     });
+    if (removedSenderCount != 1) {
+      throw Error(`Removed ${removedSenderCount} sender's, expected to remove 1`);
+    }
   }
 }

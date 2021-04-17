@@ -19,6 +19,7 @@ export default class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async setEnabled(value: boolean) {
+    if (value === this.enabled) return;
     await super.setEnabled(value);
     if (value) {
       await this.replaceTrackWith(this.settings);

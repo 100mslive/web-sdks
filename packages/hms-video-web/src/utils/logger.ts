@@ -10,58 +10,52 @@ export enum HMSLogLevel {
 export default class HMSLogger {
   static level: HMSLogLevel = HMSLogLevel.VERBOSE;
 
-  static v(tag: string, message: string, ...optionalParams: any[]) {
-    this.log(HMSLogLevel.VERBOSE, tag, message, optionalParams);
+  static v(tag: string, ...data: any[]) {
+    this.log(HMSLogLevel.VERBOSE, tag, ...data);
   }
 
-  static d(tag: string, message: string, ...optionalParams: any[]) {
-    this.log(HMSLogLevel.DEBUG, tag, message, optionalParams);
+  static d(tag: string, ...data: any[]) {
+    this.log(HMSLogLevel.DEBUG, tag, ...data);
   }
 
-  static i(tag: string, message: string, ...optionalParams: any[]) {
-    this.log(HMSLogLevel.INFO, tag, message, optionalParams);
+  static i(tag: string, ...data: any[]) {
+    this.log(HMSLogLevel.INFO, tag, ...data);
   }
 
-  static w(tag: string, message: string, ...optionalParams: any[]) {
-    this.log(HMSLogLevel.WARN, tag, message, optionalParams);
+  static w(tag: string, ...data: any[]) {
+    this.log(HMSLogLevel.WARN, tag, ...data);
   }
 
-  static e(tag: string, message: string, ...optionalParams: any[]) {
-    this.log(HMSLogLevel.ERROR, tag, message, optionalParams);
+  static e(tag: string, ...data: any[]) {
+    this.log(HMSLogLevel.ERROR, tag, ...data);
   }
 
-  private static log(level: HMSLogLevel, tag: string, message: string, ...optionalParams: any[]) {
+  private static log(level: HMSLogLevel, tag: string, ...data: any[]) {
     if (this.level.valueOf() > level.valueOf()) {
       return;
     }
 
-    let method;
     switch (level) {
       case HMSLogLevel.VERBOSE: {
-        method = console.log;
+        console.log(tag, ...data);
         break;
       }
       case HMSLogLevel.DEBUG: {
-        method = console.debug;
+        console.debug(tag, ...data);
         break;
       }
       case HMSLogLevel.INFO: {
-        method = console.info;
+        console.info(tag, ...data);
         break;
       }
       case HMSLogLevel.WARN: {
-        method = console.warn;
+        console.warn(tag, ...data);
         break;
       }
       case HMSLogLevel.ERROR: {
-        method = console.error;
+        console.error(tag, ...data);
         break;
       }
-    }
-    if (optionalParams.length > 0) {
-      method && method(`${tag}: ${message}`, ...optionalParams);
-    } else {
-      method && method(`${tag}: ${message}`, ...optionalParams);
     }
   }
 }

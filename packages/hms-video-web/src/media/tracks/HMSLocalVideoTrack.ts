@@ -19,6 +19,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async setEnabled(value: boolean): Promise<void> {
+    if (value === this.enabled) return;
     await super.setEnabled(value);
     if (value) {
       await this.replaceTrackWith(this.settings);
