@@ -3,7 +3,7 @@ export default class PeerInfo {
   metadata: string;
 
   constructor(params: any) {
-    this.userName = params?.name;
+    this.userName = params?.userName;
     this.metadata = params?.metadata;
   }
 }

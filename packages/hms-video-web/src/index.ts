@@ -76,7 +76,7 @@ export default class HMSSdk implements HMSInterface {
 
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
 
-    this.transport.join(config.authToken, roomId, peerId, { name: config.userName }).then(() => {
+    this.transport.join(config.authToken, roomId, peerId, { userName: config.userName }).then(() => {
       console.log('JOINED!');
     });
   }
