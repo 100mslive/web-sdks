@@ -138,13 +138,19 @@ export default class HMSSdk implements HMSInterface {
           ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer!)
           : log.error(this.TAG, `peer not found in peer-list ${peer}`);
         break;
-      case HMSNotificationMethod.PEER_LEAVE:
-        peer = notification as PeerNotification;
-        hmsPeer = this.notificationManager.findPeerByUID(peer.uid);
-        hmsPeer
-          ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer)
-          : log.error(this.TAG, `peer not found in peer-list ${peer}`);
+
+      case HMSNotificationMethod.PEER_LEAVE: {
+        const peer = notification as PeerNotification;
+        const hmsPeer = new Peer({
+          peerId: peer.uid,
+          name: peer.info.userName,
+          isLocal: false,
+          customerDescription: peer.info.metadata,
+        }); //@TODO: There should be a cleaner way
+        this.listener.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
         break;
+      }
+
       case HMSNotificationMethod.PEER_LIST:
         // TODO: Move getLocalTracks to immediate after `transportLayer.join`
         this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then((hmsTracks) => {

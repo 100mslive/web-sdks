@@ -23,22 +23,22 @@ export default class NotificationManager {
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN:
         peer = notification as PeerNotification;
-        log.debug(this.TAG, `PEER_JOIN event :: ${peer}`);
+        log.debug(this.TAG, `PEER_JOIN event`, peer);
         this.handlePeerJoin(peer);
         break;
       case HMSNotificationMethod.PEER_LEAVE:
         peer = notification as PeerNotification;
-        log.debug(this.TAG, `PEER_LEAVE event :: ${peer}`);
+        log.debug(this.TAG, `PEER_LEAVE event`, peer);
         this.handlePeerLeave(peer);
         break;
       case HMSNotificationMethod.PEER_LIST:
         const peerList = notification as PeerList;
-        log.debug(this.TAG, `PEER_LIST event :: ${peerList}`);
+        log.debug(this.TAG, `PEER_LIST event`, peerList);
         this.handlePeerList(peerList);
         break;
       case HMSNotificationMethod.STREAM_ADD:
         const stream = notification as Stream;
-        log.debug(this.TAG, `STREAM_ADD event :: ${stream}`);
+        log.debug(this.TAG, `STREAM_ADD event`, stream);
         this.handleStreamAdd(stream.stream);
         break;
       case HMSNotificationMethod.ACTIVE_SPEAKERS: //TODO: Write code for this
@@ -52,7 +52,7 @@ export default class NotificationManager {
    * Sets the tracks to peer and returns the peer
    */
   handleOnTrackAdd = (track: HMSTrack) => {
-    log.debug(this.TAG, `ONTRACKADD :: ${track}`);
+    log.debug(this.TAG, `ONTRACKADD`, track);
     const streamId = track.stream.id;
     const hmsPeer = this.streamIdToUIDMap.get(streamId)
       ? this.findPeerByUID(this.streamIdToUIDMap.get(streamId)!)
@@ -79,7 +79,7 @@ export default class NotificationManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleOnTrackRemove = (track: HMSTrack) => {
-    log.debug(this.TAG, `ONTRACKREMOVE :: ${track}`);
+    log.debug(this.TAG, `ONTRACKREMOVE`, track);
     const uid = this.streamIdToUIDMap.get(track.stream.id);
     const hmsPeer = uid && this.findPeerByUID(uid);
     if (hmsPeer) {
