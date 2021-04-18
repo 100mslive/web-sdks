@@ -2,6 +2,7 @@ import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import { getVideoTrack } from '../../utils/track';
+import { sleep } from '../../utils/sleep';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   private settings: HMSVideoTrackSettings;
@@ -21,9 +22,12 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) return;
     await super.setEnabled(value);
+
     if (value) {
       await this.replaceTrackWith(this.settings);
     } else {
+      // Delay this call such that last frame sent is a black frame.
+      await sleep(100);
       this.nativeTrack.stop();
     }
   }
