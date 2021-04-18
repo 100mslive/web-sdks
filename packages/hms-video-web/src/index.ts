@@ -24,7 +24,7 @@ export default class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF;
   transport: HMSTransport;
-  roomId!: string;
+  roomId!: string | null;
   localPeer!: HMSPeer;
 
   private TAG: string = 'HMSSdk';
@@ -78,13 +78,17 @@ export default class HMSSdk implements HMSInterface {
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
 
     this.transport.join(config.authToken, roomId, peerId, { userName: config.userName }).then(() => {
-      console.log('JOINED!');
+      console.log('JOINED!', roomId);
+      this.roomId = roomId;
     });
   }
 
   leave() {
     if (this.roomId) {
+      this.localPeer.audioTrack?.nativeTrack.stop();
+      this.localPeer.videoTrack?.nativeTrack.stop();
       this.transport.leave();
+      this.roomId = null;
     }
   }
 

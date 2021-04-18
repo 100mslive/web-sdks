@@ -1,4 +1,4 @@
-import HMSTrack from '../transport/interfaces/hms-track';
+import HMSTrack from '../media/tracks/HMSTrack';
 import HMSRole from './role';
 
 export default interface HMSPeer {
@@ -7,8 +7,8 @@ export default interface HMSPeer {
   isLocal: boolean;
   customerUserId?: string;
   customerDescription: string;
-  videoTrack?: HMSTrack;
-  audioTrack?: HMSTrack;
+  videoTrack?: HMSTrack | null;
+  audioTrack?: HMSTrack | null;
   auxiliaryTracks?: HMSTrack[];
   role?: HMSRole;
 }
