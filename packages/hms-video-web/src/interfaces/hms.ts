@@ -27,6 +27,6 @@ export default interface HMS {
   getPeers(): HMSPeer[];
   sendMessage(message: HMSMessage): void;
   onMessageReceived(callback: HMSMessageListener): void;
-  startScreenShare(): void;
+  startScreenShare(onStop: () => void): void;
   stopScreenShare(): void;
 }
