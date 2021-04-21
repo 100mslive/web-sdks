@@ -76,7 +76,7 @@ export class HMSSdk implements HMSInterface {
 
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
 
-    this.transport.join(config.authToken, roomId, peerId, { userName: config.userName }).then(() => {
+    this.transport.join(config.authToken, roomId, peerId, { name: config.userName }).then(() => {
       console.log('JOINED!', roomId);
       this.roomId = roomId;
     });
@@ -145,7 +145,7 @@ export class HMSSdk implements HMSInterface {
         const peer = notification as PeerNotification;
         const hmsPeer = new Peer({
           peerId: peer.uid,
-          name: peer.info.userName,
+          name: peer.info.name,
           isLocal: false,
           customerDescription: peer.info.metadata,
         }); //@TODO: There should be a cleaner way

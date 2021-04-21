@@ -104,7 +104,7 @@ export default class NotificationManager {
   private handlePeerJoin = (peer: PeerNotification) => {
     const hmsPeer = new Peer({
       peerId: peer.uid,
-      name: peer.info && peer.info.userName ? peer.info.userName : '',
+      name: peer.info && peer.info.name ? peer.info.name : '',
       isLocal: false,
       customerDescription: peer.info && peer.info.metadata ? peer.info.metadata : '',
     });
