@@ -15,6 +15,7 @@ export default class Peer implements HMSPeer {
   customerDescription: string = '';
   videoTrack?: HMSTrack | null;
   audioTrack?: HMSTrack | null;
+  auxiliaryTracks?: HMSTrack[];
 
   constructor({ peerId, name, isLocal, customerDescription }: HMSPeerInit) {
     this.name = name;

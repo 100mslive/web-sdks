@@ -48,14 +48,14 @@ export class HMSSdk implements HMSInterface {
       const hmsPeer = this.notificationManager.handleOnTrackAdd(track);
       hmsPeer
         ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer)
-        : log.error(this.TAG, `No Peer found for added track:: ${track}`);
+        : log.debug(this.TAG, `No Peer found for added track:: ${track}`);
     },
 
     onTrackRemove: (track: HMSTrack) => {
       const hmsPeer = this.notificationManager.handleOnTrackRemove(track);
       hmsPeer
         ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer)
-        : log.error(this.TAG, `No Peer found for added track:: ${track}`);
+        : log.debug(this.TAG, `No Peer found for added track:: ${track}`);
     },
 
     onFailure: (exception: HMSException) => {
@@ -149,6 +149,19 @@ export class HMSSdk implements HMSInterface {
           isLocal: false,
           customerDescription: peer.info.metadata,
         }); //@TODO: There should be a cleaner way
+
+        if (hmsPeer.audioTrack) {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.audioTrack, hmsPeer);
+        }
+
+        if (hmsPeer.videoTrack) {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.videoTrack, hmsPeer);
+        }
+
+        hmsPeer.auxiliaryTracks?.forEach((track) => {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+        });
+
         this.listener.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
         break;
       }

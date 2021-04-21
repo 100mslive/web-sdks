@@ -91,7 +91,7 @@ export default class NotificationManager {
           hmsPeer.videoTrack = null;
       }
     } else {
-      log.error(this.TAG, `No peer found for track ${track}`);
+      log.warn(this.TAG, `No peer found for track ${track}`);
     }
 
     return hmsPeer;
