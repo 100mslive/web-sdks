@@ -64,8 +64,13 @@ export default class NotificationManager {
         case HMSTrackType.AUDIO:
           hmsPeer!.audioTrack = track;
           break;
-        case HMSTrackType.VIDEO:
-          hmsPeer!.videoTrack = track;
+        case HMSTrackType.VIDEO: {
+          if (hmsPeer.videoTrack) {
+            hmsPeer!.auxiliaryTracks.push(track);
+          } else {
+            hmsPeer!.videoTrack = track;
+          }
+        }
       }
     } else {
       // Peer-JOIN has not yet come
@@ -87,8 +92,15 @@ export default class NotificationManager {
         case HMSTrackType.AUDIO:
           hmsPeer.audioTrack = null;
           break;
-        case HMSTrackType.VIDEO:
-          hmsPeer.videoTrack = null;
+        case HMSTrackType.VIDEO: {
+          const screenShareTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+
+          if (screenShareTrackIndex > -1) {
+            hmsPeer.auxiliaryTracks.splice(screenShareTrackIndex, 1);
+          } else {
+            hmsPeer.videoTrack = null;
+          }
+        }
       }
     } else {
       HMSLogger.w(this.TAG, `No peer found for track ${track}`);

@@ -9,6 +9,6 @@ export default interface HMSPeer {
   customerDescription: string;
   videoTrack?: HMSTrack | null;
   audioTrack?: HMSTrack | null;
-  auxiliaryTracks?: HMSTrack[];
+  auxiliaryTracks: HMSTrack[];
   role?: HMSRole;
 }
