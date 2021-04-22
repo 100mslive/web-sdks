@@ -5,7 +5,7 @@ import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
-import log from 'loglevel';
+import HMSLogger from '../utils/logger';
 import { getRoomId } from '../utils/room';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
@@ -48,14 +48,14 @@ export class HMSSdk implements HMSInterface {
       const hmsPeer = this.notificationManager.handleOnTrackAdd(track);
       hmsPeer
         ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer)
-        : log.debug(this.TAG, `No Peer found for added track:: ${track}`);
+        : HMSLogger.d(this.TAG, `No Peer found for added track:: ${track}`);
     },
 
     onTrackRemove: (track: HMSTrack) => {
       const hmsPeer = this.notificationManager.handleOnTrackRemove(track);
       hmsPeer
         ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer)
-        : log.debug(this.TAG, `No Peer found for added track:: ${track}`);
+        : HMSLogger.d(this.TAG, `No Peer found for added track:: ${track}`);
     },
 
     onFailure: (exception: HMSException) => {
@@ -65,7 +65,6 @@ export class HMSSdk implements HMSInterface {
 
   constructor() {
     this.transport = new HMSTransport(this.observer);
-    log.setLevel(log.levels.DEBUG);
   }
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
@@ -138,7 +137,7 @@ export class HMSSdk implements HMSInterface {
         hmsPeer = this.notificationManager.findPeerByUID(peer.uid);
         hmsPeer
           ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer!)
-          : log.error(this.TAG, `peer not found in peer-list ${peer}`);
+          : HMSLogger.e(this.TAG, `peer not found in peer-list ${peer}`);
         break;
 
       case HMSNotificationMethod.PEER_LEAVE: {
