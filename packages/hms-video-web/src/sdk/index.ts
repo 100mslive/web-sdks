@@ -85,6 +85,7 @@ export class HMSSdk implements HMSInterface {
     if (this.roomId) {
       this.localPeer.audioTrack?.nativeTrack.stop();
       this.localPeer.videoTrack?.nativeTrack.stop();
+      this.notificationManager.handleLeave();
       this.transport.leave();
       this.roomId = null;
     }

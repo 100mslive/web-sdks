@@ -109,6 +109,10 @@ export default class NotificationManager {
     return hmsPeer;
   };
 
+  handleLeave = () => {
+    this.hmsPeerList.length = 0;
+  };
+
   findPeerByUID = (uid: string) => {
     return this.hmsPeerList.find((hmsPeer) => hmsPeer.peerId === uid);
   };
