@@ -104,9 +104,8 @@ export default class HMSTransport implements ITransport {
     this.observer = observer;
   }
 
-  async getLocalScreen(settings: HMSVideoTrackSettings, onStop: () => void): Promise<HMSTrack> {
+  async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSTrack> {
     const track = await HMSLocalStream.getLocalScreen(settings);
-    track.nativeTrack.onended = () => onStop();
     return track;
   }
 

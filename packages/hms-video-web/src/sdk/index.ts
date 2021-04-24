@@ -118,14 +118,23 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const track = await this.transport.getLocalScreen(DefaultVideoSettings.HD, onStop);
-
+    const track = await this.transport.getLocalScreen(DefaultVideoSettings.HD);
+    track.nativeTrack.onended = () => {
+      this.stopEndedScreenshare(onStop);
+    };
     await this.transport.publish([track]);
     this.localPeer.auxiliaryTracks = [track];
   }
 
+  private async stopEndedScreenshare(onStop: () => void) {
+    HMSLogger.d(this.TAG, `Screenshare ended natively`);
+    await this.stopScreenShare();
+    onStop();
+  }
+
   async stopScreenShare() {
     // TODO: Right now we assume for now that there is only one aux track -- screen-share
+    HMSLogger.d(this.TAG, `Screenshare ended from app`);
     const track = this.localPeer.auxiliaryTracks![0];
     await track.setEnabled(false);
     this.transport.unpublish([track]);
