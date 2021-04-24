@@ -71,17 +71,19 @@ export class HMSSdk implements HMSInterface {
     this.listener = listener;
 
     const roomId = getRoomId(config.authToken);
+
+    // @TODO: This should be part of Peer class
     const peerId = uuidv4();
 
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
 
-    this.transport.join(config.authToken, roomId, peerId, { name: config.userName }).then(() => {
+    this.transport.join(config.authToken, roomId, this.localPeer.peerId, { name: config.userName }).then(() => {
       console.log('JOINED!', roomId);
       this.roomId = roomId;
     });
   }
 
-  leave() {
+  async leave() {
     if (this.roomId) {
       this.localPeer.audioTrack?.nativeTrack.stop();
       this.localPeer.videoTrack?.nativeTrack.stop();
@@ -168,7 +170,7 @@ export class HMSSdk implements HMSInterface {
 
       case HMSNotificationMethod.PEER_LIST:
         // TODO: Move getLocalTracks to immediate after `transportLayer.join`
-        this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then((hmsTracks) => {
+        this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then(async (hmsTracks) => {
           hmsTracks.forEach((hmsTrack) => {
             switch (hmsTrack.type) {
               case HMSTrackType.AUDIO:
@@ -180,7 +182,7 @@ export class HMSSdk implements HMSInterface {
           });
 
           this.listener.onJoin(this.createRoom());
-          this.transport.publish(hmsTracks);
+          await this.transport.publish(hmsTracks);
         });
         break;
       case HMSNotificationMethod.STREAM_ADD: // TODO: Write code for this

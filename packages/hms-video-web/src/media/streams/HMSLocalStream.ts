@@ -75,6 +75,10 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
+  async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
+    await this.connection?.setMaxBitrate(maxBitrate, track);
+  }
+
   // @ts-ignore
   setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?

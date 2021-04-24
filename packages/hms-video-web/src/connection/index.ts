@@ -1,6 +1,7 @@
 import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
+import HMSTrack from '../media/tracks/HMSTrack';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -66,6 +67,16 @@ export default abstract class HMSConnection {
 
   removeTrack(sender: RTCRtpSender) {
     this.nativeConnection.removeTrack(sender);
+  }
+
+  async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
+    const sender = this.getSenders().find((s) => s?.track?.id === track.trackId);
+
+    if (sender) {
+      const params = sender.getParameters();
+      params.encodings[0].maxBitrate = maxBitrate;
+      await sender.setParameters(params);
+    }
   }
 
   async close() {
