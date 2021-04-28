@@ -1,4 +1,5 @@
 import { HMSTrickle } from '../connection/model';
+import HMSMessage from '../interfaces/message';
 import { ISignalEventsObserver } from './ISignalEventsObserver';
 
 export interface ISignal {
@@ -19,4 +20,6 @@ export interface ISignal {
   answer(answer: RTCSessionDescriptionInit): void;
 
   trickle(trickle: HMSTrickle): void;
+
+  sendMessage(message: HMSMessage): void;
 }

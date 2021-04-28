@@ -17,6 +17,7 @@ import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
+import HMSMessage from '../interfaces/message';
 
 const TAG = '[HMSTransport]:';
 export default class HMSTransport implements ITransport {
@@ -213,5 +214,9 @@ export default class HMSTransport implements ITransport {
     for (const track of tracks) {
       await this.unpublishTrack(track);
     }
+  }
+
+  sendMessage(message: HMSMessage) {
+    this.signal.sendMessage(message);
   }
 }

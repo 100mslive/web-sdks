@@ -1,6 +1,7 @@
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
+import Message from './HMSMessage';
 
-export type HMSNotifications = Peer | PeerList | TrackStateNotification | undefined;
+export type HMSNotifications = Peer | PeerList | Message | TrackStateNotification | undefined;
 
 export interface TrackStateNotification {
   tracks: Map<string, TrackState>;
@@ -61,6 +62,8 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
       return new Peer(params);
     case HMSNotificationMethod.PEER_LIST:
       return new PeerList(params);
+    case HMSNotificationMethod.BROADCAST:
+      return new Message(params.info);
     case HMSNotificationMethod.ACTIVE_SPEAKERS:
       return;
     case HMSNotificationMethod.ROLE_CHANGE:

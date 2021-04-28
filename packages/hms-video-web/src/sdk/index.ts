@@ -1,6 +1,5 @@
 import HMSConfig from '../interfaces/config';
 import HMSInterface, { HMSAnalyticsLevel, HMSlogLevel } from '../interfaces/hms';
-import HMSMessage, { HMSMessageListener } from '../interfaces/message';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -18,6 +17,7 @@ import HMSRoom from './models/HMSRoom';
 import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
 import { DefaultVideoSettings } from '../media/settings';
+import Message from './models/HMSMessage';
 
 export class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -101,14 +101,11 @@ export class HMSSdk implements HMSInterface {
     return peers;
   }
 
-  sendMessage(message: HMSMessage) {
-    HMSLogger.d(this.TAG, `🚀 Sending message ${message}`);
-    throw new Error('Yet to implement');
-  }
-
-  onMessageReceived(cb: HMSMessageListener) {
-    HMSLogger.d(this.TAG, cb);
-    throw new Error('Yet to implement');
+  sendMessage(type: string, message: string, receiver?: string) {
+    const hmsMessage = new Message({ sender: this.localPeer.peerId, type, message, receiver });
+    HMSLogger.d(this.TAG, 'Sending Message:: ', hmsMessage);
+    this.transport.sendMessage(hmsMessage);
+    return hmsMessage;
   }
 
   async startScreenShare(onStop: () => void) {
@@ -191,6 +188,10 @@ export class HMSSdk implements HMSInterface {
         return;
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         return;
+      case HMSNotificationMethod.BROADCAST:
+        const message = notification as Message;
+        HMSLogger.d(this.TAG, `Received Message:: `, message);
+        this.listener.onMessageReceived(message);
     }
   }
 

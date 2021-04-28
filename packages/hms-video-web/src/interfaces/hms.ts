@@ -1,7 +1,7 @@
 import HMSConfig from './config';
 import HMSUpdateListener from './update-listener';
 import HMSPeer from './hms-peer';
-import HMSMessage, { HMSMessageListener } from './message';
+import HMSMessage from './message';
 
 export enum HMSlogLevel {
   OFF,
@@ -25,8 +25,7 @@ export default interface HMS {
   leave(): void;
   getLocalPeer(): HMSPeer;
   getPeers(): HMSPeer[];
-  sendMessage(message: HMSMessage): void;
-  onMessageReceived(callback: HMSMessageListener): void;
+  sendMessage(type: string, message: string, receiver?: string): HMSMessage;
   startScreenShare(onStop: () => void): void;
   stopScreenShare(): void;
 }

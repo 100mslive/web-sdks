@@ -1,13 +1,11 @@
-export enum HMSMessageType {
-  CHAT,
-}
+import { HMSMessageType } from '../sdk/models/enums/HMSMessageType';
 
 export default interface HMSMessage {
   sender: string;
-  receiver: string;
+  receiver?: string;
   time: Date;
   type: HMSMessageType;
-  mesage: string;
+  message: string;
 }
 
 export interface HMSMessageListener {

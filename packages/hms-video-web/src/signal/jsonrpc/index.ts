@@ -6,6 +6,7 @@ import { JsonRpcRequest } from './models';
 import { HMSExceptionBuilder } from '../../error/HMSException';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
+import HMSMessage from '../../interfaces/message';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -106,6 +107,11 @@ export default class JsonRpcSignal implements ISignal {
     } else {
       this.pendingTrickle.push(trickle);
     }
+  }
+
+  async sendMessage(message: HMSMessage) {
+    // Refer https://www.notion.so/100ms/Biz-Client-Communication-V2-0e93bf0fcd0d46d49e96099d498112d8#b6dd01c8e258442fb50c11c87e4581fb
+    this.notify('broadcast', { version: '1.0', info: message });
   }
 
   private onMessageHandler(text: string) {
