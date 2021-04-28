@@ -15,6 +15,6 @@ export default class InitService {
     // TODO: Add user-agent, handle error status codes
     const response = await fetch(url);
     const config = (await response.json()) as InitConfig;
-    return { ...config, endpoint: 'wss://100ms-grpc.100ms.live:8443/ws' };
+    return config;
   }
 }
