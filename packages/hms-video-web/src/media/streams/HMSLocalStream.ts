@@ -18,10 +18,6 @@ export default class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  constructor(nativeStream: MediaStream) {
-    super(nativeStream);
-  }
-
   static async getLocalScreen(settings: HMSVideoTrackSettings) {
     const constraints = {
       video: settings.toConstraints(),
@@ -111,7 +107,7 @@ export default class HMSLocalStream extends HMSMediaStream {
         } else throw Error(`Cannot find ${track} in locally stored tracks`);
       }
     });
-    if (removedSenderCount != 1) {
+    if (removedSenderCount !== 1) {
       throw Error(`Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
   }

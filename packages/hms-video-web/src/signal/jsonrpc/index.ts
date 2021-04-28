@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { ISignal } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
 import { HMSTrickle } from '../../connection/model';
@@ -8,7 +8,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 
 export default class JsonRpcSignal implements ISignal {
-  private readonly TAG = 'JsonRpcSignal';
+  private readonly TAG = '[ SIGNAL ]: ';
   readonly observer: ISignalEventsObserver;
 
   /**
@@ -31,7 +31,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private async call<T>(method: string, params: any): Promise<T> {
-    const id = v4();
+    const id = uuid();
     const message = { method, params, id } as JsonRpcRequest;
 
     this.socket!.send(JSON.stringify(message));
@@ -51,7 +51,7 @@ export default class JsonRpcSignal implements ISignal {
 
   open(uri: string): Promise<void> {
     return new Promise((resolve) => {
-      this.socket = new WebSocket(uri);
+      this.socket = new WebSocket(uri); // @DISCUSS: Inject WebSocket as a dependency so that it can be easier to mock and test
       const openHandler = () => {
         resolve();
         this.socket!.removeEventListener('open', openHandler);
@@ -72,13 +72,8 @@ export default class JsonRpcSignal implements ISignal {
     return p;
   }
 
-  async join(
-    sid: string,
-    uid: string,
-    offer: RTCSessionDescriptionInit,
-    info: Object,
-  ): Promise<RTCSessionDescriptionInit> {
-    const params = { sid, uid, offer, info };
+  async join(name: string, data: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
+    const params = { name, data, offer };
     const response = (await this.call('join', params)) as RTCSessionDescriptionInit;
 
     this.isJoinCompleted = true;
@@ -89,10 +84,16 @@ export default class JsonRpcSignal implements ISignal {
     return response;
   }
 
-  async offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
-    return (await this.call('offer', {
-      desc: offer,
-    })) as RTCSessionDescriptionInit;
+  async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
+    try {
+      const response = await this.call('offer', {
+        desc,
+        tracks,
+      });
+      return response as RTCSessionDescriptionInit;
+    } catch (e) {
+      throw e;
+    }
   }
 
   answer(answer: RTCSessionDescriptionInit) {

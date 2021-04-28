@@ -17,10 +17,10 @@ import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
-import { HMSTrackType } from '../media/tracks';
 
-const TAG = '[HMSTransport]: ';
+const TAG = '[HMSTransport]:';
 export default class HMSTransport implements ITransport {
+  private tracks: any = {};
   private readonly observer: ITransportObserver;
   private publishConnection: HMSPublishConnection | null = null;
   private subscribeConnection: HMSSubscribeConnection | null = null;
@@ -64,17 +64,21 @@ export default class HMSTransport implements ITransport {
 
   private publishConnectionObserver: IPublishConnectionObserver = {
     onRenegotiationNeeded: async () => {
-      HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded START ⏰`);
+      HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.tracks);
       const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
 
       // TODO: Handle errors, pass these errors as publish failure (try-catch)
-      const offer = await this.publishConnection!.createOffer();
-      await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.offer(offer);
-      await this.publishConnection!.setRemoteDescription(answer);
-      callback?.resolve(true);
-      HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
+      try {
+        const offer = await this.publishConnection!.createOffer();
+        await this.publishConnection!.setLocalDescription(offer);
+        const answer = await this.signal.offer(offer, this.tracks);
+        await this.publishConnection!.setRemoteDescription(answer);
+        callback?.resolve(true);
+        HMSLogger.d(TAG, `✅ [role=PUBLISH] onRenegotiationNeeded DONE`, this.tracks);
+      } catch (e) {
+        console.error(TAG, e);
+      }
     },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
@@ -113,11 +117,14 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(authToken: string, roomId: string, peerId: string, customData: Object): Promise<void> {
-    HMSLogger.d(TAG, 'join: started ⏰');
+  async join(authToken: string, peerId: string, customData: Object): Promise<void> {
     const config = await InitService.fetchInitConfig(authToken);
+
+    HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
     await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`);
-    HMSLogger.d(TAG, 'join: connected to ws endpoint');
+    HMSLogger.d(TAG, '✅ join: connected to ws endpoint');
+
+    HMSLogger.d(TAG, customData);
 
     this.publishConnection = new HMSPublishConnection(
       this.signal,
@@ -131,19 +138,19 @@ export default class HMSTransport implements ITransport {
       this.subscribeConnectionObserver,
     );
 
-    HMSLogger.d(TAG, 'join: Negotiating over PUBLISH connection ⏰');
+    HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     const offer = await this.publishConnection.createOffer();
     await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.join(roomId, peerId, offer, customData);
+    const answer = await this.signal.join('dayamax', peerId, offer, { a: 6 });
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection!.addIceCandidate(candidate);
     }
     this.publishConnection!.initAfterJoin();
-    HMSLogger.d(TAG, 'join: Negotiating over PUBLISH connection ✅');
+    HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
 
     // TODO: Handle exceptions raised - wrap them in HMSException
-    HMSLogger.d(TAG, 'join: successful ✅');
+    HMSLogger.d(TAG, '✅ join: successful');
   }
 
   async leave(): Promise<void> {
@@ -153,35 +160,44 @@ export default class HMSTransport implements ITransport {
   }
 
   private async publishTrack(track: HMSTrack): Promise<void> {
-    HMSLogger.d(TAG, `publishTrack: trackId=${track.trackId} ⏰`, track);
+    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
+    this.tracks[track.trackId] = {
+      mute: false,
+      type: track.nativeTrack.kind,
+      source: 'regular',
+      description: '',
+      track_id: track.trackId,
+      stream_id: track.stream.id,
+    };
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
-    const stream = <HMSLocalStream>track.stream;
+    const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     stream.addTransceiver(track);
     await p;
 
     // @TODO: May be this should be exposed as an API
-    if (track.type === HMSTrackType.VIDEO) {
-      const maxBitrate = 250;
-      await stream
-        .setMaxBitrate(maxBitrate * 1000, track)
-        .then(() => {
-          HMSLogger.d(TAG, `Setting maxBitrate to ${maxBitrate} kpbs`);
-        })
-        .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
-    }
+    // if (track.type === HMSTrackType.VIDEO) {
+    //   const maxBitrate = 250;
+    //   await stream
+    //     .setMaxBitrate(maxBitrate * 1000, track)
+    //     .then(() => {
+    //       HMSLogger.d(TAG, `Setting maxBitrate to ${maxBitrate} kpbs`);
+    //     })
+    //     .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
+    // }
 
-    HMSLogger.d(TAG, `publishTrack: trackId=${track.trackId} ✅`, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {
-    HMSLogger.d(TAG, `unpublishTrack: trackId=${track.trackId} ⏰`, track);
+    HMSLogger.d(TAG, `unpublishTrack: trackId=${track.trackId} ⏳`, track);
+    this.tracks.delete(track.trackId);
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
-    const stream = <HMSLocalStream>track.stream;
+    const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
     await p;
     HMSLogger.d(TAG, `unpublishTrack: trackId=${track.trackId} ✅`, this.callbacks);

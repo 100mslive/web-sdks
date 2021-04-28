@@ -32,29 +32,31 @@
   },
   "name": "@100mslive/100ms-web-sdk",
   "author": "Praveen <praveen@100ms.live>",
-  "module": "dist/hmsvideo-web.esm.js",
+  "module": "dist/100ms-web-sdk.esm.js",
   "size-limit": [
     {
-      "path": "dist/hmsvideo-web.cjs.production.min.js",
-      "limit": "10 KB"
+      "path": "dist/100ms-web-sdk.cjs.production.min.js",
+      "limit": "250 KB"
     },
     {
-      "path": "dist/hmsvideo-web.esm.js",
-      "limit": "10 KB"
+      "path": "dist/100ms-web-sdk.esm.js",
+      "limit": "250 KB"
     }
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.10.2",
+    "@types/jsonwebtoken": "^8.5.1",
     "@types/node": "^14.14.37",
     "@types/node-fetch": "^2.5.10",
     "@types/uuid": "^8.3.0",
     "husky": "^6.0.0",
+    "jest-websocket-mock": "^2.2.0",
+    "mock-socket": "^9.0.3",
     "prettier": "2.2.1",
     "size-limit": "^4.10.2",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
-    "typescript": "^4.2.3",
-    "@types/jsonwebtoken": "^8.5.1"
+    "typescript": "^4.2.3"
   },
   "dependencies": {
     "jsonwebtoken": "^8.5.1",

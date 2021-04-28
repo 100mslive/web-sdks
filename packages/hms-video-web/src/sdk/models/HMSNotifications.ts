@@ -1,49 +1,55 @@
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
-import PeerInfo from './PeerInfo';
 
-export type HMSNotifications = Peer | Stream | PeerList | undefined;
+export type HMSNotifications = Peer | PeerList | TrackStateNotification | undefined;
+
+export interface TrackStateNotification {
+  tracks: Map<string, TrackState>;
+  peer: PeerNotificationInfo;
+}
+
+export interface PeerNotificationInfo {
+  peer_id: string;
+  info: Info;
+}
+
+export interface Info {
+  name: string;
+  data: string;
+  userId: string;
+}
+
+export interface TrackState {
+  mute: boolean;
+  type: string;
+  source: string;
+  description: string;
+  track_id: string;
+  stream_id: string;
+}
 
 export class Peer {
-  uid: string;
-  sid: string;
-  info!: PeerInfo;
+  peerId: string;
+  info: Info;
+  role: string;
+  tracks: TrackState[] = [];
 
   constructor(params: any) {
-    this.uid = params.uid;
-    this.sid = params.sid;
-    this.info = new PeerInfo(params.info);
-  }
-}
-
-export class StreamInternal {
-  uid: string;
-  streamId: string;
-
-  constructor(params: any) {
-    this.uid = params.uid;
-    this.streamId = params.streamId;
-  }
-}
-
-export class Stream {
-  uid: string;
-  stream: StreamInternal;
-  streamId: string;
-
-  constructor(params: any) {
-    this.uid = params.uid;
-    this.stream = params.stream;
-    this.streamId = this.stream!.streamId;
+    this.peerId = params.peer_id;
+    this.info = {
+      name: params.info.name,
+      data: params.info.data,
+      userId: params.info.user_id,
+    };
+    this.role = params.role;
+    this.tracks = Object.values(params.tracks || {});
   }
 }
 
 export class PeerList {
   peers: Peer[];
-  streams: StreamInternal[];
 
   constructor(params: any) {
-    this.peers = params.peers;
-    this.streams = params.streams;
+    this.peers = Object.values(params.peers).map((peer) => new Peer(peer));
   }
 }
 
@@ -55,10 +61,13 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
       return new Peer(params);
     case HMSNotificationMethod.PEER_LIST:
       return new PeerList(params);
-    case HMSNotificationMethod.STREAM_ADD:
-      return new Stream(params);
-    case HMSNotificationMethod.ACTIVE_SPEAKERS: // TODO: Write Code for this
+    case HMSNotificationMethod.ACTIVE_SPEAKERS:
       return;
+    case HMSNotificationMethod.ROLE_CHANGE:
+      return;
+    case HMSNotificationMethod.TRACK_ADD: {
+      return params;
+    }
     default:
       throw Error(`Unsupported method=${method} received`);
   }

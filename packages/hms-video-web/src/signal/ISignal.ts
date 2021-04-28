@@ -14,7 +14,7 @@ export interface ISignal {
 
   join(roomId: string, uid: string, offer: RTCSessionDescriptionInit, info: Object): Promise<RTCSessionDescriptionInit>;
 
-  offer(offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>;
+  offer(offer: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit>;
 
   answer(answer: RTCSessionDescriptionInit): void;
 

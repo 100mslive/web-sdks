@@ -1,5 +1,17 @@
-import { HMSVideoResolution } from './index';
 import { HMSVideoCodec } from '../codec';
+
+export class HMSVideoResolution {
+  readonly width: number;
+  readonly height: number;
+
+  constructor(width: number, height: number) {
+    if (width <= 0) throw Error('Height should be >= 1');
+    if (height <= 0) throw Error('Height should be >= 1');
+
+    this.width = width;
+    this.height = height;
+  }
+}
 
 export class HMSVideoTrackSettingsBuilder {
   private _resolution: HMSVideoResolution = new HMSVideoResolution(320, 180);

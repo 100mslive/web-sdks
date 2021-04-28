@@ -1,6 +1,14 @@
-import HMSVideoTrackSettings from './HMSVideoTrackSettings';
+import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder, HMSVideoResolution } from './HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
-import { DefaultVideoSettings } from './index';
+
+export const DefaultVideoSettings = {
+  QVGA: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(320, 180)).maxBitRate(150_000).build(),
+  VGA: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(640, 360)).maxBitRate(500_000).build(),
+  SHD: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(960, 540)).maxBitRate(1_200_000).build(),
+  HD: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(1280, 720)).maxBitRate(2_500_000).build(),
+  FHD: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(1920, 1080)).maxBitRate(4_000_000).build(),
+  QHD: new HMSVideoTrackSettingsBuilder().resolution(new HMSVideoResolution(2560, 1440)).maxBitRate(8_000_000).build(),
+};
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = DefaultVideoSettings.QVGA;

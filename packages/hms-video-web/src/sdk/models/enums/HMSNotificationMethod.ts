@@ -4,25 +4,27 @@ export enum HMSNotificationMethod {
   PEER_LIST,
   STREAM_ADD,
   ACTIVE_SPEAKERS,
+  ROLE_CHANGE,
+  TRACK_ADD,
 }
 
 export const getNotificationMethod = (method: string) => {
   switch (method) {
-    case 'peer-join':
+    case 'on-peer-join':
       return HMSNotificationMethod.PEER_JOIN;
-      break;
-    case 'peer-leave':
+
+    case 'on-peer-leave':
       return HMSNotificationMethod.PEER_LEAVE;
-      break;
     case 'peer-list':
       return HMSNotificationMethod.PEER_LIST;
-      break;
     case 'stream-add':
       return HMSNotificationMethod.STREAM_ADD;
-      break;
+    case 'on-track-add':
+      return HMSNotificationMethod.TRACK_ADD;
     case 'active-speakers':
       return HMSNotificationMethod.ACTIVE_SPEAKERS;
-      break;
+    case 'on-role-change':
+      return HMSNotificationMethod.ROLE_CHANGE;
     default:
       throw Error(`Unsupported method=${method} received`);
   }

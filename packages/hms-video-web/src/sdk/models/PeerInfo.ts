@@ -4,6 +4,6 @@ export default class PeerInfo {
 
   constructor(params: any) {
     this.name = params?.name;
-    this.metadata = params?.metadata;
+    this.metadata = params?.data;
   }
 }

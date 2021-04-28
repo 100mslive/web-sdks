@@ -22,40 +22,30 @@ import { DefaultVideoSettings } from '../media/settings';
 export class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF;
-  transport: HMSTransport;
+  transport!: HMSTransport;
   roomId!: string | null;
   localPeer!: HMSPeer;
 
-  private TAG: string = 'HMSSdk';
+  private TAG: string = '[HMSSdk]:';
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener;
   private hmsRoom?: HMSRoom;
+  private published: Boolean = false;
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
       const method = getNotificationMethod(message!.method);
-
-      // TODO: WRITE CODE FOR THIS
-      if (method === HMSNotificationMethod.ACTIVE_SPEAKERS) return;
-
       const notification = getNotification(method, message!.params);
-
-      this.notificationManager.handleNotification(method, notification);
+      this.notificationManager.handleNotification(method, notification, this.listener);
       this.onNotificationHandled(method, notification);
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      const hmsPeer = this.notificationManager.handleOnTrackAdd(track);
-      hmsPeer
-        ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer)
-        : HMSLogger.d(this.TAG, `No Peer found for added track:: ${track}`);
+      this.notificationManager.handleOnTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      const hmsPeer = this.notificationManager.handleOnTrackRemove(track);
-      hmsPeer
-        ? this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer)
-        : HMSLogger.d(this.TAG, `No Peer found for added track:: ${track}`);
+      this.notificationManager.handleOnTrackRemove(track);
     },
 
     onFailure: (exception: HMSException) => {
@@ -68,27 +58,34 @@ export class HMSSdk implements HMSInterface {
   }
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
+    this.transport = new HMSTransport(this.observer);
     this.listener = listener;
 
     const roomId = getRoomId(config.authToken);
 
-    // @TODO: This should be part of Peer class
     const peerId = uuidv4();
 
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
 
-    this.transport.join(config.authToken, roomId, this.localPeer.peerId, { name: config.userName }).then(() => {
-      console.log('JOINED!', roomId);
+    HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
+
+    this.transport.join(config.authToken, this.localPeer.peerId, { name: config.userName }).then(() => {
+      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.roomId = roomId;
+      if (!this.published) {
+        this.publish();
+      }
     });
   }
 
   async leave() {
     if (this.roomId) {
+      HMSLogger.d(this.TAG, `⏳ Leaving room ${this.roomId}`);
       this.localPeer.audioTrack?.nativeTrack.stop();
       this.localPeer.videoTrack?.nativeTrack.stop();
       this.notificationManager.handleLeave();
       this.transport.leave();
+      HMSLogger.d(this.TAG, `✅ Left room ${this.roomId}`);
       this.roomId = null;
     }
   }
@@ -98,17 +95,20 @@ export class HMSSdk implements HMSInterface {
   }
 
   getPeers(): HMSPeer[] {
-    return [...this.notificationManager.hmsPeerList, this.localPeer];
+    const remotePeers = Array.from(this.notificationManager.hmsPeerList, (x) => x[1]);
+    const peers = [...remotePeers, this.getLocalPeer()];
+    HMSLogger.d(this.TAG, `Got peers`, peers);
+    return peers;
   }
 
   sendMessage(message: HMSMessage) {
-    console.log(message);
-    throw 'Yet to implement';
+    HMSLogger.d(this.TAG, `🚀 Sending message ${message}`);
+    throw new Error('Yet to implement');
   }
 
   onMessageReceived(cb: HMSMessageListener) {
-    console.log(cb);
-    throw 'Yet to implement';
+    HMSLogger.d(this.TAG, cb);
+    throw new Error('Yet to implement');
   }
 
   async startScreenShare(onStop: () => void) {
@@ -127,14 +127,14 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async stopEndedScreenshare(onStop: () => void) {
-    HMSLogger.d(this.TAG, `Screenshare ended natively`);
+    HMSLogger.d(this.TAG, `✅ Screenshare ended natively`);
     await this.stopScreenShare();
     onStop();
   }
 
   async stopScreenShare() {
     // TODO: Right now we assume for now that there is only one aux track -- screen-share
-    HMSLogger.d(this.TAG, `Screenshare ended from app`);
+    HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
     const track = this.localPeer.auxiliaryTracks![0];
     await track.setEnabled(false);
     this.transport.unpublish([track]);
@@ -142,23 +142,24 @@ export class HMSSdk implements HMSInterface {
   }
 
   onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
+    HMSLogger.d(this.TAG, 'onNotificationHandled', method);
     let peer, hmsPeer;
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN:
         peer = notification as PeerNotification;
-        hmsPeer = this.notificationManager.findPeerByUID(peer.uid);
+        hmsPeer = this.notificationManager.findPeerByUID(peer.peerId);
         hmsPeer
           ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer!)
-          : HMSLogger.e(this.TAG, `peer not found in peer-list ${peer}`);
+          : HMSLogger.e(this.TAG, `⚠️ peer not found in peer-list`, peer, this.notificationManager.hmsPeerList);
         break;
 
       case HMSNotificationMethod.PEER_LEAVE: {
         const peer = notification as PeerNotification;
         const hmsPeer = new Peer({
-          peerId: peer.uid,
+          peerId: peer.peerId,
           name: peer.info.name,
           isLocal: false,
-          customerDescription: peer.info.metadata,
+          customerDescription: peer.info.data,
         }); //@TODO: There should be a cleaner way
 
         if (hmsPeer.audioTrack) {
@@ -178,27 +179,35 @@ export class HMSSdk implements HMSInterface {
       }
 
       case HMSNotificationMethod.PEER_LIST:
-        // TODO: Move getLocalTracks to immediate after `transportLayer.join`
-        this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then(async (hmsTracks) => {
-          hmsTracks.forEach((hmsTrack) => {
-            switch (hmsTrack.type) {
-              case HMSTrackType.AUDIO:
-                this.localPeer.audioTrack = hmsTrack;
-                break;
-              case HMSTrackType.VIDEO:
-                this.localPeer.videoTrack = hmsTrack;
-            }
-          });
-
-          this.listener.onJoin(this.createRoom());
-          await this.transport.publish(hmsTracks);
-        });
+        this.listener.onJoin(this.createRoom());
         break;
-      case HMSNotificationMethod.STREAM_ADD: // TODO: Write code for this
+      case HMSNotificationMethod.ROLE_CHANGE:
+        if (this.roomId) {
+          this.publish();
+        }
+
+        break;
+      case HMSNotificationMethod.STREAM_ADD:
         return;
-      case HMSNotificationMethod.ACTIVE_SPEAKERS: // TODO: Write code for this
+      case HMSNotificationMethod.ACTIVE_SPEAKERS:
         return;
     }
+  }
+
+  private publish() {
+    this.transport.getLocalTracks(new HMSTrackSettingsBuilder().build()).then(async (hmsTracks) => {
+      hmsTracks.forEach((hmsTrack) => {
+        switch (hmsTrack.type) {
+          case HMSTrackType.AUDIO:
+            this.localPeer.audioTrack = hmsTrack;
+            break;
+          case HMSTrackType.VIDEO:
+            this.localPeer.videoTrack = hmsTrack;
+        }
+      });
+      await this.transport.publish(hmsTracks);
+      this.published = true;
+    });
   }
 
   createRoom() {

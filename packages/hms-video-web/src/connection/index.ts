@@ -31,9 +31,13 @@ export default abstract class HMSConnection {
   }
 
   async createOffer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
-    const offer = await this.nativeConnection.createOffer(options);
-    HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
-    return offer;
+    try {
+      const offer = await this.nativeConnection.createOffer(options);
+      HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
+      return offer;
+    } catch (e) {
+      throw e;
+    }
   }
 
   async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
@@ -48,8 +52,12 @@ export default abstract class HMSConnection {
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
-    HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
-    await this.nativeConnection.setRemoteDescription(description);
+    try {
+      HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
+      await this.nativeConnection.setRemoteDescription(description);
+    } catch (e) {
+      throw e;
+    }
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
