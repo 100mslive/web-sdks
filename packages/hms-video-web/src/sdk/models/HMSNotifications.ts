@@ -67,7 +67,7 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     case HMSNotificationMethod.ACTIVE_SPEAKERS:
       return;
     case HMSNotificationMethod.ROLE_CHANGE:
-      return;
+      return params as TrackStateNotification;
     case HMSNotificationMethod.TRACK_ADD: {
       return params;
     }

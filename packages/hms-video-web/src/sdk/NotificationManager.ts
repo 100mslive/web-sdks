@@ -30,13 +30,13 @@ export default class NotificationManager {
     this.listener = listener;
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {
-        const peer = new PeerNotification(notification);
-        HMSLogger.d(this.TAG, `PEER_JOIN event`, peer);
+        const peer = notification as PeerNotification;
+        HMSLogger.d(this.TAG, `PEER_JOIN event`, peer, notification);
         this.handlePeerJoin(peer);
         break;
       }
       case HMSNotificationMethod.PEER_LEAVE: {
-        const peer = new PeerNotification(notification);
+        const peer = notification as PeerNotification;
         HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer);
         this.handlePeerLeave(peer);
         break;
@@ -151,6 +151,8 @@ export default class NotificationManager {
     });
 
     this.hmsPeerList.set(peer.peerId, hmsPeer);
+    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
+
     peer.tracks.forEach((track) => {
       this.trackStateMap.set(track.track_id, {
         peerId: peer.peerId,

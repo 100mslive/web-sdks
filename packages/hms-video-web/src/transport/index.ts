@@ -18,6 +18,7 @@ import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
+import { HMSTrackType } from '../media/tracks';
 
 const TAG = '[HMSTransport]:';
 export default class HMSTransport implements ITransport {
@@ -179,29 +180,29 @@ export default class HMSTransport implements ITransport {
     await p;
 
     // @TODO: May be this should be exposed as an API
-    // if (track.type === HMSTrackType.VIDEO) {
-    //   const maxBitrate = 250;
-    //   await stream
-    //     .setMaxBitrate(maxBitrate * 1000, track)
-    //     .then(() => {
-    //       HMSLogger.d(TAG, `Setting maxBitrate to ${maxBitrate} kpbs`);
-    //     })
-    //     .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
-    // }
+    if (track.type === HMSTrackType.VIDEO) {
+      const maxBitrate = 250;
+      await stream
+        .setMaxBitrate(maxBitrate * 1000, track)
+        .then(() => {
+          HMSLogger.d(TAG, `Setting maxBitrate to ${maxBitrate} kpbs`);
+        })
+        .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
+    }
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {
-    HMSLogger.d(TAG, `unpublishTrack: trackId=${track.trackId} ⏳`, track);
-    this.tracks.delete(track.trackId);
+    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
+    delete this.tracks[track.trackId];
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
     await p;
-    HMSLogger.d(TAG, `unpublishTrack: trackId=${track.trackId} ✅`, this.callbacks);
+    HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
   async publish(tracks: Array<HMSTrack>): Promise<void> {
