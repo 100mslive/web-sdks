@@ -18,6 +18,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
 import { DefaultVideoSettings } from '../media/settings';
 import Message from './models/HMSMessage';
+import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
+import { HMSVideoSourceType } from '../media/tracks/HMSVideoSourceType';
 
 export class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -120,7 +122,7 @@ export class HMSSdk implements HMSInterface {
       this.stopEndedScreenshare(onStop);
     };
     await this.transport.publish([track]);
-    this.localPeer.auxiliaryTracks = [track];
+    this.localPeer.auxiliaryTracks.push(track);
   }
 
   private async stopEndedScreenshare(onStop: () => void) {
@@ -130,12 +132,16 @@ export class HMSSdk implements HMSInterface {
   }
 
   async stopScreenShare() {
-    // TODO: Right now we assume for now that there is only one aux track -- screen-share
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
-    const track = this.localPeer.auxiliaryTracks![0];
-    await track.setEnabled(false);
-    this.transport.unpublish([track]);
-    this.localPeer.auxiliaryTracks!.length = 0;
+    const track = this.localPeer.auxiliaryTracks!.find(
+      (track) =>
+        track.type === HMSTrackType.VIDEO && (track as HMSVideoTrack).videoSourceType === HMSVideoSourceType.SCREEN,
+    );
+    if (track) {
+      await track.setEnabled(false);
+      this.transport.unpublish([track]);
+      this.localPeer.auxiliaryTracks!.splice(this.localPeer.auxiliaryTracks.indexOf(track), 1);
+    }
   }
 
   onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {

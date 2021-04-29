@@ -12,6 +12,8 @@ import {
 import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSUpdateListener, { HMSTrackUpdate } from '../interfaces/update-listener';
+import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
+import { HMSVideoSourceType } from '../media/tracks/HMSVideoSourceType';
 
 interface TrackStateEntry {
   peerId: string;
@@ -86,7 +88,14 @@ export default class NotificationManager {
           hmsPeer.audioTrack = track;
           break;
         case HMSTrackType.VIDEO:
-          hmsPeer.videoTrack = track;
+          const videoTrack = track as HMSVideoTrack;
+          switch (videoTrack.videoSourceType) {
+            case HMSVideoSourceType.REGULAR:
+              hmsPeer.videoTrack = track;
+              break;
+            case HMSVideoSourceType.SCREEN:
+              hmsPeer.auxiliaryTracks.push(track);
+          }
       }
 
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
