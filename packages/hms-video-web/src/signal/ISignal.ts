@@ -1,25 +1,39 @@
-import { HMSTrickle } from '../connection/model';
-import HMSMessage from '../interfaces/message';
-import { ISignalEventsObserver } from './ISignalEventsObserver';
+export enum HMSConnectionRole {
+  PUBLISH = 0,
+  SUBSCRIBE = 1,
+}
+
+export interface Track {
+  mute: boolean;
+  type: 'audio' | 'video';
+  source: 'regular' | 'screen' | 'plugin';
+  description: string;
+  track_id: string;
+  stream_id: string;
+}
 
 export interface ISignal {
-  readonly observer: ISignalEventsObserver;
-
-  /** Open the connection to the give uri.
-   * All the other methods (except [close]) requires a
-   * proper connection. */
   open(uri: string): Promise<void>;
 
-  /** Closes the connection to the `uri` passed in [open] */
+  join(name: string, data: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>;
+
+  trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;
+
+  offer(desc: RTCSessionDescriptionInit, tracks: Map<string, Track>): Promise<RTCSessionDescriptionInit>;
+
+  answer(desc: RTCSessionDescriptionInit): void;
+
+  trackUpdate(tracks: Map<string, Track>): void;
+
+  broadcast(info: any): void;
+
+  recordStart(): void;
+
+  recordEnd(): void;
+
+  leave(): void;
+
+  analytics(): void;
+
   close(): Promise<void>;
-
-  join(roomId: string, uid: string, offer: RTCSessionDescriptionInit, info: Object): Promise<RTCSessionDescriptionInit>;
-
-  offer(offer: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit>;
-
-  answer(answer: RTCSessionDescriptionInit): void;
-
-  trickle(trickle: HMSTrickle): void;
-
-  sendMessage(message: HMSMessage): void;
 }

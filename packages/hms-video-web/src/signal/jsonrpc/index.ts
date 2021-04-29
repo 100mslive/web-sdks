@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { ISignal } from '../ISignal';
+import { ISignal, Track } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
-import { HMSTrickle } from '../../connection/model';
+import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { JsonRpcRequest } from './models';
 import { HMSExceptionBuilder } from '../../error/HMSException';
 import { PromiseCallbacks } from '../../utils/promise';
@@ -78,11 +78,19 @@ export default class JsonRpcSignal implements ISignal {
     const response = (await this.call('join', params)) as RTCSessionDescriptionInit;
 
     this.isJoinCompleted = true;
-    this.pendingTrickle.forEach((trickle) => this.trickle(trickle));
+    this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
     this.pendingTrickle.length = 0;
 
     HMSLogger.d(this.TAG, `join: response=${JSON.stringify(response, null, 1)}`);
     return response;
+  }
+
+  trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit) {
+    if (this.isJoinCompleted) {
+      this.notify('trickle', { target, candidate });
+    } else {
+      this.pendingTrickle.push({ target, candidate });
+    }
   }
 
   async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
@@ -97,22 +105,26 @@ export default class JsonRpcSignal implements ISignal {
     }
   }
 
-  answer(answer: RTCSessionDescriptionInit) {
-    this.notify('answer', { desc: answer });
+  answer(desc: RTCSessionDescriptionInit) {
+    this.notify('answer', { desc });
   }
 
-  trickle(trickle: HMSTrickle) {
-    if (this.isJoinCompleted) {
-      this.notify('trickle', trickle);
-    } else {
-      this.pendingTrickle.push(trickle);
-    }
+  trackUpdate(tracks: Map<string, Track>) {
+    HMSLogger.d('Yet to implement', String(tracks));
   }
 
-  async sendMessage(message: HMSMessage) {
+  broadcast(message: HMSMessage) {
     // Refer https://www.notion.so/100ms/Biz-Client-Communication-V2-0e93bf0fcd0d46d49e96099d498112d8#b6dd01c8e258442fb50c11c87e4581fb
     this.notify('broadcast', { version: '1.0', info: message });
   }
+
+  recordStart() {}
+
+  recordEnd() {}
+
+  leave() {}
+
+  analytics() {}
 
   private onMessageHandler(text: string) {
     const response = JSON.parse(text);

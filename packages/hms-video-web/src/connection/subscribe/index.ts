@@ -45,10 +45,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = (e) => {
       if (e.candidate !== null) {
-        this.signal.trickle({
-          candidate: e.candidate,
-          target: this.role,
-        });
+        this.signal.trickle(this.role, e.candidate);
       }
     };
 

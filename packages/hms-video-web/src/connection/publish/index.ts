@@ -22,7 +22,7 @@ export default class HMSPublishConnection extends HMSConnection {
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
-        signal.trickle({ target: this.role, candidate });
+        signal.trickle(this.role, candidate);
       }
     };
 

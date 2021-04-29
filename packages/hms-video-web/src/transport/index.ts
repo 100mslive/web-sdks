@@ -120,7 +120,7 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(authToken: string, peerId: string, customData: Object): Promise<void> {
+  async join(authToken: string, peerId: string, customData: any): Promise<void> {
     const config = await InitService.fetchInitConfig(authToken);
 
     HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
@@ -144,7 +144,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     const offer = await this.publishConnection.createOffer();
     await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.join('dayamax', peerId, offer, { a: 6 });
+    const answer = await this.signal.join(customData.name, peerId, offer);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection!.addIceCandidate(candidate);
@@ -219,6 +219,6 @@ export default class HMSTransport implements ITransport {
   }
 
   sendMessage(message: HMSMessage) {
-    this.signal.sendMessage(message);
+    this.signal.broadcast(message);
   }
 }
