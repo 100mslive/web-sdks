@@ -1,3 +1,4 @@
+import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
 
@@ -68,10 +69,11 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
       return;
     case HMSNotificationMethod.ROLE_CHANGE:
       return params as TrackStateNotification;
-    case HMSNotificationMethod.TRACK_ADD: {
+    case HMSNotificationMethod.TRACK_METADATA_ADD: {
       return params;
     }
     default:
-      throw Error(`Unsupported method=${method} received`);
+      HMSLogger.d(`method not implemented ${method}`);
+      return params;
   }
 };

@@ -6,7 +6,6 @@ import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
-import { HMSVideoSourceType } from '../tracks/HMSVideoSourceType';
 
 const TAG = 'HMSLocalStream';
 
@@ -28,7 +27,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     const stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     const local = new HMSLocalStream(stream);
     const nativeTrack = stream.getVideoTracks()[0];
-    const track = new HMSLocalVideoTrack(local, nativeTrack, settings, HMSVideoSourceType.SCREEN);
+    const track = new HMSLocalVideoTrack(local, nativeTrack, settings, 'screen');
 
     HMSLogger.v(TAG, 'getLocalScreen', track);
     return track;
@@ -45,13 +44,13 @@ export default class HMSLocalStream extends HMSMediaStream {
     const tracks: Array<HMSTrack> = [];
     if (settings.audio != null) {
       const nativeTrack = stream.getAudioTracks()[0];
-      const track = new HMSLocalAudioTrack(local, nativeTrack, settings.audio);
+      const track = new HMSLocalAudioTrack(local, nativeTrack, settings.audio, 'regular');
       tracks.push(track);
     }
 
     if (settings.video != null) {
       const nativeTrack = stream.getVideoTracks()[0];
-      const track = new HMSLocalVideoTrack(local, nativeTrack, settings.video);
+      const track = new HMSLocalVideoTrack(local, nativeTrack, settings.video, 'regular');
       tracks.push(track);
     }
 

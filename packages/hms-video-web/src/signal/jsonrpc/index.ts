@@ -122,7 +122,9 @@ export default class JsonRpcSignal implements ISignal {
 
   recordEnd() {}
 
-  leave() {}
+  leave() {
+    this.notify('leave', { version: '1.0' });
+  }
 
   analytics() {}
 

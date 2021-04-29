@@ -5,8 +5,8 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 export default class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
 
-  constructor(stream: HMSMediaStream, track: MediaStreamTrack) {
-    super(stream, track);
+  constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
+    super(stream, track, source);
     if (track.kind !== 'audio') throw new Error("Expected 'track' kind = 'audio'");
   }
 }

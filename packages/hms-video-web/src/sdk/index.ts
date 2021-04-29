@@ -18,8 +18,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
 import { DefaultVideoSettings } from '../media/settings';
 import Message from './models/HMSMessage';
-import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
-import { HMSVideoSourceType } from '../media/tracks/HMSVideoSourceType';
 
 export class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -98,7 +96,7 @@ export class HMSSdk implements HMSInterface {
 
   getPeers(): HMSPeer[] {
     const remotePeers = Array.from(this.notificationManager.hmsPeerList, (x) => x[1]);
-    const peers = [...remotePeers, this.getLocalPeer()];
+    const peers = this.localPeer ? [...remotePeers, this.getLocalPeer()] : remotePeers;
     HMSLogger.d(this.TAG, `Got peers`, peers);
     return peers;
   }
@@ -134,8 +132,7 @@ export class HMSSdk implements HMSInterface {
   async stopScreenShare() {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
     const track = this.localPeer.auxiliaryTracks!.find(
-      (track) =>
-        track.type === HMSTrackType.VIDEO && (track as HMSVideoTrack).videoSourceType === HMSVideoSourceType.SCREEN,
+      (track) => track.type === HMSTrackType.VIDEO && track.source === 'screen',
     );
     if (track) {
       await track.setEnabled(false);
@@ -184,16 +181,16 @@ export class HMSSdk implements HMSInterface {
       case HMSNotificationMethod.PEER_LIST:
         this.listener.onJoin(this.createRoom());
         break;
+
       case HMSNotificationMethod.ROLE_CHANGE:
         if (this.roomId) {
           this.publish();
         }
-
         break;
-      case HMSNotificationMethod.STREAM_ADD:
-        return;
+
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         return;
+
       case HMSNotificationMethod.BROADCAST:
         const message = notification as Message;
         HMSLogger.d(this.TAG, `Received Message:: `, message);
@@ -208,6 +205,7 @@ export class HMSSdk implements HMSInterface {
           case HMSTrackType.AUDIO:
             this.localPeer.audioTrack = hmsTrack;
             break;
+
           case HMSTrackType.VIDEO:
             this.localPeer.videoTrack = hmsTrack;
         }

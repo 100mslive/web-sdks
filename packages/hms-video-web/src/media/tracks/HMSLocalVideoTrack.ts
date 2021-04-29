@@ -3,18 +3,12 @@ import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import { getVideoTrack } from '../../utils/track';
 import { sleep } from '../../utils/sleep';
-import { HMSVideoSourceType } from './HMSVideoSourceType';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   private settings: HMSVideoTrackSettings;
 
-  constructor(
-    stream: HMSLocalStream,
-    track: MediaStreamTrack,
-    settings: HMSVideoTrackSettings,
-    videoSourceType: HMSVideoSourceType = HMSVideoSourceType.REGULAR,
-  ) {
-    super(stream, track, videoSourceType);
+  constructor(stream: HMSLocalStream, track: MediaStreamTrack, settings: HMSVideoTrackSettings, source: string) {
+    super(stream, track, source);
     stream.tracks.push(this);
 
     this.settings = settings;

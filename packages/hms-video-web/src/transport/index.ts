@@ -18,7 +18,6 @@ import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
-import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
 import { HMSTrackType } from '../media/tracks';
 
 const TAG = '[HMSTransport]:';
@@ -159,6 +158,7 @@ export default class HMSTransport implements ITransport {
   async leave(): Promise<void> {
     await this.publishConnection!.close();
     await this.subscribeConnection!.close();
+    this.signal.leave();
     await this.signal.close();
   }
 
@@ -167,7 +167,7 @@ export default class HMSTransport implements ITransport {
     this.tracks[track.trackId] = {
       mute: false,
       type: track.nativeTrack.kind,
-      source: track.nativeTrack.kind === 'audio' ? 'regular' : (track as HMSVideoTrack).videoSourceType,
+      source: track.source,
       description: '',
       track_id: track.trackId,
       stream_id: track.stream.id,

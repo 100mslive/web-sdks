@@ -4,6 +4,7 @@ import { HMSTrackType } from './HMSTrackType';
 export default abstract class HMSTrack {
   // @internal
   readonly stream: HMSMediaStream;
+  source?: string;
 
   /** Changes only when un-muting the local track
    * i.e replacing the nativeTrack with different `deviceId`
@@ -25,8 +26,9 @@ export default abstract class HMSTrack {
     this.nativeTrack.enabled = value;
   }
 
-  protected constructor(stream: HMSMediaStream, track: MediaStreamTrack) {
+  protected constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     this.stream = stream;
     this.nativeTrack = track;
+    this.source = source;
   }
 }

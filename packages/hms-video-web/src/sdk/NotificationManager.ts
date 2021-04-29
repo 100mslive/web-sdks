@@ -12,8 +12,6 @@ import {
 import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSUpdateListener, { HMSTrackUpdate } from '../interfaces/update-listener';
-import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
-import { HMSVideoSourceType } from '../media/tracks/HMSVideoSourceType';
 
 interface TrackStateEntry {
   peerId: string;
@@ -49,8 +47,8 @@ export default class NotificationManager {
         this.handlePeerList(peerList);
         break;
       }
-      case HMSNotificationMethod.TRACK_ADD: {
-        this.handleTrackAdd(notification as TrackStateNotification);
+      case HMSNotificationMethod.TRACK_METADATA_ADD: {
+        this.handleTrackMetadataAdd(notification as TrackStateNotification);
         break;
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
@@ -60,8 +58,8 @@ export default class NotificationManager {
     }
   }
 
-  handleTrackAdd(params: TrackStateNotification) {
-    HMSLogger.d(this.TAG, `BIZ:ONTRACKADD`, params);
+  handleTrackMetadataAdd(params: TrackStateNotification) {
+    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
 
     for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
       this.trackStateMap.set(trackId, {
@@ -83,18 +81,21 @@ export default class NotificationManager {
       const hmsPeer = this.hmsPeerList.get(state.peerId);
       if (!hmsPeer) return;
 
+      track.source = state.trackInfo.source;
+
       switch (track.type) {
         case HMSTrackType.AUDIO:
-          hmsPeer.audioTrack = track;
+          if (!hmsPeer.audioTrack) {
+            hmsPeer.audioTrack = track;
+          }
+          // @DISCUSS: Do we have auxilliary audio tracks too?
           break;
+
         case HMSTrackType.VIDEO:
-          const videoTrack = track as HMSVideoTrack;
-          switch (videoTrack.videoSourceType) {
-            case HMSVideoSourceType.REGULAR:
-              hmsPeer.videoTrack = track;
-              break;
-            case HMSVideoSourceType.SCREEN:
-              hmsPeer.auxiliaryTracks.push(track);
+          if (!hmsPeer.videoTrack && track.source === 'regular') {
+            hmsPeer.videoTrack = track;
+          } else {
+            hmsPeer.auxiliaryTracks.push(track);
           }
       }
 
