@@ -211,6 +211,7 @@ export class HMSSdk implements HMSInterface {
           case HMSTrackType.VIDEO:
             this.localPeer.videoTrack = hmsTrack;
         }
+        this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer);
       });
       await this.transport.publish(hmsTracks);
       this.published = true;
