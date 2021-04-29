@@ -36,22 +36,18 @@
   "size-limit": [
     {
       "path": "dist/100ms-web-sdk.cjs.production.min.js",
-      "limit": "250 KB"
+      "limit": "20 KB"
     },
     {
       "path": "dist/100ms-web-sdk.esm.js",
-      "limit": "250 KB"
+      "limit": "20 KB"
     }
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.10.2",
-    "@types/jsonwebtoken": "^8.5.1",
     "@types/node": "^14.14.37",
-    "@types/node-fetch": "^2.5.10",
     "@types/uuid": "^8.3.0",
     "husky": "^6.0.0",
-    "jest-websocket-mock": "^2.2.0",
-    "mock-socket": "^9.0.3",
     "prettier": "2.2.1",
     "size-limit": "^4.10.2",
     "tsdx": "^0.14.1",
@@ -59,10 +55,6 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.5.1",
-    "loglevel": "^1.7.1",
-    "node-fetch": "^2.6.1",
-    "sdp-transform": "^2.14.1",
     "uuid": "^8.3.2"
   }
 }
