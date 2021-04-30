@@ -144,7 +144,7 @@ export default class NotificationManager {
     }
   };
 
-  handleLeave = () => {
+  cleanUp = () => {
     this.hmsPeerList.clear();
   };
 
