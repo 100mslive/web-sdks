@@ -58,8 +58,6 @@ export default class HMSLocalStream extends HMSMediaStream {
     return tracks;
   }
 
-  // TODO: Add static method to get screen-share (similar to getLocalTracks)
-
   addTransceiver(track: HMSTrack) {
     // TODO: Add support for simulcast
     const transceiver = this.connection!.addTransceiver(track.nativeTrack, {

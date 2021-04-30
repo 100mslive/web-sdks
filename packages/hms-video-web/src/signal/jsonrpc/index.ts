@@ -106,7 +106,8 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   trackUpdate(tracks: Map<string, Track>) {
-    HMSLogger.d('Yet to implement', String(tracks));
+    HMSLogger.d(this.TAG, 'Track Update: ', { tracks: Object.fromEntries(tracks) });
+    this.notify('track-update', { version: '1.0', tracks: Object.fromEntries(tracks) });
   }
 
   broadcast(message: HMSMessage) {
