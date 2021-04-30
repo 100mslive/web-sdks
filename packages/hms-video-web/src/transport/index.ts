@@ -146,9 +146,9 @@ export default class HMSTransport implements ITransport {
     const answer = await this.signal.join(customData.name, peerId, offer);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
-      await this.publishConnection!.addIceCandidate(candidate);
+      await this.publishConnection.addIceCandidate(candidate);
     }
-    this.publishConnection!.initAfterJoin();
+    this.publishConnection.initAfterJoin();
     HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
 
     // TODO: Handle exceptions raised - wrap them in HMSException

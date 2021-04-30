@@ -30,12 +30,12 @@ export class HMSSdk implements HMSInterface {
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener;
   private hmsRoom?: HMSRoom;
-  private published: Boolean = false;
+  private published: boolean = false;
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
-      const method = getNotificationMethod(message!.method);
-      const notification = getNotification(method, message!.params);
+      const method = getNotificationMethod(message.method);
+      const notification = getNotification(method, message.params);
       this.notificationManager.handleNotification(method, notification, this.listener);
       this.onNotificationHandled(method, notification);
     },
@@ -131,27 +131,25 @@ export class HMSSdk implements HMSInterface {
 
   async stopScreenShare() {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
-    const track = this.localPeer.auxiliaryTracks!.find(
-      (track) => track.type === HMSTrackType.VIDEO && track.source === 'screen',
-    );
+    const track = this.localPeer.auxiliaryTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen');
     if (track) {
       await track.setEnabled(false);
       this.transport.unpublish([track]);
-      this.localPeer.auxiliaryTracks!.splice(this.localPeer.auxiliaryTracks.indexOf(track), 1);
+      this.localPeer.auxiliaryTracks.splice(this.localPeer.auxiliaryTracks.indexOf(track), 1);
     }
   }
 
   onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
     HMSLogger.d(this.TAG, 'onNotificationHandled', method);
-    let peer, hmsPeer;
     switch (method) {
-      case HMSNotificationMethod.PEER_JOIN:
-        peer = notification as PeerNotification;
-        hmsPeer = this.notificationManager.findPeerByUID(peer.peerId);
+      case HMSNotificationMethod.PEER_JOIN: {
+        const peer = notification as PeerNotification;
+        const hmsPeer = this.notificationManager.findPeerByUID(peer.peerId);
         hmsPeer
-          ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer!)
+          ? this.listener.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer)
           : HMSLogger.e(this.TAG, `⚠️ peer not found in peer-list`, peer, this.notificationManager.hmsPeerList);
         break;
+      }
 
       case HMSNotificationMethod.PEER_LEAVE: {
         const peer = notification as PeerNotification;

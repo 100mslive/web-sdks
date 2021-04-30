@@ -75,7 +75,7 @@ export default class JsonRpcSignal implements ISignal {
 
   async join(name: string, data: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
     const params = { name, data, offer };
-    const response = (await this.call('join', params)) as RTCSessionDescriptionInit;
+    const response: RTCSessionDescriptionInit = await this.call('join', params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -94,15 +94,11 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
-    try {
-      const response = await this.call('offer', {
-        desc,
-        tracks,
-      });
-      return response as RTCSessionDescriptionInit;
-    } catch (e) {
-      throw e;
-    }
+    const response = await this.call('offer', {
+      desc,
+      tracks,
+    });
+    return response as RTCSessionDescriptionInit;
   }
 
   answer(desc: RTCSessionDescriptionInit) {
