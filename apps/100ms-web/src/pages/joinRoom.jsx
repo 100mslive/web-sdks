@@ -62,6 +62,8 @@ export const JoinRoom = ({ setLoginInfo }) => {
             >
               <option value="Teacher">Teacher</option>
               <option value="Student">Student</option>
+              <option value="Admin">Admin</option>
+              <option value="Viewer">Viewer</option>
             </select>
           </div>
           <div className="w-full flex justify-end m-2">
