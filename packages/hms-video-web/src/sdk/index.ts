@@ -18,6 +18,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
 import { DefaultVideoSettings } from '../media/settings';
 import Message from './models/HMSMessage';
+import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
+import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 
 export class HMSSdk implements HMSInterface {
   logLevel: HMSlogLevel = HMSlogLevel.OFF;
@@ -31,11 +33,13 @@ export class HMSSdk implements HMSInterface {
   private listener!: HMSUpdateListener | null;
   private hmsRoom?: HMSRoom | null;
   private published: boolean = false;
+  private publishParams: any = null;
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
       const method = getNotificationMethod(message.method);
       const notification = getNotification(method, message.params);
+      // @TODO: Notification manager needs to be refactored. The current implementation is not manageable
       this.notificationManager.handleNotification(method, notification, this.listener!);
       this.onNotificationHandled(method, notification);
     },
@@ -54,6 +58,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   constructor() {
+    this.notificationManager.addEventListener(
+      'role-change',
+      (e: any) => (this.publishParams = e.detail.params.role.publishParams),
+    );
     this.transport = new HMSTransport(this.observer);
   }
 
@@ -192,13 +200,10 @@ export class HMSSdk implements HMSInterface {
         break;
 
       case HMSNotificationMethod.ROLE_CHANGE:
-        if (this.roomId) {
-          this.publish();
-        }
         break;
 
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
-        return;
+        break;
 
       case HMSNotificationMethod.BROADCAST:
         const message = notification as Message;
@@ -208,21 +213,43 @@ export class HMSSdk implements HMSInterface {
   }
 
   private publish() {
-    this.transport?.getLocalTracks(new HMSTrackSettingsBuilder().build()).then(async (hmsTracks) => {
-      hmsTracks.forEach((hmsTrack) => {
-        switch (hmsTrack.type) {
-          case HMSTrackType.AUDIO:
-            this.localPeer!.audioTrack = hmsTrack;
-            break;
+    const { audio, video, allowed } = this.publishParams;
+    const canPublishAudio = allowed && allowed.includes('audio');
+    const canPublishVideo = allowed && allowed.includes('video');
+    const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
+      .codec(audio.codec)
+      .maxBitRate(audio.bitrate)
+      .build();
+    const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
+      .codec(video.codec)
+      .maxBitRate(video.bitRate)
+      .maxFrameRate(video.frameRate)
+      .build();
 
-          case HMSTrackType.VIDEO:
-            this.localPeer!.videoTrack = hmsTrack;
-        }
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
-      });
-      await this.transport!.publish(hmsTracks);
-      this.published = true;
-    });
+    if (canPublishAudio || canPublishVideo) {
+      this.transport
+        ?.getLocalTracks(
+          new HMSTrackSettingsBuilder()
+            .video(canPublishVideo ? videoSettings : null)
+            .audio(canPublishAudio ? audioSettings : null)
+            .build(),
+        )
+        .then(async (hmsTracks) => {
+          hmsTracks.forEach((hmsTrack) => {
+            switch (hmsTrack.type) {
+              case HMSTrackType.AUDIO:
+                this.localPeer!.audioTrack = hmsTrack;
+                break;
+
+              case HMSTrackType.VIDEO:
+                this.localPeer!.videoTrack = hmsTrack;
+            }
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
+          });
+          await this.transport!.publish(hmsTracks);
+          this.published = true;
+        });
+    }
   }
 
   createRoom() {

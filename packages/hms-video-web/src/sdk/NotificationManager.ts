@@ -18,7 +18,7 @@ interface TrackStateEntry {
   trackInfo: TrackState;
 }
 
-export default class NotificationManager {
+export default class NotificationManager extends EventTarget {
   hmsPeerList: Map<string, HMSPeer> = new Map();
 
   private TAG: string = '[Notification Manager]:';
@@ -55,11 +55,20 @@ export default class NotificationManager {
         this.handleTrackUpdate(notification as TrackStateNotification);
         break;
       }
+      case HMSNotificationMethod.ROLE_CHANGE: {
+        this.handleRoleChange(notification as TrackStateNotification);
+        break;
+      }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         return;
       default:
         return;
     }
+  }
+
+  handleRoleChange(params: TrackStateNotification) {
+    // @DISCUSS: Make everything event based instead?
+    this.dispatchEvent(new CustomEvent('role-change', { detail: { params } }));
   }
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
@@ -157,7 +166,7 @@ export default class NotificationManager {
     for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
       const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
 
-      const track = this.getPeerTrackByTrackId(hmsPeer!.peerId, trackId);
+      const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
       if (!track) return;
 
       this.trackStateMap.set(trackId, {
