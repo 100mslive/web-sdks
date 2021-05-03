@@ -8,6 +8,7 @@ export enum HMSNotificationMethod {
   BROADCAST,
   ROLE_CHANGE,
   TRACK_METADATA_ADD,
+  TRACK_UPDATE,
   UNSUPPORTED,
 }
 
@@ -21,6 +22,8 @@ export const getNotificationMethod = (method: string) => {
       return HMSNotificationMethod.PEER_LIST;
     case 'on-track-add':
       return HMSNotificationMethod.TRACK_METADATA_ADD;
+    case 'on-track-update':
+      return HMSNotificationMethod.TRACK_UPDATE;
     case 'active-speakers':
       return HMSNotificationMethod.ACTIVE_SPEAKERS;
     case 'on-broadcast':

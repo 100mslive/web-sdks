@@ -109,4 +109,8 @@ export default class HMSLocalStream extends HMSMediaStream {
       throw Error(`Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
   }
+
+  trackUpdate(track: HMSTrack) {
+    this.connection?.trackUpdate(track);
+  }
 }

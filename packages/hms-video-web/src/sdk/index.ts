@@ -155,7 +155,7 @@ export class HMSSdk implements HMSInterface {
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {
         const peer = notification as PeerNotification;
-        const hmsPeer = this.notificationManager.findPeerByUID(peer.peerId);
+        const hmsPeer = this.notificationManager.findPeerByPeerId(peer.peerId);
         hmsPeer
           ? this.listener!.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer)
           : HMSLogger.e(this.TAG, `⚠️ peer not found in peer-list`, peer, this.notificationManager.hmsPeerList);

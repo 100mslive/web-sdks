@@ -1,3 +1,5 @@
+import HMSTrack from '../../media/tracks/HMSTrack';
+import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
@@ -20,13 +22,22 @@ export interface Info {
   userId: string;
 }
 
-export interface TrackState {
+export class TrackState implements Track {
   mute: boolean;
-  type: string;
-  source: string;
+  type: 'audio' | 'video';
+  source: 'regular' | 'screen' | 'plugin';
   description: string;
   track_id: string;
   stream_id: string;
+
+  constructor(track: HMSTrack) {
+    this.mute = !track.enabled;
+    this.type = track.type;
+    this.source = track.source || 'regular';
+    this.description = '';
+    this.track_id = track.trackId;
+    this.stream_id = track.stream.id;
+  }
 }
 
 export class Peer {
@@ -69,7 +80,8 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
       return;
     case HMSNotificationMethod.ROLE_CHANGE:
       return params as TrackStateNotification;
-    case HMSNotificationMethod.TRACK_METADATA_ADD: {
+    case HMSNotificationMethod.TRACK_METADATA_ADD:
+    case HMSNotificationMethod.TRACK_UPDATE: {
       return params;
     }
     default:

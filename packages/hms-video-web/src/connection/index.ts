@@ -2,6 +2,7 @@ import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
+import { TrackState } from '../sdk/models/HMSNotifications';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -85,6 +86,11 @@ export default abstract class HMSConnection {
       params.encodings[0].maxBitrate = maxBitrate;
       await sender.setParameters(params);
     }
+  }
+
+  trackUpdate(track: HMSTrack) {
+    const trackState = new TrackState(track);
+    this.signal.trackUpdate(new Map([[track.trackId, trackState]]));
   }
 
   async close() {

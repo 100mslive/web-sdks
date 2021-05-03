@@ -51,6 +51,10 @@ export default class NotificationManager {
         this.handleTrackMetadataAdd(notification as TrackStateNotification);
         break;
       }
+      case HMSNotificationMethod.TRACK_UPDATE: {
+        this.handleTrackUpdate(notification as TrackStateNotification);
+        break;
+      }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         return;
       default:
@@ -144,12 +148,41 @@ export default class NotificationManager {
     }
   };
 
+  handleTrackUpdate = (params: TrackStateNotification) => {
+    HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
+
+    const hmsPeer = this.hmsPeerList.get(params.peer.peer_id);
+    if (!hmsPeer) return;
+
+    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
+      const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
+
+      const track = this.getPeerTrackByTrackId(hmsPeer!.peerId, trackId);
+      if (!track) return;
+
+      this.trackStateMap.set(trackId, {
+        peerId: params.peer.peer_id,
+        trackInfo: { ...currentTrackStateInfo, ...trackEntry },
+      });
+
+      if (currentTrackStateInfo.mute !== trackEntry.mute) {
+        if (trackEntry.mute) {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
+        } else {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
+        }
+      } else if (currentTrackStateInfo.description !== trackEntry.description) {
+        this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
+      }
+    }
+  };
+
   cleanUp = () => {
     this.hmsPeerList.clear();
   };
 
-  findPeerByUID = (uid: string) => {
-    return this.hmsPeerList.get(uid);
+  findPeerByPeerId = (peerId: string) => {
+    return this.hmsPeerList.get(peerId);
   };
 
   private handlePeerJoin = (peer: PeerNotification) => {
@@ -181,4 +214,16 @@ export default class NotificationManager {
     const peers = peerList.peers;
     peers?.forEach((peer) => this.handlePeerJoin(peer));
   };
+
+  private getPeerTrackByTrackId(peerId: string, trackId: string) {
+    const peer = this.findPeerByPeerId(peerId);
+
+    if (peer?.audioTrack?.trackId === trackId) {
+      return peer.audioTrack;
+    } else if (peer?.videoTrack?.trackId === trackId) {
+      return peer.videoTrack;
+    } else {
+      return peer?.auxiliaryTracks.find((track) => track.trackId === trackId);
+    }
+  }
 }

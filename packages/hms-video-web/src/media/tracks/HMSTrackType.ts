@@ -1,4 +1,4 @@
 export enum HMSTrackType {
-  AUDIO,
-  VIDEO,
+  AUDIO = 'audio',
+  VIDEO = 'video',
 }
