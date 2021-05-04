@@ -74,6 +74,7 @@ export class HMSSdk implements HMSInterface {
     const peerId = uuidv4();
 
     this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
+    this.notificationManager.localPeer = this.localPeer;
 
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
@@ -209,6 +210,7 @@ export class HMSSdk implements HMSInterface {
         const message = notification as Message;
         HMSLogger.d(this.TAG, `Received Message:: `, message);
         this.listener?.onMessageReceived(message);
+        break;
     }
   }
 

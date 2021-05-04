@@ -8,10 +8,12 @@ import {
   PeerList,
   TrackStateNotification,
   TrackState,
+  Speaker,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
-import HMSUpdateListener, { HMSTrackUpdate } from '../interfaces/update-listener';
+import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import { HMSAudioLevelListener } from './HMSAudioLevelListener';
 
 interface TrackStateEntry {
   peerId: string;
@@ -20,11 +22,13 @@ interface TrackStateEntry {
 
 export default class NotificationManager extends EventTarget {
   hmsPeerList: Map<string, HMSPeer> = new Map();
+  localPeer!: HMSPeer | null;
 
   private TAG: string = '[Notification Manager]:';
   private tracksToProcess: Map<string, HMSTrack> = new Map();
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
   private listener!: HMSUpdateListener;
+  private audioLevelListener = new HMSAudioLevelListener();
 
   handleNotification(method: HMSNotificationMethod, notification: HMSNotifications, listener: HMSUpdateListener) {
     this.listener = listener;
@@ -60,7 +64,8 @@ export default class NotificationManager extends EventTarget {
         break;
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
-        return;
+        this.handleActiveSpeakers(notification as Speaker[]);
+        break;
       default:
         return;
     }
@@ -176,6 +181,11 @@ export default class NotificationManager extends EventTarget {
 
       if (currentTrackStateInfo.mute !== trackEntry.mute) {
         if (trackEntry.mute) {
+          // If dominant speaker is muted, resign dominant speaker.
+          if (hmsPeer.peerId === this.audioLevelListener.dominantSpeaker?.peerId) {
+            HMSLogger.d(this.TAG, 'DOMINANT_SPEAKER_MUTE', hmsPeer);
+            this.listener.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, hmsPeer);
+          }
           this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
         } else {
           this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
@@ -191,6 +201,10 @@ export default class NotificationManager extends EventTarget {
   };
 
   findPeerByPeerId = (peerId: string) => {
+    if (this.localPeer?.peerId === peerId) {
+      return this.localPeer;
+    }
+
     return this.hmsPeerList.get(peerId);
   };
 
@@ -223,6 +237,16 @@ export default class NotificationManager extends EventTarget {
     const peers = peerList.peers;
     peers?.forEach((peer) => this.handlePeerJoin(peer));
   };
+
+  /**
+   * @param speakersList List of speakers[peer_id, level] sorted by level in descending order.
+   */
+  handleActiveSpeakers(speakers: Speaker[]) {
+    HMSLogger.d(this.TAG, `ACTIVESPEAKERS`, speakers);
+    const dominantSpeaker = speakers[0];
+    const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peer_id);
+    this.audioLevelListener.updateDominantSpeaker(dominantSpeaker, dominantSpeakerPeer!, this.listener);
+  }
 
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
     const peer = this.findPeerByPeerId(peerId);

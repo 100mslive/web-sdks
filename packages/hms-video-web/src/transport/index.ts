@@ -92,8 +92,7 @@ export default class HMSTransport implements ITransport {
 
   private subscribeConnectionObserver: ISubscribeConnectionObserver = {
     onApiChannelMessage: (message: string) => {
-      const data = { method: 'active-speakers', params: JSON.parse(message) };
-      this.observer.onNotification(data);
+      this.observer.onNotification(JSON.parse(message));
     },
 
     onTrackAdd: (track: HMSTrack) => this.observer.onTrackAdd(track),
