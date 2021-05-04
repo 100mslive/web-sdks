@@ -37,7 +37,7 @@ export enum HMSTrackUpdate {
 export default interface HMSUpdateListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
-  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer): void;
+  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | null): void;
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
   onMessageReceived(message: HMSMessage): void;
   onError(error: HMSException): void;

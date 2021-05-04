@@ -244,8 +244,12 @@ export default class NotificationManager extends EventTarget {
   handleActiveSpeakers(speakers: Speaker[]) {
     HMSLogger.d(this.TAG, `ACTIVESPEAKERS`, speakers);
     const dominantSpeaker = speakers[0];
-    const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peer_id);
-    this.audioLevelListener.updateDominantSpeaker(dominantSpeaker, dominantSpeakerPeer!, this.listener);
+    if (dominantSpeaker) {
+      const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peer_id);
+      this.listener.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
+    } else {
+      this.listener.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);
+    }
   }
 
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
