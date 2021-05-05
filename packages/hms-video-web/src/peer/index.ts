@@ -6,6 +6,7 @@ type HMSPeerInit = {
   name: string;
   isLocal: boolean;
   customerDescription: string;
+  role?: string;
 };
 
 export default class Peer implements HMSPeer {
@@ -16,11 +17,13 @@ export default class Peer implements HMSPeer {
   videoTrack?: HMSTrack | null;
   audioTrack?: HMSTrack | null;
   auxiliaryTracks: HMSTrack[] = [];
+  role?: string = '';
 
-  constructor({ peerId, name, isLocal, customerDescription }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, role, customerDescription }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
+    this.role = role;
     this.customerDescription = customerDescription;
   }
 }

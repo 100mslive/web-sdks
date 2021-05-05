@@ -5,7 +5,7 @@ import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import HMSLogger from '../utils/logger';
-import { getRoomId } from '../utils/room';
+import { jwt_decode } from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
@@ -69,18 +69,24 @@ export class HMSSdk implements HMSInterface {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
 
-    const roomId = getRoomId(config.authToken);
+    const { room_id, role } = jwt_decode(config.authToken);
 
     const peerId = uuidv4();
 
-    this.localPeer = new Peer({ peerId, name: config.userName, isLocal: true, customerDescription: config.metaData });
+    this.localPeer = new Peer({
+      peerId,
+      name: config.userName,
+      isLocal: true,
+      role,
+      customerDescription: config.metaData,
+    });
     this.notificationManager.localPeer = this.localPeer;
 
-    HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
+    HMSLogger.d(this.TAG, `⏳ Joining room ${room_id}`);
 
     this.transport.join(config.authToken, this.localPeer.peerId, { name: config.userName }).then(() => {
-      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      this.roomId = roomId;
+      HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
+      this.roomId = room_id;
       if (!this.published) {
         this.publish();
       }

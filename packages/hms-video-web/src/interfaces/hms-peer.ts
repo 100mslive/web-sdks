@@ -1,5 +1,4 @@
 import HMSTrack from '../media/tracks/HMSTrack';
-import HMSRole from './role';
 
 export default interface HMSPeer {
   peerId: string;
@@ -10,5 +9,5 @@ export default interface HMSPeer {
   videoTrack?: HMSTrack | null;
   audioTrack?: HMSTrack | null;
   auxiliaryTracks: HMSTrack[];
-  role?: HMSRole;
+  role?: string;
 }

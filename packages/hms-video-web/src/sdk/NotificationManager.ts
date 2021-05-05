@@ -207,6 +207,7 @@ export default class NotificationManager extends EventTarget {
       name: peer.info.name,
       isLocal: false,
       customerDescription: '',
+      role: peer.role,
     });
 
     this.hmsPeerList.set(peer.peerId, hmsPeer);
