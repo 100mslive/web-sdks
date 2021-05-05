@@ -30,13 +30,19 @@ export class TrackState implements Track {
   track_id: string;
   stream_id: string;
 
-  constructor(track: HMSTrack) {
-    this.mute = !track.enabled;
+  constructor(track: HMSTrack | Track) {
     this.type = track.type;
     this.source = track.source || 'regular';
     this.description = '';
-    this.track_id = track.trackId;
-    this.stream_id = track.stream.id;
+    if (track instanceof HMSTrack) {
+      this.mute = !track.enabled;
+      this.track_id = track.trackId;
+      this.stream_id = track.stream.id;
+    } else {
+      this.mute = track.mute;
+      this.track_id = track.track_id;
+      this.stream_id = track.stream_id;
+    }
   }
 }
 

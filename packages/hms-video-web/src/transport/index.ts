@@ -19,10 +19,11 @@ import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
 import { HMSTrackType } from '../media/tracks';
+import { TrackState } from '../sdk/models/HMSNotifications';
 
 const TAG = '[HMSTransport]:';
 export default class HMSTransport implements ITransport {
-  private tracks: any = {};
+  private tracks: Map<string, TrackState> = new Map();
   private readonly observer: ITransportObserver;
   private publishConnection: HMSPublishConnection | null = null;
   private subscribeConnection: HMSSubscribeConnection | null = null;
@@ -131,6 +132,7 @@ export default class HMSTransport implements ITransport {
       this.signal,
       config.rtcConfiguration,
       this.publishConnectionObserver,
+      this,
     );
 
     this.subscribeConnection = new HMSSubscribeConnection(
@@ -163,14 +165,7 @@ export default class HMSTransport implements ITransport {
 
   private async publishTrack(track: HMSTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
-    this.tracks[track.trackId] = {
-      mute: false,
-      type: track.nativeTrack.kind,
-      source: track.source,
-      description: '',
-      track_id: track.trackId,
-      stream_id: track.stream.id,
-    };
+    this.tracks.set(track.trackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
@@ -195,7 +190,7 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    delete this.tracks[track.trackId];
+    this.tracks.delete(track.trackId);
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
     });
@@ -219,5 +214,21 @@ export default class HMSTransport implements ITransport {
 
   sendMessage(message: HMSMessage) {
     this.signal.broadcast(message);
+  }
+
+  trackUpdate(track: HMSTrack) {
+    const currentTrackStates = Array.from(this.tracks.values());
+    const originalTrackState = currentTrackStates.find(
+      (trackState) => track.type === trackState.type && track.source === trackState.source,
+    );
+    if (originalTrackState) {
+      const newTrackState = new TrackState({
+        ...originalTrackState,
+        mute: !track.enabled,
+      });
+      this.tracks.set(originalTrackState.track_id, newTrackState);
+      HMSLogger.d(TAG, 'Track Update', this.tracks, track);
+      this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
+    }
   }
 }

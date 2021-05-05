@@ -96,7 +96,7 @@ export default class JsonRpcSignal implements ISignal {
   async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
     const response = await this.call('offer', {
       desc,
-      tracks,
+      tracks: Object.fromEntries(tracks),
     });
     return response as RTCSessionDescriptionInit;
   }
