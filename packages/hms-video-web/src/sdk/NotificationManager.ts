@@ -13,7 +13,6 @@ import {
 import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
-import { HMSAudioLevelListener } from './HMSAudioLevelListener';
 
 interface TrackStateEntry {
   peerId: string;
@@ -28,7 +27,6 @@ export default class NotificationManager extends EventTarget {
   private tracksToProcess: Map<string, HMSTrack> = new Map();
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
   private listener!: HMSUpdateListener;
-  private audioLevelListener = new HMSAudioLevelListener();
 
   handleNotification(method: HMSNotificationMethod, notification: HMSNotifications, listener: HMSUpdateListener) {
     this.listener = listener;
@@ -181,11 +179,6 @@ export default class NotificationManager extends EventTarget {
 
       if (currentTrackStateInfo.mute !== trackEntry.mute) {
         if (trackEntry.mute) {
-          // If dominant speaker is muted, resign dominant speaker.
-          if (hmsPeer.peerId === this.audioLevelListener.dominantSpeaker?.peerId) {
-            HMSLogger.d(this.TAG, 'DOMINANT_SPEAKER_MUTE', hmsPeer);
-            this.listener.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, hmsPeer);
-          }
           this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
         } else {
           this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
