@@ -31,6 +31,6 @@ export default class HMSRemoteStream extends HMSMediaStream {
       audio: this.audio,
       framerate: this.frameRate,
     };
-    await this.connection.apiChannel.send(JSON.stringify(data));
+    await this.connection.apiChannel?.send(JSON.stringify(data));
   }
 }

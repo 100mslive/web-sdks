@@ -98,6 +98,7 @@ export default class NotificationManager extends EventTarget {
       if (!hmsPeer) return;
 
       track.source = state.trackInfo.source;
+      track.setEnabled(!state.trackInfo.mute);
 
       switch (track.type) {
         case HMSTrackType.AUDIO:
