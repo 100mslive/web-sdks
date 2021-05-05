@@ -172,6 +172,8 @@ export default class NotificationManager extends EventTarget {
       const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
       if (!track) return;
 
+      track.setEnabled(!trackEntry.mute);
+
       this.trackStateMap.set(trackId, {
         peerId: params.peer.peer_id,
         trackInfo: { ...currentTrackStateInfo, ...trackEntry },
