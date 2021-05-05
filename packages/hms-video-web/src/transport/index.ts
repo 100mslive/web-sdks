@@ -18,7 +18,6 @@ import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
-import { HMSTrackType } from '../media/tracks';
 import { TrackState } from '../sdk/models/HMSNotifications';
 
 const TAG = '[HMSTransport]:';
@@ -174,16 +173,14 @@ export default class HMSTransport implements ITransport {
     stream.addTransceiver(track);
     await p;
 
-    // @TODO: May be this should be exposed as an API
-    if (track.type === HMSTrackType.VIDEO) {
-      const maxBitrate = 250;
-      await stream
-        .setMaxBitrate(maxBitrate * 1000, track)
-        .then(() => {
-          HMSLogger.d(TAG, `Setting maxBitrate to ${maxBitrate} kpbs`);
-        })
-        .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
-    }
+    // @ts-ignore
+    const maxBitrate = track.settings.maxBitRate;
+    await stream
+      .setMaxBitrate(maxBitrate * 1000, track)
+      .then(() => {
+        HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
+      })
+      .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
   }

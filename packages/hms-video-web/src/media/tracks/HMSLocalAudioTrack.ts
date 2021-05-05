@@ -4,7 +4,7 @@ import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';
 import { getAudioTrack } from '../../utils/track';
 
 export default class HMSLocalAudioTrack extends HMSAudioTrack {
-  private settings: HMSAudioTrackSettings;
+  settings: HMSAudioTrackSettings;
 
   constructor(stream: HMSLocalStream, track: MediaStreamTrack, settings: HMSAudioTrackSettings, source: string) {
     super(stream, track, source);

@@ -2,14 +2,7 @@ import HMSConfig from './config';
 import HMSUpdateListener from './update-listener';
 import HMSPeer from './hms-peer';
 import HMSMessage from './message';
-
-export enum HMSlogLevel {
-  OFF,
-  ERROR,
-  WARN,
-  INFO,
-  VERBOSE, // @Discuss DEBUG is most commonly used
-}
+import { HMSLogLevel } from '../utils/logger';
 
 export enum HMSAnalyticsLevel {
   OFF,
@@ -19,7 +12,7 @@ export enum HMSAnalyticsLevel {
 }
 
 export default interface HMS {
-  logLevel: HMSlogLevel;
+  logLevel: HMSLogLevel;
   analyticsLevel: HMSAnalyticsLevel;
   join(config: HMSConfig, callback: HMSUpdateListener): void;
   leave(): void;

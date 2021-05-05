@@ -1,10 +1,10 @@
 import HMSConfig from '../interfaces/config';
-import HMSInterface, { HMSAnalyticsLevel, HMSlogLevel } from '../interfaces/hms';
+import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
-import HMSLogger from '../utils/logger';
+import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { jwt_decode } from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
@@ -16,13 +16,12 @@ import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
 import HMSRoom from './models/HMSRoom';
 import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
-import { DefaultVideoSettings } from '../media/settings';
 import Message from './models/HMSMessage';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 
 export class HMSSdk implements HMSInterface {
-  logLevel: HMSlogLevel = HMSlogLevel.OFF;
+  logLevel: HMSLogLevel = HMSLogLevel.INFO;
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF;
   transport!: HMSTransport | null;
   roomId!: string | null;
@@ -58,10 +57,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   constructor() {
-    this.notificationManager.addEventListener(
-      'role-change',
-      (e: any) => (this.publishParams = e.detail.params.role.publishParams),
-    );
+    this.notificationManager.addEventListener('role-change', (e: any) => {
+      this.publishParams = e.detail.params.role.publishParams;
+      console.log(e.detail.params);
+    });
     this.transport = new HMSTransport(this.observer);
   }
 
@@ -135,13 +134,21 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startScreenShare(onStop: () => void) {
-    // TODO: add optional arguments `settings`
+    const { screen } = this.publishParams;
 
     if ((this.localPeer?.auxiliaryTracks?.length || 0) > 0) {
       throw Error('Cannot share multiple screens');
     }
 
-    const track = await this.transport!.getLocalScreen(DefaultVideoSettings.HD);
+    const track = await this.transport!.getLocalScreen(
+      new HMSVideoTrackSettingsBuilder()
+        .maxBitRate(screen.bitRate)
+        .codec(screen.codec)
+        .maxFrameRate(screen.frameRate)
+        .setWidth(screen.width)
+        .setHeight(screen.height)
+        .build(),
+    );
     track.nativeTrack.onended = () => {
       this.stopEndedScreenshare(onStop);
     };
@@ -226,12 +233,14 @@ export class HMSSdk implements HMSInterface {
     const canPublishVideo = allowed && allowed.includes('video');
     const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
       .codec(audio.codec)
-      .maxBitRate(audio.bitrate)
+      .maxBitRate(audio.bitRate)
       .build();
     const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
       .codec(video.codec)
       .maxBitRate(video.bitRate)
       .maxFrameRate(video.frameRate)
+      .setWidth(video.width)
+      .setHeight(video.height)
       .build();
 
     if (canPublishAudio || canPublishVideo) {

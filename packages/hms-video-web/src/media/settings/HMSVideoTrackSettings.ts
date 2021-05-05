@@ -14,15 +14,21 @@ export class HMSVideoResolution {
 }
 
 export class HMSVideoTrackSettingsBuilder {
-  private _resolution: HMSVideoResolution = new HMSVideoResolution(320, 180);
+  private _width: number = 320;
+  private _height: number = 180;
   private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
-  private _maxFrameRate: number = 24;
+  private _maxFrameRate: number = 30;
   private _maxBitRate: number = 150_000;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
-  resolution(resolution: HMSVideoResolution) {
-    this._resolution = resolution;
+  setWidth(width: number) {
+    this._width = width;
+    return this;
+  }
+
+  setHeight(height: number) {
+    this._height = height;
     return this;
   }
 
@@ -56,7 +62,8 @@ export class HMSVideoTrackSettingsBuilder {
 
   build() {
     return new HMSVideoTrackSettings(
-      this._resolution,
+      this._width,
+      this._height,
       this._codec,
       this._maxFrameRate,
       this._maxBitRate,
@@ -67,7 +74,8 @@ export class HMSVideoTrackSettingsBuilder {
 }
 
 export default class HMSVideoTrackSettings {
-  readonly resolution: HMSVideoResolution;
+  readonly width: number;
+  readonly height: number;
   readonly codec: HMSVideoCodec;
   readonly maxFrameRate: number;
   readonly maxBitRate: number;
@@ -75,14 +83,16 @@ export default class HMSVideoTrackSettings {
   readonly advanced: Array<MediaTrackConstraintSet>;
 
   constructor(
-    resolution: HMSVideoResolution,
+    width: number,
+    height: number,
     codec: HMSVideoCodec,
     maxFrameRate: number,
     maxBitRate: number,
     deviceId: string,
     advanced: Array<MediaTrackConstraintSet>,
   ) {
-    this.resolution = resolution;
+    this.width = width;
+    this.height = height;
     this.codec = codec;
     this.maxFrameRate = maxFrameRate;
     this.maxBitRate = maxBitRate;
@@ -92,8 +102,8 @@ export default class HMSVideoTrackSettings {
 
   toConstraints(): MediaTrackConstraints {
     return {
-      width: this.resolution.width,
-      height: this.resolution.height,
+      width: this.width,
+      height: this.height,
       frameRate: this.maxFrameRate,
       deviceId: this.deviceId,
     };

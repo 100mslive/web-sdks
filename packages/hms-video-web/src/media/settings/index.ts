@@ -4,4 +4,3 @@ export enum HMSSimulcastLayer {
   MEDIUM = 'medium',
   HIGH = 'high',
 }
-export { DefaultVideoSettings } from './HMSTrackSettings';

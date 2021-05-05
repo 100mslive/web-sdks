@@ -5,7 +5,7 @@ import { getVideoTrack } from '../../utils/track';
 import { sleep } from '../../utils/sleep';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
-  private settings: HMSVideoTrackSettings;
+  settings: HMSVideoTrackSettings;
 
   constructor(stream: HMSLocalStream, track: MediaStreamTrack, settings: HMSVideoTrackSettings, source: string) {
     super(stream, track, source);
