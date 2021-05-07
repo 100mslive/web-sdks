@@ -3,6 +3,7 @@ import HMSTrack from '../media/tracks/HMSTrack';
 import HMSPeer from './hms-peer';
 import HMSMessage from './message';
 import HMSRoom from './room';
+import HMSSpeaker from './speaker';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -32,6 +33,10 @@ export enum HMSTrackUpdate {
   TRACK_MUTED,
   TRACK_UNMUTED,
   TRACK_DESCRIPTION_CHANGED,
+}
+
+export interface HMSAudioListener {
+  onAudioLevelUpdate(speakers: HMSSpeaker[]): void;
 }
 
 export default interface HMSUpdateListener {

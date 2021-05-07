@@ -8,11 +8,11 @@ import {
   PeerList,
   TrackStateNotification,
   TrackState,
-  Speaker,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
-import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import { SpeakerList } from './models/HMSSpeaker';
 
 interface TrackStateEntry {
   peerId: string;
@@ -27,9 +27,16 @@ export default class NotificationManager extends EventTarget {
   private tracksToProcess: Map<string, HMSTrack> = new Map();
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
   private listener!: HMSUpdateListener;
+  private audioListener: HMSAudioListener | null = null;
 
-  handleNotification(method: HMSNotificationMethod, notification: HMSNotifications, listener: HMSUpdateListener) {
+  handleNotification(
+    method: HMSNotificationMethod,
+    notification: HMSNotifications,
+    listener: HMSUpdateListener,
+    audioListener: HMSAudioListener | null,
+  ) {
     this.listener = listener;
+    this.audioListener = audioListener;
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {
         const peer = notification as PeerNotification;
@@ -62,7 +69,7 @@ export default class NotificationManager extends EventTarget {
         break;
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
-        this.handleActiveSpeakers(notification as Speaker[]);
+        this.handleActiveSpeakers(notification as SpeakerList);
         break;
       default:
         return;
@@ -238,11 +245,13 @@ export default class NotificationManager extends EventTarget {
   /**
    * @param speakersList List of speakers[peer_id, level] sorted by level in descending order.
    */
-  handleActiveSpeakers(speakers: Speaker[]) {
+  handleActiveSpeakers(speakerList: SpeakerList) {
+    const speakers = speakerList.speakers;
     HMSLogger.d(this.TAG, `ACTIVESPEAKERS`, speakers);
+    this.audioListener?.onAudioLevelUpdate(speakers);
     const dominantSpeaker = speakers[0];
     if (dominantSpeaker) {
-      const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peer_id);
+      const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peerId);
       this.listener.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
     } else {
       this.listener.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);

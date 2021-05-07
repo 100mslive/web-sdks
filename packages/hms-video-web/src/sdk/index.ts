@@ -3,7 +3,7 @@ import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
-import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { jwt_decode } from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
@@ -30,6 +30,7 @@ export class HMSSdk implements HMSInterface {
   private TAG: string = '[HMSSdk]:';
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener | null;
+  private audioListener: HMSAudioListener | null = null;
   private hmsRoom?: HMSRoom | null;
   private published: boolean = false;
   private publishParams: any = null;
@@ -39,7 +40,7 @@ export class HMSSdk implements HMSInterface {
       const method = getNotificationMethod(message.method);
       const notification = getNotification(method, message.params);
       // @TODO: Notification manager needs to be refactored. The current implementation is not manageable
-      this.notificationManager.handleNotification(method, notification, this.listener!);
+      this.notificationManager.handleNotification(method, notification, this.listener!, this.audioListener);
       this.onNotificationHandled(method, notification);
     },
 
@@ -172,7 +173,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
+  addAudioListener(audioListener: HMSAudioListener) {
+    this.audioListener = audioListener;
+  }
+
+  private onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
     HMSLogger.d(this.TAG, 'onNotificationHandled', method);
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {

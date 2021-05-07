@@ -3,8 +3,9 @@ import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
+import { SpeakerList } from './HMSSpeaker';
 
-export type HMSNotifications = Peer | PeerList | Message | TrackStateNotification | Speaker[] | undefined;
+export type HMSNotifications = Peer | PeerList | Message | TrackStateNotification | SpeakerList | undefined;
 
 export interface TrackStateNotification {
   tracks: Map<string, TrackState>;
@@ -72,11 +73,6 @@ export class PeerList {
   }
 }
 
-export interface Speaker {
-  peer_id: string;
-  level: number;
-}
-
 export const getNotification = (method: HMSNotificationMethod, params: any) => {
   switch (method) {
     case HMSNotificationMethod.PEER_JOIN:
@@ -88,7 +84,7 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     case HMSNotificationMethod.BROADCAST:
       return new Message(params.info);
     case HMSNotificationMethod.ACTIVE_SPEAKERS:
-      return (params.hasOwnProperty('speaker-list') ? params['speaker-list'] : []) as Speaker[];
+      return new SpeakerList(params['speaker-list']);
     case HMSNotificationMethod.ROLE_CHANGE:
       return params as TrackStateNotification;
     case HMSNotificationMethod.TRACK_METADATA_ADD:
