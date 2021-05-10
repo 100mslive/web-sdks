@@ -20,6 +20,7 @@ import Peer from '../peer';
 import Message from './models/HMSMessage';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
+import HMSAudioSinkManager from '../audio-sink-manager';
 
 export class HMSSdk implements HMSInterface {
   logLevel: HMSLogLevel = HMSLogLevel.INFO;
@@ -32,6 +33,7 @@ export class HMSSdk implements HMSInterface {
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener | null;
   private audioListener: HMSAudioListener | null = null;
+  private audioSinkManager!: HMSAudioSinkManager;
   private hmsRoom?: HMSRoom | null;
   private published: boolean = false;
   private publishParams: any = null;
@@ -69,6 +71,7 @@ export class HMSSdk implements HMSInterface {
   join(config: HMSConfig, settings: InitialSettings, listener: HMSUpdateListener) {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
+    this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
 
     const { room_id, role } = jwt_decode(config.authToken);
 
@@ -97,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
+    this.audioSinkManager.cleanUp();
     this.notificationManager.cleanUp();
 
     this.published = false;

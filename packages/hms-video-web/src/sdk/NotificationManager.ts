@@ -123,6 +123,7 @@ export default class NotificationManager extends EventTarget {
           }
       }
 
+      track.type === HMSTrackType.AUDIO && this.dispatchEvent(new CustomEvent('track-added', { detail: track }));
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(track.trackId);
     });
@@ -164,6 +165,7 @@ export default class NotificationManager extends EventTarget {
           }
         }
       }
+      track.type === HMSTrackType.AUDIO && this.dispatchEvent(new CustomEvent('track-removed', { detail: track }));
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     }
   };
