@@ -118,8 +118,8 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(authToken: string, peerId: string, customData: any): Promise<void> {
-    const config = await InitService.fetchInitConfig(authToken);
+  async join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void> {
+    const config = await InitService.fetchInitConfig(authToken, initEndpoint);
 
     HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
     await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`);

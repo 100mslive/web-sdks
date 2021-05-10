@@ -3,7 +3,7 @@ import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 
 export default interface ITransport {
-  join(authToken: string, roomId: string, peerId: string, customData: Object): Promise<void>;
+  join(authToken: string, peerId: string, customData: Object, initEndpoint?: string): Promise<void>;
 
   leave(): Promise<void>;
 

@@ -84,13 +84,15 @@ export class HMSSdk implements HMSInterface {
 
     HMSLogger.d(this.TAG, `⏳ Joining room ${room_id}`);
 
-    this.transport.join(config.authToken, this.localPeer.peerId, { name: config.userName }).then(() => {
-      HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
-      this.roomId = room_id;
-      if (!this.published) {
-        this.publish();
-      }
-    });
+    this.transport
+      .join(config.authToken, this.localPeer.peerId, { name: config.userName }, config.initEndpoint)
+      .then(() => {
+        HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
+        this.roomId = room_id;
+        if (!this.published) {
+          this.publish();
+        }
+      });
   }
 
   private cleanUp() {
