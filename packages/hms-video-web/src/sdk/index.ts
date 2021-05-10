@@ -1,4 +1,5 @@
 import HMSConfig from '../interfaces/config';
+import InitialSettings from '../interfaces/config';
 import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
@@ -65,7 +66,7 @@ export class HMSSdk implements HMSInterface {
     this.transport = new HMSTransport(this.observer);
   }
 
-  join(config: HMSConfig, listener: HMSUpdateListener) {
+  join(config: HMSConfig, settings: InitialSettings, listener: HMSUpdateListener) {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
 
@@ -90,7 +91,7 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
         this.roomId = room_id;
         if (!this.published) {
-          this.publish();
+          this.publish(settings);
         }
       });
   }
@@ -234,7 +235,8 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private publish() {
+  private publish(settings: InitialSettings) {
+    const { isAudioMuted, isVideoMuted } = settings;
     const { audio, video, allowed } = this.publishParams;
     const canPublishAudio = allowed && allowed.includes('audio');
     const canPublishVideo = allowed && allowed.includes('video');
@@ -263,10 +265,12 @@ export class HMSSdk implements HMSInterface {
             switch (hmsTrack.type) {
               case HMSTrackType.AUDIO:
                 this.localPeer!.audioTrack = hmsTrack;
+                hmsTrack.setEnabled(!isAudioMuted);
                 break;
 
               case HMSTrackType.VIDEO:
                 this.localPeer!.videoTrack = hmsTrack;
+                hmsTrack.setEnabled(!isVideoMuted);
             }
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
           });
