@@ -1,15 +1,11 @@
+import InitialSettings from './settings';
+
 export default interface HMSConfig {
   userName: string;
   authToken: string;
   metaData: string;
   audioSinkElementId?: string;
   initEndpoint?: string;
+  settings: InitialSettings;
   autoVideoSubscribe?: boolean;
-}
-
-export interface InitialSettings {
-  isAudioMuted: boolean;
-  isVideoMuted: boolean;
-  audioDeviceID: string;
-  videoDeviceID: string;
 }

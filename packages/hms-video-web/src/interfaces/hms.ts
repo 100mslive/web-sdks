@@ -1,4 +1,4 @@
-import HMSConfig, { InitialSettings } from './config';
+import HMSConfig from './config';
 import HMSUpdateListener from './update-listener';
 import HMSPeer from './hms-peer';
 import HMSMessage from './message';
@@ -14,7 +14,7 @@ export enum HMSAnalyticsLevel {
 export default interface HMS {
   logLevel: HMSLogLevel;
   analyticsLevel: HMSAnalyticsLevel;
-  join(config: HMSConfig, settings: InitialSettings, callback: HMSUpdateListener): void;
+  join(config: HMSConfig, callback: HMSUpdateListener): void;
   leave(): void;
   getLocalPeer(): HMSPeer;
   getPeers(): HMSPeer[];

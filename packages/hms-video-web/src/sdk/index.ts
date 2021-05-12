@@ -1,4 +1,5 @@
-import HMSConfig, { InitialSettings } from '../interfaces/config';
+import HMSConfig from '../interfaces/config';
+import InitialSettings from '../interfaces/settings';
 import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
@@ -67,11 +68,10 @@ export class HMSSdk implements HMSInterface {
     this.transport = new HMSTransport(this.observer);
   }
 
-  join(config: HMSConfig, settings: InitialSettings, listener: HMSUpdateListener) {
+  join(config: HMSConfig, listener: HMSUpdateListener) {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
     this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
-
     const { room_id, role } = jwt_decode(config.authToken);
 
     const peerId = uuidv4();
@@ -99,7 +99,7 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
         this.roomId = room_id;
         if (!this.published) {
-          this.publish(settings);
+          this.publish(config.settings);
         }
       });
   }
@@ -245,13 +245,15 @@ export class HMSSdk implements HMSInterface {
   }
 
   private publish(settings: InitialSettings) {
-    const { isAudioMuted, isVideoMuted } = settings;
+    const { isAudioMuted, isVideoMuted, audioInputDeviceId, videoDeviceId } = settings;
     const { audio, video, allowed } = this.publishParams;
     const canPublishAudio = allowed && allowed.includes('audio');
     const canPublishVideo = allowed && allowed.includes('video');
+    HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
     const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
       .codec(audio.codec)
       .maxBitRate(audio.bitRate)
+      .deviceId(audioInputDeviceId)
       .build();
     const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
       .codec(video.codec)
@@ -259,6 +261,7 @@ export class HMSSdk implements HMSInterface {
       .maxFrameRate(video.frameRate)
       .setWidth(video.width)
       .setHeight(video.height)
+      .deviceId(videoDeviceId)
       .build();
 
     if (canPublishAudio || canPublishVideo) {
