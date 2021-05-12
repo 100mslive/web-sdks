@@ -6,7 +6,7 @@ export default interface HMSConfig {
   initEndpoint?: string;
 }
 
-export default interface InitialSettings {
+export interface InitialSettings {
   isAudioMuted: boolean;
   isVideoMuted: boolean;
   audioDeviceID: string;

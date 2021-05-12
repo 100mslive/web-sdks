@@ -1,5 +1,4 @@
-import HMSConfig from '../interfaces/config';
-import InitialSettings from '../interfaces/config';
+import HMSConfig, { InitialSettings } from '../interfaces/config';
 import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';

@@ -1,5 +1,4 @@
-import HMSConfig from './config';
-import InitialSettings from './config';
+import HMSConfig, { InitialSettings } from './config';
 import HMSUpdateListener from './update-listener';
 import HMSPeer from './hms-peer';
 import HMSMessage from './message';
