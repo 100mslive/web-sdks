@@ -4,6 +4,7 @@ export default interface HMSConfig {
   metaData: string;
   audioSinkElementId?: string;
   initEndpoint?: string;
+  autoVideoSubscribe?: boolean;
 }
 
 export interface InitialSettings {

@@ -73,8 +73,13 @@ export default class JsonRpcSignal implements ISignal {
     return p;
   }
 
-  async join(name: string, data: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit> {
-    const params = { name, data, offer };
+  async join(
+    name: string,
+    data: string,
+    offer: RTCSessionDescriptionInit,
+    disableVidAutoSub: boolean,
+  ): Promise<RTCSessionDescriptionInit> {
+    const params = { name, disableVidAutoSub, data, offer };
     const response: RTCSessionDescriptionInit = await this.call('join', params);
 
     this.isJoinCompleted = true;

@@ -88,7 +88,13 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `⏳ Joining room ${room_id}`);
 
     this.transport
-      .join(config.authToken, this.localPeer.peerId, { name: config.userName }, config.initEndpoint)
+      .join(
+        config.authToken,
+        this.localPeer.peerId,
+        { name: config.userName },
+        config.initEndpoint,
+        config.autoVideoSubscribe,
+      )
       .then(() => {
         HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
         this.roomId = room_id;

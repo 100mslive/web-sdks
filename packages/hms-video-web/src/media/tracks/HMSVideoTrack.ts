@@ -9,4 +9,12 @@ export default class HMSVideoTrack extends HMSTrack {
     super(stream, track, source as HMSTrackSource);
     if (track.kind !== 'video') throw new Error("Expected 'track' kind = 'video'");
   }
+
+  addSink(videoElement: HTMLVideoElement) {
+    videoElement.srcObject = new MediaStream([this.nativeTrack]);
+  }
+
+  removeSink(videoElement: HTMLVideoElement) {
+    videoElement.srcObject = null;
+  }
 }

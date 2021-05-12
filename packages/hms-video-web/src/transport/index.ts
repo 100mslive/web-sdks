@@ -118,7 +118,13 @@ export default class HMSTransport implements ITransport {
     return await HMSLocalStream.getLocalTracks(settings);
   }
 
-  async join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void> {
+  async join(
+    authToken: string,
+    peerId: string,
+    customData: any,
+    initEndpoint?: string,
+    autoSubscribeVideo: boolean = true,
+  ): Promise<void> {
     const config = await InitService.fetchInitConfig(authToken, initEndpoint);
 
     HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
@@ -143,7 +149,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     const offer = await this.publishConnection.createOffer();
     await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.join(customData.name, peerId, offer);
+    const answer = await this.signal.join(customData.name, peerId, offer, !autoSubscribeVideo);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);

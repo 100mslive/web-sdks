@@ -15,7 +15,12 @@ export interface Track {
 export interface ISignal {
   open(uri: string): Promise<void>;
 
-  join(name: string, data: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>;
+  join(
+    name: string,
+    data: string,
+    offer: RTCSessionDescriptionInit,
+    disableVidAutoSub: boolean,
+  ): Promise<RTCSessionDescriptionInit>;
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;
 

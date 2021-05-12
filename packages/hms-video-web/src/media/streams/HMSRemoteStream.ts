@@ -19,8 +19,8 @@ export default class HMSRemoteStream extends HMSMediaStream {
     await this.syncWithApiChannel();
   }
 
-  async setVideo(enabled: boolean) {
-    this.video = enabled ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
+  async setVideo(layer: HMSSimulcastLayer) {
+    this.video = layer;
     await this.syncWithApiChannel();
   }
 
