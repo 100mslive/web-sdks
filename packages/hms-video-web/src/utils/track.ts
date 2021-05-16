@@ -17,8 +17,8 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings) {
 
 // the dimensions of the passed in track are used to create the empty video track
 export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack) {
-  const width = prevTrack?.getSettings()?.width || 640
-  const height = prevTrack?.getSettings()?.height || 360
+  const width = prevTrack?.getSettings()?.width || 640;
+  const height = prevTrack?.getSettings()?.height || 360;
   const canvas = Object.assign(document.createElement('canvas'), { width, height }) as any;
   canvas.getContext('2d')?.fillRect(0, 0, width, height);
   const stream = canvas.captureStream();

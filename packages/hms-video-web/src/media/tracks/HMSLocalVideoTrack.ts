@@ -1,7 +1,7 @@
 import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
-import {getEmptyVideoTrack, getVideoTrack} from '../../utils/track';
+import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
@@ -22,7 +22,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async replaceTrackWithBlackness() {
     const prevTrack = this.nativeTrack;
-    const withTrack = getEmptyVideoTrack(prevTrack)
+    const withTrack = getEmptyVideoTrack(prevTrack);
     await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
     prevTrack?.stop();
   }
