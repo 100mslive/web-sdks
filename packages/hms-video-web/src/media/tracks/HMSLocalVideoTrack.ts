@@ -1,8 +1,7 @@
 import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
-import { getVideoTrack } from '../../utils/track';
-import { sleep } from '../../utils/sleep';
+import {getEmptyVideoTrack, getVideoTrack} from '../../utils/track';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
@@ -15,8 +14,17 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
+    const prevTrack = this.nativeTrack;
     const withTrack = await getVideoTrack(settings);
     await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
+    prevTrack?.stop();
+  }
+
+  private async replaceTrackWithBlackness() {
+    const prevTrack = this.nativeTrack;
+    const withTrack = getEmptyVideoTrack(prevTrack)
+    await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
+    prevTrack?.stop();
   }
 
   async setEnabled(value: boolean): Promise<void> {
@@ -26,9 +34,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     if (value) {
       await this.replaceTrackWith(this.settings);
     } else {
-      // Delay this call such that last frame sent is a black frame.
-      await sleep(100);
-      this.nativeTrack.stop();
+      await this.replaceTrackWithBlackness();
     }
   }
 
