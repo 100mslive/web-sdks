@@ -1,7 +1,4 @@
-export enum HMSConnectionRole {
-  PUBLISH = 0,
-  SUBSCRIBE = 1,
-}
+import { HMSConnectionRole } from '../connection/model';
 
 export interface Track {
   mute: boolean;

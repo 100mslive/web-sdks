@@ -6,6 +6,7 @@ import { JsonRpcRequest } from './models';
 import { HMSExceptionBuilder } from '../../error/HMSException';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
+import HMSErrors from '../../error/HMSErrors';
 import HMSMessage from '../../interfaces/message';
 
 export default class JsonRpcSignal implements ISignal {
@@ -59,6 +60,14 @@ export default class JsonRpcSignal implements ISignal {
       };
 
       this.socket.addEventListener('open', openHandler);
+      this.socket.addEventListener('close', (e) => {
+        // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
+        if (e.code !== 1000) {
+          // 1000 code indicated `Normal Closure` [https://tools.ietf.org/html/rfc6455#section-7.4.1]
+          const error = new HMSExceptionBuilder(HMSErrors.ConnectionLost).errorInfo(`${e.reason} [${e.code}]`).build();
+          this.observer.onFailure(error);
+        }
+      });
       this.socket.addEventListener('message', (event) => this.onMessageHandler(event.data));
     });
   }
@@ -143,7 +152,7 @@ export default class JsonRpcSignal implements ISignal {
           cb.resolve(JSON.stringify(response.result));
         } else {
           const error = response.error;
-          const ex = new HMSExceptionBuilder(error.code, error.message).build();
+          const ex = HMSExceptionBuilder.from(error.code, error.message).build();
           cb.reject(ex);
         }
       } else {

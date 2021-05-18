@@ -79,7 +79,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   }
 
   constructor(signal: ISignal, config: RTCConfiguration, observer: ISubscribeConnectionObserver) {
-    super(HMSConnectionRole.SUBSCRIBE, signal);
+    super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);

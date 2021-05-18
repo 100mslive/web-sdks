@@ -1,0 +1,51 @@
+/*
+ * HMSErrors.ts
+ *
+ * Created by codegen
+ * Copyright © 2021 100ms. All rights reserved.
+ */
+
+export interface CodeMessage {
+  code: number;
+  messageTemplate: string;
+  requiresAction: boolean;
+  requiresErrorInfo: boolean;
+}
+
+const HMSErrors = {
+%{
+  import csv
+  import urllib2
+
+  url = "https://docs.google.com/spreadsheets/d/130OjD6rMeoBidosnRimQE6xmwXQRv16U0TOjZhf7ejQ/export?format=csv"
+  response = urllib2.urlopen(url)
+  data = response.read().decode('utf-8')
+
+}%
+% for row in csv.DictReader(data.splitlines()):
+%{
+reason = row["What is wrong?"]
+name = row["Error Name"]
+nameTitleCased  = ''.join(name.title().split(' '))
+
+code = row["Error Code"]
+message =  row["Error Message"]
+requiresAction = message.find("{action}") != -1
+requiresErrorInfo = message.find("{error_info}") != -1
+}%
+% if code and name and reason and message:
+  // ${reason}
+  ${nameTitleCased}: {
+    code: ${code},
+    messageTemplate: `${message}`,
+    requiresAction: ${str(requiresAction).lower()},
+    requiresErrorInfo: ${str(requiresErrorInfo).lower()},
+  },
+% elif len(reason) > 0:
+  /* ${reason} */
+
+% end
+% end
+};
+
+export default HMSErrors;

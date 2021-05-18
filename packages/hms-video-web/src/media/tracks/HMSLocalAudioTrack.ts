@@ -2,9 +2,6 @@ import HMSAudioTrack from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';
 import { getAudioTrack } from '../../utils/track';
-import HMSLogger from '../../utils/logger';
-
-const TAG = '[HMSLocalAudioTrack]';
 
 function generateHasPropertyChanged(newSettings: HMSAudioTrackSettings, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -41,10 +38,6 @@ export default class HMSLocalAudioTrack extends HMSAudioTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
-    if (hasPropertyChanged('codec')) {
-      HMSLogger.w(TAG, "Audio Codec can't be changed mid call.");
-    }
-
     if (hasPropertyChanged('deviceId')) {
       await this.replaceTrackWith(newSettings);
     }
@@ -54,11 +47,7 @@ export default class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('advanced')) {
-      try {
-        await this.nativeTrack.applyConstraints(newSettings.toConstraints());
-      } catch (error) {
-        HMSLogger.e(TAG, error);
-      }
+      await this.nativeTrack.applyConstraints(newSettings.toConstraints());
     }
 
     this.settings = newSettings;

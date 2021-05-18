@@ -20,7 +20,7 @@ export default class HMSPublishConnection extends HMSConnection {
     observer: IPublishConnectionObserver,
     transport: HMSTransport,
   ) {
-    super(HMSConnectionRole.PUBLISH, signal);
+    super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
     this.transport = transport;
 

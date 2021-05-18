@@ -6,6 +6,8 @@ import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
+import { HMSAction } from '../../error/HMSAction';
+import { BuildGetMediaError } from '../../error/HMSErrorFactory';
 
 const TAG = 'HMSLocalStream';
 
@@ -23,8 +25,14 @@ export default class HMSLocalStream extends HMSMediaStream {
       video: settings.toConstraints(),
       audio: false,
     } as MediaStreamConstraints;
-    // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
-    const stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+    let stream;
+    try {
+      // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
+      stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+    } catch (err) {
+      throw BuildGetMediaError(err, HMSAction.GetLocalScreen);
+    }
+
     const local = new HMSLocalStream(stream);
     const nativeTrack = stream.getVideoTracks()[0];
     const track = new HMSLocalVideoTrack(local, nativeTrack, settings, 'screen');
@@ -34,12 +42,16 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   static async getLocalTracks(settings: HMSTrackSettings) {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: settings.audio != null ? settings.audio!.toConstraints() : false,
-      video: settings.video != null ? settings.video!.toConstraints() : false,
-    });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: settings.audio != null ? settings.audio!.toConstraints() : false,
+        video: settings.video != null ? settings.video!.toConstraints() : false,
+      });
+    } catch (err) {
+      throw BuildGetMediaError(err, HMSAction.GetLocalScreen);
+    }
 
-    // TODO: Handle error cases, wrap in `HMSException` and throw it
     const local = new HMSLocalStream(stream);
     const tracks: Array<HMSTrack> = [];
     if (settings.audio != null) {

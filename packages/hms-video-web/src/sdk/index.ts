@@ -6,7 +6,7 @@ import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
-import { jwt_decode } from '../utils/jwt';
+import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
@@ -71,7 +71,7 @@ export class HMSSdk implements HMSInterface {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
     this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
-    const { room_id, role } = jwt_decode(config.authToken);
+    const { roomId, role } = decodeJWT(config.authToken);
 
     const peerId = uuidv4();
 
@@ -84,7 +84,7 @@ export class HMSSdk implements HMSInterface {
     });
     this.notificationManager.localPeer = this.localPeer;
 
-    HMSLogger.d(this.TAG, `⏳ Joining room ${room_id}`);
+    HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     this.transport
       .join(
@@ -95,8 +95,8 @@ export class HMSSdk implements HMSInterface {
         config.autoVideoSubscribe,
       )
       .then(() => {
-        HMSLogger.d(this.TAG, `✅ Joined room ${room_id}`);
-        this.roomId = room_id;
+        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+        this.roomId = roomId;
         if (!this.published) {
           this.publish(config.settings);
         }

@@ -1,5 +1,7 @@
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
+import { HMSExceptionBuilder } from '../../error/HMSException';
+import HMSErrors from '../../error/HMSErrors';
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
@@ -23,7 +25,7 @@ export class HMSTrackSettingsBuilder {
 
   build() {
     if (this._audio === null && this._video === null) {
-      throw Error('There is no media to return. Please select either video or audio or both');
+      throw new HMSExceptionBuilder(HMSErrors.NothingToReturn).build();
     }
 
     if (this._video === null && this._simulcast) {

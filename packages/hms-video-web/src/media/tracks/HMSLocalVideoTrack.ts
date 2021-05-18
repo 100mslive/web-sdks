@@ -2,7 +2,6 @@ import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
-import HMSLogger from '../../utils/logger';
 
 function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -11,8 +10,6 @@ function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSetti
     return prop in newSettings && newSettings[prop] !== oldSettings[prop];
   };
 }
-
-const TAG = '[HMSLocalVideoTrack]';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
@@ -31,7 +28,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     prevTrack?.stop();
   }
 
-  private async replaceTrackWithBlackness() {
+  private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     const withTrack = getEmptyVideoTrack(prevTrack);
     await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
@@ -45,7 +42,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     if (value) {
       await this.replaceTrackWith(this.settings);
     } else {
-      await this.replaceTrackWithBlackness();
+      await this.replaceTrackWithBlank();
     }
   }
 
@@ -54,10 +51,6 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, maxBitrate, deviceId, advanced);
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-
-    if (hasPropertyChanged('codec')) {
-      HMSLogger.w(TAG, "Video Codec can't be changed mid call.");
-    }
 
     if (hasPropertyChanged('deviceId')) {
       await this.replaceTrackWith(newSettings);

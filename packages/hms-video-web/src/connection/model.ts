@@ -1,6 +1,6 @@
 export enum HMSConnectionRole {
-  PUBLISH = 0,
-  SUBSCRIBE = 1,
+  Publish = 0,
+  Subscribe = 1,
 }
 
 export interface HMSTrickle {

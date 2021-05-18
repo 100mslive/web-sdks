@@ -15,9 +15,8 @@ export default class InitService {
       url += `&region=${region}`;
     }
 
-    // TODO: Add user-agent, handle error status codes
+    // @TODO: Add user-agent, handle error status codes
     const response = await fetch(url);
-    const config = (await response.json()) as InitConfig;
-    return config;
+    return (await response.json()) as InitConfig;
   }
 }

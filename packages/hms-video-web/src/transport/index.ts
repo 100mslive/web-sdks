@@ -10,7 +10,7 @@ import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSTrack from '../media/tracks/HMSTrack';
-import HMSException from '../error/HMSException';
+import HMSException, { HMSExceptionBuilder } from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
@@ -19,9 +19,19 @@ import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
 import { TrackState } from '../sdk/models/HMSNotifications';
+import HMSErrors from '../error/HMSErrors';
+import { TransportState } from './TransportState';
+import { HMSAction } from '../error/HMSAction';
 
 const TAG = '[HMSTransport]:';
+interface CallbackTriple {
+  promise: PromiseCallbacks<boolean>;
+  action: HMSAction;
+  extra: any;
+}
+
 export default class HMSTransport implements ITransport {
+  private state: TransportState = TransportState.Disconnected;
   private tracks: Map<string, TrackState> = new Map();
   private readonly observer: ITransportObserver;
   private publishConnection: HMSPublishConnection | null = null;
@@ -32,7 +42,7 @@ export default class HMSTransport implements ITransport {
    * Used here for:
    *  1. publish/unpublish waits for [IPublishConnectionObserver.onRenegotiationNeeded] to complete
    */
-  private readonly callbacks = new Map<string, PromiseCallbacks<boolean>>();
+  private readonly callbacks = new Map<string, CallbackTriple>();
 
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
@@ -47,7 +57,7 @@ export default class HMSTransport implements ITransport {
     },
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
-        trickle.target === HMSConnectionRole.PUBLISH ? this.publishConnection! : this.subscribeConnection!;
+        trickle.target === HMSConnectionRole.Publish ? this.publishConnection! : this.subscribeConnection!;
       if (connection.remoteDescription === null) {
         // ICE candidates can't be added without any remote session description
         connection.candidates.push(trickle.candidate);
@@ -70,22 +80,32 @@ export default class HMSTransport implements ITransport {
       const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
 
-      // TODO: Handle errors, pass these errors as publish failure (try-catch)
       try {
         const offer = await this.publishConnection!.createOffer();
         await this.publishConnection!.setLocalDescription(offer);
         const answer = await this.signal.offer(offer, this.tracks);
         await this.publishConnection!.setRemoteDescription(answer);
-        callback?.resolve(true);
-        HMSLogger.d(TAG, `✅ [role=PUBLISH] onRenegotiationNeeded DONE`, this.tracks);
-      } catch (e) {
-        console.error(TAG, e);
+        callback!.promise.resolve(true);
+        HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
+      } catch (err) {
+        let ex: HMSException;
+        if (err instanceof HMSException) {
+          ex = err;
+        } else {
+          ex = new HMSExceptionBuilder(HMSErrors.PeerConnectionFailed)
+            .action(callback!.action)
+            .errorInfo(err.message)
+            .build();
+        }
+
+        callback!.promise.reject(ex);
+        HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded FAILED ❌`);
       }
     },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
       if (newState === 'failed') {
-        // TODO: Handle `failed` event, initiate restartIce/reconnection
+        this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
     },
   };
@@ -95,23 +115,41 @@ export default class HMSTransport implements ITransport {
       this.observer.onNotification(JSON.parse(message));
     },
 
-    onTrackAdd: (track: HMSTrack) => this.observer.onTrackAdd(track),
-    onTrackRemove: (track: HMSTrack) => this.observer.onTrackRemove(track),
+    onTrackAdd: (track: HMSTrack) => {
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
+      this.observer.onTrackAdd(track);
+    },
+
+    onTrackRemove: (track: HMSTrack) => {
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
+      this.observer.onTrackRemove(track);
+    },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
       if (newState === 'failed') {
-        // TODO: Handle `failed` event, initiate restartIce/reconnection
+        this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
     },
   };
+
+  private handleIceConnectionFailure(role: HMSConnectionRole) {
+    // TODO: Should we initiate an ice-restart?
+    // TODO: Should we close both peer-connections or just one?
+
+    const ex = new HMSExceptionBuilder(HMSErrors.PeerConnectionFailed)
+      .errorInfo(`[role=${role}] Ice connection state FAILED`)
+      .build();
+
+    this.state = TransportState.Failed;
+    this.observer.onFailure(ex);
+  }
 
   constructor(observer: ITransportObserver) {
     this.observer = observer;
   }
 
   async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSTrack> {
-    const track = await HMSLocalStream.getLocalScreen(settings);
-    return track;
+    return await HMSLocalStream.getLocalScreen(settings);
   }
 
   async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSTrack>> {
@@ -125,6 +163,9 @@ export default class HMSTransport implements ITransport {
     initEndpoint?: string,
     autoSubscribeVideo: boolean = true,
   ): Promise<void> {
+    if (this.state !== TransportState.Disconnected) {
+      throw new HMSExceptionBuilder(HMSErrors.AlreadyJoined).action(HMSAction.Join).build();
+    }
     const config = await InitService.fetchInitConfig(authToken, initEndpoint);
 
     HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
@@ -172,7 +213,11 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
     this.tracks.set(track.trackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
+        promise: { resolve, reject },
+        action: HMSAction.Publish,
+        extra: {},
+      });
     });
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
@@ -195,7 +240,11 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
     this.tracks.delete(track.trackId);
     const p = new Promise<boolean>((resolve, reject) => {
-      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, { resolve, reject });
+      this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
+        promise: { resolve, reject },
+        action: HMSAction.Unpublish,
+        extra: {},
+      });
     });
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
