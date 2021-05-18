@@ -180,23 +180,27 @@ export default class NotificationManager extends EventTarget {
       const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
 
       const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
-      if (!track) return;
-
-      track.setEnabled(!trackEntry.mute);
 
       this.trackStateMap.set(trackId, {
         peerId: params.peer.peer_id,
         trackInfo: { ...currentTrackStateInfo, ...trackEntry },
       });
 
-      if (currentTrackStateInfo.mute !== trackEntry.mute) {
-        if (trackEntry.mute) {
-          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
-        } else {
-          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
+      // TRACK_UPDATE came before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
+      if (!track || this.tracksToProcess.has(trackId)) {
+        this.processPendingTracks();
+      } else {
+        track.setEnabled(!trackEntry.mute);
+
+        if (currentTrackStateInfo.mute !== trackEntry.mute) {
+          if (trackEntry.mute) {
+            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
+          } else {
+            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
+          }
+        } else if (currentTrackStateInfo.description !== trackEntry.description) {
+          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
         }
-      } else if (currentTrackStateInfo.description !== trackEntry.description) {
-        this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
       }
     }
   };

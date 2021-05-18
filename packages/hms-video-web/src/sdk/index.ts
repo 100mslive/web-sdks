@@ -101,6 +101,7 @@ export class HMSSdk implements HMSInterface {
         if (!this.published) {
           this.publish(config.settings);
         }
+        this.listener?.onJoin(this.createRoom());
       });
   }
 
@@ -226,10 +227,6 @@ export class HMSSdk implements HMSInterface {
         break;
       }
 
-      case HMSNotificationMethod.PEER_LIST:
-        this.listener?.onJoin(this.createRoom());
-        break;
-
       case HMSNotificationMethod.ROLE_CHANGE:
         break;
 
@@ -273,20 +270,26 @@ export class HMSSdk implements HMSInterface {
             .build(),
         )
         .then(async (hmsTracks) => {
-          hmsTracks.forEach((hmsTrack) => {
+          hmsTracks.forEach(async (hmsTrack) => {
             switch (hmsTrack.type) {
               case HMSTrackType.AUDIO:
                 this.localPeer!.audioTrack = hmsTrack;
-                hmsTrack.setEnabled(!isAudioMuted);
                 break;
 
               case HMSTrackType.VIDEO:
                 this.localPeer!.videoTrack = hmsTrack;
-                hmsTrack.setEnabled(!isVideoMuted);
+                break;
+            }
+            await this.transport!.publish([hmsTrack]);
+
+            if (isAudioMuted && this.localPeer?.audioTrack) {
+              await this.localPeer.audioTrack.setEnabled(false);
+            }
+            if (isVideoMuted && this.localPeer?.videoTrack) {
+              await this.localPeer.videoTrack.setEnabled(false);
             }
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
           });
-          await this.transport!.publish(hmsTracks);
           this.published = true;
         });
     }
