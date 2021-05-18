@@ -69,7 +69,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
+  async setMaxBitrate(maxBitrate: number, track: HMSTrack): Promise<void> {
     await this.connection?.setMaxBitrate(maxBitrate, track);
   }
 

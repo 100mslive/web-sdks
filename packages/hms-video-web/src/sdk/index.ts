@@ -63,7 +63,6 @@ export class HMSSdk implements HMSInterface {
   constructor() {
     this.notificationManager.addEventListener('role-change', (e: any) => {
       this.publishParams = e.detail.params.role.publishParams;
-      console.log(e.detail.params);
     });
     this.transport = new HMSTransport(this.observer);
   }
@@ -156,9 +155,9 @@ export class HMSSdk implements HMSInterface {
 
     const track = await this.transport!.getLocalScreen(
       new HMSVideoTrackSettingsBuilder()
-        .maxBitRate(screen.bitRate)
+        .maxBitrate(screen.bitRate)
         .codec(screen.codec)
-        .maxFrameRate(screen.frameRate)
+        .maxFramerate(screen.frameRate)
         .setWidth(screen.width)
         .setHeight(screen.height)
         .build(),
@@ -249,13 +248,13 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
     const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
       .codec(audio.codec)
-      .maxBitRate(audio.bitRate)
+      .maxBitrate(audio.bitRate)
       .deviceId(audioInputDeviceId)
       .build();
     const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
       .codec(video.codec)
-      .maxBitRate(video.bitRate)
-      .maxFrameRate(video.frameRate)
+      .maxBitrate(video.bitRate)
+      .maxFramerate(video.frameRate)
       .setWidth(video.width)
       .setHeight(video.height)
       .deviceId(videoDeviceId)

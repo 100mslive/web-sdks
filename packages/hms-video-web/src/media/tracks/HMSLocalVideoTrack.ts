@@ -2,6 +2,17 @@ import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
+import HMSLogger from '../../utils/logger';
+
+function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSettings: HMSVideoTrackSettings) {
+  return function hasChanged(
+    prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced',
+  ) {
+    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+  };
+}
+
+const TAG = '[HMSLocalVideoTrack]';
 
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
@@ -38,16 +49,28 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
     }
   }
 
-  async setSettings(newSettings: HMSVideoTrackSettings) {
-    if (this.settings.codec !== newSettings.codec) {
-      throw Error("Video Codec can't be changed mid call.");
+  async setSettings(settings: HMSVideoTrackSettings) {
+    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
+    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, maxBitrate, deviceId, advanced);
+    const stream = this.stream as HMSLocalStream;
+    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
+
+    if (hasPropertyChanged('codec')) {
+      HMSLogger.w(TAG, "Video Codec can't be changed mid call.");
     }
 
-    if (this.settings.deviceId !== newSettings.deviceId) {
+    if (hasPropertyChanged('deviceId')) {
       await this.replaceTrackWith(newSettings);
     }
 
-    await this.nativeTrack.applyConstraints(newSettings.toConstraints());
+    if (hasPropertyChanged('maxBitrate')) {
+      await stream.setMaxBitrate(newSettings.maxBitrate, this);
+    }
+
+    if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
+      await this.nativeTrack.applyConstraints(newSettings.toConstraints());
+    }
+
     this.settings = newSettings;
   }
 }

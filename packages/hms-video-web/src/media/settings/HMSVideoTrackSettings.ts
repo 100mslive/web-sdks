@@ -17,8 +17,8 @@ export class HMSVideoTrackSettingsBuilder {
   private _width: number = 320;
   private _height: number = 180;
   private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
-  private _maxFrameRate: number = 30;
-  private _maxBitRate: number = 150_000;
+  private _maxFramerate: number = 30;
+  private _maxBitrate: number = 150_000;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
@@ -37,15 +37,15 @@ export class HMSVideoTrackSettingsBuilder {
     return this;
   }
 
-  maxFrameRate(maxFrameRate: number) {
-    if (maxFrameRate <= 0) throw Error('maxFrameRate should be >= 1');
-    this._maxFrameRate = maxFrameRate;
+  maxFramerate(maxFramerate: number) {
+    if (maxFramerate <= 0) throw Error('maxFramerate should be >= 1');
+    this._maxFramerate = maxFramerate;
     return this;
   }
 
-  maxBitRate(maxBitRate: number) {
-    if (maxBitRate <= 0) throw Error('maxBitRate should be >= 1');
-    this._maxBitRate = maxBitRate;
+  maxBitrate(maxBitrate: number) {
+    if (maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+    this._maxBitrate = maxBitrate;
     return this;
   }
 
@@ -65,8 +65,8 @@ export class HMSVideoTrackSettingsBuilder {
       this._width,
       this._height,
       this._codec,
-      this._maxFrameRate,
-      this._maxBitRate,
+      this._maxFramerate,
+      this._maxBitrate,
       this._deviceId,
       this._advanced,
     );
@@ -77,8 +77,8 @@ export default class HMSVideoTrackSettings {
   readonly width: number;
   readonly height: number;
   readonly codec: HMSVideoCodec;
-  readonly maxFrameRate: number;
-  readonly maxBitRate: number;
+  readonly maxFramerate: number;
+  readonly maxBitrate: number;
   readonly deviceId: string;
   readonly advanced: Array<MediaTrackConstraintSet>;
 
@@ -86,16 +86,16 @@ export default class HMSVideoTrackSettings {
     width: number,
     height: number,
     codec: HMSVideoCodec,
-    maxFrameRate: number,
-    maxBitRate: number,
+    maxFramerate: number,
+    maxBitrate: number,
     deviceId: string,
     advanced: Array<MediaTrackConstraintSet>,
   ) {
     this.width = width;
     this.height = height;
     this.codec = codec;
-    this.maxFrameRate = maxFrameRate;
-    this.maxBitRate = maxBitRate;
+    this.maxFramerate = maxFramerate;
+    this.maxBitrate = maxBitrate;
     this.deviceId = deviceId;
     this.advanced = advanced;
   }
@@ -104,7 +104,7 @@ export default class HMSVideoTrackSettings {
     return {
       width: this.width,
       height: this.height,
-      frameRate: this.maxFrameRate,
+      frameRate: this.maxFramerate,
       deviceId: this.deviceId,
     };
   }

@@ -180,9 +180,9 @@ export default class HMSTransport implements ITransport {
     await p;
 
     // @ts-ignore
-    const maxBitrate = track.settings.maxBitRate;
+    const maxBitrate = track.settings.maxBitrate;
     await stream
-      .setMaxBitrate(maxBitrate * 1000, track)
+      .setMaxBitrate(maxBitrate, track)
       .then(() => {
         HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
       })

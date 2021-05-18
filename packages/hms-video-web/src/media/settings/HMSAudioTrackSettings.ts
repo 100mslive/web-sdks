@@ -3,7 +3,7 @@ import { HMSAudioCodec } from '../codec';
 export class HMSAudioTrackSettingsBuilder {
   private _volume: number = 1.0;
   private _codec: HMSAudioCodec = HMSAudioCodec.OPUS;
-  private _maxBitRate: number = 32_000;
+  private _maxBitrate: number = 32_000;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
@@ -29,9 +29,9 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
-  maxBitRate(maxBitRate: number) {
-    if (maxBitRate <= 0) throw Error('maxBitRate should be >= 1');
-    this._maxBitRate = maxBitRate;
+  maxBitrate(maxBitrate: number) {
+    if (maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+    this._maxBitrate = maxBitrate;
     return this;
   }
 
@@ -47,27 +47,27 @@ export class HMSAudioTrackSettingsBuilder {
   }
 
   build() {
-    return new HMSAudioTrackSettings(this._volume, this._codec, this._maxBitRate, this._deviceId, this._advanced);
+    return new HMSAudioTrackSettings(this._volume, this._codec, this._maxBitrate, this._deviceId, this._advanced);
   }
 }
 
 export default class HMSAudioTrackSettings {
   readonly volume: number;
   readonly codec: HMSAudioCodec;
-  readonly maxBitRate: number;
+  readonly maxBitrate: number;
   readonly deviceId: string;
   readonly advanced: Array<MediaTrackConstraintSet>;
 
   constructor(
     volume: number,
     codec: HMSAudioCodec,
-    maxBitRate: number,
+    maxBitrate: number,
     deviceId: string,
     advanced: Array<MediaTrackConstraintSet>,
   ) {
     this.volume = volume;
     this.codec = codec;
-    this.maxBitRate = maxBitRate;
+    this.maxBitrate = maxBitrate;
     this.deviceId = deviceId;
     this.advanced = advanced;
   }

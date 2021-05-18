@@ -82,7 +82,7 @@ export default abstract class HMSConnection {
 
     if (sender) {
       const params = sender.getParameters();
-      params.encodings[0].maxBitrate = maxBitrate;
+      params.encodings[0].maxBitrate = maxBitrate * 1000;
       await sender.setParameters(params);
     }
   }
