@@ -60,14 +60,10 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
-  constructor() {
+  join(config: HMSConfig, listener: HMSUpdateListener) {
     this.notificationManager.addEventListener('role-change', (e: any) => {
       this.publishParams = e.detail.params.role.publishParams;
     });
-    this.transport = new HMSTransport(this.observer);
-  }
-
-  join(config: HMSConfig, listener: HMSUpdateListener) {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
     this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
