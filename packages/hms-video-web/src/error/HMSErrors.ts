@@ -90,28 +90,28 @@ const HMSErrors = {
   // Both publish audio/video is off nothing to return
   NothingToReturn: {
     code: 2001,
-    messageTemplate: `There is no media to return. Please select either video or audio or both.`,
+    messageTemplate: `There is no media to return. Please select either video or audio or both`,
     requiresAction: false,
     requiresErrorInfo: false,
   },
   // Trying to change codec on the fly
   CodecChangeNotPermitted: {
     code: 2002,
-    messageTemplate: `Codec can't be changed mid call.`,
+    messageTemplate: `Codec can't be changed mid call`,
     requiresAction: false,
     requiresErrorInfo: false,
   },
   // Trying to change publish video/audio mid call
   PublishSettingsCantBeChanged: {
     code: 2003,
-    messageTemplate: `Publish options can't be changed mid call.`,
+    messageTemplate: `Publish options can't be changed mid call`,
     requiresAction: false,
     requiresErrorInfo: false,
   },
   // User denied permission to access capture device
   CantAccessCaptureDevice: {
     code: 2004,
-    messageTemplate: `No permission to access capture device.`,
+    messageTemplate: `No permission to access capture device`,
     requiresAction: false,
     requiresErrorInfo: false,
   },
@@ -119,6 +119,13 @@ const HMSErrors = {
   DeviceNotAvailable: {
     code: 2005,
     messageTemplate: `Capture device is no longer available`,
+    requiresAction: false,
+    requiresErrorInfo: false,
+  },
+  // WEB: Capture device is in use by another application
+  DeviceInUse: {
+    code: 2006,
+    messageTemplate: `Capture device is in use by another application`,
     requiresAction: false,
     requiresErrorInfo: false,
   },

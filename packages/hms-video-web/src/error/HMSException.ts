@@ -1,5 +1,5 @@
 import { HMSAction } from './HMSAction';
-import { CodeMessage } from './HMSErrors';
+import HMSErrors, { CodeMessage } from './HMSErrors';
 
 export class HMSExceptionBuilder {
   private readonly cm: CodeMessage;
@@ -11,7 +11,7 @@ export class HMSExceptionBuilder {
   }
 
   action(action: HMSAction) {
-    this._action = action.toString();
+    this._action = HMSAction[action].toString();
     return this;
   }
 
@@ -40,6 +40,8 @@ export class HMSExceptionBuilder {
 
   build(): HMSException {
     const { code, requiresAction, requiresErrorInfo } = this.cm;
+    const hmsErrorEntry = Object.entries(HMSErrors).find((errorEntry) => errorEntry[1].code === code);
+    const title = (hmsErrorEntry && hmsErrorEntry[0]) || '';
     let message = this.cm.messageTemplate;
     if (requiresAction && this._action === null) {
       throw Error(`${code}: ${message} requires action property`);
@@ -57,19 +59,21 @@ export class HMSExceptionBuilder {
       message = `${message}. ${this._errorInfo}`;
     }
 
-    return new HMSException(this.cm.code, message);
+    return new HMSException(this.cm.code, title, message);
   }
 }
 
 export default class HMSException extends Error {
   readonly code: number;
+  readonly title: string = '';
 
-  constructor(code: number, message: string) {
+  constructor(code: number, title: string, message: string) {
     super(message);
 
     // Ref: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     Object.setPrototypeOf(this, HMSException.prototype);
     this.name = 'HMSException';
+    this.title = title;
     this.code = code;
   }
 }
