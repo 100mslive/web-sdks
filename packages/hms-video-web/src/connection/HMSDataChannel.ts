@@ -9,6 +9,7 @@ export default class HMSDataChannel {
   private readonly nativeChannel: RTCDataChannel;
   private readonly observer: DataChannelObserver;
   private readonly metadata: string;
+  private msgQueue: string[] = [];
 
   public get id() {
     return this.nativeChannel.id;
@@ -25,20 +26,26 @@ export default class HMSDataChannel {
 
     nativeChannel.onmessage = (e) => {
       HMSLogger.d(this.TAG, `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`);
-
-      // Right now we only receive an array
       this.observer.onMessage(e.data);
+    };
+
+    nativeChannel.onopen = () => {
+      if (this.msgQueue.length > 0) {
+        HMSLogger.d('Found pending message queue, sending messages');
+        this.msgQueue.forEach((msg) => this.send(msg));
+        this.msgQueue.length = 0;
+      }
     };
   }
 
   async send(message: string) {
-    if (this.nativeChannel.readyState !== 'open') {
-      // TODO: Wait for channel to open
-      throw Error(`Channel ${this.label} not yet ready`);
+    if (this.nativeChannel.readyState === 'open') {
+      HMSLogger.d(this.TAG, `[${this.metadata}] Sending [size=${message.length}] message=${message}`);
+      this.nativeChannel.send(message);
+    } else {
+      HMSLogger.d(this.TAG, 'Connection is not open, queueing', message);
+      this.msgQueue.push(message);
     }
-
-    HMSLogger.d(this.TAG, `[${this.metadata}] Sending [size=${message.length}] message=${message}`);
-    this.nativeChannel.send(message);
   }
 
   close() {
