@@ -24,6 +24,10 @@ export default abstract class HMSTrack {
     return this.nativeTrack.id;
   }
 
+  getMediaTrackSettings(): MediaTrackSettings {
+    return this.nativeTrack.getSettings();
+  }
+
   async setEnabled(value: boolean): Promise<void> {
     this.nativeTrack.enabled = value;
   }
