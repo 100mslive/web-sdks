@@ -31,9 +31,29 @@ export const selectPeers = createSelector(
   },
 );
 
+export interface MinimalLocalPeer {
+  id: HMSPeerID;
+  name: string;
+  role?: string;
+}
+
 export const selectLocalPeer = createSelector(selectPeers, peers => {
   return peers.filter(p => p.isLocal)[0];
 });
+
+/**
+ * A more efficient version of selectLocalPeer which doesn't have changing
+ * fields.
+ */
+export const selectMinimalLocalPeer = createSelector(
+  selectLocalPeer,
+  (peer): MinimalLocalPeer | null => {
+    if (!peer) {
+      return null;
+    }
+    return { id: peer.id, name: peer.name, role: peer.role }
+  }
+)
 
 export const selectLocalPeerID = createSelector(selectLocalPeer, peer => {
   return peer.id;

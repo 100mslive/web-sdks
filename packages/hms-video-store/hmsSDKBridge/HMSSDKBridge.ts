@@ -307,7 +307,7 @@ export class HMSSDKBridge implements IHMSBridge {
       draftStore.room.peers = newHmsPeerIDs;
       const draftPeers = draftStore.peers;
       const draftTracks = draftStore.tracks;
-      this.mergeNewPeersInDraft(draftPeers, newHmsPeers);
+      this.mergeNewPeersInDraft(draftPeers, newHmsPeers, newHmsTracks, newHmsSDkTracks);
       this.mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
@@ -318,10 +318,14 @@ export class HMSSDKBridge implements IHMSBridge {
    * updates draftPeers with newPeers ensuring minimal reference changes
    * @param draftPeers the current peers object in store
    * @param newPeers the latest update which needs to be stored
+   * @param newHmsTracks this will be update if required
+   * @param newHmsSDkTracks this is future value of local hms tacks map
    */
   private mergeNewPeersInDraft(
     draftPeers: Record<HMSPeerID, HMSPeer>,
     newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
+    newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>>,
+    newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack>,
   ) {
     const peerIDs = union(Object.keys(draftPeers), Object.keys(newPeers));
     for (let peerID of peerIDs) {
@@ -332,8 +336,19 @@ export class HMSSDKBridge implements IHMSBridge {
         if (isEqual(oldPeer.auxiliaryTracks, newPeer.auxiliaryTracks)) {
           newPeer.auxiliaryTracks = oldPeer.auxiliaryTracks;
         }
+        // on replace track, use prev video track id in peer object, this is because we
+        // don't want the peer or peers object reference to change
+        if (oldPeer.isLocal && oldPeer.videoTrack && newPeer.videoTrack &&
+          oldPeer.videoTrack !== newPeer.videoTrack) {
+          newHmsSDkTracks[oldPeer.videoTrack] = newHmsSDkTracks[newPeer.videoTrack];
+          delete newHmsSDkTracks[newPeer.videoTrack];
+          newHmsTracks[oldPeer.videoTrack] = newHmsTracks[newPeer.videoTrack];
+          newHmsTracks[oldPeer.videoTrack].id = oldPeer.videoTrack;
+          delete newHmsTracks[newPeer.videoTrack]
+          newPeer.videoTrack = oldPeer.videoTrack;
+        }
         Object.assign(oldPeer, newPeer);
-      } else if (oldPeer && !newPeers) {
+      } else if (oldPeer && !newPeer) {
         // remove
         delete draftPeers[peerID];
       } else if (!oldPeer && newPeer) {
