@@ -25,7 +25,7 @@ export default class HMSDataChannel {
     this.metadata = metadata;
 
     nativeChannel.onmessage = (e) => {
-      HMSLogger.d(this.TAG, `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`);
+      // HMSLogger.d(this.TAG, `[${this.metadata}] onMessage: label=${this.label}, message=${e.data}`);
       this.observer.onMessage(e.data);
     };
 

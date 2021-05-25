@@ -1,5 +1,5 @@
 import HMSTrack from '../media/tracks/HMSTrack';
-import { HMSTrackType } from '../media/tracks/HMSTrackType';
+import { HMSTrackType } from '../media/tracks';
 import Peer from '../peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
@@ -249,11 +249,10 @@ export default class NotificationManager extends EventTarget {
   };
 
   /**
-   * @param speakersList List of speakers[peer_id, level] sorted by level in descending order.
+   * @param speakerList List of speakers[peer_id, level] sorted by level in descending order.
    */
   handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList.speakers;
-    HMSLogger.d(this.TAG, `ACTIVESPEAKERS`, speakers);
     this.audioListener?.onAudioLevelUpdate(speakers);
     const dominantSpeaker = speakers[0];
     if (dominantSpeaker) {

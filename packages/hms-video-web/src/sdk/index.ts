@@ -11,7 +11,7 @@ import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMS
 import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
 import HMSTrack from '../media/tracks/HMSTrack';
-import { HMSTrackType } from '../media/tracks/HMSTrackType';
+import { HMSTrackType } from '../media/tracks';
 import HMSException from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
 import HMSRoom from './models/HMSRoom';
@@ -43,6 +43,10 @@ export class HMSSdk implements HMSInterface {
       const method = getNotificationMethod(message.method);
       const notification = getNotification(method, message.params);
       // @TODO: Notification manager needs to be refactored. The current implementation is not manageable
+      // this will pollute logs
+      if (method !== HMSNotificationMethod.ACTIVE_SPEAKERS) {
+        HMSLogger.d(this.TAG, `onNotification: message=${message}`);
+      }
       this.notificationManager.handleNotification(method, notification, this.listener!, this.audioListener);
       this.onNotificationHandled(method, notification);
     },
@@ -186,7 +190,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
-    HMSLogger.d(this.TAG, 'onNotificationHandled', method);
+    // HMSLogger.d(this.TAG, 'onNotificationHandled', method);
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {
         const peer = notification as PeerNotification;
