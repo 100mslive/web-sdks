@@ -51,7 +51,8 @@ export const selectDominantSpeakerName = createSelector(selectPeersMap, selectSp
     const s2Level = s2[1]?.audioLevel || 0;
     return s2Level > s1Level ? 1 : -1;
   });
-  if (speakersInOrder.length > 0) {
+  if (speakersInOrder.length > 0 && speakersInOrder[0][1].audioLevel &&
+    speakersInOrder[0][1].audioLevel > 0) {
     const peerID = speakersInOrder[0][0];
     if (peerID in peersMap) {
       return peersMap[peerID].name;

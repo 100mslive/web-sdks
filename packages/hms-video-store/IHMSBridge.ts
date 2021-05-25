@@ -60,7 +60,7 @@ export interface IHMSBridge {
    * @param videoElement HTML native element where the video has to be shown
    */
   attachVideo(trackID: string, videoElement: HTMLVideoElement): void;
-  removeVideo(trackID: string, videoElement: HTMLVideoElement): void;
+  detachVideo(trackID: string, videoElement: HTMLVideoElement): void;
 
 }
 

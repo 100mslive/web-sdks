@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { createDefaultStoreState, HMSStore } from './schema';
 import produce from 'immer';
 import { GetState, StoreApi } from 'zustand/vanilla';
+import { registerSelectorTools } from './selectors/setUpSelectorTools';
 
 const immer = <T extends HMSStore>(outerFn: (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T) => {
   return (
@@ -26,3 +27,5 @@ export const createNewStore = () => {
   hmsStore.setState = (fn: any ) => prevSetState(produce(fn));
   return hmsStore;
 };
+
+registerSelectorTools();

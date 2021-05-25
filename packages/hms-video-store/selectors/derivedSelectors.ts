@@ -5,17 +5,17 @@ import { selectTracksMap } from './trackSelectors';
 
 export interface HMSPeerWithMuteStatus {
   peer: HMSPeer;
-  isAudioMuted?: boolean;
+  isAudioEnabled?: boolean;
 }
 
-export const selectPeersWithMuteStatus = createSelector(
+export const selectPeersWithAudioStatus = createSelector(
   [selectPeersMap, selectTracksMap],
   (peersMap, tracksMap) => {
     const participants: HMSPeerWithMuteStatus[] = Object.values(peersMap).map(
       peer => {
         return {
           peer: peer,
-          isAudioMuted: peer.audioTrack
+          isAudioEnabled: peer.audioTrack
             ? tracksMap[peer.audioTrack]?.enabled
             : true,
         };
