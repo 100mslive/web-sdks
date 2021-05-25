@@ -1,3 +1,8 @@
+import {
+  HMSAudioTrackSettings,
+  HMSVideoTrackSettings,
+} from './hmsSDKBridge/sdkTypes';
+
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
  * It talks to our 100ms backend and handles error reconnections, state managements
@@ -52,6 +57,21 @@ export interface IHMSBridge {
   setLocalVideoEnabled(enabled: boolean): void;
 
   /**
+   * Change settings of the local peer's audio track
+   * @param settings HMSAudioTrackSettings
+   * ({ volume, codec, maxBitrate, deviceId, advanced })
+   * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
+   */
+  setAudioSettings(settings: HMSAudioTrackSettings): void;
+  /**
+   * Change settings of the local peer's video track
+   * @param settings HMSVideoTrackSettings
+   * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
+   * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
+   */
+  setVideoSettings(settings: HMSVideoTrackSettings): void;
+
+  /**
    * If you're not using our Video Component you can use the below functions directly
    * to add/remove video from an element for a track ID. The benefit of using this
    * instead of removing the video yourself is that it'll also auto unsubscribe to
@@ -61,7 +81,6 @@ export interface IHMSBridge {
    */
   attachVideo(trackID: string, videoElement: HTMLVideoElement): void;
   detachVideo(trackID: string, videoElement: HTMLVideoElement): void;
-
 }
 
 /**
