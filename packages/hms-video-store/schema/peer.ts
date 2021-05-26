@@ -21,6 +21,8 @@ export interface HMSPeer {
  * HMS Track stores details about individual tracks of the room. This object is
  * not meant to be used normally for UI interfaces, as interactions with this object
  * should be kept to bare minimum.
+ * enabled - tells the real track enabled status, use this to call attach/detach video
+ * displayEnabled - can be used to give immediate feedback to the user on button click
  */
 export interface HMSTrack {
   id: HMSTrackID;
@@ -28,7 +30,8 @@ export interface HMSTrack {
   type: HMSTrackType;
   enabled: boolean;
   height?: number;
-  width?: number
+  width?: number;
+  displayEnabled?: boolean;
 }
 
 /**

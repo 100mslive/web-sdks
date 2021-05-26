@@ -21,7 +21,6 @@ import {
   selectPeerNameByID,
   selectIsConnectedToRoom,
 } from '../selectors';
-import { union, isEqual } from 'lodash';
 import HMSLogger from '../../utils/ui-logger';
 import { HMSSdk } from '@100mslive/100ms-web-sdk';
 import { IHMSStore } from '../IHMSStore';
@@ -31,6 +30,10 @@ import SDKHMSTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSTrack';
 import HMSLocalAudioTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSLocalVideoTrack';
 import merge from 'lodash/merge';
+import {
+  mergeNewPeersInDraft,
+  mergeNewTracksInDraft,
+} from './sdkUtils/storeMergeUtils';
 
 /**
  * This class implements the HMSBridge interface for 100ms SDK. It connects with SDK
@@ -241,18 +244,18 @@ export class HMSSDKBridge implements IHMSBridge {
       if (!store.tracks[trackID]) {
         this.logPossibleInconsistency('track id not found for setEnabled');
       } else {
-        store.tracks[trackID].enabled = enabled;
+        store.tracks[trackID].displayEnabled = enabled;
       }
     });
     try {
       await this.setEnabledSDKTrack(trackID, enabled); // do the operation
+      this.syncPeers();
     } catch (err) {
       // rollback on failure
       this.store.setState(store => {
-        store.tracks[trackID].enabled = !enabled;
+        store.tracks[trackID].displayEnabled = !enabled;
       });
     }
-    this.syncPeers();
   }
 
   /**
@@ -263,7 +266,8 @@ export class HMSSDKBridge implements IHMSBridge {
    * which return a new copy of the data. Use Object.assign etc. to ensure that if the data
    * doesn't change reference is also not changed.
    * The UI and selectors rely on the fact that the store is immutable that is if there is
-   * any change they'll get a new copy of the data they're interested in with a new reference.
+   * any change and only if there is a change, they'll get a new copy of the data they're
+   * interested in with a new reference.
    * @protected
    */
   protected syncPeers() {
@@ -302,81 +306,23 @@ export class HMSSDKBridge implements IHMSBridge {
     }
 
     // then merge them carefully with our store so if something hasn't changed
-    // the reference shouldn't change
+    // the reference shouldn't change. Note that the draftStore is an immer draft
+    // object.
     this.store.setState(draftStore => {
       draftStore.room.peers = newHmsPeerIDs;
       const draftPeers = draftStore.peers;
       const draftTracks = draftStore.tracks;
-      this.mergeNewPeersInDraft(draftPeers, newHmsPeers, newHmsTracks, newHmsSDkTracks);
-      this.mergeNewTracksInDraft(draftTracks, newHmsTracks);
+      // the order of below statements are important as merge functions are mutating
+      mergeNewPeersInDraft(
+        draftPeers,
+        newHmsPeers,
+        newHmsTracks,
+        newHmsSDkTracks,
+      );
+      mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
     });
-  }
-
-  /**
-   * updates draftPeers with newPeers ensuring minimal reference changes
-   * @param draftPeers the current peers object in store
-   * @param newPeers the latest update which needs to be stored
-   * @param newHmsTracks this will be update if required
-   * @param newHmsSDkTracks this is future value of local hms tacks map
-   */
-  private mergeNewPeersInDraft(
-    draftPeers: Record<HMSPeerID, HMSPeer>,
-    newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
-    newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>>,
-    newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack>,
-  ) {
-    const peerIDs = union(Object.keys(draftPeers), Object.keys(newPeers));
-    for (let peerID of peerIDs) {
-      const oldPeer = draftPeers[peerID];
-      const newPeer = newPeers[peerID];
-      if (oldPeer && newPeer) {
-        // update
-        if (isEqual(oldPeer.auxiliaryTracks, newPeer.auxiliaryTracks)) {
-          newPeer.auxiliaryTracks = oldPeer.auxiliaryTracks;
-        }
-        // on replace track, use prev video track id in peer object, this is because we
-        // don't want the peer or peers object reference to change
-        if (oldPeer.isLocal && oldPeer.videoTrack && newPeer.videoTrack &&
-          oldPeer.videoTrack !== newPeer.videoTrack) {
-          newHmsSDkTracks[oldPeer.videoTrack] = newHmsSDkTracks[newPeer.videoTrack];
-          delete newHmsSDkTracks[newPeer.videoTrack];
-          newHmsTracks[oldPeer.videoTrack] = newHmsTracks[newPeer.videoTrack];
-          newHmsTracks[oldPeer.videoTrack].id = oldPeer.videoTrack;
-          delete newHmsTracks[newPeer.videoTrack]
-          newPeer.videoTrack = oldPeer.videoTrack;
-        }
-        Object.assign(oldPeer, newPeer);
-      } else if (oldPeer && !newPeer) {
-        // remove
-        delete draftPeers[peerID];
-      } else if (!oldPeer && newPeer) {
-        // add
-        draftPeers[peerID] = newPeer as HMSPeer;
-      }
-    }
-  }
-
-  private mergeNewTracksInDraft(
-    draftTracks: Record<HMSTrackID, HMSTrack>,
-    newTracks: Record<HMSTrackID, Partial<HMSTrack>>,
-  ) {
-    const trackIDs = union(Object.keys(draftTracks), Object.keys(newTracks));
-    for (let trackID of trackIDs) {
-      const oldTrack = draftTracks[trackID];
-      const newTrack = newTracks[trackID];
-      if (oldTrack && newTrack) {
-        // update
-        Object.assign(oldTrack, newTrack);
-      } else if (oldTrack && !newTrack) {
-        // remove
-        delete draftTracks[trackID];
-      } else if (!oldTrack && newTrack) {
-        // add
-        draftTracks[trackID] = newTrack as HMSTrack;
-      }
-    }
   }
 
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
