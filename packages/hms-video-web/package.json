@@ -30,16 +30,16 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "name": "@100mslive/100ms-web-sdk",
+  "name": "@100mslive/hms-video",
   "author": "Praveen <praveen@100ms.live>",
-  "module": "dist/100ms-web-sdk.esm.js",
+  "module": "dist/hms-video.esm.js",
   "size-limit": [
     {
-      "path": "dist/100ms-web-sdk.cjs.production.min.js",
+      "path": "dist/hms-video.cjs.production.min.js",
       "limit": "20 KB"
     },
     {
-      "path": "dist/100ms-web-sdk.esm.js",
+      "path": "dist/hms-video.esm.js",
       "limit": "20 KB"
     }
   ],
