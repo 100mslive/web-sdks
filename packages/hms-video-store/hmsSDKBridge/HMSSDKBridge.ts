@@ -173,6 +173,13 @@ export class HMSSDKBridge implements IHMSBridge {
     hmsMessage.senderName = 'You';
     this.onHMSMessage(hmsMessage);
   }
+  markMessagesAsRead() {
+    this.store.setState(store => {
+      store.messages.allIDs.forEach(id => {
+        if (!store.messages.byID[id].read) store.messages.byID[id].read = true;
+      });
+    });
+  }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
