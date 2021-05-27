@@ -3,9 +3,9 @@ import InitialSettings from './settings';
 export default interface HMSConfig {
   userName: string;
   authToken: string;
-  metaData: string;
+  metaData?: string;
   audioSinkElementId?: string;
   initEndpoint?: string;
-  settings: InitialSettings;
+  settings?: InitialSettings;
   autoVideoSubscribe?: boolean;
 }

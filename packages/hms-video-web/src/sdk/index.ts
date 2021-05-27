@@ -22,6 +22,15 @@ import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/se
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import HMSAudioSinkManager from '../audio-sink-manager';
 
+// @DISCUSS: Adding it here as a hotfix
+const defaultSettings = {
+  isAudioMuted: false,
+  isVideoMuted: false,
+  audioInputDeviceId: 'default',
+  audioOutputDeviceId: 'default',
+  videoDeviceId: 'default',
+};
+
 export class HMSSdk implements HMSInterface {
   logLevel: HMSLogLevel = HMSLogLevel.INFO;
   analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF;
@@ -80,7 +89,7 @@ export class HMSSdk implements HMSInterface {
       name: config.userName,
       isLocal: true,
       role,
-      customerDescription: config.metaData,
+      customerDescription: config.metaData || '',
     });
     this.notificationManager.localPeer = this.localPeer;
 
@@ -98,7 +107,7 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         this.roomId = roomId;
         if (!this.published) {
-          this.publish(config.settings);
+          this.publish(config.settings || defaultSettings);
         }
         this.listener?.onJoin(this.createRoom());
       });
