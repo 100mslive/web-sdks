@@ -173,7 +173,7 @@ export class HMSSDKBridge implements IHMSBridge {
     hmsMessage.senderName = 'You';
     this.onHMSMessage(hmsMessage);
   }
-  markMessage(id: string, readStatus: boolean) {
+  setMessageRead(id: string, readStatus: boolean) {
     this.store.setState(store => {
       if (!store.messages.byID[id]) {
         this.logPossibleInconsistency('no message with id is found');

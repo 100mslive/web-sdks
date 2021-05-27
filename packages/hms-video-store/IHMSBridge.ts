@@ -52,7 +52,7 @@ export interface IHMSBridge {
   /**
    * changes read status of message if present in store
    */
-  markMessage(id: string, readStatus: boolean): void;
+  setMessageRead(id: string, readStatus: boolean): void;
 
   /**
    * These functions can be used to mute/unmute the local peer's audio and video
