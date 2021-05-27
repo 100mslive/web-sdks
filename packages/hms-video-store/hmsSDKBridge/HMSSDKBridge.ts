@@ -378,10 +378,16 @@ export class HMSSDKBridge implements IHMSBridge {
       const peerIDAudioLevelMap: Record<HMSPeerID, number> = {};
       sdkSpeakers.forEach(sdkSpeaker => {
         peerIDAudioLevelMap[sdkSpeaker.peerId] = sdkSpeaker.audioLevel;
-        store.speakers[sdkSpeaker.peerId] = {};
+        if (!store.speakers[sdkSpeaker.peerId]) {
+          store.speakers[sdkSpeaker.peerId] = {};
+        }
       });
-      for (let [peerID, speaker] of Object.entries(store.speakers)) {
+      const speakerEntries = Object.entries(store.speakers);
+      for (let [peerID, speaker] of speakerEntries) {
         speaker.audioLevel = peerIDAudioLevelMap[peerID] || 0;
+        if (speaker.audioLevel === 0) {
+          delete store.speakers[peerID];
+        }
       }
     });
   }

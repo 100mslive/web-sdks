@@ -17,7 +17,7 @@ export const selectPeersWithAudioStatus = createSelector(
           peer: peer,
           isAudioEnabled: peer.audioTrack
             ? tracksMap[peer.audioTrack]?.enabled
-            : true,
+            : false,
         };
       },
     );
