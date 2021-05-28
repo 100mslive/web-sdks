@@ -6,7 +6,7 @@ const TAG = 'InitService';
 export default class InitService {
   static async fetchInitConfig(
     token: string,
-    initEndpoint: string = 'https://qa-init.100ms.live/init',
+    initEndpoint: string = 'https://prod-init.100ms.live/init',
     region: string = '',
   ): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} region=${region}`);
