@@ -9,7 +9,7 @@
  * @param newHmsSDkTracks this is future value of local hms tacks map
  */
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
-import SDKHMSTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSTrack';
+import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 import { isEqual, union } from 'lodash';
 
 export const mergeNewPeersInDraft = (

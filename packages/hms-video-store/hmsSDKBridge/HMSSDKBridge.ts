@@ -22,13 +22,13 @@ import {
   selectIsConnectedToRoom,
 } from '../selectors';
 import HMSLogger from '../../utils/ui-logger';
-import { HMSSdk } from '@100mslive/100ms-web-sdk';
+import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
-import SDKHMSException from '@100mslive/100ms-web-sdk/dist/error/HMSException';
-import SDKHMSVideoTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSVideoTrack';
-import SDKHMSTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSTrack';
-import HMSLocalAudioTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSLocalVideoTrack';
+import SDKHMSException from '@100mslive/hms-video/dist/error/HMSException';
+import SDKHMSVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSVideoTrack';
+import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
+import HMSLocalAudioTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalAudioTrack';
+import HMSLocalVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalVideoTrack';
 import merge from 'lodash/merge';
 import {
   mergeNewPeersInDraft,

@@ -1,5 +1,5 @@
 import { HMSPeer, HMSMessage, HMSTrack, HMSRoom } from '../schema';
-import SDKHMSTrack from '@100mslive/100ms-web-sdk/dist/media/tracks/HMSTrack';
+import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 
 import * as sdkTypes from './sdkTypes';
 

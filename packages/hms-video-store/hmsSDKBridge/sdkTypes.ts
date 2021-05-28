@@ -1,10 +1,10 @@
-import HMSPeer from '@100mslive/100ms-web-sdk/dist/interfaces/hms-peer';
-import HMSRoom from '@100mslive/100ms-web-sdk/dist/interfaces/room';
-import HMSMessage from '@100mslive/100ms-web-sdk/dist/interfaces/message';
-import HMSSpeaker from '@100mslive/100ms-web-sdk/dist/interfaces/speaker';
-import HMSConfig from '@100mslive/100ms-web-sdk/dist/interfaces/config';
-import SDKHMSAudioTrackSettings from '@100mslive/100ms-web-sdk/dist/media/settings/HMSAudioTrackSettings';
-import SDKHMSVideoTrackSettings from '@100mslive/100ms-web-sdk/dist/media/settings/HMSVideoTrackSettings';
+import HMSPeer from '@100mslive/hms-video/dist/interfaces/hms-peer';
+import HMSRoom from '@100mslive/hms-video/dist/interfaces/room';
+import HMSMessage from '@100mslive/hms-video/dist/interfaces/message';
+import HMSSpeaker from '@100mslive/hms-video/dist/interfaces/speaker';
+import HMSConfig from '@100mslive/hms-video/dist/interfaces/config';
+import SDKHMSAudioTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSAudioTrackSettings';
+import SDKHMSVideoTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSVideoTrackSettings';
 
 type HMSAudioTrackSettings = Omit<SDKHMSAudioTrackSettings, "toConstraints">;
 type HMSVideoTrackSettings = Omit<SDKHMSVideoTrackSettings, "toConstraints">;
