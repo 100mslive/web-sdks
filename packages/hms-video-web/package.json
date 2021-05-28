@@ -1,5 +1,5 @@
 {
-  "version": "0.0.17-0",
+  "version": "0.0.17",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
