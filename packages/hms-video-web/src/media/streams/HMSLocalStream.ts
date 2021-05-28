@@ -11,7 +11,6 @@ import { BuildGetMediaError } from '../../error/HMSErrorFactory';
 
 const TAG = 'HMSLocalStream';
 
-/** @internal */
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
   private connection: HMSPublishConnection | null = null;
