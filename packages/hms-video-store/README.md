@@ -1,6 +1,6 @@
 # 100ms Reactive Store
 
-This is an add on to the core sdk provided by 100ms. It abstracts away the
+This is an addon to the core sdk provided by 100ms. It abstracts away the
 intricacies of data management and provides
 a flux based reactive data store where data flows in only one direction.
 
@@ -26,6 +26,10 @@ There are two important pieces -
 2. Actions - The actions interface for dispatching actions which in turn may reach
     out to server and update the store.
    
+Important Note: The data received from either getState or Subscribe is immutable, the 
+object received is frozen, and it is not allowed to mutate it. You'll get an error
+if you try to mutate this data in any way. Immutability of the store is how we ensure
+it to be consistent and reflect the truth at any point of time.
 
 ### How To Use
 
