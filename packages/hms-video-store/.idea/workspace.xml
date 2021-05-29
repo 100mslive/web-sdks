@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2668d8a5-f03a-4928-ac52-6ae65dee63ec" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/common/ui-logger.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HMSStoreService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/HMSStoreService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IHMSBridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/IHMSBridge.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IHMSStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/IHMSStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hmsSDKBridge/HMSSDKBridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/HMSSDKBridge.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hmsSDKBridge/adapter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/adapter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hmsSDKBridge/sdkTypes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkTypes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hmsSDKBridge/sdkUtils/storeMergeUtils.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hmsSDKBridge/sdkUtils/storeMergeUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/message.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/message.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/peer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/peer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/room.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/room.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/settings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/settings.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/ui.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/ui.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/derivedSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/derivedSelectors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/messageSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/messageSelectors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/peerSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/peerSelectors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/setUpSelectorTools.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/setUpSelectorTools.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selectors/trackSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/trackSelectors.ts" afterDir="false" />
+    <list default="true" id="2668d8a5-f03a-4928-ac52-6ae65dee63ec" name="Default Changelist" comment="feat: separate out core store from react repo">
+      <change afterPath="$PROJECT_DIR$/.eslintrc.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/main.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/npm-publish.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/size.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CODEOWNERS" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/trackFixtures.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/blah.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/common/ui-logger.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/common/ui-logger.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/HMSStoreService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/HMSStoreService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/IHMSBridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/IHMSBridge.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/IHMSStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/IHMSStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hmsSDKBridge/HMSSDKBridge.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/HMSSDKBridge.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hmsSDKBridge/adapter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/adapter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkTypes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkTypes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hmsSDKBridge/sdkUtils/storeMergeUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/schema/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/schema/schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/selectors/derivedSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/derivedSelectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/selectors/messageSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/messageSelectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/selectors/peerSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/peerSelectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/selectors/trackSelectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/selectors/trackSelectors.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +40,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1tDIXCs1hyNUn3RnRT0sWTXiysd" />
   <component name="ProjectViewState">
@@ -43,13 +58,16 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/common" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.github/workflows" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="F:\work\hms-video-react\node_modules\prettier" />
+    <property name="settings.editor.selected.configurable" value="settings.javascript.prettier" />
     <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2021.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\work\hms-video-react\.github\workflows" />
       <recent name="F:\work\hms-video-react\src\common" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -64,7 +82,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1622297271067</updated>
-      <workItem from="1622297272777" duration="1104000" />
+      <workItem from="1622297272777" duration="8056000" />
     </task>
     <servers />
   </component>
@@ -81,5 +99,13 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: separate out core store from react repo" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: separate out core store from react repo" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

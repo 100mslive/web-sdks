@@ -2,8 +2,7 @@ import { HMSPeer, HMSPeerID, HMSRoom, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
 
 const selectRoom = (store: HMSStore): HMSRoom => store.room;
-export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> =>
-  store.peers;
+export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> => store.peers;
 const selectPeerID = (store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
@@ -25,12 +24,9 @@ export const selectIsConnectedToRoom = createSelector(
   room => room && room.isConnected,
 );
 
-export const selectPeers = createSelector(
-  [selectRoom, selectPeersMap],
-  (room, storePeers) => {
-    return room.peers.map(peerID => storePeers[peerID]);
-  },
-);
+export const selectPeers = createSelector([selectRoom, selectPeersMap], (room, storePeers) => {
+  return room.peers.map(peerID => storePeers[peerID]);
+});
 
 export const selectLocalPeer = createSelector(selectPeers, peers => {
   return peers.filter(p => p.isLocal)[0];
@@ -68,15 +64,11 @@ export const selectDominantSpeakerName = createSelector(
   },
 );
 
-export const selectPeerByID = createSelector(
-  [selectPeersMap, selectPeerID],
-  (storePeers, peerID) => (peerID ? storePeers[peerID] : null),
+export const selectPeerByID = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
+  peerID ? storePeers[peerID] : null,
 );
 
-export const selectPeerNameByID = createSelector(
-  selectPeerByID,
-  peer => peer?.name,
-);
+export const selectPeerNameByID = createSelector(selectPeerByID, peer => peer?.name);
 
 export const selectPeerAudioByID = createSelector(
   selectSpeakerByID,

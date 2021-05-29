@@ -11,16 +11,12 @@ export interface HMSPeerWithMuteStatus {
 export const selectPeersWithAudioStatus = createSelector(
   [selectPeersMap, selectTracksMap],
   (peersMap, tracksMap) => {
-    const participants: HMSPeerWithMuteStatus[] = Object.values(peersMap).map(
-      peer => {
-        return {
-          peer: peer,
-          isAudioEnabled: peer.audioTrack
-            ? tracksMap[peer.audioTrack]?.enabled
-            : false,
-        };
-      },
-    );
+    const participants: HMSPeerWithMuteStatus[] = Object.values(peersMap).map(peer => {
+      return {
+        peer: peer,
+        isAudioEnabled: peer.audioTrack ? tracksMap[peer.audioTrack]?.enabled : false,
+      };
+    });
     return participants;
   },
 );

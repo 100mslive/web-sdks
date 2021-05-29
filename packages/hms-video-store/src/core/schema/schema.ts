@@ -19,26 +19,25 @@ export interface HMSStore {
   settings: HMSMediaSettings;
 }
 
-
 export const createDefaultStoreState = (): HMSStore => {
   return {
     room: {
       id: '',
-        isConnected: false,
-        name: '',
-        peers: [],
-        shareableLink: '',
-        hasWaitingRoom: false,
+      isConnected: false,
+      name: '',
+      peers: [],
+      shareableLink: '',
+      hasWaitingRoom: false,
     },
     peers: {},
     tracks: {},
     messages: { byID: {}, allIDs: [] },
     speakers: {},
     settings: {
-      audioInputDeviceId: "",
-        audioOutputDeviceId: "",
-        videoInputDeviceId: "",
-        maxTileCount: 9,
-    }
-  }
+      audioInputDeviceId: '',
+      audioOutputDeviceId: '',
+      videoInputDeviceId: '',
+      maxTileCount: 9,
+    },
+  };
 };

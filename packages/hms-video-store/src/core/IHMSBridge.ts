@@ -1,7 +1,4 @@
-import {
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-} from './hmsSDKBridge/sdkTypes';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKBridge/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.

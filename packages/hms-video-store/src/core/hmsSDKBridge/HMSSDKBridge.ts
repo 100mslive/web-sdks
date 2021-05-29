@@ -29,11 +29,9 @@ import SDKHMSVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSVideoTra
 import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 import HMSLocalAudioTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalVideoTrack';
-import merge from 'lodash/merge';
-import {
-  mergeNewPeersInDraft,
-  mergeNewTracksInDraft,
-} from './sdkUtils/storeMergeUtils';
+
+import { mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
 
 /**
  * This class implements the HMSBridge interface for 100ms SDK. It connects with SDK
@@ -84,9 +82,7 @@ export class HMSSDKBridge implements IHMSBridge {
   async leave() {
     const isRoomConnected = selectIsConnectedToRoom(this.store.getState());
     if (!isRoomConnected) {
-      this.logPossibleInconsistency(
-        'room leave is called when no room is connected',
-      );
+      this.logPossibleInconsistency('room leave is called when no room is connected');
       return; // ignore
     }
     return this.sdk
@@ -134,31 +130,17 @@ export class HMSSDKBridge implements IHMSBridge {
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const trackID = selectLocalAudioTrackID(this.store.getState());
-    const currentSettings = this.store.getState().settings;
     if (trackID) {
-      // TODO: Handle other settings changes
-      if (
-        settings.deviceId &&
-        currentSettings.audioInputDeviceId !== settings.deviceId
-      ) {
-        await this.setSDKLocalTrackSettings(trackID, settings);
-        this.syncPeers();
-      }
+      await this.setSDKLocalAudioTrackSettings(trackID, settings);
+      this.syncPeers();
     }
   }
 
   async setVideoSettings(settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
     const trackID = selectLocalVideoTrackID(this.store.getState());
-    const currentSettings = this.store.getState().settings;
     if (trackID) {
-      // TODO: Handle other settings changes
-      if (
-        settings.deviceId &&
-        currentSettings.videoInputDeviceId !== settings.deviceId
-      ) {
-        await this.setSDKLocalTrackSettings(trackID, settings);
-        this.syncPeers();
-      }
+      await this.setSDKLocalVideoTrackSettings(trackID, settings);
+      this.syncPeers();
     }
   }
 
@@ -235,9 +217,7 @@ export class HMSSDKBridge implements IHMSBridge {
       await this.sdk.startScreenShare(this.syncPeers.bind(this));
       this.syncPeers();
     } else {
-      this.logPossibleInconsistency(
-        "start screenshare is called while it's on",
-      );
+      this.logPossibleInconsistency("start screenshare is called while it's on");
     }
   }
 
@@ -247,9 +227,7 @@ export class HMSSDKBridge implements IHMSBridge {
       await this.sdk.stopScreenShare();
       this.syncPeers();
     } else {
-      this.logPossibleInconsistency(
-        "stop screenshare is called while it's not on",
-      );
+      this.logPossibleInconsistency("stop screenshare is called while it's not on");
     }
   }
 
@@ -300,11 +278,7 @@ export class HMSSDKBridge implements IHMSBridge {
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
 
-      const sdkTracks = [
-        sdkPeer.audioTrack,
-        sdkPeer.videoTrack,
-        ...sdkPeer.auxiliaryTracks,
-      ];
+      const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (let sdkTrack of sdkTracks) {
         if (!sdkTrack) {
           continue;
@@ -328,12 +302,7 @@ export class HMSSDKBridge implements IHMSBridge {
       const draftPeers = draftStore.peers;
       const draftTracks = draftStore.tracks;
       // the order of below statements are important as merge functions are mutating
-      mergeNewPeersInDraft(
-        draftPeers,
-        newHmsPeers,
-        newHmsTracks,
-        newHmsSDkTracks,
-      );
+      mergeNewPeersInDraft(draftPeers, newHmsPeers, newHmsTracks, newHmsSDkTracks);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
@@ -370,10 +339,7 @@ export class HMSSDKBridge implements IHMSBridge {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    hmsMessage.senderName = selectPeerNameByID(
-      this.store.getState(),
-      hmsMessage.sender,
-    );
+    hmsMessage.senderName = selectPeerNameByID(this.store.getState(), hmsMessage.sender);
     this.onHMSMessage(hmsMessage);
   }
 
@@ -421,35 +387,31 @@ export class HMSSDKBridge implements IHMSBridge {
     if (track) {
       await track.setEnabled(enabled);
     } else {
-      this.logPossibleInconsistency(
-        `track ${trackID} not present, unable to enabled/disable`,
-      );
+      this.logPossibleInconsistency(`track ${trackID} not present, unable to enabled/disable`);
     }
   }
 
-  private async setSDKLocalTrackSettings(
+  private async setSDKLocalVideoTrackSettings(
     trackID: string,
-    settings:
-      | Partial<sdkTypes.HMSAudioTrackSettings>
-      | Partial<sdkTypes.HMSVideoTrackSettings>,
+    settings: Partial<sdkTypes.HMSVideoTrackSettings>,
   ) {
     const track = this.hmsSDKTracks[trackID];
-    // TODO: Export type from sdk-index(instead of dist) to use instanceOf
-    if (
-      track &&
-      (track.constructor.name === 'HMSLocalAudioTrack' ||
-        track.constructor.name === 'HMSLocalVideoTrack')
-    ) {
-      // Clone track.settings - lodash.merge overrides destination(first parameter)
-      // track.settings should be updated only in the SDK.
-      // @ts-expect-error
-      const newSettings = merge({ ...track.settings }, settings);
-      // @ts-expect-error
-      await track.setSettings(newSettings);
+    if (track) {
+      await (track as HMSLocalVideoTrack).setSettings(settings as HMSVideoTrackSettings);
     } else {
-      this.logPossibleInconsistency(
-        `local track ${trackID} not present, unable to set settings`,
-      );
+      this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
+    }
+  }
+
+  private async setSDKLocalAudioTrackSettings(
+    trackID: string,
+    settings: Partial<sdkTypes.HMSAudioTrackSettings>,
+  ) {
+    const track = this.hmsSDKTracks[trackID];
+    if (track) {
+      await (track as HMSLocalAudioTrack).setSettings(settings as HMSAudioTrackSettings);
+    } else {
+      this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }
   }
 
@@ -459,14 +421,10 @@ export class HMSSDKBridge implements IHMSBridge {
     hmsTrack.width = mediaSettings.width;
   }
 
-  private getMediaSettings(
-    sdkPeer: sdkTypes.HMSPeer,
-  ): Partial<HMSMediaSettings> {
+  private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
     return {
-      audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.settings
-        ?.deviceId,
-      videoInputDeviceId: (sdkPeer.audioTrack as HMSLocalVideoTrack)?.settings
-        ?.deviceId,
+      audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.settings?.deviceId,
+      videoInputDeviceId: (sdkPeer.audioTrack as HMSLocalVideoTrack)?.settings?.deviceId,
     };
   }
 

@@ -1,4 +1,4 @@
-const HMS_STORE_TAG = "HMS-Store:";
+const HMS_STORE_TAG = 'HMS-Store:';
 
 export default class HMSLogger {
   static d(...data: any[]) {

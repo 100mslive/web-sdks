@@ -3,18 +3,13 @@ import { selectLocalPeer, selectPeerByID, selectPeers } from './peerSelectors';
 import { createSelector } from 'reselect';
 
 export const selectTracksMap = (store: HMSStore) => store.tracks;
-export const trackIDSelector = (store: HMSStore, trackID: HMSTrackID) =>
-  trackID;
+export const trackIDSelector = (_store: HMSStore, trackID: HMSTrackID) => {
+  return trackID;
+};
 
-export const selectLocalAudioTrackID = createSelector(
-  selectLocalPeer,
-  peer => peer?.audioTrack,
-);
+export const selectLocalAudioTrackID = createSelector(selectLocalPeer, peer => peer?.audioTrack);
 
-export const selectLocalVideoTrackID = createSelector(
-  selectLocalPeer,
-  peer => peer?.videoTrack,
-);
+export const selectLocalVideoTrackID = createSelector(selectLocalPeer, peer => peer?.videoTrack);
 
 export const selectIsLocalAudioEnabled = (store: HMSStore) => {
   const localPeer = selectLocalPeer(store);
@@ -51,9 +46,7 @@ export const selectIsSomeoneScreenSharing = (store: HMSStore): boolean => {
   return peers.some(peer => isScreenSharing(store, peer));
 };
 
-export const selectPeerScreenSharing = (
-  store: HMSStore,
-): HMSPeer | undefined => {
+export const selectPeerScreenSharing = (store: HMSStore): HMSPeer | undefined => {
   const peers = selectPeers(store);
   return peers.find(peer => isScreenSharing(store, peer));
 };
@@ -64,9 +57,7 @@ export const selectScreenShareByPeerID = (
 ): HMSTrack | undefined => {
   const peer = selectPeerByID(store, peerID);
   if (peer && isScreenSharing(store, peer)) {
-    const trackID = peer?.auxiliaryTracks.find(trackID =>
-      isScreenShare(store.tracks[trackID]),
-    );
+    const trackID = peer?.auxiliaryTracks.find(trackID => isScreenShare(store.tracks[trackID]));
     return trackID ? store.tracks[trackID] : undefined;
   }
   return undefined;

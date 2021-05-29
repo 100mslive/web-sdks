@@ -1,0 +1,24 @@
+
+name: CI
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - name: Install packages
+        run: npm install
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test --ci --coverage
+      - name: Build
+        run: npm run build

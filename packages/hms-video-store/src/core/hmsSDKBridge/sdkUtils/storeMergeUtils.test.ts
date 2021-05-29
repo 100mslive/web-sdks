@@ -1,6 +1,6 @@
 import { HMSPeerID, HMSTrack } from '../../schema';
 import { mergeNewTracksInDraft } from './storeMergeUtils';
-import { makeFakeTrack } from '../../../storybook/fixtures/trackFixtures';
+import { makeFakeTrack } from '../../../test/trackFixtures';
 
 type HMSTrackMap = Record<HMSPeerID, HMSTrack>;
 let draftTracks: Record<HMSPeerID, Partial<HMSTrack>>,

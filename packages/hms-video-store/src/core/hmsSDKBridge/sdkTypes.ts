@@ -6,10 +6,18 @@ import HMSConfig from '@100mslive/hms-video/dist/interfaces/config';
 import SDKHMSAudioTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSAudioTrackSettings';
 import SDKHMSVideoTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSVideoTrackSettings';
 
-type HMSAudioTrackSettings = Omit<SDKHMSAudioTrackSettings, "toConstraints">;
-type HMSVideoTrackSettings = Omit<SDKHMSVideoTrackSettings, "toConstraints">;
+type HMSAudioTrackSettings = SDKHMSAudioTrackSettings;
+type HMSVideoTrackSettings = SDKHMSVideoTrackSettings;
 
-export type { HMSPeer, HMSRoom, HMSMessage, HMSSpeaker, HMSConfig, HMSAudioTrackSettings, HMSVideoTrackSettings };
+export {
+  HMSPeer,
+  HMSRoom,
+  HMSMessage,
+  HMSSpeaker,
+  HMSConfig,
+  HMSAudioTrackSettings,
+  HMSVideoTrackSettings,
+};
 
 // temporary solution due to below problem in sdk
 // https://lukasbehal.com/2017-05-22-enums-in-declaration-files/

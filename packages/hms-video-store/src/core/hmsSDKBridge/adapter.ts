@@ -4,9 +4,7 @@ import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 import * as sdkTypes from './sdkTypes';
 
 export class SDKToHMS {
-  static convertPeer(
-    sdkPeer: sdkTypes.HMSPeer,
-  ): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
+  static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
     return {
       id: sdkPeer.peerId,
       name: sdkPeer.name,
