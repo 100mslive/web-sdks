@@ -21,7 +21,7 @@ import {
   selectPeerNameByID,
   selectIsConnectedToRoom,
 } from '../selectors';
-import HMSLogger from '../../utils/ui-logger';
+import HMSLogger from '../../common/ui-logger';
 import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 import SDKHMSException from '@100mslive/hms-video/dist/error/HMSException';
@@ -93,7 +93,7 @@ export class HMSSDKBridge implements IHMSBridge {
       .leave()
       .then(() => {
         this.resetState();
-        HMSLogger.i('sdk', 'left room');
+        HMSLogger.i('left room');
       })
       .catch(err => {
         HMSLogger.e('error in leaving room - ', err);
@@ -413,7 +413,7 @@ export class HMSSDKBridge implements IHMSBridge {
       // critical error
       this.leave().then(() => console.log('error from SDK, left room.'));
     }
-    HMSLogger.e('sdkError', 'received error from sdk', error);
+    HMSLogger.e('received error from sdk', error);
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
@@ -470,7 +470,7 @@ export class HMSSDKBridge implements IHMSBridge {
     };
   }
 
-  private logPossibleInconsistency(a: string) {
-    HMSLogger.w('store', 'possible inconsistency detected - ', a);
+  private logPossibleInconsistency(inconsistency: string) {
+    HMSLogger.w('possible inconsistency detected - ', inconsistency);
   }
 }
