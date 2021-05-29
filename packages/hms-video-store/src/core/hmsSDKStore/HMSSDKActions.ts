@@ -8,7 +8,7 @@ import {
   HMSTrack,
   HMSTrackID,
 } from '../schema';
-import { IHMSBridge } from '../IHMSBridge';
+import { IHMSActions } from '../IHMSActions';
 import * as sdkTypes from './sdkTypes';
 import { SDKToHMS } from './adapter';
 import {
@@ -21,7 +21,7 @@ import {
   selectPeerNameByID,
   selectIsConnectedToRoom,
 } from '../selectors';
-import HMSLogger from '../../common/ui-logger';
+import { HMSLogger } from '../../common/ui-logger';
 import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 import SDKHMSException from '@100mslive/hms-video/dist/error/HMSException';
@@ -34,7 +34,7 @@ import { mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMer
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
 
 /**
- * This class implements the HMSBridge interface for 100ms SDK. It connects with SDK
+ * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
  * and takes control of data management by letting every action pass through it. The
  * passed in store is ensured to be the single source of truth reflecting current
  * room related data at any point in time.
@@ -53,15 +53,15 @@ import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKBridge implements IHMSBridge {
+export class HMSSDKActions implements IHMSActions {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore;
   private isRoomJoinCalled: boolean = false;
 
-  constructor(sdk: HMSSdk, store: IHMSStore) {
-    this.sdk = sdk;
+  constructor(store: IHMSStore, sdk: HMSSdk) {
     this.store = store;
+    this.sdk = sdk;
   }
 
   join(config: sdkTypes.HMSConfig) {
@@ -80,7 +80,7 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   async leave() {
-    const isRoomConnected = selectIsConnectedToRoom(this.store.getState());
+    const isRoomConnected = this.store.getState(selectIsConnectedToRoom);
     if (!isRoomConnected) {
       this.logPossibleInconsistency('room leave is called when no room is connected');
       return; // ignore
@@ -105,9 +105,9 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   async setLocalAudioEnabled(enabled: boolean) {
-    const trackID = selectLocalAudioTrackID(this.store.getState());
+    const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const isCurrentEnabled = selectIsLocalAudioEnabled(this.store.getState());
+      const isCurrentEnabled = this.store.getState(selectIsLocalAudioEnabled);
       if (isCurrentEnabled === enabled) {
         // why would same value will be set again?
         this.logPossibleInconsistency('local audio track muted states.');
@@ -117,9 +117,9 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   async setLocalVideoEnabled(enabled: boolean) {
-    const trackID = selectLocalVideoTrackID(this.store.getState());
+    const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const isCurrentEnabled = selectIsLocalVideoEnabled(this.store.getState());
+      const isCurrentEnabled = this.store.getState(selectIsLocalVideoEnabled);
       if (isCurrentEnabled === enabled) {
         // why would same value will be set again?
         this.logPossibleInconsistency('local video track muted states.');
@@ -129,7 +129,7 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
-    const trackID = selectLocalAudioTrackID(this.store.getState());
+    const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
       await this.setSDKLocalAudioTrackSettings(trackID, settings);
       this.syncPeers();
@@ -137,7 +137,7 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   async setVideoSettings(settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
-    const trackID = selectLocalVideoTrackID(this.store.getState());
+    const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
       await this.setSDKLocalVideoTrackSettings(trackID, settings);
       this.syncPeers();
@@ -212,7 +212,7 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   private async startScreenShare() {
-    const isScreenShared = selectIsLocalScreenShared(this.store.getState());
+    const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
       await this.sdk.startScreenShare(this.syncPeers.bind(this));
       this.syncPeers();
@@ -222,7 +222,7 @@ export class HMSSDKBridge implements IHMSBridge {
   }
 
   private async stopScreenShare() {
-    const isScreenShared = selectIsLocalScreenShared(this.store.getState());
+    const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (isScreenShared) {
       await this.sdk.stopScreenShare();
       this.syncPeers();
@@ -345,7 +345,7 @@ export class HMSSDKBridge implements IHMSBridge {
 
   protected onHMSMessage(hmsMessage: HMSMessage) {
     this.store.setState(store => {
-      hmsMessage.id = String(selectHMSMessagesCount(this.store.getState()) + 1);
+      hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     });

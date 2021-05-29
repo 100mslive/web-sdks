@@ -1,5 +1,5 @@
 export { IHMSStore } from './IHMSStore';
-export { createNewStore } from './HMSStoreService';
-export { IHMSBridge } from './IHMSBridge';
-export { HMSSDKBridge } from './hmsSDKBridge/HMSSDKBridge';
-export { HMSStore } from '../store/schema';
+export { IHMSActions } from './IHMSActions';
+export { HMSSDKActions } from './hmsSDKStore/HMSSDKActions';
+export { HMSStore } from './schema';
+export * from './selectors';

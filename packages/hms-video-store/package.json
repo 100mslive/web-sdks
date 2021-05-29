@@ -8,7 +8,7 @@
     "src"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "scripts": {
     "start": "tsdx watch",
@@ -29,7 +29,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "tsdx lint --fix"
     }
   },
   "prettier": {
@@ -38,16 +38,17 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "name": "hms-store",
-  "author": "Tushar",
-  "module": "dist/hms-store.esm.js",
+  "name": "@100mslive/hms-video-store",
+  "author": "100ms",
+  "module": "dist/hms-video-store.esm.js",
+  "sideEffects": false,
   "size-limit": [
     {
-      "path": "dist/hms-store.cjs.production.min.js",
+      "path": "dist/hms-video-store.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/hms-store.esm.js",
+      "path": "dist/hms-video-store.esm.js",
       "limit": "10 KB"
     }
   ],

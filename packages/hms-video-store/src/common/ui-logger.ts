@@ -1,6 +1,6 @@
 const HMS_STORE_TAG = 'HMS-Store:';
 
-export default class HMSLogger {
+export class HMSLogger {
   static d(...data: any[]) {
     console.debug(HMS_STORE_TAG, ...data);
   }

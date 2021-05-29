@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 
 const selectRoom = (store: HMSStore): HMSRoom => store.room;
 export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> => store.peers;
-const selectPeerID = (store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
+const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
 export const selectMaxTilesCount = createSelector(

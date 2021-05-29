@@ -1,4 +1,4 @@
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKBridge/sdkTypes';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -14,7 +14,7 @@ import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKBridge/sdk
  * There is a one to one mapping between an instance of this class and a 100ms room,
  * in case you're creating multiple rooms please create new instance per room.
  */
-export interface IHMSBridge {
+export interface IHMSActions {
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
