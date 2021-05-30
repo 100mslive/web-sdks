@@ -2,7 +2,7 @@ name: check-size
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
 jobs:
   size:
