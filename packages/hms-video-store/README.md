@@ -2,7 +2,6 @@
 ![Test](https://github.com/100mslive/hms-video-store/actions/workflows/main.yaml/badge.svg)
 ![Size](https://github.com/100mslive/hms-video-store/actions/workflows/size.yml/badge.svg)
 [![Publish](https://github.com/100mslive/hms-video-store/actions/workflows/npm-publish.yml/badge.svg)](https://www.npmjs.com/package/@100mslive/hms-video-store)
-![Publish Beta](https://github.com/100mslive/hms-video-store/actions/workflows/npm-publish-beta.yml/badge.svg?branch=develop)
 [![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-video-store)](https://bundlephobia.com/result?p=@100mslive/hms-video-store)
 ![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-video-store)
 
