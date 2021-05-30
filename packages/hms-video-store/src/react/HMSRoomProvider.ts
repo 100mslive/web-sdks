@@ -1,18 +1,22 @@
 import React, { createContext, useContext } from 'react';
-import { HMSReactiveStore, HMSStore, IHMSActions, IHMSStore } from '../core';
+import { HMSReactiveStore, HMSStore, IHMSActions } from '../core';
 import { IHMSStoreReadOnly } from '../core/IHMSStore';
-import { EqualityChecker, StateSelector } from 'zustand';
+import create, { EqualityChecker, StateSelector } from 'zustand';
 import shallow from 'zustand/shallow';
 import { HMSLogger } from '../common/ui-logger';
 
+export interface IHMSReactStore extends IHMSStoreReadOnly {
+  <U>(selector: StateSelector<HMSStore, U>, equalityFn?: EqualityChecker<U>): U;
+}
+
 interface HMSContextProviderProps {
   actions: IHMSActions; // for actions which may also mutate store
-  store: IHMSStoreReadOnly; // readonly store, don't mutate this
+  store: IHMSReactStore; // readonly store, don't mutate this
 }
 
 export interface HMSRoomProviderProps {
   actions?: IHMSActions;
-  store?: IHMSStoreReadOnly;
+  store?: IHMSReactStore;
 }
 
 /**
@@ -30,7 +34,7 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({ children, ...p
       const hmsReactiveStore = new HMSReactiveStore();
       providerProps = {
         actions: hmsReactiveStore.getHMSActions(),
-        store: hmsReactiveStore.getStore(),
+        store: create<HMSStore>(hmsReactiveStore.getStore()), // convert vanilla store in react hook
       };
     }
   }
@@ -59,7 +63,7 @@ export const useHMSStore = () => {
     if (!HMSContextConsumer) {
       throw new Error('HMSContext state variables are not set');
     }
-    const useStore = HMSContextConsumer.store as IHMSStore;
+    const useStore = HMSContextConsumer.store;
     return useStore(selector, equalityFn);
   };
   return useHMSStore;

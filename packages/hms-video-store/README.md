@@ -6,6 +6,8 @@
 [![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-video-store)](https://bundlephobia.com/result?p=@100mslive/hms-video-store)
 ![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-video-store)
 
+![Architecture](images/architecture.png)
+
 This is an addon to the core sdk provided by 100ms. It abstracts away the
 intricacies of data management and provides
 a flux based reactive data store where data flows in only one direction.
@@ -23,7 +25,8 @@ control in order to provide an even easier usability and integration experience.
 Your UI components can forget about local states, and tracking what actions are happening,
 instead focusing only on giving the best possible experience to the end users.
 
-There are two important pieces - 
+There are two important pieces, store for what you want to show and actions for what 
+you want to do - 
 1. Store - The core store interface for reading data usually using selectors. The store
    acts as a single source of truth for any data related to the room. There are two exposed
    functions - 

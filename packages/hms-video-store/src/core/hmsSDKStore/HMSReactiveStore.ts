@@ -1,8 +1,8 @@
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { HMSSdk } from '@100mslive/hms-video';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
-import create, { SetState } from 'zustand';
+import { IHMSStore } from '../IHMSStore';
+import create, { SetState } from 'zustand/vanilla';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { devtools } from 'zustand/middleware';
 import produce from 'immer';
@@ -25,9 +25,11 @@ export class HMSReactiveStore {
    * to subscribe to a subset of the store. The store serves as a single source of truth for
    * all data related to the corresponding HMS Room.
    */
-  getStore(): IHMSStoreReadOnly {
-    // override subscribe requiring a selector
-    return this.store;
+  getStore(): IHMSStore {
+    const setStateError = () => {
+      throw new Error('Mutating store is not allowed');
+    };
+    return { ...this.store, setState: setStateError };
   }
 
   /**
