@@ -1,1 +1,6 @@
-export { HMSRoomProvider } from './HMSRoomProvider';
+export {
+  HMSRoomProvider,
+  useHMSStore,
+  useHMSActions,
+  HMSRoomProviderProps,
+} from './HMSRoomProvider';

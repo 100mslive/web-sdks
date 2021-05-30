@@ -47,11 +47,11 @@
   "size-limit": [
     {
       "path": "dist/hms-video-store.cjs.production.min.js",
-      "limit": "10 KB"
+      "limit": "20 KB"
     },
     {
       "path": "dist/hms-video-store.esm.js",
-      "limit": "10 KB"
+      "limit": "20 KB"
     }
   ],
   "devDependencies": {
@@ -61,6 +61,22 @@
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
-    "typescript": "^4.3.2"
-  }
+    "typescript": "^4.3.2",
+    "@100mslive/hms-video": "^0.0.17"
+  },
+  "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/100mslive/hms-video-store.git"
+  },
+  "keywords": [
+    "video",
+    "webrtc",
+    "conferencing",
+    "100ms"
+  ],
+  "bugs": {
+    "url": "https://github.com/100mslive/hms-video-store/issues"
+  },
+  "homepage": "https://github.com/100mslive/hms-video-store#readme"
 }

@@ -1,9 +1,10 @@
 
-name: CI
+name: lint-test-build
 on:
-  push:
+  pull_request:
     branches:
-      - '*'
+      - master
+      - develop
 
 jobs:
   lint-test:
@@ -15,10 +16,10 @@ jobs:
           node-version: 14
           registry-url: https://registry.npmjs.org/
       - name: Install packages
-        run: npm install
+        run: yarn install
       - name: Lint
-        run: npm run lint
+        run: yarn lint
       - name: Test
-        run: npm test --ci --coverage
+        run: yarn test --ci --coverage
       - name: Build
-        run: npm run build
+        run: yarn build
