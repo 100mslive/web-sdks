@@ -27,11 +27,16 @@ There are two important pieces -
 1. Store - The core store interface for reading data usually using selectors. The store
    acts as a single source of truth for any data related to the room. There are two exposed
    functions - 
-    * getState() -> get the full current state of the UI, true at current time
-    * subscribe(callback, selector) -> 
+    * getState(selector) -> get the current state of the UI, true at the time of function call
+    * subscribe(callback, selector) -> subscribe to a portion of the state selected by the
+    passed in selector such that whenever the portion changes, the passed in callback is notified.
 2. Actions - The actions interface for dispatching actions which in turn may reach
-    out to server and update the store.
+    out to server and update the store. Check the interface with detailed doc 
+    [here](src/core/IHMSActions.ts).
    
+We also provide optimized and efficient selectors for most common use cases. These are
+available in [this folder](src/core/selectors).
+
 Important Note: The data received from either getState or Subscribe is immutable, the 
 object received is frozen, and it is not allowed to mutate it. You'll get an error
 if you try to mutate this data in any way. Immutability of the store is how we ensure
@@ -83,10 +88,10 @@ function join() {
 ```
 
 
-## Redux Devtools Images of the store
+## Out of Box Support for [Redux Devtools Extension](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
 
-#### Store State
+### Store State
 ![Store State](images/store-state.png)
 
-#### Store Graph
+### Store Graph
 ![Store State](images/store-graph.png)
