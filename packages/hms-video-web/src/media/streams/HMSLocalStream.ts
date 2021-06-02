@@ -6,8 +6,7 @@ import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
-import { HMSAction } from '../../error/HMSAction';
-import { BuildGetMediaError } from '../../error/HMSErrorFactory';
+import { BuildGetMediaError } from '../../error/utils';
 
 const TAG = 'HMSLocalStream';
 
@@ -29,7 +28,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err, HMSAction.GetLocalScreen);
+      throw BuildGetMediaError(err, 'Local Screen');
     }
 
     const local = new HMSLocalStream(stream);
@@ -48,7 +47,7 @@ export default class HMSLocalStream extends HMSMediaStream {
         video: settings.video != null ? settings.video!.toConstraints() : false,
       });
     } catch (err) {
-      throw BuildGetMediaError(err, HMSAction.GetLocalScreen);
+      throw BuildGetMediaError(err, 'Video and Audio Input');
     }
 
     const local = new HMSLocalStream(stream);

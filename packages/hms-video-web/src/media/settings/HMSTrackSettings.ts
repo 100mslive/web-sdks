@@ -1,7 +1,6 @@
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
-import { HMSExceptionBuilder } from '../../error/HMSException';
-import HMSErrors from '../../error/HMSErrors';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
@@ -25,11 +24,14 @@ export class HMSTrackSettingsBuilder {
 
   build() {
     if (this._audio === null && this._video === null) {
-      throw new HMSExceptionBuilder(HMSErrors.NothingToReturn).build();
+      throw ErrorFactory.TracksErrors.NothingToReturn(HMSAction.TRACK);
     }
 
     if (this._video === null && this._simulcast) {
-      throw Error('Cannot enable simulcast when no video settings are provided');
+      throw ErrorFactory.TracksErrors.InvalidVideoSettings(
+        HMSAction.TRACK,
+        'Cannot enable simulcast when no video settings are provided',
+      );
     }
 
     return new HMSTrackSettings(this._video, this._audio, this._simulcast);

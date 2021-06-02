@@ -10,7 +10,7 @@ import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSTrack from '../media/tracks/HMSTrack';
-import HMSException, { HMSExceptionBuilder } from '../error/HMSException';
+import HMSException from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
@@ -19,9 +19,9 @@ import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSMessage from '../interfaces/message';
 import { TrackState } from '../sdk/models/HMSNotifications';
-import HMSErrors from '../error/HMSErrors';
 import { TransportState } from './TransportState';
-import { HMSAction } from '../error/HMSAction';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSConnectionMethodException } from '../error/utils';
 
 const TAG = '[HMSTransport]:';
 interface CallbackTriple {
@@ -46,14 +46,27 @@ export default class HMSTransport implements ITransport {
 
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
-      await this.subscribeConnection!.setRemoteDescription(jsep);
-      for (const candidate of this.subscribeConnection!.candidates) {
-        await this.subscribeConnection!.addIceCandidate(candidate);
+      try {
+        await this.subscribeConnection!.setRemoteDescription(jsep);
+        for (const candidate of this.subscribeConnection!.candidates) {
+          await this.subscribeConnection!.addIceCandidate(candidate);
+        }
+        this.subscribeConnection!.candidates.length = 0;
+        const answer = await this.subscribeConnection!.createAnswer();
+        await this.subscribeConnection!.setLocalDescription(answer);
+        this.signal.answer(answer);
+      } catch (err) {
+        let ex: HMSException;
+        if (err instanceof HMSException) {
+          ex = err;
+        } else if (err instanceof HMSConnectionMethodException) {
+          ex = err.toHMSException(HMSAction.SUBSCRIBE);
+        } else {
+          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
+        }
+
+        throw ex;
       }
-      this.subscribeConnection!.candidates.length = 0;
-      const answer = await this.subscribeConnection!.createAnswer();
-      await this.subscribeConnection!.setLocalDescription(answer);
-      this.signal.answer(answer);
     },
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
@@ -91,11 +104,10 @@ export default class HMSTransport implements ITransport {
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
+        } else if (err instanceof HMSConnectionMethodException) {
+          ex = err.toHMSException(HMSAction.PUBLISH);
         } else {
-          ex = new HMSExceptionBuilder(HMSErrors.PeerConnectionFailed)
-            .action(callback!.action)
-            .errorInfo(err.message)
-            .build();
+          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
         }
 
         callback!.promise.reject(ex);
@@ -136,10 +148,8 @@ export default class HMSTransport implements ITransport {
     // TODO: Should we initiate an ice-restart?
     // TODO: Should we close both peer-connections or just one?
 
-    const ex = new HMSExceptionBuilder(HMSErrors.PeerConnectionFailed)
-      .errorInfo(`[role=${role}] Ice connection state FAILED`)
-      .build();
-
+    const action = role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
+    const ex = ErrorFactory.WebrtcErrors.ICEFailure(action);
     this.state = TransportState.Failed;
     this.observer.onFailure(ex);
   }
@@ -164,7 +174,7 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo: boolean = true,
   ): Promise<void> {
     if (this.state !== TransportState.Disconnected) {
-      throw new HMSExceptionBuilder(HMSErrors.AlreadyJoined).action(HMSAction.Join).build();
+      throw ErrorFactory.JoinErrors.AlreadyJoined(HMSAction.JOIN);
     }
     const config = await InitService.fetchInitConfig(authToken, initEndpoint);
 
@@ -187,19 +197,31 @@ export default class HMSTransport implements ITransport {
       this.subscribeConnectionObserver,
     );
 
-    HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-    const offer = await this.publishConnection.createOffer();
-    await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.join(customData.name, peerId, offer, !autoSubscribeVideo);
-    await this.publishConnection.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection.candidates) {
-      await this.publishConnection.addIceCandidate(candidate);
-    }
-    this.publishConnection.initAfterJoin();
-    HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
+    try {
+      HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
+      const offer = await this.publishConnection.createOffer();
+      await this.publishConnection.setLocalDescription(offer);
+      const answer = await this.signal.join(customData.name, peerId, offer, !autoSubscribeVideo);
+      await this.publishConnection.setRemoteDescription(answer);
+      for (const candidate of this.publishConnection.candidates) {
+        await this.publishConnection.addIceCandidate(candidate);
+      }
+      this.publishConnection.initAfterJoin();
+      HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
+      HMSLogger.d(TAG, '✅ join: successful');
+    } catch (err) {
+      let ex: HMSException;
+      if (err instanceof HMSException) {
+        ex = err;
+      } else if (err instanceof HMSConnectionMethodException) {
+        ex = err.toHMSException(HMSAction.JOIN);
+      } else {
+        ex = ErrorFactory.GenericErrors.Unknown(HMSAction.JOIN, err.message);
+      }
 
-    // TODO: Handle exceptions raised - wrap them in HMSException
-    HMSLogger.d(TAG, '✅ join: successful');
+      HMSLogger.d(TAG, '❌ join: failed', { error: ex });
+      throw ex;
+    }
   }
 
   async leave(): Promise<void> {
@@ -215,7 +237,7 @@ export default class HMSTransport implements ITransport {
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
-        action: HMSAction.Publish,
+        action: HMSAction.PUBLISH,
         extra: {},
       });
     });
@@ -244,7 +266,7 @@ export default class HMSTransport implements ITransport {
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
-        action: HMSAction.Unpublish,
+        action: HMSAction.UNPUBLISH,
         extra: {},
       });
     });

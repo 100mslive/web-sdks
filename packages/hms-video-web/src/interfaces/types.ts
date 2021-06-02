@@ -4,8 +4,3 @@ export enum HMSMode {
   ONLY_SUBSCRIBE,
   AUTO,
 }
-
-export type HMSError = {
-  code: number;
-  reason: string;
-};

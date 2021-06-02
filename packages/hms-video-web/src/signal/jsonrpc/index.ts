@@ -3,11 +3,10 @@ import { ISignal, Track } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { JsonRpcRequest } from './models';
-import { HMSExceptionBuilder } from '../../error/HMSException';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
-import HMSErrors from '../../error/HMSErrors';
 import HMSMessage from '../../interfaces/message';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -64,7 +63,10 @@ export default class JsonRpcSignal implements ISignal {
         // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
         if (e.code !== 1000) {
           // 1000 code indicated `Normal Closure` [https://tools.ietf.org/html/rfc6455#section-7.4.1]
-          const error = new HMSExceptionBuilder(HMSErrors.ConnectionLost).errorInfo(`${e.reason} [${e.code}]`).build();
+          const error = ErrorFactory.WebSocketConnectionErrors.GenericConnect(
+            HMSAction.INIT,
+            `${e.reason} [${e.code}]`,
+          );
           this.observer.onFailure(error);
         }
       });
@@ -152,7 +154,11 @@ export default class JsonRpcSignal implements ISignal {
           cb.resolve(JSON.stringify(response.result));
         } else {
           const error = response.error;
-          const ex = HMSExceptionBuilder.from(error.code, error.message).build();
+          const ex = ErrorFactory.JoinErrors.ServerErrors(
+            Number(error.code),
+            HMSAction.JOIN,
+            `${error.message} [json: ${text}]`,
+          );
           cb.reject(ex);
         }
       } else {

@@ -1,12 +1,11 @@
-import { HMSAction } from '../error/HMSAction';
-import { BuildGetMediaError } from '../error/HMSErrorFactory';
+import { BuildGetMediaError } from '../error/utils';
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSAction.GetLocalStream);
+    throw BuildGetMediaError(err, 'Video and Audio Input');
   }
 }
 
@@ -16,7 +15,7 @@ export async function getLocalScreen(constraints: MediaStreamConstraints['video'
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: constraints, audio: false });
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSAction.GetLocalScreen);
+    throw BuildGetMediaError(err, 'Local Screen');
   }
 }
 
@@ -37,6 +36,6 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     devices.forEach((device) => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSAction.GetLocalDevices);
+    throw BuildGetMediaError(err, 'Video and Audio Input');
   }
 }

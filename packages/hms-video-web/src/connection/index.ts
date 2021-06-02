@@ -2,6 +2,7 @@ import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
+import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -36,19 +37,27 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
       return offer;
     } catch (e) {
-      throw e;
+      throw new HMSConnectionMethodException(HMSConnectionMethod.CreateOffer, e.message);
     }
   }
 
   async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
-    const answer = await this.nativeConnection.createAnswer(options);
-    HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
-    return answer;
+    try {
+      const answer = await this.nativeConnection.createAnswer(options);
+      HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
+      return answer;
+    } catch (e) {
+      throw new HMSConnectionMethodException(HMSConnectionMethod.CreateAnswer, e.message);
+    }
   }
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
-    HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
-    await this.nativeConnection.setLocalDescription(description);
+    try {
+      HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
+      await this.nativeConnection.setLocalDescription(description);
+    } catch (e) {
+      throw new HMSConnectionMethodException(HMSConnectionMethod.SetLocalDescription, e.message);
+    }
   }
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
@@ -56,7 +65,7 @@ export default abstract class HMSConnection {
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
     } catch (e) {
-      throw e;
+      throw new HMSConnectionMethodException(HMSConnectionMethod.SetRemoteDescription, e.message);
     }
   }
 

@@ -1,4 +1,3 @@
-import HMSErrors from '../error/HMSErrors';
 import HMSException from '../error/HMSException';
 import decodeJWT from './jwt';
 
@@ -19,7 +18,7 @@ describe('decodeJWT', () => {
       decodeJWT('');
     } catch (e) {
       expect(e).toBeInstanceOf(HMSException);
-      expect(e.message).toEqual(HMSErrors.MissingToken.messageTemplate);
+      expect(e.message).toEqual('Token is not in proper JWT format');
     }
   });
 
@@ -30,7 +29,7 @@ describe('decodeJWT', () => {
       );
     } catch (e) {
       expect(e).toBeInstanceOf(HMSException);
-      expect(e.message).toEqual(HMSErrors.InvalidTokenFormat.messageTemplate);
+      expect(e.message).toEqual('Token is not in proper JWT format');
     }
   });
 });

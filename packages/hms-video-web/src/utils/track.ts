@@ -1,5 +1,4 @@
-import { HMSAction } from '../error/HMSAction';
-import { BuildGetMediaError } from '../error/HMSErrorFactory';
+import { BuildGetMediaError } from '../error/utils';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 
@@ -10,7 +9,7 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
     });
     return stream.getAudioTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err, HMSAction.SwitchDevice);
+    throw BuildGetMediaError(err, 'Audio Input');
   }
 }
 
@@ -21,7 +20,7 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<Me
     });
     return stream.getVideoTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err, HMSAction.SwitchDevice);
+    throw BuildGetMediaError(err, 'Video Input');
   }
 }
 

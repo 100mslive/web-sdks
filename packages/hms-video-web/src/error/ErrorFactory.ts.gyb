@@ -1,0 +1,117 @@
+
+/*
+ * ErrorFactory.ts
+ *
+ * Created by codegen
+ * Copyright © 2021 100ms. All rights reserved.
+ */
+
+import HMSException from "./HMSException";
+
+export enum HMSAction {
+  TRACK = 'TRACK',
+  INIT = 'INIT',
+  PUBLISH = 'PUBLISH',
+  UNPUBLISH = 'UNPUBLISH',
+  JOIN = 'JOIN',
+  SUBSCRIBE = 'SUBSCRIBE',
+  DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
+}
+
+export const ErrorFactory = {
+
+%{
+  import csv
+  from urllib.request import urlopen
+
+  url = "https://docs.google.com/spreadsheets/u/1/d/130OjD6rMeoBidosnRimQE6xmwXQRv16U0TOjZhf7ejQ/export?format=csv&id=130OjD6rMeoBidosnRimQE6xmwXQRv16U0TOjZhf7ejQ&gid=761969878"
+  response = urlopen(url)
+  data = response.read().decode('utf-8')
+}%
+% for idx, row in enumerate(csv.DictReader(data.splitlines())):
+%{
+import re
+from re import search
+
+PLATFORM = "WEB"
+PLATFORMS = ["ANDROID", "WEB", "IOS"]
+
+def Title(x):
+    if len(x) == 0:
+        return x
+    x = re.sub(r"[^a-zA-Z0-9 ]+", '', x)
+    x = ''.join([word[0].upper() + word[1:] for word in x.strip().split(' ')])
+    return x
+
+reason = row["What is wrong?"]
+skip = not all([not reason.upper().startswith(p + ':') for p in PLATFORMS])
+
+if skip and reason.upper().startswith(PLATFORM + ':'):
+    skip = False
+    reason = reason.replace(reason[:reason.find(':') + 1], '')
+
+name = row["Error Name"]
+code = row["Error Code"]
+message =  row["Error Message"]
+description = row["Error Description (:What is the error(Parsing/unknown error))"]
+
+reason = Title(reason)
+name = Title(name)
+}%
+% if code and name and reason and message and not skip:
+
+    ${name} (
+      % if code == '2400' or code == '5000':
+      code: number,
+      % end
+      action: HMSAction,
+      % if search('{device_type}', message):
+      deviceInfo: string,
+      % end
+      % if search('{json_message}', message):
+      jsonMessage: string,
+      % end
+      % if search('{error_info}', message) or search('{server_error}', message):
+      description: string,
+      % else:
+      description: string = "",
+      % end
+    ) {
+      return new HMSException(
+        % if code == '2400' or code == '5000':
+        ${code} + code,
+        % else:
+        ${code},
+        % end
+        "${name}",
+        action.toString(),
+        "${message}"
+          % if search('{action}', message):
+          .replace("{action}", action.toString())
+          % end
+          % if search('{error_info}', message):
+          .replace("{error_info}", description)
+          % end
+          % if search('{device_type}', message):
+          .replace("{device_type}", deviceInfo)
+          % end
+          % if search('{server_error}', message):
+          .replace("{server_error}", description)
+          % end
+          % if search('{json_message}', message):
+          .replace("{json_message}", jsonMessage)
+          % end
+          ,
+        description,
+      )
+    },
+% elif len(reason) > 0 and not skip:
+  % if idx != 1:
+  },
+  %end
+
+  ${reason}: {
+% end
+% end
+  },
+}

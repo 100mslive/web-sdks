@@ -1,5 +1,4 @@
-import HMSErrors from '../error/HMSErrors';
-import { HMSExceptionBuilder } from '../error/HMSException';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 
 export interface AuthToken {
   roomId: string;
@@ -9,12 +8,15 @@ export interface AuthToken {
 
 export default function decodeJWT(token: string): AuthToken {
   if (token.length === 0) {
-    throw new HMSExceptionBuilder(HMSErrors.MissingToken).build();
+    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, 'Token cannot be an empty string');
   }
 
   const parts = token.split('.');
   if (parts.length !== 3) {
-    throw new HMSExceptionBuilder(HMSErrors.InvalidTokenFormat).build();
+    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(
+      HMSAction.INIT,
+      `Expected 3 '.' separate fields - header, payload and signature respectively`,
+    );
   }
 
   const payloadStr = atob(parts[1]);
@@ -26,6 +28,6 @@ export default function decodeJWT(token: string): AuthToken {
       role: payload.role,
     } as AuthToken;
   } catch (err) {
-    throw new HMSExceptionBuilder(HMSErrors.TokenMissingRoomId).build();
+    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, err.message);
   }
 }
