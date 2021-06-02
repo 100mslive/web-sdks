@@ -12,12 +12,17 @@ export class HMSReactiveStore {
   private readonly hmsActions: IHMSActions;
   private readonly store: IHMSStore;
 
-  constructor(sdk?: HMSSdk) {
-    if (!sdk) {
-      sdk = new HMSSdk();
+  constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions) {
+    if (hmsStore) {
+      this.store = hmsStore;
+    } else {
+      this.store = HMSReactiveStore.createNewHMSStore();
     }
-    this.store = this.createNewHMSStore();
-    this.hmsActions = new HMSSDKActions(this.store, sdk);
+    if (hmsActions) {
+      this.hmsActions = hmsActions;
+    } else {
+      this.hmsActions = new HMSSDKActions(this.store, new HMSSdk());
+    }
   }
 
   /**
@@ -50,10 +55,10 @@ export class HMSReactiveStore {
     throw new Error('Not yet implemented');
   }
 
-  private createNewHMSStore(): IHMSStore {
+  static createNewHMSStore(): IHMSStore {
     const hmsStore = create<HMSStore>(
       devtools(
-        this.immerMiddleware(() => createDefaultStoreState()),
+        HMSReactiveStore.immerMiddleware(() => createDefaultStoreState()),
         'HMSStore',
       ),
     );
@@ -72,7 +77,7 @@ export class HMSReactiveStore {
    * Immer is used to maintain immutability of the core store
    * @param outerFn
    */
-  private immerMiddleware<T extends HMSStore>(
+  private static immerMiddleware<T extends HMSStore>(
     outerFn: (set: SetState<T>, get: GetState<T>, api: StoreApi<T>) => T,
   ) {
     return (set: SetState<T>, get: GetState<T>, api: StoreApi<T>): T => {
