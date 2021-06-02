@@ -1,5 +1,5 @@
 {
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -26,8 +26,7 @@
     "zustand": "^3.5.1"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.17",
-    "react": ">=16.8"
+    "@100mslive/hms-video": "^0.0.17"
   },
   "husky": {
     "hooks": {
@@ -56,7 +55,6 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.11.0",
-    "@types/react": "^17.0.3",
     "husky": "^6.0.0",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
