@@ -156,7 +156,13 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startScreenShare(onStop: () => void) {
-    const { screen } = this.publishParams;
+    const { screen, allowed } = this.publishParams;
+    const canPublishScreen = allowed && allowed.includes('screen');
+
+    if (!canPublishScreen) {
+      HMSLogger.e(this.TAG, `Role ${this.localPeer?.role} cannot share screen`);
+      return;
+    }
 
     if ((this.localPeer?.auxiliaryTracks?.length || 0) > 0) {
       throw Error('Cannot share multiple screens');
@@ -164,7 +170,9 @@ export class HMSSdk implements HMSInterface {
 
     const track = await this.transport!.getLocalScreen(
       new HMSVideoTrackSettingsBuilder()
-        .maxBitrate(screen.bitRate)
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
         .codec(screen.codec)
         .maxFramerate(screen.frameRate)
         .setWidth(screen.width)

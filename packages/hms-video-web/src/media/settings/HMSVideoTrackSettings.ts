@@ -18,7 +18,7 @@ export class HMSVideoTrackSettingsBuilder {
   private _height: number = 180;
   private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
   private _maxFramerate: number = 30;
-  private _maxBitrate: number = 150_000;
+  private _maxBitrate?: number = 150_000;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
@@ -43,9 +43,15 @@ export class HMSVideoTrackSettingsBuilder {
     return this;
   }
 
-  maxBitrate(maxBitrate: number) {
-    if (maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+  /**
+   * @param useDefault Ignored if maxBitrate is valid.
+   * If true and maxBitrate is undefined - sets a default value.
+   * If false and maxBitrate is undefined - sets undefined.
+   */
+  maxBitrate(maxBitrate?: number, useDefault = true) {
+    if (typeof maxBitrate === 'number' && maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
     this._maxBitrate = maxBitrate;
+    if (!this._maxBitrate && useDefault) this._maxBitrate = 150_000;
     return this;
   }
 
@@ -66,9 +72,9 @@ export class HMSVideoTrackSettingsBuilder {
       this._height,
       this._codec,
       this._maxFramerate,
-      this._maxBitrate,
       this._deviceId,
       this._advanced,
+      this._maxBitrate,
     );
   }
 }
@@ -78,7 +84,7 @@ export default class HMSVideoTrackSettings {
   readonly height: number;
   readonly codec: HMSVideoCodec;
   readonly maxFramerate: number;
-  readonly maxBitrate: number;
+  readonly maxBitrate?: number;
   readonly deviceId: string;
   readonly advanced: Array<MediaTrackConstraintSet>;
 
@@ -87,9 +93,9 @@ export default class HMSVideoTrackSettings {
     height: number,
     codec: HMSVideoCodec,
     maxFramerate: number,
-    maxBitrate: number,
     deviceId: string,
     advanced: Array<MediaTrackConstraintSet>,
+    maxBitrate?: number,
   ) {
     this.width = width;
     this.height = height;

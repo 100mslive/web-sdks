@@ -48,7 +48,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
 
   async setSettings(settings: HMSVideoTrackSettings) {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, maxBitrate, deviceId, advanced);
+    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
@@ -56,7 +56,7 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
       await this.replaceTrackWith(newSettings);
     }
 
-    if (hasPropertyChanged('maxBitrate')) {
+    if (hasPropertyChanged('maxBitrate') && newSettings.maxBitrate) {
       await stream.setMaxBitrate(newSettings.maxBitrate, this);
     }
 
