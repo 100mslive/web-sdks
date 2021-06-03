@@ -75,7 +75,7 @@ export class HMSSDKActions implements IHMSActions {
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
-      return;
+      throw err;
     }
   }
 
