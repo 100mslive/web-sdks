@@ -116,6 +116,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
+      HMSLogger.d('publisher ice connection state change, ', newState);
       if (newState === 'failed') {
         this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
@@ -138,6 +139,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: (newState: RTCIceConnectionState) => {
+      HMSLogger.d('subscriber ice connection state change, ', newState);
       if (newState === 'failed') {
         this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }

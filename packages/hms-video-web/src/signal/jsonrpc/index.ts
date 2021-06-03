@@ -60,6 +60,7 @@ export default class JsonRpcSignal implements ISignal {
 
       this.socket.addEventListener('open', openHandler);
       this.socket.addEventListener('close', (e) => {
+        HMSLogger.e(`Websocket closed code=${e.code}, reason=${e.reason}`);
         // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
         if (e.code !== 1000) {
           // 1000 code indicated `Normal Closure` [https://tools.ietf.org/html/rfc6455#section-7.4.1]
