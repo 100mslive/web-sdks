@@ -3,15 +3,15 @@ import { selectPeersMap } from './selectors';
 import { HMSPeerID, HMSStore, HMSTrack } from '../schema';
 import { isScreenShare, isScreenSharing, isTrackEnabled } from './selectorUtils';
 
-type byIDSelector<T> = (store: HMSStore, id: string) => T;
+type byIDSelector<T> = (store: HMSStore, id?: string) => T;
 
 /**
  * takes in a normal selector which has store and id as input and curries it to make it easier to use.
  * Before: store.getState((store) => normalSelector(store, peerID))
  * After: store.getState(curriedSelector(peerID))
  */
-function byIDCurry<T>(selector: byIDSelector<T>): (id: string) => (store: HMSStore) => T {
-  return (id: string) => {
+function byIDCurry<T>(selector: byIDSelector<T>): (id?: string) => (store: HMSStore) => T {
+  return (id?: string) => {
     return (store: HMSStore) => selector(store, id);
   };
 }
@@ -34,7 +34,7 @@ export const selectPeerAudioByID = byIDCurry(
   createSelector(selectSpeakerByID, speaker => speaker?.audioLevel || 0),
 );
 
-export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID: HMSPeerID):
+export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
   | HMSTrack
   | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
@@ -45,7 +45,7 @@ export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID: HMS
   return undefined;
 });
 
-export const selectCameraStreamByPeerID = byIDCurry((store: HMSStore, peerID: HMSPeerID):
+export const selectCameraStreamByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
   | HMSTrack
   | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
@@ -55,12 +55,12 @@ export const selectCameraStreamByPeerID = byIDCurry((store: HMSStore, peerID: HM
   return undefined;
 });
 
-export const selectIsPeerAudioEnabled = byIDCurry((store: HMSStore, peerID: string) => {
+export const selectIsPeerAudioEnabled = byIDCurry((store: HMSStore, peerID?: string) => {
   const peer = selectPeerByIDBare(store, peerID);
   return isTrackEnabled(store, peer?.audioTrack);
 });
 
-export const selectIsPeerVideoEnabled = byIDCurry((store: HMSStore, peerID: string) => {
+export const selectIsPeerVideoEnabled = byIDCurry((store: HMSStore, peerID?: string) => {
   const peer = selectPeerByIDBare(store, peerID);
   return isTrackEnabled(store, peer?.videoTrack);
 });
