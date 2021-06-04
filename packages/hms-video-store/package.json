@@ -1,5 +1,5 @@
 {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -26,7 +26,7 @@
     "zustand": "^3.5.1"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.17"
+    "@100mslive/hms-video": "^0.0.20"
   },
   "husky": {
     "hooks": {
@@ -54,13 +54,13 @@
     }
   ],
   "devDependencies": {
+    "@100mslive/hms-video": "^0.0.20",
     "@size-limit/preset-small-lib": "^4.11.0",
     "husky": "^6.0.0",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
-    "typescript": "^4.3.2",
-    "@100mslive/hms-video": "^0.0.17"
+    "typescript": "^4.3.2"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
   "repository": {

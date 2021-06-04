@@ -1,7 +1,6 @@
 import { HMSPeer } from '../schema';
-import { selectPeersMap } from './peerSelectors';
+import { selectPeersMap, selectTracksMap } from './selectors';
 import { createSelector } from 'reselect';
-import { selectTracksMap } from './trackSelectors';
 
 export interface HMSPeerWithMuteStatus {
   peer: HMSPeer;

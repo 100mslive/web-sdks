@@ -339,7 +339,7 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    hmsMessage.senderName = selectPeerNameByID(this.store.getState(), hmsMessage.sender);
+    hmsMessage.senderName = this.store.getState(selectPeerNameByID(hmsMessage.sender));
     this.onHMSMessage(hmsMessage);
   }
 

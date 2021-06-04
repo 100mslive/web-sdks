@@ -1,4 +1,3 @@
-export * from './peerSelectors';
-export * from './trackSelectors';
-export * from './messageSelectors';
+export * from './selectors';
+export * from './selectorsByID';
 export * from './derivedSelectors';
