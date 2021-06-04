@@ -16,6 +16,7 @@
     "test": "tsdx test",
     "test:watch": "tsdx test --watch",
     "lint": "tsdx lint",
+    "lint:fix": "tsdx lint --fix",
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why"
