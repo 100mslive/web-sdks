@@ -23,6 +23,7 @@ export interface HMSPeer {
  * should be kept to bare minimum.
  * enabled - tells the real track enabled status, use this to call attach/detach video
  * displayEnabled - can be used to give immediate feedback to the user on button click
+ * deviceID - this is the ID of the source device for the track. This can be a dummy ID when track is on mute.
  */
 export interface HMSTrack {
   id: HMSTrackID;

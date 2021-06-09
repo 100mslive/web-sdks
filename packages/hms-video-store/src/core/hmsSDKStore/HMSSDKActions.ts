@@ -260,8 +260,8 @@ export class HMSSDKActions implements IHMSActions {
 
   private async setEnabledTrack(trackID: string, enabled: boolean) {
     // if mute/unmute is clicked multiple times for same operation, ignore repeated ones
-    const alreadyInProgress = this.store.getState().tracks[trackID]?.displayEnabled === enabled;
-    if (alreadyInProgress) {
+    const alreadyInSameState = this.store.getState().tracks[trackID]?.enabled === enabled;
+    if (alreadyInSameState) {
       return;
     }
     this.store.setState(store => {
@@ -456,8 +456,10 @@ export class HMSSDKActions implements IHMSActions {
 
   private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
     return {
-      audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.settings?.deviceId,
-      videoInputDeviceId: (sdkPeer.audioTrack as HMSLocalVideoTrack)?.settings?.deviceId,
+      audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.getMediaTrackSettings()
+        ?.deviceId,
+      videoInputDeviceId: (sdkPeer.videoTrack as HMSLocalVideoTrack)?.getMediaTrackSettings()
+        ?.deviceId,
     };
   }
 
