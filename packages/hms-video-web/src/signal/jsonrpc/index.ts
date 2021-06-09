@@ -7,6 +7,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import HMSMessage from '../../interfaces/message';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -140,7 +141,9 @@ export default class JsonRpcSignal implements ISignal {
     this.notify('leave', { version: '1.0' });
   }
 
-  analytics() {}
+  sendEvent(event: AnalyticsEvent) {
+    this.notify('analytics-event', event.toParams());
+  }
 
   private onMessageHandler(text: string) {
     const response = JSON.parse(text);

@@ -1,6 +1,7 @@
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
@@ -38,7 +39,7 @@ export class HMSTrackSettingsBuilder {
   }
 }
 
-export default class HMSTrackSettings {
+export default class HMSTrackSettings implements IAnalyticsPropertiesProvider {
   readonly video: HMSVideoTrackSettings | null;
   readonly audio: HMSAudioTrackSettings | null;
   readonly simulcast: boolean;
@@ -47,5 +48,22 @@ export default class HMSTrackSettings {
     this.video = video;
     this.audio = audio;
     this.simulcast = simulcast;
+  }
+
+  toAnalyticsProperties() {
+    let properties = {
+      audio_enabled: this.audio !== null,
+      video_enabled: this.video !== null,
+    };
+
+    if (this.audio) {
+      properties = { ...this.audio.toAnalyticsProperties(), ...properties };
+    }
+
+    if (this.video) {
+      properties = { ...this.video.toAnalyticsProperties(), ...properties };
+    }
+
+    return properties;
   }
 }

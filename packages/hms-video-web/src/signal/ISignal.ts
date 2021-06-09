@@ -1,3 +1,4 @@
+import { IAnalyticsTransport } from '../analytics/IAnalyticsTransport';
 import { HMSConnectionRole } from '../connection/model';
 
 export interface Track {
@@ -9,7 +10,7 @@ export interface Track {
   stream_id: string;
 }
 
-export interface ISignal {
+export interface ISignal extends IAnalyticsTransport {
   open(uri: string): Promise<void>;
 
   join(
@@ -34,8 +35,6 @@ export interface ISignal {
   recordEnd(): void;
 
   leave(): void;
-
-  analytics(): void;
 
   close(): Promise<void>;
 }

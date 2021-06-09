@@ -1,4 +1,6 @@
-export default class HMSException extends Error {
+import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
+
+export default class HMSException extends Error implements IAnalyticsPropertiesProvider {
   readonly code: number;
   name: string;
   action: string;
@@ -15,5 +17,14 @@ export default class HMSException extends Error {
     this.action = action;
     this.message = message;
     this.description = description;
+  }
+
+  toAnalyticsProperties() {
+    return {
+      error_code: this.code,
+      error_message: this.message,
+      error_description: this.description,
+      action: this.action,
+    };
   }
 }

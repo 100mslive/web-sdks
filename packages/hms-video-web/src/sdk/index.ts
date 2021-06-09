@@ -1,6 +1,6 @@
 import HMSConfig from '../interfaces/config';
 import InitialSettings from '../interfaces/settings';
-import HMSInterface, { HMSAnalyticsLevel } from '../interfaces/hms';
+import HMSInterface from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -21,6 +21,8 @@ import Message from './models/HMSMessage';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import HMSAudioSinkManager from '../audio-sink-manager';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import analyticsEventsService from '../analytics/AnalyticsEventsService';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -32,8 +34,6 @@ const defaultSettings = {
 };
 
 export class HMSSdk implements HMSInterface {
-  logLevel: HMSLogLevel = HMSLogLevel.INFO;
-  analyticsLevel: HMSAnalyticsLevel = HMSAnalyticsLevel.OFF;
   transport!: HMSTransport | null;
   roomId!: string | null;
   localPeer!: HMSPeer | null;
@@ -200,6 +200,14 @@ export class HMSSdk implements HMSInterface {
       this.transport!.unpublish([track]);
       this.localPeer!.auxiliaryTracks.splice(this.localPeer!.auxiliaryTracks.indexOf(track), 1);
     }
+  }
+
+  setAnalyticsLevel(level: HMSAnalyticsLevel) {
+    analyticsEventsService.level = level;
+  }
+
+  setLogLevel(level: HMSLogLevel) {
+    HMSLogger.level = level;
   }
 
   addAudioListener(audioListener: HMSAudioListener) {

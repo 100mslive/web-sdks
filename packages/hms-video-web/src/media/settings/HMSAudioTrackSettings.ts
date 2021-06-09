@@ -1,3 +1,4 @@
+import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSAudioCodec } from '../codec';
 
 export class HMSAudioTrackSettingsBuilder {
@@ -51,7 +52,7 @@ export class HMSAudioTrackSettingsBuilder {
   }
 }
 
-export default class HMSAudioTrackSettings {
+export default class HMSAudioTrackSettings implements IAnalyticsPropertiesProvider {
   readonly volume: number;
   readonly codec: HMSAudioCodec;
   readonly maxBitrate: number;
@@ -76,6 +77,13 @@ export default class HMSAudioTrackSettings {
     return {
       deviceId: this.deviceId,
       advanced: this.advanced,
+    };
+  }
+
+  toAnalyticsProperties() {
+    return {
+      audio_bitrate: this.maxBitrate,
+      audio_codec: this.codec,
     };
   }
 }

@@ -22,6 +22,8 @@ import { TrackState } from '../sdk/models/HMSNotifications';
 import { TransportState } from './TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSConnectionMethodException } from '../error/utils';
+import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
 const TAG = '[HMSTransport]:';
 interface CallbackTriple {
@@ -65,6 +67,7 @@ export default class HMSTransport implements ITransport {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
         }
 
+        analyticsEventsService.queue(AnalyticsEventFactory.subscribeFail(ex)).flush();
         throw ex;
       }
     },
@@ -80,6 +83,8 @@ export default class HMSTransport implements ITransport {
     },
     onNotification: (message: Object) => this.observer.onNotification(message),
     onFailure: (exception: HMSException) => {
+      analyticsEventsService.queue(AnalyticsEventFactory.disconnect(exception)).flush();
+      analyticsEventsService.removeTransport(this.signal);
       // TODO: Init the reconnecting logic
       this.observer.onFailure(exception);
     },
@@ -130,11 +135,13 @@ export default class HMSTransport implements ITransport {
 
     onTrackAdd: (track: HMSTrack) => {
       HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
+      analyticsEventsService.queue(AnalyticsEventFactory.trackAdd(track)).flush();
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
       HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
+      analyticsEventsService.queue(AnalyticsEventFactory.trackRemove(track)).flush();
       this.observer.onTrackRemove(track);
     },
 
@@ -161,45 +168,68 @@ export default class HMSTransport implements ITransport {
   }
 
   async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSTrack> {
-    return await HMSLocalStream.getLocalScreen(settings);
+    try {
+      const track = await HMSLocalStream.getLocalScreen(settings);
+      analyticsEventsService.queue(AnalyticsEventFactory.getLocalScreen(settings, track)).flush();
+      return track;
+    } catch (error) {
+      if (error instanceof HMSException) {
+        analyticsEventsService.queue(AnalyticsEventFactory.getLocalScreen(settings, undefined, error)).flush();
+      }
+      throw error;
+    }
   }
 
   async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSTrack>> {
-    return await HMSLocalStream.getLocalTracks(settings);
+    try {
+      const tracks = await HMSLocalStream.getLocalTracks(settings);
+
+      tracks.forEach((track) => analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, track)));
+      analyticsEventsService.flush();
+
+      return tracks;
+    } catch (error) {
+      if (error instanceof HMSException) {
+        analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, undefined, error)).flush();
+      }
+      throw error;
+    }
   }
 
   async join(
     authToken: string,
     peerId: string,
     customData: any,
-    initEndpoint?: string,
+    initEndpoint: string = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo: boolean = true,
   ): Promise<void> {
     if (this.state !== TransportState.Disconnected) {
       throw ErrorFactory.JoinErrors.AlreadyJoined(HMSAction.JOIN);
     }
-    const config = await InitService.fetchInitConfig(authToken, initEndpoint);
-
-    HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
-    await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`);
-    HMSLogger.d(TAG, '✅ join: connected to ws endpoint');
-
-    HMSLogger.d(TAG, customData);
-
-    this.publishConnection = new HMSPublishConnection(
-      this.signal,
-      config.rtcConfiguration,
-      this.publishConnectionObserver,
-      this,
-    );
-
-    this.subscribeConnection = new HMSSubscribeConnection(
-      this.signal,
-      config.rtcConfiguration,
-      this.subscribeConnectionObserver,
-    );
-
+    const connectRequestedAt = new Date();
     try {
+      const config = await InitService.fetchInitConfig(authToken, initEndpoint);
+
+      HMSLogger.d(TAG, '⏳ join: connecting to ws endpoint', config.endpoint);
+      await this.signal.open(`${config.endpoint}?peer=${peerId}&token=${authToken}`);
+      HMSLogger.d(TAG, '✅ join: connected to ws endpoint');
+
+      HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
+      analyticsEventsService.addTransport(this.signal);
+
+      this.publishConnection = new HMSPublishConnection(
+        this.signal,
+        config.rtcConfiguration,
+        this.publishConnectionObserver,
+        this,
+      );
+
+      this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        config.rtcConfiguration,
+        this.subscribeConnectionObserver,
+      );
+
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection.createOffer();
       await this.publishConnection.setLocalDescription(offer);
@@ -208,6 +238,7 @@ export default class HMSTransport implements ITransport {
       for (const candidate of this.publishConnection.candidates) {
         await this.publishConnection.addIceCandidate(candidate);
       }
+
       this.publishConnection.initAfterJoin();
       HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       HMSLogger.d(TAG, '✅ join: successful');
@@ -222,15 +253,26 @@ export default class HMSTransport implements ITransport {
       }
 
       HMSLogger.d(TAG, '❌ join: failed', { error: ex });
+      analyticsEventsService
+        .queue(AnalyticsEventFactory.connect(connectRequestedAt, new Date(), initEndpoint, ex))
+        .flush();
       throw ex;
     }
   }
 
   async leave(): Promise<void> {
-    await this.publishConnection!.close();
-    await this.subscribeConnection!.close();
-    this.signal.leave();
-    await this.signal.close();
+    analyticsEventsService.queue(AnalyticsEventFactory.leave()).flush();
+    analyticsEventsService.removeTransport(this.signal);
+    try {
+      await this.publishConnection!.close();
+      await this.subscribeConnection!.close();
+      this.signal.leave();
+      await this.signal.close();
+    } catch (err) {
+      if (err instanceof HMSException) {
+        analyticsEventsService.queue(AnalyticsEventFactory.disconnect(err)).flush();
+      }
+    }
   }
 
   private async publishTrack(track: HMSTrack): Promise<void> {
@@ -259,6 +301,7 @@ export default class HMSTransport implements ITransport {
         .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
+    analyticsEventsService.queue(AnalyticsEventFactory.trackStateChange(track.type, !track.enabled)).flush();
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
@@ -280,7 +323,13 @@ export default class HMSTransport implements ITransport {
 
   async publish(tracks: Array<HMSTrack>): Promise<void> {
     for (const track of tracks) {
-      await this.publishTrack(track);
+      try {
+        await this.publishTrack(track);
+      } catch (error) {
+        if (error instanceof HMSException) {
+          analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
+        }
+      }
     }
   }
 
@@ -306,6 +355,7 @@ export default class HMSTransport implements ITransport {
       });
       this.tracks.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.tracks, track);
+      analyticsEventsService.queue(AnalyticsEventFactory.trackStateChange(track.type, newTrackState.mute)).flush();
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
   }

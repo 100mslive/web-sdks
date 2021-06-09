@@ -1,3 +1,4 @@
+import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSVideoCodec } from '../codec';
 
 export class HMSVideoResolution {
@@ -79,7 +80,7 @@ export class HMSVideoTrackSettingsBuilder {
   }
 }
 
-export default class HMSVideoTrackSettings {
+export default class HMSVideoTrackSettings implements IAnalyticsPropertiesProvider {
   readonly width: number;
   readonly height: number;
   readonly codec: HMSVideoCodec;
@@ -112,6 +113,16 @@ export default class HMSVideoTrackSettings {
       height: this.height,
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
+    };
+  }
+
+  toAnalyticsProperties() {
+    return {
+      width: this.width,
+      height: this.height,
+      video_bitrate: this.maxBitrate,
+      framerate: this.maxFramerate,
+      video_codec: this.codec,
     };
   }
 }
