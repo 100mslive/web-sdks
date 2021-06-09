@@ -2,7 +2,7 @@ import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
 import { isScreenSharing, isTrackDisplayEnabled, isTrackEnabled } from './selectorUtils';
 
-const selectRoom = (store: HMSStore): HMSRoom => store.room;
+export const selectRoom = (store: HMSStore): HMSRoom => store.room;
 export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> => store.peers;
 
 export const selectMessagesMap = (store: HMSStore) => store.messages.byID;
@@ -16,7 +16,7 @@ export const selectMaxTilesCount = createSelector(
   settings => settings.maxTileCount,
 );
 
-const selectSpeakers = (store: HMSStore) => {
+export const selectSpeakers = (store: HMSStore) => {
   return store.speakers;
 };
 

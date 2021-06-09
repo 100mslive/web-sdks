@@ -31,6 +31,7 @@ export interface HMSTrack {
   enabled: boolean;
   height?: number;
   width?: number;
+  deviceID?: string;
   displayEnabled?: boolean;
 }
 

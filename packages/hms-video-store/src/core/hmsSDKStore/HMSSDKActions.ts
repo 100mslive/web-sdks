@@ -20,6 +20,8 @@ import {
   selectHMSMessagesCount,
   selectPeerNameByID,
   selectIsConnectedToRoom,
+  selectIsLocalVideoDisplayEnabled,
+  selectLocalPeer,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import { HMSSdk } from '@100mslive/hms-video';
@@ -172,11 +174,19 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+    if (this.localAndVideoUnmuting(trackID)) {
+      // wait till video unmute has finished
+      return new Promise<void>(resolve => {
+        const unsub = this.store.subscribe(async enabled => {
+          if (enabled) {
+            await this.attachVideoInternal(trackID, videoElement);
+            unsub();
+            resolve();
+          }
+        }, selectIsLocalVideoEnabled);
+      });
     } else {
-      this.logPossibleInconsistency('no video track found to add sink');
+      await this.attachVideoInternal(trackID, videoElement);
     }
   }
 
@@ -231,7 +241,29 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack && sdkTrack.type === 'video') {
+      const srcObject = videoElement.srcObject;
+      if (srcObject !== null && srcObject instanceof MediaStream) {
+        const existingTrackID = srcObject.getVideoTracks()[0]?.id;
+        if (existingTrackID === sdkTrack.trackId) {
+          // it's already attached, attaching again would just cause flickering
+          return;
+        }
+      }
+      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+    } else {
+      this.logPossibleInconsistency('no video track found to add sink');
+    }
+  }
+
   private async setEnabledTrack(trackID: string, enabled: boolean) {
+    // if mute/unmute is clicked multiple times for same operation, ignore repeated ones
+    const alreadyInProgress = this.store.getState().tracks[trackID]?.displayEnabled === enabled;
+    if (alreadyInProgress) {
+      return;
+    }
     this.store.setState(store => {
       // show on UI immediately
       if (!store.tracks[trackID]) {
@@ -419,6 +451,7 @@ export class HMSSDKActions implements IHMSActions {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
     hmsTrack.height = mediaSettings.height;
     hmsTrack.width = mediaSettings.width;
+    hmsTrack.deviceID = mediaSettings.deviceId;
   }
 
   private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
@@ -426,6 +459,20 @@ export class HMSSDKActions implements IHMSActions {
       audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.settings?.deviceId,
       videoInputDeviceId: (sdkPeer.audioTrack as HMSLocalVideoTrack)?.settings?.deviceId,
     };
+  }
+
+  /**
+   * Tells if the trackID is for local peer and video unmute is in process
+   * @private
+   */
+  private localAndVideoUnmuting(trackID: string) {
+    const localPeer = this.store.getState(selectLocalPeer);
+    if (localPeer.videoTrack !== trackID) {
+      return false;
+    }
+    const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);
+    const actuallyEnabled = this.store.getState(selectIsLocalVideoEnabled);
+    return displayEnabled && !actuallyEnabled;
   }
 
   private logPossibleInconsistency(inconsistency: string) {

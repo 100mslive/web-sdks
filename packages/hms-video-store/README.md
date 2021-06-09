@@ -1,8 +1,7 @@
 # 100ms Reactive Store
 
+[![NPM](https://badgen.net/npm/v/@100mslive/hms-video-store?color=green)](https://www.npmjs.com/package/@100mslive/hms-video-store)
 ![Test](https://github.com/100mslive/hms-video-store/actions/workflows/main.yaml/badge.svg)
-![Size](https://github.com/100mslive/hms-video-store/actions/workflows/size.yml/badge.svg)
-[![Publish](https://github.com/100mslive/hms-video-store/actions/workflows/npm-publish.yml/badge.svg)](https://www.npmjs.com/package/@100mslive/hms-video-store)
 [![Bundle Size](https://badgen.net/bundlephobia/minzip/@100mslive/hms-video-store)](https://bundlephobia.com/result?p=@100mslive/hms-video-store)
 ![Tree shaking](https://badgen.net/bundlephobia/tree-shaking/@100mslive/hms-video-store)
 
@@ -16,8 +15,8 @@ The complexity of managing the state of a room is not a trivial task
 and can spiral out of control very fast. For example, multiple UI components can be interested in a
 simple data point such as whether the user is currently muted. The mute action
 itself can be taken from multiple different places in the UI or even by a remote
-participant. Local states and improper handling of actions or missing corner cases, 
-state duplication etc. have a high potential to make the data mutually inconsistent 
+participant. Local states and improper handling of actions or missing corner cases,
+state duplication etc. have a high potential to make the data mutually inconsistent
 and out of sync with the source of truth.
 
 This is an opinionated reactive layer on top of our core sdk which takes some
@@ -25,22 +24,22 @@ control in order to provide an even easier usability and integration experience.
 Your UI components can forget about local states, and tracking what actions are happening,
 instead focusing only on giving the best possible experience to the end users.
 
-There are two important pieces, store for what you want to show and actions for what 
-you want to do - 
+There are two important pieces, store for what you want to show and actions for what
+you want to do -
 1. Store - The core store interface for reading data usually using selectors. The store
    acts as a single source of truth for any data related to the room. There are two exposed
-   functions - 
+   functions -
     * getState(selector) -> get the current state of the UI, true at the time of function call
     * subscribe(callback, selector) -> subscribe to a portion of the state selected by the
-    passed in selector such that whenever the portion changes, the passed in callback is notified.
+      passed in selector such that whenever the portion changes, the passed in callback is notified.
 2. Actions - The actions interface for dispatching actions which in turn may reach
-    out to server and update the store. Check the interface with detailed doc 
-    [here](src/core/IHMSActions.ts).
-   
+   out to server and update the store. Check the interface with detailed doc
+   [here](src/core/IHMSActions.ts).
+
 We also provide optimized and efficient selectors for most common use cases. These are
 available in [this folder](src/core/selectors).
 
-Important Note: The data received from either getState or Subscribe is immutable, the 
+Important Note: The data received from either getState or Subscribe is immutable, the
 object received is frozen, and it is not allowed to mutate it. You'll get an error
 if you try to mutate this data in any way. Immutability of the store is how we ensure
 it to be consistent and reflect the truth at any point of time.
@@ -80,13 +79,13 @@ making these hooks available to your UI components.
 function join() {
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const hmsActions = useHMSActions();
-    
+
     return <>
         {
-            !isConnected && 
+            !isConnected &&
             <Button onClick={hmsActions.join()}>Join</Button>
         }
-        </>
+    </>
 }
 ```
 

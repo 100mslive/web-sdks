@@ -7,6 +7,12 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'images/**'
+      - '.eslintrc.js'
+      - 'CODEOWNERS'
+      - 'README.MD'
+      - '.gitignore'
 
 jobs:
   publish-npm:
