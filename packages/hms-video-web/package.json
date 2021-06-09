@@ -1,5 +1,5 @@
 {
-  "version": "0.0.21",
+  "version": "0.0.22",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "bowser": "^2.11.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "webrtc-adapter": "^8.0.0"
   }
 }

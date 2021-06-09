@@ -1,3 +1,4 @@
+import { normalizeMediaId } from '../../utils/media-id';
 import HMSMediaStream from '../streams/HMSMediaStream';
 import { HMSTrackType } from './HMSTrackType';
 
@@ -21,7 +22,7 @@ export default abstract class HMSTrack {
   }
 
   public get trackId(): string {
-    return this.nativeTrack.id;
+    return normalizeMediaId(this.nativeTrack.id);
   }
 
   getMediaTrackSettings(): MediaTrackSettings {

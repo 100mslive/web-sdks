@@ -1,4 +1,5 @@
 import HMSTrack from '../tracks/HMSTrack';
+import { normalizeMediaId } from '../../utils/media-id';
 
 export default class HMSMediaStream {
   readonly nativeStream: MediaStream;
@@ -8,6 +9,6 @@ export default class HMSMediaStream {
 
   constructor(nativeStream: MediaStream) {
     this.nativeStream = nativeStream;
-    this.id = nativeStream.id;
+    this.id = normalizeMediaId(nativeStream.id);
   }
 }

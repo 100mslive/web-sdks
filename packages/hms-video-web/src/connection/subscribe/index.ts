@@ -7,6 +7,7 @@ import HMSDataChannel from '../HMSDataChannel';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
 import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
+import { normalizeMediaId } from '../../utils/media-id';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
@@ -51,12 +52,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
     this.nativeConnection.ontrack = (e) => {
       const stream = e.streams[0];
-      if (!this.remoteStreams.has(stream.id)) {
+      const streamId = normalizeMediaId(stream.id);
+      if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
-        this.remoteStreams.set(stream.id, remote);
+        this.remoteStreams.set(streamId, remote);
 
         stream.onremovetrack = (e) => {
-          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === e.track.id);
+          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === normalizeMediaId(e.track.id));
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
@@ -64,13 +66,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
             // If the length becomes 0 we assume that stream is removed entirely
             if (remote.tracks.length === 0) {
-              this.remoteStreams.delete(stream.id);
+              this.remoteStreams.delete(streamId);
             }
           }
         };
       }
 
-      const remote = this.remoteStreams.get(stream.id)!;
+      const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
       remote.tracks.push(track);

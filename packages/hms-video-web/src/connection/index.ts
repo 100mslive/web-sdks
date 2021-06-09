@@ -3,6 +3,7 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
+import { normalizeMediaId } from '../utils/media-id';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -87,7 +88,7 @@ export default abstract class HMSConnection {
   }
 
   async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
-    const sender = this.getSenders().find((s) => s?.track?.id === track.trackId);
+    const sender = this.getSenders().find((s) => s?.track?.id && normalizeMediaId(s?.track?.id) === track.trackId);
 
     if (sender) {
       const params = sender.getParameters();

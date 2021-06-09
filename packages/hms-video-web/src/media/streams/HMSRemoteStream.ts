@@ -26,7 +26,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
 
   async syncWithApiChannel() {
     const data = {
-      streamId: this.nativeStream.id,
+      streamId: this.id,
       video: this.video,
       audio: this.audio,
       framerate: this.frameRate,

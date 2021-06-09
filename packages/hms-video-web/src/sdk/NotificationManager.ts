@@ -84,8 +84,8 @@ export default class NotificationManager extends EventTarget {
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
 
-    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
-      this.trackStateMap.set(trackId, {
+    for (const trackEntry of Object.values(params.tracks)) {
+      this.trackStateMap.set(`${trackEntry.stream_id}${trackEntry.type}`, {
         peerId: params.peer.peer_id,
         trackInfo: trackEntry,
       });
@@ -98,7 +98,8 @@ export default class NotificationManager extends EventTarget {
     const tracksCopy = new Map(this.tracksToProcess);
 
     tracksCopy.forEach((track) => {
-      const state = this.trackStateMap.get(track.trackId);
+      const trackId = `${track.stream.id}${track.type}`;
+      const state = this.trackStateMap.get(trackId);
       if (!state) return;
 
       const hmsPeer = this.hmsPeerList.get(state.peerId);
@@ -125,7 +126,7 @@ export default class NotificationManager extends EventTarget {
 
       track.type === HMSTrackType.AUDIO && this.dispatchEvent(new CustomEvent('track-added', { detail: track }));
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
-      this.tracksToProcess.delete(track.trackId);
+      this.tracksToProcess.delete(trackId);
     });
   }
 
@@ -134,7 +135,7 @@ export default class NotificationManager extends EventTarget {
    */
   handleOnTrackAdd = (track: HMSTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, track);
-    this.tracksToProcess.set(track.trackId, track);
+    this.tracksToProcess.set(`${track.stream.id}${track.type}`, track);
     this.processPendingTracks();
   };
 
@@ -143,7 +144,7 @@ export default class NotificationManager extends EventTarget {
    */
   handleOnTrackRemove = (track: HMSTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track);
-    const trackStateEntry = this.trackStateMap.get(track.trackId);
+    const trackStateEntry = this.trackStateMap.get(`${track.stream.id}${track.type}`);
 
     if (!trackStateEntry) return;
 
@@ -176,7 +177,8 @@ export default class NotificationManager extends EventTarget {
     const hmsPeer = this.hmsPeerList.get(params.peer.peer_id);
     if (!hmsPeer) return;
 
-    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
+    for (const trackEntry of Object.values(params.tracks)) {
+      const trackId = `${trackEntry.stream_id}${trackEntry.type}`;
       const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
 
       const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
@@ -230,7 +232,7 @@ export default class NotificationManager extends EventTarget {
     HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
 
     peer.tracks.forEach((track) => {
-      this.trackStateMap.set(track.track_id, {
+      this.trackStateMap.set(`${track.stream_id}${track.type}`, {
         peerId: peer.peerId,
         trackInfo: track,
       });
@@ -266,12 +268,19 @@ export default class NotificationManager extends EventTarget {
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
     const peer = this.findPeerByPeerId(peerId);
 
-    if (peer?.audioTrack?.trackId === trackId) {
-      return peer.audioTrack;
-    } else if (peer?.videoTrack?.trackId === trackId) {
-      return peer.videoTrack;
+    if (this.getTrackId(peer?.audioTrack) === trackId) {
+      return peer?.audioTrack;
+    } else if (this.getTrackId(peer?.videoTrack) === trackId) {
+      return peer?.videoTrack;
     } else {
       return peer?.auxiliaryTracks.find((track) => track.trackId === trackId);
     }
+  }
+
+  private getTrackId(track: HMSTrack | null | undefined) {
+    if (!track) {
+      return null;
+    }
+    return `${track.stream.id}${track.type}`;
   }
 }

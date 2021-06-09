@@ -7,6 +7,7 @@ import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError } from '../../error/utils';
+import { normalizeMediaId } from '../../utils/media-id';
 
 const TAG = 'HMSLocalStream';
 
@@ -70,10 +71,15 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   addTransceiver(track: HMSTrack) {
     // TODO: Add support for simulcast
+    let trackEncondings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
+    if (track instanceof HMSLocalVideoTrack && track.settings.maxBitrate) {
+      trackEncondings.maxBitrate = track.settings.maxBitrate;
+    }
+
     const transceiver = this.connection!.addTransceiver(track.nativeTrack, {
       streams: [this.nativeStream],
       direction: 'sendonly',
-      sendEncodings: undefined, // TODO
+      sendEncodings: [trackEncondings],
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     return transceiver;
@@ -89,7 +95,9 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection!.getSenders().find((sender) => sender.track && sender.track!.id === track.trackId);
+    const sender = this.connection!.getSenders().find(
+      (sender) => sender.track && normalizeMediaId(sender.track.id) === track.trackId,
+    );
 
     if (sender === undefined) throw Error(`No sender found for trackId=${track.trackId}`);
     this.nativeStream.addTrack(withTrack);
@@ -105,7 +113,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   removeSender(track: HMSTrack) {
     let removedSenderCount = 0;
     this.connection!.getSenders().forEach((sender) => {
-      if (sender.track && sender.track.id === track.trackId) {
+      if (sender.track && normalizeMediaId(sender.track.id) === track.trackId) {
         this.connection!.removeTrack(sender);
         removedSenderCount += 1;
 
