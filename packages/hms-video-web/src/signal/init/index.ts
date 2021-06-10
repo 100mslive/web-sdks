@@ -1,4 +1,5 @@
 import { InitConfig } from './models';
+import transformInitConfig from './transform-init-config';
 import HMSLogger from '../../utils/logger';
 
 const TAG = 'InitService';
@@ -17,6 +18,8 @@ export default class InitService {
 
     // @TODO: Add user-agent, handle error status codes
     const response = await fetch(url);
-    return (await response.json()) as InitConfig;
+    const config = await response.json();
+    HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+    return transformInitConfig(config);
   }
 }
