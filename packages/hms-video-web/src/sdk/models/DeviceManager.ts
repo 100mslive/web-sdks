@@ -6,16 +6,18 @@ import HMSLocalVideoTrack from '../../media/tracks/HMSLocalVideoTrack';
 import { HMSAudioTrackSettingsBuilder } from '../../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../../media/settings/HMSVideoTrackSettings';
 
+type SelectedDevices = {
+  audioInput: InputDeviceInfo;
+  audioOutput: MediaDeviceInfo;
+  videoInput: InputDeviceInfo;
+};
+
 export default class DeviceManager implements HMSDeviceManager {
   audioInput: InputDeviceInfo[] = [];
   audioOutput: MediaDeviceInfo[] = [];
   videoInput: InputDeviceInfo[] = [];
 
-  selected!: {
-    audioInput: InputDeviceInfo;
-    audioOutput: MediaDeviceInfo;
-    videoInput: InputDeviceInfo;
-  };
+  selected: SelectedDevices = {} as SelectedDevices;
 
   localPeer!: HMSPeer | null;
 
@@ -26,8 +28,8 @@ export default class DeviceManager implements HMSDeviceManager {
     this.enumerateDevices();
   }
 
-  private enumerateDevices = () => {
-    navigator.mediaDevices
+  private enumerateDevices = async () => {
+    return navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
         const filteredDevices = devices.filter(
@@ -65,7 +67,7 @@ export default class DeviceManager implements HMSDeviceManager {
   handleDeviceChange = async () => {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
-    this.enumerateDevices();
+    await this.enumerateDevices();
 
     if (
       this.localPeer &&
