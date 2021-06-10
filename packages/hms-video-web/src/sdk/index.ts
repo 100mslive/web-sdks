@@ -21,6 +21,7 @@ import Message from './models/HMSMessage';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import HMSAudioSinkManager from '../audio-sink-manager';
+import DeviceManager from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 
@@ -46,6 +47,7 @@ export class HMSSdk implements HMSInterface {
   private hmsRoom?: HMSRoom | null;
   private published: boolean = false;
   private publishParams: any = null;
+  private deviceManager: DeviceManager = new DeviceManager();
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
@@ -315,6 +317,7 @@ export class HMSSdk implements HMSInterface {
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
           });
           this.published = true;
+          this.deviceManager.localPeer = this.localPeer;
         });
     }
   }
