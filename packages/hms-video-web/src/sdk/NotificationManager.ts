@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks';
 import Peer from '../peer';
@@ -19,7 +20,7 @@ interface TrackStateEntry {
   trackInfo: TrackState;
 }
 
-export default class NotificationManager extends EventTarget {
+export default class NotificationManager {
   hmsPeerList: Map<string, HMSPeer> = new Map();
   localPeer!: HMSPeer | null;
 
@@ -28,6 +29,7 @@ export default class NotificationManager extends EventTarget {
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
   private listener!: HMSUpdateListener;
   private audioListener: HMSAudioListener | null = null;
+  private eventEmitter: EventEmitter = new EventEmitter();
 
   handleNotification(
     method: HMSNotificationMethod,
@@ -78,7 +80,7 @@ export default class NotificationManager extends EventTarget {
 
   handleRoleChange(params: TrackStateNotification) {
     // @DISCUSS: Make everything event based instead?
-    this.dispatchEvent(new CustomEvent('role-change', { detail: { params } }));
+    this.eventEmitter.emit('role-change', { detail: { params } });
   }
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
@@ -124,7 +126,7 @@ export default class NotificationManager extends EventTarget {
           }
       }
 
-      track.type === HMSTrackType.AUDIO && this.dispatchEvent(new CustomEvent('track-added', { detail: track }));
+      track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-added', { detail: track });
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(trackId);
     });
@@ -166,7 +168,7 @@ export default class NotificationManager extends EventTarget {
           }
         }
       }
-      track.type === HMSTrackType.AUDIO && this.dispatchEvent(new CustomEvent('track-removed', { detail: track }));
+      track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
       this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     }
   };
@@ -218,6 +220,14 @@ export default class NotificationManager extends EventTarget {
 
     return this.hmsPeerList.get(peerId);
   };
+
+  addEventListener(event: string, listener: EventListener) {
+    this.eventEmitter.addListener(event, listener);
+  }
+
+  removeEventListener(event: string, listener: EventListener) {
+    this.eventEmitter.removeListener(event, listener);
+  }
 
   private handlePeerJoin = (peer: PeerNotification) => {
     const hmsPeer = new Peer({
