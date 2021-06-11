@@ -82,7 +82,7 @@ export class HMSSdk implements HMSInterface {
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
     this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
-    const { roomId, role } = decodeJWT(config.authToken);
+    const { roomId, userId, role } = decodeJWT(config.authToken);
 
     const peerId = uuidv4();
 
@@ -90,6 +90,7 @@ export class HMSSdk implements HMSInterface {
       peerId,
       name: config.userName,
       isLocal: true,
+      customerUserId: userId,
       role,
       customerDescription: config.metaData || '',
     });
@@ -101,7 +102,7 @@ export class HMSSdk implements HMSInterface {
       .join(
         config.authToken,
         this.localPeer.peerId,
-        { name: config.userName },
+        { name: config.userName, metaData: config.metaData || '' },
         config.initEndpoint,
         config.autoVideoSubscribe,
       )
@@ -234,7 +235,9 @@ export class HMSSdk implements HMSInterface {
           peerId: peer.peerId,
           name: peer.info.name,
           isLocal: false,
+          customerUserId: peer.info.userId,
           customerDescription: peer.info.data,
+          role: peer.role,
         }); //@TODO: There should be a cleaner way
 
         if (hmsPeer.audioTrack) {

@@ -5,7 +5,7 @@ export default interface HMSPeer {
   name: string;
   isLocal: boolean;
   customerUserId?: string;
-  customerDescription: string;
+  customerDescription?: string;
   videoTrack?: HMSTrack | null;
   audioTrack?: HMSTrack | null;
   auxiliaryTracks: HMSTrack[];

@@ -40,7 +40,7 @@ export default class NotificationManager extends EventTarget {
     switch (method) {
       case HMSNotificationMethod.PEER_JOIN: {
         const peer = notification as PeerNotification;
-        HMSLogger.d(this.TAG, `PEER_JOIN event`, peer, notification);
+        HMSLogger.d(this.TAG, `PEER_JOIN event`, peer);
         this.handlePeerJoin(peer);
         break;
       }
@@ -224,7 +224,8 @@ export default class NotificationManager extends EventTarget {
       peerId: peer.peerId,
       name: peer.info.name,
       isLocal: false,
-      customerDescription: '',
+      customerUserId: peer.info.userId,
+      customerDescription: peer.info.data,
       role: peer.role,
     });
 

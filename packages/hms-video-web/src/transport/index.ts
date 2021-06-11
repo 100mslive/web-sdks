@@ -199,7 +199,7 @@ export default class HMSTransport implements ITransport {
   async join(
     authToken: string,
     peerId: string,
-    customData: any,
+    customData: { name: string; metaData: string },
     initEndpoint: string = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo: boolean = true,
   ): Promise<void> {
@@ -233,7 +233,7 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection.createOffer();
       await this.publishConnection.setLocalDescription(offer);
-      const answer = await this.signal.join(customData.name, peerId, offer, !autoSubscribeVideo);
+      const answer = await this.signal.join(customData.name, customData.metaData, offer, !autoSubscribeVideo);
       await this.publishConnection.setRemoteDescription(answer);
       for (const candidate of this.publishConnection.candidates) {
         await this.publishConnection.addIceCandidate(candidate);
