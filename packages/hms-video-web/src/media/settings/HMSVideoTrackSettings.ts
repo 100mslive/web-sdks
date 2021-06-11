@@ -20,7 +20,7 @@ export class HMSVideoTrackSettingsBuilder {
   private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
   private _maxFramerate: number = 30;
   private _maxBitrate?: number = 150_000;
-  private _deviceId: string = 'default';
+  private _deviceId?: string;
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
   setWidth(width: number) {
@@ -86,7 +86,7 @@ export default class HMSVideoTrackSettings implements IAnalyticsPropertiesProvid
   readonly codec: HMSVideoCodec;
   readonly maxFramerate: number;
   readonly maxBitrate?: number;
-  readonly deviceId: string;
+  readonly deviceId?: string;
   readonly advanced: Array<MediaTrackConstraintSet>;
 
   constructor(
@@ -94,7 +94,7 @@ export default class HMSVideoTrackSettings implements IAnalyticsPropertiesProvid
     height: number,
     codec: HMSVideoCodec,
     maxFramerate: number,
-    deviceId: string,
+    deviceId: string | undefined,
     advanced: Array<MediaTrackConstraintSet>,
     maxBitrate?: number,
   ) {
