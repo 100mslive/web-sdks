@@ -44,7 +44,7 @@ export const selectRemotePeers = createSelector(selectPeers, peers => {
   return peers.filter(p => !p.isLocal);
 });
 
-export const selectDominantSpeakerName = createSelector(
+export const selectDominantSpeaker = createSelector(
   selectPeersMap,
   selectSpeakers,
   (peersMap, speakers) => {
@@ -61,7 +61,7 @@ export const selectDominantSpeakerName = createSelector(
     ) {
       const peerID = speakersInOrder[0][0];
       if (peerID in peersMap) {
-        return peersMap[peerID].name;
+        return peersMap[peerID];
       }
     }
     return null;
@@ -96,6 +96,11 @@ export const selectIsSomeoneScreenSharing = (store: HMSStore): boolean => {
 export const selectPeerScreenSharing = (store: HMSStore): HMSPeer | undefined => {
   const peers = selectPeers(store);
   return peers.find(peer => isScreenSharing(store, peer));
+};
+
+export const selectPeersScreenSharing = (store: HMSStore): HMSPeer[] => {
+  const peers = selectPeers(store);
+  return peers.filter(peer => isScreenSharing(store, peer));
 };
 
 export const selectHMSMessagesCount = createSelector(

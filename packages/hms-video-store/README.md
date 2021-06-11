@@ -60,7 +60,7 @@ const onSpeakerUpdate = (speaker, prevSpeaker) => {
     console.log("speaker changed from - ", prevSpeaker, ", to - ", speaker);
 }
 
-hmsStore.subscribe(onSpeakerUpdate, selectDominantSpeakerName);
+hmsStore.subscribe(onSpeakerUpdate, selectDominantSpeaker);
 ```
 
 ## Framework specific wrappers

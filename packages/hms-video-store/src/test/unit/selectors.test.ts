@@ -5,7 +5,7 @@ import {
   HMSStore,
   HMSTrack,
   selectCameraStreamByPeerID,
-  selectDominantSpeakerName,
+  selectDominantSpeaker,
   selectHMSMessages,
   selectHMSMessagesCount,
   selectIsConnectedToRoom,
@@ -25,6 +25,7 @@ import {
   selectPeerAudioByID,
   selectPeerByID,
   selectPeerScreenSharing,
+  selectPeersScreenSharing,
   selectPeersWithAudioStatus,
   selectRemotePeers,
   selectRoom,
@@ -95,6 +96,7 @@ describe('secondary selectors', () => {
   test('screenshare related', () => {
     expect(selectIsSomeoneScreenSharing(fakeStore)).toBe(true);
     expect(selectPeerScreenSharing(fakeStore)).toBe(peerScreenSharing);
+    expect(selectPeersScreenSharing(fakeStore)).toEqual([peerScreenSharing]);
   });
 
   test('messages related', () => {
@@ -109,7 +111,7 @@ describe('secondary selectors', () => {
   test('speakers', () => {
     expect(selectSpeakers(fakeStore)).toBe(fakeStore.speakers);
     fakeStore.speakers[peerScreenSharing.id] = { audioLevel: 10 };
-    expect(selectDominantSpeakerName(fakeStore)).toBe(localPeer.name);
+    expect(selectDominantSpeaker(fakeStore)).toBe(localPeer);
   });
 
   test('remote peers', () => {
