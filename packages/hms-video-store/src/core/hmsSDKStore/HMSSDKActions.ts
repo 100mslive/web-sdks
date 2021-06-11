@@ -12,7 +12,6 @@ import { IHMSActions } from '../IHMSActions';
 import * as sdkTypes from './sdkTypes';
 import { SDKToHMS } from './adapter';
 import {
-  selectIsLocalAudioEnabled,
   selectIsLocalScreenShared,
   selectIsLocalVideoEnabled,
   selectLocalAudioTrackID,
@@ -109,11 +108,6 @@ export class HMSSDKActions implements IHMSActions {
   async setLocalAudioEnabled(enabled: boolean) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const isCurrentEnabled = this.store.getState(selectIsLocalAudioEnabled);
-      if (isCurrentEnabled === enabled) {
-        // why would same value will be set again?
-        this.logPossibleInconsistency('local audio track muted states.');
-      }
       await this.setEnabledTrack(trackID, enabled);
     }
   }
@@ -121,11 +115,6 @@ export class HMSSDKActions implements IHMSActions {
   async setLocalVideoEnabled(enabled: boolean) {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const isCurrentEnabled = this.store.getState(selectIsLocalVideoEnabled);
-      if (isCurrentEnabled === enabled) {
-        // why would same value will be set again?
-        this.logPossibleInconsistency('local video track muted states.');
-      }
       await this.setEnabledTrack(trackID, enabled);
     }
   }
@@ -262,6 +251,8 @@ export class HMSSDKActions implements IHMSActions {
     // if mute/unmute is clicked multiple times for same operation, ignore repeated ones
     const alreadyInSameState = this.store.getState().tracks[trackID]?.enabled === enabled;
     if (alreadyInSameState) {
+      // it could also be a case of possible inconsistency where UI state is out of sync with truth
+      this.logPossibleInconsistency(`local track[${trackID}] enabled state - ${enabled}`);
       return;
     }
     this.store.setState(store => {
