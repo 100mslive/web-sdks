@@ -158,7 +158,7 @@ export default class JsonRpcSignal implements ISignal {
           cb.resolve(JSON.stringify(response.result));
         } else {
           const error = response.error;
-          const ex = ErrorFactory.JoinErrors.ServerErrors(
+          const ex = ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(error.code),
             HMSAction.JOIN,
             `${error.message} [json: ${text}]`,

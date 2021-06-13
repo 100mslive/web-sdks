@@ -18,12 +18,14 @@ import HMSRoom from './models/HMSRoom';
 import { v4 as uuidv4 } from 'uuid';
 import Peer from '../peer';
 import Message from './models/HMSMessage';
+import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import HMSAudioSinkManager from '../audio-sink-manager';
 import DeviceManager from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import { HMSAction } from '../error/ErrorFactory';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -106,11 +108,11 @@ export class HMSSdk implements HMSInterface {
         config.initEndpoint,
         config.autoVideoSubscribe,
       )
-      .then(() => {
+      .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         this.roomId = roomId;
         if (!this.published) {
-          this.publish(config.settings || defaultSettings);
+          await this.publish(config.settings || defaultSettings);
         }
         this.listener?.onJoin(this.createRoom());
       });
@@ -270,8 +272,8 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private publish(settings: InitialSettings) {
-    const { isAudioMuted, isVideoMuted, audioInputDeviceId, videoDeviceId } = settings;
+  private async publish(initialSettings: InitialSettings) {
+    const { audioInputDeviceId, videoDeviceId } = initialSettings;
     const { audio, video, allowed } = this.publishParams;
     const canPublishAudio = allowed && allowed.includes('audio');
     const canPublishVideo = allowed && allowed.includes('video');
@@ -291,37 +293,60 @@ export class HMSSdk implements HMSInterface {
       .build();
 
     if (canPublishAudio || canPublishVideo) {
-      this.transport
-        ?.getLocalTracks(
-          new HMSTrackSettingsBuilder()
-            .video(canPublishVideo ? videoSettings : null)
-            .audio(canPublishAudio ? audioSettings : null)
-            .build(),
-        )
-        .then(async (hmsTracks) => {
-          hmsTracks.forEach(async (hmsTrack) => {
-            switch (hmsTrack.type) {
-              case HMSTrackType.AUDIO:
-                this.localPeer!.audioTrack = hmsTrack;
-                break;
+      const trackSettings = new HMSTrackSettingsBuilder()
+        .video(canPublishVideo ? videoSettings : null)
+        .audio(canPublishAudio ? audioSettings : null)
+        .build();
+      let tracks: Array<HMSLocalTrack> = [];
+      let deviceFailure;
+      try {
+        tracks = (await this.transport?.getLocalTracks(trackSettings)) || [];
+      } catch (error) {
+        if (error instanceof HMSException && error.action === HMSAction.TRACK) {
+          const audioFailure = error.message.includes('audio');
+          const videoFailure = error.message.includes('video');
+          deviceFailure = { audio: audioFailure, video: videoFailure };
+          tracks = await HMSLocalStream.getEmptyLocalTracks(deviceFailure, trackSettings);
+        } else {
+          throw error;
+        }
+      }
+      this.setAndPublishTracks(tracks, initialSettings, deviceFailure);
+      this.published = true;
+      this.deviceManager.localPeer = this.localPeer;
+    }
+  }
 
-              case HMSTrackType.VIDEO:
-                this.localPeer!.videoTrack = hmsTrack;
-                break;
-            }
-            await this.transport!.publish([hmsTrack]);
+  private setAndPublishTracks(
+    tracks: HMSLocalTrack[],
+    initialSettings: InitialSettings,
+    deviceFailure = { audio: false, video: false },
+  ) {
+    tracks.forEach(async (track) => {
+      this.setLocalPeerTrack(track);
 
-            if (isAudioMuted && this.localPeer?.audioTrack) {
-              await this.localPeer.audioTrack.setEnabled(false);
-            }
-            if (isVideoMuted && this.localPeer?.videoTrack) {
-              await this.localPeer.videoTrack.setEnabled(false);
-            }
-            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
-          });
-          this.published = true;
-          this.deviceManager.localPeer = this.localPeer;
-        });
+      await this.transport!.publish([track]);
+
+      if (!deviceFailure.audio && initialSettings.isAudioMuted && this.localPeer?.audioTrack) {
+        await this.localPeer.audioTrack.setEnabled(false);
+      }
+      if (!deviceFailure.video && initialSettings.isVideoMuted && this.localPeer?.videoTrack) {
+        await this.localPeer.videoTrack.setEnabled(false);
+      }
+
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
+    });
+  }
+
+  private setLocalPeerTrack(track: HMSLocalTrack) {
+    switch (track.type) {
+      case HMSTrackType.AUDIO:
+        this.localPeer!.audioTrack = track;
+        break;
+
+      case HMSTrackType.VIDEO:
+        this.localPeer!.videoTrack = track;
+        break;
     }
   }
 

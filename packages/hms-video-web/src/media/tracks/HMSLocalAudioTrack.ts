@@ -1,7 +1,7 @@
 import HMSAudioTrack from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';
-import { getAudioTrack } from '../../utils/track';
+import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 
 function generateHasPropertyChanged(newSettings: HMSAudioTrackSettings, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -28,6 +28,11 @@ export default class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async setEnabled(value: boolean) {
     if (value === this.enabled) return;
+
+    // Replace silent empty track with an actual audio track, if enabled.
+    if (value && isEmptyTrack(this.nativeTrack)) {
+      await this.replaceTrackWith(this.settings);
+    }
     await super.setEnabled(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
   }

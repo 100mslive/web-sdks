@@ -1,6 +1,8 @@
 import HMSTrack from '../media/tracks/HMSTrack';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
+import { HMSLocalTrack } from '../media/streams/HMSLocalStream';
+import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 
 export default interface ITransport {
   join(authToken: string, peerId: string, customData: Object, initEndpoint?: string): Promise<void>;
@@ -11,6 +13,6 @@ export default interface ITransport {
 
   unpublish(tracks: Array<HMSTrack>): Promise<void>;
 
-  getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSTrack>>;
-  getLocalScreen(settings: HMSVideoTrackSettings, onStop: () => void): Promise<HMSTrack>;
+  getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>>;
+  getLocalScreen(settings: HMSVideoTrackSettings, onStop: () => void): Promise<HMSLocalVideoTrack>;
 }

@@ -57,6 +57,13 @@ description = row["Error Description (:What is the error(Parsing/unknown error))
 
 reason = Title(reason)
 name = Title(name)
+
+variableFilledMessage = message.replace('{action}', '${%s}' % ('action.toString()'))
+variableFilledMessage = variableFilledMessage.replace('{error_info}', '${%s}' % ('description'))
+variableFilledMessage = variableFilledMessage.replace('{device_type}', '${%s}' % ('deviceInfo'))
+variableFilledMessage = variableFilledMessage.replace('{server_error}', '${%s}' % ('description'))
+variableFilledMessage = variableFilledMessage.replace('{json_message}', '${%s}' % ('jsonMessage'))
+
 }%
 % if code and name and reason and message and not skip:
 
@@ -84,24 +91,8 @@ name = Title(name)
         ${code},
         % end
         "${name}",
-        action.toString(),
-        "${message}"
-          % if search('{action}', message):
-          .replace("{action}", action.toString())
-          % end
-          % if search('{error_info}', message):
-          .replace("{error_info}", description)
-          % end
-          % if search('{device_type}', message):
-          .replace("{device_type}", deviceInfo)
-          % end
-          % if search('{server_error}', message):
-          .replace("{server_error}", description)
-          % end
-          % if search('{json_message}', message):
-          .replace("{json_message}", jsonMessage)
-          % end
-          ,
+        action,
+        `${variableFilledMessage}`,
         description,
       )
     },

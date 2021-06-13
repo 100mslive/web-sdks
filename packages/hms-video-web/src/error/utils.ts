@@ -1,11 +1,14 @@
-import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from './ErrorFactory';
 import HMSException from './HMSException';
 
-const TAG = 'HMSErrorFactory';
+export enum HMSGetMediaActions {
+  AUDIO = 'audio',
+  VIDEO = 'video',
+  AV = 'audio, video',
+  SCREEN = 'screen',
+}
 
 export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
-  HMSLogger.e(TAG, `getLocalScreen`, err);
   const message = err.message.toLowerCase();
 
   switch (err.name) {
@@ -14,14 +17,14 @@ export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException
     case 'NotAllowedError':
       return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
     case 'NotFoundError':
-      return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, err.message);
+      return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
     case 'NotReadableError':
-      return ErrorFactory.TracksErrors.DeviceInUse(HMSAction.TRACK, err.message);
+      return ErrorFactory.TracksErrors.DeviceInUse(HMSAction.TRACK, deviceInfo, err.message);
     case 'TypeError':
       return ErrorFactory.TracksErrors.NothingToReturn(HMSAction.TRACK, err.message);
     default:
       if (message.includes('device not found')) {
-        return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, err.message);
+        return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
       } else if (message.includes('permission denied')) {
         return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
       } else {

@@ -4,12 +4,17 @@ import HMSTrackSettings from '../settings/HMSTrackSettings';
 import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
-import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
+import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
-import { BuildGetMediaError } from '../../error/utils';
+import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { normalizeMediaId } from '../../utils/media-id';
+import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
+import { HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
+import { validateDeviceAV } from '../../utils/device-error';
 
 const TAG = 'HMSLocalStream';
+
+export type HMSLocalTrack = HMSLocalAudioTrack | HMSLocalVideoTrack;
 
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
@@ -29,7 +34,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err, 'Local Screen');
+      throw BuildGetMediaError(err, HMSGetMediaActions.SCREEN);
     }
 
     const local = new HMSLocalStream(stream);
@@ -40,33 +45,44 @@ export default class HMSLocalStream extends HMSMediaStream {
     return track;
   }
 
-  static async getLocalTracks(settings: HMSTrackSettings) {
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: settings.audio != null ? settings.audio!.toConstraints() : false,
-        video: settings.video != null ? settings.video!.toConstraints() : false,
-      });
-    } catch (err) {
-      throw BuildGetMediaError(err, 'Video and Audio Input');
-    }
+  static async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
+    // @TODO: starts and stops new tracks to check failures, increases join time(by 600ms).
+    // Use same tracks for quicker join.
+    await validateDeviceAV();
+    const nativeVideoTrack = await getVideoTrack(settings.video);
+    const nativeAudioTrack = await getAudioTrack(settings.audio);
+    const local = new HMSLocalStream(new MediaStream([nativeVideoTrack, nativeAudioTrack]));
 
-    const local = new HMSLocalStream(stream);
-    const tracks: Array<HMSTrack> = [];
+    const tracks: Array<HMSLocalTrack> = [];
     if (settings.audio != null) {
-      const nativeTrack = stream.getAudioTracks()[0];
-      const track = new HMSLocalAudioTrack(local, nativeTrack, settings.audio, 'regular');
-      tracks.push(track);
+      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, settings.audio, 'regular');
+      tracks.push(audioTrack);
     }
 
     if (settings.video != null) {
-      const nativeTrack = stream.getVideoTracks()[0];
-      const track = new HMSLocalVideoTrack(local, nativeTrack, settings.video, 'regular');
-      tracks.push(track);
+      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, settings.video, 'regular');
+      tracks.push(videoTrack);
     }
 
     HMSLogger.v(TAG, 'getLocalTracks', tracks);
     return tracks;
+  }
+
+  static async getEmptyLocalTracks(
+    empty = { audio: false, video: false },
+    settings?: HMSTrackSettings,
+  ): Promise<Array<HMSLocalTrack>> {
+    const nativeVideoTrack = empty.video ? getEmptyVideoTrack() : await getVideoTrack(settings?.video || null);
+    const nativeAudioTrack = empty.audio ? getEmptyAudioTrack() : await getAudioTrack(settings?.audio || null);
+    const local = new HMSLocalStream(new MediaStream([nativeVideoTrack, nativeAudioTrack]));
+
+    const videoTrackSettings = settings?.video || new HMSVideoTrackSettingsBuilder().build();
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, videoTrackSettings, 'regular');
+
+    const audioTrackSettings = settings?.audio || new HMSAudioTrackSettingsBuilder().build();
+    const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, audioTrackSettings, 'regular');
+
+    return [audioTrack, videoTrack];
   }
 
   addTransceiver(track: HMSTrack) {

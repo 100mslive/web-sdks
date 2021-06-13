@@ -13,7 +13,7 @@ import HMSTrack from '../media/tracks/HMSTrack';
 import HMSException from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import { RENEGOTIATION_CALLBACK_ID } from '../utils/constants';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
@@ -24,6 +24,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSConnectionMethodException } from '../error/utils';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 
 const TAG = '[HMSTransport]:';
 interface CallbackTriple {
@@ -167,7 +168,7 @@ export default class HMSTransport implements ITransport {
     this.observer = observer;
   }
 
-  async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSTrack> {
+  async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSLocalVideoTrack> {
     try {
       const track = await HMSLocalStream.getLocalScreen(settings);
       analyticsEventsService.queue(AnalyticsEventFactory.getLocalScreen(settings, track)).flush();
@@ -180,7 +181,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSTrack>> {
+  async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
     try {
       const tracks = await HMSLocalStream.getLocalTracks(settings);
 
@@ -204,7 +205,7 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo: boolean = true,
   ): Promise<void> {
     if (this.state !== TransportState.Disconnected) {
-      throw ErrorFactory.JoinErrors.AlreadyJoined(HMSAction.JOIN);
+      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN);
     }
     const connectRequestedAt = new Date();
     try {
