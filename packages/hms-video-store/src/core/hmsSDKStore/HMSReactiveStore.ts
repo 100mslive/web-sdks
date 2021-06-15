@@ -1,27 +1,33 @@
-import { IHMSActions } from '../IHMSActions';
-import { HMSSDKActions } from './HMSSDKActions';
-import { HMSSdk } from '@100mslive/hms-video';
-import { IHMSStore } from '../IHMSStore';
-import create, { SetState } from 'zustand/vanilla';
-import { createDefaultStoreState, HMSStore } from '../schema';
 import { devtools } from 'zustand/middleware';
 import produce from 'immer';
-import { GetState, StateSelector, StoreApi } from 'zustand/vanilla';
+import create, { GetState, StateSelector, StoreApi, SetState } from 'zustand/vanilla';
+import { HMSSdk } from '@100mslive/hms-video';
+import { IHMSActions } from '../IHMSActions';
+import { HMSSDKActions } from './HMSSDKActions';
+import { IHMSStore } from '../IHMSStore';
+import { createDefaultStoreState, HMSStore } from '../schema';
+import { HMSNotifications } from './HMSNotifications';
 
 export class HMSReactiveStore {
-  private readonly hmsActions: IHMSActions;
+  private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
+  private readonly notifications: HMSNotifications;
 
-  constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions) {
+  constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
       this.store = HMSReactiveStore.createNewHMSStore();
     }
-    if (hmsActions) {
-      this.hmsActions = hmsActions;
+    if (hmsNotifications) {
+      this.notifications = hmsNotifications;
     } else {
-      this.hmsActions = new HMSSDKActions(this.store, new HMSSdk());
+      this.notifications = new HMSNotifications(this.store);
+    }
+    if (hmsActions) {
+      this.actions = hmsActions;
+    } else {
+      this.actions = new HMSSDKActions(this.store, new HMSSdk(), this.notifications);
     }
   }
 
@@ -42,17 +48,16 @@ export class HMSReactiveStore {
    * through the IHMSActions instance returned by this
    */
   getHMSActions(): IHMSActions {
-    return this.hmsActions;
+    return this.actions;
   }
 
   /**
-   * you can subscribe to notifications for new message, peer add etc. using this function.
-   * note that this is not meant to maintain any state on your side, as the reactive store already
-   * does that. The intent of this function is mainly to display toast notifications or send analytics.
-   * We'll provide a display message which can be displayed as it is for common cases.
+   * This return notification handler function to which you can pass your callback to
+   * receive notifications like peer joined, peer left, etc. to show in your UI or use
+   * for analytics
    */
-  onNotification() {
-    throw new Error('Not yet implemented');
+  getNotifications() {
+    return this.notifications.onNotification;
   }
 
   static createNewHMSStore(): IHMSStore {

@@ -1,0 +1,13 @@
+import { HMSNotification } from './schema/notification';
+
+type NotificationCallback = (notification: HMSNotification) => void;
+
+export interface IHMSNotifications {
+  /**
+   * you can subscribe to notifications for new message, peer add etc. using this function.
+   * note that this is not meant to maintain any state on your side, as the reactive store already
+   * does that. The intent of this function is mainly to display toast notifications or send analytics.
+   * We'll provide a display message which can be displayed as it is for common cases.
+   */
+  onNotification: (cb: NotificationCallback) => () => void;
+}

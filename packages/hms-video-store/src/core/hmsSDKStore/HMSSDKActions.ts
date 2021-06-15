@@ -33,6 +33,7 @@ import HMSLocalVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalV
 
 import { mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
+import { HMSNotifications } from './HMSNotifications';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -59,10 +60,12 @@ export class HMSSDKActions implements IHMSActions {
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore;
   private isRoomJoinCalled: boolean = false;
+  private hmsNotifications: HMSNotifications;
 
-  constructor(store: IHMSStore, sdk: HMSSdk) {
+  constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
     this.store = store;
     this.sdk = sdk;
+    this.hmsNotifications = notificationManager;
   }
 
   join(config: sdkTypes.HMSConfig) {
@@ -344,7 +347,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncPeers();
   }
 
-  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate) {
+  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: sdkTypes.HMSPeer) {
     if (
       type === sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER ||
       type === sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER
@@ -352,6 +355,7 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     } else {
       this.syncPeers();
+      this.hmsNotifications.sendPeerUpdate(type, peer);
     }
   }
 
@@ -364,6 +368,7 @@ export class HMSSDKActions implements IHMSActions {
     hmsMessage.read = false;
     hmsMessage.senderName = this.store.getState(selectPeerNameByID(hmsMessage.sender));
     this.onHMSMessage(hmsMessage);
+    this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
 
   protected onHMSMessage(hmsMessage: HMSMessage) {
@@ -402,6 +407,7 @@ export class HMSSDKActions implements IHMSActions {
       // critical error
       this.leave().then(() => console.log('error from SDK, left room.'));
     }
+    this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);
   }
 
