@@ -13,6 +13,8 @@ export class SDKToHMS {
       videoTrack: sdkPeer.videoTrack?.trackId,
       audioTrack: sdkPeer.audioTrack?.trackId,
       auxiliaryTracks: sdkPeer.auxiliaryTracks.map(t => t.trackId),
+      customerUserId: sdkPeer.customerUserId,
+      customerDescription: sdkPeer.customerDescription,
     };
   }
 

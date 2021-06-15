@@ -15,6 +15,8 @@ export interface HMSPeer {
   videoTrack?: HMSTrackID;
   audioTrack?: HMSTrackID;
   auxiliaryTracks: HMSTrackID[];
+  customerUserId?: string;
+  customerDescription?: string;
 }
 
 /**

@@ -207,6 +207,8 @@ export class HMSSDKActions implements IHMSActions {
       onTrackUpdate: this.onTrackUpdate.bind(this),
       onMessageReceived: this.onMessageReceived.bind(this),
       onError: this.onError.bind(this),
+      onReconnected: this.onReconnected.bind(this),
+      onReconnecting: this.onReconnecting.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -399,6 +401,14 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
     });
+  }
+
+  protected onReconnected() {
+    this.syncPeers();
+  }
+
+  protected onReconnecting(error: SDKHMSException) {
+    HMSLogger.e('Reconnection: received error from sdk', error);
   }
 
   protected onError(error: SDKHMSException) {
