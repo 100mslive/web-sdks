@@ -15,6 +15,7 @@ export enum HMSAction {
   JOIN = 'JOIN',
   SUBSCRIBE = 'SUBSCRIBE',
   DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
+  RESTART_ICE = 'RESTART_ICE',
 }
 
 export const ErrorFactory = {

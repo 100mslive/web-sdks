@@ -1,6 +1,8 @@
 export enum TransportState {
-  Joined,
   Disconnected,
+  Connecting,
+  Joined,
   Failed,
   Reconnecting,
+  WaitingToReconnect,
 }

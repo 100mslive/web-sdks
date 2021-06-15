@@ -11,6 +11,8 @@ export interface Track {
 }
 
 export interface ISignal extends IAnalyticsTransport {
+  isConnected: boolean;
+
   open(uri: string): Promise<void>;
 
   join(
@@ -35,6 +37,8 @@ export interface ISignal extends IAnalyticsTransport {
   recordEnd(): void;
 
   leave(): void;
+
+  ping(timeout: number): Promise<number>;
 
   close(): Promise<void>;
 }

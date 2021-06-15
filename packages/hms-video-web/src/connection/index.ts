@@ -28,6 +28,10 @@ export default abstract class HMSConnection {
     this.signal = signal;
   }
 
+  public get iceConnectionState(): RTCIceConnectionState {
+    return this.nativeConnection.iceConnectionState;
+  }
+
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
     return this.nativeConnection.addTransceiver(track, init);
   }

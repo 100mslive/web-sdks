@@ -8,5 +8,7 @@ export interface ISignalEventsObserver {
 
   onNotification(message: Object): void;
 
+  onServerError(error: HMSException): void;
+
   onFailure(exception: HMSException): void;
 }

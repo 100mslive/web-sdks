@@ -14,12 +14,14 @@ import HMSLogger from '../utils/logger';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { SpeakerList } from './models/HMSSpeaker';
+import Message from './models/HMSMessage';
 
 interface TrackStateEntry {
   peerId: string;
   trackInfo: TrackState;
 }
 
+// @TODO: Split into separate managers
 export default class NotificationManager {
   hmsPeerList: Map<string, HMSPeer> = new Map();
   localPeer!: HMSPeer | null;
@@ -34,6 +36,7 @@ export default class NotificationManager {
   handleNotification(
     method: HMSNotificationMethod,
     notification: HMSNotifications,
+    isReconnecting: boolean,
     listener: HMSUpdateListener,
     audioListener: HMSAudioListener | null,
   ) {
@@ -48,14 +51,18 @@ export default class NotificationManager {
       }
       case HMSNotificationMethod.PEER_LEAVE: {
         const peer = notification as PeerNotification;
-        HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer);
         this.handlePeerLeave(peer);
         break;
       }
       case HMSNotificationMethod.PEER_LIST: {
         const peerList = notification as PeerList;
-        HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
-        this.handlePeerList(peerList);
+        if (isReconnecting) {
+          HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
+          this.handleReconnectPeerList(peerList);
+        } else {
+          HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
+          this.handleInitialPeerList(peerList);
+        }
         break;
       }
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
@@ -73,17 +80,22 @@ export default class NotificationManager {
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         this.handleActiveSpeakers(notification as SpeakerList);
         break;
+
+      case HMSNotificationMethod.BROADCAST:
+        this.handleBroadcast(notification as Message);
+        break;
+
       default:
         return;
     }
   }
 
-  handleRoleChange(params: TrackStateNotification) {
+  private handleRoleChange(params: TrackStateNotification) {
     // @DISCUSS: Make everything event based instead?
     this.eventEmitter.emit('role-change', { detail: { params } });
   }
 
-  handleTrackMetadataAdd(params: TrackStateNotification) {
+  private handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
 
     for (const trackEntry of Object.values(params.tracks)) {
@@ -173,7 +185,7 @@ export default class NotificationManager {
     }
   };
 
-  handleTrackUpdate = (params: TrackStateNotification) => {
+  private handleTrackUpdate = (params: TrackStateNotification) => {
     HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
 
     const hmsPeer = this.hmsPeerList.get(params.peer.peer_id);
@@ -249,22 +261,101 @@ export default class NotificationManager {
       });
     });
 
+    this.listener!.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
     this.processPendingTracks();
   };
 
   private handlePeerLeave = (peer: PeerNotification) => {
+    const hmsPeer = this.findPeerByPeerId(peer.peerId);
     this.hmsPeerList.delete(peer.peerId);
+    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.hmsPeerList);
+
+    if (hmsPeer) {
+      if (hmsPeer.audioTrack) {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.audioTrack, hmsPeer);
+      }
+
+      if (hmsPeer.videoTrack) {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.videoTrack, hmsPeer);
+      }
+
+      hmsPeer.auxiliaryTracks?.forEach((track) => {
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+      });
+
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
+    }
   };
 
-  private handlePeerList = (peerList: PeerList) => {
+  private handleInitialPeerList = (peerList: PeerList) => {
     const peers = peerList.peers;
     peers?.forEach((peer) => this.handlePeerJoin(peer));
+  };
+
+  private handleReconnectPeerList = (peerList: PeerList) => {
+    const currentPeerList = Array.from(this.hmsPeerList.values());
+    const peersToRemove = currentPeerList.filter(
+      (hmsPeer) => !peerList.peers.some((peer) => peer.peerId === hmsPeer.peerId),
+    );
+
+    HMSLogger.d(this.TAG, { peersToRemove });
+
+    // Send peer-leave updates to all the missing peers
+    peersToRemove.forEach((peer) => {
+      const peerNotification = new PeerNotification({
+        peer_id: peer.peerId,
+        role: peer.role,
+        info: {
+          name: peer.name,
+          data: peer.customerDescription,
+          user_id: peer.customerUserId,
+        },
+      });
+
+      this.handlePeerLeave(peerNotification);
+    });
+
+    // Check for any tracks which are added/removed
+    peerList.peers.forEach((newPeerNotification) => {
+      const oldPeer = this.findPeerByPeerId(newPeerNotification.peerId);
+
+      if (oldPeer) {
+        // Peer already present in room, we take diff between the tracks
+        const tracks = [...oldPeer.auxiliaryTracks]; // Clone array to avoid pushing into auxiliaryTracks
+        oldPeer.audioTrack && tracks.push(oldPeer.audioTrack);
+        oldPeer.videoTrack && tracks.push(oldPeer.videoTrack);
+
+        // Remove all the tracks which are not present in the peer.tracks
+        tracks.forEach((track) => {
+          if (!newPeerNotification.tracks.some((newTrack) => newTrack.track_id === track.trackId)) {
+            this.removePeerTrack(oldPeer, track.trackId);
+            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
+          }
+        });
+
+        // Add track-metadata for all the new tracks
+        newPeerNotification.tracks.forEach((trackData) => {
+          if (!this.getPeerTrackByTrackId(oldPeer.peerId, trackData.track_id)) {
+            // NOTE: We assume that, once the connection is re-established,
+            //  transport layer will send a native onTrackAdd
+            this.trackStateMap.set(`${trackData.stream_id}${trackData.type}`, {
+              peerId: oldPeer.peerId,
+              trackInfo: trackData,
+            });
+          }
+        });
+        this.processPendingTracks();
+      } else {
+        // New peer joined while reconnecting
+        this.handlePeerJoin(newPeerNotification);
+      }
+    });
   };
 
   /**
    * @param speakerList List of speakers[peer_id, level] sorted by level in descending order.
    */
-  handleActiveSpeakers(speakerList: SpeakerList) {
+  private handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList.speakers;
     this.audioListener?.onAudioLevelUpdate(speakers);
     const dominantSpeaker = speakers[0];
@@ -276,6 +367,11 @@ export default class NotificationManager {
     }
   }
 
+  private handleBroadcast(message: Message) {
+    HMSLogger.d(this.TAG, `Received Message:: `, message);
+    this.listener?.onMessageReceived(message);
+  }
+
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
     const peer = this.findPeerByPeerId(peerId);
 
@@ -285,6 +381,17 @@ export default class NotificationManager {
       return peer?.videoTrack;
     } else {
       return peer?.auxiliaryTracks.find((track) => track.trackId === trackId);
+    }
+  }
+
+  private removePeerTrack(peer: HMSPeer, trackId: string) {
+    if (peer.audioTrack?.trackId === trackId) {
+      peer.audioTrack = null;
+    } else if (peer.videoTrack?.trackId === trackId) {
+      peer.videoTrack = null;
+    } else {
+      const track = peer.auxiliaryTracks.find((track) => track.trackId === trackId);
+      track && peer.auxiliaryTracks.splice(peer.auxiliaryTracks.indexOf(track), 1);
     }
   }
 

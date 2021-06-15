@@ -1,5 +1,6 @@
 import HMSException from '../error/HMSException';
 import HMSTrack from '../media/tracks/HMSTrack';
+import { TransportState } from './models/TransportState';
 
 export default interface ITransportObserver {
   /**
@@ -34,6 +35,8 @@ export default interface ITransportObserver {
   onTrackRemove(track: HMSTrack): void;
 
   onFailure(exception: HMSException): void;
+
+  onStateChange(state: TransportState, error?: HMSException): void;
 
   /* onReconnecting(): void
   onReconnected(): void */

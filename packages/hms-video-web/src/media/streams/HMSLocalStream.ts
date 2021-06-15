@@ -46,7 +46,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   static async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
-    // @TODO: starts and stops new tracks to check failures, increases join time(by 600ms).
+    // @TODO(eswar): starts and stops new tracks to check failures, increases join time(by 600ms).
     // Use same tracks for quicker join.
     await validateDeviceAV();
     const nativeVideoTrack = await getVideoTrack(settings.video);

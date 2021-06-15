@@ -4,11 +4,11 @@ import HMSInterface from '../interfaces/hms';
 import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
-import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import HMSUpdateListener, { HMSAudioListener, HMSTrackUpdate } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
-import { getNotification, HMSNotifications, Peer as PeerNotification } from './models/HMSNotifications';
+import { getNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks';
@@ -25,6 +25,7 @@ import HMSAudioSinkManager from '../audio-sink-manager';
 import DeviceManager from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import { TransportState } from '../transport/models/TransportState';
 import { HMSAction } from '../error/ErrorFactory';
 
 // @DISCUSS: Adding it here as a hotfix
@@ -50,6 +51,8 @@ export class HMSSdk implements HMSInterface {
   private published: boolean = false;
   private publishParams: any = null;
   private deviceManager: DeviceManager = new DeviceManager();
+  private transportState: TransportState = TransportState.Disconnected;
+  private isReconnecting: boolean = false;
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
@@ -58,10 +61,15 @@ export class HMSSdk implements HMSInterface {
       // @TODO: Notification manager needs to be refactored. The current implementation is not manageable
       // this will pollute logs
       if (method !== HMSNotificationMethod.ACTIVE_SPEAKERS) {
-        HMSLogger.d(this.TAG, `onNotification: message=${message}`);
+        HMSLogger.d(this.TAG, 'onNotification: ', message);
       }
-      this.notificationManager.handleNotification(method, notification, this.listener!, this.audioListener);
-      this.onNotificationHandled(method, notification);
+      this.notificationManager.handleNotification(
+        method,
+        notification,
+        this.isReconnecting,
+        this.listener!,
+        this.audioListener,
+      );
     },
 
     onTrackAdd: (track: HMSTrack) => {
@@ -75,11 +83,36 @@ export class HMSSdk implements HMSInterface {
     onFailure: (exception: HMSException) => {
       this.listener?.onError(exception);
     },
+
+    onStateChange: (state: TransportState, error?: HMSException) => {
+      switch (state) {
+        case TransportState.Joined:
+          if (this.transportState === TransportState.Reconnecting) {
+            this.listener?.onReconnected();
+          }
+          break;
+        case TransportState.Failed:
+          this.listener?.onError(error!);
+          this.isReconnecting = false;
+          break;
+        case TransportState.Reconnecting:
+          this.isReconnecting = true;
+          break;
+        case TransportState.WaitingToReconnect:
+          this.listener?.onReconnecting(error!);
+          break;
+      }
+
+      this.transportState = state;
+    },
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
     this.notificationManager.addEventListener('role-change', (e: any) => {
       this.publishParams = e.detail.params.role.publishParams;
+      if (this.publishParams && !this.published) {
+        this.publish(config.settings || defaultSettings);
+      }
     });
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
@@ -111,7 +144,7 @@ export class HMSSdk implements HMSInterface {
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         this.roomId = roomId;
-        if (!this.published) {
+        if (this.publishParams && !this.published) {
           await this.publish(config.settings || defaultSettings);
         }
         this.listener?.onJoin(this.createRoom());
@@ -128,6 +161,7 @@ export class HMSSdk implements HMSInterface {
     this.hmsRoom = null;
     this.transport = null;
     this.listener = null;
+    this.isReconnecting = false;
   }
 
   async leave() {
@@ -136,6 +170,7 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       this.localPeer?.audioTrack?.nativeTrack.stop();
       this.localPeer?.videoTrack?.nativeTrack.stop();
+      this.localPeer?.auxiliaryTracks.forEach((track) => track.nativeTrack.stop());
       await this.transport?.leave();
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
@@ -217,59 +252,6 @@ export class HMSSdk implements HMSInterface {
 
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
-  }
-
-  private onNotificationHandled(method: HMSNotificationMethod, notification: HMSNotifications) {
-    // HMSLogger.d(this.TAG, 'onNotificationHandled', method);
-    switch (method) {
-      case HMSNotificationMethod.PEER_JOIN: {
-        const peer = notification as PeerNotification;
-        const hmsPeer = this.notificationManager.findPeerByPeerId(peer.peerId);
-        hmsPeer
-          ? this.listener!.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer)
-          : HMSLogger.e(this.TAG, `⚠️ peer not found in peer-list`, peer, this.notificationManager.hmsPeerList);
-        break;
-      }
-
-      case HMSNotificationMethod.PEER_LEAVE: {
-        const peer = notification as PeerNotification;
-        const hmsPeer = new Peer({
-          peerId: peer.peerId,
-          name: peer.info.name,
-          isLocal: false,
-          customerUserId: peer.info.userId,
-          customerDescription: peer.info.data,
-          role: peer.role,
-        }); //@TODO: There should be a cleaner way
-
-        if (hmsPeer.audioTrack) {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.audioTrack, hmsPeer);
-        }
-
-        if (hmsPeer.videoTrack) {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.videoTrack, hmsPeer);
-        }
-
-        hmsPeer.auxiliaryTracks?.forEach((track) => {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
-        });
-
-        this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
-        break;
-      }
-
-      case HMSNotificationMethod.ROLE_CHANGE:
-        break;
-
-      case HMSNotificationMethod.ACTIVE_SPEAKERS:
-        break;
-
-      case HMSNotificationMethod.BROADCAST:
-        const message = notification as Message;
-        HMSLogger.d(this.TAG, `Received Message:: `, message);
-        this.listener?.onMessageReceived(message);
-        break;
-    }
   }
 
   private async publish(initialSettings: InitialSettings) {

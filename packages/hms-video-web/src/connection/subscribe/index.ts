@@ -27,6 +27,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       this.observer.onIceConnectionChange(this.nativeConnection.iceConnectionState);
     };
 
+    // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
+    this.nativeConnection.onconnectionstatechange = () => {
+      this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
+    };
+
     this.nativeConnection.ondatachannel = (e) => {
       if (e.channel.label !== API_DATA_CHANNEL) {
         // TODO: this.observer.onDataChannel(e.channel);

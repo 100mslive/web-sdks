@@ -3,4 +3,5 @@ export interface InitConfig {
   readonly log_level: string;
   readonly policy: string;
   readonly rtcConfiguration: RTCConfiguration;
+  readonly pingTimeout?: number;
 }

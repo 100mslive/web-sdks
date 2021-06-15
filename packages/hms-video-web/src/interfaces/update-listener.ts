@@ -46,4 +46,6 @@ export default interface HMSUpdateListener {
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
   onMessageReceived(message: HMSMessage): void;
   onError(error: HMSException): void;
+  onReconnecting(error: HMSException): void;
+  onReconnected(): void;
 }
