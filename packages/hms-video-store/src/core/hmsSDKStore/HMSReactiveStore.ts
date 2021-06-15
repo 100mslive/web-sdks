@@ -7,6 +7,7 @@ import { HMSSDKActions } from './HMSSDKActions';
 import { IHMSStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
+import { IHMSNotifications } from '../IHMSNotifications';
 
 export class HMSReactiveStore {
   private readonly actions: IHMSActions;
@@ -56,8 +57,8 @@ export class HMSReactiveStore {
    * receive notifications like peer joined, peer left, etc. to show in your UI or use
    * for analytics
    */
-  getNotifications() {
-    return this.notifications.onNotification;
+  getNotifications(): IHMSNotifications {
+    return this.notifications;
   }
 
   static createNewHMSStore(): IHMSStore {
