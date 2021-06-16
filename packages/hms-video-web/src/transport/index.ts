@@ -124,21 +124,21 @@ export default class HMSTransport implements ITransport {
       await this.performPublishRenegotiation();
     },
 
-    onIceConnectionChange: (newState: RTCIceConnectionState) => {
+    onIceConnectionChange: async (newState: RTCIceConnectionState) => {
       HMSLogger.d('publisher ice connection state change, ', newState);
 
-      // @DISCUSS: This doesn't get triggered
+      // @TODO: Uncomment this and remove connectionstatechange
       if (newState === 'failed') {
-        this.handleIceConnectionFailure(HMSConnectionRole.Publish);
+        // await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
     },
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
-    onConnectionStateChange: (newState: RTCPeerConnectionState) => {
+    onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
       HMSLogger.d('publisher connection state change, ', newState);
 
       if (newState === 'failed') {
-        this.handleIceConnectionFailure(HMSConnectionRole.Publish);
+        await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
     },
   };
@@ -160,18 +160,18 @@ export default class HMSTransport implements ITransport {
       this.observer.onTrackRemove(track);
     },
 
-    onIceConnectionChange: (newState: RTCIceConnectionState) => {
+    onIceConnectionChange: async (newState: RTCIceConnectionState) => {
       HMSLogger.d('subscriber ice connection state change, ', newState);
       if (newState === 'failed') {
-        this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+        // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
     },
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
-    onConnectionStateChange: (newState: RTCPeerConnectionState) => {
+    onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
       HMSLogger.d('subscriber connection state change, ', newState);
       if (newState === 'failed') {
-        this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+        await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
     },
   };
@@ -250,7 +250,7 @@ export default class HMSTransport implements ITransport {
 
     const joinRequestedAt = new Date();
     try {
-      this.connectionJoin(customData.name, customData.metaData, config.rtcConfiguration, autoSubscribeVideo);
+      await this.connectionJoin(customData.name, customData.metaData, config.rtcConfiguration, autoSubscribeVideo);
     } catch (error) {
       HMSLogger.d(TAG, 'join: failed ❌');
       this.state = TransportState.Failed;
@@ -475,7 +475,10 @@ export default class HMSTransport implements ITransport {
   }
 
   private retryPublishIceFailedTask = async () => {
-    if (this.publishConnection!.iceConnectionState !== 'connected') {
+    if (
+      this.publishConnection!.iceConnectionState !== 'connected' ||
+      this.publishConnection!.connectionState !== 'connected'
+    ) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -491,7 +494,10 @@ export default class HMSTransport implements ITransport {
   };
 
   private retrySubscribeIceFailedTask = async () => {
-    if (this.publishConnection!.iceConnectionState !== 'connected') {
+    if (
+      this.publishConnection!.iceConnectionState !== 'connected' ||
+      this.publishConnection!.connectionState !== 'connected'
+    ) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -500,7 +506,6 @@ export default class HMSTransport implements ITransport {
         });
       });
 
-      // @DOUBT(eswar): withTimeout in android
       await p;
     }
 
@@ -514,7 +519,8 @@ export default class HMSTransport implements ITransport {
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
       try {
-        this.connect(this.joinParameters!.authToken, this.joinParameters!.endpoint, this.joinParameters!.peerId);
+        await this.connect(this.joinParameters!.authToken, this.joinParameters!.endpoint, this.joinParameters!.peerId);
+        ok = true;
       } catch (ex) {
         ok = false;
       }

@@ -32,6 +32,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.iceConnectionState;
   }
 
+  public get connectionState(): RTCPeerConnectionState {
+    return this.nativeConnection.connectionState;
+  }
+
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
     return this.nativeConnection.addTransceiver(track, init);
   }

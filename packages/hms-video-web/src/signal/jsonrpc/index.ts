@@ -76,6 +76,7 @@ export default class JsonRpcSignal implements ISignal {
     const p = new Promise<void>((resolve) => {
       this.socket!.addEventListener('close', () => resolve());
     });
+    // @TODO: Clean up: Remove event listeners.
 
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     this.socket!.close(1000, 'Normal Close');

@@ -110,9 +110,6 @@ export class HMSSdk implements HMSInterface {
   join(config: HMSConfig, listener: HMSUpdateListener) {
     this.notificationManager.addEventListener('role-change', (e: any) => {
       this.publishParams = e.detail.params.role.publishParams;
-      if (this.publishParams && !this.published) {
-        this.publish(config.settings || defaultSettings);
-      }
     });
     this.transport = new HMSTransport(this.observer);
     this.listener = listener;
