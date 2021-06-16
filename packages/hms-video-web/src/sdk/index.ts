@@ -236,7 +236,6 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
     const track = this.localPeer?.auxiliaryTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen');
     if (track) {
-      await track.setEnabled(false);
       this.transport!.unpublish([track]);
       this.localPeer!.auxiliaryTracks.splice(this.localPeer!.auxiliaryTracks.indexOf(track), 1);
     }
