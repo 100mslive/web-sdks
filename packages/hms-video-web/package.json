@@ -48,6 +48,7 @@
     "@size-limit/preset-small-lib": "^4.10.2",
     "@types/events": "^3.0.0",
     "@types/node": "^15.0.1",
+    "@types/sdp-transform": "^2.4.4",
     "@types/uuid": "^8.3.0",
     "husky": "^6.0.0",
     "prettier": "2.2.1",
@@ -59,6 +60,7 @@
   "dependencies": {
     "bowser": "^2.11.0",
     "events": "^3.3.0",
+    "sdp-transform": "^2.14.1",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0"
   }

@@ -4,6 +4,7 @@ import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
 import { normalizeMediaId } from '../utils/media-id';
+import * as sdpTransform from 'sdp-transform';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -40,11 +41,11 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  async createOffer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
+  async createOffer(options: RTCOfferOptions | undefined = undefined, tracks: any): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
-      return offer;
+      return transformOffer(offer, tracks);
     } catch (e) {
       throw new HMSConnectionMethodException(HMSConnectionMethod.CreateOffer, e.message);
     }
@@ -108,4 +109,20 @@ export default abstract class HMSConnection {
   async close() {
     this.nativeConnection.close();
   }
+}
+
+function transformOffer(offer: any, tracks: any[]) {
+  const parsedSdp = sdpTransform.parse(offer.sdp);
+  if (!parsedSdp.origin?.username.startsWith('mozilla')) {
+    // This isn't firefox, so we return the original offer without doing anything
+    return offer;
+  }
+
+  // For each track, find the corresponding media line and replace the msid with correct track id
+  tracks.forEach((track) => {
+    const trackInSdp = parsedSdp.media.find((m) => m.type === track.type);
+    if (trackInSdp) trackInSdp.msid = trackInSdp?.msid?.split(' ').slice(0, 1).concat(track.track_id).join(' '); // @REFACTOR: This isn't very clean and I'm not that happy with this, but this gets the work done 🤷🏻‍♂️
+  });
+
+  return { ...offer, sdp: sdpTransform.write(parsedSdp) };
 }

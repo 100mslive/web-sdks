@@ -387,7 +387,7 @@ export default class HMSTransport implements ITransport {
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-      const offer = await this.publishConnection!.createOffer(constraints);
+      const offer = await this.publishConnection!.createOffer(constraints, []);
       await this.publishConnection!.setLocalDescription(offer);
       const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo);
       await this.publishConnection!.setRemoteDescription(answer);
@@ -409,7 +409,7 @@ export default class HMSTransport implements ITransport {
     this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
 
     try {
-      const offer = await this.publishConnection!.createOffer(constraints);
+      const offer = await this.publishConnection!.createOffer(constraints, this.tracks);
       await this.publishConnection!.setLocalDescription(offer);
       const answer = await this.signal.offer(offer, this.tracks);
       await this.publishConnection!.setRemoteDescription(answer);
