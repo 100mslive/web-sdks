@@ -27,7 +27,7 @@
     "zustand": "^3.5.1"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.28"
+    "@100mslive/hms-video": "^0.0.30"
   },
   "husky": {
     "hooks": {
@@ -55,7 +55,7 @@
     }
   ],
   "devDependencies": {
-    "@100mslive/hms-video": "^0.0.28",
+    "@100mslive/hms-video": "^0.0.30",
     "@size-limit/preset-small-lib": "^4.11.0",
     "husky": "^6.0.0",
     "size-limit": "^4.11.0",

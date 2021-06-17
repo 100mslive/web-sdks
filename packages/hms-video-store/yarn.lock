@@ -2,13 +2,14 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-video@^0.0.28":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.0.28.tgz#8b64fc857684d558a191013c4b632030931db066"
-  integrity sha512-aEsP9Aes0SSktGMlVq6Ouz70XqOsodaHb4v7a8KGt7bhJy3jSLosvM2g/LpQeLHG5Q6S9hyj+qMvMZ/vzYbiEQ==
+"@100mslive/hms-video@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.0.30.tgz#08a59dab64a90453aca66d988c264b5ea81d84d5"
+  integrity sha512-puiWnw/wCBGUf7jQs8H0Fs3LKzBhId2bzgBCBz70snxf6/M8+pdomzuPGfooNnRik1e19X2VDzqSr/qJlbSG8g==
   dependencies:
     bowser "^2.11.0"
     events "^3.3.0"
+    sdp-transform "^2.14.1"
     uuid "^8.3.2"
     webrtc-adapter "^8.0.0"
 
@@ -7140,6 +7141,11 @@ schema-utils@^3.0.0:
     "@types/json-schema" "^7.0.6"
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
+
+sdp-transform@^2.14.1:
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/sdp-transform/-/sdp-transform-2.14.1.tgz#2bb443583d478dee217df4caa284c46b870d5827"
+  integrity sha512-RjZyX3nVwJyCuTo5tGPx+PZWkDMCg7oOLpSlhjDdZfwUoNqG1mM8nyj31IGHyaPWXhjbP7cdK3qZ2bmkJ1GzRw==
 
 sdp@^3.0.2:
   version "3.0.3"
