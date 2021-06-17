@@ -356,8 +356,15 @@ export class HMSSDKActions implements IHMSActions {
     ) {
       return; // ignore, high frequency update so no point of syncing peers
     } else {
+      // this check is needed because for peer left case, the store does not have
+      // the peer info to be sent as notification
+      if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
+        this.hmsNotifications.sendPeerUpdate(type, peer);
+      }
       this.syncPeers();
-      this.hmsNotifications.sendPeerUpdate(type, peer);
+      if (type !== sdkTypes.HMSPeerUpdate.PEER_LEFT) {
+        this.hmsNotifications.sendPeerUpdate(type, peer);
+      }
     }
   }
 
