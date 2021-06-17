@@ -3,8 +3,8 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
-import { normalizeMediaId } from '../utils/media-id';
 import * as sdpTransform from 'sdp-transform';
+import { TrackState } from '../sdk/models/HMSNotifications';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -97,7 +97,7 @@ export default abstract class HMSConnection {
   }
 
   async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
-    const sender = this.getSenders().find((s) => s?.track?.id && normalizeMediaId(s?.track?.id) === track.trackId);
+    const sender = this.getSenders().find((s) => s?.track?.id === track.trackId);
 
     if (sender) {
       const params = sender.getParameters();
@@ -111,17 +111,21 @@ export default abstract class HMSConnection {
   }
 }
 
-function transformOffer(offer: any, tracks: any[]) {
+function transformOffer(offer: any, tracks: Map<string, TrackState>) {
   const parsedSdp = sdpTransform.parse(offer.sdp);
   if (!parsedSdp.origin?.username.startsWith('mozilla')) {
     // This isn't firefox, so we return the original offer without doing anything
     return offer;
   }
 
-  // For each track, find the corresponding media line and replace the msid with correct track id
-  tracks.forEach((track) => {
-    const trackInSdp = parsedSdp.media.find((m) => m.type === track.type);
-    if (trackInSdp) trackInSdp.msid = trackInSdp?.msid?.split(' ').slice(0, 1).concat(track.track_id).join(' '); // @REFACTOR: This isn't very clean and I'm not that happy with this, but this gets the work done 🤷🏻‍♂️
+  const mediaTracks = Array.from(tracks.values());
+  parsedSdp.media.forEach((m) => {
+    const streamId = m.msid?.split(' ')[0];
+    // check for both type and streamid as both video and screenshare have same type but different stream_id
+    const trackId = mediaTracks.find((val) => val.type === m.type && val.stream_id === streamId)?.track_id;
+    if (trackId) {
+      m.msid = m.msid?.replace(/\s(.+)/, ` ${trackId}`);
+    }
   });
 
   return { ...offer, sdp: sdpTransform.write(parsedSdp) };

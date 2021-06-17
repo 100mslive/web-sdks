@@ -7,7 +7,6 @@ import HMSDataChannel from '../HMSDataChannel';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
 import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
-import { normalizeMediaId } from '../../utils/media-id';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
@@ -57,13 +56,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
     this.nativeConnection.ontrack = (e) => {
       const stream = e.streams[0];
-      const streamId = normalizeMediaId(stream.id);
+      const streamId = stream.id;
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
 
         stream.onremovetrack = (e) => {
-          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === normalizeMediaId(e.track.id));
+          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === e.track.id);
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);

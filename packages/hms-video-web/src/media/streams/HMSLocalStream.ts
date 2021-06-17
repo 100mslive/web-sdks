@@ -7,7 +7,6 @@ import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
-import { normalizeMediaId } from '../../utils/media-id';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
 import { validateDeviceAV } from '../../utils/device-error';
@@ -111,9 +110,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection!.getSenders().find(
-      (sender) => sender.track && normalizeMediaId(sender.track.id) === track.trackId,
-    );
+    const sender = this.connection!.getSenders().find((sender) => sender.track?.id === track.trackId);
 
     if (sender === undefined) throw Error(`No sender found for trackId=${track.trackId}`);
     this.nativeStream.addTrack(withTrack);
@@ -129,7 +126,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   removeSender(track: HMSTrack) {
     let removedSenderCount = 0;
     this.connection!.getSenders().forEach((sender) => {
-      if (sender.track && normalizeMediaId(sender.track.id) === track.trackId) {
+      if (sender.track?.id === track.trackId) {
         this.connection!.removeTrack(sender);
         removedSenderCount += 1;
 

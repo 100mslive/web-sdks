@@ -2,8 +2,14 @@ import Bowser from 'bowser';
 
 export const parsedUserAgent = Bowser.getParser(navigator.userAgent);
 
+const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
 const checkIsSupported = () => {
   let isSupported = false;
+
+  if (isNode) {
+    return false;
+  }
   const osName = parsedUserAgent.getOSName(true);
   const engine = parsedUserAgent.getEngineName().toLowerCase();
   const browserVersion = parseInt(parsedUserAgent.getBrowserVersion().split('.')[0]);
