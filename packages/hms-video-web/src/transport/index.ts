@@ -29,6 +29,7 @@ import { InitConfig } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { RetryScheduler } from './RetryScheduler';
+import { userAgent } from '../utils/support';
 
 const TAG = '[HMSTransport]:';
 
@@ -454,7 +455,7 @@ export default class HMSTransport implements ITransport {
       config = await InitService.fetchInitConfig(token, endpoint);
 
       HMSLogger.d(TAG, '⏳ connect: connecting to ws endpoint', config.endpoint);
-      this.endpoint = `${config.endpoint}?peer=${peerId}&token=${token}`;
+      this.endpoint = `${config.endpoint}?peer=${peerId}&token=${token}&user_agent=${userAgent}`;
       await this.signal.open(this.endpoint);
       this.pingPongLoop(config);
       HMSLogger.d(TAG, '✅ connect: connected to ws endpoint');

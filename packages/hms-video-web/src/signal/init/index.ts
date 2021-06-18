@@ -1,5 +1,6 @@
 import { InitConfig } from './models';
 import HMSLogger from '../../utils/logger';
+import { userAgent } from '../../utils/support';
 
 const TAG = 'InitService';
 
@@ -31,7 +32,7 @@ export function getUrl(endpoint: string, region?: string) {
     if (region && region.trim().length > 0) {
       url.searchParams.set('region', region.trim());
     }
-
+    url.searchParams.set('user_agent', userAgent);
     return url.toString();
   } catch (error) {
     console.log(error.name, error.message);

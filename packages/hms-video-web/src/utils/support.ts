@@ -1,4 +1,5 @@
 import Bowser from 'bowser';
+import { version } from './package.alias.json';
 
 export const parsedUserAgent = Bowser.getParser(navigator.userAgent);
 
@@ -37,3 +38,16 @@ const checkIsSupported = () => {
 };
 
 export const isSupported = checkIsSupported();
+
+function createUserAgent(): string {
+  if (isNode) {
+    return `hmsclient/${version}`;
+  }
+  const platform = parsedUserAgent.getPlatform();
+  const browser = parsedUserAgent.getBrowser();
+  const os = parsedUserAgent.getOS();
+
+  return `hmsclient/${version} ${os.name}/${os.version} (${platform.vendor} ${platform.type} / ${browser.name} ${browser.version})`;
+}
+
+export const userAgent = createUserAgent();
