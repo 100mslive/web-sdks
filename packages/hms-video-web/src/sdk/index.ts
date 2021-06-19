@@ -10,7 +10,7 @@ import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
-import HMSTrack from '../media/tracks/HMSTrack';
+import HMSTrack, { HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks';
 import HMSException from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
@@ -25,6 +25,8 @@ import HMSAudioSinkManager from '../audio-sink-manager';
 import DeviceManager from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import HMSLocalAudioTrack from '../media/tracks/HMSLocalAudioTrack';
+import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
 import { HMSAction } from '../error/ErrorFactory';
 
@@ -219,8 +221,10 @@ export class HMSSdk implements HMSInterface {
     track.nativeTrack.onended = () => {
       this.stopEndedScreenshare(onStop);
     };
+
     await this.transport!.publish([track]);
     this.localPeer?.auxiliaryTracks.push(track);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
   }
 
   private async stopEndedScreenshare(onStop: () => void) {
@@ -233,8 +237,30 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
     const track = this.localPeer?.auxiliaryTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen');
     if (track) {
-      this.transport!.unpublish([track]);
+      await this.removeTrack(track.trackId);
+    }
+  }
+
+  async addTrack(track: MediaStreamTrack, source: HMSTrackSource = 'regular'): Promise<void> {
+    const type = track.kind;
+    const nativeStream = new MediaStream([track]);
+    const stream = new HMSLocalStream(nativeStream);
+
+    const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
+    const hmsTrack = new TrackKlass(stream, track, source);
+
+    await this.transport?.publish([hmsTrack]);
+    this.localPeer?.auxiliaryTracks.push(hmsTrack);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
+  }
+
+  async removeTrack(trackId: string) {
+    const track = this.localPeer?.auxiliaryTracks.find((t) => t.trackId === trackId);
+    if (track) {
+      track.nativeTrack.stop();
+      await this.transport!.unpublish([track]);
       this.localPeer!.auxiliaryTracks.splice(this.localPeer!.auxiliaryTracks.indexOf(track), 1);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer!);
     }
   }
 

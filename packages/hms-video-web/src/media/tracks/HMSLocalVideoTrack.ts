@@ -1,6 +1,6 @@
 import HMSVideoTrack from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
-import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
+import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
 import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 
 function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSettings: HMSVideoTrackSettings) {
@@ -14,7 +14,12 @@ function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSetti
 export default class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
 
-  constructor(stream: HMSLocalStream, track: MediaStreamTrack, settings: HMSVideoTrackSettings, source: string) {
+  constructor(
+    stream: HMSLocalStream,
+    track: MediaStreamTrack,
+    source: string,
+    settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
+  ) {
     super(stream, track, source);
     stream.tracks.push(this);
 

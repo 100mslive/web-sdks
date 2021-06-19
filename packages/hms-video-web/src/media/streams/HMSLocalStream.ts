@@ -38,7 +38,7 @@ export default class HMSLocalStream extends HMSMediaStream {
 
     const local = new HMSLocalStream(stream);
     const nativeTrack = stream.getVideoTracks()[0];
-    const track = new HMSLocalVideoTrack(local, nativeTrack, settings, 'screen');
+    const track = new HMSLocalVideoTrack(local, nativeTrack, 'screen', settings);
 
     HMSLogger.v(TAG, 'getLocalScreen', track);
     return track;
@@ -54,12 +54,12 @@ export default class HMSLocalStream extends HMSMediaStream {
 
     const tracks: Array<HMSLocalTrack> = [];
     if (settings.audio != null) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, settings.audio, 'regular');
+      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', settings.audio);
       tracks.push(audioTrack);
     }
 
     if (settings.video != null) {
-      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, settings.video, 'regular');
+      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', settings.video);
       tracks.push(videoTrack);
     }
 
@@ -76,10 +76,10 @@ export default class HMSLocalStream extends HMSMediaStream {
     const local = new HMSLocalStream(new MediaStream([nativeVideoTrack, nativeAudioTrack]));
 
     const videoTrackSettings = settings?.video || new HMSVideoTrackSettingsBuilder().build();
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, videoTrackSettings, 'regular');
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', videoTrackSettings);
 
     const audioTrackSettings = settings?.audio || new HMSAudioTrackSettingsBuilder().build();
-    const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, audioTrackSettings, 'regular');
+    const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', audioTrackSettings);
 
     return [audioTrack, videoTrack];
   }
