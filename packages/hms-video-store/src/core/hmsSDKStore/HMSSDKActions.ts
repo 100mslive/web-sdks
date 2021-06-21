@@ -22,6 +22,7 @@ import {
   selectIsConnectedToRoom,
   selectIsLocalVideoDisplayEnabled,
   selectLocalPeer,
+  selectPeerByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import { HMSSdk } from '@100mslive/hms-video';
@@ -158,6 +159,10 @@ export class HMSSDKActions implements IHMSActions {
         store.tracks[trackID].displayEnabled = !enabled;
       });
     }
+    const type = enabled
+      ? sdkTypes.HMSTrackUpdate.TRACK_UNMUTED
+      : sdkTypes.HMSTrackUpdate.TRACK_MUTED;
+    this.hmsNotifications.sendTrackUpdate(type, trackID);
   }
 
   async setAudioSettings(settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
@@ -360,27 +365,57 @@ export class HMSSDKActions implements IHMSActions {
     this.syncPeers();
   }
 
-  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: sdkTypes.HMSPeer) {
+  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
     if (
       type === sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER ||
       type === sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER
     ) {
       return; // ignore, high frequency update so no point of syncing peers
     } else {
-      // this check is needed because for peer left case, the store does not have
-      // the peer info to be sent as notification
-      if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
-        this.hmsNotifications.sendPeerUpdate(type, peer);
-      }
+      // store peer in case it doesn't exist later(will happen if event is peer leave)
+      const peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
       this.syncPeers();
-      if (type !== sdkTypes.HMSPeerUpdate.PEER_LEFT) {
-        this.hmsNotifications.sendPeerUpdate(type, peer);
-      }
+      this.hmsNotifications.sendPeerUpdate(type, peer);
     }
   }
 
-  protected onTrackUpdate() {
-    this.syncPeers();
+  protected onTrackUpdate(
+    type: sdkTypes.HMSTrackUpdate,
+    track: SDKHMSTrack,
+    peer: sdkTypes.HMSPeer,
+  ) {
+    // this check is needed because for track removed case, the store does not have
+    // the track info to be sent as notification
+    if (type === sdkTypes.HMSTrackUpdate.TRACK_REMOVED) {
+      this.hmsNotifications.sendTrackUpdate(type, track.trackId);
+      this.handleTrackRemove(track, peer);
+    } else {
+      this.syncPeers();
+      this.hmsNotifications.sendTrackUpdate(type, track.trackId);
+    }
+  }
+
+  private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
+    this.store.setState(draftStore => {
+      const hmsPeer = draftStore.peers[sdkPeer.peerId];
+      const draftTracks = draftStore.tracks;
+      // find and remove the exact track from hmsPeer
+      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.audioTrack)) {
+        delete hmsPeer.audioTrack;
+      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.videoTrack)) {
+        delete hmsPeer.videoTrack;
+      } else {
+        const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(sdkTrack.trackId);
+        if (
+          auxiliaryIndex > -1 &&
+          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.auxiliaryTracks[auxiliaryIndex])
+        ) {
+          hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
+        }
+      }
+      delete draftTracks[sdkTrack.trackId];
+      delete this.hmsSDKTracks[sdkTrack.trackId];
+    });
   }
 
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
@@ -423,10 +458,12 @@ export class HMSSDKActions implements IHMSActions {
 
   protected onReconnected() {
     this.syncPeers();
+    this.hmsNotifications.sendReconnected();
   }
 
   protected onReconnecting(error: SDKHMSException) {
     HMSLogger.e('Reconnection: received error from sdk', error);
+    this.hmsNotifications.sendReconnecting(error);
   }
 
   protected onError(error: SDKHMSException) {
@@ -504,5 +541,16 @@ export class HMSSDKActions implements IHMSActions {
 
   private logPossibleInconsistency(inconsistency: string) {
     HMSLogger.w('possible inconsistency detected - ', inconsistency);
+  }
+
+  /**
+   * In case of replace track id is changed but not in store. Given the store id, check the real id
+   * sdk is using to refer to the track and match them.
+   */
+  private isSameStoreSDKTrack(sdkTrackID: string, storeTrackID?: string): boolean {
+    if (!storeTrackID) {
+      return false;
+    }
+    return this.hmsSDKTracks[storeTrackID]?.trackId === sdkTrackID;
   }
 }

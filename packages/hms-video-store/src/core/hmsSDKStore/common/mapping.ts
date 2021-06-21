@@ -11,3 +11,10 @@ export const PEER_NOTIFICATION_TYPES: notifcationMap = {
   [sdkTypes.HMSPeerUpdate.AUDIO_TOGGLED]: 'PEER_AUDIO_UPDATED',
   [sdkTypes.HMSPeerUpdate.VIDEO_TOGGLED]: 'PEER_VIDEO_UPDATED',
 };
+
+export const TRACK_NOTIFICATION_TYPES: notifcationMap = {
+  [sdkTypes.HMSTrackUpdate.TRACK_ADDED]: HMSNotificationTypes.TRACK_ADDED,
+  [sdkTypes.HMSTrackUpdate.TRACK_REMOVED]: HMSNotificationTypes.TRACK_REMOVED,
+  [sdkTypes.HMSTrackUpdate.TRACK_MUTED]: HMSNotificationTypes.TRACK_MUTED,
+  [sdkTypes.HMSTrackUpdate.TRACK_UNMUTED]: HMSNotificationTypes.TRACK_UNMUTED,
+};
