@@ -49,7 +49,7 @@ export const makeFakeStore = (): HMSStore => {
         isLocal: false,
         videoTrack: '103',
         audioTrack: '104',
-        auxiliaryTracks: ['105'],
+        auxiliaryTracks: ['105', '106'],
       },
     },
     tracks: {
@@ -58,6 +58,7 @@ export const makeFakeStore = (): HMSStore => {
       '103': makeTrack('103', 'video', 'regular'),
       '104': makeTrack('104', 'audio', 'regular'),
       '105': makeTrack('105', 'video', 'screen'),
+      '106': makeTrack('106', 'audio', 'regular'),
     },
     messages: {
       byID: {

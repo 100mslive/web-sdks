@@ -29,6 +29,7 @@ import {
   selectPeersWithAudioStatus,
   selectRemotePeers,
   selectRoom,
+  selectAuxiliaryAudioByPeerID,
   selectScreenShareByPeerID,
   selectSpeakers,
   selectUnreadHMSMessagesCount,
@@ -40,6 +41,7 @@ let peerScreenSharing: HMSPeer;
 let localVideo: HMSTrack;
 let localAudio: HMSTrack;
 let screenShare: HMSTrack;
+let auxiliaryAudio: HMSTrack;
 let localSpeaker: HMSSpeaker;
 
 // start from a new fake store for every test
@@ -50,6 +52,7 @@ beforeEach(() => {
   localVideo = fakeStore.tracks['101'];
   localAudio = fakeStore.tracks['102'];
   screenShare = fakeStore.tracks['105'];
+  auxiliaryAudio = fakeStore.tracks['106'];
   localSpeaker = fakeStore.speakers[localPeer.id];
 });
 
@@ -139,6 +142,10 @@ describe('by ID selectors', () => {
   test('selectVideoStream', () => {
     expect(selectCameraStreamByPeerID(localPeer.id)(fakeStore)).toBe(localVideo);
     expect(selectScreenShareByPeerID(peerScreenSharing.id)(fakeStore)).toBe(screenShare);
+  });
+
+  test('selectAuxiliaryAudio', () => {
+    expect(selectAuxiliaryAudioByPeerID(peerScreenSharing.id)(fakeStore)).toBe(auxiliaryAudio);
   });
 });
 
