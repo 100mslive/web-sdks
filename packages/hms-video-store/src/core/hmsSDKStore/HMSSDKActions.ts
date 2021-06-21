@@ -7,6 +7,7 @@ import {
   HMSPeerID,
   HMSTrack,
   HMSTrackID,
+  HMSTrackSource,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
 import * as sdkTypes from './sdkTypes';
@@ -108,6 +109,16 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async addTrack(track: MediaStreamTrack, type: HMSTrackSource = 'regular') {
+    await this.sdk.addTrack(track, type);
+    this.syncPeers();
+  }
+
+  async removeTrack(trackId: string) {
+    await this.sdk.removeTrack(trackId);
+    this.syncPeers();
+  }
+
   async setLocalAudioEnabled(enabled: boolean) {
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
@@ -119,6 +130,33 @@ export class HMSSDKActions implements IHMSActions {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
       await this.setEnabledTrack(trackID, enabled);
+    }
+  }
+
+  async setEnabledTrack(trackID: string, enabled: boolean) {
+    // if mute/unmute is clicked multiple times for same operation, ignore repeated ones
+    const alreadyInSameState = this.store.getState().tracks[trackID]?.enabled === enabled;
+    if (alreadyInSameState) {
+      // it could also be a case of possible inconsistency where UI state is out of sync with truth
+      this.logPossibleInconsistency(`local track[${trackID}] enabled state - ${enabled}`);
+      return;
+    }
+    this.store.setState(store => {
+      // show on UI immediately
+      if (!store.tracks[trackID]) {
+        this.logPossibleInconsistency('track id not found for setEnabled');
+      } else {
+        store.tracks[trackID].displayEnabled = enabled;
+      }
+    });
+    try {
+      await this.setEnabledSDKTrack(trackID, enabled); // do the operation
+      this.syncPeers();
+    } catch (err) {
+      // rollback on failure
+      this.store.setState(store => {
+        store.tracks[trackID].displayEnabled = !enabled;
+      });
     }
   }
 
@@ -249,33 +287,6 @@ export class HMSSDKActions implements IHMSActions {
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
-    }
-  }
-
-  private async setEnabledTrack(trackID: string, enabled: boolean) {
-    // if mute/unmute is clicked multiple times for same operation, ignore repeated ones
-    const alreadyInSameState = this.store.getState().tracks[trackID]?.enabled === enabled;
-    if (alreadyInSameState) {
-      // it could also be a case of possible inconsistency where UI state is out of sync with truth
-      this.logPossibleInconsistency(`local track[${trackID}] enabled state - ${enabled}`);
-      return;
-    }
-    this.store.setState(store => {
-      // show on UI immediately
-      if (!store.tracks[trackID]) {
-        this.logPossibleInconsistency('track id not found for setEnabled');
-      } else {
-        store.tracks[trackID].displayEnabled = enabled;
-      }
-    });
-    try {
-      await this.setEnabledSDKTrack(trackID, enabled); // do the operation
-      this.syncPeers();
-    } catch (err) {
-      // rollback on failure
-      this.store.setState(store => {
-        store.tracks[trackID].displayEnabled = !enabled;
-      });
     }
   }
 

@@ -13,6 +13,10 @@ export function isScreenSharing(store: HMSStore, peer: HMSPeer) {
   );
 }
 
+export function isAudio(track: HMSTrack | undefined) {
+  return track && track.type === 'audio';
+}
+
 export function isScreenShare(track: HMSTrack | undefined) {
   return track && track.type === 'video' && track.source === 'screen';
 }

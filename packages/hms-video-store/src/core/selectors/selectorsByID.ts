@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { selectPeersMap } from './selectors';
 import { HMSPeerID, HMSStore, HMSTrack } from '../schema';
-import { isScreenShare, isScreenSharing, isTrackEnabled } from './selectorUtils';
+import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled } from './selectorUtils';
 
 type byIDSelector<T> = (store: HMSStore, id?: string) => T;
 
@@ -33,6 +33,17 @@ const selectSpeakerByID = (store: HMSStore, peerID: HMSPeerID | undefined) => {
 export const selectPeerAudioByID = byIDCurry(
   createSelector(selectSpeakerByID, speaker => speaker?.audioLevel || 0),
 );
+
+export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
+  | HMSTrack
+  | undefined => {
+  const peer = selectPeerByIDBare(store, peerID);
+  if (peer) {
+    const trackID = peer?.auxiliaryTracks.find(trackID => isAudio(store.tracks[trackID]));
+    return trackID ? store.tracks[trackID] : undefined;
+  }
+  return undefined;
+});
 
 export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
   | HMSTrack

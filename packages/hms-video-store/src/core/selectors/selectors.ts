@@ -34,7 +34,7 @@ export const selectLocalPeer = createSelector(selectPeers, peers => {
 });
 
 export const selectLocalPeerID = createSelector(selectLocalPeer, peer => {
-  return peer.id;
+  return peer?.id;
 });
 
 export const selectLocalAudioTrackID = createSelector(selectLocalPeer, peer => peer?.audioTrack);
