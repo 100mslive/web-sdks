@@ -25,5 +25,9 @@ jobs:
         run: yarn lint
       - name: Test
         run: yarn test --ci --coverage
+      - name: Code Coverage Report
+        uses: romeovs/lcov-reporter-action@v0.2.11
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
         run: yarn build
