@@ -47,7 +47,7 @@ function createUserAgent(): string {
   const browser = parsedUserAgent.getBrowser();
   const os = parsedUserAgent.getOS();
 
-  return `hmsclient/${version} ${os.name}/${os.version} (${platform.vendor} ${platform.type} / ${browser.name} ${browser.version})`;
+  return `hmsclient/${version} ${os.name}/${os.version} (${platform.vendor}_${platform.type}_/_${browser.name}_${browser.version})`;
 }
 
 export const userAgent = createUserAgent();

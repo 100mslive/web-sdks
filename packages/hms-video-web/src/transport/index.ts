@@ -455,7 +455,11 @@ export default class HMSTransport implements ITransport {
       config = await InitService.fetchInitConfig(token, endpoint);
 
       HMSLogger.d(TAG, '⏳ connect: connecting to ws endpoint', config.endpoint);
-      this.endpoint = `${config.endpoint}?peer=${peerId}&token=${token}&user_agent=${userAgent}`;
+      const url = new URL(config.endpoint);
+      url.searchParams.set('peer', peerId);
+      url.searchParams.set('token', token);
+      url.searchParams.set('user_agent', userAgent);
+      this.endpoint = url.toString();
       await this.signal.open(this.endpoint);
       this.pingPongLoop(config);
       HMSLogger.d(TAG, '✅ connect: connected to ws endpoint');
