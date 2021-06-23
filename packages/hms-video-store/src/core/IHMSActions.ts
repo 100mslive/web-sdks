@@ -1,4 +1,5 @@
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
+import { HMSTrackSource } from './schema';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -30,7 +31,7 @@ export interface IHMSActions {
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
    */
-  leave(): void;
+  leave(): Promise<void>;
 
   /**
    * If you want to enable screenshare for the local peer this class can be called.
@@ -38,7 +39,22 @@ export interface IHMSActions {
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
    */
-  setScreenShareEnabled(enabled: boolean): void;
+  setScreenShareEnabled(enabled: boolean): Promise<void>;
+
+  /**
+   * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
+   * This method adds the track to the local peer's list of auxiliary tracks and publishes it to make it available to remote peers.
+   * @param track MediaStreamTrack - Track to be added
+   * @param type HMSTrackSource - 'regular' | 'screen' | 'plugin' - Source of track - default: 'regular'
+   */
+  addTrack(track: MediaStreamTrack, type: HMSTrackSource): Promise<void>;
+
+  /**
+   * You can use the removeTrack method to remove an auxiliary track.
+   * This method removes the track from the local peer's list of auxiliary tracks and unpublishes it.
+   * @param trackId string - ID of the track to be removed
+   */
+  removeTrack(trackId: string): Promise<void>;
 
   /**
    * Send a plain text message to all the other participants in the room.
@@ -62,8 +78,15 @@ export interface IHMSActions {
    * These functions can be used to mute/unmute the local peer's audio and video
    * @param enabled boolean
    */
-  setLocalAudioEnabled(enabled: boolean): void;
-  setLocalVideoEnabled(enabled: boolean): void;
+  setLocalAudioEnabled(enabled: boolean): Promise<void>;
+  setLocalVideoEnabled(enabled: boolean): Promise<void>;
+
+  /**
+   *
+   * @param trackId string - ID of the track whose mute status needs to be set
+   * @param enabled boolean - true when we want to unmute the track and false when we want to unmute it
+   */
+  setEnabledTrack(trackId: string, enabled: boolean): Promise<void>;
 
   /**
    * Change settings of the local peer's audio track
@@ -71,14 +94,14 @@ export interface IHMSActions {
    * ({ volume, codec, maxBitrate, deviceId, advanced })
    * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
-  setAudioSettings(settings: HMSAudioTrackSettings): void;
+  setAudioSettings(settings: HMSAudioTrackSettings): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
    * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
-  setVideoSettings(settings: HMSVideoTrackSettings): void;
+  setVideoSettings(settings: HMSVideoTrackSettings): Promise<void>;
 
   /**
    * If you're not using our Video Component you can use the below functions directly
@@ -88,8 +111,8 @@ export interface IHMSActions {
    * @param trackID trackID as stored in the store for the peer
    * @param videoElement HTML native element where the video has to be shown
    */
-  attachVideo(trackID: string, videoElement: HTMLVideoElement): void;
-  detachVideo(trackID: string, videoElement: HTMLVideoElement): void;
+  attachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+  detachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
 }
 
 /**
