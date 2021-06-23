@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';
@@ -10,28 +11,22 @@ import {
   HMSNoticiationSeverity,
   HMSPeer,
 } from '../schema';
-import { getEventTarget, HMSNotificationCallback } from './EventTargetPolyfill';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
-
 export class HMSNotifications implements IHMSNotifications {
   private id: number = 0;
-  private eventTarget: EventTarget;
+  private eventEmitter: EventEmitter;
   private store: IHMSStore;
 
   constructor(store: IHMSStore) {
     this.store = store;
-    const EventTargetPolyfilled = getEventTarget();
-    this.eventTarget = new EventTargetPolyfilled();
+    this.eventEmitter = new EventEmitter();
   }
 
   onNotification = (cb: (notification: HMSNotification) => void): (() => void) => {
-    const listener: HMSNotificationCallback = (e: any) => {
-      cb(e.detail as HMSNotification);
-    };
-    this.eventTarget.addEventListener(HMS_NOTIFICATION_EVENT, listener);
+    this.eventEmitter.addListener(HMS_NOTIFICATION_EVENT, cb);
     return () => {
-      this.eventTarget.removeEventListener(HMS_NOTIFICATION_EVENT, listener);
+      this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, cb);
     };
   };
 
@@ -98,8 +93,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   private emitEvent(notification: HMSNotification) {
-    const event = new CustomEvent(HMS_NOTIFICATION_EVENT, { detail: notification });
-    this.eventTarget.dispatchEvent(event);
+    this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
 
   private createNotification(
