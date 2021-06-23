@@ -373,8 +373,12 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     } else {
       // store peer in case it doesn't exist later(will happen if event is peer leave)
-      const peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
       this.syncPeers();
+      // if peer wasn't available before sync(will happen if event is peer join)
+      if (!peer) {
+        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      }
       this.hmsNotifications.sendPeerUpdate(type, peer);
     }
   }
