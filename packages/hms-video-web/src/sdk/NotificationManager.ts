@@ -327,7 +327,11 @@ export default class NotificationManager {
 
         // Remove all the tracks which are not present in the peer.tracks
         tracks.forEach((track) => {
-          if (!newPeerNotification.tracks.some((newTrack) => newTrack.track_id === track.trackId)) {
+          if (
+            !newPeerNotification.tracks.some((newTrack) => {
+              return newTrack.stream_id === track.stream.id && newTrack.type === track.type;
+            })
+          ) {
             this.removePeerTrack(oldPeer, track.trackId);
             this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
           }

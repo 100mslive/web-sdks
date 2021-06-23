@@ -28,7 +28,7 @@ import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import HMSLocalAudioTrack from '../media/tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
-import { HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -90,18 +90,17 @@ export class HMSSdk implements HMSInterface {
       switch (state) {
         case TransportState.Joined:
           if (this.transportState === TransportState.Reconnecting) {
-            this.listener?.onReconnected();
+            this.listener?.onReconnected?.();
           }
           break;
         case TransportState.Failed:
-          this.listener?.onError(error!);
+          this.listener?.onError?.(error!);
+
           this.isReconnecting = false;
           break;
         case TransportState.Reconnecting:
           this.isReconnecting = true;
-          break;
-        case TransportState.WaitingToReconnect:
-          this.listener?.onReconnecting(error!);
+          this.listener?.onReconnecting?.(error!);
           break;
       }
 
@@ -165,13 +164,17 @@ export class HMSSdk implements HMSInterface {
 
   async leave() {
     if (this.roomId) {
+      // Start transport.leave and parallelly stop the tracks
+      const transportLeave = this.transport?.leave();
       const roomId = this.roomId;
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       this.localPeer?.audioTrack?.nativeTrack.stop();
       this.localPeer?.videoTrack?.nativeTrack.stop();
       this.localPeer?.auxiliaryTracks.forEach((track) => track.nativeTrack.stop());
-      await this.transport?.leave();
       this.cleanUp();
+
+      // wait for transport.leave to complete before returning from this function
+      await transportLeave;
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
   }
@@ -307,12 +310,14 @@ export class HMSSdk implements HMSInterface {
         tracks = (await this.transport?.getLocalTracks(trackSettings)) || [];
       } catch (error) {
         if (error instanceof HMSException && error.action === HMSAction.TRACK) {
+          this.listener?.onError?.(error);
+
           const audioFailure = error.message.includes('audio');
           const videoFailure = error.message.includes('video');
           deviceFailure = { audio: audioFailure, video: videoFailure };
           tracks = await HMSLocalStream.getEmptyLocalTracks(deviceFailure, trackSettings);
         } else {
-          throw error;
+          this.listener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));
         }
       }
       this.setAndPublishTracks(tracks, initialSettings, deviceFailure);

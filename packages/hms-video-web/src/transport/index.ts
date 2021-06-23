@@ -12,7 +12,12 @@ import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConn
 import HMSTrack from '../media/tracks/HMSTrack';
 import HMSException from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, RENEGOTIATION_CALLBACK_ID, SIGNAL_PING_INTERVAL } from '../utils/constants';
+import {
+  MAX_TRANSPORT_RETRIES,
+  RENEGOTIATION_CALLBACK_ID,
+  SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
+  SUBSCRIBE_TIMEOUT,
+} from '../utils/constants';
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
@@ -48,10 +53,11 @@ export default class HMSTransport implements ITransport {
   private endpoint!: string;
   private joinParameters?: JoinParameters;
   private retryScheduler = new RetryScheduler(analyticsEventsService, (state, error) => {
-    this.state = state;
-    this.observer.onStateChange(this.state, error);
+    if (state !== this.state) {
+      this.state = state;
+      this.observer.onStateChange(this.state, error);
+    }
   });
-  private pingPongIntervalId: number = 0;
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -64,6 +70,11 @@ export default class HMSTransport implements ITransport {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
       try {
         await this.subscribeConnection!.setRemoteDescription(jsep);
+        HMSLogger.d(
+          TAG,
+          `[SUBSCRIBE] Adding ${this.subscribeConnection!.candidates.length} ice-candidates`,
+          this.subscribeConnection!.candidates,
+        );
         for (const candidate of this.subscribeConnection!.candidates) {
           await this.subscribeConnection!.addIceCandidate(candidate);
         }
@@ -71,7 +82,10 @@ export default class HMSTransport implements ITransport {
         const answer = await this.subscribeConnection!.createAnswer();
         await this.subscribeConnection!.setLocalDescription(answer);
         this.signal.answer(answer);
+        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
+        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌');
+        this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
@@ -105,9 +119,9 @@ export default class HMSTransport implements ITransport {
     },
 
     onFailure: (exception: HMSException) => {
-      analyticsEventsService.queue(AnalyticsEventFactory.disconnect(exception)).flush();
       analyticsEventsService.removeTransport(this.signal);
 
+      // @DISCUSS: Should we remove this? Pong failure would have already scheduled signal retry.
       if (this.joinParameters) {
         this.retryScheduler.schedule(
           TransportFailureCategory.SignalDisconnect,
@@ -115,6 +129,26 @@ export default class HMSTransport implements ITransport {
           this.retrySignalDisconnectTask,
         );
       }
+    },
+
+    onOffline: async () => {
+      HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
+      analyticsEventsService.removeTransport(this.signal);
+      try {
+        if (this.state !== TransportState.Leaving && this.joinParameters) {
+          this.retryScheduler.schedule(
+            TransportFailureCategory.SignalDisconnect,
+            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.INIT, 'Network offline'),
+            this.retrySignalDisconnectTask,
+          );
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+
+    onOnline: () => {
+      HMSLogger.d(TAG, 'socket online', TransportState[this.state]);
     },
   };
 
@@ -166,6 +200,15 @@ export default class HMSTransport implements ITransport {
       if (newState === 'failed') {
         // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
+
+      if (newState === 'connected') {
+        const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+        this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+
+        if (callback) {
+          callback.promise.resolve(true);
+        }
+      }
     },
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
@@ -173,6 +216,15 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d('subscriber connection state change, ', newState);
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+      }
+
+      if (newState === 'connected') {
+        const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+        this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+
+        if (callback) {
+          callback.promise.resolve(true);
+        }
       }
     },
   };
@@ -240,18 +292,47 @@ export default class HMSTransport implements ITransport {
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
-    let config: InitConfig;
+    let config: InitConfig | undefined;
     try {
       config = await this.connect(authToken, initEndpoint, peerId);
     } catch (error) {
-      this.state = TransportState.Failed;
-      this.observer.onStateChange(this.state, error);
-      return;
+      let configClosure: InitConfig | undefined;
+
+      if (error instanceof HMSException) {
+        // @TODO: Use constant error codes.
+        if ([1003, 2003].includes(error.code)) {
+          const task = async () => {
+            configClosure = await this.connect(authToken, initEndpoint, peerId);
+            return Boolean(configClosure && configClosure.endpoint);
+          };
+
+          try {
+            this.retryScheduler.schedule(
+              TransportFailureCategory.ConnectFailed,
+              error,
+              task,
+              MAX_TRANSPORT_RETRIES,
+              false,
+            );
+          } catch (retryError) {
+            HMSLogger.e(TAG, 'join: failed ❌ [token=$authToken]', retryError);
+          }
+        }
+        if (!configClosure) {
+          this.state = TransportState.Failed;
+          this.observer.onStateChange(this.state, error);
+          return;
+        }
+
+        config = configClosure;
+      }
     }
 
     const joinRequestedAt = new Date();
     try {
-      await this.connectionJoin(customData.name, customData.metaData, config.rtcConfiguration, autoSubscribeVideo);
+      if (config) {
+        await this.connectionJoin(customData.name, customData.metaData, config.rtcConfiguration, autoSubscribeVideo);
+      }
     } catch (error) {
       HMSLogger.d(TAG, 'join: failed ❌');
       this.state = TransportState.Failed;
@@ -274,12 +355,14 @@ export default class HMSTransport implements ITransport {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
 
-    clearInterval(this.pingPongIntervalId);
     try {
+      this.state = TransportState.Leaving;
       await this.publishConnection!.close();
       await this.subscribeConnection!.close();
-      this.signal.leave();
-      await this.signal.close();
+      if (this.signal.isConnected) {
+        this.signal.leave();
+        await this.signal.close();
+      }
     } catch (err) {
       if (err instanceof HMSException) {
         analyticsEventsService.queue(AnalyticsEventFactory.disconnect(err)).flush();
@@ -443,6 +526,7 @@ export default class HMSTransport implements ITransport {
         TransportFailureCategory.SubscribeIceConnectionFailed,
         ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
         this.retrySubscribeIceFailedTask,
+        1,
       );
     }
   }
@@ -461,11 +545,11 @@ export default class HMSTransport implements ITransport {
       url.searchParams.set('user_agent', userAgent);
       this.endpoint = url.toString();
       await this.signal.open(this.endpoint);
-      this.pingPongLoop(config);
       HMSLogger.d(TAG, '✅ connect: connected to ws endpoint');
 
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       analyticsEventsService.addTransport(this.signal);
+      analyticsEventsService.flush();
     } catch (ex) {
       if (ex instanceof HMSException) {
         analyticsEventsService
@@ -500,26 +584,32 @@ export default class HMSTransport implements ITransport {
 
   private retrySubscribeIceFailedTask = async () => {
     if (
-      this.publishConnection!.iceConnectionState !== 'connected' ||
-      this.publishConnection!.connectionState !== 'connected'
+      this.subscribeConnection!.iceConnectionState !== 'connected' ||
+      this.subscribeConnection!.connectionState !== 'connected'
     ) {
       const p = new Promise<boolean>((resolve, reject) => {
-        this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
+        // Use subscribe constant string
+        this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {
           promise: { resolve, reject },
           action: HMSAction.RESTART_ICE,
           extra: {},
         });
       });
 
-      await p;
+      const timeout = new Promise((resolve) => {
+        setTimeout(resolve, SUBSCRIBE_TIMEOUT, false);
+      });
+
+      return Promise.race([p, timeout]) as Promise<boolean>;
     }
 
     return true;
   };
 
   private retrySignalDisconnectTask = async () => {
-    let ok = true;
+    let ok = this.signal.isConnected;
 
+    HMSLogger.d(TAG, 'retrySignalDisconnectTask', { signalConnected: this.signal.isConnected });
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
@@ -535,22 +625,4 @@ export default class HMSTransport implements ITransport {
 
     return ok;
   };
-
-  private pingPongLoop(config: InitConfig) {
-    const pingTimeout = config.pingTimeout || DEFAULT_SIGNAL_PING_TIMEOUT;
-    // @ts-ignore TS doesn't believe setInterval returns a number
-    this.pingPongIntervalId = setInterval(async () => {
-      if (this.signal.isConnected) {
-        const pongTimeDiff = await this.signal.ping(pingTimeout);
-        if (pongTimeDiff > pingTimeout) {
-          this.signalObserver.onFailure(
-            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.INIT, 'Pong timeout'),
-          );
-        }
-      } else {
-        // socket closed, stop pinging
-        clearInterval(this.pingPongIntervalId);
-      }
-    }, SIGNAL_PING_INTERVAL);
-  }
 }

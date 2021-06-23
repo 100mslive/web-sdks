@@ -4,8 +4,8 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import HMSException from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
-import { PromiseCallbacks } from '../utils/promise';
-import { TransportFailureCategory as TFC } from './models/TransportFailureCategory';
+import { PromiseWithCallbacks } from '../utils/promise';
+import { TransportFailureCategory as TFC, Dependencies as TFCDependencies } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 
 /**
@@ -27,7 +27,7 @@ export class RetryScheduler {
   private analyticsEventsService: AnalyticsEventsService;
   private onStateChange: (state: TransportState, error?: HMSException) => void;
 
-  private inProgress = new Map<TFC, PromiseCallbacks<number>>();
+  private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(
@@ -51,6 +51,7 @@ export class RetryScheduler {
   reset() {
     this.retryTaskIds.forEach((future) => clearTimeout(future));
     this.retryTaskIds = [];
+    this.inProgress.clear();
   }
 
   private async scheduleTask(
@@ -60,24 +61,69 @@ export class RetryScheduler {
     task: RetryTask,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
-  ) {
-    HMSLogger.d(TAG, 'schedule: ', { category, error });
+  ): Promise<void> {
+    HMSLogger.d(TAG, 'schedule: ', { category: TFC[category], error });
 
+    // First schedule call
     if (failedRetryCount === 0) {
-      new Promise<number>((resolve, reject) => {
-        this.inProgress.set(category, { resolve, reject });
-      });
+      const inProgressTask = this.inProgress.get(category);
+      if (inProgressTask) {
+        HMSLogger.d(TAG, `schedule: Already a task for ${TFC[category]} scheduled, waiting for its completion`);
+        await inProgressTask.promise;
+        return;
+      }
+
+      const taskPromise = new PromiseWithCallbacks<number>((_, __) => {});
+      this.inProgress.set(category, taskPromise);
 
       this.sendEvent(error, category);
     }
 
-    if (failedRetryCount >= maxFailedRetries) {
+    let hasFailedDependency = false;
+    const dependencies = TFCDependencies[category];
+
+    for (const dependencyIndexString in dependencies) {
+      const dependency = dependencies[parseInt(dependencyIndexString)];
+      try {
+        const dependencyTask = this.inProgress.get(dependency);
+        if (dependencyTask) {
+          HMSLogger.d(
+            TAG,
+            `schedule: Suspending retry task of ${TFC[category]}, waiting for ${TFC[dependency]} to recover`,
+          );
+          await dependencyTask.promise;
+          HMSLogger.d(
+            TAG,
+            `schedule: Resuming retry task ${TFC[category]} as it's dependency ${TFC[dependency]} is recovered`,
+          );
+        }
+      } catch (ex) {
+        HMSLogger.d(
+          TAG,
+          `schedule: Stopping retry task of ${TFC[category]} as it's dependency ${TFC[dependency]} failed to recover`,
+        );
+        hasFailedDependency = true;
+        break;
+      }
+    }
+
+    if (failedRetryCount >= maxFailedRetries || hasFailedDependency) {
       error.description += `. [${TFC[category]}] Could not recover after ${failedRetryCount} tries`;
 
-      const taskPromise = this.inProgress.get(category);
+      if (hasFailedDependency) {
+        error.description += ` Could not recover all of it's required dependencies - [${(dependencies as Array<TFC>)
+          .map((dep) => TFC[dep])
+          .toString()}]`;
+      }
+      error.isTerminal = true;
+
+      // @NOTE: Don't reject to throw error for dependencies, use onStateChange
+      // const taskPromise = this.inProgress.get(category);
       this.inProgress.delete(category);
-      taskPromise?.reject(error);
+      // taskPromise?.reject(error);
       this.sendEvent(error, category);
+
+      this.reset();
 
       if (changeState) {
         this.onStateChange(TransportState.Failed, error);
@@ -99,35 +145,26 @@ export class RetryScheduler {
       `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Scheduling retry task in ${delay}ms`,
     );
 
-    const deferred = new Promise<void>((resolve) => {
-      const future = window.setTimeout(async () => {
-        let success: boolean;
-        try {
-          success = await task();
-        } catch (ex) {
-          HMSLogger.w(TAG, `[${TFC[category]}] Un-caught exception ${ex.name} in retry-task, initiating retry`, ex);
-          success = false;
-        }
+    let taskSucceeded: boolean;
+    try {
+      taskSucceeded = await this.setTimeoutPromise(task, delay);
+    } catch (ex) {
+      taskSucceeded = false;
+      HMSLogger.w(TAG, `[${TFC[category]}] Un-caught exception ${ex.name} in retry-task, initiating retry`, ex);
+    }
 
-        if (success) {
-          const taskPromise = this.inProgress.get(category);
-          this.inProgress.delete(category);
-          taskPromise?.resolve(failedRetryCount);
+    if (taskSucceeded) {
+      const taskPromise = this.inProgress.get(category);
+      this.inProgress.delete(category);
+      taskPromise?.resolve(failedRetryCount);
 
-          if (changeState) {
-            this.onStateChange(TransportState.Joined);
-          }
-        } else {
-          this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
-        }
-
-        resolve();
-      }, delay);
-
-      this.retryTaskIds.push(future);
-    });
-
-    await deferred;
+      if (changeState && this.inProgress.size === 0) {
+        this.onStateChange(TransportState.Joined);
+      }
+      HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
+    } else {
+      await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
+    }
   }
 
   private sendEvent(error: HMSException, category: TFC) {
@@ -150,5 +187,21 @@ export class RetryScheduler {
     let delay = Math.pow(2, n);
     const jitter = Math.random();
     return Math.round(Math.min(delay + jitter, MAX_TRANSPORT_RETRY_DELAY) * 1000);
+  }
+
+  private async setTimeoutPromise<T>(task: () => Promise<T>, delay: number): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const timeoutId = window.setTimeout(async () => {
+        try {
+          const value: T = await task();
+          value && this.retryTaskIds.splice(this.retryTaskIds.indexOf(timeoutId), 1);
+          resolve(value);
+        } catch (error) {
+          reject(error);
+        }
+      }, delay);
+
+      this.retryTaskIds.push(timeoutId);
+    });
   }
 }

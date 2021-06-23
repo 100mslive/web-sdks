@@ -2,22 +2,21 @@ import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesP
 import { HMSAction } from './ErrorFactory';
 
 export default class HMSException extends Error implements IAnalyticsPropertiesProvider {
-  readonly code: number;
-  name: string;
   action: string;
-  message: string;
-  description: string;
 
-  constructor(code: number, name: string, action: HMSAction, message: string, description: string) {
+  constructor(
+    public readonly code: number,
+    public name: string,
+    action: HMSAction,
+    public message: string,
+    public description: string,
+    public isTerminal: boolean = false,
+  ) {
     super(message);
 
     // Ref: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     Object.setPrototypeOf(this, HMSException.prototype);
-    this.code = code;
-    this.name = name;
     this.action = action.toString();
-    this.message = message;
-    this.description = description;
   }
 
   toAnalyticsProperties() {
@@ -26,6 +25,7 @@ export default class HMSException extends Error implements IAnalyticsPropertiesP
       error_message: this.message,
       error_description: this.description,
       action: this.action,
+      is_terminal: this.isTerminal,
     };
   }
 }

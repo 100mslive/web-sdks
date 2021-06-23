@@ -11,4 +11,8 @@ export interface ISignalEventsObserver {
   onServerError(error: HMSException): void;
 
   onFailure(exception: HMSException): void;
+
+  onOffline(): void;
+
+  onOnline(): void;
 }
