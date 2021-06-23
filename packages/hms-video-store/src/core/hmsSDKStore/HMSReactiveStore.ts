@@ -58,7 +58,7 @@ export class HMSReactiveStore {
    * for analytics
    */
   getNotifications(): IHMSNotifications {
-    return this.notifications;
+    return { onNotification: this.notifications.onNotification };
   }
 
   static createNewHMSStore(): IHMSStore {

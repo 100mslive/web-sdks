@@ -10,6 +10,7 @@ import {
   HMSNoticiationSeverity,
   HMSPeer,
 } from '../schema';
+import { getEventTarget, HMSNotificationCallback } from './EventTargetPolyfill';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
@@ -20,11 +21,12 @@ export class HMSNotifications implements IHMSNotifications {
 
   constructor(store: IHMSStore) {
     this.store = store;
-    this.eventTarget = new EventTarget();
+    const EventTargetPolyfilled = getEventTarget();
+    this.eventTarget = new EventTargetPolyfilled();
   }
 
   onNotification = (cb: (notification: HMSNotification) => void): (() => void) => {
-    const listener = (e: any) => {
+    const listener: HMSNotificationCallback = (e: any) => {
       cb(e.detail as HMSNotification);
     };
     this.eventTarget.addEventListener(HMS_NOTIFICATION_EVENT, listener);
