@@ -3,7 +3,7 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
-import { enableOpusDtx, transformOffer } from '../utils/offer';
+import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -44,7 +44,7 @@ export default abstract class HMSConnection {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
-      return enableOpusDtx(transformOffer(offer, tracks));
+      return enableOpusDtx(fixMsid(offer, tracks));
     } catch (e) {
       throw new HMSConnectionMethodException(HMSConnectionMethod.CreateOffer, e.message);
     }
