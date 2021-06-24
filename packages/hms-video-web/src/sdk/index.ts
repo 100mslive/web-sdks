@@ -86,7 +86,7 @@ export class HMSSdk implements HMSInterface {
       this.listener?.onError(exception);
     },
 
-    onStateChange: (state: TransportState, error?: HMSException) => {
+    onStateChange: async (state: TransportState, error?: HMSException) => {
       switch (state) {
         case TransportState.Joined:
           if (this.transportState === TransportState.Reconnecting) {
@@ -94,8 +94,10 @@ export class HMSSdk implements HMSInterface {
           }
           break;
         case TransportState.Failed:
-          this.listener?.onError?.(error!);
+          const listener = this.listener;
+          await this.leave();
 
+          listener?.onError?.(error!);
           this.isReconnecting = false;
           break;
         case TransportState.Reconnecting:
