@@ -7,4 +7,4 @@ Install using
 npm install --save @100mslive/hms-video@latest
 ```
 
-For detailed documentation visit [our documentation page](https://100ms.gitbook.io/100ms-v2/clientsdks/getting-started-javascript)
+For detailed documentation visit [our documentation page](https://docs.100ms.live/v2/client-sdks/Getting-Started-Javascript)
