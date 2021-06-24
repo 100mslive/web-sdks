@@ -3,8 +3,7 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
 import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
-import * as sdpTransform from 'sdp-transform';
-import { TrackState } from '../sdk/models/HMSNotifications';
+import { enableOpusDtx, transformOffer } from '../utils/offer';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -45,7 +44,7 @@ export default abstract class HMSConnection {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
-      return transformOffer(offer, tracks);
+      return enableOpusDtx(transformOffer(offer, tracks));
     } catch (e) {
       throw new HMSConnectionMethodException(HMSConnectionMethod.CreateOffer, e.message);
     }
@@ -109,24 +108,4 @@ export default abstract class HMSConnection {
   async close() {
     this.nativeConnection.close();
   }
-}
-
-function transformOffer(offer: any, tracks: Map<string, TrackState>) {
-  const parsedSdp = sdpTransform.parse(offer.sdp);
-  if (!parsedSdp.origin?.username.startsWith('mozilla')) {
-    // This isn't firefox, so we return the original offer without doing anything
-    return offer;
-  }
-
-  const mediaTracks = Array.from(tracks.values());
-  parsedSdp.media.forEach((m) => {
-    const streamId = m.msid?.split(' ')[0];
-    // check for both type and streamid as both video and screenshare have same type but different stream_id
-    const trackId = mediaTracks.find((val) => val.type === m.type && val.stream_id === streamId)?.track_id;
-    if (trackId) {
-      m.msid = m.msid?.replace(/\s(.+)/, ` ${trackId}`);
-    }
-  });
-
-  return { ...offer, sdp: sdpTransform.write(parsedSdp) };
 }
