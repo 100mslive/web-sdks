@@ -24,8 +24,8 @@ export function transformOffer(
   return { ...offer, sdp: sdpTransform.write(parsedSdp) };
 }
 
-export function enableOpusDtx(offer: RTCSessionDescriptionInit) {
+export function enableOpusDtx(offer: RTCSessionDescriptionInit): RTCSessionDescriptionInit {
   if (offer.sdp!.includes('usedtx=1')) return offer;
 
-  return { ...offer, sdp: offer.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
+  return { type: 'offer', sdp: offer.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
 }
