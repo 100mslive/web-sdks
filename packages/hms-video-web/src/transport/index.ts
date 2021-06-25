@@ -267,7 +267,7 @@ export default class HMSTransport implements ITransport {
     peerId: string,
     customData: { name: string; metaData: string },
     initEndpoint: string = 'https://prod-init.100ms.live/init',
-    autoSubscribeVideo: boolean = true,
+    autoSubscribeVideo: boolean = false,
   ): Promise<void> {
     if (this.state === TransportState.Failed) {
       this.state = TransportState.Disconnected;

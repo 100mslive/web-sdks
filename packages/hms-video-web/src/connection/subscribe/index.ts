@@ -7,19 +7,18 @@ import HMSDataChannel from '../HMSDataChannel';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
 import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
+import HMSLogger from '../../utils/logger';
 
 export default class HMSSubscribeConnection extends HMSConnection {
+  private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
 
   private readonly observer: ISubscribeConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
 
-  private _apiChannel: HMSDataChannel | null = null;
+  private pendingMessageQueue: string[] = [];
 
-  public get apiChannel(): HMSDataChannel {
-    // TODO: Wait for the channel to be open;
-    return this._apiChannel!;
-  }
+  private apiChannel?: HMSDataChannel;
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
@@ -37,7 +36,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         return;
       }
 
-      this._apiChannel = new HMSDataChannel(
+      this.apiChannel = new HMSDataChannel(
         e.channel,
         {
           onMessage: (value: string) => {
@@ -46,6 +45,9 @@ export default class HMSSubscribeConnection extends HMSConnection {
         },
         `role=${this.role}`,
       );
+
+      this.handlePendingApiMessages();
+      e.channel.onopen = this.handlePendingApiMessages;
     };
 
     this.nativeConnection.onicecandidate = (e) => {
@@ -92,8 +94,25 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.initNativeConnectionCallbacks();
   }
 
+  sendOverApiDataChannel(message: string) {
+    if (this.apiChannel && this.apiChannel.readyState === 'open') {
+      this.apiChannel.send(message);
+    } else {
+      HMSLogger.w(this.TAG, `API Data channel not ${this.apiChannel ? 'open' : 'present'}, queueing`, message);
+      this.pendingMessageQueue.push(message);
+    }
+  }
+
   async close() {
     await super.close();
     this.apiChannel?.close();
   }
+
+  private handlePendingApiMessages = () => {
+    if (this.pendingMessageQueue.length > 0) {
+      HMSLogger.d(this.TAG, 'Found pending message queue, sending messages');
+      this.pendingMessageQueue.forEach((msg) => this.sendOverApiDataChannel(msg));
+      this.pendingMessageQueue.length = 0;
+    }
+  };
 }

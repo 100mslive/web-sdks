@@ -7,20 +7,20 @@ export default class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (value === this.enabled) return;
     await super.setEnabled(value);
     const layer = value ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
-    await this.preferLayer(layer);
+    this.preferLayer(layer);
   }
 
-  async preferLayer(layer: HMSSimulcastLayer) {
-    await (this.stream as HMSRemoteStream).setVideo(layer);
+  preferLayer(layer: HMSSimulcastLayer) {
+    (this.stream as HMSRemoteStream).setVideo(layer);
   }
 
-  async addSink(videoElement: HTMLVideoElement) {
-    await this.preferLayer(HMSSimulcastLayer.HIGH);
+  addSink(videoElement: HTMLVideoElement) {
+    this.preferLayer(HMSSimulcastLayer.HIGH);
     super.addSink(videoElement);
   }
 
-  async removeSink(videoElement: HTMLVideoElement) {
-    await this.preferLayer(HMSSimulcastLayer.NONE);
+  removeSink(videoElement: HTMLVideoElement) {
+    this.preferLayer(HMSSimulcastLayer.NONE);
     super.removeSink(videoElement);
   }
 }

@@ -14,23 +14,23 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  async setAudio(enabled: boolean) {
+  setAudio(enabled: boolean) {
     this.audio = enabled;
-    await this.syncWithApiChannel();
+    this.syncWithApiChannel();
   }
 
-  async setVideo(layer: HMSSimulcastLayer) {
+  setVideo(layer: HMSSimulcastLayer) {
     this.video = layer;
-    await this.syncWithApiChannel();
+    this.syncWithApiChannel();
   }
 
-  async syncWithApiChannel() {
+  syncWithApiChannel() {
     const data = {
       streamId: this.id,
       video: this.video,
       audio: this.audio,
       framerate: this.frameRate,
     };
-    await this.connection.apiChannel?.send(JSON.stringify(data));
+    this.connection.sendOverApiDataChannel(JSON.stringify(data));
   }
 }
