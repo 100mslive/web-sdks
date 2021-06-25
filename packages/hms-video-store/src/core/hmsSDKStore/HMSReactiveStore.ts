@@ -57,6 +57,7 @@ export class HMSReactiveStore {
       // already done
       return;
     }
+    HMSLogger.d('turning on trigger on subscribe');
     HMSReactiveStore.makeStoreTriggerOnSubscribe(this.store);
     this.initialTriggerOnSubscribe = true;
   }
@@ -113,9 +114,6 @@ export class HMSReactiveStore {
       equalityFn?: EqualityChecker<StateSlice>,
     ): (() => void) => {
       if (!selector) {
-        HMSLogger.w(
-          'subscribing to store without selector can have heavy performance impact on UI.',
-        );
         selector = (store): StateSlice => (store as unknown) as StateSlice;
       }
       equalityFn = equalityFn || shallow;
