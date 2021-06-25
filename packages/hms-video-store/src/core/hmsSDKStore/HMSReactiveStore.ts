@@ -1,6 +1,14 @@
 import { devtools } from 'zustand/middleware';
 import produce from 'immer';
-import create, { GetState, StateSelector, StoreApi, SetState } from 'zustand/vanilla';
+import create, {
+  GetState,
+  StateSelector,
+  StoreApi,
+  SetState,
+  StateSliceListener,
+  EqualityChecker,
+} from 'zustand/vanilla';
+import shallow from 'zustand/shallow';
 import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
@@ -8,11 +16,13 @@ import { IHMSStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
+import { HMSLogger } from '../../common/ui-logger';
 
 export class HMSReactiveStore {
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
+  private initialTriggerOnSubscribe: boolean;
 
   constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
     if (hmsStore) {
@@ -30,6 +40,25 @@ export class HMSReactiveStore {
     } else {
       this.actions = new HMSSDKActions(this.store, new HMSSdk(), this.notifications);
     }
+    this.initialTriggerOnSubscribe = false;
+  }
+
+  /**
+   * By default store.subscribe does not call the handler with the current state at time of subscription,
+   * this behaviour can be modified by calling this function. What it means is that instead of calling the
+   * handler only for changes which happen post subscription we'll also call it exactly once at the time
+   * of subscription with the current state. This behaviour is similar to that of BehaviourSubject in rxjs.
+   * This will be an irreversible change
+   *
+   * Note: you don't need this if you're using our react hooks, it takes care of this requirement.
+   */
+  triggerOnSubscribe(): void {
+    if (this.initialTriggerOnSubscribe) {
+      // already done
+      return;
+    }
+    HMSReactiveStore.makeStoreTriggerOnSubscribe(this.store);
+    this.initialTriggerOnSubscribe = true;
   }
 
   /**
@@ -76,7 +105,37 @@ export class HMSReactiveStore {
     hmsStore.getState = <StateSlice>(selector?: StateSelector<HMSStore, StateSlice>) => {
       return selector ? selector(prevGetState()) : prevGetState();
     };
+    // use shallow equality check by default for subscribe to optimize for array/object selectors
+    const prevSubscribe = hmsStore.subscribe;
+    hmsStore.subscribe = <StateSlice>(
+      listener: StateSliceListener<StateSlice>,
+      selector?: StateSelector<HMSStore, StateSlice>,
+      equalityFn?: EqualityChecker<StateSlice>,
+    ): (() => void) => {
+      if (!selector) {
+        HMSLogger.w(
+          'subscribing to store without selector can have heavy performance impact on UI.',
+        );
+        selector = (store): StateSlice => (store as unknown) as StateSlice;
+      }
+      equalityFn = equalityFn || shallow;
+      return prevSubscribe(listener, selector, equalityFn);
+    };
     return hmsStore;
+  }
+
+  static makeStoreTriggerOnSubscribe(store: IHMSStore) {
+    const prevSubscribe = store.subscribe;
+    store.subscribe = <StateSlice>(
+      listener: StateSliceListener<StateSlice>,
+      selector?: StateSelector<HMSStore, StateSlice>,
+      equalityFn?: EqualityChecker<StateSlice>,
+    ): (() => void) => {
+      // initial call, the prev state will always be null for this
+      listener(store.getState(selector), (undefined as unknown) as StateSlice);
+      // then subscribe
+      return prevSubscribe(listener, selector!, equalityFn);
+    };
   }
 
   /**

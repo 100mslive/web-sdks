@@ -1,5 +1,7 @@
 import {
   HMSMessageType,
+  HMSPeer,
+  HMSSpeaker,
   HMSStore,
   HMSTrack,
   HMSTrackID,
@@ -22,8 +24,16 @@ function makeTrack(
   };
 }
 
+export let localPeer: HMSPeer;
+export let peerScreenSharing: HMSPeer;
+export let localVideo: HMSTrack;
+export let localAudio: HMSTrack;
+export let screenShare: HMSTrack;
+export let auxiliaryAudio: HMSTrack;
+export let localSpeaker: HMSSpeaker;
+
 export const makeFakeStore = (): HMSStore => {
-  return {
+  const fakeStore: HMSStore = {
     room: {
       id: '123',
       isConnected: true,
@@ -93,4 +103,12 @@ export const makeFakeStore = (): HMSStore => {
       maxTileCount: 12,
     },
   };
+  localPeer = fakeStore.peers['1'];
+  peerScreenSharing = fakeStore.peers['2'];
+  localVideo = fakeStore.tracks['101'];
+  localAudio = fakeStore.tracks['102'];
+  screenShare = fakeStore.tracks['105'];
+  auxiliaryAudio = fakeStore.tracks['106'];
+  localSpeaker = fakeStore.speakers[localPeer.id];
+  return fakeStore;
 };

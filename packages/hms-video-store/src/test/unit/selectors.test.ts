@@ -1,9 +1,15 @@
-import { makeFakeStore } from '../fakeStore';
 import {
-  HMSPeer,
-  HMSSpeaker,
+  auxiliaryAudio,
+  localAudio,
+  localPeer,
+  localSpeaker,
+  localVideo,
+  makeFakeStore,
+  peerScreenSharing,
+  screenShare,
+} from '../fakeStore';
+import {
   HMSStore,
-  HMSTrack,
   selectCameraStreamByPeerID,
   selectDominantSpeaker,
   selectHMSMessages,
@@ -36,24 +42,10 @@ import {
 } from '../../core';
 
 let fakeStore: HMSStore;
-let localPeer: HMSPeer;
-let peerScreenSharing: HMSPeer;
-let localVideo: HMSTrack;
-let localAudio: HMSTrack;
-let screenShare: HMSTrack;
-let auxiliaryAudio: HMSTrack;
-let localSpeaker: HMSSpeaker;
 
 // start from a new fake store for every test
 beforeEach(() => {
   fakeStore = makeFakeStore();
-  localPeer = fakeStore.peers['1'];
-  peerScreenSharing = fakeStore.peers['2'];
-  localVideo = fakeStore.tracks['101'];
-  localAudio = fakeStore.tracks['102'];
-  screenShare = fakeStore.tracks['105'];
-  auxiliaryAudio = fakeStore.tracks['106'];
-  localSpeaker = fakeStore.speakers[localPeer.id];
 });
 
 describe('test primitive selectors', () => {
