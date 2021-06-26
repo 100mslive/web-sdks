@@ -29,14 +29,36 @@ export function isEmptyTrack(track: MediaStreamTrack) {
   return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode';
 }
 
+let blankCanvas: any;
+
 // the dimensions of the passed in track are used to create the empty video track
+// a dummy change(toggling a pixel value) is done periodically to keep on sending bytes
 export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack) {
   const width = prevTrack?.getSettings()?.width || 640;
   const height = prevTrack?.getSettings()?.height || 360;
-  const canvas = Object.assign(document.createElement('canvas'), { width, height }) as any;
-  canvas.getContext('2d')?.fillRect(0, 0, width, height);
-  const stream = canvas.captureStream();
+  const frameRate = 1; // fps
+  if (!blankCanvas) {
+    blankCanvas = Object.assign(document.createElement('canvas'), { width, height });
+    blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
+  }
+  const stream = blankCanvas.captureStream(frameRate);
   const emptyTrack = stream.getVideoTracks()[0];
+  const intervalID = setInterval(() => {
+    if (emptyTrack.readyState === 'ended') {
+      clearInterval(intervalID);
+      return;
+    }
+    const ctx = blankCanvas.getContext('2d');
+    if (ctx) {
+      const pixel = ctx.getImageData(0, 0, 1, 1).data;
+      const red = pixel[0] === 0 ? 1 : 0; // toggle red in pixel
+      ctx.fillStyle = `rgb(${red}, 0, 0)`;
+      ctx.fillRect(0, 0, 1, 1);
+    }
+  }, 1000 / frameRate);
+  emptyTrack.onended = () => {
+    clearInterval(intervalID);
+  };
   emptyTrack.enabled = false;
   return emptyTrack;
 }
