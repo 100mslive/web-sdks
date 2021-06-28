@@ -46,7 +46,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
         `role=${this.role}`,
       );
 
-      this.handlePendingApiMessages();
       e.channel.onopen = this.handlePendingApiMessages;
     };
 
