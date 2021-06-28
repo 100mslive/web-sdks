@@ -1,4 +1,4 @@
-import Bowser from 'bowser';
+import * as Bowser from 'bowser';
 import { version } from './package.alias.json';
 
 export const parsedUserAgent = Bowser.getParser(navigator.userAgent);
