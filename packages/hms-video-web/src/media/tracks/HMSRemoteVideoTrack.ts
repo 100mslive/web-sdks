@@ -6,8 +6,6 @@ export default class HMSRemoteVideoTrack extends HMSVideoTrack {
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) return;
     await super.setEnabled(value);
-    const layer = value ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
-    this.preferLayer(layer);
   }
 
   preferLayer(layer: HMSSimulcastLayer) {

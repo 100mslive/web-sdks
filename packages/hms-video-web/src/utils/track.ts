@@ -34,9 +34,9 @@ let blankCanvas: any;
 // the dimensions of the passed in track are used to create the empty video track
 // a dummy change(toggling a pixel value) is done periodically to keep on sending bytes
 export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack) {
-  const width = prevTrack?.getSettings()?.width || 640;
-  const height = prevTrack?.getSettings()?.height || 360;
-  const frameRate = 1; // fps
+  const width = prevTrack?.getSettings()?.width || 320;
+  const height = prevTrack?.getSettings()?.height || 240;
+  const frameRate = 10; // fps TODO: experiment, see if this can be reduced
   if (!blankCanvas) {
     blankCanvas = Object.assign(document.createElement('canvas'), { width, height });
     blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
