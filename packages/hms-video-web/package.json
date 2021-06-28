@@ -1,10 +1,12 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=10"
   },

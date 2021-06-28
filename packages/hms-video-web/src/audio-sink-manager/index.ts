@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import HMSAudioTrack from '../media/tracks/HMSAudioTrack';
 import NotificationManager from '../sdk/NotificationManager';
 
-const SILENT_AUDIO_URL = 'https://res.cloudinary.com/dlzh3j8em/video/upload/v1619210717/silence_xko7fm.mp3';
+const SILENT_AUDIO_URL = 'https://100ms.live/silence.mp3';
 
 export default class HMSAudioSinkManager {
   private audioSink: HTMLElement;

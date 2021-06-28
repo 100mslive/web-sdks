@@ -112,7 +112,11 @@ export default class HMSLocalStream extends HMSMediaStream {
   async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
     const sender = this.connection!.getSenders().find((sender) => sender.track?.id === track.trackId);
 
-    if (sender === undefined) throw Error(`No sender found for trackId=${track.trackId}`);
+    if (sender === undefined) {
+      // Not throwing an error as this is not a fatal error
+      HMSLogger.e(TAG, 'No sender found for trackId', track.trackId);
+      return;
+    }
     this.nativeStream.addTrack(withTrack);
     this.nativeStream.removeTrack(track.nativeTrack);
 
