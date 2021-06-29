@@ -158,6 +158,7 @@ export class HMSSDKActions implements IHMSActions {
       this.store.setState(store => {
         store.tracks[trackID].displayEnabled = !enabled;
       });
+      throw err;
     }
     const type = enabled
       ? sdkTypes.HMSTrackUpdate.TRACK_UNMUTED
