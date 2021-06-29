@@ -109,9 +109,9 @@ export default class HMSVideoTrackSettings implements IAnalyticsPropertiesProvid
 
   toConstraints(): MediaTrackConstraints {
     return {
-      width: { max: this.width },
-      height: { max: this.height },
-      frameRate: { max: this.maxFramerate },
+      width: this.width,
+      height: this.height,
+      frameRate: this.maxFramerate,
       deviceId: this.deviceId,
     };
   }
