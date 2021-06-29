@@ -1,6 +1,6 @@
 import HMSException from '../error/HMSException';
 import HMSTrack from '../media/tracks/HMSTrack';
-import HMSPeer from './hms-peer';
+import { HMSPeer } from '../sdk/models/peer';
 import HMSMessage from './message';
 import HMSRoom from './room';
 import HMSSpeaker from './speaker';

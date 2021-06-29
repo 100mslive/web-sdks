@@ -1,7 +1,9 @@
-import HMSPeer from '../interfaces/hms-peer';
-import HMSTrack from '../media/tracks/HMSTrack';
+import IHMSPeer from '../../../interfaces/hms-peer';
+import HMSAudioTrack from '../../../media/tracks/HMSAudioTrack';
+import HMSTrack from '../../../media/tracks/HMSTrack';
+import HMSVideoTrack from '../../../media/tracks/HMSVideoTrack';
 
-type HMSPeerInit = {
+export type HMSPeerInit = {
   peerId: string;
   name: string;
   isLocal: boolean;
@@ -10,14 +12,14 @@ type HMSPeerInit = {
   role?: string;
 };
 
-export default class Peer implements HMSPeer {
-  peerId: string;
-  isLocal: boolean;
+export class HMSPeer implements IHMSPeer {
+  readonly peerId: string;
+  readonly isLocal: boolean;
   name: string;
   customerUserId?: string = '';
   customerDescription?: string = '';
-  videoTrack?: HMSTrack | null;
-  audioTrack?: HMSTrack | null;
+  audioTrack?: HMSAudioTrack;
+  videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[] = [];
   role?: string = '';
 

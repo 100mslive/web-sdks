@@ -1,15 +1,15 @@
 import HMSConfig from './config';
 import HMSUpdateListener from './update-listener';
-import HMSPeer from './hms-peer';
 import HMSMessage from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { HMSTrackSource } from '../media/tracks';
+import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 
 export default interface HMS {
   join(config: HMSConfig, callback: HMSUpdateListener): void;
   leave(): Promise<void>;
-  getLocalPeer(): HMSPeer;
+  getLocalPeer(): HMSLocalPeer;
   getPeers(): HMSPeer[];
   sendMessage(type: string, message: string, receiver?: string): HMSMessage;
   startScreenShare(onStop: () => void): Promise<void>;

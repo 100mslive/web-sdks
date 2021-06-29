@@ -1,13 +1,15 @@
+import HMSAudioTrack from '../media/tracks/HMSAudioTrack';
 import HMSTrack from '../media/tracks/HMSTrack';
+import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
 
-export default interface HMSPeer {
+export default interface IHMSPeer {
   peerId: string;
   name: string;
   isLocal: boolean;
   customerUserId?: string;
   customerDescription?: string;
-  videoTrack?: HMSTrack | null;
-  audioTrack?: HMSTrack | null;
+  audioTrack?: HMSAudioTrack;
+  videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
   role?: string;
 }

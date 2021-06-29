@@ -1,10 +1,10 @@
-import HMSPeer from '../../interfaces/hms-peer';
 import HMSDeviceManager from '../../interfaces/HMSDeviceManager';
 import HMSLogger from '../../utils/logger';
 import HMSLocalAudioTrack from '../../media/tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../../media/tracks/HMSLocalVideoTrack';
 import { HMSAudioTrackSettingsBuilder } from '../../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../../media/settings/HMSVideoTrackSettings';
+import { HMSLocalPeer } from './peer';
 
 type SelectedDevices = {
   audioInput: InputDeviceInfo;
@@ -19,7 +19,7 @@ export default class DeviceManager implements HMSDeviceManager {
 
   selected: SelectedDevices = {} as SelectedDevices;
 
-  localPeer!: HMSPeer | null;
+  localPeer!: HMSLocalPeer | null;
 
   private TAG: string = '[Device Manager]:';
 

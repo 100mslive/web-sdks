@@ -1,7 +1,10 @@
 import EventEmitter from 'events';
 import HMSTrack from '../media/tracks/HMSTrack';
+import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
+import HMSRemoteVideoTrack from '../media/tracks/HMSRemoteVideoTrack';
+import HMSRemoteAudioTrack from '../media/tracks/HMSRemoteAudioTrack';
 import { HMSTrackType } from '../media/tracks';
-import Peer from '../peer';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
   Peer as PeerNotification,
@@ -11,7 +14,6 @@ import {
   TrackState,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
-import HMSPeer from '../interfaces/hms-peer';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { SpeakerList } from './models/HMSSpeaker';
 import Message from './models/HMSMessage';
@@ -23,11 +25,11 @@ interface TrackStateEntry {
 
 // @TODO: Split into separate managers
 export default class NotificationManager {
-  hmsPeerList: Map<string, HMSPeer> = new Map();
-  localPeer!: HMSPeer | null;
+  hmsPeerList: Map<string, HMSRemotePeer> = new Map();
+  localPeer!: HMSLocalPeer | null;
 
   private TAG: string = '[Notification Manager]:';
-  private tracksToProcess: Map<string, HMSTrack> = new Map();
+  private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
   private listener!: HMSUpdateListener;
   private audioListener: HMSAudioListener | null = null;
@@ -125,14 +127,14 @@ export default class NotificationManager {
       switch (track.type) {
         case HMSTrackType.AUDIO:
           if (!hmsPeer.audioTrack) {
-            hmsPeer.audioTrack = track;
+            hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
           }
           // @DISCUSS: Do we have auxilliary audio tracks too?
           break;
 
         case HMSTrackType.VIDEO:
           if (!hmsPeer.videoTrack && track.source === 'regular') {
-            hmsPeer.videoTrack = track;
+            hmsPeer.videoTrack = track as HMSRemoteVideoTrack;
           } else {
             hmsPeer.auxiliaryTracks.push(track);
           }
@@ -167,7 +169,7 @@ export default class NotificationManager {
     if (hmsPeer) {
       switch (track.type) {
         case HMSTrackType.AUDIO:
-          hmsPeer.audioTrack = null;
+          hmsPeer.audioTrack = undefined;
           break;
         case HMSTrackType.VIDEO: {
           const screenShareTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
@@ -176,7 +178,7 @@ export default class NotificationManager {
             // @TODO: change this based on source
             hmsPeer.auxiliaryTracks.splice(screenShareTrackIndex, 1);
           } else {
-            hmsPeer.videoTrack = null;
+            hmsPeer.videoTrack = undefined;
           }
         }
       }
@@ -242,13 +244,12 @@ export default class NotificationManager {
   }
 
   private handlePeerJoin = (peer: PeerNotification) => {
-    const hmsPeer = new Peer({
+    const hmsPeer = new HMSRemotePeer({
       peerId: peer.peerId,
       name: peer.info.name,
-      isLocal: false,
+      role: peer.role,
       customerUserId: peer.info.userId,
       customerDescription: peer.info.data,
-      role: peer.role,
     });
 
     this.hmsPeerList.set(peer.peerId, hmsPeer);
@@ -390,9 +391,9 @@ export default class NotificationManager {
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {
     if (peer.audioTrack?.trackId === trackId) {
-      peer.audioTrack = null;
+      peer.audioTrack = undefined;
     } else if (peer.videoTrack?.trackId === trackId) {
-      peer.videoTrack = null;
+      peer.videoTrack = undefined;
     } else {
       const track = peer.auxiliaryTracks.find((track) => track.trackId === trackId);
       track && peer.auxiliaryTracks.splice(peer.auxiliaryTracks.indexOf(track), 1);

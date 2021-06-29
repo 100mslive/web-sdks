@@ -1,6 +1,6 @@
 import { Peer, PeerList } from './HMSNotifications';
 
-describe('Peer', () => {
+describe('Peer Notification', () => {
   const params = {
     peer_id: '3f18e019-5463-4c38-bcac-06f0010c43ab',
     info: {
@@ -41,7 +41,7 @@ describe('Peer', () => {
   });
 });
 
-describe('PeerList', () => {
+describe('PeerList Notification', () => {
   const params = {
     peers: {
       peer_id_1: {

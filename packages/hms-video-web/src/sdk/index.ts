@@ -1,7 +1,6 @@
 import HMSConfig from '../interfaces/config';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
-import HMSPeer from '../interfaces/hms-peer';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSUpdateListener, { HMSAudioListener, HMSTrackUpdate } from '../interfaces/update-listener';
@@ -15,8 +14,7 @@ import { HMSTrackType } from '../media/tracks';
 import HMSException from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
 import HMSRoom from './models/HMSRoom';
-import { v4 as uuidv4 } from 'uuid';
-import Peer from '../peer';
+import { HMSLocalPeer } from './models/peer';
 import Message from './models/HMSMessage';
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
@@ -42,7 +40,7 @@ const defaultSettings = {
 export class HMSSdk implements HMSInterface {
   transport!: HMSTransport | null;
   roomId!: string | null;
-  localPeer!: HMSPeer | null;
+  localPeer!: HMSLocalPeer | null;
 
   private TAG: string = '[HMSSdk]:';
   private notificationManager: NotificationManager = new NotificationManager();
@@ -119,15 +117,11 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
-    const peerId = uuidv4();
-
-    this.localPeer = new Peer({
-      peerId,
+    this.localPeer = new HMSLocalPeer({
       name: config.userName,
-      isLocal: true,
+      role: role,
       customerUserId: userId,
-      role,
-      customerDescription: config.metaData || '',
+      customerDescription: config.metaData,
     });
     this.notificationManager.localPeer = this.localPeer;
 
@@ -181,11 +175,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  getLocalPeer(): HMSPeer {
+  getLocalPeer() {
     return this.localPeer!;
   }
 
-  getPeers(): HMSPeer[] {
+  getPeers() {
     const remotePeers = Array.from(this.notificationManager.hmsPeerList, (x) => x[1]);
     const peers = this.localPeer ? [...remotePeers, this.getLocalPeer()] : remotePeers;
     HMSLogger.d(this.TAG, `Got peers`, peers);
@@ -352,18 +346,17 @@ export class HMSSdk implements HMSInterface {
   private setLocalPeerTrack(track: HMSLocalTrack) {
     switch (track.type) {
       case HMSTrackType.AUDIO:
-        this.localPeer!.audioTrack = track;
+        this.localPeer!.audioTrack = track as HMSLocalAudioTrack;
         break;
 
       case HMSTrackType.VIDEO:
-        this.localPeer!.videoTrack = track;
+        this.localPeer!.videoTrack = track as HMSLocalVideoTrack;
         break;
     }
   }
 
   createRoom() {
-    const hmsPeerList = this.getPeers();
-    this.hmsRoom = new HMSRoom(this.localPeer!.peerId, '', hmsPeerList);
+    this.hmsRoom = new HMSRoom(this.localPeer!.peerId, '', this);
     return this.hmsRoom;
   }
 }

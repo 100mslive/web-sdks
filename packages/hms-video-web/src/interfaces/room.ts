@@ -1,4 +1,4 @@
-import HMSPeer from './hms-peer';
+import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 
 export enum HMSRoomType {
   DEFAULT,
@@ -7,6 +7,7 @@ export enum HMSRoomType {
 export default interface HMSRoom {
   id: string;
   name: string;
+  localPeer: HMSLocalPeer;
   peers: HMSPeer[];
   shareableLink: string;
   type: HMSRoomType;
