@@ -4,12 +4,11 @@ import HMSTrackSettings from '../settings/HMSTrackSettings';
 import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
-import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
+import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
-import { HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
-import { validateDeviceAV } from '../../utils/device-error';
+import { IFetchAVTrackOptions } from '../../transport/ITransport';
 
 const TAG = 'HMSLocalStream';
 
@@ -45,43 +44,31 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   static async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
-    // @TODO(eswar): starts and stops new tracks to check failures, increases join time(by 600ms).
-    // Use same tracks for quicker join.
-    await validateDeviceAV();
-    const nativeVideoTrack = await getVideoTrack(settings.video);
-    const nativeAudioTrack = await getAudioTrack(settings.audio);
-    const local = new HMSLocalStream(new MediaStream([nativeVideoTrack, nativeAudioTrack]));
+    return await this.getEmptyLocalTracks({ audio: true, video: true }, settings);
+  }
+
+  static async getEmptyLocalTracks(
+    fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
+    settings?: HMSTrackSettings,
+  ): Promise<Array<HMSLocalTrack>> {
+    const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
+    const nativeVideoTrack = nativeTracks.find((track) => track.kind === 'video');
+    const nativeAudioTrack = nativeTracks.find((track) => track.kind === 'audio');
+    const local = new HMSLocalStream(new MediaStream(nativeTracks));
 
     const tracks: Array<HMSLocalTrack> = [];
-    if (settings.audio != null) {
+    if (nativeAudioTrack && settings?.audio) {
       const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', settings.audio);
       tracks.push(audioTrack);
     }
 
-    if (settings.video != null) {
+    if (nativeVideoTrack && settings?.video) {
       const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', settings.video);
       tracks.push(videoTrack);
     }
 
-    HMSLogger.v(TAG, 'getLocalTracks', tracks);
+    HMSLogger.v(TAG, 'getEmptyLocalTracks', tracks);
     return tracks;
-  }
-
-  static async getEmptyLocalTracks(
-    empty = { audio: false, video: false },
-    settings?: HMSTrackSettings,
-  ): Promise<Array<HMSLocalTrack>> {
-    const nativeVideoTrack = empty.video ? getEmptyVideoTrack() : await getVideoTrack(settings?.video || null);
-    const nativeAudioTrack = empty.audio ? getEmptyAudioTrack() : await getAudioTrack(settings?.audio || null);
-    const local = new HMSLocalStream(new MediaStream([nativeVideoTrack, nativeAudioTrack]));
-
-    const videoTrackSettings = settings?.video || new HMSVideoTrackSettingsBuilder().build();
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', videoTrackSettings);
-
-    const audioTrackSettings = settings?.audio || new HMSAudioTrackSettingsBuilder().build();
-    const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', audioTrackSettings);
-
-    return [audioTrack, videoTrack];
   }
 
   addTransceiver(track: HMSTrack) {
@@ -148,5 +135,24 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   trackUpdate(track: HMSTrack) {
     this.connection?.trackUpdate(track);
+  }
+
+  private static async getNativeLocalTracks(
+    fetchTrackOptions: IFetchAVTrackOptions = { audio: false, video: false },
+    settings?: HMSTrackSettings,
+  ) {
+    const nativeVideoTrack =
+      fetchTrackOptions.video === 'empty'
+        ? getEmptyVideoTrack()
+        : fetchTrackOptions.video && settings?.video && (await getVideoTrack(settings.video));
+    const nativeAudioTrack =
+      fetchTrackOptions.audio === 'empty'
+        ? getEmptyAudioTrack()
+        : fetchTrackOptions.audio && settings?.audio && (await getAudioTrack(settings.audio));
+
+    const nativeTracks: MediaStreamTrack[] = [];
+    if (nativeAudioTrack) nativeTracks.push(nativeAudioTrack);
+    if (nativeVideoTrack) nativeTracks.push(nativeVideoTrack);
+    return nativeTracks;
   }
 }

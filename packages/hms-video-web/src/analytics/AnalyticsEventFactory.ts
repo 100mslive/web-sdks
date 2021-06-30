@@ -2,6 +2,7 @@ import HMSException from '../error/HMSException';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSTrack from '../media/tracks/HMSTrack';
+import { isEmptyTrack } from '../utils/track';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
@@ -54,27 +55,29 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent(name, level, false, properties);
   }
 
-  static getLocalTracks(settings: HMSTrackSettings, track?: HMSTrack, error?: HMSException) {
+  static getLocalTracks(settings?: HMSTrackSettings, track?: HMSTrack, error?: HMSException) {
     const name = this.eventNameFor('get.local.tracks', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError(
       {
         local_stream_id: track?.stream.id,
-        ...settings.toAnalyticsProperties(),
+        ...settings?.toAnalyticsProperties(),
       },
       error,
     );
 
+    if (track) properties.isEmpty = isEmptyTrack(track.nativeTrack);
+
     return new AnalyticsEvent(name, level, false, properties);
   }
 
-  static getLocalScreen(settings: HMSVideoTrackSettings, track?: HMSTrack, error?: HMSException) {
+  static getLocalScreen(settings?: HMSVideoTrackSettings, track?: HMSTrack, error?: HMSException) {
     const name = this.eventNameFor('get.local.screen', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError(
       {
         local_stream_id: track?.stream.id,
-        ...settings.toAnalyticsProperties(),
+        ...settings?.toAnalyticsProperties(),
       },
       error,
     );

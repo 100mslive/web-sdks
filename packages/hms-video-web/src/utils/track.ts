@@ -2,7 +2,7 @@ import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 
-export async function getAudioTrack(settings: HMSAudioTrackSettings | null): Promise<MediaStreamTrack> {
+export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: settings ? settings.toConstraints() : false,
@@ -13,7 +13,7 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings | null): Pro
   }
 }
 
-export async function getVideoTrack(settings: HMSVideoTrackSettings | null): Promise<MediaStreamTrack> {
+export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<MediaStreamTrack> {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: settings ? settings.toConstraints() : false,
@@ -33,7 +33,7 @@ let blankCanvas: any;
 
 // the dimensions of the passed in track are used to create the empty video track
 // a dummy change(toggling a pixel value) is done periodically to keep on sending bytes
-export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack) {
+export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
   const width = prevTrack?.getSettings()?.width || 320;
   const height = prevTrack?.getSettings()?.height || 240;
   const frameRate = 10; // fps TODO: experiment, see if this can be reduced
@@ -63,7 +63,7 @@ export function getEmptyVideoTrack(prevTrack?: MediaStreamTrack) {
   return emptyTrack;
 }
 
-export function getEmptyAudioTrack() {
+export function getEmptyAudioTrack(): MediaStreamTrack {
   const ctx = new AudioContext();
   const oscillator = ctx.createOscillator();
   const dst = oscillator.connect(ctx.createMediaStreamDestination());

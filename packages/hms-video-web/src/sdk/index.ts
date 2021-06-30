@@ -27,6 +27,7 @@ import HMSLocalAudioTrack from '../media/tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { IFetchAVTrackOptions } from '../transport/ITransport';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -278,67 +279,65 @@ export class HMSSdk implements HMSInterface {
   private async publish(initialSettings: InitialSettings) {
     const { audioInputDeviceId, videoDeviceId } = initialSettings;
     const { audio, video, allowed } = this.publishParams;
-    const canPublishAudio = allowed && allowed.includes('audio');
-    const canPublishVideo = allowed && allowed.includes('video');
+    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
+    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
     HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
-    const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
-      .codec(audio.codec)
-      .maxBitrate(audio.bitRate)
-      .deviceId(audioInputDeviceId)
-      .build();
-    const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
-      .codec(video.codec)
-      .maxBitrate(video.bitRate)
-      .maxFramerate(video.frameRate)
-      .setWidth(video.width)
-      .setHeight(video.height)
-      .deviceId(videoDeviceId)
-      .build();
 
     if (canPublishAudio || canPublishVideo) {
+      const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
+        .codec(audio.codec)
+        .maxBitrate(audio.bitRate)
+        .deviceId(audioInputDeviceId)
+        .build();
+
+      const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
+        .codec(video.codec)
+        .maxBitrate(video.bitRate)
+        .maxFramerate(video.frameRate)
+        .setWidth(video.width)
+        .setHeight(video.height)
+        .deviceId(videoDeviceId)
+        .build();
+
       const trackSettings = new HMSTrackSettingsBuilder()
         .video(canPublishVideo ? videoSettings : null)
         .audio(canPublishAudio ? audioSettings : null)
         .build();
+
       let tracks: Array<HMSLocalTrack> = [];
-      let deviceFailure;
+      let fetchTrackOptions: IFetchAVTrackOptions;
       try {
-        tracks = (await this.transport?.getLocalTracks(trackSettings)) || [];
+        fetchTrackOptions = {
+          audio: canPublishAudio && (initialSettings.isAudioMuted ? 'empty' : true),
+          video: canPublishVideo && (initialSettings.isVideoMuted ? 'empty' : true),
+        };
+        HMSLogger.d(this.TAG, 'Join Publish', { fetchTrackOptions });
+        tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
       } catch (error) {
         if (error instanceof HMSException && error.action === HMSAction.TRACK) {
           this.listener?.onError?.(error);
 
           const audioFailure = error.message.includes('audio');
           const videoFailure = error.message.includes('video');
-          deviceFailure = { audio: audioFailure, video: videoFailure };
-          tracks = await HMSLocalStream.getEmptyLocalTracks(deviceFailure, trackSettings);
+          fetchTrackOptions = {
+            audio: canPublishAudio && (audioFailure ? 'empty' : true),
+            video: canPublishVideo && (videoFailure ? 'empty' : true),
+          };
+          tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
         } else {
           this.listener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));
         }
       }
-      this.setAndPublishTracks(tracks, initialSettings, deviceFailure);
+      this.setAndPublishTracks(tracks);
       this.published = true;
       this.deviceManager.localPeer = this.localPeer;
     }
   }
 
-  private setAndPublishTracks(
-    tracks: HMSLocalTrack[],
-    initialSettings: InitialSettings,
-    deviceFailure = { audio: false, video: false },
-  ) {
+  private setAndPublishTracks(tracks: HMSLocalTrack[]) {
     tracks.forEach(async (track) => {
       this.setLocalPeerTrack(track);
-
       await this.transport!.publish([track]);
-
-      if (!deviceFailure.audio && initialSettings.isAudioMuted && this.localPeer?.audioTrack) {
-        await this.localPeer.audioTrack.setEnabled(false);
-      }
-      if (!deviceFailure.video && initialSettings.isVideoMuted && this.localPeer?.videoTrack) {
-        await this.localPeer.videoTrack.setEnabled(false);
-      }
-
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     });
   }
