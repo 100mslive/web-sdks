@@ -3,13 +3,27 @@ import HMSLogger from '../../utils/logger';
 import { userAgent } from '../../utils/support';
 
 const TAG = 'InitService';
+const MAX_TRIES = 3;
 
 export default class InitService {
-  static async fetchInitConfig(
+  static async fetchInitConfigWithRetry(
     token: string,
     initEndpoint: string = 'https://prod-init.100ms.live',
     region: string = '',
   ): Promise<InitConfig> {
+    let initError: string = 'init api failed';
+    for (let i = 1; i <= MAX_TRIES; i++) {
+      try {
+        return await InitService.fetchInitConfig(token, initEndpoint, region);
+      } catch (err) {
+        HMSLogger.e(TAG, 'init: failed init api - ', err);
+        initError = err;
+      }
+    }
+    throw initError;
+  }
+
+  private static async fetchInitConfig(token: string, initEndpoint: string, region: string = ''): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} region=${region}`);
     const url = getUrl(initEndpoint, region);
 

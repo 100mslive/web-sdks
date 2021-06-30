@@ -536,7 +536,7 @@ export default class HMSTransport implements ITransport {
     let config: InitConfig;
     const connectRequestedAt = new Date();
     try {
-      config = await InitService.fetchInitConfig(token, endpoint);
+      config = await InitService.fetchInitConfigWithRetry(token, endpoint);
 
       HMSLogger.d(TAG, '⏳ connect: connecting to ws endpoint', config.endpoint);
       const url = new URL(config.endpoint);
