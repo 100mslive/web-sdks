@@ -33,7 +33,7 @@ export default class AnalyticsEventFactory {
   }
 
   static disconnect(error?: HMSException) {
-    const name = this.eventNameFor('disconnect', error === undefined);
+    const name = 'disconnected';
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError({}, error);
 
@@ -100,7 +100,7 @@ export default class AnalyticsEventFactory {
   }
 
   static publishFail(error: HMSException) {
-    const name = this.eventNameFor('publish.connection', false);
+    const name = this.eventNameFor('publish', false);
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
 
@@ -108,7 +108,7 @@ export default class AnalyticsEventFactory {
   }
 
   static subscribeFail(error: HMSException) {
-    const name = this.eventNameFor('subscribe.connection', false);
+    const name = this.eventNameFor('subscribe', false);
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
 

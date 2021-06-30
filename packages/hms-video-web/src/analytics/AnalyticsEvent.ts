@@ -18,7 +18,7 @@ export default class AnalyticsEvent {
   toParams() {
     return {
       name: this.name,
-      properties: this.properties,
+      info: this.properties,
       timestamp: this.timestamp,
     };
   }
