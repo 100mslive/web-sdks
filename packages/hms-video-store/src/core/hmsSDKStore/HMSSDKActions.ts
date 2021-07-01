@@ -472,11 +472,11 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onError(error: SDKHMSException) {
-    // send notification
-    if (Math.floor(error.code / 1000) === 1) {
-      // critical error
+    if (error.isTerminal) {
+      // terminal error leave room as it is not recoverable
       this.leave().then(() => console.log('error from SDK, left room.'));
     }
+    // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);
   }
