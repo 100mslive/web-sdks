@@ -16,6 +16,7 @@ export enum HMSAction {
   JOIN = 'JOIN',
   SUBSCRIBE = 'SUBSCRIBE',
   DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
+  RESTART_ICE = 'RESTART_ICE',
 }
 
 export const ErrorFactory = {
@@ -86,7 +87,7 @@ variableFilledMessage = variableFilledMessage.replace('{json_message}', '${%s}' 
     ) {
       return new HMSException(
         % if code == '2400' or code == '5000':
-        ${code} + code,
+        code,
         % else:
         ${code},
         % end

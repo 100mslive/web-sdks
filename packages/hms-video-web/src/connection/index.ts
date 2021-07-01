@@ -2,8 +2,8 @@ import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import HMSTrack from '../media/tracks/HMSTrack';
-import { HMSConnectionMethod, HMSConnectionMethodException } from '../error/utils';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -36,6 +36,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.connectionState;
   }
 
+  private get action(): HMSAction {
+    return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
+  }
+
   addTransceiver(track: MediaStreamTrack, init: RTCRtpTransceiverInit): RTCRtpTransceiver {
     return this.nativeConnection.addTransceiver(track, init);
   }
@@ -45,8 +49,8 @@ export default abstract class HMSConnection {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
       return enableOpusDtx(fixMsid(offer, tracks));
-    } catch (e) {
-      throw new HMSConnectionMethodException(HMSConnectionMethod.CreateOffer, e.message);
+    } catch (error) {
+      throw ErrorFactory.WebrtcErrors.CreateOfferFailed(this.action, error.message);
     }
   }
 
@@ -55,8 +59,8 @@ export default abstract class HMSConnection {
       const answer = await this.nativeConnection.createAnswer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
       return answer;
-    } catch (e) {
-      throw new HMSConnectionMethodException(HMSConnectionMethod.CreateAnswer, e.message);
+    } catch (error) {
+      throw ErrorFactory.WebrtcErrors.CreateAnswerFailed(this.action, error.message);
     }
   }
 
@@ -64,8 +68,8 @@ export default abstract class HMSConnection {
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setLocalDescription(description);
-    } catch (e) {
-      throw new HMSConnectionMethodException(HMSConnectionMethod.SetLocalDescription, e.message);
+    } catch (error) {
+      throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, error.message);
     }
   }
 
@@ -73,8 +77,8 @@ export default abstract class HMSConnection {
     try {
       HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
       await this.nativeConnection.setRemoteDescription(description);
-    } catch (e) {
-      throw new HMSConnectionMethodException(HMSConnectionMethod.SetRemoteDescription, e.message);
+    } catch (error) {
+      throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, error.message);
     }
   }
 

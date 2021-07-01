@@ -1,0 +1,69 @@
+/*
+ * ErrorCodes.ts
+ *
+ * Created by codegen
+ * Copyright © 2021 100ms. All rights reserved.
+ */
+
+
+export const ErrorCodes = {
+%{
+  import csv
+  from urllib.request import urlopen
+
+  url = "https://docs.google.com/spreadsheets/u/1/d/130OjD6rMeoBidosnRimQE6xmwXQRv16U0TOjZhf7ejQ/export?format=csv&id=130OjD6rMeoBidosnRimQE6xmwXQRv16U0TOjZhf7ejQ&gid=761969878"
+  response = urlopen(url)
+  data = response.read().decode('utf-8')
+  first = True
+}%
+% for row in csv.DictReader(data.splitlines()):
+%{
+import re
+from re import search
+
+PLATFORM = "WEB"
+PLATFORMS = ["ANDROID", "WEB", "IOS"]
+
+def Title(x):
+    if len(x) == 0:
+        return x
+    x = re.sub(r"[^a-zA-Z0-9 ]+", '', x)
+    x = ''.join([word[0].upper() + word[1:] for word in x.strip().split(' ')])
+    return x
+
+def UpperCaseSnake(x):
+    if len(x) == 0:
+        return x
+    x = re.sub(r"[^a-zA-Z0-9 ]+", '', x)
+    x = '_'.join([word.upper() for word in x.strip().split(' ')])
+    return x
+
+reason = row["What is wrong?"]
+skip = not all([not reason.upper().startswith(p + ':') for p in PLATFORMS])
+
+if skip and reason.upper().startswith(PLATFORM + ':'):
+    skip = False
+    reason = reason.replace(reason[:reason.find(':') + 1], '')
+
+name = row["Error Name"]
+code = row["Error Code"]
+message =  row["Error Message"]
+
+reason = Title(reason)
+name = UpperCaseSnake(name)
+}%
+% if code and name and reason and message and not skip:
+
+    // ${message}
+    ${name}: ${code},
+% elif len(reason) > 0 and not skip:
+  % if not first:
+  },
+  % end
+  % first = False
+
+  ${reason}: {
+% end
+% end
+  },
+}

@@ -26,7 +26,6 @@ import HMSMessage from '../interfaces/message';
 import { TrackState } from '../sdk/models/HMSNotifications';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSConnectionMethodException } from '../error/utils';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
@@ -35,6 +34,7 @@ import { TransportFailureCategory } from './models/TransportFailureCategory';
 import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
+import { ErrorCodes } from '../error/ErrorCodes';
 
 const TAG = '[HMSTransport]:';
 
@@ -50,12 +50,13 @@ export default class HMSTransport implements ITransport {
   private readonly observer: ITransportObserver;
   private publishConnection: HMSPublishConnection | null = null;
   private subscribeConnection: HMSSubscribeConnection | null = null;
+  private initConfig?: InitConfig;
   private endpoint!: string;
   private joinParameters?: JoinParameters;
-  private retryScheduler = new RetryScheduler(analyticsEventsService, (state, error) => {
+  private retryScheduler = new RetryScheduler(analyticsEventsService, async (state, error) => {
     if (state !== this.state) {
       this.state = state;
-      this.observer.onStateChange(this.state, error);
+      await this.observer.onStateChange(this.state, error);
     }
   });
 
@@ -89,8 +90,6 @@ export default class HMSTransport implements ITransport {
         let ex: HMSException;
         if (err instanceof HMSException) {
           ex = err;
-        } else if (err instanceof HMSConnectionMethodException) {
-          ex = err.toHMSException(HMSAction.SUBSCRIBE);
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
         }
@@ -115,7 +114,7 @@ export default class HMSTransport implements ITransport {
 
     onServerError: async (error: HMSException) => {
       await this.leave();
-      this.observer.onStateChange(TransportState.Failed, error);
+      await this.observer.onStateChange(TransportState.Failed, error);
     },
 
     onFailure: (exception: HMSException) => {
@@ -311,60 +310,67 @@ export default class HMSTransport implements ITransport {
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
-    let config: InitConfig | undefined;
-    try {
-      config = await this.connect(authToken, initEndpoint, peerId);
-    } catch (error) {
-      let configClosure: InitConfig | undefined;
-
-      if (error instanceof HMSException) {
-        // @TODO: Use constant error codes.
-        if ([1003, 2003].includes(error.code)) {
-          const task = async () => {
-            configClosure = await this.connect(authToken, initEndpoint, peerId);
-            return Boolean(configClosure && configClosure.endpoint);
-          };
-
-          try {
-            this.retryScheduler.schedule(
-              TransportFailureCategory.ConnectFailed,
-              error,
-              task,
-              MAX_TRANSPORT_RETRIES,
-              false,
-            );
-          } catch (retryError) {
-            HMSLogger.e(TAG, 'join: failed ❌ [token=$authToken]', retryError);
-          }
-        }
-        if (!configClosure) {
-          this.state = TransportState.Failed;
-          this.observer.onStateChange(this.state, error);
-          return;
-        }
-
-        config = configClosure;
-      }
-    }
-
     const joinRequestedAt = new Date();
     try {
-      if (config) {
-        await this.connectionJoin(customData.name, customData.metaData, config.rtcConfiguration, autoSubscribeVideo);
+      if (!this.signal.isConnected || !this.initConfig) {
+        await this.connect(authToken, initEndpoint, peerId);
+      }
+
+      if (this.initConfig) {
+        await this.connectionJoin(
+          customData.name,
+          customData.metaData,
+          this.initConfig.rtcConfiguration,
+          autoSubscribeVideo,
+        );
       }
     } catch (error) {
-      HMSLogger.d(TAG, 'join: failed ❌');
+      HMSLogger.e(TAG, 'join: failed ❌ [token=$authToken]', error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
         analyticsEventsService.queue(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error)).flush();
       }
-      this.observer.onStateChange(this.state, error);
-      return;
+      await this.observer.onStateChange(this.state, error);
+      throw error;
     }
 
     HMSLogger.d(TAG, '✅ join: successful');
     this.state = TransportState.Joined;
     this.observer.onStateChange(this.state);
+  }
+
+  async connect(token: string, endpoint: string, peerId: string) {
+    try {
+      return await this.internalConnect(token, endpoint, peerId);
+    } catch (error) {
+      let configClosure: InitConfig | undefined;
+      const shouldRetry =
+        error instanceof HMSException &&
+        ([
+          ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
+          ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+          ErrorCodes.InitAPIErrors.CONNECTION_LOST,
+          ErrorCodes.InitAPIErrors.HTTP_ERROR,
+        ].includes(error.code) ||
+          error.code.toString().startsWith('5') ||
+          error.code.toString().startsWith('429'));
+
+      if (shouldRetry) {
+        const task = async () => {
+          await this.internalConnect(token, endpoint, peerId);
+          return Boolean(configClosure && configClosure.endpoint);
+        };
+        await this.retryScheduler.schedule(
+          TransportFailureCategory.ConnectFailed,
+          error,
+          task,
+          MAX_TRANSPORT_RETRIES,
+          false,
+        );
+      } else {
+        throw error;
+      }
+    }
   }
 
   async leave(): Promise<void> {
@@ -376,8 +382,8 @@ export default class HMSTransport implements ITransport {
 
     try {
       this.state = TransportState.Leaving;
-      await this.publishConnection!.close();
-      await this.subscribeConnection!.close();
+      await this.publishConnection?.close();
+      await this.subscribeConnection?.close();
       if (this.signal.isConnected) {
         this.signal.leave();
         await this.signal.close();
@@ -522,8 +528,6 @@ export default class HMSTransport implements ITransport {
       let ex: HMSException;
       if (err instanceof HMSException) {
         ex = err;
-      } else if (err instanceof HMSConnectionMethodException) {
-        ex = err.toHMSException(HMSAction.PUBLISH);
       } else {
         ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
       }
@@ -550,36 +554,37 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async connect(token: string, endpoint: string, peerId: string) {
+  private async internalConnect(token: string, endpoint: string, peerId: string) {
     HMSLogger.d(TAG, 'connect: started ⏰');
-    let config: InitConfig;
     const connectRequestedAt = new Date();
     try {
-      config = await InitService.fetchInitConfigWithRetry(token, endpoint);
-
-      HMSLogger.d(TAG, '⏳ connect: connecting to ws endpoint', config.endpoint);
-      const url = new URL(config.endpoint);
-      url.searchParams.set('peer', peerId);
-      url.searchParams.set('token', token);
-      url.searchParams.set('user_agent', userAgent);
-      this.endpoint = url.toString();
-      await this.signal.open(this.endpoint);
-      HMSLogger.d(TAG, '✅ connect: connected to ws endpoint');
-
+      this.initConfig = await InitService.fetchInitConfig(token, endpoint);
+      await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       analyticsEventsService.addTransport(this.signal);
       analyticsEventsService.flush();
-    } catch (ex) {
-      if (ex instanceof HMSException) {
-        analyticsEventsService
-          .queue(AnalyticsEventFactory.connect(connectRequestedAt, new Date(), endpoint, ex))
-          .flush();
-      }
-      HMSLogger.d(TAG, '❌ connect: failed', { error: ex });
-      throw ex;
+    } catch (error) {
+      analyticsEventsService
+        .queue(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint))
+        .flush();
+      HMSLogger.d(TAG, '❌ internal connect: failed', error);
+      throw error;
+    }
+  }
+
+  private async openSignal(token: string, peerId: string) {
+    if (!this.initConfig) {
+      throw ErrorFactory.WebSocketConnectionErrors.GenericConnect(HMSAction.INIT, 'Init Config not found');
     }
 
-    return config;
+    HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);
+    const url = new URL(this.initConfig.endpoint);
+    url.searchParams.set('peer', peerId);
+    url.searchParams.set('token', token);
+    url.searchParams.set('user_agent', userAgent);
+    this.endpoint = url.toString();
+    await this.signal.open(this.endpoint);
+    HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
   private retryPublishIceFailedTask = async () => {
@@ -633,14 +638,18 @@ export default class HMSTransport implements ITransport {
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
       try {
-        await this.connect(this.joinParameters!.authToken, this.joinParameters!.endpoint, this.joinParameters!.peerId);
+        await this.internalConnect(
+          this.joinParameters!.authToken,
+          this.joinParameters!.endpoint,
+          this.joinParameters!.peerId,
+        );
         ok = true;
       } catch (ex) {
         ok = false;
       }
     }
 
-    ok = ok && (await this.retryPublishIceFailedTask());
+    ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
 
     return ok;
   };

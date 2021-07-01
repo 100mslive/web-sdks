@@ -1,40 +1,42 @@
 import { InitConfig } from './models';
 import HMSLogger from '../../utils/logger';
 import { userAgent } from '../../utils/support';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 const TAG = 'InitService';
-const MAX_TRIES = 3;
 
 export default class InitService {
-  static async fetchInitConfigWithRetry(
+  static async fetchInitConfig(
     token: string,
     initEndpoint: string = 'https://prod-init.100ms.live',
     region: string = '',
   ): Promise<InitConfig> {
-    let initError: string = 'init api failed';
-    for (let i = 1; i <= MAX_TRIES; i++) {
-      try {
-        return await InitService.fetchInitConfig(token, initEndpoint, region);
-      } catch (err) {
-        HMSLogger.e(TAG, 'init: failed init api - ', err);
-        initError = err;
-      }
-    }
-    throw initError;
-  }
-
-  private static async fetchInitConfig(token: string, initEndpoint: string, region: string = ''): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} region=${region}`);
     const url = getUrl(initEndpoint, region);
-
-    // @TODO: Add user-agent, handle error status codes
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const config = await response.json();
-    HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+    let response, config;
+    try {
+      response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 404) {
+        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, response.statusText);
+      }
+      if (response.status === 401) {
+        throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, response.statusText);
+      }
+      if (response?.status !== 200) {
+        throw ErrorFactory.InitAPIErrors.HTTPError(response.status, HMSAction.INIT, response?.statusText);
+      }
+      config = await response?.json();
+      HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+    } catch (error) {
+      if (error.message === 'Failed to fetch') {
+        throw ErrorFactory.InitAPIErrors.ConnectionLost(HMSAction.INIT, error.message);
+      }
+      throw ErrorFactory.GenericErrors.JsonParsingFailed(HMSAction.INIT, error.message);
+    }
     return transformInitConfig(config);
   }
 }

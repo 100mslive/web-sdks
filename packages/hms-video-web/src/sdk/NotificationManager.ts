@@ -141,7 +141,7 @@ export default class NotificationManager {
       }
 
       track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-added', { detail: track });
-      this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(trackId);
     });
   }
@@ -183,7 +183,7 @@ export default class NotificationManager {
         }
       }
       track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
-      this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     }
   };
 
@@ -212,12 +212,12 @@ export default class NotificationManager {
 
         if (currentTrackStateInfo.mute !== trackEntry.mute) {
           if (trackEntry.mute) {
-            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
           } else {
-            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
           }
         } else if (currentTrackStateInfo.description !== trackEntry.description) {
-          this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
         }
       }
     }
@@ -262,7 +262,7 @@ export default class NotificationManager {
       });
     });
 
-    this.listener!.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
+    this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
     this.processPendingTracks();
   };
 
@@ -334,7 +334,7 @@ export default class NotificationManager {
             })
           ) {
             this.removePeerTrack(oldPeer, track.trackId);
-            this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
+            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
           }
         });
 
@@ -366,9 +366,9 @@ export default class NotificationManager {
     const dominantSpeaker = speakers[0];
     if (dominantSpeaker) {
       const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peerId);
-      this.listener.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
     } else {
-      this.listener.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);
     }
   }
 

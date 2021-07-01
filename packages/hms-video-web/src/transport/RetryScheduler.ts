@@ -32,7 +32,7 @@ export class RetryScheduler {
 
   constructor(
     analyticsEventsService: AnalyticsEventsService,
-    onStateChange: (state: TransportState, error?: HMSException) => void,
+    onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
   ) {
     this.analyticsEventsService = analyticsEventsService;
     this.onStateChange = onStateChange;
@@ -170,6 +170,9 @@ export class RetryScheduler {
   private sendEvent(error: HMSException, category: TFC) {
     let event: AnalyticsEvent;
     switch (category) {
+      case TFC.ConnectFailed:
+        event = AnalyticsEventFactory.connect(error);
+        break;
       case TFC.SignalDisconnect:
         event = AnalyticsEventFactory.disconnect(error);
         break;

@@ -16,14 +16,19 @@ export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
   private static KEY_RESPONDED_AT = 'responded_at';
 
-  static connect(requestedAt: Date, respondedAt: Date, endpoint: string, error?: HMSException) {
+  static connect(
+    error?: HMSException,
+    requestedAt: Date = new Date(),
+    respondedAt: Date = new Date(),
+    endpoint?: string,
+  ) {
     const name = this.eventNameFor('connect', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
 
     const properties = this.getPropertiesWithError(
       {
-        [this.KEY_REQUESTED_AT]: requestedAt.getTime(),
-        [this.KEY_RESPONDED_AT]: respondedAt.getTime(),
+        [this.KEY_REQUESTED_AT]: requestedAt?.getTime(),
+        [this.KEY_RESPONDED_AT]: respondedAt?.getTime(),
         endpoint,
       },
       error,

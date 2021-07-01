@@ -32,32 +32,3 @@ export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException
       }
   }
 }
-
-export enum HMSConnectionMethod {
-  CreateOffer,
-  CreateAnswer,
-  SetLocalDescription,
-  SetRemoteDescription,
-}
-
-export class HMSConnectionMethodException extends Error {
-  method: HMSConnectionMethod;
-
-  constructor(method: HMSConnectionMethod, message: string) {
-    super(message);
-    this.method = method;
-  }
-
-  toHMSException(action: HMSAction): HMSException {
-    switch (this.method) {
-      case HMSConnectionMethod.CreateOffer:
-        return ErrorFactory.WebrtcErrors.CreateOfferFailed(action, this.message);
-      case HMSConnectionMethod.CreateAnswer:
-        return ErrorFactory.WebrtcErrors.CreateAnswerFailed(action, this.message);
-      case HMSConnectionMethod.SetLocalDescription:
-        return ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(action, this.message);
-      case HMSConnectionMethod.SetRemoteDescription:
-        return ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(action, this.message);
-    }
-  }
-}

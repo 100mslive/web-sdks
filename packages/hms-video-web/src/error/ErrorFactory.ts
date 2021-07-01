@@ -39,7 +39,7 @@ export const ErrorFactory = {
     },
 
     HTTPError(code: number, action: HMSAction, description: string = '') {
-      return new HMSException(2400 + code, 'HTTPError', action, `Bad Request`, description);
+      return new HMSException(code, 'HTTPError', action, `Bad Request`, description);
     },
 
     InvalidEndpointURL(action: HMSAction, description: string = '') {
@@ -179,11 +179,21 @@ export const ErrorFactory = {
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction, description: string) {
-      return new HMSException(5000 + code, 'ServerErrors', action, `[JOIN]: ${description}`, description);
+      return new HMSException(code, 'ServerErrors', action, `[JOIN]: ${description}`, description);
     },
 
     AlreadyJoined(action: HMSAction, description: string = '') {
       return new HMSException(5001, 'AlreadyJoined', action, `[JOIN]: You have already joined this room.`, description);
+    },
+
+    CannotJoinPreviewInProgress(action: HMSAction, description: string = '') {
+      return new HMSException(
+        5002,
+        'CannotJoinPreviewInProgress',
+        action,
+        `[JOIN]: Cannot join if preview is in progress`,
+        description,
+      );
     },
   },
 

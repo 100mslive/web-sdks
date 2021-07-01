@@ -36,7 +36,7 @@ export default interface ITransportObserver {
 
   onFailure(exception: HMSException): void;
 
-  onStateChange(state: TransportState, error?: HMSException): void;
+  onStateChange(state: TransportState, error?: HMSException): Promise<void>;
 
   /* onReconnecting(): void
   onReconnected(): void */

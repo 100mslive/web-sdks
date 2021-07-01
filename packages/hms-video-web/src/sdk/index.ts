@@ -127,6 +127,7 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.localPeer = this.localPeer;
 
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
+    this.roomId = roomId;
 
     this.transport
       .join(
@@ -138,11 +139,14 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        this.roomId = roomId;
         if (this.publishParams && !this.published) {
           await this.publish(config.settings || defaultSettings);
         }
         this.listener?.onJoin(this.createRoom());
+      })
+      .catch((error) => {
+        HMSLogger.d(this.TAG, 'join: failed ❌', error);
+        this.listener?.onError(error);
       });
   }
 
