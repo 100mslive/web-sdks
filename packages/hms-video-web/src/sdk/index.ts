@@ -327,6 +327,7 @@ export class HMSSdk implements HMSInterface {
             audio: canPublishAudio && (audioFailure ? 'empty' : true),
             video: canPublishVideo && (videoFailure ? 'empty' : true),
           };
+          HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
           tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
         } else {
           this.listener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));

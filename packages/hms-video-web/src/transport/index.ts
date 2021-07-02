@@ -184,13 +184,11 @@ export default class HMSTransport implements ITransport {
 
     onTrackAdd: (track: HMSTrack) => {
       HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
-      analyticsEventsService.queue(AnalyticsEventFactory.trackAdd(track)).flush();
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
       HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
-      analyticsEventsService.queue(AnalyticsEventFactory.trackRemove(track)).flush();
       this.observer.onTrackRemove(track);
     },
 
@@ -234,12 +232,10 @@ export default class HMSTransport implements ITransport {
 
   async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSLocalVideoTrack> {
     try {
-      const track = await HMSLocalStream.getLocalScreen(settings);
-      analyticsEventsService.queue(AnalyticsEventFactory.getLocalScreen(settings, track)).flush();
-      return track;
+      return await HMSLocalStream.getLocalScreen(settings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.getLocalScreen(settings, undefined, error)).flush();
+        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
       }
       throw error;
     }
@@ -247,15 +243,10 @@ export default class HMSTransport implements ITransport {
 
   async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
     try {
-      const tracks = await HMSLocalStream.getLocalTracks(settings);
-
-      tracks.forEach((track) => analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, track)));
-      analyticsEventsService.flush();
-
-      return tracks;
+      return await HMSLocalStream.getLocalTracks(settings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, undefined, error)).flush();
+        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
       }
       throw error;
     }
@@ -266,15 +257,10 @@ export default class HMSTransport implements ITransport {
     settings?: HMSTrackSettings,
   ): Promise<Array<HMSLocalTrack>> {
     try {
-      const tracks = await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
-
-      tracks.forEach((track) => analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, track)));
-      analyticsEventsService.flush();
-
-      return tracks;
+      return await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.getLocalTracks(settings, undefined, error)).flush();
+        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
       }
       throw error;
     }
@@ -433,7 +419,6 @@ export default class HMSTransport implements ITransport {
       });
       this.tracks.set(originalTrackState.track_id, newTrackState);
       HMSLogger.d(TAG, 'Track Update', this.tracks, track);
-      analyticsEventsService.queue(AnalyticsEventFactory.trackStateChange(track.type, newTrackState.mute)).flush();
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
   }
@@ -464,7 +449,6 @@ export default class HMSTransport implements ITransport {
         .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
-    analyticsEventsService.queue(AnalyticsEventFactory.trackStateChange(track.type, !track.enabled)).flush();
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 

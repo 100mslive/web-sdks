@@ -1,16 +1,7 @@
 import HMSException from '../error/HMSException';
-import HMSTrackSettings from '../media/settings/HMSTrackSettings';
-import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
-import HMSTrack from '../media/tracks/HMSTrack';
-import { isEmptyTrack } from '../utils/track';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
-
-const lastTrackStateEventTimestamp: Record<'audio' | 'video', number | null> = {
-  audio: null,
-  video: null,
-};
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -60,50 +51,6 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent(name, level, false, properties);
   }
 
-  static getLocalTracks(settings?: HMSTrackSettings, track?: HMSTrack, error?: HMSException) {
-    const name = this.eventNameFor('get.local.tracks', error === undefined);
-    const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-    const properties = this.getPropertiesWithError(
-      {
-        local_stream_id: track?.stream.id,
-        ...settings?.toAnalyticsProperties(),
-      },
-      error,
-    );
-
-    if (track) properties.isEmpty = isEmptyTrack(track.nativeTrack);
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
-  static getLocalScreen(settings?: HMSVideoTrackSettings, track?: HMSTrack, error?: HMSException) {
-    const name = this.eventNameFor('get.local.screen', error === undefined);
-    const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-    const properties = this.getPropertiesWithError(
-      {
-        local_stream_id: track?.stream.id,
-        ...settings?.toAnalyticsProperties(),
-      },
-      error,
-    );
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
-  static setSettings(settings: HMSTrackSettings, track: HMSTrack, error?: HMSException) {
-    const name = this.eventNameFor('apply.constraints', error === undefined);
-    const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-    const properties = this.getPropertiesWithError(
-      {
-        local_stream_id: track.stream.id,
-        ...settings.toAnalyticsProperties(),
-      },
-      error,
-    );
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
   static publishFail(error: HMSException) {
     const name = this.eventNameFor('publish', false);
     const level = AnalyticsEventLevel.ERROR;
@@ -116,41 +63,6 @@ export default class AnalyticsEventFactory {
     const name = this.eventNameFor('subscribe', false);
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
-  static trackStateChange(type: 'audio' | 'video', isMute: boolean) {
-    const name = `${type}.state.change`;
-    const level = AnalyticsEventLevel.INFO;
-    const nowInMs = new Date().getTime();
-    const stateDuration = lastTrackStateEventTimestamp[type] ? nowInMs - lastTrackStateEventTimestamp[type]! : 0;
-    const properties = {
-      mute: isMute ? 'true' : 'false',
-      state_duration: stateDuration.toString(),
-    };
-
-    lastTrackStateEventTimestamp[type] = nowInMs;
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
-  static trackAdd(track: HMSTrack) {
-    const name = 'stream.add';
-    const level = AnalyticsEventLevel.INFO;
-    const properties = {
-      remote_stream_id: track.stream.id,
-    };
-
-    return new AnalyticsEvent(name, level, false, properties);
-  }
-
-  static trackRemove(track: HMSTrack) {
-    const name = 'stream.remove';
-    const level = AnalyticsEventLevel.INFO;
-    const properties = {
-      remote_stream_id: track.stream.id,
-    };
 
     return new AnalyticsEvent(name, level, false, properties);
   }

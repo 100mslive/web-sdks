@@ -43,7 +43,16 @@ export class AnalyticsEventsService {
     while (this.pendingEvents.length > 0) {
       const event = this.pendingEvents.shift();
       if (event) {
-        this.transports.forEach((transport) => transport.sendEvent(event));
+        this.transports.forEach((transport) => {
+          try {
+            transport.sendEvent(event);
+          } catch (error) {
+            HMSLogger.w(TAG, 'Failed to send event through transport', {
+              event,
+              transportName: transport.constructor.name,
+            });
+          }
+        });
       }
     }
   }
