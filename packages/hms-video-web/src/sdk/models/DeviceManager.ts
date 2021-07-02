@@ -68,6 +68,7 @@ export default class DeviceManager implements HMSDeviceManager {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
     await this.enumerateDevices();
+    HMSLogger.d('[AudioOuput]', this.selected.audioOutput);
 
     if (
       this.localPeer &&

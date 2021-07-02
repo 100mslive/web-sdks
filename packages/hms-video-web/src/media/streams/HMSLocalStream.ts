@@ -5,6 +5,7 @@ import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
 import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
+import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
@@ -22,10 +23,13 @@ export default class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  static async getLocalScreen(settings: HMSVideoTrackSettings) {
+  static async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings: HMSAudioTrackSettings) {
+    const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
+    // remove advanced constraints as it not supported for screenshare audio
+    delete audioConstraints.advanced;
     const constraints = {
-      video: settings.toConstraints(),
-      audio: false,
+      video: videosettings.toConstraints(),
+      audio: audioConstraints,
     } as MediaStreamConstraints;
     let stream;
     try {
@@ -35,12 +39,19 @@ export default class HMSLocalStream extends HMSMediaStream {
       throw BuildGetMediaError(err, HMSGetMediaActions.SCREEN);
     }
 
+    const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
-    const nativeTrack = stream.getVideoTracks()[0];
-    const track = new HMSLocalVideoTrack(local, nativeTrack, 'screen', settings);
+    const nativeVideoTrack = stream.getVideoTracks()[0];
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', videosettings);
+    tracks.push(videoTrack);
+    const nativeAudioTrack = stream.getAudioTracks()[0];
+    if (nativeAudioTrack) {
+      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'screen', audioSettings);
+      tracks.push(audioTrack);
+    }
 
-    HMSLogger.v(TAG, 'getLocalScreen', track);
-    return track;
+    HMSLogger.v(TAG, 'getLocalScreen', tracks);
+    return tracks;
   }
 
   static async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {

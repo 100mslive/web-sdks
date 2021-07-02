@@ -126,12 +126,12 @@ export default class NotificationManager {
 
       switch (track.type) {
         case HMSTrackType.AUDIO:
-          if (!hmsPeer.audioTrack) {
+          if (!hmsPeer.audioTrack && track.source === 'regular') {
             hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
+          } else {
+            hmsPeer.auxiliaryTracks.push(track);
           }
-          // @DISCUSS: Do we have auxilliary audio tracks too?
           break;
-
         case HMSTrackType.VIDEO:
           if (!hmsPeer.videoTrack && track.source === 'regular') {
             hmsPeer.videoTrack = track as HMSRemoteVideoTrack;
@@ -165,26 +165,35 @@ export default class NotificationManager {
     if (!trackStateEntry) return;
 
     const hmsPeer = this.hmsPeerList.get(trackStateEntry.peerId);
+    if (!hmsPeer) {
+      return;
+    }
 
-    if (hmsPeer) {
-      switch (track.type) {
-        case HMSTrackType.AUDIO:
+    const removeAuxiliaryTrack = () => {
+      const screenshareTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+      if (screenshareTrackIndex > -1) {
+        hmsPeer.auxiliaryTracks.splice(screenshareTrackIndex, 1);
+      }
+    };
+
+    switch (track.type) {
+      case HMSTrackType.AUDIO:
+        if (track.source === 'screen') {
+          removeAuxiliaryTrack();
+        } else {
           hmsPeer.audioTrack = undefined;
-          break;
-        case HMSTrackType.VIDEO: {
-          const screenShareTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
-
-          if (screenShareTrackIndex > -1) {
-            // @TODO: change this based on source
-            hmsPeer.auxiliaryTracks.splice(screenShareTrackIndex, 1);
-          } else {
-            hmsPeer.videoTrack = undefined;
-          }
+        }
+        break;
+      case HMSTrackType.VIDEO: {
+        if (track.source === 'screen') {
+          removeAuxiliaryTrack();
+        } else {
+          hmsPeer.videoTrack = undefined;
         }
       }
-      track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     }
+    track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
+    this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 
   private handleTrackUpdate = (params: TrackStateNotification) => {

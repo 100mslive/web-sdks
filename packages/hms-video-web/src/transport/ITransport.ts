@@ -1,8 +1,8 @@
 import HMSTrack from '../media/tracks/HMSTrack';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
+import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { HMSLocalTrack } from '../media/streams/HMSLocalStream';
-import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
 export type IFetchTrackOptions = boolean | 'empty';
@@ -25,5 +25,9 @@ export default interface ITransport {
     fetchTrackOptions?: IFetchAVTrackOptions,
     settings?: HMSTrackSettings,
   ): Promise<Array<HMSLocalTrack>>;
-  getLocalScreen(settings: HMSVideoTrackSettings, onStop: () => void): Promise<HMSLocalVideoTrack>;
+  getLocalScreen(
+    videoSettings: HMSVideoTrackSettings,
+    audioSettings: HMSAudioTrackSettings,
+    onStop: () => void,
+  ): Promise<Array<HMSLocalTrack>>;
 }

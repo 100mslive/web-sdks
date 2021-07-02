@@ -211,7 +211,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const track = await this.transport!.getLocalScreen(
+    const tracks = await this.transport!.getLocalScreen(
       new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
         // If publish params doesn't have bitRate value - don't set maxBitrate.
@@ -221,14 +221,23 @@ export class HMSSdk implements HMSInterface {
         .setWidth(screen.width)
         .setHeight(screen.height)
         .build(),
+      new HMSAudioTrackSettingsBuilder().build(),
     );
-    track.nativeTrack.onended = () => {
-      this.stopEndedScreenshare(onStop);
-    };
 
-    await this.transport!.publish([track]);
-    this.localPeer?.auxiliaryTracks.push(track);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
+    tracks.forEach((track) => {
+      // end screenshare when video track ended
+      if (track.type === 'video') {
+        track.nativeTrack.onended = () => {
+          this.stopEndedScreenshare(onStop);
+        };
+      }
+    });
+
+    await this.transport!.publish(tracks);
+    tracks.forEach((track) => {
+      this.localPeer?.auxiliaryTracks.push(track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
+    });
   }
 
   private async stopEndedScreenshare(onStop: () => void) {
@@ -239,9 +248,11 @@ export class HMSSdk implements HMSInterface {
 
   async stopScreenShare() {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
-    const track = this.localPeer?.auxiliaryTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen');
-    if (track) {
-      await this.removeTrack(track.trackId);
+    const screenTracks = this.localPeer?.auxiliaryTracks.filter((t) => t.source === 'screen');
+    if (screenTracks) {
+      for (let track of screenTracks) {
+        await this.removeTrack(track.trackId);
+      }
     }
   }
 

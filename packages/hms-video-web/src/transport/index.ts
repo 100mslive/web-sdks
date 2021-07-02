@@ -31,9 +31,9 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
 import { InitConfig } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
-import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
+import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { ErrorCodes } from '../error/ErrorCodes';
 
 const TAG = '[HMSTransport]:';
@@ -230,9 +230,12 @@ export default class HMSTransport implements ITransport {
     this.observer = observer;
   }
 
-  async getLocalScreen(settings: HMSVideoTrackSettings): Promise<HMSLocalVideoTrack> {
+  async getLocalScreen(
+    videoSettings: HMSVideoTrackSettings,
+    audioSettings: HMSAudioTrackSettings,
+  ): Promise<Array<HMSLocalTrack>> {
     try {
-      return await HMSLocalStream.getLocalScreen(settings);
+      return await HMSLocalStream.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
       if (error instanceof HMSException) {
         analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
