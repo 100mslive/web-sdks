@@ -332,7 +332,6 @@ export default class HMSTransport implements ITransport {
     try {
       return await this.internalConnect(token, endpoint, peerId);
     } catch (error) {
-      let configClosure: InitConfig | undefined;
       const shouldRetry =
         error instanceof HMSException &&
         ([
@@ -347,8 +346,9 @@ export default class HMSTransport implements ITransport {
       if (shouldRetry) {
         const task = async () => {
           await this.internalConnect(token, endpoint, peerId);
-          return Boolean(configClosure && configClosure.endpoint);
+          return Boolean(this.initConfig && this.initConfig.endpoint);
         };
+
         await this.retryScheduler.schedule(
           TransportFailureCategory.ConnectFailed,
           error,
