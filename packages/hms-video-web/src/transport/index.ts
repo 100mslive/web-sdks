@@ -35,6 +35,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { ErrorCodes } from '../error/ErrorCodes';
+import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 
 const TAG = '[HMSTransport]:';
 
@@ -118,8 +119,6 @@ export default class HMSTransport implements ITransport {
     },
 
     onFailure: (exception: HMSException) => {
-      analyticsEventsService.removeTransport(this.signal);
-
       // @DISCUSS: Should we remove this? Pong failure would have already scheduled signal retry.
       if (this.joinParameters) {
         this.retryScheduler.schedule(
@@ -132,7 +131,6 @@ export default class HMSTransport implements ITransport {
 
     onOffline: async () => {
       HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
-      analyticsEventsService.removeTransport(this.signal);
       try {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
           this.retryScheduler.schedule(
@@ -148,10 +146,12 @@ export default class HMSTransport implements ITransport {
 
     onOnline: () => {
       HMSLogger.d(TAG, 'socket online', TransportState[this.state]);
+      this.analyticsSignalTransport.flushFailedEvents();
     },
   };
 
   private signal: ISignal = new JsonRpcSignal(this.signalObserver);
+  private analyticsSignalTransport = new SignalAnalyticsTransport(this.signal);
 
   private publishConnectionObserver: IPublishConnectionObserver = {
     onRenegotiationNeeded: async () => {
@@ -364,7 +364,7 @@ export default class HMSTransport implements ITransport {
 
   async leave(): Promise<void> {
     analyticsEventsService.queue(AnalyticsEventFactory.leave()).flush();
-    analyticsEventsService.removeTransport(this.signal);
+    analyticsEventsService.removeTransport(this.analyticsSignalTransport);
 
     this.retryScheduler.reset();
     this.joinParameters = undefined;
@@ -548,7 +548,7 @@ export default class HMSTransport implements ITransport {
       this.initConfig = await InitService.fetchInitConfig(token, endpoint);
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
-      analyticsEventsService.addTransport(this.signal);
+      analyticsEventsService.addTransport(this.analyticsSignalTransport);
       analyticsEventsService.flush();
     } catch (error) {
       analyticsEventsService

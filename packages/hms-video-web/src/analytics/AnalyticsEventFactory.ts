@@ -25,7 +25,7 @@ export default class AnalyticsEventFactory {
       error,
     );
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static disconnect(error?: HMSException) {
@@ -33,7 +33,7 @@ export default class AnalyticsEventFactory {
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError({}, error);
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static join(requestedAt: Date, respondedAt: Date, error?: HMSException) {
@@ -48,7 +48,7 @@ export default class AnalyticsEventFactory {
       error,
     );
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static publishFail(error: HMSException) {
@@ -56,7 +56,7 @@ export default class AnalyticsEventFactory {
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static subscribeFail(error: HMSException) {
@@ -64,11 +64,11 @@ export default class AnalyticsEventFactory {
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static leave() {
-    return new AnalyticsEvent('leave', AnalyticsEventLevel.INFO, false);
+    return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }
 
   static performance(stats: IAnalyticsPropertiesProvider) {
@@ -76,7 +76,7 @@ export default class AnalyticsEventFactory {
     const level = AnalyticsEventLevel.INFO;
     const properties = stats.toAnalyticsProperties();
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   static rtcStats(stats: IAnalyticsPropertiesProvider) {
@@ -84,7 +84,7 @@ export default class AnalyticsEventFactory {
     const level = AnalyticsEventLevel.INFO;
     const properties = stats.toAnalyticsProperties();
 
-    return new AnalyticsEvent(name, level, false, properties);
+    return new AnalyticsEvent({ name, level, properties });
   }
 
   private static eventNameFor(name: string, ok: boolean) {

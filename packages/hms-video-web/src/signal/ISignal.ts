@@ -1,4 +1,4 @@
-import { IAnalyticsTransport } from '../analytics/IAnalyticsTransport';
+import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 
 export interface Track {
@@ -10,7 +10,7 @@ export interface Track {
   stream_id: string;
 }
 
-export interface ISignal extends IAnalyticsTransport {
+export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
 
   open(uri: string): Promise<void>;

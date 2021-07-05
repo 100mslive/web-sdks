@@ -2,23 +2,23 @@ import { HMSAnalyticsLevel } from './AnalyticsEventLevel';
 import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import AnalyticsEvent from './AnalyticsEvent';
-import { IAnalyticsTransport } from './IAnalyticsTransport';
+import { AnalyticsTransport } from './AnalyticsTransport';
 
 const TAG = 'AnalyticsEventsService';
 
 export class AnalyticsEventsService {
   private bufferSize = ANALYTICS_BUFFER_SIZE;
 
-  private transports: IAnalyticsTransport[] = [];
+  private transports: AnalyticsTransport[] = [];
   private pendingEvents: AnalyticsEvent[] = [];
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.ERROR;
 
-  addTransport(transport: IAnalyticsTransport) {
+  addTransport(transport: AnalyticsTransport) {
     this.transports.push(transport);
   }
 
-  removeTransport(transport: IAnalyticsTransport) {
+  removeTransport(transport: AnalyticsTransport) {
     this.transports.splice(this.transports.indexOf(transport), 1);
   }
 
@@ -40,20 +40,15 @@ export class AnalyticsEventsService {
       return;
     }
 
-    while (this.pendingEvents.length > 0) {
-      const event = this.pendingEvents.shift();
-      if (event) {
-        this.transports.forEach((transport) => {
-          try {
-            transport.sendEvent(event);
-          } catch (error) {
-            HMSLogger.w(TAG, 'Failed to send event through transport', {
-              event,
-              transportName: transport.constructor.name,
-            });
-          }
-        });
+    try {
+      while (this.pendingEvents.length > 0) {
+        const event = this.pendingEvents.shift();
+        if (event) {
+          this.transports.forEach((transport) => transport.sendEvent(event));
+        }
       }
+    } catch (error) {
+      HMSLogger.w(TAG, 'Flush Failed', error);
     }
   }
 }

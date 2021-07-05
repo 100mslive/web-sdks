@@ -1,5 +1,5 @@
 import AnalyticsEvent from './AnalyticsEvent';
 
-export interface IAnalyticsTransport {
+export interface IAnalyticsTransportProvider {
   sendEvent: (event: AnalyticsEvent) => void;
 }
