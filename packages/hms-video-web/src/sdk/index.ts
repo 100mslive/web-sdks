@@ -28,6 +28,8 @@ import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
+import { HMSPreviewListener } from '../interfaces/preview-listener';
+import { IErrorListener } from '../interfaces/error-listener';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -46,6 +48,7 @@ export class HMSSdk implements HMSInterface {
   private TAG: string = '[HMSSdk]:';
   private notificationManager: NotificationManager = new NotificationManager();
   private listener!: HMSUpdateListener | null;
+  private errorListener?: IErrorListener;
   private audioListener: HMSAudioListener | null = null;
   private audioSinkManager!: HMSAudioSinkManager;
   private hmsRoom?: HMSRoom | null;
@@ -54,6 +57,7 @@ export class HMSSdk implements HMSInterface {
   private deviceManager: DeviceManager = new DeviceManager();
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
+  private localTracks?: HMSLocalTrack[];
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
@@ -82,7 +86,7 @@ export class HMSSdk implements HMSInterface {
     },
 
     onFailure: (exception: HMSException) => {
-      this.listener?.onError(exception);
+      this.errorListener?.onError(exception);
     },
 
     onStateChange: async (state: TransportState, error?: HMSException) => {
@@ -93,10 +97,9 @@ export class HMSSdk implements HMSInterface {
           }
           break;
         case TransportState.Failed:
-          const listener = this.listener;
           await this.leave();
 
-          listener?.onError?.(error!);
+          this.errorListener?.onError?.(error!);
           this.isReconnecting = false;
           break;
         case TransportState.Reconnecting:
@@ -109,45 +112,80 @@ export class HMSSdk implements HMSInterface {
     },
   };
 
-  join(config: HMSConfig, listener: HMSUpdateListener) {
-    this.notificationManager.addEventListener('role-change', (e: any) => {
-      this.publishParams = e.detail.params.role.publishParams;
-    });
-    this.transport = new HMSTransport(this.observer);
-    this.listener = listener;
-    this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
+  async preview(config: HMSConfig, listener: HMSPreviewListener) {
     const { roomId, userId, role } = decodeJWT(config.authToken);
-
+    this.roomId = roomId;
+    this.errorListener = listener;
     this.localPeer = new HMSLocalPeer({
-      name: config.userName,
+      name: config.userName || '',
       role: role,
       customerUserId: userId,
       customerDescription: config.metaData,
     });
     this.notificationManager.localPeer = this.localPeer;
 
-    HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
-    this.roomId = roomId;
+    const roleChangeHandler = async (e: any) => {
+      this.publishParams = e.detail.params.role.publishParams;
+      this.notificationManager.removeEventListener('role-change', roleChangeHandler);
+      const tracks = await this.initLocalTracks(config.settings!);
+      tracks.forEach((track) => this.setLocalPeerTrack(track));
+      listener.onPreview(this.getRoom(), tracks);
+    };
 
-    this.transport
-      .join(
+    this.notificationManager.addEventListener('role-change', roleChangeHandler);
+
+    this.transport = new HMSTransport(this.observer);
+
+    try {
+      await this.transport.connect(
         config.authToken,
+        config.initEndpoint || 'https://prod-init.100ms.live/init',
         this.localPeer.peerId,
-        { name: config.userName, metaData: config.metaData || '' },
-        config.initEndpoint,
-        config.autoVideoSubscribe,
-      )
-      .then(async () => {
-        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        if (this.publishParams && !this.published) {
-          await this.publish(config.settings || defaultSettings);
-        }
-        this.listener?.onJoin(this.createRoom());
-      })
-      .catch((error) => {
-        HMSLogger.d(this.TAG, 'join: failed ❌', error);
-        this.listener?.onError(error);
+      );
+    } catch (ex) {
+      this.errorListener?.onError(ex);
+    }
+  }
+
+  join(config: HMSConfig, listener: HMSUpdateListener) {
+    this.listener = listener;
+    this.errorListener = listener;
+    this.audioSinkManager = new HMSAudioSinkManager(this.notificationManager, config.audioSinkElementId);
+    const { roomId, userId, role } = decodeJWT(config.authToken);
+
+    if (!this.localPeer) {
+      this.notificationManager.addEventListener('role-change', (e: any) => {
+        this.publishParams = e.detail.params.role.publishParams;
       });
+      this.transport = new HMSTransport(this.observer);
+
+      this.localPeer = new HMSLocalPeer({
+        name: config.userName,
+        customerUserId: userId,
+        role,
+        customerDescription: config.metaData || '',
+      });
+      this.notificationManager.localPeer = this.localPeer;
+    } else {
+      this.localPeer.name = config.userName;
+    }
+
+    HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
+
+    this.transport!.join(
+      config.authToken,
+      this.localPeer.peerId,
+      { name: config.userName, metaData: config.metaData || '' },
+      config.initEndpoint,
+      config.autoVideoSubscribe,
+    ).then(async () => {
+      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+      this.roomId = roomId;
+      if (this.publishParams && !this.published) {
+        await this.publish(config.settings || defaultSettings);
+      }
+      this.listener?.onJoin(this.getRoom());
+    });
   }
 
   private cleanUp() {
@@ -161,6 +199,7 @@ export class HMSSdk implements HMSInterface {
     this.transport = null;
     this.listener = null;
     this.isReconnecting = false;
+    this.localTracks = [];
   }
 
   async leave() {
@@ -292,62 +331,10 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async publish(initialSettings: InitialSettings) {
-    const { audioInputDeviceId, videoDeviceId } = initialSettings;
-    const { audio, video, allowed } = this.publishParams;
-    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
-    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-    HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
-
-    if (canPublishAudio || canPublishVideo) {
-      const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
-        .codec(audio.codec)
-        .maxBitrate(audio.bitRate)
-        .deviceId(audioInputDeviceId)
-        .build();
-
-      const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
-        .codec(video.codec)
-        .maxBitrate(video.bitRate)
-        .maxFramerate(video.frameRate)
-        .setWidth(video.width)
-        .setHeight(video.height)
-        .deviceId(videoDeviceId)
-        .build();
-
-      const trackSettings = new HMSTrackSettingsBuilder()
-        .video(canPublishVideo ? videoSettings : null)
-        .audio(canPublishAudio ? audioSettings : null)
-        .build();
-
-      let tracks: Array<HMSLocalTrack> = [];
-      let fetchTrackOptions: IFetchAVTrackOptions;
-      try {
-        fetchTrackOptions = {
-          audio: canPublishAudio && (initialSettings.isAudioMuted ? 'empty' : true),
-          video: canPublishVideo && (initialSettings.isVideoMuted ? 'empty' : true),
-        };
-        HMSLogger.d(this.TAG, 'Join Publish', { fetchTrackOptions });
-        tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
-      } catch (error) {
-        if (error instanceof HMSException && error.action === HMSAction.TRACK) {
-          this.listener?.onError?.(error);
-
-          const audioFailure = error.message.includes('audio');
-          const videoFailure = error.message.includes('video');
-          fetchTrackOptions = {
-            audio: canPublishAudio && (audioFailure ? 'empty' : true),
-            video: canPublishVideo && (videoFailure ? 'empty' : true),
-          };
-          HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
-          tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
-        } else {
-          this.listener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));
-        }
-      }
-      this.setAndPublishTracks(tracks);
-      this.published = true;
-      this.deviceManager.localPeer = this.localPeer;
-    }
+    const tracks = await this.initLocalTracks(initialSettings);
+    this.setAndPublishTracks(tracks);
+    this.published = true;
+    this.deviceManager.localPeer = this.localPeer;
   }
 
   private setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -370,7 +357,72 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  createRoom() {
+  private async initLocalTracks(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
+    if (this.localTracks && this.localTracks.length) {
+      return this.localTracks;
+    }
+
+    const { audioInputDeviceId, videoDeviceId } = initialSettings;
+    const { audio, video, allowed } = this.publishParams;
+    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
+    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
+    HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
+    let tracks: Array<HMSLocalTrack> = [];
+
+    if (canPublishAudio || canPublishVideo) {
+      const audioSettings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
+        .codec(audio.codec)
+        .maxBitrate(audio.bitRate)
+        .deviceId(audioInputDeviceId)
+        .build();
+
+      const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
+        .codec(video.codec)
+        .maxBitrate(video.bitRate)
+        .maxFramerate(video.frameRate)
+        .setWidth(video.width)
+        .setHeight(video.height)
+        .deviceId(videoDeviceId)
+        .build();
+
+      const trackSettings = new HMSTrackSettingsBuilder()
+        .video(canPublishVideo ? videoSettings : null)
+        .audio(canPublishAudio ? audioSettings : null)
+        .build();
+      let fetchTrackOptions: IFetchAVTrackOptions;
+      try {
+        fetchTrackOptions = {
+          audio: canPublishAudio && (initialSettings.isAudioMuted ? 'empty' : true),
+          video: canPublishVideo && (initialSettings.isVideoMuted ? 'empty' : true),
+        };
+        HMSLogger.d(this.TAG, 'Join Publish', { fetchTrackOptions });
+        tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
+      } catch (error) {
+        if (error instanceof HMSException && error.action === HMSAction.TRACK) {
+          this.errorListener?.onError?.(error);
+
+          const audioFailure = error.message.includes('audio');
+          const videoFailure = error.message.includes('video');
+          fetchTrackOptions = {
+            audio: canPublishAudio && (audioFailure ? 'empty' : true),
+            video: canPublishVideo && (videoFailure ? 'empty' : true),
+          };
+          HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
+          tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
+        } else {
+          this.errorListener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));
+        }
+      }
+    }
+    this.localTracks = tracks;
+
+    return this.localTracks;
+  }
+
+  private getRoom(): HMSRoom {
+    if (this.hmsRoom) {
+      return this.hmsRoom;
+    }
     this.hmsRoom = new HMSRoom(this.localPeer!.peerId, '', this);
     return this.hmsRoom;
   }
