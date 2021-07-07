@@ -189,7 +189,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    this.audioSinkManager.cleanUp();
+    this.audioSinkManager?.cleanUp();
     this.notificationManager.cleanUp();
 
     this.published = false;
