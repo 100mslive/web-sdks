@@ -7,6 +7,8 @@ import { HMSAudioTrackSettingsBuilder } from '../../media/settings/HMSAudioTrack
 import { HMSVideoTrackSettingsBuilder } from '../../media/settings/HMSVideoTrackSettings';
 import { HMSLocalPeer } from './peer';
 import HMSException from '../../error/HMSException';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
+import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 
 type SelectedDevices = {
   audioInput: InputDeviceInfo;
@@ -86,7 +88,7 @@ export default class DeviceManager implements HMSDeviceManager {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
     await this.enumerateDevices();
-    HMSLogger.d('[AudioOuput]', this.selected.audioOutput);
+    HMSLogger.d(this.TAG, '[After Device Change]', JSON.stringify(this.selected, null, 2));
 
     if (
       this.localPeer &&
@@ -107,7 +109,10 @@ export default class DeviceManager implements HMSDeviceManager {
           this.localPeer.audioTrack.setEnabled(prevAudioEnabled);
         }
       } catch (error) {
-        HMSLogger.e('[Audio Device Change]', error);
+        HMSLogger.e(this.TAG, '[Audio Device Change]', error);
+        analyticsEventsService
+          .queue(AnalyticsEventFactory.deviceChangeFail('audio', this.selected.audioInput.deviceId, error))
+          .flush();
         this.eventEmitter.emit('audio-device-change', { track: this.localPeer.audioTrack, error });
       }
     }
@@ -134,7 +139,10 @@ export default class DeviceManager implements HMSDeviceManager {
           this.localPeer.videoTrack.setEnabled(prevVideoEnabled);
         }
       } catch (error) {
-        HMSLogger.e('[Video Device Change]', error);
+        HMSLogger.e(this.TAG, '[Video Device Change]', error);
+        analyticsEventsService
+          .queue(AnalyticsEventFactory.deviceChangeFail('video', this.selected.videoInput.deviceId, error))
+          .flush();
         this.eventEmitter.emit('video-device-change', { track: this.localPeer.videoTrack, error });
       }
     }

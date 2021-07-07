@@ -71,6 +71,19 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }
 
+  static deviceChangeFail(type: 'audio' | 'video', deviceId: string, error: HMSException) {
+    const name = this.eventNameFor('deviceChange', false);
+    return new AnalyticsEvent({
+      name,
+      level: AnalyticsEventLevel.ERROR,
+      properties: {
+        deviceId,
+        type,
+        error,
+      },
+    });
+  }
+
   static performance(stats: IAnalyticsPropertiesProvider) {
     const name = 'perf.stats';
     const level = AnalyticsEventLevel.INFO;
