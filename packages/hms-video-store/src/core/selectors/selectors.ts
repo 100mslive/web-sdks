@@ -1,4 +1,4 @@
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSStore } from '../schema';
+import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
 import { isScreenSharing, isTrackDisplayEnabled, isTrackEnabled } from './selectorUtils';
 
@@ -122,4 +122,11 @@ export const selectHMSMessages = createSelector(
     });
     return messages;
   },
+);
+
+export const selectRoomState = createSelector([selectRoom], room => room && room.roomState);
+
+export const selectIsInPreview = createSelector(
+  [selectRoom],
+  room => !!room && room.roomState === HMSRoomState.Preview,
 );

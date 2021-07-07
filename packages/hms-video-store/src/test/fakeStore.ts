@@ -1,6 +1,7 @@
 import {
   HMSMessageType,
   HMSPeer,
+  HMSRoomState,
   HMSSpeaker,
   HMSStore,
   HMSTrack,
@@ -41,6 +42,7 @@ export const makeFakeStore = (): HMSStore => {
       peers: ['1', '2'],
       shareableLink: '',
       hasWaitingRoom: false,
+      roomState: HMSRoomState.Disconnected,
     },
     peers: {
       '1': {

@@ -5,6 +5,7 @@ import {
   HMSMessageType,
   HMSPeer,
   HMSPeerID,
+  HMSRoomState,
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
@@ -70,6 +71,23 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications = notificationManager;
   }
 
+  preview(config: sdkTypes.HMSConfig) {
+    if (this.isRoomJoinCalled) {
+      this.logPossibleInconsistency('attempting to call preview after join was called');
+      return; // ignore
+    }
+
+    try {
+      this.sdkPreviewWithListeners(config);
+      this.store.setState(store => {
+        store.room.roomState = HMSRoomState.Connecting;
+      });
+    } catch (err) {
+      HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
+      throw err;
+    }
+  }
+
   join(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('room join is called again');
@@ -78,6 +96,9 @@ export class HMSSDKActions implements IHMSActions {
     try {
       this.sdkJoinWithListeners(config);
       this.isRoomJoinCalled = true;
+      this.store.setState(store => {
+        store.room.roomState = HMSRoomState.Connecting;
+      });
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -259,6 +280,13 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
+  private sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
+    this.sdk.preview(config, {
+      onPreview: this.onPreview.bind(this),
+      onError: this.onError.bind(this),
+    });
+  }
+
   private async startScreenShare() {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
@@ -354,10 +382,19 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
+  protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
+    this.store.setState(store => {
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      store.room.roomState = HMSRoomState.Preview;
+    });
+    this.syncPeers();
+  }
+
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
     this.store.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
       store.room.isConnected = true;
+      store.room.roomState = HMSRoomState.Connected;
     });
     this.syncPeers();
   }
@@ -464,17 +501,26 @@ export class HMSSDKActions implements IHMSActions {
   protected onReconnected() {
     this.syncPeers();
     this.hmsNotifications.sendReconnected();
+    this.store.setState(store => {
+      store.room.roomState = HMSRoomState.Connected;
+    });
   }
 
   protected onReconnecting(error: SDKHMSException) {
     HMSLogger.e('Reconnection: received error from sdk', error);
     this.hmsNotifications.sendReconnecting(error);
+    this.store.setState(store => {
+      store.room.roomState = HMSRoomState.Reconnecting;
+    });
   }
 
   protected onError(error: SDKHMSException) {
     if (error.isTerminal) {
       // terminal error leave room as it is not recoverable
       this.leave().then(() => console.log('error from SDK, left room.'));
+      this.store.setState(store => {
+        store.room.roomState = HMSRoomState.Failed;
+      });
     }
     // send notification
     this.hmsNotifications.sendError(error);

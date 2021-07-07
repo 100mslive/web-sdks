@@ -1,5 +1,6 @@
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
 import { HMSTrackSource } from './schema';
+import { HMSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -16,6 +17,7 @@ import { HMSTrackSource } from './schema';
  * in case you're creating multiple rooms please create new instance per room.
  */
 export interface IHMSActions {
+  preview(config: HMSConfig): void;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.

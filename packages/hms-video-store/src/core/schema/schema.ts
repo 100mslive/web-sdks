@@ -1,6 +1,6 @@
 import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
-import { HMSRoom } from './room';
+import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
 
 /*
@@ -28,6 +28,7 @@ export const createDefaultStoreState = (): HMSStore => {
       peers: [],
       shareableLink: '',
       hasWaitingRoom: false,
+      roomState: HMSRoomState.Disconnected,
     },
     peers: {},
     tracks: {},
