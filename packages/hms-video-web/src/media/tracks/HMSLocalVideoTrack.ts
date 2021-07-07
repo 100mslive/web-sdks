@@ -28,9 +28,9 @@ export default class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
+    prevTrack?.stop();
     const withTrack = await getVideoTrack(settings);
     await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
-    prevTrack?.stop();
   }
 
   private async replaceTrackWithBlank() {

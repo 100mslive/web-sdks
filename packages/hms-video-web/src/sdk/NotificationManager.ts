@@ -164,6 +164,8 @@ export default class NotificationManager {
 
     if (!trackStateEntry) return;
 
+    // emit this event here as peer will already be removed(if left the room) by the time this event is received
+    track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
     const hmsPeer = this.hmsPeerList.get(trackStateEntry.peerId);
     if (!hmsPeer) {
       return;
@@ -192,7 +194,6 @@ export default class NotificationManager {
         }
       }
     }
-    track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
     this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 

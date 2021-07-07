@@ -26,9 +26,9 @@ export default class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
+    prevTrack?.stop();
     const withTrack = await getAudioTrack(settings);
     await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
-    prevTrack?.stop();
   }
 
   async setEnabled(value: boolean) {
