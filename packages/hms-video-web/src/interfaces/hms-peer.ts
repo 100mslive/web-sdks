@@ -1,6 +1,7 @@
 import HMSAudioTrack from '../media/tracks/HMSAudioTrack';
 import HMSTrack from '../media/tracks/HMSTrack';
 import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
+import HMSPolicy from './policy';
 
 export default interface IHMSPeer {
   peerId: string;
@@ -12,4 +13,5 @@ export default interface IHMSPeer {
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
   role?: string;
+  policy?: HMSPolicy;
 }

@@ -12,11 +12,13 @@ import {
   PeerList,
   TrackStateNotification,
   TrackState,
+  PolicyParams,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { SpeakerList } from './models/HMSSpeaker';
 import Message from './models/HMSMessage';
+import { HMSSdk } from '.';
 
 interface TrackStateEntry {
   peerId: string;
@@ -34,6 +36,8 @@ export default class NotificationManager {
   private listener!: HMSUpdateListener;
   private audioListener: HMSAudioListener | null = null;
   private eventEmitter: EventEmitter = new EventEmitter();
+
+  constructor(private sdk: HMSSdk) {}
 
   handleNotification(
     method: HMSNotificationMethod,
@@ -87,6 +91,10 @@ export default class NotificationManager {
         this.handleBroadcast(notification as Message);
         break;
 
+      case HMSNotificationMethod.POLICY_CHANGE:
+        this.handlePolicyChange(notification as PolicyParams);
+        break;
+
       default:
         return;
     }
@@ -95,6 +103,18 @@ export default class NotificationManager {
   private handleRoleChange(params: TrackStateNotification) {
     // @DISCUSS: Make everything event based instead?
     this.eventEmitter.emit('role-change', { detail: { params } });
+  }
+
+  private handlePolicyChange(params: PolicyParams) {
+    this.sdk.knownRoles = params.known_roles;
+
+    this.hmsPeerList.forEach((peer) => {
+      peer.policy = this.sdk.knownRoles[peer.role!];
+    });
+
+    if (this.localPeer) {
+      this.localPeer.policy = this.sdk.knownRoles[this.localPeer.role!];
+    }
   }
 
   private handleTrackMetadataAdd(params: TrackStateNotification) {
@@ -260,6 +280,7 @@ export default class NotificationManager {
       role: peer.role,
       customerUserId: peer.info.userId,
       customerDescription: peer.info.data,
+      policy: this.sdk.knownRoles[peer.role],
     });
 
     this.hmsPeerList.set(peer.peerId, hmsPeer);

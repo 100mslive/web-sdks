@@ -31,6 +31,7 @@ import { IFetchAVTrackOptions } from '../transport/ITransport';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
+import HMSPolicy from '../interfaces/policy';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -47,7 +48,7 @@ export class HMSSdk implements HMSInterface {
   localPeer!: HMSLocalPeer | null;
 
   private TAG: string = '[HMSSdk]:';
-  private notificationManager: NotificationManager = new NotificationManager();
+  private notificationManager: NotificationManager = new NotificationManager(this);
   private listener!: HMSUpdateListener | null;
   private errorListener?: IErrorListener;
   private audioListener: HMSAudioListener | null = null;
@@ -59,6 +60,7 @@ export class HMSSdk implements HMSInterface {
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
   private localTracks?: HMSLocalTrack[];
+  public knownRoles: { [role: string]: HMSPolicy } = {};
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
@@ -122,6 +124,7 @@ export class HMSSdk implements HMSInterface {
       role: role,
       customerUserId: userId,
       customerDescription: config.metaData,
+      policy: this.knownRoles[role],
     });
     this.notificationManager.localPeer = this.localPeer;
 
@@ -190,6 +193,7 @@ export class HMSSdk implements HMSInterface {
         customerUserId: userId,
         role,
         customerDescription: config.metaData || '',
+        policy: this.knownRoles[role],
       });
       this.notificationManager.localPeer = this.localPeer;
     } else {

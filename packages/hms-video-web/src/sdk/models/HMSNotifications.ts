@@ -1,3 +1,4 @@
+import HMSPolicy from '../../interfaces/policy';
 import HMSTrack from '../../media/tracks/HMSTrack';
 import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
@@ -5,7 +6,14 @@ import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
 import { SpeakerList } from './HMSSpeaker';
 
-export type HMSNotifications = Peer | PeerList | Message | TrackStateNotification | SpeakerList | undefined;
+export type HMSNotifications =
+  | Peer
+  | PeerList
+  | Message
+  | TrackStateNotification
+  | SpeakerList
+  | PolicyParams
+  | undefined;
 
 export interface TrackStateNotification {
   tracks: Map<string, TrackState>;
@@ -21,6 +29,13 @@ export interface Info {
   name: string;
   data: string;
   userId: string;
+}
+
+export interface PolicyParams {
+  name: string;
+  known_roles: {
+    [role: string]: HMSPolicy;
+  };
 }
 
 export class TrackState implements Track {
@@ -91,6 +106,8 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     case HMSNotificationMethod.TRACK_UPDATE: {
       return params;
     }
+    case HMSNotificationMethod.POLICY_CHANGE:
+      return params;
     default:
       HMSLogger.d(`method not implemented ${method}`);
       return params;

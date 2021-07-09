@@ -10,6 +10,7 @@ export enum HMSNotificationMethod {
   TRACK_METADATA_ADD,
   TRACK_UPDATE,
   UNSUPPORTED,
+  POLICY_CHANGE,
 }
 
 export const getNotificationMethod = (method: string) => {
@@ -30,6 +31,8 @@ export const getNotificationMethod = (method: string) => {
       return HMSNotificationMethod.BROADCAST;
     case 'on-role-change':
       return HMSNotificationMethod.ROLE_CHANGE;
+    case 'on-policy-change':
+      return HMSNotificationMethod.POLICY_CHANGE;
     default:
       HMSLogger.d(`method not supported - ${method}`);
       return HMSNotificationMethod.UNSUPPORTED;
