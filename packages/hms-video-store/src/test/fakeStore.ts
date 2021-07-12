@@ -22,6 +22,7 @@ function makeTrack(
     type: type,
     enabled: !!enabled,
     displayEnabled: true,
+    volume: type === 'audio' ? 10 : undefined,
   };
 }
 
@@ -32,6 +33,7 @@ export let localAudio: HMSTrack;
 export let screenShare: HMSTrack;
 export let auxiliaryAudio: HMSTrack;
 export let localSpeaker: HMSSpeaker;
+export let screenshareAudio: HMSTrack;
 
 export const makeFakeStore = (): HMSStore => {
   const fakeStore: HMSStore = {
@@ -61,7 +63,7 @@ export const makeFakeStore = (): HMSStore => {
         isLocal: false,
         videoTrack: '103',
         audioTrack: '104',
-        auxiliaryTracks: ['105', '106'],
+        auxiliaryTracks: ['105', '106', '107'],
       },
     },
     tracks: {
@@ -71,6 +73,7 @@ export const makeFakeStore = (): HMSStore => {
       '104': makeTrack('104', 'audio', 'regular'),
       '105': makeTrack('105', 'video', 'screen'),
       '106': makeTrack('106', 'audio', 'regular'),
+      '107': makeTrack('107', 'audio', 'screen'),
     },
     messages: {
       byID: {
@@ -111,6 +114,7 @@ export const makeFakeStore = (): HMSStore => {
   localAudio = fakeStore.tracks['102'];
   screenShare = fakeStore.tracks['105'];
   auxiliaryAudio = fakeStore.tracks['106'];
+  screenshareAudio = fakeStore.tracks['107'];
   localSpeaker = fakeStore.speakers[localPeer.id];
   return fakeStore;
 };

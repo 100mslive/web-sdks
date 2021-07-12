@@ -26,13 +26,16 @@ import {
   selectPeerByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
-import { HMSSdk } from '@100mslive/hms-video';
+import {
+  HMSSdk,
+  HMSTrack as SDKHMSTrack,
+  HMSLocalAudioTrack,
+  HMSLocalVideoTrack,
+  HMSAudioTrack as SDKHMSAudioTrack,
+  HMSVideoTrack as SDKHMSVideoTrack,
+  HMSException as SDKHMSException,
+} from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
-import SDKHMSException from '@100mslive/hms-video/dist/error/HMSException';
-import SDKHMSVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSVideoTrack';
-import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
-import HMSLocalAudioTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '@100mslive/hms-video/dist/media/tracks/HMSLocalVideoTrack';
 
 import { mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
@@ -69,6 +72,20 @@ export class HMSSDKActions implements IHMSActions {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+  }
+
+  setVolume(trackId: string, value: number): void {
+    const track = this.hmsSDKTracks[trackId];
+    if (track) {
+      if (track instanceof SDKHMSAudioTrack) {
+        track.setVolume(value);
+        this.syncPeers();
+      } else {
+        HMSLogger.w(`track ${trackId} is not an audio track`);
+      }
+    } else {
+      this.logPossibleInconsistency(`track ${trackId} not present, unable to set volume`);
+    }
   }
 
   preview(config: sdkTypes.HMSConfig) {

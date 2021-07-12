@@ -115,6 +115,12 @@ export interface IHMSActions {
    */
   attachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
   detachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+  /**
+   * set the volume of selected audio track locally
+   * @param trackId trackId as stored in the store
+   * @param value number between 0-100
+   */
+  setVolume(trackId: string, value: number): void;
 }
 
 /**

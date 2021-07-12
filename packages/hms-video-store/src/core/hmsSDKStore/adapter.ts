@@ -1,5 +1,9 @@
+import {
+  HMSTrack as SDKHMSTrack,
+  HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
+  HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
+} from '@100mslive/hms-video';
 import { HMSPeer, HMSMessage, HMSTrack, HMSRoom } from '../schema';
-import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 
 import * as sdkTypes from './sdkTypes';
 
@@ -18,14 +22,21 @@ export class SDKToHMS {
     };
   }
 
-  static convertTrack(sdkTrack: SDKHMSTrack): HMSTrack {
-    return {
+  static convertTrack(
+    sdkTrack: SDKHMSTrack | SDKHMSRemoteVideoTrack | SDKHMSRemoteAudioTrack,
+  ): HMSTrack {
+    const track: HMSTrack = {
       id: sdkTrack.trackId,
       source: sdkTrack.source,
       type: sdkTrack.type,
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
     };
+    if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
+      const volume = sdkTrack.getVolume();
+      track.volume = volume;
+    }
+    return track;
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom): Partial<HMSRoom> {

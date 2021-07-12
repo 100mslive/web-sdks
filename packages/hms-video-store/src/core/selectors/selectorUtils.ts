@@ -17,8 +17,12 @@ export function isAudio(track: HMSTrack | undefined) {
   return track && track.type === 'audio';
 }
 
+export function isVideo(track: HMSTrack | undefined) {
+  return track && track.type === 'video';
+}
+
 export function isScreenShare(track: HMSTrack | undefined) {
-  return track && track.type === 'video' && track.source === 'screen';
+  return track && track.source === 'screen';
 }
 
 export function isTrackEnabled(store: HMSStore, trackID?: string) {

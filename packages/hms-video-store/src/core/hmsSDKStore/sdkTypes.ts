@@ -5,7 +5,7 @@ import HMSSpeaker from '@100mslive/hms-video/dist/interfaces/speaker';
 import HMSConfig from '@100mslive/hms-video/dist/interfaces/config';
 import SDKHMSAudioTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSAudioTrackSettings';
 import SDKHMSVideoTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSVideoTrackSettings';
-import SDKHMSException from '@100mslive/hms-video/dist/error/HMSException';
+import { HMSException as SDKHMSException } from '@100mslive/hms-video';
 
 type HMSAudioTrackSettings = SDKHMSAudioTrackSettings;
 type HMSVideoTrackSettings = SDKHMSVideoTrackSettings;

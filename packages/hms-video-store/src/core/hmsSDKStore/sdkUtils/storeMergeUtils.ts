@@ -1,5 +1,5 @@
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
-import SDKHMSTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
+import { HMSTrack as SDKHMSTrack } from '@100mslive/hms-video';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes

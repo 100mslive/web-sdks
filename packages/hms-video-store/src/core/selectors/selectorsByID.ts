@@ -1,7 +1,8 @@
 import { createSelector } from 'reselect';
 import { selectPeersMap, selectTracksMap } from './selectors';
 import { HMSPeerID, HMSStore, HMSTrack } from '../schema';
-import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled } from './selectorUtils';
+import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled, isVideo } from './selectorUtils';
+import { HMSLogger } from '../../common/ui-logger';
 
 type byIDSelector<T> = (store: HMSStore, id?: string) => T;
 
@@ -57,7 +58,24 @@ export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID?: HM
   | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
   if (peer && isScreenSharing(store, peer)) {
-    const trackID = peer?.auxiliaryTracks.find(trackID => isScreenShare(store.tracks[trackID]));
+    const trackID = peer?.auxiliaryTracks.find(trackId => {
+      const track = store.tracks[trackId];
+      return isVideo(track) && isScreenShare(track);
+    });
+    return trackID ? store.tracks[trackID] : undefined;
+  }
+  return undefined;
+});
+
+export const selectScreenShareAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
+  | HMSTrack
+  | undefined => {
+  const peer = selectPeerByIDBare(store, peerID);
+  if (peer && isScreenSharing(store, peer)) {
+    const trackID = peer?.auxiliaryTracks.find(trackId => {
+      const track = store.tracks[trackId];
+      return isAudio(track) && isScreenShare(track);
+    });
     return trackID ? store.tracks[trackID] : undefined;
   }
   return undefined;
@@ -82,3 +100,47 @@ export const selectIsPeerVideoEnabled = byIDCurry((store: HMSStore, peerID?: str
   const peer = selectPeerByIDBare(store, peerID);
   return isTrackEnabled(store, peer?.videoTrack);
 });
+
+export const selectIsAudioLocallyMuted = byIDCurry((store: HMSStore, trackID?: string) => {
+  if (trackID && store.tracks[trackID]) {
+    return store.tracks[trackID].volume === 0;
+  }
+  HMSLogger.w('Track not found', trackID);
+  return undefined;
+});
+
+export const selectIsLocallyMutedByPeerID = byIDCurry((store: HMSStore, peerID?: string) => {
+  const peer = selectPeerByIDBare(store, peerID);
+  return selectIsAudioLocallyMuted(peer?.audioTrack)(store);
+});
+
+export const selectIsScreenShareLocallyMutedByPeerID = byIDCurry(
+  (store: HMSStore, peerID?: string) => {
+    const track = selectScreenShareAudioByPeerID(peerID)(store);
+    return selectIsAudioLocallyMuted(track?.id)(store);
+  },
+);
+
+export const selectAudioTrackVolume = byIDCurry((store: HMSStore, trackID?: string) => {
+  const track = selectTrackByIDBare(store, trackID);
+  if (track) {
+    if (track.type !== 'audio') {
+      HMSLogger.w('Please pass audio track here');
+      return undefined;
+    }
+    return track.volume;
+  }
+  return undefined;
+});
+
+export const selectAudioVolumeByPeerID = byIDCurry((store: HMSStore, peerID?: string) => {
+  const peer = selectPeerByIDBare(store, peerID);
+  return selectAudioTrackVolume(peer?.audioTrack)(store);
+});
+
+export const selectScreenshareAudioVolumeByPeerID = byIDCurry(
+  (store: HMSStore, peerID?: string) => {
+    const track = selectScreenShareAudioByPeerID(peerID)(store);
+    return selectAudioTrackVolume(track?.id)(store);
+  },
+);

@@ -1,10 +1,10 @@
+import { HMSTrack as SDKTrack } from '@100mslive/hms-video';
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../core';
 import {
   mergeNewPeersInDraft,
   mergeNewTracksInDraft,
 } from '../../core/hmsSDKStore/sdkUtils/storeMergeUtils';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
-import SDKTrack from '@100mslive/hms-video/dist/media/tracks/HMSTrack';
 
 type trackMap = Record<HMSTrackID, HMSTrack>;
 type peerMap = Record<HMSTrackID, HMSPeer>;

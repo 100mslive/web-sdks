@@ -7,6 +7,7 @@ import {
   makeFakeStore,
   peerScreenSharing,
   screenShare,
+  screenshareAudio,
 } from '../fakeStore';
 import {
   HMSStore,
@@ -39,6 +40,11 @@ import {
   selectScreenShareByPeerID,
   selectSpeakers,
   selectUnreadHMSMessagesCount,
+  selectScreenShareAudioByPeerID,
+  selectAudioVolumeByPeerID,
+  selectAudioTrackVolume,
+  selectIsLocallyMutedByPeerID,
+  selectIsAudioLocallyMuted,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -138,6 +144,24 @@ describe('by ID selectors', () => {
 
   test('selectAuxiliaryAudio', () => {
     expect(selectAuxiliaryAudioByPeerID(peerScreenSharing.id)(fakeStore)).toBe(auxiliaryAudio);
+  });
+
+  test('selectScreenshareAudio', () => {
+    expect(selectScreenShareAudioByPeerID(peerScreenSharing.id)(fakeStore)).toBe(screenshareAudio);
+  });
+
+  test('selectAudioVolumeByPeerID', () => {
+    expect(selectAudioVolumeByPeerID(localPeer.id)(fakeStore)).toBe(localAudio.volume);
+  });
+
+  test('selectAudioVolumeByTrackID', () => {
+    expect(selectAudioTrackVolume(localPeer.audioTrack)(fakeStore)).toBe(localAudio.volume);
+  });
+  test('selectLocallyMutedByPeerID', () => {
+    expect(selectIsLocallyMutedByPeerID(localPeer.id)(fakeStore)).toBe(false);
+  });
+  test('selectLocallyMutedByTrackID', () => {
+    expect(selectIsAudioLocallyMuted(localPeer.audioTrack)(fakeStore)).toBe(false);
   });
 });
 
