@@ -1,4 +1,4 @@
-import HMSAudioTrack from './HMSAudioTrack';
+import { HMSAudioTrack } from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
@@ -9,7 +9,7 @@ function generateHasPropertyChanged(newSettings: HMSAudioTrackSettings, oldSetti
   };
 }
 
-export default class HMSLocalAudioTrack extends HMSAudioTrack {
+export class HMSLocalAudioTrack extends HMSAudioTrack {
   settings: HMSAudioTrackSettings;
 
   constructor(

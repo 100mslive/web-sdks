@@ -1,12 +1,12 @@
 import EventEmitter from 'events';
 import HMSDeviceManager from '../../interfaces/HMSDeviceManager';
 import HMSLogger from '../../utils/logger';
-import HMSLocalAudioTrack from '../../media/tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '../../media/tracks/HMSLocalVideoTrack';
+import { HMSLocalAudioTrack } from '../../media/tracks/HMSLocalAudioTrack';
+import { HMSLocalVideoTrack } from '../../media/tracks/HMSLocalVideoTrack';
 import { HMSAudioTrackSettingsBuilder } from '../../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../../media/settings/HMSVideoTrackSettings';
 import { HMSLocalPeer } from './peer';
-import HMSException from '../../error/HMSException';
+import { HMSException } from '../../error/HMSException';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 

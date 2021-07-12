@@ -1,7 +1,7 @@
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
-import HMSException from '../error/HMSException';
+import { HMSException } from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';

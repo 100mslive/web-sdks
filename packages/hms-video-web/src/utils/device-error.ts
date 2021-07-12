@@ -1,5 +1,5 @@
 import { HMSAction } from '../error/ErrorFactory';
-import HMSException from '../error/HMSException';
+import { HMSException } from '../error/HMSException';
 import { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
 import { getLocalStream } from './media';

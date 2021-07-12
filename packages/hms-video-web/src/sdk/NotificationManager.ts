@@ -1,8 +1,8 @@
 import EventEmitter from 'events';
-import HMSTrack from '../media/tracks/HMSTrack';
+import { HMSTrack } from '../media/tracks/HMSTrack';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
-import HMSRemoteVideoTrack from '../media/tracks/HMSRemoteVideoTrack';
-import HMSRemoteAudioTrack from '../media/tracks/HMSRemoteAudioTrack';
+import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
+import { HMSRemoteAudioTrack } from '../media/tracks/HMSRemoteAudioTrack';
 import { HMSTrackType } from '../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
@@ -169,7 +169,7 @@ export default class NotificationManager {
   /**
    * Sets the tracks to peer and returns the peer
    */
-  handleOnTrackAdd = (track: HMSTrack) => {
+  handleOnTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, track);
     this.tracksToProcess.set(`${track.stream.id}${track.type}`, track);
     this.processPendingTracks();
@@ -178,7 +178,7 @@ export default class NotificationManager {
   /**
    * Sets the track of corresponding peer to null and returns the peer
    */
-  handleOnTrackRemove = (track: HMSTrack) => {
+  handleOnTrackRemove = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track);
     const trackStateEntry = this.trackStateMap.get(`${track.stream.id}${track.type}`);
 
@@ -262,7 +262,7 @@ export default class NotificationManager {
       return this.localPeer;
     }
 
-    return this.hmsPeerList.get(peerId);
+    return this.hmsPeerList.get(peerId) as HMSPeer;
   };
 
   addEventListener(event: string, listener: EventListener) {

@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import HMSAudioTrack from '../media/tracks/HMSAudioTrack';
+import { HMSAudioTrack } from '../media/tracks/HMSAudioTrack';
 import DeviceManager from '../sdk/models/DeviceManager';
 import NotificationManager from '../sdk/NotificationManager';
 import HMSLogger from '../utils/logger';
@@ -72,6 +72,7 @@ export default class HMSAudioSinkManager {
     audioEl.addEventListener('pause', this.handleAudioPaused);
     HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
     this.audioSink.append(audioEl);
+    track.setAudioElement(audioEl);
   };
 
   private handleTrackRemove = (event: CustomEvent<HMSAudioTrack>) => {
@@ -82,6 +83,7 @@ export default class HMSAudioSinkManager {
     if (audioEl) {
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.remove();
+      track.setAudioElement(null);
     }
   };
 

@@ -3,7 +3,7 @@ import { HMSTrackType } from './HMSTrackType';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin';
 
-export default abstract class HMSTrack {
+export abstract class HMSTrack {
   // @internal
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;

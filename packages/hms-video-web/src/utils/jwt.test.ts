@@ -1,4 +1,4 @@
-import HMSException from '../error/HMSException';
+import { HMSException } from '../error/HMSException';
 import decodeJWT from './jwt';
 
 const validToken =

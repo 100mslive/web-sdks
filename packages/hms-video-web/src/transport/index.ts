@@ -9,8 +9,8 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
-import HMSTrack from '../media/tracks/HMSTrack';
-import HMSException from '../error/HMSException';
+import { HMSTrack } from '../media/tracks/HMSTrack';
+import { HMSException } from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import {
   MAX_TRANSPORT_RETRIES,

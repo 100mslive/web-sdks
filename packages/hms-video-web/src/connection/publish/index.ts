@@ -4,7 +4,7 @@ import { IPublishConnectionObserver } from './IPublishConnectionObserver';
 import { HMSConnectionRole } from '../model';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import HMSTrack from '../../media/tracks/HMSTrack';
+import { HMSTrack } from '../../media/tracks/HMSTrack';
 import HMSTransport from '../../transport';
 
 const TAG = 'HMSPublishConnection';

@@ -1,4 +1,4 @@
-import HMSException from '../error/HMSException';
+import { HMSException } from '../error/HMSException';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';

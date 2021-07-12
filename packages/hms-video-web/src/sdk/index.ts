@@ -9,9 +9,9 @@ import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
-import HMSTrack, { HMSTrackSource } from '../media/tracks/HMSTrack';
+import { HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSTrackType } from '../media/tracks';
-import HMSException from '../error/HMSException';
+import { HMSException } from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
@@ -23,14 +23,15 @@ import HMSAudioSinkManager from '../audio-sink-manager';
 import DeviceManager, { DeviceChangeEvent } from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
-import HMSLocalAudioTrack from '../media/tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '../media/tracks/HMSLocalVideoTrack';
+import { HMSLocalAudioTrack } from '../media/tracks/HMSLocalAudioTrack';
+import { HMSLocalVideoTrack } from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
+import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 import HMSPolicy from '../interfaces/policy';
 
 // @DISCUSS: Adding it here as a hotfix
@@ -80,11 +81,11 @@ export class HMSSdk implements HMSInterface {
       );
     },
 
-    onTrackAdd: (track: HMSTrack) => {
+    onTrackAdd: (track: HMSRemoteTrack) => {
       this.notificationManager.handleOnTrackAdd(track);
     },
 
-    onTrackRemove: (track: HMSTrack) => {
+    onTrackRemove: (track: HMSRemoteTrack) => {
       this.notificationManager.handleOnTrackRemove(track);
     },
 

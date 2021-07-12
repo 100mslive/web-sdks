@@ -1,5 +1,5 @@
 import IConnectionObserver from '../IConnectionObserver';
-import HMSTrack from '../../media/tracks/HMSTrack';
+import { HMSTrack } from '../../media/tracks/HMSTrack';
 
 export default interface ISubscribeConnectionObserver extends IConnectionObserver {
   /** Triggered when a remote peer opens a DataChannel.

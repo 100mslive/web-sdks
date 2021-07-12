@@ -5,7 +5,7 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
-import HMSException from './HMSException';
+import { HMSException } from './HMSException';
 
 export enum HMSAction {
   TRACK = 'TRACK',

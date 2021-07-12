@@ -1,7 +1,7 @@
 import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
-import HMSTrack from '../media/tracks/HMSTrack';
+import { HMSTrack } from '../media/tracks';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 

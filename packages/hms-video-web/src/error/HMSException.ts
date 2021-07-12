@@ -1,7 +1,7 @@
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
 import { HMSAction } from './ErrorFactory';
 
-export default class HMSException extends Error implements IAnalyticsPropertiesProvider {
+export class HMSException extends Error implements IAnalyticsPropertiesProvider {
   action: string;
 
   constructor(

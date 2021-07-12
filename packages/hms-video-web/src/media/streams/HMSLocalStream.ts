@@ -1,8 +1,8 @@
 import HMSMediaStream from './HMSMediaStream';
-import HMSTrack from '../tracks/HMSTrack';
+import { HMSTrack } from '../tracks/HMSTrack';
 import HMSTrackSettings from '../settings/HMSTrackSettings';
-import HMSLocalAudioTrack from '../tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '../tracks/HMSLocalVideoTrack';
+import { HMSLocalAudioTrack } from '../tracks/HMSLocalAudioTrack';
+import { HMSLocalVideoTrack } from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
 import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';

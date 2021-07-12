@@ -1,7 +1,6 @@
 import { HMSPeer, HMSPeerInit } from './HMSPeer';
 import { HMSLocalTrack } from '../../../media/streams/HMSLocalStream';
-import HMSLocalAudioTrack from '../../../media/tracks/HMSLocalAudioTrack';
-import HMSLocalVideoTrack from '../../../media/tracks/HMSLocalVideoTrack';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack } from '../../../media/tracks';
 import HMSIdFactory from '../../../utils/id-factory';
 
 type HMSLocalPeerInit = Omit<HMSPeerInit, 'isLocal' | 'peerId'>;

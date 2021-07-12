@@ -1,5 +1,5 @@
+import { HMSTrack } from '../../media/tracks/HMSTrack';
 import HMSPolicy from '../../interfaces/policy';
-import HMSTrack from '../../media/tracks/HMSTrack';
 import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';

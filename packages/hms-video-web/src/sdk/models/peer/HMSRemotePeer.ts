@@ -1,7 +1,6 @@
 import { HMSPeer, HMSPeerInit } from './HMSPeer';
 import { HMSRemoteTrack } from '../../../media/streams/HMSRemoteStream';
-import HMSRemoteAudioTrack from '../../../media/tracks/HMSRemoteAudioTrack';
-import HMSRemoteVideoTrack from '../../../media/tracks/HMSRemoteVideoTrack';
+import { HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../../../media/tracks';
 
 type HMSRemotePeerInit = Omit<HMSPeerInit, 'isLocal'>;
 

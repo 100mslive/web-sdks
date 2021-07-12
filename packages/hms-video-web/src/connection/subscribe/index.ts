@@ -5,8 +5,8 @@ import { HMSConnectionRole } from '../model';
 import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
 import HMSDataChannel from '../HMSDataChannel';
 import { API_DATA_CHANNEL } from '../../utils/constants';
-import HMSRemoteAudioTrack from '../../media/tracks/HMSRemoteAudioTrack';
-import HMSRemoteVideoTrack from '../../media/tracks/HMSRemoteVideoTrack';
+import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
+import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import HMSLogger from '../../utils/logger';
 
 export default class HMSSubscribeConnection extends HMSConnection {

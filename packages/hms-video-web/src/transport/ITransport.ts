@@ -1,4 +1,4 @@
-import HMSTrack from '../media/tracks/HMSTrack';
+import { HMSTrack } from '../media/tracks';
 import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';

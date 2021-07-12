@@ -1,8 +1,6 @@
 import IHMSPeer from '../../../interfaces/hms-peer';
 import HMSPolicy from '../../../interfaces/policy';
-import HMSAudioTrack from '../../../media/tracks/HMSAudioTrack';
-import HMSTrack from '../../../media/tracks/HMSTrack';
-import HMSVideoTrack from '../../../media/tracks/HMSVideoTrack';
+import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
 
 export type HMSPeerInit = {
   peerId: string;

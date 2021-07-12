@@ -1,6 +1,4 @@
-import HMSAudioTrack from '../media/tracks/HMSAudioTrack';
-import HMSTrack from '../media/tracks/HMSTrack';
-import HMSVideoTrack from '../media/tracks/HMSVideoTrack';
+import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../media/tracks';
 import HMSPolicy from './policy';
 
 export default interface IHMSPeer {

@@ -1,5 +1,5 @@
 import { ErrorFactory, HMSAction } from './ErrorFactory';
-import HMSException from './HMSException';
+import { HMSException } from './HMSException';
 
 export enum HMSGetMediaActions {
   AUDIO = 'audio',

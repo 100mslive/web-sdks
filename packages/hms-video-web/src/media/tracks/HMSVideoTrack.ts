@@ -1,8 +1,8 @@
-import HMSTrack, { HMSTrackSource } from './HMSTrack';
+import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSMediaStream from '../streams/HMSMediaStream';
 
-export default class HMSVideoTrack extends HMSTrack {
+export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
