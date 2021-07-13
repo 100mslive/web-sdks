@@ -3,7 +3,7 @@ import { HMSTrack } from '../media/tracks/HMSTrack';
 import { HMSPeer } from '../sdk/models/peer';
 import HMSMessage from './message';
 import HMSRoom from './room';
-import HMSSpeaker from './speaker';
+import { HMSSpeaker } from './speaker';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,

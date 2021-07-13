@@ -4,7 +4,6 @@ import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
-import { SpeakerList } from './HMSSpeaker';
 
 export type HMSNotifications =
   | Peer
@@ -85,6 +84,26 @@ export class PeerList {
 
   constructor(params: any) {
     this.peers = Object.values(params.peers).map((peer) => new Peer(peer));
+  }
+}
+
+export interface Speaker {
+  peerId: string;
+  trackId: string;
+  audioLevel: number;
+}
+
+export class SpeakerList {
+  speakers: Speaker[] = [];
+
+  constructor(speakerList: any) {
+    if (speakerList && speakerList.length > 0) {
+      this.speakers = speakerList.map((speaker: any) => ({
+        peerId: speaker.peer_id,
+        trackId: speaker.track_id,
+        audioLevel: speaker.level,
+      }));
+    }
   }
 }
 

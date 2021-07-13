@@ -1,9 +1,6 @@
 import EventEmitter from 'events';
-import { HMSTrack } from '../media/tracks/HMSTrack';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
-import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
-import { HMSRemoteAudioTrack } from '../media/tracks/HMSRemoteAudioTrack';
-import { HMSTrackType } from '../media/tracks';
+import { HMSTrack, HMSTrackType, HMSAudioTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
@@ -13,10 +10,11 @@ import {
   TrackStateNotification,
   TrackState,
   PolicyParams,
+  SpeakerList,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
-import { SpeakerList } from './models/HMSSpeaker';
+import { HMSSpeaker } from '../interfaces/speaker';
 import Message from './models/HMSMessage';
 import { IStore } from './store/IStore';
 
@@ -371,9 +369,15 @@ export default class NotificationManager {
    */
   private handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList.speakers;
-    this.store.updateSpeakers(speakers);
-    this.audioListener?.onAudioLevelUpdate(speakers);
+    const hmsSpeakers: HMSSpeaker[] = speakers.map((speaker) => ({
+      audioLevel: speaker.audioLevel,
+      peer: this.store.getPeerById(speaker.peerId),
+      track: this.store.getTrackById(speaker.trackId) as HMSAudioTrack,
+    }));
+
+    this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     const dominantSpeaker = speakers[0];
+
     if (dominantSpeaker) {
       const dominantSpeakerPeer = this.store.getPeerById(dominantSpeaker.peerId);
       this.listener?.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
@@ -390,9 +394,9 @@ export default class NotificationManager {
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
     const peer = this.store.getPeerById(peerId);
 
-    if (this.getTrackId(peer?.audioTrack) === trackId) {
+    if (this.getTrackId(peer.audioTrack) === trackId || peer.audioTrack?.trackId === trackId) {
       return peer?.audioTrack;
-    } else if (this.getTrackId(peer?.videoTrack) === trackId) {
+    } else if (this.getTrackId(peer?.videoTrack) === trackId || peer.videoTrack?.trackId === trackId) {
       return peer?.videoTrack;
     } else {
       return peer?.auxiliaryTracks.find((track) => track.trackId === trackId);

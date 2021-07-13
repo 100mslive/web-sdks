@@ -1,7 +1,7 @@
 import { IStore, KnownRoles } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import HMSSpeaker from '../../interfaces/speaker';
+import { HMSSpeaker } from '../../interfaces/speaker';
 import { HMSTrack, HMSVideoTrack, HMSAudioTrack, HMSTrackType } from '../../media/tracks';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 
@@ -78,7 +78,7 @@ class Store implements IStore {
   }
 
   getSpeakerPeers() {
-    return this.speakers.map((speaker) => this.peers[speaker.peerId]);
+    return this.speakers.map((speaker) => speaker.peer);
   }
 
   setRoom(room: HMSRoom) {
@@ -141,8 +141,8 @@ class Store implements IStore {
         ),
       speaker: (peerA: HMSPeer, peerB: HMSPeer) =>
         this.primitiveComparator<number>(
-          this.speakers.find((speaker) => speaker.peerId === peerA.peerId)?.audioLevel || -1,
-          this.speakers.find((speaker) => speaker.peerId === peerB.peerId)?.audioLevel || -1,
+          this.speakers.find((speaker) => speaker.peer.peerId === peerA.peerId)?.audioLevel || -1,
+          this.speakers.find((speaker) => speaker.peer.peerId === peerB.peerId)?.audioLevel || -1,
         ),
 
       // @TODO: Get role priority number after adding HMSRole to HMSPeer
@@ -158,8 +158,8 @@ class Store implements IStore {
 
       speaker: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator<number>(
-          this.speakers.find((speaker) => speaker.trackId === trackA.trackId)?.audioLevel || -1,
-          this.speakers.find((speaker) => speaker.trackId === trackB.trackId)?.audioLevel || -1,
+          this.speakers.find((speaker) => speaker.track.trackId === trackA.trackId)?.audioLevel || -1,
+          this.speakers.find((speaker) => speaker.track.trackId === trackB.trackId)?.audioLevel || -1,
         ),
       screenShare: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator(trackA.source === 'screen', trackB.source === 'screen'),

@@ -1,5 +1,5 @@
 import HMSRoom from '../../interfaces/room';
-import HMSSpeaker from '../../interfaces/speaker';
+import { HMSSpeaker } from '../../interfaces/speaker';
 import { HMSTrack, HMSAudioTrack, HMSVideoTrack } from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
