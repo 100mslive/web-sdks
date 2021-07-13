@@ -51,7 +51,7 @@ export function getUrl(endpoint: string, region?: string) {
     url.searchParams.set('user_agent', userAgent);
     return url.toString();
   } catch (error) {
-    console.log(error.name, error.message);
+    HMSLogger.e(TAG, error.name, error.message);
     throw error;
   }
 }

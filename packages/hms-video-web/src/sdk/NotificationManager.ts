@@ -4,7 +4,7 @@ import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 import { HMSRemoteVideoTrack } from '../media/tracks/HMSRemoteVideoTrack';
 import { HMSRemoteAudioTrack } from '../media/tracks/HMSRemoteAudioTrack';
 import { HMSTrackType } from '../media/tracks';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
+import { HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
   Peer as PeerNotification,
@@ -18,7 +18,7 @@ import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { SpeakerList } from './models/HMSSpeaker';
 import Message from './models/HMSMessage';
-import { HMSSdk } from '.';
+import { IStore } from './store/IStore';
 
 interface TrackStateEntry {
   peerId: string;
@@ -27,9 +27,6 @@ interface TrackStateEntry {
 
 // @TODO: Split into separate managers
 export default class NotificationManager {
-  hmsPeerList: Map<string, HMSRemotePeer> = new Map();
-  localPeer!: HMSLocalPeer | null;
-
   private TAG: string = '[Notification Manager]:';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
   private trackStateMap: Map<string, TrackStateEntry> = new Map();
@@ -37,7 +34,7 @@ export default class NotificationManager {
   private audioListener: HMSAudioListener | null = null;
   private eventEmitter: EventEmitter = new EventEmitter();
 
-  constructor(private sdk: HMSSdk) {}
+  constructor(private readonly store: IStore) {}
 
   handleNotification(
     method: HMSNotificationMethod,
@@ -106,15 +103,7 @@ export default class NotificationManager {
   }
 
   private handlePolicyChange(params: PolicyParams) {
-    this.sdk.knownRoles = params.known_roles;
-
-    this.hmsPeerList.forEach((peer) => {
-      peer.policy = this.sdk.knownRoles[peer.role!];
-    });
-
-    if (this.localPeer) {
-      this.localPeer.policy = this.sdk.knownRoles[this.localPeer.role!];
-    }
+    this.store.setKnownRoles(params.known_roles);
   }
 
   private handleTrackMetadataAdd(params: TrackStateNotification) {
@@ -138,7 +127,7 @@ export default class NotificationManager {
       const state = this.trackStateMap.get(trackId);
       if (!state) return;
 
-      const hmsPeer = this.hmsPeerList.get(state.peerId);
+      const hmsPeer = this.store.getPeerById(state.peerId);
       if (!hmsPeer) return;
 
       track.source = state.trackInfo.source;
@@ -171,6 +160,7 @@ export default class NotificationManager {
    */
   handleOnTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, track);
+    this.store.addTrack(track);
     this.tracksToProcess.set(`${track.stream.id}${track.type}`, track);
     this.processPendingTracks();
   };
@@ -186,7 +176,7 @@ export default class NotificationManager {
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
-    const hmsPeer = this.hmsPeerList.get(trackStateEntry.peerId);
+    const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
     if (!hmsPeer) {
       return;
     }
@@ -214,13 +204,15 @@ export default class NotificationManager {
         }
       }
     }
+
+    this.store.removeTrack(track.trackId);
     this.listener.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 
   private handleTrackUpdate = (params: TrackStateNotification) => {
     HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
 
-    const hmsPeer = this.hmsPeerList.get(params.peer.peer_id);
+    const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) return;
 
     for (const trackEntry of Object.values(params.tracks)) {
@@ -253,18 +245,6 @@ export default class NotificationManager {
     }
   };
 
-  cleanUp = () => {
-    this.hmsPeerList.clear();
-  };
-
-  findPeerByPeerId = (peerId: string) => {
-    if (this.localPeer?.peerId === peerId) {
-      return this.localPeer;
-    }
-
-    return this.hmsPeerList.get(peerId) as HMSPeer;
-  };
-
   addEventListener(event: string, listener: EventListener) {
     this.eventEmitter.addListener(event, listener);
   }
@@ -280,10 +260,10 @@ export default class NotificationManager {
       role: peer.role,
       customerUserId: peer.info.userId,
       customerDescription: peer.info.data,
-      policy: this.sdk.knownRoles[peer.role],
+      policy: this.store.getPolicyForRole(peer.role),
     });
 
-    this.hmsPeerList.set(peer.peerId, hmsPeer);
+    this.store.addPeer(hmsPeer);
     HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
 
     peer.tracks.forEach((track) => {
@@ -298,9 +278,9 @@ export default class NotificationManager {
   };
 
   private handlePeerLeave = (peer: PeerNotification) => {
-    const hmsPeer = this.findPeerByPeerId(peer.peerId);
-    this.hmsPeerList.delete(peer.peerId);
-    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.hmsPeerList);
+    const hmsPeer = this.store.getPeerById(peer.peerId);
+    this.store.removePeer(peer.peerId);
+    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.store.getPeers());
 
     if (hmsPeer) {
       if (hmsPeer.audioTrack) {
@@ -325,7 +305,7 @@ export default class NotificationManager {
   };
 
   private handleReconnectPeerList = (peerList: PeerList) => {
-    const currentPeerList = Array.from(this.hmsPeerList.values());
+    const currentPeerList = this.store.getRemotePeers();
     const peersToRemove = currentPeerList.filter(
       (hmsPeer) => !peerList.peers.some((peer) => peer.peerId === hmsPeer.peerId),
     );
@@ -349,13 +329,11 @@ export default class NotificationManager {
 
     // Check for any tracks which are added/removed
     peerList.peers.forEach((newPeerNotification) => {
-      const oldPeer = this.findPeerByPeerId(newPeerNotification.peerId);
+      const oldPeer = this.store.getPeerById(newPeerNotification.peerId);
 
       if (oldPeer) {
         // Peer already present in room, we take diff between the tracks
-        const tracks = [...oldPeer.auxiliaryTracks]; // Clone array to avoid pushing into auxiliaryTracks
-        oldPeer.audioTrack && tracks.push(oldPeer.audioTrack);
-        oldPeer.videoTrack && tracks.push(oldPeer.videoTrack);
+        const tracks = this.store.getPeerTracks(oldPeer.peerId);
 
         // Remove all the tracks which are not present in the peer.tracks
         tracks.forEach((track) => {
@@ -393,10 +371,11 @@ export default class NotificationManager {
    */
   private handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList.speakers;
+    this.store.updateSpeakers(speakers);
     this.audioListener?.onAudioLevelUpdate(speakers);
     const dominantSpeaker = speakers[0];
     if (dominantSpeaker) {
-      const dominantSpeakerPeer = this.findPeerByPeerId(dominantSpeaker.peerId);
+      const dominantSpeakerPeer = this.store.getPeerById(dominantSpeaker.peerId);
       this.listener?.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
     } else {
       this.listener?.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);
@@ -409,7 +388,7 @@ export default class NotificationManager {
   }
 
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
-    const peer = this.findPeerByPeerId(peerId);
+    const peer = this.store.getPeerById(peerId);
 
     if (this.getTrackId(peer?.audioTrack) === trackId) {
       return peer?.audioTrack;

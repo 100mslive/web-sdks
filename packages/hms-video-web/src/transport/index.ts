@@ -389,6 +389,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async publish(tracks: Array<HMSTrack>): Promise<void> {
+    // @FIX: Doesn't wait for one publishTrack to complete
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
@@ -452,7 +453,7 @@ export default class HMSTransport implements ITransport {
         .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {

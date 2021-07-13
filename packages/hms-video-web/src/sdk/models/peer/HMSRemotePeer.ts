@@ -10,7 +10,7 @@ export class HMSRemotePeer extends HMSPeer {
   videoTrack?: HMSRemoteVideoTrack;
   auxiliaryTracks: HMSRemoteTrack[] = [];
 
-  constructor({ peerId, name, role, customerUserId, customerDescription }: HMSRemotePeerInit) {
-    super({ isLocal: false, peerId, name, role, customerUserId, customerDescription });
+  constructor(peerData: HMSRemotePeerInit) {
+    super({ ...peerData, isLocal: false });
   }
 }

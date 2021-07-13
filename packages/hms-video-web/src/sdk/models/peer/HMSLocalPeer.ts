@@ -11,7 +11,7 @@ export class HMSLocalPeer extends HMSPeer {
   videoTrack?: HMSLocalVideoTrack;
   auxiliaryTracks: HMSLocalTrack[] = [];
 
-  constructor({ name, role, customerUserId, customerDescription }: HMSLocalPeerInit) {
-    super({ peerId: HMSIdFactory.makePeerId(), isLocal: true, name, role, customerUserId, customerDescription });
+  constructor(peerData: HMSLocalPeerInit) {
+    super({ ...peerData, peerId: HMSIdFactory.makePeerId(), isLocal: true });
   }
 }
