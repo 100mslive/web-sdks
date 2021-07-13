@@ -45,6 +45,9 @@ import {
   selectAudioTrackVolume,
   selectIsLocallyMutedByPeerID,
   selectIsAudioLocallyMuted,
+  selectVideoTrackByPeerID,
+  selectAudioTrackByPeerID,
+  selectTrackAudioByID,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -130,20 +133,21 @@ describe('by ID selectors', () => {
     expect(selectPeerByID(peerScreenSharing.id)(fakeStore)).toBe(peerScreenSharing);
   });
 
-  test('select peer by id', () => {
+  test('select peer AV enabled', () => {
     localAudio.enabled = false;
     localVideo.enabled = true;
     expect(selectIsPeerAudioEnabled(localPeer.id)(fakeStore)).toBe(false);
     expect(selectIsPeerVideoEnabled(localPeer.id)(fakeStore)).toBe(true);
   });
 
-  test('selectPeerAudioByID', () => {
-    expect(selectPeerAudioByID(localPeer.id)(fakeStore)).toBe(localSpeaker.audioLevel);
-  });
-
-  test('selectVideoStream', () => {
+  test('selectVideoTrack', () => {
+    expect(selectVideoTrackByPeerID(localPeer.id)(fakeStore)).toBe(localVideo);
     expect(selectCameraStreamByPeerID(localPeer.id)(fakeStore)).toBe(localVideo);
     expect(selectScreenShareByPeerID(peerScreenSharing.id)(fakeStore)).toBe(screenShare);
+  });
+
+  test('selectAudioTrack', () => {
+    expect(selectAudioTrackByPeerID(localPeer.id)(fakeStore)).toBe(localAudio);
   });
 
   test('selectAuxiliaryAudio', () => {
@@ -152,6 +156,14 @@ describe('by ID selectors', () => {
 
   test('selectScreenshareAudio', () => {
     expect(selectScreenShareAudioByPeerID(peerScreenSharing.id)(fakeStore)).toBe(screenshareAudio);
+  });
+
+  test('selectTrackAudioByID', () => {
+    expect(selectTrackAudioByID(localAudio.id)(fakeStore)).toBe(localSpeaker.audioLevel);
+  });
+
+  test('selectPeerAudioByID', () => {
+    expect(selectPeerAudioByID(localPeer.id)(fakeStore)).toBe(localSpeaker.audioLevel);
   });
 
   test('selectAudioVolumeByPeerID', () => {

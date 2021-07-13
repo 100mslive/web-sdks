@@ -63,17 +63,6 @@ export const selectAuxiliaryTracksByPeerID = byIDCurry(
   },
 );
 
-export const selectTracksByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack[] => {
-  const tracks: HMSTrack[] = [];
-  const videoTrack = selectVideoTrackByPeerID(peerID)(store);
-  const audioTrack = selectAudioTrackByPeerID(peerID)(store);
-  const auxiliaryTracks = selectAuxiliaryTracksByPeerID(peerID)(store);
-  videoTrack && tracks.push(videoTrack);
-  audioTrack && tracks.push(audioTrack);
-  tracks.push(...auxiliaryTracks);
-  return tracks;
-});
-
 const selectSpeakerByTrackID = (store: HMSStore, trackID: HMSTrackID | undefined) => {
   return trackID ? store.speakers[trackID] : null;
 };
