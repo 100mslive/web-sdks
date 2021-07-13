@@ -498,18 +498,24 @@ export class HMSSDKActions implements IHMSActions {
    */
   protected onAudioLevelUpdate(sdkSpeakers: sdkTypes.HMSSpeaker[]) {
     this.store.setState(store => {
-      const peerIDAudioLevelMap: Record<HMSPeerID, number> = {};
+      const trackIDAudioLevelMap: Record<HMSPeerID, number> = {};
       sdkSpeakers.forEach(sdkSpeaker => {
-        peerIDAudioLevelMap[sdkSpeaker.peerId] = sdkSpeaker.audioLevel;
-        if (!store.speakers[sdkSpeaker.peerId]) {
-          store.speakers[sdkSpeaker.peerId] = {};
+        const trackID = sdkSpeaker.track.trackId;
+        trackIDAudioLevelMap[trackID] = sdkSpeaker.audioLevel;
+        if (!store.speakers[trackID]) {
+          // Set store instances(peers, tracks) references in speaker, not the new ones received.
+          store.speakers[trackID] = {
+            audioLevel: sdkSpeaker.audioLevel,
+            peerID: sdkSpeaker.peer.peerId,
+            trackID: trackID,
+          };
         }
       });
       const speakerEntries = Object.entries(store.speakers);
-      for (let [peerID, speaker] of speakerEntries) {
-        speaker.audioLevel = peerIDAudioLevelMap[peerID] || 0;
+      for (let [trackID, speaker] of speakerEntries) {
+        speaker.audioLevel = trackIDAudioLevelMap[trackID] || 0;
         if (speaker.audioLevel === 0) {
-          delete store.speakers[peerID];
+          delete store.speakers[trackID];
         }
       }
     });

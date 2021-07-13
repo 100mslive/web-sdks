@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { selectPeersMap, selectTracksMap } from './selectors';
-import { HMSPeerID, HMSStore, HMSTrack } from '../schema';
+import { HMSPeerID, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled, isVideo } from './selectorUtils';
 import { HMSLogger } from '../../common/ui-logger';
 
@@ -34,12 +34,70 @@ export const selectPeerNameByID = byIDCurry(createSelector(selectPeerByIDBare, p
 
 export const selectTrackByID = byIDCurry(selectTrackByIDBare);
 
-const selectSpeakerByID = (store: HMSStore, peerID: HMSPeerID | undefined) => {
-  return peerID ? store.speakers[peerID] : null;
+export const selectVideoTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
+  | HMSTrack
+  | undefined => {
+  const peer = selectPeerByIDBare(store, peerID);
+  if (peer && peer.videoTrack && peer.videoTrack !== '') {
+    return store.tracks[peer.videoTrack];
+  }
+  return undefined;
+});
+
+export const selectAudioTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
+  | HMSTrack
+  | undefined => {
+  const peer = selectPeerByIDBare(store, peerID);
+  if (peer && peer.audioTrack && peer.audioTrack !== '') {
+    return store.tracks[peer.audioTrack];
+  }
+  return undefined;
+});
+
+export const selectCameraStreamByPeerID = selectVideoTrackByPeerID;
+
+export const selectAuxiliaryTracksByPeerID = byIDCurry(
+  (store: HMSStore, peerID?: HMSPeerID): HMSTrack[] => {
+    const peer = selectPeerByIDBare(store, peerID);
+    return peer?.auxiliaryTracks.map(trackID => store.tracks[trackID]) || [];
+  },
+);
+
+export const selectTracksByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack[] => {
+  const tracks: HMSTrack[] = [];
+  const videoTrack = selectVideoTrackByPeerID(peerID)(store);
+  const audioTrack = selectAudioTrackByPeerID(peerID)(store);
+  const auxiliaryTracks = selectAuxiliaryTracksByPeerID(peerID)(store);
+  videoTrack && tracks.push(videoTrack);
+  audioTrack && tracks.push(audioTrack);
+  tracks.push(...auxiliaryTracks);
+  return tracks;
+});
+
+const selectSpeakerByTrackID = (store: HMSStore, trackID: HMSTrackID | undefined) => {
+  return trackID ? store.speakers[trackID] : null;
 };
 
+/**
+ * Selects audio level of a track
+ */
+export const selectTrackAudioByID = byIDCurry(
+  createSelector(selectSpeakerByTrackID, speaker => speaker?.audioLevel || 0),
+);
+
+/**
+ * Selects speaker object of audioTrack of a peer.
+ */
+const selectSpeakerByPeerID = (store: HMSStore, peerID: HMSPeerID | undefined) => {
+  const peerAudioTrack = selectAudioTrackByPeerID(peerID)(store);
+  return selectSpeakerByTrackID(store, peerAudioTrack?.id);
+};
+
+/**
+ * Selects audio level of audioTrack of a peer.
+ */
 export const selectPeerAudioByID = byIDCurry(
-  createSelector(selectSpeakerByID, speaker => speaker?.audioLevel || 0),
+  createSelector(selectSpeakerByPeerID, speaker => speaker?.audioLevel || 0),
 );
 
 export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
@@ -77,16 +135,6 @@ export const selectScreenShareAudioByPeerID = byIDCurry((store: HMSStore, peerID
       return isAudio(track) && isScreenShare(track);
     });
     return trackID ? store.tracks[trackID] : undefined;
-  }
-  return undefined;
-});
-
-export const selectCameraStreamByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
-  const peer = selectPeerByIDBare(store, peerID);
-  if (peer && peer.videoTrack && peer.videoTrack !== '') {
-    return store.tracks[peer.videoTrack];
   }
   return undefined;
 });

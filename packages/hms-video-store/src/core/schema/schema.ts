@@ -10,7 +10,7 @@ of this central store. This is the global state - the single source of immutable
 export interface HMSStore {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
-  speakers: Record<HMSPeerID, HMSSpeaker>;
+  speakers: Record<HMSTrackID, HMSSpeaker>;
   tracks: Record<HMSTrackID, HMSTrack>;
   messages: {
     byID: Record<HMSMessageID, HMSMessage>;

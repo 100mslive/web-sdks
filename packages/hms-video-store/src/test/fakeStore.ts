@@ -97,8 +97,10 @@ export const makeFakeStore = (): HMSStore => {
       allIDs: ['201', '202'],
     },
     speakers: {
-      '1': {
+      '102': {
         audioLevel: 75,
+        peerID: '1',
+        trackID: '102',
       },
     },
     settings: {
@@ -115,6 +117,6 @@ export const makeFakeStore = (): HMSStore => {
   screenShare = fakeStore.tracks['105'];
   auxiliaryAudio = fakeStore.tracks['106'];
   screenshareAudio = fakeStore.tracks['107'];
-  localSpeaker = fakeStore.speakers[localPeer.id];
+  localSpeaker = fakeStore.speakers[localPeer.audioTrack!];
   return fakeStore;
 };

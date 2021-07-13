@@ -59,7 +59,7 @@ export const selectDominantSpeaker = createSelector(
       speakersInOrder[0][1].audioLevel &&
       speakersInOrder[0][1].audioLevel > 0
     ) {
-      const peerID = speakersInOrder[0][0];
+      const peerID = speakersInOrder[0][1].peerID;
       if (peerID in peersMap) {
         return peersMap[peerID];
       }

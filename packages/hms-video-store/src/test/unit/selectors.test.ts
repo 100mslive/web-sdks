@@ -111,7 +111,11 @@ describe('secondary selectors', () => {
 
   test('speakers', () => {
     expect(selectSpeakers(fakeStore)).toBe(fakeStore.speakers);
-    fakeStore.speakers[peerScreenSharing.id] = { audioLevel: 10 };
+    fakeStore.speakers[peerScreenSharing.audioTrack!] = {
+      audioLevel: 10,
+      peerID: peerScreenSharing.id,
+      trackID: peerScreenSharing.audioTrack!,
+    };
     expect(selectDominantSpeaker(fakeStore)).toBe(localPeer);
   });
 

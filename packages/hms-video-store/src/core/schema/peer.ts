@@ -48,5 +48,7 @@ export interface HMSTrack {
  * corresponding update is high frequency.
  */
 export interface HMSSpeaker {
-  audioLevel?: number;
+  peerID: HMSPeerID;
+  trackID: HMSTrackID;
+  audioLevel: number;
 }

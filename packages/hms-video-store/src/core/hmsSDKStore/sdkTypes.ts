@@ -1,7 +1,7 @@
 import HMSPeer from '@100mslive/hms-video/dist/interfaces/hms-peer';
 import HMSRoom from '@100mslive/hms-video/dist/interfaces/room';
 import HMSMessage from '@100mslive/hms-video/dist/interfaces/message';
-import HMSSpeaker from '@100mslive/hms-video/dist/interfaces/speaker';
+import { HMSSpeaker } from '@100mslive/hms-video/dist/interfaces/speaker';
 import HMSConfig from '@100mslive/hms-video/dist/interfaces/config';
 import SDKHMSAudioTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSAudioTrackSettings';
 import SDKHMSVideoTrackSettings from '@100mslive/hms-video/dist/media/settings/HMSVideoTrackSettings';
