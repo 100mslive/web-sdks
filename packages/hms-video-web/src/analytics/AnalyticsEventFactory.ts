@@ -1,4 +1,6 @@
 import { HMSException } from '../error/HMSException';
+import HMSTrackSettings from '../media/settings/HMSTrackSettings';
+import { DeviceList, SelectedDevices } from '../sdk/models/DeviceManager';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
@@ -51,12 +53,43 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static publishFail(error: HMSException) {
+  static publish(devices: DeviceList, settings?: HMSTrackSettings) {
+    const name = this.eventNameFor('publish', true);
+    const level = AnalyticsEventLevel.INFO;
+    return new AnalyticsEvent({
+      name,
+      level,
+      properties: {
+        devices,
+        audio: settings?.audio,
+        video: settings?.video,
+      },
+    });
+  }
+
+  static publishFail({
+    error,
+    devices,
+    settings,
+  }: {
+    error: HMSException;
+    devices?: DeviceList;
+    settings?: HMSTrackSettings;
+  }) {
     const name = this.eventNameFor('publish', false);
     const level = AnalyticsEventLevel.ERROR;
     const properties = error.toAnalyticsProperties();
 
-    return new AnalyticsEvent({ name, level, properties });
+    return new AnalyticsEvent({
+      name,
+      level,
+      properties: {
+        error: properties,
+        devices,
+        audio: settings?.audio,
+        video: settings?.video,
+      },
+    });
   }
 
   static subscribeFail(error: HMSException) {
@@ -71,14 +104,42 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }
 
-  static deviceChangeFail(type: 'audio' | 'video', deviceId: string, error: HMSException) {
-    const name = this.eventNameFor('deviceChange', false);
+  static deviceChange({
+    selection,
+    type,
+    devices,
+  }: {
+    selection: SelectedDevices;
+    type: 'change' | 'list';
+    devices: DeviceList;
+  }) {
+    return new AnalyticsEvent({
+      name: `device.${type}`,
+      level: AnalyticsEventLevel.INFO,
+      properties: {
+        selection,
+        devices,
+      },
+    });
+  }
+
+  static deviceChangeFail({
+    selection,
+    devices,
+    error,
+  }: {
+    selection: InputDeviceInfo;
+    error: HMSException;
+    devices: DeviceList;
+  }) {
+    // should it be publish? we do replaceTrack internally
+    const name = this.eventNameFor('publish', false);
     return new AnalyticsEvent({
       name,
       level: AnalyticsEventLevel.ERROR,
       properties: {
-        deviceId,
-        type,
+        selection,
+        devices,
         error,
       },
     });

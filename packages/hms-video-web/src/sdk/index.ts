@@ -140,7 +140,7 @@ export class HMSSdk implements HMSInterface {
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
 
-    this.transport = new HMSTransport(this.observer);
+    this.transport = new HMSTransport(this.observer, this.deviceManager);
 
     try {
       await this.transport.connect(
@@ -188,7 +188,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager.addEventListener('role-change', (e: any) => {
         this.publishParams = e.detail.params.role.publishParams;
       });
-      this.transport = new HMSTransport(this.observer);
+      this.transport = new HMSTransport(this.observer, this.deviceManager);
 
       const localPeer = new HMSLocalPeer({
         name: config.userName,

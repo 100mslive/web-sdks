@@ -177,7 +177,7 @@ export class RetryScheduler {
         event = AnalyticsEventFactory.disconnect(error);
         break;
       case TFC.PublishIceConnectionFailed:
-        event = AnalyticsEventFactory.publishFail(error);
+        event = AnalyticsEventFactory.publishFail({ error });
         break;
       case TFC.SubscribeIceConnectionFailed:
         event = AnalyticsEventFactory.subscribeFail(error);

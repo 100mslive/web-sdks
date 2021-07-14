@@ -10,10 +10,16 @@ import { HMSException } from '../../error/HMSException';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 
-type SelectedDevices = {
+export type SelectedDevices = {
   audioInput: InputDeviceInfo;
   audioOutput: MediaDeviceInfo;
   videoInput: InputDeviceInfo;
+};
+
+export type DeviceList = {
+  audioInput: InputDeviceInfo[];
+  audioOutput: MediaDeviceInfo[];
+  videoInput: InputDeviceInfo[];
 };
 
 export interface DeviceChangeEvent {
@@ -41,6 +47,18 @@ export default class DeviceManager implements HMSDeviceManager {
     this.initCalled = true;
     navigator.mediaDevices.ondevicechange = () => this.handleDeviceChange();
     this.enumerateDevices();
+    HMSLogger.d(this.TAG, '[DeviceList]', JSON.stringify(this.selected, null, 2));
+    analyticsEventsService
+      .queue(AnalyticsEventFactory.deviceChange({ selection: this.selected, type: 'list', devices: this.getDevices() }))
+      .flush();
+  }
+
+  getDevices() {
+    return {
+      audioInput: this.audioInput,
+      audioOutput: this.audioOutput,
+      videoInput: this.videoInput,
+    };
   }
 
   cleanUp() {
@@ -88,6 +106,9 @@ export default class DeviceManager implements HMSDeviceManager {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
     await this.enumerateDevices();
+    analyticsEventsService
+      .queue(AnalyticsEventFactory.deviceChange({ selection: this.selected, type: 'list', devices: this.getDevices() }))
+      .flush();
     HMSLogger.d(this.TAG, '[After Device Change]', JSON.stringify(this.selected, null, 2));
 
     if (
@@ -111,7 +132,13 @@ export default class DeviceManager implements HMSDeviceManager {
       } catch (error) {
         HMSLogger.e(this.TAG, '[Audio Device Change]', error);
         analyticsEventsService
-          .queue(AnalyticsEventFactory.deviceChangeFail('audio', this.selected.audioInput.deviceId, error))
+          .queue(
+            AnalyticsEventFactory.deviceChangeFail({
+              selection: this.selected.audioInput,
+              devices: this.getDevices(),
+              error,
+            }),
+          )
           .flush();
         this.eventEmitter.emit('audio-device-change', { track: this.localPeer.audioTrack, error });
       }
@@ -141,7 +168,13 @@ export default class DeviceManager implements HMSDeviceManager {
       } catch (error) {
         HMSLogger.e(this.TAG, '[Video Device Change]', error);
         analyticsEventsService
-          .queue(AnalyticsEventFactory.deviceChangeFail('video', this.selected.videoInput.deviceId, error))
+          .queue(
+            AnalyticsEventFactory.deviceChangeFail({
+              selection: this.selected.videoInput,
+              devices: this.getDevices(),
+              error,
+            }),
+          )
           .flush();
         this.eventEmitter.emit('video-device-change', { track: this.localPeer.videoTrack, error });
       }

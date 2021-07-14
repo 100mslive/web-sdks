@@ -36,6 +36,7 @@ import { userAgent } from '../utils/support';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
+import DeviceManager from '../sdk/models/DeviceManager';
 
 const TAG = '[HMSTransport]:';
 
@@ -226,7 +227,7 @@ export default class HMSTransport implements ITransport {
     },
   };
 
-  constructor(observer: ITransportObserver) {
+  constructor(observer: ITransportObserver, private deviceManager: DeviceManager) {
     this.observer = observer;
   }
 
@@ -238,7 +239,15 @@ export default class HMSTransport implements ITransport {
       return await HMSLocalStream.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
+        analyticsEventsService
+          .queue(
+            AnalyticsEventFactory.publishFail({
+              error,
+              devices: this.deviceManager.getDevices(),
+              settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+            }),
+          )
+          .flush();
       }
       throw error;
     }
@@ -249,7 +258,15 @@ export default class HMSTransport implements ITransport {
       return await HMSLocalStream.getLocalTracks(settings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
+        analyticsEventsService
+          .queue(
+            AnalyticsEventFactory.publishFail({
+              devices: this.deviceManager.getDevices(),
+              error,
+              settings,
+            }),
+          )
+          .flush();
       }
       throw error;
     }
@@ -260,10 +277,20 @@ export default class HMSTransport implements ITransport {
     settings?: HMSTrackSettings,
   ): Promise<Array<HMSLocalTrack>> {
     try {
-      return await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
+      const tracks = await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
+      analyticsEventsService.queue(AnalyticsEventFactory.publish(this.deviceManager.getDevices(), settings)).flush();
+      return tracks;
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
+        analyticsEventsService
+          .queue(
+            AnalyticsEventFactory.publishFail({
+              devices: this.deviceManager.getDevices(),
+              error,
+              settings,
+            }),
+          )
+          .flush();
       }
       throw error;
     }
@@ -395,7 +422,14 @@ export default class HMSTransport implements ITransport {
         await this.publishTrack(track);
       } catch (error) {
         if (error instanceof HMSException) {
-          analyticsEventsService.queue(AnalyticsEventFactory.publishFail(error)).flush();
+          analyticsEventsService
+            .queue(
+              AnalyticsEventFactory.publishFail({
+                devices: this.deviceManager.getDevices(),
+                error,
+              }),
+            )
+            .flush();
         }
       }
     }
