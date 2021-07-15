@@ -12,6 +12,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     (this.stream as HMSRemoteStream).setVideo(layer);
   }
 
+  getSimulcastLayer() {
+    return (this.stream as HMSRemoteStream).getSimulcastLayer();
+  }
+
   addSink(videoElement: HTMLVideoElement) {
     this.preferLayer(HMSSimulcastLayer.HIGH);
     super.addSink(videoElement);

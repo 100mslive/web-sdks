@@ -140,7 +140,7 @@ export class HMSSdk implements HMSInterface {
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
 
-    this.transport = new HMSTransport(this.observer, this.deviceManager);
+    this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
 
     try {
       await this.transport.connect(
@@ -188,7 +188,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager.addEventListener('role-change', (e: any) => {
         this.publishParams = e.detail.params.role.publishParams;
       });
-      this.transport = new HMSTransport(this.observer, this.deviceManager);
+      this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
 
       const localPeer = new HMSLocalPeer({
         name: config.userName,
@@ -289,6 +289,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
+    const dimensions = this.store.getSimulcastDimensions('screen');
     const tracks = await this.transport!.getLocalScreen(
       new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
@@ -296,8 +297,8 @@ export class HMSSdk implements HMSInterface {
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec)
         .maxFramerate(screen.frameRate)
-        .setWidth(screen.width)
-        .setHeight(screen.height)
+        .setWidth(dimensions.width || screen.width)
+        .setHeight(dimensions.height || screen.height)
         .build(),
       new HMSAudioTrackSettingsBuilder().build(),
     );
@@ -420,12 +421,13 @@ export class HMSSdk implements HMSInterface {
         .deviceId(audioInputDeviceId)
         .build();
 
+      const dimensions = this.store.getSimulcastDimensions('regular');
       const videoSettings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
         .codec(video.codec)
         .maxBitrate(video.bitRate)
         .maxFramerate(video.frameRate)
-        .setWidth(video.width)
-        .setHeight(video.height)
+        .setWidth(dimensions.width || video.width) // take simulcast width if available
+        .setHeight(dimensions.height || video.height) // take simulcast width if available
         .deviceId(videoDeviceId)
         .build();
 

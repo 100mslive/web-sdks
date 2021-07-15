@@ -1,3 +1,5 @@
+import { HMSSimulcastLayers } from './simulcast-layers';
+
 export default interface HMSPolicy {
   name: string;
   publishParams: {
@@ -19,6 +21,8 @@ export default interface HMSPolicy {
       height: number;
     };
     allowed: string[];
+    videoSimulcastLayers: HMSSimulcastLayers;
+    screenshareSimulcastLayers: HMSSimulcastLayers;
   };
   subscribeParams: {
     subscribeToRoles: string[];

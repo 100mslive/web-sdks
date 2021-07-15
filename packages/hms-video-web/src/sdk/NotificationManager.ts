@@ -102,6 +102,9 @@ export default class NotificationManager {
 
   private handlePolicyChange(params: PolicyParams) {
     this.store.setKnownRoles(params.known_roles);
+    const { videoSimulcastLayers, screenshareSimulcastLayers } = params.known_roles[params.name].publishParams;
+    this.store.setVideoSimulcastLayers(videoSimulcastLayers);
+    this.store.setScreenshareSimulcastLayers(screenshareSimulcastLayers);
   }
 
   private handleTrackMetadataAdd(params: TrackStateNotification) {

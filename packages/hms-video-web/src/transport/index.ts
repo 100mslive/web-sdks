@@ -36,6 +36,7 @@ import { userAgent } from '../utils/support';
 import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
+import { IStore } from '../sdk/store/IStore';
 import DeviceManager from '../sdk/models/DeviceManager';
 
 const TAG = '[HMSTransport]:';
@@ -227,7 +228,7 @@ export default class HMSTransport implements ITransport {
     },
   };
 
-  constructor(observer: ITransportObserver, private deviceManager: DeviceManager) {
+  constructor(observer: ITransportObserver, private deviceManager: DeviceManager, private store: IStore) {
     this.observer = observer;
   }
 
@@ -473,7 +474,8 @@ export default class HMSTransport implements ITransport {
     });
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
-    stream.addTransceiver(track);
+    const simulcastLayers = this.store.getSimulcastLayers(track.source!);
+    stream.addTransceiver(track, simulcastLayers);
     await p;
 
     // @ts-ignore

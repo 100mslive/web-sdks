@@ -1,9 +1,10 @@
 import HMSRoom from '../../interfaces/room';
 import { HMSSpeaker } from '../../interfaces/speaker';
-import { HMSTrack, HMSAudioTrack, HMSVideoTrack } from '../../media/tracks';
+import { HMSTrack, HMSAudioTrack, HMSVideoTrack, HMSTrackSource } from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 import HMSPolicy from '../../interfaces/policy';
+import { HMSSimulcastLayer, SimulcastDimensions, HMSSimulcastLayers } from '../../interfaces/simulcast-layers';
 
 type Comparator<T> = (a: T, b: T) => number;
 export type KnownRoles = { [role: string]: HMSPolicy };
@@ -11,6 +12,8 @@ export type KnownRoles = { [role: string]: HMSPolicy };
 export interface IStore {
   getRoom(): HMSRoom;
   getPolicyForRole(role: string): HMSPolicy;
+  getSimulcastLayers(source: HMSTrackSource): HMSSimulcastLayer[];
+  getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
 
   getLocalPeer(): HMSLocalPeer;
   getRemotePeers(): HMSRemotePeer[];
@@ -31,6 +34,8 @@ export interface IStore {
 
   setRoom(room: HMSRoom): void;
   setKnownRoles(knownRoles: KnownRoles): void;
+  setVideoSimulcastLayers(layers: HMSSimulcastLayers): void;
+  setScreenshareSimulcastLayers(layers: HMSSimulcastLayers): void;
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;

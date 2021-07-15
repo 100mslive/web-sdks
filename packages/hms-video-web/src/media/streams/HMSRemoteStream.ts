@@ -27,6 +27,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.syncWithApiChannel();
   }
 
+  getSimulcastLayer() {
+    return this.video;
+  }
+
   syncWithApiChannel() {
     const data = {
       streamId: this.id,

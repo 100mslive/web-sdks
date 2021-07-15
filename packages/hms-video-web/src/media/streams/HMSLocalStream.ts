@@ -10,6 +10,7 @@ import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { IFetchAVTrackOptions } from '../../transport/ITransport';
+import { HMSSimulcastLayer } from '../../interfaces/simulcast-layers';
 
 const TAG = 'HMSLocalStream';
 
@@ -82,17 +83,24 @@ export default class HMSLocalStream extends HMSMediaStream {
     return tracks;
   }
 
-  addTransceiver(track: HMSTrack) {
-    // TODO: Add support for simulcast
-    let trackEncondings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-    if (track instanceof HMSLocalVideoTrack && track.settings.maxBitrate) {
-      trackEncondings.maxBitrate = track.settings.maxBitrate;
+  addTransceiver(track: HMSTrack, simulcastLayers: HMSSimulcastLayer[]) {
+    let trackEncodings: RTCRtpEncodingParameters[] = [];
+    if (track instanceof HMSLocalVideoTrack) {
+      if (simulcastLayers.length > 0) {
+        trackEncodings.push(...simulcastLayers);
+      } else {
+        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
+        if (track instanceof HMSLocalVideoTrack && track.settings.maxBitrate) {
+          encodings.maxBitrate = track.settings.maxBitrate;
+        }
+        trackEncodings.push(encodings);
+      }
     }
 
     const transceiver = this.connection!.addTransceiver(track.nativeTrack, {
       streams: [this.nativeStream],
       direction: 'sendonly',
-      sendEncodings: [trackEncondings],
+      sendEncodings: trackEncodings,
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     return transceiver;

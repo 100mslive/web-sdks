@@ -1,13 +1,11 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSMediaStream from '../streams/HMSMediaStream';
-import HMSLogger from '../../utils/logger';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private volume: number = 100;
-  private TAG = 'HMSAudioTrack';
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -25,7 +23,6 @@ export class HMSAudioTrack extends HMSTrack {
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
       this.volume = value;
-      HMSLogger.d(this.TAG, `volume update for ${this.trackId} to ${this.volume}`);
     }
   }
 

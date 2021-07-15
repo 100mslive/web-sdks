@@ -2,8 +2,9 @@ import { IStore, KnownRoles } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces/speaker';
-import { HMSTrack, HMSVideoTrack, HMSAudioTrack, HMSTrackType } from '../../media/tracks';
+import { HMSTrack, HMSVideoTrack, HMSAudioTrack, HMSTrackType, HMSTrackSource } from '../../media/tracks';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
+import { HMSSimulcastLayer, HMSSimulcastLayers, SimulcastDimensions } from '../../interfaces/simulcast-layers';
 
 class Store implements IStore {
   private room?: HMSRoom;
@@ -12,6 +13,8 @@ class Store implements IStore {
   private peers: Record<string, HMSPeer> = {};
   private tracks: Record<string, HMSTrack> = {};
   private speakers: HMSSpeaker[] = [];
+  private videoLayers: HMSSimulcastLayers | null = null;
+  private screenshareLayers: HMSSimulcastLayers | null = null;
 
   getRoom() {
     return this.room!;
@@ -110,6 +113,31 @@ class Store implements IStore {
 
   updateSpeakers(speakers: HMSSpeaker[]) {
     this.speakers = speakers;
+  }
+
+  getSimulcastLayers(source: HMSTrackSource): HMSSimulcastLayer[] {
+    if (source === 'screen') {
+      return this.screenshareLayers?.layers || [];
+    }
+    return this.videoLayers?.layers || [];
+  }
+
+  getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions {
+    const layers = source === 'screen' ? this.screenshareLayers : this.videoLayers;
+    const width = layers?.width;
+    const height = layers?.width;
+    return {
+      width,
+      height,
+    };
+  }
+
+  setVideoSimulcastLayers(simulcastLayers: HMSSimulcastLayers): void {
+    this.videoLayers = simulcastLayers;
+  }
+
+  setScreenshareSimulcastLayers(simulcastLayers: HMSSimulcastLayers): void {
+    this.screenshareLayers = simulcastLayers;
   }
 
   cleanUp() {
