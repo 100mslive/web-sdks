@@ -181,3 +181,15 @@ export const selectScreenshareAudioVolumeByPeerID = byIDCurry(
     return selectAudioTrackVolume(track?.id)(store);
   },
 );
+
+export const selectSimulcastLayerByTrack = byIDCurry((store: HMSStore, trackID?: string) => {
+  const track = selectTrackByIDBare(store, trackID);
+  if (track) {
+    if (track.type !== 'video') {
+      HMSLogger.w('Please pass video track here');
+      return undefined;
+    }
+    return track.layer;
+  }
+  return undefined;
+});

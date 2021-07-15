@@ -1,3 +1,5 @@
+import { HMSSimulcastLayer } from '../hmsSDKStore/sdkTypes';
+
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin';
@@ -38,6 +40,7 @@ export interface HMSTrack {
   processors?: string[];
   displayEnabled?: boolean;
   volume?: number;
+  layer?: HMSSimulcastLayer;
 }
 
 /**

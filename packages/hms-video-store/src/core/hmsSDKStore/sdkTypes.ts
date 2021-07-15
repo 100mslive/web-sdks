@@ -53,3 +53,10 @@ export enum HMSTrackUpdate {
   TRACK_UNMUTED,
   TRACK_DESCRIPTION_CHANGED,
 }
+
+export enum HMSSimulcastLayer {
+  NONE = 'none',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}

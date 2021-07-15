@@ -48,6 +48,7 @@ import {
   selectVideoTrackByPeerID,
   selectAudioTrackByPeerID,
   selectTrackAudioByID,
+  selectSimulcastLayerByTrack,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -178,6 +179,11 @@ describe('by ID selectors', () => {
   });
   test('selectLocallyMutedByTrackID', () => {
     expect(selectIsAudioLocallyMuted(localPeer.audioTrack)(fakeStore)).toBe(false);
+  });
+  test('selectSimulcastLayerByTrack', () => {
+    const peer = selectRemotePeers(fakeStore);
+    const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore);
+    expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
   });
 });
 

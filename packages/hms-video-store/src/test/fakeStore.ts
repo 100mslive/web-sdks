@@ -9,6 +9,7 @@ import {
   HMSTrackSource,
   HMSTrackType,
 } from '../core';
+import { HMSSimulcastLayer } from '../core/hmsSDKStore/sdkTypes';
 
 function makeTrack(
   id: HMSTrackID,
@@ -23,6 +24,7 @@ function makeTrack(
     enabled: !!enabled,
     displayEnabled: true,
     volume: type === 'audio' ? 10 : undefined,
+    layer: type === 'video' ? HMSSimulcastLayer.HIGH : undefined,
   };
 }
 

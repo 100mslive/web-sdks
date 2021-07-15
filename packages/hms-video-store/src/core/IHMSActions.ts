@@ -1,7 +1,7 @@
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
 import { HMSTrackSource } from './schema';
+import { HMSConfig, HMSSimulcastLayer } from './hmsSDKStore/sdkTypes';
 import { HMSVideoProcessor } from '@100mslive/hms-video';
-import { HMSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -122,6 +122,12 @@ export interface IHMSActions {
    * @param value number between 0-100
    */
   setVolume(trackId: string, value: number): void;
+  /**
+   * set the quality of the selected videoTrack
+   * @param trackId
+   * @param layer
+   */
+  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer): void;
 
   /**
    * Adding/Removing Processor to the local peer video track

@@ -22,9 +22,7 @@ export class SDKToHMS {
     };
   }
 
-  static convertTrack(
-    sdkTrack: SDKHMSTrack | SDKHMSRemoteVideoTrack | SDKHMSRemoteAudioTrack,
-  ): HMSTrack {
+  static convertTrack(sdkTrack: SDKHMSTrack): HMSTrack {
     const track: HMSTrack = {
       id: sdkTrack.trackId,
       source: sdkTrack.source,
@@ -33,11 +31,22 @@ export class SDKToHMS {
       displayEnabled: sdkTrack.enabled,
       processors: sdkTrack.processors,
     };
+    this.enrichTrack(track, sdkTrack);
+    return track;
+  }
+
+  static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+    const mediaSettings = sdkTrack.getMediaTrackSettings();
+    track.height = mediaSettings.height;
+    track.width = mediaSettings.width;
+    track.deviceID = mediaSettings.deviceId;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
       const volume = sdkTrack.getVolume();
       track.volume = volume;
     }
-    return track;
+    if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
+      track.layer = sdkTrack.getSimulcastLayer();
+    }
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom): Partial<HMSRoom> {

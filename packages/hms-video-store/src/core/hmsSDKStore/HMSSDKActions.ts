@@ -30,6 +30,7 @@ import {
   HMSSdk,
   HMSVideoProcessor,
   HMSTrack as SDKHMSTrack,
+  HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSAudioTrack as SDKHMSAudioTrack,
@@ -73,6 +74,20 @@ export class HMSSDKActions implements IHMSActions {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+  }
+
+  setPreferredLayer(trackId: string, layer: sdkTypes.HMSSimulcastLayer) {
+    const track = this.hmsSDKTracks[trackId];
+    if (track) {
+      if (track instanceof SDKHMSRemoteVideoTrack) {
+        track.preferLayer(layer);
+        this.syncPeers();
+      } else {
+        HMSLogger.w(`track ${trackId} is not an video track`);
+      }
+    } else {
+      this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
+    }
   }
 
   setVolume(trackId: string, value: number): void {
@@ -410,7 +425,6 @@ export class HMSSDKActions implements IHMSActions {
           continue;
         }
         const hmsTrack = SDKToHMS.convertTrack(sdkTrack);
-        this.enrichHMSTrack(hmsTrack, sdkTrack); // fill in video width/height
         newHmsTracks[hmsTrack.id] = hmsTrack;
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
@@ -617,13 +631,6 @@ export class HMSSDKActions implements IHMSActions {
     } else {
       this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }
-  }
-
-  private enrichHMSTrack(hmsTrack: HMSTrack, sdkTrack: SDKHMSTrack) {
-    const mediaSettings = sdkTrack.getMediaTrackSettings();
-    hmsTrack.height = mediaSettings.height;
-    hmsTrack.width = mediaSettings.width;
-    hmsTrack.deviceID = mediaSettings.deviceId;
   }
 
   private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
