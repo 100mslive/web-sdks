@@ -31,6 +31,7 @@ export class SDKToHMS {
       type: sdkTrack.type,
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
+      processors: sdkTrack.processors,
     };
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
       const volume = sdkTrack.getVolume();

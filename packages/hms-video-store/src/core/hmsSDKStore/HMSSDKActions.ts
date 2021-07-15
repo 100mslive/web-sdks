@@ -28,9 +28,10 @@ import {
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSSdk,
+  HMSVideoProcessor,
   HMSTrack as SDKHMSTrack,
-  HMSLocalAudioTrack,
-  HMSLocalVideoTrack,
+  HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
+  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSVideoTrack as SDKHMSVideoTrack,
   HMSException as SDKHMSException,
@@ -270,6 +271,41 @@ export class HMSSDKActions implements IHMSActions {
       await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to remove sink');
+    }
+  }
+
+  async addVideoProcessor(processor: HMSVideoProcessor): Promise<void> {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (!processor) {
+      console.log('Invalid processor add request got in store');
+      return;
+    }
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        console.log('video track exist add Processor', sdkTrack);
+        await (sdkTrack as SDKHMSLocalVideoTrack).addProcessor(processor);
+        this.syncPeers();
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to add Processor`);
+      }
+    }
+  }
+
+  async removeVideoProcessor(processor: HMSVideoProcessor): Promise<void> {
+    if (!processor) {
+      console.log('Invalid processor remove request got in store');
+      return;
+    }
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        await (sdkTrack as SDKHMSLocalVideoTrack).removeProcessor(processor);
+        this.syncPeers();
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove Processor`);
+      }
     }
   }
 
@@ -565,7 +601,7 @@ export class HMSSDKActions implements IHMSActions {
   ) {
     const track = this.hmsSDKTracks[trackID];
     if (track) {
-      await (track as HMSLocalVideoTrack).setSettings(settings as HMSVideoTrackSettings);
+      await (track as SDKHMSLocalVideoTrack).setSettings(settings as HMSVideoTrackSettings);
     } else {
       this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }
@@ -577,7 +613,7 @@ export class HMSSDKActions implements IHMSActions {
   ) {
     const track = this.hmsSDKTracks[trackID];
     if (track) {
-      await (track as HMSLocalAudioTrack).setSettings(settings as HMSAudioTrackSettings);
+      await (track as SDKHMSLocalAudioTrack).setSettings(settings as HMSAudioTrackSettings);
     } else {
       this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }
@@ -592,9 +628,9 @@ export class HMSSDKActions implements IHMSActions {
 
   private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
     return {
-      audioInputDeviceId: (sdkPeer.audioTrack as HMSLocalAudioTrack)?.getMediaTrackSettings()
+      audioInputDeviceId: (sdkPeer.audioTrack as SDKHMSLocalAudioTrack)?.getMediaTrackSettings()
         ?.deviceId,
-      videoInputDeviceId: (sdkPeer.videoTrack as HMSLocalVideoTrack)?.getMediaTrackSettings()
+      videoInputDeviceId: (sdkPeer.videoTrack as SDKHMSLocalVideoTrack)?.getMediaTrackSettings()
         ?.deviceId,
     };
   }

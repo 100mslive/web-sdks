@@ -1,5 +1,6 @@
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
 import { HMSTrackSource } from './schema';
+import { HMSVideoProcessor } from '@100mslive/hms-video';
 import { HMSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
@@ -121,6 +122,13 @@ export interface IHMSActions {
    * @param value number between 0-100
    */
   setVolume(trackId: string, value: number): void;
+
+  /**
+   * Adding/Removing Processor to the local peer video track
+   * @param processor HMSVideoProcessor
+   */
+  addVideoProcessor(processor: HMSVideoProcessor): Promise<void>;
+  removeVideoProcessor(processor: HMSVideoProcessor): Promise<void>;
 }
 
 /**

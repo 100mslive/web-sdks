@@ -1,5 +1,5 @@
 {
-  "version": "0.1.43",
+  "version": "0.1.44",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -28,7 +28,7 @@
     "zustand": "3.5.4"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.79",
+    "@100mslive/hms-video": "^0.0.80",
     "events": "^3.3.0"
   },
   "husky": {
@@ -57,7 +57,7 @@
     }
   ],
   "devDependencies": {
-    "@100mslive/hms-video": "^0.0.79",
+    "@100mslive/hms-video": "^0.0.80",
     "events": "^3.3.0",
     "@size-limit/preset-small-lib": "^4.11.0",
     "husky": "^6.0.0",
