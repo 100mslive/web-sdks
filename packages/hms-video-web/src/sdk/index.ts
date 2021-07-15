@@ -245,6 +245,11 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       this.localPeer?.audioTrack?.nativeTrack.stop();
       this.localPeer?.videoTrack?.nativeTrack.stop();
+      const videoTrack = this.localPeer?.videoTrack;
+      if (videoTrack && videoTrack?.processors.length !== 0) {
+        await videoTrack?.clearProcessors();
+      }
+
       this.localPeer?.auxiliaryTracks.forEach((track) => track.nativeTrack.stop());
       this.cleanUp();
 

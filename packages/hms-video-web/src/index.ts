@@ -9,3 +9,4 @@ export * from './utils/media';
 export * from './utils/device-error';
 export * from './utils/support';
 export * from './error/HMSException';
+export * from './interfaces/videoProcessors';

@@ -8,7 +8,10 @@ export abstract class HMSTrack {
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;
 
-  /** Changes only when un-muting the local track
+  //name of processors
+  processors: Array<string>;
+
+  /** Changes when un-muting and adding processor the local track
    * i.e replacing the nativeTrack with different `deviceId`
    * track.
    * @internal */
@@ -36,5 +39,6 @@ export abstract class HMSTrack {
     this.stream = stream;
     this.nativeTrack = track;
     this.source = source;
+    this.processors = [];
   }
 }
