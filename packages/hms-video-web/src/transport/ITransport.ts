@@ -1,7 +1,5 @@
 import { HMSTrack } from '../media/tracks';
-import HMSTrackSettings from '../media/settings/HMSTrackSettings';
-import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
-import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
+import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
 import { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
