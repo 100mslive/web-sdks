@@ -66,8 +66,7 @@ export class HMSSdk implements HMSInterface {
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
   private config?: HMSConfig;
-
-  audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
+  private audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
 
   public get localPeer(): HMSLocalPeer {
     return this.store.getLocalPeer();
@@ -280,6 +279,10 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     HMSLogger.d(this.TAG, `Got peers`, peers);
     return peers;
+  }
+
+  getAudioOutput() {
+    return this.audioOutput;
   }
 
   sendMessage(type: string, message: string, receiver?: string) {

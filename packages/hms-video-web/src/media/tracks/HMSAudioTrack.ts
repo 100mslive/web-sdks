@@ -7,7 +7,6 @@ export class HMSAudioTrack extends HMSTrack {
   private readonly TAG = '[HMSAudioTrack]';
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
-  private volume: number = 100;
   private outputDevice?: MediaDeviceInfo;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
@@ -16,7 +15,7 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   getVolume() {
-    return this.volume;
+    return this.audioElement ? this.audioElement.volume * 100 : null;
   }
 
   setVolume(value: number) {
@@ -25,7 +24,6 @@ export class HMSAudioTrack extends HMSTrack {
     }
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
-      this.volume = value;
     }
   }
 
