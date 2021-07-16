@@ -1,4 +1,4 @@
-import HMSMessage from '../../interfaces/message';
+import { HMSMessage } from '../../interfaces/message';
 import { getMessageType, HMSMessageType } from './enums/HMSMessageType';
 
 interface HMSMessageInit {

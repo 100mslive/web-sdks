@@ -52,7 +52,7 @@ export class HMSAudioTrackSettingsBuilder {
   }
 }
 
-export default class HMSAudioTrackSettings implements IAnalyticsPropertiesProvider {
+export class HMSAudioTrackSettings implements IAnalyticsPropertiesProvider {
   readonly volume: number;
   readonly codec: HMSAudioCodec;
   readonly maxBitrate: number;

@@ -1,4 +1,4 @@
-import HMSConfig from '../interfaces/config';
+import { HMSConfig } from '../interfaces/config';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -17,8 +17,12 @@ import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
 import Message from './models/HMSMessage';
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
-import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
-import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
+import {
+  HMSVideoTrackSettings,
+  HMSVideoTrackSettingsBuilder,
+  HMSAudioTrackSettings,
+  HMSAudioTrackSettingsBuilder,
+} from '../media/settings';
 import HMSAudioSinkManager from '../audio-sink-manager';
 import DeviceManager, { DeviceChangeEvent } from './models/DeviceManager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';

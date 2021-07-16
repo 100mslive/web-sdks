@@ -1,5 +1,5 @@
 import { HMSException } from '../error/HMSException';
-import HMSTrackSettings from '../media/settings/HMSTrackSettings';
+import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { DeviceList, SelectedDevices } from '../sdk/models/DeviceManager';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';

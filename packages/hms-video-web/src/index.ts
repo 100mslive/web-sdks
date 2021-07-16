@@ -4,9 +4,9 @@ console.log(`%c ${adapter.browserDetails.browser} v${adapter.browserDetails.vers
 
 export * from './sdk';
 export * from './media/tracks';
-export * from './interfaces/update-listener';
 export * from './utils/media';
+export * from './media/settings';
 export * from './utils/device-error';
 export * from './utils/support';
 export * from './error/HMSException';
-export * from './interfaces/videoProcessors';
+export * from './interfaces';

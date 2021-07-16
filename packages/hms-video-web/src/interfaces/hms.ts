@@ -1,6 +1,6 @@
-import HMSConfig from './config';
+import { HMSConfig } from './config';
 import HMSUpdateListener from './update-listener';
-import HMSMessage from './message';
+import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { HMSTrackSource } from '../media/tracks';

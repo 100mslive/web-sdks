@@ -1,6 +1,6 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
-import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
 import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { HMSVideoProcessor } from '../../interfaces/videoProcessors';
 

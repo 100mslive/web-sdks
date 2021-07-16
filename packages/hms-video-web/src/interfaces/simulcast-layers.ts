@@ -1,4 +1,4 @@
-export interface HMSSimulcastLayer {
+export interface SimulcastLayer {
   rid: string;
   scaleResolutionDownBy?: number;
   maxBitrate: number;
@@ -10,6 +10,6 @@ export interface SimulcastDimensions {
   height?: number;
 }
 
-export interface HMSSimulcastLayers extends SimulcastDimensions {
-  layers: HMSSimulcastLayer[];
+export interface SimulcastLayers extends SimulcastDimensions {
+  layers: SimulcastLayer[];
 }

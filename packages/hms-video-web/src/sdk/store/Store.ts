@@ -4,7 +4,7 @@ import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces/speaker';
 import { HMSTrack, HMSVideoTrack, HMSAudioTrack, HMSTrackType, HMSTrackSource } from '../../media/tracks';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
-import { HMSSimulcastLayer, HMSSimulcastLayers, SimulcastDimensions } from '../../interfaces/simulcast-layers';
+import { SimulcastLayer, SimulcastLayers, SimulcastDimensions } from '../../interfaces/simulcast-layers';
 
 class Store implements IStore {
   private room?: HMSRoom;
@@ -13,8 +13,8 @@ class Store implements IStore {
   private peers: Record<string, HMSPeer> = {};
   private tracks: Record<string, HMSTrack> = {};
   private speakers: HMSSpeaker[] = [];
-  private videoLayers: HMSSimulcastLayers | null = null;
-  private screenshareLayers: HMSSimulcastLayers | null = null;
+  private videoLayers: SimulcastLayers | null = null;
+  private screenshareLayers: SimulcastLayers | null = null;
 
   getRoom() {
     return this.room!;
@@ -115,7 +115,7 @@ class Store implements IStore {
     this.speakers = speakers;
   }
 
-  getSimulcastLayers(source: HMSTrackSource): HMSSimulcastLayer[] {
+  getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     if (source === 'screen') {
       return this.screenshareLayers?.layers || [];
     }
@@ -132,11 +132,11 @@ class Store implements IStore {
     };
   }
 
-  setVideoSimulcastLayers(simulcastLayers: HMSSimulcastLayers): void {
+  setVideoSimulcastLayers(simulcastLayers: SimulcastLayers): void {
     this.videoLayers = simulcastLayers;
   }
 
-  setScreenshareSimulcastLayers(simulcastLayers: HMSSimulcastLayers): void {
+  setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
     this.screenshareLayers = simulcastLayers;
   }
 

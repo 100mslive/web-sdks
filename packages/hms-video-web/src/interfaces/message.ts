@@ -1,6 +1,6 @@
 import { HMSMessageType } from '../sdk/models/enums/HMSMessageType';
 
-export default interface HMSMessage {
+export interface HMSMessage {
   sender: string;
   receiver?: string;
   time: Date;

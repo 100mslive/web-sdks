@@ -1,6 +1,5 @@
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
-import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
-import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 
 export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {

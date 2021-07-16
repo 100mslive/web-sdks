@@ -1,6 +1,6 @@
-import { HMSSimulcastLayers } from './simulcast-layers';
+import { SimulcastLayers } from './simulcast-layers';
 
-export default interface HMSPolicy {
+export interface HMSPolicy {
   name: string;
   publishParams: {
     audio: {
@@ -21,8 +21,8 @@ export default interface HMSPolicy {
       height: number;
     };
     allowed: string[];
-    videoSimulcastLayers: HMSSimulcastLayers;
-    screenshareSimulcastLayers: HMSSimulcastLayers;
+    videoSimulcastLayers: SimulcastLayers;
+    screenshareSimulcastLayers: SimulcastLayers;
   };
   subscribeParams: {
     subscribeToRoles: string[];

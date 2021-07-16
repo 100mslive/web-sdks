@@ -1,6 +1,6 @@
 import InitialSettings from './settings';
 
-export default interface HMSConfig {
+export interface HMSConfig {
   userName: string;
   authToken: string;
   metaData?: string;

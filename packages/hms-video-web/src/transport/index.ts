@@ -19,10 +19,9 @@ import {
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
-import HMSTrackSettings from '../media/settings/HMSTrackSettings';
 import HMSLogger from '../utils/logger';
-import HMSVideoTrackSettings from '../media/settings/HMSVideoTrackSettings';
-import HMSMessage from '../interfaces/message';
+import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
+import { HMSMessage } from '../interfaces/message';
 import { TrackState } from '../sdk/models/HMSNotifications';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
@@ -33,7 +32,6 @@ import { InitConfig } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
-import HMSAudioTrackSettings from '../media/settings/HMSAudioTrackSettings';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { IStore } from '../sdk/store/IStore';

@@ -1,4 +1,4 @@
-import HMSRoom, { HMSRoomType } from '../../interfaces/room';
+import { HMSRoom, HMSRoomType } from '../../interfaces/room';
 import { IStore } from '../store/IStore';
 
 export default class Room implements HMSRoom {

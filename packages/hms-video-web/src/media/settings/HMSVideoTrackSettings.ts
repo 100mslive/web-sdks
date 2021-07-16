@@ -80,7 +80,7 @@ export class HMSVideoTrackSettingsBuilder {
   }
 }
 
-export default class HMSVideoTrackSettings implements IAnalyticsPropertiesProvider {
+export class HMSVideoTrackSettings implements IAnalyticsPropertiesProvider {
   readonly width: number;
   readonly height: number;
   readonly codec: HMSVideoCodec;

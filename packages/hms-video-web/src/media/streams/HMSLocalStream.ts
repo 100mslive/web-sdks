@@ -1,16 +1,14 @@
 import HMSMediaStream from './HMSMediaStream';
 import { HMSTrack } from '../tracks/HMSTrack';
-import HMSTrackSettings from '../settings/HMSTrackSettings';
 import { HMSLocalAudioTrack } from '../tracks/HMSLocalAudioTrack';
 import { HMSLocalVideoTrack } from '../tracks/HMSLocalVideoTrack';
 import HMSPublishConnection from '../../connection/publish';
-import HMSVideoTrackSettings from '../settings/HMSVideoTrackSettings';
-import HMSAudioTrackSettings from '../settings/HMSAudioTrackSettings';
+import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { IFetchAVTrackOptions } from '../../transport/ITransport';
-import { HMSSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { SimulcastLayer } from '../../interfaces/simulcast-layers';
 
 const TAG = 'HMSLocalStream';
 
@@ -83,7 +81,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     return tracks;
   }
 
-  addTransceiver(track: HMSTrack, simulcastLayers: HMSSimulcastLayer[]) {
+  addTransceiver(track: HMSTrack, simulcastLayers: SimulcastLayer[]) {
     let trackEncodings: RTCRtpEncodingParameters[] = [];
     if (track instanceof HMSLocalVideoTrack) {
       if (simulcastLayers.length > 0) {

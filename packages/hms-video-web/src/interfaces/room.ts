@@ -4,7 +4,7 @@ export enum HMSRoomType {
   DEFAULT,
 }
 
-export default interface HMSRoom {
+export interface HMSRoom {
   id: string;
   name: string;
   localPeer: HMSLocalPeer;

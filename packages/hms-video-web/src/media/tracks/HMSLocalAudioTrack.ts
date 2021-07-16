@@ -1,6 +1,6 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
-import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
+import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 
 function generateHasPropertyChanged(newSettings: HMSAudioTrackSettings, oldSettings: HMSAudioTrackSettings) {

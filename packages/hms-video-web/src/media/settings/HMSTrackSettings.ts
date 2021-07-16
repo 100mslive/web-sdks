@@ -1,5 +1,5 @@
-import HMSVideoTrackSettings, { HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
-import HMSAudioTrackSettings, { HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
+import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 
@@ -39,7 +39,7 @@ export class HMSTrackSettingsBuilder {
   }
 }
 
-export default class HMSTrackSettings implements IAnalyticsPropertiesProvider {
+export class HMSTrackSettings implements IAnalyticsPropertiesProvider {
   readonly video: HMSVideoTrackSettings | null;
   readonly audio: HMSAudioTrackSettings | null;
   readonly simulcast: boolean;

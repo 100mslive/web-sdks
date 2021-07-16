@@ -1,5 +1,5 @@
-import IHMSPeer from '../../../interfaces/hms-peer';
-import HMSPolicy from '../../../interfaces/policy';
+import { IHMSPeer } from '../../../interfaces/hms-peer';
+import { HMSPolicy } from '../../../interfaces/policy';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
 
 export type HMSPeerInit = {

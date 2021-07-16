@@ -1,7 +1,7 @@
 import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../media/tracks';
-import HMSPolicy from './policy';
+import { HMSPolicy } from './policy';
 
-export default interface IHMSPeer {
+export interface IHMSPeer {
   peerId: string;
   name: string;
   isLocal: boolean;

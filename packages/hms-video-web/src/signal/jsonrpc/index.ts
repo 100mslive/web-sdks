@@ -5,7 +5,7 @@ import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { HMSSignalMethod, JsonRpcRequest } from './models';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
-import HMSMessage from '../../interfaces/message';
+import { HMSMessage } from '../../interfaces/message';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
