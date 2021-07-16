@@ -42,7 +42,9 @@ export class SDKToHMS {
     track.deviceID = mediaSettings.deviceId;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
       const volume = sdkTrack.getVolume();
-      track.volume = volume;
+      if (volume) {
+        track.volume = volume;
+      }
     }
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();

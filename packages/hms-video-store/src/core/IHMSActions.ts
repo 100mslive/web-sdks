@@ -120,12 +120,21 @@ export interface IHMSActions {
    */
   attachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
   detachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+
   /**
-   * set the volume of selected audio track locally
-   * @param trackId trackId as stored in the store
+   * Set the output volume of audio tracks(overall/particular audio track)
    * @param value number between 0-100
+   * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
+   *
    */
-  setVolume(trackId: string, value: number): void;
+  setVolume(value: number, trackId?: string): void;
+
+  /**
+   * Set the audio output(speaker) device
+   * @param deviceId string deviceId of the audio output device
+   */
+  setAudioOutputDevice(deviceId: string): void;
+
   /**
    * set the quality of the selected videoTrack
    * @param trackId

@@ -76,6 +76,20 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications = notificationManager;
   }
 
+  setVolume(value: number, trackId?: HMSTrackID): void {
+    if (trackId) {
+      this.setTrackVolume(value, trackId);
+    } else {
+      this.sdk.getAudioOutput().setVolume(value);
+      this.syncPeers();
+    }
+  }
+
+  setAudioOutputDevice(deviceId: string): void {
+    this.sdk.getAudioOutput().setDevice(deviceId);
+    this.syncPeers();
+  }
+
   setPreferredLayer(trackId: string, layer: sdkTypes.HMSSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
@@ -87,20 +101,6 @@ export class HMSSDKActions implements IHMSActions {
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
-    }
-  }
-
-  setVolume(trackId: string, value: number): void {
-    const track = this.hmsSDKTracks[trackId];
-    if (track) {
-      if (track instanceof SDKHMSAudioTrack) {
-        track.setVolume(value);
-        this.syncPeers();
-      } else {
-        HMSLogger.w(`track ${trackId} is not an audio track`);
-      }
-    } else {
-      this.logPossibleInconsistency(`track ${trackId} not present, unable to set volume`);
     }
   }
 
@@ -352,6 +352,9 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.preview(config, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
+    });
+    this.sdk.addAudioListener({
+      onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
   }
 
@@ -639,7 +642,22 @@ export class HMSSDKActions implements IHMSActions {
         ?.deviceId,
       videoInputDeviceId: (sdkPeer.videoTrack as SDKHMSLocalVideoTrack)?.getMediaTrackSettings()
         ?.deviceId,
+      audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
     };
+  }
+
+  private setTrackVolume(value: number, trackId: HMSTrackID) {
+    const track = this.hmsSDKTracks[trackId];
+    if (track) {
+      if (track instanceof SDKHMSAudioTrack) {
+        track.setVolume(value);
+        this.syncPeers();
+      } else {
+        HMSLogger.w(`track ${trackId} is not an audio track`);
+      }
+    } else {
+      this.logPossibleInconsistency(`track ${trackId} not present, unable to set volume`);
+    }
   }
 
   /**
