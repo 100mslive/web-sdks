@@ -1,52 +1,50 @@
 import EventEmitter from 'events';
-import HMSDeviceManager from '../../interfaces/HMSDeviceManager';
-import HMSLogger from '../../utils/logger';
-import { HMSLocalAudioTrack } from '../../media/tracks/HMSLocalAudioTrack';
-import { HMSLocalVideoTrack } from '../../media/tracks/HMSLocalVideoTrack';
-import { HMSAudioTrackSettingsBuilder } from '../../media/settings/HMSAudioTrackSettings';
-import { HMSVideoTrackSettingsBuilder } from '../../media/settings/HMSVideoTrackSettings';
-import { HMSLocalPeer } from './peer';
-import { HMSException } from '../../error/HMSException';
-import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
-import analyticsEventsService from '../../analytics/AnalyticsEventsService';
+import HMSDeviceManager from '../interfaces/HMSDeviceManager';
+import HMSLogger from '../utils/logger';
+import { HMSLocalAudioTrack } from '../media/tracks/HMSLocalAudioTrack';
+import { HMSLocalVideoTrack } from '../media/tracks/HMSLocalVideoTrack';
+import { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
+import { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
+import { HMSLocalPeer } from '../sdk/models/peer';
+import { HMSException } from '../error/HMSException';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import { IStore } from '../sdk/store';
 
-export type SelectedDevices = {
-  audioInput: InputDeviceInfo;
-  audioOutput: MediaDeviceInfo;
-  videoInput: InputDeviceInfo;
-};
+export type SelectedDevices = HMSDeviceManager['selected'];
 
-export type DeviceList = {
-  audioInput: InputDeviceInfo[];
-  audioOutput: MediaDeviceInfo[];
-  videoInput: InputDeviceInfo[];
-};
+export type DeviceList = Omit<HMSDeviceManager, 'selected'>;
 
 export interface DeviceChangeEvent {
   track: HMSLocalAudioTrack | HMSLocalVideoTrack;
   error: HMSException;
 }
 
-export default class DeviceManager implements HMSDeviceManager {
+export class DeviceManager implements HMSDeviceManager {
   audioInput: InputDeviceInfo[] = [];
   audioOutput: MediaDeviceInfo[] = [];
   videoInput: InputDeviceInfo[] = [];
-
-  selected: SelectedDevices = {} as SelectedDevices;
-
+  selected: SelectedDevices = {};
   localPeer!: HMSLocalPeer | null;
 
   private eventEmitter: EventEmitter = new EventEmitter();
   private TAG: string = '[Device Manager]:';
-  private initCalled = false;
+  private initialized = false;
 
-  init() {
-    if (this.initCalled) {
+  constructor(private store: IStore) {}
+
+  updateOutputDevice = (newDevice: MediaDeviceInfo | undefined) => {
+    this.selected.audioOutput = newDevice;
+    this.selected.audioOutput && this.store.updateAudioOutputDevice(this.selected.audioOutput);
+  };
+
+  async init() {
+    if (this.initialized) {
       return;
     }
-    this.initCalled = true;
+    this.initialized = true;
     navigator.mediaDevices.ondevicechange = () => this.handleDeviceChange();
-    this.enumerateDevices();
+    await this.enumerateDevices();
     HMSLogger.d(this.TAG, '[DeviceList]', JSON.stringify(this.selected, null, 2));
     analyticsEventsService
       .queue(AnalyticsEventFactory.deviceChange({ selection: this.selected, type: 'list', devices: this.getDevices() }))
@@ -62,7 +60,7 @@ export default class DeviceManager implements HMSDeviceManager {
   }
 
   cleanUp() {
-    this.initCalled = false;
+    this.initialized = false;
     navigator.mediaDevices.ondevicechange = () => {};
   }
 
@@ -102,26 +100,36 @@ export default class DeviceManager implements HMSDeviceManager {
       });
   };
 
-  handleDeviceChange = async () => {
+  private handleDeviceChange = async () => {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
+    const prevSelectedAudioOutput = this.selected.audioOutput;
     await this.enumerateDevices();
     analyticsEventsService
       .queue(AnalyticsEventFactory.deviceChange({ selection: this.selected, type: 'list', devices: this.getDevices() }))
       .flush();
     HMSLogger.d(this.TAG, '[After Device Change]', JSON.stringify(this.selected, null, 2));
 
+    if (prevSelectedAudioOutput?.deviceId !== this.selected.audioOutput?.deviceId) {
+      this.updateOutputDevice(this.selected.audioOutput);
+    }
+
     if (
       this.localPeer &&
       this.localPeer.audioTrack &&
-      prevSelectedAudioInput.deviceId !== this.selected.audioInput.deviceId
+      prevSelectedAudioInput?.deviceId !== this.selected.audioInput?.deviceId
     ) {
       const prevAudioTrackSettings = (this.localPeer.audioTrack as HMSLocalAudioTrack).settings;
       const prevAudioEnabled = this.localPeer.audioTrack.enabled;
+      const newAudioDeviceId =
+        this.selected.audioInput?.deviceId ||
+        prevSelectedAudioInput?.deviceId ||
+        this.audioInput[0]?.deviceId ||
+        'default';
       const newAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
         .codec(prevAudioTrackSettings.codec)
         .maxBitrate(prevAudioTrackSettings.maxBitrate)
-        .deviceId(this.selected.audioInput.deviceId)
+        .deviceId(newAudioDeviceId)
         .build();
       try {
         await (this.localPeer.audioTrack as HMSLocalAudioTrack).setSettings(newAudioTrackSettings);
@@ -147,17 +155,22 @@ export default class DeviceManager implements HMSDeviceManager {
     if (
       this.localPeer &&
       this.localPeer.videoTrack &&
-      prevSelectedVideoInput.deviceId !== this.selected.videoInput.deviceId
+      prevSelectedVideoInput?.deviceId !== this.selected.videoInput?.deviceId
     ) {
       const prevVideoTrackSettings = (this.localPeer.videoTrack as HMSLocalVideoTrack).settings;
       const prevVideoEnabled = this.localPeer.videoTrack.enabled;
+      const newVideoDeviceId =
+        this.selected.videoInput?.deviceId ||
+        prevSelectedVideoInput?.deviceId ||
+        this.videoInput[0]?.deviceId ||
+        'default';
       const newVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
         .codec(prevVideoTrackSettings.codec)
         .maxBitrate(prevVideoTrackSettings.maxBitrate)
         .maxFramerate(prevVideoTrackSettings.maxFramerate)
         .setWidth(prevVideoTrackSettings.width)
         .setHeight(prevVideoTrackSettings.height)
-        .deviceId(this.selected.videoInput.deviceId)
+        .deviceId(newVideoDeviceId)
         .build();
       try {
         await (this.localPeer.videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings);

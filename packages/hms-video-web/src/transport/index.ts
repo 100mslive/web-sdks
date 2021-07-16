@@ -34,8 +34,8 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { IStore } from '../sdk/store/IStore';
-import DeviceManager from '../sdk/models/DeviceManager';
+import { DeviceManager } from '../device-manager';
+import { IStore } from '../sdk/store';
 
 const TAG = '[HMSTransport]:';
 

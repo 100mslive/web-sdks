@@ -1,6 +1,6 @@
 import { HMSException } from '../error/HMSException';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
-import { DeviceList, SelectedDevices } from '../sdk/models/DeviceManager';
+import { DeviceList, SelectedDevices } from '../device-manager';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
@@ -128,7 +128,7 @@ export default class AnalyticsEventFactory {
     devices,
     error,
   }: {
-    selection: InputDeviceInfo;
+    selection?: InputDeviceInfo;
     error: HMSException;
     devices: DeviceList;
   }) {

@@ -23,8 +23,8 @@ import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
 } from '../media/settings';
-import HMSAudioSinkManager from '../audio-sink-manager';
-import DeviceManager, { DeviceChangeEvent } from './models/DeviceManager';
+import { AudioSinkManager } from '../audio-sink-manager';
+import { DeviceChangeEvent, DeviceManager, AudioOutputManager } from '../device-manager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import { HMSLocalAudioTrack } from '../media/tracks/HMSLocalAudioTrack';
@@ -35,7 +35,7 @@ import { IFetchAVTrackOptions } from '../transport/ITransport';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
-import { store } from './store/Store';
+import { store } from './store';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 
 // @DISCUSS: Adding it here as a hotfix
@@ -55,12 +55,19 @@ export class HMSSdk implements HMSInterface {
   private listener!: HMSUpdateListener | null;
   private errorListener?: IErrorListener;
   private audioListener: HMSAudioListener | null = null;
-  private audioSinkManager!: HMSAudioSinkManager;
   private published: boolean = false;
   private publishParams: any = null;
-  private deviceManager: DeviceManager = new DeviceManager();
+  private deviceManager: DeviceManager = new DeviceManager(this.store);
+  private audioSinkManager: AudioSinkManager = new AudioSinkManager(
+    this.store,
+    this.notificationManager,
+    this.deviceManager,
+  );
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
+  private config?: HMSConfig;
+
+  audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
 
   public get localPeer(): HMSLocalPeer {
     return this.store.getLocalPeer();
@@ -121,6 +128,7 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.config = config;
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     this.errorListener = listener;
     const localPeer = new HMSLocalPeer({
@@ -139,6 +147,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager.removeEventListener('role-change', roleChangeHandler);
       const tracks = await this.initLocalTracks(config.settings!);
       tracks.forEach((track) => this.setLocalPeerTrack(track));
+      this.localPeer.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       listener.onPreview(this.store.getRoom(), tracks);
     };
 
@@ -157,9 +166,10 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private handleDeviceChangeError(event: DeviceChangeEvent | undefined) {
+  private handleDeviceChangeError = (event: DeviceChangeEvent | undefined) => {
     if (!event) return;
     const track = event.track;
+    HMSLogger.d(this.TAG, 'Device Change event', event);
     if (event.error) {
       this.errorListener?.onError(event.error);
       if (
@@ -173,19 +183,13 @@ export class HMSSdk implements HMSInterface {
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, this.localPeer!);
       }
     }
-  }
+  };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
+    this.localPeer.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
-    this.deviceManager.init();
-    this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
-    this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
-    this.audioSinkManager = new HMSAudioSinkManager(
-      this.notificationManager,
-      this.deviceManager,
-      config.audioSinkElementId,
-    );
+    this.config = config;
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
     if (!this.localPeer) {
@@ -230,8 +234,8 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    this.audioSinkManager?.cleanUp();
-    this.deviceManager.cleanUp();
+    this.localPeer.audioTrack?.destroyAudioLevelMonitor();
+    this.cleanDeviceManagers();
     this.store.cleanUp();
 
     this.published = false;
@@ -381,7 +385,6 @@ export class HMSSdk implements HMSInterface {
     const tracks = await this.initLocalTracks(initialSettings);
     await this.setAndPublishTracks(tracks);
     this.published = true;
-    this.deviceManager.localPeer = this.localPeer;
   }
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -407,6 +410,7 @@ export class HMSSdk implements HMSInterface {
 
   private async initLocalTracks(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
     const localTracks = this.store.getLocalPeerTracks();
+
     if (localTracks.length) {
       return localTracks;
     }
@@ -415,7 +419,6 @@ export class HMSSdk implements HMSInterface {
     const { audio, video, allowed } = this.publishParams;
     const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
     const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-    HMSLogger.d(this.TAG, `Device IDs :  ${audioInputDeviceId} ,  ${videoDeviceId} `);
     let tracks: Array<HMSLocalTrack> = [];
 
     if (canPublishAudio || canPublishVideo) {
@@ -465,6 +468,34 @@ export class HMSSdk implements HMSInterface {
       }
     }
 
+    await this.initDeviceManagers();
+
     return tracks;
+  }
+
+  private async initDeviceManagers() {
+    await this.deviceManager.init();
+    this.deviceManager.localPeer = this.localPeer;
+    this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
+    this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
+    this.audioSinkManager.init(this.config?.audioSinkElementId);
+  }
+
+  private cleanDeviceManagers() {
+    this.deviceManager.removeEventListener('audio-device-change', this.handleDeviceChangeError);
+    this.deviceManager.removeEventListener('video-device-change', this.handleDeviceChangeError);
+    this.deviceManager.cleanUp();
+    this.audioSinkManager.cleanUp();
+  }
+
+  private initPreviewTrackAudioLevelMonitor() {
+    this.localPeer.audioTrack?.initAudioLevelMonitor();
+    this.localPeer.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', (audioLevelUpdate) => {
+      const hmsSpeakers = audioLevelUpdate
+        ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer, track: this.localPeer.audioTrack! }]
+        : [];
+      this.store.updateSpeakers(hmsSpeakers);
+      this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
+    });
   }
 }

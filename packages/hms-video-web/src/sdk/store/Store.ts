@@ -115,6 +115,14 @@ class Store implements IStore {
     this.speakers = speakers;
   }
 
+  updateAudioOutputVolume(value: number) {
+    this.getAudioTracks().forEach((track) => track.setVolume(value));
+  }
+
+  updateAudioOutputDevice(device: MediaDeviceInfo) {
+    this.getAudioTracks().forEach((track) => track.setOutputDevice(device));
+  }
+
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     if (source === 'screen') {
       return this.screenshareLayers?.layers || [];

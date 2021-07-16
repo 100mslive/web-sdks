@@ -4,8 +4,8 @@ export default interface HMSDeviceManager {
   videoInput: InputDeviceInfo[];
 
   selected: {
-    audioInput: InputDeviceInfo;
-    audioOutput: MediaDeviceInfo;
-    videoInput: InputDeviceInfo;
+    audioInput?: InputDeviceInfo;
+    audioOutput?: MediaDeviceInfo;
+    videoInput?: InputDeviceInfo;
   };
 }

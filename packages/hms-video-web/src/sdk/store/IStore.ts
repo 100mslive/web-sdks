@@ -44,6 +44,8 @@ export interface IStore {
   removeTrack(trackId: string): void;
 
   updateSpeakers(speakers: HMSSpeaker[]): void;
+  updateAudioOutputVolume(volume: number): void;
+  updateAudioOutputDevice(device: MediaDeviceInfo): void;
 
   /**
    * Used to sort list of items(peers/tracks) based on common use cases.

@@ -16,7 +16,7 @@ import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { HMSSpeaker } from '../interfaces/speaker';
 import Message from './models/HMSMessage';
-import { IStore } from './store/IStore';
+import { IStore } from './store';
 
 interface TrackStateEntry {
   peerId: string;
@@ -379,6 +379,7 @@ export default class NotificationManager {
     }));
 
     this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
+    this.store.updateSpeakers(hmsSpeakers);
     const dominantSpeaker = speakers[0];
 
     if (dominantSpeaker) {
