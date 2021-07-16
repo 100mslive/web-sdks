@@ -1,6 +1,10 @@
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './hmsSDKStore/sdkTypes';
+import {
+  HMSAudioTrackSettings,
+  HMSVideoTrackSettings,
+  HMSConfig,
+  HMSSimulcastLayer,
+} from './hmsSDKStore/sdkTypes';
 import { HMSTrackSource } from './schema';
-import { HMSConfig, HMSSimulcastLayer } from './hmsSDKStore/sdkTypes';
 import { HMSVideoProcessor } from '@100mslive/hms-video';
 
 /**
@@ -97,14 +101,14 @@ export interface IHMSActions {
    * ({ volume, codec, maxBitrate, deviceId, advanced })
    * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
-  setAudioSettings(settings: HMSAudioTrackSettings): Promise<void>;
+  setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
    * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
-  setVideoSettings(settings: HMSVideoTrackSettings): Promise<void>;
+  setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
 
   /**
    * If you're not using our Video Component you can use the below functions directly
