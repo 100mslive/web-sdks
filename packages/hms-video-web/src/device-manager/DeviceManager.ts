@@ -136,6 +136,7 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventEmitter.emit('audio-device-change');
         if (!prevAudioEnabled) {
           this.localPeer.audioTrack.setEnabled(prevAudioEnabled);
+          HMSLogger.e(this.TAG, '[Audio Device Change Success]');
         }
       } catch (error) {
         HMSLogger.e(this.TAG, '[Audio Device Change]', error);
@@ -177,6 +178,7 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventEmitter.emit('video-device-change');
         if (!prevVideoEnabled) {
           this.localPeer.videoTrack.setEnabled(prevVideoEnabled);
+          HMSLogger.e(this.TAG, '[Video Device Change Success]');
         }
       } catch (error) {
         HMSLogger.e(this.TAG, '[Video Device Change]', error);

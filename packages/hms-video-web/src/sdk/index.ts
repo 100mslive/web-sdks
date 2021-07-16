@@ -145,6 +145,10 @@ export class HMSSdk implements HMSInterface {
     const roleChangeHandler = async (e: any) => {
       this.publishParams = e.detail.params.role.publishParams;
       this.notificationManager.removeEventListener('role-change', roleChangeHandler);
+    };
+
+    const policyHandler = async () => {
+      this.notificationManager.removeEventListener('policy-change', roleChangeHandler);
       const tracks = await this.initLocalTracks(config.settings!);
       tracks.forEach((track) => this.setLocalPeerTrack(track));
       this.localPeer.audioTrack && this.initPreviewTrackAudioLevelMonitor();
@@ -152,6 +156,7 @@ export class HMSSdk implements HMSInterface {
     };
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
+    this.notificationManager.addEventListener('policy-change', policyHandler);
 
     this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
 
