@@ -68,7 +68,7 @@ export class HMSSdk implements HMSInterface {
   private config?: HMSConfig;
   private audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
 
-  public get localPeer(): HMSLocalPeer {
+  public get localPeer(): HMSLocalPeer | undefined {
     return this.store.getLocalPeer();
   }
 
@@ -150,7 +150,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager.removeEventListener('policy-change', roleChangeHandler);
       const tracks = await this.initLocalTracks(config.settings!);
       tracks.forEach((track) => this.setLocalPeerTrack(track));
-      this.localPeer.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+      this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       listener.onPreview(this.store.getRoom(), tracks);
     };
 
@@ -163,7 +163,7 @@ export class HMSSdk implements HMSInterface {
       await this.transport.connect(
         config.authToken,
         config.initEndpoint || 'https://prod-init.100ms.live/init',
-        this.localPeer.peerId,
+        this.localPeer!.peerId,
       );
     } catch (ex) {
       this.errorListener?.onError(ex);
@@ -190,7 +190,7 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
-    this.localPeer.audioTrack?.destroyAudioLevelMonitor();
+    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
     this.config = config;
@@ -223,7 +223,7 @@ export class HMSSdk implements HMSInterface {
 
     this.transport!.join(
       config.authToken,
-      this.localPeer.peerId,
+      this.localPeer!.peerId,
       { name: config.userName, metaData: config.metaData || '' },
       config.initEndpoint,
       config.autoVideoSubscribe,
@@ -238,7 +238,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    this.localPeer.audioTrack?.destroyAudioLevelMonitor();
+    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.cleanDeviceManagers();
     this.store.cleanUp();
 
@@ -483,7 +483,6 @@ export class HMSSdk implements HMSInterface {
 
   private async initDeviceManagers() {
     await this.deviceManager.init();
-    this.deviceManager.localPeer = this.localPeer;
     this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
     this.audioSinkManager.init(this.config?.audioSinkElementId);
@@ -497,10 +496,10 @@ export class HMSSdk implements HMSInterface {
   }
 
   private initPreviewTrackAudioLevelMonitor() {
-    this.localPeer.audioTrack?.initAudioLevelMonitor();
-    this.localPeer.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', (audioLevelUpdate) => {
+    this.localPeer?.audioTrack?.initAudioLevelMonitor();
+    this.localPeer?.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', (audioLevelUpdate) => {
       const hmsSpeakers = audioLevelUpdate
-        ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer, track: this.localPeer.audioTrack! }]
+        ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
         : [];
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);

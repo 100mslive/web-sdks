@@ -7,7 +7,7 @@ export default class Room implements HMSRoom {
   hasWaitingRoom!: boolean;
 
   public get localPeer() {
-    return this.store.getLocalPeer();
+    return this.store.getLocalPeer()!;
   }
 
   public get peers() {

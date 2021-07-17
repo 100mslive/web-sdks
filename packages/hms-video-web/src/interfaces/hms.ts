@@ -9,7 +9,7 @@ import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 export default interface HMS {
   join(config: HMSConfig, callback: HMSUpdateListener): void;
   leave(): Promise<void>;
-  getLocalPeer(): HMSLocalPeer;
+  getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
   sendMessage(type: string, message: string, receiver?: string): HMSMessage;
   startScreenShare(onStop: () => void): Promise<void>;

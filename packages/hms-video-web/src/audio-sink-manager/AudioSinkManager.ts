@@ -58,6 +58,9 @@ export class AudioSinkManager {
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.audioSink?.remove();
+    this.silentAudio?.remove();
+    this.autoPausedTracks = new Set();
+    this.playInProgress = false;
     this.initialized = false;
   }
 

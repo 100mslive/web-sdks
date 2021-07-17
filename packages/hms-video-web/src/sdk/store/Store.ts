@@ -25,7 +25,10 @@ class Store implements IStore {
   }
 
   getLocalPeer() {
-    return this.peers[this.localPeerId!] as HMSLocalPeer;
+    if (this.localPeerId && this.peers[this.localPeerId]) {
+      return this.peers[this.localPeerId] as HMSLocalPeer;
+    }
+    return undefined;
   }
 
   getRemotePeers() {

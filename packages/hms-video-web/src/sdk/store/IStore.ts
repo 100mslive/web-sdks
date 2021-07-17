@@ -15,7 +15,7 @@ export interface IStore {
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
 
-  getLocalPeer(): HMSLocalPeer;
+  getLocalPeer(): HMSLocalPeer | undefined;
   getRemotePeers(): HMSRemotePeer[];
   getPeers(): HMSPeer[];
 

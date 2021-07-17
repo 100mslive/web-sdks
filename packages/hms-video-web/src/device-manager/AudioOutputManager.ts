@@ -26,9 +26,7 @@ export class AudioOutputManager implements IAudioOutputManager {
     return this.deviceManager.selected.audioOutput;
   }
 
-  setDevice(deviceId: string) {
-    const newDevice = this.deviceManager.audioOutput.find((device) => device.deviceId === deviceId);
-    newDevice && this.deviceManager.updateOutputDevice(newDevice);
-    return newDevice;
+  setDevice(deviceId?: string) {
+    return this.deviceManager.updateOutputDevice(deviceId);
   }
 }
