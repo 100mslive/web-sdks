@@ -37,7 +37,7 @@ export class DeviceManager implements HMSDeviceManager {
 
   updateOutputDevice = (deviceId?: string) => {
     const newDevice = this.audioOutput.find((device) => device.deviceId === deviceId);
-    if (newDevice && newDevice.deviceId !== this.selected.audioOutput?.deviceId) {
+    if (newDevice) {
       this.selected.audioOutput = newDevice;
       this.store.updateAudioOutputDevice(this.selected.audioOutput);
     }
@@ -115,16 +115,13 @@ export class DeviceManager implements HMSDeviceManager {
   private handleDeviceChange = async () => {
     const prevSelectedAudioInput = this.selected.audioInput;
     const prevSelectedVideoInput = this.selected.videoInput;
-    const prevSelectedAudioOutput = this.selected.audioOutput;
     await this.enumerateDevices();
     analyticsEventsService
       .queue(AnalyticsEventFactory.deviceChange({ selection: this.selected, type: 'list', devices: this.getDevices() }))
       .flush();
     this.logDevices('After Device Change');
 
-    if (prevSelectedAudioOutput?.deviceId !== this.selected.audioOutput?.deviceId) {
-      this.updateOutputDevice(this.selected.audioOutput?.deviceId);
-    }
+    this.updateOutputDevice(this.selected.audioOutput?.deviceId);
 
     if (
       this.localPeer &&
