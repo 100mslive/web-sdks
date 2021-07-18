@@ -33,7 +33,7 @@ export interface IHMSActions {
    *
    * @param args join config with room id, required for joining the room
    */
-  join(...args: any[]): void;
+  join(config: HMSConfig): void;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
