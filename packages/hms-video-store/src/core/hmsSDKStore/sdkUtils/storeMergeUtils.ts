@@ -58,7 +58,7 @@ const isEntityRemoved = <T>(oldItem: T, newItem: T) => oldItem && !newItem;
 const isEntityAdded = <T>(oldItem: T, newItem: T) => !oldItem && newItem;
 
 // eslint-disable-next-line complexity
-const areArraysEqual = <T>(arr1: T[], arr2?: T[]): boolean => {
+export const areArraysEqual = <T>(arr1: T[], arr2?: T[]): boolean => {
   if (arr1 === arr2) {
     // reference check
     return true;

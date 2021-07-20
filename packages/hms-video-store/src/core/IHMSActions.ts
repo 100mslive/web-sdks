@@ -3,9 +3,9 @@ import {
   HMSVideoTrackSettings,
   HMSConfig,
   HMSSimulcastLayer,
-} from './hmsSDKStore/sdkTypes';
+} from '@100mslive/hms-video';
 import { HMSTrackSource } from './schema';
-import { HMSVideoProcessor } from '@100mslive/hms-video';
+import { HMSVideoPlugin } from '@100mslive/hms-video';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -31,7 +31,7 @@ export interface IHMSActions {
    * If join is called while an earlier join is in progress for the room id, it
    * is ignored
    *
-   * @param args join config with room id, required for joining the room
+   * @param config join config with room id, required for joining the room
    */
   join(config: HMSConfig): void;
 
@@ -86,10 +86,13 @@ export interface IHMSActions {
    * @param enabled boolean
    */
   setLocalAudioEnabled(enabled: boolean): Promise<void>;
+
+  /**
+   * @see setLocalAudioEnabled
+   */
   setLocalVideoEnabled(enabled: boolean): Promise<void>;
 
   /**
-   *
    * @param trackId string - ID of the track whose mute status needs to be set
    * @param enabled boolean - true when we want to unmute the track and false when we want to unmute it
    */
@@ -99,14 +102,12 @@ export interface IHMSActions {
    * Change settings of the local peer's audio track
    * @param settings HMSAudioTrackSettings
    * ({ volume, codec, maxBitrate, deviceId, advanced })
-   * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
    * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
-   * @privateRemarks TODO: Change to MediaStreamConstraints or define interface in sdk-components.
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
 
@@ -119,6 +120,10 @@ export interface IHMSActions {
    * @param videoElement HTML native element where the video has to be shown
    */
   attachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+
+  /**
+   * @see attachVideo
+   */
   detachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
 
   /**
@@ -143,11 +148,17 @@ export interface IHMSActions {
   setPreferredLayer(trackId: string, layer: HMSSimulcastLayer): void;
 
   /**
-   * Adding/Removing Processor to the local peer video track
-   * @param processor HMSVideoProcessor
+   * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
+   * Video plugins can be added/removed at any time after the join is successful.
+   * @param plugin HMSVideoPlugin
+   * @see HMSVideoPlugin
    */
-  addVideoProcessor(processor: HMSVideoProcessor): Promise<void>;
-  removeVideoProcessor(processor: HMSVideoProcessor): Promise<void>;
+  addPluginToVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
+
+  /**
+   * @see addPluginToVideoTrack
+   */
+  removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 }
 
 /**

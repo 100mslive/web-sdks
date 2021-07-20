@@ -1,11 +1,13 @@
 import {
   HMSTrack as SDKHMSTrack,
+  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
 } from '@100mslive/hms-video';
 import { HMSPeer, HMSMessage, HMSTrack, HMSRoom } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
+import { areArraysEqual } from './sdkUtils/storeMergeUtils';
 
 export class SDKToHMS {
   static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
@@ -29,7 +31,6 @@ export class SDKToHMS {
       type: sdkTrack.type,
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
-      processors: sdkTrack.processors,
     };
     this.enrichTrack(track, sdkTrack);
     return track;
@@ -48,6 +49,11 @@ export class SDKToHMS {
     }
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
+    }
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+      if (!areArraysEqual(sdkTrack.getPlugins(), track.plugins)) {
+        track.plugins = sdkTrack.getPlugins();
+      }
     }
   }
 

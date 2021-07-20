@@ -37,7 +37,7 @@ export interface HMSTrack {
   height?: number;
   width?: number;
   deviceID?: string;
-  processors?: string[];
+  plugins?: string[];
   displayEnabled?: boolean;
   volume?: number;
   layer?: HMSSimulcastLayer;

@@ -28,7 +28,7 @@ import {
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSSdk,
-  HMSVideoProcessor,
+  HMSVideoPlugin,
   HMSTrack as SDKHMSTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
@@ -289,39 +289,12 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async addVideoProcessor(processor: HMSVideoProcessor): Promise<void> {
-    const trackID = this.store.getState(selectLocalVideoTrackID);
-    if (!processor) {
-      console.log('Invalid processor add request got in store');
-      return;
-    }
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        console.log('video track exist add Processor', sdkTrack);
-        await (sdkTrack as SDKHMSLocalVideoTrack).addProcessor(processor);
-        this.syncPeers();
-      } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to add Processor`);
-      }
-    }
+  async addPluginToVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
+    return this.addRemoveVideoPlugin(plugin, 'add');
   }
 
-  async removeVideoProcessor(processor: HMSVideoProcessor): Promise<void> {
-    if (!processor) {
-      console.log('Invalid processor remove request got in store');
-      return;
-    }
-    const trackID = this.store.getState(selectLocalVideoTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        await (sdkTrack as SDKHMSLocalVideoTrack).removeProcessor(processor);
-        this.syncPeers();
-      } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove Processor`);
-      }
-    }
+  async removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
+    return this.addRemoveVideoPlugin(plugin, 'remove');
   }
 
   private resetState() {
@@ -381,14 +354,6 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      const srcObject = videoElement.srcObject;
-      if (srcObject !== null && srcObject instanceof MediaStream) {
-        const existingTrackID = srcObject.getVideoTracks()[0]?.id;
-        if (existingTrackID === sdkTrack.trackId) {
-          // it's already attached, attaching again would just cause flickering
-          return;
-        }
-      }
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
@@ -676,6 +641,27 @@ export class HMSSDKActions implements IHMSActions {
 
   private logPossibleInconsistency(inconsistency: string) {
     HMSLogger.w('possible inconsistency detected - ', inconsistency);
+  }
+
+  private async addRemoveVideoPlugin(plugin: HMSVideoPlugin, action: 'add' | 'remove') {
+    if (!plugin) {
+      HMSLogger.w('Invalid plugin received in store');
+      return;
+    }
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        if (action === 'add') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin);
+        } else if (action === 'remove') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).removePlugin(plugin);
+        }
+        this.syncPeers();
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+      }
+    }
   }
 
   /**
