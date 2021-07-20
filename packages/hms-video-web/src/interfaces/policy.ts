@@ -22,7 +22,7 @@ export interface HMSPolicy {
     };
     allowed: string[];
     videoSimulcastLayers: SimulcastLayers;
-    screenshareSimulcastLayers: SimulcastLayers;
+    screenSimulcastLayers: SimulcastLayers;
   };
   subscribeParams: {
     subscribeToRoles: string[];

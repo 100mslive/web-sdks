@@ -85,6 +85,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     let trackEncodings: RTCRtpEncodingParameters[] = [];
     if (track instanceof HMSLocalVideoTrack) {
       if (simulcastLayers.length > 0) {
+        HMSLogger.v(TAG, 'Simulcast enabled with layers', simulcastLayers);
         trackEncodings.push(...simulcastLayers);
       } else {
         const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };

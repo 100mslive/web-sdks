@@ -102,9 +102,13 @@ export default class NotificationManager {
 
   private handlePolicyChange(params: PolicyParams) {
     this.store.setKnownRoles(params.known_roles);
-    const { videoSimulcastLayers, screenshareSimulcastLayers } = params.known_roles[params.name].publishParams;
-    this.store.setVideoSimulcastLayers(videoSimulcastLayers);
-    this.store.setScreenshareSimulcastLayers(screenshareSimulcastLayers);
+    // handle when role is not present in known_roles
+    const publishParams = params.known_roles[params.name]?.publishParams;
+    if (publishParams && Object.keys(publishParams).length > 0) {
+      const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
+      this.store.setVideoSimulcastLayers(videoSimulcastLayers);
+      this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
+    }
     this.eventEmitter.emit('policy-change', { detail: { params } });
   }
 

@@ -2,6 +2,7 @@ import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
 import { HMSSimulcastLayer } from '../settings';
 import { HMSRemoteVideoTrack, HMSRemoteAudioTrack } from '../tracks';
+import HMSLogger from '../../utils/logger';
 
 export type HMSRemoteTrack = HMSRemoteAudioTrack | HMSRemoteVideoTrack;
 
@@ -24,6 +25,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
 
   setVideo(layer: HMSSimulcastLayer) {
     this.video = layer;
+    HMSLogger.v('[Remote stream]', `Switching to ${layer} layer`);
     this.syncWithApiChannel();
   }
 

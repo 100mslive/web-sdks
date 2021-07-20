@@ -136,7 +136,7 @@ class Store implements IStore {
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions {
     const layers = source === 'screen' ? this.screenshareLayers : this.videoLayers;
     const width = layers?.width;
-    const height = layers?.width;
+    const height = layers?.height;
     return {
       width,
       height,
