@@ -1,7 +1,7 @@
 import HMSMediaStream from './HMSMediaStream';
-import { HMSTrack } from '../tracks/HMSTrack';
-import { HMSLocalAudioTrack } from '../tracks/HMSLocalAudioTrack';
-import { HMSLocalVideoTrack } from '../tracks/HMSLocalVideoTrack';
+import { HMSTrack } from '../tracks';
+import { HMSLocalAudioTrack } from '../tracks';
+import { HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
 import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
@@ -113,29 +113,36 @@ export default class HMSLocalStream extends HMSMediaStream {
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
   }
 
-  async replaceTrack(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection?.getSenders().find((sender) => sender.track?.id === track.trackId);
-    if (sender === undefined) {
-      // Not throwing an error as this is not a fatal error
-      HMSLogger.e(TAG, 'No sender found for trackId', track.trackId);
-    } else {
-      sender.track!.stop(); // If the track is already stopped, this does not throw any error. 😉
-      await sender.replaceTrack(withTrack);
-    }
-
-    this.nativeStream.addTrack(withTrack);
-    this.nativeStream.removeTrack(track.nativeTrack);
-    track.nativeTrack = withTrack;
+  /**
+   * On mute and unmute of video tracks as well as for changing cameras, we replace the track using replaceTrack api
+   * so as to avoid a renegotiation with the backend and reflect changes faster.
+   * @param track - the current track
+   * @param withTrack - the track to replace it with
+   */
+  async replaceTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
+    await this.replaceSenderTrack(track, withTrack);
+    track.stop(); // If the track is already stopped, this does not throw any error. 😉
+    this.replaceStreamTrack(track, withTrack);
   }
 
-  async replaceTrackWithoutStop(track: HMSTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection!.getSenders().find((sender) => sender.track && sender.track!.id === track.trackId);
-
-    if (sender === undefined) throw Error(`No sender found for trackId=${track.trackId}`);
+  replaceStreamTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
     this.nativeStream.addTrack(withTrack);
-    await sender.replaceTrack(withTrack);
+    this.nativeStream.removeTrack(track);
+  }
 
-    track.nativeTrack = withTrack;
+  /**
+   * In case of video plugins we need to replace the track sent to remote without stopping the original one. As
+   * if the original is stopped, plugin would stop getting input frames to process. So only the track in the
+   * sender needs to be replaced.
+   */
+  async replaceSenderTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
+    const sender = this.connection?.getSenders().find((sender) => sender.track && sender.track!.id === track.id);
+
+    if (sender === undefined) {
+      HMSLogger.w(TAG, `No sender found for trackId=${track.id}`);
+      return;
+    }
+    await sender.replaceTrack(withTrack);
   }
 
   removeSender(track: HMSTrack) {

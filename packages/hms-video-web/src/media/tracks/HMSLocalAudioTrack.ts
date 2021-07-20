@@ -1,6 +1,6 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings/HMSAudioTrackSettings';
+import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { ITrackAudioLevelUpdate, TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { EventReceiver } from '../../utils/typed-event-emitter';
@@ -33,8 +33,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
-    const withTrack = await getAudioTrack(settings);
-    await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
+    const newTrack = await getAudioTrack(settings);
+    await (this.stream as HMSLocalStream).replaceTrack(this.nativeTrack, newTrack);
+    this.nativeTrack = newTrack;
   }
 
   async setEnabled(value: boolean) {

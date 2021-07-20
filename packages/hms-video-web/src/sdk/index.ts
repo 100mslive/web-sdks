@@ -1,4 +1,4 @@
-import { HMSConfig } from '../interfaces/config';
+import { HMSConfig } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -9,10 +9,9 @@ import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
-import { HMSTrackSource } from '../media/tracks/HMSTrack';
-import { HMSTrackType } from '../media/tracks';
+import { HMSTrackSource, HMSTrackType, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
-import { HMSTrackSettingsBuilder } from '../media/settings/HMSTrackSettings';
+import { HMSTrackSettingsBuilder } from '../media/settings';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
 import Message from './models/HMSMessage';
@@ -27,8 +26,6 @@ import { AudioSinkManager } from '../audio-sink-manager';
 import { DeviceChangeEvent, DeviceManager, AudioOutputManager } from '../device-manager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
-import { HMSLocalAudioTrack } from '../media/tracks/HMSLocalAudioTrack';
-import { HMSLocalVideoTrack } from '../media/tracks/HMSLocalVideoTrack';
 import { TransportState } from '../transport/models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
@@ -257,10 +254,7 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       this.localPeer?.audioTrack?.nativeTrack.stop();
       this.localPeer?.videoTrack?.nativeTrack.stop();
-      const videoTrack = this.localPeer?.videoTrack;
-      if (videoTrack && videoTrack?.processors.length !== 0) {
-        await videoTrack?.clearProcessors();
-      }
+      this.localPeer?.videoTrack?.cleanupPlugins();
 
       this.localPeer?.auxiliaryTracks.forEach((track) => track.nativeTrack.stop());
       this.cleanUp();

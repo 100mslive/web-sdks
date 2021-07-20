@@ -4,14 +4,13 @@ import { HMSTrackType } from './HMSTrackType';
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin';
 
 export abstract class HMSTrack {
-  // @internal
+  /**
+   * @internal
+   */
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;
 
-  //name of processors
-  processors: Array<string>;
-
-  /** Changes when un-muting and adding processor the local track
+  /** Changes on mute/unmute or plugins addition and removal
    * i.e replacing the nativeTrack with different `deviceId`
    * track.
    * @internal */
@@ -39,6 +38,5 @@ export abstract class HMSTrack {
     this.stream = stream;
     this.nativeTrack = track;
     this.source = source;
-    this.processors = [];
   }
 }

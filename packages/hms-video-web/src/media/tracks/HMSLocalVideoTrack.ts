@@ -1,8 +1,9 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings/HMSVideoTrackSettings';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
-import { HMSVideoProcessor } from '../../interfaces/videoProcessors';
+import { HMSVideoPlugin } from '../../plugins';
+import { HMSVideoPluginsManager } from '../../plugins/video';
 
 function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -14,9 +15,9 @@ function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSetti
 
 export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
-  private timerID: number;
-  processedTrack: MediaStreamTrack | null = null;
-  private processorsMap: Record<string, HMSVideoProcessor>; //name and Processor
+  private pluginsManager: HMSVideoPluginsManager;
+  private processedTrack?: MediaStreamTrack;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -26,135 +27,40 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.settings = settings;
-    this.processorsMap = {};
-    this.timerID = 0;
+    this.pluginsManager = new HMSVideoPluginsManager(this);
   }
 
-  private async replaceTrackWith(settings: HMSVideoTrackSettings) {
-    const prevTrack = this.nativeTrack;
-    prevTrack?.stop();
-    const withTrack = await getVideoTrack(settings);
-    await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
-  }
-
-  private async replaceTrackWithBlank() {
-    const prevTrack = this.nativeTrack;
-    const withTrack = getEmptyVideoTrack(prevTrack);
-    await (this.stream as HMSLocalStream).replaceTrack(this, withTrack);
-    prevTrack?.stop();
-  }
-
+  /**
+   * use this function to set the enabled state of a track. If true the track will be unmuted and muted otherwise.
+   * @param value
+   */
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) return;
     if (this.source === 'regular') {
       if (value) {
         await this.replaceTrackWith(this.settings);
-        //Find all Processors attach and add them
-        // if (Object.keys(this.processorsMap).length !== 0) {
-        //   for (const procName of this.processors) {
-        //     if (procName !== '') {
-        //       await this.addProcessor(this.processorsMap[procName]);
-        //     }
-        //   }
-        // }
       } else {
         await this.replaceTrackWithBlank();
-        // if (Object.keys(this.processorsMap).length !== 0) {
-        //   for (const procName of this.processors) {
-        //     if (procName !== '') {
-        //       await this.removeProcessor(this.processorsMap[procName]);
-        //     }
-        //   }
-        // }
       }
     }
     await super.setEnabled(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
-  // addSink(videoElement: HTMLVideoElement) {
-  //   if(this.processedTrack){
-  //     videoElement.srcObject = new MediaStream([this.processedTrack]);
-  //   }
-  //   else{
-  //     super.addSink(videoElement);
-  //   }
-  // }
-
-  async addProcessor(processor: HMSVideoProcessor): Promise<void> {
-    console.log('inside addProcessor function call');
-    if (!this.nativeTrack.enabled) {
-      console.log('Track is not enabled');
-      return;
-    }
-    if (processor == null) {
-      console.log('Processor is possibly null');
-      return;
-    }
-    if (!processor.isSupported()) {
-      console.log('Platform is not supported');
-      return;
-    }
-
-    const input = this.getInputCanvas();
-    const output = document.createElement('canvas') as any;
-    //for firefox
-    output.getContext('2d');
-
-    let name = processor.getName();
-    console.log('Platform is supported...starting processor ', name);
-    await processor.init();
-    processor.processVideo(input, output);
-
-    this.processorsMap[name] = processor;
-
-    if (this.processors) {
-      this.processors = Object.assign([], this.processors);
-      if (!this.processors.includes(name)) {
-        this.processors?.push(name);
-      } else {
-        throw new Error('Processor is already added to track');
-      }
-    }
-
-    console.log('Number of Processors added = ', this.processors.length);
-
-    const fps = processor.getFrameRate();
-    let modifiedStream = output.captureStream(fps); //TODO :check fps is required
-    let track = modifiedStream.getVideoTracks()[0];
-    console.log('Modified track', track.id, 'native track', this.nativeTrack.id);
-    this.processedTrack = this.nativeTrack;
-    await (this.stream as HMSLocalStream).replaceTrackWithoutStop(this, track);
+  /**
+   * @see HMSVideoTrack#addSink()
+   */
+  addSink(videoElement: HTMLVideoElement) {
+    this.addSinkInternal(videoElement, this.processedTrack || this.nativeTrack);
   }
 
-  async removeProcessor(processor: HMSVideoProcessor): Promise<void> {
-    if (!processor || !processor.isSupported()) {
-      console.log("Can't Remove Unsupported/Invalid Processor");
-    } else {
-      console.log('Removing processor', processor);
-      processor.stop();
-      const name = processor.getName();
-      this.processors = Object.assign([], this.processors);
-      const idx = this.processors.indexOf(name);
-      if (idx > -1) {
-        this.processors.splice(idx, 1);
-      }
-      if (this.processorsMap[name]) {
-        delete this.processorsMap[name];
-      }
-      await (this.stream as HMSLocalStream).replaceTrackWithoutStop(this, this.processedTrack!);
-    }
-  }
-
-  async clearProcessors() {
-    for (const name of Object.keys(this.processorsMap)) {
-      await this.removeProcessor(this.processorsMap[name]);
-    }
-
-    this.processorsMap = {};
-    this.processors = [];
-  }
-
+  /**
+   * This function can be used to set media track settings. Frequent options -
+   * deviceID: can be used to change to different input source
+   * width, height - can be used to change capture dimensions
+   * maxFramerate - can be used to control the capture framerate
+   * @param settings
+   */
   async setSettings(settings: HMSVideoTrackSettings) {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
@@ -176,39 +82,96 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.settings = newSettings;
   }
 
-  getInputCanvas(): HTMLCanvasElement {
-    if (this.timerID !== 0) clearTimeout(this.timerID);
+  /**
+   * @see HMSVideoPlugin
+   */
+  getPlugins(): string[] {
+    return this.pluginsManager.getPlugins();
+  }
 
-    const width = this.nativeTrack.getSettings().width;
-    const height = this.nativeTrack.getSettings().height;
+  /**
+   * @see HMSVideoPlugin
+   */
+  async addPlugin(plugin: HMSVideoPlugin): Promise<void> {
+    return this.pluginsManager.addPlugin(plugin);
+  }
 
-    if (!width || !height || width <= 0 || height <= 0) {
-      throw new Error('Invalid video track');
+  /**
+   * @see HMSVideoPlugin
+   */
+  async removePlugin(plugin: HMSVideoPlugin): Promise<void> {
+    return this.pluginsManager.removePlugin(plugin);
+  }
+
+  /**
+   * @internal
+   */
+  async cleanupPlugins() {
+    await this.pluginsManager.cleanup();
+    this.processedTrack?.stop();
+  }
+
+  /**
+   * once the plugin manager has done its processing it can set or remove processed track via this method
+   * note that replacing sender track only makes sense if the native track is enabled. if it's disabled there is
+   * no point in replacing it. We'll update the processed track variable though so next time unmute happens
+   * it's set properly.
+   * @internal
+   */
+  async setProcessedTrack(processedTrack?: MediaStreamTrack) {
+    // required replacement will happen when video is unmuted
+    if (!this.nativeTrack.enabled) {
+      this.processedTrack = processedTrack;
+      return;
     }
-    //setting input
-    const input = document.createElement('canvas');
-    const ctx = input.getContext('2d');
-    const video = document.createElement('video');
-    video.srcObject = new MediaStream([this.nativeTrack]);
-    // if (this.processedTrack) {
-    //   video.srcObject = new MediaStream([this.processedTrack]);
-    // } else {
-    //   video.srcObject = new MediaStream([this.nativeTrack]);
-    // }
-    video.muted = true;
-    video.width = width;
-    video.height = height;
-    video.play();
+    if (!processedTrack) {
+      if (this.processedTrack) {
+        // remove, reset back to the native track
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
+      }
+      this.processedTrack = undefined;
+      return;
+    }
+    if (processedTrack !== this.processedTrack) {
+      if (this.processedTrack) {
+        // replace previous processed track with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
+      } else {
+        // there is no prev processed track, replace native with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
+      }
+      this.processedTrack = processedTrack;
+    }
+  }
 
-    input.width = width;
-    input.height = height;
+  /**
+   * called when the video is unmuted
+   * @private
+   */
+  private async replaceTrackWith(settings: HMSVideoTrackSettings) {
+    const prevTrack = this.nativeTrack;
+    prevTrack?.stop();
+    const newTrack = await getVideoTrack(settings);
+    const localStream = this.stream as HMSLocalStream;
+    // change nativeTrack so plugin can start its work
+    await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
+    await localStream.replaceStreamTrack(prevTrack, newTrack);
+    this.nativeTrack = newTrack;
+    await this.pluginsManager.waitForRestart();
+  }
 
-    const drawInput = () => {
-      ctx!.drawImage(video, 0, 0, width, height);
-      this.timerID = window.setTimeout(drawInput, 30); //TODO: check interval time
-    };
-    drawInput();
-
-    return input;
+  /**
+   * called when the video is muted. A blank track is used to replace the original track. This is in order to
+   * turn off the camera light and keep the bytes flowing to avoid av sync, timestamp issues.
+   * @private
+   */
+  private async replaceTrackWithBlank() {
+    const prevTrack = this.nativeTrack;
+    prevTrack?.stop();
+    const newTrack = getEmptyVideoTrack(prevTrack);
+    const localStream = this.stream as HMSLocalStream;
+    await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    this.nativeTrack = newTrack;
   }
 }

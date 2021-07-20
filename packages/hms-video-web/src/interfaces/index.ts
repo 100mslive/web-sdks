@@ -1,5 +1,4 @@
 export * from './update-listener';
-export * from './videoProcessors';
 export * from './hms-peer';
 export * from './room';
 export * from './config';
