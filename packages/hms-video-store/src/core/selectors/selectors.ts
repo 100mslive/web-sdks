@@ -1,6 +1,11 @@
 import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
-import { isScreenSharing, isTrackDisplayEnabled, isTrackEnabled } from './selectorUtils';
+import {
+  isDegraded,
+  isScreenSharing,
+  isTrackDisplayEnabled,
+  isTrackEnabled,
+} from './selectorUtils';
 
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
 export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> => store.peers;
@@ -27,6 +32,10 @@ export const selectIsConnectedToRoom = createSelector(
 
 export const selectPeers = createSelector([selectRoom, selectPeersMap], (room, storePeers) => {
   return room.peers.map(peerID => storePeers[peerID]);
+});
+
+const selectTracks = createSelector(selectTracksMap, storeTracks => {
+  return Object.values(storeTracks);
 });
 
 export const selectLocalPeer = createSelector(selectPeers, peers => {
@@ -102,6 +111,13 @@ export const selectPeersScreenSharing = (store: HMSStore): HMSPeer[] => {
   const peers = selectPeers(store);
   return peers.filter(peer => isScreenSharing(store, peer));
 };
+
+/**
+ * Select tracks that have been degraded(receiving lower video quality/no video) due to bad network locally
+ */
+export const selectDegradedTracks = createSelector(selectTracks, tracks =>
+  tracks.filter(isDegraded),
+);
 
 export const selectHMSMessagesCount = createSelector(
   selectMessageIDsInOrder,

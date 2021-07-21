@@ -28,6 +28,7 @@ export interface HMSPeer {
  * enabled - tells the real track enabled status, use this to call attach/detach video
  * displayEnabled - can be used to give immediate feedback to the user on button click
  * deviceID - this is the ID of the source device for the track. This can be a dummy ID when track is on mute.
+ * degraded - tells whether the track has been degraded(receiving lower video quality/no video) due to bad network locally
  */
 export interface HMSTrack {
   id: HMSTrackID;
@@ -41,6 +42,7 @@ export interface HMSTrack {
   displayEnabled?: boolean;
   volume?: number;
   layer?: HMSSimulcastLayer;
+  degraded?: boolean;
 }
 
 /**

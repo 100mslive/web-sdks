@@ -49,6 +49,7 @@ export class SDKToHMS {
     }
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
+      track.degraded = sdkTrack.degraded;
     }
     if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getPlugins(), track.plugins)) {

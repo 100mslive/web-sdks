@@ -32,6 +32,7 @@ export let localPeer: HMSPeer;
 export let peerScreenSharing: HMSPeer;
 export let localVideo: HMSTrack;
 export let localAudio: HMSTrack;
+export let remoteVideo: HMSTrack;
 export let screenShare: HMSTrack;
 export let auxiliaryAudio: HMSTrack;
 export let localSpeaker: HMSSpeaker;
@@ -116,6 +117,7 @@ export const makeFakeStore = (): HMSStore => {
   peerScreenSharing = fakeStore.peers['2'];
   localVideo = fakeStore.tracks['101'];
   localAudio = fakeStore.tracks['102'];
+  remoteVideo = fakeStore.tracks['103'];
   screenShare = fakeStore.tracks['105'];
   auxiliaryAudio = fakeStore.tracks['106'];
   screenshareAudio = fakeStore.tracks['107'];

@@ -25,6 +25,10 @@ export function isScreenShare(track: HMSTrack | undefined) {
   return track && track.source === 'screen';
 }
 
+export function isDegraded(track: HMSTrack | undefined) {
+  return Boolean(track?.degraded);
+}
+
 export function isTrackEnabled(store: HMSStore, trackID?: string) {
   if (trackID && store.tracks[trackID]) {
     return store.tracks[trackID].enabled;
