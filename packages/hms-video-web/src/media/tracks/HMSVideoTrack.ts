@@ -29,7 +29,9 @@ export class HMSVideoTrack extends HMSTrack {
    */
   removeSink(videoElement: HTMLVideoElement) {
     videoElement.srcObject = null;
-    this.sinkCount--;
+    if (this.sinkCount > 0) {
+      this.sinkCount--;
+    }
   }
 
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
