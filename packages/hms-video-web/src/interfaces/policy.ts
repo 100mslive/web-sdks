@@ -1,4 +1,5 @@
 import { SimulcastLayers } from './simulcast-layers';
+import { SubscribeDegradationParams } from './subscribe-degradation-params';
 
 export interface HMSPolicy {
   name: string;
@@ -27,6 +28,7 @@ export interface HMSPolicy {
   subscribeParams: {
     subscribeToRoles: string[];
     maxSubsBitRate: number;
+    subscribeDegradation?: SubscribeDegradationParams;
   };
   permissions: {
     endRoom: boolean;

@@ -2,11 +2,20 @@ import { IStore, KnownRoles } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces/speaker';
-import { HMSTrack, HMSVideoTrack, HMSAudioTrack, HMSTrackType, HMSTrackSource } from '../../media/tracks';
+import {
+  HMSTrack,
+  HMSVideoTrack,
+  HMSAudioTrack,
+  HMSTrackType,
+  HMSTrackSource,
+  HMSRemoteVideoTrack,
+} from '../../media/tracks';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 import { SimulcastLayer, SimulcastLayers, SimulcastDimensions } from '../../interfaces/simulcast-layers';
+import { Comparator } from './Comparator';
 
 class Store implements IStore {
+  private readonly comparator: Comparator = new Comparator(this);
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -15,6 +24,10 @@ class Store implements IStore {
   private speakers: HMSSpeaker[] = [];
   private videoLayers: SimulcastLayers | null = null;
   private screenshareLayers: SimulcastLayers | null = null;
+
+  getComparator() {
+    return this.comparator;
+  }
 
   getRoom() {
     return this.room!;
@@ -49,6 +62,10 @@ class Store implements IStore {
 
   getVideoTracks() {
     return this.getTracks().filter((track) => track.type === HMSTrackType.VIDEO) as HMSVideoTrack[];
+  }
+
+  getRemoteVideoTracks() {
+    return this.getTracks().filter((track) => track instanceof HMSRemoteVideoTrack) as HMSRemoteVideoTrack[];
   }
 
   getAudioTracks() {
@@ -126,6 +143,14 @@ class Store implements IStore {
     this.getAudioTracks().forEach((track) => track.setOutputDevice(device));
   }
 
+  getSubscribeDegradationParams() {
+    const params = this.getLocalPeer()?.policy?.subscribeParams.subscribeDegradation;
+    if (params && Object.keys(params).length > 0) {
+      return params;
+    }
+    return undefined;
+  }
+
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     if (source === 'screen') {
       return this.screenshareLayers?.layers || [];
@@ -163,56 +188,6 @@ class Store implements IStore {
     this.getPeers().forEach((peer) => {
       peer.policy = this.getPolicyForRole(peer.role!);
     });
-  }
-
-  comparators = {
-    peer: {
-      videoEnabled: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<boolean>(Boolean(peerA.videoTrack?.enabled), Boolean(peerB.videoTrack?.enabled)),
-
-      audioEnabled: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<boolean>(Boolean(peerA.audioTrack?.enabled), Boolean(peerB.audioTrack?.enabled)),
-
-      screenShare: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<boolean>(
-          peerA.auxiliaryTracks.some((track) => track.source === 'screen'),
-          peerB.auxiliaryTracks.some((track) => track.source === 'screen'),
-        ),
-      speaker: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<number>(
-          this.speakers.find((speaker) => speaker.peer.peerId === peerA.peerId)?.audioLevel || -1,
-          this.speakers.find((speaker) => speaker.peer.peerId === peerB.peerId)?.audioLevel || -1,
-        ),
-
-      // @TODO: Get role priority number after adding HMSRole to HMSPeer
-      rolePriority: () => 1,
-    },
-    track: {
-      video: (trackA: HMSTrack, trackB: HMSTrack) =>
-        this.primitiveComparator<boolean>(trackA.type === HMSTrackType.VIDEO, trackB.type === HMSTrackType.VIDEO),
-      audio: (trackA: HMSTrack, trackB: HMSTrack) =>
-        this.primitiveComparator<boolean>(trackA.type === HMSTrackType.AUDIO, trackB.type === HMSTrackType.AUDIO),
-      enabled: (trackA: HMSTrack, trackB: HMSTrack) =>
-        this.primitiveComparator<boolean>(Boolean(trackA.enabled), Boolean(trackB.enabled)),
-
-      speaker: (trackA: HMSTrack, trackB: HMSTrack) =>
-        this.primitiveComparator<number>(
-          this.speakers.find((speaker) => speaker.track.trackId === trackA.trackId)?.audioLevel || -1,
-          this.speakers.find((speaker) => speaker.track.trackId === trackB.trackId)?.audioLevel || -1,
-        ),
-      screenShare: (trackA: HMSTrack, trackB: HMSTrack) =>
-        this.primitiveComparator(trackA.source === 'screen', trackB.source === 'screen'),
-
-      // @TODO: Get role priority number after adding HMSRole to HMSPeer
-      rolePriority: () => 1,
-    },
-  };
-
-  /**
-   * @returns 0 if primitives are equal, 1 if a is greater and -1 if b is greater
-   */
-  private primitiveComparator<T>(a: T, b: T): number {
-    return a === b ? 0 : Number(a) - Number(b);
   }
 }
 

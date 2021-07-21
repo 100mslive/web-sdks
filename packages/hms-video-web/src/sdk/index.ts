@@ -9,7 +9,13 @@ import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import { getNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
-import { HMSTrackSource, HMSTrackType, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../media/tracks';
+import {
+  HMSTrackSource,
+  HMSTrackType,
+  HMSLocalAudioTrack,
+  HMSLocalVideoTrack,
+  HMSRemoteVideoTrack,
+} from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings';
 import HMSRoom from './models/HMSRoom';
@@ -93,6 +99,16 @@ export class HMSSdk implements HMSInterface {
 
     onTrackRemove: (track: HMSRemoteTrack) => {
       this.notificationManager.handleOnTrackRemove(track);
+    },
+
+    onTrackDegrade: (track: HMSRemoteVideoTrack) => {
+      HMSLogger.d(this.TAG, 'Sending Track Update Track Degraded', track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, this.store.getPeerByTrackId(track.trackId)!);
+    },
+
+    onTrackRestore: (track: HMSRemoteVideoTrack) => {
+      HMSLogger.d(this.TAG, 'Sending Track Update Track Restored', track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, this.store.getPeerByTrackId(track.trackId)!);
     },
 
     onFailure: (exception: HMSException) => {

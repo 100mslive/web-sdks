@@ -19,11 +19,15 @@ export default class HMSRemoteStream extends HMSMediaStream {
   }
 
   setAudio(enabled: boolean) {
+    if (this.audio === enabled) return;
+
     this.audio = enabled;
     this.syncWithApiChannel();
   }
 
   setVideo(layer: HMSSimulcastLayer) {
+    if (this.video === layer) return;
+
     this.video = layer;
     HMSLogger.v('[Remote stream]', `Switching to ${layer} layer`);
     this.syncWithApiChannel();
@@ -33,7 +37,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
     return this.video;
   }
 
-  syncWithApiChannel() {
+  private syncWithApiChannel() {
     const data = {
       streamId: this.id,
       video: this.video,

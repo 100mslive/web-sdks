@@ -4,6 +4,11 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
+  private sinkCount: number = 0;
+
+  hasSinks() {
+    return this.sinkCount > 0;
+  }
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -24,6 +29,7 @@ export class HMSVideoTrack extends HMSTrack {
    */
   removeSink(videoElement: HTMLVideoElement) {
     videoElement.srcObject = null;
+    this.sinkCount--;
   }
 
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
@@ -36,5 +42,6 @@ export class HMSVideoTrack extends HMSTrack {
       }
     }
     videoElement.srcObject = new MediaStream([track]);
+    this.sinkCount++;
   }
 }

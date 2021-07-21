@@ -33,6 +33,8 @@ export enum HMSTrackUpdate {
   TRACK_MUTED,
   TRACK_UNMUTED,
   TRACK_DESCRIPTION_CHANGED,
+  TRACK_DEGRADED,
+  TRACK_RESTORED,
 }
 
 export interface HMSAudioListener {

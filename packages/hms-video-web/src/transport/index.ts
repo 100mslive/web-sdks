@@ -34,8 +34,10 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { DeviceManager } from '../device-manager';
+import { RTCStatsMonitor } from '../rtc-stats';
+import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
+import { DeviceManager } from '../device-manager';
 
 const TAG = '[HMSTransport]:';
 
@@ -48,7 +50,6 @@ interface CallbackTriple {
 export default class HMSTransport implements ITransport {
   private state: TransportState = TransportState.Disconnected;
   private tracks: Map<string, TrackState> = new Map();
-  private readonly observer: ITransportObserver;
   private publishConnection: HMSPublishConnection | null = null;
   private subscribeConnection: HMSSubscribeConnection | null = null;
   private initConfig?: InitConfig;
@@ -60,6 +61,10 @@ export default class HMSTransport implements ITransport {
       await this.observer.onStateChange(this.state, error);
     }
   });
+  private subscribeConnStatsMonitor?: RTCStatsMonitor;
+  private trackDegradationController?: TrackDegradationController;
+
+  constructor(private observer: ITransportObserver, private deviceManager: DeviceManager, private store: IStore) {}
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -225,10 +230,6 @@ export default class HMSTransport implements ITransport {
       }
     },
   };
-
-  constructor(observer: ITransportObserver, private deviceManager: DeviceManager, private store: IStore) {
-    this.observer = observer;
-  }
 
   async getLocalScreen(
     videoSettings: HMSVideoTrackSettings,
@@ -397,6 +398,9 @@ export default class HMSTransport implements ITransport {
 
     try {
       this.state = TransportState.Leaving;
+      this.subscribeConnStatsMonitor?.stop();
+      this.subscribeConnStatsMonitor?.removeAllListeners();
+      this.trackDegradationController?.removeAllListeners();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (this.signal.isConnected) {
@@ -415,7 +419,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async publish(tracks: Array<HMSTrack>): Promise<void> {
-    // @FIX: Doesn't wait for one publishTrack to complete
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
@@ -527,6 +530,7 @@ export default class HMSTransport implements ITransport {
       }
 
       this.publishConnection!.initAfterJoin();
+      await this.initRtcStatsMonitor();
       HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
     } catch (error) {
       this.state = TransportState.Failed;
@@ -607,6 +611,19 @@ export default class HMSTransport implements ITransport {
     this.endpoint = url.toString();
     await this.signal.open(this.endpoint);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
+  }
+
+  private async initRtcStatsMonitor() {
+    if (this.store.getSubscribeDegradationParams()) {
+      this.subscribeConnStatsMonitor = new RTCStatsMonitor([this.subscribeConnection!]);
+      this.trackDegradationController = new TrackDegradationController(this.store);
+      this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', (stats) =>
+        this.trackDegradationController?.handleRtcStatsChange(stats),
+      );
+      this.trackDegradationController.on('TRACK_DEGRADED', this.observer.onTrackDegrade);
+      this.trackDegradationController.on('TRACK_RESTORED', this.observer.onTrackRestore);
+      await this.subscribeConnStatsMonitor.start();
+    }
   }
 
   private retryPublishIceFailedTask = async () => {
