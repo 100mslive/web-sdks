@@ -14,6 +14,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
   }
 
+  preferLayer(layer: HMSSimulcastLayer) {
+    (this.stream as HMSRemoteStream).setVideo(layer);
+  }
+
   getSimulcastLayer() {
     return (this.stream as HMSRemoteStream).getSimulcastLayer();
   }
