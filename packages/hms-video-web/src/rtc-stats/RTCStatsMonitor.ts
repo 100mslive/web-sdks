@@ -1,5 +1,6 @@
 import HMSConnection from '../connection';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
+import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/sleep';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { RTCStats } from './RTCStats';
@@ -13,14 +14,19 @@ export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCSt
   async start() {
     this.stop();
     this.isMonitored = true;
-    while (this.isMonitored) {
-      await this.handleConnectionsStats();
-      await sleep(this.interval);
-    }
+    HMSLogger.d('Starting RTCStatsMonitor');
+    this.startLoop().then(() => HMSLogger.d('Stopping RTCStatsMonitor'));
   }
 
   stop() {
     this.isMonitored = false;
+  }
+
+  private async startLoop() {
+    while (this.isMonitored) {
+      await this.handleConnectionsStats();
+      await sleep(this.interval);
+    }
   }
 
   private async handleConnectionsStats() {
