@@ -241,7 +241,7 @@ export default class HMSTransport implements ITransport {
       if (error instanceof HMSException) {
         analyticsEventsService
           .queue(
-            AnalyticsEventFactory.publishFail({
+            AnalyticsEventFactory.publish({
               error,
               devices: this.deviceManager.getDevices(),
               settings: new HMSTrackSettings(videoSettings, audioSettings, false),
@@ -260,7 +260,7 @@ export default class HMSTransport implements ITransport {
       if (error instanceof HMSException) {
         analyticsEventsService
           .queue(
-            AnalyticsEventFactory.publishFail({
+            AnalyticsEventFactory.publish({
               devices: this.deviceManager.getDevices(),
               error,
               settings,
@@ -278,13 +278,15 @@ export default class HMSTransport implements ITransport {
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const tracks = await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
-      analyticsEventsService.queue(AnalyticsEventFactory.publish(this.deviceManager.getDevices(), settings)).flush();
+      analyticsEventsService
+        .queue(AnalyticsEventFactory.publish({ devices: this.deviceManager.getDevices(), settings }))
+        .flush();
       return tracks;
     } catch (error) {
       if (error instanceof HMSException) {
         analyticsEventsService
           .queue(
-            AnalyticsEventFactory.publishFail({
+            AnalyticsEventFactory.publish({
               devices: this.deviceManager.getDevices(),
               error,
               settings,
@@ -426,7 +428,7 @@ export default class HMSTransport implements ITransport {
         if (error instanceof HMSException) {
           analyticsEventsService
             .queue(
-              AnalyticsEventFactory.publishFail({
+              AnalyticsEventFactory.publish({
                 devices: this.deviceManager.getDevices(),
                 error,
               }),

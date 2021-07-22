@@ -10,7 +10,7 @@ export type HMSRemoteTrack = HMSRemoteAudioTrack | HMSRemoteVideoTrack;
 export default class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
-  private video = HMSSimulcastLayer.HIGH;
+  private video = HMSSimulcastLayer.MEDIUM;
   private frameRate = HMSSimulcastLayer.HIGH;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {

@@ -151,8 +151,8 @@ export class DeviceManager implements HMSDeviceManager {
         HMSLogger.e(this.TAG, '[Audio Device Change]', error);
         analyticsEventsService
           .queue(
-            AnalyticsEventFactory.deviceChangeFail({
-              selection: this.selected.audioInput,
+            AnalyticsEventFactory.deviceChange({
+              selection: { audioInput: this.selected.audioInput },
               devices: this.getDevices(),
               error,
             }),
@@ -193,8 +193,8 @@ export class DeviceManager implements HMSDeviceManager {
         HMSLogger.e(this.TAG, '[Video Device Change]', error);
         analyticsEventsService
           .queue(
-            AnalyticsEventFactory.deviceChangeFail({
-              selection: this.selected.videoInput,
+            AnalyticsEventFactory.deviceChange({
+              selection: { videoInput: this.selected.videoInput },
               devices: this.getDevices(),
               error,
             }),

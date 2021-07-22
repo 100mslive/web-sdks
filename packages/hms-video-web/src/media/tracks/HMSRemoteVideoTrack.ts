@@ -39,7 +39,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {SimulcastLayerDefinition[]}
    */
   getSimulcastDefinitions() {
-    return this._layerDefinitions;
+    // send a clone to store as it will freeze the object from further updates
+    return [...this._layerDefinitions];
   }
 
   /** @internal */
