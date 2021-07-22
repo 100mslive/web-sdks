@@ -11,6 +11,7 @@ import {
   HMSMessage,
   HMSConfig,
   HMSSpeaker,
+  SimulcastLayerDefinition,
 } from '@100mslive/hms-video';
 
 export {
@@ -26,4 +27,5 @@ export {
   HMSRoomUpdate,
   HMSPeerUpdate,
   HMSTrackUpdate,
+  SimulcastLayerDefinition,
 };

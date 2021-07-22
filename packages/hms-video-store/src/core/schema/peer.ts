@@ -1,3 +1,4 @@
+import { SimulcastLayerDefinition } from '@100mslive/hms-video';
 import { HMSSimulcastLayer } from '../hmsSDKStore/sdkTypes';
 
 export type HMSPeerID = string;
@@ -42,6 +43,7 @@ export interface HMSTrack {
   displayEnabled?: boolean;
   volume?: number;
   layer?: HMSSimulcastLayer;
+  layerDefinitions?: SimulcastLayerDefinition[];
   degraded?: boolean;
 }
 

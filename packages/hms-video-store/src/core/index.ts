@@ -10,4 +10,5 @@ export {
   HMSVideoTrackSettings,
   HMSConfig,
   HMSSimulcastLayer,
+  SimulcastLayerDefinition,
 } from './hmsSDKStore/sdkTypes';

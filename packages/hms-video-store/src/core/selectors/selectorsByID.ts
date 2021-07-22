@@ -142,7 +142,6 @@ export const selectIsAudioLocallyMuted = byIDCurry((store: HMSStore, trackID?: s
   if (trackID && store.tracks[trackID]) {
     return store.tracks[trackID].volume === 0;
   }
-  HMSLogger.w('Track not found', trackID);
   return undefined;
 });
 

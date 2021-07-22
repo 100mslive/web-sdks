@@ -47,9 +47,16 @@ export class SDKToHMS {
         track.volume = volume;
       }
     }
+    this.enrichVideoTrack(track, sdkTrack);
+  }
+
+  static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
       track.degraded = sdkTrack.degraded;
+      if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
+        track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
+      }
     }
     if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getPlugins(), track.plugins)) {
