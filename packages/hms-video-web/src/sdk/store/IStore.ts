@@ -4,7 +4,12 @@ import { HMSTrack, HMSAudioTrack, HMSVideoTrack, HMSTrackSource, HMSRemoteVideoT
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 import { HMSPolicy } from '../../interfaces/policy';
-import { SimulcastLayer, SimulcastDimensions, SimulcastLayers } from '../../interfaces/simulcast-layers';
+import {
+  SimulcastLayer,
+  SimulcastDimensions,
+  SimulcastLayers,
+  SimulcastLayerDefinition,
+} from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
 
@@ -18,6 +23,7 @@ export interface IStore {
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
   getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;
+  getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): SimulcastLayerDefinition[];
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getRemotePeers(): HMSRemotePeer[];

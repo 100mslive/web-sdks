@@ -1,9 +1,11 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer } from '../settings';
+import { SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
+  private _layerDefinitions: SimulcastLayerDefinition[] = [];
 
   public get degraded() {
     return this._degraded;
@@ -30,6 +32,19 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
     this.updateLayer();
+  }
+
+  /**
+   * Method to get available simulcast definitions for the track
+   * @returns {SimulcastLayerDefinition[]}
+   */
+  getSimulcastDefinitions() {
+    return this._layerDefinitions;
+  }
+
+  /** @internal */
+  setSimulcastDefinitons(definitions: SimulcastLayerDefinition[]) {
+    this._layerDefinitions = definitions;
   }
 
   /** @internal */

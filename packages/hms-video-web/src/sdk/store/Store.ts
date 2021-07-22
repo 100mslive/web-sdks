@@ -11,7 +11,14 @@ import {
   HMSRemoteVideoTrack,
 } from '../../media/tracks';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
-import { SimulcastLayer, SimulcastLayers, SimulcastDimensions } from '../../interfaces/simulcast-layers';
+import {
+  SimulcastLayer,
+  SimulcastLayers,
+  SimulcastDimensions,
+  simulcastMapping,
+  RID,
+  SimulcastLayerDefinition,
+} from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
 
 class Store implements IStore {
@@ -174,6 +181,32 @@ class Store implements IStore {
 
   setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
     this.screenshareLayers = simulcastLayers;
+  }
+
+  getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
+    const publishParams = this.getPolicyForRole(peer.role!).publishParams;
+    let simulcastLayers: SimulcastLayers | undefined;
+    if (source === 'regular') {
+      simulcastLayers = publishParams.videoSimulcastLayers;
+    } else if (source === 'screen') {
+      simulcastLayers = publishParams.screenSimulcastLayers;
+    }
+    if (!simulcastLayers || !simulcastLayers.layers || simulcastLayers.layers.length === 0) {
+      return [];
+    }
+    const width = simulcastLayers.width;
+    const height = simulcastLayers.height;
+    return simulcastLayers.layers.map((value) => {
+      const layer = simulcastMapping[value.rid as RID];
+      const resolution = {
+        width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
+        height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
+      };
+      return {
+        layer,
+        resolution,
+      } as SimulcastLayerDefinition;
+    });
   }
 
   cleanUp() {

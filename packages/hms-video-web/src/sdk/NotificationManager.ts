@@ -148,10 +148,13 @@ export default class NotificationManager {
           }
           break;
         case HMSTrackType.VIDEO:
+          const remoteTrack = track as HMSRemoteVideoTrack;
+          const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
+          remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
           if (!hmsPeer.videoTrack && track.source === 'regular') {
-            hmsPeer.videoTrack = track as HMSRemoteVideoTrack;
+            hmsPeer.videoTrack = remoteTrack;
           } else {
-            hmsPeer.auxiliaryTracks.push(track);
+            hmsPeer.auxiliaryTracks.push(remoteTrack);
           }
       }
 
