@@ -9,6 +9,7 @@ import { HMSMessage } from '../../interfaces/message';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../../interfaces/role-change-request';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -205,6 +206,14 @@ export default class JsonRpcSignal implements ISignal {
       .catch(() => Date.now() - pingTime);
 
     return Promise.race([timer, pongTimeDiff]);
+  }
+
+  requestRoleChange(params: RequestForRoleChangeParams) {
+    this.notify(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+  }
+
+  acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
+    this.notify(HMSSignalMethod.ROLE_CHANGE, params);
   }
 
   private onCloseHandler(event: CloseEvent) {

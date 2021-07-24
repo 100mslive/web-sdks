@@ -1,6 +1,7 @@
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
 import { HMSPeer } from '../sdk/models/peer';
+import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSMessage } from './message';
 import { HMSRoom } from './room';
 import { HMSSpeaker } from './speaker';
@@ -25,6 +26,7 @@ export enum HMSPeerUpdate {
   RESIGNED_DOMINANT_SPEAKER,
   STARTED_SPEAKING,
   STOPPED_SPEAKING,
+  ROLE_UPDATED,
 }
 
 export enum HMSTrackUpdate {
@@ -50,4 +52,6 @@ export default interface HMSUpdateListener {
   onError(error: HMSException): void;
   onReconnecting(error: HMSException): void;
   onReconnected(): void;
+  onRoleChangeRequest(request: HMSRoleChangeRequest): void;
+  onRoleUpdate(newRole: string): void;
 }

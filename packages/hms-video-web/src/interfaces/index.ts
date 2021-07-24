@@ -4,5 +4,7 @@ export * from './room';
 export * from './config';
 export * from './message';
 export * from './speaker';
-export * from './policy';
+export * from './role';
+export * from './hms-remote-peer';
+export * from './role-change-request';
 export { SimulcastLayerDefinition, SimulcastLayer, SimulcastDimensions } from './simulcast-layers';

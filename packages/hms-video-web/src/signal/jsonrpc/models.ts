@@ -16,4 +16,6 @@ export enum HMSSignalMethod {
   SDK_NOTIFICATION = 'sdk-notification',
   LEAVE = 'leave',
   PING = 'ping',
+  ROLE_CHANGE_REQUEST = 'role-change-request',
+  ROLE_CHANGE = 'role-change',
 }

@@ -20,6 +20,7 @@ import {
   SimulcastLayerDefinition,
 } from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
+import { HMSConfig, PublishParams } from '../../interfaces';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -31,6 +32,16 @@ class Store implements IStore {
   private speakers: HMSSpeaker[] = [];
   private videoLayers: SimulcastLayers | null = null;
   private screenshareLayers: SimulcastLayers | null = null;
+  private config?: HMSConfig;
+  private publishParams?: PublishParams;
+
+  getConfig() {
+    return this.config;
+  }
+
+  getPublishParams() {
+    return this.publishParams;
+  }
 
   getComparator() {
     return this.comparator;
@@ -42,6 +53,10 @@ class Store implements IStore {
 
   getPolicyForRole(role: string) {
     return this.knownRoles[role];
+  }
+
+  getKnownRoles() {
+    return this.knownRoles;
   }
 
   getLocalPeer() {
@@ -120,6 +135,14 @@ class Store implements IStore {
     this.updatePeersPolicy();
   }
 
+  setConfig(config: HMSConfig) {
+    this.config = config;
+  }
+
+  setPublishParams(params: PublishParams) {
+    this.publishParams = params;
+  }
+
   addPeer(peer: HMSPeer) {
     this.peers[peer.peerId] = peer;
     if (peer.isLocal) this.localPeerId = peer.peerId;
@@ -151,7 +174,7 @@ class Store implements IStore {
   }
 
   getSubscribeDegradationParams() {
-    const params = this.getLocalPeer()?.policy?.subscribeParams.subscribeDegradation;
+    const params = this.getLocalPeer()?.role?.subscribeParams.subscribeDegradation;
     if (params && Object.keys(params).length > 0) {
       return params;
     }
@@ -184,7 +207,9 @@ class Store implements IStore {
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    const publishParams = this.getPolicyForRole(peer.role!).publishParams;
+    if (!peer.role) return [];
+
+    const publishParams = this.getPolicyForRole(peer.role.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;
     if (source === 'regular') {
       simulcastLayers = publishParams.videoSimulcastLayers;
@@ -219,7 +244,7 @@ class Store implements IStore {
 
   private updatePeersPolicy() {
     this.getPeers().forEach((peer) => {
-      peer.policy = this.getPolicyForRole(peer.role!);
+      peer.role = this.getPolicyForRole(peer.role!.name);
     });
   }
 }

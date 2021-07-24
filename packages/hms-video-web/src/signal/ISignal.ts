@@ -1,5 +1,6 @@
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
+import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../interfaces/role-change-request';
 
 export interface Track {
   mute: boolean;
@@ -39,6 +40,10 @@ export interface ISignal extends IAnalyticsTransportProvider {
   leave(): void;
 
   ping(timeout: number): Promise<number>;
+
+  requestRoleChange(params: RequestForRoleChangeParams): void;
+
+  acceptRoleChangeRequest(params: AcceptRoleChangeParams): void;
 
   close(): Promise<void>;
 }

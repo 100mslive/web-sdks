@@ -62,7 +62,7 @@ export class Comparator implements IComparator {
         ),
 
       rolePriority: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<number>(peerA.policy?.priority || 0, peerB.policy?.priority || 0),
+        this.primitiveComparator<number>(peerA.role?.priority || 0, peerB.role?.priority || 0),
     };
   }
 
@@ -97,8 +97,8 @@ export class Comparator implements IComparator {
 
       rolePriority: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator<number>(
-          this.store.getPeerByTrackId(trackA.trackId)?.policy?.priority || 0,
-          this.store.getPeerByTrackId(trackB.trackId)?.policy?.priority || 0,
+          this.store.getPeerByTrackId(trackA.trackId)?.role?.priority || 0,
+          this.store.getPeerByTrackId(trackB.trackId)?.role?.priority || 0,
         ),
     };
   }

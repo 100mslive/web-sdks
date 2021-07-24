@@ -34,6 +34,8 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
+import { HMSRemotePeer } from '../sdk/models/peer';
+import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
 import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
@@ -463,6 +465,18 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'Track Update', this.tracks, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
+  }
+
+  changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
+    this.signal.requestRoleChange({
+      requested_for: forPeer.peerId,
+      role: toRole,
+      force,
+    });
+  }
+
+  acceptRoleChange(request: HMSRoleChangeRequest) {
+    this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
   }
 
   private async publishTrack(track: HMSTrack): Promise<void> {

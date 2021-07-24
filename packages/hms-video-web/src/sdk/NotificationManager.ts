@@ -16,7 +16,8 @@ import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
 import { HMSSpeaker } from '../interfaces/speaker';
 import Message from './models/HMSMessage';
-import { IStore } from './store';
+import { IStore } from './store/IStore';
+import { HMSRoleChangeRequest, RoleChangeRequestParams } from '../interfaces/role-change-request';
 
 interface TrackStateEntry {
   peerId: string;
@@ -90,9 +91,37 @@ export default class NotificationManager {
         this.handlePolicyChange(notification as PolicyParams);
         break;
 
+      case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
+        this.handleRoleChangeRequest(notification as RoleChangeRequestParams);
+        break;
+
+      case HMSNotificationMethod.PEER_UPDATE:
+        this.handlePeerUpdate(notification as PeerNotification);
+        break;
+
       default:
         return;
     }
+  }
+
+  private handlePeerUpdate(notification: PeerNotification) {
+    const peer = this.store.getPeerById(notification.peerId);
+
+    if (peer.role && peer.role.name !== notification.role) {
+      const newRole = this.store.getPolicyForRole(notification.role);
+      peer.updateRole(newRole);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
+    }
+  }
+
+  private handleRoleChangeRequest(notification: RoleChangeRequestParams) {
+    const request: HMSRoleChangeRequest = {
+      requestedBy: this.store.getPeerById(notification.requested_by) as HMSRemotePeer,
+      role: this.store.getPolicyForRole(notification.role),
+      token: notification.token,
+    };
+
+    this.listener?.onRoleChangeRequest(request);
   }
 
   private handleRoleChange(params: TrackStateNotification) {
@@ -101,6 +130,13 @@ export default class NotificationManager {
   }
 
   private handlePolicyChange(params: PolicyParams) {
+    const localPeer = this.store.getLocalPeer();
+
+    if (localPeer && !localPeer.role) {
+      const newRole = params.known_roles[params.name];
+      localPeer.updateRole(newRole);
+    }
+
     this.store.setKnownRoles(params.known_roles);
     // handle when role is not present in known_roles
     const publishParams = params.known_roles[params.name]?.publishParams;
@@ -108,6 +144,13 @@ export default class NotificationManager {
       const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
       this.store.setVideoSimulcastLayers(videoSimulcastLayers);
       this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
+    }
+
+    if (localPeer?.role && localPeer.role.name !== params.name) {
+      const newRole = this.store.getPolicyForRole(params.name);
+      const oldRole = localPeer.role;
+      localPeer.updateRole(newRole);
+      this.eventEmitter.emit('local-peer-role-update', { detail: { oldRole, newRole } });
     }
     this.eventEmitter.emit('policy-change', { detail: { params } });
   }
@@ -266,10 +309,9 @@ export default class NotificationManager {
     const hmsPeer = new HMSRemotePeer({
       peerId: peer.peerId,
       name: peer.info.name,
-      role: peer.role,
       customerUserId: peer.info.userId,
       customerDescription: peer.info.data,
-      policy: this.store.getPolicyForRole(peer.role),
+      role: this.store.getPolicyForRole(peer.role),
     });
 
     this.store.addPeer(hmsPeer);

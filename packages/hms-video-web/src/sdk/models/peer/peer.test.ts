@@ -5,11 +5,44 @@ import { HMSRemotePeer } from './HMSRemotePeer';
 
 const validToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNWY5ZWRjNmJkMjM4MjE1YWVjNzcwMGUyIiwiYXBwX2lkIjoiNWY5ZWRjNmJkMjM4MjE1YWVjNzcwMGUxIiwicm9vbV9pZCI6IjVmY2I0ZGY2YjQ5MjQxOWE5ODVhYjIzYSIsInVzZXJfaWQiOiJhMDVmZWEzZC03YmNhLTRhY2ItODQ1Ny1mZjliZTM4NjIwMDlFZGxhIiwicm9sZSI6Ikhvc3QiLCJpYXQiOjE2MTg0NzgyMzksImV4cCI6MTYxODU2NDYzOSwiaXNzIjoiNWY5ZWRjNmJkMjM4MjE1YWVjNzcwMGRmIiwianRpIjoiZjE0OTZhNmQtMjllYy00ZGVhLWI0YmItNzZkMjcxOGY0NDJkIn0.YsBSyt52cdRfYDSeDEm-FRc4wL792eXM6PFHMtrp6i4';
+const getParamsForRole = (roleName: string) => ({
+  name: roleName,
+  publishParams: {
+    audio: { bitRate: 100, codec: 'opus' },
+    video: { bitRate: 100, codec: 'vp8', frameRate: 30, width: 720, height: 1280 },
+    screen: { bitRate: 100, codec: 'vp8', frameRate: 30, width: 1080, height: 1920 },
+    allowed: [],
+    videoSimulcastLayers: {
+      layers: [],
+    },
+    screenSimulcastLayers: {
+      layers: [],
+    },
+  },
+  subscribeParams: {
+    subscribeToRoles: [],
+    maxSubsBitRate: 30,
+  },
+  permissions: {
+    endRoom: false,
+    removeOthers: false,
+    stopPresentation: false,
+    muteAll: false,
+    askToUnmute: false,
+    muteSelective: false,
+    changeRole: false,
+  },
+  priority: 0,
+});
 
 describe('HMSLocalPeer', () => {
   const { userId, role } = decodeJWT(validToken);
 
-  const params = { name: 'John Doe', role, customerUserId: userId };
+  const params = {
+    name: 'John Doe',
+    role: getParamsForRole(role),
+    customerUserId: userId,
+  };
   const peer = new HMSLocalPeer(params);
 
   it('should be constructed using params', () => {
@@ -29,7 +62,7 @@ describe('HMSLocalPeer', () => {
   });
 
   it('should have valid role', () => {
-    expect(peer.role).toBe(params.role);
+    expect(peer.role?.name).toBe(params.role.name);
   });
 
   it('should have valid customerUserId', () => {
@@ -51,7 +84,7 @@ describe('HMSRemotPeer', () => {
   const peer = new HMSRemotePeer({
     peerId: peerInfo.peerId,
     name: peerInfo.info.name,
-    role: peerInfo.role,
+    role: getParamsForRole(peerInfo.role),
     customerUserId: peerInfo.info.userId,
     customerDescription: peerInfo.info.data,
   });
@@ -73,7 +106,7 @@ describe('HMSRemotPeer', () => {
   });
 
   it('should have valid role', () => {
-    expect(peer.role).toBe(peerInfo.role);
+    expect(peer.role?.name).toBe(peerInfo.role);
   });
 
   it('should have valid customerUserId', () => {

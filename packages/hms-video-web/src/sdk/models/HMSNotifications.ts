@@ -1,9 +1,10 @@
 import { HMSTrack } from '../../media/tracks/HMSTrack';
-import { HMSPolicy } from '../../interfaces/policy';
+import { HMSRole } from '../../interfaces/role';
 import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
 import Message from './HMSMessage';
+import { RoleChangeRequestParams } from '../../interfaces/role-change-request';
 
 export type HMSNotifications =
   | Peer
@@ -12,6 +13,7 @@ export type HMSNotifications =
   | TrackStateNotification
   | SpeakerList
   | PolicyParams
+  | RoleChangeRequestParams
   | undefined;
 
 export interface TrackStateNotification {
@@ -33,7 +35,7 @@ export interface Info {
 export interface PolicyParams {
   name: string;
   known_roles: {
-    [role: string]: HMSPolicy;
+    [role: string]: HMSRole;
   };
 }
 
@@ -127,6 +129,10 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     }
     case HMSNotificationMethod.POLICY_CHANGE:
       return params;
+    case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
+      return params;
+    case HMSNotificationMethod.PEER_UPDATE:
+      return new Peer(params);
     default:
       HMSLogger.d(`method not implemented ${method}`);
       return params;

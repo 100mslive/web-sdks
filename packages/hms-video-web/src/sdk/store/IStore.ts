@@ -3,7 +3,7 @@ import { HMSSpeaker } from '../../interfaces/speaker';
 import { HMSTrack, HMSAudioTrack, HMSVideoTrack, HMSTrackSource, HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
-import { HMSPolicy } from '../../interfaces/policy';
+import { HMSRole, PublishParams } from '../../interfaces/role';
 import {
   SimulcastLayer,
   SimulcastDimensions,
@@ -12,14 +12,19 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
+import { HMSConfig } from '../../interfaces';
 
-export type KnownRoles = { [role: string]: HMSPolicy };
+export type KnownRoles = { [role: string]: HMSRole };
 
 export interface IStore {
+  getConfig(): HMSConfig | undefined;
+  getPublishParams(): PublishParams | undefined;
+
   getComparator(): Comparator;
 
   getRoom(): HMSRoom;
-  getPolicyForRole(role: string): HMSPolicy;
+  getPolicyForRole(role: string): HMSRole;
+  getKnownRoles(): KnownRoles;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
   getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;
@@ -47,6 +52,8 @@ export interface IStore {
   setKnownRoles(knownRoles: KnownRoles): void;
   setVideoSimulcastLayers(layers: SimulcastLayers): void;
   setScreenshareSimulcastLayers(layers: SimulcastLayers): void;
+  setConfig(config: HMSConfig): void;
+  setPublishParams(params: PublishParams): void;
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;

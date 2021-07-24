@@ -1,5 +1,5 @@
 import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSPolicy } from './policy';
+import { HMSRole } from './role';
 
 export interface IHMSPeer {
   peerId: string;
@@ -10,6 +10,7 @@ export interface IHMSPeer {
   audioTrack?: HMSAudioTrack;
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
-  role?: string;
-  policy?: HMSPolicy;
+  role?: HMSRole;
+
+  updateRole(newRole: HMSRole): void;
 }

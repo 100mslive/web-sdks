@@ -5,6 +5,7 @@ import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { HMSTrackSource } from '../media/tracks';
 import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
+import { HMSRole } from './role';
 
 export default interface HMS {
   join(config: HMSConfig, callback: HMSUpdateListener): void;
@@ -19,4 +20,5 @@ export default interface HMS {
 
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
+  getRoles(): HMSRole[];
 }
