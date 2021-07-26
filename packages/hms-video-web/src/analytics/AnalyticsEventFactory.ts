@@ -1,6 +1,7 @@
 import { HMSException } from '../error/HMSException';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
-import { DeviceList, SelectedDevices } from '../device-manager';
+import { SelectedDevices } from '../device-manager';
+import { DeviceMap } from '../interfaces';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
@@ -58,7 +59,7 @@ export default class AnalyticsEventFactory {
     settings,
     error,
   }: {
-    devices?: DeviceList;
+    devices?: DeviceMap;
     settings?: HMSTrackSettings;
     error?: HMSException;
   }) {
@@ -99,7 +100,7 @@ export default class AnalyticsEventFactory {
   }: {
     selection: Partial<SelectedDevices>;
     type?: 'change' | 'list';
-    devices: DeviceList;
+    devices: DeviceMap;
     error?: HMSException;
   }) {
     const name = this.eventNameFor(error ? 'publish' : `device.${type}`, error === undefined);

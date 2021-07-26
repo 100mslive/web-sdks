@@ -26,7 +26,7 @@ export class AudioSinkManager {
   }
 
   private get outputDevice() {
-    return this.deviceManager.selected.audioOutput;
+    return this.deviceManager.outputDevice;
   }
 
   getVolume() {

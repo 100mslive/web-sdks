@@ -1,7 +1,7 @@
 import HMSConnection from '../connection';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
 import HMSLogger from '../utils/logger';
-import { sleep } from '../utils/sleep';
+import { sleep } from '../utils/timer-utils';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { RTCStats } from './RTCStats';
 

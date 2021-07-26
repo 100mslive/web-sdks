@@ -23,7 +23,7 @@ export class AudioOutputManager implements IAudioOutputManager {
   }
 
   getDevice() {
-    return this.deviceManager.selected.audioOutput;
+    return this.deviceManager.outputDevice;
   }
 
   setDevice(deviceId?: string) {

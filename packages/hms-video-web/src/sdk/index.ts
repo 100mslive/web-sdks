@@ -40,6 +40,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
 import { store } from './store';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
+import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
 import { HMSRole } from '../interfaces/role';
 import RoleChangeManager from './RoleChangeManager';
@@ -61,6 +62,7 @@ export class HMSSdk implements HMSInterface {
   private notificationManager: NotificationManager = new NotificationManager(this.store);
   private listener!: HMSUpdateListener | null;
   private errorListener?: IErrorListener;
+  private deviceChangeListener?: DeviceChangeListener;
   private audioListener: HMSAudioListener | null = null;
   private published: boolean = false;
   private deviceManager: DeviceManager = new DeviceManager(this.store);
@@ -146,6 +148,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     this.errorListener = listener;
+    this.deviceChangeListener = listener;
     const policy = this.store.getPolicyForRole(role);
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
@@ -167,7 +170,9 @@ export class HMSSdk implements HMSInterface {
       const tracks = await this.initLocalTracks(config.settings!);
       tracks.forEach((track) => this.setLocalPeerTrack(track));
       this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+      await this.initDeviceManagers();
       listener.onPreview(this.store.getRoom(), tracks);
+      this.deviceChangeListener?.onDeviceChange(this.deviceManager.getDevices());
     };
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
@@ -186,10 +191,10 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private handleDeviceChangeError = (event: DeviceChangeEvent | undefined) => {
-    if (!event) return;
+  private handleDeviceChangeError = (event: DeviceChangeEvent) => {
     const track = event.track;
     HMSLogger.d(this.TAG, 'Device Change event', event);
+    this.deviceChangeListener?.onDeviceChange(event.devices);
     if (event.error) {
       this.errorListener?.onError(event.error);
       if (
@@ -209,6 +214,7 @@ export class HMSSdk implements HMSInterface {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
+    this.deviceChangeListener = listener;
     this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
@@ -452,6 +458,9 @@ export class HMSSdk implements HMSInterface {
       await this.transport!.publish([track]);
       this.setLocalPeerTrack(track);
       this.store.addTrack(track);
+      await this.initDeviceManagers();
+      this.deviceChangeListener?.onDeviceChange(this.deviceManager.getDevices());
+      await this.transport!.publish([track]);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
   }
@@ -528,8 +537,6 @@ export class HMSSdk implements HMSInterface {
         }
       }
     }
-
-    await this.initDeviceManagers();
 
     return tracks.concat(localTracks);
   }

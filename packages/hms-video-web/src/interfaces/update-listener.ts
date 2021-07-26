@@ -5,6 +5,7 @@ import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSMessage } from './message';
 import { HMSRoom } from './room';
 import { HMSSpeaker } from './speaker';
+import { DeviceChangeListener } from './device-change-listener';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -43,7 +44,7 @@ export interface HMSAudioListener {
   onAudioLevelUpdate(speakers: HMSSpeaker[]): void;
 }
 
-export default interface HMSUpdateListener {
+export default interface HMSUpdateListener extends DeviceChangeListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | null): void;

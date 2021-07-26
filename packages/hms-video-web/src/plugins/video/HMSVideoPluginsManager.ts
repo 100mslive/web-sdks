@@ -1,7 +1,7 @@
 import { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
-import { sleep } from '../../utils/sleep';
+import { sleep } from '../../utils/timer-utils';
 
 const DEFAULT_FRAME_RATE = 24;
 const TAG = 'VideoPluginsManager';
