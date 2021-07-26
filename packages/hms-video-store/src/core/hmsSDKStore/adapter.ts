@@ -3,18 +3,21 @@ import {
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
+  HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
 } from '@100mslive/hms-video';
-import { HMSPeer, HMSMessage, HMSTrack, HMSRoom } from '../schema';
+import { HMSPeer, HMSMessage, HMSTrack, HMSRoom, HMSRoleChangeStoreRequest } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
 import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+import { HMSRole, HMSRoleName } from '../schema';
 
 export class SDKToHMS {
   static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
     return {
       id: sdkPeer.peerId,
       name: sdkPeer.name,
-      role: sdkPeer.role,
+      role: sdkPeer.role?.name,
+      roleName: sdkPeer.role?.name,
       isLocal: sdkPeer.isLocal,
       videoTrack: sdkPeer.videoTrack?.trackId,
       audioTrack: sdkPeer.audioTrack?.trackId,
@@ -47,7 +50,7 @@ export class SDKToHMS {
         track.volume = volume;
       }
     }
-    this.enrichVideoTrack(track, sdkTrack);
+    SDKToHMS.enrichVideoTrack(track, sdkTrack);
   }
 
   static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
@@ -82,6 +85,24 @@ export class SDKToHMS {
       time: sdkMessage.time,
       type: sdkMessage.type,
       message: sdkMessage.message,
+    };
+  }
+
+  static convertRoles(sdkRoles: HMSRole[]): Record<HMSRoleName, HMSRole> {
+    const roles: Record<HMSRoleName, HMSRole> = {};
+    if (sdkRoles) {
+      sdkRoles.forEach(role => {
+        roles[role.name] = role;
+      });
+    }
+    return roles;
+  }
+
+  static convertRoleChangeRequest(req: SDKHMSRoleChangeRequest): HMSRoleChangeStoreRequest {
+    return {
+      requestedBy: req.requestedBy.peerId,
+      roleName: req.role.name,
+      token: req.token,
     };
   }
 }

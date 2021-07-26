@@ -24,6 +24,7 @@ import {
   selectIsLocalVideoDisplayEnabled,
   selectLocalPeer,
   selectPeerByID,
+  HMSRoleChangeRequest,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -36,6 +37,7 @@ import {
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSVideoTrack as SDKHMSVideoTrack,
   HMSException as SDKHMSException,
+  HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -65,6 +67,7 @@ import { HMSNotifications } from './HMSNotifications';
  */
 export class HMSSDKActions implements IHMSActions {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
+  private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore;
   private isRoomJoinCalled: boolean = false;
@@ -104,14 +107,14 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  preview(config: sdkTypes.HMSConfig) {
+  async preview(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
       return; // ignore
     }
 
     try {
-      this.sdkPreviewWithListeners(config);
+      await this.sdkPreviewWithListeners(config);
       this.store.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       });
@@ -247,6 +250,7 @@ export class HMSSDKActions implements IHMSActions {
     hmsMessage.senderName = 'You';
     this.onHMSMessage(hmsMessage);
   }
+
   setMessageRead(readStatus: boolean, messageId?: string) {
     this.store.setState(store => {
       if (messageId) {
@@ -297,6 +301,46 @@ export class HMSSDKActions implements IHMSActions {
     return this.addRemoveVideoPlugin(plugin, 'remove');
   }
 
+  changeRole(forPeerId: string, toRole: string, force: boolean = false) {
+    const peer = this.hmsSDKPeers[forPeerId];
+    if (!peer) {
+      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
+      return;
+    }
+    if (peer.isLocal) {
+      HMSLogger.w('changing role for local peer is not yet supported');
+      return;
+    }
+    this.sdk.changeRole(peer as sdkTypes.HMSRemotePeer, toRole, force);
+  }
+
+  // TODO: separate out role related things in another file
+  acceptChangeRole(request: HMSRoleChangeRequest) {
+    const sdkPeer = this.hmsSDKPeers[request.requestedBy.id];
+    if (!sdkPeer) {
+      HMSLogger.w(
+        `peer for which role change is requested no longer available - ${request.requestedBy}`,
+      );
+      return;
+    }
+    const sdkRequest = {
+      requestedBy: sdkPeer,
+      role: request.role,
+      token: request.token,
+    };
+    this.sdk.acceptChangeRole(sdkRequest);
+    this.removeRoleChangeRequest(request);
+  }
+
+  /**
+   * @privateRemarks
+   * there is no corresponding sdk method for rejecting change role but as the store also maintains the full
+   * state of current pending requests, this method allows it to clean up when the request is rejected
+   */
+  rejectChangeRole(request: HMSRoleChangeRequest) {
+    this.removeRoleChangeRequest(request);
+  }
+
   private resetState() {
     this.store.setState(store => {
       Object.assign(store, createDefaultStoreState());
@@ -315,16 +359,20 @@ export class HMSSDKActions implements IHMSActions {
       onError: this.onError.bind(this),
       onReconnected: this.onReconnected.bind(this),
       onReconnecting: this.onReconnecting.bind(this),
+      onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
+      onRoleUpdate: this.onRoleUpdate.bind(this),
+      onDeviceChange: this.onDeviceChange.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
   }
 
-  private sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
-    this.sdk.preview(config, {
+  private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
+    await this.sdk.preview(config, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
+      onDeviceChange: this.onDeviceChange.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -386,6 +434,7 @@ export class HMSSDKActions implements IHMSActions {
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
+      this.hmsSDKPeers[hmsPeer.id] = sdkPeer;
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (let sdkTrack of sdkTracks) {
@@ -414,6 +463,7 @@ export class HMSSDKActions implements IHMSActions {
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+      Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
     });
   }
 
@@ -518,6 +568,9 @@ export class HMSSDKActions implements IHMSActions {
     this.store.setState(store => {
       const trackIDAudioLevelMap: Record<HMSPeerID, number> = {};
       sdkSpeakers.forEach(sdkSpeaker => {
+        if (!sdkSpeaker.track) {
+          return;
+        }
         const trackID = sdkSpeaker.track.trackId;
         trackIDAudioLevelMap[trackID] = sdkSpeaker.audioLevel;
         if (!store.speakers[trackID]) {
@@ -673,5 +726,38 @@ export class HMSSDKActions implements IHMSActions {
       return false;
     }
     return this.hmsSDKTracks[storeTrackID]?.trackId === sdkTrackID;
+  }
+
+  /**
+   * convert new role change requests to store format and save.
+   * keep only one request at a time in store till we figure out how to handle multiple requests at the same time
+   */
+  private onRoleChangeRequest(request: SDKHMSRoleChangeRequest) {
+    this.store.setState(store => {
+      if (store.roleChangeRequests.length === 0) {
+        store.roleChangeRequests.push(SDKToHMS.convertRoleChangeRequest(request));
+      }
+    });
+  }
+
+  private onDeviceChange() {}
+
+  private removeRoleChangeRequest(toRemove: HMSRoleChangeRequest) {
+    this.store.setState(store => {
+      const index = store.roleChangeRequests.findIndex(req => {
+        return (
+          req.requestedBy === toRemove.requestedBy.id &&
+          req.roleName === toRemove.role.name &&
+          req.token === toRemove.token
+        );
+      });
+      if (index !== -1) {
+        store.roleChangeRequests.splice(index, 1);
+      }
+    });
+  }
+
+  private onRoleUpdate() {
+    this.syncPeers();
   }
 }

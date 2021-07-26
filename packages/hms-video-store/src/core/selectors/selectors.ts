@@ -1,5 +1,7 @@
 import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
+// noinspection ES6PreferShortImport
+import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
   isDegraded,
   isScreenSharing,
@@ -145,4 +147,17 @@ export const selectRoomState = createSelector([selectRoom], room => room && room
 export const selectIsInPreview = createSelector(
   [selectRoom],
   room => !!room && room.roomState === HMSRoomState.Preview,
+);
+
+export const selectRolesMap = (store: HMSStore): Record<string, HMSRole> => {
+  return store.roles;
+};
+
+export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMap =>
+  Object.keys(rolesMap),
+);
+
+export const selectLocalPeerRole = createSelector(
+  [selectLocalPeer, selectRolesMap],
+  (localPeer, rolesMap) => (localPeer?.roleName ? rolesMap[localPeer.roleName] : null),
 );

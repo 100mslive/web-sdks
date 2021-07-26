@@ -5,3 +5,4 @@ export * from './message';
 export * from './settings';
 export * from './ui';
 export * from './notification';
+export * from './role';

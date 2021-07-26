@@ -10,6 +10,7 @@ import {
   HMSTrackType,
 } from '../core';
 import { HMSSimulcastLayer } from '../core/hmsSDKStore/sdkTypes';
+import { HMSRole } from '../core/schema';
 
 function makeTrack(
   id: HMSTrackID,
@@ -29,6 +30,7 @@ function makeTrack(
 }
 
 export let localPeer: HMSPeer;
+export let remotePeer: HMSPeer;
 export let peerScreenSharing: HMSPeer;
 export let localVideo: HMSTrack;
 export let localAudio: HMSTrack;
@@ -37,6 +39,8 @@ export let screenShare: HMSTrack;
 export let auxiliaryAudio: HMSTrack;
 export let localSpeaker: HMSSpeaker;
 export let screenshareAudio: HMSTrack;
+export let hostRole: HMSRole;
+export let speakerRole: HMSRole;
 
 export const makeFakeStore = (): HMSStore => {
   const fakeStore: HMSStore = {
@@ -53,7 +57,8 @@ export const makeFakeStore = (): HMSStore => {
       '1': {
         id: '1',
         name: 'test1',
-        role: 'student',
+        role: 'host',
+        roleName: 'host',
         isLocal: true,
         videoTrack: '101',
         audioTrack: '102',
@@ -62,7 +67,8 @@ export const makeFakeStore = (): HMSStore => {
       '2': {
         id: '2',
         name: 'test2',
-        role: 'student',
+        role: 'host',
+        roleName: 'host',
         isLocal: false,
         videoTrack: '103',
         audioTrack: '104',
@@ -112,8 +118,21 @@ export const makeFakeStore = (): HMSStore => {
       videoInputDeviceId: 'testVideoIn',
       maxTileCount: 12,
     },
+    roleChangeRequests: [
+      {
+        requestedBy: '2',
+        roleName: 'speaker',
+        token: '123',
+      },
+    ],
+    roles: {
+      host: { name: 'host' } as HMSRole,
+      viewer: { name: 'viewer' } as HMSRole,
+      speaker: { name: 'speaker' } as HMSRole,
+    },
   };
   localPeer = fakeStore.peers['1'];
+  remotePeer = fakeStore.peers['2'];
   peerScreenSharing = fakeStore.peers['2'];
   localVideo = fakeStore.tracks['101'];
   localAudio = fakeStore.tracks['102'];
@@ -122,5 +141,7 @@ export const makeFakeStore = (): HMSStore => {
   auxiliaryAudio = fakeStore.tracks['106'];
   screenshareAudio = fakeStore.tracks['107'];
   localSpeaker = fakeStore.speakers[localPeer.audioTrack!];
+  hostRole = fakeStore.roles['host'];
+  speakerRole = fakeStore.roles['speaker'];
   return fakeStore;
 };

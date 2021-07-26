@@ -1,5 +1,7 @@
 import { SimulcastLayerDefinition } from '@100mslive/hms-video';
+// noinspection ES6PreferShortImport
 import { HMSSimulcastLayer } from '../hmsSDKStore/sdkTypes';
+import { HMSRoleName } from './role';
 
 export type HMSPeerID = string;
 export type HMSTrackID = string;
@@ -12,7 +14,11 @@ export type HMSTrackType = 'audio' | 'video';
 export interface HMSPeer {
   id: HMSPeerID;
   name: string;
+  /**
+   * @deprecated use roleName instead
+   */
   role?: string;
+  roleName?: HMSRoleName;
   isLocal: boolean;
   isStarred?: boolean;
   videoTrack?: HMSTrackID;

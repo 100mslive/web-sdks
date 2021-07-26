@@ -2,6 +2,8 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
+import { HMSRole } from './role';
+import { HMSRoleChangeStoreRequest } from './role';
 
 /*
 Defines the schema of the central store. UI Components are aware of the presence
@@ -17,6 +19,8 @@ export interface HMSStore {
     allIDs: HMSMessageID[];
   };
   settings: HMSMediaSettings;
+  roles: Record<string, HMSRole>;
+  roleChangeRequests: HMSRoleChangeStoreRequest[];
 }
 
 export const createDefaultStoreState = (): HMSStore => {
@@ -40,5 +44,7 @@ export const createDefaultStoreState = (): HMSStore => {
       videoInputDeviceId: '',
       maxTileCount: 9,
     },
+    roles: {},
+    roleChangeRequests: [],
   };
 };

@@ -24,4 +24,5 @@ export class HMSNotificationTypes {
   static TRACK_REMOVED = 'TRACK_REMOVED';
   static TRACK_MUTED = 'TRACK_MUTED';
   static TRACK_UNMUTED = 'TRACK_UNMUTED';
+  static ROLE_CHANGE_REQUEST = 'ROLE_CHANGE_REQUEST';
 }

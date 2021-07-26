@@ -11,6 +11,8 @@ import {
   HMSMessage,
   HMSConfig,
   HMSSpeaker,
+  HMSRole,
+  IHMSRemotePeer,
   SimulcastLayerDefinition,
 } from '@100mslive/hms-video';
 
@@ -27,5 +29,7 @@ export {
   HMSRoomUpdate,
   HMSPeerUpdate,
   HMSTrackUpdate,
+  HMSRole,
+  IHMSRemotePeer as HMSRemotePeer, // TODO: sdk should import HMSRemotePeer
   SimulcastLayerDefinition,
 };

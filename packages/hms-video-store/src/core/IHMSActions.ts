@@ -4,8 +4,10 @@ import {
   HMSConfig,
   HMSSimulcastLayer,
 } from '@100mslive/hms-video';
+
 import { HMSTrackSource } from './schema';
 import { HMSVideoPlugin } from '@100mslive/hms-video';
+import { HMSRoleChangeRequest } from './selectors';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -22,7 +24,7 @@ import { HMSVideoPlugin } from '@100mslive/hms-video';
  * in case you're creating multiple rooms please create new instance per room.
  */
 export interface IHMSActions {
-  preview(config: HMSConfig): void;
+  preview(config: HMSConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -159,6 +161,26 @@ export interface IHMSActions {
    * @see addPluginToVideoTrack
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRole(forPeerId: string, toRole: string, force?: boolean): void;
+
+  /**
+   * Accept the role change request received
+   * @param {HMSRoleChangeRequest} request The original request that was received
+   */
+  acceptChangeRole(request: HMSRoleChangeRequest): void;
+
+  /**
+   * Reject pending role change request
+   * @param {HMSRoleChangeRequest} request The original request that was received
+   */
+  rejectChangeRole(request: HMSRoleChangeRequest): void;
 }
 
 /**

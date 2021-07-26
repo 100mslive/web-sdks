@@ -59,7 +59,6 @@ let fakeStore: HMSStore;
 beforeEach(() => {
   fakeStore = makeFakeStore();
 });
-
 describe('test primitive selectors', () => {
   test('selectRoom', () => {
     expect(selectRoom(fakeStore)).toBe(fakeStore.room);
