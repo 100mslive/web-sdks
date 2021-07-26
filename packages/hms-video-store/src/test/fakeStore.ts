@@ -130,6 +130,11 @@ export const makeFakeStore = (): HMSStore => {
       viewer: { name: 'viewer' } as HMSRole,
       speaker: { name: 'speaker' } as HMSRole,
     },
+    devices: {
+      audioInput: [],
+      audioOutput: [],
+      videoInput: [],
+    },
   };
   localPeer = fakeStore.peers['1'];
   remotePeer = fakeStore.peers['2'];

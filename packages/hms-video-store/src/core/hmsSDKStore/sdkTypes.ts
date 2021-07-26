@@ -14,6 +14,7 @@ import {
   HMSRole,
   IHMSRemotePeer,
   SimulcastLayerDefinition,
+  DeviceMap,
 } from '@100mslive/hms-video';
 
 export {
@@ -32,4 +33,5 @@ export {
   HMSRole,
   IHMSRemotePeer as HMSRemotePeer, // TODO: sdk should import HMSRemotePeer
   SimulcastLayerDefinition,
+  DeviceMap,
 };

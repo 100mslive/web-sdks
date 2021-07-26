@@ -2,6 +2,7 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
+import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './role';
 
@@ -19,6 +20,7 @@ export interface HMSStore {
     allIDs: HMSMessageID[];
   };
   settings: HMSMediaSettings;
+  devices: DeviceMap;
   roles: Record<string, HMSRole>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
 }
@@ -43,6 +45,11 @@ export const createDefaultStoreState = (): HMSStore => {
       audioOutputDeviceId: '',
       videoInputDeviceId: '',
       maxTileCount: 9,
+    },
+    devices: {
+      audioInput: [],
+      audioOutput: [],
+      videoInput: [],
     },
     roles: {},
     roleChangeRequests: [],

@@ -23,6 +23,10 @@ export const selectMaxTilesCount = createSelector(
   settings => settings.maxTileCount,
 );
 
+export const selectDevices = (store: HMSStore) => {
+  return store.devices;
+};
+
 export const selectSpeakers = (store: HMSStore) => {
   return store.speakers;
 };

@@ -11,4 +11,5 @@ export {
   HMSConfig,
   HMSSimulcastLayer,
   SimulcastLayerDefinition,
+  DeviceMap,
 } from './hmsSDKStore/sdkTypes';

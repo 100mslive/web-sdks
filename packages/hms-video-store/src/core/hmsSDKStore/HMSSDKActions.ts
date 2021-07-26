@@ -37,11 +37,16 @@ import {
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSVideoTrack as SDKHMSVideoTrack,
   HMSException as SDKHMSException,
+  DeviceMap,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
-import { mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import {
+  mergeNewPeersInDraft,
+  mergeNewTracksInDraft,
+  areArraysEqual,
+} from './sdkUtils/storeMergeUtils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
 import { HMSNotifications } from './HMSNotifications';
 
@@ -365,6 +370,20 @@ export class HMSSDKActions implements IHMSActions {
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+  }
+
+  private onDeviceChange(devices: DeviceMap) {
+    this.store.setState(store => {
+      if (!areArraysEqual(store.devices.audioInput, devices.audioInput)) {
+        store.devices.audioInput = devices.audioInput;
+      }
+      if (!areArraysEqual(store.devices.videoInput, devices.videoInput)) {
+        store.devices.videoInput = devices.videoInput;
+      }
+      if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
+        store.devices.audioOutput = devices.audioOutput;
+      }
     });
   }
 
@@ -739,8 +758,6 @@ export class HMSSDKActions implements IHMSActions {
       }
     });
   }
-
-  private onDeviceChange() {}
 
   private removeRoleChangeRequest(toRemove: HMSRoleChangeRequest) {
     this.store.setState(store => {
