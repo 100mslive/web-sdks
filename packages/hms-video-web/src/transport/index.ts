@@ -280,9 +280,6 @@ export default class HMSTransport implements ITransport {
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const tracks = await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
-      analyticsEventsService
-        .queue(AnalyticsEventFactory.publish({ devices: this.deviceManager.getDevices(), settings }))
-        .flush();
       return tracks;
     } catch (error) {
       if (error instanceof HMSException) {
@@ -394,7 +391,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    analyticsEventsService.queue(AnalyticsEventFactory.leave()).flush();
     analyticsEventsService.removeTransport(this.analyticsSignalTransport);
 
     this.retryScheduler.reset();

@@ -12,7 +12,7 @@ export class AnalyticsEventsService {
   private transports: AnalyticsTransport[] = [];
   private pendingEvents: AnalyticsEvent[] = [];
 
-  level: HMSAnalyticsLevel = HMSAnalyticsLevel.ERROR;
+  level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
   addTransport(transport: AnalyticsTransport) {
     this.transports.push(transport);

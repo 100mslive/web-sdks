@@ -2,6 +2,7 @@ import { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
+import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 
 const DEFAULT_FRAME_RATE = 24;
 const TAG = 'VideoPluginsManager';
@@ -44,11 +45,13 @@ export class HMSVideoPluginsManager {
   private inputCanvas?: CanvasElement;
   private outputCanvas?: CanvasElement;
   private outputTrack?: MediaStreamTrack;
+  private analytics: VideoPluginsAnalytics;
 
   constructor(track: HMSLocalVideoTrack) {
     this.hmsTrack = track;
     this.plugins = [];
     this.pluginsMap = {};
+    this.analytics = new VideoPluginsAnalytics();
   }
 
   getPlugins(): string[] {
@@ -62,7 +65,12 @@ export class HMSVideoPluginsManager {
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number) {
     try {
-      if (this.pluginsMap[plugin.getName()]) {
+      const name = plugin.getName?.();
+      if (!name || name === '') {
+        HMSLogger.w('no name provided by the plugin');
+        return;
+      }
+      if (this.pluginsMap[name]) {
         HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
         return;
       }
@@ -71,34 +79,51 @@ export class HMSVideoPluginsManager {
         HMSLogger.i(TAG, 'Track width/height is not valid');
         return;
       }
+
+      HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
+      this.analytics.added(name);
+
       if (!plugin.isSupported()) {
+        const err = 'Platform not supported';
+        this.analytics.failure(name, err as any);
         HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
         return;
       }
-      HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
       await plugin.init();
+      await this.analytics.initWithTime(name, async () => await plugin.init());
       this.plugins.push(plugin.getName());
       this.pluginsMap[plugin.getName()] = plugin;
       await this.startPluginsLoop();
-    } catch (e) {
+    } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin');
-      throw e;
+      await this.removePlugin(plugin);
+      throw err;
     }
   }
 
   async removePlugin(plugin: HMSVideoPlugin) {
-    if (!this.pluginsMap[plugin.getName()]) {
-      HMSLogger.w(TAG, `plugin - ${plugin.getName()} not found to remove.`);
+    const name = plugin.getName();
+    if (!this.pluginsMap[name]) {
+      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
       return;
     }
-    HMSLogger.i(TAG, `removing plugin ${plugin.getName()}`);
-    const index = this.plugins.indexOf(plugin.getName());
-    this.plugins.splice(index, 1);
-    delete this.pluginsMap[plugin.getName()];
+    HMSLogger.i(TAG, `removing plugin ${name}`);
+    this.removePluginEntry(name);
     if (this.plugins.length == 0) {
       await this.stopPluginsLoop();
     }
     plugin.stop();
+    this.analytics.removed(name);
+  }
+
+  removePluginEntry(name: string) {
+    const index = this.plugins.indexOf(name);
+    if (index !== -1) {
+      this.plugins.splice(index, 1);
+    }
+    if (this.pluginsMap[name]) {
+      delete this.pluginsMap[name];
+    }
   }
 
   /**
@@ -150,7 +175,12 @@ export class HMSVideoPluginsManager {
     }
     this.initElementsAndStream();
     this.pluginsLoopRunning = true;
-    await this.hmsTrack.setProcessedTrack(this.outputTrack);
+    try {
+      await this.hmsTrack.setProcessedTrack(this.outputTrack);
+    } catch (err) {
+      this.pluginsLoopRunning = false;
+      throw err;
+    }
     // can't await on pluginsLoop as it'll run for a long long time
     this.pluginsLoop().then(() => {
       HMSLogger.d(TAG, 'processLoop stopped');
@@ -179,9 +209,7 @@ export class HMSVideoPluginsManager {
       }
       let processingTime: number = 0;
       try {
-        await this.addTrackToVideo(); // ensure current native track is playing in video
-        await this.updateInputCanvas(); // put the latest video frame on input canvas
-
+        await this.analytics.preProcessWithTime(async () => await this.doPreProcessing());
         const start = Date.now();
         await this.processFramesThroughPlugins();
         processingTime = Math.floor(Date.now() - start);
@@ -198,6 +226,11 @@ export class HMSVideoPluginsManager {
     }
   }
 
+  private async doPreProcessing() {
+    await this.addTrackToVideo(); // ensure current native track is playing in video
+    await this.updateInputCanvas(); // put the latest video frame on input canvas
+  }
+
   /**
    * pass the input canvas through all plugins in a loop
    * @private
@@ -207,10 +240,13 @@ export class HMSVideoPluginsManager {
       const plugin = this.pluginsMap[name];
       // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
       if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
-        await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas);
+        await this.analytics.processWithTime(
+          name,
+          async () => await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas),
+        );
       } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE) {
         // there is no need to await for this case
-        plugin.processVideoFrame(this.inputCanvas!);
+        await this.analytics.processWithTime(name, async () => await plugin.processVideoFrame(this.inputCanvas!));
       }
     }
   }
@@ -260,6 +296,14 @@ export class HMSVideoPluginsManager {
     const ctx = this.inputCanvas.getContext('2d');
     ctx!.drawImage(this.inputVideo, 0, 0, width, height);
   }
+
+  //TODO: is this required on cleanup
+  // private resetOutputCanvas() {
+  //   const ctx = this.outputCanvas?.getContext('2d');
+  //   if (this.outputCanvas && ctx) {
+  //     ctx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+  //   }
+  // }
 
   private resetCanvases() {
     if (!this.outputCanvas || !this.inputCanvas) {
