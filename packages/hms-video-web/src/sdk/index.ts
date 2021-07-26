@@ -460,7 +460,6 @@ export class HMSSdk implements HMSInterface {
       this.store.addTrack(track);
       await this.initDeviceManagers();
       this.deviceChangeListener?.onDeviceChange(this.deviceManager.getDevices());
-      await this.transport!.publish([track]);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
   }
