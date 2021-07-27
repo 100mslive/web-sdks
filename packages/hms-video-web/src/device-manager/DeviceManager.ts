@@ -190,7 +190,7 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
-    const { settings } = audioTrack;
+    const { settings, enabled } = audioTrack;
     const newAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
@@ -198,6 +198,10 @@ export class DeviceManager implements HMSDeviceManager {
       .build();
     try {
       await audioTrack.setSettings(newAudioTrackSettings);
+      if (!enabled) {
+        // On replace track, enabled will be true. Need to be set to previous state
+        audioTrack.setEnabled(enabled);
+      }
       this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() });
       this.logDevices('Audio Device Change Success');
     } catch (error) {
@@ -230,7 +234,7 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.w(this.TAG, 'Video device not found');
       return;
     }
-    const { settings } = videoTrack;
+    const { settings, enabled } = videoTrack;
     const newVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
@@ -241,6 +245,10 @@ export class DeviceManager implements HMSDeviceManager {
       .build();
     try {
       await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings);
+      if (!enabled) {
+        // On replace track, enabled will be true. Need to be set to previous state
+        videoTrack.setEnabled(enabled);
+      }
       this.eventEmitter.emit('video-device-change', { devices: this.getDevices() });
       this.logDevices('Video Device Change Success');
     } catch (error) {
