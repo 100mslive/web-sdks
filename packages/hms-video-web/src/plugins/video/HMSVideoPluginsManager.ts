@@ -238,6 +238,9 @@ export class HMSVideoPluginsManager {
   private async processFramesThroughPlugins() {
     for (const name of this.plugins) {
       const plugin = this.pluginsMap[name];
+      if (!plugin) {
+        continue;
+      }
       // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
       if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
         await this.analytics.processWithTime(

@@ -44,7 +44,6 @@ export class VideoPluginsAnalytics {
       delete this.pluginAdded[name];
 
       // send stats
-      console.log('sending stats in event');
       analyticsEventsService.queue(VideoPluginsAnalyticsFactory.stats(stats)).flush();
     }
   }
