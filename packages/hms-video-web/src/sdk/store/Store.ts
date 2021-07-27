@@ -234,14 +234,6 @@ class Store implements IStore {
     });
   }
 
-  cleanUp() {
-    this.room = undefined;
-    this.localPeerId = undefined;
-    this.peers = {};
-    this.tracks = {};
-    this.speakers = [];
-  }
-
   private updatePeersPolicy() {
     this.getPeers().forEach((peer) => {
       peer.role = this.getPolicyForRole(peer.role!.name);
@@ -249,5 +241,4 @@ class Store implements IStore {
   }
 }
 
-const store = new Store();
-export { store };
+export { Store };

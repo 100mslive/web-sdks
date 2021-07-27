@@ -38,7 +38,7 @@ import { IFetchAVTrackOptions } from '../transport/ITransport';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
-import { store } from './store';
+import { IStore, Store } from './store';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
@@ -58,26 +58,35 @@ const defaultSettings = {
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport | null;
   private TAG: string = '[HMSSdk]:';
-  private store = store;
-  private notificationManager: NotificationManager = new NotificationManager(this.store);
   private listener!: HMSUpdateListener | null;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener: HMSAudioListener | null = null;
   private published: boolean = false;
-  private deviceManager: DeviceManager = new DeviceManager(this.store);
-  private audioSinkManager: AudioSinkManager = new AudioSinkManager(
-    this.store,
-    this.notificationManager,
-    this.deviceManager,
-  );
+  private store!: IStore;
+  private notificationManager!: NotificationManager;
+  private deviceManager!: DeviceManager;
+  private audioSinkManager!: AudioSinkManager;
+  private audioOutput!: AudioOutputManager;
+  private isInitialised = false;
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
-  private audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
   private roleChangeManager?: RoleChangeManager;
 
-  public get localPeer(): HMSLocalPeer | undefined {
-    return this.store.getLocalPeer();
+  private initStoreAndManagers() {
+    if (this.isInitialised) {
+      return;
+    }
+    this.isInitialised = true;
+    this.store = new Store();
+    this.notificationManager = new NotificationManager(this.store);
+    this.deviceManager = new DeviceManager(this.store);
+    this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
+    this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
+  }
+
+  private get localPeer(): HMSLocalPeer | undefined {
+    return this.store?.getLocalPeer();
   }
 
   private observer: ITransportObserver = {
@@ -108,12 +117,12 @@ export class HMSSdk implements HMSInterface {
 
     onTrackDegrade: (track: HMSRemoteVideoTrack) => {
       HMSLogger.d(this.TAG, 'Sending Track Update Track Degraded', track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, this.store.getPeerByTrackId(track.trackId)!);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, this.store?.getPeerByTrackId(track.trackId)!);
     },
 
     onTrackRestore: (track: HMSRemoteVideoTrack) => {
       HMSLogger.d(this.TAG, 'Sending Track Update Track Restored', track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, this.store.getPeerByTrackId(track.trackId)!);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, this.store?.getPeerByTrackId(track.trackId)!);
     },
 
     onFailure: (exception: HMSException) => {
@@ -145,6 +154,7 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.initStoreAndManagers();
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     this.errorListener = listener;
@@ -212,6 +222,7 @@ export class HMSSdk implements HMSInterface {
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
+    this.initStoreAndManagers();
     this.listener = listener;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
@@ -272,8 +283,7 @@ export class HMSSdk implements HMSInterface {
   private cleanUp() {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.cleanDeviceManagers();
-    this.store.cleanUp();
-
+    this.isInitialised = false;
     this.published = false;
     this.transport = null;
     this.listener = null;
@@ -351,8 +361,8 @@ export class HMSSdk implements HMSInterface {
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec as HMSVideoCodec)
         .maxFramerate(screen.frameRate)
-        .setWidth(dimensions.width || screen.width)
-        .setHeight(dimensions.height || screen.height)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
         .build(),
       new HMSAudioTrackSettingsBuilder().build(),
     );
@@ -502,8 +512,8 @@ export class HMSSdk implements HMSInterface {
         .codec(video.codec as HMSVideoCodec)
         .maxBitrate(video.bitRate)
         .maxFramerate(video.frameRate)
-        .setWidth(dimensions.width || video.width) // take simulcast width if available
-        .setHeight(dimensions.height || video.height) // take simulcast width if available
+        .setWidth(dimensions?.width || video.width) // take simulcast width if available
+        .setHeight(dimensions?.height || video.height) // take simulcast width if available
         .deviceId(videoDeviceId)
         .build();
 
