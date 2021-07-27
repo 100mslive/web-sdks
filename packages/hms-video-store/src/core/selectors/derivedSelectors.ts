@@ -1,5 +1,5 @@
 import { HMSPeer, HMSStore } from '../schema';
-import { selectPeersMap, selectRolesMap, selectTracksMap } from './selectors';
+import { selectLocalPeerRole, selectPeersMap, selectRolesMap, selectTracksMap } from './selectors';
 import { createSelector } from 'reselect';
 import { HMSRole } from '@100mslive/hms-video/dist/interfaces/role';
 
@@ -16,6 +16,12 @@ export interface HMSRoleChangeRequest {
   requestedBy: HMSPeer;
   role: HMSRole;
   token: string;
+}
+
+export interface HMSPublishAllowed {
+  video: boolean;
+  audio: boolean;
+  screen: boolean;
 }
 
 export const selectPeersWithAudioStatus = createSelector(
@@ -45,6 +51,28 @@ export const selectRoleChangeRequest = createSelector(
       requestedBy: peersMap[request.requestedBy],
       role: rolesMap[request.roleName],
       token: request.token,
+    };
+  },
+);
+
+/**
+ * use this selector to know what streams is the local peer allowed to publish from video, audio and screenshare.
+ */
+export const selectIsAllowedToPublish = createSelector(
+  [selectLocalPeerRole],
+  (role): HMSPublishAllowed => {
+    let video = false,
+      audio = false,
+      screen = false;
+    if (role?.publishParams?.allowed) {
+      video = role.publishParams.allowed.includes('video');
+      audio = role.publishParams.allowed.includes('audio');
+      screen = role.publishParams.allowed.includes('screen');
+    }
+    return {
+      video,
+      audio,
+      screen,
     };
   },
 );

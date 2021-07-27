@@ -165,3 +165,13 @@ export const selectLocalPeerRole = createSelector(
   [selectLocalPeer, selectRolesMap],
   (localPeer, rolesMap) => (localPeer?.roleName ? rolesMap[localPeer.roleName] : null),
 );
+
+/**
+ * use this selector to know if the local peer is allowed to subscribe to any other role
+ */
+export const selectIsAllowedToSubscribe = createSelector([selectLocalPeerRole], (role): boolean => {
+  if (!role?.subscribeParams?.subscribeToRoles) {
+    return false;
+  }
+  return role.subscribeParams.subscribeToRoles.length > 0;
+});

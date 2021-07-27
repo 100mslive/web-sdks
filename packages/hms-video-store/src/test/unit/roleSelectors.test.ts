@@ -5,8 +5,10 @@ import {
   selectLocalPeerRole,
   selectRoleByRoleName,
   selectRoleChangeRequest,
+  selectIsAllowedToPublish,
+  selectIsAllowedToSubscribe,
 } from '../../core';
-import { hostRole, makeFakeStore, remotePeer, speakerRole } from '../fakeStore';
+import { hostRole, localPeer, makeFakeStore, remotePeer, ROLES, speakerRole } from '../fakeStore';
 
 let fakeStore: HMSStore;
 
@@ -24,9 +26,9 @@ describe('test role related selectors', () => {
     expect(storeRoles.student).toBeUndefined();
 
     const roleNames = selectAvailableRoleNames(fakeStore);
-    expect(roleNames).toContain('speaker');
-    expect(roleNames).toContain('host');
-    expect(roleNames).toContain('viewer');
+    expect(roleNames).toContain(ROLES.SPEAKER);
+    expect(roleNames).toContain(ROLES.HOST);
+    expect(roleNames).toContain(ROLES.VIEWER);
     expect(roleNames).not.toContain('student');
   });
 
@@ -37,14 +39,40 @@ describe('test role related selectors', () => {
   test('selectRole change request', () => {
     const req = selectRoleChangeRequest(fakeStore);
     expect(req?.requestedBy).toBe(remotePeer);
-    expect(req?.role.name).toBe('speaker');
+    expect(req?.role.name).toBe(ROLES.SPEAKER);
     expect(req?.role).toBe(speakerRole);
     expect(req?.token).toBe('123');
   });
 
   test('select role by name', () => {
-    const storeHost = selectRoleByRoleName('host')(fakeStore);
+    const storeHost = selectRoleByRoleName(ROLES.HOST)(fakeStore);
     expect(storeHost).not.toBeUndefined();
     expect(storeHost).toBe(hostRole);
+  });
+
+  test('publish params', () => {
+    localPeer.roleName = ROLES.SPEAKER;
+    const allowed = selectIsAllowedToPublish(fakeStore);
+    expect(allowed.audio).toBe(true);
+    expect(allowed.video).toBe(false);
+    expect(allowed.screen).toBe(false);
+  });
+
+  test('publish params viewer', () => {
+    localPeer.roleName = ROLES.VIEWER;
+    const allowed = selectIsAllowedToPublish(fakeStore);
+    expect(allowed.audio).toBe(false);
+    expect(allowed.video).toBe(false);
+    expect(allowed.screen).toBe(false);
+  });
+
+  test('is subscription allowed true', () => {
+    localPeer.roleName = ROLES.SPEAKER;
+    expect(selectIsAllowedToSubscribe(fakeStore)).toBe(true);
+  });
+
+  test('is subscription allowed false', () => {
+    localPeer.roleName = ROLES.NOSUBSCRIBE;
+    expect(selectIsAllowedToSubscribe(fakeStore)).toBe(false);
   });
 });

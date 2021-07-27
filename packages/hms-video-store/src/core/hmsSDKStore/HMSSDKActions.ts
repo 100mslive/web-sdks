@@ -385,6 +385,8 @@ export class HMSSDKActions implements IHMSActions {
         store.devices.audioOutput = devices.audioOutput;
       }
     });
+    // sync is needed to update the current selected device
+    this.syncPeers();
   }
 
   private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {

@@ -42,6 +42,13 @@ export let screenshareAudio: HMSTrack;
 export let hostRole: HMSRole;
 export let speakerRole: HMSRole;
 
+export const ROLES = {
+  HOST: 'host', // allowed to turn any of video, audio and screen on. can make a viewer speaker
+  SPEAKER: 'speaker', // allowed to turn on audio and speak
+  VIEWER: 'viewer', // allowed to watch and listen to other people, can't publish, can be converted to speaker
+  NOSUBSCRIBE: 'nosubscribe', // allowed to publish but not subscribe to anything
+};
+
 export const makeFakeStore = (): HMSStore => {
   const fakeStore: HMSStore = {
     room: {
@@ -57,8 +64,8 @@ export const makeFakeStore = (): HMSStore => {
       '1': {
         id: '1',
         name: 'test1',
-        role: 'host',
-        roleName: 'host',
+        role: ROLES.HOST,
+        roleName: ROLES.HOST,
         isLocal: true,
         videoTrack: '101',
         audioTrack: '102',
@@ -67,8 +74,8 @@ export const makeFakeStore = (): HMSStore => {
       '2': {
         id: '2',
         name: 'test2',
-        role: 'host',
-        roleName: 'host',
+        role: ROLES.HOST,
+        roleName: ROLES.HOST,
         isLocal: false,
         videoTrack: '103',
         audioTrack: '104',
@@ -126,9 +133,26 @@ export const makeFakeStore = (): HMSStore => {
       },
     ],
     roles: {
-      host: { name: 'host' } as HMSRole,
-      viewer: { name: 'viewer' } as HMSRole,
-      speaker: { name: 'speaker' } as HMSRole,
+      host: {
+        name: ROLES.HOST,
+        publishParams: { allowed: ['audio', 'video', 'screen'] },
+        subscribeParams: { subscribeToRoles: [ROLES.HOST, ROLES.SPEAKER] },
+        permissions: { changeRole: true },
+      } as HMSRole,
+      viewer: {
+        name: ROLES.VIEWER,
+        publishParams: {},
+        subscribeParams: { subscribeToRoles: [ROLES.HOST, ROLES.SPEAKER] },
+      } as HMSRole,
+      speaker: {
+        name: ROLES.SPEAKER,
+        publishParams: { allowed: ['audio'] },
+        subscribeParams: { subscribeToRoles: [ROLES.HOST, ROLES.SPEAKER] },
+      } as HMSRole,
+      nosubscribe: {
+        name: ROLES.NOSUBSCRIBE,
+        subscribeParams: {},
+      } as HMSRole,
     },
     devices: {
       audioInput: [],
