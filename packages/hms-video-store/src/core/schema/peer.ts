@@ -14,10 +14,6 @@ export type HMSTrackType = 'audio' | 'video';
 export interface HMSPeer {
   id: HMSPeerID;
   name: string;
-  /**
-   * @deprecated use roleName instead
-   */
-  role?: string;
   roleName?: HMSRoleName;
   isLocal: boolean;
   isStarred?: boolean;

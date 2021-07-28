@@ -16,7 +16,6 @@ export class SDKToHMS {
     return {
       id: sdkPeer.peerId,
       name: sdkPeer.name,
-      role: sdkPeer.role?.name,
       roleName: sdkPeer.role?.name,
       isLocal: sdkPeer.isLocal,
       videoTrack: sdkPeer.videoTrack?.trackId,

@@ -130,19 +130,19 @@ describe('peers merge is happening properly', () => {
     expect(draftPeers[fakePeer.id]).toBe(fakePeer);
     expect(draftPeers[fakePeer.id].auxiliaryTracks).toBe(fakePeer.auxiliaryTracks);
     expect(fakePeer.name).toBe('test');
-    expect(fakePeer.role).toBe('host');
+    expect(fakePeer.roleName).toBe('host');
     expect(fakePeer).not.toBe(clonedPeer); // test object.assign happened properly
   });
 
   test('partial update does not override older data', () => {
     const clonedPeer = { ...fakePeer };
-    fakePeer.role = 'random';
+    fakePeer.roleName = 'random';
     draftPeers[fakePeer.id] = fakePeer;
     newPeers[clonedPeer.id] = clonedPeer;
     mergeNewPeersInDraft(draftPeers as peerMap, newPeers, newTracks, newSDKTracks);
     expectNoReferenceChange();
-    expect(fakePeer.role).toBe('random');
-    expect(clonedPeer.role).toBeUndefined();
+    expect(fakePeer.roleName).toBe('random');
+    expect(clonedPeer.roleName).toBeUndefined();
   });
 
   test('replace track does not change peer.videoTrack', () => {

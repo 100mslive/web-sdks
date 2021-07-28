@@ -64,7 +64,6 @@ export const makeFakeStore = (): HMSStore => {
       '1': {
         id: '1',
         name: 'test1',
-        role: ROLES.HOST,
         roleName: ROLES.HOST,
         isLocal: true,
         videoTrack: '101',
@@ -74,7 +73,6 @@ export const makeFakeStore = (): HMSStore => {
       '2': {
         id: '2',
         name: 'test2',
-        role: ROLES.HOST,
         roleName: ROLES.HOST,
         isLocal: false,
         videoTrack: '103',
