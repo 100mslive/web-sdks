@@ -86,8 +86,11 @@ export default class RoleChangeManager {
 
     const tracksToUnpublish = [];
 
+    // TODO check auxillary tracks for regular audio and video too
     if (localPeer?.videoTrack && removeVideo) {
       localPeer.videoTrack.nativeTrack.stop();
+      // TODO: stop processed track and cleanup plugins loop non async
+      // vb can throw change role off otherwise
       tracksToUnpublish.push(localPeer.videoTrack);
       this.store.removeTrack(localPeer.videoTrack.trackId);
       localPeer.videoTrack = undefined;

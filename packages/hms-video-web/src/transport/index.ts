@@ -9,7 +9,7 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
-import { HMSTrack } from '../media/tracks/HMSTrack';
+import { HMSTrack } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import {
@@ -21,7 +21,7 @@ import {
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
-import { HMSMessage } from '../interfaces/message';
+import { HMSMessage } from '../interfaces';
 import { TrackState } from '../sdk/models/HMSNotifications';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
@@ -35,7 +35,7 @@ import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSRemotePeer } from '../sdk/models/peer';
-import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
+import { HMSRoleChangeRequest } from '../interfaces';
 import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
@@ -51,7 +51,7 @@ interface CallbackTriple {
 
 export default class HMSTransport implements ITransport {
   private state: TransportState = TransportState.Disconnected;
-  private tracks: Map<string, TrackState> = new Map();
+  private trackStates: Map<string, TrackState> = new Map();
   private publishConnection: HMSPublishConnection | null = null;
   private subscribeConnection: HMSSubscribeConnection | null = null;
   private initConfig?: InitConfig;
@@ -448,7 +448,7 @@ export default class HMSTransport implements ITransport {
   }
 
   trackUpdate(track: HMSTrack) {
-    const currentTrackStates = Array.from(this.tracks.values());
+    const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       (trackState) => track.type === trackState.type && track.source === trackState.source,
     );
@@ -457,8 +457,8 @@ export default class HMSTransport implements ITransport {
         ...originalTrackState,
         mute: !track.enabled,
       });
-      this.tracks.set(originalTrackState.track_id, newTrackState);
-      HMSLogger.d(TAG, 'Track Update', this.tracks, track);
+      this.trackStates.set(originalTrackState.track_id, newTrackState);
+      HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
   }
@@ -477,7 +477,7 @@ export default class HMSTransport implements ITransport {
 
   private async publishTrack(track: HMSTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
-    this.tracks.set(track.trackId, new TrackState(track));
+    this.trackStates.set(track.trackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
@@ -507,7 +507,20 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    this.tracks.delete(track.trackId);
+    if (this.trackStates.has(track.trackId)) {
+      this.trackStates.delete(track.trackId);
+    } else {
+      // TODO: hotfix to unpublish replaced video track id, solve it properly
+      // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
+      // the original initial track id for a proper fix
+      const currentTrackStates = Array.from(this.trackStates.values());
+      const originalTrackState = currentTrackStates.find(
+        (trackState) => track.type === trackState.type && track.source === trackState.source,
+      );
+      if (originalTrackState) {
+        this.trackStates.delete(originalTrackState.track_id);
+      }
+    }
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
@@ -551,14 +564,14 @@ export default class HMSTransport implements ITransport {
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
-    HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.tracks);
+    HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
     this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
 
     try {
-      const offer = await this.publishConnection!.createOffer(constraints, this.tracks);
+      const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
       await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.offer(offer, this.tracks);
+      const answer = await this.signal.offer(offer, this.trackStates);
       await this.publishConnection!.setRemoteDescription(answer);
       callback!.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
