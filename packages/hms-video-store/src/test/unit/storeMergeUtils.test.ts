@@ -120,7 +120,7 @@ describe('peers merge is happening properly', () => {
   test('old peer update maintains reference on update', () => {
     const clonedPeer = {
       ...fakePeer,
-      role: 'host',
+      roleName: 'host',
       auxiliaryTracks: [...fakePeer.auxiliaryTracks],
     };
     draftPeers[fakePeer.id] = fakePeer;
