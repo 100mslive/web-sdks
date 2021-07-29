@@ -3,6 +3,9 @@ import { RunningAverage } from '../../utils/math';
 import VideoPluginsAnalyticsFactory from '../../analytics/VideoPluginsAnalyticsFactory';
 import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import HMSLogger from '../../utils/logger';
+
+const TAG = 'VideoPluginsAnalytics';
 
 export class VideoPluginsAnalytics {
   private readonly initTime: Record<string, number>;
@@ -57,6 +60,7 @@ export class VideoPluginsAnalytics {
     let time: number | undefined = undefined;
     try {
       time = await this.timeInMs(initFn);
+      HMSLogger.i(TAG, `Time taken for Plugin ${name} initialization : ${time}`);
     } catch (err) {
       //Failed during initialization of plugin(model loading etc...)
       err += ' initialization error';
