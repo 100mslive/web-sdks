@@ -64,38 +64,44 @@ export class HMSVideoPluginsManager {
    * @param pluginFrameRate
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number) {
-    try {
-      const name = plugin.getName?.();
-      if (!name || name === '') {
-        HMSLogger.w('no name provided by the plugin');
-        return;
-      }
-      if (this.pluginsMap[name]) {
-        HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
-        return;
-      }
-      const { width, height } = this.hmsTrack.getMediaTrackSettings();
-      if (!width || !height || width <= 0 || height <= 0) {
-        HMSLogger.i(TAG, 'Track width/height is not valid');
-        return;
-      }
+    const name = plugin.getName?.();
+    if (!name || name === '') {
+      HMSLogger.w('no name provided by the plugin');
+      return;
+    }
+    if (this.pluginsMap[name]) {
+      HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
+      return;
+    }
+    const { width, height } = this.hmsTrack.getMediaTrackSettings();
+    if (!width || !height || width <= 0 || height <= 0) {
+      HMSLogger.i(TAG, 'Track width/height is not valid');
+      return;
+    }
 
+    if (pluginFrameRate) {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
-      this.analytics.added(name);
+    } else {
+      HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
+    }
 
-      if (!plugin.isSupported()) {
-        const err = 'Platform not supported';
-        this.analytics.failure(name, err as any);
-        HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
-        return;
-      }
-      await plugin.init();
+    //Adding Analytics TODO: shall we make this configurable
+    this.analytics.added(name);
+
+    if (!plugin.isSupported()) {
+      const err = 'Platform not supported';
+      this.analytics.failure(name, err as any);
+      HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
+      return;
+    }
+
+    try {
       await this.analytics.initWithTime(name, async () => await plugin.init());
-      this.plugins.push(plugin.getName());
-      this.pluginsMap[plugin.getName()] = plugin;
+      this.plugins.push(name);
+      this.pluginsMap[name] = plugin;
       await this.startPluginsLoop();
     } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin');
+      HMSLogger.e(TAG, 'failed to add plugin', err);
       await this.removePlugin(plugin);
       throw err;
     }
@@ -110,6 +116,7 @@ export class HMSVideoPluginsManager {
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
     if (this.plugins.length == 0) {
+      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsLoop();
     }
     plugin.stop();
@@ -190,6 +197,7 @@ export class HMSVideoPluginsManager {
   private async stopPluginsLoop() {
     this.pluginsLoopRunning = false;
     await this.hmsTrack.setProcessedTrack(undefined);
+    this.resetCanvases();
     this.outputTrack?.stop();
   }
 
@@ -241,15 +249,22 @@ export class HMSVideoPluginsManager {
       if (!plugin) {
         continue;
       }
-      // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
-      if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
-        await this.analytics.processWithTime(
-          name,
-          async () => await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas),
-        );
-      } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE) {
-        // there is no need to await for this case
-        await this.analytics.processWithTime(name, async () => await plugin.processVideoFrame(this.inputCanvas!));
+      try {
+        // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
+        if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
+          await this.analytics.processWithTime(
+            name,
+            async () => await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas),
+          );
+        } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE) {
+          // there is no need to await for this case
+          await this.analytics.processWithTime(name, async () => await plugin.processVideoFrame(this.inputCanvas!));
+        }
+      } catch (err) {
+        //TODO error happened on processing of plugin notify UI
+        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+        //remove plugin from loop and stop analytics for it
+        await this.removePlugin(plugin);
       }
     }
   }
@@ -290,10 +305,10 @@ export class HMSVideoPluginsManager {
       return;
     }
     // TODO: should we reduce height/width to optimize?
-    if (this.inputCanvas.height != height) {
+    if (this.inputCanvas.height !== height) {
       this.inputCanvas.height = height;
     }
-    if (this.inputCanvas.width != width) {
+    if (this.inputCanvas.width !== width) {
       this.inputCanvas.width = width;
     }
     const ctx = this.inputCanvas.getContext('2d');

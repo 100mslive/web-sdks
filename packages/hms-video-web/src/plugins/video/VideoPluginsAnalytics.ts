@@ -37,14 +37,10 @@ export class VideoPluginsAnalytics {
         avgPreProcessingTime: this.preProcessingAvgs.getAvg(), //Do we need this in stat not plugin specific
         avgProcessingTime: this.processingAvgs[name]?.getAvg(),
       };
-
-      delete this.addedTimestamps[name];
-      delete this.initTime[name];
-      delete this.processingAvgs[name];
-      delete this.pluginAdded[name];
-
-      // send stats
+      //send stats
       analyticsEventsService.queue(VideoPluginsAnalyticsFactory.stats(stats)).flush();
+      //clean the plugin details
+      this.clean(name);
     }
   }
 
@@ -52,6 +48,8 @@ export class VideoPluginsAnalytics {
     // send failure event
     if (this.pluginAdded[name]) {
       analyticsEventsService.queue(VideoPluginsAnalyticsFactory.failure(name, error)).flush();
+      //clean the plugin details
+      this.clean(name);
     }
   }
 
@@ -61,8 +59,10 @@ export class VideoPluginsAnalytics {
       time = await this.timeInMs(initFn);
     } catch (err) {
       //Failed during initialization of plugin(model loading etc...)
+      err += ' initialization error';
       const ex = this.getErrorAsException(err);
       this.failure(name, ex);
+      throw err;
     }
     if (time) {
       this.initTime[name] = time;
@@ -81,8 +81,10 @@ export class VideoPluginsAnalytics {
       time = await this.timeInMs(processFn);
     } catch (err) {
       //Failed during processing of plugin
+      err += ' processing error';
       const ex = this.getErrorAsException(err);
       this.failure(name, ex);
+      throw err;
     }
     if (time) {
       this.processingAvgs[name]?.add(time);
@@ -100,8 +102,15 @@ export class VideoPluginsAnalytics {
     if (err instanceof HMSException) {
       ex = err;
     } else {
-      ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
+      ex = ErrorFactory.GenericErrors.Unknown(HMSAction.VIDEO_PLUGINS, err.message);
     }
     return ex;
+  }
+
+  private clean(name: string) {
+    delete this.addedTimestamps[name];
+    delete this.initTime[name];
+    delete this.processingAvgs[name];
+    delete this.pluginAdded[name];
   }
 }
