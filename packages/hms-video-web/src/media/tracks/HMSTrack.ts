@@ -16,6 +16,12 @@ export abstract class HMSTrack {
    * @internal */
   nativeTrack: MediaStreamTrack;
 
+  /** For remote tracks track.trackId should return the
+   * track ID from SDP to maintain consistency with the server.
+   * Firefox has known track ID mismatch issues.
+   * @internal */
+  private sdpTrackId?: string;
+
   abstract readonly type: HMSTrackType;
 
   public get enabled(): boolean {
@@ -23,7 +29,7 @@ export abstract class HMSTrack {
   }
 
   public get trackId(): string {
-    return this.nativeTrack.id;
+    return this.sdpTrackId || this.nativeTrack.id;
   }
 
   getMediaTrackSettings(): MediaTrackSettings {
@@ -38,5 +44,12 @@ export abstract class HMSTrack {
     this.stream = stream;
     this.nativeTrack = track;
     this.source = source;
+  }
+
+  /**
+   * @internal
+   */
+  setSdpTrackId(sdpTrackId: string) {
+    this.sdpTrackId = sdpTrackId;
   }
 }

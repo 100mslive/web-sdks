@@ -1,5 +1,10 @@
 import * as sdpTransform from 'sdp-transform';
 import { TrackState } from '../sdk/models/HMSNotifications';
+import { isPresent } from './presence';
+
+/**
+ * @DISCUSS: Should we have a wrapper over RTCSessionDescriptionInit(SDP) and have these methods in it?
+ */
 
 export function fixMsid(desc: RTCSessionDescriptionInit, tracks: Map<string, TrackState>): RTCSessionDescriptionInit {
   const parsedSdp = sdpTransform.parse(desc.sdp!);
@@ -21,6 +26,24 @@ export function fixMsid(desc: RTCSessionDescriptionInit, tracks: Map<string, Tra
   });
 
   return { type: desc.type, sdp: sdpTransform.write(parsedSdp) };
+}
+
+/**
+ * Get the track ID from the SDP using the transceiver's mid from RTCTrackEvent
+ * @TODO: This could take more processing time in a large room and when the SDP is big.
+ * Consider using this for Firefox only?
+ */
+export function getSdpTrackIdForMid(
+  desc?: RTCSessionDescriptionInit | null,
+  mid?: RTCRtpTransceiver['mid'],
+): string | undefined {
+  if (!desc?.sdp || !mid) {
+    return undefined;
+  }
+  const parsedSdp = sdpTransform.parse(desc.sdp);
+  const trackSection = parsedSdp.media.find((media) => isPresent(media.mid) && parseInt(media.mid!) === parseInt(mid));
+  const trackId = trackSection?.msid?.split(' ')[1];
+  return trackId;
 }
 
 export function enableOpusDtx(desc: RTCSessionDescriptionInit): RTCSessionDescriptionInit {

@@ -8,6 +8,7 @@ import { API_DATA_CHANNEL } from '../../utils/constants';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import HMSLogger from '../../utils/logger';
+import { getSdpTrackIdForMid } from '../../utils/session-description';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
@@ -80,6 +81,8 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
+      const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
+      trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);
       this.observer.onTrackAdd(track);
     };

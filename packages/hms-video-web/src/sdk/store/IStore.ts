@@ -39,8 +39,8 @@ export interface IStore {
   getAudioTracks(): HMSAudioTrack[];
   getRemoteVideoTracks(): HMSRemoteVideoTrack[];
 
-  getPeerById(peerId: string): HMSPeer;
-  getTrackById(trackId: string): HMSTrack;
+  getPeerById(peerId: string): HMSPeer | undefined;
+  getTrackById(trackId: string): HMSTrack | undefined;
   getPeerByTrackId(trackId: string): HMSPeer | undefined;
   getPeerTracks(peerId: string): HMSTrack[];
   getLocalPeerTracks(): HMSLocalTrack[];

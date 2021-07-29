@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
-import { HMSTrack, HMSTrackType, HMSAudioTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSTrackType, HMSAudioTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
@@ -107,6 +107,10 @@ export default class NotificationManager {
   private handlePeerUpdate(notification: PeerNotification) {
     const peer = this.store.getPeerById(notification.peerId);
 
+    if (!peer) {
+      return;
+    }
+
     if (peer.role && peer.role.name !== notification.role) {
       const newRole = this.store.getPolicyForRole(notification.role);
       peer.updateRole(newRole);
@@ -158,8 +162,8 @@ export default class NotificationManager {
   private handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
 
-    for (const trackEntry of Object.values(params.tracks)) {
-      this.trackStateMap.set(`${trackEntry.stream_id}${trackEntry.type}`, {
+    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
+      this.trackStateMap.set(trackId, {
         peerId: params.peer.peer_id,
         trackInfo: trackEntry,
       });
@@ -172,12 +176,15 @@ export default class NotificationManager {
     const tracksCopy = new Map(this.tracksToProcess);
 
     tracksCopy.forEach((track) => {
-      const trackId = `${track.stream.id}${track.type}`;
-      const state = this.trackStateMap.get(trackId);
-      if (!state) return;
+      const state = this.trackStateMap.get(track.trackId);
+      if (!state) {
+        return;
+      }
 
       const hmsPeer = this.store.getPeerById(state.peerId);
-      if (!hmsPeer) return;
+      if (!hmsPeer) {
+        return;
+      }
 
       track.source = state.trackInfo.source;
       track.setEnabled(!state.trackInfo.mute);
@@ -203,7 +210,7 @@ export default class NotificationManager {
 
       track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-added', { detail: track });
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
-      this.tracksToProcess.delete(trackId);
+      this.tracksToProcess.delete(track.trackId);
     });
   }
 
@@ -213,7 +220,7 @@ export default class NotificationManager {
   handleOnTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, track);
     this.store.addTrack(track);
-    this.tracksToProcess.set(`${track.stream.id}${track.type}`, track);
+    this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
   };
 
@@ -222,7 +229,7 @@ export default class NotificationManager {
    */
   handleOnTrackRemove = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track);
-    const trackStateEntry = this.trackStateMap.get(`${track.stream.id}${track.type}`);
+    const trackStateEntry = this.trackStateMap.get(track.trackId);
 
     if (!trackStateEntry) return;
 
@@ -265,10 +272,11 @@ export default class NotificationManager {
     HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
 
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
-    if (!hmsPeer) return;
+    if (!hmsPeer) {
+      return;
+    }
 
-    for (const trackEntry of Object.values(params.tracks)) {
-      const trackId = `${trackEntry.stream_id}${trackEntry.type}`;
+    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
       const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
 
       const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
@@ -318,7 +326,7 @@ export default class NotificationManager {
     HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
 
     peer.tracks.forEach((track) => {
-      this.trackStateMap.set(`${track.stream_id}${track.type}`, {
+      this.trackStateMap.set(track.track_id, {
         peerId: peer.peerId,
         trackInfo: track,
       });
@@ -388,11 +396,7 @@ export default class NotificationManager {
 
         // Remove all the tracks which are not present in the peer.tracks
         tracks.forEach((track) => {
-          if (
-            !newPeerNotification.tracks.some((newTrack) => {
-              return newTrack.stream_id === track.stream.id && newTrack.type === track.type;
-            })
-          ) {
+          if (!newPeerNotification.tracks.some((newTrack) => newTrack.track_id === track.trackId)) {
             this.removePeerTrack(oldPeer, track.trackId);
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
           }
@@ -403,7 +407,7 @@ export default class NotificationManager {
           if (!this.getPeerTrackByTrackId(oldPeer.peerId, trackData.track_id)) {
             // NOTE: We assume that, once the connection is re-established,
             //  transport layer will send a native onTrackAdd
-            this.trackStateMap.set(`${trackData.stream_id}${trackData.type}`, {
+            this.trackStateMap.set(trackData.track_id, {
               peerId: oldPeer.peerId,
               trackInfo: trackData,
             });
@@ -424,7 +428,7 @@ export default class NotificationManager {
     const speakers = speakerList.speakers;
     const hmsSpeakers: HMSSpeaker[] = speakers.map((speaker) => ({
       audioLevel: speaker.audioLevel,
-      peer: this.store.getPeerById(speaker.peerId),
+      peer: this.store.getPeerById(speaker.peerId)!,
       track: this.store.getTrackById(speaker.trackId) as HMSAudioTrack,
     }));
 
@@ -448,9 +452,9 @@ export default class NotificationManager {
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
     const peer = this.store.getPeerById(peerId);
 
-    if (this.getTrackId(peer.audioTrack) === trackId || peer.audioTrack?.trackId === trackId) {
+    if (peer?.audioTrack?.trackId === trackId) {
       return peer?.audioTrack;
-    } else if (this.getTrackId(peer?.videoTrack) === trackId || peer.videoTrack?.trackId === trackId) {
+    } else if (peer?.videoTrack?.trackId === trackId) {
       return peer?.videoTrack;
     } else {
       return peer?.auxiliaryTracks.find((track) => track.trackId === trackId);
@@ -466,12 +470,5 @@ export default class NotificationManager {
       const track = peer.auxiliaryTracks.find((track) => track.trackId === trackId);
       track && peer.auxiliaryTracks.splice(peer.auxiliaryTracks.indexOf(track), 1);
     }
-  }
-
-  private getTrackId(track: HMSTrack | null | undefined) {
-    if (!track) {
-      return null;
-    }
-    return `${track.stream.id}${track.type}`;
   }
 }

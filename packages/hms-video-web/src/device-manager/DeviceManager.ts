@@ -275,11 +275,15 @@ export class DeviceManager implements HMSDeviceManager {
   }
 
   private logDevices(label = '') {
-    HMSLogger.d(this.TAG, label, {
-      videoInput: [...this.videoInput],
-      audioInput: [...this.audioInput],
-      audioOutput: [...this.audioOutput],
-      selected: this.getCurrentSelection(),
-    });
+    HMSLogger.d(
+      this.TAG,
+      label,
+      JSON.stringify({
+        videoInput: [...this.videoInput],
+        audioInput: [...this.audioInput],
+        audioOutput: [...this.audioOutput],
+        selected: this.getCurrentSelection(),
+      }),
+    );
   }
 }

@@ -75,7 +75,10 @@ class Store implements IStore {
   }
 
   getPeerById(peerId: string) {
-    return this.peers[peerId];
+    if (this.peers[peerId]) {
+      return this.peers[peerId];
+    }
+    return undefined;
   }
 
   getTracks() {
