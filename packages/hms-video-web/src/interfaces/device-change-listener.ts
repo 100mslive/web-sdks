@@ -1,5 +1,5 @@
-import { HMSDeviceManager } from './HMSDeviceManager';
+import { DeviceMap } from './HMSDeviceManager';
 
 export interface DeviceChangeListener {
-  onDeviceChange(deviceMap: HMSDeviceManager): void;
+  onDeviceChange(deviceMap: DeviceMap): void;
 }

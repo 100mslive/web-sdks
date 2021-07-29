@@ -4,11 +4,16 @@ import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/
 import ITransport from '../transport/ITransport';
 import { IStore } from './store';
 
+export type PublishConfig = {
+  publishAudio?: boolean;
+  publishVideo?: boolean;
+};
+
 export default class RoleChangeManager {
   constructor(
     private store: IStore,
     private transport: ITransport,
-    private publish: (settings: InitialSettings) => void,
+    private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
     private removeTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
   ) {}
@@ -22,8 +27,8 @@ export default class RoleChangeManager {
     const oldRole = event.detail.oldRole as HMSRole;
     const newRole = event.detail.newRole as HMSRole;
 
-    const wasPublishing = oldRole.publishParams.allowed;
-    const isPublishing = newRole.publishParams.allowed;
+    const wasPublishing = oldRole.publishParams.allowed || [];
+    const isPublishing = newRole.publishParams.allowed || [];
 
     const toRemove = {
       removeVideo: false,
@@ -31,9 +36,9 @@ export default class RoleChangeManager {
       removeScreen: false,
     };
 
-    if (wasPublishing) {
+    if (wasPublishing.length > 0) {
       // check if we have to remove any tracks
-      if (!isPublishing) {
+      if (isPublishing.length === 0) {
         toRemove.removeVideo = true;
         toRemove.removeAudio = true;
         toRemove.removeScreen = true;
@@ -55,7 +60,15 @@ export default class RoleChangeManager {
     await this.removeLocalTracks(toRemove);
     this.store.setPublishParams(newRole.publishParams);
 
-    if (!wasPublishing && isPublishing) {
+    const newTracksToCreate = isPublishing
+      .filter((val) => !wasPublishing.includes(val))
+      .filter((val) => val !== 'screen');
+    const publishConfig: PublishConfig = {
+      publishAudio: newTracksToCreate.includes('audio'),
+      publishVideo: newTracksToCreate.includes('video'),
+    };
+
+    if (newTracksToCreate.length > 0) {
       const initialSettings = this.store.getConfig()?.settings || {
         isAudioMuted: true,
         isVideoMuted: true,
@@ -63,7 +76,7 @@ export default class RoleChangeManager {
         videoDeviceId: 'default',
         audioOutputDeviceId: 'default',
       };
-      await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
+      await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true }, publishConfig);
     }
 
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
