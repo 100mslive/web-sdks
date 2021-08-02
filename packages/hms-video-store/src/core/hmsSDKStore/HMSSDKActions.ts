@@ -430,6 +430,16 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      // Update layer as it is updated in addSink
+      if (
+        sdkTrack instanceof SDKHMSRemoteVideoTrack &&
+        sdkTrack.getSimulcastDefinitions().length > 0
+      ) {
+        this.setState(draft => {
+          const layer = sdkTrack.getSimulcastLayer();
+          draft.tracks[trackID].layer = layer;
+        }, 'updateLayerOnAttach');
+      }
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
