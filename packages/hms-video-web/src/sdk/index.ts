@@ -45,6 +45,7 @@ import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
 import { HMSRole } from '../interfaces/role';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { HMSAudioCodec, HMSVideoCodec } from '../media/codec';
+import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -83,7 +84,12 @@ export class HMSSdk implements HMSInterface {
     this.deviceManager = new DeviceManager(this.store);
     this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
+    this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
   }
+
+  private handleAutoplayError = (event: AutoplayEvent) => {
+    this.errorListener?.onError?.(event.error);
+  };
 
   private get localPeer(): HMSLocalPeer | undefined {
     return this.store?.getLocalPeer();
@@ -154,11 +160,11 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
     this.initStoreAndManagers();
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
     const policy = this.store.getPolicyForRole(role);
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
@@ -222,10 +228,10 @@ export class HMSSdk implements HMSInterface {
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
-    this.initStoreAndManagers();
     this.listener = listener;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
+    this.initStoreAndManagers();
     this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
@@ -573,6 +579,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceManager.removeEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.removeEventListener('video-device-change', this.handleDeviceChangeError);
     this.deviceManager.cleanUp();
+    this.audioSinkManager.removeEventListener(AutoplayError, this.handleAutoplayError);
     this.audioSinkManager.cleanUp();
   }
 

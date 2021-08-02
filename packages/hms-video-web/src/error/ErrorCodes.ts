@@ -58,6 +58,9 @@ export const ErrorCodes = {
 
     // Codec can't be changed mid call.
     CODEC_CHANGE_NOT_PERMITTED: 3007,
+
+    // When the browser throws autoplay exception if something is played before interacting
+    AUTOPLAY_ERROR: 3008,
   },
 
   WebrtcErrors: {

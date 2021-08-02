@@ -5,6 +5,7 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
+import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
 
 export enum HMSAction {
@@ -17,6 +18,7 @@ export enum HMSAction {
   DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
   RESTART_ICE = 'RESTART_ICE',
   VIDEO_PLUGINS = 'VIDEO_PLUGINS',
+  AUTOPLAY = 'AUTOPLAY',
 }
 
 export const ErrorFactory = {
@@ -117,6 +119,16 @@ export const ErrorFactory = {
         'InvalidVideoSettings',
         action,
         `Cannot enable simulcast when no video settings are provided`,
+        description,
+      );
+    },
+
+    AutoplayBlocked(action: HMSAction, description: string = '') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.AUTOPLAY_ERROR,
+        'AutoplayBlocked',
+        action,
+        "Autoplay blocked because the user didn't interact with the document first",
         description,
       );
     },

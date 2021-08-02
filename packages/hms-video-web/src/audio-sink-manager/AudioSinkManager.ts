@@ -1,19 +1,30 @@
+import { EventEmitter } from 'events';
 import { v4 as uuid } from 'uuid';
 import { HMSAudioTrack } from '../media/tracks/HMSAudioTrack';
 import { DeviceManager } from '../device-manager';
 import NotificationManager from '../sdk/NotificationManager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
+import { HMSException } from '../error/HMSException';
+import { playSilentAudio } from '../utils/autoplay';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 
-const SILENT_AUDIO_URL = 'https://100ms.live/silence.mp3';
+export interface AutoplayEvent {
+  error: HMSException;
+}
+
+export const AutoplayError = 'autoplay-error';
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
-  private silentAudio?: HTMLAudioElement;
   private autoPausedTracks: Set<string> = new Set();
   private playInProgress = false;
   private TAG = '[AudioSinkManager]:';
   private initialized = false;
   private volume: number = 100;
+  private silentAudio?: HTMLAudioElement;
+  private eventEmitter: EventEmitter = new EventEmitter();
+  private autoplayFailed: boolean | undefined;
+  private tracksToAdd = new Set<HMSAudioTrack>();
 
   constructor(
     private store: IStore,
@@ -23,6 +34,14 @@ export class AudioSinkManager {
     this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.addEventListener('audio-device-change', this.handleAudioDeviceChange);
+  }
+
+  addEventListener(event: string, listener: (event: AutoplayEvent) => void) {
+    this.eventEmitter.addListener(event, listener);
+  }
+
+  removeEventListener(event: string, listener: (event: AutoplayEvent) => void) {
+    this.eventEmitter.removeListener(event, listener);
   }
 
   private get outputDevice() {
@@ -36,6 +55,20 @@ export class AudioSinkManager {
   setVolume(value: number) {
     this.store.updateAudioOutputVolume(value);
     this.volume = value;
+  }
+
+  async unblockAutoplay() {
+    if (!this.autoplayFailed) {
+      return;
+    }
+    try {
+      await this.silentAudio?.play();
+      this.autoplayFailed = false;
+    } catch (error) {
+      this.autoplayFailed = true;
+      HMSLogger.e(this.TAG, error);
+    }
+    this.addPendingTracks();
   }
 
   init(elementId?: string) {
@@ -58,20 +91,24 @@ export class AudioSinkManager {
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.audioSink?.remove();
-    this.silentAudio?.remove();
     this.autoPausedTracks = new Set();
     this.playInProgress = false;
     this.initialized = false;
+    this.autoplayFailed = false;
   }
 
   private addSilentAudio() {
-    this.silentAudio = document.createElement('audio');
-    this.silentAudio.autoplay = true;
-    this.silentAudio.style.display = 'none';
-    this.silentAudio.id = `HMS-SDK-silent-audio-track-${uuid()}`;
-    this.silentAudio.src = SILENT_AUDIO_URL;
-
-    this.audioSink?.append(this.silentAudio);
+    return playSilentAudio().then(({ audio, error }: { audio: HTMLAudioElement; error?: Error }) => {
+      if (error) {
+        this.autoplayFailed = true;
+        const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+        this.eventEmitter.emit(AutoplayError, { error: ex });
+      } else {
+        this.autoplayFailed = false;
+        this.addPendingTracks();
+      }
+      this.silentAudio = audio;
+    });
   }
 
   private handleAudioPaused = (event: any) => {
@@ -92,6 +129,22 @@ export class AudioSinkManager {
 
   private handleTrackAdd = (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
+    // undefined is necessary to handle a case where trackAdd is called before autoplay
+    if (this.autoplayFailed === undefined || this.autoplayFailed === true) {
+      this.tracksToAdd.add(track);
+    } else {
+      this.addToDOM(track);
+    }
+  };
+
+  private addPendingTracks() {
+    for (let track of Array.from(this.tracksToAdd)) {
+      this.addToDOM(track);
+      this.tracksToAdd.delete(track);
+    }
+  }
+
+  private addToDOM = (track: HMSAudioTrack) => {
     const audioEl = document.createElement('audio');
     audioEl.autoplay = true;
     audioEl.style.display = 'none';
