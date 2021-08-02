@@ -181,6 +181,11 @@ export interface IHMSActions {
    * @param {HMSRoleChangeRequest} request The original request that was received
    */
   rejectChangeRole(request: HMSRoleChangeRequest): void;
+
+  /**
+   * Method to be called with some UI interaction after autoplay error is received
+   */
+  unblockAudio: () => Promise<void>;
 }
 
 /**

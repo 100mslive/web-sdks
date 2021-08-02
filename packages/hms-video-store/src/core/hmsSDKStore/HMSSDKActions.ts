@@ -86,6 +86,10 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications = notificationManager;
   }
 
+  async unblockAudio() {
+    await this.sdk.getAudioOutput().unblockAutoplay();
+  }
+
   setVolume(value: number, trackId?: HMSTrackID): void {
     if (trackId) {
       this.setTrackVolume(value, trackId);
