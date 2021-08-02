@@ -6,6 +6,7 @@ import {
   HMSPeer,
   HMSPeerID,
   HMSRoomState,
+  HMSStore,
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
@@ -49,6 +50,7 @@ import {
 } from './sdkUtils/storeMergeUtils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
 import { HMSNotifications } from './HMSNotifications';
+import { NamedSetState } from './internalTypes';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -89,13 +91,13 @@ export class HMSSDKActions implements IHMSActions {
       this.setTrackVolume(value, trackId);
     } else {
       this.sdk.getAudioOutput().setVolume(value);
-      this.syncPeers();
+      this.syncRoomState('setVolume');
     }
   }
 
   setAudioOutputDevice(deviceId: string): void {
     this.sdk.getAudioOutput().setDevice(deviceId);
-    this.syncPeers();
+    this.syncRoomState('setAudioOutput');
   }
 
   setPreferredLayer(trackId: string, layer: sdkTypes.HMSSimulcastLayer) {
@@ -103,7 +105,7 @@ export class HMSSDKActions implements IHMSActions {
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         track.preferLayer(layer);
-        this.syncPeers();
+        this.syncRoomState('setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);
       }
@@ -120,9 +122,9 @@ export class HMSSDKActions implements IHMSActions {
 
     try {
       await this.sdkPreviewWithListeners(config);
-      this.store.setState(store => {
+      this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      });
+      }, 'preview');
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
@@ -137,9 +139,9 @@ export class HMSSDKActions implements IHMSActions {
     try {
       this.sdkJoinWithListeners(config);
       this.isRoomJoinCalled = true;
-      this.store.setState(store => {
+      this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      });
+      }, 'join');
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -174,12 +176,12 @@ export class HMSSDKActions implements IHMSActions {
 
   async addTrack(track: MediaStreamTrack, type: HMSTrackSource = 'regular') {
     await this.sdk.addTrack(track, type);
-    this.syncPeers();
+    this.syncRoomState('addTrack');
   }
 
   async removeTrack(trackId: string) {
     await this.sdk.removeTrack(trackId);
-    this.syncPeers();
+    this.syncRoomState('removeTrack');
   }
 
   async setLocalAudioEnabled(enabled: boolean) {
@@ -204,22 +206,22 @@ export class HMSSDKActions implements IHMSActions {
       this.logPossibleInconsistency(`local track[${trackID}] enabled state - ${enabled}`);
       return;
     }
-    this.store.setState(store => {
+    this.setState(store => {
       // show on UI immediately
       if (!store.tracks[trackID]) {
         this.logPossibleInconsistency('track id not found for setEnabled');
       } else {
         store.tracks[trackID].displayEnabled = enabled;
       }
-    });
+    }, 'displayEnabled');
     try {
       await this.setEnabledSDKTrack(trackID, enabled); // do the operation
-      this.syncPeers();
+      this.syncRoomState('setEnabled');
     } catch (err) {
       // rollback on failure
-      this.store.setState(store => {
+      this.setState(store => {
         store.tracks[trackID].displayEnabled = !enabled;
-      });
+      }, 'rollbackDisplayEnabled');
       throw err;
     }
     const type = enabled
@@ -232,7 +234,7 @@ export class HMSSDKActions implements IHMSActions {
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
       await this.setSDKLocalAudioTrackSettings(trackID, settings);
-      this.syncPeers();
+      this.syncRoomState('setAudioSettings');
     }
   }
 
@@ -240,7 +242,7 @@ export class HMSSDKActions implements IHMSActions {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
       await this.setSDKLocalVideoTrackSettings(trackID, settings);
-      this.syncPeers();
+      this.syncRoomState('setVideoSettings');
     }
   }
 
@@ -257,7 +259,7 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
-    this.store.setState(store => {
+    this.setState(store => {
       if (messageId) {
         if (!store.messages.byID[messageId]) {
           this.logPossibleInconsistency('no message with id is found');
@@ -269,7 +271,7 @@ export class HMSSDKActions implements IHMSActions {
           store.messages.byID[id].read = readStatus;
         });
       }
-    });
+    }, 'setMessageRead');
   }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
@@ -347,9 +349,9 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private resetState() {
-    this.store.setState(store => {
+    this.setState(store => {
       Object.assign(store, createDefaultStoreState());
-    });
+    }, 'resetState');
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
   }
@@ -374,7 +376,7 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private onDeviceChange(devices: DeviceMap) {
-    this.store.setState(store => {
+    this.setState(store => {
       if (!areArraysEqual(store.devices.audioInput, devices.audioInput)) {
         store.devices.audioInput = devices.audioInput;
       }
@@ -384,9 +386,9 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-    });
+    }, 'deviceChange');
     // sync is needed to update the current selected device
-    this.syncPeers();
+    this.syncRoomState('deviceChangeSync');
   }
 
   private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
@@ -403,8 +405,8 @@ export class HMSSDKActions implements IHMSActions {
   private async startScreenShare() {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
-      await this.sdk.startScreenShare(this.syncPeers.bind(this));
-      this.syncPeers();
+      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'));
+      this.syncRoomState('startScreenShare');
     } else {
       this.logPossibleInconsistency("start screenshare is called while it's on");
     }
@@ -414,7 +416,7 @@ export class HMSSDKActions implements IHMSActions {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (isScreenShared) {
       await this.sdk.stopScreenShare();
-      this.syncPeers();
+      this.syncRoomState('stopScreenShare');
     } else {
       this.logPossibleInconsistency("stop screenshare is called while it's not on");
     }
@@ -441,7 +443,7 @@ export class HMSSDKActions implements IHMSActions {
    * interested in with a new reference.
    * @protected
    */
-  protected syncPeers() {
+  protected syncRoomState(action?: string) {
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
@@ -475,7 +477,7 @@ export class HMSSDKActions implements IHMSActions {
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
     // object.
-    this.store.setState(draftStore => {
+    this.setState(draftStore => {
       draftStore.room.peers = newHmsPeerIDs;
       const draftPeers = draftStore.peers;
       const draftTracks = draftStore.tracks;
@@ -485,28 +487,28 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
-    });
+    }, action);
   }
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
-    this.store.setState(store => {
+    this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
       store.room.roomState = HMSRoomState.Preview;
-    });
-    this.syncPeers();
+    }, 'previewStart');
+    this.syncRoomState('previewSync');
   }
 
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
-    this.store.setState(store => {
+    this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
-    });
-    this.syncPeers();
+    }, 'joined');
+    this.syncRoomState('joinSync');
   }
 
   protected onRoomUpdate() {
-    this.syncPeers();
+    this.syncRoomState('roomUpdate');
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
@@ -518,7 +520,13 @@ export class HMSSDKActions implements IHMSActions {
     } else {
       // store peer in case it doesn't exist later(will happen if event is peer leave)
       let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-      this.syncPeers();
+      let actionName = 'peerUpdate';
+      if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
+        actionName = 'peerJoined';
+      } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
+        actionName = 'peerLeft';
+      }
+      this.syncRoomState(actionName);
       // if peer wasn't available before sync(will happen if event is peer join)
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
@@ -538,13 +546,15 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
     } else {
-      this.syncPeers();
+      const actionName =
+        type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
+      this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
 
   private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
-    this.store.setState(draftStore => {
+    this.setState(draftStore => {
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
       const draftTracks = draftStore.tracks;
       // find and remove the exact track from hmsPeer
@@ -563,7 +573,7 @@ export class HMSSDKActions implements IHMSActions {
       }
       delete draftTracks[sdkTrack.trackId];
       delete this.hmsSDKTracks[sdkTrack.trackId];
-    });
+    }, 'trackRemoved');
   }
 
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
@@ -575,18 +585,18 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onHMSMessage(hmsMessage: HMSMessage) {
-    this.store.setState(store => {
+    this.setState(store => {
       hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
-    });
+    }, 'newMessage');
   }
 
   /*
   note: speakers array contain the value only for peers who have audioLevel != 0
    */
   protected onAudioLevelUpdate(sdkSpeakers: sdkTypes.HMSSpeaker[]) {
-    this.store.setState(store => {
+    this.setState(store => {
       const trackIDAudioLevelMap: Record<HMSPeerID, number> = {};
       sdkSpeakers.forEach(sdkSpeaker => {
         if (!sdkSpeaker.track) {
@@ -610,32 +620,44 @@ export class HMSSDKActions implements IHMSActions {
           delete store.speakers[trackID];
         }
       }
-    });
+    }, 'audioLevel');
   }
 
   protected onReconnected() {
-    this.syncPeers();
+    this.syncRoomState('reconnectedSync');
     this.hmsNotifications.sendReconnected();
-    this.store.setState(store => {
+    this.setState(store => {
       store.room.roomState = HMSRoomState.Connected;
-    });
+    }, 'reconnected');
   }
 
-  protected onReconnecting(error: SDKHMSException) {
+  protected onReconnecting(sdkError: SDKHMSException) {
+    const error = SDKToHMS.convertException(sdkError);
     HMSLogger.e('Reconnection: received error from sdk', error);
     this.hmsNotifications.sendReconnecting(error);
-    this.store.setState(store => {
+    this.setState(store => {
       store.room.roomState = HMSRoomState.Reconnecting;
-    });
+      store.errors.push(error);
+    }, 'reconnecting');
   }
 
-  protected onError(error: SDKHMSException) {
+  protected onError(sdkException: SDKHMSException) {
+    const error = SDKToHMS.convertException(sdkException);
     if (error.isTerminal) {
       // terminal error leave room as it is not recoverable
       this.leave().then(() => console.log('error from SDK, left room.'));
-      this.store.setState(store => {
+      this.setState(store => {
         store.room.roomState = HMSRoomState.Failed;
-      });
+        store.errors.push(error);
+      }, 'errorTerminal');
+    } else {
+      const numExistingErrors = this.store.getState().errors.length;
+      // just in case there is some infinite loop sending errors
+      if (numExistingErrors < 50) {
+        this.setState(store => {
+          store.errors.push(error);
+        }, 'error');
+      }
     }
     // send notification
     this.hmsNotifications.sendError(error);
@@ -690,7 +712,7 @@ export class HMSSDKActions implements IHMSActions {
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
         track.setVolume(value);
-        this.syncPeers();
+        this.syncRoomState('trackVolume');
       } else {
         HMSLogger.w(`track ${trackId} is not an audio track`);
       }
@@ -731,7 +753,7 @@ export class HMSSDKActions implements IHMSActions {
         } else if (action === 'remove') {
           await (sdkTrack as SDKHMSLocalVideoTrack).removePlugin(plugin);
         }
-        this.syncPeers();
+        this.syncRoomState(`${action}VideoPlugin`);
       } else {
         this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
       }
@@ -754,15 +776,15 @@ export class HMSSDKActions implements IHMSActions {
    * keep only one request at a time in store till we figure out how to handle multiple requests at the same time
    */
   private onRoleChangeRequest(request: SDKHMSRoleChangeRequest) {
-    this.store.setState(store => {
+    this.setState(store => {
       if (store.roleChangeRequests.length === 0) {
         store.roleChangeRequests.push(SDKToHMS.convertRoleChangeRequest(request));
       }
-    });
+    }, 'roleChangeRequest');
   }
 
   private removeRoleChangeRequest(toRemove: HMSRoleChangeRequest) {
-    this.store.setState(store => {
+    this.setState(store => {
       const index = store.roleChangeRequests.findIndex(req => {
         return (
           req.requestedBy === toRemove.requestedBy.id &&
@@ -773,10 +795,19 @@ export class HMSSDKActions implements IHMSActions {
       if (index !== -1) {
         store.roleChangeRequests.splice(index, 1);
       }
-    });
+    }, 'removeRoleChangeRequest');
   }
 
   private onRoleUpdate() {
-    this.syncPeers();
+    this.syncRoomState('roleUpdate');
   }
+
+  /**
+   * setState is separate so any future changes to how state change can be done from one place.
+   * @param fn
+   * @param name
+   */
+  private setState: NamedSetState<HMSStore> = (fn, name) => {
+    return this.store.namedSetState(fn, name);
+  };
 }

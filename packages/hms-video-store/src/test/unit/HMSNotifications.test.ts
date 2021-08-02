@@ -1,4 +1,11 @@
-import { HMSNoticiationSeverity, HMSPeer, HMSReactiveStore, HMSStore, HMSTrack } from '../../core';
+import {
+  HMSNotificationSeverity,
+  HMSPeer,
+  HMSReactiveStore,
+  HMSStore,
+  HMSTrack,
+  HMSException,
+} from '../../core';
 import {
   PEER_NOTIFICATION_TYPES,
   TRACK_NOTIFICATION_TYPES,
@@ -24,6 +31,12 @@ beforeEach(() => {
   fakeStore = makeFakeStore();
 });
 
+function makeException(name: string): HMSException {
+  return {
+    name: name,
+  } as HMSException;
+}
+
 describe('hms notifications tests', () => {
   test('when unhandled peer event on Notification not to be called', () => {
     notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, peer);
@@ -37,7 +50,7 @@ describe('hms notifications tests', () => {
       PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_JOINED],
     );
     expect(cb.mock.results[0].value.data).toBe(peer);
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.INFO);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when peer left on Notification to be called', () => {
@@ -47,7 +60,7 @@ describe('hms notifications tests', () => {
       PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT],
     );
     expect(cb.mock.results[0].value.data).toBe(peer);
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.INFO);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when unhandled track event on Notification not to be called', () => {
@@ -61,7 +74,7 @@ describe('hms notifications tests', () => {
     expect(cb.mock.results[0].value.type).toBe(
       TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_ADDED],
     );
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.INFO);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when track removed on Notification to be called', () => {
@@ -70,7 +83,7 @@ describe('hms notifications tests', () => {
     expect(cb.mock.results[0].value.type).toBe(
       TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_REMOVED],
     );
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.INFO);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when new message received on Notification to be called', () => {
@@ -78,15 +91,15 @@ describe('hms notifications tests', () => {
     notifications.sendMessageReceived(message);
     expect(cb.mock.calls.length).toBe(1);
     expect(cb.mock.results[0].value.data).toBe(message);
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.INFO);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when error received on Notification to be called', () => {
-    const error = new Error('Test');
+    const error = makeException('Test');
     notifications.sendError(error);
     expect(cb.mock.calls.length).toBe(1);
     expect(cb.mock.results[0].value.data).toBe(error);
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.ERROR);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.ERROR);
   });
 
   test('when reconnected received on Notification to be called', () => {
@@ -95,11 +108,11 @@ describe('hms notifications tests', () => {
   });
 
   test('when reconnecting received on Notification to be called', () => {
-    const error = new Error('Test');
+    const error = makeException('Test');
     notifications.sendReconnecting(error);
     expect(cb.mock.calls.length).toBe(1);
     expect(cb.mock.results[0].value.data).toBe(error);
-    expect(cb.mock.results[0].value.severity).toBe(HMSNoticiationSeverity.ERROR);
+    expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.ERROR);
   });
 
   test('when unsubscribed on Notification not to be called', () => {

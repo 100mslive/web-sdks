@@ -8,8 +8,11 @@ import {
   HMSNotification,
   HMSSeverity,
   HMSNotificationTypes,
-  HMSNoticiationSeverity,
+  HMSNotificationSeverity,
   HMSPeer,
+  HMSException,
+  HMSMessage,
+  HMSTrack,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -37,7 +40,7 @@ export class HMSNotifications implements IHMSNotifications {
       const notification = this.createNotification(
         notificationType,
         hmsPeer,
-        HMSNoticiationSeverity.INFO as HMSSeverity,
+        HMSNotificationSeverity.INFO as HMSSeverity,
       );
       this.emitEvent(notification);
     }
@@ -50,35 +53,35 @@ export class HMSNotifications implements IHMSNotifications {
       const notification = this.createNotification(
         notificationType,
         hmsTrack,
-        HMSNoticiationSeverity.INFO as HMSSeverity,
+        HMSNotificationSeverity.INFO as HMSSeverity,
       );
       this.emitEvent(notification);
     }
   }
 
-  sendMessageReceived(message: any) {
+  sendMessageReceived(message: HMSMessage) {
     const notification = this.createNotification(
       HMSNotificationTypes.NEW_MESSAGE,
       message,
-      HMSNoticiationSeverity.INFO as HMSSeverity,
+      HMSNotificationSeverity.INFO as HMSSeverity,
     );
     this.emitEvent(notification);
   }
 
-  sendError(error: any) {
+  sendError(error: HMSException) {
     const notification = this.createNotification(
       HMSNotificationTypes.ERROR,
       error,
-      HMSNoticiationSeverity.ERROR as HMSSeverity,
+      HMSNotificationSeverity.ERROR as HMSSeverity,
     );
     this.emitEvent(notification);
   }
 
-  sendReconnecting(error: any) {
+  sendReconnecting(error: HMSException) {
     const notification = this.createNotification(
       HMSNotificationTypes.RECONNECTING,
       error,
-      HMSNoticiationSeverity.ERROR as HMSSeverity,
+      HMSNotificationSeverity.ERROR as HMSSeverity,
     );
     this.emitEvent(notification);
   }
@@ -87,7 +90,7 @@ export class HMSNotifications implements IHMSNotifications {
     const notification = this.createNotification(
       HMSNotificationTypes.RECONNECTED,
       null,
-      HMSNoticiationSeverity.INFO as HMSSeverity,
+      HMSNotificationSeverity.INFO as HMSSeverity,
     );
     this.emitEvent(notification);
   }
@@ -98,7 +101,7 @@ export class HMSNotifications implements IHMSNotifications {
 
   private createNotification(
     type: string,
-    data?: any,
+    data?: HMSPeer | HMSTrack | HMSMessage | HMSException | null,
     severity?: HMSSeverity,
     message: string = '',
   ): HMSNotification {

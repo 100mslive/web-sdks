@@ -5,6 +5,7 @@ import { HMSMediaSettings } from './settings';
 import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './role';
+import { HMSException } from './error';
 
 /*
 Defines the schema of the central store. UI Components are aware of the presence
@@ -23,6 +24,7 @@ export interface HMSStore {
   devices: DeviceMap;
   roles: Record<string, HMSRole>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
+  errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
 export const createDefaultStoreState = (): HMSStore => {
@@ -44,7 +46,6 @@ export const createDefaultStoreState = (): HMSStore => {
       audioInputDeviceId: '',
       audioOutputDeviceId: '',
       videoInputDeviceId: '',
-      maxTileCount: 9,
     },
     devices: {
       audioInput: [],
@@ -53,5 +54,6 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     roles: {},
     roleChangeRequests: [],
+    errors: [],
   };
 };

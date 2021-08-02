@@ -1,11 +1,15 @@
+import { HMSPeer, HMSTrack } from './peer';
+import { HMSMessage } from './message';
+import { HMSException } from './error';
+
 export interface HMSNotification {
   id: number;
   type: string;
   message: string;
-  data: any;
+  data?: HMSPeer | HMSTrack | HMSMessage | HMSException | null;
   severity?: HMSSeverity;
 }
-export class HMSNoticiationSeverity {
+export class HMSNotificationSeverity {
   static INFO = 'info';
   static ERROR = 'error';
   static CRITICAL = 'critical';

@@ -121,7 +121,6 @@ export const makeFakeStore = (): HMSStore => {
       audioInputDeviceId: 'testAudioIn',
       audioOutputDeviceId: 'testAudioOut',
       videoInputDeviceId: 'testVideoIn',
-      maxTileCount: 12,
     },
     roleChangeRequests: [
       {
@@ -157,6 +156,7 @@ export const makeFakeStore = (): HMSStore => {
       audioOutput: [],
       videoInput: [],
     },
+    errors: [],
   };
   localPeer = fakeStore.peers['1'];
   remotePeer = fakeStore.peers['2'];

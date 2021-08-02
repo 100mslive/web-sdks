@@ -5,7 +5,14 @@ import {
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
 } from '@100mslive/hms-video';
-import { HMSPeer, HMSMessage, HMSTrack, HMSRoom, HMSRoleChangeStoreRequest } from '../schema';
+import {
+  HMSPeer,
+  HMSMessage,
+  HMSTrack,
+  HMSRoom,
+  HMSRoleChangeStoreRequest,
+  HMSException,
+} from '../schema';
 
 import * as sdkTypes from './sdkTypes';
 import { areArraysEqual } from './sdkUtils/storeMergeUtils';
@@ -102,6 +109,18 @@ export class SDKToHMS {
       requestedBy: req.requestedBy.peerId,
       roleName: req.role.name,
       token: req.token,
+    };
+  }
+
+  static convertException(sdkException: sdkTypes.HMSException): HMSException {
+    return {
+      code: sdkException.code,
+      action: sdkException.action,
+      name: sdkException.name,
+      message: sdkException.message,
+      description: sdkException.description,
+      isTerminal: sdkException.isTerminal,
+      timestamp: new Date(),
     };
   }
 }

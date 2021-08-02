@@ -1,5 +1,5 @@
 {
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -23,9 +23,9 @@
     "analyze": "size-limit --why"
   },
   "dependencies": {
-    "immer": "^9.0.2",
+    "immer": "^9.0.5",
     "reselect": "^4.0.0",
-    "zustand": "3.5.4"
+    "zustand": "3.5.7"
   },
   "peerDependencies": {
     "@100mslive/hms-video": "^0.0.112",

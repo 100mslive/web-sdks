@@ -29,7 +29,6 @@ import {
   selectLocalPeer,
   selectLocalPeerID,
   selectLocalVideoTrackID,
-  selectMaxTilesCount,
   selectPeerAudioByID,
   selectPeerByID,
   selectPeerScreenSharing,
@@ -62,10 +61,6 @@ beforeEach(() => {
 describe('test primitive selectors', () => {
   test('selectRoom', () => {
     expect(selectRoom(fakeStore)).toBe(fakeStore.room);
-  });
-
-  test('selectMaxTilesCount', () => {
-    expect(selectMaxTilesCount(fakeStore)).toBe(fakeStore.settings.maxTileCount);
   });
 
   test('selectIsConnectedToRoom false', () => {

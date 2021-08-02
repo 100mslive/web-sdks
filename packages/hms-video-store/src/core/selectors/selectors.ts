@@ -18,10 +18,6 @@ export const selectMessageIDsInOrder = (store: HMSStore) => store.messages.allID
 export const selectTracksMap = (store: HMSStore) => store.tracks;
 
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
-export const selectMaxTilesCount = createSelector(
-  selectLocalMediaSettings,
-  settings => settings.maxTileCount,
-);
 
 export const selectDevices = (store: HMSStore) => {
   return store.devices;
