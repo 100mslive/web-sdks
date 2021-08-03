@@ -68,7 +68,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      await this.replaceTrackWith(newSettings);
+      if (this.enabled) {
+        await this.replaceTrackWith(newSettings);
+      }
     }
 
     if (hasPropertyChanged('maxBitrate') && newSettings.maxBitrate) {
@@ -150,8 +152,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
+    const prevState = prevTrack.enabled;
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
+    newTrack.enabled = prevState;
     const localStream = this.stream as HMSLocalStream;
     // change nativeTrack so plugin can start its work
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
