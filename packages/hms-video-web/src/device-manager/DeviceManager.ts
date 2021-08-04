@@ -132,7 +132,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.videoInputChanged = this.computeChange(prevVideoInput, this.videoInput);
       this.audioInputChanged = this.computeChange(prevAudioInput, this.audioInput);
       if (this.audioOutput.length > 0) {
-        this.outputDevice = this.audioOutput[0];
+        this.setOutputDevice();
       }
       this.logDevices('Enumerate Devices');
     } catch (error) {
@@ -153,7 +153,7 @@ export class DeviceManager implements HMSDeviceManager {
       .flush();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default');
+    this.setOutputDevice();
     this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     this.handleVideoInputDeviceChange(localPeer?.videoTrack);
   };
@@ -167,12 +167,42 @@ export class DeviceManager implements HMSDeviceManager {
   private getNewAudioInputDevice() {
     const defaultDevice = this.audioInput.find((device) => device.deviceId === 'default');
     if (defaultDevice) {
+      // Selecting a non-default device so that the deviceId comparision does not give
+      // false positives when device is removed, because the other available device
+      // get's the deviceId as default once this device is removed
       const nextDevice = this.audioInput.find(
         (device) => device.label === defaultDevice?.label.replace(/Default - /, ''),
       );
       return nextDevice;
     }
     return this.audioInput[0];
+  }
+
+  /**
+   * This method is to select the input/output from same group
+   * same group meaning both input/output are of same device
+   * This method might override the default coming from browser and system so as to select options from same
+   * device type. This is required in certain cases where browser's default is not correct.
+   * Algo:
+   * 1. find the non default input device if selected one is default by matching device label
+   * 2. find the corresponding output device which has the same group id or same label
+   * 3. select the default one if nothing was found
+   * 4. select the first option if there is no default
+   */
+  private setOutputDevice() {
+    const inputDevice = this.getNewAudioInputDevice();
+    this.outputDevice = undefined;
+    if (inputDevice?.groupId) {
+      this.outputDevice = this.audioOutput.find(
+        (device) =>
+          device.groupId === inputDevice.groupId ||
+          (inputDevice.deviceId !== 'default' && device.label === inputDevice.label),
+      );
+    }
+    if (!this.outputDevice) {
+      // select default deviceId device if available, otherwise select 0th device
+      this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default') || this.audioOutput[0];
+    }
   }
 
   private handleAudioInputDeviceChange = async (audioTrack?: HMSLocalAudioTrack) => {

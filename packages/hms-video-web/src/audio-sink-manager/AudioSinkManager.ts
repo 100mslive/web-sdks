@@ -141,10 +141,10 @@ export class AudioSinkManager {
   };
 
   private addPendingTracks() {
-    for (let track of Array.from(this.tracksToAdd)) {
+    this.tracksToAdd.forEach((track) => {
       this.addToDOM(track);
       this.tracksToAdd.delete(track);
-    }
+    });
   }
 
   private addToDOM = (track: HMSAudioTrack) => {
