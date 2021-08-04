@@ -255,4 +255,24 @@ export const ErrorFactory = {
       return new HMSException(6007, 'PeerMetadataMissing', action, `Peer Metadata Missing`, description);
     },
   },
+
+  VideoPluginErrors: {
+    PlatformNotSupported(action: HMSAction, description: string = '') {
+      return new HMSException(
+        7001,
+        'PlatformNotSupported',
+        action,
+        'Check HMS Docs to see the list of supported platforms',
+        description,
+      );
+    },
+
+    InitFailed(action: HMSAction, description: string = '') {
+      return new HMSException(7002, 'InitFailed', action, 'Plugin init failed', description);
+    },
+
+    ProcessingFailed(action: HMSAction, description: string = '') {
+      return new HMSException(7003, 'ProcessingFailed', action, 'Plugin processing failed', description);
+    },
+  },
 };

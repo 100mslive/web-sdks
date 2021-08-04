@@ -1,9 +1,9 @@
-import { HMSException } from '../../error/HMSException';
 import { RunningAverage } from '../../utils/math';
 import VideoPluginsAnalyticsFactory from '../../analytics/VideoPluginsAnalyticsFactory';
 import analyticsEventsService from '../../analytics/AnalyticsEventsService';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import HMSLogger from '../../utils/logger';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
 
 const TAG = 'VideoPluginsAnalytics';
 
@@ -57,15 +57,22 @@ export class VideoPluginsAnalytics {
   }
 
   async initWithTime<T>(name: string, initFn: () => Promise<T>) {
+    if (this.initTime[name]) {
+      HMSLogger.i(TAG, `Plugin Already loaded ${name}, time it took: ${this.initTime[name]}`);
+      return;
+    }
     let time: number | undefined = undefined;
     try {
       time = await this.timeInMs(initFn);
       HMSLogger.i(TAG, `Time taken for Plugin ${name} initialization : ${time}`);
     } catch (err) {
       //Failed during initialization of plugin(model loading etc...)
-      err += ' initialization error';
-      const ex = this.getErrorAsException(err);
-      this.failure(name, ex);
+      err = ErrorFactory.VideoPluginErrors.InitFailed(
+        HMSAction.VIDEO_PLUGINS,
+        'failed during initialization of plugin',
+      );
+      HMSLogger.e(TAG, err);
+      this.failure(name, err);
       throw err;
     }
     if (time) {
@@ -85,9 +92,12 @@ export class VideoPluginsAnalytics {
       time = await this.timeInMs(processFn);
     } catch (err) {
       //Failed during processing of plugin
-      err += ' processing error';
-      const ex = this.getErrorAsException(err);
-      this.failure(name, ex);
+      err = ErrorFactory.VideoPluginErrors.ProcessingFailed(
+        HMSAction.VIDEO_PLUGINS,
+        'Failed during processing of plugin',
+      );
+      HMSLogger.e(TAG, err);
+      this.failure(name, err);
       throw err;
     }
     if (time) {
@@ -99,16 +109,6 @@ export class VideoPluginsAnalytics {
     const start = Date.now();
     await fn();
     return Math.floor(Date.now() - start);
-  }
-
-  private getErrorAsException(err: any) {
-    let ex: HMSException;
-    if (err instanceof HMSException) {
-      ex = err;
-    } else {
-      ex = ErrorFactory.GenericErrors.Unknown(HMSAction.VIDEO_PLUGINS, err.message);
-    }
-    return ex;
   }
 
   private clean(name: string) {

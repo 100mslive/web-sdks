@@ -1,6 +1,6 @@
 import AnalyticsEvent from './AnalyticsEvent';
-import { HMSException } from '../error/HMSException';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
+import { HMSException } from '../error/HMSException';
 
 export default class VideoPluginsAnalyticsFactory {
   static failure(pluginName: string, error: HMSException) {

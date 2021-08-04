@@ -3,6 +3,7 @@ import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 const DEFAULT_FRAME_RATE = 24;
 const TAG = 'VideoPluginsManager';
@@ -79,7 +80,7 @@ export class HMSVideoPluginsManager {
       return;
     }
 
-    if (pluginFrameRate) {
+    if (pluginFrameRate && pluginFrameRate > 0) {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
     } else {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
@@ -89,8 +90,8 @@ export class HMSVideoPluginsManager {
     this.analytics.added(name);
 
     if (!plugin.isSupported()) {
-      const err = 'Platform not supported';
-      this.analytics.failure(name, err as any);
+      let err = ErrorFactory.VideoPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');
+      this.analytics.failure(name, err);
       HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
       return;
     }
@@ -186,6 +187,7 @@ export class HMSVideoPluginsManager {
       await this.hmsTrack.setProcessedTrack(this.outputTrack);
     } catch (err) {
       this.pluginsLoopRunning = false;
+      HMSLogger.e(TAG, 'error in setting processed track', err);
       throw err;
     }
     // can't await on pluginsLoop as it'll run for a long long time
@@ -203,8 +205,8 @@ export class HMSVideoPluginsManager {
 
   private async pluginsLoop() {
     while (this.pluginsLoopRunning) {
-      const frameRate = this.hmsTrack.getMediaTrackSettings().frameRate || DEFAULT_FRAME_RATE;
-      const sleepTimeMs = Math.floor(1000 / frameRate);
+      const inputFrameRate = this.hmsTrack.getMediaTrackSettings().frameRate || DEFAULT_FRAME_RATE;
+      const sleepTimeMs = Math.floor(1000 / inputFrameRate);
       if (!this.hmsTrack.enabled || this.hmsTrack.nativeTrack.readyState === 'ended') {
         if (this.pluginsLoopState === 'running') {
           // mute just happened, reset canvases to black so even if it is sent to remote, it
@@ -314,14 +316,6 @@ export class HMSVideoPluginsManager {
     const ctx = this.inputCanvas.getContext('2d');
     ctx!.drawImage(this.inputVideo, 0, 0, width, height);
   }
-
-  //TODO: is this required on cleanup
-  // private resetOutputCanvas() {
-  //   const ctx = this.outputCanvas?.getContext('2d');
-  //   if (this.outputCanvas && ctx) {
-  //     ctx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-  //   }
-  // }
 
   private resetCanvases() {
     if (!this.outputCanvas || !this.inputCanvas) {

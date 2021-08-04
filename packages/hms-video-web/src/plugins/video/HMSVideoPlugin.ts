@@ -41,9 +41,13 @@ export interface HMSVideoPlugin {
    * CPU usage in case of complex processing.
    * @param input input canvas containing the input frame
    * @param output the output canvas which should contain the output frame
-   * @param pass use results from previous run if true
+   * @param skipProcessing use results from previous run if true
    */
-  processVideoFrame(input: HTMLCanvasElement, output?: HTMLCanvasElement, pass?: boolean): Promise<void> | void;
+  processVideoFrame(
+    input: HTMLCanvasElement,
+    output?: HTMLCanvasElement,
+    skipProcessing?: boolean,
+  ): Promise<void> | void;
 
   /**
    * the plugin can use this function to dispose off its resources. It'll be called when the processor instance is
