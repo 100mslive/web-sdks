@@ -40,6 +40,7 @@ import {
   HMSException as SDKHMSException,
   DeviceMap,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSSimulcastLayer,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -104,7 +105,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('setAudioOutput');
   }
 
-  setPreferredLayer(trackId: string, layer: sdkTypes.HMSSimulcastLayer) {
+  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {

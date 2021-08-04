@@ -1,12 +1,8 @@
-import { HMSPeer, HMSTrack } from './peer';
-import { HMSMessage } from './message';
-import { HMSException } from './error';
-
 export interface HMSNotification {
   id: number;
   type: string;
   message: string;
-  data?: HMSPeer | HMSTrack | HMSMessage | HMSException | null;
+  data?: any; // HMSPeer | HMSTrack | HMSMessage | HMSException
   severity?: HMSSeverity;
 }
 export class HMSNotificationSeverity {
