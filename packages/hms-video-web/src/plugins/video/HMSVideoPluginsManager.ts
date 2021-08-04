@@ -201,6 +201,10 @@ export class HMSVideoPluginsManager {
     await this.hmsTrack.setProcessedTrack(undefined);
     this.resetCanvases();
     this.outputTrack?.stop();
+    if (this.inputVideo) {
+      this.inputVideo.srcObject = null;
+      this.inputVideo = undefined;
+    }
   }
 
   private async pluginsLoop() {

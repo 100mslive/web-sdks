@@ -152,10 +152,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const prevState = prevTrack.enabled;
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
-    newTrack.enabled = prevState;
     const localStream = this.stream as HMSLocalStream;
     // change nativeTrack so plugin can start its work
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
