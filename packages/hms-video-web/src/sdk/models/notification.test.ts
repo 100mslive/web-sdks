@@ -35,10 +35,6 @@ describe('Peer Notification', () => {
   it('should have custom data in the info', () => {
     expect(peer.info.data).toBe(params.info.data);
   });
-
-  it('should have tracks as empty array or array of type TrackState', () => {
-    expect(peer.tracks).toBeInstanceOf(Array);
-  });
 });
 
 describe('PeerList Notification', () => {
@@ -111,5 +107,10 @@ describe('PeerList Notification', () => {
   it('should have appropriate roles', () => {
     expect(peerList.peers[0].role).toBe('host');
     expect(peerList.peers[1].role).toBe('viewer');
+  });
+
+  it('should have correct track states', () => {
+    expect(Object.values(peerList.peers[0].tracks)[0].mute).toBe(true);
+    expect(Object.values(peerList.peers[1].tracks)[0].mute).toBe(false);
   });
 });

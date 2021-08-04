@@ -162,10 +162,10 @@ export default class NotificationManager {
   private handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
 
-    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
+    for (const trackId in params.tracks) {
       this.trackStateMap.set(trackId, {
         peerId: params.peer.peer_id,
-        trackInfo: trackEntry,
+        trackInfo: params.tracks[trackId],
       });
     }
 
@@ -276,9 +276,10 @@ export default class NotificationManager {
       return;
     }
 
-    for (const [trackId, trackEntry] of Object.entries(params.tracks)) {
+    for (const trackId in params.tracks) {
       const currentTrackStateInfo = Object.assign({}, this.trackStateMap.get(trackId)?.trackInfo);
 
+      const trackEntry = params.tracks[trackId];
       const track = this.getPeerTrackByTrackId(hmsPeer.peerId, trackId);
 
       this.trackStateMap.set(trackId, {
@@ -325,12 +326,12 @@ export default class NotificationManager {
     this.store.addPeer(hmsPeer);
     HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
 
-    peer.tracks.forEach((track) => {
-      this.trackStateMap.set(track.track_id, {
+    for (const trackId in peer.tracks) {
+      this.trackStateMap.set(trackId, {
         peerId: peer.peerId,
-        trackInfo: track,
+        trackInfo: peer.tracks[trackId],
       });
-    });
+    }
 
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
     this.processPendingTracks();
@@ -389,6 +390,7 @@ export default class NotificationManager {
     // Check for any tracks which are added/removed
     peerList.peers.forEach((newPeerNotification) => {
       const oldPeer = this.store.getPeerById(newPeerNotification.peerId);
+      const newPeerTrackStates = Object.values(newPeerNotification.tracks);
 
       if (oldPeer) {
         // Peer already present in room, we take diff between the tracks
@@ -396,14 +398,14 @@ export default class NotificationManager {
 
         // Remove all the tracks which are not present in the peer.tracks
         tracks.forEach((track) => {
-          if (!newPeerNotification.tracks.some((newTrack) => newTrack.track_id === track.trackId)) {
+          if (!newPeerNotification.tracks.hasOwnProperty(track.trackId)) {
             this.removePeerTrack(oldPeer, track.trackId);
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
           }
         });
 
         // Add track-metadata for all the new tracks
-        newPeerNotification.tracks.forEach((trackData) => {
+        newPeerTrackStates.forEach((trackData) => {
           if (!this.getPeerTrackByTrackId(oldPeer.peerId, trackData.track_id)) {
             // NOTE: We assume that, once the connection is re-established,
             //  transport layer will send a native onTrackAdd
@@ -413,7 +415,12 @@ export default class NotificationManager {
             });
           }
         });
-        this.processPendingTracks();
+
+        // Handle RTC track add and track state change.
+        this.handleTrackUpdate({
+          peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peerId },
+          tracks: newPeerNotification.tracks,
+        });
       } else {
         // New peer joined while reconnecting
         this.handlePeerJoin(newPeerNotification);

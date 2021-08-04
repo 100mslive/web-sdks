@@ -43,6 +43,7 @@ import { DeviceManager } from '../device-manager';
 
 const TAG = '[HMSTransport]:';
 
+// @DISCUSS: action and extra are not used at all.
 interface CallbackTriple {
   promise: PromiseCallbacks<boolean>;
   action: HMSAction;
@@ -142,7 +143,10 @@ export default class HMSTransport implements ITransport {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
           this.retryScheduler.schedule(
             TransportFailureCategory.SignalDisconnect,
-            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.INIT, 'Network offline'),
+            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+              HMSAction.RECONNECT_SIGNAL,
+              'Network offline',
+            ),
             this.retrySignalDisconnectTask,
           );
         }
@@ -714,6 +718,9 @@ export default class HMSTransport implements ITransport {
     }
 
     ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
+
+    // Send track update to sync local track state changes during reconnection
+    this.signal.trackUpdate(this.trackStates);
 
     return ok;
   };

@@ -19,6 +19,7 @@ export enum HMSAction {
   RESTART_ICE = 'RESTART_ICE',
   VIDEO_PLUGINS = 'VIDEO_PLUGINS',
   AUTOPLAY = 'AUTOPLAY',
+  RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
 }
 
 export const ErrorFactory = {

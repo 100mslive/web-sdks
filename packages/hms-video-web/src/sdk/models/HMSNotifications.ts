@@ -17,7 +17,9 @@ export type HMSNotifications =
   | undefined;
 
 export interface TrackStateNotification {
-  tracks: Map<string, TrackState>;
+  tracks: {
+    [track_id: string]: TrackState;
+  };
   peer: PeerNotificationInfo;
 }
 
@@ -67,7 +69,9 @@ export class Peer {
   peerId: string;
   info: Info;
   role: string;
-  tracks: TrackState[] = [];
+  tracks: {
+    [track_id: string]: TrackState;
+  };
 
   constructor(params: any) {
     this.peerId = params.peer_id;
@@ -77,7 +81,7 @@ export class Peer {
       userId: params.info.user_id,
     };
     this.role = params.role;
-    this.tracks = Object.values(params.tracks || {});
+    this.tracks = params.tracks || {};
   }
 }
 
