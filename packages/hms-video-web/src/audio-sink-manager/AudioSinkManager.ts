@@ -21,7 +21,6 @@ export class AudioSinkManager {
   private TAG = '[AudioSinkManager]:';
   private initialized = false;
   private volume: number = 100;
-  private silentAudio?: HTMLAudioElement;
   private eventEmitter: EventEmitter = new EventEmitter();
   private autoplayFailed: boolean | undefined;
   private tracksToAdd = new Set<HMSAudioTrack>();
@@ -57,15 +56,20 @@ export class AudioSinkManager {
     this.volume = value;
   }
 
+  /**
+   *  This function is to be called only on user interaction when
+   *  autoplay error is received.
+   */
   async unblockAutoplay() {
     if (!this.autoplayFailed) {
       return;
     }
     try {
-      await this.silentAudio?.play();
       this.autoplayFailed = false;
+      await playSilentAudio();
     } catch (error) {
-      this.autoplayFailed = true;
+      // autoplayFailed is not set to true here because even if the play fails,
+      // we have a user interaction and proceed with adding tracks
       HMSLogger.e(this.TAG, error);
     }
     this.addPendingTracks();
@@ -97,18 +101,17 @@ export class AudioSinkManager {
     this.autoplayFailed = false;
   }
 
-  private addSilentAudio() {
-    return playSilentAudio().then(({ audio, error }: { audio: HTMLAudioElement; error?: Error }) => {
-      if (error) {
-        this.autoplayFailed = true;
-        const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
-        this.eventEmitter.emit(AutoplayError, { error: ex });
-      } else {
-        this.autoplayFailed = false;
-        this.addPendingTracks();
-      }
-      this.silentAudio = audio;
-    });
+  private async addSilentAudio() {
+    try {
+      await playSilentAudio();
+      this.autoplayFailed = false;
+      this.addPendingTracks();
+    } catch (error) {
+      HMSLogger.e(this.TAG, error);
+      this.autoplayFailed = true;
+      const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+      this.eventEmitter.emit(AutoplayError, { error: ex });
+    }
   }
 
   private handleAudioPaused = (event: any) => {
@@ -161,10 +164,11 @@ export class AudioSinkManager {
   private handleTrackRemove = (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
     HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
-    const audioEl = document.getElementById(track.trackId);
+    const audioEl = document.getElementById(track.trackId) as HTMLAudioElement;
     this.autoPausedTracks.delete(track.trackId);
     if (audioEl) {
       audioEl.removeEventListener('pause', this.handleAudioPaused);
+      audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
     }
