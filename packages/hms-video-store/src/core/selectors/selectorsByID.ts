@@ -18,13 +18,14 @@ function byIDCurry<T>(selector: byIDSelector<T>): (id?: string) => (store: HMSSt
 }
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
+const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
 );
 
 const selectTrackByIDBare = createSelector(
-  [selectTracksMap, selectPeerID],
+  [selectTracksMap, selectTrackID],
   (storeTracks, trackID) => (trackID ? storeTracks[trackID] : null),
 );
 
