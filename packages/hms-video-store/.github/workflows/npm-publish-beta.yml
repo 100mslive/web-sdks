@@ -15,6 +15,7 @@ on:
       - 'README.MD'
       - '.gitignore'
       - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   publish-npm:
