@@ -53,11 +53,11 @@
     "zustand": "3.5.7"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.114",
+    "@100mslive/hms-video": "^0.0.122",
     "events": "^3.3.0"
   },
   "devDependencies": {
-    "@100mslive/hms-video": "0.0.114",
+    "@100mslive/hms-video": "0.0.122",
     "@size-limit/preset-small-lib": "^4.11.0",
     "events": "^3.3.0",
     "husky": "^6.0.0",
