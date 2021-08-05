@@ -108,7 +108,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /**
    * @internal
    */
-  async cleanupPlugins() {
+  async cleanup() {
+    super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
   }
@@ -126,6 +127,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
       return;
     }
+    // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
       if (this.processedTrack) {
         // remove, reset back to the native track
@@ -144,6 +146,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       this.processedTrack = processedTrack;
     }
+  }
+
+  /**
+   * @internal
+   * sent track id will be different in case there was some processing done using plugins.
+   * replace track is used to, start sending data from a new track without un publishing the prior one. There
+   * are thus two track ids - the one which was initially published and should be unpublished when required.
+   * The one whose data is currently being sent, which will be used when removing from connection senders.
+   */
+  getTrackIDBeingSent() {
+    return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
   }
 
   /**

@@ -52,4 +52,15 @@ export abstract class HMSTrack {
   setSdpTrackId(sdpTrackId: string) {
     this.sdpTrackId = sdpTrackId;
   }
+
+  /**
+   * @internal
+   * take care of -
+   * 1. https://bugs.chromium.org/p/chromium/issues/detail?id=1232649
+   * 2. stopping any tracks
+   * 3. plugins related cleanups and stopping
+   */
+  cleanup() {
+    this.nativeTrack?.stop();
+  }
 }

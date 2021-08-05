@@ -1,9 +1,7 @@
-import { HMSRoom } from '../../interfaces/room';
-import { HMSSpeaker } from '../../interfaces/speaker';
+import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
 import { HMSTrack, HMSAudioTrack, HMSVideoTrack, HMSTrackSource, HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
-import { HMSRole, PublishParams } from '../../interfaces/role';
 import {
   SimulcastLayer,
   SimulcastDimensions,
@@ -12,7 +10,6 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
-import { HMSConfig } from '../../interfaces';
 
 export type KnownRoles = { [role: string]: HMSRole };
 
@@ -64,4 +61,6 @@ export interface IStore {
   updateSpeakers(speakers: HMSSpeaker[]): void;
   updateAudioOutputVolume(volume: number): void;
   updateAudioOutputDevice(device: MediaDeviceInfo): void;
+
+  cleanUp(): void;
 }

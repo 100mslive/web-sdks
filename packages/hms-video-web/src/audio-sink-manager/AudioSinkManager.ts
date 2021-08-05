@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { v4 as uuid } from 'uuid';
-import { HMSAudioTrack } from '../media/tracks/HMSAudioTrack';
+import { HMSAudioTrack } from '../media/tracks';
 import { DeviceManager } from '../device-manager';
 import NotificationManager from '../sdk/NotificationManager';
 import HMSLogger from '../utils/logger';

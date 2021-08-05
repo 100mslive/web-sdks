@@ -441,7 +441,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async unpublish(tracks: Array<HMSTrack>): Promise<void> {
+  async unpublish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
       await this.unpublishTrack(track);
     }
@@ -494,6 +494,8 @@ export default class HMSTransport implements ITransport {
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     await p;
+    // add track to store after publish
+    this.store.addTrack(track);
 
     // @ts-ignore
     const maxBitrate = track.settings.maxBitrate;
@@ -509,7 +511,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
   }
 
-  private async unpublishTrack(track: HMSTrack): Promise<void> {
+  private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
     if (this.trackStates.has(track.trackId)) {
       this.trackStates.delete(track.trackId);
@@ -535,6 +537,9 @@ export default class HMSTransport implements ITransport {
     const stream = track.stream as HMSLocalStream;
     stream.removeSender(track);
     await p;
+    await track.cleanup();
+    // remove track from store on unpublish
+    this.store.removeTrack(track.trackId);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 

@@ -8,7 +8,7 @@ import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { IFetchAVTrackOptions } from '../../transport/ITransport';
-import { SimulcastLayer } from '../../interfaces/simulcast-layers';
+import { SimulcastLayer } from '../../interfaces';
 
 const TAG = 'HMSLocalStream';
 
@@ -89,7 +89,7 @@ export default class HMSLocalStream extends HMSMediaStream {
         trackEncodings.push(...simulcastLayers);
       } else {
         const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track instanceof HMSLocalVideoTrack && track.settings.maxBitrate) {
+        if (track.settings.maxBitrate) {
           encodings.maxBitrate = track.settings.maxBitrate;
         }
         trackEncodings.push(encodings);
@@ -146,10 +146,10 @@ export default class HMSLocalStream extends HMSMediaStream {
     await sender.replaceTrack(withTrack);
   }
 
-  removeSender(track: HMSTrack) {
+  removeSender(track: HMSLocalTrack) {
     let removedSenderCount = 0;
     this.connection!.getSenders().forEach((sender) => {
-      if (sender.track?.id === track.trackId) {
+      if (sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent()) {
         this.connection!.removeTrack(sender);
         removedSenderCount += 1;
 

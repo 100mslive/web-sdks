@@ -56,8 +56,13 @@ export class TrackAudioLevelMonitor extends TypedEventEmitter<{
   };
 
   start() {
+    let prev = -1;
     this.interval = window.setTimeout(() => {
-      this.updateAudioLevel(this.rawLevel);
+      if (this.rawLevel !== prev) {
+        // only send an update when there is a change
+        prev = this.rawLevel;
+        this.updateAudioLevel(this.rawLevel);
+      }
       this.start();
     }, 1000);
   }

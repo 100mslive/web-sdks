@@ -88,4 +88,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.audioLevelMonitor?.stop();
     this.audioLevelMonitor = undefined;
   }
+
+  /**
+   * @internal
+   * published track id will be different in case there was some processing done using plugins.
+   */
+  getTrackIDBeingSent() {
+    return this.nativeTrack.id;
+  }
 }

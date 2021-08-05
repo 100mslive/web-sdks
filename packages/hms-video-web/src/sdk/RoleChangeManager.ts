@@ -14,7 +14,7 @@ export default class RoleChangeManager {
     private store: IStore,
     private transport: ITransport,
     private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
-    private removeTrack: (trackId: string) => void,
+    private removeAuxillaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
   ) {}
 
@@ -101,23 +101,18 @@ export default class RoleChangeManager {
 
     // TODO check auxillary tracks for regular audio and video too
     if (localPeer?.videoTrack && removeVideo) {
-      localPeer.videoTrack.nativeTrack.stop();
       // TODO: stop processed track and cleanup plugins loop non async
       // vb can throw change role off otherwise
       tracksToUnpublish.push(localPeer.videoTrack);
-      this.store.removeTrack(localPeer.videoTrack.trackId);
       localPeer.videoTrack = undefined;
     }
 
     if (localPeer?.audioTrack && removeAudio) {
-      localPeer.audioTrack.nativeTrack.stop();
       tracksToUnpublish.push(localPeer.audioTrack);
-      this.store.removeTrack(localPeer.audioTrack.trackId);
       localPeer.audioTrack = undefined;
     }
 
     await this.transport.unpublish(tracksToUnpublish);
-
     for (let track of tracksToUnpublish) {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
     }
@@ -125,7 +120,7 @@ export default class RoleChangeManager {
     if (localPeer.auxiliaryTracks && removeScreen) {
       for (const track of localPeer.auxiliaryTracks)
         if (track.source === 'screen') {
-          await this.removeTrack(track.trackId);
+          await this.removeAuxillaryTrack(track.trackId);
         }
     }
   }

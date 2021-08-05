@@ -35,6 +35,15 @@ export class HMSAudioTrack extends HMSTrack {
     return this.outputDevice;
   }
 
+  cleanup() {
+    super.cleanup();
+    if (this.audioElement) {
+      this.audioElement.srcObject = null;
+      this.audioElement.remove();
+      this.audioElement = null;
+    }
+  }
+
   async setOutputDevice(device: MediaDeviceInfo) {
     try {
       // @ts-ignore

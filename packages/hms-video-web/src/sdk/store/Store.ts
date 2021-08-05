@@ -1,7 +1,7 @@
 import { IStore, KnownRoles } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSSpeaker } from '../../interfaces/speaker';
+import { HMSSpeaker } from '../../interfaces';
 import {
   HMSTrack,
   HMSVideoTrack,
@@ -235,6 +235,13 @@ class Store implements IStore {
         resolution,
       } as SimulcastLayerDefinition;
     });
+  }
+
+  cleanUp() {
+    const tracks = this.getTracks();
+    for (const track of tracks) {
+      track.cleanup();
+    }
   }
 
   private updatePeersPolicy() {

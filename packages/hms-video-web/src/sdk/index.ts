@@ -41,8 +41,8 @@ import { IErrorListener } from '../interfaces/error-listener';
 import { IStore, Store } from './store';
 import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
-import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
-import { HMSRole } from '../interfaces/role';
+import { HMSRoleChangeRequest } from '../interfaces';
+import { HMSRole } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { HMSAudioCodec, HMSVideoCodec } from '../media/codec';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
@@ -288,6 +288,7 @@ export class HMSSdk implements HMSInterface {
 
   private cleanUp() {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
+    this.store.cleanUp();
     this.cleanDeviceManagers();
     this.isInitialised = false;
     this.published = false;
@@ -305,19 +306,14 @@ export class HMSSdk implements HMSInterface {
   async leave() {
     const room = this.store.getRoom();
     if (room) {
-      // Start transport.leave and parallelly stop the tracks
-      const transportLeave = this.transport?.leave();
+      // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
+      // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
+      // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
+      // for cases where uses stays on the page post leave.
+      await this.transport?.leave();
       const roomId = room.id;
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
-      this.localPeer?.audioTrack?.nativeTrack.stop();
-      this.localPeer?.videoTrack?.nativeTrack.stop();
-      this.localPeer?.videoTrack?.cleanupPlugins();
-
-      this.localPeer?.auxiliaryTracks.forEach((track) => track.nativeTrack.stop());
       this.cleanUp();
-
-      // wait for transport.leave to complete before returning from this function
-      await transportLeave;
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
   }
@@ -385,7 +381,6 @@ export class HMSSdk implements HMSInterface {
     await this.transport!.publish(tracks);
     tracks.forEach((track) => {
       this.localPeer?.auxiliaryTracks.push(track);
-      this.store.addTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     });
   }
@@ -416,17 +411,14 @@ export class HMSSdk implements HMSInterface {
 
     await this.transport?.publish([hmsTrack]);
     this.localPeer?.auxiliaryTracks.push(hmsTrack);
-    this.store.addTrack(hmsTrack);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
   async removeTrack(trackId: string) {
     const track = this.localPeer?.auxiliaryTracks.find((t) => t.trackId === trackId);
     if (track) {
-      track.nativeTrack.stop();
       await this.transport!.unpublish([track]);
       this.localPeer!.auxiliaryTracks.splice(this.localPeer!.auxiliaryTracks.indexOf(track), 1);
-      this.store.removeTrack(track.trackId);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer!);
     }
   }
@@ -473,7 +465,6 @@ export class HMSSdk implements HMSInterface {
     for (const track of tracks) {
       await this.transport!.publish([track]);
       this.setLocalPeerTrack(track);
-      this.store.addTrack(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
     await this.initDeviceManagers();
@@ -560,7 +551,9 @@ export class HMSSdk implements HMSInterface {
 
     /**
      * concat local tracks only if both are true which means it is either join or switched from a role
-     * with no tracks earlier
+     * with no tracks earlier.
+     * the reason we need this is for preview API to work, in case of preview we want to publish the same
+     * tracks which were shown and are already part of the local peer instead of creating new ones.
      * */
     if (publishConfig.publishAudio && publishConfig.publishVideo) {
       return tracks.concat(localTracks);
