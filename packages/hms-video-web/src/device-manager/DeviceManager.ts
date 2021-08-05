@@ -193,10 +193,10 @@ export class DeviceManager implements HMSDeviceManager {
     const inputDevice = this.getNewAudioInputDevice();
     this.outputDevice = undefined;
     if (inputDevice?.groupId) {
+      // only check for label because if groupId check is added it will select speaker
+      // when an external earphone without microphone is added
       this.outputDevice = this.audioOutput.find(
-        (device) =>
-          device.groupId === inputDevice.groupId ||
-          (inputDevice.deviceId !== 'default' && device.label === inputDevice.label),
+        (device) => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
       );
     }
     if (!this.outputDevice) {
