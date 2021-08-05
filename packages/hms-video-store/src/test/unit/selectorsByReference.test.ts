@@ -1,9 +1,9 @@
-// start from a new fake store for every test
 import { localVideo, makeFakeStore } from '../fakeStore';
 import { HMSStore, selectIsLocalVideoPluginPresent } from '../../core';
 
 let fakeStore: HMSStore;
 
+// start from a new fake store for every test
 beforeEach(() => {
   fakeStore = makeFakeStore();
 });

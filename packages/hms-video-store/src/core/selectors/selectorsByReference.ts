@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 import { selectLocalVideoTrackID, selectRolesMap, selectTracksMap } from './selectors';
 import { HMSTrack } from '../schema';
-// import { HMSStore } from '../schema';
 
 export const selectRoleByRoleName = (roleName: string) =>
   createSelector([selectRolesMap], rolesMap => rolesMap[roleName]);
