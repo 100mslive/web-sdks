@@ -11,3 +11,4 @@ export * from './utils/support';
 export * from './error/HMSException';
 export * from './interfaces';
 export * from './plugins';
+export * from './utils/logger';
