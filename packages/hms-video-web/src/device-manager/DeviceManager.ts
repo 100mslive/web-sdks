@@ -164,7 +164,7 @@ export class DeviceManager implements HMSDeviceManager {
    * Firefox and safari give 0th device as system default
    * @returns {InputDeviceInfo}
    */
-  private getNewAudioInputDevice() {
+  getNewAudioInputDevice() {
     const defaultDevice = this.audioInput.find((device) => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
@@ -189,7 +189,7 @@ export class DeviceManager implements HMSDeviceManager {
    * 3. select the default one if nothing was found
    * 4. select the first option if there is no default
    */
-  private setOutputDevice() {
+  setOutputDevice() {
     const inputDevice = this.getNewAudioInputDevice();
     this.outputDevice = undefined;
     if (inputDevice?.groupId) {
