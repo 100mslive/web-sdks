@@ -16,9 +16,11 @@ export abstract class HMSTrack {
    * @internal */
   nativeTrack: MediaStreamTrack;
 
-  /** For remote tracks track.trackId should return the
-   * track ID from SDP to maintain consistency with the server.
-   * Firefox has known track ID mismatch issues.
+  /**
+   * Firefox doesn't respect the track id as sent from the backend when calling peerconnection.track callback. This
+   * breaks correlation of future track updates from backend. So we're storing the sdp track id as present in the
+   * original offer along with the track as well and will let this override the native track id for any correlation
+   * purpose.
    * @internal */
   private sdpTrackId?: string;
 

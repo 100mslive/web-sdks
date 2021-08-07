@@ -64,7 +64,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
         this.remoteStreams.set(streamId, remote);
 
         stream.onremovetrack = (e) => {
-          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.trackId === e.track.id);
+          /*
+           * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
+           * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
+           * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
+           */
+          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.nativeTrack.id === e.track.id);
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
