@@ -32,10 +32,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const prevState = prevTrack.enabled;
     prevTrack?.stop();
     const newTrack = await getAudioTrack(settings);
-    newTrack.enabled = prevState;
     await (this.stream as HMSLocalStream).replaceTrack(this.nativeTrack, newTrack);
     this.nativeTrack = newTrack;
   }
@@ -62,8 +60,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const eventListeners = this.audioLevelMonitor?.listeners('AUDIO_LEVEL_UPDATE');
       HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
       isLevelMonitored && this.destroyAudioLevelMonitor();
-      await this.replaceTrackWith(newSettings);
-      isLevelMonitored && this.initAudioLevelMonitor(eventListeners);
+      if (this.enabled) {
+        await this.replaceTrackWith(newSettings);
+        isLevelMonitored && this.initAudioLevelMonitor(eventListeners);
+      }
     }
 
     if (hasPropertyChanged('maxBitrate')) {

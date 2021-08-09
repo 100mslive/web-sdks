@@ -25,7 +25,8 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<Me
 
 // To differentiate between normal track and empty track.
 export function isEmptyTrack(track: MediaStreamTrack) {
-  return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode';
+  // Firefox gives '' as label for empty track(created from audio context)
+  return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode' || track.label === '';
 }
 
 let blankCanvas: any;
