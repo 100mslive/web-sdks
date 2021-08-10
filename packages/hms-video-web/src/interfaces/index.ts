@@ -7,5 +7,6 @@ export * from './speaker';
 export * from './role';
 export * from './hms-remote-peer';
 export * from './role-change-request';
-export { SimulcastLayerDefinition, SimulcastLayer, SimulcastDimensions } from './simulcast-layers';
+export { HMSSimulcastLayer, SimulcastLayerDefinition, SimulcastLayer, SimulcastDimensions } from './simulcast-layers';
 export { DeviceMap } from './HMSDeviceManager';
+export * from './track-settings';

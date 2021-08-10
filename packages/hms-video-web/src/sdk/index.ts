@@ -1,4 +1,4 @@
-import { HMSConfig } from '../interfaces';
+import { HMSAudioCodec, HMSConfig, HMSVideoCodec } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -44,7 +44,6 @@ import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import { HMSRoleChangeRequest } from '../interfaces';
 import { HMSRole } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
-import { HMSAudioCodec, HMSVideoCodec } from '../media/codec';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 
 // @DISCUSS: Adding it here as a hotfix

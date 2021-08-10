@@ -1,8 +1,8 @@
 import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
-import { HMSSimulcastLayer } from '../settings';
 import { HMSRemoteVideoTrack, HMSRemoteAudioTrack } from '../tracks';
 import HMSLogger from '../../utils/logger';
+import { HMSSimulcastLayer } from '../../interfaces';
 
 export type HMSRemoteTrack = HMSRemoteAudioTrack | HMSRemoteVideoTrack;
 

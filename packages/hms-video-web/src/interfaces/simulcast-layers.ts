@@ -1,4 +1,9 @@
-import { HMSSimulcastLayer } from '../media/settings';
+export enum HMSSimulcastLayer {
+  NONE = 'none',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
 
 export interface SimulcastLayer {
   rid: string;

@@ -1,5 +1,5 @@
+import { HMSAudioTrackSettings as IHMSAudioTrackSettings, HMSAudioCodec } from '../../interfaces';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSAudioCodec } from '../codec';
 
 export class HMSAudioTrackSettingsBuilder {
   private _volume: number = 1.0;
@@ -52,7 +52,7 @@ export class HMSAudioTrackSettingsBuilder {
   }
 }
 
-export class HMSAudioTrackSettings implements IAnalyticsPropertiesProvider {
+export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalyticsPropertiesProvider {
   readonly volume: number;
   readonly codec: HMSAudioCodec;
   readonly maxBitrate: number;

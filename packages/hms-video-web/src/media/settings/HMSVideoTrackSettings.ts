@@ -1,18 +1,5 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSVideoCodec } from '../codec';
-
-export class HMSVideoResolution {
-  readonly width: number;
-  readonly height: number;
-
-  constructor(width: number, height: number) {
-    if (width <= 0) throw Error('Height should be >= 1');
-    if (height <= 0) throw Error('Height should be >= 1');
-
-    this.width = width;
-    this.height = height;
-  }
-}
+import { HMSVideoTrackSettings as IHMSVideoTrackSettings, HMSVideoCodec } from '../../interfaces';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width: number = 320;
@@ -80,7 +67,7 @@ export class HMSVideoTrackSettingsBuilder {
   }
 }
 
-export class HMSVideoTrackSettings implements IAnalyticsPropertiesProvider {
+export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalyticsPropertiesProvider {
   readonly width: number;
   readonly height: number;
   readonly codec: HMSVideoCodec;
