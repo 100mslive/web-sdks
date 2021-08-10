@@ -3,13 +3,12 @@ import { HMSRole } from '../../interfaces/role';
 import { Track } from '../../signal/ISignal';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
-import Message from './HMSMessage';
 import { RoleChangeRequestParams } from '../../interfaces/role-change-request';
 
 export type HMSNotifications =
   | Peer
   | PeerList
-  | Message
+  | MessageNotification
   | TrackStateNotification
   | SpeakerList
   | PolicyParams
@@ -113,6 +112,35 @@ export class SpeakerList {
   }
 }
 
+export interface MessageNotification {
+  peer: {
+    peer_id: string;
+    info: {
+      name: string;
+      data: any;
+      user_id: string;
+    };
+  };
+  roles?: string[];
+  peer_id?: string;
+  private: boolean;
+  timestamp: number;
+  info: MessageNotificationInfo;
+}
+
+export interface SendMessage {
+  info: MessageNotificationInfo;
+  roles?: string[];
+  peer_id?: string;
+}
+
+export interface MessageNotificationInfo {
+  sender: string;
+  message: any;
+  type: string;
+  time?: string;
+}
+
 export const getNotification = (method: HMSNotificationMethod, params: any) => {
   switch (method) {
     case HMSNotificationMethod.PEER_JOIN:
@@ -122,7 +150,7 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     case HMSNotificationMethod.PEER_LIST:
       return new PeerList(params);
     case HMSNotificationMethod.BROADCAST:
-      return new Message(params.info);
+      return params as MessageNotification;
     case HMSNotificationMethod.ACTIVE_SPEAKERS:
       return new SpeakerList(params['speaker-list']);
     case HMSNotificationMethod.ROLE_CHANGE:

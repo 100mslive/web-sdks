@@ -1,4 +1,4 @@
-import { HMSAudioCodec, HMSConfig, HMSVideoCodec } from '../interfaces';
+import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessage, HMSMessageInput } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -19,7 +19,7 @@ import {
 import { HMSException } from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings';
 import HMSRoom from './models/HMSRoom';
-import { HMSLocalPeer, HMSRemotePeer } from './models/peer';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import Message from './models/HMSMessage';
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import {
@@ -331,8 +331,80 @@ export class HMSSdk implements HMSInterface {
     return this.audioOutput;
   }
 
-  sendMessage(type: string, message: string, receiver?: string) {
-    const hmsMessage = new Message({ sender: this.localPeer!.peerId, type, message, receiver });
+  sendMessage({ type, message, recipientPeers, recipientRoles }: HMSMessageInput) {
+    if (typeof message === 'string' && message.trim() === '') {
+      HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
+      return;
+    }
+    if (!recipientPeers?.length && !recipientRoles?.length) {
+      /**
+       * No recipient broadcast to all
+       */
+      return this.sendMessageInternal({ message, type });
+    }
+    return this.sendMultipleRecepientsMessage({ message, type, recipientRoles, recipientPeers });
+  }
+
+  private sendMultipleRecepientsMessage({
+    message,
+    type,
+    recipientPeers,
+    recipientRoles,
+  }: HMSMessageInput): HMSMessage | void {
+    const roles: HMSRole[] = [];
+    const peers: HMSPeer[] = [];
+
+    /**
+     * Add all valid roles from store to roles
+     */
+    const knownRoles = this.store.getKnownRoles();
+    recipientRoles?.forEach((role) => {
+      const storeRole = knownRoles[role];
+      storeRole && roles.push(storeRole);
+    });
+
+    /**
+     * Add all valid peers from store to peers
+     */
+    recipientPeers?.forEach((peer) => {
+      const storePeer = this.store.getPeerById(peer);
+      storePeer && peers.push(storePeer);
+    });
+
+    if (roles.length === 0 && peers.length === 0) {
+      HMSLogger.w(this.TAG, 'sendMessage', 'Invalid recipient - no corresponding peer or role found');
+      return;
+    }
+
+    if (roles.length) {
+      return this.sendMessageInternal({ message, recipientRoles: roles, type });
+    }
+    if (peers.length) {
+      const hmsMessage = new Message({ sender: this.localPeer!, message, recipientPeers: peers, time: new Date() });
+      /**
+       * Right now server only takes in one peer_id hence the loop. But we return message with all peers
+       */
+      peers.forEach((peer) => {
+        this.sendMessageInternal({ message, recipientPeers: [peer], type });
+      });
+      return hmsMessage;
+    }
+  }
+
+  private sendMessageInternal({
+    recipientRoles,
+    recipientPeers,
+    type = 'chat',
+    message,
+  }: Pick<HMSMessage, 'message' | 'recipientPeers' | 'recipientRoles' | 'type'>) {
+    const hmsMessage = new Message({
+      sender: this.localPeer!,
+      type,
+      message,
+      recipientPeers,
+      recipientRoles,
+      time: new Date(),
+    });
     HMSLogger.d(this.TAG, 'Sending Message:: ', hmsMessage);
     this.transport!.sendMessage(hmsMessage);
     return hmsMessage;

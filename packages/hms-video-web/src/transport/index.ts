@@ -21,7 +21,6 @@ import {
 import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
-import { HMSMessage } from '../interfaces';
 import { TrackState } from '../sdk/models/HMSNotifications';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
@@ -40,6 +39,7 @@ import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
+import Message from '../sdk/models/HMSMessage';
 
 const TAG = '[HMSTransport]:';
 
@@ -447,7 +447,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  sendMessage(message: HMSMessage) {
+  sendMessage(message: Message) {
     this.signal.broadcast(message);
   }
 

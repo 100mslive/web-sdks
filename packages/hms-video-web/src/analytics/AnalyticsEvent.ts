@@ -1,3 +1,4 @@
+import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 
 interface AnalyticsEventInit {
@@ -7,7 +8,14 @@ interface AnalyticsEventInit {
   properties?: Record<string, any>;
   timestamp?: number;
 }
-export default class AnalyticsEvent {
+
+interface SignalEventParams {
+  name: string;
+  info: any;
+  timestamp: number;
+}
+
+export default class AnalyticsEvent implements ISignalParamsProvider<SignalEventParams> {
   name: string;
   level: AnalyticsEventLevel;
   includesPII: boolean;
@@ -22,7 +30,7 @@ export default class AnalyticsEvent {
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
   }
 
-  toParams() {
+  toSignalParams() {
     return {
       name: this.name,
       info: { ...this.properties, timestamp: this.timestamp },

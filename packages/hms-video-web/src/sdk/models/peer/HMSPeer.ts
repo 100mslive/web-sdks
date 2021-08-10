@@ -8,7 +8,7 @@ export type HMSPeerInit = {
   isLocal: boolean;
   customerUserId?: string;
   customerDescription?: string;
-  role: HMSRole;
+  role?: HMSRole;
 };
 
 export class HMSPeer implements IHMSPeer {

@@ -5,11 +5,11 @@ import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { HMSSignalMethod, JsonRpcRequest } from './models';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
-import { HMSMessage } from '../../interfaces/message';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../../interfaces/role-change-request';
+import Message from '../../sdk/models/HMSMessage';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -175,8 +175,8 @@ export default class JsonRpcSignal implements ISignal {
     this.notify(HMSSignalMethod.TRACK_UPDATE, { version: '1.0', tracks: Object.fromEntries(tracks) });
   }
 
-  broadcast(message: HMSMessage) {
-    this.notify(HMSSignalMethod.BROADCAST, { version: '1.0', info: message });
+  broadcast(message: Message) {
+    this.notify(HMSSignalMethod.BROADCAST, { version: '1.0', ...message.toSignalParams() });
   }
 
   recordStart() {}
@@ -191,7 +191,7 @@ export default class JsonRpcSignal implements ISignal {
     if (!this.isConnected) {
       throw Error(`${this.TAG} not connected. Could not send event ${event}`);
     }
-    this.notify(HMSSignalMethod.ANALYTICS, event.toParams());
+    this.notify(HMSSignalMethod.ANALYTICS, event.toSignalParams());
   }
 
   ping(timeout: number): Promise<number> {

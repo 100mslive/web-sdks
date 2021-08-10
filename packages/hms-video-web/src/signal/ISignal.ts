@@ -1,5 +1,6 @@
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
+import { HMSMessage } from '../interfaces';
 import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../interfaces/role-change-request';
 
 export interface Track {
@@ -31,7 +32,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   trackUpdate(tracks: Map<string, Track>): void;
 
-  broadcast(info: any): void;
+  broadcast(message: HMSMessage): void;
 
   recordStart(): void;
 

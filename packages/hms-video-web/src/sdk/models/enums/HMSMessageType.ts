@@ -2,17 +2,3 @@
 export enum HMSMessageType {
   CHAT = 'chat',
 }
-
-export const getMessageType = (type: string) => {
-  // Default type is CHAT
-  if (!type) {
-    return HMSMessageType.CHAT;
-  }
-
-  switch (type) {
-    case 'chat':
-      return HMSMessageType.CHAT;
-    default:
-      throw Error(`Unsupported message type=${type} received`);
-  }
-};

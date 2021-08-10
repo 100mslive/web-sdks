@@ -11,6 +11,7 @@ import {
   TrackState,
   PolicyParams,
   SpeakerList,
+  MessageNotification,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
 import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
@@ -84,7 +85,7 @@ export default class NotificationManager {
         break;
 
       case HMSNotificationMethod.BROADCAST:
-        this.handleBroadcast(notification as Message);
+        this.handleBroadcast(notification as MessageNotification);
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
@@ -451,9 +452,51 @@ export default class NotificationManager {
     }
   }
 
-  private handleBroadcast(message: Message) {
-    HMSLogger.d(this.TAG, `Received Message:: `, message);
-    this.listener?.onMessageReceived(message);
+  private handleBroadcast(messageNotification: MessageNotification) {
+    const notifPeer = messageNotification.peer;
+    const notifMessage = messageNotification.info;
+    const notifRoles = messageNotification.roles;
+    const notifPeerID = messageNotification.peer_id;
+    // If sender peerId is available in store, use that peer.
+    let sender = this.store.getPeerById(notifPeer.peer_id);
+    // If not available in store, use peer data from received broadcast message from Biz
+    if (!sender) {
+      sender = new HMSPeer({
+        peerId: notifPeer.peer_id,
+        name: notifPeer.info.name,
+        isLocal: false,
+        customerUserId: notifPeer.info.user_id,
+        customerDescription: notifPeer.info.data,
+      });
+    }
+
+    const recipientPeers = [];
+    const recipientRoles = [];
+
+    if (notifRoles?.length) {
+      const knownRoles = this.store.getKnownRoles();
+      for (const role of notifRoles) {
+        if (knownRoles[role]) {
+          recipientRoles.push(knownRoles[role]);
+        }
+      }
+    }
+
+    if (notifPeerID) {
+      const peer = this.store.getPeerById(notifPeerID);
+      peer && recipientPeers.push(peer);
+    }
+
+    const hmsMessage = new Message({
+      ...notifMessage,
+      sender,
+      recipientRoles,
+      recipientPeers,
+      time: new Date(messageNotification.timestamp),
+      isPrivate: messageNotification.private,
+    });
+    HMSLogger.d(this.TAG, `Received Message:: `, hmsMessage);
+    this.listener?.onMessageReceived(hmsMessage);
   }
 
   private getPeerTrackByTrackId(peerId: string, trackId: string) {
