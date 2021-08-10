@@ -8,5 +8,5 @@
   "excludeTags": ["privateremarks"],
   "hideBreadcrumbs": true,
   "hideInPageTOC": true,
-  "publicPath": "/api-references/javascript/v2/"
+  "publicPath": "/api-reference/javascript/v2/"
 }
