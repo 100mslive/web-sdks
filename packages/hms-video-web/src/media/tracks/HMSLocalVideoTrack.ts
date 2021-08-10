@@ -5,7 +5,7 @@ import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 
-function generateHasPropertyChanged(newSettings: HMSVideoTrackSettings, oldSettings: HMSVideoTrackSettings) {
+function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
     prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced',
   ) {
@@ -61,7 +61,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * maxFramerate - can be used to control the capture framerate
    * @param settings
    */
-  async setSettings(settings: HMSVideoTrackSettings) {
+  async setSettings(settings: Partial<HMSVideoTrackSettings>) {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
     const stream = this.stream as HMSLocalStream;

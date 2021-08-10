@@ -6,7 +6,7 @@ import { ITrackAudioLevelUpdate, TrackAudioLevelMonitor } from '../../utils/trac
 import { EventReceiver } from '../../utils/typed-event-emitter';
 import HMSLogger from '../../utils/logger';
 
-function generateHasPropertyChanged(newSettings: HMSAudioTrackSettings, oldSettings: HMSAudioTrackSettings) {
+function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
     return prop in newSettings && newSettings[prop] !== oldSettings[prop];
   };
@@ -49,7 +49,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
-  async setSettings(settings: HMSAudioTrackSettings) {
+  async setSettings(settings: Partial<HMSAudioTrackSettings>) {
     const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
     const stream = this.stream as HMSLocalStream;
