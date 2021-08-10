@@ -49,7 +49,6 @@ import {
   mergeNewTracksInDraft,
   areArraysEqual,
 } from './sdkUtils/storeMergeUtils';
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from './sdkTypes';
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 
@@ -692,9 +691,9 @@ export class HMSSDKActions implements IHMSActions {
     trackID: string,
     settings: Partial<sdkTypes.HMSVideoTrackSettings>,
   ) {
-    const track = this.hmsSDKTracks[trackID];
+    const track = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
     if (track) {
-      await (track as SDKHMSLocalVideoTrack).setSettings(settings as HMSVideoTrackSettings);
+      await track.setSettings(settings);
     } else {
       this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }
@@ -704,9 +703,9 @@ export class HMSSDKActions implements IHMSActions {
     trackID: string,
     settings: Partial<sdkTypes.HMSAudioTrackSettings>,
   ) {
-    const track = this.hmsSDKTracks[trackID];
+    const track = this.hmsSDKTracks[trackID] as SDKHMSLocalAudioTrack;
     if (track) {
-      await (track as SDKHMSLocalAudioTrack).setSettings(settings as HMSAudioTrackSettings);
+      await track.setSettings(settings);
     } else {
       this.logPossibleInconsistency(`local track ${trackID} not present, unable to set settings`);
     }

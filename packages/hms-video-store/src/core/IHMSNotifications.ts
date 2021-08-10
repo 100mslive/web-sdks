@@ -2,6 +2,9 @@ import { HMSNotification } from './schema/notification';
 
 type NotificationCallback = (notification: HMSNotification) => void;
 
+/**
+ * @category Core
+ */
 export interface IHMSNotifications {
   /**
    * you can subscribe to notifications for new message, peer add etc. using this function.

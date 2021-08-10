@@ -20,7 +20,8 @@
     "lint:fix": "tsdx lint --fix",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "docs": "rm -rf ./docs && typedoc && rm -f ./docs/README.md && mkdir ./docs/home &&mv ./docs/modules.md ./docs/home/content.md && ./bin/typedoc-mdx && npx prettier --write './docs/**/*'"
   },
   "husky": {
     "hooks": {
@@ -53,17 +54,19 @@
     "zustand": "3.5.7"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.0.123",
+    "@100mslive/hms-video": "^0.0.130",
     "events": "^3.3.0"
   },
   "devDependencies": {
-    "@100mslive/hms-video": "0.0.123",
+    "@100mslive/hms-video": "0.0.130",
     "@size-limit/preset-small-lib": "^4.11.0",
     "events": "^3.3.0",
     "husky": "^6.0.0",
     "size-limit": "^4.11.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
+    "typedoc": "^0.21.5",
+    "typedoc-plugin-markdown": "^3.10.4",
     "typescript": "^4.3.2"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",

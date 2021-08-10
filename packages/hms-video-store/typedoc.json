@@ -1,0 +1,12 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "docs",
+  "disableSources": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeTags": ["privateremarks"],
+  "hideBreadcrumbs": true,
+  "hideInPageTOC": true,
+  "publicPath": "/api-references/javascript/v2/"
+}

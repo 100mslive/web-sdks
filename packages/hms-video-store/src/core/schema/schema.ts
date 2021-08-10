@@ -8,8 +8,8 @@ import { HMSRoleChangeStoreRequest } from './role';
 import { HMSException } from './error';
 
 /*
-Defines the schema of the central store. UI Components are aware of the presence
-of this central store. This is the global state - the single source of immutable truth.
+ * Defines the schema of the central store. UI Components are aware of the presence
+ * of this central store. This is the global state - the single source of immutable truth.
  */
 export interface HMSStore {
   room: HMSRoom;
@@ -27,6 +27,9 @@ export interface HMSStore {
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
+/**
+ * @internal
+ */
 export const createDefaultStoreState = (): HMSStore => {
   return {
     room: {

@@ -89,6 +89,9 @@ export class HMSReactiveStore {
     return { onNotification: this.notifications.onNotification };
   }
 
+  /**
+   * @internal
+   */
   static createNewHMSStore(): IHMSStore {
     const hmsStore = create<HMSStore>(() => createDefaultStoreState());
     // make set state immutable, by passing functions through immer
@@ -107,6 +110,9 @@ export class HMSReactiveStore {
     return { ...hmsStore, namedSetState };
   }
 
+  /**
+   * @internal
+   */
   static makeStoreTriggerOnSubscribe(store: IHMSStore) {
     const prevSubscribe = store.subscribe;
     store.subscribe = <StateSlice>(

@@ -1,14 +1,13 @@
-export { IHMSStore, IHMSStoreReadOnly } from './IHMSStore';
-export { IHMSActions } from './IHMSActions';
-export { IHMSNotifications } from './IHMSNotifications';
-export { HMSSDKActions } from './hmsSDKStore/HMSSDKActions';
+export { IHMSStore, IHMSStoreReadOnly as HMSStoreWrapper } from './IHMSStore';
+export { IHMSActions as HMSActions } from './IHMSActions';
+export { IHMSNotifications as HMSNotifications } from './IHMSNotifications';
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';
 export {
+  HMSConfig,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
-  HMSConfig,
   HMSSimulcastLayer,
   SimulcastLayerDefinition,
   DeviceMap,

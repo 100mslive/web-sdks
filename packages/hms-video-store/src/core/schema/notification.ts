@@ -2,28 +2,29 @@ export interface HMSNotification {
   id: number;
   type: string;
   message: string;
-  data?: any; // HMSPeer | HMSTrack | HMSMessage | HMSException
-  severity?: HMSSeverity;
+  /**
+   * HMSPeer | HMSTrack | HMSMessage | HMSException
+   */
+  data?: any;
+  severity?: HMSNotificationSeverity;
 }
-export class HMSNotificationSeverity {
-  static INFO = 'info';
-  static ERROR = 'error';
-  static CRITICAL = 'critical';
+export enum HMSNotificationSeverity {
+  INFO = 'info',
+  ERROR = 'error',
+  CRITICAL = 'critical',
 }
 
-export type HMSSeverity = 'info' | 'error' | 'critical';
-
-export class HMSNotificationTypes {
-  static PEER_JOINED = 'PEER_JOINED';
-  static PEER_LEFT = 'PEER_LEFT';
-  static NEW_MESSAGE = 'NEW_MESSAGE';
-  static ERROR = 'ERROR';
-  static RECONNECTING = 'RECONNECTING';
-  static RECONNECTED = 'RECONNECTED';
-  static TRACK_ADDED = 'TRACK_ADDED';
-  static TRACK_REMOVED = 'TRACK_REMOVED';
-  static TRACK_MUTED = 'TRACK_MUTED';
-  static TRACK_UNMUTED = 'TRACK_UNMUTED';
-  static ROLE_CHANGE_REQUEST = 'ROLE_CHANGE_REQUEST';
-  static ROLE_UPDATED = 'ROLE_UPDATED';
+export enum HMSNotificationTypes {
+  PEER_JOINED = 'PEER_JOINED',
+  PEER_LEFT = 'PEER_LEFT',
+  NEW_MESSAGE = 'NEW_MESSAGE',
+  ERROR = 'ERROR',
+  RECONNECTING = 'RECONNECTING',
+  RECONNECTED = 'RECONNECTED',
+  TRACK_ADDED = 'TRACK_ADDED',
+  TRACK_REMOVED = 'TRACK_REMOVED',
+  TRACK_MUTED = 'TRACK_MUTED',
+  TRACK_UNMUTED = 'TRACK_UNMUTED',
+  ROLE_CHANGE_REQUEST = 'ROLE_CHANGE_REQUEST',
+  ROLE_UPDATED = 'ROLE_UPDATED',
 }

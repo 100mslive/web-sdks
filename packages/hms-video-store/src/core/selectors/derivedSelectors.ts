@@ -41,6 +41,9 @@ const selectRoleChangeStoreRequest = (store: HMSStore) => {
   return store.roleChangeRequests[0] || null;
 };
 
+/**
+ * Select the role change request received for your local peer.
+ */
 export const selectRoleChangeRequest = createSelector(
   [selectRoleChangeStoreRequest, selectPeersMap, selectRolesMap],
   (request, peersMap, rolesMap): HMSRoleChangeRequest | null => {
@@ -56,7 +59,7 @@ export const selectRoleChangeRequest = createSelector(
 );
 
 /**
- * use this selector to know what streams is the local peer allowed to publish from video, audio and screenshare.
+ * Select what streams is the local peer allowed to publish from video, audio and screenshare.
  */
 export const selectIsAllowedToPublish = createSelector(
   [selectLocalPeerRole],

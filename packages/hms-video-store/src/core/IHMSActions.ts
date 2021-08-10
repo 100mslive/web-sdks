@@ -1,10 +1,9 @@
 import {
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
   HMSConfig,
   HMSSimulcastLayer,
+  HMSAudioTrackSettings,
+  HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
-
 import { HMSTrackSource } from './schema';
 import { HMSVideoPlugin } from '@100mslive/hms-video';
 import { HMSRoleChangeRequest } from './selectors';
@@ -22,6 +21,8 @@ import { HMSRoleChangeRequest } from './selectors';
  * @remarks
  * There is a one to one mapping between an instance of this class and a 100ms room,
  * in case you're creating multiple rooms please create new instance per room.
+ *
+ * @category Core
  */
 export interface IHMSActions {
   preview(config: HMSConfig): Promise<void>;
