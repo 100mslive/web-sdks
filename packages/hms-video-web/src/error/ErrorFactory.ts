@@ -275,5 +275,9 @@ export const ErrorFactory = {
     ProcessingFailed(action: HMSAction, description: string = '') {
       return new HMSException(7003, 'ProcessingFailed', action, 'Plugin processing failed', description);
     },
+
+    AddAlreadyInProgress(action: HMSAction, description: string = '') {
+      return new HMSException(7004, 'AddAlreadyInProgress', action, 'Plugin add already in progress', description);
+    },
   },
 };

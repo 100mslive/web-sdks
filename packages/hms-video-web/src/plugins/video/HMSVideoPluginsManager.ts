@@ -47,12 +47,14 @@ export class HMSVideoPluginsManager {
   private outputCanvas?: CanvasElement;
   private outputTrack?: MediaStreamTrack;
   private analytics: VideoPluginsAnalytics;
+  private pluginAddInProgress: boolean = false;
 
   constructor(track: HMSLocalVideoTrack) {
     this.hmsTrack = track;
     this.plugins = [];
     this.pluginsMap = {};
     this.analytics = new VideoPluginsAnalytics();
+    this.pluginAddInProgress = false;
   }
 
   getPlugins(): string[] {
@@ -65,6 +67,33 @@ export class HMSVideoPluginsManager {
    * @param pluginFrameRate
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number) {
+    if (this.pluginAddInProgress) {
+      const name = plugin.getName?.();
+      if (!name || name === '') {
+        HMSLogger.w('no name provided by the plugin');
+        return;
+      }
+      let err = ErrorFactory.VideoPluginErrors.AddAlreadyInProgress(
+        HMSAction.VIDEO_PLUGINS,
+        'Add Plugin is already in Progress',
+      );
+      this.analytics.failure(name, err);
+      HMSLogger.w("can't add another plugin when previous add is in progress");
+      return;
+    }
+
+    this.pluginAddInProgress = true;
+
+    try {
+      await this.addPluginInternal(plugin, pluginFrameRate);
+    } catch (err) {
+      throw err;
+    } finally {
+      this.pluginAddInProgress = false;
+    }
+  }
+
+  private async addPluginInternal(plugin: HMSVideoPlugin, pluginFrameRate?: number) {
     const name = plugin.getName?.();
     if (!name || name === '') {
       HMSLogger.w('no name provided by the plugin');
@@ -86,7 +115,8 @@ export class HMSVideoPluginsManager {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
     }
 
-    //Adding Analytics TODO: shall we make this configurable
+    //Adding Analytics
+    //TODO: shall we make this configurable
     this.analytics.added(name);
 
     if (!plugin.isSupported()) {
@@ -95,7 +125,6 @@ export class HMSVideoPluginsManager {
       HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
       return;
     }
-
     try {
       await this.analytics.initWithTime(name, async () => await plugin.init());
       this.plugins.push(name);
