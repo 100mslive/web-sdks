@@ -235,9 +235,9 @@ Send a plain text message to all the other participants in the room.
 
 #### Parameters
 
-| Name      | Type     | Description                 |
-| :-------- | :------- | :-------------------------- |
-| `message` | `string` | string message to broadcast |
+| Name      | Type                                                                                     | Description                 |
+| :-------- | :--------------------------------------------------------------------------------------- | :-------------------------- |
+| `message` | `string` \| [`HMSMessageInput`](/api-reference/javascript/v2/interfaces/HMSMessageInput) | string message to broadcast |
 
 #### Returns
 
@@ -370,6 +370,25 @@ set the quality of the selected videoTrack
 
 ---
 
+### setRemoteTrackEnabled
+
+▸ **setRemoteTrackEnabled**(`forRemoteTrackID`, `enabled`): `void`
+Change track state a remote peer's track
+This can be used to mute/unmute a remote peer's track
+
+#### Parameters
+
+| Name               | Type                   | Description                                                                                    |
+| :----------------- | :--------------------- | :--------------------------------------------------------------------------------------------- |
+| `forRemoteTrackID` | `string` \| `string`[] | The track ID or array of track IDs for which you want to change the state                      |
+| `enabled`          | `boolean`              | `true` if you wish to enable(unmute) the track, `false` if you wish to disable(mute) the track |
+
+#### Returns
+
+`void`
+
+---
+
 ### setScreenShareEnabled
 
 ▸ **setScreenShareEnabled**(`enabled`): `Promise`<`void`\>
@@ -432,7 +451,7 @@ Method to be called with some UI interaction after autoplay error is received
 #### Returns
 
 `Promise`<`void`\>
-Audio
+unblockAudio
 
 ▸ **unblockAudio**(): `Promise`<`void`\>
 

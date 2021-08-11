@@ -285,3 +285,8 @@ export const selectIsAllowedToSubscribe = createSelector([selectLocalPeerRole], 
   }
   return role.subscribeParams.subscribeToRoles.length > 0;
 });
+
+/**
+ * Select the permissions which determine what actions the local peer can do.
+ */
+export const selectPermissions = createSelector(selectLocalPeerRole, role => role?.permissions);

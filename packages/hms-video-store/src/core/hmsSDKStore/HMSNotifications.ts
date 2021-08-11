@@ -12,6 +12,7 @@ import {
   HMSException,
   HMSMessage,
   HMSTrack,
+  HMSChangeTrackStateRequest,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -94,13 +95,22 @@ export class HMSNotifications implements IHMSNotifications {
     this.emitEvent(notification);
   }
 
+  sendChangeTrackStateRequest(request: HMSChangeTrackStateRequest) {
+    const notification = this.createNotification(
+      HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+      request,
+      HMSNotificationSeverity.INFO,
+    );
+    this.emitEvent(notification);
+  }
+
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
 
   private createNotification(
     type: string,
-    data?: HMSPeer | HMSTrack | HMSMessage | HMSException | null,
+    data?: HMSPeer | HMSTrack | HMSMessage | HMSException | HMSChangeTrackStateRequest | null,
     severity?: HMSNotificationSeverity,
     message: string = '',
   ): HMSNotification {

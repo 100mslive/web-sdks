@@ -6,19 +6,20 @@ import {
   HMSTrackUpdate,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
-  IHMSPeer,
+  HMSPeer,
   HMSRoom,
   HMSMessage,
   HMSConfig,
   HMSSpeaker,
   HMSRole,
-  IHMSRemotePeer,
+  HMSLocalPeer,
+  HMSRemotePeer,
   SimulcastLayerDefinition,
   DeviceMap,
 } from '@100mslive/hms-video';
 
 export {
-  IHMSPeer as HMSPeer,
+  HMSPeer,
   HMSRoom,
   HMSMessage,
   HMSSpeaker,
@@ -31,7 +32,8 @@ export {
   HMSPeerUpdate,
   HMSTrackUpdate,
   HMSRole,
-  IHMSRemotePeer as HMSRemotePeer, // TODO: sdk should import HMSRemotePeer
+  HMSLocalPeer,
+  HMSRemotePeer,
   SimulcastLayerDefinition,
   DeviceMap,
 };

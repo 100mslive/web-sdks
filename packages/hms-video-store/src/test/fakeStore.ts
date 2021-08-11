@@ -150,7 +150,7 @@ export const makeFakeStore = (): HMSStore => {
         name: ROLES.HOST,
         publishParams: { allowed: ['audio', 'video', 'screen'] },
         subscribeParams: { subscribeToRoles: [ROLES.HOST, ROLES.SPEAKER] },
-        permissions: { changeRole: true },
+        permissions: { changeRole: true, askToUnmute: true },
       } as HMSRole,
       viewer: {
         name: ROLES.VIEWER,

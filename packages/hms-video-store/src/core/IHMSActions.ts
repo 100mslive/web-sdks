@@ -184,6 +184,14 @@ export interface IHMSActions {
   rejectChangeRole(request: HMSRoleChangeRequest): void;
 
   /**
+   * Change track state a remote peer's track
+   * This can be used to mute/unmute a remote peer's track
+   * @param forRemoteTrackID The track ID or array of track IDs for which you want to change the state
+   * @param enabled `true` if you wish to enable(unmute) the track, `false` if you wish to disable(mute) the track
+   */
+  setRemoteTrackEnabled(forRemoteTrackID: string | string[], enabled: boolean): void;
+
+  /**
    * Method to be called with some UI interaction after autoplay error is received
    */
   unblockAudio: () => Promise<void>;

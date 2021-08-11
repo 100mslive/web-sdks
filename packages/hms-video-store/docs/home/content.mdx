@@ -23,11 +23,13 @@ title: 100mslive/hms-video-store
 ## Other Interfaces
 
 - [HMSAudioTrackSettings](/api-reference/javascript/v2/interfaces/HMSAudioTrackSettings)
+- [HMSChangeTrackStateRequest](/api-reference/javascript/v2/interfaces/HMSChangeTrackStateRequest)
 - [HMSComponentsStyle](/api-reference/javascript/v2/interfaces/HMSComponentsStyle)
 - [HMSConfig](/api-reference/javascript/v2/interfaces/HMSConfig)
 - [HMSException](/api-reference/javascript/v2/interfaces/HMSException)
 - [HMSMediaSettings](/api-reference/javascript/v2/interfaces/HMSMediaSettings)
 - [HMSMessage](/api-reference/javascript/v2/interfaces/HMSMessage)
+- [HMSMessageInput](/api-reference/javascript/v2/interfaces/HMSMessageInput)
 - [HMSNotification](/api-reference/javascript/v2/interfaces/HMSNotification)
 - [HMSPeer](/api-reference/javascript/v2/interfaces/HMSPeer)
 - [HMSPeerWithMuteStatus](/api-reference/javascript/v2/interfaces/HMSPeerWithMuteStatus)
@@ -203,6 +205,13 @@ Select an array of peers(remote peers and your local peer) present in the room.
 
 ---
 
+### selectPermissions
+
+• `Const` **selectPermissions**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| { `askToUnmute`: `boolean` ; `changeRole`: `boolean` ; `endRoom`: `boolean` ; `muteAll`: `boolean` ; `muteSelective`: `boolean` ; `removeOthers`: `boolean` ; `stopPresentation`: `boolean` }, `fn`\>
+Select the permissions which determine what actions the local peer can do.
+
+---
+
 ### selectRemotePeers
 
 • `Const` **selectRemotePeers**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSPeer`](/api-reference/javascript/v2/interfaces/HMSPeer)[], `fn`\>
@@ -214,6 +223,12 @@ Select remote peers(other users you're connected with via the internet) present 
 
 • `Const` **selectRoleChangeRequest**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `null` \| [`HMSRoleChangeRequest`](/api-reference/javascript/v2/interfaces/HMSRoleChangeRequest), `fn`\>
 Select the role change request received for your local peer.
+
+---
+
+### selectRoomStarted
+
+• `Const` **selectRoomStarted**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `boolean`, `fn`\>
 
 ---
 
@@ -359,6 +374,38 @@ type DeviceMap = {
   videoInput: InputDeviceInfo[];
 }
 ```
+
+---
+
+### selectHMSMessagesByPeerID
+
+▸ `Const` **selectHMSMessagesByPeerID**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+---
+
+### selectHMSMessagesByRole
+
+▸ `Const` **selectHMSMessagesByRole**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
 
 ---
 
@@ -856,7 +903,7 @@ Select the primary video track of a peer given a peer ID.
 #### Returns
 
 `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
-id?`):`StoreSelector`<`undefined`\| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
+ideoTrackByPeerID\*\*(`id?`): `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
 
 Select the primary video track of a peer given a peer ID.
 

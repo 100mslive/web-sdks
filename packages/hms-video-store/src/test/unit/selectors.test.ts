@@ -1,5 +1,6 @@
 import {
   auxiliaryAudio,
+  hostRole,
   localAudio,
   localPeer,
   localSpeaker,
@@ -50,6 +51,7 @@ import {
   selectTrackAudioByID,
   selectSimulcastLayerByTrack,
   selectDegradedTracks,
+  selectPermissions,
   selectRoomState,
   HMSRoomState,
   selectIsInPreview,
@@ -108,6 +110,8 @@ describe('test primitive selectors', () => {
     expect(selectIsLocalScreenShared(fakeStore)).toBe(false);
     localVideo.displayEnabled = true;
     expect(selectIsLocalVideoDisplayEnabled(fakeStore)).toBe(true);
+    expect(selectPermissions(fakeStore)?.muteSelective).toBe(hostRole.permissions.muteSelective);
+    expect(selectPermissions(fakeStore)?.askToUnmute).toBe(hostRole.permissions.askToUnmute);
   });
 });
 

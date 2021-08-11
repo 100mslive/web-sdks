@@ -24,6 +24,7 @@ import {
   selectLocalPeer,
   selectPeerByID,
   HMSRoleChangeRequest,
+  selectTrackByID,
   selectRoomStarted,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -34,11 +35,13 @@ import {
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
+  HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSVideoTrack as SDKHMSVideoTrack,
   HMSException as SDKHMSException,
   DeviceMap,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSSimulcastLayer,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
@@ -50,6 +53,7 @@ import {
 } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
+import { getStoreTrackIDfromSDKTrack, isRemoteTrack } from './sdkUtils/sdkUtils';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -361,6 +365,21 @@ export class HMSSDKActions implements IHMSActions {
     this.removeRoleChangeRequest(request);
   }
 
+  setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
+    if (typeof trackID === 'string') {
+      const track = this.hmsSDKTracks[trackID];
+      if (track && isRemoteTrack(track)) {
+        this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
+      } else {
+        this.logPossibleInconsistency(
+          `No remote track with ID ${trackID} found for change track state`,
+        );
+      }
+    } else if (Array.isArray(trackID)) {
+      trackID.forEach(id => this.setRemoteTrackEnabled(id, enabled));
+    }
+  }
+
   private resetState() {
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
@@ -382,6 +401,7 @@ export class HMSSDKActions implements IHMSActions {
       onRoleChangeRequest: this.onRoleChangeRequest.bind(this),
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -576,29 +596,6 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
-    this.setState(draftStore => {
-      const hmsPeer = draftStore.peers[sdkPeer.peerId];
-      const draftTracks = draftStore.tracks;
-      // find and remove the exact track from hmsPeer
-      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.audioTrack)) {
-        delete hmsPeer.audioTrack;
-      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.videoTrack)) {
-        delete hmsPeer.videoTrack;
-      } else {
-        const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(sdkTrack.trackId);
-        if (
-          auxiliaryIndex > -1 &&
-          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.auxiliaryTracks[auxiliaryIndex])
-        ) {
-          hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
-        }
-      }
-      delete draftTracks[sdkTrack.trackId];
-      delete this.hmsSDKTracks[sdkTrack.trackId];
-    }, 'trackRemoved');
-  }
-
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
@@ -615,7 +612,7 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   /*
-  note: speakers array contain the value only for peers who have audioLevel != 0
+   * Note: speakers array contain the value only for peers who have audioLevel != 0
    */
   protected onAudioLevelUpdate(sdkSpeakers: sdkTypes.HMSSpeaker[]) {
     this.setState(store => {
@@ -643,6 +640,32 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
     }, 'audioLevel');
+  }
+
+  protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
+    const track = this.store.getState(selectTrackByID(getStoreTrackIDfromSDKTrack(request.track)));
+
+    if (!requestedBy) {
+      return this.logPossibleInconsistency(
+        `Not found peer who requested track state change, ${request.requestedBy}`,
+      );
+    }
+    if (!track) {
+      return this.logPossibleInconsistency(
+        `Not found track for which track state change was requested, ${request.track}`,
+      );
+    }
+
+    if (!request.enabled) {
+      this.syncRoomState('changeTrackStateRequest');
+    }
+
+    this.hmsNotifications.sendChangeTrackStateRequest({
+      requestedBy,
+      track,
+      enabled: request.enabled,
+    });
   }
 
   protected onReconnected() {
@@ -684,6 +707,29 @@ export class HMSSDKActions implements IHMSActions {
     // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);
+  }
+
+  private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
+    this.setState(draftStore => {
+      const hmsPeer = draftStore.peers[sdkPeer.peerId];
+      const draftTracks = draftStore.tracks;
+      // find and remove the exact track from hmsPeer
+      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.audioTrack)) {
+        delete hmsPeer.audioTrack;
+      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.videoTrack)) {
+        delete hmsPeer.videoTrack;
+      } else {
+        const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(sdkTrack.trackId);
+        if (
+          auxiliaryIndex > -1 &&
+          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.auxiliaryTracks[auxiliaryIndex])
+        ) {
+          hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
+        }
+      }
+      delete draftTracks[sdkTrack.trackId];
+      delete this.hmsSDKTracks[sdkTrack.trackId];
+    }, 'trackRemoved');
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {

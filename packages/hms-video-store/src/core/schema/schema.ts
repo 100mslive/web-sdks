@@ -4,7 +4,7 @@ import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
 import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
-import { HMSRoleChangeStoreRequest } from './role';
+import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
 
 /*
