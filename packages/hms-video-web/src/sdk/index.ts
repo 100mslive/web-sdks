@@ -72,6 +72,7 @@ export class HMSSdk implements HMSInterface {
   private transportState: TransportState = TransportState.Disconnected;
   private isReconnecting: boolean = false;
   private roleChangeManager?: RoleChangeManager;
+  private isPreviewInProgress: boolean = false;
 
   private initStoreAndManagers() {
     if (this.isInitialised) {
@@ -158,6 +159,11 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
+    if (this.isPreviewInProgress) {
+      return;
+    }
+
+    this.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.errorListener = listener;
     this.deviceChangeListener = listener;
@@ -188,6 +194,7 @@ export class HMSSdk implements HMSInterface {
       await this.initDeviceManagers();
       listener.onPreview(this.store.getRoom(), tracks);
       this.deviceChangeListener?.onDeviceChange?.(this.deviceManager.getDevices());
+      this.isPreviewInProgress = false;
     };
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
@@ -203,6 +210,7 @@ export class HMSSdk implements HMSInterface {
       );
     } catch (ex) {
       this.errorListener?.onError(ex);
+      this.isPreviewInProgress = false;
     }
   }
 
@@ -226,6 +234,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
+    if (this.isPreviewInProgress) {
+      throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
+    }
+
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
