@@ -12,7 +12,7 @@ export default interface HMS {
   leave(): Promise<void>;
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
-  sendMessage(message: HMSMessageInput): HMSMessage | void;
+  sendMessage(message: string | HMSMessageInput): HMSMessage | void;
   startScreenShare(onStop: () => void): Promise<void>;
   stopScreenShare(): Promise<void>;
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;

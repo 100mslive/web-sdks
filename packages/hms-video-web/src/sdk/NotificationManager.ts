@@ -493,7 +493,6 @@ export default class NotificationManager {
       recipientRoles,
       recipientPeers,
       time: new Date(messageNotification.timestamp),
-      isPrivate: messageNotification.private,
     });
     HMSLogger.d(this.TAG, `Received Message:: `, hmsMessage);
     this.listener?.onMessageReceived(hmsMessage);

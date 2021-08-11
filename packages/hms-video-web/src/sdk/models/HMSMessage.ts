@@ -11,16 +11,14 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   message: any;
   time: Date;
   type: string;
-  isPrivate?: boolean;
 
-  constructor({ sender, message, type = 'chat', recipientPeers, recipientRoles, time, isPrivate }: HMSMessage) {
+  constructor({ sender, message, type = 'chat', recipientPeers, recipientRoles, time }: HMSMessage) {
     this.sender = sender;
     this.message = message;
     this.type = type;
     this.recipientPeers = recipientPeers;
     this.recipientRoles = recipientRoles;
     this.time = time;
-    this.isPrivate = isPrivate;
   }
 
   toSignalParams() {

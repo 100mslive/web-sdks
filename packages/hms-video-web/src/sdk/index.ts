@@ -343,11 +343,15 @@ export class HMSSdk implements HMSInterface {
     return this.audioOutput;
   }
 
-  sendMessage({ type, message, recipientPeers, recipientRoles }: HMSMessageInput) {
-    if (typeof message === 'string' && message.trim() === '') {
+  sendMessage(messageInput: string | HMSMessageInput) {
+    if (typeof messageInput === 'string' && messageInput.trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
       return;
     }
+    if (typeof messageInput === 'string') {
+      return this.sendMessageInternal({ message: messageInput });
+    }
+    const { type, message, recipientPeers, recipientRoles } = messageInput;
     if (!recipientPeers?.length && !recipientRoles?.length) {
       /**
        * No recipient broadcast to all
