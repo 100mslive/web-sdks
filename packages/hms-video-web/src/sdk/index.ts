@@ -345,7 +345,8 @@ export class HMSSdk implements HMSInterface {
   }
 
   sendMessage(messageInput: string | HMSMessageInput) {
-    if (typeof messageInput === 'string' && messageInput.trim() === '') {
+    // \u200b is to handle zero width non breaking space
+    if (typeof messageInput === 'string' && messageInput.replace(/\u200b/g, ' ').trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
       return;
     }
@@ -353,6 +354,10 @@ export class HMSSdk implements HMSInterface {
       return this.sendMessageInternal({ message: messageInput });
     }
     const { type, message, recipientPeers, recipientRoles } = messageInput;
+    if (message.replace(/\u200b/g, ' ').trim() === '') {
+      HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
+      return;
+    }
     if (!recipientPeers?.length && !recipientRoles?.length) {
       /**
        * No recipient broadcast to all

@@ -488,7 +488,6 @@ export default class NotificationManager {
     const notifPeer = messageNotification.peer;
     const notifMessage = messageNotification.info;
     const notifRoles = messageNotification.roles;
-    const notifPeerID = messageNotification.peer_id;
     // If sender peerId is available in store, use that peer.
     let sender = this.store.getPeerById(notifPeer.peer_id);
     // If not available in store, use peer data from received broadcast message from Biz
@@ -514,8 +513,8 @@ export default class NotificationManager {
       }
     }
 
-    if (notifPeerID) {
-      const peer = this.store.getPeerById(notifPeerID);
+    if (messageNotification.private) {
+      const peer = this.store.getLocalPeer();
       peer && recipientPeers.push(peer);
     }
 

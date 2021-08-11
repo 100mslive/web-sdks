@@ -138,7 +138,6 @@ export interface MessageNotification {
     };
   };
   roles?: string[];
-  peer_id?: string;
   private: boolean;
   timestamp: number;
   info: MessageNotificationInfo;
