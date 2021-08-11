@@ -94,6 +94,8 @@ export const makeFakeStore = (): HMSStore => {
         '201': {
           id: '201',
           sender: '1',
+          senderName: 'test1',
+          senderRole: ROLES.HOST,
           read: true,
           type: HMSMessageType.CHAT,
           message: 'hello!',
@@ -102,13 +104,27 @@ export const makeFakeStore = (): HMSStore => {
         '202': {
           id: '202',
           sender: '2',
+          senderName: 'test2',
+          senderRole: ROLES.HOST,
+          recipientPeers: ['1'],
           read: false,
           type: HMSMessageType.CHAT,
           message: 'hi!',
           time: new Date(),
         },
+        '203': {
+          id: '203',
+          sender: '2',
+          senderName: 'test2',
+          senderRole: ROLES.HOST,
+          recipientRoles: [ROLES.HOST],
+          read: true,
+          type: HMSMessageType.CHAT,
+          message: 'hi!',
+          time: new Date(),
+        },
       },
-      allIDs: ['201', '202'],
+      allIDs: ['201', '202', '203'],
     },
     speakers: {
       '102': {
@@ -158,6 +174,7 @@ export const makeFakeStore = (): HMSStore => {
     },
     errors: [],
   };
+
   localPeer = fakeStore.peers['1'];
   remotePeer = fakeStore.peers['2'];
   peerScreenSharing = fakeStore.peers['2'];

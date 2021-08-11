@@ -87,7 +87,12 @@ export class SDKToHMS {
     sdkMessage: sdkTypes.HMSMessage,
   ): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender,
+      sender: sdkMessage.sender.peerId,
+      senderName: sdkMessage.sender.name,
+      senderRole: sdkMessage.sender.role?.name,
+      senderUserId: sdkMessage.sender.customerUserId,
+      recipientPeers: sdkMessage.recipientPeers?.map(peer => peer.peerId),
+      recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,
       type: sdkMessage.type,
       message: sdkMessage.message,

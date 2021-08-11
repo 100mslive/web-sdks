@@ -4,7 +4,7 @@ import {
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
-import { HMSTrackSource } from './schema';
+import { HMSMessageInput, HMSTrackSource } from './schema';
 import { HMSVideoPlugin } from '@100mslive/hms-video';
 import { HMSRoleChangeRequest } from './selectors';
 
@@ -70,7 +70,7 @@ export interface IHMSActions {
    * Send a plain text message to all the other participants in the room.
    * @param message - string message to broadcast
    */
-  sendMessage(message: string): void;
+  sendMessage(message: string | HMSMessageInput): void;
 
   /**
    * If just readStatus argument is passed, the function will set read flag of every message

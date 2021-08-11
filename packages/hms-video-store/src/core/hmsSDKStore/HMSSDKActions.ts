@@ -2,7 +2,7 @@ import {
   createDefaultStoreState,
   HMSMediaSettings,
   HMSMessage,
-  HMSMessageType,
+  HMSMessageInput,
   HMSPeer,
   HMSPeerID,
   HMSRoomState,
@@ -20,12 +20,11 @@ import {
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
   selectHMSMessagesCount,
-  selectPeerNameByID,
-  selectIsConnectedToRoom,
   selectIsLocalVideoDisplayEnabled,
   selectLocalPeer,
   selectPeerByID,
   HMSRoleChangeRequest,
+  selectRoomStarted,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -154,8 +153,8 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async leave() {
-    const isRoomConnected = this.store.getState(selectIsConnectedToRoom);
-    if (!isRoomConnected) {
+    const hasRoomStarted = this.store.getState(selectRoomStarted);
+    if (!hasRoomStarted) {
       this.logPossibleInconsistency('room leave is called when no room is connected');
       return; // ignore
     }
@@ -250,12 +249,22 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  sendMessage(message: string) {
-    if (message.trim() === '') {
-      HMSLogger.d('Ignoring empty message send');
+  sendMessage(messageInput: string | HMSMessageInput) {
+    if (typeof messageInput === 'string' && messageInput.trim() === '') {
+      HMSLogger.w('sendMessage', 'Ignoring empty message send');
       return;
     }
-    const sdkMessage = this.sdk.sendMessage(HMSMessageType.CHAT, message);
+    let sdkMessage;
+    if (typeof messageInput === 'string') {
+      sdkMessage = this.sdk.sendMessage(messageInput);
+    } else {
+      const { message, type = 'chat', recipientPeers, recipientRoles } = messageInput;
+      sdkMessage = this.sdk.sendMessage({ type, message, recipientRoles, recipientPeers });
+    }
+    if (!sdkMessage) {
+      HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
+      return;
+    }
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = 'You';
@@ -593,7 +602,6 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    hmsMessage.senderName = this.store.getState(selectPeerNameByID(hmsMessage.sender));
     this.onHMSMessage(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }

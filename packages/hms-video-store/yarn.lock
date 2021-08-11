@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-video@0.0.130":
-  version "0.0.130"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.0.130.tgz#654d985b2a660b26bbade142c94d1878885b9950"
-  integrity sha512-cNxhGtoRWX+3rRp556SpmnWi8Orc1yQfdC6KqdF1zbRyodJIheXEwXvVIwN1Oju/+nagYKOXVh0FCleODznHYg==
+"@100mslive/hms-video@0.0.133":
+  version "0.0.133"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.0.133.tgz#b480ef2ea182423b3fcd516f7bcb23fb755b8b65"
+  integrity sha512-ZaNit4VSh7jtTNPKKRXsUWoHMUCGJ6ICthorJ3Hf1Vh1mtqWRHzKzC975ukztxAta2D1/NrW5XJbmGbOOVnCqA==
   dependencies:
     events "^3.3.0"
     sdp-transform "^2.14.1"

@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
-import { selectPeersMap, selectTracksMap } from './selectors';
-import { HMSPeerID, HMSStore, HMSTrack, HMSTrackID } from '../schema';
+import { selectHMSMessages, selectLocalPeerID, selectPeersMap, selectTracksMap } from './selectors';
+import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled, isVideo } from './selectorUtils';
 import { HMSLogger } from '../../common/ui-logger';
 
@@ -26,6 +26,7 @@ function byIDCurry<T>(selector: byIDSelector<T>): (id?: string) => StoreSelector
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
+const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -262,3 +263,48 @@ export const selectSimulcastLayerByTrack = byIDCurry((store: HMSStore, trackID?:
   }
   return undefined;
 });
+
+const selectMessagesByPeerID = createSelector(
+  [selectHMSMessages, selectLocalPeerID, selectPeerID],
+  (messages, localPeerID, peerID) => {
+    if (!peerID) {
+      return undefined;
+    }
+    return messages.filter(message => {
+      // Broadcast message
+      if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+        return false;
+      }
+      // if localPeer or peerID is not a sender remove this
+      if (![localPeerID, peerID].includes(message.sender)) {
+        return false;
+      }
+      // at this point we know the sender is one of local or passed in peer, check the recipient side
+      return message.recipientPeers?.some(recipient => {
+        return [localPeerID, peerID].includes(recipient);
+      });
+    });
+  },
+);
+
+const selectMessagesByRole = createSelector(
+  [selectHMSMessages, selectRoleName],
+  (messages, roleName) => {
+    if (!roleName) {
+      return undefined;
+    }
+    return messages.filter(message => {
+      // Broadcast message
+      if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+        return false;
+      }
+      const iSent = message.recipientRoles?.includes(roleName);
+      const roleSent = message.senderRole === roleName;
+      return iSent || roleSent;
+    });
+  },
+);
+
+export const selectHMSMessagesByPeerID = byIDCurry(selectMessagesByPeerID);
+
+export const selectHMSMessagesByRole = byIDCurry(selectMessagesByRole);

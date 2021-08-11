@@ -50,6 +50,12 @@ import {
   selectTrackAudioByID,
   selectSimulcastLayerByTrack,
   selectDegradedTracks,
+  selectRoomState,
+  HMSRoomState,
+  selectIsInPreview,
+  selectRoomStarted,
+  selectHMSMessagesByPeerID,
+  selectHMSMessagesByRole,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -71,6 +77,18 @@ describe('test primitive selectors', () => {
   test('selectIsConnectedToRoom true', () => {
     fakeStore.room.isConnected = true;
     expect(selectIsConnectedToRoom(fakeStore)).toBe(true);
+  });
+
+  test('room state disconnected', () => {
+    expect(selectRoomState(fakeStore)).toBe(HMSRoomState.Disconnected);
+    expect(selectIsInPreview(fakeStore)).toBe(false);
+    expect(selectRoomStarted(fakeStore)).toBe(false);
+  });
+
+  test('room state preview/connected', () => {
+    fakeStore.room.roomState = HMSRoomState.Preview;
+    expect(selectIsInPreview(fakeStore)).toBe(true);
+    expect(selectRoomStarted(fakeStore)).toBe(true);
   });
 
   test('selectLocal things', () => {
@@ -101,11 +119,12 @@ describe('secondary selectors', () => {
   });
 
   test('messages related', () => {
-    expect(selectHMSMessagesCount(fakeStore)).toBe(2);
+    expect(selectHMSMessagesCount(fakeStore)).toBe(3);
     expect(selectUnreadHMSMessagesCount(fakeStore)).toBe(1);
     expect(selectHMSMessages(fakeStore)).toEqual([
       fakeStore.messages.byID['201'],
       fakeStore.messages.byID['202'],
+      fakeStore.messages.byID['203'],
     ]);
   });
 
@@ -190,6 +209,18 @@ describe('by ID selectors', () => {
     const peer = selectRemotePeers(fakeStore);
     const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore);
     expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
+  });
+
+  test('selectHMSMessagesByPeerID', () => {
+    const peer = selectRemotePeers(fakeStore);
+    const messages = selectHMSMessagesByPeerID(peer[0].id)(fakeStore);
+    expect(messages).toEqual([fakeStore.messages.byID['202']]);
+  });
+
+  test('selectHMSMessagesByRole', () => {
+    const peer = selectRemotePeers(fakeStore);
+    const messages = selectHMSMessagesByRole(peer[0].roleName)(fakeStore);
+    expect(messages).toEqual([fakeStore.messages.byID['202'], fakeStore.messages.byID['203']]);
   });
 });
 

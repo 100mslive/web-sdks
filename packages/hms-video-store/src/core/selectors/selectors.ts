@@ -245,8 +245,13 @@ export const selectRoomState = createSelector([selectRoom], room => room && room
  * Select a boolean denoting whether the room is in Preview state.
  */
 export const selectIsInPreview = createSelector(
-  [selectRoom],
-  room => !!room && room.roomState === HMSRoomState.Preview,
+  selectRoomState,
+  roomState => roomState === HMSRoomState.Preview,
+);
+
+export const selectRoomStarted = createSelector(
+  selectRoom,
+  room => room.roomState !== HMSRoomState.Disconnected,
 );
 
 /**
