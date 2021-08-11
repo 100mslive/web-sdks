@@ -19,6 +19,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   settings: HMSAudioTrackSettings;
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
+  /**
+   * @internal
+   */
+  initiallyPublishedTrackId: string;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -29,6 +34,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     stream.tracks.push(this);
 
     this.settings = settings;
+    this.initiallyPublishedTrackId = this.trackId;
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {

@@ -12,6 +12,7 @@ export enum HMSNotificationMethod {
   UNSUPPORTED,
   POLICY_CHANGE,
   ROLE_CHANGE_REQUEST,
+  TRACK_UPDATE_REQUEST,
   PEER_UPDATE,
 }
 
@@ -37,6 +38,8 @@ export const getNotificationMethod = (method: string) => {
       return HMSNotificationMethod.POLICY_CHANGE;
     case 'on-role-change-request':
       return HMSNotificationMethod.ROLE_CHANGE_REQUEST;
+    case 'on-track-update-request':
+      return HMSNotificationMethod.TRACK_UPDATE_REQUEST;
     case 'on-peer-update':
       return HMSNotificationMethod.PEER_UPDATE;
     default:

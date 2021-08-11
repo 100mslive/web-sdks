@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import { ISignal, Track } from '../ISignal';
+import { ISignal } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
+import { Track, AcceptRoleChangeParams, RequestForRoleChangeParams, TrackUpdateRequestParams } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { HMSSignalMethod, JsonRpcRequest } from './models';
 import { PromiseCallbacks } from '../../utils/promise';
@@ -8,7 +9,6 @@ import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
-import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../../interfaces/role-change-request';
 import Message from '../../sdk/models/HMSMessage';
 
 export default class JsonRpcSignal implements ISignal {
@@ -214,6 +214,10 @@ export default class JsonRpcSignal implements ISignal {
 
   acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
     this.notify(HMSSignalMethod.ROLE_CHANGE, params);
+  }
+
+  requestTrackStateChange(params: TrackUpdateRequestParams) {
+    this.notify(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
   }
 
   private onCloseHandler(event: CloseEvent) {

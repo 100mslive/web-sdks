@@ -1,10 +1,7 @@
 import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
-import { HMSRemoteVideoTrack, HMSRemoteAudioTrack } from '../tracks';
 import HMSLogger from '../../utils/logger';
 import { HMSSimulcastLayer } from '../../interfaces';
-
-export type HMSRemoteTrack = HMSRemoteAudioTrack | HMSRemoteVideoTrack;
 
 /** @internal */
 export default class HMSRemoteStream extends HMSMediaStream {

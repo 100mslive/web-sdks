@@ -6,6 +6,7 @@ import { HMSMessage } from './message';
 import { HMSRoom } from './room';
 import { HMSSpeaker } from './speaker';
 import { DeviceChangeListener } from './device-change-listener';
+import { HMSChangeTrackStateRequest } from './change-track-state';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -55,4 +56,5 @@ export default interface HMSUpdateListener extends DeviceChangeListener {
   onReconnected(): void;
   onRoleChangeRequest(request: HMSRoleChangeRequest): void;
   onRoleUpdate(newRole: string): void;
+  onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
 }

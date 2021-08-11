@@ -1,7 +1,7 @@
-import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSRole } from './role';
+import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../../media/tracks';
+import { HMSRole } from '../role';
 
-export interface IHMSPeer {
+export interface HMSPeer {
   peerId: string;
   name: string;
   isLocal: boolean;

@@ -1,12 +1,12 @@
 export * from './update-listener';
-export * from './hms-peer';
+export * from './peer';
 export * from './room';
 export * from './config';
 export * from './message';
 export * from './speaker';
 export * from './role';
-export * from './hms-remote-peer';
 export * from './role-change-request';
+export * from './change-track-state';
 export { HMSSimulcastLayer, SimulcastLayerDefinition, SimulcastLayer, SimulcastDimensions } from './simulcast-layers';
 export { DeviceMap } from './HMSDeviceManager';
 export * from './track-settings';

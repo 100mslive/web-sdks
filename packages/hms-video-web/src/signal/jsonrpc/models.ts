@@ -18,4 +18,5 @@ export enum HMSSignalMethod {
   PING = 'ping',
   ROLE_CHANGE_REQUEST = 'role-change-request',
   ROLE_CHANGE = 'role-change',
+  TRACK_UPDATE_REQUEST = 'track-update-request',
 }

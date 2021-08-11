@@ -1,9 +1,8 @@
 import { HMSTrack } from '../../media/tracks/HMSTrack';
 import { HMSRole } from '../../interfaces/role';
-import { Track } from '../../signal/ISignal';
+import { Track } from '../../signal/interfaces';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from './enums/HMSNotificationMethod';
-import { RoleChangeRequestParams } from '../../interfaces/role-change-request';
 
 export type HMSNotifications =
   | Peer
@@ -13,6 +12,7 @@ export type HMSNotifications =
   | SpeakerList
   | PolicyParams
   | RoleChangeRequestParams
+  | TrackUpdateRequestNotification
   | undefined;
 
 export interface TrackStateNotification {
@@ -112,6 +112,22 @@ export class SpeakerList {
   }
 }
 
+/**
+ * Represents the role change request received from the server
+ */
+export interface RoleChangeRequestParams {
+  requested_by: string;
+  role: string;
+  token: string;
+}
+
+export interface TrackUpdateRequestNotification {
+  requested_by: string;
+  track_id: string;
+  stream_id: string;
+  mute: boolean;
+}
+
 export interface MessageNotification {
   peer: {
     peer_id: string;
@@ -162,6 +178,8 @@ export const getNotification = (method: HMSNotificationMethod, params: any) => {
     case HMSNotificationMethod.POLICY_CHANGE:
       return params;
     case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
+      return params;
+    case HMSNotificationMethod.TRACK_UPDATE_REQUEST:
       return params;
     case HMSNotificationMethod.PEER_UPDATE:
       return new Peer(params);

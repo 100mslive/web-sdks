@@ -9,7 +9,7 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
-import { HMSTrack } from '../media/tracks';
+import { HMSTrack, HMSLocalTrack } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import { PromiseCallbacks } from '../utils/promise';
 import {
@@ -18,7 +18,7 @@ import {
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
-import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
 import { TrackState } from '../sdk/models/HMSNotifications';
@@ -39,6 +39,7 @@ import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
+import { TrackUpdateRequestParams } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
 
 const TAG = '[HMSTransport]:';
@@ -422,7 +423,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async publish(tracks: Array<HMSTrack>): Promise<void> {
+  async publish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
       try {
         await this.publishTrack(track);
@@ -479,9 +480,15 @@ export default class HMSTransport implements ITransport {
     this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
   }
 
-  private async publishTrack(track: HMSTrack): Promise<void> {
+  changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
+    this.signal.requestTrackStateChange(trackUpdateRequest);
+  }
+
+  private async publishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
     this.trackStates.set(track.trackId, new TrackState(track));
+    track.initiallyPublishedTrackId = track.trackId;
+
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },

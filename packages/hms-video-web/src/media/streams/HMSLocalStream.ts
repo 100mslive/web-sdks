@@ -1,7 +1,5 @@
 import HMSMediaStream from './HMSMediaStream';
-import { HMSTrack } from '../tracks';
-import { HMSLocalAudioTrack } from '../tracks';
-import { HMSLocalVideoTrack } from '../tracks';
+import { HMSLocalTrack, HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
 import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
@@ -11,8 +9,6 @@ import { IFetchAVTrackOptions } from '../../transport/ITransport';
 import { SimulcastLayer } from '../../interfaces';
 
 const TAG = 'HMSLocalStream';
-
-export type HMSLocalTrack = HMSLocalAudioTrack | HMSLocalVideoTrack;
 
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */

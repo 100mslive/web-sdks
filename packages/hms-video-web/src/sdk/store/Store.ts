@@ -9,8 +9,8 @@ import {
   HMSTrackType,
   HMSTrackSource,
   HMSRemoteVideoTrack,
+  HMSLocalTrack,
 } from '../../media/tracks';
-import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 import {
   SimulcastLayer,
   SimulcastLayers,

@@ -1,4 +1,4 @@
-import { IHMSPeer } from '../../../interfaces/hms-peer';
+import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
 

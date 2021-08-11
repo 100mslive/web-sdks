@@ -15,13 +15,15 @@ import {
   HMSLocalAudioTrack,
   HMSLocalVideoTrack,
   HMSRemoteVideoTrack,
+  HMSLocalTrack,
+  HMSRemoteTrack,
 } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import { HMSTrackSettingsBuilder } from '../media/settings';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import Message from './models/HMSMessage';
-import HMSLocalStream, { HMSLocalTrack } from '../media/streams/HMSLocalStream';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import {
   HMSVideoTrackSettings,
   HMSVideoTrackSettingsBuilder,
@@ -39,7 +41,6 @@ import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
 import { IStore, Store } from './store';
-import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import { HMSRoleChangeRequest } from '../interfaces';
 import { HMSRole } from '../interfaces';
@@ -540,6 +541,32 @@ export class HMSSdk implements HMSInterface {
 
   getRoles(): HMSRole[] {
     return Object.values(this.store.getKnownRoles());
+  }
+
+  changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean) {
+    if (forRemoteTrack.enabled === enabled) {
+      HMSLogger.w(this.TAG, `Aborting change track state, track already has enabled - ${enabled}`, forRemoteTrack);
+      return;
+    }
+
+    if (!this.store.getTrackById(forRemoteTrack.trackId)) {
+      HMSLogger.w(this.TAG, 'No track found for change track state', forRemoteTrack);
+      return;
+    }
+
+    const peer = this.store.getPeerByTrackId(forRemoteTrack.trackId);
+
+    if (!peer) {
+      HMSLogger.w(this.TAG, 'No peer found for change track state', forRemoteTrack);
+      return;
+    }
+
+    this.transport?.changeTrackState({
+      requested_for: peer.peerId,
+      track_id: forRemoteTrack.trackId,
+      stream_id: forRemoteTrack.stream.id,
+      mute: !enabled,
+    });
   }
 
   private async publish(initialSettings: InitialSettings, publishConfig?: PublishConfig) {

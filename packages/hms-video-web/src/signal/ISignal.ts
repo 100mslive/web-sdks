@@ -1,16 +1,7 @@
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
-import { AcceptRoleChangeParams, RequestForRoleChangeParams } from '../interfaces/role-change-request';
-
-export interface Track {
-  mute: boolean;
-  type: 'audio' | 'video';
-  source: 'regular' | 'screen' | 'plugin';
-  description: string;
-  track_id: string;
-  stream_id: string;
-}
+import { Track, AcceptRoleChangeParams, RequestForRoleChangeParams, TrackUpdateRequestParams } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
@@ -45,6 +36,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   requestRoleChange(params: RequestForRoleChangeParams): void;
 
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): void;
+
+  requestTrackStateChange(params: TrackUpdateRequestParams): void;
 
   close(): Promise<void>;
 }

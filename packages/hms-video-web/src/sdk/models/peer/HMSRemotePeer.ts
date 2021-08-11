@@ -1,10 +1,10 @@
+import { HMSRemotePeer as IHMSRemotePeer } from '../../../interfaces/peer';
 import { HMSPeer, HMSPeerInit } from './HMSPeer';
-import { HMSRemoteTrack } from '../../../media/streams/HMSRemoteStream';
-import { HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../../../media/tracks';
+import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack } from '../../../media/tracks';
 
 type HMSRemotePeerInit = Omit<HMSPeerInit, 'isLocal'>;
 
-export class HMSRemotePeer extends HMSPeer {
+export class HMSRemotePeer extends HMSPeer implements IHMSRemotePeer {
   isLocal: boolean = false;
   audioTrack?: HMSRemoteAudioTrack;
   videoTrack?: HMSRemoteVideoTrack;

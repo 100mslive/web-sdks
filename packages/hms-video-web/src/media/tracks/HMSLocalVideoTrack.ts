@@ -19,6 +19,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
 
+  /**
+   * @internal
+   */
+  initiallyPublishedTrackId: string;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -29,6 +34,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     stream.tracks.push(this);
     this.settings = settings;
     this.pluginsManager = new HMSVideoPluginsManager(this);
+    this.initiallyPublishedTrackId = this.trackId;
   }
 
   /**

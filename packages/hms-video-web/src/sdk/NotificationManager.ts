@@ -1,6 +1,5 @@
 import EventEmitter from 'events';
-import { HMSRemoteTrack } from '../media/streams/HMSRemoteStream';
-import { HMSTrackType, HMSAudioTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSTrackType, HMSAudioTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack, HMSRemoteTrack } from '../media/tracks';
 import { HMSPeer, HMSRemotePeer } from './models/peer';
 import { HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
 import {
@@ -11,6 +10,8 @@ import {
   TrackState,
   PolicyParams,
   SpeakerList,
+  TrackUpdateRequestNotification,
+  RoleChangeRequestParams,
   MessageNotification,
 } from './models/HMSNotifications';
 import HMSLogger from '../utils/logger';
@@ -18,7 +19,7 @@ import HMSUpdateListener, { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate } fr
 import { HMSSpeaker } from '../interfaces/speaker';
 import Message from './models/HMSMessage';
 import { IStore } from './store/IStore';
-import { HMSRoleChangeRequest, RoleChangeRequestParams } from '../interfaces/role-change-request';
+import { HMSRoleChangeRequest } from '../interfaces/role-change-request';
 
 interface TrackStateEntry {
   peerId: string;
@@ -94,6 +95,10 @@ export default class NotificationManager {
 
       case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
         this.handleRoleChangeRequest(notification as RoleChangeRequestParams);
+        break;
+
+      case HMSNotificationMethod.TRACK_UPDATE_REQUEST:
+        this.handleTrackUpdateRequest(notification as TrackUpdateRequestNotification);
         break;
 
       case HMSNotificationMethod.PEER_UPDATE:
@@ -449,6 +454,33 @@ export default class NotificationManager {
       this.listener?.onPeerUpdate(HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, dominantSpeakerPeer!);
     } else {
       this.listener?.onPeerUpdate(HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER, null);
+    }
+  }
+
+  private handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
+    const { requested_by, track_id, mute } = trackUpdateRequest;
+    const peer = this.store.getPeerById(requested_by);
+    const track = this.store.getLocalPeerTracks().find((track) => track.initiallyPublishedTrackId === track_id);
+
+    if (!peer || peer.isLocal || !track) {
+      return;
+    }
+
+    HMSLogger.d(this.TAG, 'onChangeTrackStateRequest', trackUpdateRequest);
+    const sendNotification = () => {
+      this.listener.onChangeTrackStateRequest({ requestedBy: peer as HMSRemotePeer, track, enabled: !mute });
+    };
+
+    if (mute) {
+      /**
+       * Directly mute track when request arrives
+       */
+      track.setEnabled(!mute).then(sendNotification);
+    } else {
+      /**
+       * Notify UI to unmute for requesting consent
+       */
+      sendNotification();
     }
   }
 

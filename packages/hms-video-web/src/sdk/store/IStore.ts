@@ -1,7 +1,13 @@
 import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
-import { HMSTrack, HMSAudioTrack, HMSVideoTrack, HMSTrackSource, HMSRemoteVideoTrack } from '../../media/tracks';
+import {
+  HMSTrack,
+  HMSAudioTrack,
+  HMSVideoTrack,
+  HMSTrackSource,
+  HMSRemoteVideoTrack,
+  HMSLocalTrack,
+} from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSLocalTrack } from '../../media/streams/HMSLocalStream';
 import {
   SimulcastLayer,
   SimulcastDimensions,

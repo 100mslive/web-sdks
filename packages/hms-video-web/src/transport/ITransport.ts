@@ -1,6 +1,5 @@
-import { HMSTrack } from '../media/tracks';
+import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
-import { HMSLocalTrack } from '../media/streams/HMSLocalStream';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
 export type IFetchTrackOptions = boolean | 'empty';
@@ -14,9 +13,9 @@ export default interface ITransport {
 
   leave(): Promise<void>;
 
-  publish(tracks: Array<HMSTrack>): Promise<void>;
+  publish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
-  unpublish(tracks: Array<HMSTrack>): Promise<void>;
+  unpublish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
   getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>>;
   getEmptyLocalTracks(
