@@ -1,6 +1,6 @@
 import { HMSPeer } from '../sdk/models/peer';
 
-export interface HMSPeerLeaveRequest {
+export interface HMSLeaveRoomRequest {
   requestedBy: HMSPeer;
   reason: string;
   roomEnded: boolean;

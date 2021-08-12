@@ -46,7 +46,7 @@ import { HMSRoleChangeRequest } from '../interfaces';
 import { HMSRole } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
-import { HMSPeerLeaveRequest } from '../interfaces/peer-leave-request';
+import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -165,16 +165,14 @@ export class HMSSdk implements HMSInterface {
   };
 
   private handlePeerLeaveRequest = (message: PeerLeaveRequestNotification) => {
-    if (message.room_end) {
-      const peer = this.store.getPeerById(message.requested_by);
-      const request: HMSPeerLeaveRequest = {
-        roomEnded: message.room_end,
-        reason: message.reason,
-        requestedBy: peer!,
-      };
-      this.listener?.onRemovedFromRoom(request);
-      this.leave();
-    }
+    const peer = this.store.getPeerById(message.requested_by);
+    const request: HMSLeaveRoomRequest = {
+      roomEnded: message.room_end,
+      reason: message.reason,
+      requestedBy: peer!,
+    };
+    this.listener?.onRemovedFromRoom(request);
+    this.leave();
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
