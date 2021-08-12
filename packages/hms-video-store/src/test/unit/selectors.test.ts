@@ -56,8 +56,12 @@ import {
   HMSRoomState,
   selectIsInPreview,
   selectRoomStarted,
-  selectHMSMessagesByPeerID,
-  selectHMSMessagesByRole,
+  selectMessagesByPeerID,
+  selectMessagesByRole,
+  selectBroadcastMessages,
+  selectMessagesUnreadCountByRole,
+  selectBroadcastMessagesUnreadCount,
+  selectMessagesUnreadCountByPeerID,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -215,16 +219,38 @@ describe('by ID selectors', () => {
     expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
   });
 
-  test('selectHMSMessagesByPeerID', () => {
+  test('selectMessagesByPeerID', () => {
     const peer = selectRemotePeers(fakeStore);
-    const messages = selectHMSMessagesByPeerID(peer[0].id)(fakeStore);
+    const messages = selectMessagesByPeerID(peer[0].id)(fakeStore);
     expect(messages).toEqual([fakeStore.messages.byID['202']]);
   });
 
-  test('selectHMSMessagesByRole', () => {
+  test('selectMessagesByRole', () => {
     const peer = selectRemotePeers(fakeStore);
-    const messages = selectHMSMessagesByRole(peer[0].roleName)(fakeStore);
+    const messages = selectMessagesByRole(peer[0].roleName)(fakeStore);
     expect(messages).toEqual([fakeStore.messages.byID['202'], fakeStore.messages.byID['203']]);
+  });
+
+  test('selectBroadcastMessages', () => {
+    const messages = selectBroadcastMessages(fakeStore);
+    expect(messages).toEqual([fakeStore.messages.byID['201']]);
+  });
+
+  test('selectMessagesUnreadCountByRole', () => {
+    const peer = selectRemotePeers(fakeStore);
+    const messages = selectMessagesUnreadCountByRole(peer[0].roleName)(fakeStore);
+    expect(messages).toBe(1);
+  });
+
+  test('selectMessagesUnreadCountByPeerID', () => {
+    const peer = selectRemotePeers(fakeStore);
+    const messages = selectMessagesUnreadCountByPeerID(peer[0].id)(fakeStore);
+    expect(messages).toBe(1);
+  });
+
+  test('selectBroadcastMessagesUnreadCount', () => {
+    const messages = selectBroadcastMessagesUnreadCount(fakeStore);
+    expect(messages).toBe(0);
   });
 });
 

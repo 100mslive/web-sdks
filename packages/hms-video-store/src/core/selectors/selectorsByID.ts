@@ -264,7 +264,7 @@ export const selectSimulcastLayerByTrack = byIDCurry((store: HMSStore, trackID?:
   return undefined;
 });
 
-const selectMessagesByPeerID = createSelector(
+const selectMessagesByPeerIDInternal = createSelector(
   [selectHMSMessages, selectLocalPeerID, selectPeerID],
   (messages, localPeerID, peerID) => {
     if (!peerID) {
@@ -287,7 +287,7 @@ const selectMessagesByPeerID = createSelector(
   },
 );
 
-const selectMessagesByRole = createSelector(
+const selectMessagesByRoleInternal = createSelector(
   [selectHMSMessages, selectRoleName],
   (messages, roleName) => {
     if (!roleName) {
@@ -305,6 +305,45 @@ const selectMessagesByRole = createSelector(
   },
 );
 
-export const selectHMSMessagesByPeerID = byIDCurry(selectMessagesByPeerID);
+export const selectBroadcastMessages = createSelector(selectHMSMessages, messages => {
+  return messages.filter(message => {
+    if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+      return true;
+    }
+    return false;
+  });
+});
 
-export const selectHMSMessagesByRole = byIDCurry(selectMessagesByRole);
+const selectUnreadMessageCountByRole = createSelector(
+  [selectMessagesByRoleInternal, selectRoleName],
+  messages => {
+    if (!messages) {
+      return 0;
+    }
+    return messages.filter(m => !m.read).length;
+  },
+);
+
+const selectUnreadMessageCountByPeerID = createSelector(
+  [selectMessagesByPeerIDInternal, selectPeerID],
+  messages => {
+    if (!messages) {
+      return 0;
+    }
+    return messages.filter(m => !m.read).length;
+  },
+);
+
+export const selectBroadcastMessagesUnreadCount = createSelector(
+  selectBroadcastMessages,
+  messages => {
+    return messages.filter(m => !m.read).length;
+  },
+);
+
+export const selectMessagesByPeerID = byIDCurry(selectMessagesByPeerIDInternal);
+
+export const selectMessagesByRole = byIDCurry(selectMessagesByRoleInternal);
+
+export const selectMessagesUnreadCountByRole = byIDCurry(selectUnreadMessageCountByRole);
+export const selectMessagesUnreadCountByPeerID = byIDCurry(selectUnreadMessageCountByPeerID);
