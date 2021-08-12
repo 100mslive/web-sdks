@@ -7,7 +7,7 @@ import HMSUpdateListener, { HMSAudioListener, HMSTrackUpdate } from '../interfac
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import decodeJWT from '../utils/jwt';
 import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
-import { getNotification } from './models/HMSNotifications';
+import { getNotification, PeerLeaveRequestNotification } from './models/HMSNotifications';
 import NotificationManager from './NotificationManager';
 import {
   HMSTrackSource,
@@ -46,6 +46,7 @@ import { HMSRoleChangeRequest } from '../interfaces';
 import { HMSRole } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
+import { HMSPeerLeaveRequest } from '../interfaces/peer-leave-request';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -105,6 +106,10 @@ export class HMSSdk implements HMSInterface {
       if (method !== HMSNotificationMethod.ACTIVE_SPEAKERS) {
         HMSLogger.d(this.TAG, 'onNotification: ', message);
       }
+      if (method === HMSNotificationMethod.PEER_LEAVE_REQUEST) {
+        this.handlePeerLeaveRequest(notification as PeerLeaveRequestNotification);
+        return;
+      }
       this.notificationManager.handleNotification(
         method,
         notification,
@@ -157,6 +162,19 @@ export class HMSSdk implements HMSInterface {
 
       this.transportState = state;
     },
+  };
+
+  private handlePeerLeaveRequest = (message: PeerLeaveRequestNotification) => {
+    if (message.room_end) {
+      const peer = this.store.getPeerById(message.requested_by);
+      const request: HMSPeerLeaveRequest = {
+        roomEnded: message.room_end,
+        reason: message.reason,
+        requestedBy: peer!,
+      };
+      this.listener?.onRemovedFromRoom(request);
+      this.leave();
+    }
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
@@ -542,6 +560,19 @@ export class HMSSdk implements HMSInterface {
 
   acceptChangeRole(request: HMSRoleChangeRequest) {
     this.transport?.acceptRoleChange(request);
+  }
+
+  endRoom(lock: boolean, reason: string) {
+    if (!this.localPeer) {
+      HMSLogger.w(this.TAG, 'No local peer present, cannot end room');
+      return;
+    }
+    const permissions = this.localPeer.role?.permissions;
+    if (!permissions || !permissions.endRoom) {
+      HMSLogger.w(this.TAG, 'No permission, cannot end room');
+      return;
+    }
+    this.transport?.endRoom(lock, reason);
   }
 
   getRoles(): HMSRole[] {

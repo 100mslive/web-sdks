@@ -14,6 +14,7 @@ export enum HMSNotificationMethod {
   ROLE_CHANGE_REQUEST,
   TRACK_UPDATE_REQUEST,
   PEER_UPDATE,
+  PEER_LEAVE_REQUEST,
 }
 
 export const getNotificationMethod = (method: string) => {
@@ -40,6 +41,8 @@ export const getNotificationMethod = (method: string) => {
       return HMSNotificationMethod.ROLE_CHANGE_REQUEST;
     case 'on-track-update-request':
       return HMSNotificationMethod.TRACK_UPDATE_REQUEST;
+    case 'on-peer-leave-request':
+      return HMSNotificationMethod.PEER_LEAVE_REQUEST;
     case 'on-peer-update':
       return HMSNotificationMethod.PEER_UPDATE;
     default:

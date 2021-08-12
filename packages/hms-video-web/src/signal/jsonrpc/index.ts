@@ -187,6 +187,10 @@ export default class JsonRpcSignal implements ISignal {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
   }
 
+  endRoom(lock: boolean, reason: string) {
+    this.notify(HMSSignalMethod.END_ROOM, { version: '1.0', params: { lock, reason } });
+  }
+
   sendEvent(event: AnalyticsEvent) {
     if (!this.isConnected) {
       throw Error(`${this.TAG} not connected. Could not send event ${event}`);

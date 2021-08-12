@@ -25,6 +25,8 @@ export default interface HMS {
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): void;
 
+  endRoom(lock: boolean, reason: string): void;
+
   sendMessage(message: string | HMSMessageInput): HMSMessage | void;
   startScreenShare(onStop: () => void): Promise<void>;
   stopScreenShare(): Promise<void>;

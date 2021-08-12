@@ -480,6 +480,10 @@ export default class HMSTransport implements ITransport {
     this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
   }
 
+  endRoom(lock: boolean, reason: string) {
+    this.signal.endRoom(lock, reason);
+  }
+
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     this.signal.requestTrackStateChange(trackUpdateRequest);
   }

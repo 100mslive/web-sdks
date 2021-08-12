@@ -13,6 +13,7 @@ export type HMSNotifications =
   | PolicyParams
   | RoleChangeRequestParams
   | TrackUpdateRequestNotification
+  | PeerLeaveRequestNotification
   | undefined;
 
 export interface TrackStateNotification {
@@ -126,6 +127,12 @@ export interface TrackUpdateRequestNotification {
   track_id: string;
   stream_id: string;
   mute: boolean;
+}
+
+export interface PeerLeaveRequestNotification {
+  requested_by: string;
+  reason: string;
+  room_end: boolean;
 }
 
 export interface MessageNotification {

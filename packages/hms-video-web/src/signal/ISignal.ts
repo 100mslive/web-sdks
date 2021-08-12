@@ -31,6 +31,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   leave(): void;
 
+  endRoom(lock: boolean, reason: string): void;
+
   ping(timeout: number): Promise<number>;
 
   requestRoleChange(params: RequestForRoleChangeParams): void;
