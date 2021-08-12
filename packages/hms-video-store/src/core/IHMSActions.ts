@@ -195,6 +195,11 @@ export interface IHMSActions {
    * Method to be called with some UI interaction after autoplay error is received
    */
   unblockAudio: () => Promise<void>;
+  /**
+   * If you have required permissions, you can end the room. That means everyone will be kicked out.
+   * If lock is passed as true, the room cannot be used further.
+   */
+  endRoom: (lock: boolean, reason: string) => void;
 }
 
 /**

@@ -33,8 +33,19 @@ export class HMSNotifications implements IHMSNotifications {
     };
   };
 
+  sendLeaveRoom(peer: HMSPeer, ended: boolean) {
+    const hmsPeer = this.store.getState(selectPeerByID(peer.id));
+    const notification = this.createNotification(
+      ended ? HMSNotificationTypes.ROOM_ENDED : HMSNotificationTypes.REMOVED_FROM_ROOM,
+      hmsPeer,
+      HMSNotificationSeverity.INFO,
+      `${ended ? `Room ended` : 'Removed from room'} by ${peer.name}`,
+    );
+    this.emitEvent(notification);
+  }
+
   sendPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: HMSPeer | null) {
-    let hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
+    const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
     const notificationType = PEER_NOTIFICATION_TYPES[type];
     if (notificationType) {
       const notification = this.createNotification(

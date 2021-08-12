@@ -26,6 +26,7 @@ import {
   HMSRoleChangeRequest,
   selectTrackByID,
   selectRoomStarted,
+  selectPermissions,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -43,6 +44,7 @@ import {
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSSimulcastLayer,
+  HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -365,6 +367,15 @@ export class HMSSDKActions implements IHMSActions {
     this.removeRoleChangeRequest(request);
   }
 
+  endRoom(lock: boolean, reason: string) {
+    const permissions = this.store.getState(selectPermissions);
+    if (!permissions?.endRoom) {
+      HMSLogger.w('You are not allowed to perform this action - endRoom');
+      return;
+    }
+    this.sdk.endRoom(lock, reason);
+  }
+
   setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
@@ -402,10 +413,16 @@ export class HMSSDKActions implements IHMSActions {
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
+      onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
+  }
+
+  private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
+    const peer = SDKToHMS.convertPeer(request.requestedBy);
+    this.hmsNotifications.sendLeaveRoom(peer as HMSPeer, request.roomEnded);
   }
 
   private onDeviceChange(devices: DeviceMap) {
