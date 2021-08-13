@@ -360,7 +360,23 @@ export class HMSSdk implements HMSInterface {
     return this.audioOutput;
   }
 
-  sendMessage(messageInput: string | HMSMessageInput) {
+  sendMessage(type: string, message: string) {
+    this.sendBroadcastMessage(message, type);
+  }
+
+  sendBroadcastMessage(message: string, type?: string): void | HMSMessage {
+    return this.handleSendMessage({ message, type });
+  }
+
+  sendGroupMessage(message: string, roles: HMSRole[], type?: string): void | HMSMessage {
+    return this.handleSendMessage({ message, recipientRoles: roles, type });
+  }
+
+  sendDirectMessage(message: string, peer: HMSPeer, type?: string): void | HMSMessage {
+    return this.handleSendMessage({ message, recipientPeers: [peer], type });
+  }
+
+  private handleSendMessage(messageInput: string | HMSMessageInput) {
     // \u200b is to handle zero width non breaking space
     if (typeof messageInput === 'string' && messageInput.replace(/\u200b/g, ' ').trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
@@ -389,25 +405,22 @@ export class HMSSdk implements HMSInterface {
     recipientPeers,
     recipientRoles,
   }: HMSMessageInput): HMSMessage | void {
-    const roles: HMSRole[] = [];
-    const peers: HMSPeer[] = [];
-
     /**
      * Add all valid roles from store to roles
      */
     const knownRoles = this.store.getKnownRoles();
-    recipientRoles?.forEach((role) => {
-      const storeRole = knownRoles[role];
-      storeRole && roles.push(storeRole);
-    });
+    const roles =
+      recipientRoles?.filter((role) => {
+        return knownRoles[role.name];
+      }) || [];
 
     /**
      * Add all valid peers from store to peers
      */
-    recipientPeers?.forEach((peer) => {
-      const storePeer = this.store.getPeerById(peer);
-      storePeer && peers.push(storePeer);
-    });
+    const peers =
+      recipientPeers?.filter((peer) => {
+        return this.store.getPeerById(peer.peerId);
+      }) || [];
 
     if (roles.length === 0 && peers.length === 0) {
       HMSLogger.w(this.TAG, 'sendMessage', 'Invalid recipient - no corresponding peer or role found');

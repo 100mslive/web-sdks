@@ -1,6 +1,6 @@
 import { HMSConfig } from './config';
 import HMSUpdateListener, { HMSAudioListener } from './update-listener';
-import { HMSMessage, HMSMessageInput } from './message';
+import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
@@ -27,7 +27,15 @@ export default interface HMS {
 
   endRoom(lock: boolean, reason: string): void;
 
-  sendMessage(message: string | HMSMessageInput): HMSMessage | void;
+  /**
+   * @deprecated The method should not be used
+   * @see sendBroadcastMessage
+   */
+  sendMessage(type: string, message: string): HMSMessage | void;
+  sendBroadcastMessage(message: string, type?: string): HMSMessage | void;
+  sendGroupMessage(message: string, roles: HMSRole[], type?: string): HMSMessage | void;
+  sendDirectMessage(message: string, peer: HMSPeer, type?: string): HMSMessage | void;
+
   startScreenShare(onStop: () => void): Promise<void>;
   stopScreenShare(): Promise<void>;
 
