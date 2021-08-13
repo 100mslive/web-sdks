@@ -194,7 +194,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   endRoom(lock: boolean, reason: string) {
-    this.notify(HMSSignalMethod.END_ROOM, { version: '1.0', params: { lock, reason } });
+    this.notify(HMSSignalMethod.END_ROOM, { lock, reason });
   }
 
   sendEvent(event: AnalyticsEvent) {

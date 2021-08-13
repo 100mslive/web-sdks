@@ -304,14 +304,18 @@ export class HMSSdk implements HMSInterface {
       { name: config.userName, metaData: config.metaData || '' },
       config.initEndpoint,
       config.autoVideoSubscribe,
-    ).then(async () => {
-      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      if (this.store.getPublishParams() && !this.published) {
-        await this.publish(config.settings || defaultSettings);
-      }
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-      this.listener?.onJoin(this.store.getRoom());
-    });
+    )
+      .then(async () => {
+        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+        if (this.store.getPublishParams() && !this.published) {
+          await this.publish(config.settings || defaultSettings);
+        }
+        this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+        this.listener?.onJoin(this.store.getRoom());
+      })
+      .catch((error) => {
+        this.listener?.onError(error as HMSException);
+      });
   }
 
   private cleanUp() {
