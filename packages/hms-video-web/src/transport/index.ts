@@ -352,8 +352,10 @@ export default class HMSTransport implements ITransport {
       if (error instanceof HMSException) {
         analyticsEventsService.queue(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error)).flush();
       }
-      await this.observer.onStateChange(this.state, error);
-      throw error;
+      const ex = error as HMSException;
+      ex.isTerminal = ex.code === 500;
+      await this.observer.onStateChange(this.state, ex);
+      throw ex;
     }
 
     HMSLogger.d(TAG, '✅ join: successful');
