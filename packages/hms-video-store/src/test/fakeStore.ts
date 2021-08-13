@@ -106,7 +106,7 @@ export const makeFakeStore = (): HMSStore => {
           sender: '2',
           senderName: 'test2',
           senderRole: ROLES.HOST,
-          recipientPeers: ['1'],
+          recipientPeer: '1',
           read: false,
           type: HMSMessageType.CHAT,
           message: 'hi!',

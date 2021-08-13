@@ -12,3 +12,9 @@ export interface HMSChangeTrackStateRequest {
   track: HMSTrack;
   enabled: boolean;
 }
+
+export interface HMSLeaveRoomRequest {
+  requestedBy: HMSPeer;
+  reason: string;
+  roomEnded: boolean;
+}

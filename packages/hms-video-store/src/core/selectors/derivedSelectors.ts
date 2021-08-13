@@ -1,7 +1,7 @@
 import { HMSPeer, HMSStore } from '../schema';
 import { selectLocalPeerRole, selectPeersMap, selectRolesMap, selectTracksMap } from './selectors';
 import { createSelector } from 'reselect';
-import { HMSRole } from '@100mslive/hms-video/dist/interfaces/role';
+import { HMSRole } from '@100mslive/hms-video';
 
 export interface HMSPeerWithMuteStatus {
   peer: HMSPeer;

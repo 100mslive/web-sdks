@@ -91,7 +91,7 @@ export class SDKToHMS {
       senderName: sdkMessage.sender.name,
       senderRole: sdkMessage.sender.role?.name,
       senderUserId: sdkMessage.sender.customerUserId,
-      recipientPeers: sdkMessage.recipientPeers?.map(peer => peer.peerId),
+      recipientPeer: sdkMessage.recipientPeer?.peerId,
       recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,
       type: sdkMessage.type,

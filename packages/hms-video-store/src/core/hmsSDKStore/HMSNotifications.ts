@@ -13,6 +13,7 @@ import {
   HMSMessage,
   HMSTrack,
   HMSChangeTrackStateRequest,
+  HMSLeaveRoomRequest,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -33,13 +34,12 @@ export class HMSNotifications implements IHMSNotifications {
     };
   };
 
-  sendLeaveRoom(peer: HMSPeer, ended: boolean) {
-    const hmsPeer = this.store.getState(selectPeerByID(peer.id));
+  sendLeaveRoom(request: HMSLeaveRoomRequest) {
     const notification = this.createNotification(
-      ended ? HMSNotificationTypes.ROOM_ENDED : HMSNotificationTypes.REMOVED_FROM_ROOM,
-      hmsPeer,
+      request.roomEnded ? HMSNotificationTypes.ROOM_ENDED : HMSNotificationTypes.REMOVED_FROM_ROOM,
+      request,
       HMSNotificationSeverity.INFO,
-      `${ended ? `Room ended` : 'Removed from room'} by ${peer.name}`,
+      `${request.roomEnded ? `Room ended` : 'Removed from room'} by ${request.requestedBy.name}`,
     );
     this.emitEvent(notification);
   }
@@ -121,7 +121,14 @@ export class HMSNotifications implements IHMSNotifications {
 
   private createNotification(
     type: string,
-    data?: HMSPeer | HMSTrack | HMSMessage | HMSException | HMSChangeTrackStateRequest | null,
+    data?:
+      | HMSPeer
+      | HMSTrack
+      | HMSMessage
+      | HMSException
+      | HMSChangeTrackStateRequest
+      | HMSLeaveRoomRequest
+      | null,
     severity?: HMSNotificationSeverity,
     message: string = '',
   ): HMSNotification {

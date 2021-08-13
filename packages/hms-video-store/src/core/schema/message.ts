@@ -13,7 +13,7 @@ export interface HMSMessage {
   senderName: string;
   senderUserId?: string;
   senderRole?: string;
-  recipientPeers?: HMSPeerID[];
+  recipientPeer?: HMSPeerID;
   recipientRoles?: HMSRoleName[];
   time: Date;
   read: boolean;
@@ -22,7 +22,7 @@ export interface HMSMessage {
 }
 
 export interface HMSMessageInput {
-  recipientPeers?: HMSPeerID[];
+  recipientPeer?: HMSPeerID;
   recipientRoles?: HMSRoleName[];
   type?: string;
   message: any;

@@ -5,7 +5,7 @@ import {
   HMSVideoTrackSettings,
   HMSLogLevel,
 } from '@100mslive/hms-video';
-import { HMSMessageInput, HMSTrackSource } from './schema';
+import { HMSPeerID, HMSRoleName, HMSTrackSource } from './schema';
 import { HMSVideoPlugin } from '@100mslive/hms-video';
 import { HMSRoleChangeRequest } from './selectors';
 
@@ -68,10 +68,33 @@ export interface IHMSActions {
   removeTrack(trackId: string): Promise<void>;
 
   /**
+   * @deprecated The method should not be used
+   * @see sendBroadcastMessage
    * Send a plain text message to all the other participants in the room.
    * @param message - string message to broadcast
    */
-  sendMessage(message: string | HMSMessageInput): void;
+  sendMessage(message: string): void;
+
+  /**
+   * Send a plain text message to all the other participants in the room.
+   * @param message - string message to broadcast
+   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   */
+  sendBroadcastMessage(message: string, type?: string): Promise<void>;
+  /**
+   *
+   * @param message - string message to send
+   * @param roles - roles to which to send the message
+   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   */
+  sendGroupMessage(message: string, roles: HMSRoleName[], type?: string): Promise<void>;
+  /**
+   *
+   * @param message
+   * @param peerID - id of the peer to which message has to be sent
+   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   */
+  sendDirectMessage(message: string, peerID: HMSPeerID, type?: string): Promise<void>;
 
   /**
    * If just readStatus argument is passed, the function will set read flag of every message

@@ -27,6 +27,7 @@ import {
   selectTrackByID,
   selectRoomStarted,
   selectPermissions,
+  selectRolesMap,
   selectLocalTrackIDs,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -258,26 +259,42 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  sendMessage(messageInput: string | HMSMessageInput) {
-    if (typeof messageInput === 'string' && messageInput.trim() === '') {
-      HMSLogger.w('sendMessage', 'Ignoring empty message send');
-      return;
-    }
-    let sdkMessage;
-    if (typeof messageInput === 'string') {
-      sdkMessage = this.sdk.sendMessage(messageInput);
-    } else {
-      const { message, type = 'chat', recipientPeers, recipientRoles } = messageInput;
-      sdkMessage = this.sdk.sendMessage({ type, message, recipientRoles, recipientPeers });
-    }
+  sendMessage(message: string) {
+    this.sendBroadcastMessage(message);
+  }
+
+  async sendBroadcastMessage(message: string, type?: string) {
+    const sdkMessage = await this.sdk.sendBroadcastMessage(message, type);
+    this.updateMessageInStore(sdkMessage, { message, type });
+  }
+
+  async sendGroupMessage(message: string, roles: string[], type?: string) {
+    const storeRoles = this.store.getState(selectRolesMap);
+    const hmsRoles = roles.map(roleName => {
+      return storeRoles[roleName];
+    });
+    const sdkMessage = await this.sdk.sendGroupMessage(message, hmsRoles, type);
+    this.updateMessageInStore(sdkMessage, { message, recipientRoles: roles, type });
+  }
+  async sendDirectMessage(message: string, peerID: string, type?: string) {
+    const hmsPeer = this.hmsSDKPeers[peerID];
+    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer);
+    this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
+  }
+
+  private updateMessageInStore(
+    sdkMessage: sdkTypes.HMSMessage | void,
+    messageInput: string | HMSMessageInput,
+  ) {
     if (!sdkMessage) {
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
-      return;
+      throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = 'You';
     this.onHMSMessage(hmsMessage);
+    return hmsMessage;
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
@@ -429,8 +446,17 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
-    const peer = SDKToHMS.convertPeer(request.requestedBy);
-    this.hmsNotifications.sendLeaveRoom(peer as HMSPeer, request.roomEnded);
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
+    if (!requestedBy) {
+      this.logPossibleInconsistency(
+        `Not found peer who requested leave room, ${request.requestedBy}`,
+      );
+      return;
+    }
+    this.hmsNotifications.sendLeaveRoom({
+      ...request,
+      requestedBy,
+    });
   }
 
   private onDeviceChange(devices: DeviceMap) {

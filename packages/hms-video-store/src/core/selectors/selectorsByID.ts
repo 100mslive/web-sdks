@@ -272,7 +272,7 @@ const selectMessagesByPeerIDInternal = createSelector(
     }
     return messages.filter(message => {
       // Broadcast message
-      if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+      if (!message.recipientPeer && !message.recipientRoles?.length) {
         return false;
       }
       // if localPeer or peerID is not a sender remove this
@@ -280,9 +280,7 @@ const selectMessagesByPeerIDInternal = createSelector(
         return false;
       }
       // at this point we know the sender is one of local or passed in peer, check the recipient side
-      return message.recipientPeers?.some(recipient => {
-        return [localPeerID, peerID].includes(recipient);
-      });
+      return [localPeerID, peerID].includes(message.recipientPeer!);
     });
   },
 );
@@ -295,7 +293,7 @@ const selectMessagesByRoleInternal = createSelector(
     }
     return messages.filter(message => {
       // Broadcast message
-      if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+      if (!message.recipientPeer && !message.recipientRoles?.length) {
         return false;
       }
       const iSent = message.recipientRoles?.includes(roleName);
@@ -307,7 +305,7 @@ const selectMessagesByRoleInternal = createSelector(
 
 export const selectBroadcastMessages = createSelector(selectHMSMessages, messages => {
   return messages.filter(message => {
-    if (!message.recipientPeers?.length && !message.recipientRoles?.length) {
+    if (!message.recipientPeer && !message.recipientRoles?.length) {
       return true;
     }
     return false;
