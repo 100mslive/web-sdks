@@ -553,6 +553,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   async changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean) {
+    if (forRemoteTrack.type === HMSTrackType.VIDEO && forRemoteTrack.source !== 'regular') {
+      HMSLogger.w(this.TAG, `Muting non-regular video tracks is currently not supported`);
+      return;
+    }
+
     if (forRemoteTrack.enabled === enabled) {
       HMSLogger.w(this.TAG, `Aborting change track state, track already has enabled - ${enabled}`, forRemoteTrack);
       return;
