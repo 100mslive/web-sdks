@@ -23,9 +23,9 @@ export default interface HMS {
   changeRole(forPeer: HMSRemotePeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;
 
-  changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): void;
-
-  endRoom(lock: boolean, reason: string): void;
+  changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
+  removePeer(peer: HMSRemotePeer, reason: string): Promise<void>;
+  endRoom(lock: boolean, reason: string): Promise<void>;
 
   /**
    * @deprecated The method should not be used

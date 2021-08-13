@@ -484,6 +484,10 @@ export default class HMSTransport implements ITransport {
     this.signal.endRoom(lock, reason);
   }
 
+  removePeer(peerId: string, reason: string) {
+    this.signal.removePeer({ requested_for: peerId, reason });
+  }
+
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     this.signal.requestTrackStateChange(trackUpdateRequest);
   }

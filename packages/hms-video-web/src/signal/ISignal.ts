@@ -1,7 +1,13 @@
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
-import { Track, AcceptRoleChangeParams, RequestForRoleChangeParams, TrackUpdateRequestParams } from './interfaces';
+import {
+  Track,
+  AcceptRoleChangeParams,
+  RequestForRoleChangeParams,
+  TrackUpdateRequestParams,
+  RemovePeerRequest,
+} from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
@@ -40,6 +46,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): void;
 
   requestTrackStateChange(params: TrackUpdateRequestParams): void;
+
+  removePeer(params: RemovePeerRequest): void;
 
   close(): Promise<void>;
 }

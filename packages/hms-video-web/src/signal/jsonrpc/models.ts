@@ -20,4 +20,5 @@ export enum HMSSignalMethod {
   ROLE_CHANGE_REQUEST = 'role-change-request',
   ROLE_CHANGE = 'role-change',
   TRACK_UPDATE_REQUEST = 'track-update-request',
+  PEER_LEAVE_REQUEST = 'peer-leave-request',
 }

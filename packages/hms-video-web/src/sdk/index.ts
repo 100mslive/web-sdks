@@ -559,7 +559,7 @@ export class HMSSdk implements HMSInterface {
 
   changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
     if (!this.localPeer?.role?.permissions.changeRole) {
-      throw ErrorFactory.GenericErrors.Unknown(HMSAction.TRACK, 'Do not have permission to change roles');
+      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to change roles');
     }
 
     if (!forPeer.role || forPeer.role.name === toRole) {
@@ -573,39 +573,54 @@ export class HMSSdk implements HMSInterface {
     this.transport?.acceptRoleChange(request);
   }
 
-  endRoom(lock: boolean, reason: string) {
+  async endRoom(lock: boolean, reason: string) {
     if (!this.localPeer) {
-      HMSLogger.w(this.TAG, 'No local peer present, cannot end room');
-      return;
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot end room');
     }
     const permissions = this.localPeer.role?.permissions;
+    /**
+     * This should come from server
+     */
     if (!permissions || !permissions.endRoom) {
-      HMSLogger.w(this.TAG, 'No permission, cannot end room');
-      return;
+      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to end room');
     }
     this.transport?.endRoom(lock, reason);
+  }
+
+  async removePeer(peer: HMSRemotePeer, reason: string) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot remove peer');
+    }
+    /**
+     * This should come from server
+     */
+    if (!this.localPeer.role?.permissions.removeOthers) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to remove others from room');
+    }
+    if (!this.store.getPeerById(peer.peerId)) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer, given peer not present in room', peer);
+    }
+    this.transport?.removePeer(peer.peerId, reason);
   }
 
   getRoles(): HMSRole[] {
     return Object.values(this.store.getKnownRoles());
   }
 
-  changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean) {
+  async changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean) {
     if (forRemoteTrack.enabled === enabled) {
       HMSLogger.w(this.TAG, `Aborting change track state, track already has enabled - ${enabled}`, forRemoteTrack);
       return;
     }
 
     if (!this.store.getTrackById(forRemoteTrack.trackId)) {
-      HMSLogger.w(this.TAG, 'No track found for change track state', forRemoteTrack);
-      return;
+      throw ErrorFactory.GenericErrors.ValidationFailed('No track found for change track state', forRemoteTrack);
     }
 
     const peer = this.store.getPeerByTrackId(forRemoteTrack.trackId);
 
     if (!peer) {
-      HMSLogger.w(this.TAG, 'No peer found for change track state', forRemoteTrack);
-      return;
+      throw ErrorFactory.GenericErrors.ValidationFailed('No peer found for change track state', forRemoteTrack);
     }
 
     this.transport?.changeTrackState({

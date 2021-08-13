@@ -20,6 +20,7 @@ export enum HMSAction {
   VIDEO_PLUGINS = 'VIDEO_PLUGINS',
   AUTOPLAY = 'AUTOPLAY',
   RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
+  VALIDATION = 'VALIDATION',
 }
 
 export const ErrorFactory = {
@@ -254,6 +255,16 @@ export const ErrorFactory = {
 
     PeerMetadataMissing(action: HMSAction, description: string = '') {
       return new HMSException(6007, 'PeerMetadataMissing', action, `Peer Metadata Missing`, description);
+    },
+
+    ValidationFailed(message: string, entity?: any) {
+      return new HMSException(
+        6008,
+        'ValidationFailed',
+        HMSAction.VALIDATION,
+        message,
+        entity ? JSON.stringify(entity) : '',
+      );
     },
   },
 

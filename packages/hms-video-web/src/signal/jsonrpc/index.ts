@@ -1,7 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { ISignal } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
-import { Track, AcceptRoleChangeParams, RequestForRoleChangeParams, TrackUpdateRequestParams } from '../interfaces';
+import {
+  Track,
+  AcceptRoleChangeParams,
+  RequestForRoleChangeParams,
+  TrackUpdateRequestParams,
+  RemovePeerRequest,
+} from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { HMSSignalMethod, JsonRpcRequest } from './models';
 import { PromiseCallbacks } from '../../utils/promise';
@@ -222,6 +228,10 @@ export default class JsonRpcSignal implements ISignal {
 
   requestTrackStateChange(params: TrackUpdateRequestParams) {
     this.notify(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
+  }
+
+  removePeer(params: RemovePeerRequest) {
+    this.notify(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
   }
 
   private onCloseHandler(event: CloseEvent) {
