@@ -32,9 +32,9 @@ export default interface HMS {
    * @see sendBroadcastMessage
    */
   sendMessage(type: string, message: string): HMSMessage | void;
-  sendBroadcastMessage(message: string, type?: string): HMSMessage | void;
-  sendGroupMessage(message: string, roles: HMSRole[], type?: string): HMSMessage | void;
-  sendDirectMessage(message: string, peer: HMSPeer, type?: string): HMSMessage | void;
+  sendBroadcastMessage(message: string, type?: string): Promise<HMSMessage>;
+  sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
+  sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
   startScreenShare(onStop: () => void): Promise<void>;
   stopScreenShare(): Promise<void>;

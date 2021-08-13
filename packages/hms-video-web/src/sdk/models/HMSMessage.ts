@@ -6,24 +6,24 @@ import { HMSPeer } from './peer';
 
 export default class Message implements HMSMessage, ISignalParamsProvider<SendMessage> {
   sender: HMSPeer;
-  recipientPeers?: HMSPeer[];
+  recipientPeer?: HMSPeer;
   recipientRoles?: HMSRole[];
   message: any;
   time: Date;
   type: string;
 
-  constructor({ sender, message, type = 'chat', recipientPeers, recipientRoles, time }: HMSMessage) {
+  constructor({ sender, message, type = 'chat', recipientPeer, recipientRoles, time }: HMSMessage) {
     this.sender = sender;
     this.message = message;
     this.type = type;
-    this.recipientPeers = recipientPeers;
+    this.recipientPeer = recipientPeer;
     this.recipientRoles = recipientRoles;
     this.time = time;
   }
 
   toSignalParams() {
     const roles = this.recipientRoles?.map((role) => role.name);
-    const peer = this.recipientPeers?.map((peer) => peer.peerId)[0];
+    const peer = this.recipientPeer?.peerId;
     const sendParams: SendMessage = {
       info: {
         sender: this.sender.peerId,

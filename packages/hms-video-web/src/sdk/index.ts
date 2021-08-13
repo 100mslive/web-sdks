@@ -1,4 +1,4 @@
-import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessage, HMSMessageInput } from '../interfaces';
+import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessageInput } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -361,98 +361,43 @@ export class HMSSdk implements HMSInterface {
   }
 
   sendMessage(type: string, message: string) {
-    this.sendBroadcastMessage(message, type);
+    this.sendMessageInternal({ message, type });
   }
 
-  sendBroadcastMessage(message: string, type?: string): void | HMSMessage {
-    return this.handleSendMessage({ message, type });
+  async sendBroadcastMessage(message: string, type?: string) {
+    return this.sendMessageInternal({ message, type });
   }
 
-  sendGroupMessage(message: string, roles: HMSRole[], type?: string): void | HMSMessage {
-    return this.handleSendMessage({ message, recipientRoles: roles, type });
-  }
-
-  sendDirectMessage(message: string, peer: HMSPeer, type?: string): void | HMSMessage {
-    return this.handleSendMessage({ message, recipientPeers: [peer], type });
-  }
-
-  private handleSendMessage(messageInput: string | HMSMessageInput) {
-    // \u200b is to handle zero width non breaking space
-    if (typeof messageInput === 'string' && messageInput.replace(/\u200b/g, ' ').trim() === '') {
-      HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
-      return;
-    }
-    if (typeof messageInput === 'string') {
-      return this.sendMessageInternal({ message: messageInput });
-    }
-    const { type, message, recipientPeers, recipientRoles } = messageInput;
-    if (message.replace(/\u200b/g, ' ').trim() === '') {
-      HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
-      return;
-    }
-    if (!recipientPeers?.length && !recipientRoles?.length) {
-      /**
-       * No recipient broadcast to all
-       */
-      return this.sendMessageInternal({ message, type });
-    }
-    return this.sendMultipleRecepientsMessage({ message, type, recipientRoles, recipientPeers });
-  }
-
-  private sendMultipleRecepientsMessage({
-    message,
-    type,
-    recipientPeers,
-    recipientRoles,
-  }: HMSMessageInput): HMSMessage | void {
-    /**
-     * Add all valid roles from store to roles
-     */
+  async sendGroupMessage(message: string, roles: HMSRole[], type?: string) {
     const knownRoles = this.store.getKnownRoles();
-    const roles =
-      recipientRoles?.filter((role) => {
+    const recipientRoles =
+      roles.filter((role) => {
         return knownRoles[role.name];
       }) || [];
-
-    /**
-     * Add all valid peers from store to peers
-     */
-    const peers =
-      recipientPeers?.filter((peer) => {
-        return this.store.getPeerById(peer.peerId);
-      }) || [];
-
-    if (roles.length === 0 && peers.length === 0) {
-      HMSLogger.w(this.TAG, 'sendMessage', 'Invalid recipient - no corresponding peer or role found');
-      return;
+    if (recipientRoles.length === 0) {
+      throw Error('No valid role is present');
     }
-
-    if (roles.length) {
-      return this.sendMessageInternal({ message, recipientRoles: roles, type });
-    }
-    if (peers.length) {
-      const hmsMessage = new Message({ sender: this.localPeer!, message, recipientPeers: peers, time: new Date() });
-      /**
-       * Right now server only takes in one peer_id hence the loop. But we return message with all peers
-       */
-      peers.forEach((peer) => {
-        this.sendMessageInternal({ message, recipientPeers: [peer], type });
-      });
-      return hmsMessage;
-    }
+    return this.sendMessageInternal({ message, recipientRoles: roles, type });
   }
 
-  private sendMessageInternal({
-    recipientRoles,
-    recipientPeers,
-    type = 'chat',
-    message,
-  }: Pick<HMSMessage, 'message' | 'recipientPeers' | 'recipientRoles' | 'type'>) {
+  async sendDirectMessage(message: string, peer: HMSPeer, type?: string) {
+    let recipientPeer = this.store.getPeerById(peer.peerId);
+    if (!recipientPeer) {
+      throw Error('Peer not present in room');
+    }
+    return this.sendMessageInternal({ message, recipientPeer: peer, type });
+  }
+
+  private sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
+    if (message.replace(/\u200b/g, ' ').trim() === '') {
+      HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
+      throw Error('Empty message not allowed');
+    }
     const hmsMessage = new Message({
       sender: this.localPeer!,
       type,
       message,
-      recipientPeers,
+      recipientPeer,
       recipientRoles,
       time: new Date(),
     });

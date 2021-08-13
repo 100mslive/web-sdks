@@ -2,14 +2,14 @@ import { HMSPeer } from '../sdk/models/peer';
 import { HMSRole } from './role';
 
 export interface HMSMessageInput {
-  recipientPeers?: HMSPeer[];
+  recipientPeer?: HMSPeer;
   recipientRoles?: HMSRole[];
   type?: string;
   message: string;
 }
 export interface HMSMessage {
   sender: HMSPeer;
-  recipientPeers?: HMSPeer[];
+  recipientPeer?: HMSPeer;
   recipientRoles?: HMSRole[];
   time: Date;
   type?: string;

@@ -501,7 +501,7 @@ export default class NotificationManager {
       });
     }
 
-    const recipientPeers = [];
+    let recipientPeer;
     const recipientRoles = [];
 
     if (notifRoles?.length) {
@@ -515,14 +515,14 @@ export default class NotificationManager {
 
     if (messageNotification.private) {
       const peer = this.store.getLocalPeer();
-      peer && recipientPeers.push(peer);
+      recipientPeer = peer;
     }
 
     const hmsMessage = new Message({
       ...notifMessage,
       sender,
       recipientRoles,
-      recipientPeers,
+      recipientPeer,
       time: new Date(messageNotification.timestamp),
     });
     HMSLogger.d(this.TAG, `Received Message:: `, hmsMessage);
