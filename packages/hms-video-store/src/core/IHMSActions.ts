@@ -221,10 +221,19 @@ export interface IHMSActions {
   unblockAudio: () => Promise<void>;
 
   /**
-   * If you have required permissions, you can end the room. That means everyone will be kicked out.
+   * If you have the **endRoom** permission, you can end the room. That means everyone will be kicked out.
    * If lock is passed as true, the room cannot be used further.
    */
   endRoom: (lock: boolean, reason: string) => void;
+
+  /**
+   * If you have **removeOthers** permission, you can remove a peer from the room.
+   * @param peerID peerID of the peer to be removed from the remove
+   * @param reason a string explaining why the peer is removed from the room.
+   * This string could be used to notify the user before they're removed from the room
+   * using the `REMOVED_FROM_ROOM` type of notification
+   */
+  removePeer(peerID: string, reason: string): void;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.

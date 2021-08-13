@@ -396,6 +396,16 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.endRoom(lock, reason);
   }
 
+  removePeer(peerID: string, reason: string) {
+    const peer = this.hmsSDKPeers[peerID];
+    if (peer && !peer.isLocal) {
+      this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
+    } else {
+      this.logPossibleInconsistency(`No remote peer found for peerID - ${peerID}`);
+      return;
+    }
+  }
+
   setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
