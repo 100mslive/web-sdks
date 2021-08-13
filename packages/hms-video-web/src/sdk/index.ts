@@ -375,7 +375,7 @@ export class HMSSdk implements HMSInterface {
         return knownRoles[role.name];
       }) || [];
     if (recipientRoles.length === 0) {
-      throw Error('No valid role is present');
+      throw ErrorFactory.GenericErrors.ValidationFailed('No valid role is present', roles);
     }
     return this.sendMessageInternal({ message, recipientRoles: roles, type });
   }
@@ -383,7 +383,10 @@ export class HMSSdk implements HMSInterface {
   async sendDirectMessage(message: string, peer: HMSPeer, type?: string) {
     let recipientPeer = this.store.getPeerById(peer.peerId);
     if (!recipientPeer) {
-      throw Error('Peer not present in room');
+      throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peer);
+    }
+    if (this.localPeer?.peerId === peer.peerId) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Cannot send message to self');
     }
     return this.sendMessageInternal({ message, recipientPeer: peer, type });
   }
@@ -391,7 +394,7 @@ export class HMSSdk implements HMSInterface {
   private sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
     if (message.replace(/\u200b/g, ' ').trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
-      throw Error('Empty message not allowed');
+      throw ErrorFactory.GenericErrors.ValidationFailed('Empty message not allowed');
     }
     const hmsMessage = new Message({
       sender: this.localPeer!,
