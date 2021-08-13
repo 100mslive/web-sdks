@@ -16,7 +16,6 @@ import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
-import { HMSLogger } from '../../common/ui-logger';
 import { NamedSetState } from './internalTypes';
 
 export class HMSReactiveStore {
@@ -58,7 +57,6 @@ export class HMSReactiveStore {
       // already done
       return;
     }
-    HMSLogger.d('turning on trigger on subscribe');
     HMSReactiveStore.makeStoreTriggerOnSubscribe(this.store);
     this.initialTriggerOnSubscribe = true;
   }

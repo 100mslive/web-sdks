@@ -3,6 +3,7 @@ import {
   HMSSimulcastLayer,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
+  HMSLogLevel,
 } from '@100mslive/hms-video';
 import { HMSMessageInput, HMSTrackSource } from './schema';
 import { HMSVideoPlugin } from '@100mslive/hms-video';
@@ -195,18 +196,25 @@ export interface IHMSActions {
    * Method to be called with some UI interaction after autoplay error is received
    */
   unblockAudio: () => Promise<void>;
+
   /**
    * If you have required permissions, you can end the room. That means everyone will be kicked out.
    * If lock is passed as true, the room cannot be used further.
    */
   endRoom: (lock: boolean, reason: string) => void;
-}
 
-/**
- * If there is an error in any action, the notification will contain the details
- * about the error which will be an object following this interface.
- */
-export interface HMSError {
-  code: number;
-  message: string;
+  /**
+   * Set the type of logs from the SDK you want to be logged in the browser console.
+   *
+   * Note that HMSLogLevel is decremental meaning,
+   * HMSLogLevel.VERBOSE(0) - will log every message from SDK.
+   * HMSLogLevel.DEBUG(1) - will log messages that are helpful in debugging, important info, warnings and errors.
+   * HMSLogLevel.INFO(2) - will log important info, warnings and errors.
+   * HMSLogLevel.WARN(3) - will log warnings and errors.
+   * HMSLogLevel.ERROR(4) - will log only errors.
+   * HMSLogLevel.NONE(5) - won't log anything.
+   *
+   * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
+   */
+  setLogLevel(level: HMSLogLevel): void;
 }

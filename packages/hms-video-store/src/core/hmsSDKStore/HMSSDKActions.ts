@@ -27,12 +27,14 @@ import {
   selectTrackByID,
   selectRoomStarted,
   selectPermissions,
+  selectLocalTrackIDs,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSSdk,
   HMSVideoPlugin,
   HMSTrack as SDKHMSTrack,
+  HMSLocalTrack as SDKHMSLocalTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
@@ -45,6 +47,7 @@ import {
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSSimulcastLayer,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
+  HMSLogLevel,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -55,7 +58,7 @@ import {
 } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
-import { getStoreTrackIDfromSDKTrack, isRemoteTrack } from './sdkUtils/sdkUtils';
+import { isRemoteTrack } from './sdkUtils/sdkUtils';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -391,6 +394,11 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  setLogLevel(level: HMSLogLevel) {
+    HMSLogger.level = level;
+    this.sdk.setLogLevel(level);
+  }
+
   private resetState() {
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
@@ -661,7 +669,8 @@ export class HMSSDKActions implements IHMSActions {
 
   protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {
     const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
-    const track = this.store.getState(selectTrackByID(getStoreTrackIDfromSDKTrack(request.track)));
+    const storeTrackID = this.getStoreLocalTrackIDfromSDKTrack(request.track);
+    const track = this.store.getState(selectTrackByID(storeTrackID));
 
     if (!requestedBy) {
       return this.logPossibleInconsistency(
@@ -885,6 +894,11 @@ export class HMSSDKActions implements IHMSActions {
 
   private onRoleUpdate() {
     this.syncRoomState('roleUpdate');
+  }
+
+  private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
+    const trackIDs = this.store.getState(selectLocalTrackIDs);
+    return trackIDs.find(trackID => this.hmsSDKTracks[trackID].trackId === sdkTrack.trackId);
   }
 
   /**

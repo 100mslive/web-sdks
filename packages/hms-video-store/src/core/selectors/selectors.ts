@@ -99,8 +99,33 @@ export const selectLocalPeerID = createSelector(selectLocalPeer, peer => {
   return peer?.id;
 });
 
+/**
+ * Select the track ID of your local peer's primary audio track
+ */
 export const selectLocalAudioTrackID = createSelector(selectLocalPeer, peer => peer?.audioTrack);
+
+/**
+ * Select the track ID of your local peer's primary video track
+ */
 export const selectLocalVideoTrackID = createSelector(selectLocalPeer, peer => peer?.videoTrack);
+
+/**
+ * Select an array of track IDs of your local peer's auxiliary tracks
+ */
+const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => peer?.auxiliaryTracks);
+
+/**
+ * Select an array of track IDs of all your local peer's tracks
+ */
+export const selectLocalTrackIDs = createSelector(
+  [selectLocalAudioTrackID, selectLocalVideoTrackID, selectLocalAuxiliaryTrackIDs],
+  (audioTrackID, videoTrackID, auxiliaryTrackIDs) => {
+    const trackIDs: string[] = [...auxiliaryTrackIDs];
+    audioTrackID && trackIDs.unshift(audioTrackID);
+    videoTrackID && trackIDs.unshift(videoTrackID);
+    return trackIDs;
+  },
+);
 
 /**
  * Select remote peers(other users you're connected with via the internet) present in the room.

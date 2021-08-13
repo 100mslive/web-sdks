@@ -102,6 +102,18 @@ Select an array of names of available roles in the room.
 
 ---
 
+### selectBroadcastMessages
+
+• `Const` **selectBroadcastMessages**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[], `fn`\>
+
+---
+
+### selectBroadcastMessagesUnreadCount
+
+• `Const` **selectBroadcastMessagesUnreadCount**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `number`, `fn`\>
+
+---
+
 ### selectDegradedTracks
 
 • `Const` **selectDegradedTracks**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)[], `fn`\>
@@ -159,12 +171,6 @@ Select a boolean denoting whether the room is in Preview state.
 
 ---
 
-### selectLocalAudioTrackID
-
-• `Const` **selectLocalAudioTrackID**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| `string`, `fn`\>
-
----
-
 ### selectLocalPeer
 
 • `Const` **selectLocalPeer**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSPeer`](/api-reference/javascript/v2/interfaces/HMSPeer), `fn`\>
@@ -183,12 +189,6 @@ Select the peer ID of your local peer.
 
 • `Const` **selectLocalPeerRole**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `null` \| [`HMSRole`](/api-reference/javascript/v2/interfaces/HMSRole), `fn`\>
 Select the [HMSRole](/api-reference/javascript/v2/interfaces/HMSRole) object of your local peer.
-
----
-
-### selectLocalVideoTrackID
-
-• `Const` **selectLocalVideoTrackID**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| `string`, `fn`\>
 
 ---
 
@@ -374,38 +374,6 @@ type DeviceMap = {
   videoInput: InputDeviceInfo[];
 }
 ```
-
----
-
-### selectHMSMessagesByPeerID
-
-▸ `Const` **selectHMSMessagesByPeerID**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
-
-#### Parameters
-
-| Name  | Type     |
-| :---- | :------- |
-| `id?` | `string` |
-
-#### Returns
-
-`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
-
----
-
-### selectHMSMessagesByRole
-
-▸ `Const` **selectHMSMessagesByRole**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
-
-#### Parameters
-
-| Name  | Type     |
-| :---- | :------- |
-| `id?` | `string` |
-
-#### Returns
-
-`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
 
 ---
 
@@ -633,6 +601,70 @@ Select IDs of messages you've sent or received sorted chronologically.
 #### Returns
 
 `string`[]
+
+---
+
+### selectMessagesByPeerID
+
+▸ `Const` **selectMessagesByPeerID**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+---
+
+### selectMessagesByRole
+
+▸ `Const` **selectMessagesByRole**(`id?`): `StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`undefined` \| [`HMSMessage`](/api-reference/javascript/v2/interfaces/HMSMessage)[]\>
+
+---
+
+### selectMessagesUnreadCountByPeerID
+
+▸ `Const` **selectMessagesUnreadCountByPeerID**(`id?`): `StoreSelector`<`number`\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`number`\>
+
+---
+
+### selectMessagesUnreadCountByRole
+
+▸ `Const` **selectMessagesUnreadCountByRole**(`id?`): `StoreSelector`<`number`\>
+
+#### Parameters
+
+| Name  | Type     |
+| :---- | :------- |
+| `id?` | `string` |
+
+#### Returns
+
+`StoreSelector`<`number`\>
 
 ---
 
@@ -903,7 +935,7 @@ Select the primary video track of a peer given a peer ID.
 #### Returns
 
 `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
-ideoTrackByPeerID\*\*(`id?`): `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
+nst`**selectVideoTrackByPeerID**(`id?`):`StoreSelector`<`undefined`\| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
 
 Select the primary video track of a peer given a peer ID.
 

@@ -16,6 +16,7 @@ import {
   HMSRemotePeer,
   SimulcastLayerDefinition,
   DeviceMap,
+  HMSLogLevel,
 } from '@100mslive/hms-video';
 
 export {
@@ -34,6 +35,7 @@ export {
   HMSRole,
   HMSLocalPeer,
   HMSRemotePeer,
+  HMSLogLevel,
   SimulcastLayerDefinition,
   DeviceMap,
 };
