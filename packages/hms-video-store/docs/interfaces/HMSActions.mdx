@@ -35,16 +35,18 @@ Accept the role change request received
 
 ### addPluginToVideoTrack
 
-▸ **addPluginToVideoTrack**(`plugin`): `Promise`<`void`\>
+▸ **addPluginToVideoTrack**(`plugin`, `pluginFrameRate?`): `Promise`<`void`\>
 Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
 Video plugins can be added/removed at any time after the join is successful.
+pluginFrameRate is the rate at which the output plugin will do processing
 **`see`** HMSVideoPlugin
 
 #### Parameters
 
-| Name     | Type             | Description    |
-| :------- | :--------------- | :------------- |
-| `plugin` | `HMSVideoPlugin` | HMSVideoPlugin |
+| Name               | Type             | Description    |
+| :----------------- | :--------------- | :------------- |
+| `plugin`           | `HMSVideoPlugin` | HMSVideoPlugin |
+| `pluginFrameRate?` | `number`         | number         |
 
 #### Returns
 
@@ -131,7 +133,7 @@ Request for a role change of a remote peer. Can be forced.
 ### endRoom
 
 ▸ **endRoom**(`lock`, `reason`): `void`
-If you have required permissions, you can end the room. That means everyone will be kicked out.
+If you have the **endRoom** permission, you can end the room. That means everyone will be kicked out.
 If lock is passed as true, the room cannot be used further.
 
 #### Parameters
@@ -212,6 +214,24 @@ Reject pending role change request
 
 ---
 
+### removePeer
+
+▸ **removePeer**(`peerID`, `reason`): `void`
+If you have **removeOthers** permission, you can remove a peer from the room.
+
+#### Parameters
+
+| Name     | Type     | Description                                                                                                                                                                                     |
+| :------- | :------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `peerID` | `string` | peerID of the peer to be removed from the remove                                                                                                                                                |
+| `reason` | `string` | a string explaining why the peer is removed from the room. This string could be used to notify the user before they're removed from the room using the `REMOVED_FROM_ROOM` type of notification |
+
+#### Returns
+
+`void`
+
+---
+
 ### removePluginFromVideoTrack
 
 ▸ **removePluginFromVideoTrack**(`plugin`): `Promise`<`void`\>
@@ -247,16 +267,72 @@ This method removes the track from the local peer's list of auxiliary tracks and
 
 ---
 
-### sendMessage
+### sendBroadcastMessage
 
-▸ **sendMessage**(`message`): `void`
+▸ **sendBroadcastMessage**(`message`, `type?`): `Promise`<`void`\>
 Send a plain text message to all the other participants in the room.
 
 #### Parameters
 
-| Name      | Type                                                                                     | Description                 |
-| :-------- | :--------------------------------------------------------------------------------------- | :-------------------------- |
-| `message` | `string` \| [`HMSMessageInput`](/api-reference/javascript/v2/interfaces/HMSMessageInput) | string message to broadcast |
+| Name      | Type     | Description                                                       |
+| :-------- | :------- | :---------------------------------------------------------------- |
+| `message` | `string` | string message to broadcast                                       |
+| `type?`   | `string` | type of message eg: image, video etc. - optional defaults to chat |
+
+#### Returns
+
+`Promise`<`void`\>
+
+---
+
+### sendDirectMessage
+
+▸ **sendDirectMessage**(`message`, `peerID`, `type?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name      | Type     | Description                                                       |
+| :-------- | :------- | :---------------------------------------------------------------- |
+| `message` | `string` |                                                                   |
+| `peerID`  | `string` | id of the peer to which message has to be sent                    |
+| `type?`   | `string` | type of message eg: image, video etc. - optional defaults to chat |
+
+#### Returns
+
+`Promise`<`void`\>
+
+---
+
+### sendGroupMessage
+
+▸ **sendGroupMessage**(`message`, `roles`, `type?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name      | Type       | Description                                                       |
+| :-------- | :--------- | :---------------------------------------------------------------- |
+| `message` | `string`   | string message to send                                            |
+| `roles`   | `string`[] | roles to which to send the message                                |
+| `type?`   | `string`   | type of message eg: image, video etc. - optional defaults to chat |
+
+#### Returns
+
+`Promise`<`void`\>
+
+---
+
+### sendMessage
+
+▸ **sendMessage**(`message`): `void`
+**`deprecated`** The method should not be used
+**`see`** sendBroadcastMessage
+Send a plain text message to all the other participants in the room.
+
+#### Parameters
+
+| Name      | Type     | Description                 |
+| :-------- | :------- | :-------------------------- |
+| `message` | `string` | string message to broadcast |
 
 #### Returns
 
@@ -422,10 +498,10 @@ This can be used to mute/unmute a remote peer's track
 
 #### Parameters
 
-| Name               | Type                   | Description                                                                                    |
-| :----------------- | :--------------------- | :--------------------------------------------------------------------------------------------- |
-| `forRemoteTrackID` | `string` \| `string`[] | The track ID or array of track IDs for which you want to change the state                      |
-| `enabled`          | `boolean`              | `true` if you wish to enable(unmute) the track, `false` if you wish to disable(mute) the track |
+| Name               | Type                   | Description                                                                                                                                  |
+| :----------------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| `forRemoteTrackID` | `string` \| `string`[] | The track ID or array of track IDs for which you want to change the state                                                                    |
+| `enabled`          | `boolean`              | `true` if you wish to enable(unmute permission is required) the track, `false` if you wish to disable(mute permission is required) the track |
 
 #### Returns
 
@@ -495,6 +571,9 @@ Method to be called with some UI interaction after autoplay error is received
 #### Returns
 
 `Promise`<`void`\>
+lar audio track |
+
+#### Returns
 
 `void`
 

@@ -16,6 +16,8 @@ on:
       - '.gitignore'
       - 'package.json'
       - 'yarn.lock'
+      - 'docs/**'
+      - 'internal-docs/**'
 
 jobs:
   publish-npm:
@@ -36,4 +38,4 @@ jobs:
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{secrets.npm_token}}
-          tag: "beta"
+          tag: 'beta'

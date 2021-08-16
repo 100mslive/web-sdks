@@ -27,6 +27,7 @@ title: 100mslive/hms-video-store
 - [HMSComponentsStyle](/api-reference/javascript/v2/interfaces/HMSComponentsStyle)
 - [HMSConfig](/api-reference/javascript/v2/interfaces/HMSConfig)
 - [HMSException](/api-reference/javascript/v2/interfaces/HMSException)
+- [HMSLeaveRoomRequest](/api-reference/javascript/v2/interfaces/HMSLeaveRoomRequest)
 - [HMSMediaSettings](/api-reference/javascript/v2/interfaces/HMSMediaSettings)
 - [HMSMessage](/api-reference/javascript/v2/interfaces/HMSMessage)
 - [HMSMessageInput](/api-reference/javascript/v2/interfaces/HMSMessageInput)
@@ -171,6 +172,13 @@ Select a boolean denoting whether the room is in Preview state.
 
 ---
 
+### selectLocalAudioTrackID
+
+• `Const` **selectLocalAudioTrackID**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| `string`, `fn`\>
+Select the track ID of your local peer's primary audio track
+
+---
+
 ### selectLocalPeer
 
 • `Const` **selectLocalPeer**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSPeer`](/api-reference/javascript/v2/interfaces/HMSPeer), `fn`\>
@@ -192,6 +200,20 @@ Select the [HMSRole](/api-reference/javascript/v2/interfaces/HMSRole) object of 
 
 ---
 
+### selectLocalTrackIDs
+
+• `Const` **selectLocalTrackIDs**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `string`[], `fn`\>
+Select an array of track IDs of all your local peer's tracks
+
+---
+
+### selectLocalVideoTrackID
+
+• `Const` **selectLocalVideoTrackID**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| `string`, `fn`\>
+Select the track ID of your local peer's primary video track
+
+---
+
 ### selectPeers
 
 • `Const` **selectPeers**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), [`HMSPeer`](/api-reference/javascript/v2/interfaces/HMSPeer)[], `fn`\>
@@ -207,7 +229,7 @@ Select an array of peers(remote peers and your local peer) present in the room.
 
 ### selectPermissions
 
-• `Const` **selectPermissions**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| { `askToUnmute`: `boolean` ; `changeRole`: `boolean` ; `endRoom`: `boolean` ; `muteAll`: `boolean` ; `muteSelective`: `boolean` ; `removeOthers`: `boolean` ; `stopPresentation`: `boolean` }, `fn`\>
+• `Const` **selectPermissions**: `OutputSelector`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore), `undefined` \| { `changeRole`: `boolean` ; `endRoom`: `boolean` ; `mute`: `boolean` ; `muteAll`: `boolean` ; `removeOthers`: `boolean` ; `stopPresentation`: `boolean` ; `unmute`: `boolean` }, `fn`\>
 Select the permissions which determine what actions the local peer can do.
 
 ---
@@ -935,7 +957,9 @@ Select the primary video track of a peer given a peer ID.
 #### Returns
 
 `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
-nst`**selectVideoTrackByPeerID**(`id?`):`StoreSelector`<`undefined`\| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
+rID
+
+▸ `Const` **selectVideoTrackByPeerID**(`id?`): `StoreSelector`<`undefined` \| [`HMSTrack`](/api-reference/javascript/v2/interfaces/HMSTrack)\>
 
 Select the primary video track of a peer given a peer ID.
 
