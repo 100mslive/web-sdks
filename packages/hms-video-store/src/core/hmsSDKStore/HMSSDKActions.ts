@@ -339,8 +339,8 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async addPluginToVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
-    return this.addRemoveVideoPlugin(plugin, 'add');
+  async addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
+    return this.addRemoveVideoPlugin(plugin, 'add', pluginFrameRate);
   }
 
   async removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
@@ -869,7 +869,11 @@ export class HMSSDKActions implements IHMSActions {
     HMSLogger.w('possible inconsistency detected - ', inconsistency);
   }
 
-  private async addRemoveVideoPlugin(plugin: HMSVideoPlugin, action: 'add' | 'remove') {
+  private async addRemoveVideoPlugin(
+    plugin: HMSVideoPlugin,
+    action: 'add' | 'remove',
+    pluginFrameRate?: number,
+  ) {
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');
       return;
@@ -879,7 +883,7 @@ export class HMSSDKActions implements IHMSActions {
       const sdkTrack = this.hmsSDKTracks[trackID];
       if (sdkTrack) {
         if (action === 'add') {
-          await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin);
+          await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin, pluginFrameRate);
         } else if (action === 'remove') {
           await (sdkTrack as SDKHMSLocalVideoTrack).removePlugin(plugin);
         }

@@ -177,10 +177,12 @@ export interface IHMSActions {
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the join is successful.
+   * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
+   * @param pluginFrameRate number
    * @see HMSVideoPlugin
    */
-  addPluginToVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
+  addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
   /**
    * @see addPluginToVideoTrack
