@@ -122,17 +122,15 @@ export class HMSVideoPluginsManager {
       if (pluginFrameRate < inputFrameRate) {
         numFramesToSkip = Math.ceil(inputFrameRate / pluginFrameRate) - 1;
       }
+      this.analytics.added(name, inputFrameRate, pluginFrameRate);
     } else {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
+      this.analytics.added(name, inputFrameRate);
     }
 
     HMSLogger.i(TAG, 'numFrames to skip processing', numFramesToSkip);
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
-
-    //Adding Analytics
-    //TODO: shall we make this configurable
-    this.analytics.added(name, numFramesToSkip);
 
     if (!plugin.isSupported()) {
       let err = ErrorFactory.VideoPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');

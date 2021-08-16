@@ -17,14 +17,16 @@ export default class VideoPluginsAnalyticsFactory {
     loadTime,
     avgPreProcessingTime,
     avgProcessingTime,
-    framesSkippedPerSec,
+    inputFrameRate,
+    pluginFrameRate,
   }: {
     pluginName: string;
     duration: number;
     loadTime: number;
     avgPreProcessingTime: number;
     avgProcessingTime: number;
-    framesSkippedPerSec: number;
+    inputFrameRate: number;
+    pluginFrameRate: number;
   }) {
     const name = 'videoPlugin.stats';
     const level = AnalyticsEventLevel.INFO;
@@ -34,7 +36,8 @@ export default class VideoPluginsAnalyticsFactory {
       load_time: loadTime,
       avg_preprocessing_time: avgPreProcessingTime,
       avg_processing_time: avgProcessingTime,
-      frames_skipped_ps: framesSkippedPerSec,
+      input_frame_rate: inputFrameRate,
+      plugin_frame_rate: pluginFrameRate,
     };
     return new AnalyticsEvent({ name, level, properties });
   }

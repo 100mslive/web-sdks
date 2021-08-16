@@ -13,7 +13,8 @@ export class VideoPluginsAnalytics {
   private readonly preProcessingAvgs: RunningAverage;
   private readonly processingAvgs: Record<string, RunningAverage>;
   private readonly pluginAdded: Record<string, boolean>;
-  private readonly pluginNumFramesToSkip: Record<string, number>;
+  private readonly pluginInputFrameRate: Record<string, number>;
+  private readonly pluginFrameRate: Record<string, number>;
 
   constructor() {
     this.initTime = {};
@@ -21,15 +22,17 @@ export class VideoPluginsAnalytics {
     this.addedTimestamps = {};
     this.processingAvgs = {};
     this.pluginAdded = {};
-    this.pluginNumFramesToSkip = {};
+    this.pluginInputFrameRate = {};
+    this.pluginFrameRate = {};
   }
 
-  added(name: string, numFramesToSkip: number) {
+  added(name: string, inputFrameRate: number, pluginFrameRate?: number) {
     this.pluginAdded[name] = true;
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
     this.processingAvgs[name] = new RunningAverage();
-    this.pluginNumFramesToSkip[name] = numFramesToSkip;
+    this.pluginInputFrameRate[name] = inputFrameRate;
+    this.pluginFrameRate[name] = pluginFrameRate || inputFrameRate;
   }
 
   removed(name: string) {
@@ -42,7 +45,8 @@ export class VideoPluginsAnalytics {
         loadTime: this.initTime[name],
         avgPreProcessingTime: this.preProcessingAvgs.getAvg(), //Do we need this in stat not plugin specific
         avgProcessingTime: this.processingAvgs[name]?.getAvg(),
-        framesSkippedPerSec: this.pluginNumFramesToSkip[name],
+        inputFrameRate: this.pluginInputFrameRate[name],
+        pluginFrameRate: this.pluginFrameRate[name],
       };
       //send stats
       analyticsEventsService.queue(VideoPluginsAnalyticsFactory.stats(stats)).flush();
@@ -120,6 +124,7 @@ export class VideoPluginsAnalytics {
     delete this.initTime[name];
     delete this.processingAvgs[name];
     delete this.pluginAdded[name];
-    delete this.pluginNumFramesToSkip[name];
+    delete this.pluginInputFrameRate[name];
+    delete this.pluginFrameRate[name];
   }
 }
