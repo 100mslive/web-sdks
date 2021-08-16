@@ -292,13 +292,11 @@ const selectMessagesByRoleInternal = createSelector(
       return undefined;
     }
     return messages.filter(message => {
-      // Broadcast message
-      if (!message.recipientPeer && !message.recipientRoles?.length) {
+      // Not Role message - Broadcast message or Private Peer message
+      if (!message.recipientRoles?.length) {
         return false;
       }
-      const iSent = message.recipientRoles?.includes(roleName);
-      const roleSent = message.senderRole === roleName;
-      return iSent || roleSent;
+      return message.recipientRoles?.includes(roleName);
     });
   },
 );

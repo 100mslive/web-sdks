@@ -114,8 +114,8 @@ describe('test primitive selectors', () => {
     expect(selectIsLocalScreenShared(fakeStore)).toBe(false);
     localVideo.displayEnabled = true;
     expect(selectIsLocalVideoDisplayEnabled(fakeStore)).toBe(true);
-    expect(selectPermissions(fakeStore)?.muteSelective).toBe(hostRole.permissions.muteSelective);
-    expect(selectPermissions(fakeStore)?.askToUnmute).toBe(hostRole.permissions.askToUnmute);
+    expect(selectPermissions(fakeStore)?.mute).toBe(hostRole.permissions.mute);
+    expect(selectPermissions(fakeStore)?.unmute).toBe(hostRole.permissions.unmute);
   });
 });
 
@@ -228,7 +228,7 @@ describe('by ID selectors', () => {
   test('selectMessagesByRole', () => {
     const peer = selectRemotePeers(fakeStore);
     const messages = selectMessagesByRole(peer[0].roleName)(fakeStore);
-    expect(messages).toEqual([fakeStore.messages.byID['202'], fakeStore.messages.byID['203']]);
+    expect(messages).toEqual([fakeStore.messages.byID['203']]);
   });
 
   test('selectBroadcastMessages', () => {
@@ -239,7 +239,7 @@ describe('by ID selectors', () => {
   test('selectMessagesUnreadCountByRole', () => {
     const peer = selectRemotePeers(fakeStore);
     const messages = selectMessagesUnreadCountByRole(peer[0].roleName)(fakeStore);
-    expect(messages).toBe(1);
+    expect(messages).toBe(0);
   });
 
   test('selectMessagesUnreadCountByPeerID', () => {
