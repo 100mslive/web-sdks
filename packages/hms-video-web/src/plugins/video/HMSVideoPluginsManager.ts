@@ -48,13 +48,16 @@ export class HMSVideoPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private analytics: VideoPluginsAnalytics;
   private pluginAddInProgress: boolean = false;
+  private pluginNumFramesToSkip: Record<string, number>;
+  private pluginNumFramesSkipped: Record<string, number>;
 
   constructor(track: HMSLocalVideoTrack) {
     this.hmsTrack = track;
     this.plugins = [];
     this.pluginsMap = {};
+    this.pluginNumFramesToSkip = {};
+    this.pluginNumFramesSkipped = {};
     this.analytics = new VideoPluginsAnalytics();
-    this.pluginAddInProgress = false;
   }
 
   getPlugins(): string[] {
@@ -109,15 +112,27 @@ export class HMSVideoPluginsManager {
       return;
     }
 
+    //TODO: assuming this inputFrameRate from getMediaTrackSettings will not change once set
+    //TODO: even if it changes will not have the info/params to know the change
+    const inputFrameRate = this.hmsTrack.getMediaTrackSettings().frameRate || DEFAULT_FRAME_RATE;
+
+    let numFramesToSkip = 0;
     if (pluginFrameRate && pluginFrameRate > 0) {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
+      if (pluginFrameRate < inputFrameRate) {
+        numFramesToSkip = Math.ceil(inputFrameRate / pluginFrameRate) - 1;
+      }
     } else {
       HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
     }
 
+    HMSLogger.i(TAG, 'numFrames to skip processing', numFramesToSkip);
+    this.pluginNumFramesToSkip[name] = numFramesToSkip;
+    this.pluginNumFramesSkipped[name] = numFramesToSkip;
+
     //Adding Analytics
     //TODO: shall we make this configurable
-    this.analytics.added(name);
+    this.analytics.added(name, numFramesToSkip);
 
     if (!plugin.isSupported()) {
       let err = ErrorFactory.VideoPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');
@@ -160,6 +175,12 @@ export class HMSVideoPluginsManager {
     }
     if (this.pluginsMap[name]) {
       delete this.pluginsMap[name];
+    }
+    if (this.pluginNumFramesToSkip[name]) {
+      delete this.pluginNumFramesToSkip[name];
+    }
+    if (this.pluginNumFramesSkipped[name]) {
+      delete this.pluginNumFramesSkipped[name];
     }
   }
 
@@ -285,13 +306,18 @@ export class HMSVideoPluginsManager {
         continue;
       }
       try {
+        const skipProcessing = this.checkIfSkipRequired(name);
         // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
         if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
-          await this.analytics.processWithTime(
-            name,
-            async () => await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas),
-          );
-        } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE) {
+          const process = async () => {
+            await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas, skipProcessing);
+          };
+          if (!skipProcessing) {
+            await this.analytics.processWithTime(name, process);
+          } else {
+            await process();
+          }
+        } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
           // there is no need to await for this case
           await this.analytics.processWithTime(name, async () => await plugin.processVideoFrame(this.inputCanvas!));
         }
@@ -364,5 +390,24 @@ export class HMSVideoPluginsManager {
       inputCtx.fillStyle = `rgb(0, 0, 0)`;
       inputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
+  }
+
+  /**
+    N = ceil(inputFrameRate/pluginFrameRate) - 1
+    N = this.pluginNumFramesToSkip[name] = frames to skip for every processed frame
+    all the frames we are skipping are using the previous frame output
+   **/
+  private checkIfSkipRequired(name: string) {
+    let skip = false;
+
+    if (this.pluginNumFramesSkipped[name] < this.pluginNumFramesToSkip[name]) {
+      this.pluginNumFramesSkipped[name]++;
+      skip = true;
+    } else {
+      skip = false;
+      this.pluginNumFramesSkipped[name] = 0;
+    }
+
+    return skip;
   }
 }

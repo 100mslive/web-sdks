@@ -13,6 +13,7 @@ export class VideoPluginsAnalytics {
   private readonly preProcessingAvgs: RunningAverage;
   private readonly processingAvgs: Record<string, RunningAverage>;
   private readonly pluginAdded: Record<string, boolean>;
+  private readonly pluginNumFramesToSkip: Record<string, number>;
 
   constructor() {
     this.initTime = {};
@@ -20,13 +21,15 @@ export class VideoPluginsAnalytics {
     this.addedTimestamps = {};
     this.processingAvgs = {};
     this.pluginAdded = {};
+    this.pluginNumFramesToSkip = {};
   }
 
-  added(name: string) {
+  added(name: string, numFramesToSkip: number) {
     this.pluginAdded[name] = true;
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
     this.processingAvgs[name] = new RunningAverage();
+    this.pluginNumFramesToSkip[name] = numFramesToSkip;
   }
 
   removed(name: string) {
@@ -39,6 +42,7 @@ export class VideoPluginsAnalytics {
         loadTime: this.initTime[name],
         avgPreProcessingTime: this.preProcessingAvgs.getAvg(), //Do we need this in stat not plugin specific
         avgProcessingTime: this.processingAvgs[name]?.getAvg(),
+        framesSkippedPerSec: this.pluginNumFramesToSkip[name],
       };
       //send stats
       analyticsEventsService.queue(VideoPluginsAnalyticsFactory.stats(stats)).flush();
@@ -116,5 +120,6 @@ export class VideoPluginsAnalytics {
     delete this.initTime[name];
     delete this.processingAvgs[name];
     delete this.pluginAdded[name];
+    delete this.pluginNumFramesToSkip[name];
   }
 }

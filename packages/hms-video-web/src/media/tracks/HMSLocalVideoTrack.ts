@@ -101,8 +101,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   /**
    * @see HMSVideoPlugin
    */
-  async addPlugin(plugin: HMSVideoPlugin): Promise<void> {
-    return this.pluginsManager.addPlugin(plugin);
+  async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
+    return this.pluginsManager.addPlugin(plugin, pluginFrameRate);
   }
 
   /**
