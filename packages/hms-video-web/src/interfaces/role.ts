@@ -14,8 +14,8 @@ export interface HMSRole {
     removeOthers: boolean;
     stopPresentation: boolean;
     muteAll: boolean;
-    askToUnmute: boolean;
-    muteSelective: boolean;
+    unmute: boolean;
+    mute: boolean;
     changeRole: boolean;
   };
   priority: number;
