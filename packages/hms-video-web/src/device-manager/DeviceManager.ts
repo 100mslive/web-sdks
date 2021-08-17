@@ -170,9 +170,9 @@ export class DeviceManager implements HMSDeviceManager {
       // Selecting a non-default device so that the deviceId comparision does not give
       // false positives when device is removed, because the other available device
       // get's the deviceId as default once this device is removed
-      const nextDevice = this.audioInput.find(
-        (device) => device.label === defaultDevice?.label.replace(/Default - /, ''),
-      );
+      const nextDevice = this.audioInput.find((device) => {
+        return device.label !== defaultDevice.label && defaultDevice.label.includes(device.label);
+      });
       return nextDevice;
     }
     return this.audioInput[0];
@@ -203,6 +203,7 @@ export class DeviceManager implements HMSDeviceManager {
       // select default deviceId device if available, otherwise select 0th device
       this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default') || this.audioOutput[0];
     }
+    this.store.updateAudioOutputDevice(this.outputDevice);
   }
 
   private handleAudioInputDeviceChange = async (audioTrack?: HMSLocalAudioTrack) => {

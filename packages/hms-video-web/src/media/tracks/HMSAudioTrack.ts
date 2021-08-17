@@ -45,12 +45,22 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   async setOutputDevice(device: MediaDeviceInfo) {
+    if (!this.audioElement) {
+      HMSLogger.w(this.TAG, 'No Audio element attached to track yet');
+      return;
+    }
     try {
       // @ts-ignore
-      await this.audioElement?.setSinkId(device.deviceId);
-      this.outputDevice = device;
-    } catch {
-      HMSLogger.w(this.TAG, 'setSinkId not supported - cannot set output device');
+      if (typeof this.audioElement.setSinkId === 'function') {
+        // @ts-ignore
+        await this.audioElement?.setSinkId(device.deviceId);
+        this.outputDevice = device;
+      } else {
+        HMSLogger.w(this.TAG, 'setSinkId not supported - cannot set output device');
+      }
+    } catch (error) {
+      // Firefox throws error even when accessing setSinkId on audioElement
+      HMSLogger.w(this.TAG, 'setSinkId failed', error);
     }
   }
 }
