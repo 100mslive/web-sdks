@@ -21,6 +21,7 @@ export class AudioSinkManager {
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
   private autoplayFailed: boolean = false;
+  private autoPlayErrorThrown = false;
 
   constructor(
     private store: IStore,
@@ -86,6 +87,7 @@ export class AudioSinkManager {
     this.autoPausedTracks = new Set();
     this.initialized = false;
     this.autoplayFailed = false;
+    this.autoPlayErrorThrown = false;
   }
 
   private handleAudioPaused = (event: any) => {
@@ -148,8 +150,11 @@ export class AudioSinkManager {
       this.autoplayFailed = true;
       this.autoPausedTracks.add(track);
       HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
-      const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
-      this.eventEmitter.emit(AutoplayError, { error: ex });
+      if (!this.autoPlayErrorThrown) {
+        this.autoPlayErrorThrown = true;
+        const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+        this.eventEmitter.emit(AutoplayError, { error: ex });
+      }
     }
   }
 
