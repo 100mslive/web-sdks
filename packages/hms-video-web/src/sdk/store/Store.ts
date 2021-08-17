@@ -173,7 +173,9 @@ class Store implements IStore {
   }
 
   updateAudioOutputDevice(device: MediaDeviceInfo) {
-    this.getAudioTracks().forEach((track) => track.setOutputDevice(device));
+    this.getAudioTracks().forEach((track) => {
+      track.setOutputDevice(device);
+    });
   }
 
   getSubscribeDegradationParams() {

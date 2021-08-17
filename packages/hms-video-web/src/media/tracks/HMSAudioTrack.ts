@@ -1,10 +1,8 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSMediaStream from '../streams/HMSMediaStream';
-import HMSLogger from '../../utils/logger';
 
 export class HMSAudioTrack extends HMSTrack {
-  private readonly TAG = '[HMSAudioTrack]';
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
@@ -46,7 +44,6 @@ export class HMSAudioTrack extends HMSTrack {
 
   async setOutputDevice(device: MediaDeviceInfo) {
     if (!this.audioElement) {
-      HMSLogger.w(this.TAG, 'No Audio element attached to track yet');
       return;
     }
     try {
@@ -55,12 +52,7 @@ export class HMSAudioTrack extends HMSTrack {
         // @ts-ignore
         await this.audioElement?.setSinkId(device.deviceId);
         this.outputDevice = device;
-      } else {
-        HMSLogger.w(this.TAG, 'setSinkId not supported - cannot set output device');
       }
-    } catch (error) {
-      // Firefox throws error even when accessing setSinkId on audioElement
-      HMSLogger.w(this.TAG, 'setSinkId failed', error);
-    }
+    } catch {}
   }
 }
