@@ -3,6 +3,9 @@ import { HMSRoleName } from './role';
 
 export type HMSMessageID = string;
 
+/**
+ * @internal
+ */
 export enum HMSMessageType {
   CHAT = 'chat',
 }
@@ -21,6 +24,9 @@ export interface HMSMessage {
   message: any;
 }
 
+/**
+ * @internal
+ */
 export interface HMSMessageInput {
   recipientPeer?: HMSPeerID;
   recipientRoles?: HMSRoleName[];
