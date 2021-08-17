@@ -195,13 +195,13 @@ export interface IHMSActions {
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
-  changeRole(forPeerId: string, toRole: string, force?: boolean): void;
+  changeRole(forPeerId: string, toRole: string, force?: boolean): Promise<void>;
 
   /**
    * Accept the role change request received
    * @param {HMSRoleChangeRequest} request The original request that was received
    */
-  acceptChangeRole(request: HMSRoleChangeRequest): void;
+  acceptChangeRole(request: HMSRoleChangeRequest): Promise<void>;
 
   /**
    * Reject pending role change request
@@ -215,7 +215,7 @@ export interface IHMSActions {
    * @param forRemoteTrackID The track ID or array of track IDs for which you want to change the state
    * @param enabled `true` if you wish to enable(unmute permission is required) the track, `false` if you wish to disable(mute permission is required) the track
    */
-  setRemoteTrackEnabled(forRemoteTrackID: string | string[], enabled: boolean): void;
+  setRemoteTrackEnabled(forRemoteTrackID: string | string[], enabled: boolean): Promise<void>;
 
   /**
    * Method to be called with some UI interaction after autoplay error is received
@@ -226,7 +226,7 @@ export interface IHMSActions {
    * If you have the **endRoom** permission, you can end the room. That means everyone will be kicked out.
    * If lock is passed as true, the room cannot be used further.
    */
-  endRoom: (lock: boolean, reason: string) => void;
+  endRoom: (lock: boolean, reason: string) => Promise<void>;
 
   /**
    * If you have **removeOthers** permission, you can remove a peer from the room.
@@ -235,18 +235,18 @@ export interface IHMSActions {
    * This string could be used to notify the user before they're removed from the room
    * using the `REMOVED_FROM_ROOM` type of notification
    */
-  removePeer(peerID: string, reason: string): void;
+  removePeer(peerID: string, reason: string): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
    *
    * Note that HMSLogLevel is decremental meaning,
-   * HMSLogLevel.VERBOSE(0) - will log every message from SDK.
-   * HMSLogLevel.DEBUG(1) - will log messages that are helpful in debugging, important info, warnings and errors.
-   * HMSLogLevel.INFO(2) - will log important info, warnings and errors.
-   * HMSLogLevel.WARN(3) - will log warnings and errors.
-   * HMSLogLevel.ERROR(4) - will log only errors.
-   * HMSLogLevel.NONE(5) - won't log anything.
+   * - HMSLogLevel.VERBOSE(0) - will log every message from SDK.
+   * - HMSLogLevel.DEBUG(1) - will log messages that are helpful in debugging, important info, warnings and errors.
+   * - HMSLogLevel.INFO(2) - will log important info, warnings and errors.
+   * - HMSLogLevel.WARN(3) - will log warnings and errors.
+   * - HMSLogLevel.ERROR(4) - will log only errors.
+   * - HMSLogLevel.NONE(5) - won't log anything.
    *
    * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
    */

@@ -276,6 +276,7 @@ export class HMSSDKActions implements IHMSActions {
     const sdkMessage = await this.sdk.sendGroupMessage(message, hmsRoles, type);
     this.updateMessageInStore(sdkMessage, { message, recipientRoles: roles, type });
   }
+
   async sendDirectMessage(message: string, peerID: string, type?: string) {
     const hmsPeer = this.hmsSDKPeers[peerID];
     const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer);
@@ -347,7 +348,7 @@ export class HMSSDKActions implements IHMSActions {
     return this.addRemoveVideoPlugin(plugin, 'remove');
   }
 
-  changeRole(forPeerId: string, toRole: string, force: boolean = false) {
+  async changeRole(forPeerId: string, toRole: string, force: boolean = false) {
     const peer = this.hmsSDKPeers[forPeerId];
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
@@ -357,11 +358,11 @@ export class HMSSDKActions implements IHMSActions {
       HMSLogger.w('changing role for local peer is not yet supported');
       return;
     }
-    this.sdk.changeRole(peer as sdkTypes.HMSRemotePeer, toRole, force);
+    await this.sdk.changeRole(peer as sdkTypes.HMSRemotePeer, toRole, force);
   }
 
   // TODO: separate out role related things in another file
-  acceptChangeRole(request: HMSRoleChangeRequest) {
+  async acceptChangeRole(request: HMSRoleChangeRequest) {
     const sdkPeer = this.hmsSDKPeers[request.requestedBy.id];
     if (!sdkPeer) {
       HMSLogger.w(
@@ -374,7 +375,7 @@ export class HMSSDKActions implements IHMSActions {
       role: request.role,
       token: request.token,
     };
-    this.sdk.acceptChangeRole(sdkRequest);
+    await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
   }
 
@@ -387,30 +388,30 @@ export class HMSSDKActions implements IHMSActions {
     this.removeRoleChangeRequest(request);
   }
 
-  endRoom(lock: boolean, reason: string) {
+  async endRoom(lock: boolean, reason: string) {
     const permissions = this.store.getState(selectPermissions);
     if (!permissions?.endRoom) {
       HMSLogger.w('You are not allowed to perform this action - endRoom');
       return;
     }
-    this.sdk.endRoom(lock, reason);
+    await this.sdk.endRoom(lock, reason);
   }
 
-  removePeer(peerID: string, reason: string) {
+  async removePeer(peerID: string, reason: string) {
     const peer = this.hmsSDKPeers[peerID];
     if (peer && !peer.isLocal) {
-      this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
+      await this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
     } else {
       this.logPossibleInconsistency(`No remote peer found for peerID - ${peerID}`);
       return;
     }
   }
 
-  setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
+  async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
       if (track && isRemoteTrack(track)) {
-        this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
+        await this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
       } else {
         this.logPossibleInconsistency(
           `No remote track with ID ${trackID} found for change track state`,
