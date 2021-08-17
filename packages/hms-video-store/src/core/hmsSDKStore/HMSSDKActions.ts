@@ -363,18 +363,21 @@ export class HMSSDKActions implements IHMSActions {
 
   // TODO: separate out role related things in another file
   async acceptChangeRole(request: HMSRoleChangeRequest) {
-    const sdkPeer = this.hmsSDKPeers[request.requestedBy.id];
+    let sdkPeer: sdkTypes.HMSPeer | undefined = request.requestedBy
+      ? this.hmsSDKPeers[request.requestedBy.id]
+      : undefined;
     if (!sdkPeer) {
       HMSLogger.w(
         `peer for which role change is requested no longer available - ${request.requestedBy}`,
       );
-      return;
     }
     const sdkRequest = {
       requestedBy: sdkPeer,
       role: request.role,
       token: request.token,
     };
+    // TODO: hotfix for HMS-3639. Needs a better solution
+    //@ts-ignore
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
   }
@@ -921,11 +924,7 @@ export class HMSSDKActions implements IHMSActions {
   private removeRoleChangeRequest(toRemove: HMSRoleChangeRequest) {
     this.setState(store => {
       const index = store.roleChangeRequests.findIndex(req => {
-        return (
-          req.requestedBy === toRemove.requestedBy.id &&
-          req.roleName === toRemove.role.name &&
-          req.token === toRemove.token
-        );
+        return req.token === toRemove.token;
       });
       if (index !== -1) {
         store.roleChangeRequests.splice(index, 1);
