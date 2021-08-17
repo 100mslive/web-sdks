@@ -19,6 +19,7 @@ export interface DeviceChangeEvent {
   track: HMSLocalAudioTrack | HMSLocalVideoTrack;
   error: HMSException;
   devices: DeviceMap;
+  init?: boolean;
 }
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
@@ -53,7 +54,7 @@ export class DeviceManager implements HMSDeviceManager {
     navigator.mediaDevices.ondevicechange = debounce(() => this.handleDeviceChange());
     await this.enumerateDevices();
     this.logDevices('Init');
-    this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() });
+    this.eventEmitter.emit('audio-device-change', { devices: this.getDevices(), init: true } as DeviceChangeEvent);
     analyticsEventsService
       .queue(
         AnalyticsEventFactory.deviceChange({
@@ -221,7 +222,7 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
-    const { settings, enabled } = audioTrack;
+    const { settings } = audioTrack;
     const newAudioTrackSettings = new HMSAudioTrackSettingsBuilder()
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
@@ -229,11 +230,7 @@ export class DeviceManager implements HMSDeviceManager {
       .build();
     try {
       await audioTrack.setSettings(newAudioTrackSettings);
-      if (!enabled) {
-        // On replace track, enabled will be true. Need to be set to previous state
-        audioTrack.setEnabled(enabled);
-      }
-      this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() });
+      this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() } as DeviceChangeEvent);
       this.logDevices('Audio Device Change Success');
     } catch (error) {
       HMSLogger.e(this.TAG, '[Audio Device Change]', error);
@@ -246,7 +243,11 @@ export class DeviceManager implements HMSDeviceManager {
           }),
         )
         .flush();
-      this.eventEmitter.emit('audio-device-change', { track: audioTrack, error, devices: this.getDevices() });
+      this.eventEmitter.emit('audio-device-change', {
+        track: audioTrack,
+        error,
+        devices: this.getDevices(),
+      } as DeviceChangeEvent);
     }
   };
 
@@ -280,7 +281,7 @@ export class DeviceManager implements HMSDeviceManager {
         // On replace track, enabled will be true. Need to be set to previous state
         videoTrack.setEnabled(enabled);
       }
-      this.eventEmitter.emit('video-device-change', { devices: this.getDevices() });
+      this.eventEmitter.emit('video-device-change', { devices: this.getDevices() } as DeviceChangeEvent);
       this.logDevices('Video Device Change Success');
     } catch (error) {
       HMSLogger.e(this.TAG, '[Video Device Change]', error);
@@ -293,7 +294,11 @@ export class DeviceManager implements HMSDeviceManager {
           }),
         )
         .flush();
-      this.eventEmitter.emit('video-device-change', { track: videoTrack, error, devices: this.getDevices() });
+      this.eventEmitter.emit('video-device-change', {
+        track: videoTrack,
+        error,
+        devices: this.getDevices(),
+      } as DeviceChangeEvent);
     }
   };
 

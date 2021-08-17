@@ -1,12 +1,11 @@
 import { EventEmitter } from 'events';
 import { v4 as uuid } from 'uuid';
 import { HMSAudioTrack } from '../media/tracks';
-import { DeviceManager } from '../device-manager';
+import { DeviceChangeEvent, DeviceManager } from '../device-manager';
 import NotificationManager from '../sdk/NotificationManager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
-import { playSilentAudio } from '../utils/autoplay';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 
 export interface AutoplayEvent {
@@ -16,14 +15,12 @@ export interface AutoplayEvent {
 export const AutoplayError = 'autoplay-error';
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
-  private autoPausedTracks: Set<string> = new Set();
-  private playInProgress = false;
+  private autoPausedTracks: Set<HMSAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
   private initialized = false;
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
-  private autoplayFailed: boolean | undefined;
-  private tracksToAdd = new Set<HMSAudioTrack>();
+  private autoplayFailed: boolean = false;
 
   constructor(
     private store: IStore,
@@ -64,15 +61,7 @@ export class AudioSinkManager {
     if (!this.autoplayFailed) {
       return;
     }
-    try {
-      this.autoplayFailed = false;
-      await playSilentAudio();
-    } catch (error) {
-      // autoplayFailed is not set to true here because even if the play fails,
-      // we have a user interaction and proceed with adding tracks
-      HMSLogger.e(this.TAG, error);
-    }
-    this.addPendingTracks();
+    this.unpauseAudioTracks();
   }
 
   init(elementId?: string) {
@@ -87,7 +76,6 @@ export class AudioSinkManager {
     audioSinkParent.append(audioSink);
 
     this.audioSink = audioSink;
-    this.addSilentAudio();
   }
 
   cleanUp() {
@@ -96,22 +84,8 @@ export class AudioSinkManager {
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.audioSink?.remove();
     this.autoPausedTracks = new Set();
-    this.playInProgress = false;
     this.initialized = false;
     this.autoplayFailed = false;
-  }
-
-  private async addSilentAudio() {
-    try {
-      await playSilentAudio();
-      this.autoplayFailed = false;
-      this.addPendingTracks();
-    } catch (error) {
-      HMSLogger.e(this.TAG, error);
-      this.autoplayFailed = true;
-      const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
-      this.eventEmitter.emit(AutoplayError, { error: ex });
-    }
   }
 
   private handleAudioPaused = (event: any) => {
@@ -124,32 +98,15 @@ export class AudioSinkManager {
     }
     // this means the audio paused because of external factors(headset removal)
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
-    this.autoPausedTracks.add(event.target.id);
-    if (!this.playInProgress) {
-      this.handleAudioDeviceChange();
+    const audioTrack = this.store.getTrackById(event.target.id);
+    if (audioTrack) {
+      this.autoPausedTracks.add(audioTrack as HMSAudioTrack);
     }
   };
 
   private handleTrackAdd = (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
-    // undefined is necessary to handle a case where trackAdd is called before autoplay
-    if (this.autoplayFailed === undefined || this.autoplayFailed === true) {
-      this.tracksToAdd.add(track);
-    } else {
-      this.addToDOM(track);
-    }
-  };
-
-  private addPendingTracks() {
-    this.tracksToAdd.forEach((track) => {
-      this.addToDOM(track);
-      this.tracksToAdd.delete(track);
-    });
-  }
-
-  private addToDOM = (track: HMSAudioTrack) => {
     const audioEl = document.createElement('audio');
-    audioEl.autoplay = true;
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -159,38 +116,62 @@ export class AudioSinkManager {
     track.setAudioElement(audioEl);
     this.outputDevice && track.setOutputDevice(this.outputDevice);
     track.setVolume(this.volume);
+    /**
+     * Don't play the track if autoplay already failed. Add to paused list
+     */
+    if (this.autoplayFailed) {
+      this.autoPausedTracks.add(track);
+      return;
+    }
+    this.handleAudioPlay(track);
   };
+
+  private handleAudioDeviceChange = (event: DeviceChangeEvent) => {
+    if (event.error || event.init) {
+      return;
+    }
+    this.unpauseAudioTracks();
+  };
+
+  private async handleAudioPlay(track: HMSAudioTrack) {
+    const audioEl = track.getAudioElement();
+    if (!audioEl) {
+      HMSLogger.w(this.TAG, 'No audio element found on track', track.trackId);
+      return;
+    }
+    try {
+      await audioEl.play();
+      this.autoplayFailed = false;
+      this.autoPausedTracks.delete(track);
+      HMSLogger.d(this.TAG, 'Played track', track.trackId);
+    } catch (error) {
+      this.autoplayFailed = true;
+      this.autoPausedTracks.add(track);
+      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
+      const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+      this.eventEmitter.emit(AutoplayError, { error: ex });
+    }
+  }
 
   private handleTrackRemove = (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
-    HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
+    this.autoPausedTracks.delete(track);
     const audioEl = document.getElementById(track.trackId) as HTMLAudioElement;
-    this.autoPausedTracks.delete(track.trackId);
     if (audioEl) {
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
     }
+    HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
   };
 
-  private handleAudioDeviceChange = async () => {
-    if (this.playInProgress) {
-      return;
-    }
-    this.playInProgress = true;
-    for (let trackId of Array.from(this.autoPausedTracks)) {
-      const audioEl = document.getElementById(trackId);
-      if (audioEl) {
-        try {
-          await (audioEl as HTMLAudioElement).play();
-          HMSLogger.d(this.TAG, 'Audio Resumed', trackId);
-          this.autoPausedTracks.delete(trackId);
-        } catch (error) {
-          HMSLogger.e(this.TAG, 'Failed to play track', trackId);
-        }
-      }
-    }
-    this.playInProgress = false;
+  private unpauseAudioTracks = async () => {
+    const promises: Promise<void>[] = [];
+    this.autoPausedTracks.forEach((track) => {
+      promises.push(this.handleAudioPlay(track));
+    });
+    // Return after all pending tracks are played
+    await Promise.all(promises);
   };
 }

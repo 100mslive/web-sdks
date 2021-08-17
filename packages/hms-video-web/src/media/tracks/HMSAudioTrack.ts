@@ -29,6 +29,14 @@ export class HMSAudioTrack extends HMSTrack {
     this.audioElement = element;
   }
 
+  /**
+   * @internal
+   * @returns {HTMLAudioElement | null}
+   */
+  getAudioElement(): HTMLAudioElement | null {
+    return this.audioElement;
+  }
+
   getOutputDevice() {
     return this.outputDevice;
   }
