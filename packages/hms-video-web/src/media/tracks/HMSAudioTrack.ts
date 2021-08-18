@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSMediaStream from '../streams/HMSMediaStream';
+import HMSLogger from '../../utils/logger';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
@@ -52,6 +53,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   async setOutputDevice(device: MediaDeviceInfo) {
     if (!this.audioElement) {
+      HMSLogger.d('audio-track', 'no audio element to set output');
       return;
     }
     try {

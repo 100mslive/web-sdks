@@ -20,7 +20,10 @@ export class AudioSinkManager {
   private initialized = false;
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
-  private autoplayFailed: boolean = false;
+  private autoplayFailed?: boolean;
+  // this promise will be set for the first track. remaining tracks will be processed once it's know whether
+  // autoplay is allowed or not
+  private autoplayCheckPromise?: Promise<void>;
   private autoPlayErrorThrown = false;
 
   constructor(
@@ -86,7 +89,7 @@ export class AudioSinkManager {
     this.audioSink?.remove();
     this.autoPausedTracks = new Set();
     this.initialized = false;
-    this.autoplayFailed = false;
+    this.autoplayFailed = undefined;
     this.autoPlayErrorThrown = false;
   }
 
@@ -107,6 +110,10 @@ export class AudioSinkManager {
   };
 
   private handleTrackAdd = (event: CustomEvent<HMSAudioTrack>) => {
+    this.handleTrackAddAsync(event);
+  };
+
+  private handleTrackAddAsync = async (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
@@ -116,16 +123,29 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
     this.audioSink?.append(audioEl);
     track.setAudioElement(audioEl);
-    this.outputDevice && track.setOutputDevice(this.outputDevice);
+    this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     track.setVolume(this.volume);
     /**
-     * Don't play the track if autoplay already failed. Add to paused list
+     * if it's not known whether autoplay will succeed, wait for it to be known
+     */
+    if (this.autoplayFailed === undefined) {
+      if (!this.autoplayCheckPromise) {
+        // it's the first track, try to play it, that'll tell us whether autoplay is allowed
+        this.autoplayCheckPromise = new Promise<void>((resolve) => {
+          this.playAudioFor(track).then(resolve);
+        });
+      }
+      // and wait for the result to be known
+      await this.autoplayCheckPromise;
+    }
+    /**
+     * Don't play the track if autoplay failed, add to paused list
      */
     if (this.autoplayFailed) {
       this.autoPausedTracks.add(track);
       return;
     }
-    this.handleAudioPlay(track);
+    await this.playAudioFor(track);
   };
 
   private handleAudioDeviceChange = (event: DeviceChangeEvent) => {
@@ -135,7 +155,12 @@ export class AudioSinkManager {
     this.unpauseAudioTracks();
   };
 
-  private async handleAudioPlay(track: HMSAudioTrack) {
+  /**
+   * try to play audio for the passed in track, assume autoplay error happened if play fails
+   * @param track
+   * @private
+   */
+  private async playAudioFor(track: HMSAudioTrack) {
     const audioEl = track.getAudioElement();
     if (!audioEl) {
       HMSLogger.w(this.TAG, 'No audio element found on track', track.trackId);
@@ -174,7 +199,7 @@ export class AudioSinkManager {
   private unpauseAudioTracks = async () => {
     const promises: Promise<void>[] = [];
     this.autoPausedTracks.forEach((track) => {
-      promises.push(this.handleAudioPlay(track));
+      promises.push(this.playAudioFor(track));
     });
     // Return after all pending tracks are played
     await Promise.all(promises);
