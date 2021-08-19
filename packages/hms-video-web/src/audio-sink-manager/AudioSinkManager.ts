@@ -91,6 +91,7 @@ export class AudioSinkManager {
     this.initialized = false;
     this.autoplayFailed = undefined;
     this.autoPlayErrorThrown = false;
+    this.autoplayCheckPromise = undefined;
   }
 
   private handleAudioPaused = (event: any) => {
@@ -192,6 +193,13 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
+    }
+    // Reset autoplay error thrown because if all tracks are removed and a new track is added
+    // Autoplay error is thrown in safari
+    if (this.audioSink && this.audioSink.childElementCount === 0) {
+      this.autoPlayErrorThrown = false;
+      this.autoplayCheckPromise = undefined;
+      this.autoplayFailed = undefined;
     }
     HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
   };
