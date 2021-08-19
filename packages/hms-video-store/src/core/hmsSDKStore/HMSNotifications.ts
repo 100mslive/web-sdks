@@ -14,6 +14,7 @@ import {
   HMSTrack,
   HMSChangeTrackStateRequest,
   HMSLeaveRoomRequest,
+  HMSDeviceChangeEvent,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -33,6 +34,16 @@ export class HMSNotifications implements IHMSNotifications {
       this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, cb);
     };
   };
+
+  sendDeviceChange(request: HMSDeviceChangeEvent) {
+    const notification = this.createNotification(
+      HMSNotificationTypes.DEVICE_CHANGE_UPDATE,
+      request,
+      request.error ? HMSNotificationSeverity.ERROR : HMSNotificationSeverity.INFO,
+      `Selected ${request.type} device - ${request.selection?.label}`,
+    );
+    this.emitEvent(notification);
+  }
 
   sendLeaveRoom(request: HMSLeaveRoomRequest) {
     const notification = this.createNotification(
@@ -128,6 +139,7 @@ export class HMSNotifications implements IHMSNotifications {
       | HMSException
       | HMSChangeTrackStateRequest
       | HMSLeaveRoomRequest
+      | HMSDeviceChangeEvent
       | null,
     severity?: HMSNotificationSeverity,
     message: string = '',

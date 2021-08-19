@@ -43,7 +43,6 @@ import {
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSVideoTrack as SDKHMSVideoTrack,
   HMSException as SDKHMSException,
-  DeviceMap,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSSimulcastLayer,
@@ -473,7 +472,8 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  private onDeviceChange(devices: DeviceMap) {
+  private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
+    const devices = event.devices;
     this.setState(store => {
       if (!areArraysEqual(store.devices.audioInput, devices.audioInput)) {
         store.devices.audioInput = devices.audioInput;
@@ -487,6 +487,11 @@ export class HMSSDKActions implements IHMSActions {
     }, 'deviceChange');
     // sync is needed to update the current selected device
     this.syncRoomState('deviceChangeSync');
+    // send notification only on device change - selection is present
+    if (event.selection) {
+      const notification = SDKToHMS.convertDeviceChangeUpdate(event);
+      this.hmsNotifications.sendDeviceChange(notification);
+    }
   }
 
   private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {

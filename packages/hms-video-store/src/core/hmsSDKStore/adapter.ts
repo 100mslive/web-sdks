@@ -12,6 +12,7 @@ import {
   HMSRoom,
   HMSRoleChangeStoreRequest,
   HMSException,
+  HMSDeviceChangeEvent,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -127,5 +128,19 @@ export class SDKToHMS {
       isTerminal: sdkException.isTerminal,
       timestamp: new Date(),
     };
+  }
+
+  static convertDeviceChangeUpdate(
+    sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent,
+  ): HMSDeviceChangeEvent {
+    const convertedData: HMSDeviceChangeEvent = {
+      devices: sdkDeviceChangeEvent.devices,
+      selection: sdkDeviceChangeEvent.selection,
+      type: sdkDeviceChangeEvent.type,
+    };
+    if (sdkDeviceChangeEvent.error) {
+      convertedData.error = this.convertException(sdkDeviceChangeEvent.error);
+    }
+    return convertedData;
   }
 }

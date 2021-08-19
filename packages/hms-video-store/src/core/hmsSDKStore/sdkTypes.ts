@@ -17,6 +17,7 @@ import {
   SimulcastLayerDefinition,
   DeviceMap,
   HMSLogLevel,
+  HMSDeviceChangeEvent,
 } from '@100mslive/hms-video';
 
 export {
@@ -38,4 +39,5 @@ export {
   HMSLogLevel,
   SimulcastLayerDefinition,
   DeviceMap,
+  HMSDeviceChangeEvent,
 };

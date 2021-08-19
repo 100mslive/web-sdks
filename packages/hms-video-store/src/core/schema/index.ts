@@ -8,3 +8,4 @@ export * from './notification';
 export * from './role';
 export * from './error';
 export * from './requests';
+export * from './device-change';
