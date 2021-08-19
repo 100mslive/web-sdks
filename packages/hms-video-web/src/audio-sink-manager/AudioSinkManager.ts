@@ -1,12 +1,13 @@
 import { EventEmitter } from 'events';
 import { v4 as uuid } from 'uuid';
 import { HMSAudioTrack } from '../media/tracks';
-import { DeviceChangeEvent, DeviceManager } from '../device-manager';
+import { DeviceManager } from '../device-manager';
 import NotificationManager from '../sdk/NotificationManager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { DeviceChangeEvent } from '../interfaces';
 
 export interface AutoplayEvent {
   error: HMSException;
@@ -150,7 +151,8 @@ export class AudioSinkManager {
   };
 
   private handleAudioDeviceChange = (event: DeviceChangeEvent) => {
-    if (event.error || event.init) {
+    // if there is no selection that means this is an init request. No need to do anything
+    if (event.error || !event.selection) {
       return;
     }
     this.unpauseAudioTracks();

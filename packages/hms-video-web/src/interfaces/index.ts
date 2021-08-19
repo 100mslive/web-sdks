@@ -11,3 +11,4 @@ export * from './leave-room-request';
 export { HMSSimulcastLayer, SimulcastLayerDefinition, SimulcastLayer, SimulcastDimensions } from './simulcast-layers';
 export { DeviceMap } from './HMSDeviceManager';
 export * from './track-settings';
+export * from './device-change-event';

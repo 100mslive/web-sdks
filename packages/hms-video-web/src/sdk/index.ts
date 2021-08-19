@@ -1,4 +1,4 @@
-import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessageInput } from '../interfaces';
+import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessageInput, DeviceChangeEvent } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -31,7 +31,7 @@ import {
   HMSAudioTrackSettingsBuilder,
 } from '../media/settings';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { DeviceChangeEvent, DeviceManager, AudioOutputManager } from '../device-manager';
+import { DeviceManager, AudioOutputManager } from '../device-manager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import { TransportState } from '../transport/models/TransportState';
@@ -210,7 +210,6 @@ export class HMSSdk implements HMSInterface {
       this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       await this.initDeviceManagers();
       listener.onPreview(this.store.getRoom(), tracks);
-      this.deviceChangeListener?.onDeviceChange?.(this.deviceManager.getDevices());
       this.isPreviewInProgress = false;
     };
 
@@ -232,9 +231,9 @@ export class HMSSdk implements HMSInterface {
   }
 
   private handleDeviceChangeError = (event: DeviceChangeEvent) => {
-    const track = event.track;
     HMSLogger.d(this.TAG, 'Device Change event', event);
-    this.deviceChangeListener?.onDeviceChange?.(event.devices);
+    this.deviceChangeListener?.onDeviceChange?.(event);
+    const track = event.type === 'audio' ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;
     if (event.error) {
       this.errorListener?.onError(event.error);
       if (
@@ -242,7 +241,8 @@ export class HMSSdk implements HMSInterface {
           ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
           ErrorCodes.TracksErrors.DEVICE_IN_USE,
           ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,
-        ]
+        ].includes(event.error.code) &&
+        track
       ) {
         track.setEnabled(false);
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, this.localPeer!);
@@ -601,7 +601,6 @@ export class HMSSdk implements HMSInterface {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     }
     await this.initDeviceManagers();
-    this.deviceChangeListener?.onDeviceChange?.(this.deviceManager.getDevices());
   }
 
   private setLocalPeerTrack(track: HMSLocalTrack) {
@@ -695,9 +694,9 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async initDeviceManagers() {
-    await this.deviceManager.init();
     this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
+    await this.deviceManager.init();
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 

@@ -1,2 +1,2 @@
-export { DeviceManager, DeviceChangeEvent, SelectedDevices } from './DeviceManager';
+export { DeviceManager, SelectedDevices } from './DeviceManager';
 export { AudioOutputManager } from './AudioOutputManager';
