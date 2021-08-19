@@ -7,7 +7,7 @@ import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { DeviceChangeEvent } from '../interfaces';
+import { HMSDeviceChangeEvent } from '../interfaces';
 
 export interface AutoplayEvent {
   error: HMSException;
@@ -150,7 +150,7 @@ export class AudioSinkManager {
     await this.playAudioFor(track);
   };
 
-  private handleAudioDeviceChange = (event: DeviceChangeEvent) => {
+  private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
     if (event.error || !event.selection) {
       return;

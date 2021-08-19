@@ -1,4 +1,4 @@
-import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessageInput, DeviceChangeEvent } from '../interfaces';
+import { HMSAudioCodec, HMSConfig, HMSVideoCodec, HMSMessageInput, HMSDeviceChangeEvent } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -230,7 +230,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private handleDeviceChangeError = (event: DeviceChangeEvent) => {
+  private handleDeviceChangeError = (event: HMSDeviceChangeEvent) => {
     HMSLogger.d(this.TAG, 'Device Change event', event);
     this.deviceChangeListener?.onDeviceChange?.(event);
     const track = event.type === 'audio' ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;

@@ -1,7 +1,7 @@
 import { HMSException } from '../error/HMSException';
 import { DeviceMap } from './HMSDeviceManager';
 
-export interface DeviceChangeEvent {
+export interface HMSDeviceChangeEvent {
   error?: HMSException;
   devices: DeviceMap;
   selection?: InputDeviceInfo;
