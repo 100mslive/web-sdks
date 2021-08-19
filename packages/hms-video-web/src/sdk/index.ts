@@ -75,6 +75,7 @@ export class HMSSdk implements HMSInterface {
   private isReconnecting: boolean = false;
   private roleChangeManager?: RoleChangeManager;
   private isPreviewInProgress: boolean = false;
+  private deviceManagersInitialised: boolean = false;
 
   private initStoreAndManagers() {
     if (this.isInitialised) {
@@ -233,8 +234,8 @@ export class HMSSdk implements HMSInterface {
   private handleDeviceChangeError = (event: HMSDeviceChangeEvent) => {
     HMSLogger.d(this.TAG, 'Device Change event', event);
     this.deviceChangeListener?.onDeviceChange?.(event);
-    const track = event.type === 'audio' ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;
-    if (event.error) {
+    if (event.error && event.type) {
+      const track = event.type.includes('audio') ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;
       this.errorListener?.onError(event.error);
       if (
         [
@@ -694,6 +695,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async initDeviceManagers() {
+    // No need to initialise and add listeners if already initialised in preview
+    if (this.deviceManagersInitialised) {
+      return;
+    }
+    this.deviceManagersInitialised = true;
     this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
     await this.deviceManager.init();
@@ -701,6 +707,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanDeviceManagers() {
+    this.deviceManagersInitialised = false;
     this.deviceManager.removeEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.removeEventListener('video-device-change', this.handleDeviceChangeError);
     this.deviceManager.cleanUp();

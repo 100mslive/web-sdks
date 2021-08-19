@@ -44,7 +44,7 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
     this.initialized = true;
-    navigator.mediaDevices.ondevicechange = debounce(() => this.handleDeviceChange());
+    navigator.mediaDevices.ondevicechange = debounce(() => this.handleDeviceChange(), 500);
     await this.enumerateDevices();
     this.logDevices('Init');
     this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() } as HMSDeviceChangeEvent);
@@ -147,7 +147,7 @@ export class DeviceManager implements HMSDeviceManager {
       .flush();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    this.setOutputDevice();
+    this.setOutputDevice(true);
     this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     this.handleVideoInputDeviceChange(localPeer?.videoTrack);
   };
@@ -183,7 +183,7 @@ export class DeviceManager implements HMSDeviceManager {
    * 3. select the default one if nothing was found
    * 4. select the first option if there is no default
    */
-  setOutputDevice() {
+  setOutputDevice(deviceChange: boolean = false) {
     const inputDevice = this.getNewAudioInputDevice();
     this.outputDevice = undefined;
     if (inputDevice?.groupId) {
@@ -198,6 +198,14 @@ export class DeviceManager implements HMSDeviceManager {
       this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default') || this.audioOutput[0];
     }
     this.store.updateAudioOutputDevice(this.outputDevice);
+    // send event only on device change
+    if (deviceChange) {
+      this.eventEmitter.emit('audio-device-change', {
+        selection: this.outputDevice,
+        type: 'audioOutput',
+        devices: this.getDevices(),
+      } as HMSDeviceChangeEvent);
+    }
   }
 
   private handleAudioInputDeviceChange = async (audioTrack?: HMSLocalAudioTrack) => {
@@ -226,7 +234,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventEmitter.emit('audio-device-change', {
         devices: this.getDevices(),
         selection: newSelection,
-        type: 'audio',
+        type: 'audioInput',
       } as HMSDeviceChangeEvent);
       this.logDevices('Audio Device Change Success');
     } catch (error) {
@@ -243,7 +251,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventEmitter.emit('audio-device-change', {
         error,
         selection: newSelection,
-        type: 'audio',
+        type: 'audioInput',
         devices: this.getDevices(),
       } as HMSDeviceChangeEvent);
     }

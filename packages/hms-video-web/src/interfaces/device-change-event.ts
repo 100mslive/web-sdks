@@ -5,5 +5,5 @@ export interface HMSDeviceChangeEvent {
   error?: HMSException;
   devices: DeviceMap;
   selection?: InputDeviceInfo;
-  type: 'audio' | 'video';
+  type: 'audioOutput' | 'audioInput' | 'video';
 }
