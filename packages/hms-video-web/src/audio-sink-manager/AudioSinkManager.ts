@@ -8,6 +8,7 @@ import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent } from '../interfaces';
+import { isMobile } from '../utils/support';
 
 export interface AutoplayEvent {
   error: HMSException;
@@ -107,7 +108,16 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
     const audioTrack = this.store.getTrackById(event.target.id);
     if (audioTrack) {
-      this.autoPausedTracks.add(audioTrack as HMSAudioTrack);
+      if (isMobile()) {
+        // Play after a delay since mobile devices don't call onDevice change event
+        setTimeout(async () => {
+          if (audioTrack) {
+            await this.playAudioFor(audioTrack as HMSAudioTrack);
+          }
+        }, 500);
+      } else {
+        this.autoPausedTracks.add(audioTrack as HMSAudioTrack);
+      }
     }
   };
 

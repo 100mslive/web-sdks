@@ -30,4 +30,6 @@ function createUserAgent(): string {
   }
 }
 
+export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
+
 export const userAgent = createUserAgent();
