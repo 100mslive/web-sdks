@@ -47,6 +47,7 @@ export class DeviceManager implements HMSDeviceManager {
     navigator.mediaDevices.ondevicechange = debounce(() => this.handleDeviceChange(), 500);
     await this.enumerateDevices();
     this.logDevices('Init');
+    this.setOutputDevice();
     this.eventEmitter.emit('audio-device-change', { devices: this.getDevices() } as HMSDeviceChangeEvent);
     analyticsEventsService
       .queue(
@@ -125,9 +126,6 @@ export class DeviceManager implements HMSDeviceManager {
       });
       this.videoInputChanged = this.computeChange(prevVideoInput, this.videoInput);
       this.audioInputChanged = this.computeChange(prevAudioInput, this.audioInput);
-      if (this.audioOutput.length > 0) {
-        this.setOutputDevice();
-      }
       this.logDevices('Enumerate Devices');
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed enumerating devices', error);
@@ -185,6 +183,7 @@ export class DeviceManager implements HMSDeviceManager {
    */
   setOutputDevice(deviceChange: boolean = false) {
     const inputDevice = this.getNewAudioInputDevice();
+    const prevSelection = this.createIdentifier(this.outputDevice);
     this.outputDevice = undefined;
     if (inputDevice?.groupId) {
       // only check for label because if groupId check is added it will select speaker
@@ -198,8 +197,8 @@ export class DeviceManager implements HMSDeviceManager {
       this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default') || this.audioOutput[0];
     }
     this.store.updateAudioOutputDevice(this.outputDevice);
-    // send event only on device change
-    if (deviceChange) {
+    // send event only on device change and device is not same as previous
+    if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
       this.eventEmitter.emit('audio-device-change', {
         selection: this.outputDevice,
         type: 'audioOutput',
@@ -325,12 +324,16 @@ export class DeviceManager implements HMSDeviceManager {
     HMSLogger.d(
       this.TAG,
       label,
-      JSON.stringify({
-        videoInput: [...this.videoInput],
-        audioInput: [...this.audioInput],
-        audioOutput: [...this.audioOutput],
-        selected: this.getCurrentSelection(),
-      }),
+      JSON.stringify(
+        {
+          videoInput: [...this.videoInput],
+          audioInput: [...this.audioInput],
+          audioOutput: [...this.audioOutput],
+          selected: this.getCurrentSelection(),
+        },
+        null,
+        4,
+      ),
     );
   }
 }
