@@ -370,7 +370,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async sendBroadcastMessage(message: string, type?: string) {
-    return this.sendMessageInternal({ message, type });
+    return await this.sendMessageInternal({ message, type });
   }
 
   async sendGroupMessage(message: string, roles: HMSRole[], type?: string) {
@@ -382,7 +382,7 @@ export class HMSSdk implements HMSInterface {
     if (recipientRoles.length === 0) {
       throw ErrorFactory.GenericErrors.ValidationFailed('No valid role is present', roles);
     }
-    return this.sendMessageInternal({ message, recipientRoles: roles, type });
+    return await this.sendMessageInternal({ message, recipientRoles: roles, type });
   }
 
   async sendDirectMessage(message: string, peer: HMSPeer, type?: string) {
@@ -393,10 +393,10 @@ export class HMSSdk implements HMSInterface {
     if (this.localPeer?.peerId === peer.peerId) {
       throw ErrorFactory.GenericErrors.ValidationFailed('Cannot send message to self');
     }
-    return this.sendMessageInternal({ message, recipientPeer: peer, type });
+    return await this.sendMessageInternal({ message, recipientPeer: peer, type });
   }
 
-  private sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
+  private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
     if (message.replace(/\u200b/g, ' ').trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
       throw ErrorFactory.GenericErrors.ValidationFailed('Empty message not allowed');
@@ -410,7 +410,7 @@ export class HMSSdk implements HMSInterface {
       time: new Date(),
     });
     HMSLogger.d(this.TAG, 'Sending Message:: ', hmsMessage);
-    this.transport!.sendMessage(hmsMessage);
+    await this.transport!.sendMessage(hmsMessage);
     return hmsMessage;
   }
 
@@ -510,50 +510,34 @@ export class HMSSdk implements HMSInterface {
     this.audioListener = audioListener;
   }
 
-  changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
-    if (!this.localPeer?.role?.permissions.changeRole) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to change roles');
-    }
-
+  async changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
     if (!forPeer.role || forPeer.role.name === toRole) {
       return;
     }
 
-    this.transport?.changeRole(forPeer, toRole, force);
+    await this.transport?.changeRole(forPeer, toRole, force);
   }
 
-  acceptChangeRole(request: HMSRoleChangeRequest) {
-    this.transport?.acceptRoleChange(request);
+  async acceptChangeRole(request: HMSRoleChangeRequest) {
+    await this.transport?.acceptRoleChange(request);
   }
 
   async endRoom(lock: boolean, reason: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot end room');
     }
-    const permissions = this.localPeer.role?.permissions;
-    /**
-     * This should come from server
-     */
-    if (!permissions || !permissions.endRoom) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to end room');
-    }
-    this.transport?.endRoom(lock, reason);
+    await this.transport?.endRoom(lock, reason);
   }
 
   async removePeer(peer: HMSRemotePeer, reason: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot remove peer');
     }
-    /**
-     * This should come from server
-     */
-    if (!this.localPeer.role?.permissions.removeOthers) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Do not have permission to remove others from room');
-    }
+
     if (!this.store.getPeerById(peer.peerId)) {
       throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer, given peer not present in room', peer);
     }
-    this.transport?.removePeer(peer.peerId, reason);
+    await this.transport?.removePeer(peer.peerId, reason);
   }
 
   getRoles(): HMSRole[] {
@@ -581,7 +565,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.ValidationFailed('No peer found for change track state', forRemoteTrack);
     }
 
-    this.transport?.changeTrackState({
+    await this.transport?.changeTrackState({
       requested_for: peer.peerId,
       track_id: forRemoteTrack.trackId,
       stream_id: forRemoteTrack.stream.id,

@@ -9,6 +9,7 @@ import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
 
 export enum HMSAction {
+  NONE = 'NONE',
   TRACK = 'TRACK',
   INIT = 'INIT',
   PUBLISH = 'PUBLISH',
@@ -194,7 +195,7 @@ export const ErrorFactory = {
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction, description: string) {
-      return new HMSException(code, 'ServerErrors', action, `[JOIN]: ${description}`, description);
+      return new HMSException(code, 'ServerErrors', action, description, description);
     },
 
     AlreadyJoined(action: HMSAction, description: string = '') {

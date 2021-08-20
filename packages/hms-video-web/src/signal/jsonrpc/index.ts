@@ -9,7 +9,7 @@ import {
   RemovePeerRequest,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
-import { HMSSignalMethod, JsonRpcRequest } from './models';
+import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
 import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -80,11 +80,19 @@ export default class JsonRpcSignal implements ISignal {
 
     this.socket!.send(JSON.stringify(message));
 
-    const response = await new Promise<string>((resolve, reject) => {
-      this.callbacks.set(id, { resolve, reject });
-    });
+    try {
+      const response = await new Promise<any>((resolve, reject) => {
+        this.callbacks.set(id, { resolve, reject });
+      });
 
-    return JSON.parse(response);
+      return response;
+    } catch (error) {
+      throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
+        Number(error.code),
+        convertSignalMethodtoErrorAction(method as HMSSignalMethod),
+        error.message,
+      );
+    }
   }
 
   private notify(method: string, params: any) {
@@ -181,8 +189,8 @@ export default class JsonRpcSignal implements ISignal {
     this.notify(HMSSignalMethod.TRACK_UPDATE, { version: '1.0', tracks: Object.fromEntries(tracks) });
   }
 
-  broadcast(message: Message) {
-    this.notify(HMSSignalMethod.BROADCAST, { version: '1.0', ...message.toSignalParams() });
+  async broadcast(message: Message) {
+    await this.call(HMSSignalMethod.BROADCAST, { version: '1.0', ...message.toSignalParams() });
   }
 
   recordStart() {}
@@ -193,8 +201,8 @@ export default class JsonRpcSignal implements ISignal {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
   }
 
-  endRoom(lock: boolean, reason: string) {
-    this.notify(HMSSignalMethod.END_ROOM, { lock, reason });
+  async endRoom(lock: boolean, reason: string) {
+    await this.call(HMSSignalMethod.END_ROOM, { lock, reason });
   }
 
   sendEvent(event: AnalyticsEvent) {
@@ -218,20 +226,20 @@ export default class JsonRpcSignal implements ISignal {
     return Promise.race([timer, pongTimeDiff]);
   }
 
-  requestRoleChange(params: RequestForRoleChangeParams) {
-    this.notify(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+  async requestRoleChange(params: RequestForRoleChangeParams) {
+    await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
   }
 
-  acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
-    this.notify(HMSSignalMethod.ROLE_CHANGE, params);
+  async acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
+    await this.call(HMSSignalMethod.ROLE_CHANGE, params);
   }
 
-  requestTrackStateChange(params: TrackUpdateRequestParams) {
-    this.notify(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
+  async requestTrackStateChange(params: TrackUpdateRequestParams) {
+    await this.call(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
   }
 
-  removePeer(params: RemovePeerRequest) {
-    this.notify(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
+  async removePeer(params: RemovePeerRequest) {
+    await this.call(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
   }
 
   private onCloseHandler(event: CloseEvent) {
@@ -257,25 +265,18 @@ export default class JsonRpcSignal implements ISignal {
 
     if (response.hasOwnProperty('id')) {
       /** This is a response to [call] */
-      const id: string = response.id;
+      const typedResponse = response as JsonRpcResponse;
+      const id: string = typedResponse.id;
       if (this.callbacks.has(id)) {
         const cb = this.callbacks.get(id)!;
         this.callbacks.delete(id);
-        if (response.result) {
-          cb.resolve(JSON.stringify(response.result));
+        if (typedResponse.result) {
+          cb.resolve(typedResponse.result);
         } else {
-          const error = response.error;
-          const ex =
-            error &&
-            ErrorFactory.WebsocketMethodErrors.ServerErrors(
-              Number(error.code),
-              HMSAction.JOIN,
-              `${error.message} [json: ${text}]`,
-            );
-          cb.reject(ex);
+          cb.reject(typedResponse.error);
         }
       } else {
-        this.observer.onNotification(response);
+        this.observer.onNotification(typedResponse);
       }
     } else if (response.hasOwnProperty('method')) {
       if (response.method === HMSSignalMethod.OFFER) {
@@ -286,7 +287,7 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
-            HMSAction.JOIN,
+            HMSAction.NONE,
             response.params.message,
           ),
         );

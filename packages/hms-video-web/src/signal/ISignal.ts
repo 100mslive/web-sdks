@@ -29,7 +29,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   trackUpdate(tracks: Map<string, Track>): void;
 
-  broadcast(message: HMSMessage): void;
+  broadcast(message: HMSMessage): Promise<void>;
 
   recordStart(): void;
 
@@ -37,17 +37,17 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   leave(): void;
 
-  endRoom(lock: boolean, reason: string): void;
+  endRoom(lock: boolean, reason: string): Promise<void>;
 
   ping(timeout: number): Promise<number>;
 
-  requestRoleChange(params: RequestForRoleChangeParams): void;
+  requestRoleChange(params: RequestForRoleChangeParams): Promise<void>;
 
-  acceptRoleChangeRequest(params: AcceptRoleChangeParams): void;
+  acceptRoleChangeRequest(params: AcceptRoleChangeParams): Promise<void>;
 
-  requestTrackStateChange(params: TrackUpdateRequestParams): void;
+  requestTrackStateChange(params: TrackUpdateRequestParams): Promise<void>;
 
-  removePeer(params: RemovePeerRequest): void;
+  removePeer(params: RemovePeerRequest): Promise<void>;
 
   close(): Promise<void>;
 }

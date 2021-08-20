@@ -1,7 +1,18 @@
+import { HMSAction } from '../../error/ErrorFactory';
+
 export interface JsonRpcRequest {
   id: string;
   method: string;
   params: Map<string, any>;
+}
+
+export interface JsonRpcResponse {
+  id: string;
+  result: any;
+  error: {
+    code: number;
+    message: string;
+  };
 }
 
 export enum HMSSignalMethod {
@@ -21,4 +32,19 @@ export enum HMSSignalMethod {
   ROLE_CHANGE = 'role-change',
   TRACK_UPDATE_REQUEST = 'track-update-request',
   PEER_LEAVE_REQUEST = 'peer-leave-request',
+}
+
+export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {
+  switch (method) {
+    case HMSSignalMethod.JOIN:
+      return HMSAction.JOIN;
+    case HMSSignalMethod.OFFER:
+      return HMSAction.PUBLISH;
+    case HMSSignalMethod.ANSWER:
+      return HMSAction.SUBSCRIBE;
+    case HMSSignalMethod.TRACK_UPDATE:
+      return HMSAction.TRACK;
+    default:
+      return HMSAction.NONE;
+  }
 }

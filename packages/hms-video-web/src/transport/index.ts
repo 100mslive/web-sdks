@@ -3,7 +3,6 @@ import ITransport, { IFetchAVTrackOptions } from './ITransport';
 import HMSPublishConnection from '../connection/publish';
 import HMSSubscribeConnection from '../connection/subscribe';
 import InitService from '../signal/init';
-import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
@@ -41,6 +40,7 @@ import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
 import { TrackUpdateRequestParams } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
+import { ISignal } from '../signal/ISignal';
 
 const TAG = '[HMSTransport]:';
 
@@ -347,7 +347,7 @@ export default class HMSTransport implements ITransport {
         );
       }
     } catch (error) {
-      HMSLogger.e(TAG, 'join: failed ❌ [token=$authToken]', error);
+      HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
         analyticsEventsService.queue(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error)).flush();
@@ -450,8 +450,8 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  sendMessage(message: Message) {
-    this.signal.broadcast(message);
+  async sendMessage(message: Message) {
+    await this.signal.broadcast(message);
   }
 
   trackUpdate(track: HMSTrack) {
@@ -470,28 +470,28 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
-    this.signal.requestRoleChange({
+  async changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
+    await this.signal.requestRoleChange({
       requested_for: forPeer.peerId,
       role: toRole,
       force,
     });
   }
 
-  acceptRoleChange(request: HMSRoleChangeRequest) {
-    this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
+  async acceptRoleChange(request: HMSRoleChangeRequest) {
+    await this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
   }
 
-  endRoom(lock: boolean, reason: string) {
-    this.signal.endRoom(lock, reason);
+  async endRoom(lock: boolean, reason: string) {
+    await this.signal.endRoom(lock, reason);
   }
 
-  removePeer(peerId: string, reason: string) {
-    this.signal.removePeer({ requested_for: peerId, reason });
+  async removePeer(peerId: string, reason: string) {
+    await this.signal.removePeer({ requested_for: peerId, reason });
   }
 
-  changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
-    this.signal.requestTrackStateChange(trackUpdateRequest);
+  async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
+    await this.signal.requestTrackStateChange(trackUpdateRequest);
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
