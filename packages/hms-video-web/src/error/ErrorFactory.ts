@@ -36,8 +36,8 @@ export const ErrorFactory = {
   },
 
   InitAPIErrors: {
-    ServerErrors(action: HMSAction, description: string = '') {
-      return new HMSException(2000, 'ServerErrors', action, `[INIT]: Server error`, description);
+    ServerErrors(code: number, action: HMSAction, description: string = '') {
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description);
     },
 
     ConnectionLost(action: HMSAction, description: string = '') {
@@ -45,7 +45,7 @@ export const ErrorFactory = {
     },
 
     HTTPError(code: number, action: HMSAction, description: string = '') {
-      return new HMSException(code, 'HTTPError', action, `Bad Request`, description);
+      return new HMSException(code, 'HTTPError', action, `[INIT]: Bad Request`, description);
     },
 
     InvalidEndpointURL(action: HMSAction, description: string = '') {

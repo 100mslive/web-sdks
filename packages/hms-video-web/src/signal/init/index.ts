@@ -20,22 +20,24 @@ export default class InitService {
           Authorization: `Bearer ${token}`,
         },
       });
+      const body = await response.json();
       if (response.status === 404) {
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, response.statusText);
-      }
-      if (response.status === 401) {
-        throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, response.statusText);
+        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
       }
       if (response?.status !== 200) {
-        throw ErrorFactory.InitAPIErrors.HTTPError(response.status, HMSAction.INIT, response?.statusText);
+        throw ErrorFactory.InitAPIErrors.ServerErrors(
+          body.code || response.status,
+          HMSAction.INIT,
+          body.message || response?.statusText,
+        );
       }
-      config = await response?.json();
+      config = body;
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
     } catch (error) {
       if (error.message === 'Failed to fetch') {
         throw ErrorFactory.InitAPIErrors.ConnectionLost(HMSAction.INIT, error.message);
       }
-      throw ErrorFactory.GenericErrors.JsonParsingFailed(HMSAction.INIT, error.message);
+      throw error;
     }
     return transformInitConfig(config);
   }

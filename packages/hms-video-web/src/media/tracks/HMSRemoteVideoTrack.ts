@@ -12,6 +12,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async setEnabled(value: boolean): Promise<void> {
     if (value === this.enabled) return;
+
+    // If remote track is muted when degraded, reset degraded state
+    if (this._degraded && !value) {
+      this._degraded = false;
+    }
+
     await super.setEnabled(value);
   }
 
