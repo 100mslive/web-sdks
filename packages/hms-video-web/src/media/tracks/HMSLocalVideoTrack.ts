@@ -5,6 +5,7 @@ import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -68,7 +69,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * maxFramerate - can be used to control the capture framerate
    * @param settings
    */
-  async setSettings(settings: Partial<IHMSVideoTrackSettings>) {
+  async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
     const stream = this.stream as HMSLocalStream;
@@ -77,6 +78,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
         await this.replaceTrackWith(newSettings);
+        if (!internal) {
+          DeviceStorageManager.updateSelection('videoInput', {
+            deviceId: settings.deviceId,
+            groupId: this.nativeTrack.getSettings().groupId,
+          });
+        }
       }
     }
 

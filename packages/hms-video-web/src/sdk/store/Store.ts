@@ -21,6 +21,8 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
 import { HMSConfig, PublishParams } from '../../interfaces';
+import { SelectedDevices } from '../../device-manager';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -139,6 +141,24 @@ class Store implements IStore {
   }
 
   setConfig(config: HMSConfig) {
+    DeviceStorageManager.rememberDevices(Boolean(config.rememberDeviceSelection));
+    if (config.rememberDeviceSelection) {
+      const devices: SelectedDevices | undefined = DeviceStorageManager.getSelection();
+      if (devices) {
+        if (!config.settings) {
+          config.settings = {};
+        }
+        if (devices.audioInput?.deviceId) {
+          config.settings.audioInputDeviceId = config.settings.audioInputDeviceId || devices.audioInput.deviceId;
+        }
+        if (devices.audioOutput?.deviceId) {
+          config.settings.audioOutputDeviceId = config.settings.audioOutputDeviceId || devices.audioOutput.deviceId;
+        }
+        if (devices.videoInput?.deviceId) {
+          config.settings.videoDeviceId = config.settings.videoDeviceId || devices.videoInput.deviceId;
+        }
+      }
+    }
     this.config = config;
   }
 

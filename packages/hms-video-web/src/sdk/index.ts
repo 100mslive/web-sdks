@@ -47,6 +47,7 @@ import { HMSRole } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
+import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -323,11 +324,13 @@ export class HMSSdk implements HMSInterface {
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.store.cleanUp();
     this.cleanDeviceManagers();
+    DeviceStorageManager.cleanup();
     this.isInitialised = false;
     this.published = false;
     this.transport = null;
     this.listener = null;
     this.isReconnecting = false;
+    this.deviceManagersInitialised = false;
     if (this.roleChangeManager) {
       this.notificationManager.removeEventListener(
         'local-peer-role-update',
@@ -622,7 +625,7 @@ export class HMSSdk implements HMSInterface {
       audioSettings = new HMSAudioTrackSettingsBuilder()
         .codec(audio.codec as HMSAudioCodec)
         .maxBitrate(audio.bitRate)
-        .deviceId(audioInputDeviceId)
+        .deviceId(audioInputDeviceId || defaultSettings.audioInputDeviceId)
         .build();
     }
     if (canPublishVideo && publishConfig.publishVideo) {
@@ -633,7 +636,7 @@ export class HMSSdk implements HMSInterface {
         .maxFramerate(video.frameRate)
         .setWidth(dimensions?.width || video.width) // take simulcast width if available
         .setHeight(dimensions?.height || video.height) // take simulcast width if available
-        .deviceId(videoDeviceId)
+        .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
         .build();
     }
 
@@ -687,6 +690,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
     await this.deviceManager.init();
+    this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 

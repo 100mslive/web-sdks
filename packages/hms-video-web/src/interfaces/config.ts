@@ -8,4 +8,5 @@ export interface HMSConfig {
   initEndpoint?: string;
   settings?: InitialSettings;
   autoVideoSubscribe?: boolean;
+  rememberDeviceSelection?: boolean;
 }

@@ -5,6 +5,7 @@ import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../m
 import { HMSDeviceChangeEvent } from '../interfaces';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import { DeviceStorageManager } from './DeviceStorage';
 import { IStore } from '../sdk/store';
 import { debounce } from '../utils/timer-utils';
 import HMSLogger from '../utils/logger';
@@ -35,6 +36,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (newDevice) {
       this.outputDevice = newDevice;
       this.store.updateAudioOutputDevice(newDevice);
+      DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
   };
@@ -126,6 +128,11 @@ export class DeviceManager implements HMSDeviceManager {
       });
       this.videoInputChanged = this.computeChange(prevVideoInput, this.videoInput);
       this.audioInputChanged = this.computeChange(prevAudioInput, this.audioInput);
+      DeviceStorageManager.setDevices({
+        videoInput: [...this.videoInput],
+        audioInput: [...this.audioInput],
+        audioOutput: [...this.audioOutput],
+      });
       this.logDevices('Enumerate Devices');
     } catch (error) {
       HMSLogger.e(this.TAG, 'Failed enumerating devices', error);
@@ -146,8 +153,8 @@ export class DeviceManager implements HMSDeviceManager {
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
     this.setOutputDevice(true);
-    this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    this.handleVideoInputDeviceChange(localPeer?.videoTrack);
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
+    await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
   };
 
   /**
@@ -229,7 +236,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
-      await audioTrack.setSettings(newAudioTrackSettings);
+      await audioTrack.setSettings(newAudioTrackSettings, true);
       this.eventEmitter.emit('audio-device-change', {
         devices: this.getDevices(),
         selection: newSelection,
@@ -281,7 +288,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
-      await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings);
+      await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
       if (!enabled) {
         // On replace track, enabled will be true. Need to be set to previous state
         videoTrack.setEnabled(enabled);
