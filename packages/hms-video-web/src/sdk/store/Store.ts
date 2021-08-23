@@ -203,12 +203,30 @@ class Store implements IStore {
     };
   }
 
+  /**
+   * Convert maxBitrate from kbps to bps
+   * @internal
+   * @param simulcastLayers
+   * @returns {SimulcastLayers}
+   */
+  private convertSimulcastLayers(simulcastLayers: SimulcastLayers) {
+    return {
+      ...simulcastLayers,
+      layers: (simulcastLayers.layers || []).map((layer) => {
+        return {
+          ...layer,
+          maxBitrate: layer.maxBitrate * 1000,
+        };
+      }),
+    };
+  }
+
   setVideoSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    this.videoLayers = simulcastLayers;
+    this.videoLayers = this.convertSimulcastLayers(simulcastLayers);
   }
 
   setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    this.screenshareLayers = simulcastLayers;
+    this.screenshareLayers = this.convertSimulcastLayers(simulcastLayers);
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
