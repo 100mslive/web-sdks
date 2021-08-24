@@ -58,6 +58,14 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
+const INITIAL_STATE = {
+  published: false,
+  isInitialised: false,
+  isReconnecting: false,
+  isPreviewInProgress: false,
+  deviceManagersInitialised: false,
+};
+
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport | null;
   private TAG: string = '[HMSSdk]:';
@@ -65,24 +73,20 @@ export class HMSSdk implements HMSInterface {
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener: HMSAudioListener | null = null;
-  private published: boolean = false;
   private store!: IStore;
   private notificationManager!: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private audioOutput!: AudioOutputManager;
-  private isInitialised = false;
   private transportState: TransportState = TransportState.Disconnected;
-  private isReconnecting: boolean = false;
   private roleChangeManager?: RoleChangeManager;
-  private isPreviewInProgress: boolean = false;
-  private deviceManagersInitialised: boolean = false;
+  private sdkState = INITIAL_STATE;
 
   private initStoreAndManagers() {
-    if (this.isInitialised) {
+    if (this.sdkState.isInitialised) {
       return;
     }
-    this.isInitialised = true;
+    this.sdkState.isInitialised = true;
     this.store = new Store();
     this.notificationManager = new NotificationManager(this.store);
     this.deviceManager = new DeviceManager(this.store);
@@ -115,7 +119,7 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager.handleNotification(
         method,
         notification,
-        this.isReconnecting,
+        this.sdkState.isReconnecting,
         this.listener!,
         this.audioListener,
       );
@@ -154,10 +158,10 @@ export class HMSSdk implements HMSInterface {
           await this.leave();
 
           this.errorListener?.onError?.(error!);
-          this.isReconnecting = false;
+          this.sdkState.isReconnecting = false;
           break;
         case TransportState.Reconnecting:
-          this.isReconnecting = true;
+          this.sdkState.isReconnecting = true;
           this.listener?.onReconnecting?.(error!);
           break;
       }
@@ -178,11 +182,11 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
-    if (this.isPreviewInProgress) {
+    if (this.sdkState.isPreviewInProgress) {
       return;
     }
 
-    this.isPreviewInProgress = true;
+    this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.errorListener = listener;
     this.deviceChangeListener = listener;
@@ -212,7 +216,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       await this.initDeviceManagers();
       listener.onPreview(this.store.getRoom(), tracks);
-      this.isPreviewInProgress = false;
+      this.sdkState.isPreviewInProgress = false;
     };
 
     this.notificationManager.addEventListener('role-change', roleChangeHandler);
@@ -228,7 +232,7 @@ export class HMSSdk implements HMSInterface {
       );
     } catch (ex) {
       this.errorListener?.onError(ex);
-      this.isPreviewInProgress = false;
+      this.sdkState.isPreviewInProgress = false;
     }
   }
 
@@ -253,7 +257,7 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
-    if (this.isPreviewInProgress) {
+    if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
@@ -309,7 +313,7 @@ export class HMSSdk implements HMSInterface {
     )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        if (this.store.getPublishParams() && !this.published) {
+        if (this.store.getPublishParams() && !this.sdkState.published) {
           await this.publish(config.settings || defaultSettings);
         }
         this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
@@ -321,16 +325,12 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.store.cleanUp();
     this.cleanDeviceManagers();
     DeviceStorageManager.cleanup();
-    this.isInitialised = false;
-    this.published = false;
+    this.sdkState = INITIAL_STATE;
     this.transport = null;
     this.listener = null;
-    this.isReconnecting = false;
-    this.deviceManagersInitialised = false;
     if (this.roleChangeManager) {
       this.notificationManager.removeEventListener(
         'local-peer-role-update',
@@ -342,13 +342,13 @@ export class HMSSdk implements HMSInterface {
   async leave() {
     const room = this.store.getRoom();
     if (room) {
+      const roomId = room.id;
+      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave();
-      const roomId = room.id;
-      HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
@@ -579,7 +579,7 @@ export class HMSSdk implements HMSInterface {
   private async publish(initialSettings: InitialSettings, publishConfig?: PublishConfig) {
     const tracks = await this.initLocalTracks(initialSettings, publishConfig);
     await this.setAndPublishTracks(tracks);
-    this.published = true;
+    this.sdkState.published = true;
   }
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
@@ -683,10 +683,10 @@ export class HMSSdk implements HMSInterface {
 
   private async initDeviceManagers() {
     // No need to initialise and add listeners if already initialised in preview
-    if (this.deviceManagersInitialised) {
+    if (this.sdkState.deviceManagersInitialised) {
       return;
     }
-    this.deviceManagersInitialised = true;
+    this.sdkState.deviceManagersInitialised = true;
     this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
     await this.deviceManager.init();
@@ -695,7 +695,6 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanDeviceManagers() {
-    this.deviceManagersInitialised = false;
     this.deviceManager.removeEventListener('audio-device-change', this.handleDeviceChangeError);
     this.deviceManager.removeEventListener('video-device-change', this.handleDeviceChangeError);
     this.deviceManager.cleanUp();

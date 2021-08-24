@@ -224,7 +224,7 @@ export default class NotificationManager {
    * Sets the tracks to peer and returns the peer
    */
   handleOnTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, track);
+    HMSLogger.d(this.TAG, `ONTRACKADD`, track, track.nativeTrack);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -234,7 +234,7 @@ export default class NotificationManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleOnTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track, track.nativeTrack);
     const trackStateEntry = this.trackStateMap.get(track.trackId);
 
     if (!trackStateEntry) return;

@@ -15,18 +15,28 @@ export interface AutoplayEvent {
 }
 
 export const AutoplayError = 'autoplay-error';
+
+type AudioSinkState = {
+  autoplayFailed?: boolean;
+  initialized: boolean;
+  // this promise will be set for the first track. remaining tracks will be processed once it's know whether
+  // autoplay is allowed or not
+  autoplayCheckPromise?: Promise<void>;
+};
+
+const INITIAL_STATE: AudioSinkState = {
+  autoplayFailed: undefined,
+  initialized: false,
+  autoplayCheckPromise: undefined,
+};
+
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
   private autoPausedTracks: Set<HMSAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
-  private initialized = false;
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
-  private autoplayFailed?: boolean;
-  // this promise will be set for the first track. remaining tracks will be processed once it's know whether
-  // autoplay is allowed or not
-  private autoplayCheckPromise?: Promise<void>;
-  private autoPlayErrorThrown = false;
+  private state = INITIAL_STATE;
 
   constructor(
     private store: IStore,
@@ -64,17 +74,16 @@ export class AudioSinkManager {
    *  autoplay error is received.
    */
   async unblockAutoplay() {
-    if (!this.autoplayFailed) {
-      return;
+    if (this.autoPausedTracks.size > 0) {
+      this.unpauseAudioTracks();
     }
-    this.unpauseAudioTracks();
   }
 
   init(elementId?: string) {
-    if (this.initialized) {
+    if (this.state.initialized) {
       return;
     }
-    this.initialized = true;
+    this.state.initialized = true;
     const audioSink = document.createElement('div');
     audioSink.id = `HMS-SDK-audio-sink-${uuid()}`;
     const userElement = elementId && document.getElementById(elementId);
@@ -90,10 +99,7 @@ export class AudioSinkManager {
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.audioSink?.remove();
     this.autoPausedTracks = new Set();
-    this.initialized = false;
-    this.autoplayFailed = undefined;
-    this.autoPlayErrorThrown = false;
-    this.autoplayCheckPromise = undefined;
+    this.state = INITIAL_STATE;
   }
 
   private handleAudioPaused = (event: any) => {
@@ -140,20 +146,20 @@ export class AudioSinkManager {
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
-    if (this.autoplayFailed === undefined) {
-      if (!this.autoplayCheckPromise) {
+    if (this.state.autoplayFailed === undefined) {
+      if (!this.state.autoplayCheckPromise) {
         // it's the first track, try to play it, that'll tell us whether autoplay is allowed
-        this.autoplayCheckPromise = new Promise<void>((resolve) => {
+        this.state.autoplayCheckPromise = new Promise<void>((resolve) => {
           this.playAudioFor(track).then(resolve);
         });
       }
       // and wait for the result to be known
-      await this.autoplayCheckPromise;
+      await this.state.autoplayCheckPromise;
     }
     /**
      * Don't play the track if autoplay failed, add to paused list
      */
-    if (this.autoplayFailed) {
+    if (this.state.autoplayFailed) {
       this.autoPausedTracks.add(track);
       return;
     }
@@ -181,15 +187,14 @@ export class AudioSinkManager {
     }
     try {
       await audioEl.play();
-      this.autoplayFailed = false;
+      this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);
       HMSLogger.d(this.TAG, 'Played track', track.trackId);
     } catch (error) {
-      this.autoplayFailed = true;
       this.autoPausedTracks.add(track);
       HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
-      if (!this.autoPlayErrorThrown) {
-        this.autoPlayErrorThrown = true;
+      if (!this.state.autoplayFailed) {
+        this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
         this.eventEmitter.emit(AutoplayError, { error: ex });
       }
@@ -209,9 +214,8 @@ export class AudioSinkManager {
     // Reset autoplay error thrown because if all tracks are removed and a new track is added
     // Autoplay error is thrown in safari
     if (this.audioSink && this.audioSink.childElementCount === 0) {
-      this.autoPlayErrorThrown = false;
-      this.autoplayCheckPromise = undefined;
-      this.autoplayFailed = undefined;
+      this.state.autoplayCheckPromise = undefined;
+      this.state.autoplayFailed = undefined;
     }
     HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
   };

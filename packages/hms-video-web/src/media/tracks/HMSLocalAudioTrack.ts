@@ -106,6 +106,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.audioLevelMonitor = undefined;
   }
 
+  cleanup() {
+    super.cleanup();
+    this.destroyAudioLevelMonitor();
+  }
+
   /**
    * @internal
    * published track id will be different in case there was some processing done using plugins.
