@@ -20,7 +20,7 @@ export default interface HMS {
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
 
-  changeRole(forPeer: HMSRemotePeer, toRole: string, force?: boolean): void;
+  changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;

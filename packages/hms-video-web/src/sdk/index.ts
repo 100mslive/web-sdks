@@ -513,7 +513,7 @@ export class HMSSdk implements HMSInterface {
     this.audioListener = audioListener;
   }
 
-  async changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
+  async changeRole(forPeer: HMSPeer, toRole: string, force: boolean = false) {
     if (!forPeer.role || forPeer.role.name === toRole) {
       return;
     }

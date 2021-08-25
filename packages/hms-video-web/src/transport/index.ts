@@ -32,8 +32,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSRemotePeer } from '../sdk/models/peer';
-import { HMSRoleChangeRequest } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest } from '../interfaces';
 import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
@@ -470,7 +469,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async changeRole(forPeer: HMSRemotePeer, toRole: string, force: boolean = false) {
+  async changeRole(forPeer: HMSPeer, toRole: string, force: boolean = false) {
     await this.signal.requestRoleChange({
       requested_for: forPeer.peerId,
       role: toRole,
