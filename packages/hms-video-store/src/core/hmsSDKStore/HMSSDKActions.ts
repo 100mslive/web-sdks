@@ -467,6 +467,8 @@ export class HMSSDKActions implements IHMSActions {
       ...request,
       requestedBy,
     });
+    HMSLogger.i('resetting state after peer removed', request);
+    this.resetState();
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
