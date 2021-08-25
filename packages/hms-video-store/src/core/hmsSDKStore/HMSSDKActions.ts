@@ -354,7 +354,7 @@ export class HMSSDKActions implements IHMSActions {
       return;
     }
 
-    await this.sdk.changeRole(peer as sdkTypes.HMSRemotePeer, toRole, force);
+    await this.sdk.changeRole(peer, toRole, force);
   }
 
   // TODO: separate out role related things in another file
