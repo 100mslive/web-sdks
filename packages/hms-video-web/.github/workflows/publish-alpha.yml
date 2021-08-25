@@ -1,8 +1,15 @@
 name: Publish alpha
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'CODEOWNERS'
+      - 'README.MD'
+      - '.gitignore'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   publish:
@@ -12,8 +19,13 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
-      - run: npm install
-      - run: npm test
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Test
+        run: yarn test --ci --coverage
+
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
