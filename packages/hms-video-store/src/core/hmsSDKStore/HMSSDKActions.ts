@@ -353,10 +353,7 @@ export class HMSSDKActions implements IHMSActions {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
       return;
     }
-    if (peer.isLocal) {
-      HMSLogger.w('changing role for local peer is not yet supported');
-      return;
-    }
+
     await this.sdk.changeRole(peer as sdkTypes.HMSRemotePeer, toRole, force);
   }
 
