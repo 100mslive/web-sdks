@@ -80,7 +80,7 @@ export class HMSSdk implements HMSInterface {
   private audioOutput!: AudioOutputManager;
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
-  private sdkState = INITIAL_STATE;
+  private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -185,12 +185,12 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       return;
     }
-
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
+    console.log('sdkState', this.sdkState, this.store);
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     const policy = this.store.getPolicyForRole(role);
@@ -328,7 +328,7 @@ export class HMSSdk implements HMSInterface {
     this.store.cleanUp();
     this.cleanDeviceManagers();
     DeviceStorageManager.cleanup();
-    this.sdkState = INITIAL_STATE;
+    this.sdkState = { ...INITIAL_STATE };
     this.transport = null;
     this.listener = null;
     if (this.roleChangeManager) {

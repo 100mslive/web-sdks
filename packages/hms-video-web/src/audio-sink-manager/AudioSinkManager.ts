@@ -36,7 +36,7 @@ export class AudioSinkManager {
   private TAG = '[AudioSinkManager]:';
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
-  private state = INITIAL_STATE;
+  private state = { ...INITIAL_STATE };
 
   constructor(
     private store: IStore,
@@ -99,7 +99,7 @@ export class AudioSinkManager {
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.audioSink?.remove();
     this.autoPausedTracks = new Set();
-    this.state = INITIAL_STATE;
+    this.state = { ...INITIAL_STATE };
   }
 
   private handleAudioPaused = (event: any) => {
