@@ -57,7 +57,8 @@ class DeviceStorage {
   }
 
   private isSame(current: DeviceInfo, device: DeviceInfo) {
-    return current.deviceId === device.deviceId && current.groupId === device.groupId;
+    // Safari doesn't give groupId from nativeTrack. Check if groupId's match or current groupId is not present
+    return current.deviceId === device.deviceId && (current.groupId === device.groupId || !current.groupId);
   }
 }
 

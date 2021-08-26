@@ -150,6 +150,7 @@ export default class NotificationManager {
     this.store.setKnownRoles(params.known_roles);
     // handle when role is not present in known_roles
     const publishParams = params.known_roles[params.name]?.publishParams;
+    this.store.setPublishParams(publishParams);
     if (publishParams && Object.keys(publishParams).length > 0) {
       const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
       this.store.setVideoSimulcastLayers(videoSimulcastLayers);

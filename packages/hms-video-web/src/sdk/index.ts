@@ -204,11 +204,6 @@ export class HMSSdk implements HMSInterface {
     this.store.addPeer(localPeer);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
 
-    const roleChangeHandler = async (e: any) => {
-      this.store.setPublishParams(e.detail.params.role.publishParams);
-      this.notificationManager.removeEventListener('role-change', roleChangeHandler);
-    };
-
     const policyHandler = async () => {
       this.notificationManager.removeEventListener('policy-change', policyHandler);
       const tracks = await this.initLocalTracks(config.settings!);
@@ -219,7 +214,6 @@ export class HMSSdk implements HMSInterface {
       this.sdkState.isPreviewInProgress = false;
     };
 
-    this.notificationManager.addEventListener('role-change', roleChangeHandler);
     this.notificationManager.addEventListener('policy-change', policyHandler);
 
     this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
@@ -270,9 +264,6 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
     if (!this.localPeer) {
-      this.notificationManager.addEventListener('role-change', (e: any) => {
-        this.store.setPublishParams(e.detail.params.role.publishParams);
-      });
       this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
 
       const localPeer = new HMSLocalPeer({
