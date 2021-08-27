@@ -170,7 +170,7 @@ export class HMSSDKActions implements IHMSActions {
     return this.sdk
       .leave()
       .then(() => {
-        this.resetState();
+        this.resetState('leave');
         HMSLogger.i('left room');
       })
       .catch(err => {
@@ -426,10 +426,10 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
-  private resetState() {
+  private resetState(reason: string = 'resetState') {
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
-    }, 'resetState');
+    }, reason);
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
   }
@@ -468,7 +468,7 @@ export class HMSSDKActions implements IHMSActions {
       requestedBy,
     });
     HMSLogger.i('resetting state after peer removed', request);
-    this.resetState();
+    this.resetState(request.roomEnded ? 'roomEnded' : 'removedFromRoom');
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
