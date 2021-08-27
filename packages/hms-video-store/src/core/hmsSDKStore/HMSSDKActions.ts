@@ -178,9 +178,9 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean) {
+  async setScreenShareEnabled(enabled: boolean, audioOnly?: boolean) {
     if (enabled) {
-      await this.startScreenShare();
+      await this.startScreenShare(audioOnly);
     } else {
       await this.stopScreenShare();
     }
@@ -507,10 +507,10 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  private async startScreenShare() {
+  private async startScreenShare(audioOnly?: boolean) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
-      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'));
+      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), audioOnly);
       this.syncRoomState('startScreenShare');
     } else {
       this.logPossibleInconsistency("start screenshare is called while it's on");
