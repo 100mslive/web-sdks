@@ -473,6 +473,9 @@ export class HMSSDKActions implements IHMSActions {
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
     const devices = event.devices;
+    if (!devices) {
+      return;
+    }
     this.setState(store => {
       if (!areArraysEqual(store.devices.audioInput, devices.audioInput)) {
         store.devices.audioInput = devices.audioInput;
