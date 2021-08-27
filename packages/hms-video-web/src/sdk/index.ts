@@ -408,7 +408,7 @@ export class HMSSdk implements HMSInterface {
     return hmsMessage;
   }
 
-  async startScreenShare(onStop: () => void, audioOnly = true) {
+  async startScreenShare(onStop: () => void, audioOnly = false) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams) return;
 
