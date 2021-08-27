@@ -5,6 +5,8 @@ export const parsedUserAgent = new UAParser();
 
 const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
+export const isBrowser = typeof window !== 'undefined';
+
 const checkIsSupported = () => {
   if (isNode) {
     return false;

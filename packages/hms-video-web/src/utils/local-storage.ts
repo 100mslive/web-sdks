@@ -1,10 +1,22 @@
+import { isBrowser } from './support';
+
 export class LocalStorage<T> {
-  private storage = localStorage;
+  private storage: Storage | null = null;
 
   constructor(public readonly key: string) {}
 
+  /**
+   * localstorage is not available in SSR, so get it only at time of use
+   */
+  getStorage() {
+    if (isBrowser) {
+      this.storage = window.localStorage;
+    }
+    return this.storage;
+  }
+
   get(): T | undefined {
-    const stringItem = this.storage.getItem(this.key);
+    const stringItem = this.getStorage()?.getItem(this.key);
     if (!stringItem) {
       return;
     }
@@ -14,10 +26,10 @@ export class LocalStorage<T> {
 
   set(value: T) {
     const stringValue = JSON.stringify(value);
-    this.storage.setItem(this.key, stringValue);
+    this.getStorage()?.setItem(this.key, stringValue);
   }
 
   clear() {
-    this.storage.removeItem(this.key);
+    this.getStorage()?.removeItem(this.key);
   }
 }
