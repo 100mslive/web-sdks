@@ -36,7 +36,7 @@ export default interface HMS {
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
-  startScreenShare(onStop: () => void): Promise<void>;
+  startScreenShare(onStop: () => void, audioOnly: boolean): Promise<void>;
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;

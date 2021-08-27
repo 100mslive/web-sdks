@@ -408,7 +408,7 @@ export class HMSSdk implements HMSInterface {
     return hmsMessage;
   }
 
-  async startScreenShare(onStop: () => void) {
+  async startScreenShare(onStop: () => void, audioOnly = true) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams) return;
 
@@ -425,7 +425,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     const dimensions = this.store.getSimulcastDimensions('screen');
-    const tracks = await this.transport!.getLocalScreen(
+    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
       new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
         // If publish params doesn't have bitRate value - don't set maxBitrate.
@@ -438,15 +438,26 @@ export class HMSSdk implements HMSInterface {
       new HMSAudioTrackSettingsBuilder().build(),
     );
 
-    tracks.forEach((track) => {
-      // end screenshare when video track ended
-      if (track.type === 'video') {
-        track.nativeTrack.onended = () => {
-          this.stopEndedScreenshare(onStop);
-        };
-      }
-    });
+    const handleEnded = () => {
+      this.stopEndedScreenshare(onStop);
+    };
 
+    const tracks = [];
+    if (audioOnly) {
+      videoTrack.nativeTrack.stop();
+      if (!audioTrack) {
+        throw Error('Select share audio when sharing screen');
+      }
+      tracks.push(audioTrack);
+      audioTrack.nativeTrack.onended = handleEnded;
+    } else {
+      tracks.push(videoTrack);
+      videoTrack.nativeTrack.onended = handleEnded;
+      // audio track is not always available
+      if (audioTrack) {
+        tracks.push(audioTrack);
+      }
+    }
     await this.transport!.publish(tracks);
     tracks.forEach((track) => {
       this.localPeer?.auxiliaryTracks.push(track);
