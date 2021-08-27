@@ -787,17 +787,17 @@ export class HMSSDKActions implements IHMSActions {
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
       const draftTracks = draftStore.tracks;
       // find and remove the exact track from hmsPeer
-      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.audioTrack)) {
-        delete hmsPeer.audioTrack;
-      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.videoTrack)) {
-        delete hmsPeer.videoTrack;
+      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.audioTrack)) {
+        delete hmsPeer?.audioTrack;
+      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.videoTrack)) {
+        delete hmsPeer?.videoTrack;
       } else {
-        const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(sdkTrack.trackId);
+        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(sdkTrack.trackId);
         if (
           auxiliaryIndex > -1 &&
-          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer.auxiliaryTracks[auxiliaryIndex])
+          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])
         ) {
-          hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
+          hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
         }
       }
       delete draftTracks[sdkTrack.trackId];
