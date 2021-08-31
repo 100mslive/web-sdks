@@ -1,38 +1,26 @@
-import { RunningAverage } from '../../utils/math';
 import MediaPluginsAnalyticsFactory from '../../analytics/MediaPluginsAnalyticsFactory';
 import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HMSException } from '../../error/HMSException';
 
-const TAG = 'VideoPluginsAnalytics';
+const TAG = 'AudioPluginsAnalytics';
 
-export class VideoPluginsAnalytics {
+export class AudioPluginsAnalytics {
   private readonly initTime: Record<string, number>;
   private readonly addedTimestamps: Record<string, number>;
-  private readonly preProcessingAvgs: RunningAverage;
-  private readonly processingAvgs: Record<string, RunningAverage>;
   private readonly pluginAdded: Record<string, boolean>;
-  private readonly pluginInputFrameRate: Record<string, number>;
-  private readonly pluginFrameRate: Record<string, number>;
 
   constructor() {
     this.initTime = {};
-    this.preProcessingAvgs = new RunningAverage();
     this.addedTimestamps = {};
-    this.processingAvgs = {};
     this.pluginAdded = {};
-    this.pluginInputFrameRate = {};
-    this.pluginFrameRate = {};
   }
 
-  added(name: string, inputFrameRate: number, pluginFrameRate?: number) {
+  added(name: string) {
     this.pluginAdded[name] = true;
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
-    this.processingAvgs[name] = new RunningAverage();
-    this.pluginInputFrameRate[name] = inputFrameRate;
-    this.pluginFrameRate[name] = pluginFrameRate || inputFrameRate;
   }
 
   removed(name: string) {
@@ -43,13 +31,9 @@ export class VideoPluginsAnalytics {
         // duration in seconds
         duration: Math.floor((Date.now() - this.addedTimestamps[name]) / 1000),
         loadTime: this.initTime[name],
-        avgPreProcessingTime: this.preProcessingAvgs.getAvg(), //Do we need this in stat not plugin specific
-        avgProcessingTime: this.processingAvgs[name]?.getAvg(),
-        inputFrameRate: this.pluginInputFrameRate[name],
-        pluginFrameRate: this.pluginFrameRate[name],
       };
       //send stats
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.stats(stats)).flush();
+      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.audioPluginStats(stats)).flush();
       //clean the plugin details
       this.clean(name);
     }
@@ -73,11 +57,11 @@ export class VideoPluginsAnalytics {
     try {
       time = await this.timeInMs(initFn);
       HMSLogger.i(TAG, `Time taken for Plugin ${name} initialization : ${time}`);
-    } catch (err) {
+    } catch (e) {
       //Failed during initialization of plugin(model loading etc...)
-      err = ErrorFactory.MediaPluginErrors.InitFailed(
-        HMSAction.VIDEO_PLUGINS,
-        'failed during initialization of plugin',
+      const err = ErrorFactory.MediaPluginErrors.InitFailed(
+        HMSAction.AUDIO_PLUGINS,
+        'failed during initialization of plugin' + e,
       );
       HMSLogger.e(TAG, err);
       this.failure(name, err);
@@ -85,31 +69,6 @@ export class VideoPluginsAnalytics {
     }
     if (time) {
       this.initTime[name] = time;
-    }
-  }
-
-  async preProcessWithTime<T>(preProcessFn: () => Promise<T>) {
-    //TODO: check if it is required to maintain and shall we handle preprocess failures
-    const time = await this.timeInMs(preProcessFn);
-    this.preProcessingAvgs.add(time);
-  }
-
-  async processWithTime<T>(name: string, processFn: () => Promise<T>) {
-    let time: number | undefined = undefined;
-    try {
-      time = await this.timeInMs(processFn);
-    } catch (err) {
-      //Failed during processing of plugin
-      err = ErrorFactory.MediaPluginErrors.ProcessingFailed(
-        HMSAction.VIDEO_PLUGINS,
-        'Failed during processing of plugin',
-      );
-      HMSLogger.e(TAG, err);
-      this.failure(name, err);
-      throw err;
-    }
-    if (time) {
-      this.processingAvgs[name]?.add(time);
     }
   }
 
@@ -122,9 +81,6 @@ export class VideoPluginsAnalytics {
   private clean(name: string) {
     delete this.addedTimestamps[name];
     delete this.initTime[name];
-    delete this.processingAvgs[name];
     delete this.pluginAdded[name];
-    delete this.pluginInputFrameRate[name];
-    delete this.pluginFrameRate[name];
   }
 }

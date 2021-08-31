@@ -19,6 +19,7 @@ export enum HMSAction {
   DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
   RESTART_ICE = 'RESTART_ICE',
   VIDEO_PLUGINS = 'VIDEO_PLUGINS',
+  AUDIO_PLUGINS = 'AUDIO_PLUGINS',
   AUTOPLAY = 'AUTOPLAY',
   RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
   VALIDATION = 'VALIDATION',
@@ -269,7 +270,7 @@ export const ErrorFactory = {
     },
   },
 
-  VideoPluginErrors: {
+  MediaPluginErrors: {
     PlatformNotSupported(action: HMSAction, description: string = '') {
       return new HMSException(
         7001,

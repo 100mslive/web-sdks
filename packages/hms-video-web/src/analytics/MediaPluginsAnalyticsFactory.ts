@@ -2,12 +2,31 @@ import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { HMSException } from '../error/HMSException';
 
-export default class VideoPluginsAnalyticsFactory {
+export default class MediaPluginsAnalyticsFactory {
   static failure(pluginName: string, error: HMSException) {
-    const name = 'videoPlugin.failed';
+    const name = 'mediaPlugin.failed';
     const level = AnalyticsEventLevel.ERROR;
     const properties = { name: pluginName, error_message: error };
 
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
+  static audioPluginStats({
+    pluginName,
+    duration,
+    loadTime,
+  }: {
+    pluginName: string;
+    duration: number;
+    loadTime: number;
+  }) {
+    const name = 'mediaPlugin.stats';
+    const level = AnalyticsEventLevel.INFO;
+    const properties = {
+      name: pluginName,
+      duration: duration,
+      load_time: loadTime,
+    };
     return new AnalyticsEvent({ name, level, properties });
   }
 
@@ -28,7 +47,7 @@ export default class VideoPluginsAnalyticsFactory {
     inputFrameRate: number;
     pluginFrameRate: number;
   }) {
-    const name = 'videoPlugin.stats';
+    const name = 'mediaPlugin.stats';
     const level = AnalyticsEventLevel.INFO;
     const properties = {
       name: pluginName,

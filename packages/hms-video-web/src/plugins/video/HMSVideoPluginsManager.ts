@@ -65,7 +65,6 @@ export class HMSVideoPluginsManager {
   }
 
   /**
-   * TODO: handle pluginFrameRate
    * @param plugin
    * @param pluginFrameRate
    */
@@ -76,7 +75,7 @@ export class HMSVideoPluginsManager {
         HMSLogger.w('no name provided by the plugin');
         return;
       }
-      let err = ErrorFactory.VideoPluginErrors.AddAlreadyInProgress(
+      let err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
         HMSAction.VIDEO_PLUGINS,
         'Add Plugin is already in Progress',
       );
@@ -133,7 +132,7 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
     if (!plugin.isSupported()) {
-      let err = ErrorFactory.VideoPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');
+      let err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');
       this.analytics.failure(name, err);
       HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
       return;
