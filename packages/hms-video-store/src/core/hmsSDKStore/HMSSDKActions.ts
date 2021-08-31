@@ -34,6 +34,7 @@ import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSSdk,
   HMSVideoPlugin,
+  HMSAudioPlugin,
   HMSTrack as SDKHMSTrack,
   HMSLocalTrack as SDKHMSLocalTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
@@ -342,9 +343,15 @@ export class HMSSDKActions implements IHMSActions {
   async addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
     return this.addRemoveVideoPlugin(plugin, 'add', pluginFrameRate);
   }
+  async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
+    return this.addRemoveAudioPlugin(plugin, 'add');
+  }
 
   async removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
     return this.addRemoveVideoPlugin(plugin, 'remove');
+  }
+  async removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
+    return this.addRemoveAudioPlugin(plugin, 'remove');
   }
 
   async changeRole(forPeerId: string, toRole: string, force: boolean = false) {
@@ -899,6 +906,26 @@ export class HMSSDKActions implements IHMSActions {
           await (sdkTrack as SDKHMSLocalVideoTrack).removePlugin(plugin);
         }
         this.syncRoomState(`${action}VideoPlugin`);
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+      }
+    }
+  }
+  private async addRemoveAudioPlugin(plugin: HMSAudioPlugin, action: 'add' | 'remove') {
+    if (!plugin) {
+      HMSLogger.w('Invalid plugin received in store');
+      return;
+    }
+    const trackID = this.store.getState(selectLocalAudioTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        if (action === 'add') {
+          await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
+        } else if (action === 'remove') {
+          await (sdkTrack as SDKHMSLocalAudioTrack).removePlugin(plugin);
+        }
+        this.syncRoomState(`${action}AudioPlugin`);
       } else {
         this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
       }

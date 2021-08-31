@@ -6,7 +6,8 @@ import {
   HMSLogLevel,
 } from '@100mslive/hms-video';
 import { HMSPeerID, HMSRoleName, HMSTrackSource } from './schema';
-import { HMSVideoPlugin } from '@100mslive/hms-video';
+import { HMSVideoPlugin, HMSAudioPlugin } from '@100mslive/hms-video';
+
 import { HMSRoleChangeRequest } from './selectors';
 
 /**
@@ -185,10 +186,14 @@ export interface IHMSActions {
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
+  addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
+
   /**
    * @see addPluginToVideoTrack
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
+
+  removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
    * Request for a role change of a remote peer. Can be forced.

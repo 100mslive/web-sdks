@@ -1,6 +1,7 @@
 import {
   HMSTrack as SDKHMSTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
+  HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
@@ -68,7 +69,7 @@ export class SDKToHMS {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
       }
     }
-    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack || sdkTrack instanceof SDKHMSLocalAudioTrack) {
       if (!areArraysEqual(sdkTrack.getPlugins(), track.plugins)) {
         track.plugins = sdkTrack.getPlugins();
       }
