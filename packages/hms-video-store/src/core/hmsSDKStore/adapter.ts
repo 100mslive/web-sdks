@@ -53,10 +53,8 @@ export class SDKToHMS {
     track.width = mediaSettings.width;
     track.deviceID = mediaSettings.deviceId;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
-      const volume = sdkTrack.getVolume();
-      if (volume) {
-        track.volume = volume;
-      }
+      const volume = sdkTrack.getVolume() || 0;
+      track.volume = volume;
     }
     SDKToHMS.enrichVideoTrack(track, sdkTrack);
   }

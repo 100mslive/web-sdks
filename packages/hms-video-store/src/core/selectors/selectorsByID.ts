@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { selectHMSMessages, selectLocalPeerID, selectPeersMap, selectTracksMap } from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
-import { isAudio, isScreenShare, isScreenSharing, isTrackEnabled, isVideo } from './selectorUtils';
+import { getScreenshareTracks, isAudio, isTrackEnabled } from './selectorUtils';
 import { HMSLogger } from '../../common/ui-logger';
 
 type byIDSelector<T> = (store: HMSStore, id?: string) => T;
@@ -141,14 +141,10 @@ export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID?: HM
   | HMSTrack
   | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
-  if (peer && isScreenSharing(store, peer)) {
-    const trackID = peer?.auxiliaryTracks.find(trackId => {
-      const track = store.tracks[trackId];
-      return isVideo(track) && isScreenShare(track);
-    });
-    return trackID ? store.tracks[trackID] : undefined;
+  if (!peer) {
+    return undefined;
   }
-  return undefined;
+  return getScreenshareTracks(store.tracks, peer)[0];
 });
 
 /**
@@ -158,14 +154,10 @@ export const selectScreenShareAudioByPeerID = byIDCurry((store: HMSStore, peerID
   | HMSTrack
   | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
-  if (peer && isScreenSharing(store, peer)) {
-    const trackID = peer?.auxiliaryTracks.find(trackId => {
-      const track = store.tracks[trackId];
-      return isAudio(track) && isScreenShare(track);
-    });
-    return trackID ? store.tracks[trackID] : undefined;
+  if (!peer) {
+    return undefined;
   }
-  return undefined;
+  return getScreenshareTracks(store.tracks, peer)[1];
 });
 
 /**

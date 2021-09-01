@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
+  getScreenshareTracks,
   isDegraded,
   isScreenSharing,
   isTrackDisplayEnabled,
@@ -195,34 +196,73 @@ export const selectIsLocalVideoDisplayEnabled = (store: HMSStore) => {
 /**
  * Select a boolean denoting whether your screen is shared to remote peers in the room.
  */
-export const selectIsLocalScreenShared = (store: HMSStore): boolean => {
-  const localPeer = selectLocalPeer(store);
-  return isScreenSharing(store, localPeer);
-};
-
-/**
- * Select a boolean denoting whether someone is sharing screen in the room.
- */
-export const selectIsSomeoneScreenSharing = (store: HMSStore): boolean => {
-  const peers = selectPeers(store);
-  return peers.some(peer => isScreenSharing(store, peer));
-};
+export const selectIsLocalScreenShared = createSelector(
+  selectLocalPeer,
+  selectTracksMap,
+  (localPeer, tracksMap) => {
+    return isScreenSharing(tracksMap, localPeer);
+  },
+);
 
 /**
  * Select the first peer who is currently sharing their screen.
  */
-export const selectPeerScreenSharing = (store: HMSStore): HMSPeer | undefined => {
-  const peers = selectPeers(store);
-  return peers.find(peer => isScreenSharing(store, peer));
-};
+export const selectPeerScreenSharing = createSelector(
+  selectPeersMap,
+  selectTracksMap,
+  (peersMap, tracksMap) => {
+    for (const peerID in peersMap) {
+      const peer = peersMap[peerID];
+      if (isScreenSharing(tracksMap, peer)) {
+        return peer;
+      }
+    }
+    return undefined;
+  },
+);
+
+/**
+ * Select a boolean denoting whether someone is sharing screen in the room.
+ */
+export const selectIsSomeoneScreenSharing = createSelector(selectPeerScreenSharing, peer => {
+  return !!peer;
+});
+
+/**
+ * Select the first peer who is currently sharing their audio only screen
+ */
+export const selectPeerSharingAudio = createSelector(
+  selectPeersMap,
+  selectTracksMap,
+  (peersMap, tracksMap) => {
+    for (const peerID in peersMap) {
+      const peer = peersMap[peerID];
+      const [videoTrack, audioTrack] = getScreenshareTracks(tracksMap, peer);
+      if (!videoTrack && !!audioTrack) {
+        return peer;
+      }
+    }
+    return undefined;
+  },
+);
 
 /**
  * Select an array of peers who are currently sharing their screen.
  */
-export const selectPeersScreenSharing = (store: HMSStore): HMSPeer[] => {
-  const peers = selectPeers(store);
-  return peers.filter(peer => isScreenSharing(store, peer));
-};
+export const selectPeersScreenSharing = createSelector(
+  selectPeersMap,
+  selectTracksMap,
+  (peersMap, tracksMap) => {
+    const peers = [];
+    for (const peerID in peersMap) {
+      const peer = peersMap[peerID];
+      if (isScreenSharing(tracksMap, peer)) {
+        peers.push(peer);
+      }
+    }
+    return peers;
+  },
+);
 
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
