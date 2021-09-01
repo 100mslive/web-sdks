@@ -82,10 +82,16 @@ export class HMSSdk implements HMSInterface {
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
+      /**
+       * Init notification manager both after preview and join if store is available, since they have different listen
+       */
+      this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
       return;
     }
+
     this.sdkState.isInitialised = true;
     this.store = new Store();
+    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store);
     this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
@@ -174,7 +180,6 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
-    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
 
     console.log('sdkState', this.sdkState, this.store);
     this.store.setConfig(config);
@@ -246,10 +251,6 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
-    /**
-     * Init notification manager both after preview and join, since they have different listen
-     */
-    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
 
     this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
