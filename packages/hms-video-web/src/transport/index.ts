@@ -20,7 +20,7 @@ import {
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
-import { TrackState } from '../sdk/models/HMSNotifications';
+import { TrackState } from '../notification-manager';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';

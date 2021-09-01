@@ -46,7 +46,7 @@ export interface HMSAudioListener {
   onAudioLevelUpdate(speakers: HMSSpeaker[]): void;
 }
 
-export default interface HMSUpdateListener extends DeviceChangeListener {
+export interface HMSUpdateListener extends DeviceChangeListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | null): void;

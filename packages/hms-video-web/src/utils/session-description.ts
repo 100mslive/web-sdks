@@ -1,5 +1,5 @@
 import * as sdpTransform from 'sdp-transform';
-import { TrackState } from '../sdk/models/HMSNotifications';
+import { TrackState } from '../notification-manager';
 import { isPresent } from './presence';
 
 /**

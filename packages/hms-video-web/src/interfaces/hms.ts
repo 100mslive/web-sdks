@@ -1,5 +1,5 @@
 import { HMSConfig } from './config';
-import HMSUpdateListener, { HMSAudioListener } from './update-listener';
+import { HMSAudioListener, HMSUpdateListener } from './update-listener';
 import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';

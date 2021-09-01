@@ -16,8 +16,13 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
+import { TrackState } from '../../notification-manager';
 
 export type KnownRoles = { [role: string]: HMSRole };
+export interface TrackStateEntry {
+  peerId: string;
+  trackInfo: TrackState;
+}
 
 export interface IStore {
   getConfig(): HMSConfig | undefined;
@@ -60,6 +65,9 @@ export interface IStore {
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;
+
+  getTrackState(trackId: string): TrackStateEntry;
+  setTrackState(trackState: TrackStateEntry): void;
 
   removePeer(peerId: string): void;
   removeTrack(trackId: string): void;

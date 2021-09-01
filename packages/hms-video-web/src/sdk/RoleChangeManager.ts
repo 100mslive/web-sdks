@@ -1,6 +1,6 @@
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
-import HMSUpdateListener, { HMSPeerUpdate, HMSTrackUpdate } from '../interfaces/update-listener';
+import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import ITransport from '../transport/ITransport';
 import { IStore } from './store';
 

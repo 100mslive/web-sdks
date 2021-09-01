@@ -3,12 +3,10 @@ import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
-import HMSUpdateListener, { HMSAudioListener, HMSTrackUpdate } from '../interfaces/update-listener';
+import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import decodeJWT from '../utils/jwt';
-import { getNotificationMethod, HMSNotificationMethod } from './models/enums/HMSNotificationMethod';
-import { getNotification, PeerLeaveRequestNotification } from './models/HMSNotifications';
-import NotificationManager from './NotificationManager';
+import { NotificationManager, HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
 import {
   HMSTrackSource,
   HMSTrackType,
@@ -69,10 +67,10 @@ const INITIAL_STATE = {
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport | null;
   private TAG: string = '[HMSSdk]:';
-  private listener!: HMSUpdateListener | null;
+  private listener?: HMSUpdateListener;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
-  private audioListener: HMSAudioListener | null = null;
+  private audioListener?: HMSAudioListener;
   private store!: IStore;
   private notificationManager!: NotificationManager;
   private deviceManager!: DeviceManager;
@@ -88,7 +86,6 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.isInitialised = true;
     this.store = new Store();
-    this.notificationManager = new NotificationManager(this.store);
     this.deviceManager = new DeviceManager(this.store);
     this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
@@ -105,32 +102,19 @@ export class HMSSdk implements HMSInterface {
 
   private observer: ITransportObserver = {
     onNotification: (message: any) => {
-      const method = getNotificationMethod(message.method);
-      const notification = getNotification(method, message.params);
-      // @TODO: Notification manager needs to be refactored. The current implementation is not manageable
-      // this will pollute logs
-      if (method !== HMSNotificationMethod.ACTIVE_SPEAKERS) {
-        HMSLogger.d(this.TAG, 'onNotification: ', message);
-      }
-      if (method === HMSNotificationMethod.PEER_LEAVE_REQUEST) {
-        this.handlePeerLeaveRequest(notification as PeerLeaveRequestNotification);
+      if (message.method === HMSNotificationMethod.PEER_LEAVE_REQUEST) {
+        this.handlePeerLeaveRequest(message.params as PeerLeaveRequestNotification);
         return;
       }
-      this.notificationManager.handleNotification(
-        method,
-        notification,
-        this.sdkState.isReconnecting,
-        this.listener!,
-        this.audioListener,
-      );
+      this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
     },
 
     onTrackAdd: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleOnTrackAdd(track);
+      this.notificationManager.handleTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleOnTrackRemove(track);
+      this.notificationManager.handleTrackRemove(track);
     },
 
     onTrackDegrade: (track: HMSRemoteVideoTrack) => {
@@ -151,7 +135,7 @@ export class HMSSdk implements HMSInterface {
       switch (state) {
         case TransportState.Joined:
           if (this.transportState === TransportState.Reconnecting) {
-            this.listener?.onReconnected?.();
+            this.listener?.onReconnected();
           }
           break;
         case TransportState.Failed:
@@ -162,7 +146,7 @@ export class HMSSdk implements HMSInterface {
           break;
         case TransportState.Reconnecting:
           this.sdkState.isReconnecting = true;
-          this.listener?.onReconnecting?.(error!);
+          this.listener?.onReconnecting(error!);
           break;
       }
 
@@ -190,6 +174,8 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
+    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
+
     console.log('sdkState', this.sdkState, this.store);
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
@@ -260,6 +246,11 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
+    /**
+     * Init notification manager both after preview and join, since they have different listen
+     */
+    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
+
     this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
@@ -321,7 +312,7 @@ export class HMSSdk implements HMSInterface {
     DeviceStorageManager.cleanup();
     this.sdkState = { ...INITIAL_STATE };
     this.transport = null;
-    this.listener = null;
+    this.listener = undefined;
     if (this.roleChangeManager) {
       this.notificationManager.removeEventListener(
         'local-peer-role-update',
@@ -513,6 +504,7 @@ export class HMSSdk implements HMSInterface {
 
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
+    this.notificationManager.setAudioListener(audioListener);
   }
 
   async changeRole(forPeer: HMSPeer, toRole: string, force: boolean = false) {

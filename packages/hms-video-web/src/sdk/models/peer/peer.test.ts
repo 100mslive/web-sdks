@@ -1,6 +1,6 @@
 import decodeJWT from '../../../utils/jwt';
 import { HMSLocalPeer } from './HMSLocalPeer';
-import { Peer as PeerNotification } from '../HMSNotifications';
+import { PeerNotification } from '../../../notification-manager';
 import { HMSRemotePeer } from './HMSRemotePeer';
 
 const validToken =
@@ -71,7 +71,7 @@ describe('HMSLocalPeer', () => {
 });
 
 describe('HMSRemotPeer', () => {
-  const params = {
+  const peerInfo: PeerNotification = {
     peer_id: '3f18e019-5463-4c38-bcac-06f0010c43ab',
     info: {
       name: 'John Doe',
@@ -79,13 +79,13 @@ describe('HMSRemotPeer', () => {
       user_id: 'customer_user_id',
     },
     role: 'viewer',
+    tracks: {},
   };
-  const peerInfo = new PeerNotification(params);
   const peer = new HMSRemotePeer({
-    peerId: peerInfo.peerId,
+    peerId: peerInfo.peer_id,
     name: peerInfo.info.name,
     role: getParamsForRole(peerInfo.role),
-    customerUserId: peerInfo.info.userId,
+    customerUserId: peerInfo.info.user_id,
     customerDescription: peerInfo.info.data,
   });
 
@@ -94,7 +94,7 @@ describe('HMSRemotPeer', () => {
   });
 
   it('should have valid peerId', () => {
-    expect(peer.peerId).toBe(peerInfo.peerId);
+    expect(peer.peerId).toBe(peerInfo.peer_id);
   });
 
   it('should have valid name', () => {
@@ -110,6 +110,6 @@ describe('HMSRemotPeer', () => {
   });
 
   it('should have valid customerUserId', () => {
-    expect(peer.customerUserId).toBe(peerInfo.info.userId);
+    expect(peer.customerUserId).toBe(peerInfo.info.user_id);
   });
 });

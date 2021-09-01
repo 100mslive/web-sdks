@@ -1,4 +1,4 @@
-import { IStore, KnownRoles } from './IStore';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces';
@@ -31,6 +31,7 @@ class Store implements IStore {
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
   private tracks: Record<string, HMSTrack> = {};
+  private peerTrackStates: Record<string, TrackStateEntry> = {};
   private speakers: HMSSpeaker[] = [];
   private videoLayers: SimulcastLayers | null = null;
   private screenshareLayers: SimulcastLayers | null = null;
@@ -173,6 +174,14 @@ class Store implements IStore {
 
   addTrack(track: HMSTrack) {
     this.tracks[track.trackId] = track;
+  }
+
+  getTrackState(trackId: string) {
+    return this.peerTrackStates[trackId];
+  }
+
+  setTrackState(trackStateEntry: TrackStateEntry) {
+    this.peerTrackStates[trackStateEntry.trackInfo.track_id] = trackStateEntry;
   }
 
   removePeer(peerId: string) {
