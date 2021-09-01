@@ -6,7 +6,7 @@ import HMSLogger from '../../utils/logger';
 import { MessageNotification } from '../HMSNotifications';
 
 export class BroadcastManager {
-  constructor(private store: IStore, private listener?: HMSUpdateListener) {}
+  constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
   private get TAG() {
     return `[${this.constructor.name}]`;

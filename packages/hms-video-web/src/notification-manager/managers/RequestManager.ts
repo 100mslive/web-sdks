@@ -3,7 +3,7 @@ import { IStore } from '../../sdk/store';
 import { RoleChangeRequestParams, TrackUpdateRequestNotification } from '../HMSNotifications';
 
 export class RequestManager {
-  constructor(private store: IStore, private listener?: HMSUpdateListener) {}
+  constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
   handleRoleChangeRequest(notification: RoleChangeRequestParams) {
     const request: HMSRoleChangeRequest = {

@@ -33,7 +33,7 @@ export class NotificationManager {
   private requestManager: RequestManager;
   private eventEmitter: EventEmitter = new EventEmitter();
 
-  constructor(private store: IStore, private listener?: HMSUpdateListener, public audioListener?: HMSAudioListener) {
+  constructor(private store: IStore, private listener?: HMSUpdateListener, private audioListener?: HMSAudioListener) {
     this.trackManager = new TrackManager(this.store, this.eventEmitter, this.listener);
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
@@ -41,6 +41,21 @@ export class NotificationManager {
     this.policyChangeManager = new PolicyChangeManager(this.store, this.eventEmitter);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
+  }
+
+  setListener(listener?: HMSUpdateListener) {
+    this.listener = listener;
+    this.trackManager.listener = listener;
+    this.peerManager.listener = listener;
+    this.peerListManager.listener = listener;
+    this.broadcastManager.listener = listener;
+    this.requestManager.listener = listener;
+    this.activeSpeakerManager.listener = listener;
+  }
+
+  setAudioListener(audioListener?: HMSAudioListener) {
+    this.audioListener = audioListener;
+    this.activeSpeakerManager.audioListener = audioListener;
   }
 
   addEventListener(event: string, listener: EventListener) {
@@ -126,9 +141,4 @@ export class NotificationManager {
   handleTrackRemove = (track: HMSRemoteTrack) => {
     this.trackManager.handleTrackRemove(track);
   };
-
-  setAudioListener(audioListener: HMSAudioListener) {
-    this.audioListener = audioListener;
-    this.activeSpeakerManager.audioListener = audioListener;
-  }
 }

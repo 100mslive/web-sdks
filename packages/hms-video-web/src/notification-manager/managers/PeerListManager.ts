@@ -25,7 +25,7 @@ export class PeerListManager {
     private store: IStore,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
-    private listener?: HMSUpdateListener,
+    public listener?: HMSUpdateListener,
   ) {}
 
   private get TAG() {

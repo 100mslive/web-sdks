@@ -27,7 +27,7 @@ export class TrackManager {
     return `[${this.constructor.name}]`;
   }
 
-  constructor(private store: IStore, private eventEmitter: EventEmitter, private listener?: HMSUpdateListener) {}
+  constructor(private store: IStore, private eventEmitter: EventEmitter, public listener?: HMSUpdateListener) {}
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);

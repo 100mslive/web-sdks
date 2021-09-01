@@ -16,7 +16,7 @@ import { TrackManager } from './TrackManager';
  * we add it to the store and call TrackManager to process it when RTC Track comes in.
  */
 export class PeerManager {
-  constructor(private store: IStore, private trackManager: TrackManager, private listener?: HMSUpdateListener) {}
+  constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
 
   private get TAG() {
     return `[${this.constructor.name}]`;

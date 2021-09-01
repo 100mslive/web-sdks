@@ -83,9 +83,9 @@ export class HMSSdk implements HMSInterface {
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
       /**
-       * Init notification manager both after preview and join if store is available, since they have different listen
+       * Set listener after join and preview, since they have different listeners
        */
-      this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
+      this.notificationManager.setListener(this.listener);
       return;
     }
 
