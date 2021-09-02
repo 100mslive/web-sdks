@@ -5,7 +5,6 @@ import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
   getScreenshareTracks,
   isDegraded,
-  isScreenSharing,
   isTrackDisplayEnabled,
   isTrackEnabled,
 } from './selectorUtils';
@@ -200,7 +199,8 @@ export const selectIsLocalScreenShared = createSelector(
   selectLocalPeer,
   selectTracksMap,
   (localPeer, tracksMap) => {
-    return isScreenSharing(tracksMap, localPeer);
+    const { video, audio } = getScreenshareTracks(tracksMap, localPeer);
+    return !!(video || audio);
   },
 );
 
@@ -211,13 +211,17 @@ export const selectPeerScreenSharing = createSelector(
   selectPeersMap,
   selectTracksMap,
   (peersMap, tracksMap) => {
+    let screensharePeer = undefined;
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      if (isScreenSharing(tracksMap, peer)) {
+      const { video, audio } = getScreenshareTracks(tracksMap, peer);
+      if (video) {
         return peer;
+      } else if (audio && !screensharePeer) {
+        screensharePeer = peer;
       }
     }
-    return undefined;
+    return screensharePeer;
   },
 );
 
@@ -237,8 +241,8 @@ export const selectPeerSharingAudio = createSelector(
   (peersMap, tracksMap) => {
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      const [videoTrack, audioTrack] = getScreenshareTracks(tracksMap, peer);
-      if (!videoTrack && !!audioTrack) {
+      const { audio, video } = getScreenshareTracks(tracksMap, peer);
+      if (!video && !!audio) {
         return peer;
       }
     }
@@ -253,14 +257,18 @@ export const selectPeersScreenSharing = createSelector(
   selectPeersMap,
   selectTracksMap,
   (peersMap, tracksMap) => {
-    const peers = [];
+    const videoPeers = [];
+    const audioPeers = [];
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      if (isScreenSharing(tracksMap, peer)) {
-        peers.push(peer);
+      const { video, audio } = getScreenshareTracks(tracksMap, peer);
+      if (video) {
+        videoPeers.push(peer);
+      } else if (audio) {
+        audioPeers.push(peer);
       }
     }
-    return peers;
+    return videoPeers.concat(audioPeers);
   },
 );
 

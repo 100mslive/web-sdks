@@ -134,31 +134,27 @@ export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?:
   return undefined;
 });
 
+export const selectScreenSharesByPeerId = byIDCurry(
+  createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
+    return getScreenshareTracks(tracks, peer);
+  }),
+);
+
 /**
  * Select the screen share video track of a peer given a peer ID.
  */
-export const selectScreenShareByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
-  const peer = selectPeerByIDBare(store, peerID);
-  if (!peer) {
-    return undefined;
-  }
-  return getScreenshareTracks(store.tracks, peer)[0];
-});
+export const selectScreenShareByPeerID = (id?: string) =>
+  createSelector(selectScreenSharesByPeerId(id), screenshare => {
+    return screenshare.video;
+  });
 
 /**
  * Select the screen share audio track of a peer given a peer ID.
  */
-export const selectScreenShareAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
-  const peer = selectPeerByIDBare(store, peerID);
-  if (!peer) {
-    return undefined;
-  }
-  return getScreenshareTracks(store.tracks, peer)[1];
-});
+export const selectScreenShareAudioByPeerID = (id?: string) =>
+  createSelector(selectScreenSharesByPeerId(id), screenshare => {
+    return screenshare.audio;
+  });
 
 /**
  * Select a boolean denoting whether a peer has unmuted audio and sharing it to other peers.

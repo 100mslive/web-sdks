@@ -1,25 +1,18 @@
 import { HMSPeer, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 
-export function isScreenSharing(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer) {
-  const [videoTrack] = getScreenshareTracks(tracks, peer);
-  return !!videoTrack;
-}
-
-export function getScreenshareTracks(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer) {
+export function getScreenshareTracks(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer | null) {
   let videoScreenShare = undefined;
   let audioScreenShare = undefined;
-  if (!peer) {
-    return [videoScreenShare, audioScreenShare];
-  }
-
-  for (let trackID of peer.auxiliaryTracks) {
-    const track = tracks[trackID];
-    if (isScreenShare(track)) {
-      audioScreenShare = isAudio(track) ? track : audioScreenShare;
-      videoScreenShare = isVideo(track) ? track : videoScreenShare;
+  if (peer) {
+    for (let trackID of peer.auxiliaryTracks) {
+      const track = tracks[trackID];
+      if (isScreenShare(track)) {
+        audioScreenShare = isAudio(track) ? track : audioScreenShare;
+        videoScreenShare = isVideo(track) ? track : videoScreenShare;
+      }
     }
   }
-  return [videoScreenShare, audioScreenShare];
+  return { video: videoScreenShare, audio: audioScreenShare };
 }
 
 export function isAudio(track: HMSTrack | undefined) {
