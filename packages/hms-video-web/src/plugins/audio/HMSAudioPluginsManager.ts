@@ -41,7 +41,7 @@ export class HMSAudioPluginsManager {
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
-      this.analytics.failure(name, err); //TODO: implement analytics
+      this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
       return;
     }
@@ -81,10 +81,10 @@ export class HMSAudioPluginsManager {
       return;
     }
     try {
+      this.analytics.added(name);
       await this.analytics.initWithTime(name, async () => plugin.init());
       this.plugins.push(name);
       this.pluginsMap[name] = plugin;
-      this.analytics.added(name);
       await this.startPluginsProcess();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
@@ -128,7 +128,7 @@ export class HMSAudioPluginsManager {
     for (const name of this.plugins) {
       await this.removePlugin(this.pluginsMap[name]);
     }
-    // memory cleanup // TODO: check this
+    // memory cleanup
     this.outputTrack?.stop();
   }
 
@@ -195,6 +195,5 @@ export class HMSAudioPluginsManager {
 
   private async stopPluginsProcess() {
     await this.hmsTrack.setProcessedTrack(undefined);
-    //this.outputTrack?.stop();
   }
 }
