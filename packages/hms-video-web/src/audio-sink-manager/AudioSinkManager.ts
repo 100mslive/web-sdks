@@ -37,6 +37,7 @@ export class AudioSinkManager {
   private volume: number = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
+  private audioContext?: AudioContext;
 
   constructor(
     private store: IStore,
@@ -46,6 +47,8 @@ export class AudioSinkManager {
     this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.addEventListener('audio-device-change', this.handleAudioDeviceChange);
+    // Initiate a Audio Context so safari will play audio on speaker instead of earpiece
+    this.audioContext = new AudioContext();
   }
 
   addEventListener(event: string, listener: (event: AutoplayEvent) => void) {
@@ -94,6 +97,8 @@ export class AudioSinkManager {
   }
 
   cleanUp() {
+    this.audioContext?.close();
+    this.audioContext = undefined;
     this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
