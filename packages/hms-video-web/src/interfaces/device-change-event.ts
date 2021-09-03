@@ -4,6 +4,6 @@ import { DeviceMap } from './HMSDeviceManager';
 export interface HMSDeviceChangeEvent {
   error?: HMSException;
   devices: DeviceMap;
-  selection?: InputDeviceInfo | MediaDeviceInfo;
+  selection?: MediaDeviceInfo;
   type: 'audioOutput' | 'audioInput' | 'video';
 }

@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.0.181",
+  "version": "0.0.182",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -37,15 +37,16 @@
   "size-limit": [
     {
       "path": "dist/hms-video.cjs.production.min.js",
-      "limit": "20 KB"
+      "limit": "50 KB"
     },
     {
       "path": "dist/hms-video.esm.js",
-      "limit": "20 KB"
+      "limit": "200 KB"
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.10.2",
+    "size-limit": "^5.0.3",
+    "@size-limit/file": "^5.0.3",
     "@types/events": "^3.0.0",
     "@types/node": "^15.0.1",
     "@types/sdp-transform": "^2.4.4",
@@ -53,10 +54,9 @@
     "@types/uuid": "^8.3.0",
     "husky": "^6.0.0",
     "prettier": "2.2.1",
-    "size-limit": "^4.10.2",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.4.2"
   },
   "dependencies": {
     "events": "^3.3.0",
@@ -64,5 +64,8 @@
     "ua-parser-js": "^0.7.28",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0"
+  },
+  "resolutions": {
+    "node-notifier": "^8.0.1"
   }
 }

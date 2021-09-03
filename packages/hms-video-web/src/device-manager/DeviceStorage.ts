@@ -39,7 +39,7 @@ class DeviceStorage {
     if (type === 'audioOutput') {
       selectedDevices[type] = newSelection as MediaDeviceInfo;
     } else {
-      selectedDevices[type] = newSelection as InputDeviceInfo;
+      selectedDevices[type] = newSelection as MediaDeviceInfo;
     }
     this.storage.set(selectedDevices);
   }

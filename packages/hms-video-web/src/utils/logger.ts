@@ -7,6 +7,10 @@ export enum HMSLogLevel {
   NONE,
 }
 
+/**
+ * TODO: fix this so logs show the real file and line numbers where they originated from instead of this class
+ * https://stackoverflow.com/questions/13815640/a-proper-wrapper-for-console-log-with-correct-line-number
+ */
 export default class HMSLogger {
   static level: HMSLogLevel = HMSLogLevel.VERBOSE;
 

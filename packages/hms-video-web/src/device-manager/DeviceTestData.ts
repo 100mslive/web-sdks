@@ -5,13 +5,13 @@ export const DevicesWiredHeadphonesWithoutMic = {
       kind: 'audioinput',
       label: 'Default - MacBook Pro Microphone (Built-in)',
       groupId: 'f0c91af7ec3863a76d9bc256a72af79e88f0eba3a7ad68b06849cdbdd3ceb6f2',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'ad7072fd613b86ccba8b8fa59ab1bc9e79f6fc0185df4f8c1fd4eb323de8982a',
       kind: 'audioinput',
       label: 'MacBook Pro Microphone (Built-in)',
       groupId: 'f0c91af7ec3863a76d9bc256a72af79e88f0eba3a7ad68b06849cdbdd3ceb6f2',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
   audioOutput: [
     {
@@ -39,19 +39,19 @@ export const DevicesWiredHeadphonesWithoutMic = {
       kind: 'videoinput',
       label: 'Snap Camera',
       groupId: 'c5ce28f27d44e68e69674bee49e26c7b245c1d85ec47b5dae0a0ed5639e2be6c',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '4227c1865a1474e7ee57c431d6ddfc8767fee2ec0d75c74fff904d53e161e425',
       kind: 'videoinput',
       label: 'OBS Virtual Camera (m-de:vice)',
       groupId: '55d090d515f38608a55c549169d949e0321874af0457f580328d4c30d85c9994',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'a7a83ca89e1307e6c8724845211b44975adf4c26bf617e4c7b803d9e4f07bc13',
       kind: 'videoinput',
       label: 'FaceTime HD Camera (Built-in) (05ac:8514)',
       groupId: 'a12b06c5d07b7af21de6d66e12b29efbf11aa524a0972d43a9c3218eb92a2fd5',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
 };
 
@@ -62,19 +62,19 @@ export const DevicesWiredHeadphonesWithMic = {
       kind: 'audioinput',
       label: 'Default - External Microphone (Built-in)',
       groupId: 'f000c9b6a673299ccb900edcbcb6128b14d2c373d3f96b6deae1f0ee79247722',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '10bfc3a0000b85e33a62a78e51ae3bc46e149903d45e803fd0c41d5ba2a0948a',
       kind: 'audioinput',
       label: 'External Microphone (Built-in)',
       groupId: 'f000c9b6a673299ccb900edcbcb6128b14d2c373d3f96b6deae1f0ee79247722',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'e95efae211823dedb6f8695b798b86b970504c789aa66d388bf7349986691253',
       kind: 'audioinput',
       label: 'MacBook Pro Microphone (Built-in)',
       groupId: 'a1fe56cd4aed8c11e9e9ee7cde0859c0dca214d04a70b407ef5d67ce976e91d8',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
   audioOutput: [
     {
@@ -102,19 +102,19 @@ export const DevicesWiredHeadphonesWithMic = {
       kind: 'videoinput',
       label: 'Snap Camera',
       groupId: 'c5ce28f27d44e68e69674bee49e26c7b245c1d85ec47b5dae0a0ed5639e2be6c',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '4227c1865a1474e7ee57c431d6ddfc8767fee2ec0d75c74fff904d53e161e425',
       kind: 'videoinput',
       label: 'OBS Virtual Camera (m-de:vice)',
       groupId: '55d090d515f38608a55c549169d949e0321874af0457f580328d4c30d85c9994',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'a7a83ca89e1307e6c8724845211b44975adf4c26bf617e4c7b803d9e4f07bc13',
       kind: 'videoinput',
       label: 'FaceTime HD Camera (Built-in) (05ac:8514)',
       groupId: 'a12b06c5d07b7af21de6d66e12b29efbf11aa524a0972d43a9c3218eb92a2fd5',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
 };
 
@@ -125,25 +125,25 @@ export const DevicesWithStereoHeadphones = {
       kind: 'audioinput',
       label: 'Default - Headset (OnePlus Bullets Wireless Z Hands-Free AG Audio) (Bluetooth)',
       groupId: '7eef08454a87a2c8ec51942cf1901bf45373c24c447a0626a7f39b59eaf4fa0e',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'communications',
       kind: 'audioinput',
       label: 'Communications - Headset (OnePlus Bullets Wireless Z Hands-Free AG Audio) (Bluetooth)',
       groupId: '7eef08454a87a2c8ec51942cf1901bf45373c24c447a0626a7f39b59eaf4fa0e',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '93f0e524ed1ed985e162bfb2cfd43c466d49844c67d4260e4844deea8fb5cd9f',
       kind: 'audioinput',
       label: 'Microphone Array (Intel® Smart Sound Technology (Intel® SST))',
       groupId: 'be22ae50692cb72794a5adf747ca7b71ada99a5be0188e6f36557aae96c5f73c',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '28798a0070936a432e3c5c7ac0306c5b584b111e145f38394ebb9fe6ffcacce1',
       kind: 'audioinput',
       label: 'Headset (OnePlus Bullets Wireless Z Hands-Free AG Audio) (Bluetooth)',
       groupId: '7eef08454a87a2c8ec51942cf1901bf45373c24c447a0626a7f39b59eaf4fa0e',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
   audioOutput: [
     {
@@ -189,18 +189,18 @@ export const DevicesWithStereoHeadphones = {
       kind: 'videoinput',
       label: 'Snap Camera',
       groupId: 'c5ce28f27d44e68e69674bee49e26c7b245c1d85ec47b5dae0a0ed5639e2be6c',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: '4227c1865a1474e7ee57c431d6ddfc8767fee2ec0d75c74fff904d53e161e425',
       kind: 'videoinput',
       label: 'OBS Virtual Camera (m-de:vice)',
       groupId: '55d090d515f38608a55c549169d949e0321874af0457f580328d4c30d85c9994',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
     {
       deviceId: 'a7a83ca89e1307e6c8724845211b44975adf4c26bf617e4c7b803d9e4f07bc13',
       kind: 'videoinput',
       label: 'FaceTime HD Camera (Built-in) (05ac:8514)',
       groupId: 'a12b06c5d07b7af21de6d66e12b29efbf11aa524a0972d43a9c3218eb92a2fd5',
-    } as InputDeviceInfo,
+    } as MediaDeviceInfo,
   ],
 };

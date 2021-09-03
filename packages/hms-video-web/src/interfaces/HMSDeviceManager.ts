@@ -1,7 +1,7 @@
 export interface HMSDeviceManager {
-  audioInput: InputDeviceInfo[];
+  audioInput: MediaDeviceInfo[];
   audioOutput: MediaDeviceInfo[];
-  videoInput: InputDeviceInfo[];
+  videoInput: MediaDeviceInfo[];
   outputDevice?: MediaDeviceInfo;
 }
 

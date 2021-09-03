@@ -73,9 +73,9 @@ export class VideoPluginsAnalytics {
     try {
       time = await this.timeInMs(initFn);
       HMSLogger.i(TAG, `Time taken for Plugin ${name} initialization : ${time}`);
-    } catch (err) {
+    } catch {
       //Failed during initialization of plugin(model loading etc...)
-      err = ErrorFactory.MediaPluginErrors.InitFailed(
+      const err = ErrorFactory.MediaPluginErrors.InitFailed(
         HMSAction.VIDEO_PLUGINS,
         'failed during initialization of plugin',
       );
@@ -105,7 +105,7 @@ export class VideoPluginsAnalytics {
         'Failed during processing of plugin',
       );
       HMSLogger.e(TAG, err);
-      this.failure(name, err);
+      this.failure(name, err as HMSException);
       throw err;
     }
     if (time) {

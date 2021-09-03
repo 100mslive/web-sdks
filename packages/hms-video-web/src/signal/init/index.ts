@@ -33,7 +33,8 @@ export default class InitService {
       }
       config = body;
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error;
       if (error.message === 'Failed to fetch') {
         throw ErrorFactory.InitAPIErrors.ConnectionLost(HMSAction.INIT, error.message);
       }
@@ -52,7 +53,8 @@ export function getUrl(endpoint: string, region?: string) {
     }
     url.searchParams.set('user_agent', userAgent);
     return url.toString();
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
     HMSLogger.e(TAG, error.name, error.message);
     throw error;
   }

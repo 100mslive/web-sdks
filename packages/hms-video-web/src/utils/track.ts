@@ -8,7 +8,7 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
     });
     return stream.getAudioTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err, HMSGetMediaActions.AUDIO);
+    throw BuildGetMediaError(err as Error, HMSGetMediaActions.AUDIO);
   }
 }
 
@@ -19,7 +19,7 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<Me
     });
     return stream.getVideoTracks()[0];
   } catch (err) {
-    throw BuildGetMediaError(err, HMSGetMediaActions.VIDEO);
+    throw BuildGetMediaError(err as Error, HMSGetMediaActions.VIDEO);
   }
 }
 

@@ -9,18 +9,19 @@ import { DeviceStorageManager } from './DeviceStorage';
 import { IStore } from '../sdk/store';
 import { debounce } from '../utils/timer-utils';
 import HMSLogger from '../utils/logger';
+import { HMSException } from '../error/HMSException';
 
 export type SelectedDevices = {
-  audioInput?: InputDeviceInfo;
-  videoInput?: InputDeviceInfo;
+  audioInput?: MediaDeviceInfo;
+  videoInput?: MediaDeviceInfo;
   audioOutput?: MediaDeviceInfo;
 };
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
 export class DeviceManager implements HMSDeviceManager {
-  audioInput: InputDeviceInfo[] = [];
+  audioInput: MediaDeviceInfo[] = [];
   audioOutput: MediaDeviceInfo[] = [];
-  videoInput: InputDeviceInfo[] = [];
+  videoInput: MediaDeviceInfo[] = [];
   outputDevice?: MediaDeviceInfo;
 
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -102,7 +103,7 @@ export class DeviceManager implements HMSDeviceManager {
     };
   };
 
-  private computeChange = (prevDevices: string[], currentDevices: InputDeviceInfo[]) => {
+  private computeChange = (prevDevices: string[], currentDevices: MediaDeviceInfo[]) => {
     if (prevDevices.length !== currentDevices.length) {
       return true;
     }
@@ -119,11 +120,11 @@ export class DeviceManager implements HMSDeviceManager {
       this.videoInput = [];
       devices.forEach((device) => {
         if (device.kind === 'audioinput') {
-          this.audioInput.push(device as InputDeviceInfo);
+          this.audioInput.push(device as MediaDeviceInfo);
         } else if (device.kind === 'audiooutput') {
           this.audioOutput.push(device);
         } else if (device.kind === 'videoinput') {
-          this.videoInput.push(device as InputDeviceInfo);
+          this.videoInput.push(device as MediaDeviceInfo);
         }
       });
       this.videoInputChanged = this.computeChange(prevVideoInput, this.videoInput);
@@ -161,7 +162,7 @@ export class DeviceManager implements HMSDeviceManager {
    * Function to get the device after device change
    * Chrome and Edge provide a default device from which we select the actual device
    * Firefox and safari give 0th device as system default
-   * @returns {InputDeviceInfo}
+   * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
     const defaultDevice = this.audioInput.find((device) => device.deviceId === 'default');
@@ -250,7 +251,7 @@ export class DeviceManager implements HMSDeviceManager {
           AnalyticsEventFactory.deviceChange({
             selection: { audioInput: newSelection },
             devices: this.getDevices(),
-            error,
+            error: error as HMSException,
           }),
         )
         .flush();
@@ -306,12 +307,12 @@ export class DeviceManager implements HMSDeviceManager {
           AnalyticsEventFactory.deviceChange({
             selection: { videoInput: newSelection },
             devices: this.getDevices(),
-            error,
+            error: error as HMSException,
           }),
         )
         .flush();
       this.eventEmitter.emit('video-device-change', {
-        error,
+        error: error as Error,
         type: 'video',
         selection: newSelection,
         devices: this.getDevices(),

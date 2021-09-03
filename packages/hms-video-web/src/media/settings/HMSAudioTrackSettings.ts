@@ -11,7 +11,9 @@ export class HMSAudioTrackSettingsBuilder {
     { googEchoCancellation: { exact: true } },
     // @ts-ignore
     { googExperimentalEchoCancellation: { exact: true } },
+    // @ts-ignore
     { autoGainControl: { exact: true } },
+    // @ts-ignore
     { noiseSuppression: { exact: true } },
     // @ts-ignore
     { googHighpassFilter: { exact: true } },
