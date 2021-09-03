@@ -24,7 +24,13 @@ export default class HMSLocalStream extends HMSMediaStream {
     delete audioConstraints.advanced;
     const constraints = {
       video: videosettings.toConstraints(),
-      audio: audioConstraints,
+      audio: {
+        ...audioConstraints,
+        autoGainControl: false,
+        noiseSuppression: false,
+        googAutoGainControl: false,
+        echoCancellation: false,
+      },
     } as MediaStreamConstraints;
     let stream;
     try {
