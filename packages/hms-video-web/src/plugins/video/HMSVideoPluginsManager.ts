@@ -157,7 +157,7 @@ export class HMSVideoPluginsManager {
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.plugins.length == 0) {
+    if (this.plugins.length === 0) {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsLoop();
     }
@@ -208,10 +208,10 @@ export class HMSVideoPluginsManager {
 
   private initElementsAndStream() {
     if (!this.inputCanvas) {
-      this.inputCanvas = <CanvasElement>document.createElement('canvas');
+      this.inputCanvas = document.createElement('canvas') as CanvasElement;
     }
     if (!this.outputCanvas) {
-      this.outputCanvas = <CanvasElement>document.createElement('canvas');
+      this.outputCanvas = document.createElement('canvas') as CanvasElement;
     }
     if (!this.inputVideo) {
       this.inputVideo = document.createElement('video');

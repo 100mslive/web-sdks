@@ -2,7 +2,7 @@ import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfac
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { PeerNotification as PeerNotification } from '../HMSNotifications';
+import { PeerNotification } from '../HMSNotifications';
 import { TrackManager } from './TrackManager';
 
 /**

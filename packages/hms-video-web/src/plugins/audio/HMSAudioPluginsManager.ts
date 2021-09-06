@@ -101,7 +101,7 @@ export class HMSAudioPluginsManager {
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.plugins.length == 0) {
+    if (this.plugins.length === 0) {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsProcess();
     }

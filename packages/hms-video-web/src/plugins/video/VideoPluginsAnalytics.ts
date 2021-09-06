@@ -98,9 +98,9 @@ export class VideoPluginsAnalytics {
     let time: number | undefined = undefined;
     try {
       time = await this.timeInMs(processFn);
-    } catch (err) {
+    } catch {
       //Failed during processing of plugin
-      err = ErrorFactory.MediaPluginErrors.ProcessingFailed(
+      const err = ErrorFactory.MediaPluginErrors.ProcessingFailed(
         HMSAction.VIDEO_PLUGINS,
         'Failed during processing of plugin',
       );

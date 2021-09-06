@@ -28,7 +28,6 @@ describe('DeviceStorage', () => {
   });
 
   it('should update audioOutputdevice to storage and see if prev update exists', () => {
-    // console.log(DeviceStorageManager.getSelection());
     DeviceStorageManager.updateSelection('audioOutput', {
       deviceId: selection.audioOutput.deviceId,
       groupId: selection.audioOutput.groupId,

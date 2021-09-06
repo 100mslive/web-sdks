@@ -230,8 +230,8 @@ export async function playSilentAudio() {
   let error: Error | undefined;
   try {
     await audio.play();
-  } catch (error) {
-    error = error;
+  } catch (err) {
+    error = err;
   }
   // reset audio src properly to reduce the mediaplayer element count
   // because of a bug in chrome 92 https://bugs.chromium.org/p/chromium/issues/detail?id=1232649

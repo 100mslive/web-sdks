@@ -6,7 +6,7 @@ import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   MessageNotification,
-  PeerNotification as PeerNotification,
+  PeerNotification,
   PeerListNotification,
   PolicyParams,
   RoleChangeRequestParams,
