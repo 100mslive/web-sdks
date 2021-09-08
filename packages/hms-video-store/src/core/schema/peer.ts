@@ -7,6 +7,7 @@ export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin';
 export type HMSTrackType = 'audio' | 'video';
+export type HMSTrackDisplaySurface = 'application' | 'browser' | 'monitor' | 'window';
 
 /**
  * HMSPeer stores the details of individual participants in the room
@@ -47,6 +48,7 @@ export interface HMSTrack {
   layer?: HMSSimulcastLayer;
   layerDefinitions?: SimulcastLayerDefinition[];
   degraded?: boolean;
+  displaySurface?: HMSTrackDisplaySurface;
 }
 
 /**

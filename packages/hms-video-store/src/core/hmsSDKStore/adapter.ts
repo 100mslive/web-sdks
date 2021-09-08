@@ -49,6 +49,10 @@ export class SDKToHMS {
 
   static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
+    if (track.source === 'screen' && track.type === 'video') {
+      // @ts-ignore
+      track.displaySurface = mediaSettings.displaySurface;
+    }
     track.height = mediaSettings.height;
     track.width = mediaSettings.width;
     track.deviceID = mediaSettings.deviceId;
