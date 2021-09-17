@@ -10,7 +10,7 @@ import {
   HMSTrackType,
 } from '../core';
 import { HMSSimulcastLayer } from '../core/hmsSDKStore/sdkTypes';
-import { HMSRole } from '../core/schema';
+import { HMSPlaylist, HMSPlaylistType, HMSRole } from '../core/schema';
 
 function makeTrack(
   id: HMSTrackID,
@@ -41,6 +41,7 @@ export let localSpeaker: HMSSpeaker;
 export let screenshareAudio: HMSTrack;
 export let hostRole: HMSRole;
 export let speakerRole: HMSRole;
+export let playlist: HMSPlaylist<any>;
 
 export const ROLES = {
   HOST: 'host', // allowed to turn any of video, audio and screen on. can make a viewer speaker
@@ -88,6 +89,54 @@ export const makeFakeStore = (): HMSStore => {
       '105': makeTrack('105', 'video', 'screen'),
       '106': makeTrack('106', 'audio', 'regular'),
       '107': makeTrack('107', 'audio', 'screen'),
+    },
+    playlist: {
+      audio: {
+        list: {
+          audio1: {
+            url: 'https://test.com/link1',
+            type: HMSPlaylistType.audio,
+            name: 'audio1',
+            id: 'audio1',
+            playing: true,
+            selected: true,
+          },
+          audio2: {
+            url: 'https://test.com/link2',
+            type: HMSPlaylistType.audio,
+            name: 'audio2',
+            id: 'audio2',
+            playing: false,
+            selected: false,
+          },
+        },
+        selection: { id: 'audio1', hasNext: true, hasPrevious: false },
+        progress: 20,
+        volume: 100,
+      },
+      video: {
+        list: {
+          video1: {
+            url: 'https://test.com/link1',
+            type: HMSPlaylistType.audio,
+            name: 'Video1',
+            id: 'video1',
+            playing: true,
+            selected: true,
+          },
+          video2: {
+            url: 'https://test.com/link2',
+            type: HMSPlaylistType.audio,
+            name: 'Video2',
+            id: 'video2',
+            playing: false,
+            selected: false,
+          },
+        },
+        selection: { id: 'video1', hasNext: true, hasPrevious: false },
+        progress: 30,
+        volume: 100,
+      },
     },
     messages: {
       byID: {
@@ -187,5 +236,6 @@ export const makeFakeStore = (): HMSStore => {
   localSpeaker = fakeStore.speakers[localPeer.audioTrack!];
   hostRole = fakeStore.roles['host'];
   speakerRole = fakeStore.roles['speaker'];
+  playlist = fakeStore.playlist;
   return fakeStore;
 };

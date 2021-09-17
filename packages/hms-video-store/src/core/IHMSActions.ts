@@ -4,10 +4,10 @@ import {
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSLogLevel,
+  HMSVideoPlugin,
+  HMSAudioPlugin,
 } from '@100mslive/hms-video';
-import { HMSPeerID, HMSRoleName, HMSTrackSource } from './schema';
-import { HMSVideoPlugin, HMSAudioPlugin } from '@100mslive/hms-video';
-
+import { HMSPeerID, HMSRoleName, HMSTrackSource, IHMSPlaylistActions } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 
 /**
@@ -257,4 +257,15 @@ export interface IHMSActions {
    * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
    */
   setLogLevel(level: HMSLogLevel): void;
+
+  /**
+   * audio Playlist contains all actions that can be performed on the audio playlist
+   * This will be available after joining the room
+   */
+  audioPlaylist: IHMSPlaylistActions;
+  /**
+   * video Playlist contains all actions that can be performed on the video playlist
+   * This will be available after joining the room
+   */
+  videoPlaylist: IHMSPlaylistActions;
 }

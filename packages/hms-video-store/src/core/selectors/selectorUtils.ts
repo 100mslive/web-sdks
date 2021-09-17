@@ -1,18 +1,24 @@
 import { HMSPeer, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 
-export function getScreenshareTracks(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer | null) {
-  let videoScreenShare = undefined;
-  let audioScreenShare = undefined;
+type trackCheck = (track: HMSTrack | undefined) => boolean | undefined;
+
+export function getPeerTracksByCondition(
+  tracks: Record<HMSTrackID, HMSTrack>,
+  peer: HMSPeer | null,
+  trackCheckFn: trackCheck = isScreenShare,
+) {
+  let videoTrack = undefined;
+  let audioTrack = undefined;
   if (peer) {
     for (let trackID of peer.auxiliaryTracks) {
       const track = tracks[trackID];
-      if (isScreenShare(track)) {
-        audioScreenShare = isAudio(track) ? track : audioScreenShare;
-        videoScreenShare = isVideo(track) ? track : videoScreenShare;
+      if (trackCheckFn(track)) {
+        audioTrack = isAudio(track) ? track : audioTrack;
+        videoTrack = isVideo(track) ? track : videoTrack;
       }
     }
   }
-  return { video: videoScreenShare, audio: audioScreenShare };
+  return { video: videoTrack, audio: audioTrack };
 }
 
 export function isAudio(track: HMSTrack | undefined) {
@@ -25,6 +31,14 @@ export function isVideo(track: HMSTrack | undefined) {
 
 export function isScreenShare(track: HMSTrack | undefined) {
   return track && track.source === 'screen';
+}
+
+export function isAudioPlaylist(track: HMSTrack | undefined) {
+  return track && track.source === 'audioplaylist';
+}
+
+export function isVideoPlaylist(track: HMSTrack | undefined) {
+  return track && track.source === 'videoplaylist';
 }
 
 export function isDegraded(track: HMSTrack | undefined) {

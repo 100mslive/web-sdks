@@ -18,6 +18,9 @@ import {
   DeviceMap,
   HMSLogLevel,
   HMSDeviceChangeEvent,
+  HMSPlaylistItem,
+  HMSPlaylistManager,
+  HMSPlaylistProgressEvent,
 } from '@100mslive/hms-video';
 
 export {
@@ -40,4 +43,7 @@ export {
   SimulcastLayerDefinition,
   DeviceMap,
   HMSDeviceChangeEvent,
+  HMSPlaylistItem,
+  HMSPlaylistManager,
+  HMSPlaylistProgressEvent,
 };

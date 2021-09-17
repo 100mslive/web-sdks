@@ -6,6 +6,7 @@ import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
+import { HMSPlaylist } from './playlist';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -16,6 +17,7 @@ export interface HMSStore {
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
   tracks: Record<HMSTrackID, HMSTrack>;
+  playlist: HMSPlaylist<any>;
   messages: {
     byID: Record<HMSMessageID, HMSMessage>;
     allIDs: HMSMessageID[];
@@ -43,6 +45,20 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     peers: {},
     tracks: {},
+    playlist: {
+      audio: {
+        list: {},
+        selection: { id: '', hasPrevious: false, hasNext: false },
+        progress: 0,
+        volume: 0,
+      },
+      video: {
+        list: {},
+        selection: { id: '', hasPrevious: false, hasNext: false },
+        progress: 0,
+        volume: 0,
+      },
+    },
     messages: { byID: {}, allIDs: [] },
     speakers: {},
     settings: {

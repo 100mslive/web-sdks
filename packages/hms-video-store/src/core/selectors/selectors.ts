@@ -3,8 +3,9 @@ import { createSelector } from 'reselect';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
-  getScreenshareTracks,
+  getPeerTracksByCondition,
   isDegraded,
+  isVideoPlaylist,
   isTrackDisplayEnabled,
   isTrackEnabled,
 } from './selectorUtils';
@@ -199,7 +200,7 @@ export const selectIsLocalScreenShared = createSelector(
   selectLocalPeer,
   selectTracksMap,
   (localPeer, tracksMap) => {
-    const { video, audio } = getScreenshareTracks(tracksMap, localPeer);
+    const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
     return !!(video || audio);
   },
 );
@@ -214,7 +215,7 @@ export const selectPeerScreenSharing = createSelector(
     let screensharePeer = undefined;
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      const { video, audio } = getScreenshareTracks(tracksMap, peer);
+      const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
       if (video) {
         return peer;
       } else if (audio && !screensharePeer) {
@@ -241,7 +242,7 @@ export const selectPeerSharingAudio = createSelector(
   (peersMap, tracksMap) => {
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      const { audio, video } = getScreenshareTracks(tracksMap, peer);
+      const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
       if (!video && !!audio) {
         return peer;
       }
@@ -261,7 +262,7 @@ export const selectPeersScreenSharing = createSelector(
     const audioPeers = [];
     for (const peerID in peersMap) {
       const peer = peersMap[peerID];
-      const { video, audio } = getScreenshareTracks(tracksMap, peer);
+      const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
       if (video) {
         videoPeers.push(peer);
       } else if (audio) {
@@ -269,6 +270,21 @@ export const selectPeersScreenSharing = createSelector(
       }
     }
     return videoPeers.concat(audioPeers);
+  },
+);
+
+export const selectPeerSharingVideoPlaylist = createSelector(
+  selectPeersMap,
+  selectTracksMap,
+  (peersMap, tracksMap) => {
+    for (const peerID in peersMap) {
+      const peer = peersMap[peerID];
+      const { video } = getPeerTracksByCondition(tracksMap, peer, isVideoPlaylist);
+      if (video) {
+        return peer;
+      }
+    }
+    return undefined;
   },
 );
 

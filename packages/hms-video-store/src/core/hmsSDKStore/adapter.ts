@@ -14,6 +14,8 @@ import {
   HMSRoleChangeStoreRequest,
   HMSException,
   HMSDeviceChangeEvent,
+  HMSPlaylistItem,
+  HMSPlaylistType,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -145,5 +147,44 @@ export class SDKToHMS {
       convertedData.error = this.convertException(sdkDeviceChangeEvent.error);
     }
     return convertedData;
+  }
+
+  static convertPlaylist(playlistManager: sdkTypes.HMSPlaylistManager) {
+    const audioPlaylist = this.getConvertedPlaylistType(playlistManager, HMSPlaylistType.audio);
+    const videoPlaylist = this.getConvertedPlaylistType(playlistManager, HMSPlaylistType.video);
+    return { audio: audioPlaylist, video: videoPlaylist };
+  }
+
+  private static getConvertedPlaylistType(
+    playlistManager: sdkTypes.HMSPlaylistManager,
+    type: HMSPlaylistType,
+  ) {
+    const convertedPlaylist: Record<string, HMSPlaylistItem<any>> = {};
+    const currentSelection = playlistManager.getCurrentSelection(type);
+    const progress = playlistManager.getCurrentProgress(type);
+    const isPlaying = playlistManager.isPlaying(type);
+    const volume = playlistManager.getVolume(type);
+    const list = playlistManager.getList(type);
+    const currentIndex = playlistManager.getCurrentIndex(type);
+
+    playlistManager.getList(type).forEach(value => {
+      const isSelected = value.url === currentSelection?.url;
+      convertedPlaylist[value.id] = {
+        ...value,
+        type: value.type as HMSPlaylistType,
+        selected: isSelected,
+        playing: isSelected && isPlaying,
+      };
+    });
+    return {
+      list: convertedPlaylist,
+      selection: {
+        id: currentSelection?.id,
+        hasPrevious: currentIndex > 0,
+        hasNext: currentIndex < list.length - 1,
+      },
+      progress,
+      volume,
+    };
   }
 }

@@ -60,6 +60,8 @@ import {
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
+import { HMSPlaylistType, IHMSPlaylistActions } from '../schema/playlist';
+import { HMSPlaylist } from './HMSPlaylist';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -88,6 +90,8 @@ export class HMSSDKActions implements IHMSActions {
   private readonly store: IHMSStore;
   private isRoomJoinCalled: boolean = false;
   private hmsNotifications: HMSNotifications;
+  audioPlaylist!: IHMSPlaylistActions;
+  videoPlaylist!: IHMSPlaylistActions;
 
   constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
     this.store = store;
@@ -235,6 +239,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.tracks[trackID].displayEnabled = !enabled;
       }, 'rollbackDisplayEnabled');
+      this.hmsNotifications.sendError(SDKToHMS.convertException(err as SDKHMSException));
       throw err;
     }
     const type = enabled
@@ -609,6 +614,7 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
+      Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
     }, action);
   }
 
@@ -626,7 +632,20 @@ export class HMSSDKActions implements IHMSActions {
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
+    this.audioPlaylist = new HMSPlaylist(
+      this.sdk.getPlaylistManager(),
+      HMSPlaylistType.audio,
+      this.syncRoomState.bind(this),
+      this.setState.bind(this),
+    );
+    this.videoPlaylist = new HMSPlaylist(
+      this.sdk.getPlaylistManager(),
+      HMSPlaylistType.video,
+      this.syncRoomState.bind(this),
+      this.setState.bind(this),
+    );
     this.syncRoomState('joinSync');
+    this.sdk.getPlaylistManager().onProgress(this.setProgress);
   }
 
   protected onRoomUpdate() {
@@ -974,6 +993,12 @@ export class HMSSDKActions implements IHMSActions {
     const trackIDs = this.store.getState(selectLocalTrackIDs);
     return trackIDs.find(trackID => this.hmsSDKTracks[trackID].trackId === sdkTrack.trackId);
   }
+
+  private setProgress = ({ type, progress }: sdkTypes.HMSPlaylistProgressEvent) => {
+    this.setState(draftStore => {
+      draftStore.playlist[type].progress = progress;
+    }, 'playlistProgress');
+  };
 
   /**
    * setState is separate so any future changes to how state change can be done from one place.

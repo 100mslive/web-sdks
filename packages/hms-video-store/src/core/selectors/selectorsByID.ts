@@ -1,7 +1,14 @@
 import { createSelector } from 'reselect';
 import { selectHMSMessages, selectLocalPeerID, selectPeersMap, selectTracksMap } from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
-import { getScreenshareTracks, isAudio, isTrackEnabled } from './selectorUtils';
+import {
+  getPeerTracksByCondition,
+  isAudio,
+  isVideoPlaylist,
+  isTrackEnabled,
+  isVideo,
+  isAudioPlaylist,
+} from './selectorUtils';
 import { HMSLogger } from '../../common/ui-logger';
 
 type byIDSelector<T> = (store: HMSStore, id?: string) => T;
@@ -134,9 +141,39 @@ export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?:
   return undefined;
 });
 
+export const selectVideoPlaylistVideoTrackByPeerID = byIDCurry(
+  createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
+    const trackID = peer?.auxiliaryTracks.find(trackID => {
+      const track = tracks[trackID];
+      return isVideoPlaylist(track) && isVideo(track);
+    });
+    return trackID ? tracks[trackID] : undefined;
+  }),
+);
+
+export const selectVideoPlaylistAudioTrackByPeerID = byIDCurry(
+  createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
+    const trackID = peer?.auxiliaryTracks.find(trackID => {
+      const track = tracks[trackID];
+      return isVideoPlaylist(track) && isAudio(track);
+    });
+    return trackID ? tracks[trackID] : undefined;
+  }),
+);
+
+export const selectAudioPlaylistTrackByPeerID = byIDCurry(
+  createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
+    const trackID = peer?.auxiliaryTracks.find(trackID => {
+      const track = tracks[trackID];
+      return isAudioPlaylist(track) && isAudio(track);
+    });
+    return trackID ? tracks[trackID] : undefined;
+  }),
+);
+
 export const selectScreenSharesByPeerId = byIDCurry(
   createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
-    return getScreenshareTracks(tracks, peer);
+    return getPeerTracksByCondition(tracks, peer);
   }),
 );
 

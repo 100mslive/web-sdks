@@ -10,6 +10,7 @@ import {
   remoteVideo,
   screenShare,
   screenshareAudio,
+  playlist,
 } from '../fakeStore';
 import {
   HMSStore,
@@ -62,6 +63,8 @@ import {
   selectMessagesUnreadCountByRole,
   selectBroadcastMessagesUnreadCount,
   selectMessagesUnreadCountByPeerID,
+  selectAudioPlaylist,
+  selectVideoPlaylist,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -155,6 +158,30 @@ describe('secondary selectors', () => {
     screenShare.degraded = true;
     expect(selectDegradedTracks(fakeStore)).toContain(remoteVideo);
     expect(selectDegradedTracks(fakeStore)).toContain(screenShare);
+  });
+
+  test('audio playlist related', () => {
+    const list = Object.values(playlist.audio.list);
+    expect(selectAudioPlaylist.list(fakeStore)).toEqual(list);
+    expect(selectAudioPlaylist.progress(fakeStore)).toBe(20);
+    expect(selectAudioPlaylist.selection(fakeStore)).toEqual({
+      id: list[0].id,
+      hasNext: true,
+      hasPrevious: false,
+    });
+    expect(selectAudioPlaylist.selectedItem(fakeStore)).toEqual(list[0]);
+  });
+
+  test('video playlist related', () => {
+    const list = Object.values(playlist.video.list);
+    expect(selectVideoPlaylist.list(fakeStore)).toEqual(list);
+    expect(selectVideoPlaylist.progress(fakeStore)).toBe(30);
+    expect(selectVideoPlaylist.selection(fakeStore)).toEqual({
+      id: list[0].id,
+      hasNext: true,
+      hasPrevious: false,
+    });
+    expect(selectVideoPlaylist.selectedItem(fakeStore)).toEqual(list[0]);
   });
 });
 
