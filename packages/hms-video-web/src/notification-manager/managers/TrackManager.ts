@@ -69,22 +69,22 @@ export class TrackManager {
     }
 
     const removeAuxiliaryTrack = () => {
-      const screenshareTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
-      if (screenshareTrackIndex > -1) {
-        hmsPeer.auxiliaryTracks.splice(screenshareTrackIndex, 1);
+      const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+      if (auxiliaryTrackIndex > -1) {
+        hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
       }
     };
 
     switch (track.type) {
       case HMSTrackType.AUDIO:
-        if (track.source === 'screen') {
+        if (track.source !== 'regular') {
           removeAuxiliaryTrack();
         } else {
           hmsPeer.audioTrack = undefined;
         }
         break;
       case HMSTrackType.VIDEO: {
-        if (track.source === 'screen') {
+        if (track.source !== 'regular') {
           removeAuxiliaryTrack();
         } else {
           hmsPeer.videoTrack = undefined;

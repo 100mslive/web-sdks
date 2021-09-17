@@ -1,7 +1,7 @@
 import HMSMediaStream from '../streams/HMSMediaStream';
 import { HMSTrackType } from './HMSTrackType';
 
-export type HMSTrackSource = 'regular' | 'screen' | 'plugin';
+export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 
 export abstract class HMSTrack {
   /**

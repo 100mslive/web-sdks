@@ -1,4 +1,4 @@
-import { HMSTrack } from '../media/tracks/HMSTrack';
+import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
 import { Track } from '../signal/interfaces';
 
@@ -36,7 +36,7 @@ export interface PolicyParams {
 export class TrackState implements Track {
   mute: boolean;
   type: 'audio' | 'video';
-  source: 'regular' | 'screen' | 'plugin';
+  source: HMSTrackSource;
   description: string;
   track_id: string;
   stream_id: string;

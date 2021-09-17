@@ -116,4 +116,9 @@ export const ErrorCodes = {
     // Peer Metadata Missing
     PEER_METADATA_MISSING: 6007,
   },
+
+  PlaylistErrors: {
+    NO_ENTRY_TO_PLAY: 8001,
+    NO_ENTRY_IS_PLAYING: 8002,
+  },
 };

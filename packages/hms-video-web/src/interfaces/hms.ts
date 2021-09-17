@@ -9,6 +9,7 @@ import { HMSRole } from './role';
 import { HMSPreviewListener } from './preview-listener';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRoleChangeRequest } from './role-change-request';
+import { HMSPlaylistManager } from './playlist';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): void;
@@ -19,6 +20,7 @@ export default interface HMS {
   getPeers(): HMSPeer[];
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
+  getPlaylistManager(): HMSPlaylistManager;
 
   changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;

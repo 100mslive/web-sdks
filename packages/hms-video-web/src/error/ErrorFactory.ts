@@ -23,6 +23,7 @@ export enum HMSAction {
   AUTOPLAY = 'AUTOPLAY',
   RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
   VALIDATION = 'VALIDATION',
+  PLAYLIST = 'PLAYLIST',
 }
 
 export const ErrorFactory = {
@@ -291,6 +292,27 @@ export const ErrorFactory = {
 
     AddAlreadyInProgress(action: HMSAction, description: string = '') {
       return new HMSException(7004, 'AddAlreadyInProgress', action, 'Plugin add already in progress', description);
+    },
+  },
+
+  PlaylistErrors: {
+    NoEntryToPlay(action: HMSAction, description: string) {
+      return new HMSException(
+        ErrorCodes.PlaylistErrors.NO_ENTRY_TO_PLAY,
+        'NoEntryToPlay',
+        action,
+        'Reached end of playlist',
+        description,
+      );
+    },
+    NoEntryPlaying(action: HMSAction, description: string) {
+      return new HMSException(
+        ErrorCodes.PlaylistErrors.NO_ENTRY_IS_PLAYING,
+        'NoEntryIsPlaying',
+        action,
+        'No entry is playing at this time',
+        description,
+      );
     },
   },
 };

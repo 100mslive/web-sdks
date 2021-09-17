@@ -46,6 +46,7 @@ import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
+import { PlaylistManager } from '../playlist-manager';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -75,6 +76,7 @@ export class HMSSdk implements HMSInterface {
   private notificationManager!: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
+  private playlistManager!: PlaylistManager;
   private audioOutput!: AudioOutputManager;
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
@@ -91,11 +93,16 @@ export class HMSSdk implements HMSInterface {
 
     this.sdkState.isInitialised = true;
     this.store = new Store();
+    this.playlistManager = new PlaylistManager(this);
     this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store);
     this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
+  }
+
+  getPlaylistManager(): PlaylistManager {
+    return this.playlistManager;
   }
 
   private handleAutoplayError = (event: AutoplayEvent) => {
@@ -181,7 +188,6 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
-    console.log('sdkState', this.sdkState, this.store);
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     const policy = this.store.getPolicyForRole(role);
@@ -216,7 +222,7 @@ export class HMSSdk implements HMSInterface {
         this.localPeer!.peerId,
       );
     } catch (ex) {
-      this.errorListener?.onError(ex);
+      this.errorListener?.onError(ex as HMSException);
       this.sdkState.isPreviewInProgress = false;
     }
   }
@@ -311,6 +317,7 @@ export class HMSSdk implements HMSInterface {
     this.store.cleanUp();
     this.cleanDeviceManagers();
     DeviceStorageManager.cleanup();
+    this.playlistManager.cleanup();
     this.sdkState = { ...INITIAL_STATE };
     this.transport = null;
     this.listener = undefined;
@@ -412,7 +419,7 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    if ((this.localPeer?.auxiliaryTracks?.length || 0) > 0) {
+    if (this.localPeer?.auxiliaryTracks?.find((track) => track.source === 'screen')) {
       throw Error('Cannot share multiple screens');
     }
 
@@ -474,6 +481,18 @@ export class HMSSdk implements HMSInterface {
   }
 
   async addTrack(track: MediaStreamTrack, source: HMSTrackSource = 'regular'): Promise<void> {
+    if (!track) {
+      HMSLogger.w(this.TAG, 'Please pass a valid MediaStreamTrack');
+      return;
+    }
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
+    }
+    const isTrackPresent = this.localPeer.auxiliaryTracks.find((t) => t.trackId === track.id);
+    if (isTrackPresent) {
+      return;
+    }
+
     const type = track.kind;
     const nativeStream = new MediaStream([track]);
     const stream = new HMSLocalStream(nativeStream);
@@ -487,11 +506,17 @@ export class HMSSdk implements HMSInterface {
   }
 
   async removeTrack(trackId: string) {
-    const track = this.localPeer?.auxiliaryTracks.find((t) => t.trackId === trackId);
-    if (track) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot removeTrack');
+    }
+    const trackIndex = this.localPeer.auxiliaryTracks.findIndex((t) => t.trackId === trackId);
+    if (trackIndex > -1) {
+      const track = this.localPeer.auxiliaryTracks[trackIndex];
       await this.transport!.unpublish([track]);
-      this.localPeer!.auxiliaryTracks.splice(this.localPeer!.auxiliaryTracks.indexOf(track), 1);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer!);
+      this.localPeer!.auxiliaryTracks.splice(trackIndex, 1);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
+    } else {
+      HMSLogger.w(this.TAG, `No track found for ${trackId}`);
     }
   }
 
@@ -660,7 +685,9 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
         tracks = await this.transport!.getEmptyLocalTracks(fetchTrackOptions, trackSettings);
       } else {
-        this.errorListener?.onError?.(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error.message));
+        this.errorListener?.onError?.(
+          ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message),
+        );
       }
     }
 

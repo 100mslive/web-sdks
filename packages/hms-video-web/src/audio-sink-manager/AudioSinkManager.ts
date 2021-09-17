@@ -97,12 +97,13 @@ export class AudioSinkManager {
   }
 
   cleanUp() {
+    this.audioSink?.remove();
+    this.audioSink = undefined;
     this.audioContext?.close();
     this.audioContext = undefined;
     this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
-    this.audioSink?.remove();
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -191,6 +192,9 @@ export class AudioSinkManager {
       return;
     }
     try {
+      if (this.audioContext?.state === 'suspended') {
+        this.audioContext?.resume();
+      }
       await audioEl.play();
       this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);

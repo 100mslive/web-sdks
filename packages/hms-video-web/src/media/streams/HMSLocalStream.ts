@@ -37,7 +37,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err, HMSGetMediaActions.SCREEN);
+      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
     }
 
     const tracks: Array<HMSLocalTrack> = [];
@@ -159,11 +159,13 @@ export default class HMSLocalStream extends HMSMediaStream {
         const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
         if (toRemoveLocalTrackIdx !== -1) {
           this.tracks.splice(toRemoveLocalTrackIdx, 1);
-        } else throw Error(`Cannot find ${track} in locally stored tracks`);
+        } else {
+          HMSLogger.e(TAG, `Cannot find ${track.trackId} in locally stored tracks`);
+        }
       }
     });
     if (removedSenderCount !== 1) {
-      throw Error(`Removed ${removedSenderCount} sender's, expected to remove 1`);
+      HMSLogger.e(TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
   }
 
