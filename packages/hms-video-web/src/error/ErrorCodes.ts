@@ -115,6 +115,9 @@ export const ErrorCodes = {
 
     // Peer Metadata Missing
     PEER_METADATA_MISSING: 6007,
+
+    // Joined with invalid role
+    INVALID_ROLE: 6008,
   },
 
   PlaylistErrors: {

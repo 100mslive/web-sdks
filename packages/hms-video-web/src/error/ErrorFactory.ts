@@ -269,6 +269,17 @@ export const ErrorFactory = {
         entity ? JSON.stringify(entity) : '',
       );
     },
+
+    InvalidRole(action: HMSAction, description: string) {
+      return new HMSException(
+        ErrorCodes.GenericErrors.INVALID_ROLE,
+        'InvalidRole',
+        action,
+        `Invalid role. Join with valid role`,
+        description,
+        true,
+      );
+    },
   },
 
   MediaPluginErrors: {

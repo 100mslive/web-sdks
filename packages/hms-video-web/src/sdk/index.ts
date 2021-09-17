@@ -188,6 +188,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
+    this.store.setErrorListener(this.errorListener);
     this.store.setConfig(config);
     this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     const policy = this.store.getPolicyForRole(role);
@@ -203,7 +204,7 @@ export class HMSSdk implements HMSInterface {
 
     const policyHandler = async () => {
       this.notificationManager.removeEventListener('policy-change', policyHandler);
-      const tracks = await this.initLocalTracks(config.settings!);
+      const tracks = await this.initLocalTracks(config.settings || defaultSettings);
       tracks.forEach((track) => this.setLocalPeerTrack(track));
       this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       await this.initDeviceManagers();
@@ -258,6 +259,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
+    this.store.setErrorListener(this.errorListener);
     this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
 
@@ -319,6 +321,16 @@ export class HMSSdk implements HMSInterface {
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     this.sdkState = { ...INITIAL_STATE };
+    /**
+     * when leave is called after preview itself without join.
+     * Store won't have the tracks in this case
+     */
+    if (this.localPeer) {
+      this.localPeer.audioTrack?.cleanup();
+      this.localPeer.audioTrack = undefined;
+      this.localPeer.videoTrack?.cleanup();
+      this.localPeer.videoTrack = undefined;
+    }
     this.transport = null;
     this.listener = undefined;
     if (this.roleChangeManager) {

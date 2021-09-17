@@ -17,6 +17,7 @@ import {
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
 import { TrackState } from '../../notification-manager';
+import { IErrorListener } from '../../interfaces/error-listener';
 
 export type KnownRoles = { [role: string]: HMSRole };
 export interface TrackStateEntry {
@@ -62,6 +63,7 @@ export interface IStore {
   setScreenshareSimulcastLayers(layers: SimulcastLayers): void;
   setConfig(config: HMSConfig): void;
   setPublishParams(params: PublishParams): void;
+  setErrorListener(listener: IErrorListener): void;
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;

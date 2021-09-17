@@ -100,7 +100,7 @@ export default class HMSTransport implements ITransport {
         if (err instanceof HMSException) {
           ex = err;
         } else {
-          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
+          ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
 
         analyticsEventsService.queue(AnalyticsEventFactory.subscribeFail(ex)).flush();
@@ -385,7 +385,7 @@ export default class HMSTransport implements ITransport {
 
         await this.retryScheduler.schedule(
           TransportFailureCategory.ConnectFailed,
-          error,
+          error as HMSException,
           task,
           MAX_TRANSPORT_RETRIES,
           false,
@@ -605,7 +605,7 @@ export default class HMSTransport implements ITransport {
       if (err instanceof HMSException) {
         ex = err;
       } else {
-        ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, err.message);
+        ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
       }
 
       callback!.promise.reject(ex);
@@ -641,7 +641,7 @@ export default class HMSTransport implements ITransport {
       analyticsEventsService.flush();
     } catch (error) {
       analyticsEventsService
-        .queue(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint))
+        .queue(AnalyticsEventFactory.connect(error as HMSException, connectRequestedAt, new Date(), endpoint))
         .flush();
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;

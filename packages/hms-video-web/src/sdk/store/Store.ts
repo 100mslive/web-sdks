@@ -2,6 +2,7 @@ import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSTrack,
   HMSVideoTrack,
@@ -23,6 +24,7 @@ import { Comparator } from './Comparator';
 import { HMSConfig, PublishParams } from '../../interfaces';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -37,6 +39,7 @@ class Store implements IStore {
   private screenshareLayers: SimulcastLayers | null = null;
   private config?: HMSConfig;
   private publishParams?: PublishParams;
+  private errorListener?: IErrorListener;
 
   getConfig() {
     return this.config;
@@ -293,9 +296,17 @@ class Store implements IStore {
     }
   }
 
+  setErrorListener(listener: IErrorListener) {
+    this.errorListener = listener;
+  }
+
   private updatePeersPolicy() {
     this.getPeers().forEach((peer) => {
-      peer.role = this.getPolicyForRole(peer.role!.name);
+      if (!peer.role) {
+        this.errorListener?.onError(ErrorFactory.GenericErrors.InvalidRole(HMSAction.VALIDATION, ''));
+        return;
+      }
+      peer.role = this.getPolicyForRole(peer.role.name);
     });
   }
 }
