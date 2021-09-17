@@ -716,7 +716,7 @@ export class HMSSDKActions implements IHMSActions {
     this.setState(store => {
       const trackIDAudioLevelMap: Record<HMSPeerID, number> = {};
       sdkSpeakers.forEach(sdkSpeaker => {
-        if (!sdkSpeaker.track) {
+        if (!sdkSpeaker.track || !sdkSpeaker.peer) {
           return;
         }
         const trackID = sdkSpeaker.track.trackId;
