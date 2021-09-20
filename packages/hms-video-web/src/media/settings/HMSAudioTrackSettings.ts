@@ -4,7 +4,7 @@ import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsProperti
 export class HMSAudioTrackSettingsBuilder {
   private _volume: number = 1.0;
   private _codec: HMSAudioCodec = HMSAudioCodec.OPUS;
-  private _maxBitrate: number = 32_000;
+  private _maxBitrate: number = 32;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore

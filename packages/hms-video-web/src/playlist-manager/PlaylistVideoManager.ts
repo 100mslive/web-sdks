@@ -105,10 +105,12 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   private drawImage = () => {
-    this.canvasContext?.drawImage(this.videoElement, 0, 0, this.canvas?.width, this.canvas?.height);
-    this.timer = setTimeout(() => {
-      this.drawImage();
-    }, 1000 / this.DEFAUL_FPS);
+    if (this.videoElement && !this.videoElement.paused && !this.videoElement.ended) {
+      this.canvasContext?.drawImage(this.videoElement, 0, 0, this.canvas?.width, this.canvas?.height);
+      this.timer = setTimeout(() => {
+        this.drawImage();
+      }, 1000 / this.DEFAUL_FPS);
+    }
   };
 
   private get TAG() {

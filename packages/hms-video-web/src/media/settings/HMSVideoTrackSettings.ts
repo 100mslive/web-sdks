@@ -6,7 +6,7 @@ export class HMSVideoTrackSettingsBuilder {
   private _height: number = 180;
   private _codec: HMSVideoCodec = HMSVideoCodec.VP8;
   private _maxFramerate: number = 30;
-  private _maxBitrate?: number = 150_000;
+  private _maxBitrate?: number = 150;
   private _deviceId?: string;
   private _advanced: Array<MediaTrackConstraintSet> = [];
 

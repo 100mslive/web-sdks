@@ -511,6 +511,22 @@ export class HMSSdk implements HMSInterface {
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
     const hmsTrack = new TrackKlass(stream, track, source);
+    if (source === 'videoplaylist') {
+      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
+      if (type === 'audio') {
+        settings.maxBitrate = 32;
+      } else {
+        settings.maxBitrate = 1000;
+        const { width, height } = track.getSettings();
+        settings.width = width;
+        settings.height = height;
+      }
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings(settings);
+    } else if (source === 'audioplaylist') {
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings({ maxBitrate: 32 });
+    }
 
     await this.transport?.publish([hmsTrack]);
     this.localPeer?.auxiliaryTracks.push(hmsTrack);
