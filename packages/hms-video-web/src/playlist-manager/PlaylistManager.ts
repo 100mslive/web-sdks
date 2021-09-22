@@ -4,6 +4,7 @@ import { PlaylistAudioManager } from './PlaylistAudioManager';
 import { PlaylistVideoManager } from './PlaylistVideoManager';
 import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { TypedEventEmitter } from '../utils/typed-event-emitter';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -27,12 +28,15 @@ const INITIAL_STATE: PlaylistManagerState<any> = {
   },
 };
 
-export class PlaylistManager implements HMSPlaylistManager {
+export class PlaylistManager
+  extends TypedEventEmitter<{ newTrackStart: HMSPlaylistItem<any>; playlistEnded: HMSPlaylistType }>
+  implements HMSPlaylistManager {
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
 
   constructor(private sdk: HMSSdk) {
+    super();
     this.audioManager = new PlaylistAudioManager();
     this.videoManager = new PlaylistVideoManager();
     this.addListeners();
@@ -218,6 +222,14 @@ export class PlaylistManager implements HMSPlaylistManager {
     });
   }
 
+  onNewTrackStart<T>(fn: (item: HMSPlaylistItem<T>) => void) {
+    this.on('newTrackStart', fn);
+  }
+
+  onPlaylistEnded(fn: (type: HMSPlaylistType) => void) {
+    this.on('playlistEnded', fn);
+  }
+
   private getElement(type: HMSPlaylistType = HMSPlaylistType.audio) {
     return type === HMSPlaylistType.audio ? this.audioManager.getElement() : this.videoManager.getElement();
   }
@@ -258,6 +270,7 @@ export class PlaylistManager implements HMSPlaylistManager {
     if (list[currentIndex]) {
       list[currentIndex].duration = element?.duration || 0;
     }
+    this.emit('newTrackStart', list[currentIndex]);
   }
 
   private async pause(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
@@ -279,10 +292,11 @@ export class PlaylistManager implements HMSPlaylistManager {
    * Remove tracks if reached the end of list otherwise play next
    * @param {HMSPlaylistType} type
    */
-  private handleEnded(type: HMSPlaylistType = HMSPlaylistType.audio) {
+  private async handleEnded(type: HMSPlaylistType = HMSPlaylistType.audio) {
     const { list, currentIndex } = this.state[type];
     if (currentIndex === list.length - 1) {
-      this.removeTracks(type);
+      await this.stop(type);
+      this.emit('playlistEnded', type);
     } else {
       this.playNext(type);
     }

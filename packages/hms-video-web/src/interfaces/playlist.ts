@@ -64,5 +64,16 @@ export interface HMSPlaylistManager {
   getCurrentTime(type: HMSPlaylistType): number;
   setEnabled(enabled: boolean, info: { id: string; type: HMSPlaylistType }): Promise<void>;
   stop(type: HMSPlaylistType): Promise<void>;
+  /**
+   * Subscriber to progress event with a callback
+   * @param fn
+   */
   onProgress(fn: (event: HMSPlaylistProgressEvent) => void): void;
+  /**
+   * This will be called when a new track is played
+   * @param fn
+   */
+  onNewTrackStart<T>(fn: (item: HMSPlaylistItem<T>) => void): void;
+
+  onPlaylistEnded(fn: (type: HMSPlaylistType) => void): void;
 }
