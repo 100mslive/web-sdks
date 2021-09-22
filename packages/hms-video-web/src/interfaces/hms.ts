@@ -28,6 +28,8 @@ export default interface HMS {
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
   removePeer(peer: HMSRemotePeer, reason: string): Promise<void>;
   endRoom(lock: boolean, reason: string): Promise<void>;
+  startRTMPOrRecording(meetingURL: string, RTMPURLs: Array<string>, record: boolean): Promise<void>;
+  stopRTMPAndRecording(): Promise<void>;
 
   /**
    * @deprecated The method should not be used

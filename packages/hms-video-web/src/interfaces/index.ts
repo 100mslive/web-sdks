@@ -13,3 +13,4 @@ export { DeviceMap } from './HMSDeviceManager';
 export * from './track-settings';
 export * from './device-change-event';
 export * from './playlist';
+export * from './hms';

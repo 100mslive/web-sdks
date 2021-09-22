@@ -32,6 +32,8 @@ export enum HMSSignalMethod {
   ROLE_CHANGE = 'role-change',
   TRACK_UPDATE_REQUEST = 'track-update-request',
   PEER_LEAVE_REQUEST = 'peer-leave-request',
+  START_RTMP_OR_RECORDING_REQUEST = 'rtmp-start',
+  STOP_RTMP_AND_RECORDING_REQUEST = 'rtmp-stop',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

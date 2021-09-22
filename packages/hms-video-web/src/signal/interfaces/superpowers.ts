@@ -26,3 +26,9 @@ export interface TrackUpdateRequestParams {
   stream_id: string;
   mute: boolean;
 }
+
+export interface StartRTMPOrRecordingRequestParams {
+  meeting_url: string;
+  rtmp_urls: Array<string>;
+  record: boolean;
+}

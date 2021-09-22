@@ -489,6 +489,14 @@ export default class HMSTransport implements ITransport {
     await this.signal.removePeer({ requested_for: peerId, reason });
   }
 
+  async startRTMPOrRecording(meetingURL: string, RTMPURLs: Array<string>, record: boolean) {
+    await this.signal.startRTMPOrRecording({ meeting_url: meetingURL, rtmp_urls: RTMPURLs, record });
+  }
+
+  async stopRTMPOrRecording() {
+    await this.signal.stopRTMPAndRecording();
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }

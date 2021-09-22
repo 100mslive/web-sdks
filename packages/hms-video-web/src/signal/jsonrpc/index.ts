@@ -7,6 +7,7 @@ import {
   RequestForRoleChangeParams,
   TrackUpdateRequestParams,
   RemovePeerRequest,
+  StartRTMPOrRecordingRequestParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -76,7 +77,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private async call<T>(method: string, params: any): Promise<T> {
     const id = uuid();
-    const message = { method, params, id } as JsonRpcRequest;
+    const message = { method, params, id, jsonrpc: '2.0' } as JsonRpcRequest;
 
     this.socket!.send(JSON.stringify(message));
 
@@ -240,6 +241,14 @@ export default class JsonRpcSignal implements ISignal {
 
   async removePeer(params: RemovePeerRequest) {
     await this.call(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
+  }
+
+  async startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams) {
+    await this.call(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
+  }
+
+  async stopRTMPAndRecording() {
+    await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
   }
 
   private onCloseHandler(event: CloseEvent) {

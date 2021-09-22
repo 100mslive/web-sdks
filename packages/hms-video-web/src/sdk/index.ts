@@ -597,6 +597,26 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.removePeer(peer.peerId, reason);
   }
 
+  async startRTMPOrRecording(meetingURL: string, RTMPURLs: Array<string>, record: boolean) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start streaming or recording',
+      );
+    }
+    await this.transport?.startRTMPOrRecording(meetingURL, RTMPURLs, record);
+  }
+
+  async stopRTMPAndRecording() {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop streaming or recording',
+      );
+    }
+    await this.transport?.stopRTMPOrRecording();
+  }
+
   getRoles(): HMSRole[] {
     return Object.values(this.store.getKnownRoles());
   }
