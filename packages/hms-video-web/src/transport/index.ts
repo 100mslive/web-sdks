@@ -498,6 +498,7 @@ export default class HMSTransport implements ITransport {
     this.trackStates.set(track.trackId, new TrackState(track));
     track.initiallyPublishedTrackId = track.trackId;
 
+    console.time('renegotiationPromise');
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
@@ -510,6 +511,7 @@ export default class HMSTransport implements ITransport {
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
     stream.addTransceiver(track, simulcastLayers);
     await p;
+    console.timeEnd('renegotiationPromise');
     // add track to store after publish
     this.store.addTrack(track);
 

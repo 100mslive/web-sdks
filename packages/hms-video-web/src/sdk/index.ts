@@ -304,11 +304,17 @@ export class HMSSdk implements HMSInterface {
     )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        if (this.store.getPublishParams() && !this.sdkState.published) {
+        this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+        // if delay fix is set, call onJoin before publishing
+        if (process.env.DELAY_FIX) {
+          this.listener?.onJoin(this.store.getRoom());
+        }
+        if (this.publishParams && !this.sdkState.published) {
           await this.publish(config.settings || defaultSettings);
         }
-        this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-        this.listener?.onJoin(this.store.getRoom());
+        if (!process.env.DELAY_FIX) {
+          this.listener?.onJoin(this.store.getRoom());
+        }
       })
       .catch((error) => {
         this.listener?.onError(error as HMSException);
@@ -420,7 +426,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startScreenShare(onStop: () => void, audioOnly = false) {
-    const publishParams = this.store.getPublishParams();
+    const publishParams = this.publishParams;
     if (!publishParams) return;
 
     const { screen, allowed } = publishParams;
@@ -655,7 +661,7 @@ export class HMSSdk implements HMSInterface {
     initialSettings: InitialSettings,
     publishConfig: PublishConfig = { publishAudio: true, publishVideo: true },
   ): Promise<HMSLocalTrack[]> {
-    const publishParams = this.store.getPublishParams();
+    const publishParams = this.publishParams;
     if (!publishParams) return [];
 
     const { audio, video, allowed } = publishParams;
@@ -761,5 +767,9 @@ export class HMSSdk implements HMSInterface {
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });
+  }
+
+  private get publishParams() {
+    return this.store?.getPublishParams();
   }
 }

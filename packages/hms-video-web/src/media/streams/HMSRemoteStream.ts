@@ -26,7 +26,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
     if (this.video === layer) return;
 
     this.video = layer;
-    HMSLogger.v(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
+    HMSLogger.d(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
     this.syncWithApiChannel();
   }
 
