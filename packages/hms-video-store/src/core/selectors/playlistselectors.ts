@@ -15,6 +15,10 @@ const selectPlaylistProgress = (type: HMSPlaylistType = HMSPlaylistType.audio) =
   store: HMSStore,
 ) => store.playlist[type].progress;
 
+const selectPlaylistCurrentTime = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
+  store: HMSStore,
+) => store.playlist[type].currentTime;
+
 const selectPlaylistVolume = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
   store.playlist[type].volume;
 
@@ -39,21 +43,19 @@ const selectPlaylistSelectedItem = (type: HMSPlaylistType = HMSPlaylistType.audi
   );
 
 export const selectAudioPlaylist: HMSPlaylistSelector = {
-  selection: createSelector(selectPlaylistSelection(HMSPlaylistType.audio), selection => selection),
-  progress: createSelector(selectPlaylistProgress(HMSPlaylistType.audio), progress => progress),
-  volume: createSelector(selectPlaylistVolume(HMSPlaylistType.audio), volume => volume),
-  list: createSelector(selectPlaylist(HMSPlaylistType.audio), list => list),
-  selectedItem: <any>(
-    createSelector(selectPlaylistSelectedItem(HMSPlaylistType.audio), selectedItem => selectedItem)
-  ),
+  selection: selectPlaylistSelection(HMSPlaylistType.audio),
+  progress: selectPlaylistProgress(HMSPlaylistType.audio),
+  currentTime: selectPlaylistCurrentTime(HMSPlaylistType.audio),
+  volume: selectPlaylistVolume(HMSPlaylistType.audio),
+  list: selectPlaylist(HMSPlaylistType.audio),
+  selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.audio),
 };
 
 export const selectVideoPlaylist: HMSPlaylistSelector = {
-  selection: createSelector(selectPlaylistSelection(HMSPlaylistType.video), selection => selection),
-  progress: createSelector(selectPlaylistProgress(HMSPlaylistType.video), progress => progress),
-  volume: createSelector(selectPlaylistVolume(HMSPlaylistType.video), volume => volume),
-  list: createSelector(selectPlaylist(HMSPlaylistType.video), list => list),
-  selectedItem: <any>(
-    createSelector(selectPlaylistSelectedItem(HMSPlaylistType.video), selectedItem => selectedItem)
-  ),
+  selection: selectPlaylistSelection(HMSPlaylistType.video),
+  progress: selectPlaylistProgress(HMSPlaylistType.video),
+  currentTime: selectPlaylistCurrentTime(HMSPlaylistType.audio),
+  volume: selectPlaylistVolume(HMSPlaylistType.video),
+  list: selectPlaylist(HMSPlaylistType.video),
+  selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.video),
 };

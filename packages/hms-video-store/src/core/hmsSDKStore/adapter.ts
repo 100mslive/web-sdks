@@ -167,11 +167,11 @@ export class SDKToHMS {
     const list = playlistManager.getList(type);
     const currentIndex = playlistManager.getCurrentIndex(type);
 
-    playlistManager.getList(type).forEach(value => {
-      const isSelected = value.url === currentSelection?.url;
-      convertedPlaylist[value.id] = {
-        ...value,
-        type: value.type as HMSPlaylistType,
+    playlistManager.getList(type).forEach(playlistItem => {
+      const isSelected = playlistItem.url === currentSelection?.url;
+      convertedPlaylist[playlistItem.id] = {
+        ...playlistItem,
+        type: playlistItem.type as HMSPlaylistType,
         selected: isSelected,
         playing: isSelected && isPlaying,
       };
@@ -185,6 +185,7 @@ export class SDKToHMS {
       },
       progress,
       volume,
+      currentTime: playlistManager.getCurrentTime(type),
     };
   }
 }

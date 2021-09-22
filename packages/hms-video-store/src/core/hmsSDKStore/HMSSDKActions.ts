@@ -635,17 +635,21 @@ export class HMSSDKActions implements IHMSActions {
     this.audioPlaylist = new HMSPlaylist(
       this.sdk.getPlaylistManager(),
       HMSPlaylistType.audio,
-      this.syncRoomState.bind(this),
-      this.setState.bind(this),
+      this.syncPlaylistState.bind(this),
     );
     this.videoPlaylist = new HMSPlaylist(
       this.sdk.getPlaylistManager(),
       HMSPlaylistType.video,
       this.syncRoomState.bind(this),
-      this.setState.bind(this),
     );
     this.syncRoomState('joinSync');
     this.sdk.getPlaylistManager().onProgress(this.setProgress);
+    this.sdk.getPlaylistManager().onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
+      this.syncPlaylistState(`playOn${item.type}Playlist`);
+    });
+    this.sdk.getPlaylistManager().onPlaylistEnded((type: HMSPlaylistType) => {
+      this.syncPlaylistState(`${type}PlaylistEnded`);
+    });
   }
 
   protected onRoomUpdate() {
@@ -997,7 +1001,31 @@ export class HMSSDKActions implements IHMSActions {
   private setProgress = ({ type, progress }: sdkTypes.HMSPlaylistProgressEvent) => {
     this.setState(draftStore => {
       draftStore.playlist[type].progress = progress;
+      draftStore.playlist[type].currentTime = this.sdk.getPlaylistManager().getCurrentTime(type);
     }, 'playlistProgress');
+  };
+
+  private syncPlaylistState = (action: string) => {
+    const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
+    const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
+    const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
+
+    // first convert everything in the new format
+    for (let sdkPeer of sdkPeers) {
+      const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
+      for (let sdkTrack of sdkTracks) {
+        if (!sdkTrack) {
+          continue;
+        }
+        const hmsTrack = SDKToHMS.convertTrack(sdkTrack);
+        newHmsTracks[hmsTrack.id] = hmsTrack;
+        newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
+      }
+    }
+    this.setState(draftStore => {
+      mergeNewTracksInDraft(draftStore.tracks, newHmsTracks);
+      Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
+    }, action);
   };
 
   /**

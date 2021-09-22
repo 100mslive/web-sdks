@@ -27,12 +27,14 @@ export interface HMSPlaylist<T> {
     selection: HMSPlaylistSelection;
     progress: number;
     volume: number;
+    currentTime: number;
   };
   video: {
     list: Record<string, HMSPlaylistItem<T>>;
     selection: HMSPlaylistSelection;
     progress: number;
     volume: number;
+    currentTime: number;
   };
 }
 
@@ -79,10 +81,6 @@ export interface IHMSPlaylistActions {
    * Stop the current playback and remove the tracks
    */
   stop(): Promise<void>;
-  /**
-   * Get current time of the current playing item
-   */
-  getCurrentTime(): number;
 }
 
 export interface HMSPlaylistSelector {
@@ -99,4 +97,5 @@ export interface HMSPlaylistSelector {
   selectedItem: <T>(store: HMSStore) => HMSPlaylistItem<T>;
   progress: (store: HMSStore) => number;
   volume: (store: HMSStore) => number;
+  currentTime: (store: HMSStore) => number;
 }

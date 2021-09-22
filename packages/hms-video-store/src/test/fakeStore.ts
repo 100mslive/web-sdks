@@ -113,6 +113,7 @@ export const makeFakeStore = (): HMSStore => {
         selection: { id: 'audio1', hasNext: true, hasPrevious: false },
         progress: 20,
         volume: 100,
+        currentTime: 10,
       },
       video: {
         list: {
@@ -136,6 +137,7 @@ export const makeFakeStore = (): HMSStore => {
         selection: { id: 'video1', hasNext: true, hasPrevious: false },
         progress: 30,
         volume: 100,
+        currentTime: 20,
       },
     },
     messages: {
