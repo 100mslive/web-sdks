@@ -73,11 +73,11 @@ export class VideoPluginsAnalytics {
     try {
       time = await this.timeInMs(initFn);
       HMSLogger.i(TAG, `Time taken for Plugin ${name} initialization : ${time}`);
-    } catch {
+    } catch (e) {
       //Failed during initialization of plugin(model loading etc...)
       const err = ErrorFactory.MediaPluginErrors.InitFailed(
         HMSAction.VIDEO_PLUGINS,
-        'failed during initialization of plugin',
+        'failed during initialization of plugin' + ((e as Error).message || e),
       );
       HMSLogger.e(TAG, err);
       this.failure(name, err);
@@ -98,14 +98,14 @@ export class VideoPluginsAnalytics {
     let time: number | undefined = undefined;
     try {
       time = await this.timeInMs(processFn);
-    } catch {
+    } catch (e) {
       //Failed during processing of plugin
       const err = ErrorFactory.MediaPluginErrors.ProcessingFailed(
         HMSAction.VIDEO_PLUGINS,
-        'Failed during processing of plugin',
+        'Failed during processing of plugin' + ((e as Error).message || e),
       );
       HMSLogger.e(TAG, err);
-      this.failure(name, err as HMSException);
+      this.failure(name, err);
       throw err;
     }
     if (time) {

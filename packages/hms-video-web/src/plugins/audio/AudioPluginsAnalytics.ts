@@ -61,7 +61,7 @@ export class AudioPluginsAnalytics {
       //Failed during initialization of plugin(model loading etc...)
       const err = ErrorFactory.MediaPluginErrors.InitFailed(
         HMSAction.AUDIO_PLUGINS,
-        'failed during initialization of plugin' + e,
+        'failed during initialization of plugin' + ((e as Error).message || e),
       );
       HMSLogger.e(TAG, err);
       this.failure(name, err);

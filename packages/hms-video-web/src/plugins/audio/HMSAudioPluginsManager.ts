@@ -37,8 +37,13 @@ export class HMSAudioPluginsManager {
         HMSLogger.w('no name provided by the plugin');
         return;
       }
+      const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
+        HMSAction.AUDIO_PLUGINS,
+        'Add Plugin is already in Progress',
+      );
+      this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
-      return;
+      throw err;
     }
 
     this.pluginAddInProgress = true;
