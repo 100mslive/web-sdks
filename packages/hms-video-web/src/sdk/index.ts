@@ -307,13 +307,15 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
         // if delay fix is set, call onJoin before publishing
-        if (process.env.DELAY_FIX) {
+        //@ts-ignore
+        if (window.HMS?.JOIN_DELAY_FIX) {
           this.listener?.onJoin(this.store.getRoom());
         }
         if (this.publishParams && !this.sdkState.published) {
           await this.publish(config.settings || defaultSettings);
         }
-        if (!process.env.DELAY_FIX) {
+        //@ts-ignore
+        if (!window.HMS?.JOIN_DELAY_FIX) {
           this.listener?.onJoin(this.store.getRoom());
         }
       })
