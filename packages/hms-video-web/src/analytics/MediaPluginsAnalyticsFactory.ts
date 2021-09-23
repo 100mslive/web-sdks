@@ -6,7 +6,7 @@ export default class MediaPluginsAnalyticsFactory {
   static failure(pluginName: string, error: HMSException) {
     const name = 'mediaPlugin.failed';
     const level = AnalyticsEventLevel.ERROR;
-    const properties = { name: pluginName, error_message: error };
+    const properties = { name: pluginName, ...error.toAnalyticsProperties() };
 
     return new AnalyticsEvent({ name, level, properties });
   }
