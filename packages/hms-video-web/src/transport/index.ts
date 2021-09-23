@@ -40,6 +40,7 @@ import { DeviceManager } from '../device-manager';
 import { TrackUpdateRequestParams } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
+import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 
 const TAG = '[HMSTransport]:';
 
@@ -489,8 +490,19 @@ export default class HMSTransport implements ITransport {
     await this.signal.removePeer({ requested_for: peerId, reason });
   }
 
-  async startRTMPOrRecording(meetingURL: string, RTMPURLs: Array<string>, record: boolean) {
-    await this.signal.startRTMPOrRecording({ meeting_url: meetingURL, rtmp_urls: RTMPURLs, record });
+  async startRTMPOrRecording(params: RTMPRecordingConfig) {
+    if (params.rtmpURLs) {
+      await this.signal.startRTMPOrRecording({
+        meeting_url: params.meetingURL,
+        record: params.record,
+        rtmp_urls: params.rtmpURLs,
+      });
+    } else {
+      await this.signal.startRTMPOrRecording({
+        meeting_url: params.meetingURL,
+        record: params.record,
+      });
+    }
   }
 
   async stopRTMPOrRecording() {

@@ -47,6 +47,7 @@ import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkMan
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { PlaylistManager } from '../playlist-manager';
+import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -597,14 +598,14 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.removePeer(peer.peerId, reason);
   }
 
-  async startRTMPOrRecording(meetingURL: string, RTMPURLs: Array<string>, record: boolean) {
+  async startRTMPOrRecording(params: RTMPRecordingConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
         'No local peer present, cannot start streaming or recording',
       );
     }
-    await this.transport?.startRTMPOrRecording(meetingURL, RTMPURLs, record);
+    await this.transport?.startRTMPOrRecording(params);
   }
 
   async stopRTMPAndRecording() {

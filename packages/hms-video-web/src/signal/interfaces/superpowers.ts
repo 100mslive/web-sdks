@@ -29,6 +29,6 @@ export interface TrackUpdateRequestParams {
 
 export interface StartRTMPOrRecordingRequestParams {
   meeting_url: string;
-  rtmp_urls: Array<string>;
+  rtmp_urls?: Array<string>;
   record: boolean;
 }
