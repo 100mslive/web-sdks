@@ -9,6 +9,7 @@ import {
 } from '@100mslive/hms-video';
 import { HMSPeerID, HMSRoleName, HMSTrackSource, IHMSPlaylistActions } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
+import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -242,6 +243,21 @@ export interface IHMSActions {
    * using the `REMOVED_FROM_ROOM` type of notification
    */
   removePeer(peerID: string, reason: string): Promise<void>;
+
+  /**
+   * If you want to start RTMP streaming or recording.
+   * @param params.meetingURL This is the meeting url which is opened in a headless chrome instance for streaming and recording.
+   * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
+   * @param params.RTMPURLs The list of ingest URLs where the call as visible in the meeting url should be streamed.
+   * Optional, when not specified the method is used to just start the recording.
+   * @param params.record If you want to start the recording or not.
+   */
+  startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
+
+  /**
+   * If you want to stop both RTMP streaming and recording.
+   */
+  stopRTMPAndRecording(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.

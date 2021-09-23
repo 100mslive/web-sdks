@@ -23,6 +23,8 @@ import {
   HMSPlaylistProgressEvent,
 } from '@100mslive/hms-video';
 
+import { RTMPRecordingConfig } from '@100mslive/hms-video/dist/interfaces/rtmp-recording-config';
+
 export {
   HMSPeer,
   HMSRoom,
@@ -46,4 +48,5 @@ export {
   HMSPlaylistItem,
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
+  RTMPRecordingConfig,
 };

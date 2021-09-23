@@ -418,6 +418,14 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async startRTMPOrRecording(params: sdkTypes.RTMPRecordingConfig) {
+    await this.sdk.startRTMPOrRecording(params);
+  }
+
+  async stopRTMPAndRecording() {
+    await this.sdk.stopRTMPAndRecording();
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];

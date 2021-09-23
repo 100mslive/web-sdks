@@ -12,4 +12,5 @@ export {
   SimulcastLayerDefinition,
   DeviceMap,
   HMSLogLevel,
+  RTMPRecordingConfig,
 } from './hmsSDKStore/sdkTypes';
