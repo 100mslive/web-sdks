@@ -29,6 +29,7 @@ import {
   selectPermissions,
   selectRolesMap,
   selectLocalTrackIDs,
+  selectRoomState,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -60,7 +61,7 @@ import {
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { HMSPlaylistType, IHMSPlaylistActions } from '../schema/playlist';
+import { HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { HMSPlaylist } from './HMSPlaylist';
 
 /**
@@ -135,6 +136,13 @@ export class HMSSDKActions implements IHMSActions {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
       return; // ignore
+    }
+    const roomState = this.store.getState(selectRoomState);
+    if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {
+      this.logPossibleInconsistency(
+        'attempting to call preview while room is in preview/connecting',
+      );
+      return;
     }
 
     try {
@@ -635,11 +643,6 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
-    this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
-      store.room.isConnected = true;
-      store.room.roomState = HMSRoomState.Connected;
-    }, 'joined');
     this.audioPlaylist = new HMSPlaylist(
       this.sdk.getPlaylistManager(),
       HMSPlaylistType.audio,
@@ -651,6 +654,11 @@ export class HMSSDKActions implements IHMSActions {
       this.syncRoomState.bind(this),
     );
     this.syncRoomState('joinSync');
+    this.setState(store => {
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      store.room.isConnected = true;
+      store.room.roomState = HMSRoomState.Connected;
+    }, 'joined');
     this.sdk.getPlaylistManager().onProgress(this.setProgress);
     this.sdk.getPlaylistManager().onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
       this.syncPlaylistState(`playOn${item.type}Playlist`);
