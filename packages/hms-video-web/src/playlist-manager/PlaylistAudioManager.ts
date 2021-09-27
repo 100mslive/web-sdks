@@ -15,28 +15,24 @@ import { AudioContextManager } from './AudioContextManager';
  *    - The track is passed to playlist manager to publish
  */
 export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
-  private audioElement: HTMLAudioElement;
+  private audioElement: HTMLAudioElement | null;
   private track?: MediaStreamTrack;
-  private audioContextManager: AudioContextManager;
+  private audioContextManager!: AudioContextManager;
   // This is to handle audio playing when seekTo is called when audio is paused
   private seeked = false;
 
   constructor() {
     super();
-    this.audioElement = document.createElement('audio');
-    this.audioElement.crossOrigin = 'anonymous';
-    this.audioElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
-    this.audioElement.addEventListener('ended', () => {
-      this.emit('ended', null);
-    });
-    this.audioContextManager = new AudioContextManager(this.audioElement);
+    this.audioElement = this.getAudioElement();
   }
 
   async play(url: string) {
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
+      this.audioElement = this.getAudioElement();
       this.audioElement.src = url;
       this.seeked = false;
-      this.audioElement.onerror = (error) => {
+      this.audioElement.onerror = () => {
+        const error = `Error loading ${url}`;
         HMSLogger.e(this.TAG, error);
         this.stop();
         reject(error);
@@ -46,6 +42,9 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
       //    * when user seeks jumps to any mid track timestamp
       this.audioElement.oncanplaythrough = async () => {
         try {
+          if (!this.audioElement) {
+            return;
+          }
           this.audioContextManager.resumeContext();
           // Create audio track only once and reuse, it will be updated with current content
           if (!this.track) {
@@ -78,14 +77,30 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     return this.track ? [this.track.id] : [];
   }
 
-  getElement(): HTMLAudioElement {
+  getElement() {
     return this.audioElement;
   }
 
   stop() {
-    this.audioElement.pause();
-    this.audioElement.removeAttribute('src');
+    this.audioElement?.pause();
+    this.audioElement?.removeAttribute('src');
+    this.audioElement = null;
+    this.audioContextManager.cleanup();
     this.track = undefined;
+  }
+
+  private getAudioElement() {
+    if (this.audioElement) {
+      return this.audioElement;
+    }
+    const audioElement = document.createElement('audio');
+    audioElement.crossOrigin = 'anonymous';
+    audioElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
+    audioElement.addEventListener('ended', () => {
+      this.emit('ended', null);
+    });
+    this.audioContextManager = new AudioContextManager(audioElement);
+    return audioElement;
   }
 
   private get TAG() {

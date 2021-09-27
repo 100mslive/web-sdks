@@ -19,34 +19,30 @@ import { AudioContextManager } from './AudioContextManager';
  *    - The audio and video tracks are passed to playlist manager to publish
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
-  private videoElement: HTMLVideoElement;
+  private videoElement: HTMLVideoElement | null;
   private canvasContext: CanvasRenderingContext2D | null;
   private canvas!: HTMLCanvasElement;
   private timer: any;
   private tracks: MediaStreamTrack[] = [];
-  private audioContextManager: AudioContextManager;
+  private audioContextManager!: AudioContextManager;
   private DEFAUL_FPS = 24;
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
 
   constructor() {
     super();
-    this.videoElement = document.createElement('video');
-    this.videoElement.crossOrigin = 'anonymous';
-    this.videoElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
-    this.videoElement.addEventListener('ended', () => {
-      this.emit('ended', null);
-    });
+    this.videoElement = this.getVideoElement();
     this.canvas = document.createElement('canvas');
     this.canvasContext = this.canvas.getContext('2d');
-    this.audioContextManager = new AudioContextManager(this.videoElement);
   }
 
   play(url: string) {
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
+      this.videoElement = this.getVideoElement();
       this.videoElement.src = url;
       this.seeked = false;
-      this.videoElement.onerror = (error) => {
+      this.videoElement.onerror = () => {
+        const error = `Error loading ${url}`;
         HMSLogger.e(this.TAG, error);
         this.stop();
         reject(error);
@@ -56,6 +52,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       //    * when user jumps to any mid track timestamp using seekTo
       this.videoElement.oncanplaythrough = async () => {
         try {
+          if (!this.videoElement) {
+            return;
+          }
           this.canvas.width = this.videoElement.videoWidth;
           this.canvas.height = this.videoElement.videoHeight;
           // Capture stream only once and reuse the same tracks. it will be autoupdated with the selected video
@@ -109,8 +108,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   stop() {
-    this.videoElement.pause();
-    this.videoElement.removeAttribute('src');
+    this.videoElement?.pause();
+    this.videoElement?.removeAttribute('src');
+    this.videoElement = null;
     this.clearCanvasAndTracks();
   }
 
@@ -129,6 +129,20 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       }, 1000 / this.DEFAUL_FPS);
     }
   };
+
+  private getVideoElement() {
+    if (this.videoElement) {
+      return this.videoElement;
+    }
+    const videoElement = document.createElement('video');
+    videoElement.crossOrigin = 'anonymous';
+    videoElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
+    videoElement.addEventListener('ended', () => {
+      this.emit('ended', null);
+    });
+    this.audioContextManager = new AudioContextManager(videoElement);
+    return videoElement;
+  }
 
   private get TAG() {
     return 'PlaylistVideoManager';

@@ -34,7 +34,9 @@ export class AudioContextManager {
   }
 
   cleanup() {
-    this.audioContext.close();
+    if (this.audioContext.state !== 'closed') {
+      this.audioContext.close();
+    }
   }
 
   private get TAG() {
