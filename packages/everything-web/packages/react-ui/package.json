@@ -1,6 +1,6 @@
 {
-    "name": "deep-ui-comp",
-    "version": "0.0.7-alpha",
+    "name": "@100mslive/react-ui",
+    "version": "0.0.0-alpha",
     "main": "build/index.js",
     "module": "build/index.esm.js",
     "types": "build/src/index.d.ts",

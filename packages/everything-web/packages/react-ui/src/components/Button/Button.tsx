@@ -9,7 +9,7 @@ export const ButtonRoot = styled('button', {
     fontFamily: '$sans',
     outline: 'none',
     border: 'none',
-    fontSize: '60px',
+    fontSize: '16px',
     fontWeight: '500',
     lineHeight: '24px',
     variants: {
