@@ -40,40 +40,39 @@ export interface HMSPlaylist<T> {
 
 export interface IHMSPlaylistActions {
   /**
-   * Play audio/video passing url and type
+   * Pass the id of the item to be played
    * @param {string} id - id of playlist item
    */
   play(id: string): Promise<void>;
   /**
-   * Pause audio/video passing url and type
-   * @param {string} id - id of playlist item
+   * Pauses current playing item
    */
-  pause(id: string): Promise<void>;
+  pause(): Promise<void>;
   /**
-   * PlayNext audio/video passing type
+   * PlayNext
    */
   playNext(): Promise<void>;
   /**
-   * PlayPrevious audio/video passing type
+   * PlayPrevious
    */
   playPrevious(): Promise<void>;
   /**
-   * seek audio/video passing seekValue and type - this is relative to current position
+   * seek passing seekValue - this is relative to current position
    * @param {number} seekValue - number in seconds to move forwards(pass negative values to move backwards)
    */
   seek(seekValue: number): void;
   /**
-   * seek audio/video passing seekValue and type - seekValue will be absolute
+   * seek passing seekValue  - seekValue will be absolute
    * @param {number} seekValue - value in seconds of absolute position in the playlist item duration
    */
   seekTo(seekValue: number): void;
   /**
-   * set audio/video volume passing volume and type
+   * set volume passing volume
    * @param {number} volume - number between 0-100
    */
   setVolume(volume: number): void;
   /**
-   * pass list and type to set audio/video playlist
+   * pass list to set playlist
    * @param {HMSPlaylistItem[]} - list of playlist items
    */
   setList<T>(list: HMSPlaylistItem<T>[]): void;

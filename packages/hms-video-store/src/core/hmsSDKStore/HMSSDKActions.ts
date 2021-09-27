@@ -647,11 +647,13 @@ export class HMSSDKActions implements IHMSActions {
       this.sdk.getPlaylistManager(),
       HMSPlaylistType.audio,
       this.syncPlaylistState.bind(this),
+      this.store,
     );
     this.videoPlaylist = new HMSPlaylist(
       this.sdk.getPlaylistManager(),
       HMSPlaylistType.video,
       this.syncRoomState.bind(this),
+      this.store,
     );
     this.syncRoomState('joinSync');
     this.setState(store => {

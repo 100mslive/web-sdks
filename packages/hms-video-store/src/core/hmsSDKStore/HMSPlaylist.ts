@@ -1,6 +1,8 @@
 import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { HMSPlaylistManager } from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
+import { IHMSStore } from '../IHMSStore';
+import { selectVideoPlaylist, selectAudioPlaylist } from '../selectors';
 
 export class HMSPlaylist implements IHMSPlaylistActions {
   private type: HMSPlaylistType;
@@ -8,24 +10,28 @@ export class HMSPlaylist implements IHMSPlaylistActions {
     private playlistManager: HMSPlaylistManager,
     type: HMSPlaylistType,
     private syncPlaylistState: (action: string) => void,
+    private store: IHMSStore,
   ) {
     this.type = type;
   }
 
   async play(id: string): Promise<void> {
     if (!id) {
-      HMSLogger.w('Please pass id and type to pause');
+      HMSLogger.w('Please pass id to play');
       return;
     }
     await this.playlistManager.setEnabled(true, { id, type: this.type });
   }
 
-  async pause(id: string): Promise<void> {
-    if (!id) {
-      HMSLogger.w('Please pass id and type to pause');
+  async pause(): Promise<void> {
+    const selector =
+      this.type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
+    const selection = this.store.getState(selector.selection);
+    if (!selection.id) {
+      HMSLogger.w('No item is currently playing to pause');
       return;
     }
-    await this.playlistManager.setEnabled(false, { id, type: this.type });
+    await this.playlistManager.setEnabled(false, { id: selection.id, type: this.type });
   }
 
   async playNext(): Promise<void> {
