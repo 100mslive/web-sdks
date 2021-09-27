@@ -18,6 +18,8 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   private audioElement: HTMLAudioElement;
   private track?: MediaStreamTrack;
   private audioContextManager: AudioContextManager;
+  // This is to handle audio playing when seekTo is called when audio is paused
+  private seeked = false;
 
   constructor() {
     super();
@@ -33,11 +35,15 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   async play(url: string) {
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
       this.audioElement.src = url;
+      this.seeked = false;
       this.audioElement.onerror = (error) => {
         HMSLogger.e(this.TAG, error);
         this.stop();
         reject(error);
       };
+      // oncanplaythrough is called when enough media is loaded for play to be possible in two cases -
+      //    * when play is called for the first time
+      //    * when user seeks jumps to any mid track timestamp
       this.audioElement.oncanplaythrough = async () => {
         try {
           this.audioContextManager.resumeContext();
@@ -48,13 +54,22 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
             this.track = audioTrack;
             resolve([audioTrack]);
           } else {
-            await this.audioElement.play();
-            resolve([this.track]);
+            if (!this.seeked) {
+              // if this was called in response to a play call
+              await this.audioElement.play();
+              resolve([this.track]);
+            } else {
+              // if seek happened, there is no play call/promise to be resolved, just reset seeked
+              this.seeked = false;
+            }
           }
         } catch (err) {
           HMSLogger.e(this.TAG, 'Error playing audio', url, (err as ErrorEvent).message);
           reject(err);
         }
+      };
+      this.audioElement.onseeked = () => {
+        this.seeked = true;
       };
     });
   }

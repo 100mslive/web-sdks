@@ -26,6 +26,8 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private tracks: MediaStreamTrack[] = [];
   private audioContextManager: AudioContextManager;
   private DEFAUL_FPS = 24;
+  // This is to handle video playing when seekTo is called when video is paused
+  private seeked = false;
 
   constructor() {
     super();
@@ -43,11 +45,15 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   play(url: string) {
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
       this.videoElement.src = url;
+      this.seeked = false;
       this.videoElement.onerror = (error) => {
         HMSLogger.e(this.TAG, error);
         this.stop();
         reject(error);
       };
+      // oncanplaythrough is called when enough media is loaded for play to be possible in two cases -
+      //    * when play is called for the first time
+      //    * when user jumps to any mid track timestamp using seekTo
       this.videoElement.oncanplaythrough = async () => {
         try {
           this.canvas.width = this.videoElement.videoWidth;
@@ -72,13 +78,24 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
             resolve(this.tracks);
           } else {
             // No need to capture canvas stream/get audio track. They wull be auto updated
-            await this.videoElement.play();
-            resolve(this.tracks);
+            if (!this.seeked) {
+              // if this was called in response to a play call
+              await this.videoElement.play();
+              resolve(this.tracks);
+            } else {
+              // if seek happened, there is no play call/promise to be resolved, just reset seeked
+              this.seeked = false;
+              // This event will be called on seekTo when paused. Just draw the one frame on canvas.
+              this.canvasContext?.drawImage(this.videoElement, 0, 0, this.canvas?.width, this.canvas?.height);
+            }
           }
         } catch (err) {
           HMSLogger.e(this.TAG, 'Error playing video', url, (err as ErrorEvent).message);
           reject(err);
         }
+      };
+      this.videoElement.onseeked = () => {
+        this.seeked = true;
       };
     });
   }

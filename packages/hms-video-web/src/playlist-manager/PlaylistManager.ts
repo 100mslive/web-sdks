@@ -70,10 +70,8 @@ export class PlaylistManager
       throw ErrorFactory.PlaylistErrors.NoEntryToPlay(HMSAction.PLAYLIST, 'No item is currently playing');
     }
     const element = this.getElement(type);
-    if (element) {
-      let updatedValue = Math.max(element.currentTime + value, 0);
-      element.currentTime = Math.min(updatedValue, element.duration);
-    }
+    let updatedValue = Math.max(element.currentTime + value, 0);
+    element.currentTime = Math.min(updatedValue, element.duration);
   }
 
   seekTo(value: number, type: HMSPlaylistType = HMSPlaylistType.audio): void {
@@ -85,9 +83,7 @@ export class PlaylistManager
       throw Error('value cannot be negative');
     }
     const element = this.getElement(type);
-    if (element) {
-      element.currentTime = Math.min(value, element.duration);
-    }
+    element.currentTime = Math.min(value, element.duration);
   }
 
   setVolume(value: number, type: HMSPlaylistType = HMSPlaylistType.audio): void {
@@ -125,7 +121,7 @@ export class PlaylistManager
     const { list, currentIndex } = this.state[type];
     const activeUrl = list[currentIndex]?.url;
     const element = this.getElement(type);
-    if (!element || !activeUrl) {
+    if (!activeUrl) {
       return 0;
     }
     return Math.floor(100 * (element.currentTime / element.duration));
@@ -141,9 +137,7 @@ export class PlaylistManager
 
   isPlaying(type: HMSPlaylistType = HMSPlaylistType.audio) {
     const element = this.getElement(type);
-    const { list, currentIndex } = this.state[type];
-
-    return !!(element?.src === list[currentIndex]?.url && !element?.paused);
+    return !element.paused;
   }
 
   async setEnabled(
@@ -244,14 +238,14 @@ export class PlaylistManager
 
   private async play(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
     const element = this.getElement(type);
-    if (element?.src === url && !element?.paused) {
+    if (element.src === url && !element.paused) {
       HMSLogger.w(this.TAG, `The ${type} is currently playing`);
       return;
     }
-    if (element?.src === url) {
-      await element?.play();
+    if (element.src === url) {
+      await element.play();
     } else {
-      element?.pause();
+      element.pause();
       let tracks: MediaStreamTrack[];
       if (type === HMSPlaylistType.audio) {
         tracks = await this.audioManager.play(url);
@@ -268,15 +262,15 @@ export class PlaylistManager
     const element = this.getElement(type);
     const { list, currentIndex } = this.state[type];
     if (list[currentIndex]) {
-      list[currentIndex].duration = element?.duration || 0;
+      list[currentIndex].duration = element.duration || 0;
     }
     this.emit('newTrackStart', list[currentIndex]);
   }
 
   private async pause(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
     const el = this.getElement(type);
-    if (!el?.paused && el?.src === url) {
-      el?.pause();
+    if (!el.paused && el.src === url) {
+      el.pause();
       HMSLogger.d(this.TAG, 'paused url', url);
     } else {
       HMSLogger.w(this.TAG, 'The passed in url is not currently playing');
