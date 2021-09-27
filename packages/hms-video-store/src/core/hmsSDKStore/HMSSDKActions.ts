@@ -661,7 +661,7 @@ export class HMSSDKActions implements IHMSActions {
     }, 'joined');
     this.sdk.getPlaylistManager().onProgress(this.setProgress);
     this.sdk.getPlaylistManager().onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
-      this.syncPlaylistState(`playOn${item.type}Playlist`);
+      this.syncPlaylistState(`${item.type}PlaylistUpdate`);
     });
     this.sdk.getPlaylistManager().onPlaylistEnded((type: HMSPlaylistType) => {
       this.syncPlaylistState(`${type}PlaylistEnded`);
@@ -1022,24 +1022,7 @@ export class HMSSDKActions implements IHMSActions {
   };
 
   private syncPlaylistState = (action: string) => {
-    const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
-    const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
-    const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
-
-    // first convert everything in the new format
-    for (let sdkPeer of sdkPeers) {
-      const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
-      for (let sdkTrack of sdkTracks) {
-        if (!sdkTrack) {
-          continue;
-        }
-        const hmsTrack = SDKToHMS.convertTrack(sdkTrack);
-        newHmsTracks[hmsTrack.id] = hmsTrack;
-        newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
-      }
-    }
     this.setState(draftStore => {
-      mergeNewTracksInDraft(draftStore.tracks, newHmsTracks);
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
     }, action);
   };

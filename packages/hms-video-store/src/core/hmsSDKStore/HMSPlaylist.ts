@@ -26,7 +26,6 @@ export class HMSPlaylist implements IHMSPlaylistActions {
       return;
     }
     await this.playlistManager.setEnabled(false, { id, type: this.type });
-    this.syncPlaylistState(`pauseOn${this.type}Playlist`);
   }
 
   async playNext(): Promise<void> {
