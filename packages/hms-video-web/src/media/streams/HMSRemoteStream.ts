@@ -7,7 +7,7 @@ import { HMSSimulcastLayer } from '../../interfaces';
 export default class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
-  private video = HMSSimulcastLayer.HIGH;
+  private video = HMSSimulcastLayer.NONE;
   private frameRate = HMSSimulcastLayer.HIGH;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
@@ -32,6 +32,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
 
   getSimulcastLayer() {
     return this.video;
+  }
+
+  isAudioSubscribed() {
+    return this.audio;
   }
 
   private syncWithApiChannel() {
