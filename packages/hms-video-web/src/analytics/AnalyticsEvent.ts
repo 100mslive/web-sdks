@@ -1,4 +1,5 @@
 import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
+import { domainCategory } from './domain-analytics';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 
 interface AnalyticsEventInit {
@@ -33,7 +34,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   toSignalParams() {
     return {
       name: this.name,
-      info: { ...this.properties, timestamp: this.timestamp },
+      info: { ...this.properties, timestamp: this.timestamp, domain: domainCategory },
       timestamp: new Date().getTime(), // Timestamp of sending the event
     };
   }
