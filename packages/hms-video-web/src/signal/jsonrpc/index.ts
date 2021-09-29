@@ -17,6 +17,7 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
+import { HMSException } from '../../error/HMSException';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -87,7 +88,8 @@ export default class JsonRpcSignal implements ISignal {
       });
 
       return response;
-    } catch (error) {
+    } catch (ex) {
+      const error = ex as HMSException;
       throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
         Number(error.code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),

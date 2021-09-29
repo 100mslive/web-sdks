@@ -58,6 +58,16 @@ export const fakePeerList: PeerListNotification = {
       },
     },
   },
+  room: {
+    name: 'test',
+    recording: {
+      sfu: { enabled: false },
+      beam: { enabled: false },
+    },
+    streaming: {
+      enabled: false,
+    },
+  },
 };
 
 export const fakeReconnectPeerList: PeerListNotification = {
@@ -107,6 +117,16 @@ export const fakeReconnectPeerList: PeerListNotification = {
           stream_id: 'stream_id_2',
         },
       },
+    },
+  },
+  room: {
+    name: 'test',
+    recording: {
+      sfu: { enabled: false },
+      beam: { enabled: false },
+    },
+    streaming: {
+      enabled: false,
     },
   },
 };

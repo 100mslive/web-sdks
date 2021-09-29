@@ -70,6 +70,20 @@ export interface PeerListNotification {
   peers: {
     [peer_id: string]: PeerNotification;
   };
+  room: {
+    name: string;
+    recording: {
+      sfu: {
+        enabled: boolean;
+      };
+      beam: {
+        enabled: boolean;
+      };
+    };
+    streaming: {
+      enabled: boolean;
+    };
+  };
 }
 
 interface Speaker {
@@ -130,4 +144,9 @@ export interface MessageNotificationInfo {
   message: any;
   type: string;
   time?: string;
+}
+
+export interface RecordingNotification {
+  type: 'sfu' | 'Browser';
+  peer: PeerNotificationInfo;
 }

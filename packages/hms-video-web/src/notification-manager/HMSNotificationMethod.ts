@@ -19,4 +19,8 @@ export enum HMSNotificationMethod {
   PEER_UPDATE = 'on-peer-update',
   PEER_LEAVE_REQUEST = 'on-peer-leave-request',
   UNSUPPORTED = 'unsupported',
+  RTMP_START = 'on-rtmp-start',
+  RTMP_STOP = 'on-rtmp-stop',
+  RECORDING_START = 'on-record-start',
+  RECORDING_STOP = 'on-record-stop',
 }

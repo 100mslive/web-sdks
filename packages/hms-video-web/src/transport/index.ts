@@ -491,7 +491,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
-    if (params.rtmpURLs) {
+    if (params.rtmpURLs?.length) {
       await this.signal.startRTMPOrRecording({
         meeting_url: params.meetingURL,
         record: params.record,

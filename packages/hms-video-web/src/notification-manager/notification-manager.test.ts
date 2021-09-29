@@ -1,6 +1,7 @@
-import { HMSAudioListener, HMSPeerUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
+import HMSRoom from '../sdk/models/HMSRoom';
 import { NotificationManager } from './NotificationManager';
 import { Store } from '../sdk/store';
 import { fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList, FAKE_PEER_ID } from './fixtures';
@@ -40,6 +41,7 @@ beforeEach(() => {
   changeTrackStateRequestHandler = jest.fn();
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
+  store.setRoom(new HMSRoom('1234', 'test', store));
 
   listener = {
     onJoin: joinHandler,
@@ -106,6 +108,8 @@ describe('Notification Manager', () => {
         expect(call[0]).toBe(HMSPeerUpdate.PEER_JOINED);
         expect(call[1]).toBeInstanceOf(HMSRemotePeer);
       });
+      expect(roomUpdateHandler).toHaveBeenCalled();
+      expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
     });
   });
 
@@ -126,6 +130,9 @@ describe('Notification Manager', () => {
       expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_JOINED);
       expect(peerUpdateHandler.mock.calls[1][1]).toBeInstanceOf(HMSRemotePeer);
       expect(peerUpdateHandler.mock.calls[1][1].peerId).toBe('peer_id_2');
+
+      expect(roomUpdateHandler).toHaveBeenCalled();
+      expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
     });
   });
 

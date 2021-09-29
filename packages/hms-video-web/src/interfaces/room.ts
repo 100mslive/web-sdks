@@ -12,4 +12,19 @@ export interface HMSRoom {
   shareableLink: string;
   type: HMSRoomType;
   hasWaitingRoom: boolean;
+  recording?: HMSRecording;
+  rtmp?: HMSRTMP;
+}
+
+export interface HMSRecording {
+  browser: {
+    running: boolean;
+  };
+  server: {
+    running: boolean;
+  };
+}
+
+export interface HMSRTMP {
+  running: boolean;
 }

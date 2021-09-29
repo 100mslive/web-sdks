@@ -13,6 +13,7 @@ import {
   SpeakerList,
   TrackStateNotification,
   TrackUpdateRequestNotification,
+  RecordingNotification,
 } from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
@@ -20,6 +21,7 @@ import { PeerListManager } from './managers/PeerListManager';
 import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
 import { RequestManager } from './managers/RequestManager';
+import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
 
 export class NotificationManager {
@@ -31,6 +33,7 @@ export class NotificationManager {
   private broadcastManager: BroadcastManager;
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
+  private roomUpdateManager: RoomUpdateManager;
   private eventEmitter: EventEmitter = new EventEmitter();
 
   constructor(private store: IStore, private listener?: HMSUpdateListener, private audioListener?: HMSAudioListener) {
@@ -41,6 +44,7 @@ export class NotificationManager {
     this.policyChangeManager = new PolicyChangeManager(this.store, this.eventEmitter);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
+    this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -51,6 +55,7 @@ export class NotificationManager {
     this.broadcastManager.listener = listener;
     this.requestManager.listener = listener;
     this.activeSpeakerManager.listener = listener;
+    this.roomUpdateManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {
@@ -95,6 +100,7 @@ export class NotificationManager {
           HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
           this.peerListManager.handleInitialPeerList(peerList);
         }
+        this.roomUpdateManager.onPeerList(peerList);
         break;
       }
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
@@ -129,6 +135,18 @@ export class NotificationManager {
         this.peerManager.handlePeerUpdate(notification as PeerNotification);
         break;
 
+      case HMSNotificationMethod.RTMP_START:
+        this.roomUpdateManager.onRTMPStart();
+        break;
+      case HMSNotificationMethod.RTMP_STOP:
+        this.roomUpdateManager.onRTMPStop();
+        break;
+      case HMSNotificationMethod.RECORDING_START:
+        this.roomUpdateManager.onRecordingStart(notification as RecordingNotification);
+        break;
+      case HMSNotificationMethod.RECORDING_STOP:
+        this.roomUpdateManager.onRecordingStop(notification as RecordingNotification);
+        break;
       default:
         return;
     }

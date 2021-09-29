@@ -11,6 +11,7 @@ import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSPlaylistManager } from './playlist';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
+import { HMSRecording, HMSRTMP } from './room';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): void;
@@ -31,6 +32,8 @@ export default interface HMS {
   endRoom(lock: boolean, reason: string): Promise<void>;
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
   stopRTMPAndRecording(): Promise<void>;
+  getRecordingState(): HMSRecording | undefined;
+  getRTMPState(): HMSRTMP | undefined;
 
   /**
    * @deprecated The method should not be used
