@@ -65,4 +65,31 @@ export class HMSAudioTrack extends HMSTrack {
       }
     } catch {}
   }
+
+  /**
+   * removes the track from the audio element of the track
+   */
+  removeSink() {
+    if (this.audioElement) {
+      this.audioElement.srcObject = null;
+    }
+  }
+
+  /**
+   * add track if not already added
+   */
+  addSink() {
+    if (!this.nativeTrack || !this.audioElement) {
+      return;
+    }
+    const srcObject = this.audioElement.srcObject;
+    if (srcObject !== null && srcObject instanceof MediaStream) {
+      const existingTrackID = srcObject.getAudioTracks()[0]?.id;
+      if (existingTrackID === this.nativeTrack.id) {
+        // it's already attached, no need to attach again
+        return;
+      }
+    }
+    this.audioElement.srcObject = new MediaStream([this.nativeTrack]);
+  }
 }

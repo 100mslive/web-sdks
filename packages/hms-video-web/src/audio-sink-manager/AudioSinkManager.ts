@@ -46,6 +46,7 @@ export class AudioSinkManager {
   ) {
     this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
+    this.notificationManager.addEventListener('track-updated', this.handleTrackUpdate as EventListener);
     this.deviceManager.addEventListener('audio-device-change', this.handleAudioDeviceChange);
     // Initiate a Audio Context so safari will play audio on speaker instead of earpiece
     this.audioContext = new AudioContext();
@@ -103,6 +104,7 @@ export class AudioSinkManager {
     this.audioContext = undefined;
     this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
+    this.notificationManager.removeEventListener('track-updated', this.handleTrackUpdate as EventListener);
     this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
@@ -133,22 +135,39 @@ export class AudioSinkManager {
     }
   };
 
+  private handleTrackUpdate = (event: CustomEvent<{ track: HMSAudioTrack; enabled: boolean }>) => {
+    const { track, enabled } = event.detail;
+    if (enabled) {
+      track.addSink();
+      this.playAudioFor(track);
+    } else {
+      track.removeSink();
+    }
+  };
+
   private handleTrackAdd = (event: CustomEvent<HMSAudioTrack>) => {
     this.handleTrackAddAsync(event);
   };
 
   private handleTrackAddAsync = async (event: CustomEvent<HMSAudioTrack>) => {
     const track = event.detail;
+
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
-    audioEl.srcObject = new MediaStream([track.nativeTrack]);
     audioEl.addEventListener('pause', this.handleAudioPaused);
+
+    track.setAudioElement(audioEl);
+    track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
     this.audioSink?.append(audioEl);
-    track.setAudioElement(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
-    track.setVolume(this.volume);
+    // No need to play if track is not enabled
+    if (!track.enabled) {
+      track.removeSink();
+      return;
+    }
+    track.addSink();
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */

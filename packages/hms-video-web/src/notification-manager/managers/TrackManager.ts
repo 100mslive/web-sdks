@@ -120,13 +120,14 @@ export class TrackManager {
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
-
         if (currentTrackStateInfo.mute !== trackEntry.mute) {
           if (trackEntry.mute) {
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
           } else {
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
           }
+          track.type === HMSTrackType.AUDIO &&
+            this.eventEmitter.emit('track-updated', { detail: { track, enabled: !trackEntry.mute } });
         } else if (currentTrackStateInfo.description !== trackEntry.description) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
         }
