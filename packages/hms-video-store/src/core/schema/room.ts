@@ -19,4 +19,15 @@ export interface HMSRoom {
   shareableLink: string;
   hasWaitingRoom: boolean;
   roomState: HMSRoomState;
+  recording: {
+    browser: {
+      running: boolean;
+    };
+    server: {
+      running: boolean;
+    };
+  };
+  rtmp: {
+    running: boolean;
+  };
 }

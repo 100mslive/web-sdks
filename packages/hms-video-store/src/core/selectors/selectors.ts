@@ -379,3 +379,6 @@ export const selectIsAllowedToSubscribe = createSelector([selectLocalPeerRole], 
  * Select the permissions which determine what actions the local peer can do.
  */
 export const selectPermissions = createSelector(selectLocalPeerRole, role => role?.permissions);
+
+export const selectRecordingState = createSelector(selectRoom, room => room.recording);
+export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);

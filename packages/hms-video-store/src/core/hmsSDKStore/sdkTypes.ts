@@ -22,6 +22,8 @@ import {
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
   RTMPRecordingConfig,
+  HMSRecording,
+  HMSRTMP,
 } from '@100mslive/hms-video';
 
 export {
@@ -48,4 +50,6 @@ export {
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
   RTMPRecordingConfig,
+  HMSRecording,
+  HMSRTMP,
 };

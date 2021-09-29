@@ -42,6 +42,17 @@ export const createDefaultStoreState = (): HMSStore => {
       shareableLink: '',
       hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
+      recording: {
+        browser: {
+          running: false,
+        },
+        server: {
+          running: false,
+        },
+      },
+      rtmp: {
+        running: false,
+      },
     },
     peers: {},
     tracks: {},

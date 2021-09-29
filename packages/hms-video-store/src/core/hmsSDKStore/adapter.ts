@@ -188,4 +188,19 @@ export class SDKToHMS {
       currentTime: playlistManager.getCurrentTime(type),
     };
   }
+
+  static convertRecordingRTMPState(
+    recording: sdkTypes.HMSRecording | undefined,
+    rtmp: sdkTypes.HMSRTMP | undefined,
+  ) {
+    return {
+      recording: {
+        browser: {
+          running: !!recording?.browser.running,
+        },
+        server: { running: !!recording?.server?.running },
+      },
+      rtmp: { running: !!rtmp?.running },
+    };
+  }
 }
