@@ -23,7 +23,9 @@ export default class HMSRemoteStream extends HMSMediaStream {
   }
 
   setVideo(layer: HMSSimulcastLayer) {
-    if (this.video === layer) return;
+    if (this.video === layer) {
+      HMSLogger.d(`[Remote stream] ${this.id}`, `Already on ${layer} layer`);
+    }
 
     this.video = layer;
     HMSLogger.d(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
