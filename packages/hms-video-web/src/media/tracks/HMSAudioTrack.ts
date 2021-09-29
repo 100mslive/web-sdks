@@ -68,6 +68,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   /**
    * removes the track from the audio element of the track
+   * @experimental - Not production ready
    */
   removeSink() {
     if (this.audioElement) {
@@ -77,6 +78,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   /**
    * add track if not already added
+   * @experimental - Not production ready
    */
   addSink() {
     if (!this.nativeTrack || !this.audioElement) {
