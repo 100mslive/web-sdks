@@ -5,63 +5,64 @@ import {
   HMSMessageInput,
   HMSPeer,
   HMSPeerID,
+  HMSPlaylistType,
   HMSRoomState,
   HMSStore,
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
 import * as sdkTypes from './sdkTypes';
 import { SDKToHMS } from './adapter';
 import {
+  HMSRoleChangeRequest,
+  selectHMSMessagesCount,
   selectIsLocalScreenShared,
+  selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
   selectLocalAudioTrackID,
-  selectLocalVideoTrackID,
-  selectHMSMessagesCount,
-  selectIsLocalVideoDisplayEnabled,
   selectLocalPeer,
+  selectLocalTrackIDs,
+  selectLocalVideoTrackID,
   selectPeerByID,
-  HMSRoleChangeRequest,
-  selectTrackByID,
-  selectRoomStarted,
   selectPermissions,
   selectRolesMap,
-  selectLocalTrackIDs,
+  selectRoomStarted,
   selectRoomState,
+  selectTrackByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
-  HMSSdk,
-  HMSVideoPlugin,
   HMSAudioPlugin,
-  HMSTrack as SDKHMSTrack,
-  HMSLocalTrack as SDKHMSLocalTrack,
-  HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
-  HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
-  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
-  HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSAudioTrack as SDKHMSAudioTrack,
-  HMSVideoTrack as SDKHMSVideoTrack,
-  HMSException as SDKHMSException,
-  HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
-  HMSSimulcastLayer,
+  HMSException as SDKHMSException,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
+  HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
+  HMSLocalTrack as SDKHMSLocalTrack,
+  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLogLevel,
+  HMSRemoteTrack as SDKHMSRemoteTrack,
+  HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
+  HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSSdk,
+  HMSSimulcastLayer,
+  HMSTrack as SDKHMSTrack,
+  HMSVideoPlugin,
+  HMSVideoTrack as SDKHMSVideoTrack,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
 import {
+  areArraysEqual,
   mergeNewPeersInDraft,
   mergeNewTracksInDraft,
-  areArraysEqual,
 } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { HMSPlaylist } from './HMSPlaylist';
 
 /**
@@ -123,7 +124,7 @@ export class HMSSDKActions implements IHMSActions {
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         track.preferLayer(layer);
-        this.syncRoomState('setPreferredLayer');
+        this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);
       }
@@ -348,6 +349,7 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
       await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+      this.updateVideoLayer(trackID, 'detachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to remove sink');
     }
@@ -559,16 +561,7 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
-      // Update layer as it is updated in addSink
-      if (
-        sdkTrack instanceof SDKHMSRemoteVideoTrack &&
-        sdkTrack.getSimulcastDefinitions().length > 0
-      ) {
-        this.setState(draft => {
-          const layer = sdkTrack.getSimulcastLayer();
-          draft.tracks[trackID].layer = layer;
-        }, 'updateLayerOnAttach');
-      }
+      this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
@@ -832,6 +825,19 @@ export class HMSSDKActions implements IHMSActions {
     // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);
+  }
+
+  /**
+   * the layer gets updated on addsink/removesink/preferlayer calls, for simulcast there
+   * can be multiple layers, while for non simulcast there will be None and High.
+   */
+  private updateVideoLayer(trackID: string, action: string) {
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
+      this.setState(draft => {
+        draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
+      }, action);
+    }
   }
 
   private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
