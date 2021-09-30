@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSMediaStream from '../streams/HMSMediaStream';
+import HMSRemoteStream from '../streams/HMSRemoteStream';
 import HMSLogger from '../../utils/logger';
 
 export class HMSAudioTrack extends HMSTrack {
@@ -71,8 +72,10 @@ export class HMSAudioTrack extends HMSTrack {
    * @experimental - Not production ready
    */
   removeSink() {
-    if (this.audioElement) {
+    // @ts-ignore
+    if (this.audioElement && window.HMS?.AUDIO_SINK) {
       this.audioElement.srcObject = null;
+      this.updateLayer();
     }
   }
 
@@ -81,7 +84,8 @@ export class HMSAudioTrack extends HMSTrack {
    * @experimental - Not production ready
    */
   addSink() {
-    if (!this.nativeTrack || !this.audioElement) {
+    // @ts-ignore
+    if (!this.nativeTrack || !this.audioElement || !window.HMS?.AUDIO_SINK) {
       return;
     }
     const srcObject = this.audioElement.srcObject;
@@ -93,5 +97,13 @@ export class HMSAudioTrack extends HMSTrack {
       }
     }
     this.audioElement.srcObject = new MediaStream([this.nativeTrack]);
+    this.updateLayer();
+  }
+
+  private updateLayer() {
+    //@ts-ignore
+    if (this.stream instanceof HMSRemoteStream && window.HMS?.AUDIO_SINK) {
+      this.stream.setAudio(this.enabled);
+    }
   }
 }
