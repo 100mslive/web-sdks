@@ -34,7 +34,7 @@ export class PeerListManager {
 
   handleInitialPeerList = (peerList: PeerListNotification) => {
     const peers = Object.values(peerList.peers);
-    peers?.forEach((peer) => this.peerManager.handlePeerJoin(peer));
+    this.peerManager.handlePeerList(peers);
   };
 
   handleReconnectPeerList = (peerList: PeerListNotification) => {

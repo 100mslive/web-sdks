@@ -103,10 +103,10 @@ describe('Notification Manager', () => {
     it('should call onPeerUpdate with correct parameters', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_LIST, params: fakePeerList });
 
-      expect(peerUpdateHandler).toHaveBeenCalledTimes(Object.keys(fakePeerList.peers).length);
+      expect(peerUpdateHandler).toHaveBeenCalled();
       peerUpdateHandler.mock.calls.forEach((call) => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_JOINED);
-        expect(call[1]).toBeInstanceOf(HMSRemotePeer);
+        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
+        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
       });
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);

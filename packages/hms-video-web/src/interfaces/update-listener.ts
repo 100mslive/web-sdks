@@ -34,6 +34,7 @@ export enum HMSPeerUpdate {
   STARTED_SPEAKING,
   STOPPED_SPEAKING,
   ROLE_UPDATED,
+  PEER_LIST,
 }
 
 export enum HMSTrackUpdate {
@@ -53,7 +54,7 @@ export interface HMSAudioListener {
 export interface HMSUpdateListener extends DeviceChangeListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
-  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | null): void;
+  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
   onMessageReceived(message: HMSMessage): void;
   onError(error: HMSException): void;

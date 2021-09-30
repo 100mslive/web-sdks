@@ -9,6 +9,7 @@ export abstract class HMSTrack {
    */
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;
+  peerId?: string;
 
   /** Changes on mute/unmute or plugins addition and removal
    * i.e replacing the nativeTrack with different `deviceId`

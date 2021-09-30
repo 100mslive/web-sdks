@@ -150,6 +150,7 @@ export class TrackManager {
       }
 
       track.source = state.trackInfo.source;
+      track.peerId = hmsPeer.peerId;
       track.setEnabled(!state.trackInfo.mute);
 
       switch (track.type) {

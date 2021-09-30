@@ -22,24 +22,17 @@ export class PeerManager {
     return `[${this.constructor.name}]`;
   }
 
-  handlePeerJoin = (peer: PeerNotification) => {
-    const hmsPeer = new HMSRemotePeer({
-      peerId: peer.peer_id,
-      name: peer.info.name,
-      customerUserId: peer.info.user_id,
-      customerDescription: peer.info.data,
-      role: this.store.getPolicyForRole(peer.role),
-    });
-
-    this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
-
-    for (const trackId in peer.tracks) {
-      this.store.setTrackState({
-        peerId: peer.peer_id,
-        trackInfo: peer.tracks[trackId],
-      });
+  handlePeerList = (peers: PeerNotification[]) => {
+    let hmsPeers: HMSRemotePeer[] = [];
+    for (let peer of peers) {
+      hmsPeers.push(this.makePeer(peer));
     }
+    this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, hmsPeers);
+    this.trackManager.processPendingTracks();
+  };
+
+  handlePeerJoin = (peer: PeerNotification) => {
+    const hmsPeer = this.makePeer(peer);
 
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
     this.trackManager.processPendingTracks();
@@ -81,5 +74,26 @@ export class PeerManager {
       peer.updateRole(newRole);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
+  }
+
+  private makePeer(peer: PeerNotification) {
+    const hmsPeer = new HMSRemotePeer({
+      peerId: peer.peer_id,
+      name: peer.info.name,
+      customerUserId: peer.info.user_id,
+      customerDescription: peer.info.data,
+      role: this.store.getPolicyForRole(peer.role),
+    });
+
+    this.store.addPeer(hmsPeer);
+    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
+
+    for (const trackId in peer.tracks) {
+      this.store.setTrackState({
+        peerId: peer.peer_id,
+        trackInfo: peer.tracks[trackId],
+      });
+    }
+    return hmsPeer;
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.0.201",
+  "version": "0.0.202",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

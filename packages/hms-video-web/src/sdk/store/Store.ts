@@ -120,11 +120,8 @@ class Store implements IStore {
   }
 
   getPeerByTrackId(trackId: string) {
-    return Object.values(this.peers).find((peer) =>
-      this.getPeerTracks(peer.peerId)
-        .map((track) => track.trackId)
-        .includes(trackId),
-    );
+    const track = this.tracks[trackId];
+    return track.peerId ? this.peers[track.peerId] : undefined;
   }
 
   getSpeakers() {
