@@ -84,8 +84,16 @@ export class SDKToHMS {
     return {
       id: sdkRoom.id,
       name: sdkRoom.name,
+      localPeer: sdkRoom.localPeer?.peerId ?? '',
       hasWaitingRoom: sdkRoom.hasWaitingRoom,
       shareableLink: sdkRoom.shareableLink,
+      recording: {
+        browser: {
+          running: !!sdkRoom.recording?.browser.running,
+        },
+        server: { running: !!sdkRoom.recording?.server.running },
+      },
+      rtmp: { running: !!sdkRoom.rtmp?.running },
     };
   }
 

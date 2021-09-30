@@ -40,6 +40,7 @@ export const createDefaultStoreState = (): HMSStore => {
       name: '',
       peers: [],
       shareableLink: '',
+      localPeer: '',
       hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {

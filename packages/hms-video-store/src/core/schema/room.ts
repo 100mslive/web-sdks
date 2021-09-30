@@ -16,6 +16,7 @@ export interface HMSRoom {
   name: string;
   isConnected?: boolean;
   peers: HMSPeerID[];
+  localPeer: HMSPeerID;
   shareableLink: string;
   hasWaitingRoom: boolean;
   roomState: HMSRoomState;

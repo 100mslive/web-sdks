@@ -31,6 +31,7 @@ import {
   selectRolesMap,
   selectRoomStarted,
   selectRoomState,
+  selectLocalMediaSettings,
   selectTrackByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -506,6 +507,7 @@ export class HMSSDKActions implements IHMSActions {
     if (!devices) {
       return;
     }
+    const localPeer = this.store.getState(selectLocalPeer);
     this.setState(store => {
       if (!areArraysEqual(store.devices.audioInput, devices.audioInput)) {
         store.devices.audioInput = devices.audioInput;
@@ -516,9 +518,12 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
+      if (this.hmsSDKPeers[localPeer?.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      }
     }, 'deviceChange');
     // sync is needed to update the current selected device
-    this.syncRoomState('deviceChangeSync');
+    // this.syncRoomState('deviceChangeSync');
     // send notification only on device change - selection is present
     if (event.selection) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
@@ -580,6 +585,7 @@ export class HMSSDKActions implements IHMSActions {
    * @protected
    */
   protected syncRoomState(action?: string) {
+    console.time('syncRoomState');
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
@@ -629,6 +635,7 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp));
     }, action);
+    console.timeEnd('syncRoomState');
   }
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
@@ -652,7 +659,6 @@ export class HMSSDKActions implements IHMSActions {
       this.syncRoomState.bind(this),
       this.store,
     );
-    this.syncRoomState('joinSync');
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
       store.room.isConnected = true;
@@ -667,31 +673,30 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  protected onRoomUpdate() {
-    this.syncRoomState('roomUpdate');
+  //@ts-ignore
+  protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
+    this.setState(store => {
+      Object.assign(store.room, SDKToHMS.convertRoom(room));
+    }, 'RoomUpdate');
   }
 
-  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
+  protected onPeerUpdate(
+    type: sdkTypes.HMSPeerUpdate,
+    sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[],
+  ) {
     if (
       type === sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER ||
       type === sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER
     ) {
       return; // ignore, high frequency update so no point of syncing peers
+    } else if (Array.isArray(sdkPeer)) {
+      this.syncRoomState('peersJoined');
+      for (let peer of sdkPeer) {
+        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+        this.hmsNotifications.sendPeerUpdate(type, hmsPeer);
+      }
     } else {
-      // store peer in case it doesn't exist later(will happen if event is peer leave)
-      let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-      let actionName = 'peerUpdate';
-      if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
-        actionName = 'peerJoined';
-      } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
-        actionName = 'peerLeft';
-      }
-      this.syncRoomState(actionName);
-      // if peer wasn't available before sync(will happen if event is peer join)
-      if (!peer) {
-        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-      }
-      this.hmsNotifications.sendPeerUpdate(type, peer);
+      this.peerUpdateInternal(type, sdkPeer);
     }
   }
 
@@ -708,7 +713,7 @@ export class HMSSDKActions implements IHMSActions {
     } else {
       const actionName =
         type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
-      this.syncRoomState(actionName);
+      this.syncTrackState(actionName, track, peer);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
@@ -897,11 +902,18 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private getMediaSettings(sdkPeer: sdkTypes.HMSPeer): Partial<HMSMediaSettings> {
+    const settings = this.store.getState(selectLocalMediaSettings);
+    const audioTrack = sdkPeer.audioTrack as SDKHMSLocalAudioTrack;
+    const videoTrack = sdkPeer.videoTrack as SDKHMSLocalVideoTrack;
     return {
-      audioInputDeviceId: (sdkPeer.audioTrack as SDKHMSLocalAudioTrack)?.getMediaTrackSettings()
-        ?.deviceId,
-      videoInputDeviceId: (sdkPeer.videoTrack as SDKHMSLocalVideoTrack)?.getMediaTrackSettings()
-        ?.deviceId,
+      audioInputDeviceId:
+        audioTrack && audioTrack.enabled
+          ? audioTrack.getMediaTrackSettings()?.deviceId
+          : settings.audioInputDeviceId,
+      videoInputDeviceId:
+        videoTrack && videoTrack.enabled
+          ? videoTrack.getMediaTrackSettings()?.deviceId
+          : settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
     };
   }
@@ -911,7 +923,12 @@ export class HMSSDKActions implements IHMSActions {
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
         track.setVolume(value);
-        this.syncRoomState('trackVolume');
+        this.setState(draftStore => {
+          const track = draftStore.tracks[trackId];
+          if (track) {
+            track.volume = value;
+          }
+        }, 'trackVolume');
       } else {
         HMSLogger.w(`track ${trackId} is not an audio track`);
       }
@@ -1038,6 +1055,57 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
     }, action);
   };
+
+  private syncTrackState = (action: string, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) => {
+    console.time('trackUpdate');
+    this.setState(draftStore => {
+      const draftPeer = draftStore.peers[peer.peerId];
+      const hmsTrack = SDKToHMS.convertTrack(track);
+      draftStore.tracks[track.trackId] = hmsTrack;
+      if (hmsTrack.source === 'regular') {
+        if (hmsTrack.type === 'audio') {
+          draftPeer.audioTrack = hmsTrack.id;
+        } else {
+          draftPeer.videoTrack = hmsTrack.id;
+        }
+      } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
+        draftPeer.auxiliaryTracks.push(hmsTrack.id);
+      }
+      this.hmsSDKTracks[hmsTrack.id] = track;
+    }, action);
+    console.timeEnd('trackUpdate');
+  };
+
+  private peerUpdateInternal(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
+    // store peer in case it doesn't exist later(will happen if event is peer leave)
+    let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+    let actionName = 'peerUpdate';
+    if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
+      actionName = 'peerJoined';
+    } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
+      actionName = 'peerLeft';
+    }
+    this.setState(draftStore => {
+      if (actionName === 'peerLeft') {
+        const index = draftStore.room.peers.indexOf(sdkPeer.peerId);
+        if (index > -1) {
+          draftStore.room.peers.splice(index, 1);
+        }
+        delete draftStore.peers[sdkPeer.peerId];
+        delete this.hmsSDKPeers[sdkPeer.peerId];
+      } else {
+        const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
+        draftStore.peers[hmsPeer.id] = hmsPeer as HMSPeer;
+        draftStore.room.peers.push(hmsPeer.id);
+        this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
+      }
+    }, actionName);
+    // if peer wasn't available before sync(will happen if event is peer join)
+    if (!peer) {
+      peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+    }
+    this.hmsNotifications.sendPeerUpdate(type, peer);
+  }
 
   /**
    * setState is separate so any future changes to how state change can be done from one place.

@@ -89,8 +89,8 @@ const selectTracks = createSelector(selectTracksMap, storeTracks => {
 /**
  * Select the local peer object object assigned to you.
  */
-export const selectLocalPeer = createSelector(selectPeers, peers => {
-  return peers.filter(p => p.isLocal)[0];
+export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers) => {
+  return peers[room.localPeer];
 });
 
 /**
