@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: validate branch
-        if: github.ref != 'refs/heads/main' || github.ref != 'refs/heads/hot-fix'
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/hot-fix'
         run: exit 1
-      
+
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
