@@ -713,7 +713,7 @@ export class HMSSDKActions implements IHMSActions {
     } else {
       const actionName =
         type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
-      this.syncTrackState(actionName, track, peer);
+      this.syncRemoteTrackState(actionName, track, peer);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
@@ -1056,7 +1056,13 @@ export class HMSSDKActions implements IHMSActions {
     }, action);
   };
 
-  private syncTrackState = (
+  /**
+   * Handle store update on remote track changes
+   * @param {string} action - 'trackAdded' | 'trackUpdate'
+   * @param {SDKHMSTrack} track - track added/updated
+   * @param {sdkTypes.HMSPeer}peer - peer on which track is added/updated
+   */
+  private syncRemoteTrackState = (
     action: 'trackAdded' | 'trackUpdate',
     track: SDKHMSTrack,
     peer: sdkTypes.HMSPeer,
@@ -1067,17 +1073,19 @@ export class HMSSDKActions implements IHMSActions {
       const hmsTrack = SDKToHMS.convertTrack(track);
       if (action === 'trackAdded') {
         draftStore.tracks[track.trackId] = hmsTrack;
-        if (hmsTrack.source === 'regular') {
-          if (hmsTrack.type === 'audio') {
-            draftPeer.audioTrack = hmsTrack.id;
-          } else {
-            draftPeer.videoTrack = hmsTrack.id;
-          }
+        if (peer.audioTrack?.trackId === track.trackId) {
+          draftPeer.audioTrack = hmsTrack.id;
+        } else if (peer.videoTrack?.trackId === track.trackId) {
+          draftPeer.videoTrack = hmsTrack.id;
         } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
           draftPeer.auxiliaryTracks.push(hmsTrack.id);
         }
       } else {
-        Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
+        if (draftStore.tracks[hmsTrack.id]) {
+          Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
+        } else {
+          this.logPossibleInconsistency(`track ${hmsTrack.id} not present, unable to update track`);
+        }
       }
       this.hmsSDKTracks[hmsTrack.id] = track;
     }, action);
