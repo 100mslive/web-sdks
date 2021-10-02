@@ -1056,20 +1056,28 @@ export class HMSSDKActions implements IHMSActions {
     }, action);
   };
 
-  private syncTrackState = (action: string, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) => {
+  private syncTrackState = (
+    action: 'trackAdded' | 'trackUpdate',
+    track: SDKHMSTrack,
+    peer: sdkTypes.HMSPeer,
+  ) => {
     console.time('trackUpdate');
     this.setState(draftStore => {
       const draftPeer = draftStore.peers[peer.peerId];
       const hmsTrack = SDKToHMS.convertTrack(track);
-      draftStore.tracks[track.trackId] = hmsTrack;
-      if (hmsTrack.source === 'regular') {
-        if (hmsTrack.type === 'audio') {
-          draftPeer.audioTrack = hmsTrack.id;
-        } else {
-          draftPeer.videoTrack = hmsTrack.id;
+      if (action === 'trackAdded') {
+        draftStore.tracks[track.trackId] = hmsTrack;
+        if (hmsTrack.source === 'regular') {
+          if (hmsTrack.type === 'audio') {
+            draftPeer.audioTrack = hmsTrack.id;
+          } else {
+            draftPeer.videoTrack = hmsTrack.id;
+          }
+        } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
+          draftPeer.auxiliaryTracks.push(hmsTrack.id);
         }
-      } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
-        draftPeer.auxiliaryTracks.push(hmsTrack.id);
+      } else {
+        Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
       }
       this.hmsSDKTracks[hmsTrack.id] = track;
     }, action);
@@ -1095,8 +1103,12 @@ export class HMSSDKActions implements IHMSActions {
         delete this.hmsSDKPeers[sdkPeer.peerId];
       } else {
         const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
-        draftStore.peers[hmsPeer.id] = hmsPeer as HMSPeer;
-        draftStore.room.peers.push(hmsPeer.id);
+        if (draftStore.peers[hmsPeer.id]) {
+          Object.assign(draftStore.peers[hmsPeer.id], hmsPeer);
+        } else {
+          draftStore.peers[hmsPeer.id] = hmsPeer as HMSPeer;
+          draftStore.room.peers.push(hmsPeer.id);
+        }
         this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
       }
     }, actionName);
