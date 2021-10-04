@@ -107,11 +107,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   getRecordingState() {
-    return this.store.getRoom().recording;
+    return this.store.getRoom()?.recording;
   }
 
   getRTMPState() {
-    return this.store.getRoom().rtmp;
+    return this.store.getRoom()?.rtmp;
   }
 
   private handleAutoplayError = (event: AutoplayEvent) => {
