@@ -37,7 +37,7 @@ import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
-import { TrackUpdateRequestParams } from '../signal/interfaces';
+import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
@@ -511,6 +511,10 @@ export default class HMSTransport implements ITransport {
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
+  }
+
+  async changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams) {
+    await this.signal.requestMultiTrackStateChange(trackUpdateRequest);
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {

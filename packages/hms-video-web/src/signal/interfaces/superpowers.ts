@@ -1,3 +1,5 @@
+import { HMSTrackSource } from '../..';
+
 /**
  * Parameteres for the role change request sent to the server.
  */
@@ -27,6 +29,13 @@ export interface TrackUpdateRequestParams {
   mute: boolean;
 }
 
+export interface MultiTrackUpdateRequestParams {
+  requested_for?: string;
+  roles?: string[];
+  type?: 'audio' | 'video';
+  source?: HMSTrackSource;
+  value: boolean;
+}
 export interface StartRTMPOrRecordingRequestParams {
   meeting_url: string;
   rtmp_urls?: Array<string>;

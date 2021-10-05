@@ -40,8 +40,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
 import { IStore, Store } from './store';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
-import { HMSRoleChangeRequest } from '../interfaces';
-import { HMSRole } from '../interfaces';
+import { HMSRoleChangeRequest, HMSRole, HMSChangeMultiTrackStateParams } from '../interfaces';
 import RoleChangeManager, { PublishConfig } from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
@@ -678,6 +677,19 @@ export class HMSSdk implements HMSInterface {
       track_id: forRemoteTrack.trackId,
       stream_id: forRemoteTrack.stream.id,
       mute: !enabled,
+    });
+  }
+
+  async changeMultiTrackState(params: HMSChangeMultiTrackStateParams) {
+    if (typeof params.enabled !== 'boolean') {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Pass a boolean for enabled');
+    }
+    const { enabled, roles, type, source } = params;
+    await this.transport?.changeMultiTrackState({
+      value: enabled,
+      type,
+      source,
+      roles: roles?.map((role) => role?.name),
     });
   }
 

@@ -17,6 +17,7 @@ let reconnectedHandler: jest.Mock<any, any>;
 let roleChangeRequestHandler: jest.Mock<any, any>;
 let roleUpdateHandler: jest.Mock<any, any>;
 let changeTrackStateRequestHandler: jest.Mock<any, any>;
+let changeMultiTrackStateRequestHandler: jest.Mock<any, any>;
 let removedFromRoomHandler: jest.Mock<any, any>;
 let audioUpdateHandler: jest.Mock<any, any>;
 
@@ -39,6 +40,7 @@ beforeEach(() => {
   roleChangeRequestHandler = jest.fn();
   roleUpdateHandler = jest.fn();
   changeTrackStateRequestHandler = jest.fn();
+  changeMultiTrackStateRequestHandler = jest.fn();
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
   store.setRoom(new HMSRoom('1234', 'test', store));
@@ -55,6 +57,7 @@ beforeEach(() => {
     onRoleChangeRequest: roleChangeRequestHandler,
     onRoleUpdate: roleUpdateHandler,
     onChangeTrackStateRequest: changeTrackStateRequestHandler,
+    onChangeMultiTrackStateRequest: changeMultiTrackStateRequestHandler,
     onRemovedFromRoom: removedFromRoomHandler,
   };
 

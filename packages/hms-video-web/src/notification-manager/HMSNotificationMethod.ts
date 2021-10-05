@@ -10,6 +10,7 @@ export enum HMSNotificationMethod {
   PEER_LIST = 'peer-list',
   TRACK_METADATA_ADD = 'on-track-add',
   TRACK_UPDATE = 'on-track-update',
+  CHANGE_TRACK_MUTE_STATE_UPDATE = 'on-change-track-mute-state-request',
   ACTIVE_SPEAKERS = 'active-speakers',
   BROADCAST = 'on-broadcast',
   ROLE_CHANGE = 'on-role-change',

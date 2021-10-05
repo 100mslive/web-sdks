@@ -7,6 +7,7 @@ import {
   RequestForRoleChangeParams,
   TrackUpdateRequestParams,
   RemovePeerRequest,
+  MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
 } from './interfaces';
 
@@ -47,6 +48,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): Promise<void>;
 
   requestTrackStateChange(params: TrackUpdateRequestParams): Promise<void>;
+
+  requestMultiTrackStateChange(params: MultiTrackUpdateRequestParams): Promise<void>;
 
   removePeer(params: RemovePeerRequest): Promise<void>;
 

@@ -112,6 +112,14 @@ export interface TrackUpdateRequestNotification {
   mute: boolean;
 }
 
+export interface ChangeTrackMuteStateNotification {
+  requested_by: string;
+  roles?: string[];
+  type?: 'audio' | 'video';
+  source?: HMSTrackSource;
+  value: boolean;
+}
+
 export interface PeerLeaveRequestNotification {
   requested_by: string;
   reason: string;

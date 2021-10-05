@@ -13,6 +13,7 @@ import {
   SpeakerList,
   TrackStateNotification,
   TrackUpdateRequestNotification,
+  ChangeTrackMuteStateNotification,
   RecordingNotification,
 } from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
@@ -129,6 +130,10 @@ export class NotificationManager {
 
       case HMSNotificationMethod.TRACK_UPDATE_REQUEST:
         this.requestManager.handleTrackUpdateRequest(notification as TrackUpdateRequestNotification);
+        break;
+
+      case HMSNotificationMethod.CHANGE_TRACK_MUTE_STATE_UPDATE:
+        this.requestManager.handleChangeTrackStateRequest(notification as ChangeTrackMuteStateNotification);
         break;
 
       case HMSNotificationMethod.PEER_UPDATE:

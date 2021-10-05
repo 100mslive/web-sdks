@@ -7,6 +7,7 @@ import {
   RequestForRoleChangeParams,
   TrackUpdateRequestParams,
   RemovePeerRequest,
+  MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
@@ -91,9 +92,9 @@ export default class JsonRpcSignal implements ISignal {
     } catch (ex) {
       const error = ex as HMSException;
       throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
-        Number(error.code),
+        Number((error as HMSException).code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),
-        error.message,
+        (error as HMSException).message,
       );
     }
   }
@@ -239,6 +240,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async requestTrackStateChange(params: TrackUpdateRequestParams) {
     await this.call(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
+  }
+
+  async requestMultiTrackStateChange(params: MultiTrackUpdateRequestParams) {
+    await this.call(HMSSignalMethod.CHANGE_TRACK_MUTE_STATE_REQUEST, params);
   }
 
   async removePeer(params: RemovePeerRequest) {

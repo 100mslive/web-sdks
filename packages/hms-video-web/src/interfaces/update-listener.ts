@@ -6,7 +6,7 @@ import { HMSMessage } from './message';
 import { HMSRoom } from './room';
 import { HMSSpeaker } from './speaker';
 import { DeviceChangeListener } from './device-change-listener';
-import { HMSChangeTrackStateRequest } from './change-track-state';
+import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
 import { HMSLeaveRoomRequest } from './leave-room-request';
 
 export enum HMSRoomUpdate {
@@ -63,5 +63,6 @@ export interface HMSUpdateListener extends DeviceChangeListener {
   onRoleChangeRequest(request: HMSRoleChangeRequest): void;
   onRoleUpdate(newRole: string): void;
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
+  onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
 }

@@ -10,6 +10,7 @@ import { HMSPreviewListener } from './preview-listener';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSPlaylistManager } from './playlist';
+import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSRecording, HMSRTMP } from './room';
 
@@ -28,6 +29,7 @@ export default interface HMS {
   acceptChangeRole(request: HMSRoleChangeRequest): void;
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
+  changeMultiTrackState(params: HMSChangeMultiTrackStateParams): Promise<void>;
   removePeer(peer: HMSRemotePeer, reason: string): Promise<void>;
   endRoom(lock: boolean, reason: string): Promise<void>;
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;

@@ -1,6 +1,11 @@
+import { HMSLocalTrack } from '../../media/tracks';
 import { HMSRemotePeer, HMSRoleChangeRequest, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
-import { RoleChangeRequestParams, TrackUpdateRequestNotification } from '../HMSNotifications';
+import {
+  RoleChangeRequestParams,
+  TrackUpdateRequestNotification,
+  ChangeTrackMuteStateNotification,
+} from '../HMSNotifications';
 
 export class RequestManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
@@ -29,6 +34,10 @@ export class RequestManager {
     };
 
     if (mute) {
+      // if track is already in the same state as change state, do nothing
+      if (track.enabled === !mute) {
+        return;
+      }
       /**
        * Directly mute track when request arrives
        */
@@ -38,6 +47,47 @@ export class RequestManager {
        * Notify UI to unmute for requesting consent
        */
       sendNotification();
+    }
+  }
+
+  handleChangeTrackStateRequest(request: ChangeTrackMuteStateNotification) {
+    const { type, source, value, requested_by } = request;
+    const peer = this.store.getPeerById(requested_by);
+
+    if (!peer) {
+      return;
+    }
+    const localPeerTracks = this.store.getLocalPeerTracks();
+    let tracks: HMSLocalTrack[] = localPeerTracks;
+    if (type) {
+      tracks = tracks.filter((track) => track.type === type);
+    }
+
+    if (source) {
+      tracks = tracks.filter((track) => track.source === source);
+    }
+
+    // if track is to be muted, mute and send the notification, otherwise send notification
+    if (!value) {
+      const promises: Promise<void>[] = [];
+      for (let track of tracks) {
+        promises.push(track.setEnabled(value));
+      }
+      Promise.all(promises).then(() => {
+        this.listener?.onChangeMultiTrackStateRequest({
+          requestedBy: peer as HMSRemotePeer,
+          tracks,
+          enabled: value,
+        });
+      });
+    } else {
+      this.listener?.onChangeMultiTrackStateRequest({
+        requestedBy: peer as HMSRemotePeer,
+        tracks,
+        type,
+        source,
+        enabled: value,
+      });
     }
   }
 }
