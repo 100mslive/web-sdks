@@ -200,11 +200,11 @@ export class SDKToHMS {
   static convertRecordingRTMPState(
     recording: sdkTypes.HMSRecording | undefined,
     rtmp: sdkTypes.HMSRTMP | undefined,
-  ) {
+  ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP } {
     return {
       recording: {
         browser: {
-          running: !!recording?.browser.running,
+          running: !!recording?.browser?.running,
         },
         server: { running: !!recording?.server?.running },
       },

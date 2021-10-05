@@ -7,7 +7,14 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
 } from '@100mslive/hms-video';
-import { HMSPeerID, HMSRoleName, HMSTrackSource, IHMSPlaylistActions } from './schema';
+import {
+  HMSMessageID,
+  HMSPeerID,
+  HMSRoleName,
+  HMSTrackID,
+  HMSTrackSource,
+  IHMSPlaylistActions,
+} from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 
@@ -68,7 +75,7 @@ export interface IHMSActions {
    * This method removes the track from the local peer's list of auxiliary tracks and unpublishes it.
    * @param trackId string - ID of the track to be removed
    */
-  removeTrack(trackId: string): Promise<void>;
+  removeTrack(trackId: HMSTrackID): Promise<void>;
 
   /**
    * @deprecated The method should not be used
@@ -109,16 +116,17 @@ export interface IHMSActions {
    * @param readStatus boolean value which you want to set as read flag for message/messages.
    * @param messageId message id whose read falg you want to set.
    */
-  setMessageRead(readStatus: boolean, messageId?: string): void;
+  setMessageRead(readStatus: boolean, messageId?: HMSMessageID): void;
 
   /**
-   * These functions can be used to mute/unmute the local peer's audio and video
-   * @param enabled boolean
+   * This function can be used to enable/disable(unmute/mute) local audio track
+   * @param enabled boolean - true to unmute, false to mute
    */
   setLocalAudioEnabled(enabled: boolean): Promise<void>;
 
   /**
-   * @see setLocalAudioEnabled
+   * This function can be used to enable/disable(unmute/mute) local video track
+   * @param enabled boolean - true to unmute, false to mute
    */
   setLocalVideoEnabled(enabled: boolean): Promise<void>;
 
@@ -126,7 +134,7 @@ export interface IHMSActions {
    * @param trackId string - ID of the track whose mute status needs to be set
    * @param enabled boolean - true when we want to unmute the track and false when we want to unmute it
    */
-  setEnabledTrack(trackId: string, enabled: boolean): Promise<void>;
+  setEnabledTrack(trackId: HMSTrackID, enabled: boolean): Promise<void>;
 
   /**
    * Change settings of the local peer's audio track
@@ -142,19 +150,19 @@ export interface IHMSActions {
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
 
   /**
-   * If you're not using our Video Component you can use the below functions directly
+   * You can use the attach and detach video function
    * to add/remove video from an element for a track ID. The benefit of using this
    * instead of removing the video yourself is that it'll also auto unsubscribe to
    * the stream coming from server saving significant bandwidth for the user.
-   * @param trackID trackID as stored in the store for the peer
+   * @param localTrackID trackID as stored in the store for the peer
    * @param videoElement HTML native element where the video has to be shown
    */
-  attachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+  attachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
 
   /**
    * @see attachVideo
    */
-  detachVideo(trackID: string, videoElement: HTMLVideoElement): Promise<void>;
+  detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
 
   /**
    * Set the output volume of audio tracks(overall/particular audio track)
@@ -162,7 +170,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: string): void;
+  setVolume(value: number, trackId?: HMSTrackID): void;
 
   /**
    * Set the audio output(speaker) device
@@ -175,7 +183,7 @@ export interface IHMSActions {
    * @param trackId
    * @param layer
    */
-  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
@@ -202,7 +210,7 @@ export interface IHMSActions {
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
-  changeRole(forPeerId: string, toRole: string, force?: boolean): Promise<void>;
+  changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
 
   /**
    * Accept the role change request received
@@ -222,10 +230,15 @@ export interface IHMSActions {
    * @param forRemoteTrackID The track ID or array of track IDs for which you want to change the state
    * @param enabled `true` if you wish to enable(unmute permission is required) the track, `false` if you wish to disable(mute permission is required) the track
    */
-  setRemoteTrackEnabled(forRemoteTrackID: string | string[], enabled: boolean): Promise<void>;
+  setRemoteTrackEnabled(
+    forRemoteTrackID: HMSTrackID | HMSTrackID[],
+    enabled: boolean,
+  ): Promise<void>;
 
   /**
-   * Method to be called with some UI interaction after autoplay error is received
+   * Most browsers have limitations where an audio can not be played if there was no user interaction.
+   * SDK throws an autoplay error in this case, this method can be called after an UI interaction
+   * to resolve the autoplay error
    */
   unblockAudio: () => Promise<void>;
 
@@ -237,12 +250,12 @@ export interface IHMSActions {
 
   /**
    * If you have **removeOthers** permission, you can remove a peer from the room.
-   * @param peerID peerID of the peer to be removed from the remove
+   * @param peerID peerID of the peer to be removed from the room
    * @param reason a string explaining why the peer is removed from the room.
    * This string could be used to notify the user before they're removed from the room
    * using the `REMOVED_FROM_ROOM` type of notification
    */
-  removePeer(peerID: string, reason: string): Promise<void>;
+  removePeer(peerID: HMSPeerID, reason: string): Promise<void>;
 
   /**
    * If you want to start RTMP streaming or recording.

@@ -13,4 +13,6 @@ export {
   DeviceMap,
   HMSLogLevel,
   RTMPRecordingConfig,
+  HMSRecording,
+  HMSRTMP,
 } from './hmsSDKStore/sdkTypes';

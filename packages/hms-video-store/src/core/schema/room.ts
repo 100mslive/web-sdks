@@ -1,4 +1,5 @@
 import { HMSPeerID } from './peer';
+import { HMSRecording, HMSRTMP } from '@100mslive/hms-video';
 
 export type HMSRoomID = string;
 
@@ -20,15 +21,6 @@ export interface HMSRoom {
   shareableLink: string;
   hasWaitingRoom: boolean;
   roomState: HMSRoomState;
-  recording: {
-    browser: {
-      running: boolean;
-    };
-    server: {
-      running: boolean;
-    };
-  };
-  rtmp: {
-    running: boolean;
-  };
+  recording: HMSRecording;
+  rtmp: HMSRTMP;
 }
