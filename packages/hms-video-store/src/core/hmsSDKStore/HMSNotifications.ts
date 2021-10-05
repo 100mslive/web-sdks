@@ -13,6 +13,7 @@ import {
   HMSMessage,
   HMSTrack,
   HMSChangeTrackStateRequest,
+  HMSChangeMultiTrackStateRequest,
   HMSLeaveRoomRequest,
   HMSDeviceChangeEvent,
 } from '../schema';
@@ -126,6 +127,15 @@ export class HMSNotifications implements IHMSNotifications {
     this.emitEvent(notification);
   }
 
+  sendChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest) {
+    const notification = this.createNotification(
+      HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST,
+      request,
+      HMSNotificationSeverity.INFO,
+    );
+    this.emitEvent(notification);
+  }
+
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
@@ -138,6 +148,7 @@ export class HMSNotifications implements IHMSNotifications {
       | HMSMessage
       | HMSException
       | HMSChangeTrackStateRequest
+      | HMSChangeMultiTrackStateRequest
       | HMSLeaveRoomRequest
       | HMSDeviceChangeEvent
       | null,

@@ -14,6 +14,7 @@ import {
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
+  HMSChangeMultiTrackStateRequest,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
@@ -236,6 +237,13 @@ export interface IHMSActions {
   ): Promise<void>;
 
   /**
+   * Use this to mute/unmute multipe tracks by source, role or type
+   * @param {HMSChangeMultiTrackStateRequest} params
+   */
+  setRemoteTracksEnabled(params: HMSChangeMultiTrackStateRequest): Promise<void>;
+
+  /**
+   * Method to be called with some UI interaction after autoplay error is received
    * Most browsers have limitations where an audio can not be played if there was no user interaction.
    * SDK throws an autoplay error in this case, this method can be called after an UI interaction
    * to resolve the autoplay error

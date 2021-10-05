@@ -11,6 +11,7 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  HMSChangeMultiTrackStateParams,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -33,12 +34,12 @@ import {
   selectRoomState,
   selectLocalMediaSettings,
   selectTrackByID,
+  selectTracksMap,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
-  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSException as SDKHMSException,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
@@ -48,6 +49,9 @@ import {
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
+  HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
+  HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
@@ -452,6 +456,19 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async setRemoteTracksEnabled(params: HMSChangeMultiTrackStateParams) {
+    const sdkRequest: SDKHMSChangeMultiTrackStateParams = {
+      enabled: params.enabled,
+      type: params.type,
+      source: params.source,
+    };
+    if (params.roles) {
+      const rolesMap = this.store.getState(selectRolesMap);
+      sdkRequest.roles = params.roles.map(role => rolesMap[role]);
+    }
+    await this.sdk.changeMultiTrackState(sdkRequest);
+  }
+
   setLogLevel(level: HMSLogLevel) {
     HMSLogger.level = level;
     this.sdk.setLogLevel(level);
@@ -479,6 +496,7 @@ export class HMSSDKActions implements IHMSActions {
       onRoleUpdate: this.onRoleUpdate.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
+      onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
     });
     this.sdk.addAudioListener({
@@ -788,6 +806,37 @@ export class HMSSDKActions implements IHMSActions {
       requestedBy,
       track,
       enabled: request.enabled,
+    });
+  }
+
+  protected onChangeMultiTrackStateRequest(request: SDKHMSChangeMultiTrackStateRequest) {
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
+
+    if (!requestedBy) {
+      return this.logPossibleInconsistency(
+        `Not found peer who requested track state change, ${request.requestedBy}`,
+      );
+    }
+
+    if (!request.enabled) {
+      this.syncRoomState('changeMultiTrackStateRequest');
+    }
+
+    const tracks: HMSTrack[] = [];
+    const tracksMap = this.store.getState(selectTracksMap);
+    for (const track of request.tracks) {
+      const storeTrackID = this.getStoreLocalTrackIDfromSDKTrack(track);
+      if (storeTrackID && tracksMap[storeTrackID]) {
+        tracks.push(tracksMap[storeTrackID]);
+      }
+    }
+
+    this.hmsNotifications.sendChangeMultiTrackStateRequest({
+      requestedBy,
+      tracks,
+      enabled: request.enabled,
+      type: request.type,
+      source: request.source,
     });
   }
 
