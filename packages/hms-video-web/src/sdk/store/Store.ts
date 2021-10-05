@@ -33,6 +33,8 @@ class Store implements IStore {
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
   private tracks: Record<string, HMSTrack> = {};
+  // Not used currently. Will be used exclusively for preview tracks.
+  // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
   private speakers: HMSSpeaker[] = [];
   private videoLayers: SimulcastLayers | null = null;
@@ -172,6 +174,11 @@ class Store implements IStore {
     if (peer.isLocal) this.localPeerId = peer.peerId;
   }
 
+  /**
+   * @param {HMSTrack} track the published track that has to be added
+   *
+   * Note: Only use this method to add published tracks not preview traks
+   */
   addTrack(track: HMSTrack) {
     this.tracks[track.trackId] = track;
   }
@@ -291,6 +298,7 @@ class Store implements IStore {
     for (const track of tracks) {
       track.cleanup();
     }
+    this.config = undefined;
   }
 
   setErrorListener(listener: IErrorListener) {

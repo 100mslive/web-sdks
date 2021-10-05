@@ -60,24 +60,15 @@ export default class RoleChangeManager {
     await this.removeLocalTracks(toRemove);
     this.store.setPublishParams(newRole.publishParams);
 
-    const newTracksToCreate = isPublishing
-      .filter((val) => !wasPublishing.includes(val))
-      .filter((val) => val !== 'screen');
-    const publishConfig: PublishConfig = {
-      publishAudio: newTracksToCreate.includes('audio'),
-      publishVideo: newTracksToCreate.includes('video'),
+    const initialSettings = this.store.getConfig()?.settings || {
+      isAudioMuted: true,
+      isVideoMuted: true,
+      audioInputDeviceId: 'default',
+      videoDeviceId: 'default',
+      audioOutputDeviceId: 'default',
     };
-
-    if (newTracksToCreate.length > 0) {
-      const initialSettings = this.store.getConfig()?.settings || {
-        isAudioMuted: true,
-        isVideoMuted: true,
-        audioInputDeviceId: 'default',
-        videoDeviceId: 'default',
-        audioOutputDeviceId: 'default',
-      };
-      await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true }, publishConfig);
-    }
+    // call publish with new settings, local track manager will diff policies
+    await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
 
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };

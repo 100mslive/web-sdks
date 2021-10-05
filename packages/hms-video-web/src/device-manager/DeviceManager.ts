@@ -23,6 +23,11 @@ export class DeviceManager implements HMSDeviceManager {
   audioOutput: MediaDeviceInfo[] = [];
   videoInput: MediaDeviceInfo[] = [];
   outputDevice?: MediaDeviceInfo;
+  // true if user has allowed the permission
+  // false if user has denied the permission or prompt was never shown or ignored
+  // or if the camera/mic is not available in the device
+  hasWebcamPermission = false;
+  hasMicrophonePermission = false;
 
   private eventEmitter: EventEmitter = new EventEmitter();
   private TAG: string = '[Device Manager]:';
@@ -119,11 +124,13 @@ export class DeviceManager implements HMSDeviceManager {
       this.audioOutput = [];
       this.videoInput = [];
       devices.forEach((device) => {
-        if (device.kind === 'audioinput') {
+        if (device.kind === 'audioinput' && device.label) {
+          this.hasMicrophonePermission = true;
           this.audioInput.push(device as MediaDeviceInfo);
         } else if (device.kind === 'audiooutput') {
           this.audioOutput.push(device);
-        } else if (device.kind === 'videoinput') {
+        } else if (device.kind === 'videoinput' && device.label) {
+          this.hasWebcamPermission = true;
           this.videoInput.push(device as MediaDeviceInfo);
         }
       });

@@ -75,6 +75,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
+
+    if (isEmptyTrack(this.nativeTrack)) {
+      // if it is an empty track, cache the settings for when it is unmuted
+      this.settings = newSettings;
+      return;
+    }
+
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 

@@ -72,6 +72,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
+
+    if (!this.enabled) {
+      // if track is muted, we just cache the settings for when it is unmuted
+      this.settings = newSettings;
+      return;
+    }
+
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
