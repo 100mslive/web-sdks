@@ -2,7 +2,13 @@ import * as React from 'react';
 
 function SvgAudioPlayerIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
-        <svg width={24} height={24} fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <svg
+            width="24px"
+            height="24px"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            {...props}>
             <path
                 d="M16.375 10.305l-4.09-2.324a.688.688 0 00-.688 0 .688.688 0 00-.358.618v4.655a.688.688 0 001.066.619l4.07-2.31a.687.687 0 000-1.245v-.013z"
                 fill="currentColor"

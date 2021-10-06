@@ -15,7 +15,7 @@
         "rollup-plugin-postcss": "^4.0.1"
     },
     "scripts": {
-        "svg-build": "svgr --typescript --replace-attr-values '#fff=currentColor'   -d src assets",
+        "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets",
         "build": "yarn svg-build && rollup -c"
     }
 }
