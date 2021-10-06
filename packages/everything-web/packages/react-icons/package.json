@@ -1,0 +1,21 @@
+{
+    "name": "@100mslive/react-icons",
+    "version": "0.0.0-alpha",
+    "author": "100ms",
+    "main": "build/index.js",
+    "module": "build/index.esm.js",
+    "types": "build/index.d.ts",
+    "license": "MIT",
+    "files": [
+        "build",
+        "README.md"
+    ],
+    "devDependencies": {
+        "@svgr/cli": "^5.5.0",
+        "rollup-plugin-postcss": "^4.0.1"
+    },
+    "scripts": {
+        "svg-build": "svgr --typescript --replace-attr-values '#fff=currentColor'   -d src assets",
+        "build": "yarn svg-build && rollup -c"
+    }
+}

@@ -4,7 +4,7 @@
     "main": "build/index.js",
     "module": "build/index.esm.js",
     "types": "build/src/index.d.ts",
-    "author": "Deepankar Bhade",
+    "author": "100ms",
     "license": "MIT",
     "files": [
         "build",
