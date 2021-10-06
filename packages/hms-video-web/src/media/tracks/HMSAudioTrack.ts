@@ -22,6 +22,8 @@ export class HMSAudioTrack extends HMSTrack {
     if (value < 0 || value > 100) {
       throw Error('Please pass a valid number between 0-100');
     }
+    // Don't subscribe to audio when volume is 0
+    this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }
@@ -75,7 +77,7 @@ export class HMSAudioTrack extends HMSTrack {
     // @ts-ignore
     if (this.audioElement && window.HMS?.AUDIO_SINK) {
       this.audioElement.srcObject = null;
-      this.updateLayer();
+      this.subscribeToAudio(false);
     }
   }
 
@@ -97,13 +99,12 @@ export class HMSAudioTrack extends HMSTrack {
       }
     }
     this.audioElement.srcObject = new MediaStream([this.nativeTrack]);
-    this.updateLayer();
+    this.subscribeToAudio(true);
   }
 
-  private updateLayer() {
-    //@ts-ignore
-    if (this.stream instanceof HMSRemoteStream && window.HMS?.AUDIO_SINK) {
-      this.stream.setAudio(this.enabled);
+  protected subscribeToAudio(value: boolean) {
+    if (this.stream instanceof HMSRemoteStream) {
+      this.stream.setAudio(value);
     }
   }
 }
