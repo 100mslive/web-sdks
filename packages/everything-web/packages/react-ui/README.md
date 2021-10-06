@@ -49,3 +49,23 @@ Scripts:
         "lint": "eslint src/**",
         "format": "prettier -w src/**"
 ```
+
+## Setting up WebApp
+
+```
+// .env
+
+REACT_APP_TILE_SHAPE=1-1
+REACT_APP_THEME=dark
+REACT_APP_COLOR=#2F80FF
+REACT_APP_LOGO=
+REACT_APP_FONT=Roboto
+REACT_APP_SHOW_CHAT='true'
+REACT_APP_SHOW_SCREENSHARE='true'
+REACT_APP_VIDEO_AVATAR='true'
+REACT_APP_TOKEN_GENERATION_ENDPOINT=<TOKEN-END-POINT>
+REACT_APP_ENV=prod
+REACT_APP_LOGROCKET_ID=<Your Logrocket project ID>
+SKIP_PREFLIGHT_CHECK=true
+
+```

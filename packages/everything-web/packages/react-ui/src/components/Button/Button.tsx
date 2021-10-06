@@ -1,8 +1,6 @@
-import { VariantProps } from '@stitches/react';
-import React from 'react';
 import { styled } from '../../../stitches.config';
 
-export const ButtonRoot = styled('button', {
+export const Button = styled('button', {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -62,11 +60,3 @@ export const ButtonRoot = styled('button', {
         variant: 'primary'
     }
 });
-
-export type ButtonProps = VariantProps<typeof ButtonRoot>;
-
-export const Button: React.FC<ButtonProps> = ({ variant, disabled, ...props }) => (
-    <ButtonRoot variant={variant} {...props}>
-        {props.children}
-    </ButtonRoot>
-);
