@@ -256,21 +256,20 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
-    const storedConfig = this.store.getConfig();
-
-    if (storedConfig) {
-      // preview was called
-      if (config.settings) {
-        delete config.settings.audioOutputDeviceId;
-        delete config.settings.videoDeviceId;
-        delete config.settings.audioInputDeviceId;
-      }
-    }
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
+
+    const storedConfig = this.store.getConfig();
+
+    if (storedConfig && config.settings) {
+      // preview was called
+      delete config.settings.audioOutputDeviceId;
+      delete config.settings.videoDeviceId;
+      delete config.settings.audioInputDeviceId;
+    }
 
     this.store.setErrorListener(this.errorListener);
     this.store.setConfig(config);
