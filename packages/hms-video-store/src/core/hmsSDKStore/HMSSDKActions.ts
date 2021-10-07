@@ -1119,23 +1119,24 @@ export class HMSSDKActions implements IHMSActions {
   ) => {
     console.time('trackUpdate');
     this.setState(draftStore => {
-      const draftPeer = draftStore.peers[peer.peerId];
+      let draftPeer = draftStore.peers[peer.peerId];
+      /**
+       * in preview -> leave -> join flow or join -> leave -> join flow,
+       * since peer will be cleared by leave, set peer again in the store
+       **/
+      if (!draftPeer) {
+        const hmsPeer = SDKToHMS.convertPeer(peer) as HMSPeer;
+        draftStore.peers[peer.peerId] = hmsPeer;
+        draftPeer = hmsPeer;
+      }
       const hmsTrack = SDKToHMS.convertTrack(track);
       if (action === 'trackAdded') {
-        draftStore.tracks[track.trackId] = hmsTrack;
-        if (peer.audioTrack?.trackId === track.trackId) {
-          draftPeer.audioTrack = hmsTrack.id;
-        } else if (peer.videoTrack?.trackId === track.trackId) {
-          draftPeer.videoTrack = hmsTrack.id;
-        } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
-          draftPeer.auxiliaryTracks.push(hmsTrack.id);
-        }
+        draftStore.tracks[hmsTrack.id] = hmsTrack;
+        this.updateTracksInPeer(peer, draftPeer, hmsTrack);
+      } else if (draftStore.tracks[hmsTrack.id]) {
+        Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
       } else {
-        if (draftStore.tracks[hmsTrack.id]) {
-          Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
-        } else {
-          this.logPossibleInconsistency(`track ${hmsTrack.id} not present, unable to update track`);
-        }
+        this.logPossibleInconsistency(`track ${hmsTrack.id} not present, unable to update track`);
       }
       this.hmsSDKTracks[hmsTrack.id] = track;
     }, action);
@@ -1175,6 +1176,16 @@ export class HMSSDKActions implements IHMSActions {
       peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     }
     this.hmsNotifications.sendPeerUpdate(type, peer);
+  }
+
+  private updateTracksInPeer(peer: sdkTypes.HMSPeer, draftPeer: HMSPeer, hmsTrack: HMSTrack) {
+    if (peer.audioTrack?.trackId === hmsTrack.id) {
+      draftPeer.audioTrack = hmsTrack.id;
+    } else if (peer.videoTrack?.trackId === hmsTrack.id) {
+      draftPeer.videoTrack = hmsTrack.id;
+    } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
+      draftPeer.auxiliaryTracks.push(hmsTrack.id);
+    }
   }
 
   /**
