@@ -677,6 +677,7 @@ export class HMSSDKActions implements IHMSActions {
       this.syncRoomState.bind(this),
       this.store,
     );
+    this.syncRoomState('joinSync');
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
       store.room.isConnected = true;

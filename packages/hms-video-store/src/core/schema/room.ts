@@ -1,5 +1,5 @@
-import { HMSPeerID } from './peer';
 import { HMSRecording, HMSRTMP } from '@100mslive/hms-video';
+import { HMSPeerID } from './peer';
 
 export type HMSRoomID = string;
 
