@@ -1,4 +1,6 @@
 export * from './components/Avatar'
 export * from './components/Button'
 export * from './components/IconButton'
+export * from './components/VerticalDivider'
+export * from './components/Tooltip'
 export * from '../stitches.config'

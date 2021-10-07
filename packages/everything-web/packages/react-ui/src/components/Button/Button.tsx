@@ -10,11 +10,12 @@ export const Button = styled('button', {
     fontSize: '16px',
     fontWeight: '500',
     lineHeight: '24px',
+    padding: '8px 12px',
     variants: {
         variant: {
             standard: {
                 color: '$white',
-                padding: '10px 16px',
+
                 backgroundColor: '$grey2',
                 borderRadius: '8px',
                 '&:hover': {
@@ -26,7 +27,7 @@ export const Button = styled('button', {
             },
             danger: {
                 color: '$white',
-                padding: '10px 16px',
+
                 backgroundColor: '$redMain',
                 borderRadius: '8px',
                 '&:hover': {
@@ -38,7 +39,7 @@ export const Button = styled('button', {
             },
             primary: {
                 color: '$white',
-                padding: '10px 16px',
+
                 backgroundColor: '$brandMain',
                 borderRadius: '8px',
                 '&:hover': {
