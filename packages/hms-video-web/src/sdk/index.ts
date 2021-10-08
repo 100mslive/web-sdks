@@ -323,18 +323,19 @@ export class HMSSdk implements HMSInterface {
         // if delay fix is set, call onJoin before publishing
         //@ts-ignore
         if (window.HMS?.JOIN_DELAY_FIX) {
-          this.listener?.onJoin(this.store.getRoom());
+          this.notifyJoin();
         }
         if (this.publishParams && !this.sdkState.published) {
           await this.publish(config.settings || defaultSettings);
         }
         //@ts-ignore
         if (!window.HMS?.JOIN_DELAY_FIX) {
-          this.listener?.onJoin(this.store.getRoom());
+          this.notifyJoin();
         }
       })
       .catch((error) => {
         this.listener?.onError(error as HMSException);
+        HMSLogger.e(this.TAG, 'Unable to join room', error);
       });
   }
 
@@ -760,5 +761,17 @@ export class HMSSdk implements HMSInterface {
 
   private get publishParams() {
     return this.store?.getPublishParams();
+  }
+
+  private notifyJoin() {
+    const localPeer = this.store.getLocalPeer();
+
+    if (localPeer?.role) {
+      this.listener?.onJoin(this.store.getRoom());
+    } else {
+      this.notificationManager.once('policy-change', () => {
+        this.listener?.onJoin(this.store.getRoom());
+      });
+    }
   }
 }

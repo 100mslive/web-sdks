@@ -72,6 +72,10 @@ export class NotificationManager {
     this.eventEmitter.removeListener(event, listener);
   }
 
+  once(event: string, listener: EventListener) {
+    this.eventEmitter.once(event, listener);
+  }
+
   handleNotification(message: { method: string; params: any }, isReconnecting = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
