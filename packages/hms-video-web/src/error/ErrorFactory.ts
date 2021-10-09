@@ -65,7 +65,7 @@ export const ErrorFactory = {
 
   TracksErrors: {
     GenericTrack(action: HMSAction, description: string = '') {
-      return new HMSException(3000, 'GenericTrack', action, `[PUBLISH]: Something went wrong`, description);
+      return new HMSException(3000, 'GenericTrack', action, `[TRACK]: Something went wrong`, description);
     },
 
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description: string = '') {
@@ -73,7 +73,7 @@ export const ErrorFactory = {
         3001,
         'CantAccessCaptureDevice',
         action,
-        `[PUBLISH]: No permission to access capture device - ${deviceInfo}`,
+        `[TRACK]: No permission to access capture device - ${deviceInfo}`,
         description,
       );
     },
@@ -83,7 +83,7 @@ export const ErrorFactory = {
         3002,
         'DeviceNotAvailable',
         action,
-        `[PUBLISH]: Capture device is no longer available - ${deviceInfo}`,
+        `[TRACK]: Capture device is no longer available - ${deviceInfo}`,
         description,
       );
     },
@@ -93,7 +93,7 @@ export const ErrorFactory = {
         3003,
         'DeviceInUse',
         action,
-        `[PUBLISH]: Capture device is in use by another application - ${deviceInfo}`,
+        `[TRACK]: Capture device is in use by another application - ${deviceInfo}`,
         description,
       );
     },

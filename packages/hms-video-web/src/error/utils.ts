@@ -8,12 +8,18 @@ export enum HMSGetMediaActions {
   SCREEN = 'screen',
 }
 
-export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
+/**
+ * Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
+ * we will handle this internally and throw error as User block - 3001 and OS block - 3002 for all browsers.
+ * Chrome - User blocked - NotAllowedError - Permission denied System blocked - NotAllowedError - Permission denied by system
+ */
+
+function convertMediaErrorToHMSException(err: Error, deviceInfo: string) {
   const message = err.message.toLowerCase();
 
   switch (err.name) {
     case 'OverconstrainedError':
-      return ErrorFactory.GenericErrors.Unknown(HMSAction.TRACK, err.message);
+      return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, err.message);
     case 'NotAllowedError':
       return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
     case 'NotFoundError':
@@ -28,7 +34,13 @@ export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException
       } else if (message.includes('permission denied')) {
         return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
       } else {
-        return ErrorFactory.GenericErrors.Unknown(HMSAction.TRACK, err.message);
+        return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, err.message);
       }
   }
+}
+
+export function BuildGetMediaError(err: Error, deviceInfo: string): HMSException {
+  const exception = convertMediaErrorToHMSException(err, deviceInfo);
+  exception.addNativeError(err);
+  return exception;
 }

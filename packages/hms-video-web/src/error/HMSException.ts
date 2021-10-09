@@ -3,6 +3,7 @@ import { HMSAction } from './ErrorFactory';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
   action: string;
+  nativeError?: Error;
 
   constructor(
     public readonly code: number,
@@ -27,5 +28,9 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
       action: this.action,
       is_terminal: this.isTerminal,
     };
+  }
+
+  addNativeError(error: Error) {
+    this.nativeError = error;
   }
 }
