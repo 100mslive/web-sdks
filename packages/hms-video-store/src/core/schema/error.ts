@@ -9,4 +9,5 @@ export interface HMSException {
   description: string;
   isTerminal: boolean;
   timestamp: Date;
+  nativeError?: Error;
 }

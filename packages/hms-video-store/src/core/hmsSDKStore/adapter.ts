@@ -141,6 +141,7 @@ export class SDKToHMS {
       message: sdkException.message,
       description: sdkException.description,
       isTerminal: sdkException.isTerminal,
+      nativeError: sdkException.nativeError,
       timestamp: new Date(),
     };
   }
