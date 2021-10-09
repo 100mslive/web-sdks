@@ -72,6 +72,8 @@ export const selectIsConnectedToRoom = createSelector(
   room => room && room.isConnected,
 );
 
+export const selectPeerCount = createSelector(selectRoom, room => room.peers.length);
+
 /**
  * Select an array of peers(remote peers and your local peer) present in the room.
  */
@@ -96,8 +98,8 @@ export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room,
 /**
  * Select the peer ID of your local peer.
  */
-export const selectLocalPeerID = createSelector(selectLocalPeer, peer => {
-  return peer?.id;
+export const selectLocalPeerID = createSelector(selectRoom, room => {
+  return room.localPeer;
 });
 
 /**

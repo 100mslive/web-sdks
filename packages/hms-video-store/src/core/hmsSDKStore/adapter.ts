@@ -16,6 +16,7 @@ import {
   HMSDeviceChangeEvent,
   HMSPlaylistItem,
   HMSPlaylistType,
+  HMSPeerID,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -37,13 +38,14 @@ export class SDKToHMS {
     };
   }
 
-  static convertTrack(sdkTrack: SDKHMSTrack): HMSTrack {
+  static convertTrack(sdkTrack: SDKHMSTrack, peerId?: HMSPeerID): HMSTrack {
     const track: HMSTrack = {
       id: sdkTrack.trackId,
       source: sdkTrack.source,
       type: sdkTrack.type,
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
+      peerId: sdkTrack.peerId || peerId,
     };
     this.enrichTrack(track, sdkTrack);
     return track;

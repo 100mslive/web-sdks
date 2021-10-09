@@ -47,6 +47,7 @@ export interface HMSTrack {
   enabled: boolean;
   height?: number;
   width?: number;
+  peerId?: string;
   deviceID?: string;
   plugins?: string[];
   displayEnabled?: boolean;

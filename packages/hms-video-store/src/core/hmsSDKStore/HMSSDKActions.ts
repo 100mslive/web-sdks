@@ -69,6 +69,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
+// import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -97,6 +98,7 @@ export class HMSSDKActions implements IHMSActions {
   private readonly store: IHMSStore;
   private isRoomJoinCalled: boolean = false;
   private hmsNotifications: HMSNotifications;
+  // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
 
@@ -104,6 +106,7 @@ export class HMSSDKActions implements IHMSActions {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+    // this.actionBatcher = new ActionBatcher(store);
   }
 
   async unblockAudio() {
@@ -115,13 +118,17 @@ export class HMSSDKActions implements IHMSActions {
       this.setTrackVolume(value, trackId);
     } else {
       this.sdk.getAudioOutput().setVolume(value);
-      this.syncRoomState('setVolume');
+      this.syncRoomState('setOutputVolume');
     }
   }
 
   setAudioOutputDevice(deviceId: string): void {
-    this.sdk.getAudioOutput().setDevice(deviceId);
-    this.syncRoomState('setAudioOutput');
+    const deviceInfo = this.sdk.getAudioOutput().setDevice(deviceId);
+    if (deviceInfo) {
+      this.setState(draftStore => {
+        draftStore.settings.audioOutputDeviceId = deviceId;
+      }, 'setAudioOutputDevice');
+    }
   }
 
   setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
@@ -1129,7 +1136,7 @@ export class HMSSDKActions implements IHMSActions {
         draftStore.peers[peer.peerId] = hmsPeer;
         draftPeer = hmsPeer;
       }
-      const hmsTrack = SDKToHMS.convertTrack(track);
+      const hmsTrack = SDKToHMS.convertTrack(track, peer.peerId);
       if (action === 'trackAdded') {
         draftStore.tracks[hmsTrack.id] = hmsTrack;
         this.updateTracksInPeer(peer, draftPeer, hmsTrack);
@@ -1138,9 +1145,8 @@ export class HMSSDKActions implements IHMSActions {
       } else {
         this.logPossibleInconsistency(`track ${hmsTrack.id} not present, unable to update track`);
       }
-      this.hmsSDKTracks[hmsTrack.id] = track;
+      this.hmsSDKTracks[track.trackId] = track;
     }, action);
-    console.timeEnd('trackUpdate');
   };
 
   private peerUpdateInternal(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
