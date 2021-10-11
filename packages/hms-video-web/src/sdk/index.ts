@@ -80,7 +80,7 @@ export class HMSSdk implements HMSInterface {
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
       /**
-       * Set listener after join and preview, since they have different listeners
+       * Set listener after both join and preview, since they can have different listeners
        */
       this.notificationManager.setListener(this.listener);
       return;
@@ -309,6 +309,10 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
+    if (!this.store.getRoom()) {
+      // note: store room is used to handle server notifications in join and has to be done before join process starts
+      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+    }
     this.transport
       .join(
         config.authToken,
@@ -319,7 +323,6 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
         // if delay fix is set, call onJoin before publishing
         //@ts-ignore
         if (window.HMS?.JOIN_DELAY_FIX) {

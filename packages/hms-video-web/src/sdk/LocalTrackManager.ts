@@ -70,11 +70,11 @@ export class LocalTrackManager {
     const isAudioTrackPublished = Boolean(audioTrack && this.store.getTrackById(audioTrack.trackId));
 
     if (videoTrack && trackSettings.video) {
-      videoTrack.setSettings(trackSettings.video);
+      await videoTrack.setSettings(trackSettings.video);
     }
 
     if (audioTrack && trackSettings.audio) {
-      audioTrack.setSettings(trackSettings.audio);
+      await audioTrack.setSettings(trackSettings.audio);
     }
 
     if (isVideoTrackPublished && isAudioTrackPublished) {
@@ -153,6 +153,8 @@ export class LocalTrackManager {
       }
       return tracks;
     } catch (error) {
+      // TOOD: On OverConstrained error, retry with dropping all constraints.
+      // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
       if (error instanceof HMSException) {
         analyticsEventsService
           .queue(
