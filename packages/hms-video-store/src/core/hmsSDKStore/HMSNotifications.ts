@@ -56,6 +56,15 @@ export class HMSNotifications implements IHMSNotifications {
     this.emitEvent(notification);
   }
 
+  sendPeerList(peers: HMSPeer[]) {
+    const notification = this.createNotification(
+      HMSNotificationTypes.PEER_LIST,
+      peers,
+      HMSNotificationSeverity.INFO,
+    );
+    this.emitEvent(notification);
+  }
+
   sendPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: HMSPeer | null) {
     const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
     const notificationType = PEER_NOTIFICATION_TYPES[type];
@@ -144,6 +153,7 @@ export class HMSNotifications implements IHMSNotifications {
     type: string,
     data?:
       | HMSPeer
+      | HMSPeer[]
       | HMSTrack
       | HMSMessage
       | HMSException

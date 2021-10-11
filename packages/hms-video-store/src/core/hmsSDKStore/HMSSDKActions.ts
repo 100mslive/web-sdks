@@ -717,10 +717,14 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     } else if (Array.isArray(sdkPeer)) {
       this.syncRoomState('peersJoined');
+      const hmsPeers = [];
       for (let peer of sdkPeer) {
         const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        this.hmsNotifications.sendPeerUpdate(type, hmsPeer);
+        if (hmsPeer) {
+          hmsPeers.push(hmsPeer);
+        }
       }
+      this.hmsNotifications.sendPeerList(hmsPeers);
     } else {
       this.peerUpdateInternal(type, sdkPeer);
     }

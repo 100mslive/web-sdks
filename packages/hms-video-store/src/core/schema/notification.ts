@@ -17,6 +17,7 @@ export enum HMSNotificationSeverity {
 export enum HMSNotificationTypes {
   PEER_JOINED = 'PEER_JOINED',
   PEER_LEFT = 'PEER_LEFT',
+  PEER_LIST = 'PEER_LIST',
   NEW_MESSAGE = 'NEW_MESSAGE',
   ERROR = 'ERROR',
   RECONNECTING = 'RECONNECTING',
