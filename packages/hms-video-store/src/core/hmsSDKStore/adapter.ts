@@ -1,27 +1,28 @@
 import {
-  HMSTrack as SDKHMSTrack,
-  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
+  HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSTrack as SDKHMSTrack,
 } from '@100mslive/hms-video';
 import {
-  HMSPeer,
-  HMSMessage,
-  HMSTrack,
-  HMSRoom,
-  HMSRoleChangeStoreRequest,
-  HMSException,
   HMSDeviceChangeEvent,
+  HMSException,
+  HMSMessage,
+  HMSPeer,
+  HMSPeerID,
   HMSPlaylistItem,
   HMSPlaylistType,
-  HMSPeerID,
+  HMSRole,
+  HMSRoleChangeStoreRequest,
+  HMSRoleName,
+  HMSRoom,
+  HMSTrack,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
 import { areArraysEqual } from './sdkUtils/storeMergeUtils';
-import { HMSRole, HMSRoleName } from '../schema';
 
 export class SDKToHMS {
   static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
@@ -61,10 +62,10 @@ export class SDKToHMS {
     track.width = mediaSettings.width;
     track.deviceID = mediaSettings.deviceId;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
-      const volume = sdkTrack.getVolume() || 0;
-      track.volume = volume;
+      track.volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.enrichVideoTrack(track, sdkTrack);
+    SDKToHMS.enrichPluginsDetails(track, sdkTrack);
   }
 
   static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
@@ -75,6 +76,9 @@ export class SDKToHMS {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
       }
     }
+  }
+
+  static enrichPluginsDetails(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSLocalVideoTrack || sdkTrack instanceof SDKHMSLocalAudioTrack) {
       if (!areArraysEqual(sdkTrack.getPlugins(), track.plugins)) {
         track.plugins = sdkTrack.getPlugins();

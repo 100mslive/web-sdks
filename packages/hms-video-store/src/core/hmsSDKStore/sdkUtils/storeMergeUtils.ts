@@ -44,6 +44,7 @@ export const mergeNewTracksInDraft = (
     const oldTrack = draftTracks[trackID];
     const newTrack = newTracks[trackID];
     if (isEntityUpdated(oldTrack, newTrack)) {
+      mergeTrackArrayFields(oldTrack, newTrack);
       Object.assign(oldTrack, newTrack);
     } else if (isEntityRemoved(oldTrack, newTrack)) {
       delete draftTracks[trackID];
@@ -53,13 +54,28 @@ export const mergeNewTracksInDraft = (
   }
 };
 
+/**
+ * array's are usually created with new reference, avoid that update if both arrays are same
+ */
+const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) => {
+  if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
+    newTrack.plugins = oldTrack.plugins;
+  }
+  if (
+    oldTrack.layerDefinitions &&
+    areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)
+  ) {
+    newTrack.layerDefinitions = oldTrack.layerDefinitions;
+  }
+};
+
 const isEntityUpdated = <T>(oldItem: T, newItem: T) => oldItem && newItem;
 const isEntityRemoved = <T>(oldItem: T, newItem: T) => oldItem && !newItem;
 const isEntityAdded = <T>(oldItem: T, newItem: T) => !oldItem && newItem;
 
 // eslint-disable-next-line complexity
 export const areArraysEqual = <T>(arr1: T[], arr2?: T[]): boolean => {
-  if (arr1 === arr2) {
+  if (arr1 === arr2 || (arr1.length === 0 && arr2?.length === 0)) {
     // reference check
     return true;
   }

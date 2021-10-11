@@ -731,8 +731,8 @@ export class HMSSDKActions implements IHMSActions {
     track: SDKHMSTrack,
     peer: sdkTypes.HMSPeer,
   ) {
-    // this check is needed because for track removed case, the store does not have
-    // the track info to be sent as notification
+    // this check is needed because for track removed case, the notification needs to
+    // be send before the track is removed from store
     if (type === sdkTypes.HMSTrackUpdate.TRACK_REMOVED) {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
@@ -1124,7 +1124,6 @@ export class HMSSDKActions implements IHMSActions {
     track: SDKHMSTrack,
     peer: sdkTypes.HMSPeer,
   ) => {
-    console.time('trackUpdate');
     this.setState(draftStore => {
       let draftPeer = draftStore.peers[peer.peerId];
       /**
