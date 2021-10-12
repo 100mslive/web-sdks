@@ -487,6 +487,7 @@ export class HMSSDKActions implements IHMSActions {
     }, reason);
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
+    HMSLogger.cleanUp();
   }
 
   private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
@@ -610,7 +611,7 @@ export class HMSSDKActions implements IHMSActions {
    * @protected
    */
   protected syncRoomState(action?: string) {
-    console.time('syncRoomState');
+    HMSLogger.time(`store-sync-${action}`);
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
@@ -660,7 +661,7 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp));
     }, action);
-    console.timeEnd('syncRoomState');
+    HMSLogger.timeEnd(`store-sync-${action}`);
   }
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
@@ -1128,6 +1129,7 @@ export class HMSSDKActions implements IHMSActions {
     track: SDKHMSTrack,
     peer: sdkTypes.HMSPeer,
   ) => {
+    HMSLogger.time(`${action}-${track.trackId}`);
     this.setState(draftStore => {
       let draftPeer = draftStore.peers[peer.peerId];
       /**
@@ -1150,6 +1152,7 @@ export class HMSSDKActions implements IHMSActions {
       }
       this.hmsSDKTracks[track.trackId] = track;
     }, action);
+    HMSLogger.timeEnd(`${action}-${track.trackId}`);
   };
 
   private peerUpdateInternal(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
@@ -1161,6 +1164,7 @@ export class HMSSDKActions implements IHMSActions {
     } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
       actionName = 'peerLeft';
     }
+    HMSLogger.time(`${actionName}-${sdkPeer.peerId}`);
     this.setState(draftStore => {
       if (actionName === 'peerLeft') {
         const index = draftStore.room.peers.indexOf(sdkPeer.peerId);
@@ -1180,6 +1184,7 @@ export class HMSSDKActions implements IHMSActions {
         this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
       }
     }, actionName);
+    HMSLogger.time(`${actionName}-${sdkPeer.peerId}`);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {
       peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
