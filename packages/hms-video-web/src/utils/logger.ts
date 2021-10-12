@@ -3,6 +3,8 @@ export enum HMSLogLevel {
   DEBUG,
   INFO,
   WARN,
+  TIME,
+  TIMEEND,
   ERROR,
   NONE,
 }
@@ -34,6 +36,19 @@ export default class HMSLogger {
     this.log(HMSLogLevel.ERROR, tag, ...data);
   }
 
+  static time(mark: string) {
+    this.log(HMSLogLevel.TIME, '[HMSPerformanceTiming]', mark);
+  }
+
+  static timeEnd(mark: string) {
+    this.log(HMSLogLevel.TIMEEND, '[HMSPerformanceTiming]', mark, mark);
+  }
+
+  static cleanUp() {
+    performance.clearMarks();
+    performance.clearMeasures();
+  }
+
   private static log(level: HMSLogLevel, tag: string, ...data: any[]) {
     if (this.level.valueOf() > level.valueOf()) {
       return;
@@ -58,6 +73,23 @@ export default class HMSLogger {
       }
       case HMSLogLevel.ERROR: {
         console.error(tag, ...data);
+        break;
+      }
+      case HMSLogLevel.TIME: {
+        performance.mark(data[0]);
+        break;
+      }
+      case HMSLogLevel.TIMEEND: {
+        const mark = data[0];
+        try {
+          const entry = performance.measure(mark, mark);
+          // @ts-ignore
+          this.log(HMSLogLevel.DEBUG, tag, mark, entry?.duration);
+          performance.clearMarks(mark);
+          performance.clearMeasures(mark);
+        } catch (error) {
+          this.log(HMSLogLevel.DEBUG, tag, mark, error);
+        }
         break;
       }
     }

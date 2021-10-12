@@ -313,6 +313,7 @@ export class HMSSdk implements HMSInterface {
       // note: store room is used to handle server notifications in join and has to be done before join process starts
       this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
     }
+    HMSLogger.time(`join-room-${roomId}`);
     this.transport
       .join(
         config.authToken,
@@ -339,6 +340,9 @@ export class HMSSdk implements HMSInterface {
       .catch((error) => {
         this.listener?.onError(error as HMSException);
         HMSLogger.e(this.TAG, 'Unable to join room', error);
+      })
+      .then(() => {
+        HMSLogger.timeEnd(`join-room-${roomId}`);
       });
   }
 
@@ -347,6 +351,7 @@ export class HMSSdk implements HMSInterface {
     this.cleanDeviceManagers();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
+    HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**
      * when leave is called after preview itself without join.
