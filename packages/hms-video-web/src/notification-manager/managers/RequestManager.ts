@@ -67,23 +67,29 @@ export class RequestManager {
       tracks = tracks.filter((track) => track.source === source);
     }
 
+    const tracksToBeUpdated = tracks.filter((track) => track.enabled !== value);
+    //Do nothing if all tracks are already in same state as the request
+    if (tracksToBeUpdated.length === 0) {
+      return;
+    }
     // if track is to be muted, mute and send the notification, otherwise send notification
     if (!value) {
       const promises: Promise<void>[] = [];
-      for (let track of tracks) {
+
+      for (let track of tracksToBeUpdated) {
         promises.push(track.setEnabled(value));
       }
       Promise.all(promises).then(() => {
         this.listener?.onChangeMultiTrackStateRequest({
           requestedBy: peer as HMSRemotePeer,
-          tracks,
+          tracks: tracksToBeUpdated,
           enabled: value,
         });
       });
     } else {
       this.listener?.onChangeMultiTrackStateRequest({
         requestedBy: peer as HMSRemotePeer,
-        tracks,
+        tracks: tracksToBeUpdated,
         type,
         source,
         enabled: value,
