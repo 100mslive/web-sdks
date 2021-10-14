@@ -1,6 +1,5 @@
 import { createStitches } from '@stitches/react';
-
-
+import type * as Stitches from '@stitches/core';
 
 const HmsStitches = createStitches({
     prefix: 'hms-ui',
@@ -24,10 +23,71 @@ const HmsStitches = createStitches({
         },
         fonts: {
             sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif'
-        }
-    }
+        },
+    },
+    utils: {
+        p: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingTop: value,
+          paddingBottom: value,
+          paddingLeft: value,
+          paddingRight: value,
+        }),
+        pt: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingTop: value,
+        }),
+        pr: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingRight: value,
+        }),
+        pb: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingBottom: value,
+        }),
+        pl: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingLeft: value,
+        }),
+        px: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingLeft: value,
+          paddingRight: value,
+        }),
+        py: (value: Stitches.PropertyValue<'paddingTop'>) => ({
+          paddingTop: value,
+          paddingBottom: value,
+        }),
+        m: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginTop: value,
+          marginBottom: value,
+          marginLeft: value,
+          marginRight: value,
+        }),
+        mt: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginTop: value,
+        }),
+        mr: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginRight: value,
+        }),
+        mb: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginBottom: value,
+        }),
+        ml: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginLeft: value,
+        }),
+        mx: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginLeft: value,
+          marginRight: value,
+        }),
+        my: (value: Stitches.PropertyValue<'marginTop'>) => ({
+          marginTop: value,
+          marginBottom: value,
+        }),
+        size: (value: Stitches.PropertyValue<'width'>) => ({
+          width: value,
+          height: value,
+        }),
+        bc: (value: Stitches.PropertyValue<'backgroundColor'>) => ({
+          backgroundColor: value,
+        }),
+      },
 });
 
-export const { theme, createTheme, styled, globalCss } = HmsStitches
+export const { theme, createTheme, styled, globalCss , keyframes } = HmsStitches
 
 export default HmsStitches
