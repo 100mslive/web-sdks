@@ -22,6 +22,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
 
   toAnalyticsProperties() {
     return {
+      name: this.name,
       error_code: this.code,
       error_message: this.message,
       error_description: this.description,
