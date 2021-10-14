@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogClose,
-    DialogOverlay
-} from '@radix-ui/react-dialog';
+import { Dialog } from '../Dialog';
 import { SettingIcon, CrossIcon } from '@100mslive/react-icons';
 import { Text } from '../Text';
 import { HorizontalDivider, styled } from '../..';
@@ -31,12 +25,12 @@ export const HmsSetting = () => {
         audioOutput
     } = useDevices();
     return (
-        <Dialog>
-            <Overlay />
-            <Trigger>
+        <Dialog.Root>
+            <Dialog.Overlay />
+            <Dialog.Icon>
                 <SettingIcon />
-            </Trigger>
-            <Content>
+            </Dialog.Icon>
+            <Dialog.Content>
                 <Flex type="sb">
                     <Flex>
                         <SettingIcon width={36} height={36} />{' '}
@@ -45,9 +39,9 @@ export const HmsSetting = () => {
                         </Text>
                     </Flex>
 
-                    <Close>
+                    <Dialog.Close>
                         <CrossIcon />
-                    </Close>
+                    </Dialog.Close>
                 </Flex>
                 <HorizontalDivider />
                 {showVideo ? (
@@ -99,73 +93,10 @@ export const HmsSetting = () => {
                         </Select>
                     </Fieldset>
                 ) : null}
-            </Content>
-        </Dialog>
+            </Dialog.Content>
+        </Dialog.Root>
     );
 };
-
-const Content = styled(DialogContent, {
-    color: 'White',
-    backgroundColor: '$grey1',
-    borderRadius: '8px',
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '90vw',
-    maxWidth: '450px',
-    maxHeight: '85vh',
-    padding: '20px',
-    '@media (prefers-reduced-motion: no-preference)': {
-        willChange: 'transform'
-    },
-    '&:focus': { outline: 'none' }
-});
-
-const Trigger = styled(DialogTrigger, {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontFamily: '$sans',
-    outline: 'none',
-    border: 'none',
-    padding: '4px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    backgroundColor: 'transparent',
-    color: 'White',
-    '&:focus': {
-        boxShadow: '0 0 0 3px $colors$brandTint'
-    },
-    '&:hover': {
-        backgroundColor: '$grey2'
-    }
-});
-const Close = styled(DialogClose, {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontFamily: '$sans',
-    outline: 'none',
-    border: 'none',
-    padding: '4px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    backgroundColor: 'transparent',
-    color: 'White',
-    '&:focus': {
-        boxShadow: '0 0 0 3px $colors$brandTint'
-    },
-    '&:hover': {
-        backgroundColor: '$grey2'
-    }
-});
-
-const Overlay = styled(DialogOverlay, {
-    backgroundColor: 'rgba(0, 0, 0, 0.5);',
-    position: 'fixed',
-    inset: 0
-});
 
 const Flex = styled('div', {
     display: 'flex',
