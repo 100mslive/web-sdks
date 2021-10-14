@@ -3,7 +3,7 @@ import { version } from './package.alias.json';
 
 export const parsedUserAgent = new UAParser();
 
-const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+export const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 export const isBrowser = typeof window !== 'undefined';
 

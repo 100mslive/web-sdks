@@ -41,6 +41,7 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { isNode } from '../utils/support';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -329,7 +330,7 @@ export class HMSSdk implements HMSInterface {
         if (window.HMS?.JOIN_DELAY_FIX) {
           this.notifyJoin();
         }
-        if (this.publishParams && !this.sdkState.published) {
+        if (this.publishParams && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);
         }
         //@ts-ignore

@@ -7,6 +7,7 @@ import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
 import { IFetchAVTrackOptions } from '../../transport/ITransport';
 import { SimulcastLayer } from '../../interfaces';
+import { isNode } from '../../utils/support';
 
 const TAG = 'HMSLocalStream';
 
@@ -91,7 +92,7 @@ export default class HMSLocalStream extends HMSMediaStream {
         trackEncodings.push(...simulcastLayers);
       } else {
         const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track.settings.maxBitrate) {
+        if (track.settings.maxBitrate && !isNode) {
           encodings.maxBitrate = track.settings.maxBitrate;
         }
         trackEncodings.push(encodings);
