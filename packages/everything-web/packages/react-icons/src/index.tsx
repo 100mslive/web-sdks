@@ -1,6 +1,7 @@
 export { default as AudioLevelIcon } from './AudioLevelIcon'
 export { default as AudioPlayerIcon } from './AudioPlayerIcon'
 export { default as ChatIcon } from './ChatIcon'
+export { default as CrossIcon } from './CrossIcon'
 export { default as HangUpIcon } from './HangUpIcon'
 export { default as MenuIcon } from './MenuIcon'
 export { default as MicOffIcon } from './MicOffIcon'

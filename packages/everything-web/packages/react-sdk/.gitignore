@@ -1,0 +1,12 @@
+*.log
+.DS_Store
+node_modules
+.cache
+dist
+package-lock.json
+*.tgz
+ignore
+/.idea
+storybook-static
+build
+.next
