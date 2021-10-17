@@ -7,5 +7,6 @@ export * from './components/Input';
 export * from './components/Preview';
 export * from './components/Text';
 export * from './components/HorizontalDivider';
+export * from './components/Dialog'
 export * from '../stitches.config';
 export * from './utils';
