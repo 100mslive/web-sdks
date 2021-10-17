@@ -3408,6 +3408,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@stitches/core@^1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@stitches/core/-/core-1.2.5.tgz#6dd8d1aa3d5f437cea7448498e66b2c1e9d7193e"
+  integrity sha512-E2N+Y2bKK7YS+J0kyORduGSwZMQsztYZAp3G/6Hgl2smA+Zzugwfuhc7sAYscdY3ShRf4gvHueNmO2vX+uLB4Q==
+
 "@stitches/react@^1.2.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@stitches/react/-/react-1.2.1.tgz#1e6e5877ccb0151a26f27c731e03efee55e8f7c6"

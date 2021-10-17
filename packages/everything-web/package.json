@@ -14,6 +14,7 @@
     },
     "dependencies": {
         "@100mslive/hms-video": "^0.0.209",
-        "@100mslive/hms-video-store": "^0.2.62"
+        "@100mslive/hms-video-store": "^0.2.62",
+        "@stitches/core": "^1.2.5"
     }
 }

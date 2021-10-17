@@ -12,18 +12,27 @@ export const IconButton = styled('button', {
     cursor: 'pointer',
     backgroundColor: 'transparent',
     color: 'White',
-    '&:focus': {
+    '&:focus-visible': {
         boxShadow: '0 0 0 3px $colors$brandTint'
+    },
+    '&:focus': {
+        outline: 'none'
+    },
+    '&:hover': {
+        backgroundColor: '$trans'
     },
     variants: {
         active: {
             false: {
                 backgroundColor: 'White',
-                color: 'Black'
+                color: 'Black',
+                '&:hover': {
+                    backgroundColor: 'White'
+                }
             },
             true: {
                 '&:hover': {
-                    backgroundColor: '$grey2'
+                    backgroundColor: '$trans'
                 }
             }
         }

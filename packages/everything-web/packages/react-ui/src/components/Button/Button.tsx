@@ -11,6 +11,9 @@ export const Button = styled('button', {
     fontWeight: '500',
     lineHeight: '24px',
     padding: '8px 12px',
+    '&:focus': {
+        outline: 'none'
+    },
     variants: {
         variant: {
             standard: {
@@ -21,7 +24,7 @@ export const Button = styled('button', {
                 '&:hover': {
                     backgroundColor: '$grey3'
                 },
-                '&:focus': {
+                '&:focus-visible': {
                     boxShadow: '0 0 0 3px $colors$brandTint'
                 }
             },
@@ -33,7 +36,7 @@ export const Button = styled('button', {
                 '&:hover': {
                     backgroundColor: '$redTint'
                 },
-                '&:focus': {
+                '&:focus-visible': {
                     boxShadow: '0 0 0 3px $colors$brandTint'
                 }
             },
@@ -45,7 +48,7 @@ export const Button = styled('button', {
                 '&:hover': {
                     backgroundColor: '$brandTint'
                 },
-                '&:focus': {
+                '&:focus-visible': {
                     boxShadow: '0 0 0 3px $colors$brandTint'
                 }
             }
