@@ -6,7 +6,7 @@ export default class MediaPluginsAnalyticsFactory {
   static failure(pluginName: string, error: HMSException) {
     const name = 'mediaPlugin.failed';
     const level = AnalyticsEventLevel.ERROR;
-    const properties = { pluginName: pluginName, ...error.toAnalyticsProperties() };
+    const properties = { plugin_name: pluginName, ...error.toAnalyticsProperties() };
 
     return new AnalyticsEvent({ name, level, properties });
   }
@@ -23,7 +23,7 @@ export default class MediaPluginsAnalyticsFactory {
     const name = 'mediaPlugin.stats';
     const level = AnalyticsEventLevel.INFO;
     const properties = {
-      pluginName: pluginName,
+      plugin_name: pluginName,
       duration: duration,
       load_time: loadTime,
     };
@@ -50,7 +50,7 @@ export default class MediaPluginsAnalyticsFactory {
     const name = 'mediaPlugin.stats';
     const level = AnalyticsEventLevel.INFO;
     const properties = {
-      pluginName: pluginName,
+      plugin_name: pluginName,
       duration: duration,
       load_time: loadTime,
       avg_preprocessing_time: avgPreProcessingTime,
