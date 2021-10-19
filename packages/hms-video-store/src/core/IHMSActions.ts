@@ -14,7 +14,7 @@ import {
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
-  HMSChangeMultiTrackStateRequest,
+  HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
@@ -238,9 +238,9 @@ export interface IHMSActions {
 
   /**
    * Use this to mute/unmute multipe tracks by source, role or type
-   * @param {HMSChangeMultiTrackStateRequest} params
+   * @param {HMSChangeMultiTrackStateParams} params
    */
-  setRemoteTracksEnabled(params: HMSChangeMultiTrackStateRequest): Promise<void>;
+  setRemoteTracksEnabled(params: HMSChangeMultiTrackStateParams): Promise<void>;
 
   /**
    * Method to be called with some UI interaction after autoplay error is received
