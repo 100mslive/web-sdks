@@ -33,7 +33,7 @@ export class SDKToHMS {
       isLocal: sdkPeer.isLocal,
       videoTrack: sdkPeer.videoTrack?.trackId,
       audioTrack: sdkPeer.audioTrack?.trackId,
-      auxiliaryTracks: sdkPeer.auxiliaryTracks.map(t => t.trackId),
+      auxiliaryTracks: sdkPeer.auxiliaryTracks.map(track => track.trackId),
       customerUserId: sdkPeer.customerUserId,
       customerDescription: sdkPeer.customerDescription,
     };

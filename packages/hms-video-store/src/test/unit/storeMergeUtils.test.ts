@@ -98,21 +98,21 @@ describe('peers merge is happening properly', () => {
   };
 
   test('no errors with empty peers', () => {
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, {}, {});
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expectNoReferenceChange();
     expect(draftPeers).toEqual({});
   });
 
   test('peer is deleted from draft if gone', () => {
     draftPeers[fakePeer.id] = fakePeer;
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, {}, {});
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expectNoReferenceChange();
     expect(draftPeers).toEqual({});
   });
 
   test('new peer is added to draft', () => {
     newPeers[fakePeer.id] = fakePeer;
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, newTracks, newSDKTracks);
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expectNoReferenceChange();
     expect(draftPeers).toEqual(newPeers);
   });
@@ -125,7 +125,7 @@ describe('peers merge is happening properly', () => {
     };
     draftPeers[fakePeer.id] = fakePeer;
     newPeers[clonedPeer.id] = clonedPeer;
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, newTracks, newSDKTracks);
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expectNoReferenceChange();
     expect(draftPeers[fakePeer.id]).toBe(fakePeer);
     expect(draftPeers[fakePeer.id].auxiliaryTracks).toBe(fakePeer.auxiliaryTracks);
@@ -139,7 +139,7 @@ describe('peers merge is happening properly', () => {
     fakePeer.roleName = 'random';
     draftPeers[fakePeer.id] = fakePeer;
     newPeers[clonedPeer.id] = clonedPeer;
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, newTracks, newSDKTracks);
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expectNoReferenceChange();
     expect(fakePeer.roleName).toBe('random');
     expect(clonedPeer.roleName).toBeUndefined();
@@ -159,7 +159,7 @@ describe('peers merge is happening properly', () => {
     }
     newTracks[newVideo.id] = newVideo;
     newPeers[clonedPeer.id] = clonedPeer;
-    mergeNewPeersInDraft(draftPeers as peerMap, newPeers, newTracks, newSDKTracks);
+    mergeNewPeersInDraft(draftPeers as peerMap, newPeers);
     expect(draftPeers[fakePeer.id]).toBe(fakePeer);
     expect(draftPeers[fakePeer.id].videoTrack).toBe(fakePeer.videoTrack);
     // ensure the unchanged video track id can be used to get the new sdk track

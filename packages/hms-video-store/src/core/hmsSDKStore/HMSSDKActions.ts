@@ -653,7 +653,7 @@ export class HMSSDKActions implements IHMSActions {
       const draftPeers = draftStore.peers;
       const draftTracks = draftStore.tracks;
       // the order of below statements are important as merge functions are mutating
-      mergeNewPeersInDraft(draftPeers, newHmsPeers, newHmsTracks, newHmsSDkTracks);
+      mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
@@ -712,11 +712,14 @@ export class HMSSDKActions implements IHMSActions {
     sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[],
   ) {
     if (
-      type === sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER ||
-      type === sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER
+      [
+        sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
+        sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER,
+      ].includes(type)
     ) {
       return; // ignore, high frequency update so no point of syncing peers
-    } else if (Array.isArray(sdkPeer)) {
+    }
+    if (Array.isArray(sdkPeer)) {
       this.syncRoomState('peersJoined');
       const hmsPeers = [];
       for (let peer of sdkPeer) {
@@ -726,9 +729,9 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
       this.hmsNotifications.sendPeerList(hmsPeers);
-    } else {
-      this.peerUpdateInternal(type, sdkPeer);
+      return;
     }
+    this.sendPeerUpdateNotification(type, sdkPeer);
   }
 
   protected onTrackUpdate(
@@ -744,7 +747,7 @@ export class HMSSDKActions implements IHMSActions {
     } else {
       const actionName =
         type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
-      this.syncRemoteTrackState(actionName, track, peer);
+      this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
@@ -911,22 +914,23 @@ export class HMSSDKActions implements IHMSActions {
     this.setState(draftStore => {
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
       const draftTracks = draftStore.tracks;
+      const trackId = sdkTrack.trackId;
       // find and remove the exact track from hmsPeer
-      if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.audioTrack)) {
+      if (this.isSameStoreSDKTrack(trackId, hmsPeer?.audioTrack)) {
         delete hmsPeer?.audioTrack;
-      } else if (this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.videoTrack)) {
+      } else if (this.isSameStoreSDKTrack(trackId, hmsPeer?.videoTrack)) {
         delete hmsPeer?.videoTrack;
       } else {
-        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(sdkTrack.trackId);
+        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
         if (
           auxiliaryIndex > -1 &&
-          this.isSameStoreSDKTrack(sdkTrack.trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])
+          this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])
         ) {
           hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
         }
       }
-      delete draftTracks[sdkTrack.trackId];
-      delete this.hmsSDKTracks[sdkTrack.trackId];
+      delete draftTracks[trackId];
+      delete this.hmsSDKTracks[trackId];
     }, 'trackRemoved');
   }
 
@@ -1118,45 +1122,10 @@ export class HMSSDKActions implements IHMSActions {
     }, action);
   };
 
-  /**
-   * Handle store update on remote track changes
-   * @param {string} action - 'trackAdded' | 'trackUpdate'
-   * @param {SDKHMSTrack} track - track added/updated
-   * @param {sdkTypes.HMSPeer}peer - peer on which track is added/updated
-   */
-  private syncRemoteTrackState = (
-    action: 'trackAdded' | 'trackUpdate',
-    track: SDKHMSTrack,
-    peer: sdkTypes.HMSPeer,
+  private sendPeerUpdateNotification = (
+    type: sdkTypes.HMSPeerUpdate,
+    sdkPeer: sdkTypes.HMSPeer,
   ) => {
-    HMSLogger.time(`${action}-${track.trackId}`);
-    this.setState(draftStore => {
-      let draftPeer = draftStore.peers[peer.peerId];
-      /**
-       * in preview -> leave -> join flow or join -> leave -> join flow,
-       * since peer will be cleared by leave, set peer again in the store
-       **/
-      if (!draftPeer) {
-        const hmsPeer = SDKToHMS.convertPeer(peer) as HMSPeer;
-        draftStore.peers[peer.peerId] = hmsPeer;
-        draftPeer = hmsPeer;
-      }
-      const hmsTrack = SDKToHMS.convertTrack(track, peer.peerId);
-      if (action === 'trackAdded') {
-        draftStore.tracks[hmsTrack.id] = hmsTrack;
-        this.updateTracksInPeer(peer, draftPeer, hmsTrack);
-      } else if (draftStore.tracks[hmsTrack.id]) {
-        Object.assign(draftStore.tracks[hmsTrack.id], hmsTrack);
-      } else {
-        this.logPossibleInconsistency(`track ${hmsTrack.id} not present, unable to update track`);
-      }
-      this.hmsSDKTracks[track.trackId] = track;
-    }, action);
-    HMSLogger.timeEnd(`${action}-${track.trackId}`);
-  };
-
-  private peerUpdateInternal(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
-    // store peer in case it doesn't exist later(will happen if event is peer leave)
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     let actionName = 'peerUpdate';
     if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
@@ -1164,43 +1133,13 @@ export class HMSSDKActions implements IHMSActions {
     } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
       actionName = 'peerLeft';
     }
-    HMSLogger.time(`${actionName}-${sdkPeer.peerId}`);
-    this.setState(draftStore => {
-      if (actionName === 'peerLeft') {
-        const index = draftStore.room.peers.indexOf(sdkPeer.peerId);
-        if (index > -1) {
-          draftStore.room.peers.splice(index, 1);
-        }
-        delete draftStore.peers[sdkPeer.peerId];
-        delete this.hmsSDKPeers[sdkPeer.peerId];
-      } else {
-        const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
-        if (draftStore.peers[hmsPeer.id]) {
-          Object.assign(draftStore.peers[hmsPeer.id], hmsPeer);
-        } else {
-          draftStore.peers[hmsPeer.id] = hmsPeer as HMSPeer;
-          draftStore.room.peers.push(hmsPeer.id);
-        }
-        this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
-      }
-    }, actionName);
-    HMSLogger.time(`${actionName}-${sdkPeer.peerId}`);
+    this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {
       peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     }
     this.hmsNotifications.sendPeerUpdate(type, peer);
-  }
-
-  private updateTracksInPeer(peer: sdkTypes.HMSPeer, draftPeer: HMSPeer, hmsTrack: HMSTrack) {
-    if (peer.audioTrack?.trackId === hmsTrack.id) {
-      draftPeer.audioTrack = hmsTrack.id;
-    } else if (peer.videoTrack?.trackId === hmsTrack.id) {
-      draftPeer.videoTrack = hmsTrack.id;
-    } else if (!draftPeer.auxiliaryTracks.includes(hmsTrack.id)) {
-      draftPeer.auxiliaryTracks.push(hmsTrack.id);
-    }
-  }
+  };
 
   /**
    * setState is separate so any future changes to how state change can be done from one place.

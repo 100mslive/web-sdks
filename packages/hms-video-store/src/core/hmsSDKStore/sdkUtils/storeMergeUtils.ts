@@ -1,5 +1,4 @@
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
-import { HMSTrack as SDKHMSTrack } from '@100mslive/hms-video';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes
@@ -14,8 +13,6 @@ import { HMSTrack as SDKHMSTrack } from '@100mslive/hms-video';
 export const mergeNewPeersInDraft = (
   draftPeers: Record<HMSPeerID, HMSPeer>,
   newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
-  newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>>,
-  newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack>,
 ) => {
   const peerIDs = union(Object.keys(draftPeers), Object.keys(newPeers));
   for (let peerID of peerIDs) {
@@ -25,7 +22,6 @@ export const mergeNewPeersInDraft = (
       if (areArraysEqual(oldPeer.auxiliaryTracks, newPeer.auxiliaryTracks)) {
         newPeer.auxiliaryTracks = oldPeer.auxiliaryTracks;
       }
-      handleLocalVideoReplaceTrack(oldPeer, newPeer, newHmsTracks, newHmsSDkTracks);
       Object.assign(oldPeer, newPeer);
     } else if (isEntityRemoved(oldPeer, newPeer)) {
       delete draftPeers[peerID];
@@ -100,29 +96,3 @@ const union = <T>(arr1: T[], arr2: T[]): T[] => {
   }
   return Array.from(set);
 };
-
-/**
- * on replace track, use prev video track id in peer object, this is because we
- * don't want the peer or peers object reference to change, the fact that the video
- * track is changed on mute/unmute because of replace track is abstracted
- */
-function handleLocalVideoReplaceTrack(
-  oldPeer: HMSPeer,
-  newPeer: Partial<HMSPeer>,
-  newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>>,
-  newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack>,
-) {
-  if (
-    oldPeer.isLocal &&
-    oldPeer.videoTrack &&
-    newPeer.videoTrack &&
-    oldPeer.videoTrack !== newPeer.videoTrack
-  ) {
-    newHmsSDkTracks[oldPeer.videoTrack] = newHmsSDkTracks[newPeer.videoTrack];
-    delete newHmsSDkTracks[newPeer.videoTrack];
-    newHmsTracks[oldPeer.videoTrack] = newHmsTracks[newPeer.videoTrack];
-    newHmsTracks[oldPeer.videoTrack].id = oldPeer.videoTrack;
-    delete newHmsTracks[newPeer.videoTrack];
-    newPeer.videoTrack = oldPeer.videoTrack;
-  }
-}

@@ -12,6 +12,7 @@ import {
   HMSException,
   HMSMessage,
   HMSTrack,
+  HMSTrackID,
   HMSChangeTrackStateRequest,
   HMSChangeMultiTrackStateRequest,
   HMSLeaveRoomRequest,
@@ -78,7 +79,7 @@ export class HMSNotifications implements IHMSNotifications {
     }
   }
 
-  sendTrackUpdate(type: sdkTypes.HMSTrackUpdate, trackID: string) {
+  sendTrackUpdate(type: sdkTypes.HMSTrackUpdate, trackID: HMSTrackID) {
     const hmsTrack = this.store.getState(selectTrackByID(trackID));
     const notificationType = TRACK_NOTIFICATION_TYPES[type];
     if (notificationType) {
