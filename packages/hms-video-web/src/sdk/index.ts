@@ -704,7 +704,7 @@ export class HMSSdk implements HMSInterface {
     }
     const { enabled, roles, type, source } = params;
     await this.transport?.changeMultiTrackState({
-      value: enabled,
+      value: !enabled,
       type,
       source,
       roles: roles?.map((role) => role?.name),

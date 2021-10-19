@@ -26,8 +26,6 @@ const getParamsForRole = (roleName: string) => ({
   permissions: {
     endRoom: false,
     removeOthers: false,
-    stopPresentation: false,
-    muteAll: false,
     unmute: false,
     mute: false,
     changeRole: false,

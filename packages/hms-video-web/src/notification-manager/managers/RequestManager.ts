@@ -57,6 +57,8 @@ export class RequestManager {
     if (!peer) {
       return;
     }
+    // value true means the track has to be muted
+    const enabled = !value;
     const localPeerTracks = this.store.getLocalPeerTracks();
     let tracks: HMSLocalTrack[] = localPeerTracks;
     if (type) {
@@ -67,23 +69,23 @@ export class RequestManager {
       tracks = tracks.filter((track) => track.source === source);
     }
 
-    const tracksToBeUpdated = tracks.filter((track) => track.enabled !== value);
+    const tracksToBeUpdated = tracks.filter((track) => track.enabled !== enabled);
     //Do nothing if all tracks are already in same state as the request
     if (tracksToBeUpdated.length === 0) {
       return;
     }
     // if track is to be muted, mute and send the notification, otherwise send notification
-    if (!value) {
+    if (!enabled) {
       const promises: Promise<void>[] = [];
 
       for (let track of tracksToBeUpdated) {
-        promises.push(track.setEnabled(value));
+        promises.push(track.setEnabled(false));
       }
       Promise.all(promises).then(() => {
         this.listener?.onChangeMultiTrackStateRequest({
           requestedBy: peer as HMSRemotePeer,
           tracks: tracksToBeUpdated,
-          enabled: value,
+          enabled: false,
         });
       });
     } else {
@@ -92,7 +94,7 @@ export class RequestManager {
         tracks: tracksToBeUpdated,
         type,
         source,
-        enabled: value,
+        enabled: true,
       });
     }
   }

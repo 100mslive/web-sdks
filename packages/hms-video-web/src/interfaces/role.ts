@@ -12,8 +12,6 @@ export interface HMSRole {
   permissions: {
     endRoom: boolean;
     removeOthers: boolean;
-    stopPresentation: boolean;
-    muteAll: boolean;
     unmute: boolean;
     mute: boolean;
     changeRole: boolean;
