@@ -22,8 +22,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   /**
    * @internal
+   * This is required for handling remote mute/unmute as the published track will not necessarily be same as
+   * the first track id or current native track's id.
+   * It won't be same as first track id if the native track was changed after preview started but before join happened,
+   * with device change, or mute/unmute.
+   * It won't be same as native track id, as the native track can change post join(and publish), when the nativetrack
+   * changes, replacetrack is used which doesn't involve republishing which means from server's point of view, the track id
+   * is same as what was initially published.
    */
-  initiallyPublishedTrackId: string;
+  publishedTrackId: string;
 
   constructor(
     stream: HMSLocalStream,
@@ -35,7 +42,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     stream.tracks.push(this);
     this.settings = settings;
     this.pluginsManager = new HMSVideoPluginsManager(this);
-    this.initiallyPublishedTrackId = this.trackId;
+    this.publishedTrackId = this.trackId;
+    this.setFirstTrackId(this.trackId);
   }
 
   /**

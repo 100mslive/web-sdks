@@ -28,7 +28,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   /**
    * @internal
    */
-  initiallyPublishedTrackId: string;
+  publishedTrackId: string;
 
   constructor(
     stream: HMSLocalStream,
@@ -41,7 +41,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     this.settings = settings;
     this.pluginsManager = new HMSAudioPluginsManager(this);
-    this.initiallyPublishedTrackId = this.trackId;
+    this.publishedTrackId = this.trackId;
+    this.setFirstTrackId(track.id);
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {

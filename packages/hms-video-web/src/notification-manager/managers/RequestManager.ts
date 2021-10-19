@@ -23,7 +23,7 @@ export class RequestManager {
   handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
     const { requested_by, track_id, mute } = trackUpdateRequest;
     const peer = this.store.getPeerById(requested_by);
-    const track = this.store.getLocalPeerTracks().find((track) => track.initiallyPublishedTrackId === track_id);
+    const track = this.store.getLocalPeerTracks().find((track) => track.publishedTrackId === track_id);
 
     if (!peer || peer.isLocal || !track) {
       return;

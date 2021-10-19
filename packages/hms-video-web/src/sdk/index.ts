@@ -503,6 +503,7 @@ export class HMSSdk implements HMSInterface {
     }
     await this.transport.publish(tracks);
     tracks.forEach((track) => {
+      track.peerId = this.localPeer?.peerId;
       this.localPeer?.auxiliaryTracks.push(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
     });
@@ -561,6 +562,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     await this.transport?.publish([hmsTrack]);
+    hmsTrack.peerId = this.localPeer?.peerId;
     this.localPeer?.auxiliaryTracks.push(hmsTrack);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
@@ -573,7 +575,7 @@ export class HMSSdk implements HMSInterface {
     if (trackIndex > -1) {
       const track = this.localPeer.auxiliaryTracks[trackIndex];
       await this.transport!.unpublish([track]);
-      this.localPeer!.auxiliaryTracks.splice(trackIndex, 1);
+      this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
     } else {
       HMSLogger.w(this.TAG, `No track found for ${trackId}`);
@@ -725,6 +727,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private setLocalPeerTrack(track: HMSLocalTrack) {
+    track.peerId = this.localPeer?.peerId;
     switch (track.type) {
       case HMSTrackType.AUDIO:
         this.localPeer!.audioTrack = track as HMSLocalAudioTrack;
