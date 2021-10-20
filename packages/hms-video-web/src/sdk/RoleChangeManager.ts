@@ -109,10 +109,12 @@ export default class RoleChangeManager {
     }
 
     if (localPeer.auxiliaryTracks && removeScreen) {
-      for (const track of localPeer.auxiliaryTracks)
+      const localAuxTracks = [...localPeer.auxiliaryTracks];
+      for (const track of localAuxTracks) {
         if (track.source === 'screen') {
           await this.removeAuxillaryTrack(track.trackId);
         }
+      }
     }
   }
 }

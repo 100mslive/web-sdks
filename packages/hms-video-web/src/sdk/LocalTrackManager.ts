@@ -1,11 +1,11 @@
 import { HMSAudioCodec, HMSVideoCodec, PublishParams } from '../interfaces';
 import {
-  HMSVideoTrackSettings,
-  HMSVideoTrackSettingsBuilder,
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
-  HMSTrackSettingsBuilder,
   HMSTrackSettings,
+  HMSTrackSettingsBuilder,
+  HMSVideoTrackSettings,
+  HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import InitialSettings from '../interfaces/settings';
 import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
@@ -64,6 +64,9 @@ export class LocalTrackManager {
     const audioTrack = localTracks.find((t) => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
       | HMSLocalAudioTrack
       | undefined;
+    const screenTrack = localTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
+      | HMSLocalVideoTrack
+      | undefined;
 
     // The track gets added to the store only after it is published.
     const isVideoTrackPublished = Boolean(videoTrack && this.store.getTrackById(videoTrack.trackId));
@@ -75,6 +78,10 @@ export class LocalTrackManager {
 
     if (audioTrack && trackSettings.audio) {
       await audioTrack.setSettings(trackSettings.audio);
+    }
+
+    if (screenTrack && trackSettings.screen) {
+      screenTrack.setSettings(trackSettings.screen);
     }
 
     if (isVideoTrackPublished && isAudioTrackPublished) {
@@ -271,9 +278,10 @@ export class LocalTrackManager {
   }
 
   private getTrackSettings(initialSettings: InitialSettings, publishParams: PublishParams): HMSTrackSettings | null {
-    const { audio, video, allowed } = publishParams;
+    const { audio, video, screen, allowed } = publishParams;
     const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
     const canPublishVideo = Boolean(allowed && allowed.includes('video'));
+    const canPublishScreen = Boolean(allowed && allowed.includes('screen'));
 
     if (!canPublishAudio && !canPublishVideo) {
       return null;
@@ -282,6 +290,7 @@ export class LocalTrackManager {
 
     let audioSettings: HMSAudioTrackSettings | null = null;
     let videoSettings: HMSVideoTrackSettings | null = null;
+    let screenSettings: HMSVideoTrackSettings | null = null;
     if (canPublishAudio) {
       audioSettings = new HMSAudioTrackSettingsBuilder()
         .codec(audio.codec as HMSAudioCodec)
@@ -300,7 +309,19 @@ export class LocalTrackManager {
         .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
         .build();
     }
+    if (canPublishScreen) {
+      const dimensions = this.store.getSimulcastDimensions('screen');
+      screenSettings = new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build();
+    }
 
-    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).build();
+    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
   }
 }

@@ -6,6 +6,7 @@ import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsProperti
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
   private _audio: HMSAudioTrackSettings | null = new HMSAudioTrackSettingsBuilder().build();
+  private _screen: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
   private _simulcast = false;
 
   video(video: HMSVideoTrackSettings | null) {
@@ -15,6 +16,11 @@ export class HMSTrackSettingsBuilder {
 
   audio(audio: HMSAudioTrackSettings | null) {
     this._audio = audio;
+    return this;
+  }
+
+  screen(screen: HMSVideoTrackSettings | null) {
+    this._screen = screen;
     return this;
   }
 
@@ -35,19 +41,26 @@ export class HMSTrackSettingsBuilder {
       );
     }
 
-    return new HMSTrackSettings(this._video, this._audio, this._simulcast);
+    return new HMSTrackSettings(this._video, this._audio, this._simulcast, this._screen || undefined);
   }
 }
 
 export class HMSTrackSettings implements IAnalyticsPropertiesProvider {
   readonly video: HMSVideoTrackSettings | null;
   readonly audio: HMSAudioTrackSettings | null;
+  readonly screen: HMSVideoTrackSettings | null;
   readonly simulcast: boolean;
 
-  constructor(video: HMSVideoTrackSettings | null, audio: HMSAudioTrackSettings | null, simulcast: boolean) {
+  constructor(
+    video: HMSVideoTrackSettings | null,
+    audio: HMSAudioTrackSettings | null,
+    simulcast: boolean,
+    screen: HMSVideoTrackSettings | null = null,
+  ) {
     this.video = video;
     this.audio = audio;
     this.simulcast = simulcast;
+    this.screen = screen;
   }
 
   toAnalyticsProperties() {

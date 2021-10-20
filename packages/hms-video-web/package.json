@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -53,6 +53,7 @@
     "@types/uuid": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^6.0.0",
+    "jest-canvas-mock": "^2.3.1",
     "prettier": "2.2.1",
     "size-limit": "^5.0.3",
     "tsdx": "^0.14.1",
