@@ -187,9 +187,19 @@ export class HMSAudioPluginsManager {
         //remove plugin from loop and stop analytics for it
         await this.removePlugin(plugin);
       }
-    }
-    if (this.intermediateNode && this.destinationNode) {
-      this.intermediateNode.connect(this.destinationNode);
+      try {
+        if (
+          this.intermediateNode &&
+          this.destinationNode &&
+          this.intermediateNode.context === this.destinationNode.context
+        ) {
+          this.intermediateNode.connect(this.destinationNode);
+        }
+      } catch (err) {
+        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+        //remove plugin from loop and stop analytics for it
+        await this.removePlugin(plugin);
+      }
     }
   }
 
