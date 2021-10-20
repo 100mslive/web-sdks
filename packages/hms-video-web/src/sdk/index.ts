@@ -84,6 +84,7 @@ export class HMSSdk implements HMSInterface {
        * Set listener after both join and preview, since they can have different listeners
        */
       this.notificationManager.setListener(this.listener);
+      this.audioSinkManager.setListener(this.listener);
       return;
     }
 

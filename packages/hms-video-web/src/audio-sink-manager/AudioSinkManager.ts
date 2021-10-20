@@ -7,7 +7,8 @@ import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSDeviceChangeEvent } from '../interfaces';
+import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
+import { HMSRemotePeer } from '../sdk/models/peer';
 import { isMobile } from '../utils/support';
 
 export interface AutoplayEvent {
@@ -38,6 +39,7 @@ export class AudioSinkManager {
   private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
   private audioContext?: AudioContext;
+  private listener?: HMSUpdateListener;
 
   constructor(
     private store: IStore,
@@ -50,6 +52,10 @@ export class AudioSinkManager {
     this.deviceManager.addEventListener('audio-device-change', this.handleAudioDeviceChange);
     // Initiate a Audio Context so safari will play audio on speaker instead of earpiece
     this.audioContext = new AudioContext();
+  }
+
+  setListener(listener?: HMSUpdateListener) {
+    this.listener = listener;
   }
 
   addEventListener(event: string, listener: (event: AutoplayEvent) => void) {
@@ -148,12 +154,12 @@ export class AudioSinkManager {
     }
   };
 
-  private handleTrackAdd = (event: CustomEvent<HMSAudioTrack>) => {
+  private handleTrackAdd = (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
     this.handleTrackAddAsync(event);
   };
 
-  private handleTrackAddAsync = async (event: CustomEvent<HMSAudioTrack>) => {
-    const track = event.detail;
+  private handleTrackAddAsync = async (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
+    const { track, peer } = event.detail;
 
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
@@ -170,12 +176,14 @@ export class AudioSinkManager {
       // No need to play if track is not enabled
       if (!track.enabled) {
         track.removeSink();
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
         return;
       }
       track.addSink();
     } else {
       audioEl.srcObject = new MediaStream([track.nativeTrack]);
     }
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */

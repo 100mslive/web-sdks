@@ -172,8 +172,13 @@ export class TrackManager {
           }
       }
 
-      track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-added', { detail: track });
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
+      /**
+       * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
+       * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
+       **/
+      track.type === HMSTrackType.AUDIO
+        ? this.eventEmitter.emit('track-added', { detail: { track, peer: hmsPeer } })
+        : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(track.trackId);
     });
   }
