@@ -1,3 +1,4 @@
+import adapter from 'webrtc-adapter';
 import { ErrorFactory, HMSAction } from './ErrorFactory';
 import { HMSException } from './HMSException';
 
@@ -9,13 +10,27 @@ export enum HMSGetMediaActions {
 }
 
 /**
- * Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
+ * # Edge Cases:
+ * - Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
  * we will handle this internally and throw error as User block - 3001 and OS block - 3002 for all browsers.
- * Chrome - User blocked - NotAllowedError - Permission denied System blocked - NotAllowedError - Permission denied by system
+ * Chrome -
+ * User blocked - NotAllowedError - Permission denied
+ * System blocked - NotAllowedError - Permission denied by system
  */
-
-function convertMediaErrorToHMSException(err: Error, deviceInfo: string) {
+function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSException {
   const message = err.message.toLowerCase();
+
+  /**
+   * Note: Adapter detects all chromium browsers as 'chrome'
+   */
+  if (
+    deviceInfo === 'screen' &&
+    adapter.browserDetails.browser === 'chrome' &&
+    err.name === 'NotAllowedError' &&
+    err.message.includes('denied by system')
+  ) {
+    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
+  }
 
   switch (err.name) {
     case 'OverconstrainedError':
