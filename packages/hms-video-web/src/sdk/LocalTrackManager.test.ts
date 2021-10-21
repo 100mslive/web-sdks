@@ -93,6 +93,8 @@ const mockEnumerateDevices = ({ videoInput = true, audioInput = true } = {}) =>
 const mockMediaDevices = {
   getUserMedia: mockGetUserMedia,
   enumerateDevices: mockEnumerateDevices(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
 };
 
 // @ts-ignore

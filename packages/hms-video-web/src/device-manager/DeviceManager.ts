@@ -52,7 +52,7 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
     this.initialized = true;
-    navigator.mediaDevices.ondevicechange = debounce(() => this.handleDeviceChange(), 500);
+    navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     await this.enumerateDevices();
     this.logDevices('Init');
     this.setOutputDevice();
@@ -82,7 +82,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.audioOutput = [];
     this.videoInput = [];
     this.outputDevice = undefined;
-    navigator.mediaDevices.ondevicechange = () => {};
+    navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
   }
 
   private createIdentifier(deviceInfo?: DeviceAndGroup) {
@@ -147,7 +147,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = async () => {
+  private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
     analyticsEventsService
       .queue(
@@ -163,7 +163,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.setOutputDevice(true);
     await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
-  };
+  }, 500).bind(this);
 
   /**
    * Function to get the device after device change
