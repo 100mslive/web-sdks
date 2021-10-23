@@ -32,7 +32,7 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "author": "Praveen <praveen@100ms.live>",
+  "author": "100ms <tech-common@100ms.live>",
   "module": "dist/hms-video.esm.js",
   "size-limit": [
     {
@@ -63,7 +63,7 @@
   "dependencies": {
     "events": "^3.3.0",
     "sdp-transform": "^2.14.1",
-    "ua-parser-js": "0.7.28",
+    "ua-parser-js": "^1.0.1",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0"
   },
