@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "license": "UNLICENSED",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -63,7 +63,7 @@
   "dependencies": {
     "events": "^3.3.0",
     "sdp-transform": "^2.14.1",
-    "ua-parser-js": "^0.7.28",
+    "ua-parser-js": "0.7.28",
     "uuid": "^8.3.2",
     "webrtc-adapter": "^8.0.0"
   },
