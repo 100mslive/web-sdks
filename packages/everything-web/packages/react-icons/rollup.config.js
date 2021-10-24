@@ -7,7 +7,7 @@ import { terser } from 'rollup-plugin-terser';
 
 const packageJson = require('./package.json');
 
-export default {
+const config = {
     input: 'src/index.tsx',
     output: [
         {
@@ -32,3 +32,5 @@ export default {
         terser() // minify generated es bundle
     ]
 };
+
+export default config;

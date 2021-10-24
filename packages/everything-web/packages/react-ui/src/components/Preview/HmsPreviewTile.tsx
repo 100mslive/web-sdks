@@ -1,10 +1,12 @@
 import React from 'react';
 import { useVideoTile } from '@100mslive/react-sdk';
-import { Preview } from './Preview';
-import { Avatar, IconButton, getInitials } from '@100mslive/react-ui';
 import { VideoOnIcon, VideoOffIcon, MicOnIcon, MicOffIcon } from '@100mslive/react-icons';
+import { Preview } from './Preview';
 import { HmsSetting } from './HmsSetting';
+import { Avatar, getInitials, IconButton } from '../..';
 
+// TODO: please add types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const HmsPreviewTile = ({ peer, name }: any) => {
     const { actions, videoRef, isLocal, isAudioOn, isVideoOn, audioLevel } = useVideoTile(peer);
     const initials = getInitials(name);
@@ -18,14 +20,12 @@ export const HmsPreviewTile = ({ peer, name }: any) => {
             <Preview.Controls>
                 <IconButton
                     active={isAudioOn}
-                    onClick={() => actions.setLocalAudioEnabled(!isAudioOn)}
-                >
+                    onClick={() => actions.setLocalAudioEnabled(!isAudioOn)}>
                     {isAudioOn ? <MicOnIcon /> : <MicOffIcon />}
                 </IconButton>
                 <IconButton
                     active={isVideoOn}
-                    onClick={() => actions.setLocalVideoEnabled(!isVideoOn)}
-                >
+                    onClick={() => actions.setLocalVideoEnabled(!isVideoOn)}>
                     {isVideoOn ? <VideoOnIcon /> : <VideoOffIcon />}
                 </IconButton>
             </Preview.Controls>
