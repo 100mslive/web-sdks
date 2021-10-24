@@ -58,6 +58,11 @@ export const Button = styled('button', {
                 opacity: 0.2,
                 cursor: 'not-allowed'
             }
+        },
+        icon: {
+            true: {
+                gap: '5px'
+            }
         }
     },
     defaultVariants: {

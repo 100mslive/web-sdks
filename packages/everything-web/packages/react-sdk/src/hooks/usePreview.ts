@@ -1,5 +1,4 @@
 import { isBrowser } from '@100mslive/hms-video';
-import { useHMSActions, useHMSStore } from '../';
 import {
     HMSRoomState,
     selectIsLocalAudioEnabled,
@@ -9,8 +8,9 @@ import {
     selectIsAllowedToPublish
 } from '@100mslive/hms-video-store';
 import { useState, useEffect } from 'react';
+import { useHMSActions, useHMSStore } from '..';
 
-const usePreview = (authToken: string, userName: string) => {
+export const usePreview = (authToken: string, userName: string) => {
     const [inProgress, setInProgress] = useState(false);
     const actions = useHMSActions();
     const localPeer = useHMSStore(selectLocalPeer);
@@ -42,5 +42,3 @@ const usePreview = (authToken: string, userName: string) => {
         setInProgress
     };
 };
-
-export default usePreview;

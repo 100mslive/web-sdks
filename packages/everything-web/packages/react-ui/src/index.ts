@@ -7,6 +7,11 @@ export * from './components/Input';
 export * from './components/Preview';
 export * from './components/Text';
 export * from './components/HorizontalDivider';
-export * from './components/Dialog'
+export * from './components/Dialog';
+export * from './components/Popover';
+export * from './components/Switch';
+export * from './components/Slider';
+export * from './components/Flex';
+export * from './components/Select';
 export * from '../stitches.config';
 export * from './utils';

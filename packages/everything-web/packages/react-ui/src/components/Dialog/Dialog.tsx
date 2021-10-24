@@ -41,7 +41,7 @@ const Content = styled(DialogContent, {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '90vw',
-    maxWidth: '450px',
+    maxWidth: '480px',
     maxHeight: '85vh',
     padding: '20px',
     '@media (prefers-reduced-motion: no-preference)': {
@@ -51,25 +51,7 @@ const Content = styled(DialogContent, {
     '&:focus': { outline: 'none' }
 });
 
-const Close = styled(DialogClose, {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontFamily: '$sans',
-    outline: 'none',
-    border: 'none',
-    padding: '4px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    backgroundColor: 'transparent',
-    color: 'White',
-    '&:focus': {
-        boxShadow: '0 0 0 3px $colors$brandTint'
-    },
-    '&:hover': {
-        backgroundColor: '$grey2'
-    }
-});
+const Close = styled(DialogClose, {});
 
 const Overlay = styled(DialogOverlay, {
     backgroundColor: 'rgba(0, 0, 0, 0.5);',
@@ -82,5 +64,6 @@ export const Dialog = {
     Content,
     Icon,
     Close,
-    Overlay
+    Overlay,
+    Trigger: DialogTrigger
 };

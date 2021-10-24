@@ -1,8 +1,8 @@
 import { EqualityChecker, StateSelector } from 'zustand';
 import React, { useContext } from 'react';
 import shallow from 'zustand/shallow';
-import { IHMSReactStore } from './HmsRoomProvider';
 import { HMSActions, HMSStore, HMSNotifications } from '@100mslive/hms-video-store';
+import { IHMSReactStore } from './HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
 export const hooksErrorMessage =

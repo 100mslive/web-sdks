@@ -4,8 +4,8 @@ import {
     selectPeerAudioByID,
     selectVideoTrackByPeerID
 } from '@100mslive/hms-video-store';
-import { useHMSActions, useHMSStore } from '../';
 import { useRef, useEffect } from 'react';
+import { useHMSActions, useHMSStore } from '..';
 
 interface UseVideoTileType {
     videoRef: any;
@@ -17,7 +17,7 @@ interface UseVideoTileType {
     audioLevel: boolean;
 }
 
-const useVideoTile = (peer: any): UseVideoTileType => {
+export const useVideoTile = (peer: any): UseVideoTileType => {
     const actions = useHMSActions();
     const videoRef = useRef(null);
     const videoTrack = useHMSStore(selectVideoTrackByPeerID(peer.id));
@@ -44,5 +44,3 @@ const useVideoTile = (peer: any): UseVideoTileType => {
         audioLevel
     };
 };
-
-export default useVideoTile;

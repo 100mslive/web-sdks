@@ -2,6 +2,8 @@ import React from 'react';
 import { Dialog } from '../Dialog';
 import { SettingIcon, CrossIcon } from '@100mslive/react-icons';
 import { Text } from '../Text';
+import { IconButton } from '../IconButton';
+import { Select } from '../Select';
 import { HorizontalDivider, styled } from '../..';
 import { useDevices } from '@100mslive/react-sdk';
 
@@ -27,9 +29,11 @@ export const HmsSetting = () => {
     return (
         <Dialog.Root>
             <Dialog.Overlay />
-            <Dialog.Icon>
-                <SettingIcon />
-            </Dialog.Icon>
+            <Dialog.Trigger asChild>
+                <IconButton>
+                    <SettingIcon />
+                </IconButton>
+            </Dialog.Trigger>
             <Dialog.Content>
                 <Flex type="sb">
                     <Flex>
@@ -39,8 +43,10 @@ export const HmsSetting = () => {
                         </Text>
                     </Flex>
 
-                    <Dialog.Close>
-                        <CrossIcon />
+                    <Dialog.Close asChild>
+                        <IconButton>
+                            <CrossIcon />
+                        </IconButton>
                     </Dialog.Close>
                 </Flex>
                 <HorizontalDivider />
@@ -49,9 +55,10 @@ export const HmsSetting = () => {
                         <Label>Camera:</Label>
                         {videoInput.length > 0 ? (
                             <Select
-                                name="videoInputDeviceId"
+                                // @ts-ignore
                                 onChange={handleInputChange}
-                                value={selectedDevices.videoInputDeviceId}>
+                                value={selectedDevices.videoInputDeviceId}
+                            >
                                 {videoInput.map((device: MediaDeviceInfo) => (
                                     <option value={device.deviceId} key={device.deviceId}>
                                         {device.label}
@@ -66,9 +73,10 @@ export const HmsSetting = () => {
                         <Label>Camera:</Label>
                         {videoInput.length > 0 ? (
                             <Select
-                                name="audioInputDeviceId"
+                                // @ts-ignore
                                 onChange={handleInputChange}
-                                value={selectedDevices.audioInputDeviceId}>
+                                value={selectedDevices.audioInputDeviceId}
+                            >
                                 {audioInput.map((device: MediaDeviceInfo) => (
                                     <option value={device.deviceId} key={device.deviceId}>
                                         {device.label}
@@ -82,9 +90,10 @@ export const HmsSetting = () => {
                     <Fieldset>
                         <Label>Speaker:</Label>
                         <Select
-                            name="audioOutputDeviceId"
+                            // @ts-ignore
                             onChange={handleInputChange}
-                            value={selectedDevices.audioOutputDeviceId}>
+                            value={selectedDevices.audioOutputDeviceId}
+                        >
                             {audioOutput.map((device: MediaDeviceInfo) => (
                                 <option value={device.deviceId} key={device.deviceId}>
                                     {device.label}
@@ -124,16 +133,4 @@ const Label = styled('label', {
     display: 'flex',
     width: '33.3333%',
     justifyContent: 'flex-end'
-});
-
-const Select = styled('select', {
-    display: 'flex',
-    width: '67%',
-    justifyContent: 'flex-start',
-    border: 'none',
-    padding: '8px 12px',
-    backgroundColor: '$grey2',
-    borderRadius: '8px',
-    outline: 'none',
-    color: 'White'
 });

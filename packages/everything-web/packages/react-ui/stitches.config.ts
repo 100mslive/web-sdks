@@ -20,7 +20,8 @@ const HmsStitches = createStitches({
             grey5: '#C7C7C7',
             grey6: '#E3E3E3',
             grey7: '#F2F2F2',
-            trans: 'rgba(255, 255, 255, 0.25)'
+            trans: 'rgba(255, 255, 255, 0.25)',
+            cool2: '#303740',
         },
         fonts: {
             sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif'

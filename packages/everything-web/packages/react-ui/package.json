@@ -66,6 +66,7 @@
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "lint": "eslint src/**",
+        "lint-fix": "eslint src/** --fix",
         "format": "prettier -w src/**",
         "package": "yarn clear && yarn build",
         "publish": "yarn clear && yarn build && npm publish --access public "

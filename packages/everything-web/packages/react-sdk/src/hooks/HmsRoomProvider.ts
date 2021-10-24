@@ -36,8 +36,8 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
     if (!providerProps) {
         if (actions && store) {
             providerProps = {
-                actions: actions,
-                store: store
+                actions,
+                store
             };
             if (notifications) {
                 providerProps.notifications = notifications;
