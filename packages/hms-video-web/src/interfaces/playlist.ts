@@ -76,4 +76,10 @@ export interface HMSPlaylistManager {
   onNewTrackStart<T>(fn: (item: HMSPlaylistItem<T>) => void): void;
 
   onPlaylistEnded(fn: (type: HMSPlaylistType) => void): void;
+  onCurrentTrackEnded<T>(fn: (item: HMSPlaylistItem<T>) => void): void;
+  /**
+   * Function to autoplay status i.e. whether next item in playlist after the current one ends
+   * @param {boolean} autoplay
+   */
+  setIsAutoplayOn(type: HMSPlaylistType, autoplay: boolean): void;
 }

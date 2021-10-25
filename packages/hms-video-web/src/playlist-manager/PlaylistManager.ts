@@ -10,10 +10,12 @@ type PlaylistManagerState<T> = {
   audio: {
     list: HMSPlaylistItem<T>[];
     currentIndex: number;
+    isAutoplayOn: boolean;
   };
   video: {
     list: HMSPlaylistItem<T>[];
     currentIndex: number;
+    isAutoplayOn: boolean;
   };
 };
 
@@ -21,15 +23,21 @@ const INITIAL_STATE: PlaylistManagerState<any> = {
   audio: {
     list: [],
     currentIndex: -1,
+    isAutoplayOn: true,
   },
   video: {
     list: [],
     currentIndex: -1,
+    isAutoplayOn: true,
   },
 };
 
 export class PlaylistManager
-  extends TypedEventEmitter<{ newTrackStart: HMSPlaylistItem<any>; playlistEnded: HMSPlaylistType }>
+  extends TypedEventEmitter<{
+    newTrackStart: HMSPlaylistItem<any>;
+    playlistEnded: HMSPlaylistType;
+    currentTrackEnded: HMSPlaylistItem<any>;
+  }>
   implements HMSPlaylistManager {
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
@@ -144,6 +152,10 @@ export class PlaylistManager
     return !!element && !element.paused;
   }
 
+  setIsAutoplayOn(type: HMSPlaylistType = HMSPlaylistType.audio, autoplay: boolean) {
+    this.state[type].isAutoplayOn = autoplay;
+  }
+
   async setEnabled(
     enabled: boolean,
     { id, type = HMSPlaylistType.audio }: { id: string; type: HMSPlaylistType },
@@ -228,6 +240,10 @@ export class PlaylistManager
     this.on('playlistEnded', fn);
   }
 
+  onCurrentTrackEnded<T>(fn: (item: HMSPlaylistItem<T>) => void) {
+    this.on('currentTrackEnded', fn);
+  }
+
   private getElement(type: HMSPlaylistType = HMSPlaylistType.audio) {
     return type === HMSPlaylistType.audio ? this.audioManager.getElement() : this.videoManager.getElement();
   }
@@ -291,13 +307,19 @@ export class PlaylistManager
    * @param {HMSPlaylistType} type
    */
   private async handleEnded(type: HMSPlaylistType = HMSPlaylistType.audio) {
-    const { list, currentIndex } = this.state[type];
+    const { list, currentIndex, isAutoplayOn } = this.state[type];
     if (currentIndex === list.length - 1) {
       await this.stop(type);
       this.emit('playlistEnded', type);
     } else {
-      this.playNext(type);
+      if (isAutoplayOn) {
+        this.playNext(type);
+      } else {
+        // when autoplay not allowed, pause the media element
+        await this.pause(list[currentIndex].url, type);
+      }
     }
+    this.emit('currentTrackEnded', list[currentIndex]);
   }
 
   private addTrack = async (track: MediaStreamTrack, source: string) => {
