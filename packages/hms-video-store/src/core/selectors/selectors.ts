@@ -8,6 +8,8 @@ import {
   isVideoPlaylist,
   isTrackDisplayEnabled,
   isTrackEnabled,
+  isAudioPlaylist,
+  isVideo,
 } from './selectorUtils';
 
 /**
@@ -279,11 +281,24 @@ export const selectPeerSharingVideoPlaylist = createSelector(
   selectPeersMap,
   selectTracksMap,
   (peersMap, tracksMap) => {
-    for (const peerID in peersMap) {
-      const peer = peersMap[peerID];
-      const { video } = getPeerTracksByCondition(tracksMap, peer, isVideoPlaylist);
-      if (video) {
-        return peer;
+    for (const trackId in tracksMap) {
+      const track = tracksMap[trackId];
+      if (isVideoPlaylist(track) && isVideo(track) && track.peerId) {
+        return peersMap[track.peerId];
+      }
+    }
+    return undefined;
+  },
+);
+
+export const selectPeerSharingAudioPlaylist = createSelector(
+  selectPeersMap,
+  selectTracksMap,
+  (peersMap, tracksMap) => {
+    for (const trackId in tracksMap) {
+      const track = tracksMap[trackId];
+      if (isAudioPlaylist(track) && track.peerId) {
+        return peersMap[track.peerId];
       }
     }
     return undefined;

@@ -16,6 +16,7 @@ function makeTrack(
   id: HMSTrackID,
   type: HMSTrackType,
   source: HMSTrackSource,
+  peerId: string,
   enabled?: boolean,
 ): HMSTrack {
   return {
@@ -26,6 +27,7 @@ function makeTrack(
     displayEnabled: true,
     volume: type === 'audio' ? 10 : undefined,
     layer: type === 'video' ? HMSSimulcastLayer.HIGH : undefined,
+    peerId: peerId,
   };
 }
 
@@ -94,13 +96,13 @@ export const makeFakeStore = (): HMSStore => {
       },
     },
     tracks: {
-      '101': makeTrack('101', 'video', 'regular'),
-      '102': makeTrack('102', 'audio', 'regular'),
-      '103': makeTrack('103', 'video', 'regular'),
-      '104': makeTrack('104', 'audio', 'regular'),
-      '105': makeTrack('105', 'video', 'screen'),
-      '106': makeTrack('106', 'audio', 'regular'),
-      '107': makeTrack('107', 'audio', 'screen'),
+      '101': makeTrack('101', 'video', 'regular', '1'),
+      '102': makeTrack('102', 'audio', 'regular', '1'),
+      '103': makeTrack('103', 'video', 'regular', '2'),
+      '104': makeTrack('104', 'audio', 'regular', '2'),
+      '105': makeTrack('105', 'video', 'screen', '2'),
+      '106': makeTrack('106', 'audio', 'regular', '2'),
+      '107': makeTrack('107', 'audio', 'screen', '2'),
     },
     playlist: {
       audio: {
