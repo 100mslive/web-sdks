@@ -60,12 +60,20 @@ export class SDKToHMS {
     }
     track.height = mediaSettings.height;
     track.width = mediaSettings.width;
-    track.deviceID = mediaSettings.deviceId;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
       track.volume = sdkTrack.getVolume() || 0;
     }
+    SDKToHMS.updateDeviceID(track, sdkTrack);
     SDKToHMS.enrichVideoTrack(track, sdkTrack);
     SDKToHMS.enrichPluginsDetails(track, sdkTrack);
+  }
+
+  static updateDeviceID(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack || sdkTrack instanceof SDKHMSLocalAudioTrack) {
+      track.deviceID = sdkTrack.settings.deviceId;
+    } else {
+      track.deviceID = sdkTrack.getMediaTrackSettings()?.deviceId;
+    }
   }
 
   static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
