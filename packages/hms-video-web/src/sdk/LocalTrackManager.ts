@@ -8,7 +8,7 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import InitialSettings from '../interfaces/settings';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
 import { IStore } from './store';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
 import HMSLogger from '../utils/logger';
@@ -20,8 +20,6 @@ import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
-
-export type HMSLocalTrack = HMSLocalAudioTrack | HMSLocalVideoTrack;
 
 const defaultSettings = {
   isAudioMuted: false,

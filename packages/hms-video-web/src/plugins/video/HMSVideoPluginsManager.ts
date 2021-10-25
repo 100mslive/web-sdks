@@ -340,7 +340,7 @@ export class HMSVideoPluginsManager {
     const srcObject = this.inputVideo.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
       const existingTrackID = srcObject.getVideoTracks()[0]?.id;
-      if (existingTrackID === this.hmsTrack.trackId) {
+      if (existingTrackID === this.hmsTrack.nativeTrack.id) {
         // it's already attached
         return;
       }

@@ -1,5 +1,5 @@
 import HMSMediaStream from './HMSMediaStream';
-import { HMSLocalTrack, HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../tracks';
+import { HMSLocalTrack, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
 import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
@@ -84,7 +84,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     return tracks;
   }
 
-  addTransceiver(track: HMSTrack, simulcastLayers: SimulcastLayer[]) {
+  addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     let trackEncodings: RTCRtpEncodingParameters[] = [];
     if (track instanceof HMSLocalVideoTrack) {
       if (simulcastLayers.length > 0) {
@@ -108,7 +108,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSTrack): Promise<void> {
+  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack): Promise<void> {
     await this.connection?.setMaxBitrate(maxBitrate, track);
   }
 
@@ -170,7 +170,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     }
   }
 
-  trackUpdate(track: HMSTrack) {
+  trackUpdate(track: HMSLocalTrack) {
     this.connection?.trackUpdate(track);
   }
 

@@ -42,7 +42,7 @@ export abstract class HMSTrack {
   }
 
   /**
-   * initialTrackId => encapsulates change in local track ids
+   * firstTrackId => encapsulates change in local track ids
    * sdpTrackId => fixes remote track updates correlation on firefox
    */
   public get trackId(): string {

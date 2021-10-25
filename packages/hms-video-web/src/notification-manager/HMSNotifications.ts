@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
 import { Track } from '../signal/interfaces';
+import { HMSLocalTrack } from '../media/tracks';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -33,6 +34,9 @@ export interface PolicyParams {
   };
 }
 
+/**
+ * This is in a format biz sends/received the track metadata
+ */
 export class TrackState implements Track {
   mute: boolean;
   type: 'audio' | 'video';
@@ -41,13 +45,13 @@ export class TrackState implements Track {
   track_id: string;
   stream_id: string;
 
-  constructor(track: HMSTrack | Track) {
+  constructor(track: HMSLocalTrack | Track) {
     this.type = track.type;
     this.source = track.source || 'regular';
     this.description = '';
     if (track instanceof HMSTrack) {
       this.mute = !track.enabled;
-      this.track_id = track.trackId;
+      this.track_id = track.publishedTrackId;
       this.stream_id = track.stream.id;
     } else {
       this.mute = track.mute;

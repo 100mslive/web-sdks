@@ -1,5 +1,8 @@
 import { HMSTrackSource } from '../../media/tracks';
 
+/**
+ * interface for track server sends/receives
+ */
 export interface Track {
   mute: boolean;
   type: 'audio' | 'video';

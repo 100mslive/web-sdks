@@ -7,6 +7,9 @@ import {
   ChangeTrackMuteStateNotification,
 } from '../HMSNotifications';
 
+/**
+ * Handles request from remote peers to change something on the local side. For eg. role change, track mute/unmute.
+ */
 export class RequestManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 

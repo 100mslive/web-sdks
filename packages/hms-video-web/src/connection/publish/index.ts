@@ -4,8 +4,8 @@ import { IPublishConnectionObserver } from './IPublishConnectionObserver';
 import { HMSConnectionRole } from '../model';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import { HMSTrack } from '../../media/tracks/HMSTrack';
 import HMSTransport from '../../transport';
+import { HMSLocalTrack } from '../../media/tracks';
 
 const TAG = 'HMSPublishConnection';
 
@@ -52,7 +52,7 @@ export default class HMSPublishConnection extends HMSConnection {
     };
   }
 
-  trackUpdate(track: HMSTrack) {
+  trackUpdate(track: HMSLocalTrack) {
     this.transport.trackUpdate(track);
   }
 }

@@ -454,7 +454,11 @@ export default class HMSTransport implements ITransport {
     await this.signal.broadcast(message);
   }
 
-  trackUpdate(track: HMSTrack) {
+  /**
+   * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
+   * source. The hack won't work if there are multiple tracks with same source and type.
+   */
+  trackUpdate(track: HMSLocalTrack) {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
       (trackState) => track.type === trackState.type && track.source === trackState.source,
@@ -518,9 +522,9 @@ export default class HMSTransport implements ITransport {
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
-    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}`, track);
-    this.trackStates.set(track.trackId, new TrackState(track));
-    track.publishedTrackId = track.trackId;
+    track.publishedTrackId = track.nativeTrack.id;
+    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
+    this.trackStates.set(track.publishedTrackId, new TrackState(track));
 
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -555,8 +559,8 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    if (this.trackStates.has(track.trackId)) {
-      this.trackStates.delete(track.trackId);
+    if (this.trackStates.has(track.publishedTrackId)) {
+      this.trackStates.delete(track.publishedTrackId);
     } else {
       // TODO: hotfix to unpublish replaced video track id, solve it properly
       // it won't work when there are multiple regular video tracks, hmslocalvideotrack can store
@@ -597,7 +601,7 @@ export default class HMSTransport implements ITransport {
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-      const offer = await this.publishConnection!.createOffer(constraints, []);
+      const offer = await this.publishConnection!.createOffer(constraints, new Map());
       await this.publishConnection!.setLocalDescription(offer);
       const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo);
       await this.publishConnection!.setRemoteDescription(answer);
@@ -622,7 +626,9 @@ export default class HMSTransport implements ITransport {
     try {
       const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
       await this.publishConnection!.setLocalDescription(offer);
+      HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
+      HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       await this.publishConnection!.setRemoteDescription(answer);
       callback!.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);

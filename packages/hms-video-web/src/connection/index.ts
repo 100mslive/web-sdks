@@ -1,9 +1,10 @@
 import { HMSConnectionRole } from './model';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
-import { HMSTrack } from '../media/tracks';
+import { HMSLocalTrack } from '../media/tracks';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { TrackState } from '../notification-manager';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -44,7 +45,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  async createOffer(options: RTCOfferOptions | undefined = undefined, tracks: any): Promise<RTCSessionDescriptionInit> {
+  async createOffer(
+    options: RTCOfferOptions | undefined = undefined,
+    tracks: Map<string, TrackState>,
+  ): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
@@ -99,8 +103,8 @@ export default abstract class HMSConnection {
     this.nativeConnection.removeTrack(sender);
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSTrack) {
-    const sender = this.getSenders().find((s) => s?.track?.id === track.trackId);
+  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
+    const sender = this.getSenders().find((s) => s?.track?.id === track.getTrackIDBeingSent());
 
     if (sender) {
       const params = sender.getParameters();
@@ -108,6 +112,11 @@ export default abstract class HMSConnection {
         params.encodings[0].maxBitrate = maxBitrate * 1000;
       }
       await sender.setParameters(params);
+    } else {
+      HMSLogger.w(
+        TAG,
+        `no sender found to setMaxBitrate for track - ${track.trackId}, sentTrackId - ${track.getTrackIDBeingSent()}`,
+      );
     }
   }
 
