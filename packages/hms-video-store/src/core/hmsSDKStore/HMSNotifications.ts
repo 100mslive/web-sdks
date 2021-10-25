@@ -17,6 +17,7 @@ import {
   HMSChangeMultiTrackStateRequest,
   HMSLeaveRoomRequest,
   HMSDeviceChangeEvent,
+  HMSPlaylistItem,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -36,6 +37,15 @@ export class HMSNotifications implements IHMSNotifications {
       this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, cb);
     };
   };
+
+  sendPlaylistTrackEnded<T>(item: HMSPlaylistItem<T>): void {
+    const notification = this.createNotification(
+      HMSNotificationTypes.PLAYLIST_TRACK_ENDED,
+      item,
+      HMSNotificationSeverity.INFO,
+    );
+    this.emitEvent(notification);
+  }
 
   sendDeviceChange(request: HMSDeviceChangeEvent) {
     const notification = this.createNotification(
@@ -150,7 +160,7 @@ export class HMSNotifications implements IHMSNotifications {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
 
-  private createNotification(
+  private createNotification<T>(
     type: string,
     data?:
       | HMSPeer
@@ -162,6 +172,7 @@ export class HMSNotifications implements IHMSNotifications {
       | HMSChangeMultiTrackStateRequest
       | HMSLeaveRoomRequest
       | HMSDeviceChangeEvent
+      | HMSPlaylistItem<T>
       | null,
     severity?: HMSNotificationSeverity,
     message: string = '',

@@ -673,14 +673,15 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
+    const playlistManager = this.sdk.getPlaylistManager();
     this.audioPlaylist = new HMSPlaylist(
-      this.sdk.getPlaylistManager(),
+      playlistManager,
       HMSPlaylistType.audio,
       this.syncPlaylistState.bind(this),
       this.store,
     );
     this.videoPlaylist = new HMSPlaylist(
-      this.sdk.getPlaylistManager(),
+      playlistManager,
       HMSPlaylistType.video,
       this.syncRoomState.bind(this),
       this.store,
@@ -691,12 +692,18 @@ export class HMSSDKActions implements IHMSActions {
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
-    this.sdk.getPlaylistManager().onProgress(this.setProgress);
-    this.sdk.getPlaylistManager().onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
+    playlistManager.onProgress(this.setProgress);
+    playlistManager.onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
       this.syncPlaylistState(`${item.type}PlaylistUpdate`);
     });
-    this.sdk.getPlaylistManager().onPlaylistEnded((type: HMSPlaylistType) => {
+    playlistManager.onPlaylistEnded((type: HMSPlaylistType) => {
       this.syncPlaylistState(`${type}PlaylistEnded`);
+    });
+    playlistManager.onCurrentTrackEnded((item: sdkTypes.HMSPlaylistItem<any>) => {
+      this.hmsNotifications.sendPlaylistTrackEnded(
+        SDKToHMS.convertPlaylistItem(playlistManager, item),
+      );
+      this.syncPlaylistState(`${item.type}PlaylistItemEnded`);
     });
   }
 

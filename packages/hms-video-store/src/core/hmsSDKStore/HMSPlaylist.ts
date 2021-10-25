@@ -66,4 +66,8 @@ export class HMSPlaylist implements IHMSPlaylistActions {
     await this.playlistManager.stop(this.type);
     this.syncPlaylistState(`stop${this.type}Playlist`);
   }
+
+  setIsAutoplayOn(autoplay: boolean) {
+    this.playlistManager.setIsAutoplayOn(this.type, autoplay);
+  }
 }

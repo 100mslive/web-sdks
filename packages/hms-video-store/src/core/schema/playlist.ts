@@ -80,6 +80,11 @@ export interface IHMSPlaylistActions {
    * Stop the current playback and remove the tracks
    */
   stop(): Promise<void>;
+  /**
+   * set whether to autoplay next item in playlist after the current one ends
+   * @param {boolean} autoplay
+   */
+  setIsAutoplayOn(autoplay: boolean): void;
 }
 
 export interface HMSPlaylistSelector {

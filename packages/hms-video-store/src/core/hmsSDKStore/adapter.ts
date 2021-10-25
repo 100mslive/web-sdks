@@ -178,6 +178,23 @@ export class SDKToHMS {
     return { audio: audioPlaylist, video: videoPlaylist };
   }
 
+  static convertPlaylistItem<T>(
+    playlistManager: sdkTypes.HMSPlaylistManager,
+    playlistItem: sdkTypes.HMSPlaylistItem<T>,
+  ): HMSPlaylistItem<T> {
+    const type = playlistItem.type;
+    const currentSelection = playlistManager.getCurrentSelection(type);
+    const isPlaying = playlistManager.isPlaying(type);
+    const isSelected = playlistItem.url === currentSelection?.url;
+
+    return {
+      ...playlistItem,
+      type: playlistItem.type as HMSPlaylistType,
+      selected: isSelected,
+      playing: isSelected && isPlaying,
+    };
+  }
+
   private static getConvertedPlaylistType(
     playlistManager: sdkTypes.HMSPlaylistManager,
     type: HMSPlaylistType,
@@ -185,19 +202,15 @@ export class SDKToHMS {
     const convertedPlaylist: Record<string, HMSPlaylistItem<any>> = {};
     const currentSelection = playlistManager.getCurrentSelection(type);
     const progress = playlistManager.getCurrentProgress(type);
-    const isPlaying = playlistManager.isPlaying(type);
     const volume = playlistManager.getVolume(type);
     const list = playlistManager.getList(type);
     const currentIndex = playlistManager.getCurrentIndex(type);
 
     playlistManager.getList(type).forEach(playlistItem => {
-      const isSelected = playlistItem.url === currentSelection?.url;
-      convertedPlaylist[playlistItem.id] = {
-        ...playlistItem,
-        type: playlistItem.type as HMSPlaylistType,
-        selected: isSelected,
-        playing: isSelected && isPlaying,
-      };
+      convertedPlaylist[playlistItem.id] = SDKToHMS.convertPlaylistItem(
+        playlistManager,
+        playlistItem,
+      );
     });
     return {
       list: convertedPlaylist,
