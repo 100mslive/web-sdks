@@ -94,6 +94,9 @@ export class PeerListManager {
           peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peer_id },
           tracks: newPeerNotification.tracks,
         });
+
+        // Update peer's role locally, new role is received from the reconnect peer-list
+        this.peerManager.handlePeerUpdate(newPeerNotification);
       } else {
         // New peer joined while reconnecting
         this.peerManager.handlePeerJoin(newPeerNotification);
