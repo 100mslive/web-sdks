@@ -41,6 +41,7 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { UpdatePeerMetadataConfig } from '../interfaces/update-peer-metadata-config';
 import { isNode } from '../utils/support';
 
 // @DISCUSS: Adding it here as a hotfix
@@ -664,6 +665,16 @@ export class HMSSdk implements HMSInterface {
     if (rtmp?.running) {
       this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
     }
+  }
+
+  async updatePeerMetadata(params: UpdatePeerMetadataConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot update peer metadata.',
+      );
+    }
+    await this.transport?.updatePeerMetadata(params);
   }
 
   getRoles(): HMSRole[] {

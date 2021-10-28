@@ -41,6 +41,7 @@ import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../sign
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { UpdatePeerMetadataConfig } from '../interfaces/update-peer-metadata-config';
 
 const TAG = '[HMSTransport]:';
 
@@ -511,6 +512,13 @@ export default class HMSTransport implements ITransport {
 
   async stopRTMPOrRecording() {
     await this.signal.stopRTMPAndRecording();
+  }
+
+  async updatePeerMetadata(params: UpdatePeerMetadataConfig) {
+    await this.signal.updatePeerMetadata({
+      name: params.name,
+      data: params.data ? JSON.stringify(params.data) : undefined,
+    });
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

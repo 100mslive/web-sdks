@@ -15,3 +15,4 @@ export * from './device-change-event';
 export * from './playlist';
 export * from './hms';
 export * from './rtmp-recording-config';
+export * from './update-peer-metadata-config';
