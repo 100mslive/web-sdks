@@ -35,7 +35,6 @@ export enum HMSSignalMethod {
   CHANGE_TRACK_MUTE_STATE_REQUEST = 'change-track-mute-state-request',
   START_RTMP_OR_RECORDING_REQUEST = 'rtmp-start',
   STOP_RTMP_AND_RECORDING_REQUEST = 'rtmp-stop',
-  UPDATE_PEER_METADATA = 'peer-update',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

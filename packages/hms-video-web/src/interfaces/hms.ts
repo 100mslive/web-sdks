@@ -12,7 +12,6 @@ import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { UpdatePeerMetadataConfig } from './update-peer-metadata-config';
 import { HMSRecording, HMSRTMP } from './room';
 
 export default interface HMS {
@@ -37,7 +36,6 @@ export default interface HMS {
   stopRTMPAndRecording(): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
-  updatePeerMetadata(params: UpdatePeerMetadataConfig): Promise<void>;
 
   /**
    * @deprecated The method should not be used

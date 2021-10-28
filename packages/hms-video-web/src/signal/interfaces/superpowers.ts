@@ -41,8 +41,3 @@ export interface StartRTMPOrRecordingRequestParams {
   rtmp_urls?: Array<string>;
   record: boolean;
 }
-
-export interface UpdatePeerMetadataRequestParams {
-  name?: string;
-  data?: string;
-}

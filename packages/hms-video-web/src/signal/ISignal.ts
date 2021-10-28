@@ -9,7 +9,6 @@ import {
   RemovePeerRequest,
   MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
-  UpdatePeerMetadataRequestParams,
 } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
@@ -57,8 +56,6 @@ export interface ISignal extends IAnalyticsTransportProvider {
   startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams): Promise<void>;
 
   stopRTMPAndRecording(): Promise<void>;
-
-  updatePeerMetadata(params: UpdatePeerMetadataRequestParams): Promise<void>;
 
   close(): Promise<void>;
 }
