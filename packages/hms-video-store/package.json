@@ -21,6 +21,7 @@
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
+    "cypress:open": "cypress open",
     "docs": "rm -rf ./docs && typedoc && rm -f ./docs/README.md && mkdir ./docs/home &&mv ./docs/modules.md ./docs/home/content.md && ./bin/typedoc-mdx && npx prettier --write './docs/**/*'"
   },
   "husky": {
@@ -50,20 +51,27 @@
     }
   ],
   "dependencies": {
+    "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "^4.0.0",
     "zustand": "3.5.7"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.1.19",
-    "events": "^3.3.0"
+    "@100mslive/hms-video": "^0.1.19"
   },
   "devDependencies": {
     "@100mslive/hms-video": "^0.1.19",
+    "@cypress/code-coverage": "^3.9.11",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/file": "^5.0.3",
-    "events": "^3.3.0",
+    "babel-plugin-istanbul": "^6.1.1",
+    "cypress": "^8.7.0",
+    "dotenv": "^10.0.0",
     "husky": "^6.0.0",
+    "istanbul-lib-coverage": "^3.2.0",
+    "nyc": "^15.1.0",
     "size-limit": "^5.0.3",
+    "ts-node": "^10.4.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
     "typedoc": "^0.21.5",
@@ -87,5 +95,27 @@
   "resolutions": {
     "tsdx/**/node-notifier": "10.0.0"
   },
-  "homepage": "https://github.com/100mslive/hms-video-store#readme"
+  "homepage": "https://github.com/100mslive/hms-video-store#readme",
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text-summary",
+      "html"
+    ],
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": true,
+    "include": [
+      "src/core/hmsSDKStore/**/*.ts",
+      "src/core/selectors/**/*.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".js"
+    ],
+    "exclude": [
+      "**/*.spec.ts"
+    ],
+    "report-dir": "cy-coverage"
+  }
 }

@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';

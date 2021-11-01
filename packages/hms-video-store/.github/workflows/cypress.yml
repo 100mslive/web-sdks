@@ -1,0 +1,27 @@
+name: Cypress Tests for chrome
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+        env:
+          CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}
+          CYPRESS_ROOM_ID: ${{ secrets.ROOM_ID }}
+          CYPRESS_ROLE: ${{ secrets.ROLE }}
+          CYPRESS_API_ENV: ${{ secrets.API_ENV }}
+          CYPRESS_INIT_ENDPOINT: ${{ secrets.INIT_ENDPOINT }}
+      - name: Cypress Coverage
+        uses: romeovs/lcov-reporter-action@v0.2.11
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./cy-coverage/lcov.info
