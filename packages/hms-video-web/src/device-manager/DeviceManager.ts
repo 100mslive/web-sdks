@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSDeviceManager, DeviceMap } from '../interfaces/HMSDeviceManager';
 import { HMSLocalAudioTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';

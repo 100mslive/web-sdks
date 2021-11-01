@@ -1,4 +1,5 @@
-import EventEmitter from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+
 import { IStore } from '../../sdk/store';
 import { PolicyParams } from '../HMSNotifications';
 

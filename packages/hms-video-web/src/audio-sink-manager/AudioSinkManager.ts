@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import { HMSAudioTrack } from '../media/tracks';
 import { DeviceManager } from '../device-manager';

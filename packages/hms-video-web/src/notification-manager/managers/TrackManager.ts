@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { IStore } from '../../sdk/store';

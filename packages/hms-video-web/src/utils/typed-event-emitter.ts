@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 /**
  * Typed Event Emitter Reference:
