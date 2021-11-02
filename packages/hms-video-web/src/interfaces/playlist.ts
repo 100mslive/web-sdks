@@ -82,4 +82,15 @@ export interface HMSPlaylistManager {
    * @param {boolean} autoplay
    */
   setIsAutoplayOn(type: HMSPlaylistType, autoplay: boolean): void;
+  /**
+   * Get the current playback rate of audio/video playlist
+   * @param {HMSPlaylistType} type
+   */
+  getPlaybackRate(type: HMSPlaylistType): number;
+  /**
+   * set the current playback rate of audio/video playlist
+   * @param {HMSPlaylistType}type
+   * @param {number}value - number between 0.25 and 2.0
+   */
+  setPlaybackRate(type: HMSPlaylistType, value: number): void;
 }

@@ -156,6 +156,21 @@ export class PlaylistManager
     this.state[type].isAutoplayOn = autoplay;
   }
 
+  getPlaybackRate(type: HMSPlaylistType = HMSPlaylistType.audio) {
+    const element = this.getElement(type);
+    return element ? element.playbackRate : 1.0;
+  }
+
+  setPlaybackRate(type: HMSPlaylistType = HMSPlaylistType.audio, value: number) {
+    if (value < 0.25 || value > 2.0) {
+      throw Error('Please pass a value between 0.25 and 2.0');
+    }
+    const element = this.getElement(type);
+    if (element) {
+      element.playbackRate = value;
+    }
+  }
+
   async setEnabled(
     enabled: boolean,
     { id, type = HMSPlaylistType.audio }: { id: string; type: HMSPlaylistType },
