@@ -164,6 +164,8 @@ describe('secondary selectors', () => {
     const list = Object.values(playlist.audio.list);
     expect(selectAudioPlaylist.list(fakeStore)).toEqual(list);
     expect(selectAudioPlaylist.progress(fakeStore)).toBe(20);
+    expect(selectAudioPlaylist.currentTime(fakeStore)).toBe(10);
+    expect(selectAudioPlaylist.playbackRate(fakeStore)).toBe(0.5);
     expect(selectAudioPlaylist.selection(fakeStore)).toEqual({
       id: list[0].id,
       hasNext: true,
@@ -176,6 +178,8 @@ describe('secondary selectors', () => {
     const list = Object.values(playlist.video.list);
     expect(selectVideoPlaylist.list(fakeStore)).toEqual(list);
     expect(selectVideoPlaylist.progress(fakeStore)).toBe(30);
+    expect(selectVideoPlaylist.currentTime(fakeStore)).toBe(20);
+    expect(selectVideoPlaylist.playbackRate(fakeStore)).toBe(1.0);
     expect(selectVideoPlaylist.selection(fakeStore)).toEqual({
       id: list[0].id,
       hasNext: true,

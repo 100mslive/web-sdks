@@ -19,6 +19,10 @@ const selectPlaylistCurrentTime = (type: HMSPlaylistType = HMSPlaylistType.audio
   store: HMSStore,
 ) => store.playlist[type].currentTime;
 
+const selectPlaylistPlaybackRate = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
+  store: HMSStore,
+) => store.playlist[type].playbackRate;
+
 const selectPlaylistVolume = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
   store.playlist[type].volume;
 
@@ -46,6 +50,7 @@ export const selectAudioPlaylist: HMSPlaylistSelector = {
   selection: selectPlaylistSelection(HMSPlaylistType.audio),
   progress: selectPlaylistProgress(HMSPlaylistType.audio),
   currentTime: selectPlaylistCurrentTime(HMSPlaylistType.audio),
+  playbackRate: selectPlaylistPlaybackRate(HMSPlaylistType.audio),
   volume: selectPlaylistVolume(HMSPlaylistType.audio),
   list: selectPlaylist(HMSPlaylistType.audio),
   selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.audio),
@@ -54,7 +59,8 @@ export const selectAudioPlaylist: HMSPlaylistSelector = {
 export const selectVideoPlaylist: HMSPlaylistSelector = {
   selection: selectPlaylistSelection(HMSPlaylistType.video),
   progress: selectPlaylistProgress(HMSPlaylistType.video),
-  currentTime: selectPlaylistCurrentTime(HMSPlaylistType.audio),
+  currentTime: selectPlaylistCurrentTime(HMSPlaylistType.video),
+  playbackRate: selectPlaylistPlaybackRate(HMSPlaylistType.video),
   volume: selectPlaylistVolume(HMSPlaylistType.video),
   list: selectPlaylist(HMSPlaylistType.video),
   selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.video),

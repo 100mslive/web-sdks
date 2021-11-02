@@ -64,6 +64,7 @@ export const createDefaultStoreState = (): HMSStore => {
         progress: 0,
         volume: 0,
         currentTime: 0,
+        playbackRate: 1.0,
       },
       video: {
         list: {},
@@ -71,6 +72,7 @@ export const createDefaultStoreState = (): HMSStore => {
         progress: 0,
         volume: 0,
         currentTime: 0,
+        playbackRate: 1.0,
       },
     },
     messages: { byID: {}, allIDs: [] },

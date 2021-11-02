@@ -128,6 +128,7 @@ export const makeFakeStore = (): HMSStore => {
         progress: 20,
         volume: 100,
         currentTime: 10,
+        playbackRate: 0.5,
       },
       video: {
         list: {
@@ -152,6 +153,7 @@ export const makeFakeStore = (): HMSStore => {
         progress: 30,
         volume: 100,
         currentTime: 20,
+        playbackRate: 1.0,
       },
     },
     messages: {

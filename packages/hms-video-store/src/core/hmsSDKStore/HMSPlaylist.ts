@@ -70,4 +70,9 @@ export class HMSPlaylist implements IHMSPlaylistActions {
   setIsAutoplayOn(autoplay: boolean) {
     this.playlistManager.setIsAutoplayOn(this.type, autoplay);
   }
+
+  setPlaybackRate(playbackRate: number) {
+    this.playlistManager.setPlaybackRate(this.type, playbackRate);
+    this.syncPlaylistState(`set${this.type}PlaybackRate`);
+  }
 }

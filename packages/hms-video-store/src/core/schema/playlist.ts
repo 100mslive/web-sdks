@@ -28,6 +28,7 @@ export interface HMSPlaylist<T> {
     progress: number;
     volume: number;
     currentTime: number;
+    playbackRate: number;
   };
   video: {
     list: Record<string, HMSPlaylistItem<T>>;
@@ -35,6 +36,7 @@ export interface HMSPlaylist<T> {
     progress: number;
     volume: number;
     currentTime: number;
+    playbackRate: number;
   };
 }
 
@@ -85,6 +87,12 @@ export interface IHMSPlaylistActions {
    * @param {boolean} autoplay
    */
   setIsAutoplayOn(autoplay: boolean): void;
+  /**
+   * Control the playback speed - 1.0 being normal, less than 1.0 will play it slowly
+   * and more than 1.0 will play it faster.
+   * @param playbackRate - value from 0.25 and 2.0
+   */
+  setPlaybackRate(playbackRate: number): void;
 }
 
 export interface HMSPlaylistSelector {
@@ -102,4 +110,5 @@ export interface HMSPlaylistSelector {
   progress: (store: HMSStore) => number;
   volume: (store: HMSStore) => number;
   currentTime: (store: HMSStore) => number;
+  playbackRate: (store: HMSStore) => number;
 }

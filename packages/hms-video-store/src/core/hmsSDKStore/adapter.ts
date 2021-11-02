@@ -222,6 +222,7 @@ export class SDKToHMS {
       progress,
       volume,
       currentTime: playlistManager.getCurrentTime(type),
+      playbackRate: playlistManager.getPlaybackRate(type),
     };
   }
 
