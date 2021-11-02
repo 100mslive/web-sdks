@@ -61,6 +61,9 @@ export const ErrorCodes = {
 
     // When the browser throws autoplay exception if something is played before interacting
     AUTOPLAY_ERROR: 3008,
+
+    // Over constrained error - device hardware unable to satisfy requested constraints
+    OVER_CONSTRAINED: 3009,
   },
 
   WebrtcErrors: {

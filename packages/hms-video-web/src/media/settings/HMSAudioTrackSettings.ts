@@ -3,8 +3,8 @@ import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsProperti
 
 export class HMSAudioTrackSettingsBuilder {
   private _volume: number = 1.0;
-  private _codec: HMSAudioCodec = HMSAudioCodec.OPUS;
-  private _maxBitrate: number = 32;
+  private _codec?: HMSAudioCodec = HMSAudioCodec.OPUS;
+  private _maxBitrate?: number = 32;
   private _deviceId: string = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
@@ -27,13 +27,13 @@ export class HMSAudioTrackSettingsBuilder {
     return this;
   }
 
-  codec(codec: HMSAudioCodec) {
+  codec(codec?: HMSAudioCodec) {
     this._codec = codec;
     return this;
   }
 
-  maxBitrate(maxBitrate: number) {
-    if (maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+  maxBitrate(maxBitrate?: number) {
+    if (maxBitrate && maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
     this._maxBitrate = maxBitrate;
     return this;
   }
@@ -55,18 +55,18 @@ export class HMSAudioTrackSettingsBuilder {
 }
 
 export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalyticsPropertiesProvider {
-  readonly volume: number;
-  readonly codec: HMSAudioCodec;
-  readonly maxBitrate: number;
-  readonly deviceId: string;
-  readonly advanced: Array<MediaTrackConstraintSet>;
+  readonly volume?: number;
+  readonly codec?: HMSAudioCodec;
+  readonly maxBitrate?: number;
+  readonly deviceId?: string;
+  readonly advanced?: Array<MediaTrackConstraintSet>;
 
   constructor(
-    volume: number,
-    codec: HMSAudioCodec,
-    maxBitrate: number,
-    deviceId: string,
-    advanced: Array<MediaTrackConstraintSet>,
+    volume?: number,
+    codec?: HMSAudioCodec,
+    maxBitrate?: number,
+    deviceId?: string,
+    advanced?: Array<MediaTrackConstraintSet>,
   ) {
     this.volume = volume;
     this.codec = codec;

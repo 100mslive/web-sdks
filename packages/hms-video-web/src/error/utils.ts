@@ -34,7 +34,11 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSExc
 
   switch (err.name) {
     case 'OverconstrainedError':
-      return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, err.message);
+      return ErrorFactory.TracksErrors.OverConstrained(
+        HMSAction.TRACK,
+        deviceInfo,
+        (err as OverconstrainedError).constraint,
+      );
     case 'NotAllowedError':
       return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
     case 'NotFoundError':

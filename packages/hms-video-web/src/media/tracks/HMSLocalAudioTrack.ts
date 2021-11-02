@@ -102,7 +102,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('maxBitrate')) {
-      await stream.setMaxBitrate(newSettings.maxBitrate, this);
+      if (newSettings.maxBitrate) await stream.setMaxBitrate(newSettings.maxBitrate, this);
     }
 
     if (hasPropertyChanged('advanced')) {

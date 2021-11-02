@@ -20,6 +20,7 @@ import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { ErrorCodes } from '../error/ErrorCodes';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -95,27 +96,7 @@ export class LocalTrackManager {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings);
     } catch (error) {
-      if (error instanceof HMSException && error.action === HMSAction.TRACK) {
-        this.observer.onFailure(error);
-
-        const audioFailure = error.message.includes('audio');
-        const videoFailure = error.message.includes('video');
-        fetchTrackOptions.audio = audioFailure ? 'empty' : fetchTrackOptions.audio;
-        fetchTrackOptions.video = videoFailure ? 'empty' : fetchTrackOptions.video;
-        HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
-        try {
-          tracksToPublish.push(...(await this.getLocalTracks(fetchTrackOptions, trackSettings)));
-        } catch (error) {
-          HMSLogger.w(this.TAG, 'Fetch empty tacks failed', error);
-          fetchTrackOptions.audio = fetchTrackOptions.audio && 'empty';
-          fetchTrackOptions.video = fetchTrackOptions.video && 'empty';
-          tracksToPublish.push(...(await this.getLocalTracks(fetchTrackOptions, trackSettings)));
-          this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
-        }
-      } else {
-        HMSLogger.w(this.TAG, 'Fetch AV Tracks failed - unknown exception', error);
-        this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
-      }
+      tracksToPublish = await this.retryGetLocalTracks(error, trackSettings, fetchTrackOptions);
     }
 
     /**
@@ -265,6 +246,11 @@ export class LocalTrackManager {
         audioError = true;
       }
 
+      /**
+       * TODO: Only permission error throws correct device info in error(audio or video or both),
+       * Right now for other errors such as overconstrained error we are unable to get whether audio/video failure.
+       * Fix this by checking the native error message.
+       */
       if (videoError && audioError) {
         throw BuildGetMediaError(error as Error, HMSGetMediaActions.AV);
       } else if (videoError) {
@@ -321,5 +307,71 @@ export class LocalTrackManager {
     }
 
     return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
+  }
+
+  private async retryGetLocalTracks(
+    error: unknown,
+    trackSettings: HMSTrackSettings,
+    fetchTrackOptions: IFetchAVTrackOptions,
+  ): Promise<Array<HMSLocalTrack>> {
+    if (error instanceof HMSException && error.action === HMSAction.TRACK) {
+      this.observer.onFailure(error);
+
+      const overConstrainedFailure = error.code === ErrorCodes.TracksErrors.OVER_CONSTRAINED;
+      const audioFailure = error.message.includes('audio');
+      const videoFailure = error.message.includes('video');
+      if (overConstrainedFailure) {
+        // TODO: Use this once TODO@L#250 is completed
+        // const newTrackSettings = new HMSTrackSettingsBuilder()
+        //   .video(videoFailure ? new HMSVideoTrackSettings() : trackSettings.video)
+        //   .audio(audioFailure ? new HMSAudioTrackSettings() : trackSettings.audio)
+        //   .build();
+        const newTrackSettings = new HMSTrackSettingsBuilder()
+          .video(new HMSVideoTrackSettings())
+          .audio(new HMSAudioTrackSettings())
+          .build();
+
+        HMSLogger.w(this.TAG, 'Fetch AV Tracks failed with overconstrained error', { fetchTrackOptions }, { error });
+
+        try {
+          // Try get local tracks with no constraints
+          return await this.getLocalTracks(fetchTrackOptions, newTrackSettings);
+        } catch (error) {
+          /**
+           * This error shouldn't be overconstrained error(as we've dropped all constraints).
+           * If it's an overconstrained error, change error code to avoid recursive loop
+           * Try get local tracks for empty tracks
+           */
+          const nativeError: Error | undefined = error instanceof HMSException ? error.nativeError : (error as Error);
+          if (nativeError?.name === 'OverconstrainedError') {
+            const newError = ErrorFactory.TracksErrors.GenericTrack(
+              HMSAction.TRACK,
+              'Overconstrained error after dropping all constraints',
+            );
+            newError.addNativeError(nativeError);
+            error = newError;
+          }
+
+          return await this.retryGetLocalTracks(error, trackSettings, fetchTrackOptions);
+        }
+      }
+
+      fetchTrackOptions.audio = audioFailure ? 'empty' : fetchTrackOptions.audio;
+      fetchTrackOptions.video = videoFailure ? 'empty' : fetchTrackOptions.video;
+      HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
+      try {
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+      } catch (error) {
+        HMSLogger.w(this.TAG, 'Fetch empty tacks failed', error);
+        fetchTrackOptions.audio = fetchTrackOptions.audio && 'empty';
+        fetchTrackOptions.video = fetchTrackOptions.video && 'empty';
+        this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+      }
+    } else {
+      HMSLogger.w(this.TAG, 'Fetch AV Tracks failed - unknown exception', error);
+      this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
+      return [];
+    }
   }
 }

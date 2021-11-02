@@ -141,6 +141,16 @@ export const ErrorFactory = {
     CodecChangeNotPermitted(action: HMSAction, description: string = '') {
       return new HMSException(3007, 'CodecChangeNotPermitted', action, `Codec can't be changed mid call.`, description);
     },
+
+    OverConstrained(action: HMSAction, deviceInfo: string, description: string = '') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.OVER_CONSTRAINED,
+        'OverConstrained',
+        action,
+        `[TRACK]: Requested constraints cannot be satisfied with the device hardware - ${deviceInfo}`,
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {

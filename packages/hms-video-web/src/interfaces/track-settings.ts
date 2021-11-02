@@ -9,19 +9,19 @@ export enum HMSAudioCodec {
 }
 
 export interface HMSAudioTrackSettings {
-  volume: number;
-  codec: HMSAudioCodec;
-  maxBitrate: number;
-  deviceId: string;
-  advanced: Array<MediaTrackConstraintSet>;
+  volume?: number;
+  codec?: HMSAudioCodec;
+  maxBitrate?: number;
+  deviceId?: string;
+  advanced?: Array<MediaTrackConstraintSet>;
 }
 
 export interface HMSVideoTrackSettings {
-  width: number;
-  height: number;
-  codec: HMSVideoCodec;
-  maxFramerate: number;
+  width?: number;
+  height?: number;
+  codec?: HMSVideoCodec;
+  maxFramerate?: number;
   maxBitrate?: number;
   deviceId?: string;
-  advanced: Array<MediaTrackConstraintSet>;
+  advanced?: Array<MediaTrackConstraintSet>;
 }

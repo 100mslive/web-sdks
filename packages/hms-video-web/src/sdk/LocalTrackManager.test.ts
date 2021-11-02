@@ -18,7 +18,9 @@ const testObserver: ITransportObserver = {
 
   onTrackRestore(_: HMSRemoteVideoTrack): void {},
 
-  onFailure(_: HMSException): void {},
+  onFailure(_: HMSException): void {
+    console.log('Failure Callback', _);
+  },
 
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
 };
@@ -63,6 +65,18 @@ const gumSuccess = (_: any) => Promise.resolve(mockMediaStream);
 
 const gumError = (_: any) => Promise.reject(new Error('Permission denied'));
 
+class OverconstrainedError extends Error {
+  constraint: string = '';
+  constructor(constraint: string, message: string) {
+    super(message);
+    this.name = 'OverconstrainedError';
+    this.constraint = constraint;
+  }
+}
+
+const mockOverConstrainedError = new OverconstrainedError('deviceId', '');
+const gumOverConstrainedError = (_: any) => Promise.reject(mockOverConstrainedError);
+
 const mockGetUserMedia = jest.fn(gumSuccess).mockName('GUM Success');
 
 const mockDenyGetUserMedia = jest
@@ -70,6 +84,12 @@ const mockDenyGetUserMedia = jest
   .mockImplementationOnce(gumError)
   .mockImplementation(gumSuccess)
   .mockName('Deny GUM');
+
+const mockOverConstrainedGetUserMedia = jest
+  .fn()
+  .mockImplementationOnce(gumOverConstrainedError)
+  .mockImplementation(gumSuccess)
+  .mockName('Overconstrained GUM');
 
 const mockDevices = [
   { kind: 'audioinput', deviceId: 'audio-device-id', label: 'audioInputLabel' },
@@ -234,6 +254,45 @@ describe('LocalTrackManager', () => {
       expect(onFailureError.message).toContain('video');
 
       expect(mockDenyGetUserMedia).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles overconstrained error', async () => {
+      global.navigator.mediaDevices.enumerateDevices = mockEnumerateDevices({
+        videoInput: true,
+        audioInput: true,
+      }) as any;
+      global.navigator.mediaDevices.getUserMedia = mockOverConstrainedGetUserMedia as any;
+
+      await manager.getTracksToPublish({});
+
+      console.log(failureCallback.mock);
+
+      expect(failureCallback).toHaveBeenCalledTimes(1);
+
+      const onFailureError = failureCallback.mock.calls[0][0];
+
+      expect(onFailureError).toBeDefined();
+      expect(onFailureError.nativeError).toBe(mockOverConstrainedError);
+
+      expect(mockOverConstrainedGetUserMedia).toHaveBeenCalledTimes(2); // One for overconstrained failure, one gum success
+
+      const { audio: audioContraints, video: videoConstraints } = mockOverConstrainedGetUserMedia.mock.calls[0][0];
+      const droppedConstraints = mockOverConstrainedGetUserMedia.mock.calls[1][0];
+
+      for (const constraint in audioContraints) {
+        if (constraint in hostPublishParams.audio)
+          expect(audioContraints[constraint]).toEqual((hostPublishParams.audio as any)[constraint]);
+      }
+      for (const constraint in videoConstraints) {
+        if (constraint in hostPublishParams.video)
+          expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+      }
+      for (const constraint in droppedConstraints.audio) {
+        expect(droppedConstraints[constraint]).toBeUndefined();
+      }
+      for (const constraint in droppedConstraints.video) {
+        expect(droppedConstraints[constraint]).toBeUndefined();
+      }
     });
   });
 });
