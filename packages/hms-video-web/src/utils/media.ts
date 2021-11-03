@@ -5,7 +5,7 @@ export async function getLocalStream(constraints: MediaStreamConstraints): Promi
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSGetMediaActions.AV);
+    throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
   }
 }
 
@@ -15,7 +15,7 @@ export async function getLocalScreen(constraints: MediaStreamConstraints['video'
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: constraints, audio: false });
     return stream;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSGetMediaActions.SCREEN);
+    throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
   }
 }
 
@@ -36,6 +36,6 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     devices.forEach((device) => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
-    throw BuildGetMediaError(err, HMSGetMediaActions.AV);
+    throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
   }
 }

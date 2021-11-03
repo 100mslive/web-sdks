@@ -150,7 +150,11 @@ export class RetryScheduler {
       taskSucceeded = await this.setTimeoutPromise(task, delay);
     } catch (ex) {
       taskSucceeded = false;
-      HMSLogger.w(TAG, `[${TFC[category]}] Un-caught exception ${ex.name} in retry-task, initiating retry`, ex);
+      HMSLogger.w(
+        TAG,
+        `[${TFC[category]}] Un-caught exception ${(ex as Error).name} in retry-task, initiating retry`,
+        ex,
+      );
     }
 
     if (taskSucceeded) {

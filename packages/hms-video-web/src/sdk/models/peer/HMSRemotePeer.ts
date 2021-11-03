@@ -6,8 +6,8 @@ type HMSRemotePeerInit = Omit<HMSPeerInit, 'isLocal'>;
 
 export class HMSRemotePeer extends HMSPeer implements IHMSRemotePeer {
   isLocal: boolean = false;
-  audioTrack?: HMSRemoteAudioTrack;
-  videoTrack?: HMSRemoteVideoTrack;
+  declare audioTrack?: HMSRemoteAudioTrack;
+  declare videoTrack?: HMSRemoteVideoTrack;
   auxiliaryTracks: HMSRemoteTrack[] = [];
 
   constructor(peerData: HMSRemotePeerInit) {

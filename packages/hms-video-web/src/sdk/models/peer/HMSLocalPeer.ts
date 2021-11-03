@@ -7,8 +7,8 @@ type HMSLocalPeerInit = Omit<HMSPeerInit, 'isLocal' | 'peerId'>;
 
 export class HMSLocalPeer extends HMSPeer implements IHMSLocalPeer {
   isLocal: boolean = true;
-  audioTrack?: HMSLocalAudioTrack;
-  videoTrack?: HMSLocalVideoTrack;
+  declare audioTrack?: HMSLocalAudioTrack;
+  declare videoTrack?: HMSLocalVideoTrack;
   auxiliaryTracks: HMSLocalTrack[] = [];
 
   constructor(peerData: HMSLocalPeerInit) {
