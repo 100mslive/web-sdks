@@ -15,6 +15,8 @@ export interface HMSRole {
     unmute: boolean;
     mute: boolean;
     changeRole: boolean;
+    rtmp: boolean;
+    recording: boolean;
   };
   priority: number;
 }

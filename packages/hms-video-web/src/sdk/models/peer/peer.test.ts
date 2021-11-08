@@ -29,6 +29,8 @@ const getParamsForRole = (roleName: string) => ({
     unmute: false,
     mute: false,
     changeRole: false,
+    rtmp: false,
+    recording: false,
   },
   priority: 0,
 });

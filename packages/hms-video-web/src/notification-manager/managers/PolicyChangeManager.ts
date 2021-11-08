@@ -29,6 +29,16 @@ export class PolicyChangeManager {
       this.store.setVideoSimulcastLayers(videoSimulcastLayers);
       this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
     }
+    // TODO: remove hard coded value of rtmp and recording permissions when they're sent from the server.
+    const permissions = params.known_roles[params.name]?.permissions;
+    if (permissions) {
+      if (permissions.recording === undefined) {
+        permissions.recording = true;
+      }
+      if (permissions.rtmp === undefined) {
+        permissions.rtmp = true;
+      }
+    }
 
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
