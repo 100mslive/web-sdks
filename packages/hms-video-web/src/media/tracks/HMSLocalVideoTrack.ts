@@ -1,11 +1,12 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import { getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
+import { getVideoTrack } from '../../utils/track';
 import { HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -212,7 +213,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
-    const newTrack = getEmptyVideoTrack(prevTrack);
+    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
     const localStream = this.stream as HMSLocalStream;
     await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);

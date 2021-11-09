@@ -1,11 +1,9 @@
 import HMSMediaStream from './HMSMediaStream';
 import { HMSLocalTrack, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
-import { HMSTrackSettings, HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
+import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
 import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
-import { getAudioTrack, getEmptyAudioTrack, getEmptyVideoTrack, getVideoTrack } from '../../utils/track';
-import { IFetchAVTrackOptions } from '../../transport/ITransport';
 import { SimulcastLayer } from '../../interfaces';
 import { isNode } from '../../utils/support';
 
@@ -53,34 +51,6 @@ export default class HMSLocalStream extends HMSMediaStream {
     }
 
     HMSLogger.v(TAG, 'getLocalScreen', tracks);
-    return tracks;
-  }
-
-  static async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
-    return await this.getEmptyLocalTracks({ audio: true, video: true }, settings);
-  }
-
-  static async getEmptyLocalTracks(
-    fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
-    settings?: HMSTrackSettings,
-  ): Promise<Array<HMSLocalTrack>> {
-    const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
-    const nativeVideoTrack = nativeTracks.find((track) => track.kind === 'video');
-    const nativeAudioTrack = nativeTracks.find((track) => track.kind === 'audio');
-    const local = new HMSLocalStream(new MediaStream(nativeTracks));
-
-    const tracks: Array<HMSLocalTrack> = [];
-    if (nativeAudioTrack && settings?.audio) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', settings.audio);
-      tracks.push(audioTrack);
-    }
-
-    if (nativeVideoTrack && settings?.video) {
-      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', settings.video);
-      tracks.push(videoTrack);
-    }
-
-    HMSLogger.v(TAG, 'getEmptyLocalTracks', tracks);
     return tracks;
   }
 
@@ -172,24 +142,5 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   trackUpdate(track: HMSLocalTrack) {
     this.connection?.trackUpdate(track);
-  }
-
-  private static async getNativeLocalTracks(
-    fetchTrackOptions: IFetchAVTrackOptions = { audio: false, video: false },
-    settings?: HMSTrackSettings,
-  ) {
-    const nativeVideoTrack =
-      fetchTrackOptions.video === 'empty'
-        ? getEmptyVideoTrack()
-        : fetchTrackOptions.video && settings?.video && (await getVideoTrack(settings.video));
-    const nativeAudioTrack =
-      fetchTrackOptions.audio === 'empty'
-        ? getEmptyAudioTrack()
-        : fetchTrackOptions.audio && settings?.audio && (await getAudioTrack(settings.audio));
-
-    const nativeTracks: MediaStreamTrack[] = [];
-    if (nativeAudioTrack) nativeTracks.push(nativeAudioTrack);
-    if (nativeVideoTrack) nativeTracks.push(nativeVideoTrack);
-    return nativeTracks;
   }
 }

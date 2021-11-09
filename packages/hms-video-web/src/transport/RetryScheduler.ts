@@ -152,7 +152,7 @@ export class RetryScheduler {
       taskSucceeded = false;
       HMSLogger.w(
         TAG,
-        `[${TFC[category]}] Un-caught exception ${(ex as Error).name} in retry-task, initiating retry`,
+        `[${TFC[category]}] Un-caught exception ${(ex as HMSException).name} in retry-task, initiating retry`,
         ex,
       );
     }

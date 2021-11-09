@@ -165,7 +165,6 @@ export class LocalTrackManager {
       fetchTrackOptions.audio === true ? settings.audio : null,
       settings.simulcast,
     );
-
     let nativeTracks: MediaStreamTrack[] = [];
 
     if (trackSettings.audio || trackSettings.video) {
@@ -173,17 +172,17 @@ export class LocalTrackManager {
     }
 
     if (fetchTrackOptions.audio === 'empty') {
-      nativeTracks.push(this.getEmptyAudioTrack());
+      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
     }
 
     if (fetchTrackOptions.video === 'empty') {
-      nativeTracks.push(this.getEmptyVideoTrack());
+      nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
     }
 
     return nativeTracks;
   }
 
-  private getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
+  static getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
     const width = prevTrack?.getSettings()?.width || 320;
     const height = prevTrack?.getSettings()?.height || 240;
     const frameRate = 10; // fps TODO: experiment, see if this can be reduced
@@ -213,7 +212,7 @@ export class LocalTrackManager {
     return emptyTrack;
   }
 
-  private getEmptyAudioTrack(): MediaStreamTrack {
+  static getEmptyAudioTrack(): MediaStreamTrack {
     const ctx = new AudioContext();
     const oscillator = ctx.createOscillator();
     const dst = oscillator.connect(ctx.createMediaStreamDestination());

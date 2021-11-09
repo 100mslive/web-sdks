@@ -1,5 +1,5 @@
 import ITransportObserver from './ITransportObserver';
-import ITransport, { IFetchAVTrackOptions } from './ITransport';
+import ITransport from './ITransport';
 import HMSPublishConnection from '../connection/publish';
 import HMSSubscribeConnection from '../connection/subscribe';
 import InitService from '../signal/init';
@@ -252,48 +252,6 @@ export default class HMSTransport implements ITransport {
               error,
               devices: this.deviceManager.getDevices(),
               settings: new HMSTrackSettings(videoSettings, audioSettings, false),
-            }),
-          )
-          .flush();
-      }
-      throw error;
-    }
-  }
-
-  async getLocalTracks(settings: HMSTrackSettings): Promise<Array<HMSLocalTrack>> {
-    try {
-      return await HMSLocalStream.getLocalTracks(settings);
-    } catch (error) {
-      if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-              settings,
-            }),
-          )
-          .flush();
-      }
-      throw error;
-    }
-  }
-
-  async getEmptyLocalTracks(
-    fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
-    settings?: HMSTrackSettings,
-  ): Promise<Array<HMSLocalTrack>> {
-    try {
-      const tracks = await HMSLocalStream.getEmptyLocalTracks(fetchTrackOptions, settings);
-      return tracks;
-    } catch (error) {
-      if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-              settings,
             }),
           )
           .flush();

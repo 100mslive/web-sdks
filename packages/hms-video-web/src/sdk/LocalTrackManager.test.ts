@@ -5,7 +5,9 @@ import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import { TransportState } from '../transport/models/TransportState';
 import { DeviceManager } from '../device-manager';
-import { PublishParams } from '..';
+import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalPeer } from './models/peer';
 
 const testObserver: ITransportObserver = {
   onNotification(_: Object): void {},
@@ -25,7 +27,7 @@ const testObserver: ITransportObserver = {
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
 };
 
-const testStore = new Store();
+let testStore = new Store();
 
 const hostPublishParams: PublishParams = {
   allowed: ['audio', 'video', 'screen'],
@@ -61,7 +63,18 @@ const mockMediaStream = {
   getAudioTracks: jest.fn(() => [{ id: 'audio-id', kind: 'audio' }]),
 };
 
-const gumSuccess = (_: any) => Promise.resolve(mockMediaStream);
+const gumSuccess = (constraints: any) => {
+  const mediaStream = { ...mockMediaStream };
+  if (!constraints.video) {
+    mediaStream.getVideoTracks = jest.fn(() => []);
+  }
+
+  if (!constraints.audio) {
+    mediaStream.getAudioTracks = jest.fn(() => []);
+  }
+
+  return Promise.resolve(mediaStream);
+};
 
 const gumError = (_: any) => Promise.reject(new Error('Permission denied'));
 
@@ -151,19 +164,16 @@ describe('LocalTrackManager', () => {
     };
   });
 
+  beforeEach(() => {
+    testStore = new Store();
+  });
+
   it('instantiates without any issues', () => {
     const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
     expect(manager).toBeDefined();
   });
 
   it('passes the right constraints based on publish params', async () => {
-    global.navigator = {
-      mediaDevices: {
-        enumerateDevices: mockEnumerateDevices(),
-        getUserMedia: mockGetUserMedia,
-      },
-    } as any;
-
     const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
     testStore.setPublishParams(hostPublishParams);
     await manager.getTracksToPublish({});
@@ -293,6 +303,66 @@ describe('LocalTrackManager', () => {
       for (const constraint in droppedConstraints.video) {
         expect(droppedConstraints[constraint]).toBeUndefined();
       }
+    });
+  });
+
+  describe('getTracksToPublish', () => {
+    beforeAll(() => {
+      global.navigator.mediaDevices.enumerateDevices = mockEnumerateDevices() as any;
+      global.navigator.mediaDevices.getUserMedia = mockGetUserMedia as any;
+    });
+
+    beforeEach(() => {
+      testStore = new Store();
+      mockGetUserMedia.mockClear();
+    });
+
+    it('diffs the local tracks to publish', async () => {
+      const localPeer = new HMSLocalPeer({
+        name: 'test',
+      });
+      const mockVideoTrack = new HMSLocalVideoTrack(
+        new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
+        { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
+        'regular',
+      );
+      localPeer.videoTrack = mockVideoTrack;
+
+      testStore.addPeer(localPeer);
+      testStore.addTrack(mockVideoTrack);
+
+      const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+      testStore.setPublishParams(hostPublishParams);
+      const tracksToPublish = await manager.getTracksToPublish({});
+
+      expect(mockGetUserMedia).toHaveBeenCalledTimes(1);
+      const constraints = mockGetUserMedia.mock.calls[0][0];
+      expect(constraints).toHaveProperty('video', false);
+      expect(tracksToPublish).toHaveLength(1);
+      expect(tracksToPublish[0]).toHaveProperty('type', HMSTrackType.AUDIO);
+    });
+
+    it("doesn't fetch tracks if already present", async () => {
+      const localPeer = new HMSLocalPeer({
+        name: 'test',
+      });
+      localPeer.videoTrack = new HMSLocalVideoTrack(
+        new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
+        { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
+        'regular',
+      );
+
+      testStore.addPeer(localPeer);
+
+      const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+      testStore.setPublishParams(hostPublishParams);
+      const tracksToPublish = await manager.getTracksToPublish({});
+
+      expect(mockGetUserMedia).toHaveBeenCalledTimes(1);
+      const constraints = mockGetUserMedia.mock.calls[0][0];
+      expect(constraints.video).toBe(false);
+      expect(constraints.audio).not.toBe(false);
+      expect(tracksToPublish).toHaveLength(2);
     });
   });
 });
