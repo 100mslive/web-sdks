@@ -6,6 +6,7 @@ import { HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { EventBus } from '../../events/EventBus';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
@@ -37,6 +38,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     stream: HMSLocalStream,
     track: MediaStreamTrack,
     source: string,
+    private eventBus: EventBus,
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
   ) {
     super(stream, track, source);
@@ -61,6 +63,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
     }
     await super.setEnabled(value);
+    this.eventBus.localVideoEnabled.publish(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 

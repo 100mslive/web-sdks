@@ -18,3 +18,9 @@ export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CA
 export const SUBSCRIBE_TIMEOUT = 60000;
 
 export const RTC_STATS_MONITOR_INTERVAL = 1000;
+
+export const HMSEvents = {
+  DEVICE_CHANGE: 'device-change',
+  LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
+  LOCAL_VIDEO_ENABLED: 'local-video-enabled',
+};

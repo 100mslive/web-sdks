@@ -8,6 +8,7 @@ import { DeviceManager } from '../device-manager';
 import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalPeer } from './models/peer';
+import { EventBus } from '../events/EventBus';
 
 const testObserver: ITransportObserver = {
   onNotification(_: Object): void {},
@@ -28,6 +29,7 @@ const testObserver: ITransportObserver = {
 };
 
 let testStore = new Store();
+let testEventBus = new EventBus();
 
 const hostPublishParams: PublishParams = {
   allowed: ['audio', 'video', 'screen'],
@@ -166,15 +168,26 @@ describe('LocalTrackManager', () => {
 
   beforeEach(() => {
     testStore = new Store();
+    testEventBus = new EventBus();
   });
 
   it('instantiates without any issues', () => {
-    const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+    const manager = new LocalTrackManager(
+      testStore,
+      testObserver,
+      new DeviceManager(testStore, testEventBus),
+      testEventBus,
+    );
     expect(manager).toBeDefined();
   });
 
   it('passes the right constraints based on publish params', async () => {
-    const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+    const manager = new LocalTrackManager(
+      testStore,
+      testObserver,
+      new DeviceManager(testStore, testEventBus),
+      testEventBus,
+    );
     testStore.setPublishParams(hostPublishParams);
     await manager.getTracksToPublish({});
 
@@ -190,7 +203,12 @@ describe('LocalTrackManager', () => {
     let manager: LocalTrackManager;
 
     beforeEach(() => {
-      manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+      manager = new LocalTrackManager(
+        testStore,
+        testObserver,
+        new DeviceManager(testStore, testEventBus),
+        testEventBus,
+      );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setPublishParams(hostPublishParams);
     });
@@ -314,6 +332,7 @@ describe('LocalTrackManager', () => {
 
     beforeEach(() => {
       testStore = new Store();
+      testEventBus = new EventBus();
       mockGetUserMedia.mockClear();
     });
 
@@ -325,13 +344,19 @@ describe('LocalTrackManager', () => {
         new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
         { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
         'regular',
+        testEventBus,
       );
       localPeer.videoTrack = mockVideoTrack;
 
       testStore.addPeer(localPeer);
       testStore.addTrack(mockVideoTrack);
 
-      const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+      const manager = new LocalTrackManager(
+        testStore,
+        testObserver,
+        new DeviceManager(testStore, testEventBus),
+        testEventBus,
+      );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 
@@ -350,11 +375,17 @@ describe('LocalTrackManager', () => {
         new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
         { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
         'regular',
+        testEventBus,
       );
 
       testStore.addPeer(localPeer);
 
-      const manager = new LocalTrackManager(testStore, testObserver, new DeviceManager(testStore));
+      const manager = new LocalTrackManager(
+        testStore,
+        testObserver,
+        new DeviceManager(testStore, testEventBus),
+        testEventBus,
+      );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 

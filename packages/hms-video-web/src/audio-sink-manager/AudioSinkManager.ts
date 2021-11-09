@@ -10,6 +10,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { isMobile } from '../utils/support';
+import { EventBus } from '../events/EventBus';
 
 export interface AutoplayEvent {
   error: HMSException;
@@ -45,11 +46,12 @@ export class AudioSinkManager {
     private store: IStore,
     private notificationManager: NotificationManager,
     private deviceManager: DeviceManager,
+    private eventBus: EventBus,
   ) {
     this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.notificationManager.addEventListener('track-updated', this.handleTrackUpdate as EventListener);
-    this.deviceManager.addEventListener('audio-device-change', this.handleAudioDeviceChange);
+    this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
     // Initiate a Audio Context so safari will play audio on speaker instead of earpiece
     this.audioContext = new AudioContext();
   }
@@ -111,7 +113,7 @@ export class AudioSinkManager {
     this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.notificationManager.removeEventListener('track-updated', this.handleTrackUpdate as EventListener);
-    this.deviceManager.removeEventListener('audio-device-change', this.handleAudioDeviceChange);
+    this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
@@ -209,7 +211,7 @@ export class AudioSinkManager {
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
-    if (event.error || !event.selection) {
+    if (event.error || !event.selection || event.type === 'video') {
       return;
     }
     this.unpauseAudioTracks();

@@ -1,9 +1,7 @@
 import HMSMediaStream from './HMSMediaStream';
-import { HMSLocalTrack, HMSLocalAudioTrack, HMSLocalVideoTrack } from '../tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
-import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../settings';
 import HMSLogger from '../../utils/logger';
-import { BuildGetMediaError, HMSGetMediaActions } from '../../error/utils';
 import { SimulcastLayer } from '../../interfaces';
 import { isNode } from '../../utils/support';
 
@@ -15,43 +13,6 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   setConnection(connection: HMSPublishConnection) {
     this.connection = connection;
-  }
-
-  static async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings: HMSAudioTrackSettings) {
-    const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
-    // remove advanced constraints as it not supported for screenshare audio
-    delete audioConstraints.advanced;
-    const constraints = {
-      video: videosettings.toConstraints(),
-      audio: {
-        ...audioConstraints,
-        autoGainControl: false,
-        noiseSuppression: false,
-        googAutoGainControl: false,
-        echoCancellation: false,
-      },
-    } as MediaStreamConstraints;
-    let stream;
-    try {
-      // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
-      stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
-    } catch (err) {
-      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
-    }
-
-    const tracks: Array<HMSLocalTrack> = [];
-    const local = new HMSLocalStream(stream);
-    const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', videosettings);
-    tracks.push(videoTrack);
-    const nativeAudioTrack = stream.getAudioTracks()[0];
-    if (nativeAudioTrack) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'screen', audioSettings);
-      tracks.push(audioTrack);
-    }
-
-    HMSLogger.v(TAG, 'getLocalScreen', tracks);
-    return tracks;
   }
 
   addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {

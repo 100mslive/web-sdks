@@ -1,3 +1,4 @@
+import { EventBus } from '../events/EventBus';
 import { Store } from '../sdk/store';
 import { DeviceManager } from './DeviceManager';
 import {
@@ -8,7 +9,8 @@ import {
 
 describe('DeviceManager', () => {
   const store = new Store();
-  const deviceManager = new DeviceManager(store);
+  const eventBus = new EventBus();
+  const deviceManager = new DeviceManager(store, eventBus);
   deviceManager.audioInput = DevicesWiredHeadphonesWithoutMic.audioInput;
   deviceManager.audioOutput = DevicesWiredHeadphonesWithoutMic.audioOutput;
   deviceManager.videoInput = DevicesWiredHeadphonesWithoutMic.videoInput;

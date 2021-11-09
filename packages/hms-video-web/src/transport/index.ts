@@ -41,6 +41,7 @@ import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../sign
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { LocalTrackManager } from '../sdk/LocalTrackManager';
 
 const TAG = '[HMSTransport]:';
 
@@ -68,7 +69,12 @@ export default class HMSTransport implements ITransport {
   private subscribeConnStatsMonitor?: RTCStatsMonitor;
   private trackDegradationController?: TrackDegradationController;
 
-  constructor(private observer: ITransportObserver, private deviceManager: DeviceManager, private store: IStore) {}
+  constructor(
+    private observer: ITransportObserver,
+    private deviceManager: DeviceManager,
+    private store: IStore,
+    private localTrackManager: LocalTrackManager,
+  ) {}
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -243,7 +249,7 @@ export default class HMSTransport implements ITransport {
     audioSettings: HMSAudioTrackSettings,
   ): Promise<Array<HMSLocalTrack>> {
     try {
-      return await HMSLocalStream.getLocalScreen(videoSettings, audioSettings);
+      return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
       if (error instanceof HMSException) {
         analyticsEventsService

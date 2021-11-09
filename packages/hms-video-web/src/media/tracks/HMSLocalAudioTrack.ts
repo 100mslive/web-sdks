@@ -9,6 +9,7 @@ import { HMSAudioPlugin } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { EventBus } from '../../events/EventBus';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -34,6 +35,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     stream: HMSLocalStream,
     track: MediaStreamTrack,
     source: string,
+    private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
   ) {
     super(stream, track, source);
@@ -70,6 +72,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
+    this.eventBus.localAudioEnabled.publish(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 

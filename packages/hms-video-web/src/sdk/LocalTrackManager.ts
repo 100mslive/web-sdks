@@ -21,6 +21,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { ErrorCodes } from '../error/ErrorCodes';
+import { EventBus } from '../events/EventBus';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -35,7 +36,12 @@ let blankCanvas: any;
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
 
-  constructor(private store: IStore, private observer: ITransportObserver, private deviceManager: DeviceManager) {}
+  constructor(
+    private store: IStore,
+    private observer: ITransportObserver,
+    private deviceManager: DeviceManager,
+    private eventBus: EventBus,
+  ) {}
 
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
     const publishParams = this.store.getPublishParams();
@@ -129,12 +135,12 @@ export class LocalTrackManager {
 
       const tracks: Array<HMSLocalTrack> = [];
       if (nativeAudioTrack && settings?.audio) {
-        const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', settings.audio);
+        const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
         tracks.push(audioTrack);
       }
 
       if (nativeVideoTrack && settings?.video) {
-        const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', settings.video);
+        const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
         tracks.push(videoTrack);
       }
       return tracks;
@@ -180,6 +186,43 @@ export class LocalTrackManager {
     }
 
     return nativeTracks;
+  }
+
+  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings: HMSAudioTrackSettings) {
+    const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
+    // remove advanced constraints as it not supported for screenshare audio
+    delete audioConstraints.advanced;
+    const constraints = {
+      video: videosettings.toConstraints(),
+      audio: {
+        ...audioConstraints,
+        autoGainControl: false,
+        noiseSuppression: false,
+        googAutoGainControl: false,
+        echoCancellation: false,
+      },
+    } as MediaStreamConstraints;
+    let stream;
+    try {
+      // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
+      stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
+    } catch (err) {
+      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+    }
+
+    const tracks: Array<HMSLocalTrack> = [];
+    const local = new HMSLocalStream(stream);
+    const nativeVideoTrack = stream.getVideoTracks()[0];
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videosettings);
+    tracks.push(videoTrack);
+    const nativeAudioTrack = stream.getAudioTracks()[0];
+    if (nativeAudioTrack) {
+      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'screen', this.eventBus, audioSettings);
+      tracks.push(audioTrack);
+    }
+
+    HMSLogger.v(this.TAG, 'getLocalScreen', tracks);
+    return tracks;
   }
 
   static getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {

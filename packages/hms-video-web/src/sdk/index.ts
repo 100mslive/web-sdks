@@ -42,6 +42,7 @@ import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
+import { EventBus } from '../events/EventBus';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -76,6 +77,7 @@ export class HMSSdk implements HMSInterface {
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
   private localTrackManager!: LocalTrackManager;
+  private eventBus!: EventBus;
   private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
@@ -90,14 +92,20 @@ export class HMSSdk implements HMSInterface {
 
     this.sdkState.isInitialised = true;
     this.store = new Store();
+    this.eventBus = new EventBus();
     this.playlistManager = new PlaylistManager(this);
     this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
-    this.deviceManager = new DeviceManager(this.store);
-    this.audioSinkManager = new AudioSinkManager(this.store, this.notificationManager, this.deviceManager);
+    this.deviceManager = new DeviceManager(this.store, this.eventBus);
+    this.audioSinkManager = new AudioSinkManager(
+      this.store,
+      this.notificationManager,
+      this.deviceManager,
+      this.eventBus,
+    );
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
-    this.transport = new HMSTransport(this.observer, this.deviceManager, this.store);
-    this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager);
+    this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
+    this.transport = new HMSTransport(this.observer, this.deviceManager, this.store, this.localTrackManager);
   }
 
   getPlaylistManager(): PlaylistManager {
@@ -233,7 +241,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private handleDeviceChangeError = (event: HMSDeviceChangeEvent) => {
+  private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
     HMSLogger.d(this.TAG, 'Device Change event', event);
     this.deviceChangeListener?.onDeviceChange?.(event);
     if (event.error && event.type) {
@@ -544,7 +552,7 @@ export class HMSSdk implements HMSInterface {
     const stream = new HMSLocalStream(nativeStream);
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
-    const hmsTrack = new TrackKlass(stream, track, source);
+    const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
     if (source === 'videoplaylist') {
       const settings: { maxBitrate?: number; width?: number; height?: number } = {};
       if (type === 'audio') {
@@ -746,16 +754,14 @@ export class HMSSdk implements HMSInterface {
       return;
     }
     this.sdkState.deviceManagersInitialised = true;
-    this.deviceManager.addEventListener('audio-device-change', this.handleDeviceChangeError);
-    this.deviceManager.addEventListener('video-device-change', this.handleDeviceChangeError);
+    this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     await this.deviceManager.init();
     this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 
   private cleanDeviceManagers() {
-    this.deviceManager.removeEventListener('audio-device-change', this.handleDeviceChangeError);
-    this.deviceManager.removeEventListener('video-device-change', this.handleDeviceChangeError);
+    this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.deviceManager.cleanUp();
     this.audioSinkManager.removeEventListener(AutoplayError, this.handleAutoplayError);
     this.audioSinkManager.cleanUp();
