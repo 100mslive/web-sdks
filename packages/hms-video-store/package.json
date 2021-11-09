@@ -1,5 +1,5 @@
 {
-  "version": "0.2.75",
+  "version": "0.2.76",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -53,7 +53,7 @@
   "dependencies": {
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
-    "reselect": "^4.0.0",
+    "reselect": "4.0.0",
     "zustand": "3.5.7"
   },
   "peerDependencies": {
@@ -76,7 +76,7 @@
     "tslib": "^2.2.0",
     "typedoc": "^0.21.5",
     "typedoc-plugin-markdown": "^3.10.4",
-    "typescript": "^4.3.2"
+    "typescript": "^4.4.4"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
   "repository": {
