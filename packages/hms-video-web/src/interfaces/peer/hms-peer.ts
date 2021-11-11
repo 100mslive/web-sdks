@@ -13,4 +13,6 @@ export interface HMSPeer {
   role?: HMSRole;
 
   updateRole(newRole: HMSRole): void;
+  updateName(newName: string): void;
+  updateMetadata(data: string): void;
 }

@@ -1,4 +1,12 @@
-import { HMSConfig, HMSVideoCodec, HMSMessageInput, HMSDeviceChangeEvent } from '../interfaces';
+import {
+  HMSChangeMultiTrackStateParams,
+  HMSConfig,
+  HMSDeviceChangeEvent,
+  HMSMessageInput,
+  HMSRole,
+  HMSRoleChangeRequest,
+  HMSVideoCodec,
+} from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
 import HMSTransport from '../transport';
@@ -6,24 +14,24 @@ import ITransportObserver from '../transport/ITransportObserver';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import decodeJWT from '../utils/jwt';
-import { NotificationManager, HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import {
+  HMSLocalAudioTrack,
+  HMSLocalTrack,
+  HMSLocalVideoTrack,
+  HMSRemoteTrack,
+  HMSRemoteVideoTrack,
   HMSTrackSource,
   HMSTrackType,
-  HMSLocalAudioTrack,
-  HMSLocalVideoTrack,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-  HMSRemoteTrack,
 } from '../media/tracks';
 import { HMSException } from '../error/HMSException';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import Message from './models/HMSMessage';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSVideoTrackSettingsBuilder, HMSAudioTrackSettingsBuilder } from '../media/settings';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { DeviceManager, AudioOutputManager } from '../device-manager';
+import { AudioOutputManager, DeviceManager } from '../device-manager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import { TransportState } from '../transport/models/TransportState';
@@ -33,7 +41,6 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { IErrorListener } from '../interfaces/error-listener';
 import { IStore, Store } from './store';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
-import { HMSRoleChangeRequest, HMSRole, HMSChangeMultiTrackStateParams } from '../interfaces';
 import RoleChangeManager from './RoleChangeManager';
 import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
@@ -41,6 +48,7 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { HMSPeerUpdateConfig } from '../interfaces/update-peer-metadata-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 
@@ -672,6 +680,22 @@ export class HMSSdk implements HMSInterface {
     }
     if (rtmp?.running) {
       this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+    }
+  }
+
+  async updatePeer(params: HMSPeerUpdateConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot update peer metadata.',
+      );
+    }
+    await this.transport?.updatePeer(params);
+    if (params.name) {
+      this.localPeer.updateName(params.name);
+    }
+    if (params.metadata) {
+      this.localPeer.updateMetadata(params.metadata);
     }
   }
 

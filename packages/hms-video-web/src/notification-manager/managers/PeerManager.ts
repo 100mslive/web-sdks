@@ -75,6 +75,17 @@ export class PeerManager {
       peer.updateRole(newRole);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
+
+    const info = notification.info;
+    if (info.name && peer.name !== info.name) {
+      peer.updateName(info.name);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.NAME_UPDATED, peer);
+    }
+
+    if (info.data && peer.customerDescription !== info.data) {
+      peer.updateMetadata(info.data);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.METADATA_UPDATED, peer);
+    }
   }
 
   private makePeer(peer: PeerNotification) {

@@ -9,6 +9,7 @@ import {
   RemovePeerRequest,
   MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
+  UpdatePeerRequestParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -256,6 +257,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async stopRTMPAndRecording() {
     await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
+  }
+
+  async updatePeer(params: UpdatePeerRequestParams) {
+    await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
   private onCloseHandler(event: CloseEvent) {

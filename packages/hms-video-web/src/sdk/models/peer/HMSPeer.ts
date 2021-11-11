@@ -34,7 +34,22 @@ export class HMSPeer implements IHMSPeer {
     }
   }
 
+  /**
+   * @internal
+   */
   updateRole(newRole: HMSRole) {
     this.role = newRole;
+  }
+  /**
+   * @internal
+   */
+  updateName(newName: string) {
+    this.name = newName;
+  }
+  /**
+   * @internal
+   */
+  updateMetadata(data: string) {
+    this.customerDescription = data;
   }
 }

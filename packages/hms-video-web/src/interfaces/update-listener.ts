@@ -35,6 +35,8 @@ export enum HMSPeerUpdate {
   STOPPED_SPEAKING,
   ROLE_UPDATED,
   PEER_LIST,
+  NAME_UPDATED,
+  METADATA_UPDATED,
 }
 
 export enum HMSTrackUpdate {
