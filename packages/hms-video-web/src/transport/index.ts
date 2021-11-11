@@ -630,7 +630,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
-      this.initConfig = await InitService.fetchInitConfig(token, endpoint);
+      this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       analyticsEventsService.addTransport(this.analyticsSignalTransport);

@@ -8,11 +8,12 @@ const TAG = 'InitService';
 export default class InitService {
   static async fetchInitConfig(
     token: string,
+    peerId: string,
     initEndpoint: string = 'https://prod-init.100ms.live',
     region: string = '',
   ): Promise<InitConfig> {
-    HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} region=${region}`);
-    const url = getUrl(initEndpoint, region);
+    HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
+    const url = getUrl(initEndpoint, peerId, region);
     let response, config;
     try {
       response = await fetch(url, {
@@ -44,13 +45,14 @@ export default class InitService {
   }
 }
 
-export function getUrl(endpoint: string, region?: string) {
+export function getUrl(endpoint: string, peerId: string, region?: string) {
   try {
     const url = new URL('/init', endpoint);
 
     if (region && region.trim().length > 0) {
       url.searchParams.set('region', region.trim());
     }
+    url.searchParams.set('peer_id', peerId);
     url.searchParams.set('user_agent', userAgent);
     return url.toString();
   } catch (err) {
