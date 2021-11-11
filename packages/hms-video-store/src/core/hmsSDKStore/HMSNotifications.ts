@@ -58,11 +58,16 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   sendLeaveRoom(request: HMSLeaveRoomRequest) {
+    const peerName = request.requestedBy?.name;
     const notification = this.createNotification(
-      request.roomEnded ? HMSNotificationTypes.ROOM_ENDED : HMSNotificationTypes.REMOVED_FROM_ROOM,
+      request.roomEnded || !peerName
+        ? HMSNotificationTypes.ROOM_ENDED
+        : HMSNotificationTypes.REMOVED_FROM_ROOM,
       request,
       HMSNotificationSeverity.INFO,
-      `${request.roomEnded ? `Room ended` : 'Removed from room'} by ${request.requestedBy.name}`,
+      `${request.roomEnded ? `Room ended` : 'Removed from room'} ${
+        peerName ? `by ${peerName}` : ''
+      }`,
     );
     this.emitEvent(notification);
   }

@@ -513,19 +513,13 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
-    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
-    if (!requestedBy) {
-      this.logPossibleInconsistency(
-        `Not found peer who requested leave room, ${request.requestedBy}`,
-      );
-      return;
-    }
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy?.peerId));
     this.hmsNotifications.sendLeaveRoom({
       ...request,
-      requestedBy,
+      requestedBy: requestedBy || undefined,
     });
     HMSLogger.i('resetting state after peer removed', request);
-    this.resetState(request.roomEnded ? 'roomEnded' : 'removedFromRoom');
+    this.resetState(request.roomEnded || !requestedBy ? 'roomEnded' : 'removedFromRoom');
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {
