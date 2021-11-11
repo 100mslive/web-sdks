@@ -1,5 +1,5 @@
 {
-  "version": "0.2.76",
+  "version": "0.2.77",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -57,10 +57,10 @@
     "zustand": "3.5.7"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.1.26"
+    "@100mslive/hms-video": "^0.1.31"
   },
   "devDependencies": {
-    "@100mslive/hms-video": "^0.1.26",
+    "@100mslive/hms-video": "^0.1.31",
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/file": "^5.0.3",

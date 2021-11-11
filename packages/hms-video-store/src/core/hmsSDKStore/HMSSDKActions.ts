@@ -69,6 +69,8 @@ import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
+import { ACTION_TYPES } from './common/mapping';
+
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
 /**
@@ -446,6 +448,16 @@ export class HMSSDKActions implements IHMSActions {
 
   async stopRTMPAndRecording() {
     await this.sdk.stopRTMPAndRecording();
+  }
+
+  async updatePeer(params: sdkTypes.HMSPeerUpdateConfig) {
+    await this.sdk.updatePeer(params);
+    if (params.name) {
+      this.syncRoomState('nameUpdated');
+    }
+    if (params.metadata) {
+      this.syncRoomState('metadataUpdated');
+    }
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -1123,11 +1135,7 @@ export class HMSSDKActions implements IHMSActions {
   ) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     let actionName = 'peerUpdate';
-    if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
-      actionName = 'peerJoined';
-    } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
-      actionName = 'peerLeft';
-    }
+    actionName = ACTION_TYPES[type];
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {

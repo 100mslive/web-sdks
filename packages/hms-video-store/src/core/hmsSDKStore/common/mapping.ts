@@ -11,6 +11,8 @@ export const PEER_NOTIFICATION_TYPES: notifcationMap = {
   [sdkTypes.HMSPeerUpdate.ROLE_UPDATED]: HMSNotificationTypes.ROLE_UPDATED,
   [sdkTypes.HMSPeerUpdate.AUDIO_TOGGLED]: 'PEER_AUDIO_UPDATED',
   [sdkTypes.HMSPeerUpdate.VIDEO_TOGGLED]: 'PEER_VIDEO_UPDATED',
+  [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: HMSNotificationTypes.NAME_UPDATED,
+  [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: HMSNotificationTypes.METADATA_UPDATED,
 };
 
 export const TRACK_NOTIFICATION_TYPES: notifcationMap = {
@@ -18,4 +20,11 @@ export const TRACK_NOTIFICATION_TYPES: notifcationMap = {
   [sdkTypes.HMSTrackUpdate.TRACK_REMOVED]: HMSNotificationTypes.TRACK_REMOVED,
   [sdkTypes.HMSTrackUpdate.TRACK_MUTED]: HMSNotificationTypes.TRACK_MUTED,
   [sdkTypes.HMSTrackUpdate.TRACK_UNMUTED]: HMSNotificationTypes.TRACK_UNMUTED,
+};
+
+export const ACTION_TYPES: notifcationMap = {
+  [sdkTypes.HMSPeerUpdate.PEER_JOINED]: 'peerJoined',
+  [sdkTypes.HMSPeerUpdate.PEER_LEFT]: 'peerLeft',
+  [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: 'nameUpdated',
+  [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: 'metadataUpdated',
 };

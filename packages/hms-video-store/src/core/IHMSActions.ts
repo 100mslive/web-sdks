@@ -17,7 +17,7 @@ import {
   HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
+import { RTMPRecordingConfig, HMSPeerUpdateConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -279,6 +279,14 @@ export interface IHMSActions {
    * If you want to stop both RTMP streaming and recording.
    */
   stopRTMPAndRecording(): Promise<void>;
+
+  /**
+   * If both name and data is undefined: Message is ignored.
+   * If data is undefined: Name of the peer is changed.
+   * If name is undefined: Metadata of the peer is updated.
+   * If both name and data is defined: Both name and metadata is updated.
+   */
+  updatePeer(params: HMSPeerUpdateConfig): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
