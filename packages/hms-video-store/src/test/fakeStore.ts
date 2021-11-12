@@ -32,7 +32,8 @@ function makeTrack(
 }
 
 export let localPeer: HMSPeer;
-export let remotePeer: HMSPeer;
+export let remotePeerOne: HMSPeer;
+export let remotePeerTwo: HMSPeer;
 export let peerScreenSharing: HMSPeer;
 export let localVideo: HMSTrack;
 export let localAudio: HMSTrack;
@@ -58,7 +59,7 @@ export const makeFakeStore = (): HMSStore => {
       id: '123',
       isConnected: true,
       name: 'test room',
-      peers: ['1', '2'],
+      peers: ['1', '2', '3'],
       localPeer: '1',
       shareableLink: '',
       hasWaitingRoom: false,
@@ -93,6 +94,15 @@ export const makeFakeStore = (): HMSStore => {
         videoTrack: '103',
         audioTrack: '104',
         auxiliaryTracks: ['105', '106', '107'],
+      },
+      '3': {
+        id: '3',
+        name: 'test3',
+        roleName: ROLES.SPEAKER,
+        isLocal: false,
+        videoTrack: '105',
+        audioTrack: '106',
+        auxiliaryTracks: [],
       },
     },
     tracks: {
@@ -243,7 +253,8 @@ export const makeFakeStore = (): HMSStore => {
   };
 
   localPeer = fakeStore.peers['1'];
-  remotePeer = fakeStore.peers['2'];
+  remotePeerOne = fakeStore.peers['2'];
+  remotePeerTwo = fakeStore.peers['3'];
   peerScreenSharing = fakeStore.peers['2'];
   localVideo = fakeStore.tracks['101'];
   localAudio = fakeStore.tracks['102'];

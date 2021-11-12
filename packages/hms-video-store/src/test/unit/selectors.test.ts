@@ -11,6 +11,8 @@ import {
   screenShare,
   screenshareAudio,
   playlist,
+  remotePeerTwo,
+  remotePeerOne,
 } from '../fakeStore';
 import {
   HMSStore,
@@ -65,6 +67,7 @@ import {
   selectMessagesUnreadCountByPeerID,
   selectAudioPlaylist,
   selectVideoPlaylist,
+  selectPeersByRole,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -150,7 +153,7 @@ describe('secondary selectors', () => {
   });
 
   test('remote peers', () => {
-    expect(selectRemotePeers(fakeStore)).toEqual([peerScreenSharing]);
+    expect(selectRemotePeers(fakeStore)).toEqual([remotePeerOne, remotePeerTwo]);
   });
 
   test('some track degraded', () => {
@@ -283,6 +286,12 @@ describe('by ID selectors', () => {
     const messages = selectBroadcastMessagesUnreadCount(fakeStore);
     expect(messages).toBe(0);
   });
+
+  test('selectPeersByRole', () => {
+    expect(selectPeersByRole('speaker')(fakeStore)).toEqual([remotePeerTwo]);
+    // If role is not present
+    expect(selectPeersByRole('incognito')(fakeStore)).toEqual([]);
+  });
 });
 
 describe('derived selectors', () => {
@@ -291,6 +300,7 @@ describe('derived selectors', () => {
     expect(selectPeersWithAudioStatus(fakeStore)).toEqual([
       { peer: localPeer, isAudioEnabled: true },
       { peer: peerScreenSharing, isAudioEnabled: false },
+      { peer: remotePeerTwo, isAudioEnabled: false },
     ]);
   });
 });

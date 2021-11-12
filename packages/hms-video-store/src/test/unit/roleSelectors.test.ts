@@ -8,7 +8,14 @@ import {
   selectIsAllowedToPublish,
   selectIsAllowedToSubscribe,
 } from '../../core';
-import { hostRole, localPeer, makeFakeStore, remotePeer, ROLES, speakerRole } from '../fakeStore';
+import {
+  hostRole,
+  localPeer,
+  makeFakeStore,
+  remotePeerOne,
+  ROLES,
+  speakerRole,
+} from '../fakeStore';
 
 let fakeStore: HMSStore;
 
@@ -38,7 +45,7 @@ describe('test role related selectors', () => {
 
   test('selectRole change request', () => {
     const req = selectRoleChangeRequest(fakeStore);
-    expect(req?.requestedBy).toBe(remotePeer);
+    expect(req?.requestedBy).toBe(remotePeerOne);
     expect(req?.role.name).toBe(ROLES.SPEAKER);
     expect(req?.role).toBe(speakerRole);
     expect(req?.token).toBe('123');

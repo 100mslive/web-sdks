@@ -1,5 +1,11 @@
 import { createSelector } from 'reselect';
-import { selectHMSMessages, selectLocalPeerID, selectPeersMap, selectTracksMap } from './selectors';
+import {
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectPeers,
+  selectPeersMap,
+  selectTracksMap,
+} from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import {
   getPeerTracksByCondition,
@@ -368,3 +374,13 @@ export const selectMessagesByRole = byIDCurry(selectMessagesByRoleInternal);
 
 export const selectMessagesUnreadCountByRole = byIDCurry(selectUnreadMessageCountByRole);
 export const selectMessagesUnreadCountByPeerID = byIDCurry(selectUnreadMessageCountByPeerID);
+
+/**
+ * Select an array of peers of a particular role
+ * @param role HMSRoleName
+ * @returns HMSPeer[]
+ */
+export const selectPeersByRole = (role: HMSRoleName) =>
+  createSelector([selectPeers], peers => {
+    return peers.filter(p => p.roleName === role);
+  });
