@@ -285,6 +285,7 @@ export interface IHMSActions {
    * If data is undefined: Name of the peer is changed.
    * If name is undefined: Metadata of the peer is updated.
    * If both name and data is defined: Both name and metadata is updated.
+   * @alpha
    */
   updatePeer(params: HMSPeerUpdateConfig): Promise<void>;
 
