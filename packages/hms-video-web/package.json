@@ -38,7 +38,7 @@
   "size-limit": [
     {
       "path": "dist/hms-video.cjs.production.min.js",
-      "limit": "50 KB"
+      "limit": "60 KB"
     },
     {
       "path": "dist/hms-video.esm.js",
