@@ -17,7 +17,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 
@@ -319,7 +319,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private async pingPongLoop(id: number) {
-    const pingTimeout = DEFAULT_SIGNAL_PING_TIMEOUT;
+    const pingTimeout = window.HMS?.PING_TIMEOUT || DEFAULT_SIGNAL_PING_TIMEOUT;
     if (this.isConnected) {
       const pongTimeDiff = await this.ping(pingTimeout);
       if (pongTimeDiff > pingTimeout) {
@@ -328,7 +328,7 @@ export default class JsonRpcSignal implements ISignal {
           this.isConnected = false;
         }
       } else {
-        setTimeout(() => this.pingPongLoop(id), SIGNAL_PING_INTERVAL);
+        setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
       }
     }
   }
