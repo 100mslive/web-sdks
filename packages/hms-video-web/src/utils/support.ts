@@ -7,7 +7,7 @@ export const isNode =
   typeof process !== 'undefined' &&
   process.versions != null &&
   process.versions.node != null &&
-  !parsedUserAgent.getBrowser().name?.toLowerCase().includes('Electron');
+  !parsedUserAgent.getBrowser().name?.toLowerCase().includes('electron');
 
 export const isBrowser = typeof window !== 'undefined';
 
