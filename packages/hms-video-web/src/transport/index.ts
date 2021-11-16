@@ -501,7 +501,6 @@ export default class HMSTransport implements ITransport {
     track.publishedTrackId = track.nativeTrack.id;
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
-
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
         promise: { resolve, reject },
@@ -597,13 +596,16 @@ export default class HMSTransport implements ITransport {
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
     const callback = this.callbacks.get(RENEGOTIATION_CALLBACK_ID);
-    this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
+    if (!callback) {
+      return;
+    }
 
     try {
       const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
       await this.publishConnection!.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
+      this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
       await this.publishConnection!.setRemoteDescription(answer);
       callback!.promise.resolve(true);
@@ -747,7 +749,7 @@ export default class HMSTransport implements ITransport {
     }
 
     ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
-
+    await this.performPublishRenegotiation();
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 

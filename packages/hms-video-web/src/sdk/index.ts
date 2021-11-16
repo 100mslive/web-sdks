@@ -343,17 +343,9 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        // if delay fix is set, call onJoin before publishing
-        //@ts-ignore
-        if (window.HMS?.JOIN_DELAY_FIX) {
-          this.notifyJoin();
-        }
+        this.notifyJoin();
         if (this.publishParams && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);
-        }
-        //@ts-ignore
-        if (!window.HMS?.JOIN_DELAY_FIX) {
-          this.notifyJoin();
         }
       })
       .catch((error) => {
