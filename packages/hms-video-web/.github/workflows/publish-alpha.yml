@@ -20,13 +20,6 @@ jobs:
         with:
           node-version: 14
 
-      - name: Update version
-        run: |
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          npm version prerelease --preid=alpha 
-          git push
-
       - name: Install packages
         run: yarn install
 
