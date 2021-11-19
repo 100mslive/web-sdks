@@ -86,7 +86,7 @@ describe('HMSRemotPeer', () => {
     name: peerInfo.info.name,
     role: getParamsForRole(peerInfo.role),
     customerUserId: peerInfo.info.user_id,
-    customerDescription: peerInfo.info.data,
+    metadata: peerInfo.info.data,
   });
 
   it('should be constructed using params', () => {

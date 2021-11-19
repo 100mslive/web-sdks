@@ -48,7 +48,6 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { HMSPeerUpdateConfig } from '../interfaces/update-peer-metadata-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 
@@ -115,6 +114,12 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
     this.transport = new HMSTransport(this.observer, this.deviceManager, this.store, this.localTrackManager);
+  }
+
+  private validateJoined(name: string) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, `Not connected - ${name}`);
+    }
   }
 
   getPlaylistManager(): PlaylistManager {
@@ -219,7 +224,7 @@ export class HMSSdk implements HMSInterface {
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
       customerUserId: userId,
-      customerDescription: config.metaData,
+      metadata: config.metaData,
       role: policy,
     });
 
@@ -302,7 +307,7 @@ export class HMSSdk implements HMSInterface {
       const localPeer = new HMSLocalPeer({
         name: config.userName,
         customerUserId: userId,
-        customerDescription: config.metaData || '',
+        metadata: config.metaData || '',
         role: this.store.getPolicyForRole(role),
       });
       this.store.addPeer(localPeer);
@@ -310,7 +315,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
-      this.localPeer.customerDescription = config.metaData || '';
+      this.localPeer.metadata = config.metaData || '';
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -675,20 +680,30 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async updatePeer(params: HMSPeerUpdateConfig) {
-    if (!this.localPeer) {
-      throw ErrorFactory.GenericErrors.NotConnected(
-        HMSAction.VALIDATION,
-        'No local peer present, cannot update peer metadata.',
-      );
+  /**
+   * forPeer added in params for API compatibility with change role
+   * but the feature is not yet supported for remote peer.
+   */
+  async changeName(forPeer: HMSPeer, name: string) {
+    this.validateJoined('changeName');
+    if (!forPeer.isLocal) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Operation is supported only for local peer');
     }
-    await this.transport?.updatePeer(params);
-    if (params.name) {
-      this.localPeer.updateName(params.name);
+    await this.transport?.changeName(name);
+    forPeer.updateName(name);
+  }
+
+  /**
+   * forPeer added in params for API compatibility with change role
+   * but the feature is not yet supported for remote peer.
+   */
+  async changeMetadata(forPeer: HMSPeer, metadata: string) {
+    this.validateJoined('changeMetadata');
+    if (!forPeer.isLocal) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Operation is supported only for local peer');
     }
-    if (params.metadata) {
-      this.localPeer.updateMetadata(params.metadata);
-    }
+    await this.transport?.changeMetadata(metadata);
+    forPeer.updateMetadata(metadata);
   }
 
   getRoles(): HMSRole[] {

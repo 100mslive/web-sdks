@@ -51,7 +51,7 @@ export class PeerListManager {
         role: peer.role?.name || '',
         info: {
           name: peer.name,
-          data: peer.customerDescription || '',
+          data: peer.metadata || '',
           user_id: peer.customerUserId || '',
         },
         tracks: {},

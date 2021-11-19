@@ -82,7 +82,7 @@ export class PeerManager {
       this.listener?.onPeerUpdate(HMSPeerUpdate.NAME_UPDATED, peer);
     }
 
-    if (info.data && peer.customerDescription !== info.data) {
+    if (info.data && peer.metadata !== info.data) {
       peer.updateMetadata(info.data);
       this.listener?.onPeerUpdate(HMSPeerUpdate.METADATA_UPDATED, peer);
     }
@@ -93,7 +93,7 @@ export class PeerManager {
       peerId: peer.peer_id,
       name: peer.info.name,
       customerUserId: peer.info.user_id,
-      customerDescription: peer.info.data,
+      metadata: peer.info.data,
       role: this.store.getPolicyForRole(peer.role),
     });
 

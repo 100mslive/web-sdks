@@ -7,7 +7,7 @@ export type HMSPeerInit = {
   name: string;
   isLocal: boolean;
   customerUserId?: string;
-  customerDescription?: string;
+  metadata?: string;
   role?: HMSRole;
 };
 
@@ -16,18 +16,18 @@ export class HMSPeer implements IHMSPeer {
   readonly isLocal: boolean;
   name: string;
   customerUserId?: string = '';
-  customerDescription?: string = '';
+  metadata?: string = '';
   audioTrack?: HMSAudioTrack;
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[] = [];
   role?: HMSRole;
 
-  constructor({ peerId, name, isLocal, customerUserId, customerDescription, role }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, customerUserId, metadata, role }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
     this.customerUserId = customerUserId;
-    this.customerDescription = customerDescription;
+    this.metadata = metadata;
 
     if (role) {
       this.role = role;
@@ -50,6 +50,6 @@ export class HMSPeer implements IHMSPeer {
    * @internal
    */
   updateMetadata(data: string) {
-    this.customerDescription = data;
+    this.metadata = data;
   }
 }

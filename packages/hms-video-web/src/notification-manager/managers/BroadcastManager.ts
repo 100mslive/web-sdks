@@ -25,7 +25,7 @@ export class BroadcastManager {
         name: notifPeer.info.name,
         isLocal: false,
         customerUserId: notifPeer.info.user_id,
-        customerDescription: notifPeer.info.data,
+        metadata: notifPeer.info.data,
       });
     }
 
