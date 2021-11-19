@@ -36,8 +36,8 @@ export default interface HMS {
   stopRTMPAndRecording(): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
-  changeName(forPeer: HMSPeer, name: string): Promise<void>;
-  changeMetadata(forPeer: HMSPeer, metadata: string): Promise<void>;
+  changeName(name: string): Promise<void>;
+  changeMetadata(metadata: string): Promise<void>;
 
   /**
    * @deprecated The method should not be used

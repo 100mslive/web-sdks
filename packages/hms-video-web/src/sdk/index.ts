@@ -680,30 +680,16 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  /**
-   * forPeer added in params for API compatibility with change role
-   * but the feature is not yet supported for remote peer.
-   */
-  async changeName(forPeer: HMSPeer, name: string) {
+  async changeName(name: string) {
     this.validateJoined('changeName');
-    if (!forPeer.isLocal) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Operation is supported only for local peer');
-    }
     await this.transport?.changeName(name);
-    forPeer.updateName(name);
+    this.localPeer?.updateName(name);
   }
 
-  /**
-   * forPeer added in params for API compatibility with change role
-   * but the feature is not yet supported for remote peer.
-   */
-  async changeMetadata(forPeer: HMSPeer, metadata: string) {
+  async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
-    if (!forPeer.isLocal) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Operation is supported only for local peer');
-    }
     await this.transport?.changeMetadata(metadata);
-    forPeer.updateMetadata(metadata);
+    this.localPeer?.updateMetadata(metadata);
   }
 
   getRoles(): HMSRole[] {
