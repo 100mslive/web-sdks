@@ -25,7 +25,8 @@
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
-    "start": "lerna run start --stream --parallel"
+    "start": "lerna run start --stream --parallel",
+    "build": "lerna run build --stream --parallel"
   },
   "resolutions": {
     "node-notifier": "^8.0.1",
