@@ -140,7 +140,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async close(): Promise<void> {
-    const p = new Promise<void>((resolve) => {
+    const p = new Promise<void>(resolve => {
       this.socket!.addEventListener('close', () => resolve());
     });
     // @TODO: Clean up: Remove event listeners.
@@ -219,7 +219,7 @@ export default class JsonRpcSignal implements ISignal {
 
   ping(timeout: number): Promise<number> {
     const pingTime = Date.now();
-    const timer: Promise<number> = new Promise((resolve) => {
+    const timer: Promise<number> = new Promise(resolve => {
       setTimeout(() => {
         resolve(Date.now() - pingTime);
       }, timeout + 1);

@@ -60,24 +60,16 @@ export class HMSNotifications implements IHMSNotifications {
   sendLeaveRoom(request: HMSLeaveRoomRequest) {
     const peerName = request.requestedBy?.name;
     const notification = this.createNotification(
-      request.roomEnded || !peerName
-        ? HMSNotificationTypes.ROOM_ENDED
-        : HMSNotificationTypes.REMOVED_FROM_ROOM,
+      request.roomEnded || !peerName ? HMSNotificationTypes.ROOM_ENDED : HMSNotificationTypes.REMOVED_FROM_ROOM,
       request,
       HMSNotificationSeverity.INFO,
-      `${request.roomEnded ? `Room ended` : 'Removed from room'} ${
-        peerName ? `by ${peerName}` : ''
-      }`,
+      `${request.roomEnded ? `Room ended` : 'Removed from room'} ${peerName ? `by ${peerName}` : ''}`,
     );
     this.emitEvent(notification);
   }
 
   sendPeerList(peers: HMSPeer[]) {
-    const notification = this.createNotification(
-      HMSNotificationTypes.PEER_LIST,
-      peers,
-      HMSNotificationSeverity.INFO,
-    );
+    const notification = this.createNotification(HMSNotificationTypes.PEER_LIST, peers, HMSNotificationSeverity.INFO);
     this.emitEvent(notification);
   }
 
@@ -85,11 +77,7 @@ export class HMSNotifications implements IHMSNotifications {
     const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
     const notificationType = PEER_NOTIFICATION_TYPES[type];
     if (notificationType) {
-      const notification = this.createNotification(
-        notificationType,
-        hmsPeer,
-        HMSNotificationSeverity.INFO,
-      );
+      const notification = this.createNotification(notificationType, hmsPeer, HMSNotificationSeverity.INFO);
       this.emitEvent(notification);
     }
   }
@@ -98,11 +86,7 @@ export class HMSNotifications implements IHMSNotifications {
     const hmsTrack = this.store.getState(selectTrackByID(trackID));
     const notificationType = TRACK_NOTIFICATION_TYPES[type];
     if (notificationType) {
-      const notification = this.createNotification(
-        notificationType,
-        hmsTrack,
-        HMSNotificationSeverity.INFO,
-      );
+      const notification = this.createNotification(notificationType, hmsTrack, HMSNotificationSeverity.INFO);
       this.emitEvent(notification);
     }
   }
@@ -117,11 +101,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   sendError(error: HMSException) {
-    const notification = this.createNotification(
-      HMSNotificationTypes.ERROR,
-      error,
-      HMSNotificationSeverity.ERROR,
-    );
+    const notification = this.createNotification(HMSNotificationTypes.ERROR, error, HMSNotificationSeverity.ERROR);
     this.emitEvent(notification);
   }
 
@@ -135,11 +115,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   sendReconnected() {
-    const notification = this.createNotification(
-      HMSNotificationTypes.RECONNECTED,
-      null,
-      HMSNotificationSeverity.INFO,
-    );
+    const notification = this.createNotification(HMSNotificationTypes.RECONNECTED, null, HMSNotificationSeverity.INFO);
     this.emitEvent(notification);
   }
 

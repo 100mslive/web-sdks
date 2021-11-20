@@ -37,7 +37,7 @@ export class DeviceManager implements HMSDeviceManager {
   constructor(private store: IStore, private eventBus: EventBus) {}
 
   updateOutputDevice = (deviceId?: string) => {
-    const newDevice = this.audioOutput.find((device) => device.deviceId === deviceId);
+    const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
       this.store.updateAudioOutputDevice(newDevice);
@@ -115,11 +115,11 @@ export class DeviceManager implements HMSDeviceManager {
     const localPeer = this.store.getLocalPeer();
     const audioDevice = this.createIdentifier(localPeer?.audioTrack?.getMediaTrackSettings());
     const videoDevice = this.createIdentifier(localPeer?.videoTrack?.getMediaTrackSettings());
-    const audioSelection = this.audioInput.find((device) => {
+    const audioSelection = this.audioInput.find(device => {
       const id = this.createIdentifier(device);
       return id === audioDevice;
     });
-    const videoSelection = this.videoInput.find((device) => this.createIdentifier(device) === videoDevice);
+    const videoSelection = this.videoInput.find(device => this.createIdentifier(device) === videoDevice);
     return {
       audioInput: audioSelection,
       videoInput: videoSelection,
@@ -131,7 +131,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (prevDevices.length !== currentDevices.length) {
       return true;
     }
-    return currentDevices.some((device) => !prevDevices.includes(this.createIdentifier(device)));
+    return currentDevices.some(device => !prevDevices.includes(this.createIdentifier(device)));
   };
 
   private enumerateDevices = async () => {
@@ -142,7 +142,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.audioInput = [];
       this.audioOutput = [];
       this.videoInput = [];
-      devices.forEach((device) => {
+      devices.forEach(device => {
         if (device.kind === 'audioinput' && device.label) {
           this.hasMicrophonePermission = true;
           this.audioInput.push(device as MediaDeviceInfo);
@@ -191,12 +191,12 @@ export class DeviceManager implements HMSDeviceManager {
    * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
-    const defaultDevice = this.audioInput.find((device) => device.deviceId === 'default');
+    const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
       // false positives when device is removed, because the other available device
       // get's the deviceId as default once this device is removed
-      const nextDevice = this.audioInput.find((device) => {
+      const nextDevice = this.audioInput.find(device => {
         return device.label !== defaultDevice.label && defaultDevice.label.includes(device.label);
       });
       return nextDevice;
@@ -223,12 +223,12 @@ export class DeviceManager implements HMSDeviceManager {
       // only check for label because if groupId check is added it will select speaker
       // when an external earphone without microphone is added
       this.outputDevice = this.audioOutput.find(
-        (device) => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
+        device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
       );
     }
     if (!this.outputDevice) {
       // select default deviceId device if available, otherwise select 0th device
-      this.outputDevice = this.audioOutput.find((device) => device.deviceId === 'default') || this.audioOutput[0];
+      this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
     }
     this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous

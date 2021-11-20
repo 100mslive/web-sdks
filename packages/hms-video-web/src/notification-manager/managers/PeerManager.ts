@@ -56,7 +56,7 @@ export class PeerManager {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, hmsPeer.videoTrack, hmsPeer);
     }
 
-    hmsPeer.auxiliaryTracks?.forEach((track) => {
+    hmsPeer.auxiliaryTracks?.forEach(track => {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     });
 

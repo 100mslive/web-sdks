@@ -22,7 +22,7 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   }
 
   toSignalParams() {
-    const roles = this.recipientRoles?.map((role) => role.name);
+    const roles = this.recipientRoles?.map(role => role.name);
     const peer = this.recipientPeer?.peerId;
     const sendParams: SendMessage = {
       info: {

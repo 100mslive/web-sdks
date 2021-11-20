@@ -51,14 +51,14 @@ export class Comparator implements IComparator {
 
       screenShare: (peerA: HMSPeer, peerB: HMSPeer) =>
         this.primitiveComparator<boolean>(
-          peerA.auxiliaryTracks.some((track) => track.source === 'screen'),
-          peerB.auxiliaryTracks.some((track) => track.source === 'screen'),
+          peerA.auxiliaryTracks.some(track => track.source === 'screen'),
+          peerB.auxiliaryTracks.some(track => track.source === 'screen'),
         ),
 
       audioLevel: (peerA?: HMSPeer, peerB?: HMSPeer) =>
         this.primitiveComparator<number>(
-          this.store.getSpeakers().find((speaker) => speaker.peer.peerId === peerA?.peerId)?.audioLevel || -1,
-          this.store.getSpeakers().find((speaker) => speaker.peer.peerId === peerB?.peerId)?.audioLevel || -1,
+          this.store.getSpeakers().find(speaker => speaker.peer.peerId === peerA?.peerId)?.audioLevel || -1,
+          this.store.getSpeakers().find(speaker => speaker.peer.peerId === peerB?.peerId)?.audioLevel || -1,
         ),
 
       rolePriority: (peerA: HMSPeer, peerB: HMSPeer) =>
@@ -88,8 +88,8 @@ export class Comparator implements IComparator {
        */
       audioLevel: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator<number>(
-          this.store.getSpeakers().find((speaker) => speaker.track.trackId === trackA.trackId)?.audioLevel || 0,
-          this.store.getSpeakers().find((speaker) => speaker.track.trackId === trackB.trackId)?.audioLevel || 0,
+          this.store.getSpeakers().find(speaker => speaker.track.trackId === trackA.trackId)?.audioLevel || 0,
+          this.store.getSpeakers().find(speaker => speaker.track.trackId === trackB.trackId)?.audioLevel || 0,
         ),
 
       screenShare: (trackA: HMSTrack, trackB: HMSTrack) =>

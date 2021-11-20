@@ -26,7 +26,7 @@ export class LocalStorageEvents extends Queue<AnalyticsEvent> {
   }
 
   private initLocalStorageQueue() {
-    this.localStorage.get()?.forEach((event) => {
+    this.localStorage.get()?.forEach(event => {
       const eventInstance = new AnalyticsEvent(event);
       super.enqueue(eventInstance);
     });

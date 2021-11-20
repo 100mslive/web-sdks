@@ -231,10 +231,7 @@ export interface IHMSActions {
    * @param forRemoteTrackID The track ID or array of track IDs for which you want to change the state
    * @param enabled `true` if you wish to enable(unmute permission is required) the track, `false` if you wish to disable(mute permission is required) the track
    */
-  setRemoteTrackEnabled(
-    forRemoteTrackID: HMSTrackID | HMSTrackID[],
-    enabled: boolean,
-  ): Promise<void>;
+  setRemoteTrackEnabled(forRemoteTrackID: HMSTrackID | HMSTrackID[], enabled: boolean): Promise<void>;
 
   /**
    * Use this to mute/unmute multipe tracks by source, role or type

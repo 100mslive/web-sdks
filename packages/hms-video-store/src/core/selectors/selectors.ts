@@ -69,10 +69,7 @@ export const selectSpeakers = (store: HMSStore) => {
  * Select a boolean flag denoting whether you've joined a room.
  * NOTE: Returns true only after join, returns false during preview.
  */
-export const selectIsConnectedToRoom = createSelector(
-  [selectRoom],
-  room => room && room.isConnected,
-);
+export const selectIsConnectedToRoom = createSelector([selectRoom], room => room && room.isConnected);
 
 export const selectPeerCount = createSelector(selectRoom, room => room.peers.length);
 
@@ -142,29 +139,21 @@ export const selectRemotePeers = createSelector(selectPeers, peers => {
 /**
  * Select the peer who's speaking the loudest at the moment
  */
-export const selectDominantSpeaker = createSelector(
-  selectPeersMap,
-  selectSpeakers,
-  (peersMap, speakers) => {
-    // sort in descending order by audio level
-    const speakersInOrder = Object.entries(speakers).sort((s1, s2) => {
-      const s1Level = s1[1]?.audioLevel || 0;
-      const s2Level = s2[1]?.audioLevel || 0;
-      return s2Level > s1Level ? 1 : -1;
-    });
-    if (
-      speakersInOrder.length > 0 &&
-      speakersInOrder[0][1].audioLevel &&
-      speakersInOrder[0][1].audioLevel > 0
-    ) {
-      const peerID = speakersInOrder[0][1].peerID;
-      if (peerID in peersMap) {
-        return peersMap[peerID];
-      }
+export const selectDominantSpeaker = createSelector(selectPeersMap, selectSpeakers, (peersMap, speakers) => {
+  // sort in descending order by audio level
+  const speakersInOrder = Object.entries(speakers).sort((s1, s2) => {
+    const s1Level = s1[1]?.audioLevel || 0;
+    const s2Level = s2[1]?.audioLevel || 0;
+    return s2Level > s1Level ? 1 : -1;
+  });
+  if (speakersInOrder.length > 0 && speakersInOrder[0][1].audioLevel && speakersInOrder[0][1].audioLevel > 0) {
+    const peerID = speakersInOrder[0][1].peerID;
+    if (peerID in peersMap) {
+      return peersMap[peerID];
     }
-    return null;
-  },
-);
+  }
+  return null;
+});
 
 /**
  * Select a boolean denoting whether your local audio is unmuted
@@ -200,35 +189,27 @@ export const selectIsLocalVideoDisplayEnabled = (store: HMSStore) => {
 /**
  * Select a boolean denoting whether your screen is shared to remote peers in the room.
  */
-export const selectIsLocalScreenShared = createSelector(
-  selectLocalPeer,
-  selectTracksMap,
-  (localPeer, tracksMap) => {
-    const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
-    return !!(video || audio);
-  },
-);
+export const selectIsLocalScreenShared = createSelector(selectLocalPeer, selectTracksMap, (localPeer, tracksMap) => {
+  const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
+  return !!(video || audio);
+});
 
 /**
  * Select the first peer who is currently sharing their screen.
  */
-export const selectPeerScreenSharing = createSelector(
-  selectPeersMap,
-  selectTracksMap,
-  (peersMap, tracksMap) => {
-    let screensharePeer = undefined;
-    for (const peerID in peersMap) {
-      const peer = peersMap[peerID];
-      const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
-      if (video) {
-        return peer;
-      } else if (audio && !screensharePeer) {
-        screensharePeer = peer;
-      }
+export const selectPeerScreenSharing = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
+  let screensharePeer = undefined;
+  for (const peerID in peersMap) {
+    const peer = peersMap[peerID];
+    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    if (video) {
+      return peer;
+    } else if (audio && !screensharePeer) {
+      screensharePeer = peer;
     }
-    return screensharePeer;
-  },
-);
+  }
+  return screensharePeer;
+});
 
 /**
  * Select a boolean denoting whether someone is sharing screen in the room.
@@ -240,85 +221,64 @@ export const selectIsSomeoneScreenSharing = createSelector(selectPeerScreenShari
 /**
  * Select the first peer who is currently sharing their audio only screen
  */
-export const selectPeerSharingAudio = createSelector(
-  selectPeersMap,
-  selectTracksMap,
-  (peersMap, tracksMap) => {
-    for (const peerID in peersMap) {
-      const peer = peersMap[peerID];
-      const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
-      if (!video && !!audio) {
-        return peer;
-      }
+export const selectPeerSharingAudio = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
+  for (const peerID in peersMap) {
+    const peer = peersMap[peerID];
+    const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
+    if (!video && !!audio) {
+      return peer;
     }
-    return undefined;
-  },
-);
+  }
+  return undefined;
+});
 
 /**
  * Select an array of peers who are currently sharing their screen.
  */
-export const selectPeersScreenSharing = createSelector(
-  selectPeersMap,
-  selectTracksMap,
-  (peersMap, tracksMap) => {
-    const videoPeers = [];
-    const audioPeers = [];
-    for (const peerID in peersMap) {
-      const peer = peersMap[peerID];
-      const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
-      if (video) {
-        videoPeers.push(peer);
-      } else if (audio) {
-        audioPeers.push(peer);
-      }
+export const selectPeersScreenSharing = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
+  const videoPeers = [];
+  const audioPeers = [];
+  for (const peerID in peersMap) {
+    const peer = peersMap[peerID];
+    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    if (video) {
+      videoPeers.push(peer);
+    } else if (audio) {
+      audioPeers.push(peer);
     }
-    return videoPeers.concat(audioPeers);
-  },
-);
+  }
+  return videoPeers.concat(audioPeers);
+});
 
-export const selectPeerSharingVideoPlaylist = createSelector(
-  selectPeersMap,
-  selectTracksMap,
-  (peersMap, tracksMap) => {
-    for (const trackId in tracksMap) {
-      const track = tracksMap[trackId];
-      if (isVideoPlaylist(track) && isVideo(track) && track.peerId) {
-        return peersMap[track.peerId];
-      }
+export const selectPeerSharingVideoPlaylist = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
+  for (const trackId in tracksMap) {
+    const track = tracksMap[trackId];
+    if (isVideoPlaylist(track) && isVideo(track) && track.peerId) {
+      return peersMap[track.peerId];
     }
-    return undefined;
-  },
-);
+  }
+  return undefined;
+});
 
-export const selectPeerSharingAudioPlaylist = createSelector(
-  selectPeersMap,
-  selectTracksMap,
-  (peersMap, tracksMap) => {
-    for (const trackId in tracksMap) {
-      const track = tracksMap[trackId];
-      if (isAudioPlaylist(track) && track.peerId) {
-        return peersMap[track.peerId];
-      }
+export const selectPeerSharingAudioPlaylist = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
+  for (const trackId in tracksMap) {
+    const track = tracksMap[trackId];
+    if (isAudioPlaylist(track) && track.peerId) {
+      return peersMap[track.peerId];
     }
-    return undefined;
-  },
-);
+  }
+  return undefined;
+});
 
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
  */
-export const selectDegradedTracks = createSelector(selectTracks, tracks =>
-  tracks.filter(isDegraded),
-);
+export const selectDegradedTracks = createSelector(selectTracks, tracks => tracks.filter(isDegraded));
 
 /**
  * Select the number of messages(sent and received).
  */
-export const selectHMSMessagesCount = createSelector(
-  selectMessageIDsInOrder,
-  messageIDs => messageIDs.length,
-);
+export const selectHMSMessagesCount = createSelector(selectMessageIDsInOrder, messageIDs => messageIDs.length);
 
 /**
  * Select the number of unread messages.
@@ -330,17 +290,13 @@ export const selectUnreadHMSMessagesCount = createSelector(selectMessagesMap, me
 /**
  * Select an array of messages in the room(sent and received).
  */
-export const selectHMSMessages = createSelector(
-  selectMessageIDsInOrder,
-  selectMessagesMap,
-  (msgIDs, msgMap) => {
-    const messages: HMSMessage[] = [];
-    msgIDs.forEach(msgId => {
-      messages.push(msgMap[msgId]);
-    });
-    return messages;
-  },
-);
+export const selectHMSMessages = createSelector(selectMessageIDsInOrder, selectMessagesMap, (msgIDs, msgMap) => {
+  const messages: HMSMessage[] = [];
+  msgIDs.forEach(msgId => {
+    messages.push(msgMap[msgId]);
+  });
+  return messages;
+});
 
 /**
  * Select the current state of the room.
@@ -350,15 +306,9 @@ export const selectRoomState = createSelector([selectRoom], room => room && room
 /**
  * Select a boolean denoting whether the room is in Preview state.
  */
-export const selectIsInPreview = createSelector(
-  selectRoomState,
-  roomState => roomState === HMSRoomState.Preview,
-);
+export const selectIsInPreview = createSelector(selectRoomState, roomState => roomState === HMSRoomState.Preview);
 
-export const selectRoomStarted = createSelector(
-  selectRoom,
-  room => room.roomState !== HMSRoomState.Disconnected,
-);
+export const selectRoomStarted = createSelector(selectRoom, room => room.roomState !== HMSRoomState.Disconnected);
 
 /**
  * Select available roles in the room as a map between the role name and {@link HMSRole} object.
@@ -370,16 +320,13 @@ export const selectRolesMap = (store: HMSStore): Record<string, HMSRole> => {
 /**
  * Select an array of names of available roles in the room.
  */
-export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMap =>
-  Object.keys(rolesMap),
-);
+export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMap => Object.keys(rolesMap));
 
 /**
  * Select the {@link HMSRole} object of your local peer.
  */
-export const selectLocalPeerRole = createSelector(
-  [selectLocalPeer, selectRolesMap],
-  (localPeer, rolesMap) => (localPeer?.roleName ? rolesMap[localPeer.roleName] : null),
+export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesMap], (localPeer, rolesMap) =>
+  localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
 );
 
 /**

@@ -8,14 +8,7 @@ import {
   selectIsAllowedToPublish,
   selectIsAllowedToSubscribe,
 } from '../../core';
-import {
-  hostRole,
-  localPeer,
-  makeFakeStore,
-  remotePeerOne,
-  ROLES,
-  speakerRole,
-} from '../fakeStore';
+import { hostRole, localPeer, makeFakeStore, remotePeerOne, ROLES, speakerRole } from '../fakeStore';
 
 let fakeStore: HMSStore;
 

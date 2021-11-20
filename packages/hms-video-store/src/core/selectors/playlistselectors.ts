@@ -7,21 +7,17 @@ import { HMSPlaylistType, HMSStore, HMSPlaylistSelector } from '../schema';
 const selectPlaylistMap = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
   store.playlist[type].list;
 
-const selectPlaylistSelection = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
-  store: HMSStore,
-) => store.playlist[type].selection;
+const selectPlaylistSelection = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
+  store.playlist[type].selection;
 
-const selectPlaylistProgress = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
-  store: HMSStore,
-) => store.playlist[type].progress;
+const selectPlaylistProgress = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
+  store.playlist[type].progress;
 
-const selectPlaylistCurrentTime = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
-  store: HMSStore,
-) => store.playlist[type].currentTime;
+const selectPlaylistCurrentTime = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
+  store.playlist[type].currentTime;
 
-const selectPlaylistPlaybackRate = (type: HMSPlaylistType = HMSPlaylistType.audio) => (
-  store: HMSStore,
-) => store.playlist[type].playbackRate;
+const selectPlaylistPlaybackRate = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
+  store.playlist[type].playbackRate;
 
 const selectPlaylistVolume = (type: HMSPlaylistType = HMSPlaylistType.audio) => (store: HMSStore) =>
   store.playlist[type].volume;
@@ -35,16 +31,12 @@ const selectPlaylist = (type: HMSPlaylistType = HMSPlaylistType.audio) =>
   });
 
 const selectPlaylistSelectedItem = (type: HMSPlaylistType = HMSPlaylistType.audio) =>
-  createSelector(
-    selectPlaylistMap(type),
-    selectPlaylistSelection(type),
-    (storePlaylist, currentSelection) => {
-      if (!currentSelection.id) {
-        return;
-      }
-      return storePlaylist[currentSelection.id];
-    },
-  );
+  createSelector(selectPlaylistMap(type), selectPlaylistSelection(type), (storePlaylist, currentSelection) => {
+    if (!currentSelection.id) {
+      return;
+    }
+    return storePlaylist[currentSelection.id];
+  });
 
 export const selectAudioPlaylist: HMSPlaylistSelector = {
   selection: selectPlaylistSelection(HMSPlaylistType.audio),

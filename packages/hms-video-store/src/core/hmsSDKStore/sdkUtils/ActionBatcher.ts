@@ -28,10 +28,7 @@ export class ActionBatcher {
     }
     // set a future timeout if a timer is not there already
     if (window) {
-      this.timers[action] = window.setTimeout(
-        () => this.setStateBatched(action),
-        this.DEFAULT_INTERVAL_MS,
-      );
+      this.timers[action] = window.setTimeout(() => this.setStateBatched(action), this.DEFAULT_INTERVAL_MS);
     } else {
       // nodejs, ignore batching for now
       this.setStateBatched(action);

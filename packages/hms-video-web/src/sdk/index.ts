@@ -234,7 +234,7 @@ export class HMSSdk implements HMSInterface {
     const policyHandler = async () => {
       this.notificationManager.removeEventListener('policy-change', policyHandler);
       const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
-      tracks.forEach((track) => this.setLocalPeerTrack(track));
+      tracks.forEach(track => this.setLocalPeerTrack(track));
       this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
       await this.initDeviceManagers();
       listener.onPreview(this.store.getRoom(), tracks);
@@ -353,7 +353,7 @@ export class HMSSdk implements HMSInterface {
           await this.publish(config.settings || defaultSettings);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         this.listener?.onError(error as HMSException);
         HMSLogger.e(this.TAG, 'Unable to join room', error);
       })
@@ -428,7 +428,7 @@ export class HMSSdk implements HMSInterface {
   async sendGroupMessage(message: string, roles: HMSRole[], type?: string) {
     const knownRoles = this.store.getKnownRoles();
     const recipientRoles =
-      roles.filter((role) => {
+      roles.filter(role => {
         return knownRoles[role.name];
       }) || [];
     if (recipientRoles.length === 0) {
@@ -478,7 +478,7 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    if (this.localPeer?.auxiliaryTracks?.find((track) => track.source === 'screen')) {
+    if (this.localPeer?.auxiliaryTracks?.find(track => track.source === 'screen')) {
       throw Error('Cannot share multiple screens');
     }
 
@@ -517,7 +517,7 @@ export class HMSSdk implements HMSInterface {
       }
     }
     await this.transport.publish(tracks);
-    tracks.forEach((track) => {
+    tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
       this.localPeer?.auxiliaryTracks.push(track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
@@ -532,7 +532,7 @@ export class HMSSdk implements HMSInterface {
 
   async stopScreenShare() {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
-    const screenTracks = this.localPeer?.auxiliaryTracks.filter((t) => t.source === 'screen');
+    const screenTracks = this.localPeer?.auxiliaryTracks.filter(t => t.source === 'screen');
     if (screenTracks) {
       for (let track of screenTracks) {
         await this.removeTrack(track.trackId);
@@ -548,7 +548,7 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
     }
-    const isTrackPresent = this.localPeer.auxiliaryTracks.find((t) => t.trackId === track.id);
+    const isTrackPresent = this.localPeer.auxiliaryTracks.find(t => t.trackId === track.id);
     if (isTrackPresent) {
       return;
     }
@@ -586,7 +586,7 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot removeTrack');
     }
-    const trackIndex = this.localPeer.auxiliaryTracks.findIndex((t) => t.trackId === trackId);
+    const trackIndex = this.localPeer.auxiliaryTracks.findIndex(t => t.trackId === trackId);
     if (trackIndex > -1) {
       const track = this.localPeer.auxiliaryTracks[trackIndex];
       await this.transport!.unpublish([track]);
@@ -734,7 +734,7 @@ export class HMSSdk implements HMSInterface {
       value: !enabled,
       type,
       source,
-      roles: roles?.map((role) => role?.name),
+      roles: roles?.map(role => role?.name),
     });
   }
 
@@ -787,7 +787,7 @@ export class HMSSdk implements HMSInterface {
 
   private initPreviewTrackAudioLevelMonitor() {
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
-    this.localPeer?.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', (audioLevelUpdate) => {
+    this.localPeer?.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', audioLevelUpdate => {
       const hmsSpeakers = audioLevelUpdate
         ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
         : [];

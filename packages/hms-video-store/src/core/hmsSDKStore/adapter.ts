@@ -111,9 +111,7 @@ export class SDKToHMS {
     };
   }
 
-  static convertMessage(
-    sdkMessage: sdkTypes.HMSMessage,
-  ): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
+  static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
       sender: sdkMessage.sender.peerId,
       senderName: sdkMessage.sender.name,
@@ -158,9 +156,7 @@ export class SDKToHMS {
     };
   }
 
-  static convertDeviceChangeUpdate(
-    sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent,
-  ): HMSDeviceChangeEvent {
+  static convertDeviceChangeUpdate(sdkDeviceChangeEvent: sdkTypes.HMSDeviceChangeEvent): HMSDeviceChangeEvent {
     const convertedData: HMSDeviceChangeEvent = {
       devices: sdkDeviceChangeEvent.devices,
       selection: sdkDeviceChangeEvent.selection,
@@ -195,10 +191,7 @@ export class SDKToHMS {
     };
   }
 
-  private static getConvertedPlaylistType(
-    playlistManager: sdkTypes.HMSPlaylistManager,
-    type: HMSPlaylistType,
-  ) {
+  private static getConvertedPlaylistType(playlistManager: sdkTypes.HMSPlaylistManager, type: HMSPlaylistType) {
     const convertedPlaylist: Record<string, HMSPlaylistItem<any>> = {};
     const currentSelection = playlistManager.getCurrentSelection(type);
     const progress = playlistManager.getCurrentProgress(type);
@@ -207,10 +200,7 @@ export class SDKToHMS {
     const currentIndex = playlistManager.getCurrentIndex(type);
 
     playlistManager.getList(type).forEach(playlistItem => {
-      convertedPlaylist[playlistItem.id] = SDKToHMS.convertPlaylistItem(
-        playlistManager,
-        playlistItem,
-      );
+      convertedPlaylist[playlistItem.id] = SDKToHMS.convertPlaylistItem(playlistManager, playlistItem);
     });
     return {
       list: convertedPlaylist,

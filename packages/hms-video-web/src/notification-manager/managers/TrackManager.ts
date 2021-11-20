@@ -138,7 +138,7 @@ export class TrackManager {
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
 
-    tracksCopy.forEach((track) => {
+    tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
         return;

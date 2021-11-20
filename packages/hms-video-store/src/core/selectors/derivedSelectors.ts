@@ -24,18 +24,15 @@ export interface HMSPublishAllowed {
   screen: boolean;
 }
 
-export const selectPeersWithAudioStatus = createSelector(
-  [selectPeersMap, selectTracksMap],
-  (peersMap, tracksMap) => {
-    const participants: HMSPeerWithMuteStatus[] = Object.values(peersMap).map(peer => {
-      return {
-        peer: peer,
-        isAudioEnabled: peer.audioTrack ? tracksMap[peer.audioTrack]?.enabled : false,
-      };
-    });
-    return participants;
-  },
-);
+export const selectPeersWithAudioStatus = createSelector([selectPeersMap, selectTracksMap], (peersMap, tracksMap) => {
+  const participants: HMSPeerWithMuteStatus[] = Object.values(peersMap).map(peer => {
+    return {
+      peer: peer,
+      isAudioEnabled: peer.audioTrack ? tracksMap[peer.audioTrack]?.enabled : false,
+    };
+  });
+  return participants;
+});
 
 const selectRoleChangeStoreRequest = (store: HMSStore) => {
   return store.roleChangeRequests[0] || null;

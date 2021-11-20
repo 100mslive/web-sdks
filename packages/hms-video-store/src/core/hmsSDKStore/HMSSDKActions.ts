@@ -60,11 +60,7 @@ import {
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
-import {
-  areArraysEqual,
-  mergeNewPeersInDraft,
-  mergeNewTracksInDraft,
-} from './sdkUtils/storeMergeUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
@@ -154,9 +150,7 @@ export class HMSSDKActions implements IHMSActions {
     }
     const roomState = this.store.getState(selectRoomState);
     if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {
-      this.logPossibleInconsistency(
-        'attempting to call preview while room is in preview/connecting',
-      );
+      this.logPossibleInconsistency('attempting to call preview while room is in preview/connecting');
       return;
     }
 
@@ -265,9 +259,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsNotifications.sendError(SDKToHMS.convertException(err as SDKHMSException));
       throw err;
     }
-    const type = enabled
-      ? sdkTypes.HMSTrackUpdate.TRACK_UNMUTED
-      : sdkTypes.HMSTrackUpdate.TRACK_MUTED;
+    const type = enabled ? sdkTypes.HMSTrackUpdate.TRACK_UNMUTED : sdkTypes.HMSTrackUpdate.TRACK_MUTED;
     this.hmsNotifications.sendTrackUpdate(type, trackID);
   }
 
@@ -311,10 +303,7 @@ export class HMSSDKActions implements IHMSActions {
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
 
-  private updateMessageInStore(
-    sdkMessage: sdkTypes.HMSMessage | void,
-    messageInput: string | HMSMessageInput,
-  ) {
+  private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {
     if (!sdkMessage) {
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
@@ -399,9 +388,7 @@ export class HMSSDKActions implements IHMSActions {
       ? this.hmsSDKPeers[request.requestedBy.id]
       : undefined;
     if (!sdkPeer) {
-      HMSLogger.w(
-        `peer for which role change is requested no longer available - ${request.requestedBy}`,
-      );
+      HMSLogger.w(`peer for which role change is requested no longer available - ${request.requestedBy}`);
     }
     const sdkRequest = {
       requestedBy: sdkPeer,
@@ -466,9 +453,7 @@ export class HMSSDKActions implements IHMSActions {
       if (track && isRemoteTrack(track)) {
         await this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
       } else {
-        this.logPossibleInconsistency(
-          `No remote track with ID ${trackID} found for change track state`,
-        );
+        this.logPossibleInconsistency(`No remote track with ID ${trackID} found for change track state`);
       }
     } else if (Array.isArray(trackID)) {
       trackID.forEach(id => this.setRemoteTrackEnabled(id, enabled));
@@ -706,9 +691,7 @@ export class HMSSDKActions implements IHMSActions {
       this.syncPlaylistState(`${type}PlaylistEnded`);
     });
     playlistManager.onCurrentTrackEnded((item: sdkTypes.HMSPlaylistItem<any>) => {
-      this.hmsNotifications.sendPlaylistTrackEnded(
-        SDKToHMS.convertPlaylistItem(playlistManager, item),
-      );
+      this.hmsNotifications.sendPlaylistTrackEnded(SDKToHMS.convertPlaylistItem(playlistManager, item));
       this.syncPlaylistState(`${item.type}PlaylistItemEnded`);
     });
   }
@@ -720,15 +703,9 @@ export class HMSSDKActions implements IHMSActions {
     }, 'RoomUpdate');
   }
 
-  protected onPeerUpdate(
-    type: sdkTypes.HMSPeerUpdate,
-    sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[],
-  ) {
+  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
     if (
-      [
-        sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
-        sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER,
-      ].includes(type)
+      [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
     ) {
       return; // ignore, high frequency update so no point of syncing peers
     }
@@ -747,19 +724,14 @@ export class HMSSDKActions implements IHMSActions {
     this.sendPeerUpdateNotification(type, sdkPeer);
   }
 
-  protected onTrackUpdate(
-    type: sdkTypes.HMSTrackUpdate,
-    track: SDKHMSTrack,
-    peer: sdkTypes.HMSPeer,
-  ) {
+  protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {
     // this check is needed because for track removed case, the notification needs to
     // be send before the track is removed from store
     if (type === sdkTypes.HMSTrackUpdate.TRACK_REMOVED) {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
     } else {
-      const actionName =
-        type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
+      const actionName = type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
       this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
@@ -817,9 +789,7 @@ export class HMSSDKActions implements IHMSActions {
     const track = this.store.getState(selectTrackByID(storeTrackID));
 
     if (!requestedBy) {
-      return this.logPossibleInconsistency(
-        `Not found peer who requested track state change, ${request.requestedBy}`,
-      );
+      return this.logPossibleInconsistency(`Not found peer who requested track state change, ${request.requestedBy}`);
     }
     if (!track) {
       return this.logPossibleInconsistency(
@@ -842,9 +812,7 @@ export class HMSSDKActions implements IHMSActions {
     const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
 
     if (!requestedBy) {
-      return this.logPossibleInconsistency(
-        `Not found peer who requested track state change, ${request.requestedBy}`,
-      );
+      return this.logPossibleInconsistency(`Not found peer who requested track state change, ${request.requestedBy}`);
     }
 
     if (!request.enabled) {
@@ -935,10 +903,7 @@ export class HMSSDKActions implements IHMSActions {
         delete hmsPeer?.videoTrack;
       } else {
         const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
-        if (
-          auxiliaryIndex > -1 &&
-          this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])
-        ) {
+        if (auxiliaryIndex > -1 && this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])) {
           hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
         }
       }
@@ -956,10 +921,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private async setSDKLocalVideoTrackSettings(
-    trackID: string,
-    settings: Partial<sdkTypes.HMSVideoTrackSettings>,
-  ) {
+  private async setSDKLocalVideoTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
     const track = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
     if (track) {
       await track.setSettings(settings);
@@ -968,10 +930,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private async setSDKLocalAudioTrackSettings(
-    trackID: string,
-    settings: Partial<sdkTypes.HMSAudioTrackSettings>,
-  ) {
+  private async setSDKLocalAudioTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
     const track = this.hmsSDKTracks[trackID] as SDKHMSLocalAudioTrack;
     if (track) {
       await track.setSettings(settings);
@@ -1028,11 +987,7 @@ export class HMSSDKActions implements IHMSActions {
     HMSLogger.w('possible inconsistency detected - ', inconsistency);
   }
 
-  private async addRemoveVideoPlugin(
-    plugin: HMSVideoPlugin,
-    action: 'add' | 'remove',
-    pluginFrameRate?: number,
-  ) {
+  private async addRemoveVideoPlugin(plugin: HMSVideoPlugin, action: 'add' | 'remove', pluginFrameRate?: number) {
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');
       return;
@@ -1129,10 +1084,7 @@ export class HMSSDKActions implements IHMSActions {
     }, action);
   };
 
-  private sendPeerUpdateNotification = (
-    type: sdkTypes.HMSPeerUpdate,
-    sdkPeer: sdkTypes.HMSPeer,
-  ) => {
+  private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     let actionName = 'peerUpdate';
     actionName = ACTION_TYPES[type];

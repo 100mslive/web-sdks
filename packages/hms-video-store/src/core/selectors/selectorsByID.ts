@@ -1,11 +1,5 @@
 import { createSelector } from 'reselect';
-import {
-  selectHMSMessages,
-  selectLocalPeerID,
-  selectPeers,
-  selectPeersMap,
-  selectTracksMap,
-} from './selectors';
+import { selectHMSMessages, selectLocalPeerID, selectPeers, selectPeersMap, selectTracksMap } from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import {
   getPeerTracksByCondition,
@@ -45,9 +39,8 @@ const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (store
   peerID ? storePeers[peerID] : null,
 );
 
-const selectTrackByIDBare = createSelector(
-  [selectTracksMap, selectTrackID],
-  (storeTracks, trackID) => (trackID ? storeTracks[trackID] : null),
+const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
+  trackID ? storeTracks[trackID] : null,
 );
 
 /**
@@ -68,9 +61,7 @@ export const selectTrackByID = byIDCurry(selectTrackByIDBare);
 /**
  * Select the primary video track of a peer given a peer ID.
  */
-export const selectVideoTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
+export const selectVideoTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
   if (peer && peer.videoTrack && peer.videoTrack !== '') {
     return store.tracks[peer.videoTrack];
@@ -81,9 +72,7 @@ export const selectVideoTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMS
 /**
  * Select the primary audio track of a peer given a peer ID.
  */
-export const selectAudioTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
+export const selectAudioTrackByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
   if (peer && peer.audioTrack && peer.audioTrack !== '') {
     return store.tracks[peer.audioTrack];
@@ -100,12 +89,10 @@ export const selectCameraStreamByPeerID = selectVideoTrackByPeerID;
 /**
  * Select an array of auxiliary tracks of a peer given a peer ID.
  */
-export const selectAuxiliaryTracksByPeerID = byIDCurry(
-  (store: HMSStore, peerID?: HMSPeerID): HMSTrack[] => {
-    const peer = selectPeerByIDBare(store, peerID);
-    return peer?.auxiliaryTracks.map(trackID => store.tracks[trackID]) || [];
-  },
-);
+export const selectAuxiliaryTracksByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack[] => {
+  const peer = selectPeerByIDBare(store, peerID);
+  return peer?.auxiliaryTracks.map(trackID => store.tracks[trackID]) || [];
+});
 
 const selectSpeakerByTrackID = (store: HMSStore, trackID: HMSTrackID | undefined) => {
   return trackID ? store.speakers[trackID] : null;
@@ -136,9 +123,7 @@ export const selectPeerAudioByID = byIDCurry(
 /**
  * Select the first auxiliary audio track of a peer given a peer ID.
  */
-export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID):
-  | HMSTrack
-  | undefined => {
+export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack | undefined => {
   const peer = selectPeerByIDBare(store, peerID);
   if (peer) {
     const trackID = peer?.auxiliaryTracks.find(trackID => isAudio(store.tracks[trackID]));
@@ -236,12 +221,10 @@ export const selectIsLocallyMutedByPeerID = byIDCurry((store: HMSStore, peerID?:
 /**
  * Select a boolean denoting whether you've muted the screen share audio track of a peer locally(only for you) given a peer ID.
  */
-export const selectIsScreenShareLocallyMutedByPeerID = byIDCurry(
-  (store: HMSStore, peerID?: string) => {
-    const track = selectScreenShareAudioByPeerID(peerID)(store);
-    return selectIsAudioLocallyMuted(track?.id)(store);
-  },
-);
+export const selectIsScreenShareLocallyMutedByPeerID = byIDCurry((store: HMSStore, peerID?: string) => {
+  const track = selectScreenShareAudioByPeerID(peerID)(store);
+  return selectIsAudioLocallyMuted(track?.id)(store);
+});
 
 /**
  * Select the local audio volume of an audio track given a track ID.
@@ -273,12 +256,10 @@ export const selectAudioVolumeByPeerID = byIDCurry((store: HMSStore, peerID?: st
 /**
  * Select the local audio volume of the screen share of a peer given a peer ID.
  */
-export const selectScreenshareAudioVolumeByPeerID = byIDCurry(
-  (store: HMSStore, peerID?: string) => {
-    const track = selectScreenShareAudioByPeerID(peerID)(store);
-    return selectAudioTrackVolume(track?.id)(store);
-  },
-);
+export const selectScreenshareAudioVolumeByPeerID = byIDCurry((store: HMSStore, peerID?: string) => {
+  const track = selectScreenShareAudioByPeerID(peerID)(store);
+  return selectAudioTrackVolume(track?.id)(store);
+});
 
 /**
  * Select the current simulcast layer of a track given a track ID.
@@ -316,21 +297,18 @@ const selectMessagesByPeerIDInternal = createSelector(
   },
 );
 
-const selectMessagesByRoleInternal = createSelector(
-  [selectHMSMessages, selectRoleName],
-  (messages, roleName) => {
-    if (!roleName) {
-      return undefined;
+const selectMessagesByRoleInternal = createSelector([selectHMSMessages, selectRoleName], (messages, roleName) => {
+  if (!roleName) {
+    return undefined;
+  }
+  return messages.filter(message => {
+    // Not Role message - Broadcast message or Private Peer message
+    if (!message.recipientRoles?.length) {
+      return false;
     }
-    return messages.filter(message => {
-      // Not Role message - Broadcast message or Private Peer message
-      if (!message.recipientRoles?.length) {
-        return false;
-      }
-      return message.recipientRoles?.includes(roleName);
-    });
-  },
-);
+    return message.recipientRoles?.includes(roleName);
+  });
+});
 
 export const selectBroadcastMessages = createSelector(selectHMSMessages, messages => {
   return messages.filter(message => {
@@ -341,32 +319,23 @@ export const selectBroadcastMessages = createSelector(selectHMSMessages, message
   });
 });
 
-const selectUnreadMessageCountByRole = createSelector(
-  [selectMessagesByRoleInternal, selectRoleName],
-  messages => {
-    if (!messages) {
-      return 0;
-    }
-    return messages.filter(m => !m.read).length;
-  },
-);
+const selectUnreadMessageCountByRole = createSelector([selectMessagesByRoleInternal, selectRoleName], messages => {
+  if (!messages) {
+    return 0;
+  }
+  return messages.filter(m => !m.read).length;
+});
 
-const selectUnreadMessageCountByPeerID = createSelector(
-  [selectMessagesByPeerIDInternal, selectPeerID],
-  messages => {
-    if (!messages) {
-      return 0;
-    }
-    return messages.filter(m => !m.read).length;
-  },
-);
+const selectUnreadMessageCountByPeerID = createSelector([selectMessagesByPeerIDInternal, selectPeerID], messages => {
+  if (!messages) {
+    return 0;
+  }
+  return messages.filter(m => !m.read).length;
+});
 
-export const selectBroadcastMessagesUnreadCount = createSelector(
-  selectBroadcastMessages,
-  messages => {
-    return messages.filter(m => !m.read).length;
-  },
-);
+export const selectBroadcastMessagesUnreadCount = createSelector(selectBroadcastMessages, messages => {
+  return messages.filter(m => !m.read).length;
+});
 
 export const selectMessagesByPeerID = byIDCurry(selectMessagesByPeerIDInternal);
 

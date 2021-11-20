@@ -192,7 +192,7 @@ export class AudioSinkManager {
     if (this.state.autoplayFailed === undefined) {
       if (!this.state.autoplayCheckPromise) {
         // it's the first track, try to play it, that'll tell us whether autoplay is allowed
-        this.state.autoplayCheckPromise = new Promise<void>((resolve) => {
+        this.state.autoplayCheckPromise = new Promise<void>(resolve => {
           this.playAudioFor(track).then(resolve);
         });
       }
@@ -268,7 +268,7 @@ export class AudioSinkManager {
 
   private unpauseAudioTracks = async () => {
     const promises: Promise<void>[] = [];
-    this.autoPausedTracks.forEach((track) => {
+    this.autoPausedTracks.forEach(track => {
       promises.push(this.playAudioFor(track));
     });
     // Return after all pending tracks are played

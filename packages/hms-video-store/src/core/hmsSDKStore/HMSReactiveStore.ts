@@ -179,15 +179,10 @@ export class HMSReactiveStore {
    * https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Methods.md
    * modified version of zustand's devtools - https://github.com/pmndrs/zustand/blob/v3.5.7/src/middleware.ts#L46
    */
-  private static setUpDevtools<T extends State>(
-    api: StoreApi<T>,
-    prefix: string,
-  ): NamedSetState<HMSStore> {
+  private static setUpDevtools<T extends State>(api: StoreApi<T>, prefix: string): NamedSetState<HMSStore> {
     let extension;
     try {
-      extension =
-        (window as any).__REDUX_DEVTOOLS_EXTENSION__ ||
-        (window as any).top.__REDUX_DEVTOOLS_EXTENSION__;
+      extension = (window as any).__REDUX_DEVTOOLS_EXTENSION__ || (window as any).top.__REDUX_DEVTOOLS_EXTENSION__;
     } catch {}
     if (!extension) {
       return (fn: any) => {
@@ -232,11 +227,7 @@ export class HMSReactiveStore {
    * @param savedSetState - setState saved before its modified to update devtools
    * @private
    */
-  private static devtoolsSubscribe<T extends State>(
-    devtools: any,
-    api: StoreApi<T>,
-    savedSetState: SetState<T>,
-  ) {
+  private static devtoolsSubscribe<T extends State>(devtools: any, api: StoreApi<T>, savedSetState: SetState<T>) {
     // disabling complexity check instead of refactoring so as to keep the code close to zustand's and make
     // any future update based on upstream changes easier.
     // eslint-disable-next-line complexity

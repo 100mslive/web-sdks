@@ -63,13 +63,13 @@ export class LocalTrackManager {
     }
 
     const localTracks = this.store.getLocalPeerTracks();
-    const videoTrack = localTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
+    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
       | HMSLocalVideoTrack
       | undefined;
-    const audioTrack = localTracks.find((t) => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
+    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
       | HMSLocalAudioTrack
       | undefined;
-    const screenTrack = localTracks.find((t) => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
+    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
       | HMSLocalVideoTrack
       | undefined;
 
@@ -129,8 +129,8 @@ export class LocalTrackManager {
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
-      const nativeVideoTrack = nativeTracks.find((track) => track.kind === 'video');
-      const nativeAudioTrack = nativeTracks.find((track) => track.kind === 'audio');
+      const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
+      const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
       const local = new HMSLocalStream(new MediaStream(nativeTracks));
 
       const tracks: Array<HMSLocalTrack> = [];

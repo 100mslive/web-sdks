@@ -100,7 +100,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   getTracks() {
-    return this.tracks.map((track) => track.id);
+    return this.tracks.map(track => track.id);
   }
 
   getElement() {
@@ -136,7 +136,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     }
     const videoElement = document.createElement('video');
     videoElement.crossOrigin = 'anonymous';
-    videoElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
+    videoElement.addEventListener('timeupdate', event => this.emit('progress', event));
     videoElement.addEventListener('ended', () => {
       this.emit('ended', null);
     });

@@ -66,7 +66,7 @@ export class PlaylistManager
 
   removeItem<T>(item: HMSPlaylistItem<T>): void {
     const list = this.state[item.type].list;
-    const index = list.findIndex((playItem) => item.id === playItem.id);
+    const index = list.findIndex(playItem => item.id === playItem.id);
     if (index > -1) {
       list.splice(index, 1);
     }
@@ -176,7 +176,7 @@ export class PlaylistManager
     { id, type = HMSPlaylistType.audio }: { id: string; type: HMSPlaylistType },
   ): Promise<void> {
     const list = this.state[type].list;
-    const currentIndex = list.findIndex((item) => item.id === id);
+    const currentIndex = list.findIndex(item => item.id === id);
     if (!id || currentIndex === -1) {
       HMSLogger.w(this.TAG, 'Pass a valid id');
       return;

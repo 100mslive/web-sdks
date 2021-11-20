@@ -33,7 +33,7 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
       audiooutput: [],
       videoinput: [],
     };
-    devices.forEach((device) => deviceGroups[device.kind].push(device));
+    devices.forEach(device => deviceGroups[device.kind].push(device));
     return deviceGroups;
   } catch (err) {
     throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);

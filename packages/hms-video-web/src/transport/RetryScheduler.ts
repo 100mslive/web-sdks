@@ -49,7 +49,7 @@ export class RetryScheduler {
   }
 
   reset() {
-    this.retryTaskIds.forEach((future) => clearTimeout(future));
+    this.retryTaskIds.forEach(future => clearTimeout(future));
     this.retryTaskIds = [];
     this.inProgress.clear();
   }
@@ -112,7 +112,7 @@ export class RetryScheduler {
 
       if (hasFailedDependency) {
         error.description += ` Could not recover all of it's required dependencies - [${(dependencies as Array<TFC>)
-          .map((dep) => TFC[dep])
+          .map(dep => TFC[dep])
           .toString()}]`;
       }
       error.isTerminal = true;

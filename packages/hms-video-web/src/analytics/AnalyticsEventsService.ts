@@ -44,7 +44,7 @@ export class AnalyticsEventsService {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
-          this.transports.forEach((transport) => transport.sendEvent(event));
+          this.transports.forEach(transport => transport.sendEvent(event));
         }
       }
     } catch (error) {

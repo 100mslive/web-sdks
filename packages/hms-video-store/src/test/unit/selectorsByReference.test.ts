@@ -1,9 +1,5 @@
 import { localAudio, localVideo, makeFakeStore } from '../fakeStore';
-import {
-  HMSStore,
-  selectIsLocalVideoPluginPresent,
-  selectIsLocalAudioPluginPresent,
-} from '../../core';
+import { HMSStore, selectIsLocalVideoPluginPresent, selectIsLocalAudioPluginPresent } from '../../core';
 
 let fakeStore: HMSStore;
 

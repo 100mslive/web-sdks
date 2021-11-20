@@ -24,8 +24,7 @@ export class HMSPlaylist implements IHMSPlaylistActions {
   }
 
   async pause(): Promise<void> {
-    const selector =
-      this.type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
+    const selector = this.type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
     const selection = this.store.getState(selector.selection);
     if (!selection.id) {
       HMSLogger.w('No item is currently playing to pause');

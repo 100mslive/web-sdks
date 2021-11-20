@@ -8,7 +8,7 @@ export class ActiveSpeakerManager {
 
   handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList['speaker-list'];
-    const hmsSpeakers: HMSSpeaker[] = speakers.map((speaker) => ({
+    const hmsSpeakers: HMSSpeaker[] = speakers.map(speaker => ({
       audioLevel: speaker.level,
       peer: this.store.getPeerById(speaker.peer_id)!,
       track: this.store.getTrackById(speaker.track_id) as HMSAudioTrack,

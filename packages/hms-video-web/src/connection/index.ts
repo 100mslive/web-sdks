@@ -104,7 +104,7 @@ export default abstract class HMSConnection {
   }
 
   async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
-    const sender = this.getSenders().find((s) => s?.track?.id === track.getTrackIDBeingSent());
+    const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
     if (sender) {
       const params = sender.getParameters();
@@ -123,7 +123,7 @@ export default abstract class HMSConnection {
   async getStats() {
     const stats = await this.nativeConnection.getStats();
     const reports: any[] = [];
-    stats.forEach((stat) => reports.push(stat));
+    stats.forEach(stat => reports.push(stat));
     return reports;
   }
 

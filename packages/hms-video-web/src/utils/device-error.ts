@@ -25,7 +25,7 @@ export async function validateDeviceAV() {
   } catch (audioError) {
     if (isHMSDeviceError(audioError)) {
       const stream = await getLocalStream({ audio: false, video: true });
-      stream.getTracks().forEach((track) => track.stop());
+      stream.getTracks().forEach(track => track.stop());
       throw audioError;
     }
   }

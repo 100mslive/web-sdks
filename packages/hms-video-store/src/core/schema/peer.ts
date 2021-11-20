@@ -5,13 +5,7 @@ import { HMSRoleName } from './role';
 
 export type HMSPeerID = string;
 export type HMSTrackID = string;
-export type HMSTrackSource =
-  | 'regular'
-  | 'screen'
-  | 'plugin'
-  | 'audioplaylist'
-  | 'videoplaylist'
-  | string;
+export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
 export type HMSTrackDisplaySurface = 'application' | 'browser' | 'monitor' | 'window';
 

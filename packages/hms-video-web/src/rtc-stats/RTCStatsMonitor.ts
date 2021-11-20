@@ -35,7 +35,7 @@ export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCSt
     let availableOutgoingBitrate = 0;
     for (const conn of this.connections) {
       const stats = await conn.getStats();
-      stats.forEach((stat) => {
+      stats.forEach(stat => {
         if (stat.packetsLost) totalPacketsLost += stat.packetsLost;
         if (stat.availableIncomingBitrate) availableIncomingBitrate = Number(stat.availableIncomingBitrate);
         if (stat.availableOutgoingBitrate) availableOutgoingBitrate = Number(stat.availableOutgoingBitrate);

@@ -71,7 +71,7 @@ export default class HMSLocalStream extends HMSMediaStream {
    * sender needs to be replaced.
    */
   async replaceSenderTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection?.getSenders().find((sender) => sender.track && sender.track!.id === track.id);
+    const sender = this.connection?.getSenders().find(sender => sender.track && sender.track!.id === track.id);
 
     if (sender === undefined) {
       HMSLogger.w(TAG, `No sender found for trackId=${track.id}`);
@@ -82,7 +82,7 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   removeSender(track: HMSLocalTrack) {
     let removedSenderCount = 0;
-    this.connection!.getSenders().forEach((sender) => {
+    this.connection!.getSenders().forEach(sender => {
       if (sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent()) {
         this.connection!.removeTrack(sender);
         removedSenderCount += 1;

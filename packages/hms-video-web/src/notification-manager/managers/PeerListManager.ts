@@ -40,12 +40,12 @@ export class PeerListManager {
   handleReconnectPeerList = (peerList: PeerListNotification) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peerList.peers);
-    const peersToRemove = currentPeerList.filter((hmsPeer) => !peerList.peers.hasOwnProperty(hmsPeer.peerId));
+    const peersToRemove = currentPeerList.filter(hmsPeer => !peerList.peers.hasOwnProperty(hmsPeer.peerId));
 
     HMSLogger.d(this.TAG, { peersToRemove });
 
     // Send peer-leave updates to all the missing peers
-    peersToRemove.forEach((peer) => {
+    peersToRemove.forEach(peer => {
       const peerNotification: PeerNotification = {
         peer_id: peer.peerId,
         role: peer.role?.name || '',
@@ -61,7 +61,7 @@ export class PeerListManager {
     });
 
     // Check for any tracks which are added/removed
-    peers.forEach((newPeerNotification) => {
+    peers.forEach(newPeerNotification => {
       const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
       const newPeerTrackStates = Object.values(newPeerNotification.tracks);
 
@@ -70,7 +70,7 @@ export class PeerListManager {
         const tracks = this.store.getPeerTracks(oldPeer.peerId);
 
         // Remove all the tracks which are not present in the peer.tracks
-        tracks.forEach((track) => {
+        tracks.forEach(track => {
           if (!newPeerNotification.tracks.hasOwnProperty(track.trackId)) {
             this.removePeerTrack(oldPeer, track.trackId);
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
@@ -78,7 +78,7 @@ export class PeerListManager {
         });
 
         // Add track-metadata for all the new tracks
-        newPeerTrackStates.forEach((trackData) => {
+        newPeerTrackStates.forEach(trackData => {
           if (!this.store.getTrackById(trackData.track_id)) {
             // NOTE: We assume that, once the connection is re-established,
             //  transport layer will send a native onTrackAdd
@@ -110,7 +110,7 @@ export class PeerListManager {
     } else if (peer.videoTrack?.trackId === trackId) {
       peer.videoTrack = undefined;
     } else {
-      const trackIndex = peer.auxiliaryTracks.findIndex((track) => track.trackId === trackId);
+      const trackIndex = peer.auxiliaryTracks.findIndex(track => track.trackId === trackId);
       trackIndex >= 0 && peer.auxiliaryTracks.splice(trackIndex, 1);
     }
   }

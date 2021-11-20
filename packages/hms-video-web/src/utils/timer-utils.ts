@@ -4,7 +4,7 @@
  */
 export function sleep(ms: number): Promise<void> {
   if (ms < 0) throw Error('`ms` should be a positive integer');
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**

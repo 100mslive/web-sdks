@@ -1,15 +1,5 @@
-import {
-  HMSNotificationSeverity,
-  HMSPeer,
-  HMSReactiveStore,
-  HMSStore,
-  HMSTrack,
-  HMSException,
-} from '../../core';
-import {
-  PEER_NOTIFICATION_TYPES,
-  TRACK_NOTIFICATION_TYPES,
-} from '../../core/hmsSDKStore/common/mapping';
+import { HMSNotificationSeverity, HMSPeer, HMSReactiveStore, HMSStore, HMSTrack, HMSException } from '../../core';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../core/hmsSDKStore/common/mapping';
 import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
 import * as sdkTypes from '../../core/hmsSDKStore/sdkTypes';
 import { makeFakeStore } from '../fakeStore';
@@ -46,9 +36,7 @@ describe('hms notifications tests', () => {
   test('when peer joined on Notification to be called', () => {
     notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_JOINED, peer);
     expect(cb.mock.calls.length).toBe(1);
-    expect(cb.mock.results[0].value.type).toBe(
-      PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_JOINED],
-    );
+    expect(cb.mock.results[0].value.type).toBe(PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_JOINED]);
     expect(cb.mock.results[0].value.data).toBe(peer);
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
@@ -56,9 +44,7 @@ describe('hms notifications tests', () => {
   test('when peer left on Notification to be called', () => {
     notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_LEFT, peer);
     expect(cb.mock.calls.length).toBe(1);
-    expect(cb.mock.results[0].value.type).toBe(
-      PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT],
-    );
+    expect(cb.mock.results[0].value.type).toBe(PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT]);
     expect(cb.mock.results[0].value.data).toBe(peer);
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
@@ -71,18 +57,14 @@ describe('hms notifications tests', () => {
   test('when track added on Notification to be called', () => {
     notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_ADDED, track.id);
     expect(cb.mock.calls.length).toBe(1);
-    expect(cb.mock.results[0].value.type).toBe(
-      TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_ADDED],
-    );
+    expect(cb.mock.results[0].value.type).toBe(TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_ADDED]);
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
   test('when track removed on Notification to be called', () => {
     notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_REMOVED, track.id);
     expect(cb.mock.calls.length).toBe(1);
-    expect(cb.mock.results[0].value.type).toBe(
-      TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_REMOVED],
-    );
+    expect(cb.mock.results[0].value.type).toBe(TRACK_NOTIFICATION_TYPES[sdkTypes.HMSTrackUpdate.TRACK_REMOVED]);
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 

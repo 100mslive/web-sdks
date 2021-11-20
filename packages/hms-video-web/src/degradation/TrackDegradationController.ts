@@ -74,7 +74,7 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
       return;
     }
 
-    this.recoveringTrack = this.getActiveTracks(true).find((track) => track.degraded);
+    this.recoveringTrack = this.getActiveTracks(true).find(track => track.degraded);
     if (!this.recoveringTrack) {
       return;
     }
@@ -101,7 +101,7 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
   private getActiveTracks(includeDegraded: boolean) {
     return this.store
       .getRemoteVideoTracks()
-      .filter((track) => track.hasSinks() && (!track.degraded || includeDegraded))
+      .filter(track => track.hasSinks() && (!track.degraded || includeDegraded))
       .sort((trackA, trackB) => {
         const comparators = this.store.getComparator().getTrackComparators();
         /**

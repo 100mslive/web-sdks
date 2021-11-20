@@ -75,7 +75,7 @@ class Store implements IStore {
   }
 
   getRemotePeers() {
-    return Object.values(this.peers).filter((peer) => !peer.isLocal) as HMSRemotePeer[];
+    return Object.values(this.peers).filter(peer => !peer.isLocal) as HMSRemotePeer[];
   }
 
   getPeers(): HMSPeer[] {
@@ -94,15 +94,15 @@ class Store implements IStore {
   }
 
   getVideoTracks() {
-    return this.getTracks().filter((track) => track.type === HMSTrackType.VIDEO) as HMSVideoTrack[];
+    return this.getTracks().filter(track => track.type === HMSTrackType.VIDEO) as HMSVideoTrack[];
   }
 
   getRemoteVideoTracks() {
-    return this.getTracks().filter((track) => track instanceof HMSRemoteVideoTrack) as HMSRemoteVideoTrack[];
+    return this.getTracks().filter(track => track instanceof HMSRemoteVideoTrack) as HMSRemoteVideoTrack[];
   }
 
   getAudioTracks() {
-    return this.getTracks().filter((track) => track.type === HMSTrackType.AUDIO) as HMSAudioTrack[];
+    return this.getTracks().filter(track => track.type === HMSTrackType.AUDIO) as HMSAudioTrack[];
   }
 
   getPeerTracks(peerId?: string) {
@@ -131,7 +131,7 @@ class Store implements IStore {
   }
 
   getSpeakerPeers() {
-    return this.speakers.map((speaker) => speaker.peer);
+    return this.speakers.map(speaker => speaker.peer);
   }
 
   setRoom(room: HMSRoom) {
@@ -205,11 +205,11 @@ class Store implements IStore {
   }
 
   updateAudioOutputVolume(value: number) {
-    this.getAudioTracks().forEach((track) => track.setVolume(value));
+    this.getAudioTracks().forEach(track => track.setVolume(value));
   }
 
   updateAudioOutputDevice(device: MediaDeviceInfo) {
-    this.getAudioTracks().forEach((track) => {
+    this.getAudioTracks().forEach(track => {
       track.setOutputDevice(device);
     });
   }
@@ -248,7 +248,7 @@ class Store implements IStore {
   private convertSimulcastLayers(simulcastLayers: SimulcastLayers) {
     return {
       ...simulcastLayers,
-      layers: (simulcastLayers.layers || []).map((layer) => {
+      layers: (simulcastLayers.layers || []).map(layer => {
         return {
           ...layer,
           maxBitrate: layer.maxBitrate * 1000,
@@ -280,7 +280,7 @@ class Store implements IStore {
     }
     const width = simulcastLayers.width;
     const height = simulcastLayers.height;
-    return simulcastLayers.layers.map((value) => {
+    return simulcastLayers.layers.map(value => {
       const layer = simulcastMapping[value.rid as RID];
       const resolution = {
         width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
@@ -306,7 +306,7 @@ class Store implements IStore {
   }
 
   private updatePeersPolicy() {
-    this.getPeers().forEach((peer) => {
+    this.getPeers().forEach(peer => {
       if (!peer.role) {
         this.errorListener?.onError(ErrorFactory.GenericErrors.InvalidRole(HMSAction.VALIDATION, ''));
         return;

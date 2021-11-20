@@ -31,7 +31,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
     };
 
-    this.nativeConnection.ondatachannel = (e) => {
+    this.nativeConnection.ondatachannel = e => {
       if (e.channel.label !== API_DATA_CHANNEL) {
         // TODO: this.observer.onDataChannel(e.channel);
         return;
@@ -50,26 +50,26 @@ export default class HMSSubscribeConnection extends HMSConnection {
       e.channel.onopen = this.handlePendingApiMessages;
     };
 
-    this.nativeConnection.onicecandidate = (e) => {
+    this.nativeConnection.onicecandidate = e => {
       if (e.candidate !== null) {
         this.signal.trickle(this.role, e.candidate);
       }
     };
 
-    this.nativeConnection.ontrack = (e) => {
+    this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       const streamId = stream.id;
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
 
-        stream.onremovetrack = (e) => {
+        stream.onremovetrack = e => {
           /*
            * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
            * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
            * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
            */
-          const toRemoveTrackIdx = remote.tracks.findIndex((track) => track.nativeTrack.id === e.track.id);
+          const toRemoveTrackIdx = remote.tracks.findIndex(track => track.nativeTrack.id === e.track.id);
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
@@ -118,7 +118,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private handlePendingApiMessages = () => {
     if (this.pendingMessageQueue.length > 0) {
       HMSLogger.d(this.TAG, 'Found pending message queue, sending messages');
-      this.pendingMessageQueue.forEach((msg) => this.sendOverApiDataChannel(msg));
+      this.pendingMessageQueue.forEach(msg => this.sendOverApiDataChannel(msg));
       this.pendingMessageQueue.length = 0;
     }
   };

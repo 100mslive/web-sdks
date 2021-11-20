@@ -107,7 +107,7 @@ describe('Notification Manager', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_LIST, params: fakePeerList });
 
       expect(peerUpdateHandler).toHaveBeenCalled();
-      peerUpdateHandler.mock.calls.forEach((call) => {
+      peerUpdateHandler.mock.calls.forEach(call => {
         expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
         expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
       });

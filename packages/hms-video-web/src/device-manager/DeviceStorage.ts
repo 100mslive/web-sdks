@@ -31,7 +31,7 @@ class DeviceStorage {
     if (!this.devices || !this.remember) {
       return;
     }
-    const newSelection = this.devices[type].find((device) => this.isSame({ deviceId, groupId }, device));
+    const newSelection = this.devices[type].find(device => this.isSame({ deviceId, groupId }, device));
     if (!newSelection) {
       return;
     }

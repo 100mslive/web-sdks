@@ -26,7 +26,7 @@ export class RequestManager {
   handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
     const { requested_by, track_id, mute } = trackUpdateRequest;
     const peer = this.store.getPeerById(requested_by);
-    const track = this.store.getLocalPeerTracks().find((track) => track.publishedTrackId === track_id);
+    const track = this.store.getLocalPeerTracks().find(track => track.publishedTrackId === track_id);
 
     if (!peer || peer.isLocal || !track) {
       return;
@@ -65,14 +65,14 @@ export class RequestManager {
     const localPeerTracks = this.store.getLocalPeerTracks();
     let tracks: HMSLocalTrack[] = localPeerTracks;
     if (type) {
-      tracks = tracks.filter((track) => track.type === type);
+      tracks = tracks.filter(track => track.type === type);
     }
 
     if (source) {
-      tracks = tracks.filter((track) => track.source === source);
+      tracks = tracks.filter(track => track.source === source);
     }
 
-    const tracksToBeUpdated = tracks.filter((track) => track.enabled !== enabled);
+    const tracksToBeUpdated = tracks.filter(track => track.enabled !== enabled);
     //Do nothing if all tracks are already in same state as the request
     if (tracksToBeUpdated.length === 0) {
       return;

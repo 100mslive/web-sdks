@@ -425,7 +425,7 @@ export default class HMSTransport implements ITransport {
   trackUpdate(track: HMSLocalTrack) {
     const currentTrackStates = Array.from(this.trackStates.values());
     const originalTrackState = currentTrackStates.find(
-      (trackState) => track.type === trackState.type && track.source === trackState.source,
+      trackState => track.type === trackState.type && track.source === trackState.source,
     );
     if (originalTrackState) {
       const newTrackState = new TrackState({
@@ -526,7 +526,7 @@ export default class HMSTransport implements ITransport {
         .then(() => {
           HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
-        .catch((error) => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
+        .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
@@ -542,7 +542,7 @@ export default class HMSTransport implements ITransport {
       // the original initial track id for a proper fix
       const currentTrackStates = Array.from(this.trackStates.values());
       const originalTrackState = currentTrackStates.find(
-        (trackState) => track.type === trackState.type && track.source === trackState.source,
+        trackState => track.type === trackState.type && track.source === trackState.source,
       );
       if (originalTrackState) {
         this.trackStates.delete(originalTrackState.track_id);
@@ -677,7 +677,7 @@ export default class HMSTransport implements ITransport {
     if (this.store.getSubscribeDegradationParams()) {
       this.subscribeConnStatsMonitor = new RTCStatsMonitor([this.subscribeConnection!]);
       this.trackDegradationController = new TrackDegradationController(this.store);
-      this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', (stats) =>
+      this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', stats =>
         this.trackDegradationController?.handleRtcStatsChange(stats),
       );
       this.trackDegradationController.on('TRACK_DEGRADED', this.observer.onTrackDegrade);
@@ -719,7 +719,7 @@ export default class HMSTransport implements ITransport {
         });
       });
 
-      const timeout = new Promise((resolve) => {
+      const timeout = new Promise(resolve => {
         setTimeout(resolve, SUBSCRIBE_TIMEOUT, false);
       });
 

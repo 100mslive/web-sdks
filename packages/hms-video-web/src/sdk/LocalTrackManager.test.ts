@@ -115,7 +115,7 @@ const mockDevices = [
 const mockEnumerateDevices = ({ videoInput = true, audioInput = true } = {}) =>
   jest.fn(() =>
     Promise.resolve(
-      mockDevices.map((device) => ({
+      mockDevices.map(device => ({
         ...device,
         label:
           (!videoInput && device.kind === 'videoinput') || (!audioInput && device.kind === 'audioinput')

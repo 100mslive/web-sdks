@@ -95,7 +95,7 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     }
     const audioElement = document.createElement('audio');
     audioElement.crossOrigin = 'anonymous';
-    audioElement.addEventListener('timeupdate', (event) => this.emit('progress', event));
+    audioElement.addEventListener('timeupdate', event => this.emit('progress', event));
     audioElement.addEventListener('ended', () => {
       this.emit('ended', null);
     });

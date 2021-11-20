@@ -16,10 +16,10 @@ export function fixMsid(desc: RTCSessionDescriptionInit, tracks: Map<string, Tra
 
   const mediaTracks = Array.from(tracks.values());
 
-  parsedSdp.media.forEach((m) => {
+  parsedSdp.media.forEach(m => {
     const streamId = m.msid?.split(' ')[0];
     // check for both type and streamid as both video and screenshare have same type but different stream_id
-    const trackId = mediaTracks.find((val) => val.type === m.type && val.stream_id === streamId)?.track_id;
+    const trackId = mediaTracks.find(val => val.type === m.type && val.stream_id === streamId)?.track_id;
     if (trackId) {
       m.msid = m.msid?.replace(/\s(.+)/, ` ${trackId}`);
     }
@@ -41,7 +41,7 @@ export function getSdpTrackIdForMid(
     return undefined;
   }
   const parsedSdp = sdpTransform.parse(desc.sdp);
-  const trackSection = parsedSdp.media.find((media) => isPresent(media.mid) && parseInt(media.mid!) === parseInt(mid));
+  const trackSection = parsedSdp.media.find(media => isPresent(media.mid) && parseInt(media.mid!) === parseInt(mid));
   const trackId = trackSection?.msid?.split(' ')[1];
   return trackId;
 }
