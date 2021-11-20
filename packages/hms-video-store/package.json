@@ -29,13 +29,6 @@
       "pre-commit": "tsdx lint --fix"
     }
   },
-  "prettier": {
-    "printWidth": 100,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "all",
-    "arrowParens": "avoid"
-  },
   "name": "@100mslive/hms-video-store",
   "author": "100ms",
   "module": "dist/hms-video-store.esm.js",
