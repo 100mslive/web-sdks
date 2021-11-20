@@ -22,17 +22,6 @@
     "cypress:open": "cypress open",
     "format": "prettier --write src/**/*.ts"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "all"
-  },
   "author": "100ms <tech-common@100ms.live>",
   "module": "dist/hms-video.esm.js",
   "size-limit": [

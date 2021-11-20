@@ -13,6 +13,7 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
+    "format": "prettier --write src/**/*.ts",
     "test": "tsdx test",
     "test:watch": "tsdx test --watch",
     "test:coverage": "tsdx test --coverage",
@@ -23,11 +24,6 @@
     "analyze": "size-limit --why",
     "cypress:open": "cypress open",
     "docs": "rm -rf ./docs && typedoc && rm -f ./docs/README.md && mkdir ./docs/home &&mv ./docs/modules.md ./docs/home/content.md && ./bin/typedoc-mdx && npx prettier --write './docs/**/*'"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint --fix"
-    }
   },
   "name": "@100mslive/hms-video-store",
   "author": "100ms",
