@@ -2,9 +2,11 @@
 .DS_Store
 node_modules
 dist
-coverage
 .idea
+.vscode
+*.pyc
 *.tgz
+coverage
 .env
 .nyc_output
 cy-coverage
