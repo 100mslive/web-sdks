@@ -1,3 +1,9 @@
+build:
+  - any: ['packages/*/scripts', '**/*.json']
+
+docs:
+  - any: ['packages/*/docs/**', '**/*.md']
+
 sdk:
   - any: ['packages/hms-video-web/**/*']
     all: ['!packages/hms-video-web/scripts', '!packages/hms-video-web/**/*.(test|spec).ts']
@@ -11,9 +17,3 @@ test:
 
 ci:
   - '.github/*'
-
-build:
-  - any: ['packages/*/scripts', '**/*.json']
-
-docs:
-  - any: ['packages/*/docs/**', '**/*.md']
