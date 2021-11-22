@@ -10,7 +10,7 @@ export function getPeerTracksByCondition(
   let videoTrack = undefined;
   let audioTrack = undefined;
   if (peer) {
-    for (let trackID of peer.auxiliaryTracks) {
+    for (const trackID of peer.auxiliaryTracks) {
       const track = tracks[trackID];
       if (trackCheckFn(track)) {
         audioTrack = isAudio(track) ? track : audioTrack;

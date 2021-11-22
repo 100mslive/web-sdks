@@ -22,7 +22,7 @@ import {
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 export class HMSNotifications implements IHMSNotifications {
-  private id: number = 0;
+  private id = 0;
   private eventEmitter: EventEmitter;
   private store: IHMSStore;
 
@@ -156,7 +156,7 @@ export class HMSNotifications implements IHMSNotifications {
       | HMSPlaylistItem<T>
       | null,
     severity?: HMSNotificationSeverity,
-    message: string = '',
+    message = '',
   ): HMSNotification {
     this.id++;
     return {

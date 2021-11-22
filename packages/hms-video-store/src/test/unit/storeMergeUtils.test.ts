@@ -69,9 +69,9 @@ describe('tracks merge is happening properly', () => {
 describe('peers merge is happening properly', () => {
   let fakePeer: HMSPeer;
   let draftPeersCopy: Record<HMSPeerID, Partial<HMSPeer>>;
-  let draftPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
-  let newPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
-  let newSDKTracks: Record<HMSTrackID, SDKTrack> = {};
+  const draftPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
+  const newPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
+  const newSDKTracks: Record<HMSTrackID, SDKTrack> = {};
   beforeEach(() => {
     newTracks = {};
     draftPeersCopy = draftPeers;

@@ -56,4 +56,4 @@ interface GetState<T> {
  *
  * @category Core
  */
-export interface IHMSStoreReadOnly extends Omit<IHMSStore, 'setState' | 'namedSetState' | 'destroy'> {}
+export type IHMSStoreReadOnly = Omit<IHMSStore, 'setState' | 'namedSetState' | 'destroy'>;

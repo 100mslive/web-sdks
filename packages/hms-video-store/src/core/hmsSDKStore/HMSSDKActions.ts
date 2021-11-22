@@ -94,7 +94,7 @@ export class HMSSDKActions implements IHMSActions {
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore;
-  private isRoomJoinCalled: boolean = false;
+  private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications;
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
@@ -372,7 +372,7 @@ export class HMSSDKActions implements IHMSActions {
     return this.addRemoveAudioPlugin(plugin, 'remove');
   }
 
-  async changeRole(forPeerId: string, toRole: string, force: boolean = false) {
+  async changeRole(forPeerId: string, toRole: string, force = false) {
     const peer = this.hmsSDKPeers[forPeerId];
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
@@ -384,7 +384,7 @@ export class HMSSDKActions implements IHMSActions {
 
   // TODO: separate out role related things in another file
   async acceptChangeRole(request: HMSRoleChangeRequest) {
-    let sdkPeer: sdkTypes.HMSPeer | undefined = request.requestedBy
+    const sdkPeer: sdkTypes.HMSPeer | undefined = request.requestedBy
       ? this.hmsSDKPeers[request.requestedBy.id]
       : undefined;
     if (!sdkPeer) {
@@ -478,7 +478,7 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
-  private resetState(reason: string = 'resetState') {
+  private resetState(reason = 'resetState') {
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
     }, reason);
@@ -612,14 +612,14 @@ export class HMSSDKActions implements IHMSActions {
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
     // first convert everything in the new format
-    for (let sdkPeer of sdkPeers) {
+    for (const sdkPeer of sdkPeers) {
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
       this.hmsSDKPeers[hmsPeer.id] = sdkPeer;
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
-      for (let sdkTrack of sdkTracks) {
+      for (const sdkTrack of sdkTracks) {
         if (!sdkTrack) {
           continue;
         }
@@ -712,7 +712,7 @@ export class HMSSDKActions implements IHMSActions {
     if (Array.isArray(sdkPeer)) {
       this.syncRoomState('peersJoined');
       const hmsPeers = [];
-      for (let peer of sdkPeer) {
+      for (const peer of sdkPeer) {
         const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
         if (hmsPeer) {
           hmsPeers.push(hmsPeer);
@@ -774,7 +774,7 @@ export class HMSSDKActions implements IHMSActions {
         }
       });
       const speakerEntries = Object.entries(store.speakers);
-      for (let [trackID, speaker] of speakerEntries) {
+      for (const [trackID, speaker] of speakerEntries) {
         speaker.audioLevel = trackIDAudioLevelMap[trackID] || 0;
         if (speaker.audioLevel === 0) {
           delete store.speakers[trackID];

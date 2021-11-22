@@ -15,7 +15,7 @@ export const mergeNewPeersInDraft = (
   newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
 ) => {
   const peerIDs = union(Object.keys(draftPeers), Object.keys(newPeers));
-  for (let peerID of peerIDs) {
+  for (const peerID of peerIDs) {
     const oldPeer = draftPeers[peerID];
     const newPeer = newPeers[peerID];
     if (isEntityUpdated(oldPeer, newPeer)) {
@@ -36,7 +36,7 @@ export const mergeNewTracksInDraft = (
   newTracks: Record<HMSTrackID, Partial<HMSTrack>>,
 ) => {
   const trackIDs = union(Object.keys(draftTracks), Object.keys(newTracks));
-  for (let trackID of trackIDs) {
+  for (const trackID of trackIDs) {
     const oldTrack = draftTracks[trackID];
     const newTrack = newTracks[trackID];
     if (isEntityUpdated(oldTrack, newTrack)) {
@@ -85,10 +85,10 @@ export const areArraysEqual = <T>(arr1: T[], arr2?: T[]): boolean => {
 
 const union = <T>(arr1: T[], arr2: T[]): T[] => {
   const set: Set<T> = new Set();
-  for (let elem of arr1) {
+  for (const elem of arr1) {
     set.add(elem);
   }
-  for (let elem of arr2) {
+  for (const elem of arr2) {
     set.add(elem);
   }
   return Array.from(set);

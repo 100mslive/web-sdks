@@ -13,13 +13,7 @@
 // the project's config changing)
 require('dotenv').config();
 
-const keys = [
-  'CYPRESS_TOKEN_ENDPOINT',
-  'CYPRESS_ROOM_ID',
-  'CYPRESS_ROLE',
-  'CYPRESS_API_ENV',
-  'CYPRESS_INIT_ENDPOINT',
-];
+const keys = ['CYPRESS_TOKEN_ENDPOINT', 'CYPRESS_ROOM_ID', 'CYPRESS_ROLE', 'CYPRESS_API_ENV', 'CYPRESS_INIT_ENDPOINT'];
 /**
  * @type {Cypress.PluginConfig}
  */

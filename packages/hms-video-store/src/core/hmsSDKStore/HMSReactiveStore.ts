@@ -141,7 +141,7 @@ export class HMSReactiveStore {
       equalityFn?: EqualityChecker<StateSlice>,
     ): (() => void) => {
       // initial call, the prev state will always be null for this
-      listener(store.getState(selector), (undefined as unknown) as StateSlice);
+      listener(store.getState(selector), undefined as unknown as StateSlice);
       // then subscribe
       return prevSubscribe(listener, selector!, equalityFn);
     };
@@ -163,7 +163,7 @@ export class HMSReactiveStore {
       equalityFn?: EqualityChecker<StateSlice>,
     ): (() => void) => {
       if (!selector) {
-        selector = (store): StateSlice => (store as unknown) as StateSlice;
+        selector = (store): StateSlice => store as unknown as StateSlice;
       }
       equalityFn = equalityFn || shallow;
       return prevSubscribe(listener, selector, equalityFn);

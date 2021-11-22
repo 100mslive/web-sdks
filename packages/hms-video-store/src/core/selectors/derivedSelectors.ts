@@ -58,21 +58,18 @@ export const selectRoleChangeRequest = createSelector(
 /**
  * Select what streams is the local peer allowed to publish from video, audio and screenshare.
  */
-export const selectIsAllowedToPublish = createSelector(
-  [selectLocalPeerRole],
-  (role): HMSPublishAllowed => {
-    let video = false,
-      audio = false,
-      screen = false;
-    if (role?.publishParams?.allowed) {
-      video = role.publishParams.allowed.includes('video');
-      audio = role.publishParams.allowed.includes('audio');
-      screen = role.publishParams.allowed.includes('screen');
-    }
-    return {
-      video,
-      audio,
-      screen,
-    };
-  },
-);
+export const selectIsAllowedToPublish = createSelector([selectLocalPeerRole], (role): HMSPublishAllowed => {
+  let video = false,
+    audio = false,
+    screen = false;
+  if (role?.publishParams?.allowed) {
+    video = role.publishParams.allowed.includes('video');
+    audio = role.publishParams.allowed.includes('audio');
+    screen = role.publishParams.allowed.includes('screen');
+  }
+  return {
+    video,
+    audio,
+    screen,
+  };
+});
