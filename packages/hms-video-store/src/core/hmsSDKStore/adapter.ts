@@ -198,6 +198,7 @@ export class SDKToHMS {
     const volume = playlistManager.getVolume(type);
     const list = playlistManager.getList(type);
     const currentIndex = playlistManager.getCurrentIndex(type);
+    console.log('test');
 
     playlistManager.getList(type).forEach(playlistItem => {
       convertedPlaylist[playlistItem.id] = SDKToHMS.convertPlaylistItem(playlistManager, playlistItem);

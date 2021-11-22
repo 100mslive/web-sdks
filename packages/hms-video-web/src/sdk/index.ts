@@ -194,6 +194,7 @@ export class HMSSdk implements HMSInterface {
 
       this.transportState = state;
       console.log('state', state);
+      console.log('state1', state);
     },
   };
 
