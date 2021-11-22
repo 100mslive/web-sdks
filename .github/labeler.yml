@@ -1,5 +1,5 @@
 test:
-  - packages/hms-video-web/**/*.(test|spec).ts
+  - '**/*.(test|spec).ts'
 
 build:
   - any: ['packages/**/scripts/*.js', '**/*.json']

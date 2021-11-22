@@ -9,6 +9,7 @@ describe('simple gum test', () => {
       expect(audioTrack).to.not.be.undefined;
       console.log('test');
       console.log('test1');
+      console.log('test2');
     });
   });
 });
