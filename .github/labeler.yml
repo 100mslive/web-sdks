@@ -1,8 +1,8 @@
 test:
-  - '**/*.(test|spec).ts'
+  - 'packages/**/*.(test|spec).ts'
 
 build:
-  - any: ['packages/**/scripts/*.js', '**/*.json']
+  - '**/scripts/*.js'
 
 sdk:
   - any: ['packages/hms-video-web/**/*']
