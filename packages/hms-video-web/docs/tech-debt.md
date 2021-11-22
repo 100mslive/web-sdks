@@ -6,5 +6,3 @@
 
 - an optimization focused review needs to be done on core parts to handle thousands
   of peers at a time
-
-- add test doc
