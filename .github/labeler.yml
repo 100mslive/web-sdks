@@ -1,12 +1,12 @@
 build:
-  - any: ['packages/**/scripts/*', '**/*.json']
+  - any: ['packages/**/scripts/**', '**/*.json']
 
 docs:
-  - any: ['packages/**/docs/*', '*.md']
+  - any: ['packages/**/docs/**', '*.md']
 
 sdk:
   - any: ['packages/hms-video-web/**/*']
-    all: ['!packages/hms-video-web/scripts/*', '!packages/hms-video-web/**/*.(test|spec).ts']
+    all: ['!packages/hms-video-web/scripts/**', '!packages/hms-video-web/**/*.(test|spec).ts']
 
 store:
   - any: ['packages/hms-video-store/**/*']
