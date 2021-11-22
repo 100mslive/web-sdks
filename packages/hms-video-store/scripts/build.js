@@ -43,6 +43,7 @@ async function main() {
       esmSize += output.bytes;
     });
 
+    console.log('test');
     fs.readFile('./dist/esm/index.js', (_err, data) => {
       gzip(data, (_err, result) => {
         console.log(
