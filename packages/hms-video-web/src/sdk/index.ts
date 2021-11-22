@@ -117,7 +117,6 @@ export class HMSSdk implements HMSInterface {
   }
 
   private validateJoined(name: string) {
-    console.log('name', name);
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, `Not connected - ${name}`);
     }
