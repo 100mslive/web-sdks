@@ -11,8 +11,11 @@
     "node": ">=12"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
+    "prestart": "rm -rf dist",
+    "start": "node ./scripts/dev && yarn types",
+    "build": "node ./scripts/build && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "format": "prettier --write src/**/*.ts",
     "test": "tsdx test",
     "test:watch": "tsdx test --watch",
@@ -61,6 +64,7 @@
     "nyc": "^15.1.0",
     "size-limit": "^5.0.3",
     "ts-node": "^10.4.0",
+    "tsconfig-replace-paths": "^0.0.11",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
     "typedoc": "^0.21.5",
