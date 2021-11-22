@@ -1,5 +1,5 @@
 test:
-  - 'packages/hms-video-web/cypress/integration/gum.spec.ts'
+  - packages/hms-video-web/cypress/integration/gum.spec.ts
 
 build:
   - '**/scripts/*.js'
