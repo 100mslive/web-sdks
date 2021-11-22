@@ -1,8 +1,13 @@
-name: check-size
+name: check-sdk-size
 on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'packages/hms-video-web/**'
+      - '!packages/hms-video-web/cypress/**'
+      - '!packages/hms-video-web/docs/**'
+
 jobs:
   size:
     runs-on: ubuntu-latest
@@ -14,9 +19,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           directory: packages/hms-video-web
-
-      - name: Check store size
-        uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory: packages/hms-video-store

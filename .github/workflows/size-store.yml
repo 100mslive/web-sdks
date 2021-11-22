@@ -1,0 +1,20 @@
+name: check-store-size
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/hms-video-store/**'
+      - '!packages/hms-video-store/cypress/**'
+      - '!packages/hms-video-store/docs/**'
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Check store size
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          directory: packages/hms-video-store
