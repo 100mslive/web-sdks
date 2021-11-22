@@ -59,7 +59,6 @@
     "babel-plugin-istanbul": "^6.1.1",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
-    "husky": "^6.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "nyc": "^15.1.0",
     "size-limit": "^5.0.3",
@@ -67,8 +66,7 @@
     "tsconfig-replace-paths": "^0.0.11",
     "tslib": "^2.2.0",
     "typedoc": "^0.21.5",
-    "typedoc-plugin-markdown": "^3.10.4",
-    "typescript": "^4.4.4"
+    "typedoc-plugin-markdown": "^3.10.4"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
   "repository": {
@@ -83,14 +81,6 @@
   ],
   "bugs": {
     "url": "https://github.com/100mslive/hms-video-store/issues"
-  },
-  "resolutions": {
-    "tsdx/**/node-notifier": "10.0.0",
-    "**/@typescript-eslint/eslint-plugin": "^4.11.1",
-    "**/@typescript-eslint/parser": "^4.11.1",
-    "**/jest": "^26.6.3",
-    "**/ts-jest": "^26.4.4",
-    "**/typescript": "^4.4.4"
   },
   "homepage": "https://github.com/100mslive/hms-video-store#readme",
   "nyc": {
