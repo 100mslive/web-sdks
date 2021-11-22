@@ -1,7 +1,7 @@
 {
   "version": "0.2.79",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
@@ -34,7 +34,7 @@
   "sideEffects": false,
   "size-limit": [
     {
-      "path": "dist/hms-video-store.cjs.production.min.js",
+      "path": "dist/hms-video-store.cjs.js",
       "limit": "20 KB"
     },
     {

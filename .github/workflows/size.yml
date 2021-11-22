@@ -1,0 +1,25 @@
+name: check-size
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    env:
+      CI_JOB_NUMBER: 1
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Check sdk size
+      - uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          directoy: packages/hms-video-web
+
+      - name: Check store size
+      - uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          directoy: packages/hms-video-web

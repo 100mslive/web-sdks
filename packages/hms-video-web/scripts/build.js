@@ -16,8 +16,8 @@ async function main() {
   try {
     esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist',
-      minify: false,
+      outfile: 'dist/hms-video.cjs.js',
+      minify: true,
       bundle: true,
       format: 'cjs',
       target: 'es6',
@@ -28,7 +28,7 @@ async function main() {
 
     const esmResult = esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist',
+      outfile: 'dist/hms-video.esm.js',
       minify: true,
       bundle: true,
       format: 'esm',

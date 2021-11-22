@@ -16,25 +16,25 @@ async function main() {
   try {
     esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist',
-      minify: false,
+      outfile: 'dist/hms-video-store.cjs.js',
+      minify: true,
       bundle: true,
       format: 'cjs',
       target: 'es6',
-      tsconfig: './tsconfig.json',
-      external: Object.keys(pkg.dependencies),
+      tsconfig: './tsconfig.build.json',
+      external: Object.keys(pkg.dependencies).concat(Object.keys(pkg.peerDependencies)),
       metafile: true,
     });
 
     const esmResult = esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
-      outdir: 'dist',
+      outfile: 'dist/hms-video-store.esm.js',
       minify: true,
       bundle: true,
       format: 'esm',
       target: 'es6',
       tsconfig: './tsconfig.build.json',
-      external: Object.keys(pkg.dependencies),
+      external: Object.keys(pkg.dependencies).concat(Object.keys(pkg.peerDependencies)),
       metafile: true,
     });
 
@@ -43,7 +43,7 @@ async function main() {
       esmSize += output.bytes;
     });
 
-    fs.readFile('./dist/esm/index.js', (_err, data) => {
+    fs.readFile('./dist/hms-video-store.esm.js', (_err, data) => {
       gzip(data, (_err, result) => {
         console.log(
           `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(
