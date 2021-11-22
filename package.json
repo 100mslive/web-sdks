@@ -8,6 +8,7 @@
     "babel-plugin-istanbul": "^6.1.1",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
+    "esbuild": "^0.13.15",
     "husky": "^6.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "lerna": "^4.0.0",
