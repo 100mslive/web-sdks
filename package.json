@@ -27,7 +27,8 @@
     "format": "lerna run format --stream",
     "test": "lerna run test --stream",
     "start": "lerna run start --stream --parallel",
-    "build": "lerna run build --stream --parallel"
+    "build": "lerna run build --stream --parallel",
+    "postinstall": "husky install && yarn build"
   },
   "resolutions": {
     "node-notifier": "^8.0.1",
