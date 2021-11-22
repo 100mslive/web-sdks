@@ -1,8 +1,8 @@
 build:
-  - any: ['packages/*/scripts', '**/*.json']
+  - any: ['packages/**/scripts', '**/*.json']
 
 docs:
-  - any: ['packages/*/docs/**', '**/*.md']
+  - any: ['packages/**/docs/**', '*.md']
 
 sdk:
   - any: ['packages/hms-video-web/**/*']
