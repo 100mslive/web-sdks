@@ -8,6 +8,7 @@ describe('simple gum test', () => {
       expect(videoTrack).to.not.be.undefined;
       expect(audioTrack).to.not.be.undefined;
       console.log('test');
+      console.log('test1');
     });
   });
 });
