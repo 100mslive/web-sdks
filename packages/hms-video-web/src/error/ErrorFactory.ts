@@ -28,47 +28,47 @@ export enum HMSAction {
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
-    GenericConnect(action: HMSAction, description: string = '') {
+    GenericConnect(action: HMSAction, description = '') {
       return new HMSException(1000, 'GenericConnect', action, `Something went wrong`, description);
     },
 
-    WebSocketConnectionLost(action: HMSAction, description: string = '') {
+    WebSocketConnectionLost(action: HMSAction, description = '') {
       return new HMSException(1003, 'WebSocketConnectionLost', action, `Network connection lost `, description);
     },
   },
 
   InitAPIErrors: {
-    ServerErrors(code: number, action: HMSAction, description: string = '') {
+    ServerErrors(code: number, action: HMSAction, description = '') {
       return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description);
     },
 
-    ConnectionLost(action: HMSAction, description: string = '') {
+    ConnectionLost(action: HMSAction, description = '') {
       return new HMSException(2001, 'ConnectionLost', action, `[INIT]: Network error`, description);
     },
 
-    HTTPError(code: number, action: HMSAction, description: string = '') {
+    HTTPError(code: number, action: HMSAction, description = '') {
       return new HMSException(code, 'HTTPError', action, `[INIT]: Bad Request`, description);
     },
 
-    InvalidEndpointURL(action: HMSAction, description: string = '') {
+    InvalidEndpointURL(action: HMSAction, description = '') {
       return new HMSException(2002, 'InvalidEndpointURL', action, `Endpoint URL is invalid`, description);
     },
 
-    EndpointUnreachable(action: HMSAction, description: string = '') {
+    EndpointUnreachable(action: HMSAction, description = '') {
       return new HMSException(2003, 'EndpointUnreachable', action, `Endpoint is not reachable.`, description);
     },
 
-    InvalidTokenFormat(action: HMSAction, description: string = '') {
+    InvalidTokenFormat(action: HMSAction, description = '') {
       return new HMSException(2004, 'InvalidTokenFormat', action, `Token is not in proper JWT format`, description);
     },
   },
 
   TracksErrors: {
-    GenericTrack(action: HMSAction, description: string = '') {
+    GenericTrack(action: HMSAction, description = '') {
       return new HMSException(3000, 'GenericTrack', action, `[TRACK]: Something went wrong`, description);
     },
 
-    CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description: string = '') {
+    CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
         3001,
         'CantAccessCaptureDevice',
@@ -78,7 +78,7 @@ export const ErrorFactory = {
       );
     },
 
-    DeviceNotAvailable(action: HMSAction, deviceInfo: string, description: string = '') {
+    DeviceNotAvailable(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
         3002,
         'DeviceNotAvailable',
@@ -88,7 +88,7 @@ export const ErrorFactory = {
       );
     },
 
-    DeviceInUse(action: HMSAction, deviceInfo: string, description: string = '') {
+    DeviceInUse(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
         3003,
         'DeviceInUse',
@@ -98,7 +98,7 @@ export const ErrorFactory = {
       );
     },
 
-    DeviceLostMidway(action: HMSAction, deviceInfo: string, description: string = '') {
+    DeviceLostMidway(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
         3008,
         'DeviceLostMidway',
@@ -108,7 +108,7 @@ export const ErrorFactory = {
       );
     },
 
-    NothingToReturn(action: HMSAction, description: string = '') {
+    NothingToReturn(action: HMSAction, description = '') {
       return new HMSException(
         3005,
         'NothingToReturn',
@@ -118,7 +118,7 @@ export const ErrorFactory = {
       );
     },
 
-    InvalidVideoSettings(action: HMSAction, description: string = '') {
+    InvalidVideoSettings(action: HMSAction, description = '') {
       return new HMSException(
         3006,
         'InvalidVideoSettings',
@@ -128,7 +128,7 @@ export const ErrorFactory = {
       );
     },
 
-    AutoplayBlocked(action: HMSAction, description: string = '') {
+    AutoplayBlocked(action: HMSAction, description = '') {
       return new HMSException(
         ErrorCodes.TracksErrors.AUTOPLAY_ERROR,
         'AutoplayBlocked',
@@ -138,11 +138,11 @@ export const ErrorFactory = {
       );
     },
 
-    CodecChangeNotPermitted(action: HMSAction, description: string = '') {
+    CodecChangeNotPermitted(action: HMSAction, description = '') {
       return new HMSException(3007, 'CodecChangeNotPermitted', action, `Codec can't be changed mid call.`, description);
     },
 
-    OverConstrained(action: HMSAction, deviceInfo: string, description: string = '') {
+    OverConstrained(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
         ErrorCodes.TracksErrors.OVER_CONSTRAINED,
         'OverConstrained',
@@ -154,7 +154,7 @@ export const ErrorFactory = {
   },
 
   WebrtcErrors: {
-    CreateOfferFailed(action: HMSAction, description: string = '') {
+    CreateOfferFailed(action: HMSAction, description = '') {
       return new HMSException(
         4001,
         'CreateOfferFailed',
@@ -164,7 +164,7 @@ export const ErrorFactory = {
       );
     },
 
-    CreateAnswerFailed(action: HMSAction, description: string = '') {
+    CreateAnswerFailed(action: HMSAction, description = '') {
       return new HMSException(
         4002,
         'CreateAnswerFailed',
@@ -174,7 +174,7 @@ export const ErrorFactory = {
       );
     },
 
-    SetLocalDescriptionFailed(action: HMSAction, description: string = '') {
+    SetLocalDescriptionFailed(action: HMSAction, description = '') {
       return new HMSException(
         4003,
         'SetLocalDescriptionFailed',
@@ -184,7 +184,7 @@ export const ErrorFactory = {
       );
     },
 
-    SetRemoteDescriptionFailed(action: HMSAction, description: string = '') {
+    SetRemoteDescriptionFailed(action: HMSAction, description = '') {
       return new HMSException(
         4004,
         'SetRemoteDescriptionFailed',
@@ -194,7 +194,7 @@ export const ErrorFactory = {
       );
     },
 
-    ICEFailure(action: HMSAction, description: string = '') {
+    ICEFailure(action: HMSAction, description = '') {
       return new HMSException(
         4005,
         'ICEFailure',
@@ -210,11 +210,11 @@ export const ErrorFactory = {
       return new HMSException(code, 'ServerErrors', action, description, description);
     },
 
-    AlreadyJoined(action: HMSAction, description: string = '') {
+    AlreadyJoined(action: HMSAction, description = '') {
       return new HMSException(5001, 'AlreadyJoined', action, `[JOIN]: You have already joined this room.`, description);
     },
 
-    CannotJoinPreviewInProgress(action: HMSAction, description: string = '') {
+    CannotJoinPreviewInProgress(action: HMSAction, description = '') {
       return new HMSException(
         5002,
         'CannotJoinPreviewInProgress',
@@ -226,7 +226,7 @@ export const ErrorFactory = {
   },
 
   GenericErrors: {
-    NotConnected(action: HMSAction, description: string = '') {
+    NotConnected(action: HMSAction, description = '') {
       return new HMSException(6000, 'NotConnected', action, `Client is not connected`, description);
     },
 
@@ -244,11 +244,11 @@ export const ErrorFactory = {
       return new HMSException(6002, 'Unknown', action, `Unknown exception: ${description}`, description);
     },
 
-    NotReady(action: HMSAction, description: string = '') {
+    NotReady(action: HMSAction, description = '') {
       return new HMSException(6003, 'NotReady', action, `WebRTC engine is not ready yet`, description);
     },
 
-    JsonParsingFailed(action: HMSAction, jsonMessage: string, description: string = '') {
+    JsonParsingFailed(action: HMSAction, jsonMessage: string, description = '') {
       return new HMSException(
         6004,
         'JsonParsingFailed',
@@ -258,15 +258,15 @@ export const ErrorFactory = {
       );
     },
 
-    TrackMetadataMissing(action: HMSAction, description: string = '') {
+    TrackMetadataMissing(action: HMSAction, description = '') {
       return new HMSException(6005, 'TrackMetadataMissing', action, `Track Metadata Missing`, description);
     },
 
-    RTCTrackMissing(action: HMSAction, description: string = '') {
+    RTCTrackMissing(action: HMSAction, description = '') {
       return new HMSException(6006, 'RTCTrackMissing', action, `RTC Track missing`, description);
     },
 
-    PeerMetadataMissing(action: HMSAction, description: string = '') {
+    PeerMetadataMissing(action: HMSAction, description = '') {
       return new HMSException(6007, 'PeerMetadataMissing', action, `Peer Metadata Missing`, description);
     },
 
@@ -293,7 +293,7 @@ export const ErrorFactory = {
   },
 
   MediaPluginErrors: {
-    PlatformNotSupported(action: HMSAction, description: string = '') {
+    PlatformNotSupported(action: HMSAction, description = '') {
       return new HMSException(
         7001,
         'PlatformNotSupported',
@@ -303,15 +303,15 @@ export const ErrorFactory = {
       );
     },
 
-    InitFailed(action: HMSAction, description: string = '') {
+    InitFailed(action: HMSAction, description = '') {
       return new HMSException(7002, 'InitFailed', action, 'Plugin init failed', description);
     },
 
-    ProcessingFailed(action: HMSAction, description: string = '') {
+    ProcessingFailed(action: HMSAction, description = '') {
       return new HMSException(7003, 'ProcessingFailed', action, 'Plugin processing failed', description);
     },
 
-    AddAlreadyInProgress(action: HMSAction, description: string = '') {
+    AddAlreadyInProgress(action: HMSAction, description = '') {
       return new HMSException(7004, 'AddAlreadyInProgress', action, 'Plugin add already in progress', description);
     },
   },

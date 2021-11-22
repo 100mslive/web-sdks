@@ -3,14 +3,14 @@ import HMSSubscribeConnection from '../../connection/subscribe';
 import { HMSSimulcastLayer } from '../../interfaces';
 
 const streamId = '123';
-let nativeStream = { id: streamId } as MediaStream;
+const nativeStream = { id: streamId } as MediaStream;
 
 describe('HMSRemoteStream', () => {
   let stream: HMSRemoteStream;
   let sendOverApiDataChannel: jest.Mock;
   beforeEach(() => {
     sendOverApiDataChannel = jest.fn();
-    let connection = ({ sendOverApiDataChannel } as unknown) as HMSSubscribeConnection;
+    const connection = { sendOverApiDataChannel } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
   });
 

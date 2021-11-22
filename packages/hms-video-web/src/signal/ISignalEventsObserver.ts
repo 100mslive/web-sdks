@@ -6,7 +6,7 @@ export interface ISignalEventsObserver {
 
   onTrickle(trickle: HMSTrickle): void;
 
-  onNotification(message: Object): void;
+  onNotification(message: any): void;
 
   onServerError(error: HMSException): void;
 

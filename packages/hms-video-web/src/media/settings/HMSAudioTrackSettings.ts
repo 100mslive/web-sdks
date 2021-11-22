@@ -2,10 +2,10 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings, HMSAudioCodec } from '
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 
 export class HMSAudioTrackSettingsBuilder {
-  private _volume: number = 1.0;
+  private _volume = 1.0;
   private _codec?: HMSAudioCodec = HMSAudioCodec.OPUS;
   private _maxBitrate?: number = 32;
-  private _deviceId: string = 'default';
+  private _deviceId = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
     { googEchoCancellation: { exact: true } },
@@ -22,7 +22,9 @@ export class HMSAudioTrackSettingsBuilder {
   ];
 
   volume(volume: number) {
-    if (!(0.0 <= volume && volume <= 1.0)) throw Error('volume can only be in range [0.0, 1.0]');
+    if (!(0.0 <= volume && volume <= 1.0)) {
+      throw Error('volume can only be in range [0.0, 1.0]');
+    }
     this._volume = volume;
     return this;
   }
@@ -33,7 +35,9 @@ export class HMSAudioTrackSettingsBuilder {
   }
 
   maxBitrate(maxBitrate?: number) {
-    if (maxBitrate && maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+    if (maxBitrate && maxBitrate <= 0) {
+      throw Error('maxBitrate should be >= 1');
+    }
     this._maxBitrate = maxBitrate;
     return this;
   }

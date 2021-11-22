@@ -1,3 +1,3 @@
-export interface ISignalParamsProvider<T extends Object> {
+export interface ISignalParamsProvider<T> {
   toSignalParams(): T;
 }

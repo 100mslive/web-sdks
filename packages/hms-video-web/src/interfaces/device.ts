@@ -5,6 +5,6 @@ export default interface HMSDevice {
   audioOutputs: HMSAudioDevice[];
 }
 
-interface HMSVideoDevice extends HMSDevice {}
+type HMSVideoDevice = HMSDevice;
 
-interface HMSAudioDevice extends HMSDevice {}
+type HMSAudioDevice = HMSDevice;

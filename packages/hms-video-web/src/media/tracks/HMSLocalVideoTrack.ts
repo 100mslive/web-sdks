@@ -54,7 +54,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param value
    */
   async setEnabled(value: boolean): Promise<void> {
-    if (value === this.enabled) return;
+    if (value === this.enabled) {
+      return;
+    }
     if (this.source === 'regular') {
       if (value) {
         await this.replaceTrackWith(this.settings);

@@ -33,24 +33,25 @@ export default class JsonRpcSignal implements ISignal {
    * We keep a list of pending trickles and send them immediately after [join]
    * is done.
    */
-  private isJoinCompleted: boolean = false;
+  private isJoinCompleted = false;
   private pendingTrickle: Array<HMSTrickle> = [];
 
   private socket: WebSocket | null = null;
 
   private callbacks = new Map<string, PromiseCallbacks<string>>();
 
-  private _isConnected: boolean = false;
+  private _isConnected = false;
+  private id = 0;
 
   public get isConnected(): boolean {
     return this._isConnected;
   }
 
-  private id = 0;
-
   public set isConnected(newValue: boolean) {
     HMSLogger.d(this.TAG, 'isConnected set', { id: this.id, old: this._isConnected, new: newValue });
-    if (this._isConnected === newValue) return;
+    if (this._isConnected === newValue) {
+      return;
+    }
 
     if (this._isConnected && !newValue) {
       // went offline
@@ -284,7 +285,7 @@ export default class JsonRpcSignal implements ISignal {
     const text: string = event.data;
     const response = JSON.parse(text);
 
-    if (response.hasOwnProperty('id')) {
+    if (response.id) {
       /** This is a response to [call] */
       const typedResponse = response as JsonRpcResponse;
       const id: string = typedResponse.id;
@@ -299,7 +300,7 @@ export default class JsonRpcSignal implements ISignal {
       } else {
         this.observer.onNotification(typedResponse);
       }
-    } else if (response.hasOwnProperty('method')) {
+    } else if (response.method) {
       if (response.method === HMSSignalMethod.OFFER) {
         this.observer.onOffer(response.params);
       } else if (response.method === HMSSignalMethod.TRICKLE) {
@@ -315,7 +316,9 @@ export default class JsonRpcSignal implements ISignal {
       } else {
         this.observer.onNotification(response);
       }
-    } else throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+    } else {
+      throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+    }
   }
 
   private async pingPongLoop(id: number) {

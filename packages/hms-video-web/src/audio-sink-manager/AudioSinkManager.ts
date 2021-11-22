@@ -36,7 +36,7 @@ export class AudioSinkManager {
   private audioSink?: HTMLElement;
   private autoPausedTracks: Set<HMSAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
-  private volume: number = 100;
+  private volume = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
   private audioContext?: AudioContext;

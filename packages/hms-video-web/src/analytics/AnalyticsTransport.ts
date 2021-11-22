@@ -6,16 +6,15 @@ import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 export abstract class AnalyticsTransport {
   abstract transportProvider: IAnalyticsTransportProvider;
   abstract failedEvents: Queue<AnalyticsEvent>;
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
+  private TAG = 'AnalyticsTransport';
 
   sendEvent(event: AnalyticsEvent) {
     try {
       this.sendSingleEvent(event);
       this.flushFailedEvents();
-    } catch (error) {}
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'sendEvent failed', error);
+    }
   }
 
   flushFailedEvents() {
@@ -23,7 +22,9 @@ export abstract class AnalyticsTransport {
       HMSLogger.d(this.TAG, 'Flushing failed events', this.failedEvents);
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
-        if (event) this.sendSingleEvent(event);
+        if (event) {
+          this.sendSingleEvent(event);
+        }
       }
     } catch (error) {
       HMSLogger.w(this.TAG, 'flushFailedEvents failed', error);

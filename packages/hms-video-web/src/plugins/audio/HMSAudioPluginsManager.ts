@@ -17,7 +17,7 @@ export class HMSAudioPluginsManager {
   private intermediateNode?: any;
   private analytics: AudioPluginsAnalytics;
   private outputTrack?: MediaStreamTrack;
-  private pluginAddInProgress: boolean = false;
+  private pluginAddInProgress = false;
 
   constructor(track: HMSLocalAudioTrack) {
     this.hmsTrack = track;
@@ -51,9 +51,8 @@ export class HMSAudioPluginsManager {
     try {
       await this.addPluginInternal(plugin);
     } catch (err) {
-      throw err;
-    } finally {
       this.pluginAddInProgress = false;
+      throw err;
     }
   }
 
@@ -75,7 +74,10 @@ export class HMSAudioPluginsManager {
     }
 
     if (!plugin.isSupported()) {
-      let err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(HMSAction.AUDIO_PLUGINS, 'platform not supported ');
+      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+        HMSAction.AUDIO_PLUGINS,
+        'platform not supported ',
+      );
       this.analytics.failure(name, err);
       HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
       return;

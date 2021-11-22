@@ -171,7 +171,9 @@ class Store implements IStore {
 
   addPeer(peer: HMSPeer) {
     this.peers[peer.peerId] = peer;
-    if (peer.isLocal) this.localPeerId = peer.peerId;
+    if (peer.isLocal) {
+      this.localPeerId = peer.peerId;
+    }
   }
 
   /**
@@ -192,7 +194,9 @@ class Store implements IStore {
   }
 
   removePeer(peerId: string) {
-    if (this.localPeerId === peerId) this.localPeerId = undefined;
+    if (this.localPeerId === peerId) {
+      this.localPeerId = undefined;
+    }
     delete this.peers[peerId];
   }
 
@@ -266,7 +270,9 @@ class Store implements IStore {
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    if (!peer.role) return [];
+    if (!peer.role) {
+      return [];
+    }
 
     const publishParams = this.getPolicyForRole(peer.role.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;

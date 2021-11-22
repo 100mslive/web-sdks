@@ -81,7 +81,7 @@ export class RequestManager {
     if (!enabled) {
       const promises: Promise<void>[] = [];
 
-      for (let track of tracksToBeUpdated) {
+      for (const track of tracksToBeUpdated) {
         promises.push(track.setEnabled(false));
       }
       Promise.all(promises).then(() => {

@@ -22,7 +22,7 @@ export default class HMSDataChannel {
     return this.nativeChannel.readyState;
   }
 
-  constructor(nativeChannel: RTCDataChannel, observer: DataChannelObserver, metadata: string = '') {
+  constructor(nativeChannel: RTCDataChannel, observer: DataChannelObserver, metadata = '') {
     this.nativeChannel = nativeChannel;
     this.observer = observer;
     this.metadata = metadata;

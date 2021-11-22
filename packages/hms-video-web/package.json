@@ -17,7 +17,7 @@
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "test": "jest",
-    "lint": "eslint",
+    "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
     "prepare": "yarn build",
     "size": "size-limit",

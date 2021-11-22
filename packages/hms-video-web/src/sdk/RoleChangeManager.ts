@@ -104,7 +104,7 @@ export default class RoleChangeManager {
     }
 
     await this.transport.unpublish(tracksToUnpublish);
-    for (let track of tracksToUnpublish) {
+    for (const track of tracksToUnpublish) {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
     }
 

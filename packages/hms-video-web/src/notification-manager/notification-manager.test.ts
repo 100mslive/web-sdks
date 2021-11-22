@@ -23,10 +23,8 @@ let audioUpdateHandler: jest.Mock<any, any>;
 
 let listener: HMSUpdateListener;
 let audioListener: HMSAudioListener;
-let store: Store;
+const store: Store = new Store();
 let notificationManager: NotificationManager;
-
-store = new Store();
 
 beforeEach(() => {
   joinHandler = jest.fn();

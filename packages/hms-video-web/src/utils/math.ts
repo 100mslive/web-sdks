@@ -1,6 +1,6 @@
 export class RunningAverage {
-  private total: number = 0;
-  private count: number = 0;
+  private total = 0;
+  private count = 0;
 
   add(item: number) {
     this.count++;

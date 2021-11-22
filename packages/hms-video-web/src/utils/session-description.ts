@@ -47,7 +47,9 @@ export function getSdpTrackIdForMid(
 }
 
 export function enableOpusDtx(desc: RTCSessionDescriptionInit): RTCSessionDescriptionInit {
-  if (desc.sdp!.includes('usedtx=1')) return desc;
+  if (desc.sdp!.includes('usedtx=1')) {
+    return desc;
+  }
 
   return { type: desc.type, sdp: desc.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
 }

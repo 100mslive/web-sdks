@@ -11,7 +11,7 @@ export interface IFetchAVTrackOptions {
 }
 
 export default interface ITransport {
-  join(authToken: string, peerId: string, customData: Object, initEndpoint?: string): Promise<void>;
+  join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void>;
 
   leave(): Promise<void>;
 

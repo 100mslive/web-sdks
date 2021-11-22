@@ -87,7 +87,9 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
 
   private degradeActiveTracksByHalf() {
     const activeTracks = this.getActiveTracks(false);
-    if (!activeTracks.length) return;
+    if (!activeTracks.length) {
+      return;
+    }
     HMSLogger.d(this.TAG, { activeTracks: [...activeTracks] });
 
     let halfCount = Math.ceil(activeTracks.length / 2);

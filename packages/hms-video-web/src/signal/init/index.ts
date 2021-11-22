@@ -9,8 +9,8 @@ export default class InitService {
   static async fetchInitConfig(
     token: string,
     peerId: string,
-    initEndpoint: string = 'https://prod-init.100ms.live',
-    region: string = '',
+    initEndpoint = 'https://prod-init.100ms.live',
+    region = '',
   ): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, region);

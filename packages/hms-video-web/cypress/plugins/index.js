@@ -21,7 +21,7 @@ const keys = ['CYPRESS_TOKEN_ENDPOINT', 'CYPRESS_ROOM_ID', 'CYPRESS_ROLE', 'CYPR
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  keys.forEach((key) => {
+  keys.forEach(key => {
     config.env[key] = process.env[key];
   });
   console.log('config', config.env);

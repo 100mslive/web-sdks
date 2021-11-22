@@ -29,7 +29,7 @@ export class DeviceManager implements HMSDeviceManager {
   hasWebcamPermission = false;
   hasMicrophonePermission = false;
 
-  private TAG: string = '[Device Manager]:';
+  private TAG = '[Device Manager]:';
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
@@ -215,7 +215,7 @@ export class DeviceManager implements HMSDeviceManager {
    * 3. select the default one if nothing was found
    * 4. select the first option if there is no default
    */
-  setOutputDevice(deviceChange: boolean = false) {
+  setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
     this.outputDevice = undefined;

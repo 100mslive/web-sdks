@@ -28,7 +28,7 @@ export default interface ITransportObserver {
    *      2.1 code: [Int]
    *      2.2 message: [String]
    */
-  onNotification(message: Object): void;
+  onNotification(message: any): void;
 
   onTrackAdd(track: HMSTrack): void;
 

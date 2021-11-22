@@ -3,7 +3,9 @@
  * @param ms -- time in milliseconds
  */
 export function sleep(ms: number): Promise<void> {
-  if (ms < 0) throw Error('`ms` should be a positive integer');
+  if (ms < 0) {
+    throw Error('`ms` should be a positive integer');
+  }
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -14,12 +16,13 @@ export function sleep(ms: number): Promise<void> {
  * @param delay time by which the function execution has to be delayed
  * @returns {void}
  */
-export function debounce(fn: () => void, delay: number = 300) {
+export function debounce(fn: () => void, delay = 300) {
   let timer: any | undefined;
   return function (...args: []) {
     clearTimeout(timer);
     timer = undefined;
     //@ts-ignore
+    //eslint-disable-next-line
     const context = this;
     timer = setTimeout(() => {
       fn.apply(context, args);

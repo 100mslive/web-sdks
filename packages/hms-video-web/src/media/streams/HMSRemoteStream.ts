@@ -16,7 +16,9 @@ export default class HMSRemoteStream extends HMSMediaStream {
   }
 
   setAudio(enabled: boolean) {
-    if (this.audio === enabled) return;
+    if (this.audio === enabled) {
+      return;
+    }
 
     this.audio = enabled;
     this.syncWithApiChannel();

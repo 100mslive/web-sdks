@@ -11,7 +11,7 @@ import { HMSLocalPeer } from './models/peer';
 import { EventBus } from '../events/EventBus';
 
 const testObserver: ITransportObserver = {
-  onNotification(_: Object): void {},
+  onNotification(_: any): void {},
 
   onTrackAdd(_: HMSTrack): void {},
 
@@ -81,7 +81,7 @@ const gumSuccess = (constraints: any) => {
 const gumError = (_: any) => Promise.reject(new Error('Permission denied'));
 
 class OverconstrainedError extends Error {
-  constraint: string = '';
+  constraint = '';
   constructor(constraint: string, message: string) {
     super(message);
     this.name = 'OverconstrainedError';
@@ -199,7 +199,7 @@ describe('LocalTrackManager', () => {
   });
 
   describe('handling permission failures', () => {
-    let failureCallback = jest.spyOn(testObserver, 'onFailure');
+    const failureCallback = jest.spyOn(testObserver, 'onFailure');
     let manager: LocalTrackManager;
 
     beforeEach(() => {
@@ -308,12 +308,14 @@ describe('LocalTrackManager', () => {
       const droppedConstraints = mockOverConstrainedGetUserMedia.mock.calls[1][0];
 
       for (const constraint in audioContraints) {
-        if (constraint in hostPublishParams.audio)
+        if (constraint in hostPublishParams.audio) {
           expect(audioContraints[constraint]).toEqual((hostPublishParams.audio as any)[constraint]);
+        }
       }
       for (const constraint in videoConstraints) {
-        if (constraint in hostPublishParams.video)
+        if (constraint in hostPublishParams.video) {
           expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+        }
       }
       for (const constraint in droppedConstraints.audio) {
         expect(droppedConstraints[constraint]).toBeUndefined();
@@ -341,7 +343,7 @@ describe('LocalTrackManager', () => {
         name: 'test',
       });
       const mockVideoTrack = new HMSLocalVideoTrack(
-        new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
+        new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
         'regular',
         testEventBus,
@@ -372,7 +374,7 @@ describe('LocalTrackManager', () => {
         name: 'test',
       });
       localPeer.videoTrack = new HMSLocalVideoTrack(
-        new HMSLocalStream((mockMediaStream as unknown) as MediaStream),
+        new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
         'regular',
         testEventBus,

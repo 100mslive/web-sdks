@@ -77,7 +77,7 @@ export class VideoPluginsAnalytics {
       //Failed during initialization of plugin(model loading etc...)
       const err = ErrorFactory.MediaPluginErrors.InitFailed(
         HMSAction.VIDEO_PLUGINS,
-        'failed during initialization of plugin' + ((e as Error).message || e),
+        `failed during initialization of plugin${(e as Error).message || e}`,
       );
       HMSLogger.e(TAG, err);
       this.failure(name, err);
@@ -102,7 +102,7 @@ export class VideoPluginsAnalytics {
       //Failed during processing of plugin
       const err = ErrorFactory.MediaPluginErrors.ProcessingFailed(
         HMSAction.VIDEO_PLUGINS,
-        'Failed during processing of plugin' + ((e as Error).message || e),
+        `Failed during processing of plugin${(e as Error).message || e}`,
       );
       HMSLogger.e(TAG, err);
       this.failure(name, err);

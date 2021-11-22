@@ -6,7 +6,7 @@ import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { RTCStats } from './RTCStats';
 
 export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCStats }> {
-  private isMonitored: boolean = false;
+  private isMonitored = false;
   constructor(private readonly connections: HMSConnection[], private readonly interval = RTC_STATS_MONITOR_INTERVAL) {
     super();
   }
@@ -36,9 +36,15 @@ export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCSt
     for (const conn of this.connections) {
       const stats = await conn.getStats();
       stats.forEach(stat => {
-        if (stat.packetsLost) totalPacketsLost += stat.packetsLost;
-        if (stat.availableIncomingBitrate) availableIncomingBitrate = Number(stat.availableIncomingBitrate);
-        if (stat.availableOutgoingBitrate) availableOutgoingBitrate = Number(stat.availableOutgoingBitrate);
+        if (stat.packetsLost) {
+          totalPacketsLost += stat.packetsLost;
+        }
+        if (stat.availableIncomingBitrate) {
+          availableIncomingBitrate = Number(stat.availableIncomingBitrate);
+        }
+        if (stat.availableOutgoingBitrate) {
+          availableOutgoingBitrate = Number(stat.availableOutgoingBitrate);
+        }
       });
     }
 

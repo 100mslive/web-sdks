@@ -43,7 +43,7 @@ export class RoomUpdateManager {
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();
     }
-    let action: number = -1;
+    let action = -1;
     if (type === 'sfu') {
       room.recording.server.running = running;
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;

@@ -126,7 +126,7 @@ export default class HMSTransport implements ITransport {
       }
     },
 
-    onNotification: (message: Object) => this.observer.onNotification(message),
+    onNotification: (message: any) => this.observer.onNotification(message),
 
     onServerError: async (error: HMSException) => {
       await this.leave();
@@ -270,8 +270,8 @@ export default class HMSTransport implements ITransport {
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
-    initEndpoint: string = 'https://prod-init.100ms.live/init',
-    autoSubscribeVideo: boolean = false,
+    initEndpoint = 'https://prod-init.100ms.live/init',
+    autoSubscribeVideo = false,
   ): Promise<void> {
     if (this.state === TransportState.Failed) {
       this.state = TransportState.Disconnected;
@@ -438,7 +438,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async changeRole(forPeer: HMSPeer, toRole: string, force: boolean = false) {
+  async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
     await this.signal.requestRoleChange({
       requested_for: forPeer.peerId,
       role: toRole,

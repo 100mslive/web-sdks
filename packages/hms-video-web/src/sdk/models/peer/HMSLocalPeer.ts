@@ -6,7 +6,7 @@ import HMSIdFactory from '../../../utils/id-factory';
 type HMSLocalPeerInit = Omit<HMSPeerInit, 'isLocal' | 'peerId'>;
 
 export class HMSLocalPeer extends HMSPeer implements IHMSLocalPeer {
-  isLocal: boolean = true;
+  isLocal = true;
   declare audioTrack?: HMSLocalAudioTrack;
   declare videoTrack?: HMSLocalVideoTrack;
   auxiliaryTracks: HMSLocalTrack[] = [];

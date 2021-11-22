@@ -38,7 +38,8 @@ export class PlaylistManager
     playlistEnded: HMSPlaylistType;
     currentTrackEnded: HMSPlaylistItem<any>;
   }>
-  implements HMSPlaylistManager {
+  implements HMSPlaylistManager
+{
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
@@ -79,7 +80,7 @@ export class PlaylistManager
     }
     const element = this.getElement(type);
     if (element) {
-      let updatedValue = Math.max(element.currentTime + value, 0);
+      const updatedValue = Math.max(element.currentTime + value, 0);
       element.currentTime = Math.min(updatedValue, element.duration);
     }
   }
@@ -266,7 +267,7 @@ export class PlaylistManager
   private async removeTracks(type: HMSPlaylistType = HMSPlaylistType.audio) {
     const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
     const tracks = manager.getTracks();
-    for (let trackId of tracks) {
+    for (const trackId of tracks) {
       await this.removeTrack(trackId);
     }
   }

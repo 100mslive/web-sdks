@@ -37,7 +37,7 @@ export class HMSVideoPluginsManager {
   /**
    * plugins loop is the loop in which all plugins are applied
    */
-  private pluginsLoopRunning: boolean = false;
+  private pluginsLoopRunning = false;
   private pluginsLoopState: 'paused' | 'running' = 'paused';
   private readonly hmsTrack: HMSLocalVideoTrack;
   private readonly plugins: string[]; // plugin names in order they were added
@@ -47,7 +47,7 @@ export class HMSVideoPluginsManager {
   private outputCanvas?: CanvasElement;
   private outputTrack?: MediaStreamTrack;
   private analytics: VideoPluginsAnalytics;
-  private pluginAddInProgress: boolean = false;
+  private pluginAddInProgress = false;
   private pluginNumFramesToSkip: Record<string, number>;
   private pluginNumFramesSkipped: Record<string, number>;
 
@@ -91,9 +91,8 @@ export class HMSVideoPluginsManager {
     try {
       await this.addPluginInternal(plugin, pluginFrameRate);
     } catch (err) {
-      throw err;
-    } finally {
       this.pluginAddInProgress = false;
+      throw err;
     }
   }
 
@@ -134,7 +133,10 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
     if (!plugin.isSupported()) {
-      let err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(HMSAction.VIDEO_PLUGINS, 'platform not supported ');
+      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+        HMSAction.VIDEO_PLUGINS,
+        'platform not supported ',
+      );
       this.analytics.failure(name, err);
       HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
       return;
@@ -270,7 +272,7 @@ export class HMSVideoPluginsManager {
         await sleep(sleepTimeMs);
         continue;
       }
-      let processingTime: number = 0;
+      let processingTime = 0;
       try {
         await this.analytics.preProcessWithTime(async () => await this.doPreProcessing());
         const start = Date.now();

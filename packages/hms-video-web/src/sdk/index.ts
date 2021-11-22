@@ -70,7 +70,7 @@ const INITIAL_STATE = {
 
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport;
-  private TAG: string = '[HMSSdk]:';
+  private TAG = '[HMSSdk]:';
   private listener?: HMSUpdateListener;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
@@ -438,7 +438,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async sendDirectMessage(message: string, peer: HMSPeer, type?: string) {
-    let recipientPeer = this.store.getPeerById(peer.peerId);
+    const recipientPeer = this.store.getPeerById(peer.peerId);
     if (!recipientPeer) {
       throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peer);
     }
@@ -468,7 +468,9 @@ export class HMSSdk implements HMSInterface {
 
   async startScreenShare(onStop: () => void, audioOnly = false) {
     const publishParams = this.publishParams;
-    if (!publishParams) return;
+    if (!publishParams) {
+      return;
+    }
 
     const { screen, allowed } = publishParams;
     const canPublishScreen = allowed && allowed.includes('screen');
@@ -534,7 +536,7 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `✅ Screenshare ended from app`);
     const screenTracks = this.localPeer?.auxiliaryTracks.filter(t => t.source === 'screen');
     if (screenTracks) {
-      for (let track of screenTracks) {
+      for (const track of screenTracks) {
         await this.removeTrack(track.trackId);
       }
     }
@@ -610,7 +612,7 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.setAudioListener(audioListener);
   }
 
-  async changeRole(forPeer: HMSPeer, toRole: string, force: boolean = false) {
+  async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
     if (!forPeer.role || forPeer.role.name === toRole) {
       return;
     }

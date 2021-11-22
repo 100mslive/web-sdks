@@ -23,9 +23,11 @@ export class PeerManager {
   }
 
   handlePeerList = (peers: PeerNotification[]) => {
-    if (peers.length === 0) return;
-    let hmsPeers: HMSRemotePeer[] = [];
-    for (let peer of peers) {
+    if (peers.length === 0) {
+      return;
+    }
+    const hmsPeers: HMSRemotePeer[] = [];
+    for (const peer of peers) {
       hmsPeers.push(this.makePeer(peer));
     }
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, hmsPeers);

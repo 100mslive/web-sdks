@@ -11,7 +11,9 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async setEnabled(value: boolean): Promise<void> {
-    if (value === this.enabled) return;
+    if (value === this.enabled) {
+      return;
+    }
 
     // If remote track is muted when degraded, reset degraded state
     if (this._degraded && !value) {
@@ -61,7 +63,9 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private updateLayer() {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
-    if (this.degraded) newLayer = HMSSimulcastLayer.NONE;
+    if (this.degraded) {
+      newLayer = HMSSimulcastLayer.NONE;
+    }
     (this.stream as HMSRemoteStream).setVideo(newLayer);
   }
 }

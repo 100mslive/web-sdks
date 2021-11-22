@@ -57,7 +57,7 @@ export class RetryScheduler {
   private async scheduleTask(
     category: TFC,
     error: HMSException,
-    changeState: Boolean,
+    changeState: boolean,
     task: RetryTask,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
@@ -191,7 +191,7 @@ export class RetryScheduler {
   }
 
   private getDelayForRetryCount(n: number) {
-    let delay = Math.pow(2, n);
+    const delay = Math.pow(2, n);
     const jitter = Math.random();
     return Math.round(Math.min(delay + jitter, MAX_TRANSPORT_RETRY_DELAY) * 1000);
   }

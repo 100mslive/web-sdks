@@ -65,7 +65,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async setEnabled(value: boolean) {
-    if (value === this.enabled) return;
+    if (value === this.enabled) {
+      return;
+    }
 
     // Replace silent empty track with an actual audio track, if enabled.
     if (value && isEmptyTrack(this.nativeTrack)) {
@@ -105,7 +107,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('maxBitrate')) {
-      if (newSettings.maxBitrate) await stream.setMaxBitrate(newSettings.maxBitrate, this);
+      if (newSettings.maxBitrate) {
+        await stream.setMaxBitrate(newSettings.maxBitrate, this);
+      }
     }
 
     if (hasPropertyChanged('advanced')) {

@@ -4,7 +4,7 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
-  private sinkCount: number = 0;
+  private sinkCount = 0;
 
   hasSinks() {
     return this.sinkCount > 0;
@@ -12,7 +12,9 @@ export class HMSVideoTrack extends HMSTrack {
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
-    if (track.kind !== 'video') throw new Error("Expected 'track' kind = 'video'");
+    if (track.kind !== 'video') {
+      throw new Error("Expected 'track' kind = 'video'");
+    }
   }
 
   /**

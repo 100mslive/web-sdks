@@ -59,7 +59,9 @@ export class TrackManager {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track, track.nativeTrack);
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
-    if (!trackStateEntry) return;
+    if (!trackStateEntry) {
+      return;
+    }
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });

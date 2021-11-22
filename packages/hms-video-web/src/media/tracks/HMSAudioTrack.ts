@@ -11,7 +11,9 @@ export class HMSAudioTrack extends HMSTrack {
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
-    if (track.kind !== 'audio') throw new Error("Expected 'track' kind = 'audio'");
+    if (track.kind !== 'audio') {
+      throw new Error("Expected 'track' kind = 'audio'");
+    }
   }
 
   getVolume() {
@@ -66,7 +68,9 @@ export class HMSAudioTrack extends HMSTrack {
         await this.audioElement?.setSinkId(device.deviceId);
         this.outputDevice = device;
       }
-    } catch {}
+    } catch (error) {
+      HMSLogger.d('audio-track', error);
+    }
   }
 
   /**

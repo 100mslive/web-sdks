@@ -5,9 +5,9 @@ export interface IHMSDevice {
   audioOutputs: IHMSAudioDevice[];
 }
 
-interface IHMSVideoDevice extends IHMSDevice {}
+type IHMSVideoDevice = IHMSDevice;
 
-interface IHMSAudioDevice extends IHMSDevice {}
+type IHMSAudioDevice = IHMSDevice;
 
 export interface IHMSUtils {
   getDevices(): IHMSDevice[];

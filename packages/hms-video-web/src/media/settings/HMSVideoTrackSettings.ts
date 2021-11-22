@@ -26,7 +26,9 @@ export class HMSVideoTrackSettingsBuilder {
   }
 
   maxFramerate(maxFramerate?: number) {
-    if (maxFramerate && maxFramerate <= 0) throw Error('maxFramerate should be >= 1');
+    if (maxFramerate && maxFramerate <= 0) {
+      throw Error('maxFramerate should be >= 1');
+    }
     this._maxFramerate = maxFramerate;
     return this;
   }
@@ -37,9 +39,13 @@ export class HMSVideoTrackSettingsBuilder {
    * If false and maxBitrate is undefined - sets undefined.
    */
   maxBitrate(maxBitrate?: number, useDefault = true) {
-    if (typeof maxBitrate === 'number' && maxBitrate <= 0) throw Error('maxBitrate should be >= 1');
+    if (typeof maxBitrate === 'number' && maxBitrate <= 0) {
+      throw Error('maxBitrate should be >= 1');
+    }
     this._maxBitrate = maxBitrate;
-    if (!this._maxBitrate && useDefault) this._maxBitrate = 150_000;
+    if (!this._maxBitrate && useDefault) {
+      this._maxBitrate = 150_000;
+    }
     return this;
   }
 

@@ -52,7 +52,7 @@ describe('preview api', () => {
         },
         previewListener,
       )
-      .catch((error) => {
+      .catch(error => {
         expect(error.message).to.equal('Token is not in proper JWT format');
       });
   });

@@ -40,7 +40,7 @@ export class PeerListManager {
   handleReconnectPeerList = (peerList: PeerListNotification) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peerList.peers);
-    const peersToRemove = currentPeerList.filter(hmsPeer => !peerList.peers.hasOwnProperty(hmsPeer.peerId));
+    const peersToRemove = currentPeerList.filter(hmsPeer => !peerList.peers[hmsPeer.peerId]);
 
     HMSLogger.d(this.TAG, { peersToRemove });
 
@@ -71,7 +71,7 @@ export class PeerListManager {
 
         // Remove all the tracks which are not present in the peer.tracks
         tracks.forEach(track => {
-          if (!newPeerNotification.tracks.hasOwnProperty(track.trackId)) {
+          if (!newPeerNotification.tracks[track.trackId]) {
             this.removePeerTrack(oldPeer, track.trackId);
             this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
           }

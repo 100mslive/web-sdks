@@ -45,7 +45,9 @@ export class LocalTrackManager {
 
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
     const publishParams = this.store.getPublishParams();
-    if (!publishParams) return [];
+    if (!publishParams) {
+      return [];
+    }
 
     const { allowed } = publishParams;
     const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
@@ -94,7 +96,7 @@ export class LocalTrackManager {
       return [];
     }
 
-    let fetchTrackOptions: IFetchAVTrackOptions = {
+    const fetchTrackOptions: IFetchAVTrackOptions = {
       audio: canPublishAudio && !audioTrack && (initialSettings.isAudioMuted ? 'empty' : true),
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
@@ -166,12 +168,12 @@ export class LocalTrackManager {
     fetchTrackOptions: IFetchAVTrackOptions = { audio: false, video: false },
     settings: HMSTrackSettings,
   ) {
-    let trackSettings = new HMSTrackSettings(
+    const trackSettings = new HMSTrackSettings(
       fetchTrackOptions.video === true ? settings.video : null,
       fetchTrackOptions.audio === true ? settings.audio : null,
       settings.simulcast,
     );
-    let nativeTracks: MediaStreamTrack[] = [];
+    const nativeTracks: MediaStreamTrack[] = [];
 
     if (trackSettings.audio || trackSettings.video) {
       nativeTracks.push(...(await this.getAVTracks(trackSettings)));
@@ -385,16 +387,17 @@ export class LocalTrackManager {
            * Try get local tracks for empty tracks
            */
           const nativeError: Error | undefined = error instanceof HMSException ? error.nativeError : (error as Error);
+          let ex = error;
           if (nativeError?.name === 'OverconstrainedError') {
             const newError = ErrorFactory.TracksErrors.GenericTrack(
               HMSAction.TRACK,
               'Overconstrained error after dropping all constraints',
             );
             newError.addNativeError(nativeError);
-            error = newError;
+            ex = newError;
           }
 
-          return await this.retryGetLocalTracks(error, trackSettings, fetchTrackOptions);
+          return await this.retryGetLocalTracks(ex, trackSettings, fetchTrackOptions);
         }
       }
 
