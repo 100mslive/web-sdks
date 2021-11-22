@@ -10,6 +10,7 @@
       "files": ["*.ts", "*.tsx"],
       "rules": {
         "@typescript-eslint/explicit-module-boundary-types": [0],
+        "@typescript-eslint/ban-ts-comment": 1,
         "complexity": ["error", 6], // if a function is getting too complex it should be broken down
         "curly": ["error", "all"], // use curly brace even for single line functions
         "comma-dangle": ["error", "always-multiline"], // easier to see git diff
