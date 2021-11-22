@@ -25,6 +25,7 @@
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
+    "test": "lerna run test --stream",
     "start": "lerna run start --stream --parallel",
     "build": "lerna run build --stream --parallel"
   },
