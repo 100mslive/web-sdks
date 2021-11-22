@@ -45,6 +45,7 @@ async function main() {
 
     console.log('test');
     console.log('test1');
+    console.log('test2');
 
     fs.readFile('./dist/esm/index.js', (_err, data) => {
       gzip(data, (_err, result) => {

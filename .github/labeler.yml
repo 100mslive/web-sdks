@@ -1,5 +1,5 @@
 build:
-  - any: ['packages/*/scripts/*', '**/*.json']
+  - any: ['packages/*/scripts/*.js', '**/*.json']
 
 sdk:
   - any: ['packages/hms-video-web/**/*']
@@ -16,4 +16,4 @@ ci:
   - '.github/*'
 
 docs:
-  - any: ['packages/*/docs/**', '**/*.md']
+  - any: ['packages/*/docs/*', '**/*.md']
