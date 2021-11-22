@@ -16,4 +16,4 @@ ci:
   - '.github/*'
 
 docs:
-  - any: ['packages/*/docs/*', '**/*.md']
+  - '**/*.md'
