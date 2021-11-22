@@ -7,6 +7,7 @@ describe('simple gum test', () => {
       const audioTrack = stream.getAudioTracks()[0];
       expect(videoTrack).to.not.be.undefined;
       expect(audioTrack).to.not.be.undefined;
+      console.log('test');
     });
   });
 });
