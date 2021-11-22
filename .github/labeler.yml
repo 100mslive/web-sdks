@@ -10,7 +10,7 @@ store:
     all: ['!packages/hms-video-store/scripts', '!packages/hms-video-store/**/*.(test|spec).ts']
 
 test:
-  - '**/*.(test|spec).ts'
+  - 'packages/**/*.(test|spec).ts'
 
 ci:
   - '.github/*'
