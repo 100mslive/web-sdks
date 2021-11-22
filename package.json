@@ -5,6 +5,8 @@
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/file": "^5.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "babel-plugin-istanbul": "^6.1.1",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
