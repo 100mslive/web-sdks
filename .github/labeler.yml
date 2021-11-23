@@ -2,7 +2,7 @@ version: 1
 labels:
   - label: "sdk":
     files: 
-     - '**/hms-video-web/**' 
+      - '**/hms-video-web/**' 
 
   - label: "store":
     files: 
