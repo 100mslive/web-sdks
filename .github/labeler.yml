@@ -1,17 +1,17 @@
 version: 1
 labels:
-  - label: "sdk":
-    files: 
-      - '**/hms-video-web/**' 
+  - label: 'sdk'
+    files:
+      - '**/hms-video-web/**'
 
-  - label: "store":
-    files: 
-      - '**/hms-video-store/**' 
+  - label: 'store'
+    files:
+      - '**/hms-video-store/**'
 
-  - label: "sdk-test":
-    files: 
-      - '**/hms-video-web/**.(test|spec).ts' 
+  - label: 'sdk-test'
+    files:
+      - '**/hms-video-web/**.(test|spec).ts'
 
-  - label: "store-test":
-    files: 
+  - label: 'store-test'
+    files:
       - '**/hms-video-store/**.(test|spec).ts'
