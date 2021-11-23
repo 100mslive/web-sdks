@@ -1,19 +1,28 @@
 sdk:
   - any: ['packages/hms-video-web/**/*']
-    all: ['!packages/hms-video-web/scripts', '!packages/hms-video-web/**/*.(test|spec).ts']
+    all:
+      [
+        '!packages/hms-video-web/**/*.test.ts',
+        '!packages/hms-video-web/**/*.spec.ts',
+        '!packages/hms-video-web/scripts/*.js',
+      ]
 
 store:
   - any: ['packages/hms-video-store/**/*']
-    all: ['!packages/hms-video-store/scripts', '!packages/hms-video-store/**/*.(test|spec).ts']
-
+    all:
+      [
+        '!packages/hms-video-store/**/*.test.ts',
+        '!packages/hms-video-store/**/*.spec.ts',
+        '!packages/hms-video-store/scripts/*.js',
+      ]
 test:
-  - '**/*.(test|spec).ts'
+  - any: ['**/*.test.ts', '**/*.spec.ts']
 
 ci:
   - '.github/*'
 
 build:
-  - any: ['packages/*/scripts', '**/*.json']
+  - any: ['packages/*/scripts']
 
-docs:
-  - any: ['packages/*/docs/**', '**/*.md']
+documentation:
+  - '**/*.md'
