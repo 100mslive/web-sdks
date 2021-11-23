@@ -1,35 +1,48 @@
-sdk:
-  - any: ['packages/hms-video-web/**/*']
-    all:
-      [
-        '!packages/hms-video-web/**/*.test.ts',
-        '!packages/hms-video-web/**/*.spec.ts',
-        '!packages/hms-video-web/scripts/*.js',
-      ]
+version: 1
+labels:
+- label: "sdk":
+  files: '**/hms-video-web/**' 
 
-store:
-  - any: ['packages/hms-video-store/**/*']
-    all:
-      [
-        '!packages/hms-video-store/**/*.test.ts',
-        '!packages/hms-video-store/**/*.spec.ts',
-        '!packages/hms-video-store/scripts/*.js',
-      ]
+- label: "store":
+  files: '**/hms-video-store/**' 
 
-'sdk-test':
-  - any: ['packages/hms-video-web/**/*.test.ts', 'packages/hms-video-web/**/*.spec.ts']
+- label: "sdk-test":
+  files: '**/hms-video-web/**.(test|spec).ts' 
 
-'store-test':
-  - any: ['packages/hms-video-store/**/*.test.ts', 'packages/hms-video-store/**/*.spec.ts']
+- label: "store-test":
+  files: '**/hms-video-store/**.(test|spec).ts' 
 
-ci:
-  - '.github/*'
+  # - any: ['packages/hms-video-web/**/*']
+  #   all:
+  #     [
+  #       '!packages/hms-video-web/**/*.test.ts',
+  #       '!packages/hms-video-web/**/*.spec.ts',
+  #       '!packages/hms-video-web/scripts/*.js',
+  #     ]
 
-'sdk-build':
-  - 'packages/hms-video-web/scripts/*'
+# store:
+#   - any: ['packages/hms-video-store/**/*']
+#     all:
+#       [
+#         '!packages/hms-video-store/**/*.test.ts',
+#         '!packages/hms-video-store/**/*.spec.ts',
+#         '!packages/hms-video-store/scripts/*.js',
+#       ]
 
-'store-build':
-  - 'packages/hms-video-store/scripts/*'
+# 'sdk-test':
+#   - any: ['packages/hms-video-web/**/*.test.ts', 'packages/hms-video-web/**/*.spec.ts']
 
-documentation:
-  - any: ['**/*.md', '**/*.mdx']
+# 'store-test':
+#   - any: ['packages/hms-video-store/**/*.test.ts', 'packages/hms-video-store/**/*.spec.ts']
+
+# ci:
+#   - '.github/*'
+
+# 'sdk-build':
+#   - 'packages/hms-video-web/scripts/*'
+
+# 'store-build':
+#   - 'packages/hms-video-store/scripts/*'
+
+# documentation:
+#   - any: ['**/*.md', '**/*.mdx']
