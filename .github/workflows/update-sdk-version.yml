@@ -42,6 +42,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           cd packages/hms-video-web
-          VERSION=npm version prerelease
-          git commit -a -m "build: update to" -m "$VERSION"
+          VERSION=$(npm version prerelease)
+          git commit -am "build(sdk): update version to $VERSION"
           git push
