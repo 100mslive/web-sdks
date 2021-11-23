@@ -1,0 +1,39 @@
+name: Update Sdk Version
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/hms-video-web/**'
+      - '!packages/hms-video-web/cypress/**'
+      - '!packages/hms-video-web/docs/**'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        id: main
+        with:
+          ref: main
+      - run: |
+          VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $VERSION
+          echo "::set-output name=verion::$(echo $VERSION)"
+
+      - uses: actions/checkout@v2
+        id: branch-version
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - run: |
+          VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $VERSION
+          echo "::set-output name=verion::$(echo $VERSION)"
+
+      - name: Update version
+        if: steps.main.outputs.version != steps.branch.outputs.version
+      - run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          npm version prerelease --preid=alpha
+          git push
