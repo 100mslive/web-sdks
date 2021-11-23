@@ -10,4 +10,8 @@ describe('simple gum test', () => {
       console.log('test log1');
     });
   });
+
+  it('should match 1 to 1', () => {
+    expect(1).to.equal(1);
+  });
 });
