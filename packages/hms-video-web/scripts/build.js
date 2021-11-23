@@ -25,6 +25,7 @@ async function main() {
       external: Object.keys(pkg.dependencies),
       metafile: true,
     });
+    console.log('cjs eneded');
 
     const esmResult = esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
