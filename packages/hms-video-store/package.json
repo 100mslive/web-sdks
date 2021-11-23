@@ -13,6 +13,7 @@
   "scripts": {
     "prestart": "rm -rf dist",
     "start": "node ./scripts/dev && yarn types",
+    "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
