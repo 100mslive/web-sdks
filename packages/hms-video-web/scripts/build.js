@@ -26,6 +26,7 @@ async function main() {
       metafile: true,
     });
     console.log('cjs eneded');
+    console.log('test log');
 
     const esmResult = esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
