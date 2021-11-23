@@ -41,7 +41,7 @@
     "start": "lerna run start --stream --parallel",
     "build": "lerna run build --stream --parallel",
     "size": "lerna run size --stream",
-    "postinstall": "husky install && yarn build"
+    "postinstall": "husky install && lerna bootstrap"
   },
   "workspaces": [
     "packages/*"
