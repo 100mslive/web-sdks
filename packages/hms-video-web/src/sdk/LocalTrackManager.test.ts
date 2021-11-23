@@ -30,6 +30,7 @@ const testObserver: ITransportObserver = {
 
 let testStore = new Store();
 let testEventBus = new EventBus();
+console.log('test log');
 
 const hostPublishParams: PublishParams = {
   allowed: ['audio', 'video', 'screen'],
