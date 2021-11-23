@@ -11,6 +11,8 @@ on:
 jobs:
   size:
     runs-on: ubuntu-latest
+    env:
+      CI_JOB_NUMBER: 1
     steps:
       - uses: actions/checkout@v1
 
@@ -19,3 +21,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           directory: packages/hms-video-web
+          build_script: build:only
