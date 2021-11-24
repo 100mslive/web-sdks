@@ -17,9 +17,9 @@ jobs:
         with:
           filters: |
             sdk:
-              - 'packages/hms-video-web/!(cypress|scripts|docs)**/**'
+              - 'packages/hms-video-web/src/**/!(*.test.ts)'
             store:
-              - 'packages/hms-video-store/!(cypress|scripts|docs|internal-docs)**/**'
+              - 'packages/hms-video-store/src/(!test)**/!(*.test.ts)'
 
   # run this job only if the above job succeeds
   update-version:
