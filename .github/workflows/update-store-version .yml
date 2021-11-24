@@ -4,10 +4,12 @@ on:
     branches:
       - main
     paths:
-      - 'packages/hms-video-web/**'
-      - '!packages/hms-video-web/cypress/**'
-      - '!packages/hms-video-web/scripts/**'
-      - '!packages/hms-video-web/docs/**'
+      - 'packages/hms-video-store/**'
+      - '!packages/hms-video-store/cypress/**'
+      - '!packages/hms-video-store/scripts/**'
+      - '!packages/hms-video-store/docs/**'
+      - '!packages/hms-video-store/internal-docs/**'
+      - '!packages/hms-video-store/src/test/**'
 
 jobs:
   update-version:
@@ -21,7 +23,7 @@ jobs:
       - name: Get main version
         id: main
         run: |
-          VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
           echo $VERSION
           echo "::set-output name=version::$(echo $VERSION)"
 
@@ -33,7 +35,7 @@ jobs:
       - name: Get current version
         id: branch
         run: |
-          VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
           echo $VERSION
           echo "::set-output name=version::$(echo $VERSION)"
 
@@ -42,7 +44,7 @@ jobs:
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          cd packages/hms-video-web
+          cd packages/hms-video-store
           VERSION=$(npm version prerelease)
-          git commit -am "build(sdk): update version to $VERSION"
+          git commit -am "build(store): update version to $VERSION"
           git push
