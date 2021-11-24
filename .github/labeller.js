@@ -18,7 +18,7 @@ module.exports = async ({ github, context }) => {
       labelsToAdd.push(key);
     }
   }
-
+  console.log('test change');
   // This will update the labels - add if missing, delete if not present
   await github.rest.issues.setLabels({
     owner,
