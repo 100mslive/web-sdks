@@ -1,4 +1,4 @@
-name: Update Version
+name: PR checks
 on:
   pull_request:
     branches:
@@ -20,20 +20,6 @@ jobs:
               - 'packages/hms-video-web/src/**/!(*.test.ts)'
             store:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
-
-      - name: Sdk check size
-        uses: peter-evans/repository-dispatch@v1
-        if: steps.filter.outputs.sdk == 'true'
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          event-type: sdk-size
-
-      - name: Store check size
-        uses: peter-evans/repository-dispatch@v1
-        if: steps.filter.outputs.store == 'true'
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          event-type: store-size
 
   # run this job only if the above job succeeds
   update-version:
@@ -120,3 +106,15 @@ jobs:
           echo "reverting store to $VERSION"
           git commit -am "revert(store): version to $VERSION"
           git push
+
+  size:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true' || needs.changes.outputs.store == 'true'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check packages size
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_script: build:only
