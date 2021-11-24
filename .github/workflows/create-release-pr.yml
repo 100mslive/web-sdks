@@ -27,13 +27,25 @@ jobs:
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
         run: |
-          echo $(lerna version $BUMP --yes)
+          echo $(lerna version $BUMP --no-git-tag-version --yes)
+
+      - name: Get current version
+        id: version
+        run: |
+          SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $SDK_VERSION
+          STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
+          echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
+          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
       - uses: peter-evans/create-pull-request@v3
         with:
           commit-message: 'build: update versions for release'
           title: 'build: update versions for release'
-          body: Update changelog to reflect release changes
+          body: >
+            @100mslive/hms-video-web - ${{ steps.version.outputs.sdk_version }}
+            @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
           branch: release
           branch-suffix: timestamp
           base: main
