@@ -1,0 +1,122 @@
+name: Update Version
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      sdk: ${{ steps.filter.outputs.sdk }}
+      store: ${{ steps.filter.outputs.store }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            sdk:
+              - 'packages/hms-video-web/src/**/!(*.test.ts)'
+            store:
+              - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
+
+      - name: Sdk check size
+        uses: peter-evans/repository-dispatch@v1
+        if: steps.filter.outputs.sdk == 'true'
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: sdk-size
+
+      - name: Store check size
+        uses: peter-evans/repository-dispatch@v1
+        if: steps.filter.outputs.store == 'true'
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: store-size
+
+  # run this job only if the above job succeeds
+  update-version:
+    runs-on: ubuntu-latest
+    needs: changes
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Get main version
+        id: main
+        run: |
+          SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $SDK_VERSION
+          STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
+          echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
+          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
+
+      - name: Checkout current branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Get sdk current version
+        id: branch
+        run: |
+          SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $SDK_VERSION
+          STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
+          echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
+          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
+
+      - name: Set git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Update sdk version
+        # don't update the version if PR has a version change already, this prevents
+        # overriding any manual version update by the action.
+        if: steps.main.outputs.sdk_version == steps.branch.outputs.sdk_version && needs.changes.outputs.sdk == 'true'
+        run: |
+          cd packages/hms-video-web
+          VERSION=$(npm version prerelease)
+          echo "updating sdk to $VERSION"
+          git commit -am "build(sdk): update version to $VERSION"
+          git push
+
+      - name: revert sdk version
+        # revert sdk version to main version if changes are reversed
+        if: steps.main.outputs.sdk_version != steps.branch.outputs.sdk_version && needs.changes.outputs.sdk == 'false'
+        env:
+          MAIN_VERSION: ${{ steps.main.outputs.sdk_version }}
+        run: |
+          cd packages/hms-video-web
+          VERSION=$(npm version $MAIN_VERSION)
+          echo "reverting sdk to $VERSION"
+          git commit -am "revert(sdk): version to $VERSION"
+          git push
+
+      - name: Update store version
+        # don't update the version if PR has a version change already, this prevents
+        # overriding any manual version update by the action.
+        if: steps.main.outputs.store_version == steps.branch.outputs.store_version && needs.changes.outputs.store == 'true'
+        run: |
+          cd packages/hms-video-store
+          VERSION=$(npm version prerelease)
+          echo "updating store to $VERSION"
+          git commit -am "build(store): update version to $VERSION"
+          git push
+
+      - name: revert store version
+        # revert store version to main version if changes are reversed
+        if: steps.main.outputs.store_version != steps.branch.outputs.store_version && needs.changes.outputs.store == 'false'
+        env:
+          MAIN_VERSION: ${{ steps.main.outputs.store_version }}
+        run: |
+          cd packages/hms-video-store
+          VERSION=$(npm version $MAIN_VERSION)
+          echo "reverting store to $VERSION"
+          git commit -am "revert(store): version to $VERSION"
+          git push
