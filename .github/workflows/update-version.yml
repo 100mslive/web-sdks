@@ -23,14 +23,14 @@ jobs:
 
       - name: Sdk check size
         uses: peter-evans/repository-dispatch@v1
-        if: steps.filter.outputs.sdk
+        if: steps.filter.outputs.sdk == 'true'
         with:
           token: ${{ secrets.PAT_TOKEN }}
           event-type: sdk-size
 
       - name: Store check size
         uses: peter-evans/repository-dispatch@v1
-        if: steps.filter.outputs.store
+        if: steps.filter.outputs.store == 'true'
         with:
           token: ${{ secrets.PAT_TOKEN }}
           event-type: store-size
