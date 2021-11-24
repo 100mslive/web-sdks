@@ -72,6 +72,8 @@ import {
 
 let fakeStore: HMSStore;
 
+console.log('Test log');
+
 // start from a new fake store for every test
 beforeEach(() => {
   fakeStore = makeFakeStore();
