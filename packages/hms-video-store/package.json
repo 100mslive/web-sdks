@@ -33,16 +33,6 @@
   "author": "100ms",
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
-  "size-limit": [
-    {
-      "path": "dist/hms-video-store.cjs.js",
-      "limit": "20 KB"
-    },
-    {
-      "path": "dist/hms-video-store.esm.js",
-      "limit": "100 KB"
-    }
-  ],
   "dependencies": {
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
@@ -56,13 +46,11 @@
     "@100mslive/hms-video": "^0.1.32",
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@size-limit/file": "^5.0.3",
     "babel-plugin-istanbul": "^6.1.1",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "nyc": "^15.1.0",
-    "size-limit": "^5.0.3",
     "ts-node": "^10.4.0",
     "tsconfig-replace-paths": "^0.0.11",
     "tslib": "^2.2.0",
