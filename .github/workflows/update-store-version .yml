@@ -1,4 +1,4 @@
-name: Update Sdk Version
+name: Update Store Version
 on:
   pull_request:
     branches:
