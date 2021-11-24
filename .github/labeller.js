@@ -6,6 +6,11 @@ module.exports = async ({ github, context }) => {
     issue: { number: issue },
   } = context;
 
+  /**
+   * CHANGES will have the mapping set in apply-label.yml as a key and a stringifed bool value
+   * indicating whether the files in that filter has changed. Use the key as label for
+   * which the value is 'true'
+   */
   const changes = JSON.parse(CHANGES);
   const labelsToAdd = [];
   for (const key in changes) {
@@ -14,6 +19,7 @@ module.exports = async ({ github, context }) => {
     }
   }
 
+  // This will update the labels - add if missing, delete if not present
   await github.rest.issues.setLabels({
     owner,
     repo,
