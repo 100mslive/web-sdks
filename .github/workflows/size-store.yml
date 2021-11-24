@@ -1,7 +1,15 @@
 name: check-store-size
 on:
-  repository_dispatch:
-    types: [store-size]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/hms-video-store/**'
+      - '!packages/hms-video-store/cypress/**'
+      - '!packages/hms-video-store/docs/**'
+      - '!packages/hms-video-store/internal-docs/**'
+      - '!packages/hms-video-store/images/**'
+      - '!packages/hms-video-store/**/*.test.ts'
 
 jobs:
   size:

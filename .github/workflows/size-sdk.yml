@@ -1,7 +1,13 @@
 name: check-sdk-size
 on:
-  repository_dispatch:
-    types: [sdk-size]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/hms-video-web/**'
+      - '!packages/hms-video-web/cypress/**'
+      - '!packages/hms-video-web/docs/**'
+      - '!packages/hms-video-web/**/*.test.ts'
 
 jobs:
   size:
