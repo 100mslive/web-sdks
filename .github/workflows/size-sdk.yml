@@ -1,18 +1,11 @@
 name: check-sdk-size
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'packages/hms-video-web/**'
-      - '!packages/hms-video-web/cypress/**'
-      - '!packages/hms-video-web/docs/**'
+  repository_dispatch:
+    types: [sdk-size]
 
 jobs:
   size:
     runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
     steps:
       - uses: actions/checkout@v1
 
