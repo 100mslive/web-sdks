@@ -47,7 +47,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Get sdk current version
+      - name: Get current version
         id: branch
         run: |
           SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
