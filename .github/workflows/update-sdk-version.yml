@@ -14,11 +14,11 @@ jobs:
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v2
-        id: main
         with:
           ref: main
 
       - name: Get main version
+        id: main
         run: |
           VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
           echo $VERSION
@@ -26,11 +26,11 @@ jobs:
 
       - name: Checkout current branch
         uses: actions/checkout@v2
-        id: branch
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Get current version
+        id: branch
         run: |
           VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
           echo $VERSION
