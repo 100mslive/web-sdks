@@ -95,7 +95,7 @@ jobs:
         run: |
           cd packages/hms-video-web
           VERSION=$(npm version $MAIN_VERSION)
-          echo "updating sdk to $VERSION"
+          echo "reverting sdk to $VERSION"
           git commit -am "revert(sdk): version to $VERSION"
           git push
 
@@ -108,4 +108,16 @@ jobs:
           VERSION=$(npm version prerelease)
           echo "updating store to $VERSION"
           git commit -am "build(store): update version to $VERSION"
+          git push
+
+      - name: revert store version
+        # revert store version to main version if changes are reversed
+        if: steps.main.outputs.store_version != steps.branch.outputs.store_version && needs.changes.outputs.store == 'false'
+        env:
+          MAIN_VERSION: ${{ steps.main.outputs.sdk_version }}
+        run: |
+          cd packages/hms-video-store
+          VERSION=$(npm version $MAIN_VERSION)
+          echo "reverting store to $VERSION"
+          git commit -am "revert(store): version to $VERSION"
           git push
