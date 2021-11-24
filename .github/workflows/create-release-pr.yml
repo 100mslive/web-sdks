@@ -43,9 +43,10 @@ jobs:
         with:
           commit-message: 'build: update versions for release'
           title: 'build: update versions for release'
-          body: >
-            @100mslive/hms-video-web - ${{ steps.version.outputs.sdk_version }}
-            @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
+          body: |
+            - @100mslive/hms-video-web - ${{ steps.version.outputs.sdk_version }}
+            - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
           branch: release
           branch-suffix: timestamp
           base: main
+          delete-branch: true
