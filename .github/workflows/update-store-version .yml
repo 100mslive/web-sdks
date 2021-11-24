@@ -40,6 +40,7 @@ jobs:
           echo "::set-output name=version::$(echo $VERSION)"
 
       - name: Update version
+        # update version only current version is same as main
         if: steps.main.outputs.version == steps.branch.outputs.version
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
