@@ -9,14 +9,12 @@ module.exports = async ({ github, context }) => {
   const changes = JSON.parse(CHANGES);
   const labelsToAdd = [];
   for (const key in changes) {
-    if (typeof changes[key] === 'boolean' && changes[key]) {
+    if (changes[key] === 'true') {
       labelsToAdd.push(key);
     }
   }
 
-  console.log(github.rest.issues);
-  console.log({ changes, labelsToAdd });
-  await github.rest.issues.setLabelsOnIssue({
+  await github.rest.issues.setLabels({
     owner,
     repo,
     issue_number: issue,
