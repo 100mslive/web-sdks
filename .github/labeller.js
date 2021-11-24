@@ -14,6 +14,8 @@ module.exports = async ({ github, context }) => {
     }
   }
 
+  console.log(github.rest.issues);
+  console.log({ changes, labelsToAdd });
   await github.rest.issues.setLabelsOnIssue({
     owner,
     repo,
