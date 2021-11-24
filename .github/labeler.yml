@@ -23,7 +23,7 @@ store:
   - any: ['packages/hms-video-store/**/*.test.ts', 'packages/hms-video-store/**/*.spec.ts']
 
 ci:
-  - '.github/*'
+  - '.github/**'
 
 'sdk-build':
   - 'packages/hms-video-web/scripts/*'
