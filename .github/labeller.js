@@ -6,10 +6,18 @@ module.exports = async ({ github, context }) => {
     issue: { number: issue },
   } = context;
 
-  const { data } = await github.rest.issues.listLabelsOnIssue({
+  const changes = JSON.parse(CHANGES);
+  const labelsToAdd = [];
+  for (const key in changes) {
+    if (typeof changes[key] === 'boolean' && changes[key]) {
+      labelsToAdd.push(key);
+    }
+  }
+
+  await github.rest.issues.setLabelsOnIssue({
     owner,
     repo,
     issue_number: issue,
+    labels: labelsToAdd,
   });
-  console.log({ data, CHANGES });
 };
