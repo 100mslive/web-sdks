@@ -21,6 +21,20 @@ jobs:
             store:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
 
+      - name: Sdk check size
+        uses: peter-evans/repository-dispatch@v1
+        if: steps.filter.outputs.sdk
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: sdk-size
+
+      - name: Store check size
+        uses: peter-evans/repository-dispatch@v1
+        if: steps.filter.outputs.store
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: store-size
+
   # run this job only if the above job succeeds
   update-version:
     runs-on: ubuntu-latest

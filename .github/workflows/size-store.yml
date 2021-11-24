@@ -1,17 +1,11 @@
 name: check-store-size
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'packages/hms-video-store/**'
-      - '!packages/hms-video-store/cypress/**'
-      - '!packages/hms-video-store/docs/**'
+  repository_dispatch:
+    types: [store-size]
+
 jobs:
   size:
     runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 2
     steps:
       - uses: actions/checkout@v1
 
