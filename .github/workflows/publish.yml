@@ -34,6 +34,6 @@ jobs:
         # it will not publish if the version is already published in npm
       - name: Publish
         run: |
-          lerna publish from-package
+          lerna publish from-package --dist-tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
