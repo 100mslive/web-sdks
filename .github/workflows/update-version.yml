@@ -1,4 +1,4 @@
-name: Update Version
+name: PR checks
 on:
   pull_request:
     branches:
@@ -113,8 +113,7 @@ jobs:
     if: needs.changes.outputs.sdk == 'true' || needs.changes.outputs.store == 'true'
     steps:
       - uses: actions/checkout@v1
-
-      - name: Check store size
+      - name: Check packages size
         uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
