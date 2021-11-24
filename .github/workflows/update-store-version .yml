@@ -1,0 +1,51 @@
+name: Update Store Version
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'packages/hms-video-store/**'
+      - '!packages/hms-video-store/cypress/**'
+      - '!packages/hms-video-store/scripts/**'
+      - '!packages/hms-video-store/docs/**'
+      - '!packages/hms-video-store/internal-docs/**'
+      - '!packages/hms-video-store/src/test/**'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Get main version
+        id: main
+        run: |
+          VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $VERSION
+          echo "::set-output name=version::$(echo $VERSION)"
+
+      - name: Checkout current branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Get current version
+        id: branch
+        run: |
+          VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $VERSION
+          echo "::set-output name=version::$(echo $VERSION)"
+
+      - name: Update version
+        # update version only if current version is same as main
+        if: steps.main.outputs.version == steps.branch.outputs.version
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          cd packages/hms-video-store
+          VERSION=$(npm version prerelease)
+          git commit -am "build(store): update version to $VERSION"
+          git push
