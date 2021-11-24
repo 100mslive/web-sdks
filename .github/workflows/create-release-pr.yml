@@ -1,0 +1,39 @@
+name: Create release PR
+on:
+  workflow_dispatch:
+    inputs:
+      versionBump:
+        description: 'which version to bump eg: patch, minor, major'
+        required: true
+        default: 'patch'
+
+jobs:
+  publish_packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch
+        if: github.ref != 'refs/heads/main'
+        run: exit 1
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Update versions
+        env:
+          BUMP: ${{ github.event.inputs.versionBump }}
+        run: |
+          echo $(lerna version $BUMP --yes)
+
+      - uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: 'build: update versions for release'
+          title: 'build: update versions for release'
+          body: Update changelog to reflect release changes
+          branch: release
+          branch-suffix: timestamp
+          base: main
