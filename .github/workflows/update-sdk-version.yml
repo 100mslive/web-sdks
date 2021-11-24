@@ -22,11 +22,11 @@ jobs:
         run: |
           VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
           echo $VERSION
-          echo "::set-output name=verion::$(echo $VERSION)"
+          echo "::set-output name=version::$(echo $VERSION)"
 
       - name: Checkout current branch
         uses: actions/checkout@v2
-        id: branch-version
+        id: branch
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -34,7 +34,7 @@ jobs:
         run: |
           VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
           echo $VERSION
-          echo "::set-output name=verion::$(echo $VERSION)"
+          echo "::set-output name=version::$(echo $VERSION)"
 
       - name: Update version
         if: steps.main.outputs.version == steps.branch.outputs.version
