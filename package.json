@@ -41,6 +41,7 @@
     "start": "lerna run start --stream --parallel",
     "build": "lerna run build --stream --parallel",
     "size": "lerna run size --stream",
+    "build:only": "lerna run build:only --stream --parallel",
     "postinstall": "husky install && lerna bootstrap"
   },
   "workspaces": [
@@ -54,5 +55,23 @@
   },
   "lint-staged": {
     "*": "format && lint:fix"
-  }
+  },
+  "size-limit": [
+    {
+      "path": "packages/hms-video-web/dist/hms-video.cjs.js",
+      "limit": "60 KB"
+    },
+    {
+      "path": "packages/hms-video-web/dist/hms-video.esm.js",
+      "limit": "200 KB"
+    },
+    {
+      "path": "packages/hms-video-store/dist/hms-video-store.cjs.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/hms-video-store/dist/hms-video-store.esm.js",
+      "limit": "100 KB"
+    }
+  ]
 }
