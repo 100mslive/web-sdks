@@ -36,8 +36,9 @@ jobs:
         id: main
         run: |
           SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
-          echo $VERSION
+          echo $SDK_VERSION
           STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
           echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
           echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
@@ -50,8 +51,9 @@ jobs:
         id: branch
         run: |
           SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
-          echo $VERSION
+          echo $SDK_VERSION
           STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
           echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
           echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
@@ -67,6 +69,7 @@ jobs:
         run: |
           cd packages/hms-video-web
           VERSION=$(npm version prerelease)
+          echo "updating sdk to $VERSION"
           git commit -am "build(sdk): update version to $VERSION"
           git push
 
@@ -77,5 +80,6 @@ jobs:
         run: |
           cd packages/hms-video-store
           VERSION=$(npm version prerelease)
+          echo "updating store to $VERSION"
           git commit -am "build(store): update version to $VERSION"
           git push
