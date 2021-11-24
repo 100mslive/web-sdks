@@ -1,0 +1,39 @@
+name: Publish Packages
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish_packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch
+        if: github.ref != 'refs/heads/main'
+        run: exit 1
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Test
+        run: yarn test
+
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+        # from-package will publish whatever version is present in each package's package.json
+        # it will not publish if the version is already published in npm
+      - name: Publish
+        run: |
+          lerna publish from-package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
