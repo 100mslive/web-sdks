@@ -114,7 +114,7 @@ jobs:
         # revert store version to main version if changes are reversed
         if: steps.main.outputs.store_version != steps.branch.outputs.store_version && needs.changes.outputs.store == 'false'
         env:
-          MAIN_VERSION: ${{ steps.main.outputs.sdk_version }}
+          MAIN_VERSION: ${{ steps.main.outputs.store_version }}
         run: |
           cd packages/hms-video-store
           VERSION=$(npm version $MAIN_VERSION)
