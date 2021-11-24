@@ -1,0 +1,41 @@
+name: PR checks
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  update-label:
+    runs-on: ubuntu-latest
+    outputs:
+      sdk: ${{ steps.filter.outputs.sdk }}
+      store: ${{ steps.filter.outputs.store }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            sdk:
+              - 'packages/hms-video-web/src/**/!(*.test.ts)'
+            store:
+              - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
+            sdk-test: 
+              - 'packages/hms-video-web/src/**/*.(test|spec).ts'
+            store-test: 
+              - 'packages/hms-video-web/src/**/*.(test|spec).ts'
+            sdk-build: 
+              - 'packages/hms-video-web/scripts/**'
+            store-build: 
+              - 'packages/hms-video-web/scripts/**'
+            ci:
+              - '.github/**'
+
+      - name: Apply or remove label
+        uses: actions/github-script@v5
+        env:
+          CHANGES: ${{ steps.filter.outputs }}
+        with:
+          script: |
+            const script = require('.github/labeller.js')
+            await script({ github, context })
