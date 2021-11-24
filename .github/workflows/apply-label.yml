@@ -34,7 +34,7 @@ jobs:
       - name: Apply or remove label
         uses: actions/github-script@v5
         env:
-          CHANGES: ${{ steps.filter.outputs }}
+          CHANGES: ${{ toJSON(steps.filter.outputs) }}
         with:
           script: |
             const script = require('.github/labeller.js')
