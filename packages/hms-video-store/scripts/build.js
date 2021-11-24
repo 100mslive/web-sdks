@@ -13,6 +13,7 @@ async function main() {
     });
   }
 
+  console.log('add test log');
   try {
     esbuild.buildSync({
       entryPoints: ['./src/index.ts'],
