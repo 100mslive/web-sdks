@@ -21,13 +21,13 @@ jobs:
             store:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
             sdk-test: 
-              - 'packages/hms-video-web/src/**/*.(test|spec).ts'
+              - 'packages/hms-video-web/**/*.(test|spec).ts'
             store-test: 
-              - 'packages/hms-video-web/src/**/*.(test|spec).ts'
+              - 'packages/hms-video-store/**/*.(test|spec).ts'
             sdk-build: 
               - 'packages/hms-video-web/scripts/**'
             store-build: 
-              - 'packages/hms-video-web/scripts/**'
+              - 'packages/hms-video-store/scripts/**'
             ci:
               - '.github/**'
 
