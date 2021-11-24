@@ -698,6 +698,7 @@ export class HMSSDKActions implements IHMSActions {
 
   //@ts-ignore
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
+    console.log('add test comment');
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room));
     }, 'RoomUpdate');
