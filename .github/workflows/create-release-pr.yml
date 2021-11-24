@@ -8,7 +8,7 @@ on:
         default: 'patch'
 
 jobs:
-  publish_packages:
+  create_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
