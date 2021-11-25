@@ -27,6 +27,6 @@ export const TRACK_NOTIFICATION_TYPES: notifcationMap = {
 export const ACTION_TYPES: notifcationMap = {
   [sdkTypes.HMSPeerUpdate.PEER_JOINED]: 'peerJoined',
   [sdkTypes.HMSPeerUpdate.PEER_LEFT]: 'peerLeft',
-  [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: 'nameUpdated',
-  [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: 'metadataUpdated',
+  [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: 'peerNameUpdated',
+  [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: 'peerMetadataUpdated',
 };

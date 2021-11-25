@@ -1,5 +1,5 @@
 {
-  "version": "0.2.80-alpha.0",
+  "version": "0.2.80-alpha.1",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
@@ -40,10 +40,10 @@
     "zustand": "3.5.7"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.1.32"
+    "@100mslive/hms-video": "^0.1.33-alpha.3"
   },
   "devDependencies": {
-    "@100mslive/hms-video": "^0.1.32",
+    "@100mslive/hms-video": "^0.1.33-alpha.3",
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "babel-plugin-istanbul": "^6.1.1",

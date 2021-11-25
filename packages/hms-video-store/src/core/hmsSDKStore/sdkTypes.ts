@@ -24,7 +24,6 @@ import {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
-  HMSPeerUpdateConfig,
 } from '@100mslive/hms-video';
 
 export {
@@ -53,5 +52,4 @@ export {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
-  HMSPeerUpdateConfig,
 };
