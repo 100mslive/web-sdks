@@ -34,16 +34,13 @@
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
+    "@100mslive/hms-video": "0.1.34",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"
   },
-  "peerDependencies": {
-    "@100mslive/hms-video": "^0.1.34"
-  },
   "devDependencies": {
-    "@100mslive/hms-video": "^0.1.34",
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "babel-plugin-istanbul": "^6.1.1",
@@ -53,9 +50,7 @@
     "nyc": "^15.1.0",
     "ts-node": "^10.4.0",
     "tsconfig-replace-paths": "^0.0.11",
-    "tslib": "^2.2.0",
-    "typedoc": "^0.21.5",
-    "typedoc-plugin-markdown": "^3.10.4"
+    "tslib": "^2.2.0"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
   "repository": {
