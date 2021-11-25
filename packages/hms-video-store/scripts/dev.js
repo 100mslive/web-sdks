@@ -5,7 +5,7 @@ const pkg = require('../package.json');
 async function main() {
   esbuild.build({
     entryPoints: ['./src/index.ts'],
-    outdir: 'dist',
+    outfile: 'dist/hms-video-store.esm.js',
     minify: false,
     bundle: true,
     format: 'esm',
