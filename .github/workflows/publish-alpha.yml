@@ -1,4 +1,4 @@
-name: Publish Alpha Packages
+name: Publish Packages
 on:
   workflow_dispatch:
     publishFlag:
