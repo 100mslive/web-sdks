@@ -40,7 +40,7 @@
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
     "test": "yarn build && lerna run test --stream",
-    "start": "lerna run start --stream --parallel",
+    "start": "lerna run start --stream",
     "build": "lerna run build --stream",
     "size": "lerna run size --stream",
     "build:only": "lerna run build:only --stream",

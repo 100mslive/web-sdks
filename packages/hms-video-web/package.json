@@ -12,10 +12,11 @@
   },
   "scripts": {
     "prestart": "rm -rf dist",
-    "start": "node ./scripts/dev && yarn types",
+    "start": "concurrently 'yarn dev' 'yarn types'",
+    "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
-    "types": "tsc -w",
+    "types": "tsc -w -p tsconfig.build.json",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "test": "jest",
     "lint": "eslint -c ../../.eslintrc .",
