@@ -437,14 +437,20 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async updatePeer(params: sdkTypes.HMSPeerUpdateConfig) {
-    await this.sdk.updatePeer(params);
-    if (params.name) {
-      this.syncRoomState('nameUpdated');
-    }
-    if (params.metadata) {
-      this.syncRoomState('metadataUpdated');
-    }
+  async changeName(name: string) {
+    await this.sdk.changeName(name);
+    this.setState(store => {
+      const localPeer = selectLocalPeer(store);
+      localPeer.name = name;
+    }, 'peerNameUpdated');
+  }
+
+  async changeMetadata(metadata: string) {
+    await this.sdk.changeMetadata(metadata);
+    this.setState(store => {
+      const localPeer = selectLocalPeer(store);
+      localPeer.metadata = metadata;
+    }, 'peerMetadataUpdated');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {

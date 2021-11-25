@@ -22,6 +22,11 @@ export interface HMSPeer {
   audioTrack?: HMSTrackID;
   auxiliaryTracks: HMSTrackID[];
   customerUserId?: string;
+  metadata?: string;
+  /**
+   * @deprecated
+   * Use metadata field instead.
+   */
   customerDescription?: string;
 }
 

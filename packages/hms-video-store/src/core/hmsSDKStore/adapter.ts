@@ -35,7 +35,8 @@ export class SDKToHMS {
       audioTrack: sdkPeer.audioTrack?.trackId,
       auxiliaryTracks: sdkPeer.auxiliaryTracks.map(track => track.trackId),
       customerUserId: sdkPeer.customerUserId,
-      customerDescription: sdkPeer.customerDescription,
+      customerDescription: sdkPeer.metadata,
+      metadata: sdkPeer.metadata,
     };
   }
 

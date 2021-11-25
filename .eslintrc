@@ -19,7 +19,12 @@
         "curly": ["error", "all"], // use curly brace even for single line functions
         "comma-dangle": ["error", "always-multiline"], // easier to see git diff
         "prefer-template": ["error"], // easier to read code when variables are used,
-        "prettier/prettier": "error",
+        "prettier/prettier": [
+          "error",
+          {
+            "endOfLine": "auto" // This is need to handle different end-of-line in windows/mac
+          }
+        ],
         "no-case-declarations": "warn",
         "no-empty": ["error", { "allowEmptyCatch": true }]
       }
