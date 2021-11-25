@@ -1,10 +1,11 @@
 name: Publish Packages
 on:
   workflow_dispatch:
-    publishFlag:
-      description: 'which version to publish eg: alpha, beta, latest, experimental'
-      required: true
-      default: 'alpha'
+    inputs:
+      publishFlag:
+        description: 'which version to publish eg: alpha, beta, latest, experimental'
+        required: true
+        default: 'alpha'
   repository_dispatch:
     types: [publish-command]
   push:
