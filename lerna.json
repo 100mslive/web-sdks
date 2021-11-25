@@ -7,6 +7,9 @@
     "version": {
       "message": "build: update version",
       "allowBranch": "main"
+    },
+    "publish": {
+      "registry": "https://registry.npmjs.org/"
     }
   }
 }
