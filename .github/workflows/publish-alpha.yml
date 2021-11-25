@@ -1,4 +1,4 @@
-name: Publish Packages
+name: Publish Alpha Packages
 on:
   workflow_dispatch:
   repository_dispatch:
@@ -11,10 +11,6 @@ jobs:
   publish_packages:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate branch
-        if: github.ref != 'refs/heads/main'
-        run: exit 1
-
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
