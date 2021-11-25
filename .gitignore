@@ -10,4 +10,4 @@ coverage
 .env
 .nyc_output
 cy-coverage
-tsconfig.tsbuildInfo
+tsconfig.tsbuildinfo
