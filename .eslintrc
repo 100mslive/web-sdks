@@ -22,7 +22,7 @@
         "prettier/prettier": [
           "error",
           {
-            "endOfLine": "auto"
+            "endOfLine": "auto" // This is need to handle different end-of-line in windows/mac
           }
         ],
         "no-case-declarations": "warn",
