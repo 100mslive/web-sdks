@@ -21,6 +21,10 @@ jobs:
           node-version: 14
           registry-url: https://registry.npmjs.org/
 
+      - name: Check for main branch if latest
+        if: (github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1) == 'latest' && github.ref_name != 'main'
+        run: exit 1
+
       - name: Install packages
         run: yarn install
 
