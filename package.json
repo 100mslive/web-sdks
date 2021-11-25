@@ -38,11 +38,11 @@
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
-    "test": "lerna run test --stream",
+    "test": "yarn build && lerna run test --stream",
     "start": "lerna run start --stream --parallel",
-    "build": "lerna run build --stream --parallel",
+    "build": "lerna run build --stream",
     "size": "lerna run size --stream",
-    "build:only": "lerna run build:only --stream --parallel",
+    "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap"
   },
   "workspaces": [
