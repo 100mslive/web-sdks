@@ -6,7 +6,9 @@
   "command": {
     "version": {
       "message": "build: update version",
-      "allowBranch": "main",
+      "allowBranch": "main"
+    },
+    "publish": {
       "registry": "https://registry.npmjs.org/"
     }
   }
