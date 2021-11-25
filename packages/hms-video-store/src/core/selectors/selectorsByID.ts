@@ -353,3 +353,18 @@ export const selectPeersByRole = (role: HMSRoleName) =>
   createSelector([selectPeers], peers => {
     return peers.filter(p => p.roleName === role);
   });
+
+/**
+ * Selects the peer metadata for the passed in peer and returns it as JSON. If metadata is not present
+ * or conversion to JSON gives an error, an empty object is returned.
+ * Please directly use peer.metadata in case the metadata is not JSON by design.
+ */
+export const selectPeerMetadata = (peerId: HMSPeerID) =>
+  createSelector(selectPeerByID(peerId), peer => {
+    try {
+      return peer?.metadata && peer.metadata !== '' ? JSON.parse(peer.metadata) : {};
+    } catch (error) {
+      console.error('cannot parse peer metadata', error);
+      return {};
+    }
+  });
