@@ -2,7 +2,7 @@ name: Publish Alpha Packages
 on:
   workflow_dispatch:
     publishFlag:
-      description: 'which version to bump eg: alpha, beta, latest, experimental'
+      description: 'which version to publish eg: alpha, beta, latest, experimental'
       required: true
       default: 'alpha'
   repository_dispatch:
