@@ -1,6 +1,11 @@
 name: Publish Packages
 on:
   workflow_dispatch:
+    inputs:
+      publishFlag:
+        description: 'which version to publish eg: alpha, beta, latest, experimental'
+        required: true
+        default: 'alpha'
   repository_dispatch:
     types: [publish-command]
   push:
@@ -11,15 +16,15 @@ jobs:
   publish_packages:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate branch
-        if: github.ref != 'refs/heads/main'
-        run: exit 1
-
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
+
+      - name: Check for main branch if latest
+        if: (github.event.inputs.publishFlag == 'latest' || github.event.client_payload.slash_command.args.unnamed.arg1 == 'latest') && github.ref_name != 'main'
+        run: exit 1
 
       - name: Install packages
         run: yarn install
@@ -36,6 +41,7 @@ jobs:
         # it will not publish if the version is already published in npm
       - name: Publish
         run: |
-          lerna publish from-package --dist-tag alpha
+          lerna publish from-package --dist-tag $PUBLISH_FLAG --yes --no-verify-access
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
