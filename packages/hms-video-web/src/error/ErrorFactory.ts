@@ -46,10 +46,6 @@ export const ErrorFactory = {
       return new HMSException(2001, 'ConnectionLost', action, `[INIT]: Network error`, description);
     },
 
-    ConnectionBlocked(action: HMSAction, description = '') {
-      return new HMSException(2005, 'ConnectionBlocked', action, `[INIT]: Network error`, description);
-    },
-
     HTTPError(code: number, action: HMSAction, description = '') {
       return new HMSException(code, 'HTTPError', action, `[INIT]: Bad Request`, description);
     },
