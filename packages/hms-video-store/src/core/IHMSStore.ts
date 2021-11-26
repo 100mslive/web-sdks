@@ -37,7 +37,7 @@ export interface IHMSStore extends StoreApi<HMSStore> {
   namedSetState: NamedSetState<HMSStore>;
 }
 
-interface GetState<T> {
+export interface GetState<T> {
   (): T;
   <StateSlice>(selector?: StateSelector<HMSStore, StateSlice>): StateSlice;
 }
