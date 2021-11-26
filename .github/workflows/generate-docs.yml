@@ -15,7 +15,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: install typedoc
-        run: yarn global typedoc
+        run: yarn global add typedoc
 
       - name: Generate API Reference
         working-directory: ./packages/hms-video-store
