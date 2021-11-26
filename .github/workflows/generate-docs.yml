@@ -15,6 +15,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Generate API Reference
+        working-directory: ./packages/hms-video-store
         run: yarn docs
 
       - name: Create PR
