@@ -14,8 +14,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: install typedoc
-        run: yarn global add typedoc
+      - name: yarn packages cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
 
       - name: Generate API Reference
         working-directory: ./packages/hms-video-store
