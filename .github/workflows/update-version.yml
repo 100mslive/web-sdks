@@ -5,13 +5,6 @@ on:
       - main
 
 jobs:
-  log:
-    runs-on: ubuntu-latest
-    env:
-      info: ${{toJSON(github.event.pull_request) }}
-    steps:
-      - run: echo $info
-
   changes:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft != true
