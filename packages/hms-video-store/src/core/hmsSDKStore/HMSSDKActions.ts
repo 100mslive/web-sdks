@@ -865,7 +865,7 @@ export class HMSSDKActions implements IHMSActions {
     const error = SDKToHMS.convertException(sdkException);
     if (error.isTerminal) {
       // terminal error leave room as it is not recoverable
-      this.leave().then(() => console.log('error from SDK, left room.'));
+      this.leave().then(() => HMSLogger.e('error from SDK, left room.'));
       this.setState(store => {
         store.room.roomState = HMSRoomState.Failed;
         store.errors.push(error);
