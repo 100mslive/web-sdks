@@ -22,7 +22,7 @@ const testObserver: ITransportObserver = {
   onTrackRestore(_: HMSRemoteVideoTrack): void {},
 
   onFailure(_: HMSException): void {
-    console.log('Failure Callback', _);
+    // console.log('sdk Failure Callback', _s);
   },
 
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
@@ -78,7 +78,7 @@ const gumSuccess = (constraints: any) => {
   return Promise.resolve(mediaStream);
 };
 
-const gumError = (_: any) => Promise.reject(new Error('Permission denied'));
+const gumError = (_: never) => Promise.reject(new Error('Permission denied'));
 
 class OverconstrainedError extends Error {
   constraint = '';
@@ -293,7 +293,7 @@ describe('LocalTrackManager', () => {
 
       await manager.getTracksToPublish({});
 
-      console.log(failureCallback.mock);
+      // console.log(failureCallback.mock);
 
       expect(failureCallback).toHaveBeenCalledTimes(1);
 

@@ -69,7 +69,7 @@ describe('Notification Manager', () => {
     it('should call onPeerUpdate with correct parameters', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_JOIN, params: fakePeer });
 
-      console.log({ peer: peerUpdateHandler.mock.calls[0][1] });
+      // console.log({ peer: peerUpdateHandler.mock.calls[0][1] });
       expect(peerUpdateHandler).toHaveBeenCalled();
       expect(peerUpdateHandler.mock.calls[0][0]).toBe(HMSPeerUpdate.PEER_JOINED);
       expect(peerUpdateHandler.mock.calls[0][1]).toBeInstanceOf(HMSRemotePeer);
@@ -121,7 +121,7 @@ describe('Notification Manager', () => {
         true,
       );
 
-      console.log({ reconnectPeerListMock: peerUpdateHandler.mock.calls });
+      // console.log({ reconnectPeerListMock: peerUpdateHandler.mock.calls });
       expect(peerUpdateHandler).toHaveBeenCalledTimes(2);
 
       expect(peerUpdateHandler.mock.calls[0][0]).toBe(HMSPeerUpdate.PEER_LEFT);

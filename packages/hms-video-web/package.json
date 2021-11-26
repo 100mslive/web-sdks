@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.35-alpha.3",
+  "version": "0.1.35-alpha.4",
   "license": "UNLICENSED",
   "main": "dist/hms-video.cjs.js",
   "typings": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "build": "node ./scripts/build && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
-    "test": "jest",
+    "test": "jest --maxWorkers=1",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
     "prepare": "yarn build",

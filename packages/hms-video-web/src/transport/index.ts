@@ -336,8 +336,6 @@ export default class HMSTransport implements ITransport {
         ([
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
           ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
-          ErrorCodes.InitAPIErrors.CONNECTION_LOST,
-          ErrorCodes.InitAPIErrors.HTTP_ERROR,
         ].includes(error.code) ||
           error.code.toString().startsWith('5') ||
           error.code.toString().startsWith('429'));
