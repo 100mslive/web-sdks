@@ -39,6 +39,9 @@ export default class InitService {
       if (error.message === 'Failed to fetch') {
         throw ErrorFactory.InitAPIErrors.ConnectionLost(HMSAction.INIT, error.message);
       }
+      if (error.message.includes('NetworkError')) {
+        throw ErrorFactory.InitAPIErrors.ConnectionBlocked(HMSAction.INIT, error.message);
+      }
       throw error;
     }
     return transformInitConfig(config);
