@@ -1,5 +1,5 @@
-import { HMSRole } from '@100mslive/hms-video';
+import type { HMSRole } from '@100mslive/hms-video';
 
 export type HMSRoleName = string;
 
-export { HMSRole };
+export type { HMSRole };

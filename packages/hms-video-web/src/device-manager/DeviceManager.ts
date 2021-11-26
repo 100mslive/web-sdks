@@ -1,4 +1,5 @@
-import { HMSDeviceManager, DeviceMap } from '../interfaces/HMSDeviceManager';
+import { HMSDeviceManager } from '../interfaces/HMSDeviceManager';
+import type { DeviceMap } from '../interfaces/HMSDeviceManager';
 import { HMSLocalAudioTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSDeviceChangeEvent } from '../interfaces';
