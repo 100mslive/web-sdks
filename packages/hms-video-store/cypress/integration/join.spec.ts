@@ -1,4 +1,3 @@
-import { after } from 'cypress/types/lodash';
 import { HMSReactiveStore, selectIsConnectedToRoom, selectTracksMap } from '../../src';
 import { HMSSDKActions } from '../../src/core/hmsSDKStore/HMSSDKActions';
 import { IHMSStoreReadOnly } from '../../src/core/IHMSStore';

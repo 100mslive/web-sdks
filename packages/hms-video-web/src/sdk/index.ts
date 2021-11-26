@@ -211,6 +211,7 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       return;
     }
+    this.stringifyMetadata(config);
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.errorListener = listener;
@@ -279,7 +280,7 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
-
+    this.stringifyMetadata(config);
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.errorListener = listener;
@@ -360,6 +361,12 @@ export class HMSSdk implements HMSInterface {
       .then(() => {
         HMSLogger.timeEnd(`join-room-${roomId}`);
       });
+  }
+
+  private stringifyMetadata(config: HMSConfig) {
+    if (config.metaData && typeof config.metaData !== 'string') {
+      JSON.stringify(config.metaData);
+    }
   }
 
   private cleanUp() {

@@ -14,7 +14,7 @@ export enum HMSLogLevel {
  * https://stackoverflow.com/questions/13815640/a-proper-wrapper-for-console-log-with-correct-line-number
  */
 export default class HMSLogger {
-  static level: HMSLogLevel = HMSLogLevel.VERBOSE;
+  static level: HMSLogLevel = process?.env?.NODE_ENV === 'test' ? HMSLogLevel.NONE : HMSLogLevel.VERBOSE;
 
   static v(tag: string, ...data: any[]) {
     this.log(HMSLogLevel.VERBOSE, tag, ...data);
