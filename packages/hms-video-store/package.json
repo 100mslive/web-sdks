@@ -1,5 +1,5 @@
 {
-  "version": "0.2.81",
+  "version": "0.2.82-alpha.0",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,8 @@
   },
   "scripts": {
     "prestart": "rm -rf dist",
-    "start": "node ./scripts/dev && yarn types",
+    "start": "concurrently 'yarn dev' 'yarn types'",
+    "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
     "types": "tsc -w",

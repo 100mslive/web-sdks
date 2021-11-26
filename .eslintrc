@@ -30,5 +30,5 @@
       }
     }
   ],
-  "ignorePatterns": ["dist/**"]
+  "ignorePatterns": ["**/dist/**"]
 }

@@ -1,2 +1,2 @@
 export { RTCStatsMonitor } from './RTCStatsMonitor';
-export { RTCStats } from './RTCStats';
+export type { RTCStats } from './RTCStats';
