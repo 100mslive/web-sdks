@@ -7,9 +7,4 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.{ts,tsx,js,jsx}'],
   testMatch: ['<rootDir>/**/*.(test).{ts,tsx,js,jsx}'],
   testEnvironment: 'jsdom',
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-    },
-  },
 };

@@ -18,7 +18,7 @@
     "build": "node ./scripts/build && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
-    "test": "jest",
+    "test": "jest --maxWorkers=1",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
     "prepare": "yarn build",
