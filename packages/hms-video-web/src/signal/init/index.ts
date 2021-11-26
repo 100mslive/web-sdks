@@ -36,7 +36,7 @@ export default class InitService {
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
     } catch (err) {
       const error = err as Error;
-      if (error.message === 'Failed to fetch') {
+      if (error.message === 'Failed to fetch' || error.message.includes('NetworkError')) {
         throw ErrorFactory.InitAPIErrors.ConnectionLost(HMSAction.INIT, error.message);
       }
       throw error;
