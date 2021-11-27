@@ -39,7 +39,7 @@
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
-    "test": "lerna run test --scope @100mslive/hms-video-store  --include-dependencies",
+    "test": "yarn build && lerna run test --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
     "size": "lerna run size --stream",
