@@ -1,6 +1,7 @@
 import adapter from 'webrtc-adapter';
+import HMSLogger from './utils/logger';
 
-console.log(`%c ${adapter.browserDetails.browser} v${adapter.browserDetails.version}`, 'color: #2F80FF');
+HMSLogger.i('adapter', `${adapter.browserDetails.browser} v${adapter.browserDetails.version}`);
 
 export * from './sdk';
 export * from './media/tracks';

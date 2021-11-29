@@ -42,24 +42,18 @@ export const ErrorFactory = {
       return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description);
     },
 
-    ConnectionLost(action: HMSAction, description = '') {
-      return new HMSException(2001, 'ConnectionLost', action, `[INIT]: Network error`, description);
-    },
-
-    HTTPError(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'HTTPError', action, `[INIT]: Bad Request`, description);
-    },
-
-    InvalidEndpointURL(action: HMSAction, description = '') {
-      return new HMSException(2002, 'InvalidEndpointURL', action, `Endpoint URL is invalid`, description);
-    },
-
     EndpointUnreachable(action: HMSAction, description = '') {
       return new HMSException(2003, 'EndpointUnreachable', action, `Endpoint is not reachable.`, description);
     },
 
     InvalidTokenFormat(action: HMSAction, description = '') {
-      return new HMSException(2004, 'InvalidTokenFormat', action, `Token is not in proper JWT format`, description);
+      return new HMSException(
+        2004,
+        'InvalidTokenFormat',
+        action,
+        `Token is not in proper JWT format - ${description}`,
+        description,
+      );
     },
   },
 

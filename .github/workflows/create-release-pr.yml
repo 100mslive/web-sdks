@@ -1,0 +1,52 @@
+name: Create release PR
+on:
+  workflow_dispatch:
+    inputs:
+      versionBump:
+        description: 'which version to bump eg: patch, minor, major'
+        required: true
+        default: 'patch'
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch
+        if: github.ref != 'refs/heads/main'
+        run: exit 1
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Update versions
+        env:
+          BUMP: ${{ github.event.inputs.versionBump }}
+        run: |
+          echo $(lerna version $BUMP --no-git-tag-version --yes)
+
+      - name: Get current version
+        id: version
+        run: |
+          SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
+          echo $SDK_VERSION
+          STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
+          echo $STORE_VERSION
+          echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
+          echo "::set-output name=store_version::$(echo $STORE_VERSION)"
+
+      - uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: 'build: update versions for release'
+          title: 'build: update versions for release'
+          body: |
+            - @100mslive/hms-video-web - ${{ steps.version.outputs.sdk_version }}
+            - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
+          branch: release
+          branch-suffix: timestamp
+          base: main
+          delete-branch: true

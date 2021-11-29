@@ -163,7 +163,7 @@ export class TrackManager {
             hmsPeer.auxiliaryTracks.push(track);
           }
           break;
-        case HMSTrackType.VIDEO:
+        case HMSTrackType.VIDEO: {
           const remoteTrack = track as HMSRemoteVideoTrack;
           const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
           remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
@@ -172,6 +172,7 @@ export class TrackManager {
           } else {
             hmsPeer.auxiliaryTracks.push(remoteTrack);
           }
+        }
       }
 
       /**

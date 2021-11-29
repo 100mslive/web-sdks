@@ -1,0 +1,29 @@
+name: Update API Reference
+on:
+  workflow_dispatch:
+
+jobs:
+  publish_packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Generate API Reference
+        working-directory: ./packages/hms-video-store
+        run: yarn docs
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: 'docs(store): update api reference'
+          title: 'docs(store): update api reference'
+          branch: api-reference
+          branch-suffix: timestamp
+          base: main
+          delete-branch: true

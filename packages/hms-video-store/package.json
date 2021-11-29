@@ -1,5 +1,5 @@
 {
-  "version": "0.2.80-alpha.0",
+  "version": "0.2.82-alpha.2",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
@@ -12,13 +12,14 @@
   },
   "scripts": {
     "prestart": "rm -rf dist",
-    "start": "node ./scripts/dev && yarn types",
+    "start": "concurrently 'yarn dev' 'yarn types'",
+    "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "format": "prettier --write src/**/*.ts",
-    "test": "jest",
+    "test": "jest --maxWorkers=1",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint -c ../../.eslintrc .",
@@ -33,41 +34,24 @@
   "author": "100ms",
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
-  "size-limit": [
-    {
-      "path": "dist/hms-video-store.cjs.js",
-      "limit": "20 KB"
-    },
-    {
-      "path": "dist/hms-video-store.esm.js",
-      "limit": "100 KB"
-    }
-  ],
   "dependencies": {
+    "@100mslive/hms-video": "0.1.35-alpha.4",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"
   },
-  "peerDependencies": {
-    "@100mslive/hms-video": "^0.1.32"
-  },
   "devDependencies": {
-    "@100mslive/hms-video": "^0.1.32",
     "@cypress/code-coverage": "^3.9.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@size-limit/file": "^5.0.3",
     "babel-plugin-istanbul": "^6.1.1",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "nyc": "^15.1.0",
-    "size-limit": "^5.0.3",
     "ts-node": "^10.4.0",
     "tsconfig-replace-paths": "^0.0.11",
-    "tslib": "^2.2.0",
-    "typedoc": "^0.21.5",
-    "typedoc-plugin-markdown": "^3.10.4"
+    "tslib": "^2.2.0"
   },
   "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
   "repository": {
