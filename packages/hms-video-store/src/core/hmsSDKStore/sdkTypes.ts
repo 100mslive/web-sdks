@@ -24,10 +24,12 @@ import {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
-  HMSPeerUpdateConfig,
 } from '@100mslive/hms-video';
 
-export {
+export { HMSException, HMSSimulcastLayer, HMSRoomUpdate, HMSPeerUpdate, HMSTrackUpdate, HMSLogLevel };
+
+export type {
+  DeviceMap,
   HMSPeer,
   HMSRoom,
   HMSMessage,
@@ -35,17 +37,10 @@ export {
   HMSConfig,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
-  HMSException,
-  HMSSimulcastLayer,
-  HMSRoomUpdate,
-  HMSPeerUpdate,
-  HMSTrackUpdate,
   HMSRole,
   HMSLocalPeer,
   HMSRemotePeer,
-  HMSLogLevel,
   SimulcastLayerDefinition,
-  DeviceMap,
   HMSDeviceChangeEvent,
   HMSPlaylistItem,
   HMSPlaylistManager,
@@ -53,5 +48,4 @@ export {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
-  HMSPeerUpdateConfig,
 };

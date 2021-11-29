@@ -12,18 +12,25 @@
         "@typescript-eslint/explicit-module-boundary-types": [0],
         "@typescript-eslint/ban-ts-comment": 0,
         "@typescript-eslint/no-var-requires": 0,
-        "@typescript-eslint/no-empty-function": 1,
+        "@typescript-eslint/no-empty-function": 0,
         "@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
         "complexity": ["warn", 6], // if a function is getting too complex it should be broken down
         "curly": ["error", "all"], // use curly brace even for single line functions
         "comma-dangle": ["error", "always-multiline"], // easier to see git diff
         "prefer-template": ["error"], // easier to read code when variables are used,
-        "prettier/prettier": "error",
+        "prettier/prettier": [
+          "error",
+          {
+            "endOfLine": "auto" // This is need to handle different end-of-line in windows/mac
+          }
+        ],
         "no-case-declarations": "warn",
-        "no-empty": ["error", { "allowEmptyCatch": true }]
+        "no-empty": ["error", { "allowEmptyCatch": true }],
+        "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false, "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-explicit-any": 0
       }
     }
   ],
-  "ignorePatterns": ["dist/**"]
+  "ignorePatterns": ["**/dist/**"]
 }

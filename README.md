@@ -12,3 +12,15 @@ git clone https://github.com/100mslive/web-sdks.git
 cd web-sdks
 yarn install
 ```
+
+### Test
+
+```
+yarn test
+```
+
+### Lint
+
+```
+yarn lint
+```

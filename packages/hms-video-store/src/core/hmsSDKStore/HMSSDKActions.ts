@@ -437,14 +437,20 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async updatePeer(params: sdkTypes.HMSPeerUpdateConfig) {
-    await this.sdk.updatePeer(params);
-    if (params.name) {
-      this.syncRoomState('nameUpdated');
-    }
-    if (params.metadata) {
-      this.syncRoomState('metadataUpdated');
-    }
+  async changeName(name: string) {
+    await this.sdk.changeName(name);
+    this.setState(store => {
+      const localPeer = selectLocalPeer(store);
+      localPeer.name = name;
+    }, 'peerNameUpdated');
+  }
+
+  async changeMetadata(metadata: string) {
+    await this.sdk.changeMetadata(metadata);
+    this.setState(store => {
+      const localPeer = selectLocalPeer(store);
+      localPeer.metadata = metadata;
+    }, 'peerMetadataUpdated');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -859,7 +865,7 @@ export class HMSSDKActions implements IHMSActions {
     const error = SDKToHMS.convertException(sdkException);
     if (error.isTerminal) {
       // terminal error leave room as it is not recoverable
-      this.leave().then(() => console.log('error from SDK, left room.'));
+      this.leave().then(() => HMSLogger.e('error from SDK, left room.'));
       this.setState(store => {
         store.room.roomState = HMSRoomState.Failed;
         store.errors.push(error);

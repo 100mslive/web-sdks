@@ -199,10 +199,6 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.BROADCAST, { version: '1.0', ...message.toSignalParams() });
   }
 
-  recordStart() {}
-
-  recordEnd() {}
-
   leave() {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
   }

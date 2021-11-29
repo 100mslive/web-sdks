@@ -28,6 +28,9 @@ export default function decodeJWT(token: string): AuthToken {
       role: payload.role,
     } as AuthToken;
   } catch (err) {
-    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, (err as Error).message);
+    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(
+      HMSAction.INIT,
+      `couldn't parse to json - ${(err as Error).message}`,
+    );
   }
 }

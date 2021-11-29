@@ -44,7 +44,7 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   // @ts-ignore
-  setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
+  setPreferredCodec(_transceiver: RTCRtpTransceiver, _kind: string) {
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
   }
 

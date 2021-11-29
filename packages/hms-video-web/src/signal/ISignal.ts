@@ -34,10 +34,6 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   broadcast(message: HMSMessage): Promise<void>;
 
-  recordStart(): void;
-
-  recordEnd(): void;
-
   leave(): void;
 
   endRoom(lock: boolean, reason: string): Promise<void>;

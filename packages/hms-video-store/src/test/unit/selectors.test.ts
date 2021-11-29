@@ -68,6 +68,8 @@ import {
   selectAudioPlaylist,
   selectVideoPlaylist,
   selectPeersByRole,
+  selectPeers,
+  selectPeerMetadata,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -291,6 +293,14 @@ describe('by ID selectors', () => {
     expect(selectPeersByRole('speaker')(fakeStore)).toEqual([remotePeerTwo]);
     // If role is not present
     expect(selectPeersByRole('incognito')(fakeStore)).toEqual([]);
+  });
+
+  test('selectPeerMetadata', () => {
+    const peers = selectPeers(fakeStore);
+    const metadata1 = selectPeerMetadata(peers[0].id)(fakeStore);
+    expect(metadata1).toEqual({});
+    const metadata2 = selectPeerMetadata(peers[1].id)(fakeStore);
+    expect(metadata2).toEqual({ hello: 'world' });
   });
 });
 

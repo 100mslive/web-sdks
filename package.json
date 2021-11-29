@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "@babel/core": "7.8.0",
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
     "@cypress/code-coverage": "^3.9.11",
@@ -13,6 +14,7 @@
     "@typescript-eslint/parser": "^5.4.0",
     "babel-jest": "^27.3.1",
     "babel-plugin-istanbul": "^6.1.1",
+    "concurrently": "^6.4.0",
     "cypress": "^8.7.0",
     "dotenv": "^10.0.0",
     "esbuild": "^0.13.15",
@@ -29,7 +31,7 @@
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0",
-    "typedoc": "^0.21.5",
+    "typedoc": "^0.22.10",
     "typedoc-plugin-markdown": "^3.10.4",
     "typescript": "^4.4.4"
   },
@@ -37,10 +39,11 @@
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",
     "format": "lerna run format --stream",
-    "test": "lerna run test --stream",
-    "start": "lerna run start --stream --parallel",
-    "build": "lerna run build --stream --parallel",
+    "test": "yarn build && lerna run test --stream",
+    "start": "lerna run start --stream",
+    "build": "lerna run build --stream",
     "size": "lerna run size --stream",
+    "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap"
   },
   "workspaces": [
@@ -54,5 +57,23 @@
   },
   "lint-staged": {
     "*": "format && lint:fix"
-  }
+  },
+  "size-limit": [
+    {
+      "path": "packages/hms-video-web/dist/hms-video.cjs.js",
+      "limit": "60 KB"
+    },
+    {
+      "path": "packages/hms-video-web/dist/hms-video.esm.js",
+      "limit": "200 KB"
+    },
+    {
+      "path": "packages/hms-video-store/dist/hms-video-store.cjs.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/hms-video-store/dist/hms-video-store.esm.js",
+      "limit": "100 KB"
+    }
+  ]
 }

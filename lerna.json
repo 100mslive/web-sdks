@@ -6,6 +6,9 @@
   "command": {
     "version": {
       "message": "build: update version"
+    },
+    "publish": {
+      "registry": "https://registry.npmjs.org/"
     }
   }
 }

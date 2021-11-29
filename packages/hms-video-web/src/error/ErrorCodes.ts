@@ -18,15 +18,6 @@ export const ErrorCodes = {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
 
-    // [INIT]: Network error
-    CONNECTION_LOST: 2001,
-
-    // Bad Request
-    HTTP_ERROR: 2400,
-
-    // Endpoint URL is invalid
-    INVALID_ENDPOINT_URL: 2002,
-
     // Endpoint is not reachable.
     ENDPOINT_UNREACHABLE: 2003,
 

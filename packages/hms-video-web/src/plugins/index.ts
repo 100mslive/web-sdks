@@ -1,2 +1,2 @@
-export { HMSVideoPlugin, HMSVideoPluginType } from './video';
-export { HMSAudioPlugin, HMSAudioPluginType } from './audio';
+export type { HMSVideoPlugin, HMSVideoPluginType } from './video';
+export type { HMSAudioPlugin, HMSAudioPluginType } from './audio';
