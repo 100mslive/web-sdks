@@ -99,7 +99,7 @@ jobs:
 
       - name: revert store version
         # revert store version to main version if changes are reversed
-        if: steps.main.outputs.store_version != steps.branch.outputs.store_version && needs.changes.outputs.store == 'false'
+        if: steps.main.outputs.store_version != steps.branch.outputs.store_version && needs.changes.outputs.store == 'false' && needs.changes.outputs.sdk == 'false'
         env:
           MAIN_VERSION: ${{ steps.main.outputs.store_version }}
         run: |

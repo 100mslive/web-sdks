@@ -4,14 +4,13 @@
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist/**/*"
   ],
   "engines": {
     "node": ">=12"
   },
   "scripts": {
-    "prestart": "rm -rf dist",
+    "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently 'yarn dev' 'yarn types'",
     "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
@@ -35,7 +34,7 @@
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.35-alpha.5",
+    "@100mslive/hms-video": "0.1.35-alpha.6",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
