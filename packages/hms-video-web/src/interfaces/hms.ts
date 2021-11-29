@@ -13,6 +13,7 @@ import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSRecording, HMSRTMP } from './room';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): void;
@@ -24,6 +25,7 @@ export default interface HMS {
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
   getPlaylistManager(): HMSPlaylistManager;
+  getWebrtcInternals(): HMSWebrtcInternals | undefined;
 
   changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;

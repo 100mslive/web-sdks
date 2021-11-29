@@ -1,2 +1,3 @@
-export { RTCStatsMonitor } from './RTCStatsMonitor';
-export { RTCStats } from './RTCStats';
+export { HMSWebrtcInternals } from './HMSWebrtcInternals';
+export { HMSWebrtcStats } from './HMSWebrtcStats';
+export { RTCStatsUpdate } from './RTCStatsMonitor';
