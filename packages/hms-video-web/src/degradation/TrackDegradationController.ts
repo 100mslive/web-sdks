@@ -66,7 +66,7 @@ export class TrackDegradationController {
       return;
     }
 
-    this.recoveringTrack = this.getActiveTracks(true).find((track) => track.degraded);
+    this.recoveringTrack = this.getActiveTracks(true).find(track => track.degraded);
     if (!this.recoveringTrack) {
       return;
     }
@@ -84,7 +84,9 @@ export class TrackDegradationController {
 
   private degradeActiveTracksByHalf() {
     const activeTracks = this.getActiveTracks(false);
-    if (!activeTracks.length) return;
+    if (!activeTracks.length) {
+      return;
+    }
     HMSLogger.d(this.TAG, { activeTracks: [...activeTracks] });
 
     let halfCount = Math.ceil(activeTracks.length / 2);
@@ -98,7 +100,7 @@ export class TrackDegradationController {
   private getActiveTracks(includeDegraded: boolean) {
     return this.store
       .getRemoteVideoTracks()
-      .filter((track) => track.hasSinks() && (!track.degraded || includeDegraded))
+      .filter(track => track.hasSinks() && (!track.degraded || includeDegraded))
       .sort((trackA, trackB) => {
         const comparators = this.store.getComparator().getTrackComparators();
         /**

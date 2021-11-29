@@ -1,8 +1,8 @@
 import { PeerConnectionType } from '../transport/ITransport';
 
 export class HMSPeerConnectionStats {
-  private packetsLost: number = 0;
-  private jitter: number = 0;
+  private packetsLost = 0;
+  private jitter = 0;
   private rawStatsArray: RTCStats[] = [];
 
   constructor(public type: PeerConnectionType, private rawStats: RTCStatsReport) {
@@ -12,9 +12,13 @@ export class HMSPeerConnectionStats {
      *
      * Stat type -> properties can be found here: https://www.w3.org/TR/webrtc-stats/#summary
      */
-    this.rawStats.forEach((r) => {
-      if (r.packetsLost) this.packetsLost += r.packetsLost;
-      if (r.jitter) this.jitter += r.jitter;
+    this.rawStats.forEach(r => {
+      if (r.packetsLost) {
+        this.packetsLost += r.packetsLost;
+      }
+      if (r.jitter) {
+        this.jitter += r.jitter;
+      }
       this.rawStatsArray.push(r);
     });
     // console.log(
@@ -37,14 +41,14 @@ export class HMSPeerConnectionStats {
     // Get track stats by filtering using trackIdentifer
     const trackStats = this.rawStatsArray.find(
       // @ts-expect-error
-      (rawStat) => rawStat.type === 'track' && rawStat.trackIdentifier === trackId,
+      rawStat => rawStat.type === 'track' && rawStat.trackIdentifier === trackId,
     );
 
     // The 'id' of the trackStats should match the trackId of the 'inbound-rtp' streamStats
     const streamStats =
       trackStats &&
       this.rawStatsArray.find(
-        (rawStat) =>
+        rawStat =>
           // @ts-expect-error
           (rawStat.type === 'inbound-rtp' || rawStat.type === 'outbound-rtp') && rawStat.trackId === trackStats.id,
       );
@@ -54,7 +58,7 @@ export class HMSPeerConnectionStats {
 
   getLocalPeerStats(): RTCStats | undefined {
     let activeCandidatePair: RTCStats | undefined;
-    this.rawStats.forEach((report) => {
+    this.rawStats.forEach(report => {
       if (report.type === 'transport') {
         // TS doesn't have correct types for RTCStatsReports
         // @ts-expect-error
@@ -63,7 +67,7 @@ export class HMSPeerConnectionStats {
     });
     // Fallback for Firefox.
     if (!activeCandidatePair) {
-      this.rawStats.forEach((report) => {
+      this.rawStats.forEach(report => {
         if (report.type === 'candidate-pair' && report.selected) {
           activeCandidatePair = report;
         }
