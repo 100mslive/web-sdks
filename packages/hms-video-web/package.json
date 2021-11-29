@@ -5,13 +5,13 @@
   "main": "dist/hms-video.cjs.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist/**/*"
   ],
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "prestart": "rm -rf dist",
+    "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently 'yarn dev' 'yarn types'",
     "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
