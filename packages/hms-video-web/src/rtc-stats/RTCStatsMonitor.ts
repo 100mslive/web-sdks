@@ -7,7 +7,7 @@ import { sleep } from '../utils/timer-utils';
 export type RTCStatsUpdate = Record<Partial<PeerConnectionType>, RTCStatsReport>;
 
 export class RTCStatsMonitor {
-  private isMonitored: boolean = false;
+  private isMonitored = false;
   constructor(
     private readonly hmsInternalEvent: HMSInternalEvent<RTCStatsUpdate>,
     private readonly connections: Record<Partial<PeerConnectionType>, RTCPeerConnection>,
