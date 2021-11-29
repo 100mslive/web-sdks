@@ -1,2 +1,3 @@
-export type { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
+export type { HMSVideoPlugin } from './HMSVideoPlugin';
+export { HMSVideoPluginType } from './HMSVideoPlugin';
 export { HMSVideoPluginsManager } from './HMSVideoPluginsManager';
