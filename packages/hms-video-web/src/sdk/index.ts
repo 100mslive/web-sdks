@@ -692,13 +692,13 @@ export class HMSSdk implements HMSInterface {
   async changeName(name: string) {
     this.validateJoined('changeName');
     await this.transport?.changeName(name);
-    this.localPeer?.updateName(name);
+    this.notificationManager.updateLocalPeer({ name });
   }
 
   async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
-    this.localPeer?.updateMetadata(metadata);
+    this.notificationManager.updateLocalPeer({ metadata });
   }
 
   getRoles(): HMSRole[] {

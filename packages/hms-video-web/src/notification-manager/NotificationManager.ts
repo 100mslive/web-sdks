@@ -168,4 +168,9 @@ export class NotificationManager {
   handleTrackRemove = (track: HMSRemoteTrack) => {
     this.trackManager.handleTrackRemove(track);
   };
+
+  updateLocalPeer = ({ name, metadata }: { name?: string; metadata?: string }) => {
+    const peer = this.store.getLocalPeer();
+    this.peerManager.handlePeerInfoUpdate({ peer, name, data: metadata });
+  };
 }

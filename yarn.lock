@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"@100mslive/hms-video@0.1.35-alpha.4":
+  version "0.1.35-alpha.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.35-alpha.4.tgz#2ee5e4743c6bb5d19108a1e58876151d10ba3e0f"
+  integrity sha512-Xm4CesAvynhMr5St7EGc6IOUoT1xWI33fs1CHMqCgqvCHmDsVZATV9CysJFNCYaSkA3x6TICYGKcOts15LZyiw==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
