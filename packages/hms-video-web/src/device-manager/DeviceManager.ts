@@ -293,7 +293,7 @@ export class DeviceManager implements HMSDeviceManager {
 
   private handleVideoInputDeviceChange = async (videoTrack?: HMSLocalVideoTrack) => {
     if (!videoTrack) {
-      HMSLogger.d(this.TAG, 'No Audio track on local peer');
+      HMSLogger.d(this.TAG, 'No video track on local peer');
       return;
     }
     // no need to proceed further if input has not changed
@@ -317,10 +317,8 @@ export class DeviceManager implements HMSDeviceManager {
       .build();
     try {
       await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
-      if (!enabled) {
-        // On replace track, enabled will be true. Need to be set to previous state
-        videoTrack.setEnabled(enabled);
-      }
+      // On replace track, enabled will be true. Need to be set to previous state
+      videoTrack.setEnabled(enabled);
       this.eventBus.deviceChange.publish({
         devices: this.getDevices(),
         selection: newSelection,
