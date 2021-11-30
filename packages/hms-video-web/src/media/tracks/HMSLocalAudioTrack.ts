@@ -62,6 +62,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
     await localStream.replaceStreamTrack(prevTrack, newTrack);
     this.nativeTrack = newTrack;
+    await this.pluginsManager.reprocessPlugins();
   }
 
   async setEnabled(value: boolean) {

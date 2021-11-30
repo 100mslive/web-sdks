@@ -122,8 +122,24 @@ export class HMSAudioPluginsManager {
     for (const plugin of this.pluginsMap.values()) {
       await this.removePlugin(plugin);
     }
+    this.sourceNode = undefined;
+    this.destinationNode = undefined;
+    this.audioContext = undefined;
     // memory cleanup
     this.outputTrack?.stop();
+  }
+
+  async reprocessPlugins() {
+    if (this.pluginsMap.size === 0 || !this.sourceNode) {
+      HMSLogger.d(TAG, 'No plugins to process');
+      return;
+    }
+    const plugins = Array.from(this.pluginsMap.values());
+    await this.cleanup();
+    for (const plugin of plugins) {
+      await this.addPlugin(plugin);
+    }
+    console.error(this.sourceNode.context.destination);
   }
 
   private initElementsAndStream() {
