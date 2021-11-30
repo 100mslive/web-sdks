@@ -55,13 +55,13 @@ export class HMSAudioPluginsManager {
   }
 
   private async addPluginInternal(plugin: HMSAudioPlugin) {
-    const name = plugin.getName?.();
+    const name = plugin.getName();
     if (!name) {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
     if (this.pluginsMap.get(name)) {
-      HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
+      HMSLogger.w(TAG, `plugin - ${name} already added.`);
       return;
     }
 
