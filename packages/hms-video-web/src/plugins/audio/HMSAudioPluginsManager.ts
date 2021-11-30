@@ -166,34 +166,42 @@ export class HMSAudioPluginsManager {
         continue;
       }
 
-      const name = plugin.getName();
+      await this.processPlugin(plugin);
+      await this.connectToDestination(plugin);
+    }
+  }
 
-      try {
-        if (this.audioContext) {
-          this.intermediateNode = await plugin.processAudioTrack(
-            this.audioContext,
-            this.intermediateNode || this.sourceNode,
-          );
-        }
-      } catch (err) {
-        //TODO error happened on processing of plugin notify UI
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
-        //remove plugin from loop and stop analytics for it
-        await this.removePlugin(plugin);
+  private async processPlugin(plugin: HMSAudioPlugin) {
+    const name = plugin.getName();
+    try {
+      if (this.audioContext) {
+        this.intermediateNode = await plugin.processAudioTrack(
+          this.audioContext,
+          this.intermediateNode || this.sourceNode,
+        );
       }
-      try {
-        if (
-          this.intermediateNode &&
-          this.destinationNode &&
-          this.intermediateNode.context === this.destinationNode.context
-        ) {
-          this.intermediateNode.connect(this.destinationNode);
-        }
-      } catch (err) {
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
-        //remove plugin from loop and stop analytics for it
-        await this.removePlugin(plugin);
+    } catch (err) {
+      //TODO error happened on processing of plugin notify UI
+      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+      //remove plugin from loop and stop analytics for it
+      await this.removePlugin(plugin);
+    }
+  }
+
+  private async connectToDestination(plugin: HMSAudioPlugin) {
+    const name = plugin.getName();
+    try {
+      if (
+        this.intermediateNode &&
+        this.destinationNode &&
+        this.intermediateNode.context === this.destinationNode.context
+      ) {
+        this.intermediateNode.connect(this.destinationNode);
       }
+    } catch (err) {
+      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+      //remove plugin from loop and stop analytics for it
+      await this.removePlugin(plugin);
     }
   }
 
