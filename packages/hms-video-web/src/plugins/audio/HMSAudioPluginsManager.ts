@@ -66,12 +66,6 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    if (this.pluginsMap.size > 0) {
-      HMSLogger.w(TAG, 'An audio plugin is already added, currently supporting only one plugin at a time');
-      //TODO: throw err here to notify UI
-      return;
-    }
-
     if (!plugin.isSupported()) {
       const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
         HMSAction.AUDIO_PLUGINS,
