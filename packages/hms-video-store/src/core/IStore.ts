@@ -1,11 +1,11 @@
-import { HMSStore } from './schema';
-import { StateSelector, StoreApi, Subscribe } from 'zustand/vanilla';
+import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
+import { NamedSetState } from './hmsSDKStore/internalTypes';
 
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export interface IStore<T extends Object> extends StoreApi<T> {
+export interface IStore<T extends State> extends StoreApi<T> {
   /**
    * Get a part of store using a selector which is true at the current point of time.
    *
@@ -26,11 +26,19 @@ export interface IStore<T extends Object> extends StoreApi<T> {
    * ```
    */
   subscribe: Subscribe<T>;
+
+  /**
+   * @private
+   * @internal
+   * @privateRemarks
+   * wraps setState to take an additional action name parameter which can show up in redux devtools.
+   */
+  namedSetState: NamedSetState<T>;
 }
 
-interface GetState<T> {
+interface GetState<T extends State> {
   (): T;
-  <StateSlice>(selector?: StateSelector<HMSStore, StateSlice>): StateSlice;
+  <StateSlice>(selector?: StateSelector<T, StateSlice>): StateSlice;
 }
 
 /**
@@ -47,4 +55,4 @@ interface GetState<T> {
  *
  * @category Core
  */
-export type IStoreReadOnly<T extends Object> = Omit<IStore<T>, 'setState' | 'namedSetState' | 'destroy'>;
+export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'namedSetState' | 'destroy'>;

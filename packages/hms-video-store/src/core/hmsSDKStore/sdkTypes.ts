@@ -24,6 +24,9 @@ import {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSWebrtcInternals,
+  HMSWebrtcStats,
+  HMSPeerConnectionStats,
 } from '@100mslive/hms-video';
 
 export { HMSException, HMSSimulcastLayer, HMSRoomUpdate, HMSPeerUpdate, HMSTrackUpdate, HMSLogLevel };
@@ -48,4 +51,7 @@ export type {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSWebrtcInternals,
+  HMSWebrtcStats,
+  HMSPeerConnectionStats,
 };

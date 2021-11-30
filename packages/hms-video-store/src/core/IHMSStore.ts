@@ -1,20 +1,11 @@
 import { HMSStore } from './schema';
 import { IStore, IStoreReadOnly } from './IStore';
-import { NamedSetState } from './hmsSDKStore/internalTypes';
 
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export interface IHMSStore extends IStore<HMSStore> {
-  /**
-   * @private
-   * @internal
-   * @privateRemarks
-   * wraps setState to take an additional action name parameter which can show up in redux devtools.
-   */
-  namedSetState: NamedSetState<HMSStore>;
-}
+export type IHMSStore = IStore<HMSStore>;
 
 /**
  * HMS store can be used to:
