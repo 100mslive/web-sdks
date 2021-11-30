@@ -2,7 +2,7 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap } from '../hmsSDKStore/sdkTypes';
+import { DeviceMap, HMSPeerConnectionStats } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
@@ -27,6 +27,17 @@ export interface HMSStore {
   roles: Record<string, HMSRole>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
+}
+
+export interface HMSWebrtcInternalsStore {
+  publishConnection?: RTCPeerConnection;
+  subscribeConnection?: RTCPeerConnection;
+  publishStats?: HMSPeerConnectionStats;
+  subscribeStats?: HMSPeerConnectionStats;
+  packetsLost: number;
+  jitter: number;
+  trackStats: Record<HMSTrackID, RTCStats | undefined>;
+  peerStats: Record<HMSPeerID, RTCStats | undefined>;
 }
 
 /**
@@ -90,5 +101,14 @@ export const createDefaultStoreState = (): HMSStore => {
     roles: {},
     roleChangeRequests: [],
     errors: [],
+  };
+};
+
+export const createDefaultWebrtcInternalsStore = (): HMSWebrtcInternalsStore => {
+  return {
+    jitter: 0,
+    packetsLost: 0,
+    peerStats: {},
+    trackStats: {},
   };
 };

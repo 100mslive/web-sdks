@@ -1,3 +1,3 @@
 export { HMSWebrtcInternals } from './HMSWebrtcInternals';
-export { HMSWebrtcStats } from './HMSWebrtcStats';
+export { HMSWebrtcStats, HMSPeerConnectionStats } from './HMSWebrtcStats';
 export type { RTCStatsUpdate } from './RTCStatsMonitor';

@@ -12,6 +12,7 @@ import shallow from 'zustand/shallow';
 import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
+import { IStore } from '../IStore';
 import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
@@ -28,7 +29,7 @@ export class HMSReactiveStore {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
-      this.store = HMSReactiveStore.createNewHMSStore();
+      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>('HMSStore', createDefaultStoreState);
     }
     if (hmsNotifications) {
       this.notifications = hmsNotifications;
@@ -52,12 +53,12 @@ export class HMSReactiveStore {
    *
    * Note: you don't need this if you're using our react hooks, it takes care of this requirement.
    */
-  triggerOnSubscribe(): void {
+  triggerOnSubscribe<T extends State>(store: IStore<T>): void {
     if (this.initialTriggerOnSubscribe) {
       // already done
       return;
     }
-    HMSReactiveStore.makeStoreTriggerOnSubscribe(this.store);
+    HMSReactiveStore.makeStoreTriggerOnSubscribe(store);
     this.initialTriggerOnSubscribe = true;
   }
 
@@ -90,8 +91,8 @@ export class HMSReactiveStore {
   /**
    * @internal
    */
-  static createNewHMSStore(): IHMSStore {
-    const hmsStore = create<HMSStore>(() => createDefaultStoreState());
+  static createNewHMSStore<T extends State>(storeName: string, defaultCreatorFn: () => T): IStore<T> {
+    const hmsStore = create<T>(() => defaultCreatorFn());
     // make set state immutable, by passing functions through immer
     const savedSetState = hmsStore.setState;
     hmsStore.setState = (partial: any) => {
@@ -101,7 +102,7 @@ export class HMSReactiveStore {
     // add option to pass selector to getState
     const prevGetState = hmsStore.getState;
     // eslint-disable-next-line complexity
-    hmsStore.getState = <StateSlice>(selector?: StateSelector<HMSStore, StateSlice>) => {
+    hmsStore.getState = <StateSlice>(selector?: StateSelector<T, StateSlice>) => {
       if (selector) {
         const name = selector.name || 'byIDSelector';
         // @ts-ignore
@@ -126,18 +127,18 @@ export class HMSReactiveStore {
       return prevGetState();
     };
     HMSReactiveStore.useShallowCheckInSubscribe(hmsStore);
-    const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, 'HMSStore');
+    const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, storeName);
     return { ...hmsStore, namedSetState };
   }
 
   /**
    * @internal
    */
-  static makeStoreTriggerOnSubscribe(store: IHMSStore) {
+  static makeStoreTriggerOnSubscribe<T extends State>(store: IStore<T>) {
     const prevSubscribe = store.subscribe;
     store.subscribe = <StateSlice>(
       listener: StateSliceListener<StateSlice>,
-      selector?: StateSelector<HMSStore, StateSlice>,
+      selector?: StateSelector<T, StateSlice>,
       equalityFn?: EqualityChecker<StateSlice>,
     ): (() => void) => {
       // initial call, the prev state will always be null for this
@@ -155,11 +156,11 @@ export class HMSReactiveStore {
    * and a shallow check avoids that triggering.
    * @private
    */
-  private static useShallowCheckInSubscribe(hmsStore: StoreApi<HMSStore>) {
+  private static useShallowCheckInSubscribe<T extends State>(hmsStore: StoreApi<T>) {
     const prevSubscribe = hmsStore.subscribe;
     hmsStore.subscribe = <StateSlice>(
       listener: StateSliceListener<StateSlice>,
-      selector?: StateSelector<HMSStore, StateSlice>,
+      selector?: StateSelector<T, StateSlice>,
       equalityFn?: EqualityChecker<StateSlice>,
     ): (() => void) => {
       if (!selector) {
@@ -179,7 +180,7 @@ export class HMSReactiveStore {
    * https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Methods.md
    * modified version of zustand's devtools - https://github.com/pmndrs/zustand/blob/v3.5.7/src/middleware.ts#L46
    */
-  private static setUpDevtools<T extends State>(api: StoreApi<T>, prefix: string): NamedSetState<HMSStore> {
+  private static setUpDevtools<T extends State>(api: StoreApi<T>, prefix: string): NamedSetState<T> {
     let extension;
     try {
       extension = (window as any).__REDUX_DEVTOOLS_EXTENSION__ || (window as any).top.__REDUX_DEVTOOLS_EXTENSION__;

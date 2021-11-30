@@ -1,4 +1,12 @@
-import { HMSNotificationSeverity, HMSPeer, HMSReactiveStore, HMSStore, HMSTrack, HMSException } from '../../core';
+import {
+  HMSNotificationSeverity,
+  HMSPeer,
+  HMSReactiveStore,
+  HMSStore,
+  HMSTrack,
+  HMSException,
+  createDefaultStoreState,
+} from '../../core';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../core/hmsSDKStore/common/mapping';
 import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
 import * as sdkTypes from '../../core/hmsSDKStore/sdkTypes';
@@ -12,7 +20,7 @@ let fakeStore: HMSStore;
 let cb: jest.Mock;
 let unsub: () => void;
 beforeEach(() => {
-  const store = HMSReactiveStore.createNewHMSStore();
+  const store = HMSReactiveStore.createNewHMSStore('HMSStore', createDefaultStoreState);
   notifications = new HMSNotifications(store);
   cb = jest.fn(val => val);
   unsub = notifications.onNotification(cb);
