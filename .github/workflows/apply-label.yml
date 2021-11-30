@@ -30,6 +30,8 @@ jobs:
               - 'packages/hms-video-store/scripts/**'
             ci:
               - '.github/**'
+            documentation:
+              - '**/*.mdx?'
 
       - name: Apply or remove label
         uses: actions/github-script@v5
