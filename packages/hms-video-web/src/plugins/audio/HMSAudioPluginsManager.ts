@@ -8,8 +8,7 @@ const TAG = 'AudioPluginsManager';
 
 export class HMSAudioPluginsManager {
   private readonly hmsTrack: HMSLocalAudioTrack;
-  private readonly plugins: string[]; // plugin names in order they were added
-  private readonly pluginsMap: Record<string, HMSAudioPlugin>; // plugin names to their instance mapping
+  private readonly pluginsMap: Map<string, HMSAudioPlugin>; // plugin names to their instance mapping
   private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
@@ -21,18 +20,17 @@ export class HMSAudioPluginsManager {
 
   constructor(track: HMSLocalAudioTrack) {
     this.hmsTrack = track;
-    this.plugins = [];
-    this.pluginsMap = {};
+    this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics();
   }
 
   getPlugins(): string[] {
-    return [...this.plugins];
+    return Array.from(this.pluginsMap.keys());
   }
 
   async addPlugin(plugin: HMSAudioPlugin) {
     if (this.pluginAddInProgress) {
-      const name = plugin.getName?.();
+      const name = plugin.getName();
       if (!name || name === '') {
         HMSLogger.w('no name provided by the plugin');
         return;
@@ -62,12 +60,12 @@ export class HMSAudioPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
-    if (this.pluginsMap[name]) {
+    if (this.pluginsMap.get(name)) {
       HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
       return;
     }
 
-    if (this.plugins.length > 0) {
+    if (this.pluginsMap.size > 0) {
       HMSLogger.w(TAG, 'An audio plugin is already added, currently supporting only one plugin at a time');
       //TODO: throw err here to notify UI
       return;
@@ -85,8 +83,7 @@ export class HMSAudioPluginsManager {
     try {
       this.analytics.added(name);
       await this.analytics.initWithTime(name, async () => plugin.init());
-      this.plugins.push(name);
-      this.pluginsMap[name] = plugin;
+      this.pluginsMap.set(name, plugin);
       await this.startPluginsProcess();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
@@ -97,13 +94,13 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     const name = plugin.getName();
-    if (!this.pluginsMap[name]) {
+    if (!this.pluginsMap.get(name)) {
       HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
       return;
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.plugins.length === 0) {
+    if (this.pluginsMap.size === 0) {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsProcess();
     }
@@ -117,18 +114,12 @@ export class HMSAudioPluginsManager {
   }
 
   removePluginEntry(name: string) {
-    const index = this.plugins.indexOf(name);
-    if (index !== -1) {
-      this.plugins.splice(index, 1);
-    }
-    if (this.pluginsMap[name]) {
-      delete this.pluginsMap[name];
-    }
+    this.pluginsMap.delete(name);
   }
 
   async cleanup() {
-    for (const name of this.plugins) {
-      await this.removePlugin(this.pluginsMap[name]);
+    for (const name of this.pluginsMap.keys()) {
+      await this.removePlugin(this.pluginsMap.get(name)!);
     }
     // memory cleanup
     this.outputTrack?.stop();
@@ -170,11 +161,12 @@ export class HMSAudioPluginsManager {
   }
 
   private async processAudioThroughPlugins() {
-    for (const name of this.plugins) {
-      const plugin = this.pluginsMap[name];
+    for (const plugin of this.pluginsMap.values()) {
       if (!plugin) {
         continue;
       }
+
+      const name = plugin.getName();
 
       try {
         if (this.audioContext) {
