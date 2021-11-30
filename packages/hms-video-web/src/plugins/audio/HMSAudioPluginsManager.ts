@@ -31,7 +31,7 @@ export class HMSAudioPluginsManager {
   async addPlugin(plugin: HMSAudioPlugin) {
     if (this.pluginAddInProgress) {
       const name = plugin.getName();
-      if (!name || name === '') {
+      if (!name) {
         HMSLogger.w('no name provided by the plugin');
         return;
       }
@@ -56,7 +56,7 @@ export class HMSAudioPluginsManager {
 
   private async addPluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
-    if (!name || name === '') {
+    if (!name) {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
@@ -118,8 +118,8 @@ export class HMSAudioPluginsManager {
   }
 
   async cleanup() {
-    for (const name of this.pluginsMap.keys()) {
-      await this.removePlugin(this.pluginsMap.get(name)!);
+    for (const plugin of this.pluginsMap.values()) {
+      await this.removePlugin(plugin);
     }
     // memory cleanup
     this.outputTrack?.stop();
