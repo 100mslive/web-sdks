@@ -44,7 +44,7 @@ export class HMSAudioPluginsManager {
 
   async addPlugin(plugin: HMSAudioPlugin) {
     if (this.pluginAddInProgress) {
-      const name = plugin.getName();
+      const name = plugin.getName?.();
       if (!name) {
         HMSLogger.w('no name provided by the plugin');
         return;
@@ -68,7 +68,7 @@ export class HMSAudioPluginsManager {
   }
 
   private async addPluginInternal(plugin: HMSAudioPlugin) {
-    const name = plugin.getName();
+    const name = plugin.getName?.();
     if (!name) {
       HMSLogger.w('no name provided by the plugin');
       return;
