@@ -16,6 +16,6 @@ export class HMSInternalEvent<T> {
     this.eventEmitter.off(this.eventName, fn);
   };
   removeAllListeners = () => {
-    this.eventEmitter.removeAllListeners();
+    this.eventEmitter.removeAllListeners(this.eventName);
   };
 }
