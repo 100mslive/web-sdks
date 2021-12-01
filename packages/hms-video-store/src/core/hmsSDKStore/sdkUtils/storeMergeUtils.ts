@@ -50,6 +50,25 @@ export const mergeNewTracksInDraft = (
   }
 };
 
+export const mergeNewTrackStatsInDraft = (
+  tracks: Record<HMSTrackID, HMSTrack>,
+  draftTrackStats: Record<HMSTrackID, RTCStats | undefined>,
+  newTrackStats: Record<HMSTrackID, Partial<RTCStats | undefined>>,
+) => {
+  const trackIDs = Object.keys(tracks);
+  for (const trackID of trackIDs) {
+    const oldTrackStat = draftTrackStats[trackID];
+    const newTrackStat = newTrackStats[trackID];
+    if (isEntityUpdated(oldTrackStat, newTrackStat)) {
+      Object.assign(oldTrackStat, newTrackStat);
+    } else if (isEntityRemoved(oldTrackStat, newTrackStat)) {
+      delete draftTrackStats[trackID];
+    } else if (isEntityAdded(oldTrackStat, newTrackStat)) {
+      draftTrackStats[trackID] = newTrackStat as RTCStats;
+    }
+  }
+};
+
 /**
  * array's are usually created with new reference, avoid that update if both arrays are same
  */
