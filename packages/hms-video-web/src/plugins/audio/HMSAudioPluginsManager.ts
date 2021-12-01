@@ -97,9 +97,14 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     await this.removePluginInternal(plugin);
-    // Reprocess the remaining plugins again because there is no way to connect
-    // the source of the removed plugin to destination of removed plugin
-    await this.reprocessPlugins();
+    if (this.pluginsMap.size === 0) {
+      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
+      await this.hmsTrack.setProcessedTrack(undefined);
+    } else {
+      // Reprocess the remaining plugins again because there is no way to connect
+      // the source of the removed plugin to destination of removed plugin
+      await this.reprocessPlugins();
+    }
   }
 
   removePluginEntry(name: string) {
@@ -110,6 +115,7 @@ export class HMSAudioPluginsManager {
     for (const plugin of this.pluginsMap.values()) {
       await this.removePluginInternal(plugin);
     }
+    await this.hmsTrack.setProcessedTrack(undefined);
     this.sourceNode = undefined;
     this.destinationNode = undefined;
     this.audioContext = undefined;
@@ -212,10 +218,6 @@ export class HMSAudioPluginsManager {
     }
   }
 
-  private async stopPluginsProcess() {
-    await this.hmsTrack.setProcessedTrack(undefined);
-  }
-
   private async removePluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
     if (!this.pluginsMap.get(name)) {
@@ -224,10 +226,6 @@ export class HMSAudioPluginsManager {
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.pluginsMap.size === 0) {
-      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
-      await this.stopPluginsProcess();
-    }
     plugin.stop();
     this.analytics.removed(name);
   }
