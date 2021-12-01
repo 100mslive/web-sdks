@@ -13,16 +13,24 @@ import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { IStore } from '../IStore';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
+import { IHMSStore, IHMSStoreReadOnly, IHMSWebrtcInternalsStore, IHMSWebrtcInternalsStoreReadOnly } from '../IHMSStore';
+import {
+  createDefaultStoreState,
+  createDefaultWebrtcInternalsStore,
+  HMSStore,
+  HMSWebrtcInternalsStore,
+} from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
+import { subscribeToSdkWebrtcStats } from './webrtc-internals';
 
 export class HMSReactiveStore {
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
+  private readonly webrtcInternalsStore: IHMSWebrtcInternalsStore;
+  /** @TODO store flag for both HMSStore and HMSWebrtcInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
   constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
@@ -41,6 +49,13 @@ export class HMSReactiveStore {
     } else {
       this.actions = new HMSSDKActions(this.store, new HMSSdk(), this.notifications);
     }
+
+    this.webrtcInternalsStore = HMSReactiveStore.createNewHMSStore<HMSWebrtcInternalsStore>(
+      'HMSWebrtcInternalsStore',
+      createDefaultWebrtcInternalsStore,
+    );
+
+    subscribeToSdkWebrtcStats(this.actions.getSdk(), this.webrtcInternalsStore, this.store);
     this.initialTriggerOnSubscribe = false;
   }
 
@@ -86,6 +101,10 @@ export class HMSReactiveStore {
    */
   getNotifications(): IHMSNotifications {
     return { onNotification: this.notifications.onNotification };
+  }
+
+  getWebrtcInternalsStore(): IHMSWebrtcInternalsStoreReadOnly {
+    return this.webrtcInternalsStore;
   }
 
   /**
