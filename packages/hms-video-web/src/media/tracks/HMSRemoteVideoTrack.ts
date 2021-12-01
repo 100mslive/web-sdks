@@ -4,7 +4,7 @@ import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/si
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
-  private _degradedAt;
+  private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
 
   public get degraded() {

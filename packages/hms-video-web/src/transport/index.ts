@@ -698,7 +698,7 @@ export default class HMSTransport implements ITransport {
             AnalyticsEventFactory.degradationStats({
               degradeAt: track.degradedAt,
               restoredAt: restoredAt,
-              duration: restoredAt - track.degradedAt,
+              duration: restoredAt.valueOf() - track.degradedAt!.valueOf(),
               trackId: track.trackId,
             }),
           )
