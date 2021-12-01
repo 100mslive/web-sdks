@@ -6,10 +6,23 @@ import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 
 const TAG = 'AudioPluginsManager';
 
+/**
+ * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
+ * are called in the order they were added. Plugins which do not need to modify the audio are called
+ * with the original input.
+ *
+ * Concepts -
+ * Audio Plugin - A module which can take in input audio, do some processing on it and return an AudioNode
+ *
+ * For Each Plugin, an AudioNode will be created and the source will be created from local audio track.
+ * Each Audio node will be connected in the following order
+ * source -> first plugin -> second plugin -> third plugin .. so on
+ * @see HMSAudioPlugin
+ */
 export class HMSAudioPluginsManager {
   private readonly hmsTrack: HMSLocalAudioTrack;
-  private readonly plugins: string[]; // plugin names in order they were added
-  private readonly pluginsMap: Record<string, HMSAudioPlugin>; // plugin names to their instance mapping
+  // Map maintains the insertion order
+  private readonly pluginsMap: Map<string, HMSAudioPlugin>;
   private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
@@ -21,22 +34,21 @@ export class HMSAudioPluginsManager {
 
   constructor(track: HMSLocalAudioTrack) {
     this.hmsTrack = track;
-    this.plugins = [];
-    this.pluginsMap = {};
+    this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics();
   }
 
   getPlugins(): string[] {
-    return [...this.plugins];
+    return Array.from(this.pluginsMap.keys());
   }
 
   async addPlugin(plugin: HMSAudioPlugin) {
+    const name = plugin.getName?.();
+    if (!name) {
+      HMSLogger.w('no name provided by the plugin');
+      return;
+    }
     if (this.pluginAddInProgress) {
-      const name = plugin.getName?.();
-      if (!name || name === '') {
-        HMSLogger.w('no name provided by the plugin');
-        return;
-      }
       const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
@@ -50,26 +62,15 @@ export class HMSAudioPluginsManager {
 
     try {
       await this.addPluginInternal(plugin);
-    } catch (err) {
+    } finally {
       this.pluginAddInProgress = false;
-      throw err;
     }
   }
 
   private async addPluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
-    if (!name || name === '') {
-      HMSLogger.w('no name provided by the plugin');
-      return;
-    }
-    if (this.pluginsMap[name]) {
-      HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
-      return;
-    }
-
-    if (this.plugins.length > 0) {
-      HMSLogger.w(TAG, 'An audio plugin is already added, currently supporting only one plugin at a time');
-      //TODO: throw err here to notify UI
+    if (this.pluginsMap.get(name)) {
+      HMSLogger.w(TAG, `plugin - ${name} already added.`);
       return;
     }
 
@@ -85,8 +86,7 @@ export class HMSAudioPluginsManager {
     try {
       this.analytics.added(name);
       await this.analytics.initWithTime(name, async () => plugin.init());
-      this.plugins.push(name);
-      this.pluginsMap[name] = plugin;
+      this.pluginsMap.set(name, plugin);
       await this.startPluginsProcess();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
@@ -96,42 +96,50 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
-    const name = plugin.getName();
-    if (!this.pluginsMap[name]) {
-      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
-      return;
-    }
-    HMSLogger.i(TAG, `removing plugin ${name}`);
-    this.removePluginEntry(name);
-    if (this.plugins.length === 0) {
+    await this.removePluginInternal(plugin);
+    if (this.pluginsMap.size === 0) {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
-      await this.stopPluginsProcess();
+      await this.hmsTrack.setProcessedTrack(undefined);
+    } else {
+      // Reprocess the remaining plugins again because there is no way to connect
+      // the source of the removed plugin to destination of removed plugin
+      await this.reprocessPlugins();
     }
-    if (this.intermediateNode) {
-      this.intermediateNode.disconnect();
-      this.intermediateNode = null;
-    }
-
-    plugin.stop();
-    this.analytics.removed(name);
   }
 
   removePluginEntry(name: string) {
-    const index = this.plugins.indexOf(name);
-    if (index !== -1) {
-      this.plugins.splice(index, 1);
-    }
-    if (this.pluginsMap[name]) {
-      delete this.pluginsMap[name];
-    }
+    this.pluginsMap.delete(name);
   }
 
   async cleanup() {
-    for (const name of this.plugins) {
-      await this.removePlugin(this.pluginsMap[name]);
+    for (const plugin of this.pluginsMap.values()) {
+      await this.removePluginInternal(plugin);
     }
+    await this.hmsTrack.setProcessedTrack(undefined);
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
+    this.sourceNode = undefined;
+    this.destinationNode = undefined;
+    this.audioContext = undefined;
+    if (this.intermediateNode) {
+      this.intermediateNode.disconnect();
+    }
+    this.intermediateNode = null;
     // memory cleanup
     this.outputTrack?.stop();
+    this.outputTrack = undefined;
+  }
+
+  async reprocessPlugins() {
+    if (this.pluginsMap.size === 0 || !this.sourceNode) {
+      return;
+    }
+    const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
+    await this.cleanup();
+    for (const plugin of plugins) {
+      await this.addPlugin(plugin);
+    }
   }
 
   private initElementsAndStream() {
@@ -170,42 +178,59 @@ export class HMSAudioPluginsManager {
   }
 
   private async processAudioThroughPlugins() {
-    for (const name of this.plugins) {
-      const plugin = this.pluginsMap[name];
+    for (const plugin of this.pluginsMap.values()) {
       if (!plugin) {
         continue;
       }
 
-      try {
-        if (this.audioContext) {
-          this.intermediateNode = await plugin.processAudioTrack(
-            this.audioContext,
-            this.intermediateNode || this.sourceNode,
-          );
-        }
-      } catch (err) {
-        //TODO error happened on processing of plugin notify UI
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
-        //remove plugin from loop and stop analytics for it
-        await this.removePlugin(plugin);
-      }
-      try {
-        if (
-          this.intermediateNode &&
-          this.destinationNode &&
-          this.intermediateNode.context === this.destinationNode.context
-        ) {
-          this.intermediateNode.connect(this.destinationNode);
-        }
-      } catch (err) {
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
-        //remove plugin from loop and stop analytics for it
-        await this.removePlugin(plugin);
-      }
+      await this.processPlugin(plugin);
+      await this.connectToDestination(plugin);
     }
   }
 
-  private async stopPluginsProcess() {
-    await this.hmsTrack.setProcessedTrack(undefined);
+  private async processPlugin(plugin: HMSAudioPlugin) {
+    const name = plugin.getName();
+    try {
+      if (this.audioContext) {
+        this.intermediateNode = await plugin.processAudioTrack(
+          this.audioContext,
+          this.intermediateNode || this.sourceNode,
+        );
+      }
+    } catch (err) {
+      //TODO error happened on processing of plugin notify UI
+      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+      //remove plugin from loop and stop analytics for it
+      await this.removePlugin(plugin);
+    }
+  }
+
+  private async connectToDestination(plugin: HMSAudioPlugin) {
+    const name = plugin.getName();
+    try {
+      if (
+        this.intermediateNode &&
+        this.destinationNode &&
+        this.intermediateNode.context === this.destinationNode.context
+      ) {
+        this.intermediateNode.connect(this.destinationNode);
+      }
+    } catch (err) {
+      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+      //remove plugin from loop and stop analytics for it
+      await this.removePlugin(plugin);
+    }
+  }
+
+  private async removePluginInternal(plugin: HMSAudioPlugin) {
+    const name = plugin.getName?.();
+    if (!this.pluginsMap.get(name)) {
+      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
+      return;
+    }
+    HMSLogger.i(TAG, `removing plugin ${name}`);
+    this.removePluginEntry(name);
+    plugin.stop();
+    this.analytics.removed(name);
   }
 }
