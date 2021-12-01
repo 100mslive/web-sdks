@@ -443,18 +443,13 @@ export class HMSSDKActions implements IHMSActions {
 
   async changeName(name: string) {
     await this.sdk.changeName(name);
-    this.setState(store => {
-      const localPeer = selectLocalPeer(store);
-      localPeer.name = name;
-    }, 'peerNameUpdated');
   }
 
-  async changeMetadata(metadata: string) {
+  async changeMetadata(metadata: string | any) {
+    if (typeof metadata !== 'string') {
+      metadata = JSON.stringify(metadata);
+    }
     await this.sdk.changeMetadata(metadata);
-    this.setState(store => {
-      const localPeer = selectLocalPeer(store);
-      localPeer.metadata = metadata;
-    }, 'peerMetadataUpdated');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
