@@ -1,4 +1,4 @@
-import { HMSStore } from './schema';
+import { HMSStore, HMSWebrtcInternalsStore } from './schema';
 import { IStore, IStoreReadOnly } from './IStore';
 
 /**
@@ -22,3 +22,6 @@ export type IHMSStore = IStore<HMSStore>;
  * @category Core
  */
 export type IHMSStoreReadOnly = IStoreReadOnly<HMSStore>;
+
+export type IHMSWebrtcInternalsStore = IStore<HMSWebrtcInternalsStore>;
+export type IHMSWebrtcInternalsStoreReadOnly = IStoreReadOnly<HMSWebrtcInternalsStore>;
