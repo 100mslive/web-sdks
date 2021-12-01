@@ -25,7 +25,7 @@ const updateWebrtcStoreStats = (
   stats: HMSWebrtcStats,
   tracks: Record<HMSTrackID, HMSTrack>,
 ) => {
-  webrtcStore.setState(store => {
+  webrtcStore.namedSetState(store => {
     if (store.jitter !== stats.getJitter()) {
       store.jitter = stats.getJitter();
     }
@@ -35,14 +35,20 @@ const updateWebrtcStoreStats = (
 
     store.publishStats = stats.getPublishStats();
     store.subscribeStats = stats.getSubscribeStats();
-    const newTrackStats: Record<HMSTrackID, Partial<RTCStats>> = {};
+    const newTrackStats: Record<HMSTrackID, Partial<RTCStats | undefined>> = {};
+    const trackIDs = Object.keys(tracks);
+
+    for (const trackID of trackIDs) {
+      newTrackStats[trackID] = stats.getTrackStats(trackID);
+    }
+
     mergeNewTrackStatsInDraft(tracks, store.trackStats, newTrackStats);
-  });
+  }, 'webrtc-stats');
 };
 
 const storePeerConnections = (sdk: HMSSdk, store: IHMSWebrtcInternalsStore) => {
-  store.setState(store => {
+  store.namedSetState(store => {
     store.publishConnection = sdk.getWebrtcInternals()?.getPublishPeerConnection();
     store.subscribeConnection = sdk.getWebrtcInternals()?.getSubscribePeerConnection();
-  });
+  }, 'peer-connections');
 };
