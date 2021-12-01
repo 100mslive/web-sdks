@@ -27,8 +27,9 @@ export class HMSAudioPluginsManager {
 
   private sourceNode?: MediaStreamAudioSourceNode;
   private destinationNode?: MediaStreamAudioDestinationNode;
-  private intermediateNode?: any;
+  private prevAudioNode?: any;
   private analytics: AudioPluginsAnalytics;
+  // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
 
@@ -84,13 +85,19 @@ export class HMSAudioPluginsManager {
       return;
     }
     try {
+      if (this.pluginsMap.size === 0) {
+        await this.initContextAndAudioNodes();
+      } else if (this.prevAudioNode) {
+        // Previous node will be connected to destination. Disconnect that
+        this.prevAudioNode.disconnect();
+      }
       this.analytics.added(name);
       await this.analytics.initWithTime(name, async () => plugin.init());
       this.pluginsMap.set(name, plugin);
-      await this.startPluginsProcess();
+      await this.processPlugin(plugin);
+      await this.connectToDestination();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
-      await this.removePlugin(plugin);
       throw err;
     }
   }
@@ -107,27 +114,22 @@ export class HMSAudioPluginsManager {
     }
   }
 
-  removePluginEntry(name: string) {
-    this.pluginsMap.delete(name);
-  }
-
   async cleanup() {
     for (const plugin of this.pluginsMap.values()) {
       await this.removePluginInternal(plugin);
     }
     await this.hmsTrack.setProcessedTrack(undefined);
-    if (this.audioContext) {
-      this.audioContext.close();
-    }
+    // close context, disconnect nodes, stop track
+    this.audioContext?.close();
+    this.sourceNode?.disconnect();
+    this.prevAudioNode?.disconnect();
+    this.outputTrack?.stop();
+
+    // reset all variables
     this.sourceNode = undefined;
     this.destinationNode = undefined;
     this.audioContext = undefined;
-    if (this.intermediateNode) {
-      this.intermediateNode.disconnect();
-    }
-    this.intermediateNode = null;
-    // memory cleanup
-    this.outputTrack?.stop();
+    this.prevAudioNode = undefined;
     this.outputTrack = undefined;
   }
 
@@ -137,12 +139,13 @@ export class HMSAudioPluginsManager {
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
     await this.cleanup();
+    await this.initContextAndAudioNodes();
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
   }
 
-  private initElementsAndStream() {
+  private async initContextAndAudioNodes() {
     if (!this.audioContext) {
       this.audioContext = new AudioContext();
     }
@@ -154,71 +157,44 @@ export class HMSAudioPluginsManager {
     if (!this.destinationNode) {
       this.destinationNode = this.audioContext.createMediaStreamDestination();
       this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
-    }
-  }
-
-  private async startPluginsProcess() {
-    this.initElementsAndStream();
-    if (!this.audioContext) {
-      HMSLogger.w(TAG, `Audio context is not defined`);
-      return;
-    }
-    try {
-      await this.hmsTrack.setProcessedTrack(this.outputTrack);
-    } catch (err) {
-      HMSLogger.e(TAG, 'error in setting processed track', err);
-      throw err;
-    }
-    try {
-      await this.processAudioThroughPlugins();
-    } catch (err) {
-      HMSLogger.e(TAG, 'error in processing audio plugins', err);
-      throw err;
-    }
-  }
-
-  private async processAudioThroughPlugins() {
-    for (const plugin of this.pluginsMap.values()) {
-      if (!plugin) {
-        continue;
+      try {
+        await this.hmsTrack.setProcessedTrack(this.outputTrack);
+      } catch (err) {
+        HMSLogger.e(TAG, 'error in setting processed track', err);
+        throw err;
       }
-
-      await this.processPlugin(plugin);
-      await this.connectToDestination(plugin);
     }
   }
 
   private async processPlugin(plugin: HMSAudioPlugin) {
-    const name = plugin.getName();
     try {
-      if (this.audioContext) {
-        this.intermediateNode = await plugin.processAudioTrack(
-          this.audioContext,
-          this.intermediateNode || this.sourceNode,
-        );
+      const currentNode = await plugin.processAudioTrack(
+        this.audioContext!, // it is always present at this point
+        this.prevAudioNode || this.sourceNode,
+      );
+      if (this.prevAudioNode) {
+        // if previous node was present while adding this node to
+        // it is disconnected from destionation, connect the previous node to
+        // to the current node
+        this.prevAudioNode.connect(currentNode);
       }
+      this.prevAudioNode = currentNode;
     } catch (err) {
+      const name = plugin.getName();
       //TODO error happened on processing of plugin notify UI
       HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
       //remove plugin from loop and stop analytics for it
-      await this.removePlugin(plugin);
+      await this.removePluginInternal(plugin);
     }
   }
 
-  private async connectToDestination(plugin: HMSAudioPlugin) {
-    const name = plugin.getName();
+  private async connectToDestination() {
     try {
-      if (
-        this.intermediateNode &&
-        this.destinationNode &&
-        this.intermediateNode.context === this.destinationNode.context
-      ) {
-        this.intermediateNode.connect(this.destinationNode);
+      if (this.prevAudioNode && this.destinationNode && this.prevAudioNode.context === this.destinationNode.context) {
+        this.prevAudioNode.connect(this.destinationNode);
       }
     } catch (err) {
-      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
-      //remove plugin from loop and stop analytics for it
-      await this.removePlugin(plugin);
+      HMSLogger.e(TAG, 'error in connecting to destination node', err);
     }
   }
 
@@ -229,7 +205,7 @@ export class HMSAudioPluginsManager {
       return;
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
-    this.removePluginEntry(name);
+    this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
   }
