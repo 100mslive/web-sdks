@@ -44,7 +44,8 @@
     "build": "lerna run build --stream",
     "size": "lerna run size --stream",
     "build:only": "lerna run build:only --stream",
-    "postinstall": "husky install && lerna bootstrap"
+    "postinstall": "husky install && lerna bootstrap",
+    "cypress:open": "cypress open"
   },
   "workspaces": [
     "packages/*"
@@ -75,5 +76,27 @@
       "path": "packages/hms-video-store/dist/hms-video-store.esm.js",
       "limit": "100 KB"
     }
-  ]
+  ],
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text-summary",
+      "html"
+    ],
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "check-coverage": true,
+    "include": [
+      "src/core/hmsSDKStore/**/*.ts",
+      "src/core/selectors/**/*.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".js"
+    ],
+    "exclude": [
+      "**/*.spec.ts"
+    ],
+    "report-dir": "cy-coverage"
+  }
 }

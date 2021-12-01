@@ -26,7 +26,6 @@
     "prepare": "yarn build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "cypress:open": "cypress open",
     "docs": "rm -rf ./docs && typedoc && rm -f ./docs/README.md && mkdir ./docs/home &&mv ./docs/modules.md ./docs/home/content.md && ./bin/typedoc-mdx && npx prettier --write './docs/**/*'"
   },
   "name": "@100mslive/hms-video-store",
@@ -66,27 +65,5 @@
   "bugs": {
     "url": "https://github.com/100mslive/hms-video-store/issues"
   },
-  "homepage": "https://github.com/100mslive/hms-video-store#readme",
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "text-summary",
-      "html"
-    ],
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "all": true,
-    "check-coverage": true,
-    "include": [
-      "src/core/hmsSDKStore/**/*.ts",
-      "src/core/selectors/**/*.ts"
-    ],
-    "extension": [
-      ".ts",
-      ".js"
-    ],
-    "exclude": [
-      "**/*.spec.ts"
-    ],
-    "report-dir": "cy-coverage"
-  }
+  "homepage": "https://github.com/100mslive/hms-video-store#readme"
 }
