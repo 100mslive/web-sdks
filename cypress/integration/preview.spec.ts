@@ -1,6 +1,11 @@
-import { HMSReactiveStore, selectIsInPreview, selectLocalVideoTrackID, selectRoomState } from '../../src';
-import { HMSSDKActions } from '../../src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../src/core/IHMSStore';
+import {
+  HMSReactiveStore,
+  selectIsInPreview,
+  selectLocalVideoTrackID,
+  selectRoomState,
+} from '../../packages/hms-video-store/src';
+import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
+import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 
 let HMSStore;
 let actions: HMSSDKActions;
