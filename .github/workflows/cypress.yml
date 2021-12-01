@@ -10,6 +10,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Build
+        run: yarn build
+
       - name: Cypress
         uses: cypress-io/github-action@v2
         with:
