@@ -28,7 +28,6 @@ import {
   HMSVideoPluginType,
   HMSVideoPlugin,
   HMSAudioPlugin,
-  GainPlugin,
 } from '@100mslive/hms-video';
 
 export {
@@ -40,7 +39,6 @@ export {
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
-  GainPlugin,
 };
 
 export type {

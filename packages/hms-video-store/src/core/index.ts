@@ -4,7 +4,7 @@ export type { IHMSNotifications as HMSNotifications } from './IHMSNotifications'
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';
-export { HMSLogLevel, HMSAudioPluginType, HMSVideoPluginType, GainPlugin } from './hmsSDKStore/sdkTypes';
+export { HMSLogLevel, HMSAudioPluginType, HMSVideoPluginType } from './hmsSDKStore/sdkTypes';
 
 export type {
   HMSConfig,
