@@ -173,8 +173,8 @@ export class HMSAudioPluginsManager {
         this.prevAudioNode || this.sourceNode,
       );
       if (this.prevAudioNode) {
-        // if previous node was present while adding this node to
-        // it is disconnected from destionation, connect the previous node to
+        // if previous node was present while adding this plugin
+        // it is disconnected from destination, connect the previous node to
         // to the current node
         this.prevAudioNode.connect(currentNode);
       }
