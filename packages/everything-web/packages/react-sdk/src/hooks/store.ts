@@ -2,8 +2,8 @@ import { EqualityChecker, StateSelector } from 'zustand';
 import React, { useContext } from 'react';
 import shallow from 'zustand/shallow';
 import { HMSActions, HMSStore, HMSNotifications } from '@100mslive/hms-video-store';
-import { IHMSReactStore } from './HmsRoomProvider';
-import HMSLogger from '../utils/logger';
+import  HMSLogger from '../utils/logger';
+import { IHMSReactStore } from './types';
 
 export const hooksErrorMessage =
     'It seems like you forgot to add your component within a top level HMSRoomProvider, please refer to 100ms react docs(https://docs.100ms.live/javascript/v2/features/integration#react-hooks) to check on the required steps for using this hook.';

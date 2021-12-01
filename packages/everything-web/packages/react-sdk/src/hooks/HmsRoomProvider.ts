@@ -5,15 +5,13 @@ import {
     HMSActions,
     HMSNotification,
     HMSNotifications,
-    HMSStoreWrapper
 } from '@100mslive/hms-video-store';
-import create, { EqualityChecker, StateSelector } from 'zustand';
+import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage } from './store';
 import { isBrowser } from '../utils/isBrowser';
+import { IHMSReactStore } from './types';
 
-export interface IHMSReactStore extends HMSStoreWrapper {
-    <U>(selector: StateSelector<HMSStore, U>, equalityFn?: EqualityChecker<U>): U;
-}
+
 export interface HMSRoomProviderProps {
     actions?: HMSActions;
     store?: IHMSReactStore;
@@ -125,8 +123,10 @@ export const useHMSNotifications = () => {
             return;
         }
         const unsubscribe = HMSContextConsumer.notifications.onNotification(
+            // eslint-disable-next-line @typescript-eslint/no-shadow
             (notification: HMSNotification) => setNotification(notification)
         );
+        // eslint-disable-next-line consistent-return
         return unsubscribe;
     }, [HMSContextConsumer.notifications]);
 

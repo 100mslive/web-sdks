@@ -1,24 +1,26 @@
 {
     "name": "@100mslive/react-icons",
+    "source": "src/index.tsx",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
     "version": "0.0.0-alpha",
     "author": "100ms",
-    "main": "build/index.js",
-    "module": "build/index.esm.js",
-    "types": "build/index.d.ts",
     "license": "MIT",
     "files": [
-        "build",
-        "README.md"
+        "dist"
     ],
-    "devDependencies": {
-        "@svgr/cli": "^5.5.0",
-        "rollup-plugin-postcss": "^4.0.1"
-    },
+    "sideEffects": false,
     "scripts": {
         "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets",
         "build": "yarn svg-build && rollup -c",
         "format": "prettier -w src/**",
         "lint": "yarn lint",
         "lint-fix": "eslint src/** --fix"
-    }
+    },
+    "devDependencies": {
+        "rollup": "^2.39.0",
+        "@svgr/cli": "^5.5.0"
+    },
+    "dependencies": {}
 }

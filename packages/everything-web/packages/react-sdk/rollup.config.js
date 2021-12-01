@@ -1,34 +1,47 @@
-import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import resolve from '@rollup/plugin-node-resolve';
+import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from 'rollup-plugin-typescript2';
-import postcss from 'rollup-plugin-postcss';
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import summary from 'rollup-plugin-summary';
 import { terser } from 'rollup-plugin-terser';
+import visualizer from 'rollup-plugin-visualizer';
 
-const packageJson = require('./package.json');
+import pkg from './package.json';
 
-export default {
+const isProduction = process.env.NODE_ENV === 'production';
+const debug = process.env.DEBUG === 'true';
+
+const deps = Object.keys(pkg.dependencies || {});
+const peerDeps = Object.keys(pkg.peerDependencies || {});
+
+const config = {
     input: 'src/index.ts',
+    external: [...deps, ...peerDeps],
     output: [
-        {
-            file: packageJson.main,
-            format: 'cjs',
-            sourcemap: true
-        },
-        {
-            file: packageJson.module,
-            format: 'esm',
-            sourcemap: true
-        }
+        { file: pkg.main, format: 'cjs' },
+        { dir: 'dist', format: 'esm', preserveModules: true }
     ],
     plugins: [
-        peerDepsExternal(), // avoids us from bundling the peerDependencies (react and react-dom in our case)
-
-        commonjs(), // enables the conversion to CJS
-        typescript({ useTsconfigDeclarationDir: true }), // generates the type declarations
-        postcss({
-            extensions: ['.css'] // helps include the CSS that we created as separate files in our final bundle
+        summary({ showBrotliSize: false }),
+        commonjs(),
+        getBabelOutputPlugin({
+            presets: [
+                [
+                    '@babel/preset-env',
+                    {
+                        loose: true,
+                        bugfixes: true,
+                        modules: false,
+                        targets: { esmodules: true }
+                    }
+                ]
+            ]
         }),
-        terser() // minify generated es bundle,
+        resolve(),
+        isProduction && terser(),
+        typescript(),
+        debug && visualizer()
     ]
 };
+
+export default config;
