@@ -40,13 +40,6 @@
     "zustand": "3.5.7"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.9.11",
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "babel-plugin-istanbul": "^6.1.1",
-    "cypress": "^8.7.0",
-    "dotenv": "^10.0.0",
-    "istanbul-lib-coverage": "^3.2.0",
-    "nyc": "^15.1.0",
     "ts-node": "^10.4.0",
     "tsconfig-replace-paths": "^0.0.11",
     "tslib": "^2.2.0"
