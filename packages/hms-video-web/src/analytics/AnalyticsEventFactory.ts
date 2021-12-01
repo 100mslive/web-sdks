@@ -129,6 +129,13 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static degradationStats(properties) {
+    const name = 'video.degradation.stats';
+    const level = AnalyticsEventLevel.INFO;
+
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

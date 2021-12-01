@@ -680,8 +680,31 @@ export default class HMSTransport implements ITransport {
       this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', stats =>
         this.trackDegradationController?.handleRtcStatsChange(stats),
       );
-      this.trackDegradationController.on('TRACK_DEGRADED', this.observer.onTrackDegrade);
-      this.trackDegradationController.on('TRACK_RESTORED', this.observer.onTrackRestore);
+      this.trackDegradationController.on('TRACK_DEGRADED', track => {
+        analyticsEventsService
+          .queue(
+            AnalyticsEventFactory.degradationStats({
+              degradedAt: track.degradedAt,
+              trackId: track.trackId,
+            }),
+          )
+          .flush();
+        this.observer.onTrackDegrade(track);
+      });
+      this.trackDegradationController.on('TRACK_RESTORED', track => {
+        const restoredAt = new Date();
+        analyticsEventsService
+          .queue(
+            AnalyticsEventFactory.degradationStats({
+              degradeAt: track.degradedAt,
+              restoredAt: restoredAt,
+              duration: restoredAt - track.degradedAt,
+              trackId: track.trackId,
+            }),
+          )
+          .flush();
+        this.observer.onTrackRestore(track);
+      });
       await this.subscribeConnStatsMonitor.start();
     }
   }
