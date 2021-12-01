@@ -96,7 +96,7 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
-    const name = plugin.getName();
+    const name = plugin.getName?.();
     if (!this.pluginsMap.get(name)) {
       HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
       return;
@@ -107,13 +107,11 @@ export class HMSAudioPluginsManager {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsProcess();
     }
-    if (this.intermediateNode) {
-      this.intermediateNode.disconnect();
-      this.intermediateNode = null;
-    }
-
     plugin.stop();
     this.analytics.removed(name);
+    // Reprocess the remaining plugins again because there is no way to connect
+    // the source of the removed plugin to destination of removed plugin
+    await this.reprocessPlugins();
   }
 
   removePluginEntry(name: string) {
