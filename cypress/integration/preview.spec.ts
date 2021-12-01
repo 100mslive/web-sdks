@@ -33,7 +33,7 @@ describe('preview api', () => {
       .preview({ userName: 'test', authToken: '', initEndpoint })
       .then(() => {})
       .catch(error => {
-        expect(error.message).to.equal('Token is not in proper JWT format');
+        expect(error.message).to.include('Token is not in proper JWT format');
       });
   });
 

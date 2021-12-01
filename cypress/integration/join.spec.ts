@@ -30,7 +30,8 @@ describe('join api', () => {
     try {
       actions.join({ userName: 'test', authToken: '', initEndpoint });
     } catch (error) {
-      expect(error.message).to.equal('Token is not in proper JWT format');
+      console.log(error.message);
+      expect(error.message).to.include('Token is not in proper JWT format');
     }
   });
 
