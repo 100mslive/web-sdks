@@ -287,7 +287,7 @@ export interface IHMSActions {
    * If you want to update the metadata of peer.
    * @beta
    */
-  changeMetadata(metadata: string): Promise<void>;
+  changeMetadata(metadata: string | any): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
