@@ -25,7 +25,7 @@ export class HMSPeerConnectionStats {
     //   'Stats',
     //   type,
     //   this,
-    //   this.rawStatsArray.map((r) => [r.type, r.id, r]),
+    //   this.rawStatsArray.map(r => [r.type, r.id, r]),
     // );
   }
 
