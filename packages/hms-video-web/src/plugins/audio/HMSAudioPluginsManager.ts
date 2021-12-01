@@ -6,9 +6,23 @@ import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 
 const TAG = 'AudioPluginsManager';
 
+/**
+ * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
+ * are called in the order they were added. Plugins which do not need to modify the audio are called
+ * with the original input.
+ *
+ * Concepts -
+ * Audio Plugin - A module which can take in input audio, do some processing on it and return an AudioNode
+ *
+ * For Each Plugin, an AudioNode will be created and the source will be created from local audio track.
+ * Each Audio node will be connected in the following order
+ * source -> first plugin -> second plugin -> third plugin .. so on
+ * @see HMSAudioPlugin
+ */
 export class HMSAudioPluginsManager {
   private readonly hmsTrack: HMSLocalAudioTrack;
-  private readonly pluginsMap: Map<string, HMSAudioPlugin>; // plugin names to their instance mapping
+  // Map maintains the insertion order
+  private readonly pluginsMap: Map<string, HMSAudioPlugin>;
   private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
