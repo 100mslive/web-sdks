@@ -306,7 +306,7 @@ export class DeviceManager implements HMSDeviceManager {
       HMSLogger.w(this.TAG, 'Video device not found');
       return;
     }
-    const { settings, enabled } = videoTrack;
+    const { settings } = videoTrack;
     const newVideoTrackSettings = new HMSVideoTrackSettingsBuilder()
       .codec(settings.codec)
       .maxBitrate(settings.maxBitrate)
@@ -318,7 +318,7 @@ export class DeviceManager implements HMSDeviceManager {
     try {
       await (videoTrack as HMSLocalVideoTrack).setSettings(newVideoTrackSettings, true);
       // On replace track, enabled will be true. Need to be set to previous state
-      videoTrack.setEnabled(enabled);
+      // videoTrack.setEnabled(enabled); // TODO: remove this once verified on qa.
       this.eventBus.deviceChange.publish({
         devices: this.getDevices(),
         selection: newSelection,
