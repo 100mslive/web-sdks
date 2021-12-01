@@ -96,19 +96,7 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
-    const name = plugin.getName?.();
-    if (!this.pluginsMap.get(name)) {
-      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
-      return;
-    }
-    HMSLogger.i(TAG, `removing plugin ${name}`);
-    this.removePluginEntry(name);
-    if (this.pluginsMap.size === 0) {
-      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
-      await this.stopPluginsProcess();
-    }
-    plugin.stop();
-    this.analytics.removed(name);
+    await this.removePluginInternal(plugin);
     // Reprocess the remaining plugins again because there is no way to connect
     // the source of the removed plugin to destination of removed plugin
     await this.reprocessPlugins();
@@ -120,11 +108,15 @@ export class HMSAudioPluginsManager {
 
   async cleanup() {
     for (const plugin of this.pluginsMap.values()) {
-      await this.removePlugin(plugin);
+      await this.removePluginInternal(plugin);
     }
     this.sourceNode = undefined;
     this.destinationNode = undefined;
     this.audioContext = undefined;
+    if (this.intermediateNode) {
+      this.intermediateNode.disconnect();
+    }
+    this.intermediateNode = null;
     // memory cleanup
     this.outputTrack?.stop();
   }
@@ -133,7 +125,7 @@ export class HMSAudioPluginsManager {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
       return;
     }
-    const plugins = this.pluginsMap.values();
+    const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
     await this.cleanup();
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
@@ -222,5 +214,21 @@ export class HMSAudioPluginsManager {
 
   private async stopPluginsProcess() {
     await this.hmsTrack.setProcessedTrack(undefined);
+  }
+
+  private async removePluginInternal(plugin: HMSAudioPlugin) {
+    const name = plugin.getName?.();
+    if (!this.pluginsMap.get(name)) {
+      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
+      return;
+    }
+    HMSLogger.i(TAG, `removing plugin ${name}`);
+    this.removePluginEntry(name);
+    if (this.pluginsMap.size === 0) {
+      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
+      await this.stopPluginsProcess();
+    }
+    plugin.stop();
+    this.analytics.removed(name);
   }
 }
