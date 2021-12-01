@@ -125,7 +125,6 @@ export class HMSAudioPluginsManager {
 
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
-      HMSLogger.d(TAG, 'No plugins to process');
       return;
     }
     const plugins = Array.from(this.pluginsMap.values());
