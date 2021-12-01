@@ -48,10 +48,8 @@ export class HMSAudioPluginsManager {
 
     try {
       await this.addPluginInternal(plugin);
+    } finally {
       this.pluginAddInProgress = false;
-    } catch (err) {
-      this.pluginAddInProgress = false;
-      throw err;
     }
   }
 

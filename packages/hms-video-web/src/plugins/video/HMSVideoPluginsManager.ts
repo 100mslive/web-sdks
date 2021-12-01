@@ -90,10 +90,8 @@ export class HMSVideoPluginsManager {
 
     try {
       await this.addPluginInternal(plugin, pluginFrameRate);
+    } finally {
       this.pluginAddInProgress = false;
-    } catch (err) {
-      this.pluginAddInProgress = false;
-      throw err;
     }
   }
 
