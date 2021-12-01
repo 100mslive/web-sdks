@@ -1,4 +1,5 @@
 import { styled } from '../stitches.config';
+import { flexCenter } from '../utils/styles';
 
 const Page = styled('div', {
     width: '100%',
@@ -61,6 +62,7 @@ const VideoRoot = styled('div', {
     backgroundColor: '$gray1',
     borderRadius: '8px',
     transition: 'box-shadow 0.4s ease-in-out',
+    ...flexCenter,
     variants: {
         audioLevel: {
             true: {

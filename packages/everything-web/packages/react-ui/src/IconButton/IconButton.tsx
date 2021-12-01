@@ -28,14 +28,14 @@ export const IconButton = styled('button', {
     },
     variants: {
         active: {
-            true: {
+            false: {
                 backgroundColor: '$fg',
                 color: '$bg',
                 '&:not([disabled]):hover': {
-                    backgroundColor: '$trans'
+                    backgroundColor: '$fg'
                 }
             },
-            false: {
+            true: {
                 '&:not([disabled]):hover': {
                     backgroundColor: '$trans'
                 }
