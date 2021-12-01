@@ -29,7 +29,7 @@ export interface HMSStore {
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
-export interface HMSWebrtcInternalsStore {
+export interface HMSInternalsStore {
   publishConnection?: RTCPeerConnection;
   subscribeConnection?: RTCPeerConnection;
   publishStats?: HMSPeerConnectionStats;
@@ -104,7 +104,7 @@ export const createDefaultStoreState = (): HMSStore => {
   };
 };
 
-export const createDefaultWebrtcInternalsStore = (): HMSWebrtcInternalsStore => {
+export const createDefaultInternalsStore = (): HMSInternalsStore => {
   return {
     jitter: 0,
     packetsLost: 0,

@@ -13,13 +13,8 @@ import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { IStore } from '../IStore';
-import { IHMSStore, IHMSStoreReadOnly, IHMSWebrtcInternalsStore, IHMSWebrtcInternalsStoreReadOnly } from '../IHMSStore';
-import {
-  createDefaultStoreState,
-  createDefaultWebrtcInternalsStore,
-  HMSStore,
-  HMSWebrtcInternalsStore,
-} from '../schema';
+import { IHMSStore, IHMSStoreReadOnly, IHMSInternalsStore, IHMSInternalsStoreReadOnly } from '../IHMSStore';
+import { createDefaultStoreState, createDefaultInternalsStore, HMSStore, HMSInternalsStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
@@ -29,8 +24,8 @@ export class HMSReactiveStore {
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
-  private readonly webrtcInternalsStore: IHMSWebrtcInternalsStore;
-  /** @TODO store flag for both HMSStore and HMSWebrtcInternalsStore */
+  private readonly webrtcInternalsStore: IHMSInternalsStore;
+  /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
   constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
@@ -50,9 +45,9 @@ export class HMSReactiveStore {
       this.actions = new HMSSDKActions(this.store, new HMSSdk(), this.notifications);
     }
 
-    this.webrtcInternalsStore = HMSReactiveStore.createNewHMSStore<HMSWebrtcInternalsStore>(
-      'HMSWebrtcInternalsStore',
-      createDefaultWebrtcInternalsStore,
+    this.webrtcInternalsStore = HMSReactiveStore.createNewHMSStore<HMSInternalsStore>(
+      'HMSInternalsStore',
+      createDefaultInternalsStore,
     );
 
     subscribeToSdkWebrtcStats(this.actions.getSdk(), this.webrtcInternalsStore, this.store);
@@ -103,7 +98,7 @@ export class HMSReactiveStore {
     return { onNotification: this.notifications.onNotification };
   }
 
-  getWebrtcInternalsStore(): IHMSWebrtcInternalsStoreReadOnly {
+  getInternalsStore(): IHMSInternalsStoreReadOnly {
     return this.webrtcInternalsStore;
   }
 

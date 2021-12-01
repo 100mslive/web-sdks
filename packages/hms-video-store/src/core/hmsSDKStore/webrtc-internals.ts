@@ -1,10 +1,10 @@
 import { HMSSdk, HMSWebrtcStats } from '@100mslive/hms-video';
 import { selectRoomState, selectTracksMap } from '../selectors';
-import { IHMSStore, IHMSWebrtcInternalsStore } from '../IHMSStore';
+import { IHMSStore, IHMSInternalsStore } from '../IHMSStore';
 import { HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
 import { mergeNewTrackStatsInDraft } from './sdkUtils/storeMergeUtils';
 
-export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSWebrtcInternalsStore, store: IHMSStore) => {
+export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
   let unsubscribe: (() => void) | undefined;
   store.subscribe(roomState => {
     if (roomState === HMSRoomState.Connected) {
@@ -21,7 +21,7 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSWebrtcIn
 };
 
 const updateWebrtcStoreStats = (
-  webrtcStore: IHMSWebrtcInternalsStore,
+  webrtcStore: IHMSInternalsStore,
   stats: HMSWebrtcStats,
   tracks: Record<HMSTrackID, HMSTrack>,
 ) => {
@@ -46,7 +46,7 @@ const updateWebrtcStoreStats = (
   }, 'webrtc-stats');
 };
 
-const storePeerConnections = (sdk: HMSSdk, store: IHMSWebrtcInternalsStore) => {
+const storePeerConnections = (sdk: HMSSdk, store: IHMSInternalsStore) => {
   store.namedSetState(store => {
     store.publishConnection = sdk.getWebrtcInternals()?.getPublishPeerConnection();
     store.subscribeConnection = sdk.getWebrtcInternals()?.getSubscribePeerConnection();
