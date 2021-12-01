@@ -24,9 +24,22 @@ import {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSAudioPluginType,
+  HMSVideoPluginType,
+  HMSVideoPlugin,
+  HMSAudioPlugin,
 } from '@100mslive/hms-video';
 
-export { HMSException, HMSSimulcastLayer, HMSRoomUpdate, HMSPeerUpdate, HMSTrackUpdate, HMSLogLevel };
+export {
+  HMSException,
+  HMSSimulcastLayer,
+  HMSRoomUpdate,
+  HMSPeerUpdate,
+  HMSTrackUpdate,
+  HMSLogLevel,
+  HMSAudioPluginType,
+  HMSVideoPluginType,
+};
 
 export type {
   DeviceMap,
@@ -48,4 +61,6 @@ export type {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSVideoPlugin,
+  HMSAudioPlugin,
 };
