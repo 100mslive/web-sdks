@@ -116,6 +116,9 @@ export class HMSAudioPluginsManager {
       await this.removePluginInternal(plugin);
     }
     await this.hmsTrack.setProcessedTrack(undefined);
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
     this.sourceNode = undefined;
     this.destinationNode = undefined;
     this.audioContext = undefined;
@@ -125,6 +128,7 @@ export class HMSAudioPluginsManager {
     this.intermediateNode = null;
     // memory cleanup
     this.outputTrack?.stop();
+    this.outputTrack = undefined;
   }
 
   async reprocessPlugins() {
