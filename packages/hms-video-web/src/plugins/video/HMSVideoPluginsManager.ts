@@ -413,7 +413,7 @@ export class HMSVideoPluginsManager {
       inputCtx.fillStyle = `rgb(0, 0, 0)`;
       inputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
-    for (let i = 0; i < this.canvases.length; i++){
+    for (let i = 0; i < this.canvases.length; i++) {
       const canvasCtx = this.canvases[i].getContext('2d');
       if (canvasCtx) {
         canvasCtx.fillStyle = `rgb(0, 0, 0)`;
