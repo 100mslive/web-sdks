@@ -139,7 +139,7 @@ export class HMSAudioPluginsManager {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
       return;
     }
-    const plugins = Array.from(this.pluginsMap.values());
+    const plugins = this.pluginsMap.values();
     await this.cleanup();
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
