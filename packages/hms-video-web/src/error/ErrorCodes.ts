@@ -7,7 +7,7 @@
 
 export const ErrorCodes = {
   WebSocketConnectionErrors: {
-    // Something went wrong
+    // Error connecting to ws or init config not available
     GENERIC_CONNECT: 1000,
 
     // Network connection lost
@@ -26,7 +26,7 @@ export const ErrorCodes = {
   },
 
   TracksErrors: {
-    // [PUBLISH]: Something went wrong
+    // [PUBLISH]: Error with getusermedia request
     GENERIC_TRACK: 3000,
 
     // [PUBLISH]: No permission to access capture device - {device_type}
