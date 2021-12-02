@@ -17,6 +17,8 @@ export const ErrorCodes = {
   InitAPIErrors: {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
+    //init config not available
+    INIT_CONFIG_NOT_AVAILABLE: 2002,
 
     // Endpoint is not reachable.
     ENDPOINT_UNREACHABLE: 2003,
