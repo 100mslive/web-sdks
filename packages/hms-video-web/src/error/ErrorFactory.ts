@@ -29,7 +29,7 @@ export enum HMSAction {
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
     GenericConnect(action: HMSAction, description = '') {
-      return new HMSException(1000, 'GenericConnect', action, `Failed to connect to ws`, description);
+      return new HMSException(1000, 'GenericConnect', action, description, `[INIT]: ${description}`);
     },
 
     WebSocketConnectionLost(action: HMSAction, description = '') {
@@ -59,7 +59,7 @@ export const ErrorFactory = {
 
   TracksErrors: {
     GenericTrack(action: HMSAction, description = '') {
-      return new HMSException(3000, 'GenericTrack', action, `[TRACK]: Failed to create track`, description);
+      return new HMSException(3000, 'GenericTrack', action, description, `[Track] ${description}`);
     },
 
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
