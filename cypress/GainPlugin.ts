@@ -1,12 +1,16 @@
-import { HMSAudioPluginType, HMSAudioPlugin } from './HMSAudioPlugin';
+import { HMSAudioPluginType, HMSAudioPlugin } from '@100mslive/hms-video';
 
 export class GainPlugin implements HMSAudioPlugin {
   private gainNode?: GainNode;
   private gainValue = 0.25;
+  private name = 'gain-plugin';
 
-  constructor(gainValue?: number) {
+  constructor(gainValue?: number, name?: string) {
     if (gainValue !== undefined) {
       this.gainValue = gainValue;
+    }
+    if (name) {
+      this.name = name;
     }
   }
 
@@ -30,7 +34,7 @@ export class GainPlugin implements HMSAudioPlugin {
   init() {}
 
   getName() {
-    return 'gain-node';
+    return this.name;
   }
 
   getPluginType() {
