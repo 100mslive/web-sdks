@@ -91,7 +91,7 @@ export const ErrorFactory = {
         ErrorCodes.TracksErrors.GENERIC_TRACK,
         'GenericTrack',
         action,
-        `[TRACK] ${description}`,
+        `[TRACK]: ${description}`,
         `[TRACK]: ${description}`,
       );
     },
