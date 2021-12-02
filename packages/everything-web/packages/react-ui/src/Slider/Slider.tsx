@@ -17,7 +17,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-    backgroundColor: '$gray3',
+    backgroundColor: '$grey3',
     position: 'relative',
     flexGrow: 1,
     borderRadius: '$round',
@@ -37,10 +37,10 @@ const Thumb = styled(BaseSlider.Thumb, {
     width: 15,
     height: 15,
     backgroundColor: 'white',
-    boxShadow: `0 2px 10px $colors$gray4`,
+    boxShadow: `0 2px 10px $colors$grey4`,
     borderRadius: 10,
-    '&:hover': { backgroundColor: '$gray9' },
-    '&:focus': { boxShadow: `0 0 0 5px $colors$gray2` }
+    '&:hover': { backgroundColor: '$grey9' },
+    '&:focus': { boxShadow: `0 0 0 5px $colors$grey2` }
 });
 
 type SliderProps = React.ComponentProps<typeof Root>;

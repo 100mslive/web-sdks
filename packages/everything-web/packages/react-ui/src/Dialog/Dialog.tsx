@@ -14,7 +14,7 @@ const contentShow = keyframes({
 
 const Content = styled(DialogContent, {
     color: 'White',
-    backgroundColor: '$gray1',
+    backgroundColor: '$grey1',
     borderRadius: '8px',
     position: 'fixed',
     top: '50%',

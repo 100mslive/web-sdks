@@ -59,7 +59,7 @@ const VideoRoot = styled('div', {
     width: '360px',
     height: '360px',
     position: 'relative',
-    backgroundColor: '$gray1',
+    backgroundColor: '$grey1',
     borderRadius: '8px',
     transition: 'box-shadow 0.4s ease-in-out',
     ...flexCenter,

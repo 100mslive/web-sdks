@@ -29,7 +29,7 @@ const TooltipBox = styled(BaseTooltip.Content, {
     padding: '$1 $2',
     fontSize: '$xs',
     color: 'white',
-    backgroundColor: '$gray3',
+    backgroundColor: '$grey3',
     '@media (prefers-reduced-motion: no-preference)': {
         animationDuration: '400ms',
         animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',

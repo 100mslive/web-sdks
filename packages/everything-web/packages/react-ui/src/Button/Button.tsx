@@ -33,8 +33,7 @@ export const Button = styled('button', {
     fontWeight: '500',
     p: '$2 $4',
     '&:focus': {
-        outline: 'none',
-        backgroundColor: '$brandTint'
+        outline: 'none'
     },
     '&:not([disabled]):focus-visible': {
         boxShadow: '0 0 0 3px $colors$brandMain'
@@ -42,8 +41,8 @@ export const Button = styled('button', {
     transition: 'all 0.2s  ease',
     variants: {
         variant: {
-            standard: getButtonVariants('$gray9', '$gray10', '$gray8'),
-            danger: getButtonVariants('$red9', '$red10', '$red8'),
+            standard: getButtonVariants('$grey9', '$grey10', '$grey8'),
+            danger: getButtonVariants('$redMain', '$redTint', '$redTint'),
             primary: getButtonVariants('$brandMain', '$brandTint', '$brandTint')
         },
         icon: {
