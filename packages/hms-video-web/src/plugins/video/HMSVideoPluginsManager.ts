@@ -147,10 +147,10 @@ export class HMSVideoPluginsManager {
       this.plugins.push(name);
       this.pluginsMap[name] = plugin;
       const canvasesToBeAdded = this.plugins.length - this.canvases.length;
-      const prev_len = this.canvases.length;
-      const new_len = this.canvases.length + canvasesToBeAdded;
-      if (new_len > prev_len) {
-        for (let i = prev_len; i < new_len; i++) {
+      const prevLen = this.canvases.length;
+      const newLen = this.canvases.length + canvasesToBeAdded;
+      if (newLen > prevLen) {
+        for (let i = prevLen; i < newLen; i++) {
           this.canvases[i] = document.createElement('canvas') as CanvasElement;
         }
       }
@@ -413,8 +413,8 @@ export class HMSVideoPluginsManager {
       inputCtx.fillStyle = `rgb(0, 0, 0)`;
       inputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
-    for (let i = 0; i < this.canvases.length; i++) {
-      const canvasCtx = this.canvases[i].getContext('2d');
+    for (const canvas of this.canvases) {
+      const canvasCtx = canvas.getContext('2d');
       if (canvasCtx) {
         canvasCtx.fillStyle = `rgb(0, 0, 0)`;
         canvasCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
