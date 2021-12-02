@@ -29,11 +29,23 @@ export enum HMSAction {
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
     GenericConnect(action: HMSAction, description = '') {
-      return new HMSException(1000, 'GenericConnect', action, `Something went wrong`, description);
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.GENERIC_CONNECT,
+        'WebsocketConnection',
+        action,
+        `[WS]: ${description}`,
+        `[WS]: ${description}`,
+      );
     },
 
     WebSocketConnectionLost(action: HMSAction, description = '') {
-      return new HMSException(1003, 'WebSocketConnectionLost', action, `Network connection lost `, description);
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
+        'WebSocketConnectionLost',
+        action,
+        `Network connection lost `,
+        description,
+      );
     },
   },
 
@@ -43,28 +55,50 @@ export const ErrorFactory = {
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
-      return new HMSException(2003, 'EndpointUnreachable', action, `Endpoint is not reachable.`, description);
+      return new HMSException(
+        ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+        'EndpointUnreachable',
+        action,
+        `Endpoint is not reachable.`,
+        description,
+      );
     },
 
     InvalidTokenFormat(action: HMSAction, description = '') {
       return new HMSException(
-        2004,
+        ErrorCodes.InitAPIErrors.INVALID_TOKEN_FORMAT,
         'InvalidTokenFormat',
         action,
         `Token is not in proper JWT format - ${description}`,
         description,
       );
     },
+
+    InitConfigNotAvailable(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.InitAPIErrors.INIT_CONFIG_NOT_AVAILABLE,
+        'InitError',
+        action,
+        `[INIT]: ${description}`,
+        `[INIT]: ${description}`,
+      );
+    },
   },
 
   TracksErrors: {
     GenericTrack(action: HMSAction, description = '') {
-      return new HMSException(3000, 'GenericTrack', action, `[TRACK]: Something went wrong`, description);
+      return new HMSException(
+        ErrorCodes.TracksErrors.GENERIC_TRACK,
+        'GenericTrack',
+        action,
+        `[TRACK]: ${description}`,
+        `[TRACK]: ${description}`,
+      );
     },
 
     CantAccessCaptureDevice(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
-        3001,
+        ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
         'CantAccessCaptureDevice',
         action,
         `[TRACK]: No permission to access capture device - ${deviceInfo}`,
@@ -74,7 +108,7 @@ export const ErrorFactory = {
 
     DeviceNotAvailable(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
-        3002,
+        ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,
         'DeviceNotAvailable',
         action,
         `[TRACK]: Capture device is no longer available - ${deviceInfo}`,
@@ -84,7 +118,7 @@ export const ErrorFactory = {
 
     DeviceInUse(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
-        3003,
+        ErrorCodes.TracksErrors.DEVICE_IN_USE,
         'DeviceInUse',
         action,
         `[TRACK]: Capture device is in use by another application - ${deviceInfo}`,
@@ -94,7 +128,7 @@ export const ErrorFactory = {
 
     DeviceLostMidway(action: HMSAction, deviceInfo: string, description = '') {
       return new HMSException(
-        3008,
+        ErrorCodes.TracksErrors.DEVICE_LOST_MIDWAY,
         'DeviceLostMidway',
         action,
         `Lost access to capture device midway - ${deviceInfo}`,
@@ -104,7 +138,7 @@ export const ErrorFactory = {
 
     NothingToReturn(action: HMSAction, description = '') {
       return new HMSException(
-        3005,
+        ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
         `There is no media to return. Please select either video or audio or both.`,
@@ -114,7 +148,7 @@ export const ErrorFactory = {
 
     InvalidVideoSettings(action: HMSAction, description = '') {
       return new HMSException(
-        3006,
+        ErrorCodes.TracksErrors.INVALID_VIDEO_SETTINGS,
         'InvalidVideoSettings',
         action,
         `Cannot enable simulcast when no video settings are provided`,
@@ -133,7 +167,13 @@ export const ErrorFactory = {
     },
 
     CodecChangeNotPermitted(action: HMSAction, description = '') {
-      return new HMSException(3007, 'CodecChangeNotPermitted', action, `Codec can't be changed mid call.`, description);
+      return new HMSException(
+        ErrorCodes.TracksErrors.CODEC_CHANGE_NOT_PERMITTED,
+        'CodecChangeNotPermitted',
+        action,
+        `Codec can't be changed mid call.`,
+        description,
+      );
     },
 
     OverConstrained(action: HMSAction, deviceInfo: string, description = '') {
@@ -150,7 +190,7 @@ export const ErrorFactory = {
   WebrtcErrors: {
     CreateOfferFailed(action: HMSAction, description = '') {
       return new HMSException(
-        4001,
+        ErrorCodes.WebrtcErrors.CREATE_OFFER_FAILED,
         'CreateOfferFailed',
         action,
         `[${action.toString()}]: Failed to create offer. `,
@@ -160,7 +200,7 @@ export const ErrorFactory = {
 
     CreateAnswerFailed(action: HMSAction, description = '') {
       return new HMSException(
-        4002,
+        ErrorCodes.WebrtcErrors.CREATE_ANSWER_FAILED,
         'CreateAnswerFailed',
         action,
         `[${action.toString()}]: Failed to create answer. `,
@@ -170,7 +210,7 @@ export const ErrorFactory = {
 
     SetLocalDescriptionFailed(action: HMSAction, description = '') {
       return new HMSException(
-        4003,
+        ErrorCodes.WebrtcErrors.SET_LOCAL_DESCRIPTION_FAILED,
         'SetLocalDescriptionFailed',
         action,
         `[${action.toString()}]: Failed to set offer. `,
@@ -180,7 +220,7 @@ export const ErrorFactory = {
 
     SetRemoteDescriptionFailed(action: HMSAction, description = '') {
       return new HMSException(
-        4004,
+        ErrorCodes.WebrtcErrors.SET_REMOTE_DESCRIPTION_FAILED,
         'SetRemoteDescriptionFailed',
         action,
         `[${action.toString()}]: Failed to set answer. `,
@@ -190,7 +230,7 @@ export const ErrorFactory = {
 
     ICEFailure(action: HMSAction, description = '') {
       return new HMSException(
-        4005,
+        ErrorCodes.WebrtcErrors.ICE_FAILURE,
         'ICEFailure',
         action,
         `[${action.toString()}]: Ice connection state FAILED`,
@@ -205,12 +245,18 @@ export const ErrorFactory = {
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
-      return new HMSException(5001, 'AlreadyJoined', action, `[JOIN]: You have already joined this room.`, description);
+      return new HMSException(
+        ErrorCodes.WebsocketMethodErrors.ALREADY_JOINED,
+        'AlreadyJoined',
+        action,
+        `[JOIN]: You have already joined this room.`,
+        description,
+      );
     },
 
     CannotJoinPreviewInProgress(action: HMSAction, description = '') {
       return new HMSException(
-        5002,
+        ErrorCodes.WebsocketMethodErrors.CANNOT_JOIN_PREVIEW_IN_PROGRESS,
         'CannotJoinPreviewInProgress',
         action,
         `[JOIN]: Cannot join if preview is in progress`,
@@ -221,12 +267,18 @@ export const ErrorFactory = {
 
   GenericErrors: {
     NotConnected(action: HMSAction, description = '') {
-      return new HMSException(6000, 'NotConnected', action, `Client is not connected`, description);
+      return new HMSException(
+        ErrorCodes.GenericErrors.NOT_CONNECTED,
+        'NotConnected',
+        action,
+        `Client is not connected`,
+        description,
+      );
     },
 
     Signalling(action: HMSAction, description: string) {
       return new HMSException(
-        6001,
+        ErrorCodes.GenericErrors.SIGNALLING,
         'Signalling',
         action,
         `Unknown signalling error: ${action.toString()} ${description} `,
@@ -235,16 +287,22 @@ export const ErrorFactory = {
     },
 
     Unknown(action: HMSAction, description: string) {
-      return new HMSException(6002, 'Unknown', action, `Unknown exception: ${description}`, description);
+      return new HMSException(
+        ErrorCodes.GenericErrors.UNKNOWN,
+        'Unknown',
+        action,
+        `Unknown exception: ${description}`,
+        description,
+      );
     },
 
     NotReady(action: HMSAction, description = '') {
-      return new HMSException(6003, 'NotReady', action, `WebRTC engine is not ready yet`, description);
+      return new HMSException(ErrorCodes.GenericErrors.NOT_READY, 'NotReady', action, description, description);
     },
 
     JsonParsingFailed(action: HMSAction, jsonMessage: string, description = '') {
       return new HMSException(
-        6004,
+        ErrorCodes.GenericErrors.JSON_PARSING_FAILED,
         'JsonParsingFailed',
         action,
         `Failed to parse JSON message - ${jsonMessage}`,
@@ -253,20 +311,38 @@ export const ErrorFactory = {
     },
 
     TrackMetadataMissing(action: HMSAction, description = '') {
-      return new HMSException(6005, 'TrackMetadataMissing', action, `Track Metadata Missing`, description);
+      return new HMSException(
+        ErrorCodes.GenericErrors.TRACK_METADATA_MISSING,
+        'TrackMetadataMissing',
+        action,
+        `Track Metadata Missing`,
+        description,
+      );
     },
 
     RTCTrackMissing(action: HMSAction, description = '') {
-      return new HMSException(6006, 'RTCTrackMissing', action, `RTC Track missing`, description);
+      return new HMSException(
+        ErrorCodes.GenericErrors.RTC_TRACK_MISSING,
+        'RTCTrackMissing',
+        action,
+        `RTC Track missing`,
+        description,
+      );
     },
 
     PeerMetadataMissing(action: HMSAction, description = '') {
-      return new HMSException(6007, 'PeerMetadataMissing', action, `Peer Metadata Missing`, description);
+      return new HMSException(
+        ErrorCodes.GenericErrors.PEER_METADATA_MISSING,
+        'PeerMetadataMissing',
+        action,
+        `Peer Metadata Missing`,
+        description,
+      );
     },
 
     ValidationFailed(message: string, entity?: any) {
       return new HMSException(
-        6008,
+        ErrorCodes.GenericErrors.INVALID_ROLE,
         'ValidationFailed',
         HMSAction.VALIDATION,
         message,
