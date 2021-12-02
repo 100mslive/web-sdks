@@ -105,6 +105,8 @@ export class HMSAudioPluginsManager {
   async removePlugin(plugin: HMSAudioPlugin) {
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
+      // remove all previous nodes
+      await this.cleanup();
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.hmsTrack.setProcessedTrack(undefined);
     } else {
