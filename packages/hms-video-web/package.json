@@ -24,7 +24,6 @@
     "prepare": "yarn build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "cypress:open": "cypress open",
     "format": "prettier --write src/**/*.ts"
   },
   "author": "100ms <tech-common@100ms.live>",
@@ -33,7 +32,6 @@
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",
-    "dotenv": "^10.0.0",
     "jest-canvas-mock": "^2.3.1",
     "tsconfig-replace-paths": "^0.0.11",
     "tslib": "^2.2.0"
