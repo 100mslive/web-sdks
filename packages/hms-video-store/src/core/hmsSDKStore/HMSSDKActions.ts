@@ -157,7 +157,7 @@ export class HMSSDKActions implements IHMSActions {
     try {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      }, 'preview');
+      }, 'connecting');
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
