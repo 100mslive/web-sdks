@@ -4,18 +4,7 @@ import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
-import {
-  MessageNotification,
-  PeerNotification,
-  PeerListNotification,
-  PolicyParams,
-  RoleChangeRequestParams,
-  SpeakerList,
-  TrackStateNotification,
-  TrackUpdateRequestNotification,
-  ChangeTrackMuteStateNotification,
-  RecordingNotification,
-} from './HMSNotifications';
+import { PolicyParams, SpeakerList, TrackStateNotification } from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { PeerListManager } from './managers/PeerListManager';
@@ -84,30 +73,13 @@ export class NotificationManager {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
 
-    switch (method) {
-      case HMSNotificationMethod.PEER_JOIN: {
-        const peer = notification as PeerNotification;
-        this.peerManager.handlePeerJoin(peer);
-        break;
-      }
+    this.roomUpdateManager.handleNotification(method, notification);
+    this.peerManager.handleNotification(method, notification);
+    this.requestManager.handleNotification(method, notification);
+    this.peerListManager.handleNotification(method, notification, isReconnecting);
+    this.broadcastManager.handleNotification(method, notification);
 
-      case HMSNotificationMethod.PEER_LEAVE: {
-        const peer = notification as PeerNotification;
-        this.peerManager.handlePeerLeave(peer);
-        break;
-      }
-      case HMSNotificationMethod.PEER_LIST: {
-        const peerList = notification as PeerListNotification;
-        if (isReconnecting) {
-          HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
-          this.peerListManager.handleReconnectPeerList(peerList);
-        } else {
-          HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
-          this.peerListManager.handleInitialPeerList(peerList);
-        }
-        this.roomUpdateManager.onPeerList(peerList);
-        break;
-      }
+    switch (method) {
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
         this.trackManager.handleTrackMetadataAdd(notification as TrackStateNotification);
         break;
@@ -120,44 +92,12 @@ export class NotificationManager {
         this.activeSpeakerManager.handleActiveSpeakers(notification as SpeakerList);
         break;
 
-      case HMSNotificationMethod.BROADCAST:
-        this.broadcastManager.handleBroadcast(notification as MessageNotification);
-        break;
-
       case HMSNotificationMethod.POLICY_CHANGE:
         this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
-      case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
-        this.requestManager.handleRoleChangeRequest(notification as RoleChangeRequestParams);
-        break;
-
-      case HMSNotificationMethod.TRACK_UPDATE_REQUEST:
-        this.requestManager.handleTrackUpdateRequest(notification as TrackUpdateRequestNotification);
-        break;
-
-      case HMSNotificationMethod.CHANGE_TRACK_MUTE_STATE_UPDATE:
-        this.requestManager.handleChangeTrackStateRequest(notification as ChangeTrackMuteStateNotification);
-        break;
-
-      case HMSNotificationMethod.PEER_UPDATE:
-        this.peerManager.handlePeerUpdate(notification as PeerNotification);
-        break;
-
-      case HMSNotificationMethod.RTMP_START:
-        this.roomUpdateManager.onRTMPStart();
-        break;
-      case HMSNotificationMethod.RTMP_STOP:
-        this.roomUpdateManager.onRTMPStop();
-        break;
-      case HMSNotificationMethod.RECORDING_START:
-        this.roomUpdateManager.onRecordingStart(notification as RecordingNotification);
-        break;
-      case HMSNotificationMethod.RECORDING_STOP:
-        this.roomUpdateManager.onRecordingStop(notification as RecordingNotification);
-        break;
       default:
-        return;
+        break;
     }
   }
 

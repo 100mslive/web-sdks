@@ -1,3 +1,4 @@
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener } from '../..';
 import { HMSTrackUpdate } from '../../interfaces';
 import { HMSPeer } from '../../sdk/models/peer';
@@ -32,12 +33,26 @@ export class PeerListManager {
     return `[${this.constructor.name}]`;
   }
 
-  handleInitialPeerList = (peerList: PeerListNotification) => {
+  handleNotification(method: string, notification: any, isReconnecting: boolean) {
+    if (method !== HMSNotificationMethod.PEER_LIST) {
+      return;
+    }
+    const peerList = notification as PeerListNotification;
+    if (isReconnecting) {
+      HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
+      this.handleReconnectPeerList(peerList);
+    } else {
+      HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
+      this.handleInitialPeerList(peerList);
+    }
+  }
+
+  private handleInitialPeerList = (peerList: PeerListNotification) => {
     const peers = Object.values(peerList.peers);
     this.peerManager.handlePeerList(peers);
   };
 
-  handleReconnectPeerList = (peerList: PeerListNotification) => {
+  private handleReconnectPeerList = (peerList: PeerListNotification) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peerList.peers);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peerList.peers[hmsPeer.peerId]);

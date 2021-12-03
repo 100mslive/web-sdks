@@ -35,4 +35,8 @@ export interface HMSConfig {
   audioSinkElementId?: string;
   autoVideoSubscribe?: boolean;
   initEndpoint?: string;
+  /**
+   * Request Camera/Mic permissions irrespective of role to avoid delay in getting device list
+   */
+  alwaysRequestPermissions?: boolean;
 }

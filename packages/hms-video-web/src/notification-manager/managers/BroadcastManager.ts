@@ -1,3 +1,4 @@
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener } from '../../interfaces';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSPeer } from '../../sdk/models/peer';
@@ -12,7 +13,14 @@ export class BroadcastManager {
     return `[${this.constructor.name}]`;
   }
 
-  handleBroadcast(messageNotification: MessageNotification) {
+  handleNotification(method: string, notification: any) {
+    if (method !== HMSNotificationMethod.BROADCAST) {
+      return;
+    }
+    this.handleBroadcast(notification);
+  }
+
+  private handleBroadcast(messageNotification: MessageNotification) {
     const notifPeer = messageNotification.peer;
     const notifMessage = messageNotification.info;
     const notifRoles = messageNotification.roles;
@@ -28,22 +36,14 @@ export class BroadcastManager {
         metadata: notifPeer.info.data,
       });
     }
-
-    let recipientPeer;
+    const recipientPeer = messageNotification.private ? this.store.getLocalPeer() : undefined;
     const recipientRoles = [];
 
     if (notifRoles?.length) {
       const knownRoles = this.store.getKnownRoles();
       for (const role of notifRoles) {
-        if (knownRoles[role]) {
-          recipientRoles.push(knownRoles[role]);
-        }
+        knownRoles[role] && recipientRoles.push(knownRoles[role]);
       }
-    }
-
-    if (messageNotification.private) {
-      const peer = this.store.getLocalPeer();
-      recipientPeer = peer;
     }
 
     const hmsMessage = new Message({
