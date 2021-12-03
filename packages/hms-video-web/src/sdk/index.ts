@@ -487,7 +487,7 @@ export class HMSSdk implements HMSInterface {
       videoTrack.nativeTrack.onended = handleEnded;
       // audio track is not always available
       if (audioTrack) {
-        audioTrack && tracks.push(audioTrack);
+        tracks.push(audioTrack);
       }
     }
     await this.transport.publish(tracks);
