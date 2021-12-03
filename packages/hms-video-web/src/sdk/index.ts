@@ -270,38 +270,17 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
-    this.stringifyMetadata(config);
-    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
-    this.listener = listener;
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    const storedConfig = this.store.getConfig();
-
-    if (storedConfig && config.settings) {
-      // preview was called
-      delete config.settings.audioOutputDeviceId;
-      delete config.settings.videoDeviceId;
-      delete config.settings.audioInputDeviceId;
-    }
-
-    this.store.setErrorListener(this.errorListener);
-    this.store.setConfig(config);
     const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
+    this.commonSetup(config, roomId, listener);
+    this.removeDevicesFromConfig(config);
+    this.store.setConfig(config);
 
     if (!this.localPeer) {
       this.notificationManager.addEventListener('role-change', (e: any) => {
         this.store.setPublishParams(e.detail.params.role.publishParams);
       });
-
-      const localPeer = new HMSLocalPeer({
-        name: config.userName,
-        customerUserId: userId,
-        metadata: config.metaData || '',
-        role: this.store.getPolicyForRole(role),
-      });
-      this.store.addPeer(localPeer);
+      this.createAndAddLocalPeerToStore(config, role, userId);
     } else {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
@@ -324,10 +303,6 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
-    if (!this.store.getRoom()) {
-      // note: store room is used to handle server notifications in join and has to be done before join process starts
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    }
     HMSLogger.time(`join-room-${roomId}`);
     this.transport
       .join(
@@ -512,7 +487,7 @@ export class HMSSdk implements HMSInterface {
       videoTrack.nativeTrack.onended = handleEnded;
       // audio track is not always available
       if (audioTrack) {
-        tracks.push(audioTrack);
+        audioTrack && tracks.push(audioTrack);
       }
     }
     await this.transport.publish(tracks);
@@ -806,25 +781,11 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
-    this.stringifyMetadata(config);
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    this.store.setErrorListener(this.errorListener);
+    this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
-    this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    const policy = this.store.getPolicyForRole(role);
-    const localPeer = new HMSLocalPeer({
-      name: config.userName || '',
-      customerUserId: userId,
-      metadata: config.metaData,
-      role: policy,
-    });
-
-    this.store.addPeer(localPeer);
+    this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 
@@ -855,6 +816,55 @@ export class HMSSdk implements HMSInterface {
     } else if (source === 'audioplaylist') {
       // TODO: rt update from policy once policy is updated
       await hmsTrack.setSettings({ maxBitrate: 64 });
+    }
+  }
+
+  /**
+   * @param {HMSConfig} config
+   * @param {string} role
+   * @param {string} userId
+   */
+  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string) {
+    const policy = this.store.getPolicyForRole(role);
+    const localPeer = new HMSLocalPeer({
+      name: config.userName || '',
+      customerUserId: userId,
+      metadata: config.metaData || '',
+      role: policy,
+    });
+
+    this.store.addPeer(localPeer);
+  }
+
+  /**
+   * init managers and set listeners - common for join and preview
+   * @param {HMSConfig} config
+   * @param {string} roomId
+   * @param {HMSPreviewListener | HMSUpdateListener} listener
+   */
+  private commonSetup(config: HMSConfig, roomId: string, listener: HMSPreviewListener | HMSUpdateListener) {
+    this.stringifyMetadata(config);
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.initStoreAndManagers();
+
+    this.store.setErrorListener(this.errorListener);
+    if (!this.store.getRoom()) {
+      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+    }
+  }
+
+  /**
+   * Remove deviceId's passed in config for join if preview was already called
+   * @param {HMSConfig} config
+   */
+  private removeDevicesFromConfig(config: HMSConfig) {
+    const storedConfig = this.store.getConfig();
+    if (storedConfig && config.settings) {
+      // preview was called
+      delete config.settings.audioOutputDeviceId;
+      delete config.settings.videoDeviceId;
+      delete config.settings.audioInputDeviceId;
     }
   }
 }
