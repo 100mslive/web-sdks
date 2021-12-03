@@ -208,31 +208,20 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
+    if (this.sdkState.isPreviewInProgress) {
+      return Promise.reject(
+        ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
+      );
+    }
+    this.setUpPreview(config, listener);
+
+    // Request permissions and populate devices before waiting for policy
+    if (config.alwaysRequestPermissions) {
+      await this.localTrackManager.requestPermissions();
+      await this.initDeviceManagers();
+    }
+
     return new Promise<void>((resolve, reject) => {
-      if (this.sdkState.isPreviewInProgress) {
-        reject(ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'));
-      }
-      this.stringifyMetadata(config);
-      this.sdkState.isPreviewInProgress = true;
-      const { roomId, userId, role } = decodeJWT(config.authToken);
-      this.errorListener = listener;
-      this.deviceChangeListener = listener;
-      this.initStoreAndManagers();
-
-      this.store.setErrorListener(this.errorListener);
-      this.store.setConfig(config);
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-      const policy = this.store.getPolicyForRole(role);
-      const localPeer = new HMSLocalPeer({
-        name: config.userName || '',
-        customerUserId: userId,
-        metadata: config.metaData,
-        role: policy,
-      });
-
-      this.store.addPeer(localPeer);
-      HMSLogger.d(this.TAG, 'SDK Store', this.store);
-
       const policyHandler = async () => {
         this.notificationManager.removeEventListener('policy-change', policyHandler);
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
@@ -819,5 +808,33 @@ export class HMSSdk implements HMSInterface {
         this.listener?.onJoin(this.store.getRoom());
       });
     }
+  }
+
+  /**
+   * Init store and other managers, setup listeners, create local peer, room
+   * @param {HMSConfig} config
+   * @param {HMSPreviewListener} listener
+   */
+  private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.stringifyMetadata(config);
+    this.sdkState.isPreviewInProgress = true;
+    const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.initStoreAndManagers();
+
+    this.store.setErrorListener(this.errorListener);
+    this.store.setConfig(config);
+    this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+    const policy = this.store.getPolicyForRole(role);
+    const localPeer = new HMSLocalPeer({
+      name: config.userName || '',
+      customerUserId: userId,
+      metadata: config.metaData,
+      role: policy,
+    });
+
+    this.store.addPeer(localPeer);
+    HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 }
