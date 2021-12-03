@@ -6,6 +6,7 @@ import {
   TrackUpdateRequestNotification,
   ChangeTrackMuteStateNotification,
 } from '../HMSNotifications';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 
 /**
  * Handles request from remote peers to change something on the local side. For eg. role change, track mute/unmute.
@@ -13,7 +14,25 @@ import {
 export class RequestManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
-  handleRoleChangeRequest(notification: RoleChangeRequestParams) {
+  handleNotification(method: string, notification: any) {
+    switch (method) {
+      case HMSNotificationMethod.ROLE_CHANGE_REQUEST:
+        this.handleRoleChangeRequest(notification as RoleChangeRequestParams);
+        break;
+
+      case HMSNotificationMethod.TRACK_UPDATE_REQUEST:
+        this.handleTrackUpdateRequest(notification as TrackUpdateRequestNotification);
+        break;
+
+      case HMSNotificationMethod.CHANGE_TRACK_MUTE_STATE_UPDATE:
+        this.handleChangeTrackStateRequest(notification as ChangeTrackMuteStateNotification);
+        break;
+      default:
+        return;
+    }
+  }
+
+  private handleRoleChangeRequest(notification: RoleChangeRequestParams) {
     const request: HMSRoleChangeRequest = {
       requestedBy: this.store.getPeerById(notification.requested_by) as HMSRemotePeer,
       role: this.store.getPolicyForRole(notification.role),
@@ -23,7 +42,7 @@ export class RequestManager {
     this.listener?.onRoleChangeRequest(request);
   }
 
-  handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
+  private handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
     const { requested_by, track_id, mute } = trackUpdateRequest;
     const peer = this.store.getPeerById(requested_by);
     const track = this.store.getLocalPeerTracks().find(track => track.publishedTrackId === track_id);
@@ -53,7 +72,7 @@ export class RequestManager {
     }
   }
 
-  handleChangeTrackStateRequest(request: ChangeTrackMuteStateNotification) {
+  private handleChangeTrackStateRequest(request: ChangeTrackMuteStateNotification) {
     const { type, source, value, requested_by } = request;
     const peer = this.store.getPeerById(requested_by);
 
@@ -64,13 +83,8 @@ export class RequestManager {
     const enabled = !value;
     const localPeerTracks = this.store.getLocalPeerTracks();
     let tracks: HMSLocalTrack[] = localPeerTracks;
-    if (type) {
-      tracks = tracks.filter(track => track.type === type);
-    }
-
-    if (source) {
-      tracks = tracks.filter(track => track.source === source);
-    }
+    tracks = tracks.filter(track => track.type === type);
+    tracks = tracks.filter(track => track.source === source);
 
     const tracksToBeUpdated = tracks.filter(track => track.enabled !== enabled);
     //Do nothing if all tracks are already in same state as the request
