@@ -217,8 +217,9 @@ export class HMSSdk implements HMSInterface {
 
     // Request permissions and populate devices before waiting for policy
     if (config.alwaysRequestPermissions) {
-      await this.localTrackManager.requestPermissions();
-      await this.initDeviceManagers();
+      this.localTrackManager.requestPermissions().then(async () => {
+        await this.initDeviceManagers();
+      });
     }
 
     return new Promise<void>((resolve, reject) => {
