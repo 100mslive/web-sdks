@@ -558,22 +558,11 @@ export class HMSSdk implements HMSInterface {
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
     const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
-    if (source === 'videoplaylist') {
-      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
-      if (type === 'audio') {
-        settings.maxBitrate = 64;
-      } else {
-        settings.maxBitrate = 1000;
-        const { width, height } = track.getSettings();
-        settings.width = width;
-        settings.height = height;
-      }
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings(settings);
-    } else if (source === 'audioplaylist') {
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings({ maxBitrate: 64 });
-    }
+    this.setPlaylistSettings({
+      track,
+      hmsTrack,
+      source,
+    });
 
     await this.transport?.publish([hmsTrack]);
     hmsTrack.peerId = this.localPeer?.peerId;
@@ -837,5 +826,35 @@ export class HMSSdk implements HMSInterface {
 
     this.store.addPeer(localPeer);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
+  }
+
+  /**
+   * Set bitrate and dimensions for playlist track
+   */
+  private async setPlaylistSettings({
+    track,
+    hmsTrack,
+    source,
+  }: {
+    track: MediaStreamTrack;
+    hmsTrack: HMSLocalAudioTrack | HMSLocalVideoTrack;
+    source: string;
+  }) {
+    if (source === 'videoplaylist') {
+      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
+      if (track.kind === 'audio') {
+        settings.maxBitrate = 64;
+      } else {
+        settings.maxBitrate = 1000;
+        const { width, height } = track.getSettings();
+        settings.width = width;
+        settings.height = height;
+      }
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings(settings);
+    } else if (source === 'audioplaylist') {
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings({ maxBitrate: 64 });
+    }
   }
 }
