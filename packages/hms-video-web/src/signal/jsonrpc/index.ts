@@ -289,7 +289,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private handleResponseWithId(response: any) {
-    if (response.id) {
+    if (!response.id) {
       return;
     }
     /** This is a response to [call] */
