@@ -329,9 +329,13 @@ export class HMSVideoPluginsManager {
           };
           if (!skipProcessing) {
             if (index == this.plugins.length - 1) {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[index]!, this.outputCanvas!));
+              await this.analytics.processWithTime(name, async () =>
+                process(this.canvases[index]!, this.outputCanvas!),
+              );
             } else {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[index]!, this.canvases[index + 1]!));
+              await this.analytics.processWithTime(name, async () =>
+                process(this.canvases[index]!, this.canvases[index + 1]!),
+              );
             }
           } else {
             if (index == this.plugins.length - 1) {
