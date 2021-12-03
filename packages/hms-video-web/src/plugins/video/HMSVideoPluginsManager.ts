@@ -50,7 +50,7 @@ export class HMSVideoPluginsManager {
   private pluginAddInProgress = false;
   private pluginNumFramesToSkip: Record<string, number>;
   private pluginNumFramesSkipped: Record<string, number>;
-  private canvases: Array<CanvasElement>;
+  private canvases: Array<CanvasElement>; //array of canvases to store intermediate result
 
   constructor(track: HMSLocalVideoTrack) {
     this.hmsTrack = track;
@@ -146,6 +146,7 @@ export class HMSVideoPluginsManager {
       await this.analytics.initWithTime(name, async () => await plugin.init());
       this.plugins.push(name);
       this.pluginsMap[name] = plugin;
+      // add new canvases according to new added plugins
       const canvasesToBeAdded = this.plugins.length - this.canvases.length;
       const prevLen = this.canvases.length;
       const newLen = this.canvases.length + canvasesToBeAdded;
@@ -308,12 +309,11 @@ export class HMSVideoPluginsManager {
    * @private
    */
   private async processFramesThroughPlugins() {
-    for (let i = 0; i < this.plugins.length; i++) {
-      this.canvases[0] = this.inputCanvas!;
-      const name = this.plugins[i];
+    this.canvases[0] = this.inputCanvas!;
+    this.plugins.forEach(async (name, index) => {
       const plugin = this.pluginsMap[name];
       if (!plugin) {
-        continue;
+        return;
       }
       try {
         const skipProcessing = this.checkIfSkipRequired(name);
@@ -328,16 +328,16 @@ export class HMSVideoPluginsManager {
             }
           };
           if (!skipProcessing) {
-            if (i == this.plugins.length - 1) {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
+            if (index == this.plugins.length - 1) {
+              await this.analytics.processWithTime(name, async () => process(this.canvases[index]!, this.outputCanvas!));
             } else {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
+              await this.analytics.processWithTime(name, async () => process(this.canvases[index]!, this.canvases[index + 1]!));
             }
           } else {
-            if (i == this.plugins.length - 1) {
-              await process(this.canvases[i]!, this.outputCanvas!);
+            if (index == this.plugins.length - 1) {
+              await process(this.canvases[index]!, this.outputCanvas!);
             } else {
-              await process(this.canvases[i]!, this.canvases[i + 1]!);
+              await process(this.canvases[index]!, this.canvases[index + 1]!);
             }
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
@@ -350,7 +350,7 @@ export class HMSVideoPluginsManager {
         //remove plugin from loop and stop analytics for it
         await this.removePlugin(plugin);
       }
-    }
+    });
   }
 
   /**
