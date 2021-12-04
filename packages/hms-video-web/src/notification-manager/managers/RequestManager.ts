@@ -1,4 +1,4 @@
-import { HMSLocalTrack } from '../../media/tracks';
+import { HMSLocalTrack, HMSTrackSource } from '../../media/tracks';
 import { HMSRemotePeer, HMSRoleChangeRequest, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 import {
@@ -81,12 +81,7 @@ export class RequestManager {
     }
     // value true means the track has to be muted
     const enabled = !value;
-    const localPeerTracks = this.store.getLocalPeerTracks();
-    let tracks: HMSLocalTrack[] = localPeerTracks;
-    tracks = tracks.filter(track => track.type === type);
-    tracks = tracks.filter(track => track.source === source);
-
-    const tracksToBeUpdated = tracks.filter(track => track.enabled !== enabled);
+    const tracksToBeUpdated = this.getTracksToBeUpdated({ type, source, enabled });
     //Do nothing if all tracks are already in same state as the request
     if (tracksToBeUpdated.length === 0) {
       return;
@@ -114,5 +109,29 @@ export class RequestManager {
         enabled: true,
       });
     }
+  }
+
+  /**
+   * Filter the local tracks based on type, source and enabled state
+   * @returns {HMSLocalTrack[]}
+   */
+  private getTracksToBeUpdated({
+    type,
+    source,
+    enabled,
+  }: {
+    type?: 'audio' | 'video';
+    source?: HMSTrackSource;
+    enabled: boolean;
+  }) {
+    const localPeerTracks = this.store.getLocalPeerTracks();
+    let tracks: HMSLocalTrack[] = localPeerTracks;
+    if (type) {
+      tracks = tracks.filter(track => track.type === type);
+    }
+    if (source) {
+      tracks = tracks.filter(track => track.source === source);
+    }
+    return tracks.filter(track => track.enabled !== enabled);
   }
 }
