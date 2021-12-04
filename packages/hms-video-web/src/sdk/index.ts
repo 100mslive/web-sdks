@@ -6,6 +6,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSVideoCodec,
+  PublishParams,
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
@@ -445,7 +446,7 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    const { screen, allowed } = publishParams;
+    const { allowed } = publishParams;
     const canPublishScreen = allowed && allowed.includes('screen');
 
     if (!canPublishScreen) {
@@ -457,40 +458,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const dimensions = this.store.getSimulcastDimensions('screen');
-    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
-      new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build(),
-      new HMSAudioTrackSettingsBuilder().build(),
-    );
-
-    const handleEnded = () => {
-      this.stopEndedScreenshare(onStop);
-    };
-
-    const tracks = [];
-    if (audioOnly) {
-      videoTrack.nativeTrack.stop();
-      if (!audioTrack) {
-        throw Error('Select share audio when sharing screen');
-      }
-      tracks.push(audioTrack);
-      audioTrack.nativeTrack.onended = handleEnded;
-    } else {
-      tracks.push(videoTrack);
-      videoTrack.nativeTrack.onended = handleEnded;
-      // audio track is not always available
-      if (audioTrack) {
-        tracks.push(audioTrack);
-      }
-    }
+    const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
@@ -867,5 +835,51 @@ export class HMSSdk implements HMSInterface {
       delete config.settings.videoDeviceId;
       delete config.settings.audioInputDeviceId;
     }
+  }
+
+  /**
+   * Get screenshare based on policy and audioOnly flag
+   * @param {PublishParams} publishParams
+   * @param {function} onStop
+   * @param {boolean} audioOnly
+   * @returns
+   */
+  private async getScreenshareTracks(publishParams: PublishParams, onStop: () => void, audioOnly: boolean) {
+    const { screen } = publishParams;
+    const dimensions = this.store.getSimulcastDimensions('screen');
+    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
+      new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build(),
+      new HMSAudioTrackSettingsBuilder().build(),
+    );
+
+    const handleEnded = () => {
+      this.stopEndedScreenshare(onStop);
+    };
+
+    const tracks = [];
+    if (audioOnly) {
+      videoTrack.nativeTrack.stop();
+      if (!audioTrack) {
+        throw Error('Select share audio when sharing screen');
+      }
+      tracks.push(audioTrack);
+      audioTrack.nativeTrack.onended = handleEnded;
+    } else {
+      tracks.push(videoTrack);
+      videoTrack.nativeTrack.onended = handleEnded;
+      // audio track is not always available
+      if (audioTrack) {
+        tracks.push(audioTrack);
+      }
+    }
+    return tracks;
   }
 }
