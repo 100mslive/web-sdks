@@ -273,6 +273,7 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.commonSetup(config, roomId, listener);
+    this.listener = listener;
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
 
