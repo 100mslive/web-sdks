@@ -282,26 +282,40 @@ export default class JsonRpcSignal implements ISignal {
     const response = JSON.parse(text);
 
     if (response.id) {
-      /** This is a response to [call] */
-      const typedResponse = response as JsonRpcResponse;
-      const id: string = typedResponse.id;
-      if (this.callbacks.has(id)) {
-        const cb = this.callbacks.get(id)!;
-        this.callbacks.delete(id);
-        if (typedResponse.result) {
-          cb.resolve(typedResponse.result);
-        } else {
-          cb.reject(typedResponse.error);
-        }
-      } else {
-        this.observer.onNotification(typedResponse);
-      }
+      this.handleResponseWithId(response);
     } else if (response.method) {
-      if (response.method === HMSSignalMethod.OFFER) {
+      this.handleResponseWithMethod(response);
+    } else {
+      throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+    }
+  }
+
+  private handleResponseWithId(response: any) {
+    /** This is a response to [call] */
+    const typedResponse = response as JsonRpcResponse;
+    const id: string = typedResponse.id;
+    if (this.callbacks.has(id)) {
+      const cb = this.callbacks.get(id)!;
+      this.callbacks.delete(id);
+      if (typedResponse.result) {
+        cb.resolve(typedResponse.result);
+      } else {
+        cb.reject(typedResponse.error);
+      }
+    } else {
+      this.observer.onNotification(typedResponse);
+    }
+  }
+
+  private handleResponseWithMethod(response: any) {
+    switch (response.method) {
+      case HMSSignalMethod.OFFER:
         this.observer.onOffer(response.params);
-      } else if (response.method === HMSSignalMethod.TRICKLE) {
+        break;
+      case HMSSignalMethod.TRICKLE:
         this.observer.onTrickle(response.params);
-      } else if (response.method === HMSSignalMethod.SERVER_ERROR) {
+        break;
+      case HMSSignalMethod.SERVER_ERROR:
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
@@ -309,11 +323,10 @@ export default class JsonRpcSignal implements ISignal {
             response.params.message,
           ),
         );
-      } else {
+        break;
+      default:
         this.observer.onNotification(response);
-      }
-    } else {
-      throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+        break;
     }
   }
 

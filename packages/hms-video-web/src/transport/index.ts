@@ -273,19 +273,7 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
-    if (this.state === TransportState.Failed) {
-      this.state = TransportState.Disconnected;
-    }
-
-    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
-      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
-    }
-
-    if (this.state === TransportState.Disconnected) {
-      this.state = TransportState.Connecting;
-      this.observer.onStateChange(this.state);
-    }
-
+    this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
       peerId,
@@ -680,8 +668,14 @@ export default class HMSTransport implements ITransport {
       this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', stats =>
         this.trackDegradationController?.handleRtcStatsChange(stats),
       );
-      this.trackDegradationController.on('TRACK_DEGRADED', this.observer.onTrackDegrade);
-      this.trackDegradationController.on('TRACK_RESTORED', this.observer.onTrackRestore);
+      this.trackDegradationController.on('TRACK_DEGRADED', track => {
+        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
+        this.observer.onTrackDegrade(track);
+      });
+      this.trackDegradationController.on('TRACK_RESTORED', track => {
+        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, false)).flush();
+        this.observer.onTrackRestore(track);
+      });
       await this.subscribeConnStatsMonitor.start();
     }
   }
@@ -755,4 +749,19 @@ export default class HMSTransport implements ITransport {
 
     return ok;
   };
+
+  private setTransportStateForJoin() {
+    if (this.state === TransportState.Failed) {
+      this.state = TransportState.Disconnected;
+    }
+
+    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
+      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
+    }
+
+    if (this.state === TransportState.Disconnected) {
+      this.state = TransportState.Connecting;
+      this.observer.onStateChange(this.state);
+    }
+  }
 }

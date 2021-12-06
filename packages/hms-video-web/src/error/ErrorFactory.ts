@@ -24,6 +24,7 @@ export enum HMSAction {
   RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
   VALIDATION = 'VALIDATION',
   PLAYLIST = 'PLAYLIST',
+  PREVIEW = 'PREVIEW',
 }
 
 export const ErrorFactory = {
@@ -358,6 +359,16 @@ export const ErrorFactory = {
         `Invalid role. Join with valid role`,
         description,
         true,
+      );
+    },
+
+    PreviewAlreadyInProgress(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.GenericErrors.PREVIEW_IN_PROGRESS,
+        'PreviewAlreadyInProgress',
+        action,
+        `[Preview]: Cannot join if preview is in progress`,
+        description,
       );
     },
   },

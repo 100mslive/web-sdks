@@ -227,6 +227,19 @@ export class LocalTrackManager {
     return tracks;
   }
 
+  async requestPermissions() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+      // Stop stream
+      stream.getTracks().forEach(track => track.stop());
+    } catch (error) {
+      HMSLogger.e(this.TAG, error);
+    }
+  }
+
   static getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
     const width = prevTrack?.getSettings()?.width || 320;
     const height = prevTrack?.getSettings()?.height || 240;

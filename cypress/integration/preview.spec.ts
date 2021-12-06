@@ -39,8 +39,9 @@ describe('preview api', () => {
 
   it('should update store on success', () => {
     actions.preview({ userName: 'test', authToken: token, initEndpoint }).then(() => {
-      expect(store.getState(selectRoomState)).to.equal('Connecting');
+      expect(store.getState(selectIsInPreview)).to.be.true;
     });
+    expect(store.getState(selectRoomState)).to.equal('Connecting');
     cy.get('@onPreview')
       .should('be.calledOnce')
       .then(() => {

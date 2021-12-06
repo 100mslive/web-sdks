@@ -114,6 +114,8 @@ export const ErrorCodes = {
 
     // Joined with invalid role
     INVALID_ROLE: 6008,
+
+    PREVIEW_IN_PROGRESS: 6009,
   },
 
   PlaylistErrors: {
