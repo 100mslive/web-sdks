@@ -273,19 +273,7 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
-    if (this.state === TransportState.Failed) {
-      this.state = TransportState.Disconnected;
-    }
-
-    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
-      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
-    }
-
-    if (this.state === TransportState.Disconnected) {
-      this.state = TransportState.Connecting;
-      this.observer.onStateChange(this.state);
-    }
-
+    this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
       peerId,
@@ -755,4 +743,19 @@ export default class HMSTransport implements ITransport {
 
     return ok;
   };
+
+  private setTransportStateForJoin() {
+    if (this.state === TransportState.Failed) {
+      this.state = TransportState.Disconnected;
+    }
+
+    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
+      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
+    }
+
+    if (this.state === TransportState.Disconnected) {
+      this.state = TransportState.Connecting;
+      this.observer.onStateChange(this.state);
+    }
+  }
 }
