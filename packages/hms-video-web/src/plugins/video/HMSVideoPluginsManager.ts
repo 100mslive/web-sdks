@@ -149,9 +149,9 @@ export class HMSVideoPluginsManager {
       // add new canvases according to new added plugins
       if (this.plugins.length + 1 > this.canvases.length) {
         for (let i = this.canvases.length; i <= this.plugins.length; i++) {
-                this.canvases[i] = document.createElement('canvas') as CanvasElement;
+          this.canvases[i] = document.createElement('canvas') as CanvasElement;
         }
-   }
+      }
       await this.startPluginsLoop();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
@@ -307,8 +307,8 @@ export class HMSVideoPluginsManager {
    */
   private async processFramesThroughPlugins() {
     this.canvases[0] = this.inputCanvas!;
-    for (let i = 0; i < this.plugins.length; i++ ) {
-      const name =  this.plugins[i];
+    for (let i = 0; i < this.plugins.length; i++) {
+      const name = this.plugins[i];
       const plugin = this.pluginsMap[name];
       if (!plugin) {
         continue;
@@ -317,25 +317,25 @@ export class HMSVideoPluginsManager {
         const skipProcessing = this.checkIfSkipRequired(name);
 
         if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
-          const process = async (input:CanvasElement,output:CanvasElement) => {
+          const process = async (input: CanvasElement, output: CanvasElement) => {
             try {
               await plugin.processVideoFrame(input, output, skipProcessing);
-            }
-            catch (err){
+            } catch (err) {
               HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
             }
-
           };
           if (!skipProcessing) {
-            if(i==this.plugins.length-1) {
-              await this.analytics.processWithTime(name, async() => process(this.canvases[i]!,this.outputCanvas!));
+            if (i == this.plugins.length - 1) {
+              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
+            } else {
+              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
             }
-            else await this.analytics.processWithTime(name, async() => process(this.canvases[i]!,this.canvases[i+1]!));
           } else {
-            if(i==this.plugins.length-1) {
+            if (i == this.plugins.length - 1) {
               await process(this.canvases[i]!, this.outputCanvas!);
+            } else {
+              await process(this.canvases[i]!, this.canvases[i + 1]!);
             }
-            else await process(this.canvases[i]!,this.canvases[i+1]!);
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
           // there is no need to await for this case
