@@ -69,9 +69,9 @@ jobs:
         if: steps.main.outputs.sdk_version == steps.branch.outputs.sdk_version && needs.changes.outputs.sdk == 'true'
         run: |
           cd packages/hms-video-web
-          VERSION=$(npm version prerelease --preid alpha)
-          echo "updating sdk to $VERSION"
-          git commit -am "build(sdk): update version to $VERSION"
+          lerna version prerelease --no-git-tag-version --yes --exact
+          echo "updating sdk and store"
+          git commit -am "build: update versions"
           git push
 
       - name: revert sdk version

@@ -209,51 +209,41 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     if (this.sdkState.isPreviewInProgress) {
-      return;
-    }
-    this.stringifyMetadata(config);
-    this.sdkState.isPreviewInProgress = true;
-    const { roomId, userId, role } = decodeJWT(config.authToken);
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    this.store.setErrorListener(this.errorListener);
-    this.store.setConfig(config);
-    this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    const policy = this.store.getPolicyForRole(role);
-    const localPeer = new HMSLocalPeer({
-      name: config.userName || '',
-      customerUserId: userId,
-      metadata: config.metaData,
-      role: policy,
-    });
-
-    this.store.addPeer(localPeer);
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
-
-    const policyHandler = async () => {
-      this.notificationManager.removeEventListener('policy-change', policyHandler);
-      const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
-      tracks.forEach(track => this.setLocalPeerTrack(track));
-      this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
-      await this.initDeviceManagers();
-      listener.onPreview(this.store.getRoom(), tracks);
-      this.sdkState.isPreviewInProgress = false;
-    };
-
-    this.notificationManager.addEventListener('policy-change', policyHandler);
-
-    try {
-      await this.transport.connect(
-        config.authToken,
-        config.initEndpoint || 'https://prod-init.100ms.live/init',
-        this.localPeer!.peerId,
+      return Promise.reject(
+        ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
       );
-    } catch (ex) {
-      this.errorListener?.onError(ex as HMSException);
-      this.sdkState.isPreviewInProgress = false;
     }
+    this.setUpPreview(config, listener);
+
+    // Request permissions and populate devices before waiting for policy
+    if (config.alwaysRequestPermissions) {
+      this.localTrackManager.requestPermissions().then(async () => {
+        await this.initDeviceManagers();
+      });
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const policyHandler = async () => {
+        this.notificationManager.removeEventListener('policy-change', policyHandler);
+        const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
+        tracks.forEach(track => this.setLocalPeerTrack(track));
+        this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+        await this.initDeviceManagers();
+        listener.onPreview(this.store.getRoom(), tracks);
+        this.sdkState.isPreviewInProgress = false;
+        resolve();
+      };
+
+      this.notificationManager.addEventListener('policy-change', policyHandler);
+
+      this.transport
+        .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
+        .catch(ex => {
+          this.errorListener?.onError(ex as HMSException);
+          this.sdkState.isPreviewInProgress = false;
+          reject(ex as HMSException);
+        });
+    });
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
@@ -819,5 +809,33 @@ export class HMSSdk implements HMSInterface {
         this.listener?.onJoin(this.store.getRoom());
       });
     }
+  }
+
+  /**
+   * Init store and other managers, setup listeners, create local peer, room
+   * @param {HMSConfig} config
+   * @param {HMSPreviewListener} listener
+   */
+  private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.stringifyMetadata(config);
+    this.sdkState.isPreviewInProgress = true;
+    const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.initStoreAndManagers();
+
+    this.store.setErrorListener(this.errorListener);
+    this.store.setConfig(config);
+    this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+    const policy = this.store.getPolicyForRole(role);
+    const localPeer = new HMSLocalPeer({
+      name: config.userName || '',
+      customerUserId: userId,
+      metadata: config.metaData,
+      role: policy,
+    });
+
+    this.store.addPeer(localPeer);
+    HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 }

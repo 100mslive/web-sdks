@@ -1,11 +1,34 @@
 import { RecordingNotification, PeerListNotification } from '../HMSNotifications';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 
 export class RoomUpdateManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
-  onPeerList(notification: PeerListNotification) {
+  handleNotification(method: string, notification: any) {
+    switch (method) {
+      case HMSNotificationMethod.PEER_LIST:
+        this.onPeerList(notification as PeerListNotification);
+        break;
+      case HMSNotificationMethod.RTMP_START:
+        this.onRTMPStart();
+        break;
+      case HMSNotificationMethod.RTMP_STOP:
+        this.onRTMPStop();
+        break;
+      case HMSNotificationMethod.RECORDING_START:
+        this.onRecordingStart(notification as RecordingNotification);
+        break;
+      case HMSNotificationMethod.RECORDING_STOP:
+        this.onRecordingStop(notification as RecordingNotification);
+        break;
+      default:
+        break;
+    }
+  }
+
+  private onPeerList(notification: PeerListNotification) {
     const { recording, streaming } = notification.room;
     const room = this.store.getRoom();
     if (!room.recording) {
@@ -22,19 +45,19 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
-  onRTMPStart() {
+  private onRTMPStart() {
     this.setRTMPStatus(true);
   }
 
-  onRTMPStop() {
+  private onRTMPStop() {
     this.setRTMPStatus(false);
   }
 
-  onRecordingStart(notification: RecordingNotification) {
+  private onRecordingStart(notification: RecordingNotification) {
     this.setRecordingStatus(notification.type, true);
   }
 
-  onRecordingStop(notification: RecordingNotification) {
+  private onRecordingStop(notification: RecordingNotification) {
     this.setRecordingStatus(notification.type, false);
   }
 

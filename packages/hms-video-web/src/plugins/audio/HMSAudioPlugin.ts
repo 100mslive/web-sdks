@@ -8,7 +8,8 @@
 export interface HMSAudioPlugin {
   /**
    * This function will be called by the SDK for audio track which the plugin needs to process.
-
+   * The reason audio context is also part of the interface is that it's recommeneded to reuse on audio context
+   * instead of creating new for every use - https://developer.mozilla.org/en-US/docs/Web/API/AudioContext
    */
   processAudioTrack(ctx: AudioContext, source: AudioNode): Promise<AudioNode>;
 
@@ -46,6 +47,7 @@ export interface HMSAudioPlugin {
 /**
  * Specifies the type of the plugin a transforming plugin will get an output audio node to give the resulting
  * transformation. While an analyzing plugin will only be passed the input node.
+ * For analyse plugins, you can return the source node passed to plugin.processTrack to not modify anything
  */
 export enum HMSAudioPluginType {
   TRANSFORM = 'TRANSFORM',
