@@ -106,8 +106,6 @@ export class PlaylistManager
     const element = this.getElement(type);
     if (element) {
       element.volume = value * 0.01;
-    } else {
-      HMSLogger.w(this.TAG, `No valid element of type ${type} found`);
     }
   }
 
@@ -115,8 +113,6 @@ export class PlaylistManager
     const element = this.getElement(type);
     if (element) {
       return element.volume * 100;
-    } else {
-      HMSLogger.w(this.TAG, `No valid element of type ${type} found`);
     }
     return 0;
   }
