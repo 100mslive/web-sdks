@@ -138,10 +138,10 @@ export default class AnalyticsEventFactory {
       trackId: track.trackId,
     };
 
-    if (!isDegraded) {
+    if (!isDegraded && track.degradedAt instanceof Date) {
       // not degraded => restored
       const restoredAt = new Date();
-      const duration = restoredAt.valueOf() - track.degradedAt!.valueOf();
+      const duration = restoredAt.valueOf() - track.degradedAt.valueOf();
       properties = { ...properties, duration, restoredAt };
     }
 
