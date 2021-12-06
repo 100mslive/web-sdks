@@ -273,25 +273,26 @@ export class PlaylistManager
   }
 
   private async play(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
-    const element = this.getElement(type);
-    if (element && !element.paused && element.src.includes(url)) {
+    const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
+    const element = manager.getElement();
+    if (this.isItemCurrentlyPlaying(url, type)) {
       HMSLogger.w(this.TAG, `The ${type} is currently playing`);
       return;
     }
-    if (element && element.src.includes(url)) {
+    if (element?.src.includes(url)) {
       await element.play();
-    } else {
-      element?.pause();
-      let tracks: MediaStreamTrack[];
-      if (type === HMSPlaylistType.audio) {
-        tracks = await this.audioManager.play(url);
-      } else {
-        tracks = await this.videoManager.play(url);
-      }
-      for (const track of tracks) {
-        await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
-      }
+      return;
     }
+    element?.pause();
+    const tracks: MediaStreamTrack[] = await manager.play(url);
+    for (const track of tracks) {
+      await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
+    }
+  }
+
+  private isItemCurrentlyPlaying(url: string, type: HMSPlaylistType): boolean {
+    const element = this.getElement(type);
+    return !!(element && !element.paused && element.src.includes(url));
   }
 
   private setDuration(type: HMSPlaylistType = HMSPlaylistType.audio) {
