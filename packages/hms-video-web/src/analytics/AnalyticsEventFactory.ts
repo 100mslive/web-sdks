@@ -5,6 +5,7 @@ import { DeviceMap } from '../interfaces';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
+import { HMSRemoteVideoTrack } from '../media/tracks';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -129,9 +130,20 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static degradationStats(properties) {
+  static degradationStats(track: HMSRemoteVideoTrack, isDegraded: boolean) {
     const name = 'video.degradation.stats';
     const level = AnalyticsEventLevel.INFO;
+    let properties: any = {
+      degradedAt: track.degradedAt,
+      trackId: track.trackId,
+    };
+
+    if (!isDegraded) {
+      // not degraded => restored
+      const restoredAt = new Date();
+      const duration = restoredAt.valueOf() - track.degradedAt!.valueOf();
+      properties = { ...properties, duration, restoredAt };
+    }
 
     return new AnalyticsEvent({ name, level, properties });
   }
