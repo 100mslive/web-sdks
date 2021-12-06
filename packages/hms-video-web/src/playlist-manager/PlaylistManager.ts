@@ -278,12 +278,12 @@ export class PlaylistManager
     }
     if (element?.src.includes(url)) {
       await element.play();
-      return;
-    }
-    element?.pause();
-    const tracks: MediaStreamTrack[] = await manager.play(url);
-    for (const track of tracks) {
-      await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
+    } else {
+      element?.pause();
+      const tracks: MediaStreamTrack[] = await manager.play(url);
+      for (const track of tracks) {
+        await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
+      }
     }
   }
 
