@@ -281,17 +281,16 @@ export default class JsonRpcSignal implements ISignal {
     const text: string = event.data;
     const response = JSON.parse(text);
 
-    this.handleResponseWithId(response);
-    this.handleResponseWithMethod(response);
-    if (!response.id && !response.method) {
+    if (response.id) {
+      this.handleResponseWithId(response);
+    } else if (response.method) {
+      this.handleResponseWithMethod(response);
+    } else {
       throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
     }
   }
 
   private handleResponseWithId(response: any) {
-    if (!response.id) {
-      return;
-    }
     /** This is a response to [call] */
     const typedResponse = response as JsonRpcResponse;
     const id: string = typedResponse.id;
@@ -309,9 +308,6 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private handleResponseWithMethod(response: any) {
-    if (!response.method) {
-      return;
-    }
     switch (response.method) {
       case HMSSignalMethod.OFFER:
         this.observer.onOffer(response.params);

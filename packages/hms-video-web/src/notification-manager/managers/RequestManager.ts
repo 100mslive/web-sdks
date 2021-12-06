@@ -132,6 +132,7 @@ export class RequestManager {
     if (source) {
       tracks = tracks.filter(track => track.source === source);
     }
+    // filter out tracks which are already in the desired state
     return tracks.filter(track => track.enabled !== enabled);
   }
 }
