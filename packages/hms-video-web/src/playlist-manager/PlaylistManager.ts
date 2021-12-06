@@ -214,6 +214,7 @@ export class PlaylistManager
 
   async stop(type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
     const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
+    manager.getElement()?.pause(); //pause local video/audio and remove tracks in next step
     await this.removeTracks(type);
     manager.stop();
     this.state[type].currentIndex = -1;
