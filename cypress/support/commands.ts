@@ -1,4 +1,8 @@
 /// <reference types="cypress" />
+
+import { SinonSpy, SinonSpyCall } from 'cypress/types/sinon';
+import type { HMSLocalPeer } from '../../packages/hms-video-store/src/core/hmsSDKStore/sdkTypes';
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -39,4 +43,20 @@ Cypress.Commands.add('getToken', () => {
       return response.body.token;
     })
     .should('exist');
+});
+
+Cypress.Commands.add('localTracksAdded', (localPeer: HMSLocalPeer) => {
+  return cy
+    .get('@onJoin')
+    .then(() => cy.get('@onTrackUpdate'))
+    .should(value => {
+      const spy = value as unknown as SinonSpy;
+      let count = 0;
+      spy.getCalls().forEach((call: SinonSpyCall) => {
+        if (expect(call.lastArg).to.equal(localPeer)) {
+          count++;
+        }
+      });
+      expect(count).to.equal(2);
+    });
 });
