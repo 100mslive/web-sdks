@@ -1,6 +1,6 @@
-import { HMSReactiveStore, selectIsConnectedToRoom, selectTracksMap } from '../../src';
-import { HMSSDKActions } from '../../src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../src/core/IHMSStore';
+import { HMSReactiveStore, selectIsConnectedToRoom, selectTracksMap } from '../../packages/hms-video-store/src';
+import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
+import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 
 let HMSStore;
 let actions: HMSSDKActions;
@@ -30,7 +30,8 @@ describe('join api', () => {
     try {
       actions.join({ userName: 'test', authToken: '', initEndpoint });
     } catch (error) {
-      expect(error.message).to.equal('Token is not in proper JWT format');
+      console.log(error.message);
+      expect(error.message).to.include('Token is not in proper JWT format');
     }
   });
 

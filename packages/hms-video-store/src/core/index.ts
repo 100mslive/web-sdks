@@ -5,7 +5,7 @@ export type { HMSNotificationCallback } from './IHMSNotifications';
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';
-export type { HMSLogLevel, RTMPRecordingConfig, HMSRecording, HMSRTMP } from './hmsSDKStore/sdkTypes';
+export { HMSLogLevel, HMSAudioPluginType, HMSVideoPluginType } from './hmsSDKStore/sdkTypes';
 
 export type {
   HMSConfig,
@@ -14,4 +14,7 @@ export type {
   HMSSimulcastLayer,
   SimulcastLayerDefinition,
   DeviceMap,
+  RTMPRecordingConfig,
+  HMSRecording,
+  HMSRTMP,
 } from './hmsSDKStore/sdkTypes';

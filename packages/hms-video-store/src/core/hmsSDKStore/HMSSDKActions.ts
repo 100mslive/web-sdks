@@ -155,10 +155,10 @@ export class HMSSDKActions implements IHMSActions {
     }
 
     try {
-      await this.sdkPreviewWithListeners(config);
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      }, 'preview');
+      }, 'connecting');
+      await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
@@ -439,18 +439,13 @@ export class HMSSDKActions implements IHMSActions {
 
   async changeName(name: string) {
     await this.sdk.changeName(name);
-    this.setState(store => {
-      const localPeer = selectLocalPeer(store);
-      localPeer.name = name;
-    }, 'peerNameUpdated');
   }
 
-  async changeMetadata(metadata: string) {
+  async changeMetadata(metadata: string | any) {
+    if (typeof metadata !== 'string') {
+      metadata = JSON.stringify(metadata);
+    }
     await this.sdk.changeMetadata(metadata);
-    this.setState(store => {
-      const localPeer = selectLocalPeer(store);
-      localPeer.metadata = metadata;
-    }, 'peerMetadataUpdated');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {

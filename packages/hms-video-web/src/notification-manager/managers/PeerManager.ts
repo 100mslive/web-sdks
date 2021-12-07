@@ -1,4 +1,5 @@
-import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
@@ -20,6 +21,27 @@ export class PeerManager {
 
   private get TAG() {
     return `[${this.constructor.name}]`;
+  }
+
+  handleNotification(method: string, notification: any) {
+    switch (method) {
+      case HMSNotificationMethod.PEER_JOIN: {
+        const peer = notification as PeerNotification;
+        this.handlePeerJoin(peer);
+        break;
+      }
+
+      case HMSNotificationMethod.PEER_LEAVE: {
+        const peer = notification as PeerNotification;
+        this.handlePeerLeave(peer);
+        break;
+      }
+      case HMSNotificationMethod.PEER_UPDATE:
+        this.handlePeerUpdate(notification as PeerNotification);
+        break;
+      default:
+        break;
+    }
   }
 
   handlePeerList = (peers: PeerNotification[]) => {
@@ -77,15 +99,19 @@ export class PeerManager {
       peer.updateRole(newRole);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
+    this.handlePeerInfoUpdate({ peer, ...notification.info });
+  }
 
-    const info = notification.info;
-    if (info.name && peer.name !== info.name) {
-      peer.updateName(info.name);
+  handlePeerInfoUpdate({ peer, name, data }: { peer?: HMSPeer; name?: string; data?: string }) {
+    if (!peer) {
+      return;
+    }
+    if (name && peer.name !== name) {
+      peer.updateName(name);
       this.listener?.onPeerUpdate(HMSPeerUpdate.NAME_UPDATED, peer);
     }
-
-    if (info.data && peer.metadata !== info.data) {
-      peer.updateMetadata(info.data);
+    if (data && peer.metadata !== data) {
+      peer.updateMetadata(data);
       this.listener?.onPeerUpdate(HMSPeerUpdate.METADATA_UPDATED, peer);
     }
   }

@@ -14,6 +14,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
+          build: yarn build
         env:
           CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}
           CYPRESS_ROOM_ID: ${{ secrets.ROOM_ID }}

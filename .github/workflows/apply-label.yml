@@ -24,12 +24,16 @@ jobs:
               - 'packages/hms-video-web/**/*.(test|spec).ts'
             store-test: 
               - 'packages/hms-video-store/**/*.(test|spec).ts'
+            cypress:
+              - 'cypress/**'
             sdk-build: 
               - 'packages/hms-video-web/scripts/**'
             store-build: 
               - 'packages/hms-video-store/scripts/**'
             ci:
               - '.github/**'
+            documentation:
+              - '*.(md|mdx)'
 
       - name: Apply or remove label
         uses: actions/github-script@v5

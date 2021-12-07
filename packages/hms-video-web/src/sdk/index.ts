@@ -6,6 +6,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSVideoCodec,
+  PublishParams,
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
@@ -209,51 +210,41 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     if (this.sdkState.isPreviewInProgress) {
-      return;
-    }
-    this.stringifyMetadata(config);
-    this.sdkState.isPreviewInProgress = true;
-    const { roomId, userId, role } = decodeJWT(config.authToken);
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    this.store.setErrorListener(this.errorListener);
-    this.store.setConfig(config);
-    this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    const policy = this.store.getPolicyForRole(role);
-    const localPeer = new HMSLocalPeer({
-      name: config.userName || '',
-      customerUserId: userId,
-      metadata: config.metaData,
-      role: policy,
-    });
-
-    this.store.addPeer(localPeer);
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
-
-    const policyHandler = async () => {
-      this.notificationManager.removeEventListener('policy-change', policyHandler);
-      const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
-      tracks.forEach(track => this.setLocalPeerTrack(track));
-      this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
-      await this.initDeviceManagers();
-      listener.onPreview(this.store.getRoom(), tracks);
-      this.sdkState.isPreviewInProgress = false;
-    };
-
-    this.notificationManager.addEventListener('policy-change', policyHandler);
-
-    try {
-      await this.transport.connect(
-        config.authToken,
-        config.initEndpoint || 'https://prod-init.100ms.live/init',
-        this.localPeer!.peerId,
+      return Promise.reject(
+        ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
       );
-    } catch (ex) {
-      this.errorListener?.onError(ex as HMSException);
-      this.sdkState.isPreviewInProgress = false;
     }
+    this.setUpPreview(config, listener);
+
+    // Request permissions and populate devices before waiting for policy
+    if (config.alwaysRequestPermissions) {
+      this.localTrackManager.requestPermissions().then(async () => {
+        await this.initDeviceManagers();
+      });
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const policyHandler = async () => {
+        this.notificationManager.removeEventListener('policy-change', policyHandler);
+        const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
+        tracks.forEach(track => this.setLocalPeerTrack(track));
+        this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+        await this.initDeviceManagers();
+        listener.onPreview(this.store.getRoom(), tracks);
+        this.sdkState.isPreviewInProgress = false;
+        resolve();
+      };
+
+      this.notificationManager.addEventListener('policy-change', policyHandler);
+
+      this.transport
+        .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
+        .catch(ex => {
+          this.errorListener?.onError(ex as HMSException);
+          this.sdkState.isPreviewInProgress = false;
+          reject(ex as HMSException);
+        });
+    });
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
@@ -280,38 +271,18 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
-    this.stringifyMetadata(config);
+    const { roomId, userId, role } = decodeJWT(config.authToken);
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    const storedConfig = this.store.getConfig();
-
-    if (storedConfig && config.settings) {
-      // preview was called
-      delete config.settings.audioOutputDeviceId;
-      delete config.settings.videoDeviceId;
-      delete config.settings.audioInputDeviceId;
-    }
-
-    this.store.setErrorListener(this.errorListener);
+    this.commonSetup(config, roomId, listener);
+    this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
-    const { roomId, userId, role } = decodeJWT(config.authToken);
 
     if (!this.localPeer) {
       this.notificationManager.addEventListener('role-change', (e: any) => {
         this.store.setPublishParams(e.detail.params.role.publishParams);
       });
-
-      const localPeer = new HMSLocalPeer({
-        name: config.userName,
-        customerUserId: userId,
-        metadata: config.metaData || '',
-        role: this.store.getPolicyForRole(role),
-      });
-      this.store.addPeer(localPeer);
+      this.createAndAddLocalPeerToStore(config, role, userId);
     } else {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
@@ -334,10 +305,6 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
-    if (!this.store.getRoom()) {
-      // note: store room is used to handle server notifications in join and has to be done before join process starts
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
-    }
     HMSLogger.time(`join-room-${roomId}`);
     this.transport
       .join(
@@ -479,7 +446,7 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    const { screen, allowed } = publishParams;
+    const { allowed } = publishParams;
     const canPublishScreen = allowed && allowed.includes('screen');
 
     if (!canPublishScreen) {
@@ -491,40 +458,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const dimensions = this.store.getSimulcastDimensions('screen');
-    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
-      new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build(),
-      new HMSAudioTrackSettingsBuilder().build(),
-    );
-
-    const handleEnded = () => {
-      this.stopEndedScreenshare(onStop);
-    };
-
-    const tracks = [];
-    if (audioOnly) {
-      videoTrack.nativeTrack.stop();
-      if (!audioTrack) {
-        throw Error('Select share audio when sharing screen');
-      }
-      tracks.push(audioTrack);
-      audioTrack.nativeTrack.onended = handleEnded;
-    } else {
-      tracks.push(videoTrack);
-      videoTrack.nativeTrack.onended = handleEnded;
-      // audio track is not always available
-      if (audioTrack) {
-        tracks.push(audioTrack);
-      }
-    }
+    const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
@@ -568,22 +502,11 @@ export class HMSSdk implements HMSInterface {
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
     const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
-    if (source === 'videoplaylist') {
-      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
-      if (type === 'audio') {
-        settings.maxBitrate = 64;
-      } else {
-        settings.maxBitrate = 1000;
-        const { width, height } = track.getSettings();
-        settings.width = width;
-        settings.height = height;
-      }
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings(settings);
-    } else if (source === 'audioplaylist') {
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings({ maxBitrate: 64 });
-    }
+    this.setPlaylistSettings({
+      track,
+      hmsTrack,
+      source,
+    });
 
     await this.transport?.publish([hmsTrack]);
     hmsTrack.peerId = this.localPeer?.peerId;
@@ -692,13 +615,13 @@ export class HMSSdk implements HMSInterface {
   async changeName(name: string) {
     this.validateJoined('changeName');
     await this.transport?.changeName(name);
-    this.localPeer?.updateName(name);
+    this.notificationManager.updateLocalPeer({ name });
   }
 
   async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
-    this.localPeer?.updateMetadata(metadata);
+    this.notificationManager.updateLocalPeer({ metadata });
   }
 
   getRoles(): HMSRole[] {
@@ -819,5 +742,144 @@ export class HMSSdk implements HMSInterface {
         this.listener?.onJoin(this.store.getRoom());
       });
     }
+  }
+
+  /**
+   * Init store and other managers, setup listeners, create local peer, room
+   * @param {HMSConfig} config
+   * @param {HMSPreviewListener} listener
+   */
+  private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.sdkState.isPreviewInProgress = true;
+    const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.commonSetup(config, roomId, listener);
+    this.store.setConfig(config);
+    this.createAndAddLocalPeerToStore(config, role, userId);
+    HMSLogger.d(this.TAG, 'SDK Store', this.store);
+  }
+
+  /**
+   * Set bitrate and dimensions for playlist track
+   */
+  private async setPlaylistSettings({
+    track,
+    hmsTrack,
+    source,
+  }: {
+    track: MediaStreamTrack;
+    hmsTrack: HMSLocalAudioTrack | HMSLocalVideoTrack;
+    source: string;
+  }) {
+    if (source === 'videoplaylist') {
+      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
+      if (track.kind === 'audio') {
+        settings.maxBitrate = 64;
+      } else {
+        settings.maxBitrate = 1000;
+        const { width, height } = track.getSettings();
+        settings.width = width;
+        settings.height = height;
+      }
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings(settings);
+    } else if (source === 'audioplaylist') {
+      // TODO: rt update from policy once policy is updated
+      await hmsTrack.setSettings({ maxBitrate: 64 });
+    }
+  }
+
+  /**
+   * @param {HMSConfig} config
+   * @param {string} role
+   * @param {string} userId
+   */
+  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string) {
+    const policy = this.store.getPolicyForRole(role);
+    const localPeer = new HMSLocalPeer({
+      name: config.userName || '',
+      customerUserId: userId,
+      metadata: config.metaData || '',
+      role: policy,
+    });
+
+    this.store.addPeer(localPeer);
+  }
+
+  /**
+   * init managers and set listeners - common for join and preview
+   * @param {HMSConfig} config
+   * @param {string} roomId
+   * @param {HMSPreviewListener | HMSUpdateListener} listener
+   */
+  private commonSetup(config: HMSConfig, roomId: string, listener: HMSPreviewListener | HMSUpdateListener) {
+    this.stringifyMetadata(config);
+    this.errorListener = listener;
+    this.deviceChangeListener = listener;
+    this.initStoreAndManagers();
+
+    this.store.setErrorListener(this.errorListener);
+    if (!this.store.getRoom()) {
+      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+    }
+  }
+
+  /**
+   * Remove deviceId's passed in config for join if preview was already called
+   * @param {HMSConfig} config
+   */
+  private removeDevicesFromConfig(config: HMSConfig) {
+    const storedConfig = this.store.getConfig();
+    if (storedConfig && config.settings) {
+      // preview was called
+      delete config.settings.audioOutputDeviceId;
+      delete config.settings.videoDeviceId;
+      delete config.settings.audioInputDeviceId;
+    }
+  }
+
+  /**
+   * Get screenshare based on policy and audioOnly flag
+   * @param {PublishParams} publishParams
+   * @param {function} onStop
+   * @param {boolean} audioOnly
+   * @returns
+   */
+  private async getScreenshareTracks(publishParams: PublishParams, onStop: () => void, audioOnly: boolean) {
+    const { screen } = publishParams;
+    const dimensions = this.store.getSimulcastDimensions('screen');
+    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
+      new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build(),
+      new HMSAudioTrackSettingsBuilder().build(),
+    );
+
+    const handleEnded = () => {
+      this.stopEndedScreenshare(onStop);
+    };
+
+    const tracks = [];
+    if (audioOnly) {
+      videoTrack.nativeTrack.stop();
+      if (!audioTrack) {
+        throw Error('Select share audio when sharing screen');
+      }
+      tracks.push(audioTrack);
+      audioTrack.nativeTrack.onended = handleEnded;
+    } else {
+      tracks.push(videoTrack);
+      videoTrack.nativeTrack.onended = handleEnded;
+      // audio track is not always available
+      if (audioTrack) {
+        tracks.push(audioTrack);
+      }
+    }
+    return tracks;
   }
 }
