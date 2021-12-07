@@ -18,7 +18,7 @@ type byIDSelector<T> = (store: HMSStore, id?: string) => T;
  * and returns a part of the store that is queried using the selector.
  * @typeParam T Part of the store that you wish to query.
  */
-type StoreSelector<T> = (store: HMSStore) => T;
+export type StoreSelector<T> = (store: HMSStore) => T;
 
 /**
  * takes in a normal selector which has store and id as input and curries it to make it easier to use.

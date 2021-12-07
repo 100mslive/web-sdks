@@ -75,7 +75,7 @@ export interface IHMSPlaylistActions {
   setVolume(volume: number): void;
   /**
    * pass list to set playlist
-   * @param {HMSPlaylistItem[]} - list of playlist items
+   * @param {HMSPlaylistItem[]} list of playlist items
    */
   setList<T>(list: HMSPlaylistItem<T>[]): void;
   /**
@@ -95,10 +95,16 @@ export interface IHMSPlaylistActions {
   setPlaybackRate(playbackRate: number): void;
 }
 
+/**
+ * Helpful selectors for audio and video playlist
+ */
 export interface HMSPlaylistSelector {
+  /**
+   * returns the playlist items list as set initially
+   */
   list: <T>(store: HMSStore) => HMSPlaylistItem<T>[];
   /**
-   * This returns playlist selection with id, hasNext, hasPrev
+   * This returns playlist selection with {id, hasNext, hasPrev}
    * @returns {HMSPlaylistSelection}
    */
   selection: (store: HMSStore) => HMSPlaylistSelection;
@@ -107,8 +113,20 @@ export interface HMSPlaylistSelector {
    * @returns {HMSPlaylistItem}
    */
   selectedItem: <T>(store: HMSStore) => HMSPlaylistItem<T>;
+  /**
+   * returns the current progress percentage, a number between 0-100
+   */
   progress: (store: HMSStore) => number;
+  /**
+   * returns the current volume the playlist is playing at, a number between 0-100
+   */
   volume: (store: HMSStore) => number;
+  /**
+   * returns the current time of the playlist in seconds
+   */
   currentTime: (store: HMSStore) => number;
+  /**
+   * returns the playback rate, a number between 0.25-2.0.
+   */
   playbackRate: (store: HMSStore) => number;
 }
