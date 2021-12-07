@@ -18,7 +18,7 @@ export interface HMSConfig {
   authToken: string;
   /**
    * optional metadata which can be attached with a peer. This can also be changed mid call.
-   * @link https://docs.100ms.live/javascript/v2/features/peer-metadata
+   * @link https://docs.100ms.live/javascript/v2/advanced-features/peer-metadata
    */
   metaData?: string;
   /**
