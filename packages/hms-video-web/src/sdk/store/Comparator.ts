@@ -57,8 +57,10 @@ export class Comparator implements IComparator {
 
       audioLevel: (peerA?: HMSPeer, peerB?: HMSPeer) =>
         this.primitiveComparator<number>(
-          this.store.getSpeakers().find(speaker => speaker.peer.peerId === peerA?.peerId)?.audioLevel || -1,
-          this.store.getSpeakers().find(speaker => speaker.peer.peerId === peerB?.peerId)?.audioLevel || -1,
+          this.store.getSpeakers().find(speaker => speaker.peer && speaker.peer.peerId === peerA?.peerId)?.audioLevel ||
+            -1,
+          this.store.getSpeakers().find(speaker => speaker.peer && speaker.peer.peerId === peerB?.peerId)?.audioLevel ||
+            -1,
         ),
 
       rolePriority: (peerA: HMSPeer, peerB: HMSPeer) =>
