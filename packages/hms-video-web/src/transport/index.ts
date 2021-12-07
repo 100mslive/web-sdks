@@ -743,7 +743,6 @@ export default class HMSTransport implements ITransport {
     }
 
     ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
-    await this.performPublishRenegotiation();
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 
