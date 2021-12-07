@@ -4,11 +4,20 @@ export enum HMSPlaylistType {
 }
 
 export interface HMSPlaylistItem<T> {
-  name: string;
-  metadata?: T;
+  /**
+   * uniquely identifies a playlist item
+   */
   id: string;
-  url: string;
+  name: string;
   type: HMSPlaylistType;
+  /**
+   * the url to play from, local files are not supported currently.
+   */
+  url: string;
+  /**
+   * any additional info, for eg. composer, musician etc.
+   */
+  metadata?: T;
   /**
    * duration in seconds
    */
@@ -79,6 +88,7 @@ export interface HMSPlaylistManager {
   onCurrentTrackEnded<T>(fn: (item: HMSPlaylistItem<T>) => void): void;
   /**
    * Function to autoplay status i.e. whether next item in playlist after the current one ends
+   * @param {HMSPlaylistType} type
    * @param {boolean} autoplay
    */
   setIsAutoplayOn(type: HMSPlaylistType, autoplay: boolean): void;
