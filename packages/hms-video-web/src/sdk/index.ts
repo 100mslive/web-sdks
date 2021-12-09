@@ -580,7 +580,7 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.startRTMPOrRecording(params);
-    if (window.HMS?.NEW_BEAM_STATE) {
+    if (!window.HMS?.NEW_BEAM_STATE) {
       // emit this notification to update current peer recording status
       const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
       const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
@@ -601,7 +601,7 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.stopRTMPOrRecording();
-    if (window.HMS?.NEW_BEAM_STATE) {
+    if (!window.HMS?.NEW_BEAM_STATE) {
       // emit this notification to update current peer recording status
       const { recording, rtmp } = this.store.getRoom();
       if (recording?.browser.running) {
