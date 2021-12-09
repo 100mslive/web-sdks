@@ -44,7 +44,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.settings = settings;
     // Replace the 'default' deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default') {
+    if (settings.deviceId === 'default' && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSAudioPluginsManager(this);
