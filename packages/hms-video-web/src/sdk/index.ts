@@ -573,26 +573,46 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start streaming or recording',
+      );
+    }
+    await this.transport?.startRTMPOrRecording(params);
     if (window.HMS?.NEW_BEAM_STATE) {
-      if (!this.localPeer) {
-        throw ErrorFactory.GenericErrors.NotConnected(
-          HMSAction.VALIDATION,
-          'No local peer present, cannot start streaming or recording',
-        );
+      // emit this notification to update current peer recording status
+      const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
+      const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
+      if (params.rtmpURLs?.length) {
+        this.notificationManager.handleNotification(rtmpStart);
       }
-      await this.transport?.startRTMPOrRecording(params);
+      if (params.record) {
+        this.notificationManager.handleNotification(recordingStart);
+      }
     }
   }
 
   async stopRTMPAndRecording() {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop streaming or recording',
+      );
+    }
+    await this.transport?.stopRTMPOrRecording();
     if (window.HMS?.NEW_BEAM_STATE) {
-      if (!this.localPeer) {
-        throw ErrorFactory.GenericErrors.NotConnected(
-          HMSAction.VALIDATION,
-          'No local peer present, cannot stop streaming or recording',
-        );
+      // emit this notification to update current peer recording status
+      const { recording, rtmp } = this.store.getRoom();
+      if (recording?.browser.running) {
+        this.notificationManager.handleNotification({
+          method: HMSNotificationMethod.RECORDING_STOP,
+          params: { type: 'Browser' },
+        });
       }
-      await this.transport?.stopRTMPOrRecording();
+      if (rtmp?.running) {
+        this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+      }
     }
   }
 
