@@ -12,7 +12,7 @@
   },
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
-    "start": "concurrently 'yarn dev' 'yarn types'",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
