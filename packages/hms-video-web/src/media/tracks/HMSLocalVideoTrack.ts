@@ -44,6 +44,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.settings = settings;
+    // Replace the 'default' deviceId with the actual deviceId
+    // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
+    if (settings.deviceId === 'default') {
+      this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
+    }
     this.pluginsManager = new HMSVideoPluginsManager(this);
     this.publishedTrackId = this.trackId;
     this.setFirstTrackId(this.trackId);
@@ -84,8 +89,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @param settings
    */
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
-    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
+    const newSettings = this.buildNewSettings(settings);
 
     if (!this.enabled) {
       // if track is muted, we just cache the settings for when it is unmuted
@@ -224,4 +228,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
     this.nativeTrack = newTrack;
   }
+
+  private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
+    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
+    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
+    return newSettings;
+  };
 }
