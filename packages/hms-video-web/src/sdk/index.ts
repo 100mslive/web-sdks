@@ -573,23 +573,27 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
-    if (!this.localPeer) {
-      throw ErrorFactory.GenericErrors.NotConnected(
-        HMSAction.VALIDATION,
-        'No local peer present, cannot start streaming or recording',
-      );
+    if (window.HMS?.NEW_BEAM_STATE) {
+      if (!this.localPeer) {
+        throw ErrorFactory.GenericErrors.NotConnected(
+          HMSAction.VALIDATION,
+          'No local peer present, cannot start streaming or recording',
+        );
+      }
+      await this.transport?.startRTMPOrRecording(params);
     }
-    await this.transport?.startRTMPOrRecording(params);
   }
 
   async stopRTMPAndRecording() {
-    if (!this.localPeer) {
-      throw ErrorFactory.GenericErrors.NotConnected(
-        HMSAction.VALIDATION,
-        'No local peer present, cannot stop streaming or recording',
-      );
+    if (window.HMS?.NEW_BEAM_STATE) {
+      if (!this.localPeer) {
+        throw ErrorFactory.GenericErrors.NotConnected(
+          HMSAction.VALIDATION,
+          'No local peer present, cannot stop streaming or recording',
+        );
+      }
+      await this.transport?.stopRTMPOrRecording();
     }
-    await this.transport?.stopRTMPOrRecording();
   }
 
   async changeName(name: string) {
