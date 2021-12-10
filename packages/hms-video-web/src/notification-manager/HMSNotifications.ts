@@ -162,3 +162,8 @@ export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   peer: PeerNotificationInfo;
 }
+
+export interface HLSNotification {
+  url?: string;
+  peer: PeerNotificationInfo;
+}

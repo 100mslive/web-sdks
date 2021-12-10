@@ -14,6 +14,7 @@ export interface HMSRoom {
   hasWaitingRoom: boolean;
   recording?: HMSRecording;
   rtmp?: HMSRTMP;
+  hls?: HMSHLS;
 }
 
 export interface HMSRecording {
@@ -27,4 +28,9 @@ export interface HMSRecording {
 
 export interface HMSRTMP {
   running: boolean;
+}
+
+export interface HMSHLS {
+  running: boolean;
+  url: string;
 }

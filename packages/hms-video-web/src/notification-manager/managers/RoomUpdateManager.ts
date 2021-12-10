@@ -1,4 +1,4 @@
-import { RecordingNotification, PeerListNotification } from '../HMSNotifications';
+import { RecordingNotification, PeerListNotification, HLSNotification } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
 import { IStore } from '../../sdk/store';
@@ -6,7 +6,7 @@ import { IStore } from '../../sdk/store';
 export class RoomUpdateManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
-  handleNotification(method: string, notification: any) {
+  handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
         this.onPeerList(notification as PeerListNotification);
@@ -24,6 +24,7 @@ export class RoomUpdateManager {
         this.onRecordingStop(notification as RecordingNotification);
         break;
       default:
+        this.onHLS(method, notification as HLSNotification);
         break;
     }
   }
@@ -59,6 +60,27 @@ export class RoomUpdateManager {
 
   private onRecordingStop(notification: RecordingNotification) {
     this.setRecordingStatus(notification.type, false);
+  }
+
+  private onHLS(method: string, notification: HLSNotification) {
+    if (![HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(method as HMSNotificationMethod)) {
+      return;
+    }
+    const room = this.store.getRoom();
+    if (!room.hls) {
+      room.hls = {
+        running: false,
+        url: '',
+      };
+    }
+    if (method === HMSNotificationMethod.HLS_START) {
+      room.hls.running = true;
+      room.hls.url = notification.url!;
+    } else {
+      room.hls.running = false;
+      room.hls.url = '';
+    }
+    this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
   private setRecordingStatus(type: 'sfu' | 'Browser', running: boolean) {

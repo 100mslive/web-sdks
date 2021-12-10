@@ -17,7 +17,7 @@ import {
   HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
+import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -283,7 +283,7 @@ export interface IHMSActions {
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * @alpha
    */
-  startHLSStreaming(params: RTMPRecordingConfig): Promise<void>;
+  startHLSStreaming(params: HLSConfig): Promise<void>;
 
   /**
    * If you want to stop HLS streaming.

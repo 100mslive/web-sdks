@@ -136,6 +136,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.rtmp;
   }
 
+  getHLSState() {
+    return this.store.getRoom()?.hls;
+  }
+
   private handleAutoplayError = (event: AutoplayEvent) => {
     this.errorListener?.onError?.(event.error);
   };

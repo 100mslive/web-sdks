@@ -644,6 +644,7 @@ export class HMSSDKActions implements IHMSActions {
 
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
+    const hls = this.sdk.getHLSState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -659,7 +660,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp, hls));
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
