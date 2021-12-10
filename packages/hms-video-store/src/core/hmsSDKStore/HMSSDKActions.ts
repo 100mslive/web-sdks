@@ -437,6 +437,14 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
+  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+    await this.sdk.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming(): Promise<void> {
+    await this.sdk.stopHLSStreaming();
+  }
+
   async changeName(name: string) {
     await this.sdk.changeName(name);
   }

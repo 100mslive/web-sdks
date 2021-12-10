@@ -1,3 +1,4 @@
+import { HLSConfig } from '~interfaces/hls-config';
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
@@ -53,6 +54,10 @@ export interface ISignal extends IAnalyticsTransportProvider {
   startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams): Promise<void>;
 
   stopRTMPAndRecording(): Promise<void>;
+
+  startHLSStreaming(params: HLSConfig): Promise<void>;
+
+  stopHLSStreaming(): Promise<void>;
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
 

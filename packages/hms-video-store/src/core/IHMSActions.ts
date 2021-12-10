@@ -278,6 +278,20 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
+   * If you want to start HLS streaming.
+   * @param params.meetingURL This is the meeting url which is opened in a headless chrome instance for streaming and recording.
+   * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
+   * @alpha
+   */
+  startHLSStreaming(params: RTMPRecordingConfig): Promise<void>;
+
+  /**
+   * If you want to stop HLS streaming.
+   * @alpha
+   */
+  stopHLSStreaming(): Promise<void>;
+
+  /**
    * If you want to update the name of peer.
    * @beta
    */
