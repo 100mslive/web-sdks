@@ -621,7 +621,7 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
-        'No local peer present, cannot start streaming',
+        'No local peer present, cannot start HLS streaming',
       );
     }
     await this.transport?.startHLSStreaming(params);
@@ -631,7 +631,7 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
-        'No local peer present, cannot stop streaming',
+        'No local peer present, cannot stop HLS streaming',
       );
     }
     await this.transport?.stopHLSStreaming();
