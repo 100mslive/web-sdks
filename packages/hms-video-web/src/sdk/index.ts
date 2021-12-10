@@ -580,14 +580,16 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.startRTMPOrRecording(params);
-    // emit this notification to update current peer recording status
-    const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
-    const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
-    if (params.rtmpURLs?.length) {
-      this.notificationManager.handleNotification(rtmpStart);
-    }
-    if (params.record) {
-      this.notificationManager.handleNotification(recordingStart);
+    if (!window.HMS?.NEW_BEAM_STATE) {
+      // emit this notification to update current peer recording status
+      const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
+      const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
+      if (params.rtmpURLs?.length) {
+        this.notificationManager.handleNotification(rtmpStart);
+      }
+      if (params.record) {
+        this.notificationManager.handleNotification(recordingStart);
+      }
     }
   }
 
@@ -599,16 +601,18 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.stopRTMPOrRecording();
-    // emit this notification to update current peer recording status
-    const { recording, rtmp } = this.store.getRoom();
-    if (recording?.browser.running) {
-      this.notificationManager.handleNotification({
-        method: HMSNotificationMethod.RECORDING_STOP,
-        params: { type: 'Browser' },
-      });
-    }
-    if (rtmp?.running) {
-      this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+    if (!window.HMS?.NEW_BEAM_STATE) {
+      // emit this notification to update current peer recording status
+      const { recording, rtmp } = this.store.getRoom();
+      if (recording?.browser.running) {
+        this.notificationManager.handleNotification({
+          method: HMSNotificationMethod.RECORDING_STOP,
+          params: { type: 'Browser' },
+        });
+      }
+      if (rtmp?.running) {
+        this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+      }
     }
   }
 
