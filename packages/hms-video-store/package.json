@@ -34,11 +34,7 @@
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
-<<<<<<< HEAD
-    "@100mslive/hms-video": "0.1.35-alpha.17",
-=======
     "@100mslive/hms-video": "0.1.38-alpha.0",
->>>>>>> e0a2b01d03a92b67121342a2d3b8c757e7187fa3
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
