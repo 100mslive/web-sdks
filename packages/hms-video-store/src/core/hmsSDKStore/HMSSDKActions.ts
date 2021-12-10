@@ -299,7 +299,7 @@ export class HMSSDKActions implements IHMSActions {
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
     const hmsPeer = this.hmsSDKPeers[peerID];
-    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer);
+    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
 
