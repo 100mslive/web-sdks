@@ -110,6 +110,8 @@ export class SDKToHMS {
       },
       rtmp: { running: !!sdkRoom.rtmp?.running },
       hls: { running: !!sdkRoom.hls?.running, url: sdkRoom.hls?.url || '' },
+      sessionId: sdkRoom.sessionId,
+      startedAt: sdkRoom.startedAt,
     };
   }
 

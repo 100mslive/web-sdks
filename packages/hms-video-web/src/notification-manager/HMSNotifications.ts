@@ -76,6 +76,8 @@ export interface PeerListNotification {
   };
   room: {
     name: string;
+    session_id: string;
+    started_at: number;
     recording: {
       sfu: {
         enabled: boolean;
@@ -86,6 +88,8 @@ export interface PeerListNotification {
     };
     streaming: {
       enabled: boolean;
+      rtmp: { enabled: boolean; started_at?: number };
+      hls: { enabled: boolean; url: string; started_at?: number };
     };
   };
 }
@@ -163,7 +167,13 @@ export interface RecordingNotification {
   peer: PeerNotificationInfo;
 }
 
+export interface RTMPNotification {
+  peer: PeerNotificationInfo;
+  started_at?: number;
+}
+
 export interface HLSNotification {
   url?: string;
   peer: PeerNotificationInfo;
+  started_at?: number;
 }

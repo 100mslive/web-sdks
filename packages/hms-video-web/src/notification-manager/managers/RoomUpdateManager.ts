@@ -1,4 +1,4 @@
-import { RecordingNotification, PeerListNotification, HLSNotification } from '../HMSNotifications';
+import { RecordingNotification, PeerListNotification, HLSNotification, RTMPNotification } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
 import { IStore } from '../../sdk/store';
@@ -12,7 +12,7 @@ export class RoomUpdateManager {
         this.onPeerList(notification as PeerListNotification);
         break;
       case HMSNotificationMethod.RTMP_START:
-        this.onRTMPStart();
+        this.onRTMPStart(notification as RTMPNotification);
         break;
       case HMSNotificationMethod.RTMP_STOP:
         this.onRTMPStop();
@@ -30,7 +30,7 @@ export class RoomUpdateManager {
   }
 
   private onPeerList(notification: PeerListNotification) {
-    const { recording, streaming } = notification.room;
+    const { recording, streaming, session_id, started_at } = notification.room;
     const room = this.store.getRoom();
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();
@@ -40,14 +40,25 @@ export class RoomUpdateManager {
         running: false,
       };
     }
+    if (!room.hls) {
+      room.hls = {
+        running: false,
+        url: '',
+      };
+    }
     room.recording.server.running = recording.sfu.enabled;
     room.recording.browser.running = recording.beam.enabled;
-    room.rtmp.running = streaming.enabled;
+    room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
+    room.rtmp.startedAt = streaming.rtmp?.started_at;
+    room.hls.running = streaming.hls?.enabled;
+    room.hls.startedAt = streaming.hls?.started_at;
+    room.sessionId = session_id;
+    room.startedAt = started_at;
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
-  private onRTMPStart() {
-    this.setRTMPStatus(true);
+  private onRTMPStart(notification: RTMPNotification) {
+    this.setRTMPStatus(true, notification.started_at);
   }
 
   private onRTMPStop() {
@@ -76,6 +87,7 @@ export class RoomUpdateManager {
     if (method === HMSNotificationMethod.HLS_START) {
       room.hls.running = true;
       room.hls.url = notification.url!;
+      room.hls.startedAt = notification.started_at;
     } else {
       room.hls.running = false;
       room.hls.url = '';
@@ -99,11 +111,12 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(action, room);
   }
 
-  private setRTMPStatus(running: boolean) {
+  private setRTMPStatus(running: boolean, startedAt?: number) {
     const room = this.store.getRoom();
     if (!room.rtmp) {
       room.rtmp = {
         running: false,
+        startedAt,
       };
     }
     room.rtmp.running = running;

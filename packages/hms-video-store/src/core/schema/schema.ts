@@ -58,6 +58,7 @@ export const createDefaultStoreState = (): HMSStore => {
         running: false,
         url: '',
       },
+      sessionId: '',
     },
     peers: {},
     tracks: {},

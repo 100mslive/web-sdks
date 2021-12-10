@@ -24,4 +24,6 @@ export interface HMSRoom {
   recording: HMSRecording;
   rtmp: HMSRTMP;
   hls: HMSHLS;
+  sessionId: string;
+  startedAt?: number;
 }
