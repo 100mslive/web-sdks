@@ -1,7 +1,7 @@
-import { HMSVideoPluginType } from "@100mslive/hms-video";
+import { HMSVideoPluginType } from '@100mslive/hms-video';
 export class GrayscalePlugin {
   getName() {
-    return "grayscale-plugin";
+    return 'grayscale-plugin';
   }
 
   isSupported() {
@@ -16,19 +16,6 @@ export class GrayscalePlugin {
 
   stop() {}
 
-  cropCanvas = (canvas, x, y, width, height) => {
-    // create a temp canvas
-    const newCanvas = document.createElement("canvas");
-    // set its dimensions
-    newCanvas.width = width;
-    newCanvas.height = height;
-    // draw the canvas in the new resized temp canvas
-    newCanvas
-      .getContext("2d")
-      .drawImage(canvas, x, y, width, height, 0, 0, width, height);
-    return newCanvas;
-  };
-
   /**
    * @param input {HTMLCanvasElement}
    * @param output {HTMLCanvasElement}
@@ -38,8 +25,8 @@ export class GrayscalePlugin {
     const height = input.height;
     output.width = width;
     output.height = height;
-    const inputCtx = input.getContext("2d");
-    const outputCtx = output.getContext("2d");
+    const inputCtx = input.getContext('2d');
+    const outputCtx = output.getContext('2d');
     const imgData = inputCtx.getImageData(0, 0, width, height);
     const pixels = imgData.data;
 
