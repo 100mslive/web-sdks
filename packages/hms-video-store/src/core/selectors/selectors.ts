@@ -345,3 +345,6 @@ export const selectIsAllowedToSubscribe = createSelector([selectLocalPeerRole], 
 export const selectPermissions = createSelector(selectLocalPeerRole, role => role?.permissions);
 export const selectRecordingState = createSelector(selectRoom, room => room.recording);
 export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
+export const selectHLSState = createSelector(selectRoom, room => room.hls);
+export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
+export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);

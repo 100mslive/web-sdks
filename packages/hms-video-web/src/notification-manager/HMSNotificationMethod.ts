@@ -24,4 +24,6 @@ export enum HMSNotificationMethod {
   RTMP_STOP = 'on-rtmp-stop',
   RECORDING_START = 'on-record-start',
   RECORDING_STOP = 'on-record-stop',
+  HLS_START = 'on-hls-start',
+  HLS_STOP = 'on-hls-stop',
 }

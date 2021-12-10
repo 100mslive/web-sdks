@@ -12,7 +12,8 @@ import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSRecording, HMSRTMP } from './room';
+import { HMSHLS, HMSRecording, HMSRTMP } from './room';
+import { HLSConfig } from './hls-config';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): void;
@@ -34,8 +35,18 @@ export default interface HMS {
   endRoom(lock: boolean, reason: string): Promise<void>;
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
   stopRTMPAndRecording(): Promise<void>;
+  /**
+   * @alpha
+   * @param {HLSConfig} params
+   */
+  startHLSStreaming(params: HLSConfig): Promise<void>;
+  /**
+   * @alpha
+   */
+  stopHLSStreaming(): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
+  getHLSState(): HMSHLS | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
 
