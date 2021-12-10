@@ -32,7 +32,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig } from '../interfaces';
 import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
@@ -463,6 +463,14 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopRTMPAndRecording();
   }
 
+  async startHLSStreaming(params: HLSConfig) {
+    this.signal.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming() {
+    this.signal.stopHLSStreaming();
+  }
+
   async changeName(name: string) {
     await this.signal.updatePeer({
       name: name,
@@ -743,7 +751,6 @@ export default class HMSTransport implements ITransport {
     }
 
     ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
-    await this.performPublishRenegotiation();
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 

@@ -60,12 +60,16 @@ export const fakePeerList: PeerListNotification = {
   },
   room: {
     name: 'test',
+    session_id: 'session_id',
+    started_at: 100,
     recording: {
       sfu: { enabled: false },
       beam: { enabled: false },
     },
     streaming: {
       enabled: false,
+      rtmp: { enabled: false },
+      hls: { enabled: false, url: '' },
     },
   },
 };
@@ -121,12 +125,16 @@ export const fakeReconnectPeerList: PeerListNotification = {
   },
   room: {
     name: 'test',
+    session_id: 'session_id',
+    started_at: 100,
     recording: {
       sfu: { enabled: false },
       beam: { enabled: false },
     },
     streaming: {
       enabled: false,
+      rtmp: { enabled: false },
+      hls: { enabled: false, url: '' },
     },
   },
 };

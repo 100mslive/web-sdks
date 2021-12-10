@@ -1,6 +1,10 @@
 {
   "name": "@100mslive/hms-video",
+<<<<<<< HEAD
   "version": "0.1.35-alpha.17",
+=======
+  "version": "0.1.38-alpha.0",
+>>>>>>> e0a2b01d03a92b67121342a2d3b8c757e7187fa3
   "license": "UNLICENSED",
   "main": "dist/hms-video.cjs.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +16,7 @@
   },
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
-    "start": "concurrently 'yarn dev' 'yarn types'",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",

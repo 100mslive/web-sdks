@@ -1,4 +1,4 @@
-import { HMSRecording, HMSRTMP } from '@100mslive/hms-video';
+import { HMSRecording, HMSRTMP, HMSHLS } from '@100mslive/hms-video';
 import { HMSPeerID } from './peer';
 
 export type HMSRoomID = string;
@@ -23,4 +23,7 @@ export interface HMSRoom {
   roomState: HMSRoomState;
   recording: HMSRecording;
   rtmp: HMSRTMP;
+  hls: HMSHLS;
+  sessionId: string;
+  startedAt?: number;
 }

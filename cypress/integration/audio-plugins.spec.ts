@@ -23,6 +23,8 @@ describe('Audio Plugins', () => {
     gainPlugin2 = new GainPlugin(0.75, 'gain-custom');
     initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
     //@ts-ignore
+    cy.spy(actions, 'onJoin').as('onJoin');
+    //@ts-ignore
     cy.spy(actions, 'onTrackUpdate').as('onTrackUpdate');
     cy.spy(gainPlugin1, 'processAudioTrack').as('gain1Process');
     cy.spy(gainPlugin2, 'processAudioTrack').as('gain2Process');
@@ -38,8 +40,9 @@ describe('Audio Plugins', () => {
 
   it('should call plugin process/stop on add/remove plugin', () => {
     actions.join({ userName: 'test', authToken: token, initEndpoint });
-    cy.get('@onTrackUpdate')
-      .should('be.calledTwice')
+
+    //@ts-ignore
+    cy.localTracksAdded(actions.sdk.getLocalPeer())
       .then(() => {
         return actions.addPluginToAudioTrack(gainPlugin1);
       })
@@ -54,8 +57,9 @@ describe('Audio Plugins', () => {
 
   it('should handle multiple plugins', () => {
     actions.join({ userName: 'test', authToken: token, initEndpoint });
-    cy.get('@onTrackUpdate')
-      .should('be.calledTwice')
+
+    //@ts-ignore
+    cy.localTracksAdded(actions.sdk.getLocalPeer())
       .then(() => {
         return actions.addPluginToAudioTrack(gainPlugin1);
       })
