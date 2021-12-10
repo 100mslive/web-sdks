@@ -1,7 +1,13 @@
 import { HMSVideoPluginType } from '@100mslive/hms-video';
-export class GrayscalePlugin {
+export class brighteningPlugin {
+  private brightnessMul: number;
+
+  constructor(brightnessMul = 1) {
+    this.brightnessMul = brightnessMul;
+  }
+
   getName() {
-    return 'grayscale-plugin';
+    return 'brightening-plugin';
   }
 
   isSupported() {
@@ -31,12 +37,9 @@ export class GrayscalePlugin {
     const pixels = imgData.data;
 
     for (let i = 0; i < pixels.length; i += 4) {
-      const red = pixels[i];
-      const green = pixels[i + 1];
-      const blue = pixels[i + 2];
-      // https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems
-      const lightness = Math.floor(red * 0.299 + green * 0.587 + blue * 0.114);
-      pixels[i] = pixels[i + 1] = pixels[i + 2] = lightness;
+      pixels[i] = pixels[i] * this.brightnessMul;
+      pixels[i + 1] = pixels[i + 1] * this.brightnessMul;
+      pixels[i + 2] = pixels[i + 2] * this.brightnessMul;
     }
     outputCtx.putImageData(imgData, 0, 0);
   }
