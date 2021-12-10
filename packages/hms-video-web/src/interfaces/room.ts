@@ -7,6 +7,8 @@ export enum HMSRoomType {
 export interface HMSRoom {
   id: string;
   name: string;
+  sessionId?: string;
+  startedAt?: number;
   localPeer: HMSLocalPeer;
   peers: HMSPeer[];
   shareableLink: string;
@@ -14,6 +16,7 @@ export interface HMSRoom {
   hasWaitingRoom: boolean;
   recording?: HMSRecording;
   rtmp?: HMSRTMP;
+  hls?: HMSHLS;
 }
 
 export interface HMSRecording {
@@ -27,4 +30,15 @@ export interface HMSRecording {
 
 export interface HMSRTMP {
   running: boolean;
+  /**
+   * @alpha
+   **/
+  startedAt?: number;
+}
+
+export interface HMSHLS {
+  running: boolean;
+  url: string;
+  /** @alpha */
+  startedAt?: number;
 }

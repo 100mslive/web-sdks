@@ -51,6 +51,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
+import { HLSConfig } from '~interfaces/hls-config';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -133,6 +134,10 @@ export class HMSSdk implements HMSInterface {
 
   getRTMPState() {
     return this.store.getRoom()?.rtmp;
+  }
+
+  getHLSState() {
+    return this.store.getRoom()?.hls;
   }
 
   private handleAutoplayError = (event: AutoplayEvent) => {
@@ -614,6 +619,26 @@ export class HMSSdk implements HMSInterface {
         this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
       }
     }
+  }
+
+  async startHLSStreaming(params: HLSConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start HLS streaming',
+      );
+    }
+    await this.transport?.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming() {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop HLS streaming',
+      );
+    }
+    await this.transport?.stopHLSStreaming();
   }
 
   async changeName(name: string) {

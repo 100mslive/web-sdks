@@ -28,6 +28,8 @@ import {
   HMSVideoPluginType,
   HMSVideoPlugin,
   HMSAudioPlugin,
+  HLSConfig,
+  HMSHLS,
 } from '@100mslive/hms-video';
 
 export {
@@ -63,4 +65,6 @@ export type {
   HMSRTMP,
   HMSVideoPlugin,
   HMSAudioPlugin,
+  HLSConfig,
+  HMSHLS,
 };
