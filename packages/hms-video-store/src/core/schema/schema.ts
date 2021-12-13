@@ -30,8 +30,6 @@ export interface HMSStore {
 }
 
 export interface HMSInternalsStore {
-  publishConnection?: RTCPeerConnection;
-  subscribeConnection?: RTCPeerConnection;
   publishStats?: HMSPeerConnectionStats;
   subscribeStats?: HMSPeerConnectionStats;
   packetsLost: number;
