@@ -1,13 +1,15 @@
 import { HMSVideoPluginType } from '@100mslive/hms-video';
 export class brighteningPlugin {
   private brightnessMul: number;
+  private name;
 
-  constructor(brightnessMul = 1) {
+  constructor(brightnessMul = 1, name = 'brightening-plugin') {
     this.brightnessMul = brightnessMul;
+    this.name = name;
   }
 
   getName() {
-    return 'brightening-plugin';
+    return this.name;
   }
 
   isSupported() {
