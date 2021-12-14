@@ -5,7 +5,11 @@ export class HMSPeerConnectionStats {
   private jitter = 0;
   private rawStatsArray: RTCStats[] = [];
 
-  constructor(public type: PeerConnectionType, private rawStats: RTCStatsReport) {
+  constructor(
+    public type: PeerConnectionType,
+    private rawStats: RTCStatsReport,
+    private readonly getTrackIDBeingSent: (trackID: string) => string | undefined,
+  ) {
     /**
      * @TODO Instead of traversing through all stats to get packetsLost, jitter, etc.,
      * filter for those stat types which have these properties.
@@ -38,10 +42,11 @@ export class HMSPeerConnectionStats {
   }
 
   getTrackStats(trackId: string): RTCRtpStreamStats | undefined {
+    const statsTrackId = this.getTrackIDBeingSent(trackId);
     // Get track stats by filtering using trackIdentifer
     const trackStats = this.rawStatsArray.find(
       // @ts-expect-error
-      rawStat => rawStat.type === 'track' && rawStat.trackIdentifier === trackId,
+      rawStat => rawStat.type === 'track' && rawStat.trackIdentifier === statsTrackId,
     );
 
     // The 'id' of the trackStats should match the trackId of the 'inbound-rtp' streamStats
@@ -81,9 +86,12 @@ export class HMSPeerConnectionStats {
 export class HMSWebrtcStats {
   private publishStats: HMSPeerConnectionStats;
   private subscribeStats: HMSPeerConnectionStats;
-  constructor(rawStats: Record<PeerConnectionType, RTCStatsReport>) {
-    this.publishStats = new HMSPeerConnectionStats('publish', rawStats.publish);
-    this.subscribeStats = new HMSPeerConnectionStats('subscribe', rawStats.subscribe);
+  constructor(
+    rawStats: Record<PeerConnectionType, RTCStatsReport>,
+    getTrackIDBeingSent: (trackID: string) => string | undefined,
+  ) {
+    this.publishStats = new HMSPeerConnectionStats('publish', rawStats.publish, getTrackIDBeingSent);
+    this.subscribeStats = new HMSPeerConnectionStats('subscribe', rawStats.subscribe, getTrackIDBeingSent);
   }
 
   getSubscribeStats() {
