@@ -51,6 +51,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
+import { HLSConfig } from '~interfaces/hls-config';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -133,6 +134,10 @@ export class HMSSdk implements HMSInterface {
 
   getRTMPState() {
     return this.store.getRoom()?.rtmp;
+  }
+
+  getHLSState() {
+    return this.store.getRoom()?.hls;
   }
 
   private handleAutoplayError = (event: AutoplayEvent) => {
@@ -580,14 +585,16 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.startRTMPOrRecording(params);
-    // emit this notification to update current peer recording status
-    const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
-    const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
-    if (params.rtmpURLs?.length) {
-      this.notificationManager.handleNotification(rtmpStart);
-    }
-    if (params.record) {
-      this.notificationManager.handleNotification(recordingStart);
+    if (!window.HMS?.NEW_BEAM_STATE) {
+      // emit this notification to update current peer recording status
+      const rtmpStart = { method: HMSNotificationMethod.RTMP_START, params: {} };
+      const recordingStart = { method: HMSNotificationMethod.RECORDING_START, params: { type: 'Browser' } };
+      if (params.rtmpURLs?.length) {
+        this.notificationManager.handleNotification(rtmpStart);
+      }
+      if (params.record) {
+        this.notificationManager.handleNotification(recordingStart);
+      }
     }
   }
 
@@ -599,17 +606,39 @@ export class HMSSdk implements HMSInterface {
       );
     }
     await this.transport?.stopRTMPOrRecording();
-    // emit this notification to update current peer recording status
-    const { recording, rtmp } = this.store.getRoom();
-    if (recording?.browser.running) {
-      this.notificationManager.handleNotification({
-        method: HMSNotificationMethod.RECORDING_STOP,
-        params: { type: 'Browser' },
-      });
+    if (!window.HMS?.NEW_BEAM_STATE) {
+      // emit this notification to update current peer recording status
+      const { recording, rtmp } = this.store.getRoom();
+      if (recording?.browser.running) {
+        this.notificationManager.handleNotification({
+          method: HMSNotificationMethod.RECORDING_STOP,
+          params: { type: 'Browser' },
+        });
+      }
+      if (rtmp?.running) {
+        this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+      }
     }
-    if (rtmp?.running) {
-      this.notificationManager.handleNotification({ method: HMSNotificationMethod.RTMP_STOP, params: {} });
+  }
+
+  async startHLSStreaming(params: HLSConfig) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot start HLS streaming',
+      );
     }
+    await this.transport?.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming() {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot stop HLS streaming',
+      );
+    }
+    await this.transport?.stopHLSStreaming();
   }
 
   async changeName(name: string) {

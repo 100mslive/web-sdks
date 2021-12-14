@@ -36,6 +36,8 @@ export enum HMSSignalMethod {
   START_RTMP_OR_RECORDING_REQUEST = 'rtmp-start',
   STOP_RTMP_AND_RECORDING_REQUEST = 'rtmp-stop',
   UPDATE_PEER_METADATA = 'peer-update',
+  START_HLS_STREAMING = 'hls-start',
+  STOP_HLS_STREAMING = 'hls-stop',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

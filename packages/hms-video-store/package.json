@@ -1,5 +1,5 @@
 {
-  "version": "0.2.82-alpha.18",
+  "version": "0.2.84-alpha.1",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
-    "start": "concurrently 'yarn dev' 'yarn types'",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ./scripts/dev",
     "build:only": "node ./scripts/build",
     "build": "node ./scripts/build && yarn types:build",
@@ -33,7 +33,7 @@
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.35-alpha.20",
+    "@100mslive/hms-video": "0.1.38-alpha.0",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",

@@ -299,7 +299,7 @@ export class HMSSDKActions implements IHMSActions {
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
     const hmsPeer = this.hmsSDKPeers[peerID];
-    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer);
+    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
 
@@ -435,6 +435,14 @@ export class HMSSDKActions implements IHMSActions {
 
   async stopRTMPAndRecording() {
     await this.sdk.stopRTMPAndRecording();
+  }
+
+  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+    await this.sdk.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming(): Promise<void> {
+    await this.sdk.stopHLSStreaming();
   }
 
   async changeName(name: string) {
@@ -636,6 +644,7 @@ export class HMSSDKActions implements IHMSActions {
 
     const recording = this.sdk.getRecordingState();
     const rtmp = this.sdk.getRTMPState();
+    const hls = this.sdk.getHLSState();
 
     // then merge them carefully with our store so if something hasn't changed
     // the reference shouldn't change. Note that the draftStore is an immer draft
@@ -651,7 +660,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp, hls));
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }

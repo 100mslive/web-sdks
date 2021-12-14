@@ -1,10 +1,15 @@
-import { HMSRoom, HMSRoomType } from '../../interfaces/room';
+import { HMSHLS, HMSRecording, HMSRoom, HMSRoomType, HMSRTMP } from '../../interfaces/room';
 import { IStore } from '../store/IStore';
 
 export default class Room implements HMSRoom {
   shareableLink!: string;
   type!: HMSRoomType;
   hasWaitingRoom!: boolean;
+  sessionId?: string;
+  startedAt?: number;
+  recording?: HMSRecording | undefined;
+  rtmp?: HMSRTMP | undefined;
+  hls?: HMSHLS | undefined;
 
   public get localPeer() {
     return this.store.getLocalPeer()!;
