@@ -43,6 +43,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { EventBus } from '../events/EventBus';
+import { getTrackIDBeingSent } from '../utils/track';
 
 const TAG = '[HMSTransport]:';
 
@@ -681,6 +682,7 @@ export default class HMSTransport implements ITransport {
   private async initRtcStatsMonitor() {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.eventBus,
+      trackID => getTrackIDBeingSent(this.store, trackID),
       this.publishConnection?.nativeConnection,
       this.subscribeConnection?.nativeConnection,
     );

@@ -1,5 +1,7 @@
+import { IStore } from '../sdk/store';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
+import { HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack, HMSTrackType } from '../media/tracks';
 
 export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {
@@ -28,3 +30,19 @@ export function isEmptyTrack(track: MediaStreamTrack) {
   // Firefox gives '' as label for empty track(created from audio context)
   return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode' || track.label === '';
 }
+
+export const getTrackIDBeingSent = (store: IStore, trackID: string) => {
+  const track = store.getTrackById(trackID);
+  if (track) {
+    if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
+      return track.trackId;
+    }
+    if (track.type === HMSTrackType.VIDEO) {
+      return (track as HMSLocalVideoTrack).getTrackIDBeingSent();
+    } else {
+      return track.trackId;
+    }
+  } else {
+    return;
+  }
+};
