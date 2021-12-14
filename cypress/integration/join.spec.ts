@@ -70,6 +70,7 @@ describe('join api', () => {
       cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
         //@ts-ignore
         const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack;
+        console.error(sdkVideoTrack);
         //@ts-ignore
         expect(sdkVideoTrack).to.be.instanceOf(CanvasCaptureMediaStreamTrack);
       });
