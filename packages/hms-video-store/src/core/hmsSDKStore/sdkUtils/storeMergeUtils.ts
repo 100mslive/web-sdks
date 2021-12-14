@@ -1,4 +1,4 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSPeerStats, HMSTrackStats } from '../../schema';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes
@@ -50,21 +50,20 @@ export const mergeNewTracksInDraft = (
   }
 };
 
-export const mergeNewTrackStatsInDraft = (
-  tracks: Record<HMSTrackID, HMSTrack>,
-  draftTrackStats: Record<HMSTrackID, RTCStats | undefined>,
-  newTrackStats: Record<HMSTrackID, Partial<RTCStats | undefined>>,
+export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMSPeerStats | HMSTrackStats>(
+  IDs: TID[],
+  draftStats: Record<TID, T | undefined>,
+  newStats: Record<TID, Partial<T | undefined>>,
 ) => {
-  const trackIDs = Object.keys(tracks);
-  for (const trackID of trackIDs) {
-    const oldTrackStat = draftTrackStats[trackID];
-    const newTrackStat = newTrackStats[trackID];
+  for (const trackID of IDs) {
+    const oldTrackStat = draftStats[trackID];
+    const newTrackStat = newStats[trackID];
     if (isEntityUpdated(oldTrackStat, newTrackStat)) {
       Object.assign(oldTrackStat, newTrackStat);
     } else if (isEntityRemoved(oldTrackStat, newTrackStat)) {
-      delete draftTrackStats[trackID];
+      delete draftStats[trackID];
     } else if (isEntityAdded(oldTrackStat, newTrackStat)) {
-      draftTrackStats[trackID] = newTrackStat as RTCStats;
+      draftStats[trackID] = newTrackStat as T;
     }
   }
 };

@@ -37,7 +37,7 @@ export class HMSPeerConnectionStats {
     return this.jitter;
   }
 
-  getTrackStats(trackId: string) {
+  getTrackStats(trackId: string): RTCRtpStreamStats | undefined {
     // Get track stats by filtering using trackIdentifer
     const trackStats = this.rawStatsArray.find(
       // @ts-expect-error
@@ -47,17 +47,17 @@ export class HMSPeerConnectionStats {
     // The 'id' of the trackStats should match the trackId of the 'inbound-rtp' streamStats
     const streamStats =
       trackStats &&
-      this.rawStatsArray.find(
+      (this.rawStatsArray.find(
         rawStat =>
           // @ts-expect-error
           (rawStat.type === 'inbound-rtp' || rawStat.type === 'outbound-rtp') && rawStat.trackId === trackStats.id,
-      );
+      ) as RTCRtpStreamStats);
 
     return trackStats && streamStats && Object.assign({}, streamStats, trackStats);
   }
 
-  getLocalPeerStats(): RTCStats | undefined {
-    let activeCandidatePair: RTCStats | undefined;
+  getLocalPeerStats(): RTCIceCandidatePairStats | undefined {
+    let activeCandidatePair: RTCIceCandidatePairStats | undefined;
     this.rawStats.forEach(report => {
       if (report.type === 'transport') {
         // TS doesn't have correct types for RTCStatsReports
@@ -103,10 +103,10 @@ export class HMSWebrtcStats {
   }
 
   getLocalPeerStats() {
-    return this.subscribeStats.getLocalPeerStats();
+    return { publish: this.publishStats.getLocalPeerStats(), subscribe: this.subscribeStats.getLocalPeerStats() };
   }
 
-  getTrackStats(trackId: string): RTCStats | undefined {
+  getTrackStats(trackId: string): RTCRtpStreamStats | undefined {
     return this.subscribeStats.getTrackStats(trackId) || this.publishStats.getTrackStats(trackId);
   }
 }
