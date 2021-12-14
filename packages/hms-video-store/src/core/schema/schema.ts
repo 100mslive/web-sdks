@@ -7,6 +7,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
 import { HMSPlaylist } from './playlist';
+import { HMSPeerStats, HMSTrackStats } from './webrtc-stats';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -34,8 +35,8 @@ export interface HMSInternalsStore {
   subscribeStats?: HMSPeerConnectionStats;
   packetsLost: number;
   jitter: number;
-  trackStats: Record<HMSTrackID, RTCStats | undefined>;
-  peerStats: Record<HMSPeerID, RTCStats | undefined>;
+  trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
 }
 
 /**
