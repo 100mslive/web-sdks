@@ -1,6 +1,8 @@
 import { HMSStore, HMSInternalsStore } from './schema';
 import { IStore, IStoreReadOnly } from './IStore';
 
+export type { GetState } from './IStore';
+
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
