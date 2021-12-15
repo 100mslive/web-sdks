@@ -330,6 +330,7 @@ export class LocalTrackManager {
     const localPeer = this.store.getLocalPeer();
     const videoTrack = localPeer?.videoTrack;
     const audioTrack = localPeer?.audioTrack;
+    // Get device from the tracks already added in preview
     const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
     const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
 
