@@ -36,7 +36,7 @@ export interface IStore<T extends State> extends StoreApi<T> {
   namedSetState: NamedSetState<T>;
 }
 
-interface GetState<T extends State> {
+export interface GetState<T extends State> {
   (): T;
   <StateSlice>(selector?: StateSelector<T, StateSlice>): StateSlice;
 }
