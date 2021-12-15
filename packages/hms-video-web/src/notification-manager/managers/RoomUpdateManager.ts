@@ -51,6 +51,7 @@ export class RoomUpdateManager {
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
     room.rtmp.startedAt = streaming.rtmp?.started_at;
     room.hls.running = streaming.hls?.enabled;
+    room.hls.url = streaming.hls?.url;
     room.hls.startedAt = streaming.hls?.started_at;
     room.sessionId = session_id;
     room.startedAt = started_at;
