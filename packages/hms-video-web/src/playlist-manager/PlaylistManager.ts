@@ -106,8 +106,6 @@ export class PlaylistManager
     const element = this.getElement(type);
     if (element) {
       element.volume = value * 0.01;
-    } else {
-      HMSLogger.w(this.TAG, `No valid element of type ${type} found`);
     }
   }
 
@@ -115,8 +113,6 @@ export class PlaylistManager
     const element = this.getElement(type);
     if (element) {
       return element.volume * 100;
-    } else {
-      HMSLogger.w(this.TAG, `No valid element of type ${type} found`);
     }
     return 0;
   }
@@ -214,6 +210,7 @@ export class PlaylistManager
 
   async stop(type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
     const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
+    manager.getElement()?.pause(); //pause local video/audio and remove tracks in next step
     await this.removeTracks(type);
     manager.stop();
     this.state[type].currentIndex = -1;
@@ -273,25 +270,26 @@ export class PlaylistManager
   }
 
   private async play(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
-    const element = this.getElement(type);
-    if (element && !element.paused && element.src.includes(url)) {
+    const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
+    const element = manager.getElement();
+    if (this.isItemCurrentlyPlaying(url, type)) {
       HMSLogger.w(this.TAG, `The ${type} is currently playing`);
       return;
     }
-    if (element && element.src.includes(url)) {
+    if (element?.src.includes(url)) {
       await element.play();
     } else {
       element?.pause();
-      let tracks: MediaStreamTrack[];
-      if (type === HMSPlaylistType.audio) {
-        tracks = await this.audioManager.play(url);
-      } else {
-        tracks = await this.videoManager.play(url);
-      }
+      const tracks: MediaStreamTrack[] = await manager.play(url);
       for (const track of tracks) {
         await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
       }
     }
+  }
+
+  private isItemCurrentlyPlaying(url: string, type: HMSPlaylistType): boolean {
+    const element = this.getElement(type);
+    return !!(element && !element.paused && element.src.includes(url));
   }
 
   private setDuration(type: HMSPlaylistType = HMSPlaylistType.audio) {

@@ -1,6 +1,6 @@
 import { HMSNotification } from './schema/notification';
 
-type NotificationCallback = (notification: HMSNotification) => void;
+export type HMSNotificationCallback = (notification: HMSNotification) => void;
 
 /**
  * @category Core
@@ -12,5 +12,5 @@ export interface IHMSNotifications {
    * does that. The intent of this function is mainly to display toast notifications or send analytics.
    * We'll provide a display message which can be displayed as it is for common cases.
    */
-  onNotification: (cb: NotificationCallback) => () => void;
+  onNotification: (cb: HMSNotificationCallback) => () => void;
 }

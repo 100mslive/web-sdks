@@ -27,9 +27,24 @@ import {
   HMSWebrtcInternals,
   HMSWebrtcStats,
   HMSPeerConnectionStats,
+  HMSAudioPluginType,
+  HMSVideoPluginType,
+  HMSVideoPlugin,
+  HMSAudioPlugin,
+  HLSConfig,
+  HMSHLS,
 } from '@100mslive/hms-video';
 
-export { HMSException, HMSSimulcastLayer, HMSRoomUpdate, HMSPeerUpdate, HMSTrackUpdate, HMSLogLevel };
+export {
+  HMSException,
+  HMSSimulcastLayer,
+  HMSRoomUpdate,
+  HMSPeerUpdate,
+  HMSTrackUpdate,
+  HMSLogLevel,
+  HMSAudioPluginType,
+  HMSVideoPluginType,
+};
 
 export type {
   DeviceMap,
@@ -54,4 +69,8 @@ export type {
   HMSWebrtcInternals,
   HMSWebrtcStats,
   HMSPeerConnectionStats,
+  HMSVideoPlugin,
+  HMSAudioPlugin,
+  HLSConfig,
+  HMSHLS,
 };

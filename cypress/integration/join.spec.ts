@@ -1,6 +1,6 @@
-import { HMSReactiveStore, selectIsConnectedToRoom, selectTracksMap } from '../../src';
-import { HMSSDKActions } from '../../src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../src/core/IHMSStore';
+import { HMSReactiveStore, selectIsConnectedToRoom, selectTracksMap } from '../../packages/hms-video-store/src';
+import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
+import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 
 let HMSStore;
 let actions: HMSSDKActions;
@@ -30,7 +30,7 @@ describe('join api', () => {
     try {
       actions.join({ userName: 'test', authToken: '', initEndpoint });
     } catch (error) {
-      expect(error.message).to.equal('Token is not in proper JWT format');
+      expect(error.message).to.include('Token is not in proper JWT format');
     }
   });
 
@@ -52,9 +52,10 @@ describe('join api', () => {
         });
     });
 
-    it('should call onTrackUpdate twice', () => {
+    it('should call onTrackUpdate twice with localpeer', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate').should('be.calledTwice');
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer());
     });
 
     it('should get canvas stream on video disabled', () => {
@@ -64,14 +65,14 @@ describe('join api', () => {
         initEndpoint,
         settings: { isVideoMuted: true },
       });
-      cy.get('@onTrackUpdate')
-        .should('be.calledTwice')
-        .then(() => {
-          //@ts-ignore
-          const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack;
-          //@ts-ignore
-          expect(sdkVideoTrack).to.be.instanceOf(CanvasCaptureMediaStreamTrack);
-        });
+
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
+        //@ts-ignore
+        const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack;
+        //@ts-ignore
+        expect(sdkVideoTrack).to.be.instanceOf(CanvasCaptureMediaStreamTrack);
+      });
     });
 
     it('should not create extra track on joing with mute on preview and join with enabled video', () => {
@@ -98,7 +99,8 @@ describe('join api', () => {
             authToken: token,
             initEndpoint,
           });
-          return cy.get('@onTrackUpdate').should('be.calledTwice');
+          //@ts-ignore
+          return cy.localTracksAdded(actions.sdk.getLocalPeer());
         })
         .then(() => {
           const tracks = Object.keys(store.getState(selectTracksMap));

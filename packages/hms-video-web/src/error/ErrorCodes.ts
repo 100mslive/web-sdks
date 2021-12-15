@@ -7,7 +7,7 @@
 
 export const ErrorCodes = {
   WebSocketConnectionErrors: {
-    // Something went wrong
+    // Error connecting to ws or init config not available
     GENERIC_CONNECT: 1000,
 
     // Network connection lost
@@ -17,6 +17,8 @@ export const ErrorCodes = {
   InitAPIErrors: {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
+    //init config not available
+    INIT_CONFIG_NOT_AVAILABLE: 2002,
 
     // Endpoint is not reachable.
     ENDPOINT_UNREACHABLE: 2003,
@@ -26,7 +28,7 @@ export const ErrorCodes = {
   },
 
   TracksErrors: {
-    // [PUBLISH]: Something went wrong
+    // [PUBLISH]: Error with getusermedia request
     GENERIC_TRACK: 3000,
 
     // [PUBLISH]: No permission to access capture device - {device_type}
@@ -112,6 +114,8 @@ export const ErrorCodes = {
 
     // Joined with invalid role
     INVALID_ROLE: 6008,
+
+    PREVIEW_IN_PROGRESS: 6009,
   },
 
   PlaylistErrors: {
