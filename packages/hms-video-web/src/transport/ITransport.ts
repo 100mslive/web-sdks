@@ -1,6 +1,6 @@
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
-import { HMSPeer, HMSRoleChangeRequest, RTMPRecordingConfig } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, RTMPRecordingConfig, HLSConfig } from '../interfaces';
 import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
@@ -40,6 +40,10 @@ export default interface ITransport {
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
 
   stopRTMPOrRecording(): Promise<void>;
+
+  startHLSStreaming(params: HLSConfig): Promise<void>;
+
+  stopHLSStreaming(): Promise<void>;
 
   changeName(name: string): Promise<void>;
 

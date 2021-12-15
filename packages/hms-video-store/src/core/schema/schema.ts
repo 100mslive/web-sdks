@@ -64,6 +64,11 @@ export const createDefaultStoreState = (): HMSStore => {
       rtmp: {
         running: false,
       },
+      hls: {
+        running: false,
+        url: '',
+      },
+      sessionId: '',
     },
     peers: {},
     tracks: {},

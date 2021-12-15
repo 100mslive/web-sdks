@@ -32,7 +32,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -280,19 +280,7 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
-    if (this.state === TransportState.Failed) {
-      this.state = TransportState.Disconnected;
-    }
-
-    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
-      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
-    }
-
-    if (this.state === TransportState.Disconnected) {
-      this.state = TransportState.Connecting;
-      this.observer.onStateChange(this.state);
-    }
-
+    this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
       peerId,
@@ -479,6 +467,14 @@ export default class HMSTransport implements ITransport {
 
   async stopRTMPOrRecording() {
     await this.signal.stopRTMPAndRecording();
+  }
+
+  async startHLSStreaming(params: HLSConfig) {
+    this.signal.startHLSStreaming(params);
+  }
+
+  async stopHLSStreaming() {
+    this.signal.stopHLSStreaming();
   }
 
   async changeName(name: string) {
@@ -691,8 +687,14 @@ export default class HMSTransport implements ITransport {
       this.eventBus.statsUpdate.subscribe(stats => {
         this.trackDegradationController?.handleRtcStatsChange(stats.getSubscribeStats().getPacketsLost());
       });
-      this.eventBus.trackDegraded.subscribe(this.observer.onTrackDegrade);
-      this.eventBus.trackRestored.subscribe(this.observer.onTrackRestore);
+      this.eventBus.trackDegraded.subscribe(track => {
+        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
+        this.observer.onTrackDegrade(track);
+      });
+      this.eventBus.trackRestored.subscribe(track => {
+        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, false)).flush();
+        this.observer.onTrackRestore(track);
+      });
     }
     await this.webrtcInternals.getStatsMonitor().start();
   }
@@ -760,10 +762,24 @@ export default class HMSTransport implements ITransport {
     }
 
     ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
-    await this.performPublishRenegotiation();
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 
     return ok;
   };
+
+  private setTransportStateForJoin() {
+    if (this.state === TransportState.Failed) {
+      this.state = TransportState.Disconnected;
+    }
+
+    if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
+      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
+    }
+
+    if (this.state === TransportState.Disconnected) {
+      this.state = TransportState.Connecting;
+      this.observer.onStateChange(this.state);
+    }
+  }
 }

@@ -20,6 +20,7 @@ import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
+import { HLSConfig } from '~interfaces/hls-config';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -256,6 +257,14 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
   }
 
+  async startHLSStreaming(params: HLSConfig): Promise<void> {
+    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', meeting_url: params.meetingURL });
+  }
+
+  async stopHLSStreaming(): Promise<void> {
+    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0' });
+  }
+
   async updatePeer(params: UpdatePeerRequestParams) {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
@@ -282,26 +291,40 @@ export default class JsonRpcSignal implements ISignal {
     const response = JSON.parse(text);
 
     if (response.id) {
-      /** This is a response to [call] */
-      const typedResponse = response as JsonRpcResponse;
-      const id: string = typedResponse.id;
-      if (this.callbacks.has(id)) {
-        const cb = this.callbacks.get(id)!;
-        this.callbacks.delete(id);
-        if (typedResponse.result) {
-          cb.resolve(typedResponse.result);
-        } else {
-          cb.reject(typedResponse.error);
-        }
-      } else {
-        this.observer.onNotification(typedResponse);
-      }
+      this.handleResponseWithId(response);
     } else if (response.method) {
-      if (response.method === HMSSignalMethod.OFFER) {
+      this.handleResponseWithMethod(response);
+    } else {
+      throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+    }
+  }
+
+  private handleResponseWithId(response: any) {
+    /** This is a response to [call] */
+    const typedResponse = response as JsonRpcResponse;
+    const id: string = typedResponse.id;
+    if (this.callbacks.has(id)) {
+      const cb = this.callbacks.get(id)!;
+      this.callbacks.delete(id);
+      if (typedResponse.result) {
+        cb.resolve(typedResponse.result);
+      } else {
+        cb.reject(typedResponse.error);
+      }
+    } else {
+      this.observer.onNotification(typedResponse);
+    }
+  }
+
+  private handleResponseWithMethod(response: any) {
+    switch (response.method) {
+      case HMSSignalMethod.OFFER:
         this.observer.onOffer(response.params);
-      } else if (response.method === HMSSignalMethod.TRICKLE) {
+        break;
+      case HMSSignalMethod.TRICKLE:
         this.observer.onTrickle(response.params);
-      } else if (response.method === HMSSignalMethod.SERVER_ERROR) {
+        break;
+      case HMSSignalMethod.SERVER_ERROR:
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
@@ -309,11 +332,10 @@ export default class JsonRpcSignal implements ISignal {
             response.params.message,
           ),
         );
-      } else {
+        break;
+      default:
         this.observer.onNotification(response);
-      }
-    } else {
-      throw Error(`WebSocket message has no 'method' or 'id' field, message=${response}`);
+        break;
     }
   }
 

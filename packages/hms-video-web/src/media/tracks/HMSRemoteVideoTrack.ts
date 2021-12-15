@@ -4,10 +4,15 @@ import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/si
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
+  private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
 
   public get degraded() {
     return this._degraded;
+  }
+
+  public get degradedAt() {
+    return this._degradedAt;
   }
 
   async setEnabled(value: boolean): Promise<void> {
@@ -58,6 +63,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   /** @internal */
   setDegraded(value: boolean) {
     this._degraded = value;
+    if (value) {
+      this._degradedAt = new Date();
+    }
+
     this.updateLayer();
   }
 

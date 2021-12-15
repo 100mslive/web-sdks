@@ -75,6 +75,11 @@ export const makeFakeStore = (): HMSStore => {
       rtmp: {
         running: false,
       },
+      hls: {
+        running: false,
+        url: '',
+      },
+      sessionId: '',
     },
     peers: {
       '1': {

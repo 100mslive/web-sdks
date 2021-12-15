@@ -1,3 +1,4 @@
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
@@ -20,6 +21,27 @@ export class PeerManager {
 
   private get TAG() {
     return `[${this.constructor.name}]`;
+  }
+
+  handleNotification(method: string, notification: any) {
+    switch (method) {
+      case HMSNotificationMethod.PEER_JOIN: {
+        const peer = notification as PeerNotification;
+        this.handlePeerJoin(peer);
+        break;
+      }
+
+      case HMSNotificationMethod.PEER_LEAVE: {
+        const peer = notification as PeerNotification;
+        this.handlePeerLeave(peer);
+        break;
+      }
+      case HMSNotificationMethod.PEER_UPDATE:
+        this.handlePeerUpdate(notification as PeerNotification);
+        break;
+      default:
+        break;
+    }
   }
 
   handlePeerList = (peers: PeerNotification[]) => {
