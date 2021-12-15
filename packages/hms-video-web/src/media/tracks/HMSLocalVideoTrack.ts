@@ -97,29 +97,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    const stream = this.stream as HMSLocalStream;
-    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-
-    if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      if (this.enabled) {
-        await this.replaceTrackWith(newSettings);
-        if (!internal) {
-          DeviceStorageManager.updateSelection('videoInput', {
-            deviceId: settings.deviceId,
-            groupId: this.nativeTrack.getSettings().groupId,
-          });
-        }
-      }
-    }
-
-    if (hasPropertyChanged('maxBitrate') && newSettings.maxBitrate) {
-      await stream.setMaxBitrate(newSettings.maxBitrate, this);
-    }
-
-    if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(newSettings.toConstraints());
-    }
-
+    await this.handleDeviceChange(newSettings, internal);
+    await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
 
@@ -211,6 +190,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
     await localStream.replaceStreamTrack(prevTrack, newTrack);
     this.nativeTrack = newTrack;
+    // Replace deviceId with actual deviceId when it is default
+    if (this.settings.deviceId === 'default') {
+      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+    }
     await this.pluginsManager.waitForRestart();
   }
 
@@ -233,5 +216,36 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
     return newSettings;
+  };
+
+  private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
+    const stream = this.stream as HMSLocalStream;
+    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
+    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
+      await stream.setMaxBitrate(settings.maxBitrate, this);
+    }
+
+    if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
+      await this.nativeTrack.applyConstraints(settings.toConstraints());
+    }
+  };
+
+  /**
+   * Replace video track with new track on device change
+   * @param settings - VideoSettings Object constructed with new settings
+   * @param internal - whether the change was because of internal sdk call or external client call
+   */
+  private handleDeviceChange = async (settings: HMSVideoTrackSettings, internal = false) => {
+    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
+
+    if (hasPropertyChanged('deviceId') && this.source === 'regular') {
+      await this.replaceTrackWith(settings);
+      if (!internal) {
+        DeviceStorageManager.updateSelection('videoInput', {
+          deviceId: settings.deviceId,
+          groupId: this.nativeTrack.getSettings().groupId,
+        });
+      }
+    }
   };
 }
