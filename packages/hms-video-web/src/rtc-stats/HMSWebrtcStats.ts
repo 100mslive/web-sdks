@@ -41,7 +41,7 @@ export class HMSPeerConnectionStats {
     return this.jitter;
   }
 
-  getTrackStats(trackId: string): RTCRtpStreamStats | undefined {
+  getTrackStats(trackId: string): RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined {
     const statsTrackId = this.getTrackIDBeingSent(trackId);
     // Get track stats by filtering using trackIdentifer
     const trackStats = this.rawStatsArray.find(
@@ -58,7 +58,7 @@ export class HMSPeerConnectionStats {
           (rawStat.type === 'inbound-rtp' || rawStat.type === 'outbound-rtp') && rawStat.trackId === trackStats.id,
       ) as RTCRtpStreamStats);
 
-    return trackStats && streamStats && Object.assign({}, streamStats, trackStats);
+    return trackStats && streamStats && Object.assign({}, trackStats, streamStats);
   }
 
   getLocalPeerStats(): RTCIceCandidatePairStats | undefined {
