@@ -58,16 +58,15 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrt
       );
     }
 
-    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(trackIDs, store.trackStats, newTrackStats);
+    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
 
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
-    const peerIDs = [hmsStore.getState(selectLocalPeerID)];
     const newPeerStats = attachLocalPeerStats(
       hmsStore,
       store.peerStats[hmsStore.getState(selectLocalPeerID)],
       stats.getLocalPeerStats(),
     );
-    mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(peerIDs, store.peerStats, newPeerStats);
+    mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(store.peerStats, newPeerStats);
   }, 'webrtc-stats');
 };
 

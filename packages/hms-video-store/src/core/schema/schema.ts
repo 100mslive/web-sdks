@@ -2,12 +2,12 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSPeerConnectionStats } from '../hmsSDKStore/sdkTypes';
+import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
 import { HMSPlaylist } from './playlist';
-import { HMSPeerStats, HMSTrackStats } from './webrtc-stats';
+import { HMSPeerConnectionStats, HMSPeerStats, HMSTrackStats } from './webrtc-stats';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence

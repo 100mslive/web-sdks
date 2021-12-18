@@ -51,19 +51,19 @@ export const mergeNewTracksInDraft = (
 };
 
 export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMSPeerStats | HMSTrackStats>(
-  IDs: TID[],
   draftStats: Record<TID, T | undefined>,
   newStats: Record<TID, Partial<T | undefined>>,
 ) => {
+  const IDs = union(Object.keys(draftStats), Object.keys(newStats)) as TID[];
   for (const trackID of IDs) {
-    const oldTrackStat = draftStats[trackID];
-    const newTrackStat = newStats[trackID];
-    if (isEntityUpdated(oldTrackStat, newTrackStat)) {
-      Object.assign(oldTrackStat, newTrackStat);
-    } else if (isEntityRemoved(oldTrackStat, newTrackStat)) {
+    const oldStat = draftStats[trackID];
+    const newStat = newStats[trackID];
+    if (isEntityUpdated(oldStat, newStat)) {
+      Object.assign(oldStat, newStat);
+    } else if (isEntityRemoved(oldStat, newStat)) {
       delete draftStats[trackID];
-    } else if (isEntityAdded(oldTrackStat, newTrackStat)) {
-      draftStats[trackID] = newTrackStat as T;
+    } else if (isEntityAdded(oldStat, newStat)) {
+      draftStats[trackID] = newStat as T;
     }
   }
 };

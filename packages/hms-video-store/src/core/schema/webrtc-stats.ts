@@ -1,4 +1,8 @@
+import { HMSPeerConnectionStats as SDKHMSPeerConnectionStats } from '@100mslive/hms-video';
+
 type WithBitrate = { bitrate: number };
+
+export type HMSPeerConnectionStats = Pick<SDKHMSPeerConnectionStats, 'type' | 'packetsLost' | 'jitter'>;
 
 export type HMSTrackStats = RTCRtpStreamStats & { peerID?: string; peerName?: string } & WithBitrate;
 export type HMSInboundTrackStats = HMSTrackStats & RTCInboundRtpStreamStats;
