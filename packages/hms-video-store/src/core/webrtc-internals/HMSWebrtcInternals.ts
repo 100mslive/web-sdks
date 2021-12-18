@@ -8,7 +8,7 @@ import {
   IHMSInternalsStore,
   HMSInternalsStoreWrapper,
   GetState,
-} from '~core';
+} from '..';
 import { subscribeToSdkWebrtcStats } from './webrtc-internals-store';
 
 export class HMSWebrtcInternals implements HMSInternalsStoreWrapper {

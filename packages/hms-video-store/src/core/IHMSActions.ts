@@ -1,5 +1,4 @@
 import {
-  HMSSdk,
   HMSConfig,
   HMSSimulcastLayer,
   HMSAudioTrackSettings,
@@ -37,11 +36,6 @@ import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
  * @category Core
  */
 export interface IHMSActions {
-  /**
-   * @internal
-   */
-  getSdk(): HMSSdk;
-
   preview(config: HMSConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
