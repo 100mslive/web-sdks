@@ -20,7 +20,7 @@ describe('Video Plugins', () => {
     HMSStore = new HMSReactiveStore();
     actions = HMSStore.getHMSActions();
     brighteningPlugin1 = new brighteningPlugin();
-    brighteningPlugin2 = new brighteningPlugin(1.5);
+    brighteningPlugin2 = new brighteningPlugin(1.5, 'brightening-custom-plugin');
     initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
     //@ts-ignore
     cy.spy(actions, 'onJoin').as('onJoin');
@@ -72,7 +72,12 @@ describe('Video Plugins', () => {
       .then(() => {
         cy.get('@brightening1Process').should('have.been.calledOnce');
         cy.get('@brightening1Stop').should('have.been.calledOnce');
-        cy.get('@brightening2Process').should('have.been.calledTwice');
+        return cy.get('@brightening2Process').should('have.been.calledTwice');
+      })
+      .then(() => {
+        return actions.removePluginFromVideoTrack(brighteningPlugin2);
+      })
+      .then(() => {
         cy.get('@brightening2Stop').should('have.been.calledOnce');
       });
   });

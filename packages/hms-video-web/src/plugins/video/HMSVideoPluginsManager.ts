@@ -369,7 +369,12 @@ export class HMSVideoPluginsManager {
     this.inputVideo.pause();
     this.inputVideo.srcObject = new MediaStream([this.hmsTrack.nativeTrack]);
     this.inputVideo.muted = true;
-    await this.inputVideo.play();
+    if (this.inputVideo) {
+      console.error(this.inputCanvas);
+      this.inputVideo.oncanplaythrough = () => {
+        this.inputVideo?.play();
+      };
+    }
   }
 
   /**
