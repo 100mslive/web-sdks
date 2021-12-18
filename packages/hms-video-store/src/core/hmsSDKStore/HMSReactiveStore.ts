@@ -13,18 +13,20 @@ import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { IStore } from '../IStore';
-import { IHMSStore, IHMSStoreReadOnly, IHMSInternalsStore, IHMSInternalsStoreReadOnly } from '../IHMSStore';
-import { createDefaultStoreState, createDefaultInternalsStore, HMSStore, HMSInternalsStore } from '../schema';
+import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
+import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
-import { subscribeToSdkWebrtcStats } from './webrtc-internals';
+import { HMSWebrtcInternals } from '../webrtc-internals';
+import { HMSLogger } from '../../common/ui-logger';
 
 export class HMSReactiveStore {
+  private readonly sdk?: HMSSdk;
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
-  private readonly webrtcInternalsStore: IHMSInternalsStore;
+  private webrtcInternals?: HMSWebrtcInternals;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -42,15 +44,10 @@ export class HMSReactiveStore {
     if (hmsActions) {
       this.actions = hmsActions;
     } else {
-      this.actions = new HMSSDKActions(this.store, new HMSSdk(), this.notifications);
+      this.sdk = new HMSSdk();
+      this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
 
-    this.webrtcInternalsStore = HMSReactiveStore.createNewHMSStore<HMSInternalsStore>(
-      'HMSInternalsStore',
-      createDefaultInternalsStore,
-    );
-
-    subscribeToSdkWebrtcStats(this.actions.getSdk(), this.webrtcInternalsStore, this.store);
     this.initialTriggerOnSubscribe = false;
   }
 
@@ -98,8 +95,22 @@ export class HMSReactiveStore {
     return { onNotification: this.notifications.onNotification };
   }
 
-  getInternalsStore(): IHMSInternalsStoreReadOnly {
-    return this.webrtcInternalsStore;
+  getWebrtcInternals(): HMSWebrtcInternals | undefined {
+    if (!this.sdk) {
+      HMSLogger.w(
+        'Cannot initialize webrtc internals without HMSSdk. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
+      );
+      return;
+    }
+    if (!this.sdk.getWebrtcInternals()) {
+      HMSLogger.w(
+        'HMSSdk not ready for webrtc internal. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
+      );
+    }
+    if (!this.webrtcInternals) {
+      this.webrtcInternals = new HMSWebrtcInternals(this.sdk, this.store);
+    }
+    return this.webrtcInternals;
   }
 
   /**

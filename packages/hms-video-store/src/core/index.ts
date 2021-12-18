@@ -1,4 +1,10 @@
-export type { IHMSStore, IHMSStoreReadOnly as HMSStoreWrapper, GetState } from './IHMSStore';
+export type {
+  IHMSStore,
+  IHMSStoreReadOnly as HMSStoreWrapper,
+  GetState,
+  IHMSInternalsStore,
+  IHMSInternalsStoreReadOnly as HMSInternalsStoreWrapper,
+} from './IHMSStore';
 export type { IHMSActions as HMSActions } from './IHMSActions';
 export type { IHMSNotifications as HMSNotifications } from './IHMSNotifications';
 export type { HMSNotificationCallback } from './IHMSNotifications';
