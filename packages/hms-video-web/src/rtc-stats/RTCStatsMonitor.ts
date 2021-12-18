@@ -1,5 +1,5 @@
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
-import { PeerConnectionType } from '../transport/ITransport';
+import { PeerConnectionType } from '.';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';

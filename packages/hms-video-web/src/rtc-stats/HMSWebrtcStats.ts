@@ -1,8 +1,8 @@
-import { PeerConnectionType } from '../transport/ITransport';
+import { PeerConnectionType } from '.';
 
 export class HMSPeerConnectionStats {
-  private packetsLost = 0;
-  private jitter = 0;
+  packetsLost = 0;
+  jitter = 0;
   private rawStatsArray: RTCStats[] = [];
 
   constructor(
@@ -31,14 +31,6 @@ export class HMSPeerConnectionStats {
     //   this,
     //   this.rawStatsArray.map(r => [r.type, r.id, r]),
     // );
-  }
-
-  getPacketsLost() {
-    return this.packetsLost;
-  }
-
-  getJitter() {
-    return this.jitter;
   }
 
   getTrackStats(trackId: string): RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined {
@@ -103,11 +95,11 @@ export class HMSWebrtcStats {
   }
 
   getPacketsLost() {
-    return this.subscribeStats.getPacketsLost();
+    return this.subscribeStats.packetsLost;
   }
 
   getJitter() {
-    return this.subscribeStats.getJitter();
+    return this.subscribeStats.jitter;
   }
 
   getLocalPeerStats() {

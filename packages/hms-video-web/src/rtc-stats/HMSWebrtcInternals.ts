@@ -1,6 +1,6 @@
 import { RTCStatsMonitor } from './RTCStatsMonitor';
 import { EventBus } from '../events/EventBus';
-import { PeerConnectionType } from '../transport/ITransport';
+import { PeerConnectionType } from '.';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 
 export class HMSWebrtcInternals {

@@ -685,7 +685,7 @@ export default class HMSTransport implements ITransport {
     if (this.store.getSubscribeDegradationParams()) {
       this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
       this.eventBus.statsUpdate.subscribe(stats => {
-        this.trackDegradationController?.handleRtcStatsChange(stats.getSubscribeStats().getPacketsLost());
+        this.trackDegradationController?.handleRtcStatsChange(stats.getSubscribeStats().packetsLost);
       });
       this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();

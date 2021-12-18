@@ -10,8 +10,6 @@ export interface IFetchAVTrackOptions {
   video: IFetchTrackOptions;
 }
 
-export type PeerConnectionType = 'publish' | 'subscribe';
-
 export default interface ITransport {
   join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void>;
 
