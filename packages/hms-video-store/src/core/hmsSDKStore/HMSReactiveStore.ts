@@ -60,12 +60,12 @@ export class HMSReactiveStore {
    *
    * Note: you don't need this if you're using our react hooks, it takes care of this requirement.
    */
-  triggerOnSubscribe<T extends State>(store: IStore<T>): void {
+  triggerOnSubscribe(): void {
     if (this.initialTriggerOnSubscribe) {
       // already done
       return;
     }
-    HMSReactiveStore.makeStoreTriggerOnSubscribe(store);
+    HMSReactiveStore.makeStoreTriggerOnSubscribe(this.store);
     this.initialTriggerOnSubscribe = true;
   }
 
