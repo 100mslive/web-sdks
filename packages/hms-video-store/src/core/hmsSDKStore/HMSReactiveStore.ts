@@ -106,6 +106,7 @@ export class HMSReactiveStore {
       HMSLogger.w(
         'HMSSdk not ready for webrtc internal. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
       );
+      return;
     }
     if (!this.webrtcInternals) {
       this.webrtcInternals = new HMSWebrtcInternals(this.sdk, this.store);
