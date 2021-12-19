@@ -470,11 +470,11 @@ export default class HMSTransport implements ITransport {
   }
 
   async startHLSStreaming(params: HLSConfig) {
-    this.signal.startHLSStreaming(params);
+    await this.signal.startHLSStreaming(params);
   }
 
   async stopHLSStreaming() {
-    this.signal.stopHLSStreaming();
+    await this.signal.stopHLSStreaming();
   }
 
   async changeName(name: string) {
