@@ -3,7 +3,6 @@ import { selectLocalPeerID, selectPeerNameByID, selectRoomState, selectTracksMap
 import { IHMSStore, IHMSInternalsStore } from '../IHMSStore';
 import { HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID, HMSPeerStats, HMSTrackStats, RTCTrackStats } from '../schema';
 import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
-import { SDKToHMS } from '../hmsSDKStore/adapter';
 import { isPresent } from '../hmsSDKStore/common/presence';
 
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
@@ -43,8 +42,9 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrt
       store.packetsLost = stats.getPacketsLost();
     }
 
-    store.publishStats = SDKToHMS.convertConnectionStats(stats.getPublishStats());
-    store.subscribeStats = SDKToHMS.convertConnectionStats(stats.getSubscribeStats());
+    // Not used by UI
+    // store.publishStats = SDKToHMS.convertConnectionStats(stats.getPublishStats());
+    // store.subscribeStats = SDKToHMS.convertConnectionStats(stats.getSubscribeStats());
 
     const newTrackStats: Record<HMSTrackID, HMSTrackStats> = {};
     const trackIDs = Object.keys(tracks);
