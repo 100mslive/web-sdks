@@ -1,5 +1,12 @@
 import { HMSSdk, HMSWebrtcStats } from '@100mslive/hms-video';
-import { selectLocalPeerID, selectPeerNameByID, selectRoomState, selectTracksMap } from '../selectors';
+import {
+  selectLocalAudioTrackID,
+  selectLocalPeerID,
+  selectLocalVideoTrackID,
+  selectPeerNameByID,
+  selectRoomState,
+  selectTracksMap,
+} from '../selectors';
 import { IHMSStore, IHMSInternalsStore } from '../IHMSStore';
 import {
   HMSPeerID,
@@ -32,11 +39,16 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
   store.subscribe(roomState => {
     console.log('Subscribe stats', roomState);
     if (roomState === HMSRoomState.Connected && !unsubscribe) {
-      webrtcStore.namedSetState(wrtcStore => {
-        wrtcStore.localPeerID = store.getState(selectLocalPeerID);
-      }, 'local-peer-id');
+      const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 
-      unsubscribe = sdk.getWebrtcInternals()?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
+      const unsubSdkStats = sdk
+        .getWebrtcInternals()
+        ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
+
+      unsubscribe = () => {
+        unsubLocalPeer();
+        unsubSdkStats && unsubSdkStats();
+      };
     } else {
       if (unsubscribe) {
         resetHMSInternalsStore(webrtcStore);
@@ -44,6 +56,32 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
       }
     }
   }, selectRoomState);
+};
+
+const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInternalsStore) => {
+  const unsubID = store.subscribe(localPeerID => {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.id = localPeerID;
+    }, 'localpeer-id');
+  }, selectLocalPeerID);
+
+  const unsubVideoTrackID = store.subscribe(videoTrackID => {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.videoTrack = videoTrackID;
+    }, 'localpeer-videotrack-id');
+  }, selectLocalVideoTrackID);
+
+  const unsubAudioTrackID = store.subscribe(audioTrackID => {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.videoTrack = audioTrackID;
+    }, 'localpeer-audiotrack-id');
+  }, selectLocalAudioTrackID);
+
+  return () => {
+    unsubID();
+    unsubVideoTrackID();
+    unsubAudioTrackID();
+  };
 };
 
 const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
