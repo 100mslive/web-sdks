@@ -1,7 +1,16 @@
 import { HMSSdk, HMSWebrtcStats } from '@100mslive/hms-video';
 import { selectLocalPeerID, selectPeerNameByID, selectRoomState, selectTracksMap } from '../selectors';
 import { IHMSStore, IHMSInternalsStore } from '../IHMSStore';
-import { HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID, HMSPeerStats, HMSTrackStats, RTCTrackStats } from '../schema';
+import {
+  HMSPeerID,
+  HMSRoomState,
+  HMSTrack,
+  HMSTrackID,
+  HMSPeerStats,
+  HMSTrackStats,
+  RTCTrackStats,
+  createDefaultInternalsStore,
+} from '../schema';
 import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { isPresent } from '../hmsSDKStore/common/presence';
 
@@ -23,9 +32,14 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
   store.subscribe(roomState => {
     console.log('Subscribe stats', roomState);
     if (roomState === HMSRoomState.Connected && !unsubscribe) {
+      webrtcStore.namedSetState(wrtcStore => {
+        wrtcStore.localPeerID = store.getState(selectLocalPeerID);
+      }, 'local-peer-id');
+
       unsubscribe = sdk.getWebrtcInternals()?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
     } else {
       if (unsubscribe) {
+        resetHMSInternalsStore(webrtcStore);
         unsubscribe();
       }
     }
@@ -158,4 +172,10 @@ const computeBitrate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
   } else {
     return 0;
   }
+};
+
+const resetHMSInternalsStore = (store: IHMSInternalsStore, reason = 'resetState') => {
+  store.namedSetState(draft => {
+    Object.assign(draft, createDefaultInternalsStore());
+  }, reason);
 };
