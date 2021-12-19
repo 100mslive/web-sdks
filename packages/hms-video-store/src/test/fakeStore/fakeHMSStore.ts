@@ -8,9 +8,9 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSTrackType,
-} from '../core';
-import { HMSSimulcastLayer } from '../core/hmsSDKStore/sdkTypes';
-import { HMSPlaylist, HMSPlaylistType, HMSRole } from '../core/schema';
+} from '../../core';
+import { HMSSimulcastLayer } from '../../core/hmsSDKStore/sdkTypes';
+import { HMSPlaylist, HMSPlaylistType, HMSRole } from '../../core/schema';
 
 function makeTrack(
   id: HMSTrackID,
