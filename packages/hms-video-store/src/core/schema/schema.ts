@@ -37,7 +37,11 @@ export interface HMSInternalsStore {
   jitter: number;
   trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
-  localPeerID: HMSPeerID;
+  localPeer: {
+    id: HMSPeerID;
+    videoTrack?: HMSTrackID;
+    audioTrack?: HMSTrackID;
+  };
 }
 
 /**
@@ -115,6 +119,6 @@ export const createDefaultInternalsStore = (): HMSInternalsStore => {
     packetsLost: 0,
     peerStats: {},
     trackStats: {},
-    localPeerID: '',
+    localPeer: { id: '' },
   };
 };
