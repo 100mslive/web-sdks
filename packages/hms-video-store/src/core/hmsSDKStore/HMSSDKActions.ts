@@ -107,10 +107,6 @@ export class HMSSDKActions implements IHMSActions {
     // this.actionBatcher = new ActionBatcher(store);
   }
 
-  getSdk() {
-    return this.sdk;
-  }
-
   async unblockAudio() {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
