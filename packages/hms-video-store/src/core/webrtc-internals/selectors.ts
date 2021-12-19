@@ -1,13 +1,14 @@
 import { createSelector } from 'reselect';
 import { HMSInternalsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
-import { selectLocalAudioTrackID, selectLocalVideoTrackID } from '../selectors';
 
 export const selectPacketsLost = (store: HMSInternalsStore) => store.packetsLost;
 
 export const selectJitter = (store: HMSInternalsStore) => store.jitter;
 
-const selectLocalPeerID = (store: HMSInternalsStore) => store.localPeerID;
+const selectLocalPeerID = (store: HMSInternalsStore) => store.localPeer.id;
+const selectLocalAudioTrackID = (store: HMSInternalsStore) => store.localPeer.audioTrack;
+const selectLocalVideoTrackID = (store: HMSInternalsStore) => store.localPeer.videoTrack;
 const selectPeerID = (_store: HMSInternalsStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSInternalsStore, trackID: HMSTrackID | undefined) => trackID;
 const selectTrackStatsMap = (store: HMSInternalsStore) => store.trackStats;
@@ -38,7 +39,7 @@ export const selectAvailablePublishBitrate = createSelector(
 
 export const selectAvailableSubscribeBitrate = createSelector(
   selectLocalPeerStats,
-  localPeerStats => localPeerStats?.publish?.availableIncomingBitrate,
+  localPeerStats => localPeerStats?.subscribe?.availableIncomingBitrate,
 );
 
 export const selectTotalBytesSent = createSelector(
