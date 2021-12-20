@@ -18,7 +18,7 @@ interface UseVideoListProps {
     maxColCount: number;
     width: number;
     height: number;
-    showScreenFn: (peer: HMSPeer) => boolean;
+    showScreenFn?: (peer: HMSPeer) => boolean;
     peers: HMSPeer[];
     overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
     aspectRatio?: { width: number; height: number };
@@ -30,9 +30,9 @@ export const useVideoList = ({
     maxRowCount,
     width,
     height,
-    showScreenFn,
+    showScreenFn = () => false,
     peers,
-    overflow,
+    overflow = 'scroll-x',
     aspectRatio
 }: UseVideoListProps) => {
     const store = useHMSVanillaStore();
@@ -59,7 +59,7 @@ export const useVideoList = ({
         isLastPageDifferentFromFirstPage
     } = useMemo(
         () =>
-            // Flooring since there's a bug in react-slick where it converts widdh into a number
+            // Flooring since there's a bug in react-slick where it converts width into a number
             calculateLayoutSizes({
                 count,
                 parentWidth: Math.floor(width),
