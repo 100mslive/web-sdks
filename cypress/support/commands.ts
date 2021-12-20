@@ -37,7 +37,6 @@ Cypress.Commands.add('getToken', () => {
     env: Cypress.env('CYPRESS_API_ENV'),
     user_id: 'test',
   };
-  console.log(tokenEndpoint,data);
   return cy
     .request('POST', tokenEndpoint, data)
     .then(response => {
