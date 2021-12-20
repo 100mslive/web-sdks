@@ -37,7 +37,7 @@ export interface HMSRTMP {
 }
 
 export interface HMSHLS {
-  enabled: boolean;
+  running: boolean;
   variants: Array<HLSVariant>;
 }
 

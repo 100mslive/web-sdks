@@ -89,7 +89,7 @@ export interface PeerListNotification {
     streaming: {
       enabled: boolean;
       rtmp: { enabled: boolean; started_at?: number };
-      hls: { enabled: boolean; url: string; started_at?: number };
+      hls: { enabled: boolean; variants: Array<HLSVariantInfo> };
     };
   };
 }
@@ -179,7 +179,7 @@ export interface HLSNotification {
 
 export interface HLSVariantInfo {
   url: string;
-  meeting_url: string;
-  metadata: string;
-  started_at: string;
+  meeting_url?: string;
+  metadata?: string;
+  started_at?: string;
 }
