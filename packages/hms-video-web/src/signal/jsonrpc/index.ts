@@ -349,7 +349,10 @@ export default class JsonRpcSignal implements ISignal {
           this.isConnected = false;
         }
       } else {
-        setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
+        setTimeout(
+          () => this.pingPongLoop(id).catch(error => HMSLogger.e(this.TAG, error)),
+          window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL,
+        );
       }
     }
   }
