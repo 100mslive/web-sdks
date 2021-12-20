@@ -132,7 +132,7 @@ export default class JsonRpcSignal implements ISignal {
         this.id++;
         this.socket!.removeEventListener('open', openHandler);
         this.socket!.removeEventListener('error', errorListener);
-        this.pingPongLoop(this.id).catch(error => HMSLogger.e(this.TAG, '[PING]', error));
+        this.pingPongLoop(this.id);
       };
 
       this.socket.addEventListener('open', openHandler);
@@ -353,10 +353,7 @@ export default class JsonRpcSignal implements ISignal {
           this.isConnected = false;
         }
       } else {
-        setTimeout(
-          () => this.pingPongLoop(id).catch(error => HMSLogger.e(this.TAG, '[PING]', error)),
-          window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL,
-        );
+        setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
       }
     }
   }
