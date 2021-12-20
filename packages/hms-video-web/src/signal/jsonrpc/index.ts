@@ -132,7 +132,7 @@ export default class JsonRpcSignal implements ISignal {
         this.id++;
         this.socket!.removeEventListener('open', openHandler);
         this.socket!.removeEventListener('error', errorListener);
-        this.pingPongLoop(this.id);
+        this.pingPongLoop(this.id).catch(error => HMSLogger.e(this.TAG, error));
       };
 
       this.socket.addEventListener('open', openHandler);
