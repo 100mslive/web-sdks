@@ -17,7 +17,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL, PING_PONG_SEVERITY } from '../../utils/constants';
+import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 import { HLSConfig } from '~interfaces/hls-config';
@@ -325,10 +325,6 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onTrickle(response.params);
         break;
       case HMSSignalMethod.SERVER_ERROR:
-        // Ping timeout warning
-        if (response.params.severity === PING_PONG_SEVERITY) {
-          return;
-        }
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
@@ -336,6 +332,9 @@ export default class JsonRpcSignal implements ISignal {
             response.params.message,
           ),
         );
+        break;
+      case HMSSignalMethod.SERVER_WARNING:
+        HMSLogger.w(this.TAG, response.params);
         break;
       default:
         this.observer.onNotification(response);
