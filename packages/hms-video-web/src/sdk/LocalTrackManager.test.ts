@@ -61,8 +61,12 @@ const hostPublishParams: PublishParams = {
 
 const mockMediaStream = {
   id: 'native-stream-id',
-  getVideoTracks: jest.fn(() => [{ id: 'video-id', kind: 'video' }]),
-  getAudioTracks: jest.fn(() => [{ id: 'audio-id', kind: 'audio' }]),
+  getVideoTracks: jest.fn(() => [
+    { id: 'video-id', kind: 'video', getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })) },
+  ]),
+  getAudioTracks: jest.fn(() => [
+    { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
+  ]),
 };
 
 const gumSuccess = (constraints: any) => {
@@ -146,7 +150,9 @@ const mockAudioContext = {
   createMediaStreamDestination() {
     return {
       stream: {
-        getAudioTracks: jest.fn(() => [{ id: 'audio-id', kind: 'audio' }]),
+        getAudioTracks: jest.fn(() => [
+          { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-mock-device-id' })) },
+        ]),
       },
     };
   },

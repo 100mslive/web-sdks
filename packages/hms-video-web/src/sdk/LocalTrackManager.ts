@@ -327,7 +327,12 @@ export class LocalTrackManager {
     if (!canPublishAudio && !canPublishVideo) {
       return null;
     }
-    const { audioInputDeviceId, videoDeviceId } = initialSettings;
+    const localPeer = this.store.getLocalPeer();
+    const videoTrack = localPeer?.videoTrack;
+    const audioTrack = localPeer?.audioTrack;
+    // Get device from the tracks already added in preview
+    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
+    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
 
     let audioSettings: HMSAudioTrackSettings | null = null;
     let videoSettings: HMSVideoTrackSettings | null = null;
@@ -336,7 +341,7 @@ export class LocalTrackManager {
       audioSettings = new HMSAudioTrackSettingsBuilder()
         .codec(audio.codec as HMSAudioCodec)
         .maxBitrate(audio.bitRate)
-        .deviceId(audioInputDeviceId || defaultSettings.audioInputDeviceId)
+        .deviceId(audioDeviceId || defaultSettings.audioInputDeviceId)
         .build();
     }
     if (canPublishVideo) {
