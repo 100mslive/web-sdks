@@ -42,6 +42,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     stream.tracks.push(this);
 
     this.settings = settings;
+    // Replace the 'default' deviceId with the actual deviceId
+    // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
+    if (settings.deviceId === 'default' && !isEmptyTrack(track)) {
+      this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
+    }
     this.pluginsManager = new HMSAudioPluginsManager(this);
     this.publishedTrackId = this.trackId;
     this.setFirstTrackId(track.id);
@@ -80,8 +85,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
-    const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
+    const newSettings = this.buildNewSettings(settings);
 
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
@@ -191,5 +195,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   getTrackIDBeingSent() {
     return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
+  }
+
+  private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
+    const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
+    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
+    return newSettings;
   }
 }
