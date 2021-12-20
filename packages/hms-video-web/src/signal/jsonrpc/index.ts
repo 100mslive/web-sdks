@@ -17,7 +17,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL, PING_PONG_SEVERITY } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 import { HLSConfig } from '~interfaces/hls-config';
@@ -326,7 +326,7 @@ export default class JsonRpcSignal implements ISignal {
         break;
       case HMSSignalMethod.SERVER_ERROR:
         // Ping timeout warning
-        if (response.params.severity === 10) {
+        if (response.params.severity === PING_PONG_SEVERITY) {
           return;
         }
         this.observer.onServerError(
@@ -346,7 +346,7 @@ export default class JsonRpcSignal implements ISignal {
   private async pingPongLoop(id: number) {
     const pingTimeout = window.HMS?.PING_TIMEOUT || DEFAULT_SIGNAL_PING_TIMEOUT;
     if (this.isConnected) {
-      const pongTimeDiff = await this.ping(100);
+      const pongTimeDiff = await this.ping(pingTimeout);
       if (pongTimeDiff > pingTimeout) {
         HMSLogger.d(this.TAG, 'Pong timeout', { id });
         if (this.id === id) {
