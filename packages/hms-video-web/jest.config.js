@@ -5,7 +5,7 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.{ts,tsx,js,jsx}'],
-  testMatch: ['<rootDir>/**/*.(test).{ts,tsx,js,jsx}'],
+  testMatch: ['<rootDir>/src/**/*.(test).{ts,tsx,js,jsx}'],
   setupFiles: ['jest-canvas-mock'],
   testEnvironment: 'jsdom',
 };
