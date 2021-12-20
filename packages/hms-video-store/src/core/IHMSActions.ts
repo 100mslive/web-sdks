@@ -289,7 +289,7 @@ export interface IHMSActions {
    * If you want to stop HLS streaming.
    * @alpha
    */
-  stopHLSStreaming(): Promise<void>;
+  stopHLSStreaming(params: HLSConfig): Promise<void>;
 
   /**
    * If you want to update the name of peer.

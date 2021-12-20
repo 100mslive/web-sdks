@@ -77,7 +77,7 @@ export const makeFakeStore = (): HMSStore => {
       },
       hls: {
         running: false,
-        url: '',
+        variants: [{ url: '' }],
       },
       sessionId: '',
     },

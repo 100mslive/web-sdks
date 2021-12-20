@@ -109,7 +109,7 @@ export class SDKToHMS {
         server: { running: !!sdkRoom.recording?.server.running },
       },
       rtmp: { running: !!sdkRoom.rtmp?.running },
-      hls: { running: !!sdkRoom.hls?.running, url: sdkRoom.hls?.url || '' },
+      hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [{ url: '' }] },
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt,
     };
@@ -233,7 +233,7 @@ export class SDKToHMS {
         server: { running: !!recording?.server?.running },
       },
       rtmp: { running: !!rtmp?.running },
-      hls: { url: hls?.url || '', running: !!hls?.running },
+      hls: { variants: hls?.variants || [{ url: '' }], running: !!hls?.running },
     };
   }
 }
