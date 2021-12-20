@@ -279,14 +279,15 @@ export interface IHMSActions {
 
   /**
    * If you want to start HLS streaming.
-   * @param params.meetingURL This is the meeting url which is opened in a headless chrome instance for streaming and recording.
+   * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
+   * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    * @beta
    */
   startHLSStreaming(params: HLSConfig): Promise<void>;
 
   /**
-   * If you want to stop HLS streaming.
+   * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    * @beta
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
