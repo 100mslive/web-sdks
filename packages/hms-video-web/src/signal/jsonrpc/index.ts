@@ -325,6 +325,10 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onTrickle(response.params);
         break;
       case HMSSignalMethod.SERVER_ERROR:
+        // Ping timeout warning
+        if (response.params.severity === 10) {
+          return;
+        }
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
@@ -342,7 +346,7 @@ export default class JsonRpcSignal implements ISignal {
   private async pingPongLoop(id: number) {
     const pingTimeout = window.HMS?.PING_TIMEOUT || DEFAULT_SIGNAL_PING_TIMEOUT;
     if (this.isConnected) {
-      const pongTimeDiff = await this.ping(pingTimeout);
+      const pongTimeDiff = await this.ping(100);
       if (pongTimeDiff > pingTimeout) {
         HMSLogger.d(this.TAG, 'Pong timeout', { id });
         if (this.id === id) {
