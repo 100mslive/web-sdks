@@ -38,7 +38,12 @@ export interface HMSRTMP {
 
 export interface HMSHLS {
   running: boolean;
+  variants: Array<HLSVariant>;
+}
+
+export interface HLSVariant {
   url: string;
-  /** @alpha */
-  startedAt?: number;
+  meetingURL?: string;
+  metadata?: string;
+  startedAt?: Date;
 }
