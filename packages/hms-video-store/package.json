@@ -1,5 +1,5 @@
 {
-  "version": "0.2.84-alpha.2",
+  "version": "0.2.84-alpha.4",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
@@ -33,7 +33,11 @@
   "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
+<<<<<<< HEAD
     "@100mslive/hms-video": "0.1.38-alpha.1",
+=======
+    "@100mslive/hms-video": "0.1.38-alpha.3",
+>>>>>>> 0eac506354d41e48caaa90288762804e8e96d02c
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
