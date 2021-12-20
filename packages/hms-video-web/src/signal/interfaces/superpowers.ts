@@ -46,3 +46,12 @@ export interface UpdatePeerRequestParams {
   name?: string;
   data?: string;
 }
+
+export interface HLSRequestParams {
+  variants: Array<HLSVariant>;
+}
+
+export interface HLSVariant {
+  meeting_url: string;
+  metadata?: string;
+}
