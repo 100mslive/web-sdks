@@ -57,7 +57,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   startHLSStreaming(params: HLSRequestParams): Promise<void>;
 
-  stopHLSStreaming(params: HLSRequestParams): Promise<void>;
+  stopHLSStreaming(params?: HLSRequestParams): Promise<void>;
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
 

@@ -660,7 +660,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
-      Object.assign(draftStore.room, SDKToHMS.convertRecordingRTMPState(recording, rtmp, hls));
+      Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }

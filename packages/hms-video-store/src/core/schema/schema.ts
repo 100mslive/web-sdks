@@ -56,7 +56,7 @@ export const createDefaultStoreState = (): HMSStore => {
       },
       hls: {
         running: false,
-        variants: [{ url: '' }],
+        variants: [],
       },
       sessionId: '',
     },

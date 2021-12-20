@@ -261,7 +261,7 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
   }
 
-  async stopHLSStreaming(params: HLSRequestParams): Promise<void> {
+  async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
   }
 

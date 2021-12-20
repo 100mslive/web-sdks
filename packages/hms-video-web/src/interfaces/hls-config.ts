@@ -1,8 +1,8 @@
 export interface HLSConfig {
-  variants: Array<HLSStartStopVariant>;
+  variants: Array<HLSMeetingURLVariant>;
 }
 
-export interface HLSStartStopVariant {
+export interface HLSMeetingURLVariant {
   meetingURL: string;
   metadata?: string;
 }

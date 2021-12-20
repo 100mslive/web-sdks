@@ -631,7 +631,7 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.startHLSStreaming(params);
   }
 
-  async stopHLSStreaming(params: HLSConfig) {
+  async stopHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,

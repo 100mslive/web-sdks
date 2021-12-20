@@ -41,7 +41,7 @@ export default interface ITransport {
 
   startHLSStreaming(params: HLSConfig): Promise<void>;
 
-  stopHLSStreaming(params: HLSConfig): Promise<void>;
+  stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
   changeName(name: string): Promise<void>;
 
