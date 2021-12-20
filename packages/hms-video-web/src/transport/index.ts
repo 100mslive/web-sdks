@@ -37,7 +37,7 @@ import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
-import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
+import { HLSRequestParams, MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
@@ -464,11 +464,19 @@ export default class HMSTransport implements ITransport {
   }
 
   async startHLSStreaming(params: HLSConfig) {
-    await this.signal.startHLSStreaming(params);
+    const HLSParams: HLSRequestParams = { variants: [] };
+    params.variants.map(variant => {
+      HLSParams.variants.push({ meeting_url: variant.meetingURL, ...variant });
+    });
+    await this.signal.startHLSStreaming(HLSParams);
   }
 
-  async stopHLSStreaming() {
-    await this.signal.stopHLSStreaming();
+  async stopHLSStreaming(params: HLSConfig) {
+    const HLSParams: HLSRequestParams = { variants: [] };
+    params.variants.map(variant => {
+      HLSParams.variants.push({ meeting_url: variant.meetingURL, ...variant });
+    });
+    await this.signal.stopHLSStreaming(HLSParams);
   }
 
   async changeName(name: string) {

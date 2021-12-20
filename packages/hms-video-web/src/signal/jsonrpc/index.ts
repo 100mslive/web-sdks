@@ -10,6 +10,7 @@ import {
   MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
   UpdatePeerRequestParams,
+  HLSRequestParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -20,7 +21,6 @@ import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
-import { HLSConfig } from '~interfaces/hls-config';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
@@ -257,12 +257,12 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
   }
 
-  async startHLSStreaming(params: HLSConfig): Promise<void> {
-    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', meeting_url: params.meetingURL });
+  async startHLSStreaming(params: HLSRequestParams): Promise<void> {
+    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
   }
 
-  async stopHLSStreaming(): Promise<void> {
-    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0' });
+  async stopHLSStreaming(params: HLSRequestParams): Promise<void> {
+    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {

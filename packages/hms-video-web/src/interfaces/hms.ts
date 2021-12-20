@@ -43,7 +43,7 @@ export default interface HMS {
   /**
    * @alpha
    */
-  stopHLSStreaming(): Promise<void>;
+  stopHLSStreaming(params: HLSConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
   getHLSState(): HMSHLS | undefined;

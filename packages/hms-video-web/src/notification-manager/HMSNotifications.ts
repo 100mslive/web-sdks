@@ -173,7 +173,13 @@ export interface RTMPNotification {
 }
 
 export interface HLSNotification {
-  url?: string;
-  peer: PeerNotificationInfo;
-  started_at?: number;
+  enabled: boolean;
+  variants: Array<HLSVariantInfo>;
+}
+
+export interface HLSVariantInfo {
+  url: string;
+  meeting_url: string;
+  metadata: string;
+  started_at: string;
 }
