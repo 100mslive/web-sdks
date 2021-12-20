@@ -1,6 +1,6 @@
 import { UAParser } from 'ua-parser-js';
-// import { version } from './package.alias.json';
-const version = '123';
+import { version } from './package.alias.json';
+
 export const parsedUserAgent = new UAParser();
 
 export const isNode =
