@@ -10,7 +10,7 @@ export class HMSWebrtcInternals {
   constructor(
     private readonly eventBus: EventBus,
     /**
-     * Local video track's stats are changed based on the native track ID which changes on mute/unmute.
+     * Local track's stats are changed based on the native track ID which changes on mute/unmute/plugins.
      * This method is to get the track ID being sent(the active one in webrtc stats) given the original track ID.
      */
     private readonly getTrackIDBeingSent: (trackID: string) => string | undefined,

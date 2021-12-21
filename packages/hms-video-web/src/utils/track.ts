@@ -1,7 +1,7 @@
 import { IStore } from '../sdk/store';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
-import { HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack, HMSTrackType } from '../media/tracks';
+import { HMSLocalTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 
 export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<MediaStreamTrack> {
   try {
@@ -37,11 +37,7 @@ export const getTrackIDBeingSent = (store: IStore, trackID: string) => {
     if (track instanceof HMSRemoteAudioTrack || track instanceof HMSRemoteVideoTrack) {
       return track.trackId;
     }
-    if (track.type === HMSTrackType.VIDEO) {
-      return (track as HMSLocalVideoTrack).getTrackIDBeingSent();
-    } else {
-      return track.trackId;
-    }
+    return (track as HMSLocalTrack).getTrackIDBeingSent();
   } else {
     return;
   }
