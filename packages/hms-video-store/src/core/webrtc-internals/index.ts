@@ -1,2 +1,2 @@
 export { HMSWebrtcInternals } from './HMSWebrtcInternals';
-export * from './selectors';
+export * as selectHMSInternals from './selectors';
