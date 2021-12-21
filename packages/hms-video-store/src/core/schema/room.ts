@@ -25,5 +25,5 @@ export interface HMSRoom {
   rtmp: HMSRTMP;
   hls: HMSHLS;
   sessionId: string;
-  startedAt?: number;
+  startedAt?: Date;
 }

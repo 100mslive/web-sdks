@@ -6,7 +6,7 @@ export default class Room implements HMSRoom {
   type!: HMSRoomType;
   hasWaitingRoom!: boolean;
   sessionId?: string;
-  startedAt?: number;
+  startedAt?: Date;
   recording?: HMSRecording | undefined;
   rtmp?: HMSRTMP | undefined;
   hls?: HMSHLS | undefined;
