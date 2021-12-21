@@ -8,7 +8,7 @@ export interface HMSRoom {
   id: string;
   name: string;
   sessionId?: string;
-  startedAt?: number;
+  startedAt?: Date;
   localPeer: HMSLocalPeer;
   peers: HMSPeer[];
   shareableLink: string;
@@ -33,12 +33,17 @@ export interface HMSRTMP {
   /**
    * @alpha
    **/
-  startedAt?: number;
+  startedAt?: Date;
 }
 
 export interface HMSHLS {
   running: boolean;
+  variants: Array<HLSVariant>;
+}
+
+export interface HLSVariant {
   url: string;
-  /** @alpha */
-  startedAt?: number;
+  meetingURL?: string;
+  metadata?: string;
+  startedAt?: Date;
 }

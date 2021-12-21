@@ -37,7 +37,12 @@ import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
-import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
+import {
+  HLSRequestParams,
+  HLSVariant,
+  MultiTrackUpdateRequestParams,
+  TrackUpdateRequestParams,
+} from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
@@ -464,10 +469,31 @@ export default class HMSTransport implements ITransport {
   }
 
   async startHLSStreaming(params: HLSConfig) {
-    await this.signal.startHLSStreaming(params);
+    const hlsParams: HLSRequestParams = {
+      variants: params.variants.map(variant => {
+        const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
+        if (variant.metadata) {
+          hlsVariant.metadata = variant.metadata;
+        }
+        return hlsVariant;
+      }),
+    };
+    await this.signal.startHLSStreaming(hlsParams);
   }
 
-  async stopHLSStreaming() {
+  async stopHLSStreaming(params?: HLSConfig) {
+    if (params) {
+      const hlsParams: HLSRequestParams = {
+        variants: params?.variants.map(variant => {
+          const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
+          if (variant.metadata) {
+            hlsVariant.metadata = variant.metadata;
+          }
+          return hlsVariant;
+        }),
+      };
+      await this.signal.stopHLSStreaming(hlsParams);
+    }
     await this.signal.stopHLSStreaming();
   }
 
