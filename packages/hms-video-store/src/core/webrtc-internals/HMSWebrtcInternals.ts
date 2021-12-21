@@ -19,7 +19,6 @@ export class HMSWebrtcInternals implements HMSInternalsStoreWrapper {
   private readonly store: IHMSInternalsStore;
 
   constructor(private sdk: HMSSdk, private hmsStore: IHMSStore) {
-    console.log('Init HMSWebrtcInternals');
     this.store = HMSReactiveStore.createNewHMSStore<HMSInternalsStore>(
       'HMSInternalsStore',
       createDefaultInternalsStore,
