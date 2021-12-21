@@ -98,25 +98,19 @@ describe('local tracks stats selectors', () => {
   });
 
   test('selectLocalAudioTrackBytesSent', () => {
-    // @ts-ignore
     expect(selectLocalAudioTrackBytesSent(fakeStore)).toBe(localAudioTrackStats.bytesSent);
   });
 
   test('selectLocalVideoTrackBytesSent', () => {
-    // @ts-ignore
     expect(selectLocalVideoTrackBytesSent(fakeStore)).toBe(localVideoTrackStats.bytesSent);
   });
 
   test('selectLocalVideoTrackBytesSent', () => {
-    // @ts-ignore
     expect(selectLocalVideoTrackFramerate(fakeStore)).toBe(localVideoTrackStats.framesPerSecond);
   });
 
   test('selectLocalVideoTrackBytesSent', () => {
-    expect(selectLocalVideoTrackQualityLimitationReason(fakeStore)).toBe(
-      // @ts-ignore
-      localVideoTrackStats.qualityLimitationReason,
-    );
+    expect(selectLocalVideoTrackQualityLimitationReason(fakeStore)).toBe(localVideoTrackStats.qualityLimitationReason);
   });
 });
 
@@ -132,28 +126,24 @@ describe('track stats by ID', () => {
   });
 
   test('selectBytesReceivedByTrackID', () => {
-    // @ts-ignore
     expect(selectBytesReceivedByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.bytesReceived);
-    // @ts-ignore
+
     expect(selectBytesReceivedByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.bytesReceived);
   });
 
   test('selectJitterByTrackID', () => {
-    // @ts-ignore
     expect(selectJitterByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.jitter);
-    // @ts-ignore
+
     expect(selectJitterByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.jitter);
   });
 
   test('selectPacketsLostByTrackID', () => {
-    // @ts-ignore
     expect(selectPacketsLostByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.packetsLost);
-    // @ts-ignore
+
     expect(selectPacketsLostByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.packetsLost);
   });
 
   test('selectFramerateByTrackID', () => {
-    // @ts-ignore
     expect(selectFramerateByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.framesPerSecond);
   });
 });

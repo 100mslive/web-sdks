@@ -23,7 +23,6 @@ import { isPresent } from '../hmsSDKStore/common/presence';
 
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
   let unsubscribe: (() => void) | undefined;
-  console.log('Subscribe Stats');
   /**
    * Connected to room, webrtc internals can be initialized
    */
@@ -37,7 +36,6 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
    * - if internals is called before join is completed, init internals when roomState changes to connected
    */
   store.subscribe(roomState => {
-    console.log('Subscribe stats', roomState);
     if (roomState === HMSRoomState.Connected && !unsubscribe) {
       const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 

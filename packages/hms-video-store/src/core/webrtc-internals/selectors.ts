@@ -73,23 +73,19 @@ export const selectBitrateByTrackID = byIDCurry(
 );
 
 export const selectBytesReceivedByTrackID = byIDCurry(
-  // @ts-ignore
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bytesReceived as number | undefined),
+  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bytesReceived),
 );
 
 export const selectFramerateByTrackID = byIDCurry(
-  // @ts-ignore
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.framesPerSecond as number | undefined),
+  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.framesPerSecond),
 );
 
 export const selectJitterByTrackID = byIDCurry(
-  // @ts-ignore
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter as number | undefined),
+  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter),
 );
 
 export const selectPacketsLostByTrackID = byIDCurry(
-  // @ts-ignore
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.packetsLost as number | undefined),
+  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.packetsLost),
 );
 
 /**
@@ -109,25 +105,15 @@ export const selectLocalVideoTrackStats = createSelector(
 export const selectLocalAudioTrackBitrate = createSelector(selectLocalAudioTrackStats, stats => stats?.bitrate);
 export const selectLocalVideoTrackBitrate = createSelector(selectLocalVideoTrackStats, stats => stats?.bitrate);
 
-export const selectLocalAudioTrackBytesSent = createSelector(
-  selectLocalAudioTrackStats,
-  // @ts-ignore
-  stats => stats?.bytesSent as number | undefined,
-);
-export const selectLocalVideoTrackBytesSent = createSelector(
-  selectLocalVideoTrackStats,
-  // @ts-ignore
-  stats => stats?.bytesSent as number | undefined,
-);
+export const selectLocalAudioTrackBytesSent = createSelector(selectLocalAudioTrackStats, stats => stats?.bytesSent);
+export const selectLocalVideoTrackBytesSent = createSelector(selectLocalVideoTrackStats, stats => stats?.bytesSent);
 
 export const selectLocalVideoTrackFramerate = createSelector(
   selectLocalVideoTrackStats,
-  // @ts-ignore
-  stats => stats?.framesPerSecond as number | undefined,
+  stats => stats?.framesPerSecond,
 );
 
 export const selectLocalVideoTrackQualityLimitationReason = createSelector(
   selectLocalVideoTrackStats,
-  // @ts-ignore
-  stats => stats?.qualityLimitationReason as string | undefined,
+  stats => stats?.qualityLimitationReason,
 );
