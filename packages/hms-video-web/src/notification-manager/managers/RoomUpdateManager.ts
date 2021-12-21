@@ -61,7 +61,7 @@ export class RoomUpdateManager {
       });
     });
     room.sessionId = session_id;
-    room.startedAt = new Date(started_at);
+    room.startedAt = started_at ? new Date(started_at) : undefined;
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
