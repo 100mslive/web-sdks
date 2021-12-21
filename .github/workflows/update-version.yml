@@ -93,7 +93,7 @@ jobs:
         # don't update the version if PR has a version change already, this prevents
         # overriding any manual version update by the action.
         # run only if sdk update above has not run
-        if: needs.changes.outputs.store == 'true' && steps.sdkUpdate.outputs.updated !== 'true'
+        if: needs.changes.outputs.store == 'true' && steps.sdkUpdate.outputs.updated != 'true'
         run: |
           cd packages/hms-video-store
           VERSION=$(npm version prerelease --preid alpha)
