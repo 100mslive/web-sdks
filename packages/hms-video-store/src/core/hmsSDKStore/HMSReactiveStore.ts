@@ -95,7 +95,7 @@ export class HMSReactiveStore {
     return { onNotification: this.notifications.onNotification };
   }
 
-  getWebrtcInternals(): HMSWebrtcInternals | undefined {
+  getWebrtcInternals = (): HMSWebrtcInternals | undefined => {
     if (!this.sdk) {
       HMSLogger.w(
         'Cannot initialize webrtc internals without HMSSdk. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
@@ -112,7 +112,7 @@ export class HMSReactiveStore {
       this.webrtcInternals = new HMSWebrtcInternals(this.sdk, this.store);
     }
     return this.webrtcInternals;
-  }
+  };
 
   /**
    * @internal

@@ -1,4 +1,6 @@
 export type {
+  IStore,
+  IStoreReadOnly,
   IHMSStore,
   IHMSStoreReadOnly as HMSStoreWrapper,
   GetState,

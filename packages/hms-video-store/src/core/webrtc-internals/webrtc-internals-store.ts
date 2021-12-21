@@ -102,12 +102,10 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrt
     const trackIDs = Object.keys(tracks);
 
     for (const trackID of trackIDs) {
-      newTrackStats[trackID] = attachTrackStats(
-        hmsStore,
-        tracks[trackID],
-        stats.getTrackStats(trackID),
-        store.trackStats[trackID],
-      );
+      const sdkTrackStats = stats.getTrackStats(trackID);
+      if (sdkTrackStats) {
+        newTrackStats[trackID] = attachTrackStats(hmsStore, tracks[trackID], sdkTrackStats, store.trackStats[trackID]);
+      }
     }
 
     mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
