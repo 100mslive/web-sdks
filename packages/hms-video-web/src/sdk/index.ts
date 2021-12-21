@@ -641,14 +641,14 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.startHLSStreaming(params);
   }
 
-  async stopHLSStreaming() {
+  async stopHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
         'No local peer present, cannot stop HLS streaming',
       );
     }
-    await this.transport?.stopHLSStreaming();
+    await this.transport?.stopHLSStreaming(params);
   }
 
   async changeName(name: string) {
