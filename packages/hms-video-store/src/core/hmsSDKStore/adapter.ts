@@ -110,7 +110,7 @@ export class SDKToHMS {
         server: { running: !!sdkRoom.recording?.server.running },
       },
       rtmp: { running: !!sdkRoom.rtmp?.running },
-      hls: { running: !!sdkRoom.hls?.running, url: sdkRoom.hls?.url || '' },
+      hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt,
     };
@@ -228,7 +228,7 @@ export class SDKToHMS {
     };
   }
 
-  static convertRecordingRTMPState(
+  static convertRecordingStreamingState(
     recording: sdkTypes.HMSRecording | undefined,
     rtmp: sdkTypes.HMSRTMP | undefined,
     hls: sdkTypes.HMSHLS | undefined,
@@ -241,7 +241,7 @@ export class SDKToHMS {
         server: { running: !!recording?.server?.running },
       },
       rtmp: { running: !!rtmp?.running },
-      hls: { url: hls?.url || '', running: !!hls?.running },
+      hls: { variants: hls?.variants || [], running: !!hls?.running },
     };
   }
 }

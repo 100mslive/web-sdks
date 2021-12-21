@@ -69,7 +69,7 @@ export const fakePeerList: PeerListNotification = {
     streaming: {
       enabled: false,
       rtmp: { enabled: false },
-      hls: { enabled: false, url: '' },
+      hls: { enabled: false, variants: [] },
     },
   },
 };
@@ -134,7 +134,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
     streaming: {
       enabled: false,
       rtmp: { enabled: false },
-      hls: { enabled: false, url: '' },
+      hls: { enabled: false, variants: [] },
     },
   },
 };

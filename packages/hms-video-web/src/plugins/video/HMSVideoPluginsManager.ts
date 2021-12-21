@@ -50,6 +50,7 @@ export class HMSVideoPluginsManager {
   private pluginAddInProgress = false;
   private pluginNumFramesToSkip: Record<string, number>;
   private pluginNumFramesSkipped: Record<string, number>;
+  private canvases: Array<CanvasElement>; //array of canvases to store intermediate result
 
   constructor(track: HMSLocalVideoTrack) {
     this.hmsTrack = track;
@@ -58,6 +59,7 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesToSkip = {};
     this.pluginNumFramesSkipped = {};
     this.analytics = new VideoPluginsAnalytics();
+    this.canvases = new Array<CanvasElement>();
   }
 
   getPlugins(): string[] {
@@ -144,6 +146,12 @@ export class HMSVideoPluginsManager {
       await this.analytics.initWithTime(name, async () => await plugin.init());
       this.plugins.push(name);
       this.pluginsMap[name] = plugin;
+      // add new canvases according to new added plugins
+      if (this.plugins.length + 1 > this.canvases.length) {
+        for (let i = this.canvases.length; i <= this.plugins.length; i++) {
+          this.canvases[i] = document.createElement('canvas') as CanvasElement;
+        }
+      }
       await this.startPluginsLoop();
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
@@ -213,9 +221,7 @@ export class HMSVideoPluginsManager {
     if (!this.inputCanvas) {
       this.inputCanvas = document.createElement('canvas') as CanvasElement;
     }
-    if (!this.outputCanvas) {
-      this.outputCanvas = document.createElement('canvas') as CanvasElement;
-    }
+    this.outputCanvas = document.createElement('canvas') as CanvasElement;
     if (!this.inputVideo) {
       this.inputVideo = document.createElement('video');
     }
@@ -300,22 +306,36 @@ export class HMSVideoPluginsManager {
    * @private
    */
   private async processFramesThroughPlugins() {
-    for (const name of this.plugins) {
+    this.canvases[0] = this.inputCanvas!;
+    for (let i = 0; i < this.plugins.length; i++) {
+      const name = this.plugins[i];
       const plugin = this.pluginsMap[name];
       if (!plugin) {
         continue;
       }
       try {
         const skipProcessing = this.checkIfSkipRequired(name);
-        // TODO: should we use output of previous to pass in to next, instead of passing initial everytime?
+
         if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
-          const process = async () => {
-            await plugin.processVideoFrame(this.inputCanvas!, this.outputCanvas, skipProcessing);
+          const process = async (input: CanvasElement, output: CanvasElement) => {
+            try {
+              await plugin.processVideoFrame(input, output, skipProcessing);
+            } catch (err) {
+              HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+            }
           };
           if (!skipProcessing) {
-            await this.analytics.processWithTime(name, process);
+            if (i == this.plugins.length - 1) {
+              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
+            } else {
+              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
+            }
           } else {
-            await process();
+            if (i == this.plugins.length - 1) {
+              await process(this.canvases[i]!, this.outputCanvas!);
+            } else {
+              await process(this.canvases[i]!, this.canvases[i + 1]!);
+            }
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
           // there is no need to await for this case
@@ -349,7 +369,11 @@ export class HMSVideoPluginsManager {
     this.inputVideo.pause();
     this.inputVideo.srcObject = new MediaStream([this.hmsTrack.nativeTrack]);
     this.inputVideo.muted = true;
-    await this.inputVideo.play();
+    if (this.inputVideo) {
+      this.inputVideo.oncanplaythrough = () => {
+        this.inputVideo?.play();
+      };
+    }
   }
 
   /**
@@ -390,6 +414,7 @@ export class HMSVideoPluginsManager {
       inputCtx.fillStyle = `rgb(0, 0, 0)`;
       inputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
+    this.canvases = [];
   }
 
   /**

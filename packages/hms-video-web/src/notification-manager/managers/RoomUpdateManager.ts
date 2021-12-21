@@ -43,7 +43,7 @@ export class RoomUpdateManager {
     if (!room.hls) {
       room.hls = {
         running: false,
-        url: '',
+        variants: [],
       };
     }
     room.recording.server.running = recording.sfu.enabled;
@@ -51,8 +51,15 @@ export class RoomUpdateManager {
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
     room.rtmp.startedAt = streaming.rtmp?.started_at;
     room.hls.running = streaming.hls?.enabled;
-    room.hls.url = streaming.hls?.url;
-    room.hls.startedAt = streaming.hls?.started_at;
+    // update variants
+    streaming.hls?.variants?.map(variant => {
+      room.hls?.variants.push({
+        meetingURL: variant.meeting_url,
+        url: variant.url,
+        metadata: variant.metadata,
+        startedAt: variant.started_at ? new Date(variant.started_at) : undefined,
+      });
+    });
     room.sessionId = session_id;
     room.startedAt = started_at;
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
@@ -82,16 +89,15 @@ export class RoomUpdateManager {
     if (!room.hls) {
       room.hls = {
         running: false,
-        url: '',
+        variants: [],
       };
     }
     if (method === HMSNotificationMethod.HLS_START) {
       room.hls.running = true;
-      room.hls.url = notification.url!;
-      room.hls.startedAt = notification.started_at;
+      room.hls.variants = notification.variants;
     } else {
       room.hls.running = false;
-      room.hls.url = '';
+      room.hls.variants = [];
     }
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
