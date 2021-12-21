@@ -85,12 +85,8 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInterna
 const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
-    if (store.jitter !== stats.getJitter()) {
-      store.jitter = stats.getJitter();
-    }
-    if (store.packetsLost !== stats.getPacketsLost()) {
-      store.packetsLost = stats.getPacketsLost();
-    }
+    store.jitter = stats.getJitter();
+    store.packetsLost = stats.getPacketsLost();
 
     // Not used by UI
     // store.publishStats = SDKToHMS.convertConnectionStats(stats.getPublishStats());
