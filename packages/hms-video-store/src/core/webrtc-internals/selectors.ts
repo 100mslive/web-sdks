@@ -2,9 +2,9 @@ import { createSelector } from 'reselect';
 import { HMSInternalsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
-export const selectPacketsLost = (store: HMSInternalsStore) => store.packetsLost;
+export const packetsLost = (store: HMSInternalsStore) => store.packetsLost;
 
-export const selectJitter = (store: HMSInternalsStore) => store.jitter;
+export const jitter = (store: HMSInternalsStore) => store.jitter;
 
 const selectLocalPeerID = (store: HMSInternalsStore) => store.localPeer.id;
 const selectLocalAudioTrackID = (store: HMSInternalsStore) => store.localPeer.audioTrack;
@@ -17,38 +17,29 @@ const selectPeerStatsMap = (store: HMSInternalsStore) => store.peerStats;
 /**
  * Local peer stats selectors
  */
-export const selectLocalPeerStats = createSelector(
+export const localPeerStats = createSelector(
   [selectPeerStatsMap, selectLocalPeerID],
   (storePeerStats, localPeerID) => storePeerStats[localPeerID],
 );
 
-export const selectPublishBitrate = createSelector(
-  selectLocalPeerStats,
-  localPeerStats => localPeerStats?.publish?.bitrate,
-);
+export const publishBitrate = createSelector(localPeerStats, localPeerStats => localPeerStats?.publish?.bitrate);
 
-export const selectSubscribeBitrate = createSelector(
-  selectLocalPeerStats,
-  localPeerStats => localPeerStats?.subscribe?.bitrate,
-);
+export const subscribeBitrate = createSelector(localPeerStats, localPeerStats => localPeerStats?.subscribe?.bitrate);
 
-export const selectAvailablePublishBitrate = createSelector(
-  selectLocalPeerStats,
+export const availablePublishBitrate = createSelector(
+  localPeerStats,
   localPeerStats => localPeerStats?.publish?.availableOutgoingBitrate,
 );
 
-export const selectAvailableSubscribeBitrate = createSelector(
-  selectLocalPeerStats,
+export const availableSubscribeBitrate = createSelector(
+  localPeerStats,
   localPeerStats => localPeerStats?.subscribe?.availableIncomingBitrate,
 );
 
-export const selectTotalBytesSent = createSelector(
-  selectLocalPeerStats,
-  localPeerStats => localPeerStats?.publish?.bytesSent,
-);
+export const totalBytesSent = createSelector(localPeerStats, localPeerStats => localPeerStats?.publish?.bytesSent);
 
-export const selectTotalBytesReceived = createSelector(
-  selectLocalPeerStats,
+export const totalBytesReceived = createSelector(
+  localPeerStats,
   localPeerStats => localPeerStats?.subscribe?.bytesReceived,
 );
 
@@ -65,26 +56,22 @@ const selectTrackStatsByIDBare = createSelector([selectTrackStatsMap, selectTrac
   trackID ? storeTrackStats[trackID] : undefined,
 );
 
-export const selectPeerStatsByID = byIDCurry(selectPeerStatsByIDBare);
-export const selectTrackStatsByID = byIDCurry(selectTrackStatsByIDBare);
+export const peerStatsByID = byIDCurry(selectPeerStatsByIDBare);
+export const trackStatsByID = byIDCurry(selectTrackStatsByIDBare);
 
-export const selectBitrateByTrackID = byIDCurry(
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bitrate),
-);
+export const bitrateByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bitrate));
 
-export const selectBytesReceivedByTrackID = byIDCurry(
+export const bytesReceivedByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bytesReceived),
 );
 
-export const selectFramerateByTrackID = byIDCurry(
+export const framerateByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.framesPerSecond),
 );
 
-export const selectJitterByTrackID = byIDCurry(
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter),
-);
+export const jitterByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter));
 
-export const selectPacketsLostByTrackID = byIDCurry(
+export const packetsLostByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.packetsLost),
 );
 
@@ -92,28 +79,25 @@ export const selectPacketsLostByTrackID = byIDCurry(
  * Local track stats selectors
  */
 
-export const selectLocalAudioTrackStats = createSelector(
+export const localAudioTrackStats = createSelector(
   [selectTrackStatsMap, selectLocalAudioTrackID],
   (trackStatsMap, trackID) => (trackID ? trackStatsMap[trackID] : undefined),
 );
 
-export const selectLocalVideoTrackStats = createSelector(
+export const localVideoTrackStats = createSelector(
   [selectTrackStatsMap, selectLocalVideoTrackID],
   (trackStatsMap, trackID) => (trackID ? trackStatsMap[trackID] : undefined),
 );
 
-export const selectLocalAudioTrackBitrate = createSelector(selectLocalAudioTrackStats, stats => stats?.bitrate);
-export const selectLocalVideoTrackBitrate = createSelector(selectLocalVideoTrackStats, stats => stats?.bitrate);
+export const localAudioTrackBitrate = createSelector(localAudioTrackStats, stats => stats?.bitrate);
+export const localVideoTrackBitrate = createSelector(localVideoTrackStats, stats => stats?.bitrate);
 
-export const selectLocalAudioTrackBytesSent = createSelector(selectLocalAudioTrackStats, stats => stats?.bytesSent);
-export const selectLocalVideoTrackBytesSent = createSelector(selectLocalVideoTrackStats, stats => stats?.bytesSent);
+export const localAudioTrackBytesSent = createSelector(localAudioTrackStats, stats => stats?.bytesSent);
+export const localVideoTrackBytesSent = createSelector(localVideoTrackStats, stats => stats?.bytesSent);
 
-export const selectLocalVideoTrackFramerate = createSelector(
-  selectLocalVideoTrackStats,
-  stats => stats?.framesPerSecond,
-);
+export const localVideoTrackFramerate = createSelector(localVideoTrackStats, stats => stats?.framesPerSecond);
 
-export const selectLocalVideoTrackQualityLimitationReason = createSelector(
-  selectLocalVideoTrackStats,
+export const localVideoTrackQualityLimitationReason = createSelector(
+  localVideoTrackStats,
   stats => stats?.qualityLimitationReason,
 );
