@@ -38,13 +38,9 @@ export default interface HMS {
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
   stopRTMPAndRecording(): Promise<void>;
   /**
-   * @beta
    * @param {HLSConfig} params
    */
   startHLSStreaming(params: HLSConfig): Promise<void>;
-  /**
-   * @beta
-   */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
