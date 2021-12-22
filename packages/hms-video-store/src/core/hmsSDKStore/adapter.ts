@@ -112,7 +112,7 @@ export class SDKToHMS {
       rtmp: { running: !!sdkRoom.rtmp?.running },
       hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
       sessionId: sdkRoom.sessionId,
-      startedAt: sdkRoom.startedAt,
+      startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
     };
   }
 

@@ -27,7 +27,7 @@ jobs:
         env:
           BUMP: ${{ github.event.inputs.versionBump }}
         run: |
-          echo $(lerna version $BUMP --no-git-tag-version --yes)
+          echo $(lerna version $BUMP --no-git-tag-version --exact --yes)
 
       - name: Get current version
         id: version
