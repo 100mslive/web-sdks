@@ -8,9 +8,9 @@ import {
   remoteAudioTrackStats,
   remoteVideoTrackStats,
 } from '../fakeStore';
-import { HMSInternalsStore, selectHMSStats } from '../../core';
+import { HMSStatsStore, selectHMSStats } from '../../core';
 
-let fakeStore: HMSInternalsStore;
+let fakeStore: HMSStatsStore;
 
 // start from a new fake store for every test
 beforeEach(() => {

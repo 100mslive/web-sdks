@@ -7,7 +7,7 @@ import {
   selectRoomState,
   selectTracksMap,
 } from '../selectors';
-import { IHMSStore, IHMSInternalsStore } from '../IHMSStore';
+import { IHMSStore, IHMSStatsStore } from '../IHMSStore';
 import {
   HMSPeerID,
   HMSRoomState,
@@ -16,13 +16,13 @@ import {
   HMSPeerStats,
   HMSTrackStats,
   RTCTrackStats,
-  createDefaultInternalsStore,
+  createDefaultStatsStore,
 } from '../schema';
 import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { isPresent } from '../hmsSDKStore/common/presence';
 
 type Unsubscribe = (() => void) | undefined;
-export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
+export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
   let unsubscribe: Unsubscribe;
   /**
    * Connected to room, webrtc internals can be initialized
@@ -43,14 +43,14 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
       }
     } else {
       if (unsubscribe) {
-        resetHMSInternalsStore(webrtcStore);
+        resetHMSStatsStore(webrtcStore);
         unsubscribe();
       }
     }
   }, selectRoomState);
 };
 
-const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
+const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
   const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 
   const unsubSdkStats = sdk
@@ -63,7 +63,7 @@ const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSInternalsStor
   };
 };
 
-const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInternalsStore) => {
+const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsStore) => {
   let unsubID: Unsubscribe, unsubVideoTrackID: Unsubscribe, unsubAudioTrackID: Unsubscribe;
   if (store.getState(selectLocalPeerID)) {
     webrtcStore.namedSetState(draft => {
@@ -111,7 +111,7 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInterna
   };
 };
 
-const updateWebrtcStoreStats = (webrtcStore: IHMSInternalsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
+const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
     store.jitter = stats.getJitter();
@@ -233,8 +233,8 @@ const computeBitrate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
   }
 };
 
-const resetHMSInternalsStore = (store: IHMSInternalsStore, reason = 'resetState') => {
+const resetHMSStatsStore = (store: IHMSStatsStore, reason = 'resetState') => {
   store.namedSetState(draft => {
-    Object.assign(draft, createDefaultInternalsStore());
+    Object.assign(draft, createDefaultStatsStore());
   }, reason);
 };

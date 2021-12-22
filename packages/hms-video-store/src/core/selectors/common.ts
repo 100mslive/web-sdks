@@ -1,6 +1,6 @@
-import { HMSInternalsStore, HMSStore } from '../schema';
+import { HMSStatsStore, HMSStore } from '../schema';
 
-export type StoreTypes = HMSStore | HMSInternalsStore;
+export type StoreTypes = HMSStore | HMSStatsStore;
 
 type byIDSelector<S extends StoreTypes, T> = (store: S, id?: string) => T;
 

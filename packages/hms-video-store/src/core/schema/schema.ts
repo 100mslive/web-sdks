@@ -30,7 +30,7 @@ export interface HMSStore {
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
-export interface HMSInternalsStore {
+export interface HMSStatsStore {
   publishStats?: HMSPeerConnectionStats;
   subscribeStats?: HMSPeerConnectionStats;
   packetsLost: number;
@@ -113,7 +113,7 @@ export const createDefaultStoreState = (): HMSStore => {
   };
 };
 
-export const createDefaultInternalsStore = (): HMSInternalsStore => {
+export const createDefaultStatsStore = (): HMSStatsStore => {
   return {
     jitter: 0,
     packetsLost: 0,

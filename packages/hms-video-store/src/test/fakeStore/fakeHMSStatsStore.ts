@@ -1,4 +1,4 @@
-import { HMSPeerStats, HMSTrackStats, HMSInternalsStore } from '../../core';
+import { HMSPeerStats, HMSTrackStats, HMSStatsStore } from '../../core';
 
 export let packetsLost: number;
 export let jitter: number;
@@ -8,7 +8,7 @@ export let localAudioTrackStats: HMSTrackStats;
 export let remoteVideoTrackStats: HMSTrackStats;
 export let remoteAudioTrackStats: HMSTrackStats;
 
-export const makeFakeInternalsStore = (): HMSInternalsStore => {
+export const makeFakeInternalsStore = (): HMSStatsStore => {
   const fakeInternalsStore = {
     localPeer: {
       id: '1',
@@ -256,5 +256,5 @@ export const makeFakeInternalsStore = (): HMSInternalsStore => {
   remoteVideoTrackStats = fakeInternalsStore.trackStats['103'] as HMSTrackStats;
   remoteAudioTrackStats = fakeInternalsStore.trackStats['104'] as HMSTrackStats;
 
-  return fakeInternalsStore as HMSInternalsStore;
+  return fakeInternalsStore as HMSStatsStore;
 };
