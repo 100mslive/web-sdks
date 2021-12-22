@@ -4,7 +4,7 @@
     "main": "dist/index.cjs.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
-    "version": "0.0.2-alpha",
+    "version": "0.0.3-alpha",
     "author": "100ms",
     "license": "MIT",
     "files": [

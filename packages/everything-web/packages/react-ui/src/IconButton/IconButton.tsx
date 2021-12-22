@@ -9,7 +9,7 @@ export const IconButton = styled('button', {
     r: '$1',
     cursor: 'pointer',
     backgroundColor: 'transparent',
-    color: '$white',
+    color: '$fg',
     '&:not([disabled]):focus-visible': {
         boxShadow: '0 0 0 3px $colors$brandTint'
     },

@@ -19,7 +19,7 @@ const Chevron = styled('button', {
     }
 });
 
-const Dots = styled('button', {
+const Dots = styled('div', {
     display: 'flex',
     alignItems: 'center',
     '& > * + *': {

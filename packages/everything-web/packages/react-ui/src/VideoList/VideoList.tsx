@@ -12,7 +12,9 @@ const Container = styled('div', {
     width: '100%',
     position: 'relative',
     padding: '$5',
-    overflowX: 'hidden'
+    overflowX: 'hidden',
+    display: 'flex',
+    alignItems: 'center'
 });
 
 const View = styled('div', {
