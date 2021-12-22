@@ -19,7 +19,6 @@ import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { HMSWebrtcInternals } from '../webrtc-internals';
-import { HMSLogger } from '../../common/ui-logger';
 
 export class HMSReactiveStore {
   private readonly sdk?: HMSSdk;
@@ -95,21 +94,13 @@ export class HMSReactiveStore {
     return { onNotification: this.notifications.onNotification };
   }
 
-  getWebrtcInternals = (): HMSWebrtcInternals | undefined => {
-    if (!this.sdk) {
-      HMSLogger.w(
-        'Cannot initialize webrtc internals without HMSSdk. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
-      );
-      return;
-    }
-    if (!this.sdk.getWebrtcInternals()) {
-      HMSLogger.w(
-        'HMSSdk not ready for webrtc internal. Please try `getHMSWebrtcInternals` after join(roomState === `Connected`',
-      );
-      return;
-    }
+  /**
+   * @alpha
+   * @internal
+   */
+  getWebrtcInternals = (): HMSWebrtcInternals => {
     if (!this.webrtcInternals) {
-      this.webrtcInternals = new HMSWebrtcInternals(this.sdk, this.store);
+      this.webrtcInternals = new HMSWebrtcInternals(this.store, this.sdk);
     }
     return this.webrtcInternals;
   };
