@@ -4,7 +4,7 @@
     "main": "dist/index.cjs.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
-    "version": "0.0.1-alpha",
+    "version": "0.0.2-alpha",
     "author": "100ms",
     "license": "MIT",
     "files": [
@@ -19,8 +19,8 @@
         "lint-fix": "eslint src/** --fix"
     },
     "devDependencies": {
-        "rollup": "^2.39.0",
-        "@svgr/cli": "^5.5.0"
+        "@svgr/cli": "^5.5.0",
+        "rollup": "^2.39.0"
     },
     "dependencies": {}
 }
