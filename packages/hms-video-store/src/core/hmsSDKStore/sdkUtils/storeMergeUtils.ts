@@ -1,4 +1,4 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSPeerStats, HMSTrackStats } from '../../schema';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes
@@ -46,6 +46,24 @@ export const mergeNewTracksInDraft = (
       delete draftTracks[trackID];
     } else if (isEntityAdded(oldTrack, newTrack)) {
       draftTracks[trackID] = newTrack as HMSTrack;
+    }
+  }
+};
+
+export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMSPeerStats | HMSTrackStats>(
+  draftStats: Record<TID, T | undefined>,
+  newStats: Record<TID, Partial<T | undefined>>,
+) => {
+  const IDs = union(Object.keys(draftStats), Object.keys(newStats)) as TID[];
+  for (const trackID of IDs) {
+    const oldStat = draftStats[trackID];
+    const newStat = newStats[trackID];
+    if (isEntityUpdated(oldStat, newStat)) {
+      Object.assign(oldStat, newStat);
+    } else if (isEntityRemoved(oldStat, newStat)) {
+      delete draftStats[trackID];
+    } else if (isEntityAdded(oldStat, newStat)) {
+      draftStats[trackID] = newStat as T;
     }
   }
 };

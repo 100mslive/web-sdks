@@ -115,13 +115,23 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
-    this.transport = new HMSTransport(this.observer, this.deviceManager, this.store, this.localTrackManager);
+    this.transport = new HMSTransport(
+      this.observer,
+      this.deviceManager,
+      this.store,
+      this.localTrackManager,
+      this.eventBus,
+    );
   }
 
   private validateJoined(name: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, `Not connected - ${name}`);
     }
+  }
+
+  getWebrtcInternals() {
+    return this.transport?.getWebrtcInternals();
   }
 
   getPlaylistManager(): PlaylistManager {

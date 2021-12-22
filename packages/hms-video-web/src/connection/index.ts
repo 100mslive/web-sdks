@@ -121,10 +121,7 @@ export default abstract class HMSConnection {
   }
 
   async getStats() {
-    const stats = await this.nativeConnection.getStats();
-    const reports: any[] = [];
-    stats.forEach(stat => reports.push(stat));
-    return reports;
+    return await this.nativeConnection.getStats();
   }
 
   async close() {
