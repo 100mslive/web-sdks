@@ -5,17 +5,25 @@ import {
     HMSActions,
     HMSNotification,
     HMSNotifications,
+    HMSInternalsStore,
+    HMSWebrtcInternals
 } from '@100mslive/hms-video-store';
 import create from 'zustand';
-import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage } from './store';
+import {
+    HMSContextProviderProps,
+    makeHMSStoreHook,
+    hooksErrorMessage,
+    makeHMSStatsStoreHook
+} from './store';
 import { isBrowser } from '../utils/isBrowser';
 import { IHMSReactStore } from './types';
 
-
 export interface HMSRoomProviderProps {
     actions?: HMSActions;
-    store?: IHMSReactStore;
+    store?: IHMSReactStore<HMSStore>;
     notifications?: HMSNotifications;
+    webrtcInternals?: HMSWebrtcInternals;
+    isHMSStatsOn?: boolean;
 }
 
 /**
@@ -29,9 +37,16 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
     children,
     actions,
     store,
-    notifications
+    notifications,
+    webrtcInternals,
+    isHMSStatsOn = false
 }) => {
     if (!providerProps) {
+        // adding a dummy function for setstate and destroy because zustan'd create expects them
+        // to be present but we don't expose them from the store.
+        const errFn = () => {
+            throw new Error('modifying store is not allowed');
+        };
         if (actions && store) {
             providerProps = {
                 actions,
@@ -40,13 +55,19 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
             if (notifications) {
                 providerProps.notifications = notifications;
             }
+            if (webrtcInternals) {
+                const hmsInternals = webrtcInternals;
+                providerProps.statsStore = create<HMSInternalsStore>({
+                    getState: hmsInternals.getState,
+                    subscribe: hmsInternals.subscribe,
+                    setState: errFn,
+                    destroy: errFn
+                });
+                providerProps.hmsInternals = hmsInternals;
+            }
         } else {
             const hmsReactiveStore = new HMSReactiveStore();
-            // adding a dummy function for setstate and destroy because zustan'd create expects them
-            // to be present but we don't expose them from the store.
-            const errFn = () => {
-                throw new Error('modifying store is not allowed');
-            };
+
             providerProps = {
                 actions: hmsReactiveStore.getHMSActions(),
                 store: create<HMSStore>({
@@ -56,6 +77,17 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
                 }), // convert vanilla store in react hook
                 notifications: hmsReactiveStore.getNotifications()
             };
+
+            if (isHMSStatsOn) {
+                const hmsInternals = hmsReactiveStore.getWebrtcInternals();
+                providerProps.statsStore = create<HMSInternalsStore>({
+                    getState: hmsInternals.getState,
+                    subscribe: hmsInternals.subscribe,
+                    setState: errFn,
+                    destroy: errFn
+                });
+                providerProps.hmsInternals = hmsInternals;
+            }
         }
     }
     useEffect(() => {
@@ -74,6 +106,8 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
  * The hook can only be used in a component if HMSRoomProvider is present in its ancestors.
  */
 export const useHMSStore = makeHMSStoreHook(HMSContext);
+
+export const useHMSStatsStore = makeHMSStatsStoreHook(HMSContext);
 
 /**
  * `useHMSVanillaStore` is a read only hook which returns the vanilla HMSStore.

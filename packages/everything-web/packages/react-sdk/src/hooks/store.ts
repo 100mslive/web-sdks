@@ -1,8 +1,14 @@
 import { EqualityChecker, StateSelector } from 'zustand';
 import React, { useContext } from 'react';
 import shallow from 'zustand/shallow';
-import { HMSActions, HMSStore, HMSNotifications } from '@100mslive/hms-video-store';
-import  HMSLogger from '../utils/logger';
+import {
+    HMSActions,
+    HMSStore,
+    HMSNotifications,
+    HMSInternalsStore,
+    HMSWebrtcInternals
+} from '@100mslive/hms-video-store';
+import HMSLogger from '../utils/logger';
 import { IHMSReactStore } from './types';
 
 export const hooksErrorMessage =
@@ -10,8 +16,10 @@ export const hooksErrorMessage =
 
 export interface HMSContextProviderProps {
     actions: HMSActions; // for actions which may also mutate store
-    store: IHMSReactStore; // readonly store, don't mutate this
+    store: IHMSReactStore<HMSStore>; // readonly store, don't mutate this
     notifications?: HMSNotifications;
+    statsStore?: IHMSReactStore<HMSInternalsStore>;
+    hmsInternals?: HMSWebrtcInternals;
 }
 
 export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
@@ -30,6 +38,26 @@ export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderPro
         }
         const useStore = HMSContextConsumer.store;
         return useStore(selector, equalityFn);
+    };
+    return useHMSStore;
+}
+
+export function makeHMSStatsStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
+    const useHMSStore = <StateSlice>(
+        selector: StateSelector<HMSInternalsStore, StateSlice>,
+        equalityFn: EqualityChecker<StateSlice> = shallow
+    ) => {
+        if (!selector) {
+            HMSLogger.w(
+                'fetching full store without passing any selector may have a heavy performance impact on your website.'
+            );
+        }
+        const HMSContextConsumer = useContext(hmsContext);
+        if (!HMSContextConsumer) {
+            throw new Error(hooksErrorMessage);
+        }
+        const useStore = HMSContextConsumer.statsStore;
+        return useStore?.(selector, equalityFn);
     };
     return useHMSStore;
 }
