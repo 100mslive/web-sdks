@@ -37,7 +37,7 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
    * - if internals is called before join is completed, init internals when roomState changes to connected
    */
   store.subscribe(roomState => {
-    if (roomState === HMSRoomState.Connected) {
+    if ([HMSRoomState.Connected, HMSRoomState.Reconnecting].includes(roomState)) {
       if (!unsubscribe) {
         unsubscribe = initAndSubscribeWebrtcStore(sdk, webrtcStore, store);
       }
