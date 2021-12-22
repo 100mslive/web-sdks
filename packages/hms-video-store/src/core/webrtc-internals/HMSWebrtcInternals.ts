@@ -8,17 +8,18 @@ import {
   IHMSInternalsStore,
   HMSInternalsStoreWrapper,
   GetState,
+  selectRoomState,
 } from '..';
 import { subscribeToSdkWebrtcStats } from './webrtc-internals-store';
 
 export class HMSWebrtcInternals implements HMSInternalsStoreWrapper {
   readonly getState: GetState<HMSInternalsStore>;
   readonly subscribe: Subscribe<HMSInternalsStore>;
-  readonly getPublishPeerConnection: () => RTCPeerConnection | undefined;
-  readonly getSubscribePeerConnection: () => RTCPeerConnection | undefined;
+  readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;
+  readonly getSubscribePeerConnection: () => Promise<RTCPeerConnection | undefined>;
   private readonly store: IHMSInternalsStore;
 
-  constructor(private sdk: HMSSdk, private hmsStore: IHMSStore) {
+  constructor(private hmsStore: IHMSStore, private sdk?: HMSSdk) {
     this.store = HMSReactiveStore.createNewHMSStore<HMSInternalsStore>(
       'HMSInternalsStore',
       createDefaultInternalsStore,
@@ -27,8 +28,34 @@ export class HMSWebrtcInternals implements HMSInternalsStoreWrapper {
     this.getState = this.store.getState;
     this.subscribe = this.store.subscribe;
 
-    this.getPublishPeerConnection = this.sdk.getWebrtcInternals()?.getPublishPeerConnection || (() => undefined);
-    this.getSubscribePeerConnection = this.sdk.getWebrtcInternals()?.getSubscribePeerConnection || (() => undefined);
+    this.getPublishPeerConnection = () =>
+      new Promise<RTCPeerConnection | undefined>(resolve => {
+        if (this.hmsStore.getState(selectRoomState) === 'Connected') {
+          resolve(this.sdk?.getWebrtcInternals()?.getPublishPeerConnection());
+        } else {
+          this.hmsStore.subscribe(roomState => {
+            if (roomState === 'Connected') {
+              resolve(this.sdk?.getWebrtcInternals()?.getPublishPeerConnection());
+            }
+          }, selectRoomState);
+        }
+      });
+    this.getSubscribePeerConnection = () =>
+      new Promise<RTCPeerConnection | undefined>(resolve => {
+        if (this.hmsStore.getState(selectRoomState) === 'Connected') {
+          resolve(this.sdk?.getWebrtcInternals()?.getSubscribePeerConnection());
+        } else {
+          this.hmsStore.subscribe(roomState => {
+            if (roomState === 'Connected') {
+              resolve(this.sdk?.getWebrtcInternals()?.getSubscribePeerConnection());
+            }
+          }, selectRoomState);
+        }
+      });
+
+    if (!this.sdk) {
+      return;
+    }
 
     subscribeToSdkWebrtcStats(this.sdk, this.store, this.hmsStore);
   }
