@@ -9,27 +9,8 @@ import {
   isVideo,
   isAudioPlaylist,
 } from './selectorUtils';
+import { byIDCurry } from './common';
 import { HMSLogger } from '../../common/ui-logger';
-
-type byIDSelector<T> = (store: HMSStore, id?: string) => T;
-
-/**
- * StoreSelector is a function that takes in {@link HMSStore} as argument
- * and returns a part of the store that is queried using the selector.
- * @typeParam T Part of the store that you wish to query.
- */
-export type StoreSelector<T> = (store: HMSStore) => T;
-
-/**
- * takes in a normal selector which has store and id as input and curries it to make it easier to use.
- * Before: store.getState((store) => normalSelector(store, peerID))
- * After: store.getState(curriedSelector(peerID))
- */
-function byIDCurry<T>(selector: byIDSelector<T>): (id?: string) => StoreSelector<T> {
-  return (id?: string) => {
-    return (store: HMSStore) => selector(store, id);
-  };
-}
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
