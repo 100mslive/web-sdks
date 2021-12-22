@@ -21,13 +21,14 @@ import {
 import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { isPresent } from '../hmsSDKStore/common/presence';
 
+type Unsubscribe = (() => void) | undefined;
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
-  let unsubscribe: (() => void) | undefined;
+  let unsubscribe: Unsubscribe;
   /**
    * Connected to room, webrtc internals can be initialized
    */
   if (store.getState(selectRoomState) === HMSRoomState.Connected) {
-    unsubscribe = sdk.getWebrtcInternals()?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
+    unsubscribe = initAndSubscribeWebrtcStore(sdk, webrtcStore, store);
   }
 
   /**
@@ -36,17 +37,10 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
    * - if internals is called before join is completed, init internals when roomState changes to connected
    */
   store.subscribe(roomState => {
-    if (roomState === HMSRoomState.Connected && !unsubscribe) {
-      const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
-
-      const unsubSdkStats = sdk
-        .getWebrtcInternals()
-        ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
-
-      unsubscribe = () => {
-        unsubLocalPeer();
-        unsubSdkStats && unsubSdkStats();
-      };
+    if (roomState === HMSRoomState.Connected) {
+      if (!unsubscribe) {
+        unsubscribe = initAndSubscribeWebrtcStore(sdk, webrtcStore, store);
+      }
     } else {
       if (unsubscribe) {
         resetHMSInternalsStore(webrtcStore);
@@ -56,29 +50,64 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSInternal
   }, selectRoomState);
 };
 
-const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInternalsStore) => {
-  const unsubID = store.subscribe(localPeerID => {
-    webrtcStore.namedSetState(draft => {
-      draft.localPeer.id = localPeerID;
-    }, 'localpeer-id');
-  }, selectLocalPeerID);
+const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSInternalsStore, store: IHMSStore) => {
+  const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 
-  const unsubVideoTrackID = store.subscribe(videoTrackID => {
-    webrtcStore.namedSetState(draft => {
-      draft.localPeer.videoTrack = videoTrackID;
-    }, 'localpeer-videotrack-id');
-  }, selectLocalVideoTrackID);
-
-  const unsubAudioTrackID = store.subscribe(audioTrackID => {
-    webrtcStore.namedSetState(draft => {
-      draft.localPeer.videoTrack = audioTrackID;
-    }, 'localpeer-audiotrack-id');
-  }, selectLocalAudioTrackID);
+  const unsubSdkStats = sdk
+    .getWebrtcInternals()
+    ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
 
   return () => {
-    unsubID();
-    unsubVideoTrackID();
-    unsubAudioTrackID();
+    unsubLocalPeer();
+    unsubSdkStats && unsubSdkStats();
+  };
+};
+
+const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSInternalsStore) => {
+  let unsubID: Unsubscribe, unsubVideoTrackID: Unsubscribe, unsubAudioTrackID: Unsubscribe;
+  if (store.getState(selectLocalPeerID)) {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.id = store.getState(selectLocalPeerID);
+    }, 'localpeer-id');
+  } else {
+    unsubID = store.subscribe(localPeerID => {
+      localPeerID &&
+        webrtcStore.namedSetState(draft => {
+          draft.localPeer.id = localPeerID;
+        }, 'localpeer-id');
+    }, selectLocalPeerID);
+  }
+
+  if (store.getState(selectLocalVideoTrackID)) {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.videoTrack = store.getState(selectLocalVideoTrackID);
+    }, 'localpeer-videotrack-id');
+  } else {
+    unsubVideoTrackID = store.subscribe(videoTrackID => {
+      videoTrackID &&
+        webrtcStore.namedSetState(draft => {
+          draft.localPeer.videoTrack = videoTrackID;
+        }, 'localpeer-videotrack-id');
+    }, selectLocalVideoTrackID);
+  }
+
+  if (store.getState(selectLocalAudioTrackID)) {
+    webrtcStore.namedSetState(draft => {
+      draft.localPeer.videoTrack = store.getState(selectLocalAudioTrackID);
+    }, 'localpeer-audiotrack-id');
+  } else {
+    unsubAudioTrackID = store.subscribe(audioTrackID => {
+      audioTrackID &&
+        webrtcStore.namedSetState(draft => {
+          draft.localPeer.videoTrack = audioTrackID;
+        }, 'localpeer-audiotrack-id');
+    }, selectLocalAudioTrackID);
+  }
+
+  return () => {
+    unsubID?.();
+    unsubVideoTrackID?.();
+    unsubAudioTrackID?.();
   };
 };
 
