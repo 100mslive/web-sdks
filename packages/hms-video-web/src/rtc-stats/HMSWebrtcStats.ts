@@ -20,8 +20,8 @@ export class HMSPeerConnectionStats {
       if (r.packetsLost) {
         this.packetsLost += r.packetsLost;
       }
-      if (r.jitter) {
-        this.jitter += r.jitter;
+      if (r.jitter > this.jitter) {
+        this.jitter = r.jitter;
       }
       this.rawStatsArray.push(r);
     });
