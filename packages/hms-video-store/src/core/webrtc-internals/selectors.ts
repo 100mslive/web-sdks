@@ -2,6 +2,9 @@ import { createSelector } from 'reselect';
 import { HMSInternalsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
+/**
+ *  The total number of packets lost during the call
+ */
 export const packetsLost = (store: HMSInternalsStore) => store.packetsLost;
 
 export const jitter = (store: HMSInternalsStore) => store.jitter;
@@ -22,22 +25,40 @@ export const localPeerStats = createSelector(
   (storePeerStats, localPeerID) => storePeerStats[localPeerID],
 );
 
+/**
+ * The bitrate at which all the local tracks are being published at
+ */
 export const publishBitrate = createSelector(localPeerStats, localPeerStats => localPeerStats?.publish?.bitrate);
 
+/**
+ * The bitrate at which all the remote tracks are being received at
+ */
 export const subscribeBitrate = createSelector(localPeerStats, localPeerStats => localPeerStats?.subscribe?.bitrate);
 
+/**
+ * The total bitrate available for publishing
+ */
 export const availablePublishBitrate = createSelector(
   localPeerStats,
   localPeerStats => localPeerStats?.publish?.availableOutgoingBitrate,
 );
 
+/**
+ * The total bitrate available for subscribing to remote peers
+ */
 export const availableSubscribeBitrate = createSelector(
   localPeerStats,
   localPeerStats => localPeerStats?.subscribe?.availableIncomingBitrate,
 );
 
+/**
+ * The total bytes sent by the local peer
+ */
 export const totalBytesSent = createSelector(localPeerStats, localPeerStats => localPeerStats?.publish?.bytesSent);
 
+/**
+ * The total bytes received by the local peer
+ */
 export const totalBytesReceived = createSelector(
   localPeerStats,
   localPeerStats => localPeerStats?.subscribe?.bytesReceived,
@@ -56,21 +77,43 @@ const selectTrackStatsByIDBare = createSelector([selectTrackStatsMap, selectTrac
   trackID ? storeTrackStats[trackID] : undefined,
 );
 
+/**
+ * Stats(bitrate, bytes sent/received, etc...) for a single peer given the peer ID
+ */
 export const peerStatsByID = byIDCurry(selectPeerStatsByIDBare);
+
+/**
+ * Stats(bitrate, bytes sent/received, framerate, FPS, etc...) for a single track
+ */
 export const trackStatsByID = byIDCurry(selectTrackStatsByIDBare);
 
+/**
+ * The bitrate at which the track's data is being received
+ */
 export const bitrateByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bitrate));
 
+/**
+ * Bytes received from a particular track
+ */
 export const bytesReceivedByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bytesReceived),
 );
 
+/**
+ * The framerate(frames per second) of a particular video track
+ */
 export const framerateByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.framesPerSecond),
 );
 
+/**
+ * The jitter faced while receiving a particular track
+ */
 export const jitterByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter));
 
+/**
+ * The number of packets lost while receiving a particular track
+ */
 export const packetsLostByTrackID = byIDCurry(
   createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.packetsLost),
 );
