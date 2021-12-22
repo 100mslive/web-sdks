@@ -4,7 +4,7 @@ import { PeerConnectionType } from '.';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 
 export class HMSWebrtcInternals {
-  private statsMonitor: RTCStatsMonitor;
+  private statsMonitor?: RTCStatsMonitor;
   private currentHmsStats?: HMSWebrtcStats;
 
   constructor(
@@ -14,19 +14,9 @@ export class HMSWebrtcInternals {
      * This method is to get the track ID being sent(the active one in webrtc stats) given the original track ID.
      */
     private readonly getTrackIDBeingSent: (trackID: string) => string | undefined,
-    private readonly publishConnection?: RTCPeerConnection,
-    private readonly subscribeConnection?: RTCPeerConnection,
-  ) {
-    this.statsMonitor = new RTCStatsMonitor(
-      this.eventBus.rtcStatsUpdate,
-      Object.assign(
-        {},
-        this.publishConnection && { publish: this.publishConnection },
-        this.subscribeConnection && { subscribe: this.subscribeConnection },
-      ),
-    );
-    this.eventBus.rtcStatsUpdate.subscribe(this.handleStatsUpdate);
-  }
+    private publishConnection?: RTCPeerConnection,
+    private subscribeConnection?: RTCPeerConnection,
+  ) {}
 
   getPublishPeerConnection() {
     return this.publishConnection;
@@ -63,10 +53,29 @@ export class HMSWebrtcInternals {
   }
 
   /**
+   *
+   * @internal
+   */
+  setPeerConnections({ publish, subscribe }: { publish?: RTCPeerConnection; subscribe?: RTCPeerConnection }) {
+    this.publishConnection = publish;
+    this.subscribeConnection = subscribe;
+
+    this.statsMonitor = new RTCStatsMonitor(
+      this.eventBus.rtcStatsUpdate,
+      Object.assign(
+        {},
+        this.publishConnection && { publish: this.publishConnection },
+        this.subscribeConnection && { subscribe: this.subscribeConnection },
+      ),
+    );
+    this.eventBus.rtcStatsUpdate.subscribe(this.handleStatsUpdate);
+  }
+
+  /**
    * @internal
    */
   cleanUp() {
-    this.statsMonitor.stop();
+    this.statsMonitor?.stop();
     this.eventBus.rtcStatsUpdate.removeAllListeners();
     this.eventBus.statsUpdate.removeAllListeners();
   }

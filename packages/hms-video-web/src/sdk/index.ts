@@ -131,7 +131,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   getWebrtcInternals() {
-    return this.transport.getWebrtcInternals();
+    return this.transport?.getWebrtcInternals();
   }
 
   getPlaylistManager(): PlaylistManager {

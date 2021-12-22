@@ -82,7 +82,14 @@ export default class HMSTransport implements ITransport {
     private store: IStore,
     private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
-  ) {}
+  ) {
+    this.webrtcInternals = new HMSWebrtcInternals(
+      this.eventBus,
+      trackID => getTrackIDBeingSent(this.store, trackID),
+      this.publishConnection?.nativeConnection,
+      this.subscribeConnection?.nativeConnection,
+    );
+  }
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -702,12 +709,10 @@ export default class HMSTransport implements ITransport {
   }
 
   private async initRtcStatsMonitor() {
-    this.webrtcInternals = new HMSWebrtcInternals(
-      this.eventBus,
-      trackID => getTrackIDBeingSent(this.store, trackID),
-      this.publishConnection?.nativeConnection,
-      this.subscribeConnection?.nativeConnection,
-    );
+    this.webrtcInternals?.setPeerConnections({
+      publish: this.publishConnection?.nativeConnection,
+      subscribe: this.subscribeConnection?.nativeConnection,
+    });
     if (this.store.getSubscribeDegradationParams()) {
       this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
       this.eventBus.statsUpdate.subscribe(stats => {
@@ -722,7 +727,7 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
-    await this.webrtcInternals.getStatsMonitor().start();
+    await this.webrtcInternals?.getStatsMonitor()?.start();
   }
 
   private retryPublishIceFailedTask = async () => {
