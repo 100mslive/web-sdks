@@ -1,2 +1,2 @@
 export * from './fakeHMSStore';
-export * from './fakeHMSInternalsStore';
+export * from './fakeHMSStatsStore';
