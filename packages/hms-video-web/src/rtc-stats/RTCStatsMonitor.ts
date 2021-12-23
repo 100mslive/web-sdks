@@ -1,15 +1,18 @@
-import HMSConnection from '../connection';
+import { HMSInternalEvent } from '../events/HMSInternalEvent';
+import { PeerConnectionType } from '.';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
-import { TypedEventEmitter } from '../utils/typed-event-emitter';
-import { RTCStats } from './RTCStats';
 
-export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCStats }> {
+export type RTCStatsUpdate = Record<Partial<PeerConnectionType>, RTCStatsReport>;
+
+export class RTCStatsMonitor {
   private isMonitored = false;
-  constructor(private readonly connections: HMSConnection[], private readonly interval = RTC_STATS_MONITOR_INTERVAL) {
-    super();
-  }
+  constructor(
+    private readonly hmsInternalEvent: HMSInternalEvent<RTCStatsUpdate>,
+    private readonly connections: Record<Partial<PeerConnectionType>, RTCPeerConnection>,
+    private readonly interval = RTC_STATS_MONITOR_INTERVAL,
+  ) {}
 
   async start() {
     this.stop();
@@ -30,28 +33,12 @@ export class RTCStatsMonitor extends TypedEventEmitter<{ RTC_STATS_CHANGE: RTCSt
   }
 
   private async handleConnectionsStats() {
-    let totalPacketsLost = 0;
-    let availableIncomingBitrate = 0;
-    let availableOutgoingBitrate = 0;
-    for (const conn of this.connections) {
-      const stats = await conn.getStats();
-      stats.forEach(stat => {
-        if (stat.packetsLost) {
-          totalPacketsLost += stat.packetsLost;
-        }
-        if (stat.availableIncomingBitrate) {
-          availableIncomingBitrate = Number(stat.availableIncomingBitrate);
-        }
-        if (stat.availableOutgoingBitrate) {
-          availableOutgoingBitrate = Number(stat.availableOutgoingBitrate);
-        }
-      });
+    const stats: Record<string, RTCStatsReport> = {};
+    for (const connType in this.connections) {
+      const conn = this.connections[connType as PeerConnectionType];
+      stats[connType] = await conn.getStats();
     }
 
-    this.emit('RTC_STATS_CHANGE', {
-      packetsLost: totalPacketsLost,
-      availableIncomingBitrate,
-      availableOutgoingBitrate,
-    });
+    this.hmsInternalEvent.publish(stats as RTCStatsUpdate);
   }
 }

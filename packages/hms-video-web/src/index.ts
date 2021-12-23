@@ -10,5 +10,6 @@ export * from './utils/device-error';
 export * from './utils/support';
 export * from './error/HMSException';
 export * from './interfaces';
+export * from './rtc-stats';
 export * from './plugins';
 export * from './utils/logger';

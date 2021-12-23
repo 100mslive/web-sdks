@@ -15,4 +15,7 @@ export class HMSInternalEvent<T> {
   unsubscribe = (fn: (event: T) => void | Promise<void>) => {
     this.eventEmitter.off(this.eventName, fn);
   };
+  removeAllListeners = () => {
+    this.eventEmitter.removeAllListeners(this.eventName);
+  };
 }

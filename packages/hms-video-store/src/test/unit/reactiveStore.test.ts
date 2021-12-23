@@ -1,4 +1,11 @@
-import { HMSReactiveStore, HMSStore, IHMSStore, selectLocalPeer, selectPeers } from '../../core';
+import {
+  HMSReactiveStore,
+  HMSStore,
+  IHMSStore,
+  createDefaultStoreState,
+  selectLocalPeer,
+  selectPeers,
+} from '../../core';
 import { localPeer, makeFakeStore } from '../fakeStore';
 
 let store: IHMSStore;
@@ -7,7 +14,7 @@ let cb: jest.Mock;
 let initialState: HMSStore;
 
 beforeEach(() => {
-  store = HMSReactiveStore.createNewHMSStore();
+  store = HMSReactiveStore.createNewHMSStore('HMSStore', createDefaultStoreState);
   cb = jest.fn(val => val);
   fakeData = makeFakeStore();
   store.setState(store => {

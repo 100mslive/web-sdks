@@ -1,16 +1,10 @@
 import { IStore } from '../sdk/store/IStore';
-import { RTCStats } from '../rtc-stats';
-import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { HMSRemoteVideoTrack } from '../media/tracks';
 import HMSLogger from '../utils/logger';
-
-interface TrackDegradationControllerEvents {
-  TRACK_DEGRADED: HMSRemoteVideoTrack;
-  TRACK_RESTORED: HMSRemoteVideoTrack;
-}
+import { EventBus } from '../events/EventBus';
 
 /** @see docs/Subscribe-Degradation.md */
-export class TrackDegradationController extends TypedEventEmitter<TrackDegradationControllerEvents> {
+export class TrackDegradationController {
   private readonly TAG = '[TrackDegradationController]';
   private readonly PACKETS_LOST_THRESHOLD: number;
   private readonly MIN_DEGRADE_GRACE_PERIOD: number;
@@ -27,9 +21,7 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
     return Boolean(this.recoveringTrack);
   }
 
-  constructor(private store: IStore) {
-    super();
-
+  constructor(private readonly store: IStore, private readonly eventBus: EventBus) {
     const storeParams = this.store.getSubscribeDegradationParams()!;
     this.PACKETS_LOST_THRESHOLD = storeParams.packetLossThreshold;
     this.MIN_DEGRADE_GRACE_PERIOD = storeParams.degradeGracePeriodSeconds;
@@ -39,13 +31,13 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
     this.recoverGracePeriod = this.MIN_RECOVER_GRACE_PERIOD;
   }
 
-  handleRtcStatsChange(rtcStats: RTCStats) {
+  handleRtcStatsChange(packetsLost: number) {
     /**
-     * rtcStats.packetLost is a running counter
+     * packetLost is a running counter
      * Degrade if packetsLost increase is greater than threshold
      */
-    const shouldDegrade = rtcStats.packetsLost > this.packetsLost + this.PACKETS_LOST_THRESHOLD;
-    this.packetsLost = rtcStats.packetsLost;
+    const shouldDegrade = packetsLost > this.packetsLost + this.PACKETS_LOST_THRESHOLD;
+    this.packetsLost = packetsLost;
     shouldDegrade ? this.degrade() : this.recover();
   }
 
@@ -81,8 +73,13 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
 
     HMSLogger.d(this.TAG, 'Packet lost stable, recovering track', this.recoveringTrack);
     this.recoveringTrack.setDegraded(false);
-    this.emit('TRACK_RESTORED', this.recoveringTrack);
+    this.eventBus.trackRestored.publish(this.recoveringTrack);
     this.recoverGracePeriod = this.MIN_RECOVER_GRACE_PERIOD;
+  }
+
+  cleanUp() {
+    this.eventBus.trackDegraded.removeAllListeners();
+    this.eventBus.trackRestored.removeAllListeners();
   }
 
   private degradeActiveTracksByHalf() {
@@ -96,7 +93,7 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
     while (halfCount--) {
       const track = activeTracks.pop();
       track!.setDegraded(true);
-      this.emit('TRACK_DEGRADED', track!);
+      this.eventBus.trackDegraded.publish(track!);
     }
   }
 
@@ -124,7 +121,7 @@ export class TrackDegradationController extends TypedEventEmitter<TrackDegradati
   private cancelRecovery() {
     if (this.recoveringTrack) {
       this.recoveringTrack.setDegraded(true);
-      this.emit('TRACK_DEGRADED', this.recoveringTrack);
+      this.eventBus.trackDegraded.publish(this.recoveringTrack);
     }
     this.recoveringTrack = undefined;
     this.recoverAttemptCount++;
