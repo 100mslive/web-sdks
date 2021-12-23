@@ -18,14 +18,21 @@ import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
-import { HMSWebrtcInternals } from '../webrtc-internals';
+import { HMSStats } from '../webrtc-stats';
+import { storeNameWithTabTitle } from '../../common/storeName';
+
+declare global {
+  interface Window {
+    __hms: HMSReactiveStore;
+  }
+}
 
 export class HMSReactiveStore {
   private readonly sdk?: HMSSdk;
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
-  private webrtcInternals?: HMSWebrtcInternals;
+  private webrtcStats?: HMSStats;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -33,7 +40,10 @@ export class HMSReactiveStore {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
-      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>('HMSStore', createDefaultStoreState);
+      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>(
+        storeNameWithTabTitle('HMSStore'),
+        createDefaultStoreState,
+      );
     }
     if (hmsNotifications) {
       this.notifications = hmsNotifications;
@@ -48,6 +58,8 @@ export class HMSReactiveStore {
     }
 
     this.initialTriggerOnSubscribe = false;
+
+    window.__hms = this;
   }
 
   /**
@@ -98,11 +110,11 @@ export class HMSReactiveStore {
    * @alpha
    * @internal
    */
-  getWebrtcInternals = (): HMSWebrtcInternals => {
-    if (!this.webrtcInternals) {
-      this.webrtcInternals = new HMSWebrtcInternals(this.store, this.sdk);
+  getWebrtcStats = (): HMSStats => {
+    if (!this.webrtcStats) {
+      this.webrtcStats = new HMSStats(this.store, this.sdk);
     }
-    return this.webrtcInternals;
+    return this.webrtcStats;
   };
 
   /**
