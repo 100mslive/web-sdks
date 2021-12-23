@@ -1,5 +1,6 @@
 import { HMSSdk } from '@100mslive/hms-video';
 import { Subscribe } from 'zustand/vanilla';
+import { storeNameWithTabTitle } from '../../common/storeName';
 import {
   createDefaultStatsStore,
   HMSStatsStore,
@@ -20,7 +21,10 @@ export class HMSWebrtcInternals implements HMSStatsStoreWrapper {
   private readonly store: IHMSStatsStore;
 
   constructor(private hmsStore: IHMSStore, private sdk?: HMSSdk) {
-    this.store = HMSReactiveStore.createNewHMSStore<HMSStatsStore>('HMSStatsStore', createDefaultStatsStore);
+    this.store = HMSReactiveStore.createNewHMSStore<HMSStatsStore>(
+      storeNameWithTabTitle('HMSStatsStore'),
+      createDefaultStatsStore,
+    );
 
     this.getState = this.store.getState;
     this.subscribe = this.store.subscribe;

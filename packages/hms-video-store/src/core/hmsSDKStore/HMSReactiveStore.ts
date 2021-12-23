@@ -19,6 +19,13 @@ import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { HMSWebrtcInternals } from '../webrtc-internals';
+import { storeNameWithTabTitle } from '../../common/storeName';
+
+declare global {
+  interface Window {
+    __hms: HMSReactiveStore;
+  }
+}
 
 export class HMSReactiveStore {
   private readonly sdk?: HMSSdk;
@@ -33,7 +40,10 @@ export class HMSReactiveStore {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
-      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>('HMSStore', createDefaultStoreState);
+      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>(
+        storeNameWithTabTitle('HMSStore'),
+        createDefaultStoreState,
+      );
     }
     if (hmsNotifications) {
       this.notifications = hmsNotifications;
@@ -48,6 +58,8 @@ export class HMSReactiveStore {
     }
 
     this.initialTriggerOnSubscribe = false;
+
+    window.__hms = this;
   }
 
   /**
