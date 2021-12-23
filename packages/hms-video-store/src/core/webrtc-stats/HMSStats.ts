@@ -13,7 +13,7 @@ import {
 } from '..';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 
-export class HMSWebrtcInternals implements HMSStatsStoreWrapper {
+export class HMSStats implements HMSStatsStoreWrapper {
   readonly getState: GetState<HMSStatsStore>;
   readonly subscribe: Subscribe<HMSStatsStore>;
   readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;
