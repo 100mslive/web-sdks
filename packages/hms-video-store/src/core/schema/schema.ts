@@ -33,8 +33,6 @@ export interface HMSStore {
 export interface HMSStatsStore {
   publishStats?: HMSPeerConnectionStats;
   subscribeStats?: HMSPeerConnectionStats;
-  packetsLost: number;
-  jitter: number;
   trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
   localPeer: {
@@ -115,8 +113,6 @@ export const createDefaultStoreState = (): HMSStore => {
 
 export const createDefaultStatsStore = (): HMSStatsStore => {
   return {
-    jitter: 0,
-    packetsLost: 0,
     peerStats: {},
     trackStats: {},
     localPeer: { id: '' },

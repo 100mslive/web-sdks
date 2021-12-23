@@ -24,7 +24,12 @@ export type HMSOutboundTrackStats = HMSTrackStats & RTCOutboundRtpStreamStats;
 
 export type RTCTrackStats = RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats;
 
+type AdditionalPeerStats = {
+  packetsLost: number;
+  packetsLostRate: number;
+  jitter: number;
+};
 export type HMSPeerStats = {
   publish?: RTCIceCandidatePairStats & WithBitrate;
-  subscribe?: RTCIceCandidatePairStats & WithBitrate;
+  subscribe?: RTCIceCandidatePairStats & WithBitrate & AdditionalPeerStats;
 };

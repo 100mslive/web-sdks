@@ -114,9 +114,6 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
 const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
-    store.jitter = stats.getJitter();
-    store.packetsLost = stats.getPacketsLost();
-
     // Not used by UI
     // store.publishStats = SDKToHMS.convertConnectionStats(stats.getPublishStats());
     // store.subscribeStats = SDKToHMS.convertConnectionStats(stats.getSubscribeStats());
@@ -134,11 +131,7 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcSta
     mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
 
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
-    const newPeerStats = attachLocalPeerStats(
-      hmsStore,
-      store.peerStats[hmsStore.getState(selectLocalPeerID)],
-      stats.getLocalPeerStats(),
-    );
+    const newPeerStats = attachLocalPeerStats(hmsStore, store.peerStats[hmsStore.getState(selectLocalPeerID)], stats);
     mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(store.peerStats, newPeerStats);
   }, 'webrtc-stats');
 };
@@ -146,11 +139,9 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcSta
 const attachLocalPeerStats = (
   hmsStore: IHMSStore,
   storeLocalPeerStats: HMSPeerStats | undefined,
-  sdkLocalPeerStats: {
-    publish: RTCIceCandidatePairStats | undefined;
-    subscribe: RTCIceCandidatePairStats | undefined;
-  },
+  sdkStats: HMSWebrtcStats,
 ) => {
+  const sdkLocalPeerStats = sdkStats.getLocalPeerStats();
   const newPeerStats: Record<HMSPeerID, HMSPeerStats> = {};
 
   const localPeerID = hmsStore.getState(selectLocalPeerID);
@@ -159,31 +150,49 @@ const attachLocalPeerStats = (
   }
   // If prev stats is available
   if (storeLocalPeerStats) {
-    newPeerStats[localPeerID] = attachPeerBitrate(sdkLocalPeerStats, storeLocalPeerStats);
+    newPeerStats[localPeerID] = attachPeerRates(sdkStats, storeLocalPeerStats);
   } else {
     if (sdkLocalPeerStats.publish) {
       newPeerStats[localPeerID].publish = Object.assign(sdkLocalPeerStats.publish, { bitrate: 0 });
     }
     if (sdkLocalPeerStats.subscribe) {
-      newPeerStats[localPeerID].subscribe = Object.assign(sdkLocalPeerStats.subscribe, { bitrate: 0 });
+      newPeerStats[localPeerID].subscribe = Object.assign(
+        sdkLocalPeerStats.subscribe,
+        { bitrate: 0 },
+        {
+          packetsLost: sdkStats.getPacketsLost(),
+          jitter: sdkStats.getJitter(),
+          packetsLostRate: 0,
+        },
+      );
     }
   }
 
   return newPeerStats;
 };
 
-const attachPeerBitrate = (
-  newStats: {
-    publish: RTCIceCandidatePairStats | undefined;
-    subscribe: RTCIceCandidatePairStats | undefined;
-  },
-  oldStats?: HMSPeerStats,
-): HMSPeerStats => {
+const attachPeerRates = (newSdkStats: HMSWebrtcStats, oldStats?: HMSPeerStats): HMSPeerStats => {
+  const newStats = newSdkStats.getLocalPeerStats();
+
+  const packetsLostRate = computeNumberRate(
+    newSdkStats.getPacketsLost(),
+    oldStats?.subscribe?.packetsLost,
+    newStats.subscribe?.timestamp,
+    oldStats?.subscribe?.timestamp,
+  );
   const publishBitrate = computeBitrate('bytesSent', newStats.publish, oldStats?.publish);
   const subscribeBitrate = computeBitrate('bytesReceived', newStats.subscribe, oldStats?.subscribe);
 
   const newPublishStats = Object.assign(newStats.publish, { bitrate: publishBitrate });
-  const newSubscribeStats = Object.assign(newStats.subscribe, { bitrate: subscribeBitrate });
+  const newSubscribeStats = Object.assign(
+    newStats.subscribe,
+    { bitrate: subscribeBitrate },
+    {
+      packetsLost: newSdkStats.getPacketsLost(),
+      jitter: newSdkStats.getJitter(),
+      packetsLostRate,
+    },
+  );
 
   return { publish: newPublishStats, subscribe: newSubscribeStats };
 };
@@ -216,18 +225,34 @@ const computeBitrate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
   statName: keyof T,
   newReport?: T,
   oldReport?: T,
+): number => computeStatRate(statName, newReport, oldReport) * 8; // Bytes to bits
+
+const computeStatRate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
+  statName: keyof T,
+  newReport?: T,
+  oldReport?: T,
 ): number => {
   const newVal = newReport && newReport[statName];
   const oldVal = oldReport ? oldReport[statName] : null;
   if (newReport && oldReport && isPresent(newVal) && isPresent(oldVal)) {
     // Type not null checked in `isPresent`
-    // * 8 - for bytes to bits
     // * 1000 - ms to s
     return (
-      (((newVal as unknown as number) - (oldVal as unknown as number)) / (newReport.timestamp - oldReport.timestamp)) *
-      1000 *
-      8
+      computeNumberRate(
+        newVal as unknown as number,
+        oldVal as unknown as number,
+        newReport.timestamp,
+        oldReport.timestamp,
+      ) * 1000
     );
+  } else {
+    return 0;
+  }
+};
+
+const computeNumberRate = (newVal?: number, oldVal?: number, newTimestamp?: number, oldTimestamp?: number) => {
+  if (isPresent(newVal) && isPresent(oldVal) && newTimestamp && oldTimestamp) {
+    return ((newVal as number) - (oldVal as number)) / (newTimestamp - oldTimestamp);
   } else {
     return 0;
   }
