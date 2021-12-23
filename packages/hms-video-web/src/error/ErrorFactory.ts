@@ -242,7 +242,7 @@ export const ErrorFactory = {
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description);
+      return new HMSException(code, 'ServerErrors', action, description, description, true);
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
