@@ -1,4 +1,4 @@
-import { HMSStore, HMSInternalsStore } from './schema';
+import { HMSStore, HMSStatsStore } from './schema';
 import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
 import { NamedSetState } from './hmsSDKStore/internalTypes';
 
@@ -80,5 +80,5 @@ export type IHMSStore = IStore<HMSStore>;
  */
 export type IHMSStoreReadOnly = IStoreReadOnly<HMSStore>;
 
-export type IHMSInternalsStore = IStore<HMSInternalsStore>;
-export type IHMSInternalsStoreReadOnly = IStoreReadOnly<HMSInternalsStore>;
+export type IHMSStatsStore = IStore<HMSStatsStore>;
+export type IHMSStatsStoreReadOnly = IStoreReadOnly<HMSStatsStore>;

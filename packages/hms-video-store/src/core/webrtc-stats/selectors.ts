@@ -1,21 +1,14 @@
 import { createSelector } from 'reselect';
-import { HMSInternalsStore, HMSPeerID, HMSTrackID } from '../schema';
+import { HMSStatsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
-/**
- *  The total number of packets lost during the call
- */
-export const packetsLost = (store: HMSInternalsStore) => store.packetsLost;
-
-export const jitter = (store: HMSInternalsStore) => store.jitter;
-
-const selectLocalPeerID = (store: HMSInternalsStore) => store.localPeer.id;
-const selectLocalAudioTrackID = (store: HMSInternalsStore) => store.localPeer.audioTrack;
-const selectLocalVideoTrackID = (store: HMSInternalsStore) => store.localPeer.videoTrack;
-const selectPeerID = (_store: HMSInternalsStore, peerID: HMSPeerID | undefined) => peerID;
-const selectTrackID = (_store: HMSInternalsStore, trackID: HMSTrackID | undefined) => trackID;
-const selectTrackStatsMap = (store: HMSInternalsStore) => store.trackStats;
-const selectPeerStatsMap = (store: HMSInternalsStore) => store.peerStats;
+const selectLocalPeerID = (store: HMSStatsStore) => store.localPeer.id;
+const selectLocalAudioTrackID = (store: HMSStatsStore) => store.localPeer.audioTrack;
+const selectLocalVideoTrackID = (store: HMSStatsStore) => store.localPeer.videoTrack;
+const selectPeerID = (_store: HMSStatsStore, peerID: HMSPeerID | undefined) => peerID;
+const selectTrackID = (_store: HMSStatsStore, trackID: HMSTrackID | undefined) => trackID;
+const selectTrackStatsMap = (store: HMSStatsStore) => store.trackStats;
+const selectPeerStatsMap = (store: HMSStatsStore) => store.peerStats;
 
 /**
  * Local peer stats selectors
@@ -24,6 +17,13 @@ export const localPeerStats = createSelector(
   [selectPeerStatsMap, selectLocalPeerID],
   (storePeerStats, localPeerID) => storePeerStats[localPeerID],
 );
+
+/**
+ *  The total number of packets lost during the call
+ */
+export const packetsLost = createSelector(localPeerStats, localPeerStats => localPeerStats?.subscribe?.packetsLost);
+
+export const jitter = createSelector(localPeerStats, localPeerStats => localPeerStats?.subscribe?.jitter);
 
 /**
  * The bitrate at which all the local tracks are being published at

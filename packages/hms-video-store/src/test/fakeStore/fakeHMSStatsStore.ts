@@ -1,22 +1,18 @@
-import { HMSPeerStats, HMSTrackStats, HMSInternalsStore } from '../../core';
+import { HMSPeerStats, HMSTrackStats, HMSStatsStore } from '../../core';
 
-export let packetsLost: number;
-export let jitter: number;
 export let localPeerStats: HMSPeerStats;
 export let localVideoTrackStats: HMSTrackStats;
 export let localAudioTrackStats: HMSTrackStats;
 export let remoteVideoTrackStats: HMSTrackStats;
 export let remoteAudioTrackStats: HMSTrackStats;
 
-export const makeFakeInternalsStore = (): HMSInternalsStore => {
+export const makeFakeInternalsStore = (): HMSStatsStore => {
   const fakeInternalsStore = {
     localPeer: {
       id: '1',
       videoTrack: '101',
       audioTrack: '102',
     },
-    jitter: 0.026000000000000002,
-    packetsLost: 17,
     peerStats: {
       '1': {
         publish: {
@@ -73,6 +69,9 @@ export const makeFakeInternalsStore = (): HMSInternalsStore => {
           packetsDiscardedOnSend: 0,
           bytesDiscardedOnSend: 0,
           bitrate: 61413.33232196812,
+          jitter: 0.026000000000000002,
+          packetsLost: 17,
+          packetsLostRate: 0.003,
         },
       },
     },
@@ -248,13 +247,11 @@ export const makeFakeInternalsStore = (): HMSInternalsStore => {
     },
   };
 
-  packetsLost = fakeInternalsStore.packetsLost;
-  jitter = fakeInternalsStore.jitter;
   localPeerStats = fakeInternalsStore.peerStats['1'] as HMSPeerStats;
   localVideoTrackStats = fakeInternalsStore.trackStats['101'] as HMSTrackStats;
   localAudioTrackStats = fakeInternalsStore.trackStats['102'] as HMSTrackStats;
   remoteVideoTrackStats = fakeInternalsStore.trackStats['103'] as HMSTrackStats;
   remoteAudioTrackStats = fakeInternalsStore.trackStats['104'] as HMSTrackStats;
 
-  return fakeInternalsStore as HMSInternalsStore;
+  return fakeInternalsStore as HMSStatsStore;
 };
