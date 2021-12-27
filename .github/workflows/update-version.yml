@@ -68,13 +68,14 @@ jobs:
         # overriding any manual version update by the action.
         # exit job if this step is successful
         if: steps.main.outputs.sdk_version == steps.branch.outputs.sdk_version && needs.changes.outputs.sdk == 'true'
+        id: sdkUpdate
         run: |
           cd packages/hms-video-web
           lerna version prerelease --no-git-tag-version --yes --exact
           echo "updating sdk and store"
           git commit -am "build: update versions"
           git push
-          exit 0
+          echo "::set-output name=updated::true"
 
       - name: revert sdk version
         # revert sdk version to main version if changes are reversed
@@ -91,7 +92,8 @@ jobs:
       - name: Update store version
         # don't update the version if PR has a version change already, this prevents
         # overriding any manual version update by the action.
-        if: steps.main.outputs.store_version == steps.branch.outputs.store_version && needs.changes.outputs.store == 'true'
+        # run only if sdk update above has not run
+        if: needs.changes.outputs.store == 'true' && steps.sdkUpdate.outputs.updated != 'true'
         run: |
           cd packages/hms-video-store
           VERSION=$(npm version prerelease --preid alpha)

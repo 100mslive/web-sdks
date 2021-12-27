@@ -24,6 +24,7 @@ export enum HMSSignalMethod {
   BROADCAST = 'broadcast',
   ANALYTICS = 'analytics',
   SERVER_ERROR = 'on-error',
+  SERVER_WARNING = 'on-warning',
   SDK_NOTIFICATION = 'sdk-notification',
   LEAVE = 'leave',
   END_ROOM = 'end-room',

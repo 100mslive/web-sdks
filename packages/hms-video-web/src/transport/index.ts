@@ -144,7 +144,6 @@ export default class HMSTransport implements ITransport {
     onNotification: (message: any) => this.observer.onNotification(message),
 
     onServerError: async (error: HMSException) => {
-      await this.leave();
       await this.observer.onStateChange(TransportState.Failed, error);
     },
 
