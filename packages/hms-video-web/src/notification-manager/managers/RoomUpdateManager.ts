@@ -49,7 +49,7 @@ export class RoomUpdateManager {
     room.recording.server.running = recording.sfu.enabled;
     room.recording.browser.running = recording.beam.enabled;
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
-    room.rtmp.startedAt = streaming.rtmp?.started_at;
+    room.rtmp.startedAt = streaming.rtmp?.started_at ? new Date(streaming.rtmp?.started_at) : undefined;
     room.hls.running = streaming.hls?.enabled;
     // update variants
     streaming.hls?.variants?.map(variant => {
@@ -61,7 +61,7 @@ export class RoomUpdateManager {
       });
     });
     room.sessionId = session_id;
-    room.startedAt = started_at;
+    room.startedAt = started_at ? new Date(started_at) : undefined;
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
@@ -123,7 +123,7 @@ export class RoomUpdateManager {
     if (!room.rtmp) {
       room.rtmp = {
         running: false,
-        startedAt,
+        startedAt: startedAt ? new Date(startedAt) : undefined,
       };
     }
     room.rtmp.running = running;

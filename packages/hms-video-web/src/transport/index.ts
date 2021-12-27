@@ -33,7 +33,6 @@ import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSPeer, HMSRoleChangeRequest, HLSConfig } from '../interfaces';
-import { RTCStatsMonitor } from '../rtc-stats';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -47,6 +46,9 @@ import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { LocalTrackManager } from '../sdk/LocalTrackManager';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { EventBus } from '../events/EventBus';
+import { getTrackIDBeingSent } from '../utils/track';
 
 const TAG = '[HMSTransport]:';
 
@@ -71,15 +73,23 @@ export default class HMSTransport implements ITransport {
       await this.observer.onStateChange(this.state, error);
     }
   });
-  private subscribeConnStatsMonitor?: RTCStatsMonitor;
   private trackDegradationController?: TrackDegradationController;
+  private webrtcInternals?: HMSWebrtcInternals;
 
   constructor(
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private store: IStore,
     private localTrackManager: LocalTrackManager,
-  ) {}
+    private eventBus: EventBus,
+  ) {
+    this.webrtcInternals = new HMSWebrtcInternals(
+      this.eventBus,
+      trackID => getTrackIDBeingSent(this.store, trackID),
+      this.publishConnection?.nativeConnection,
+      this.subscribeConnection?.nativeConnection,
+    );
+  }
 
   /**
    * Map of callbacks used to wait for an event to fire.
@@ -271,6 +281,10 @@ export default class HMSTransport implements ITransport {
     }
   }
 
+  getWebrtcInternals() {
+    return this.webrtcInternals;
+  }
+
   async join(
     authToken: string,
     peerId: string,
@@ -360,9 +374,8 @@ export default class HMSTransport implements ITransport {
 
     try {
       this.state = TransportState.Leaving;
-      this.subscribeConnStatsMonitor?.stop();
-      this.subscribeConnStatsMonitor?.removeAllListeners();
-      this.trackDegradationController?.removeAllListeners();
+      this.webrtcInternals?.cleanUp();
+      this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (this.signal.isConnected) {
@@ -696,22 +709,25 @@ export default class HMSTransport implements ITransport {
   }
 
   private async initRtcStatsMonitor() {
+    this.webrtcInternals?.setPeerConnections({
+      publish: this.publishConnection?.nativeConnection,
+      subscribe: this.subscribeConnection?.nativeConnection,
+    });
     if (this.store.getSubscribeDegradationParams()) {
-      this.subscribeConnStatsMonitor = new RTCStatsMonitor([this.subscribeConnection!]);
-      this.trackDegradationController = new TrackDegradationController(this.store);
-      this.subscribeConnStatsMonitor.on('RTC_STATS_CHANGE', stats =>
-        this.trackDegradationController?.handleRtcStatsChange(stats),
-      );
-      this.trackDegradationController.on('TRACK_DEGRADED', track => {
+      this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
+      this.eventBus.statsUpdate.subscribe(stats => {
+        this.trackDegradationController?.handleRtcStatsChange(stats.getSubscribeStats().packetsLost);
+      });
+      this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
         this.observer.onTrackDegrade(track);
       });
-      this.trackDegradationController.on('TRACK_RESTORED', track => {
+      this.eventBus.trackRestored.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, false)).flush();
         this.observer.onTrackRestore(track);
       });
-      await this.subscribeConnStatsMonitor.start();
     }
+    await this.webrtcInternals?.getStatsMonitor()?.start();
   }
 
   private retryPublishIceFailedTask = async () => {

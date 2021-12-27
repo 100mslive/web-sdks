@@ -7,6 +7,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
 import { HMSPlaylist } from './playlist';
+import { HMSPeerConnectionStats, HMSPeerStats, HMSTrackStats } from './webrtc-stats';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -27,6 +28,18 @@ export interface HMSStore {
   roles: Record<string, HMSRole>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
+}
+
+export interface HMSStatsStore {
+  publishStats?: HMSPeerConnectionStats;
+  subscribeStats?: HMSPeerConnectionStats;
+  trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
+  localPeer: {
+    id: HMSPeerID;
+    videoTrack?: HMSTrackID;
+    audioTrack?: HMSTrackID;
+  };
 }
 
 /**
@@ -95,5 +108,13 @@ export const createDefaultStoreState = (): HMSStore => {
     roles: {},
     roleChangeRequests: [],
     errors: [],
+  };
+};
+
+export const createDefaultStatsStore = (): HMSStatsStore => {
+  return {
+    peerStats: {},
+    trackStats: {},
+    localPeer: { id: '' },
   };
 };

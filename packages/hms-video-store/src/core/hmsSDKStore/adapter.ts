@@ -1,6 +1,7 @@
 import {
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
+  HMSPeerConnectionStats,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
@@ -111,7 +112,7 @@ export class SDKToHMS {
       rtmp: { running: !!sdkRoom.rtmp?.running },
       hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
       sessionId: sdkRoom.sessionId,
-      startedAt: sdkRoom.startedAt,
+      startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
     };
   }
 
@@ -193,6 +194,13 @@ export class SDKToHMS {
       selected: isSelected,
       playing: isSelected && isPlaying,
     };
+  }
+
+  static convertConnectionStats(stats: HMSPeerConnectionStats) {
+    const serialized: any = { ...stats };
+    delete serialized['rawStatsArray'];
+    delete serialized['rawStats'];
+    return serialized;
   }
 
   private static getConvertedPlaylistType(playlistManager: sdkTypes.HMSPlaylistManager, type: HMSPlaylistType) {
