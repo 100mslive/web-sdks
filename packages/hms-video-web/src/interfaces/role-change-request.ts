@@ -6,7 +6,7 @@ import { HMSPeer } from '../sdk/models/peer';
  * sent to the users of the SDK.
  */
 export interface HMSRoleChangeRequest {
-  requestedBy: HMSPeer;
+  requestedBy?: HMSPeer;
   role: HMSRole;
   token: string;
 }

@@ -3,7 +3,7 @@ import { HMSLocalTrack, HMSTrackSource } from '../media/tracks';
 import { HMSRemotePeer } from './peer';
 
 export interface HMSChangeTrackStateRequest {
-  requestedBy: HMSRemotePeer;
+  requestedBy?: HMSRemotePeer;
   track: HMSLocalTrack;
   enabled: boolean;
 }
@@ -16,7 +16,7 @@ export interface HMSChangeMultiTrackStateParams {
 }
 
 export interface HMSChangeMultiTrackStateRequest {
-  requestedBy: HMSRemotePeer;
+  requestedBy?: HMSRemotePeer;
   tracks: HMSLocalTrack[];
   enabled: boolean;
   type?: 'audio' | 'video';

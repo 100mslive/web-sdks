@@ -794,13 +794,10 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {
-    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy?.peerId));
     const storeTrackID = this.getStoreLocalTrackIDfromSDKTrack(request.track);
     const track = this.store.getState(selectTrackByID(storeTrackID));
 
-    if (!requestedBy) {
-      return this.logPossibleInconsistency(`Not found peer who requested track state change, ${request.requestedBy}`);
-    }
     if (!track) {
       return this.logPossibleInconsistency(
         `Not found track for which track state change was requested, ${request.track}`,
@@ -812,18 +809,14 @@ export class HMSSDKActions implements IHMSActions {
     }
 
     this.hmsNotifications.sendChangeTrackStateRequest({
-      requestedBy,
+      requestedBy: requestedBy || undefined,
       track,
       enabled: request.enabled,
     });
   }
 
   protected onChangeMultiTrackStateRequest(request: SDKHMSChangeMultiTrackStateRequest) {
-    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy.peerId));
-
-    if (!requestedBy) {
-      return this.logPossibleInconsistency(`Not found peer who requested track state change, ${request.requestedBy}`);
-    }
+    const requestedBy = this.store.getState(selectPeerByID(request.requestedBy?.peerId));
 
     if (!request.enabled) {
       this.syncRoomState('changeMultiTrackStateRequest');
@@ -839,7 +832,7 @@ export class HMSSDKActions implements IHMSActions {
     }
 
     this.hmsNotifications.sendChangeMultiTrackStateRequest({
-      requestedBy,
+      requestedBy: requestedBy || undefined,
       tracks,
       enabled: request.enabled,
       type: request.type,
