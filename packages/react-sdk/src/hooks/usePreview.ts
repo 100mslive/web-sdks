@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useHMSActions, useHMSStore } from '..';
 
-export const usePreview = (authToken: string, userName: string = 'preview') => {
+export const usePreview = (authToken: string, userName = 'preview') => {
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);

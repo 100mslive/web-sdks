@@ -1,5 +1,3 @@
-// TODO: fix this please
-/* eslint-disable import/no-cycle */
 export {
   HMSRoomProvider,
   useHMSStore,
