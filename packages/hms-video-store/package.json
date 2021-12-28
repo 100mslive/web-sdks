@@ -1,5 +1,5 @@
 {
-  "version": "0.2.86-alpha.4",
+  "version": "0.2.86-alpha.6",
   "license": "MIT",
   "main": "dist/hms-video-store.cjs.js",
   "typings": "dist/index.d.ts",
