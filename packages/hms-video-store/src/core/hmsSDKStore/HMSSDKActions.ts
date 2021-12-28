@@ -396,7 +396,6 @@ export class HMSSDKActions implements IHMSActions {
       token: request.token,
     };
     // TODO: hotfix for HMS-3639. Needs a better solution
-    //@ts-ignore
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
   }
