@@ -3,19 +3,19 @@ import { HMSPeer, HMSPeerID, HMSTrack } from './peer';
 import { HMSRoleName } from './role';
 
 export interface HMSRoleChangeStoreRequest {
-  requestedBy: HMSPeerID;
+  requestedBy?: HMSPeerID;
   roleName: HMSRoleName;
   token: string;
 }
 
 export interface HMSChangeTrackStateRequest {
-  requestedBy: HMSPeer;
+  requestedBy?: HMSPeer;
   track: HMSTrack;
   enabled: boolean;
 }
 
 export interface HMSChangeMultiTrackStateRequest {
-  requestedBy: HMSPeer;
+  requestedBy?: HMSPeer;
   tracks: HMSTrack[];
   enabled: boolean;
   type?: 'audio' | 'video';

@@ -13,7 +13,7 @@ export interface HMSPeerWithMuteStatus {
  * this is more friendly to UI format, the object in store has only peer id and role name instead of the full objects
  */
 export interface HMSRoleChangeRequest {
-  requestedBy: HMSPeer;
+  requestedBy?: HMSPeer;
   role: HMSRole;
   token: string;
 }
@@ -48,7 +48,7 @@ export const selectRoleChangeRequest = createSelector(
       return null;
     }
     return {
-      requestedBy: peersMap[request.requestedBy],
+      requestedBy: request.requestedBy ? peersMap[request.requestedBy] : undefined,
       role: rolesMap[request.roleName],
       token: request.token,
     };
