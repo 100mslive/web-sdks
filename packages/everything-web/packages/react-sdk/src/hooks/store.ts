@@ -1,13 +1,7 @@
 import { EqualityChecker, StateSelector } from 'zustand';
 import React, { useContext } from 'react';
 import shallow from 'zustand/shallow';
-import {
-    HMSActions,
-    HMSStore,
-    HMSNotifications,
-    HMSInternalsStore,
-    HMSWebrtcInternals
-} from '@100mslive/hms-video-store';
+import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore } from '@100mslive/hms-video-store';
 import HMSLogger from '../utils/logger';
 import { IHMSReactStore } from './types';
 
@@ -18,8 +12,7 @@ export interface HMSContextProviderProps {
     actions: HMSActions; // for actions which may also mutate store
     store: IHMSReactStore<HMSStore>; // readonly store, don't mutate this
     notifications?: HMSNotifications;
-    statsStore?: IHMSReactStore<HMSInternalsStore>;
-    hmsInternals?: HMSWebrtcInternals;
+    statsStore?: IHMSReactStore<HMSStatsStore>;
 }
 
 export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
@@ -44,7 +37,7 @@ export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderPro
 
 export function makeHMSStatsStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
     const useHMSStore = <StateSlice>(
-        selector: StateSelector<HMSInternalsStore, StateSlice>,
+        selector: StateSelector<HMSStatsStore, StateSlice>,
         equalityFn: EqualityChecker<StateSlice> = shallow
     ) => {
         if (!selector) {

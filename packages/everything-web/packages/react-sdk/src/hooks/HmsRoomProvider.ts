@@ -5,8 +5,9 @@ import {
     HMSActions,
     HMSNotification,
     HMSNotifications,
-    HMSInternalsStore,
-    HMSWebrtcInternals
+    HMSStatsStore,
+    HMSStats,
+    HMSStoreWrapper
 } from '@100mslive/hms-video-store';
 import create from 'zustand';
 import {
@@ -16,13 +17,12 @@ import {
     makeHMSStatsStoreHook
 } from './store';
 import { isBrowser } from '../utils/isBrowser';
-import { IHMSReactStore } from './types';
 
 export interface HMSRoomProviderProps {
     actions?: HMSActions;
-    store?: IHMSReactStore<HMSStore>;
+    store?: HMSStoreWrapper;
     notifications?: HMSNotifications;
-    webrtcInternals?: HMSWebrtcInternals;
+    webrtcInternals?: HMSStats;
     isHMSStatsOn?: boolean;
 }
 
@@ -50,20 +50,23 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
         if (actions && store) {
             providerProps = {
                 actions,
-                store
+                store: create({
+                    ...store,
+                    setState: errFn,
+                    destroy: errFn
+                })
             };
             if (notifications) {
                 providerProps.notifications = notifications;
             }
             if (webrtcInternals) {
                 const hmsInternals = webrtcInternals;
-                providerProps.statsStore = create<HMSInternalsStore>({
+                providerProps.statsStore = create<HMSStatsStore>({
                     getState: hmsInternals.getState,
                     subscribe: hmsInternals.subscribe,
                     setState: errFn,
                     destroy: errFn
                 });
-                providerProps.hmsInternals = hmsInternals;
             }
         } else {
             const hmsReactiveStore = new HMSReactiveStore();
@@ -79,14 +82,13 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
             };
 
             if (isHMSStatsOn) {
-                const hmsInternals = hmsReactiveStore.getWebrtcInternals();
-                providerProps.statsStore = create<HMSInternalsStore>({
+                const hmsInternals = hmsReactiveStore.getStats();
+                providerProps.statsStore = create<HMSStatsStore>({
                     getState: hmsInternals.getState,
                     subscribe: hmsInternals.subscribe,
                     setState: errFn,
                     destroy: errFn
                 });
-                providerProps.hmsInternals = hmsInternals;
             }
         }
     }
