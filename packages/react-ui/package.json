@@ -23,6 +23,7 @@
     "viz": "rollup-plugin-visualizer"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.1.1",
     "@types/react": "^17.0.38",
     "react": "^17.0.2",
     "rollup": "^2.39.0"

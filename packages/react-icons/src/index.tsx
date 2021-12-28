@@ -13,7 +13,6 @@ export { default as ExitIcon } from './ExitIcon';
 export { default as HandIcon } from './HandIcon';
 export { default as HangUpIcon } from './HangUpIcon';
 export { default as HorizontalMenuIcon } from './HorizontalMenuIcon';
-export { default as InfoIcon } from './InfoIcon';
 export { default as InviteIcon } from './InviteIcon';
 export { default as InviteStageIcon } from './InviteStageIcon';
 export { default as MenuIcon } from './MenuIcon';
