@@ -142,7 +142,7 @@ export class SDKToHMS {
 
   static convertRoleChangeRequest(req: SDKHMSRoleChangeRequest): HMSRoleChangeStoreRequest {
     return {
-      requestedBy: req.requestedBy.peerId,
+      requestedBy: req.requestedBy?.peerId,
       roleName: req.role.name,
       token: req.token,
     };
