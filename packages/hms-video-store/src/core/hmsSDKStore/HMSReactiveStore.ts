@@ -92,8 +92,18 @@ export class HMSReactiveStore {
   /**
    * Any action which may modify the store or may need to talk to the SDK will happen
    * through the IHMSActions instance returned by this
+   *
+   * @deprecated use getActions
    */
   getHMSActions(): IHMSActions {
+    return this.actions;
+  }
+
+  /**
+   * Any action which may modify the store or may need to talk to the SDK will happen
+   * through the IHMSActions instance returned by this
+   */
+  getActions(): IHMSActions {
     return this.actions;
   }
 
@@ -110,7 +120,7 @@ export class HMSReactiveStore {
    * @alpha
    * @internal
    */
-  getWebrtcStats = (): HMSStats => {
+  getStats = (): HMSStats => {
     if (!this.webrtcStats) {
       this.webrtcStats = new HMSStats(this.store, this.sdk);
     }
