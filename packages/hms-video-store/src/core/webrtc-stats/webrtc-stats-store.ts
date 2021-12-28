@@ -183,16 +183,18 @@ const attachPeerRates = (newSdkStats: HMSWebrtcStats, oldStats?: HMSPeerStats): 
   const publishBitrate = computeBitrate('bytesSent', newStats.publish, oldStats?.publish);
   const subscribeBitrate = computeBitrate('bytesReceived', newStats.subscribe, oldStats?.subscribe);
 
-  const newPublishStats = Object.assign(newStats.publish, { bitrate: publishBitrate });
-  const newSubscribeStats = Object.assign(
-    newStats.subscribe,
-    { bitrate: subscribeBitrate },
-    {
-      packetsLost: newSdkStats.getPacketsLost(),
-      jitter: newSdkStats.getJitter(),
-      packetsLostRate,
-    },
-  );
+  const newPublishStats = newStats.publish && Object.assign(newStats.publish, { bitrate: publishBitrate });
+  const newSubscribeStats =
+    newStats.subscribe &&
+    Object.assign(
+      newStats.subscribe,
+      { bitrate: subscribeBitrate },
+      {
+        packetsLost: newSdkStats.getPacketsLost(),
+        jitter: newSdkStats.getJitter(),
+        packetsLostRate,
+      },
+    );
 
   return { publish: newPublishStats, subscribe: newSubscribeStats };
 };
