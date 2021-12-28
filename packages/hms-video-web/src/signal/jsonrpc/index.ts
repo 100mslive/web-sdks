@@ -333,6 +333,9 @@ export default class JsonRpcSignal implements ISignal {
           ),
         );
         break;
+      case HMSSignalMethod.SERVER_WARNING:
+        HMSLogger.w(this.TAG, response.params);
+        break;
       default:
         this.observer.onNotification(response);
         break;

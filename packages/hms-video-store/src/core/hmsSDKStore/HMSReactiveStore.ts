@@ -32,7 +32,7 @@ export class HMSReactiveStore {
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
-  private webrtcStats?: HMSStats;
+  private stats?: HMSStats;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -92,8 +92,18 @@ export class HMSReactiveStore {
   /**
    * Any action which may modify the store or may need to talk to the SDK will happen
    * through the IHMSActions instance returned by this
+   *
+   * @deprecated use getActions
    */
   getHMSActions(): IHMSActions {
+    return this.actions;
+  }
+
+  /**
+   * Any action which may modify the store or may need to talk to the SDK will happen
+   * through the IHMSActions instance returned by this
+   */
+  getActions(): IHMSActions {
     return this.actions;
   }
 
@@ -110,11 +120,11 @@ export class HMSReactiveStore {
    * @alpha
    * @internal
    */
-  getWebrtcStats = (): HMSStats => {
-    if (!this.webrtcStats) {
-      this.webrtcStats = new HMSStats(this.store, this.sdk);
+  getStats = (): HMSStats => {
+    if (!this.stats) {
+      this.stats = new HMSStats(this.store, this.sdk);
     }
-    return this.webrtcStats;
+    return this.stats;
   };
 
   /**
