@@ -32,7 +32,7 @@ export class HMSReactiveStore {
   private readonly actions: IHMSActions;
   private readonly store: IHMSStore;
   private readonly notifications: HMSNotifications;
-  private webrtcStats?: HMSStats;
+  private stats?: HMSStats;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -121,10 +121,10 @@ export class HMSReactiveStore {
    * @internal
    */
   getStats = (): HMSStats => {
-    if (!this.webrtcStats) {
-      this.webrtcStats = new HMSStats(this.store, this.sdk);
+    if (!this.stats) {
+      this.stats = new HMSStats(this.store, this.sdk);
     }
-    return this.webrtcStats;
+    return this.stats;
   };
 
   /**
