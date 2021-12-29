@@ -14,8 +14,8 @@
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
-    "dev": "node ../../scripts/dev-react-ui",
-    "build:only": "node ../../scripts/build-react-ui",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",

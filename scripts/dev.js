@@ -1,17 +1,18 @@
 /* eslint-disable */
 const esbuild = require('esbuild');
-const pkg = require('../package.json');
 
 async function main() {
+  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
   esbuild.build({
     entryPoints: ['./src/index.ts'],
-    outfile: 'dist/hms-video-store.esm.js',
+    outfile: 'dist/hms-video.esm.js',
     minify: false,
     bundle: true,
     format: 'esm',
     target: 'es6',
     tsconfig: './tsconfig.build.json',
-    external: Object.keys(pkg.dependencies),
+    external: Object.keys(pkg.dependencies || {}),
     sourcemap: true,
     incremental: true,
     treeShaking: true,

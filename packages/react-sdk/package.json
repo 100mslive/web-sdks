@@ -15,7 +15,7 @@
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ../../scripts/dev-react-sdk",
-    "build:only": "node ../../scripts/build-react-sdk",
+    "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
