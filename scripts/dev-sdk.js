@@ -1,6 +1,6 @@
 /* eslint-disable */
 const esbuild = require('esbuild');
-const pkg = require('../package.json');
+const pkg = require('../packages/hms-video-web/package.json');
 
 async function main() {
   esbuild.build({

@@ -13,9 +13,9 @@
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
-    "dev": "node ./scripts/dev",
-    "build:only": "node ./scripts/build",
-    "build": "node ./scripts/build && yarn types:build",
+    "dev": "node ../../scripts/dev-sdk",
+    "build:only": "node ../../scripts/build-sdk",
+    "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "test": "jest --maxWorkers=1",
