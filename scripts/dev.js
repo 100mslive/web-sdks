@@ -5,7 +5,7 @@ async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
   esbuild.build({
-    entryPoints: ['./src/index.ts'],
+    entryPoints: [source],
     outfile: 'dist/hms-video.esm.js',
     minify: false,
     bundle: true,
