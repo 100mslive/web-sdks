@@ -32,10 +32,8 @@ jobs:
               - 'packages/hms-video-store/**/*.(test|spec).ts'
             cypress:
               - 'cypress/**'
-            sdk-build: 
-              - 'scripts/*-sdk.js'
-            store-build: 
-              - 'scripts/*-store.js'
+            build: 
+              - 'scripts/**'
             ci:
               - '.github/**'
             documentation:
