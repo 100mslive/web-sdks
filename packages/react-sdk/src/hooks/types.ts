@@ -1,6 +1,6 @@
 import { EqualityChecker, StateSelector } from 'zustand';
-import { HMSStore, IStoreReadOnly, HMSInternalsStore } from '@100mslive/hms-video-store';
+import { HMSStore, IStoreReadOnly, HMSStatsStore } from '@100mslive/hms-video-store';
 
-export interface IHMSReactStore<S extends HMSStore | HMSInternalsStore> extends IStoreReadOnly<S> {
+export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
   <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
 }
