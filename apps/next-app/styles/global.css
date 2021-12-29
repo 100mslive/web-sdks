@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.page {
+  width: 100%;
+  height: 100vh;
+  background-color: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pretext {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.prename {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+.video-loader {
+  width: 360px;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+}
+
+* {
+  --height: 72px;
+}
+
+.room-nav {
+  width: 100%;
+  height: var(--height);
+  border-bottom: 1px solid #282828;
+}
+.videolist {
+  width: 100%;
+  height: calc(100vh - 2 * var(--height));
+  display: flex;
+  flex-wrap: wrap;
+  place-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.room-footer {
+  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: var(--height);
+}
+
+.pagin-ctx {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.pagin-btn {
+  cursor: pointer;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #888888;
+  border: none;
+}
+.pagin-active {
+  background-color: white;
+}
+.chevron {
+  cursor: pointer;
+  color: #888888;
+  height: 16px;
+}

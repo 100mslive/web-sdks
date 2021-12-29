@@ -1,0 +1,28 @@
+{
+  "name": "next-app",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "format": "prettier --write .",
+    "lint": "eslint",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@100mslive/hms-video": "0.1.40-alpha.4",
+    "@100mslive/hms-video-store": "0.2.86-alpha.8",
+    "@100mslive/react-icons": "0.0.3-alpha",
+    "@100mslive/react-sdk": "0.0.3-alpha.1",
+    "@100mslive/react-ui": "0.0.3-alpha",
+    "next": "latest",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-resize-detector": "^6.7.6"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.6",
+    "postcss": "^8.3.5",
+    "tailwindcss": "^2.2.4"
+  }
+}

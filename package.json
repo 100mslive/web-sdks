@@ -48,7 +48,8 @@
     "cypress:open": "cypress open"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "husky": {
     "hooks": {
