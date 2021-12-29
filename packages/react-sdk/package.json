@@ -17,9 +17,7 @@
     "clear": "rm -rf dist",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "format": "prettier -w src/**",
-    "package": "yarn clear && yarn build",
-    "publish": "yarn clear && yarn build && npm publish --access public "
+    "format": "prettier -w src/**"
   },
   "devDependencies": {
     "@types/react": "^17.0.38",
