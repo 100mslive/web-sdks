@@ -18,7 +18,7 @@
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "format": "prettier --write src/**/*.ts",
-    "test": "yarn build && jest --maxWorkers=1",
+    "test": "jest --maxWorkers=1",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint -c ../../.eslintrc .",
