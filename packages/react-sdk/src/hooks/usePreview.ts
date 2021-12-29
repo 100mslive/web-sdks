@@ -8,7 +8,7 @@ import {
   selectIsAllowedToPublish,
 } from '@100mslive/hms-video-store';
 import { useState, useEffect } from 'react';
-import { useHMSActions, useHMSStore } from '..';
+import { useHMSActions, useHMSStore } from '../hooks/HmsRoomProvider';
 
 export const usePreview = (authToken: string, userName = 'preview') => {
   const [inProgress, setInProgress] = useState(false);
