@@ -1,0 +1,43 @@
+{
+  "name": "@100mslive/react-ui",
+  "source": "src/index.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.0.3-alpha",
+  "author": "100ms",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "NODE_ENV=development rollup -c -w",
+    "build": "NODE_ENV=production rollup -c",
+    "clear": "rm -rf dist",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint src/** --fix",
+    "format": "prettier -w src/**",
+    "package": "yarn clear && yarn build",
+    "publish": "yarn clear && yarn build && npm publish --access public ",
+    "viz": "rollup-plugin-visualizer"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.1.1",
+    "@types/react": "^17.0.38",
+    "react": "^17.0.2",
+    "rollup": "^2.39.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "dependencies": {
+    "@100mslive/react-icons": "0.0.3-alpha",
+    "@radix-ui/react-dialog": "^0.1.1",
+    "@radix-ui/react-slider": "^0.1.1",
+    "@radix-ui/react-switch": "^0.1.1",
+    "@radix-ui/react-tooltip": "^0.1.1",
+    "@stitches/react": "^1.2.5"
+  }
+}
