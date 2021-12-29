@@ -2,7 +2,7 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
-const pkg = require('../packages/hms-video-web/package.json');
+const pkg = require('../packages/react-icons/package.json');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -15,26 +15,26 @@ async function main() {
 
   try {
     esbuild.buildSync({
-      entryPoints: ['./src/index.ts'],
-      outfile: 'dist/hms-video.cjs.js',
+      entryPoints: ['./src/index.tsx'],
+      outfile: 'dist/index.cjs.js',
       minify: true,
       bundle: true,
       format: 'cjs',
       target: 'es6',
       tsconfig: 'tsconfig.json',
-      external: Object.keys(pkg.dependencies),
+      external: [],
       metafile: true,
     });
 
     const esmResult = esbuild.buildSync({
-      entryPoints: ['./src/index.ts'],
-      outfile: 'dist/hms-video.esm.js',
+      entryPoints: ['./src/index.tsx'],
+      outfile: 'dist/index.js',
       minify: true,
       bundle: true,
       format: 'esm',
       target: 'es6',
       tsconfig: 'tsconfig.build.json',
-      external: Object.keys(pkg.dependencies),
+      external: [],
       metafile: true,
     });
 
@@ -43,7 +43,7 @@ async function main() {
       esmSize += output.bytes;
     });
 
-    fs.readFile('./dist/hms-video.esm.js', (_err, data) => {
+    fs.readFile('./dist/index.js', (_err, data) => {
       gzip(data, (_err, result) => {
         console.log(
           `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(
