@@ -98,7 +98,7 @@ export function EdtechComponent({
         toast={(message, options = {}) => hmsToast(message, options)}
       >
         <ReactRoomProvider
-          actions={hmsReactiveStore.getHMSActions()}
+          actions={hmsReactiveStore.getActions()}
           store={create({
             ...hmsReactiveStore.getStore(),
             setState: errFn,
@@ -107,14 +107,14 @@ export function EdtechComponent({
           notifications={hmsReactiveStore.getNotifications()}
         >
           <HMSRoomProvider
-            actions={hmsReactiveStore.getHMSActions()}
+            actions={hmsReactiveStore.getActions()}
             store={create({
               ...hmsReactiveStore.getStore(),
               setState: errFn,
               destroy: errFn,
             })}
             notifications={hmsReactiveStore.getNotifications()}
-            webrtcInternals={hmsReactiveStore.getWebrtcInternals()}
+            webrtcInternals={hmsReactiveStore.getStats()}
           >
             <AppContextProvider
               roomId={roomId}
