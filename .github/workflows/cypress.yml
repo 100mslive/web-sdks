@@ -4,8 +4,27 @@ on:
   push:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
+    outputs:
+      sdk: ${{ steps.filter.outputs.sdk }}
+      store: ${{ steps.filter.outputs.store }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            sdk:
+              - 'packages/hms-video-web/**/*.(ts|js)'
+            store:
+              - 'packages/hms-video-store/**/*.(ts|js)'
+
   cypress-run:
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true' || needs.changes.outputs.store == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
