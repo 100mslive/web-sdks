@@ -13,6 +13,11 @@ async function main() {
   }
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
+  const isReact = pkg.name.includes('react');
+  const external = Object.keys(pkg.dependencies || {});
+  if (isReact) {
+    external.push('react');
+  }
   try {
     esbuild.buildSync({
       entryPoints: [source],
@@ -22,19 +27,19 @@ async function main() {
       format: 'cjs',
       target: 'es6',
       tsconfig: 'tsconfig.json',
-      external: Object.keys(pkg.dependencies || {}),
+      external,
       metafile: true,
     });
 
     const esmResult = esbuild.buildSync({
       entryPoints: [source],
-      outfile: 'dist/index.esm.js',
+      outfile: 'dist/index.js',
       minify: true,
       bundle: true,
       format: 'esm',
       target: 'es6',
       tsconfig: 'tsconfig.build.json',
-      external: Object.keys(pkg.dependencies || {}),
+      external,
       metafile: true,
     });
 
@@ -43,7 +48,7 @@ async function main() {
       esmSize += output.bytes;
     });
 
-    fs.readFile('./dist/index.esm.js', (_err, data) => {
+    fs.readFile('./dist/index.js', (_err, data) => {
       gzip(data, (_err, result) => {
         console.log(
           `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(

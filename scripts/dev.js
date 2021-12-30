@@ -4,6 +4,11 @@ const esbuild = require('esbuild');
 async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
+  const isReact = pkg.name.includes('react');
+  const external = Object.keys(pkg.dependencies || {});
+  if (isReact) {
+    external.push('react');
+  }
   esbuild.build({
     entryPoints: [source],
     outfile: 'dist/hms-video.esm.js',
@@ -12,7 +17,7 @@ async function main() {
     format: 'esm',
     target: 'es6',
     tsconfig: './tsconfig.build.json',
-    external: Object.keys(pkg.dependencies || {}),
+    external,
     sourcemap: true,
     incremental: true,
     treeShaking: true,
