@@ -21,3 +21,5 @@ jobs:
           destination_repo: 100mslive/100ms-web
           push_include: 'apps/100ms-web/**'
           destination_branch: 'sync-with-upstream'
+          pr_move: |
+            ||apps/100ms-web
