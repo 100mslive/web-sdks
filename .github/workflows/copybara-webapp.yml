@@ -1,3 +1,4 @@
+name: Copy Webapp
 on:
   push:
     branches:
@@ -6,8 +7,24 @@ on:
     branches:
       - main
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft != true
+    outputs:
+      sdk: ${{ steps.filter.outputs.sdk }}
+      store: ${{ steps.filter.outputs.store }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            web-app:
+              - 'apps/100ms-web/**'
   move-code:
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.web-sdk == 'true'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -23,3 +40,17 @@ jobs:
           destination_branch: 'sync-with-upstream'
           pr_move: |
             ||apps/100ms-web
+
+      - uses: actions/checkout@v2
+        with:
+          repository: 100mslive/100ms-web
+          ref: sync-with-upstream
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Add Lock file
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "Github actions"
+          yarn
+          git commit -am "update lockfile"
+          git push
