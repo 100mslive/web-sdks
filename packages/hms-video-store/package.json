@@ -1,7 +1,8 @@
 {
   "version": "0.2.86-alpha.8",
   "license": "MIT",
-  "main": "dist/hms-video-store.cjs.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist/**/*"
@@ -12,9 +13,9 @@
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
-    "dev": "node ./scripts/dev",
-    "build:only": "node ./scripts/build",
-    "build": "node ./scripts/build && yarn types:build",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "format": "prettier --write src/**/*.ts",
@@ -30,7 +31,6 @@
   },
   "name": "@100mslive/hms-video-store",
   "author": "100ms",
-  "module": "dist/hms-video-store.esm.js",
   "sideEffects": false,
   "dependencies": {
     "@100mslive/hms-video": "0.1.40-alpha.4",

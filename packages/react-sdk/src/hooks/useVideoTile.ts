@@ -4,16 +4,16 @@ import {
   selectPeerAudioByID,
   selectVideoTrackByPeerID,
   HMSPeer,
+  HMSActions,
 } from '@100mslive/hms-video-store';
-import { IHMSActions } from '@100mslive/hms-video-store/dist/core/IHMSActions';
 import { useRef, useEffect } from 'react';
-import { useHMSActions, useHMSStore } from '..';
+import { useHMSActions, useHMSStore } from '../hooks/HmsRoomProvider';
 
 interface UseVideoTileType {
   videoRef: React.RefObject<HTMLVideoElement>;
   isAudioOn: boolean;
   isVideoOn: boolean;
-  actions: IHMSActions;
+  actions: HMSActions;
   isLocal: boolean;
   name: string;
   audioLevel: boolean;

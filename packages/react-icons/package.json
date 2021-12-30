@@ -13,22 +13,16 @@
   "sideEffects": false,
   "scripts": {
     "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
-    "build": "yarn svg-build && rollup -c",
+    "build:only": "yarn svg-build && node ../../scripts/build",
+    "types": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
+    "build": "yarn build:only && yarn types",
     "format": "prettier -w src/**",
     "lint": "eslint",
     "lint:fix": "eslint src/** --fix"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.16.5",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-commonjs": "^21.0.1",
-    "@rollup/plugin-typescript": "^8.3.0",
     "@svgr/cli": "^5.5.0",
     "@types/react": "^17.0.38",
-    "react": "^17.0.2",
-    "rollup": "^2.39.0",
-    "rollup-plugin-summary": "^1.3.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-visualizer": "^5.5.2"
+    "react": "^17.0.2"
   }
 }

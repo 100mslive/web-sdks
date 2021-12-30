@@ -12,19 +12,20 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "dev": "NODE_ENV=development rollup -c -w",
-    "build": "NODE_ENV=production rollup -c",
-    "clear": "rm -rf dist",
+    "prestart": "rm -rf dist && yarn types:build",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "build": "yarn build:only && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "format": "prettier -w src/**",
-    "viz": "rollup-plugin-visualizer"
+    "format": "prettier -w src/**"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.1.1",
     "@types/react": "^17.0.38",
-    "react": "^17.0.2",
-    "rollup": "^2.39.0"
+    "react": "^17.0.2"
   },
   "peerDependencies": {
     "react": "^17.0.1",
