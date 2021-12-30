@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
+jobs:
+  move-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: olivr/copybara-action@v1.2.3
+        with:
+          ssh_key: ${{ secrets.SSH_KEY }}
+          access_token: ${{ secrets.PAT_TOKEN }}
+          sot_repo: 100mslive/web-sdks
+          destination_repo: 100mslive/100ms-web
+          push_include: 'apps/100ms-web/**'
+          destination_branch: 'sync-with-upstream'
+          pr_move: |
+            ||apps/100ms-web
