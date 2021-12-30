@@ -2,16 +2,12 @@ import {
   Header,
   ParticipantList,
   useHMSStore,
-  VolumeIcon,
   LogoButton,
-  Text,
   selectDominantSpeaker,
   selectPeerSharingAudio,
   selectScreenShareAudioByPeerID,
   selectPeerSharingAudioPlaylist,
   selectAudioPlaylistTrackByPeerID,
-  useHMSActions,
-  RecordingDot,
   GlobeIcon,
   selectRecordingState,
   selectRTMPState,
@@ -19,16 +15,19 @@ import {
   selectHLSState,
   selectLocalPeer,
 } from "@100mslive/hms-video-react";
+import { useContext } from "react";
+import { SpeakerIcon, RecordIcon } from "@100mslive/react-icons";
+import { Text } from "@100mslive/react-ui";
+import { useHMSActions } from "@100mslive/react-sdk";
 import PIPComponent from "./PIP/PIPComponent";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
-import { useContext } from "react";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
     <div className="self-center focus:outline-none text-lg flex items-center">
-      <VolumeIcon />
+      <SpeakerIcon />
       <Text
         variant="body"
         size="md"
@@ -66,15 +65,14 @@ const Music = () => {
 
   return (
     <div className="flex items-center">
-      <VolumeIcon />
-      <Text variant="body" size="md" classes={{ root: "mx-2" }}>
+      <SpeakerIcon />
+      <Text variant="body" size="md" className="mx-2">
         Music is playing
       </Text>
       <Text
         variant="body"
-        size="md"
         onClick={handleMute}
-        classes={{ root: "text-red-tint cursor-pointer" }}
+        className="text-red-tint cursor-pointer"
       >
         {muted ? "Unmute" : "Mute"}
       </Text>
@@ -102,8 +100,8 @@ const PlaylistMusic = () => {
 
   return (
     <div className="flex items-center">
-      <VolumeIcon />
-      <Text variant="body" size="md" classes={{ root: "mx-2" }}>
+      <SpeakerIcon />
+      <Text variant="body" className="mx-2">
         Playlist is playing
       </Text>
       {peer.isLocal ? (
@@ -180,12 +178,12 @@ const StreamingRecording = () => {
     <div className="flex mx-2">
       {isRecordingOn && (
         <div className="flex items-center" title={getRecordingText()}>
-          <RecordingDot
+          <RecordIcon
             className="fill-current text-red-600"
             width="20"
             height="20"
           />
-          <Text variant="body" size="md" classes={{ root: "mx-1" }}>
+          <Text variant="body" className="mx-1">
             Recording
           </Text>
         </div>
@@ -193,7 +191,7 @@ const StreamingRecording = () => {
       {isStreamingOn && (
         <div className="flex items-center mx-2" title={getStreamingText()}>
           <GlobeIcon className="fill-current text-red-600" />
-          <Text variant="body" size="md" classes={{ root: "mx-1" }}>
+          <Text variant="body" className="mx-1">
             Streaming
           </Text>
         </div>
