@@ -2,11 +2,7 @@ name: Copy Webapp
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
   pull_request_target:
-    branches:
-      - main
 jobs:
   changes:
     runs-on: ubuntu-latest
