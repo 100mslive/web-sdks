@@ -53,5 +53,5 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "Github actions"
           yarn
-          git commit -am "update lockfile"
+          git diff-index --quiet HEAD || git commit -m 'build: update sdks'
           git push
