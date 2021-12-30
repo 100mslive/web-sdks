@@ -24,7 +24,7 @@ jobs:
   move-code:
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.web-sdk == 'true'
+    if: needs.changes.outputs.web-app == 'true'
     steps:
       - uses: actions/checkout@v2
         with:
