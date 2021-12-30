@@ -15,7 +15,7 @@ jobs:
 
       - uses: olivr/copybara-action@v1.2.3
         with:
-          ssh_key: ${{ secrets.PAT_TOKEN }}
+          ssh_key: ${{ secrets.SSH_KEY }}
           access_token: ${{ secrets.PAT_TOKEN }}
           sot_repo: 100mslive/web-sdks
           destination_repo: 100mslive/100ms-web
