@@ -24,14 +24,16 @@ import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
 
 const SpeakerTag = () => {
-  const dominantSpeaker = useHMSStore(selectDominantSpeaker);
+  const dominantSpeaker = useHMSStore(selectDominantSpeaker) || {
+    name: "test",
+  };
   return dominantSpeaker && dominantSpeaker.name ? (
     <div className="self-center focus:outline-none text-lg flex items-center">
       <SpeakerIcon />
       <Text
         variant="body"
-        size="md"
-        classes={{ root: "truncate max-w-xs ml-1 flex-1" }}
+        className="truncate max-w-xs"
+        css={{ ml: "$1", flex: "1 1 0" }}
         title={dominantSpeaker.name}
       >
         {dominantSpeaker.name}
@@ -66,13 +68,13 @@ const Music = () => {
   return (
     <div className="flex items-center">
       <SpeakerIcon />
-      <Text variant="body" size="md" className="mx-2">
+      <Text variant="body" css={{ mx: "$1" }}>
         Music is playing
       </Text>
       <Text
         variant="body"
         onClick={handleMute}
-        className="text-red-tint cursor-pointer"
+        css={{ color: "$redMain", cursor: "pointer" }}
       >
         {muted ? "Unmute" : "Mute"}
       </Text>
@@ -101,13 +103,12 @@ const PlaylistMusic = () => {
   return (
     <div className="flex items-center">
       <SpeakerIcon />
-      <Text variant="body" className="mx-2">
+      <Text variant="body" css={{ mx: "$1" }}>
         Playlist is playing
       </Text>
       {peer.isLocal ? (
         <Text
           variant="body"
-          size="md"
           onClick={async () => {
             if (selection.playing) {
               hmsActions.audioPlaylist.pause();
@@ -115,18 +116,17 @@ const PlaylistMusic = () => {
               await hmsActions.audioPlaylist.play(selection.id);
             }
           }}
-          classes={{ root: "text-red-tint cursor-pointer" }}
+          css={{ color: "$redMain", cursor: "pointer" }}
         >
           {selection.playing ? "Pause" : "Play"}
         </Text>
       ) : (
         <Text
           variant="body"
-          size="md"
           onClick={() => {
             hmsActions.setVolume(!track.volume ? 100 : 0, track.id);
           }}
-          classes={{ root: "text-red-tint cursor-pointer" }}
+          css={{ color: "$redMain", cursor: "pointer" }}
         >
           {track.volume === 0 ? "Unmute" : "Mute"}
         </Text>
@@ -183,7 +183,7 @@ const StreamingRecording = () => {
             width="20"
             height="20"
           />
-          <Text variant="body" className="mx-1">
+          <Text variant="body" css={{ mx: "$1" }}>
             Recording
           </Text>
         </div>
@@ -191,7 +191,7 @@ const StreamingRecording = () => {
       {isStreamingOn && (
         <div className="flex items-center mx-2" title={getStreamingText()}>
           <GlobeIcon className="fill-current text-red-600" />
-          <Text variant="body" className="mx-1">
+          <Text variant="body" css={{ mx: "$1" }}>
             Streaming
           </Text>
         </div>
