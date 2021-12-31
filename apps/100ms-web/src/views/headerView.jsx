@@ -24,9 +24,7 @@ import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
 
 const SpeakerTag = () => {
-  const dominantSpeaker = useHMSStore(selectDominantSpeaker) || {
-    name: "test",
-  };
+  const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
     <div className="self-center focus:outline-none text-lg flex items-center">
       <SpeakerIcon />
