@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.40-alpha.1",
+  "version": "0.1.40-alpha.4",
   "license": "UNLICENSED",
   "main": "dist/hms-video.cjs.js",
   "typings": "dist/index.d.ts",
