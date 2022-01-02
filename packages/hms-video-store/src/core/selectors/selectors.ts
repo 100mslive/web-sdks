@@ -155,6 +155,15 @@ export const selectDominantSpeaker = createSelector(selectPeersMap, selectSpeake
   return null;
 });
 
+let prevSpeaker: HMSPeer | null = null;
+/**
+ * Select the latest dominant speaker
+ */
+export const selectLatestDominantSpeaker = createSelector(
+  selectDominantSpeaker,
+  speaker => (prevSpeaker = speaker || prevSpeaker),
+);
+
 /**
  * Select a boolean denoting whether your local audio is unmuted
  * and the audio from your microphone is shared to remote peers
