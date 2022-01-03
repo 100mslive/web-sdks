@@ -41,7 +41,7 @@ export const Button = styled('button', {
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$grey9', '$grey10', '$grey8'),
+      standard: getButtonVariants('$grey2', '$grey3', '$grey4'),
       danger: getButtonVariants('$redMain', '$redTint', '$redTint'),
       primary: getButtonVariants('$brandMain', '$brandTint', '$brandTint'),
     },
