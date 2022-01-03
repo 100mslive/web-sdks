@@ -79,7 +79,7 @@ export const LeaveRoom = () => {
           >
             <Button
               variant="standard"
-              classes={{ root: "w-full" }}
+              className="w-full"
               onClick={() => {
                 setShowEndRoomModal(true);
               }}
