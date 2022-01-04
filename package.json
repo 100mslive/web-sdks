@@ -62,19 +62,19 @@
   },
   "size-limit": [
     {
-      "path": "packages/hms-video-web/dist/hms-video.cjs.js",
+      "path": "packages/hms-video-web/dist/index.cjs.js",
       "limit": "60 KB"
     },
     {
-      "path": "packages/hms-video-web/dist/hms-video.esm.js",
+      "path": "packages/hms-video-web/dist/index.js",
       "limit": "200 KB"
     },
     {
-      "path": "packages/hms-video-store/dist/hms-video-store.cjs.js",
+      "path": "packages/hms-video-store/dist/index.cjs.js",
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-video-store/dist/hms-video-store.esm.js",
+      "path": "packages/hms-video-store/dist/index.js",
       "limit": "100 KB"
     }
   ],
