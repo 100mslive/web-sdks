@@ -2,44 +2,44 @@ import { userAgent } from '../../utils/support';
 import { getUrl, transformInitConfig } from './index';
 
 describe('getUrl', () => {
-  const ua = encodeURIComponent(userAgent);
+  const ua = new URLSearchParams(`user_agent=${userAgent}`).toString();
   const peerId = '1234';
   it('should return the URL even if unnecesary params are passed to the endpoint', () => {
     expect(getUrl('https://prod-init.100ms.live/something_completely_redundant?this=that', peerId, 'in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
     );
   });
 
   it('should return the URL with regions if region is provided', () => {
     expect(getUrl('https://prod-init.100ms.live', peerId, 'in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, 'us')).toEqual(
-      `https://prod-init.100ms.live/init?region=us&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=us&peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, ' in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, ' in ')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, 'in ')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, ' i n ')).toEqual(
-      `https://prod-init.100ms.live/init?region=i+n&peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?region=i+n&peer_id=${peerId}&${ua}`,
     );
   });
 
   it('should return the URL without region if region is not provided or invalid', () => {
     expect(getUrl('https://prod-init.100ms.live', peerId, ' ')).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId, '')).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
     );
     expect(getUrl('https://prod-init.100ms.live', peerId)).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&user_agent=${ua}`,
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
     );
   });
 });
