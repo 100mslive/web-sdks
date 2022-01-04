@@ -110,11 +110,7 @@ const StatsRow = ({ label, value }) => (
 );
 
 const formatBytes = (bytes, unit = "B", decimals = 2) => {
-<<<<<<< HEAD
-  if (bytes === 0) return "0 Bytes";
-=======
   if (bytes === 0) return "0 " + unit;
->>>>>>> webapp/main
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
@@ -128,11 +124,6 @@ const formatBytes = (bytes, unit = "B", decimals = 2) => {
 };
 
 const LocalPeerStats = () => {
-<<<<<<< HEAD
-  const jitter = useHMSStatsStore(selectHMSStats.jitter);
-  const packetsLost = useHMSStatsStore(selectHMSStats.packetsLost);
-=======
->>>>>>> webapp/main
   const stats = useHMSStatsStore(selectHMSStats.localPeerStats);
 
   if (!stats) {
@@ -141,25 +132,6 @@ const LocalPeerStats = () => {
 
   return (
     <div className="m-4 mt-6">
-<<<<<<< HEAD
-      <StatsRow label="Packets Lost" value={packetsLost} />
-      <StatsRow label="Jitter" value={jitter} />
-      <StatsRow
-        label="Publish Bitrate"
-        value={formatBytes(stats.publish.bitrate, "b/s")}
-      />
-      <StatsRow
-        label="Subscribe Bitrate"
-        value={formatBytes(stats.subscribe.bitrate, "b/s")}
-      />
-      <StatsRow
-        label="Total Bytes Sent"
-        value={formatBytes(stats.publish.bytesSent)}
-      />
-      <StatsRow
-        label="Total Bytes Received"
-        value={formatBytes(stats.subscribe.bytesReceived)}
-=======
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
       <StatsRow
@@ -177,7 +149,6 @@ const LocalPeerStats = () => {
       <StatsRow
         label="Total Bytes Received"
         value={formatBytes(stats.subscribe?.bytesReceived)}
->>>>>>> webapp/main
       />
     </div>
   );
