@@ -22,8 +22,8 @@ import {
 import { hmsToast } from "./views/components/notifications/hms-toast";
 import { Notifications } from "./views/components/notifications/Notifications";
 import { HMSReactiveStore } from "@100mslive/hms-video-store";
-import create from "zustand";
 import { HMSRoomProvider as ReactRoomProvider } from "@100mslive/react-sdk";
+import { FeatureFlags } from "./store/FeatureFlags";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -33,6 +33,15 @@ const defaultTokenEndpoint = process.env
   : process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
 
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
+
+let appName = "";
+if (window.location.host.includes("localhost")) {
+  appName = "localhost";
+} else {
+  appName = window.location.host.split(".")[0];
+}
+
+document.title = `${document.title}(${appName})`;
 
 export function EdtechComponent({
   roomId = "",
@@ -55,9 +64,6 @@ export function EdtechComponent({
   policyConfig = envPolicyConfig,
 }) {
   const hmsReactiveStore = new HMSReactiveStore();
-  const errFn = () => {
-    throw new Error("modifying store is not allowed");
-  };
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
@@ -99,22 +105,23 @@ export function EdtechComponent({
       >
         <ReactRoomProvider
           actions={hmsReactiveStore.getActions()}
-          store={create({
-            ...hmsReactiveStore.getStore(),
-            setState: errFn,
-            destroy: errFn,
-          })}
+          store={hmsReactiveStore.getStore()}
           notifications={hmsReactiveStore.getNotifications()}
+          webrtcInternals={
+            FeatureFlags.enableStatsForNerds
+              ? hmsReactiveStore.getStats()
+              : undefined
+          }
         >
           <HMSRoomProvider
             actions={hmsReactiveStore.getActions()}
-            store={create({
-              ...hmsReactiveStore.getStore(),
-              setState: errFn,
-              destroy: errFn,
-            })}
+            store={hmsReactiveStore.getStore()}
             notifications={hmsReactiveStore.getNotifications()}
-            webrtcInternals={hmsReactiveStore.getStats()}
+            stats={
+              FeatureFlags.enableStatsForNerds
+                ? hmsReactiveStore.getStats()
+                : undefined
+            }
           >
             <AppContextProvider
               roomId={roomId}
