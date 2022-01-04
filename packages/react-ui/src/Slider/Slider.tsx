@@ -54,4 +54,4 @@ export const Slider: React.FC<SliderProps> = props => (
   </Root>
 );
 
-Slider.displayName = 'Switch';
+Slider.displayName = 'Slider';
