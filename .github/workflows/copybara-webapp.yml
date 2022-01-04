@@ -1,11 +1,8 @@
 name: Copy Webapp
 on:
   push:
-    branches:
-      - main
   pull_request_target:
-    branches:
-      - main
+
 jobs:
   move-code:
     runs-on: ubuntu-latest
@@ -21,21 +18,5 @@ jobs:
           sot_repo: 100mslive/web-sdks
           destination_repo: 100mslive/100ms-web
           push_include: 'apps/100ms-web/**'
-          destination_branch: 'sync-with-upstream'
           pr_move: |
             ||apps/100ms-web
-
-      - uses: actions/checkout@v2
-        with:
-          repository: 100mslive/100ms-web
-          ref: sync-with-upstream
-          token: ${{ secrets.PAT_TOKEN }}
-
-      - name: Add Lock file
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "Github actions"
-          yarn
-          git add --all
-          git commit -m 'build: update sdks' || echo "No Changes"
-          git push

@@ -2,10 +2,10 @@ name: Copybara
 on:
   push:
   pull_request_target:
+
 jobs:
   move-code:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'main'
     steps:
       - uses: actions/checkout@v2
         with:
