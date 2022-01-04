@@ -15,7 +15,7 @@ export enum HMSLogLevel {
  */
 export default class HMSLogger {
   // @ts-ignore - window.expect is available only when in test environment
-  static level: HMSLogLevel = typeof window.expect !== 'undefined' ? HMSLogLevel.NONE : HMSLogLevel.VERBOSE;
+  static level: HMSLogLevel = typeof window?.expect !== 'undefined' ? HMSLogLevel.NONE : HMSLogLevel.VERBOSE;
 
   static v(tag: string, ...data: any[]) {
     this.log(HMSLogLevel.VERBOSE, tag, ...data);
