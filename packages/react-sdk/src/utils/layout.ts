@@ -411,7 +411,7 @@ export const getVideoTracksFromPeers = (
   peers: HMSPeer[],
   tracks: Record<HMSTrackID, HMSTrack>,
   showScreenFn: (peer: HMSPeer) => boolean,
-  showTileForAllPeers = false,
+  filterNonPublishingPeers = true,
 ) => {
   if (!peers || !tracks || !showScreenFn) {
     return [];
@@ -432,7 +432,7 @@ export const getVideoTracksFromPeers = (
       if (screenShareTrackID) {
         videoTracks.push({ track: tracks[screenShareTrackID], peer: peer });
       }
-    } else if (showTileForAllPeers) {
+    } else if (!filterNonPublishingPeers) {
       videoTracks.push({ peer: peer });
     }
   }

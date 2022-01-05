@@ -23,11 +23,10 @@ interface UseVideoListProps {
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
   aspectRatio?: { width: number; height: number };
   /**
-   * Pass this as true to show a tile for all peers in peer list.
-   * By default only those peers with either audio/video/screen will be shown
-   * Note: Setting this to true will show non-publishing roles as tiles.
+   * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
+   * will be filtered by default. If you wish to show all peers, pass false for this.
    */
-  showTileForAllPeers?: boolean;
+  filterNonPublishingPeers?: boolean;
 }
 
 export const useVideoList = ({
@@ -40,11 +39,16 @@ export const useVideoList = ({
   peers,
   overflow = 'scroll-x',
   aspectRatio,
-  showTileForAllPeers,
+  filterNonPublishingPeers = true,
 }: UseVideoListProps) => {
   const store = useHMSVanillaStore();
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
-  const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(peers, tracksMap, showScreenFn, showTileForAllPeers);
+  const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
+    peers,
+    tracksMap,
+    showScreenFn,
+    filterNonPublishingPeers,
+  );
   const finalAspectRatio = useMemo(() => {
     if (aspectRatio) {
       return aspectRatio;
