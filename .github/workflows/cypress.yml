@@ -4,12 +4,9 @@ on:
   push:
 
 jobs:
-  changes:
+  cypress-run:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft != true
-    outputs:
-      sdk: ${{ steps.filter.outputs.sdk }}
-      store: ${{ steps.filter.outputs.store }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
@@ -21,16 +18,9 @@ jobs:
             store:
               - 'packages/hms-video-store/**/*.(ts|js)'
 
-  cypress-run:
-    runs-on: ubuntu-latest
-    needs: changes
-    if: needs.changes.outputs.sdk == 'true' || needs.changes.outputs.store == 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Cypress
         uses: cypress-io/github-action@v2
+        if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true'
         with:
           browser: chrome
           build: yarn build
@@ -40,6 +30,7 @@ jobs:
           CYPRESS_ROLE: ${{ secrets.ROLE }}
           CYPRESS_API_ENV: ${{ secrets.API_ENV }}
           CYPRESS_INIT_ENDPOINT: ${{ secrets.INIT_ENDPOINT }}
+
       - name: Cypress Coverage
         uses: romeovs/lcov-reporter-action@v0.2.11
         with:
