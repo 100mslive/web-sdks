@@ -9,13 +9,14 @@ export enum HMSLogLevel {
   NONE,
 }
 
+// @ts-ignore - window.expect is available only when in test environment
+const isTestEnv = typeof window !== 'undefined' && typeof window.expect !== 'undefined';
 /**
  * TODO: fix this so logs show the real file and line numbers where they originated from instead of this class
  * https://stackoverflow.com/questions/13815640/a-proper-wrapper-for-console-log-with-correct-line-number
  */
 export default class HMSLogger {
-  // @ts-ignore - window.expect is available only when in test environment
-  static level: HMSLogLevel = typeof window?.expect !== 'undefined' ? HMSLogLevel.NONE : HMSLogLevel.VERBOSE;
+  static level: HMSLogLevel = isTestEnv ? HMSLogLevel.NONE : HMSLogLevel.VERBOSE;
 
   static v(tag: string, ...data: any[]) {
     this.log(HMSLogLevel.VERBOSE, tag, ...data);
