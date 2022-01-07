@@ -34,6 +34,7 @@ function getVersionMap() {
     const location = path.resolve(`packages/${pkgName}`);
     const version = require(`${location}/package.json`).version;
     pkgVersions[pkgName] = version;
+    return pkgVersions;
   }, {});
 }
 
