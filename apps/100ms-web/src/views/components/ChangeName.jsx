@@ -1,4 +1,4 @@
-import React, { useState, useMemo, Fragment } from "react";
+import React, { useState, useMemo, Fragment, useContext } from "react";
 import {
   Button,
   MessageModal,
@@ -10,8 +10,10 @@ import {
   selectTracksMap,
   selectPeerNameByID,
 } from "@100mslive/hms-video-react";
+import { Switch } from "@100mslive/react-ui";
 import { hmsToast } from "./notifications/hms-toast";
 import { USERNAME_KEY } from "../../common/constants";
+import { AppContext } from "../../store/AppContext";
 
 const defaultClasses = {
   formInner: "w-full flex flex-col md:flex-row my-1.5",
@@ -199,6 +201,7 @@ export const StatsForNerds = ({ showModal, onCloseModal }) => {
   const tracksMap = useHMSStore(selectTracksMap);
   const tracks = useMemo(() => Object.values(tracksMap), [tracksMap]);
   const [selectedStat, setSelectedStat] = useState("local-peer");
+  const { showStatsOnTiles, setShowStatsOnTiles } = useContext(AppContext);
 
   return (
     <MessageModal
@@ -229,6 +232,14 @@ export const StatsForNerds = ({ showModal, onCloseModal }) => {
           ) : (
             <TrackStats trackID={selectedStat} />
           )}
+          <hr />
+          <div className="flex justify-evenly items-center mt-4">
+            <h3 className="text-base">Show Stats on Tiles</h3>
+            <Switch
+              checked={showStatsOnTiles}
+              onCheckedChange={setShowStatsOnTiles}
+            />
+          </div>
         </Fragment>
       }
     />
