@@ -49,6 +49,10 @@ const execPromise = cmd => {
   });
 };
 
+/**
+ * figure out packages which need version update for the changes in this PR and update the version properly if it's not already updated.
+ * The already updated part we figure out by comparing the version to the version of that package in main branch.
+ */
 module.exports = async ({ github, context, core }) => {
   const { CHANGES } = process.env;
   const changedPackages = JSON.parse(CHANGES);
