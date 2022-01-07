@@ -74,8 +74,7 @@ module.exports = async ({ context }) => {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
     }
   }
-  const branch = context.ref.split('refs/heads/')[1];
-  console.log({ branch, ref: context.ref, payload: context.payload });
+  const branch = context.payload.head.ref;
   await execPromise(`git checkout ${branch}`);
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
