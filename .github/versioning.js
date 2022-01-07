@@ -55,7 +55,7 @@ const execPromise = cmd => {
  * The already updated part we figure out by comparing the version to the version of that package in main branch.
  */
 module.exports = async ({ context }) => {
-  const { CHANGES } = process.env;
+  const { CHANGES, branch } = process.env;
   const changedPackages = JSON.parse(CHANGES);
 
   const packagesToBeUpdated = new Set();
@@ -74,7 +74,6 @@ module.exports = async ({ context }) => {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
     }
   }
-  const branch = context.payload.head.ref;
   await execPromise(`git checkout ${branch}`);
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
