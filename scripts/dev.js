@@ -1,4 +1,4 @@
-/* eslint-disable */
+const fs = require('fs');
 const esbuild = require('esbuild');
 
 async function main() {
@@ -11,7 +11,28 @@ async function main() {
   }
   esbuild.build({
     entryPoints: [source],
-    outfile: 'dist/hms-video.esm.js',
+    outfile: 'dist/index.cjs.js',
+    minify: true,
+    bundle: true,
+    format: 'cjs',
+    target: 'es6',
+    tsconfig: 'tsconfig.json',
+    external,
+    metafile: true,
+    watch: {
+      onRebuild(error) {
+        if (error) {
+          console.log(`× ${pkg.name}: An error in prevented the rebuild.`);
+          return;
+        }
+        console.log(`✔ ${pkg.name}: Rebuilt.`);
+      },
+    },
+  });
+
+  esbuild.build({
+    entryPoints: [source],
+    outfile: 'dist/index.js',
     minify: false,
     bundle: true,
     format: 'esm',
