@@ -68,9 +68,9 @@ module.exports = async ({ github, context, core }) => {
   const currentVersions = getVersionMap();
   await execPromise('git checkout main');
   const mainVersions = getVersionMap();
-  for (const key in currentVersions) {
-    if (currentVersions[key] !== mainVersions[key]) {
-      packagesToBeUpdated.delete(key); // Already updated delete from to be updated list
+  for (const pkg in currentVersions) {
+    if (currentVersions[pkg] !== mainVersions[pkg]) {
+      packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
     }
   }
   const branch = context.ref.split('refs/heads/')[1];
