@@ -46,7 +46,7 @@ jobs:
           CHANGES: ${{ toJSON(needs.changes.outputs) }}
         with:
           script: |
-            const script = require('.github/labeller.js')
+            const script = require('.github/versioning.js')
             await script({ github, context })
 
   size:
