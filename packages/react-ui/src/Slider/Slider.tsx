@@ -39,7 +39,7 @@ const Thumb = styled(BaseSlider.Thumb, {
   backgroundColor: 'white',
   boxShadow: `0 2px 10px $colors$grey4`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: '$grey9' },
+  '&:hover': { backgroundColor: '$grey4' },
   '&:focus': { boxShadow: `0 0 0 5px $colors$grey2` },
 });
 

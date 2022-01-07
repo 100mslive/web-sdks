@@ -6,10 +6,10 @@ const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
   width: 34,
   height: 14,
-  backgroundColor: '$gray6',
+  backgroundColor: '$gray3',
   borderRadius: '9999px',
   position: 'relative',
-  '&[data-state="checked"]': { backgroundColor: '$blue6' },
+  '&[data-state="checked"]': { backgroundColor: '$brandShade' },
   '&:focus': {
     outline: 'none',
   },
@@ -26,12 +26,12 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   left: -3,
   width: 20,
   height: 20,
-  backgroundColor: '$grey9',
+  backgroundColor: '$grey4',
   borderRadius: '$round',
   transition: 'transform 100ms',
   transform: 'translateX(2px)',
   willChange: 'transform',
-  '&[data-state="checked"]': { transform: 'translateX(18px)', backgroundColor: '$blue9' },
+  '&[data-state="checked"]': { transform: 'translateX(18px)', backgroundColor: '$brandMain' },
 });
 
 type SwitchProps = React.ComponentProps<typeof SwitchRoot>;
