@@ -9,13 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set git user
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-
-      - name: push to webapp
-        run: |
           git remote add webapp https://github.com/100mslive/100ms-web.git
           git subtree push --prefix=apps/100ms-web webapp sync-webapp
