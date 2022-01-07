@@ -20,10 +20,10 @@ const exec = require('child_process').exec;
 const path = require('path');
 
 function getVersionMap() {
-  Object.keys(dependencyMapping).reduce((acc, value) => {
-    const location = path.resolve(`packages/${value}`);
+  Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
+    const location = path.resolve(`packages/${pkgName}`);
     const version = require(`${location}/package.json`).version;
-    acc[value] = version;
+    pkgVersions[pkgName] = version;
   }, {});
 }
 
@@ -41,13 +41,13 @@ const execPromise = cmd => {
 
 module.exports = async ({ github, context, core }) => {
   const { CHANGES } = process.env;
-  const changes = JSON.parse(CHANGES);
+  const changedPackages = JSON.parse(CHANGES);
 
   const packagesToBeUpdated = new Set();
 
-  for (const key in changes) {
-    if (changes[key] === 'true') {
-      (dependencyMapping[key] || []).forEach(value => packagesToBeUpdated.add(value));
+  for (const pkgName in changedPackages) {
+    if (changedPackages[pkgName] === 'true') {
+      (dependencyMapping[pkgName] || []).forEach(pkg => packagesToBeUpdated.add(pkg));
     }
   }
 
@@ -69,4 +69,8 @@ module.exports = async ({ github, context, core }) => {
   lernaCommands.forEach(cmd => {
     exec(cmd, function (err, out) {});
   });
+
+  await execPromise(`yarn install`);
+  await execPromise(`git commit -am 'build: update versions' || echo 'no changes'`);
+  await execPromise(`git push origin ${branch}`);
 };
