@@ -35,12 +35,15 @@ jobs:
     if: needs.changes.outputs.hms-video-web == 'true' || needs.changes.outputs.hms-video-store == 'true'
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Set git user
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-      - name: Apply or remove label
+      - name: Update versions
         uses: actions/github-script@v5
         env:
           CHANGES: ${{ toJSON(needs.changes.outputs) }}
