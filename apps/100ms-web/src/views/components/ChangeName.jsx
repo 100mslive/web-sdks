@@ -1,4 +1,10 @@
-import React, { useState, useMemo, Fragment, useContext } from "react";
+import React, {
+  useState,
+  useMemo,
+  Fragment,
+  useContext,
+  useEffect,
+} from "react";
 import {
   Button,
   MessageModal,
@@ -202,6 +208,15 @@ export const StatsForNerds = ({ showModal, onCloseModal }) => {
   const tracks = useMemo(() => Object.values(tracksMap), [tracksMap]);
   const [selectedStat, setSelectedStat] = useState("local-peer");
   const { showStatsOnTiles, setShowStatsOnTiles } = useContext(AppContext);
+
+  useEffect(() => {
+    if (
+      selectedStat !== "local-peer" &&
+      !tracks.map(track => track.id).includes(selectedStat)
+    ) {
+      setSelectedStat("local-peer");
+    }
+  }, [tracks]);
 
   return (
     <MessageModal
