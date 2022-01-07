@@ -84,7 +84,6 @@ module.exports = async ({ context }) => {
     exec(cmd, function (err, out) {});
   });
 
-  await execPromise(`yarn install`);
   await execPromise(`git commit -am 'build: update versions' || echo 'no changes'`);
   await execPromise(`git push origin ${branch}`);
 };
