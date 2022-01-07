@@ -6,6 +6,12 @@ const dependencyMapping = {
   'react-ui': ['react-ui'],
 };
 
+/**
+ * lerna add will update the passed in package's version in the scoped package
+ * lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact
+ * will update @100mslive/hms-video version in @100mslive/hms-video-store.
+ * --exact use exact version instead of ^ prefix.
+ * */
 const lernaCommands = [
   'lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact',
   'lerna add @100mslive/hms-video-store --scope=@100mslive/react-sdk --exact',
@@ -19,8 +25,12 @@ const lernaCommands = [
 const exec = require('child_process').exec;
 const path = require('path');
 
+/**
+ * Get versions of all packages
+ * @returns {}
+ */
 function getVersionMap() {
-  Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
+  return Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
     const location = path.resolve(`packages/${pkgName}`);
     const version = require(`${location}/package.json`).version;
     pkgVersions[pkgName] = version;
