@@ -22,6 +22,11 @@ interface UseVideoListProps {
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
   aspectRatio?: { width: number; height: number };
+  /**
+   * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
+   * will be filtered by default. If you wish to show all peers, pass false for this.
+   */
+  filterNonPublishingPeers?: boolean;
 }
 
 export const useVideoList = ({
@@ -34,10 +39,16 @@ export const useVideoList = ({
   peers,
   overflow = 'scroll-x',
   aspectRatio,
+  filterNonPublishingPeers = true,
 }: UseVideoListProps) => {
   const store = useHMSVanillaStore();
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
-  const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(peers, tracksMap, showScreenFn);
+  const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
+    peers,
+    tracksMap,
+    showScreenFn,
+    filterNonPublishingPeers,
+  );
   const finalAspectRatio = useMemo(() => {
     if (aspectRatio) {
       return aspectRatio;
