@@ -51,7 +51,7 @@ jobs:
         with:
           script: |
             const script = require('.github/versioning.js')
-            await script({ github, context })
+            await script({ context })
 
   size:
     runs-on: ubuntu-latest
