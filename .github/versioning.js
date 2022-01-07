@@ -75,6 +75,7 @@ module.exports = async ({ github, context, core }) => {
     }
   }
   const branch = context.ref.split('refs/heads/')[1];
+  console.log({ branch, ref: context.ref });
   await execPromise(`git checkout ${branch}`);
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
