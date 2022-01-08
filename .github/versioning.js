@@ -45,6 +45,7 @@ const execPromise = cmd => {
         reject(err);
         return;
       }
+      console.log(out);
       resolve(out);
     });
   });
