@@ -9,7 +9,7 @@ import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
 import { HMSRemotePeer } from '../sdk/models/peer';
-import { isMobile } from '../utils/support';
+import { isBrowser, isMobile } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 
 export interface AutoplayEvent {
@@ -281,7 +281,7 @@ export class AudioSinkManager {
     const audioContext = new AudioContext();
     const source = audioContext.createMediaElementSource(element);
     const gain = audioContext.createGain();
-    gain.gain.value = 10;
+    gain.gain.value = isBrowser ? window.HMS?.GAIN_VALUE || 10 : 10;
     source.connect(gain);
     gain.connect(audioContext.destination);
     this.audioContextList.set(trackId, audioContext);

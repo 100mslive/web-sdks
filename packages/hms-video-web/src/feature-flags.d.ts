@@ -4,5 +4,6 @@ interface Window {
     PING_TIMEOUT?: number;
     AUDIO_SINK?: boolean;
     NEW_BEAM_STATE?: boolean;
+    GAIN_VALUE: 10;
   };
 }
