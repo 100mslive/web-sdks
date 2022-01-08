@@ -143,4 +143,18 @@ const HmsStitches = createStitches({
 
 export const { theme, createTheme, styled, globalCss, keyframes, getCssText } = HmsStitches;
 
+export const lightTheme = createTheme({
+  colors: {
+    fg: '#000',
+    bg: '#FFF',
+    grey7: '#212121',
+    grey6: '#3B3B3B',
+    grey5: '#5E5E5E',
+    grey4: '#8E8E8E',
+    grey3: '#C7C7C7',
+    grey2: '#E3E3E3',
+    grey1: '#F2F2F2',
+  },
+});
+
 export type CSS = Stitches.CSS<typeof HmsStitches>;

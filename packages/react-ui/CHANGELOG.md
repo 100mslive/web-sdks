@@ -1,3 +1,7 @@
+## 0.0.5-alpha.0
+
+- added light theme
+
 ## 0.0.3-alpha.2
 
 - fix `standard` button variant
