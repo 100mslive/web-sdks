@@ -13,13 +13,13 @@ const dependencyMapping = {
  * --exact use exact version instead of ^ prefix.
  * */
 const lernaCommands = [
-  'lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact',
-  'lerna add @100mslive/hms-video-store --scope=@100mslive/react-sdk --exact',
-  'lerna add @100mslive/react-icons --scope=@100mslive/react-ui --exact',
+  'lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact || echo "No changes"',
+  'lerna add @100mslive/hms-video-store --scope=@100mslive/react-sdk --exact || echo "No changes"',
+  'lerna add @100mslive/react-icons --scope=@100mslive/react-ui --exact || echo "No changes"',
   // Update deps in webapp
-  'lerna add @100mslive/react-ui --scope=100ms_edtech_template --exact',
-  'lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact',
-  'lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact',
+  'lerna add @100mslive/react-ui --scope=100ms_edtech_template --exact || echo "No changes"',
+  'lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact || echo "No changes"',
+  'lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact || echo "No changes"',
 ];
 
 const exec = require('child_process').exec;
@@ -65,7 +65,7 @@ module.exports = async ({ context }) => {
       (dependencyMapping[pkgName] || []).forEach(pkg => packagesToBeUpdated.add(pkg));
     }
   }
-
+  console.log('packagesToBeUpdated', packagesToBeUpdated.values());
   const currentVersions = getVersionMap();
   await execPromise('git checkout main');
   const mainVersions = getVersionMap();
@@ -74,6 +74,7 @@ module.exports = async ({ context }) => {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
     }
   }
+  console.log('packagesToBeUpdated', packagesToBeUpdated.values());
   await execPromise(`git checkout ${branch}`);
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
