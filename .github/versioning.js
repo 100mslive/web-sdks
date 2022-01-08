@@ -80,10 +80,9 @@ module.exports = async ({ context }) => {
     await execPromise(`cd ${location}; npm version prerelease --preid=alpha --git-tag-version=false`);
   }
 
-  lernaCommands.forEach(cmd => {
-    exec(cmd, function (err, out) {});
-  });
-
+  for (const cmd of lernaCommands) {
+    await execPromise(cmd);
+  }
   await execPromise(`git commit -am 'build: update versions' || echo 'no changes'`);
   await execPromise(`git push origin ${branch}`);
 };
