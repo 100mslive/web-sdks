@@ -69,6 +69,7 @@ module.exports = async ({ context }) => {
   const currentVersions = getVersionMap();
   await execPromise('git checkout main');
   const mainVersions = getVersionMap();
+  console.log({ mainVersions, currentVersions });
   for (const pkg in currentVersions) {
     if (currentVersions[pkg] !== mainVersions[pkg]) {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
