@@ -67,9 +67,10 @@ module.exports = async ({ context }) => {
     }
   }
   console.log('packagesToBeUpdated', packagesToBeUpdated.values());
-  const currentVersions = getVersionMap();
   await execPromise('git checkout main');
   const mainVersions = getVersionMap();
+  await execPromise(`git checkout ${branch}`);
+  const currentVersions = getVersionMap();
   console.log({ mainVersions, currentVersions });
   for (const pkg in currentVersions) {
     if (currentVersions[pkg] !== mainVersions[pkg]) {
@@ -77,7 +78,6 @@ module.exports = async ({ context }) => {
     }
   }
   console.log('packagesToBeUpdated', packagesToBeUpdated.values());
-  await execPromise(`git checkout ${branch}`);
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
     await execPromise(`cd ${location}; npm version prerelease --preid=alpha --git-tag-version=false`);
