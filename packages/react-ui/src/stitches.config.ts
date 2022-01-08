@@ -20,6 +20,7 @@ const HmsStitches = createStitches({
       grey5: '#C7C7C7',
       grey6: '#E3E3E3',
       grey7: '#F2F2F2',
+      iconBtn: '#FFF',
       trans: 'rgba(255, 255, 255, 0.25)',
       disabled: 'rgba(196, 196, 196, 0.21)',
     },
@@ -142,5 +143,22 @@ const HmsStitches = createStitches({
 });
 
 export const { theme, createTheme, styled, globalCss, keyframes, getCssText } = HmsStitches;
+
+export const lightTheme = createTheme({
+  colors: {
+    fg: '#000',
+    bg: '#FFF',
+    grey7: '#212121',
+    grey6: '#3B3B3B',
+    grey5: '#5E5E5E',
+    grey4: '#8E8E8E',
+    grey3: '#C7C7C7',
+    grey2: '#E3E3E3',
+    grey1: '#F2F2F2',
+    iconBtn: '#3B3B3B',
+    trans: 'rgba(0, 0, 0, 0.22)',
+    disabled: 'rgba(59, 59, 59, 0.13)',
+  },
+});
 
 export type CSS = Stitches.CSS<typeof HmsStitches>;
