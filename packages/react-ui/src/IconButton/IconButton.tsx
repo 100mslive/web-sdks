@@ -29,10 +29,10 @@ export const IconButton = styled('button', {
   variants: {
     active: {
       false: {
-        backgroundColor: '$fg',
+        backgroundColor: '$iconBtn',
         color: '$bg',
         '&:not([disabled]):hover': {
-          backgroundColor: '$fg',
+          backgroundColor: '$iconBtn',
         },
       },
       true: {
