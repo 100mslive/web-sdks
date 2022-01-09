@@ -216,7 +216,7 @@ export const StatsForNerds = ({ showModal, onCloseModal }) => {
     ) {
       setSelectedStat("local-peer");
     }
-  }, [tracks]);
+  }, [tracks, selectedStat]);
 
   return (
     <MessageModal
