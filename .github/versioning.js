@@ -1,11 +1,4 @@
-const dependencyMapping = {
-  'hms-video-web': ['hms-video-web', 'hms-video-store', 'react-sdk', 'react-ui'],
-  'hms-video-store': ['hms-video-store', 'react-sdk', 'react-ui'],
-  'react-sdk': ['react-sdk'],
-  'react-icons': ['react-icons', 'react-ui'],
-  'react-ui': ['react-ui'],
-};
-
+const { dependencyMapping } = require('./constants');
 /**
  * lerna add will update the passed in package's version in the scoped package
  * lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact
@@ -25,19 +18,6 @@ const lernaCommands = [
 const exec = require('child_process').exec;
 const path = require('path');
 
-/**
- * Get versions of all packages
- * @returns {}
- */
-function getVersionMap() {
-  return Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
-    const location = path.resolve(`packages/${pkgName}`);
-    const version = require(`${location}/package.json`).version;
-    pkgVersions[pkgName] = version;
-    return pkgVersions;
-  }, {});
-}
-
 const execPromise = cmd => {
   return new Promise((resolve, reject) => {
     exec(cmd, (err, out) => {
@@ -56,9 +36,10 @@ const execPromise = cmd => {
  * The already updated part we figure out by comparing the version to the version of that package in main branch.
  */
 module.exports = async ({ context }) => {
-  const { CHANGES, branch } = process.env;
-  const changedPackages = JSON.parse(CHANGES);
+  const { changes, mainVersions, currentVersions } = process.env;
+  const changedPackages = JSON.parse(changes);
 
+  console.log({ mainVersions, currentVersions });
   const packagesToBeUpdated = new Set();
 
   for (const pkgName in changedPackages) {
@@ -66,12 +47,6 @@ module.exports = async ({ context }) => {
       (dependencyMapping[pkgName] || []).forEach(pkg => packagesToBeUpdated.add(pkg));
     }
   }
-  console.log('packagesToBeUpdated', packagesToBeUpdated.values());
-  await execPromise('git checkout main');
-  const mainVersions = getVersionMap();
-  await execPromise(`git checkout ${branch}`);
-  const currentVersions = getVersionMap();
-  console.log({ mainVersions, currentVersions });
   for (const pkg in currentVersions) {
     if (currentVersions[pkg] !== mainVersions[pkg]) {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list

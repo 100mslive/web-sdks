@@ -32,12 +32,30 @@ jobs:
   update-version:
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.hms-video-web == 'true' || needs.changes.outputs.hms-video-store == 'true'
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          ref: main
+
+      - name: Set versions
+        uses: actions/github-script@v5
+        id: main
+        with:
+          script: |
+            const script = require('.github/setversions.js')
+            script({ core })
+
+      - uses: actions/checkout@v2
+        with:
           ref: ${{ github.head_ref }}
+
+      - name: Set versions
+        uses: actions/github-script@v5
+        id: branch
+        with:
+          script: |
+            const script = require('.github/setversions.js')
+            await script({ core })
 
       - name: Set git user
         run: |
@@ -47,8 +65,9 @@ jobs:
       - name: Update versions
         uses: actions/github-script@v5
         env:
-          CHANGES: ${{ toJSON(needs.changes.outputs) }}
-          branch: ${{ github.head_ref }}
+          changes: ${{ toJSON(needs.changes.outputs) }}
+          mainVersions: ${{ steps.main.outputs.versions }}
+          currentVersions: ${{ steps.branch.outputs.versions }}
         with:
           script: |
             const script = require('.github/versioning.js')
