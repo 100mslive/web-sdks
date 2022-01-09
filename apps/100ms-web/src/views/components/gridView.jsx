@@ -14,7 +14,7 @@ const MAX_TILES_FOR_MOBILE = 4;
  */
 const webinarProps = JSON.parse(process.env.REACT_APP_WEBINAR_PROPS || "{}");
 const eventRoomIDs = webinarProps?.ROOM_IDS || [];
-const eventsImg = webinarProps?.IMAGE_FILE || "";  // the image to show in center
+const eventsImg = webinarProps?.IMAGE_FILE || ""; // the image to show in center
 // the link to navigate to when user clicks on the image
 const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 
@@ -100,7 +100,12 @@ export const GridSidePaneView = ({
             maxColCount={2}
             maxRowCount={rowCount}
             compact={true}
-            videoTileProps={videoTileProps}
+            // show stats for upto 2 peers in sidepane
+            videoTileProps={(p, t) => ({
+              ...videoTileProps(p, t),
+              showStats:
+                peers.length < 3 ? videoTileProps(p, t).showStats : false,
+            })}
           />
         )}
       </div>
