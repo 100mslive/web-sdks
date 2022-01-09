@@ -216,6 +216,8 @@ const attachTrackStats = (
   return Object.assign(sdkTrackStats, {
     peerID: track.peerId,
     peerName: hmsStore.getState(selectPeerNameByID(track.peerId)),
+    // @ts-ignore
+    packetsLostRate: computeStatRate('packetsLost', sdkTrackStats, storeTrackStats),
     bitrate,
   });
 };

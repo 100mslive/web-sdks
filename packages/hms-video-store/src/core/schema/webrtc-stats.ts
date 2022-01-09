@@ -8,10 +8,14 @@ type WithBitrate = { bitrate: number };
  */
 type MissingRTCTrackStats = {
   bytesReceived?: number;
+  frameHeight?: number;
+  frameWidth?: number;
+  framesDropped?: number;
   framesPerSecond?: number;
   bytesSent?: number;
   jitter?: number;
   packetsLost?: number;
+  packetsLostRate?: number;
   qualityLimitationReason?: string;
 };
 
