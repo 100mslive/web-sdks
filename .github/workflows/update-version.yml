@@ -42,7 +42,7 @@ jobs:
         id: main
         with:
           script: |
-            const script = require('scripts/setversions.js')
+            const script = require('./scripts/setversions.js')
             script({ core })
 
       - uses: actions/checkout@v2
@@ -54,7 +54,7 @@ jobs:
         id: branch
         with:
           script: |
-            const script = require('scripts/setversions.js')
+            const script = require('./scripts/setversions.js')
             script({ core })
 
       - name: Set git user
@@ -71,7 +71,7 @@ jobs:
           branch: ${{ github.head_ref }}
         with:
           script: |
-            const script = require('scripts/versioning.js')
+            const script = require('./scripts/versioning.js')
             await script()
 
   size:

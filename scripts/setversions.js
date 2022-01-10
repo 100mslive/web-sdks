@@ -1,4 +1,4 @@
-import { dependencyMapping } from './constants';
+const { dependencyMapping } = require('./constants');
 const path = require('path');
 
 module.exports = ({ core }) => {
