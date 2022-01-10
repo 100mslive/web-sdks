@@ -45,5 +45,5 @@ jobs:
           CHANGES: ${{ toJSON(steps.filter.outputs) }}
         with:
           script: |
-            const script = require('scripts/labeller.js')
+            const script = require('../scripts/labeller.js')
             await script({ github, context })
