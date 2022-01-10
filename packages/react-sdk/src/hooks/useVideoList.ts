@@ -8,6 +8,7 @@ import {
   TrackWithPeer,
 } from '../utils/layout';
 import { useHMSVanillaStore } from './HmsRoomProvider';
+import { useResizeDetector } from 'react-resize-detector';
 
 interface UseVideoListProps {
   /**
@@ -16,8 +17,6 @@ interface UseVideoListProps {
   maxTileCount: number;
   maxRowCount: number;
   maxColCount: number;
-  width: number;
-  height: number;
   showScreenFn?: (peer: HMSPeer) => boolean;
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
@@ -33,14 +32,13 @@ export const useVideoList = ({
   maxTileCount,
   maxColCount,
   maxRowCount,
-  width,
-  height,
   showScreenFn = () => false,
   peers,
   overflow = 'scroll-x',
   aspectRatio,
   filterNonPublishingPeers = true,
 }: UseVideoListProps) => {
+  const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
@@ -107,5 +105,6 @@ export const useVideoList = ({
   );
   return {
     chunkedTracksWithPeer,
+    ref,
   };
 };
