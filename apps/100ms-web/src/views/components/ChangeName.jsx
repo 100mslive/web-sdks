@@ -205,18 +205,15 @@ const StatsTrackOption = ({ track }) => {
 
 export const StatsForNerds = ({ showModal, onCloseModal }) => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const tracks = useMemo(() => Object.values(tracksMap), [tracksMap]);
+  const trackIDs = useMemo(() => Object.keys(tracksMap), [tracksMap]);
   const [selectedStat, setSelectedStat] = useState("local-peer");
   const { showStatsOnTiles, setShowStatsOnTiles } = useContext(AppContext);
 
   useEffect(() => {
-    if (
-      selectedStat !== "local-peer" &&
-      !tracks.map(track => track.id).includes(selectedStat)
-    ) {
+    if (selectedStat !== "local-peer" && !trackIDs.includes(selectedStat)) {
       setSelectedStat("local-peer");
     }
-  }, [tracks, selectedStat]);
+  }, [trackIDs, selectedStat]);
 
   return (
     <MessageModal
@@ -236,8 +233,8 @@ export const StatsForNerds = ({ showModal, onCloseModal }) => {
                 onChange={e => setSelectedStat(e.target.value)}
               >
                 <option value="local-peer">Your Stats</option>
-                {tracks.map(track => (
-                  <StatsTrackOption key={track.id} track={track} />
+                {trackIDs.map(trackID => (
+                  <StatsTrackOption key={trackID} track={tracksMap[trackID]} />
                 ))}
               </select>
             </div>
