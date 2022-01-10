@@ -14,12 +14,15 @@ interface UseVideoListProps {
   /**
    * Max tiles in a  page. Overrides maxRowCount and maxColCount
    */
-  maxTileCount: number;
-  maxRowCount: number;
-  maxColCount: number;
+  maxTileCount?: number;
+  maxRowCount?: number;
+  maxColCount?: number;
   showScreenFn?: (peer: HMSPeer) => boolean;
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
+  /**
+   * Aspect ratio of VideoTiles
+   */
   aspectRatio?: { width: number; height: number };
   /**
    * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
@@ -28,16 +31,32 @@ interface UseVideoListProps {
   filterNonPublishingPeers?: boolean;
 }
 
+const DEFAULTS = {
+  maxTileCount: 4,
+  maxColCount: 4,
+  maxRowCount: 2,
+  aspectRatio: {
+    width: 1,
+    height: 1,
+  },
+};
+
 export const useVideoList = ({
-  maxTileCount,
-  maxColCount,
-  maxRowCount,
+  maxTileCount = DEFAULTS.maxTileCount,
+  maxColCount = DEFAULTS.maxColCount,
+  maxRowCount = DEFAULTS.maxRowCount,
   showScreenFn = () => false,
   peers,
   overflow = 'scroll-x',
-  aspectRatio,
+  aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
-}: UseVideoListProps) => {
+}: UseVideoListProps): {
+  chunkedTracksWithPeer: (TrackWithPeer & {
+    width: number;
+    height: number;
+  })[][];
+  ref: React.MutableRefObject<any>;
+} => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
