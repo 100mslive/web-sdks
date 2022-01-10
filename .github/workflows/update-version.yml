@@ -66,8 +66,6 @@ jobs:
         uses: actions/github-script@v5
         env:
           changes: ${{ toJSON(needs.changes.outputs) }}
-          mainVersions: ${{ steps.main.outputs.versions }}
-          currentVersions: ${{ steps.branch.outputs.versions }}
           branch: ${{ github.head_ref }}
         with:
           script: |
