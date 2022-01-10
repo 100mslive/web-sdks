@@ -30,19 +30,24 @@ For starting sdk and store locally, run `yarn start` in both folders.
 
 > Note: run yarn start in sdk first and then in store
 
-## Updating Package versions
+### Update a packages version
 
-- Whenever sdk is updated, store needs to be updated as well, as sdk is direct dependency for store now.
-  The following command will update sdk version, store version and sdk version in store.
-  `lerna version prerelease --no-git-tag-version --yes --exact`
+Go to the path of the package ex: cd packages/hms-video-web and run the following command
+`npm version prerelease --preid=alpha --git-tag-version=false`
 
-- if sdk version is automatically updated by github workflow(this will be gradually updated to do the above)
-  Run the following command to update store version and sdk version in store.
-  `lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact` - will update sdk version in store
-  `npm version prerelease --preid alpha` - This will update store version
+To update the same in dependent packages run
+`lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact`
 
-## Linking to webapp
+### Syncing with webapp
 
-- Run `yarn link` in `packages/hms-video-store`.
-- Then use the linked package in react repo and then link react to webapp.
-- If react app is not necessary, you can try linking store directly in webapp but linking in react is preferred.
+check the existing remotes with `git remote -v`;
+if there is only one remote, add webapp as a new remote.
+`git remote add -f webapp https://github.com/100mslive/100ms-web.git`
+
+## push to webapp
+
+`git subtree push --prefix=apps/100ms-web webapp sync-web-app`
+
+## pull from webapp
+
+`git subtree pull --prefix=apps/100ms-web webapp main`
