@@ -42,7 +42,7 @@ jobs:
         id: main
         with:
           script: |
-            const script = require('.github/setversions.js')
+            const script = require('scripts/setversions.js')
             script({ core })
 
       - uses: actions/checkout@v2
@@ -54,8 +54,8 @@ jobs:
         id: branch
         with:
           script: |
-            const script = require('.github/setversions.js')
-            await script({ core })
+            const script = require('scripts/setversions.js')
+            script({ core })
 
       - name: Set git user
         run: |
@@ -68,10 +68,11 @@ jobs:
           changes: ${{ toJSON(needs.changes.outputs) }}
           mainVersions: ${{ steps.main.outputs.versions }}
           currentVersions: ${{ steps.branch.outputs.versions }}
+          branch: ${{ github.head_ref }}
         with:
           script: |
-            const script = require('.github/versioning.js')
-            await script({ context })
+            const script = require('scripts/versioning.js')
+            await script()
 
   size:
     runs-on: ubuntu-latest

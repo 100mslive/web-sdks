@@ -1,3 +1,6 @@
+import { dependencyMapping } from './constants';
+const path = require('path');
+
 module.exports = ({ core }) => {
   console.log(JSON.stringify(process.env));
   console.log(core);
