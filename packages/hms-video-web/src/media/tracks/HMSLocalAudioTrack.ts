@@ -2,8 +2,7 @@ import { HMSAudioTrack } from './HMSAudioTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
-import { ITrackAudioLevelUpdate, TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
-import { EventReceiver } from '../../utils/typed-event-emitter';
+import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import HMSLogger from '../../utils/logger';
 import { HMSAudioPlugin } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
@@ -98,11 +97,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     if (hasPropertyChanged('deviceId')) {
       const isLevelMonitored = Boolean(this.audioLevelMonitor);
-      const eventListeners = this.eventBus.trackAudioLevelUpdate.getListeners();
       HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
       isLevelMonitored && this.destroyAudioLevelMonitor();
       await this.replaceTrackWith(newSettings);
-      isLevelMonitored && this.initAudioLevelMonitor(eventListeners);
+      isLevelMonitored && this.initAudioLevelMonitor();
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {
           deviceId: settings.deviceId,
@@ -170,10 +168,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
-  initAudioLevelMonitor(listeners?: EventReceiver<ITrackAudioLevelUpdate | undefined>[] | undefined) {
+  initAudioLevelMonitor() {
     HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
     this.audioLevelMonitor = new TrackAudioLevelMonitor(this, this.eventBus.trackAudioLevelUpdate);
-    listeners?.forEach(listener => this.eventBus.trackAudioLevelUpdate.subscribe(listener));
     this.audioLevelMonitor.start();
   }
 
