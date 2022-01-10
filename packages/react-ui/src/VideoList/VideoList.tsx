@@ -1,39 +1,41 @@
-import { styled } from '../stitches.config';
+import { useVideoList, HMSPeer } from '@100mslive/react-sdk';
+import { StyledVideoList } from './StyledVideoList';
+import React from 'react';
+import getLeft from './getLeft';
+import { VideoTile } from '../VideoTile';
+import { Pagination } from '../Pagination';
 
-const Root = styled('div', {
-  height: '100%',
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const Container = styled('div', {
-  height: '100%',
-  width: '100%',
-  position: 'relative',
-  padding: '$5',
-  overflowX: 'hidden',
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const View = styled('div', {
-  display: 'flex',
-  placeContent: 'center',
-  flexWrap: 'wrap',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-});
-
-interface VideoListType {
-  Root: typeof Root;
-  Container: typeof Container;
-  View: typeof View;
+interface Props {
+  peers: HMSPeer[];
 }
 
-export const VideoList: VideoListType = {
-  Root,
-  Container,
-  View,
+export const VideoList: React.FC<Props> = ({ peers }) => {
+  const { ref, chunkedTracksWithPeer } = useVideoList({
+    peers,
+    maxTileCount: 2,
+  });
+  const [page, setPage] = React.useState(0);
+  React.useEffect(() => {
+    // currentPageIndex should not exceed pages length
+    if (page >= chunkedTracksWithPeer.length) {
+      setPage(0);
+    }
+  }, [chunkedTracksWithPeer.length, page]);
+  const list = new Array(chunkedTracksWithPeer.length).fill('');
+  return (
+    <StyledVideoList.Root>
+      <StyledVideoList.Container ref={ref}>
+        {chunkedTracksWithPeer && chunkedTracksWithPeer.length > 0
+          ? chunkedTracksWithPeer.map((l, i) => (
+              <StyledVideoList.View css={{ left: getLeft(i, page), transition: 'left 0.3s ease-in-out' }} key={i}>
+                {l.map(p => (
+                  <VideoTile key={p.peer.id} width={p.width} height={p.height} peer={p.peer} />
+                ))}
+              </StyledVideoList.View>
+            ))
+          : null}
+      </StyledVideoList.Container>
+      {chunkedTracksWithPeer.length > 1 ? <Pagination page={page} setPage={setPage} list={list} /> : null}
+    </StyledVideoList.Root>
+  );
 };
