@@ -6,7 +6,7 @@ const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
   width: 34,
   height: 14,
-  backgroundColor: '$gray3',
+  backgroundColor: '$grey3',
   borderRadius: '9999px',
   position: 'relative',
   '&[data-state="checked"]': { backgroundColor: '$brandShade' },
