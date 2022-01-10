@@ -30,11 +30,11 @@ export class TrackAudioLevelMonitor {
     if (audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD) {
       this.audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
       const audioLevelUpdate = this.audioLevel ? { track: this.track, audioLevel: this.audioLevel } : undefined;
-      this.hmsInternalEvent.publish(audioLevelUpdate);
+      this.audioLevelEvent.publish(audioLevelUpdate);
     }
   }
 
-  constructor(private track: HMSAudioTrack, private hmsInternalEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
+  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
     try {
       this.audioContext = new AudioContext();
       this.audioSource = this.audioContext.createMediaStreamSource(new MediaStream([this.track.nativeTrack]));
