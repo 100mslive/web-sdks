@@ -371,6 +371,17 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    MissingMediaDevices() {
+      return new HMSException(
+        ErrorCodes.GenericErrors.MISSING_MEDIADEVICES,
+        'MissingMediaDevices',
+        HMSAction.JOIN,
+        `navigator.mediaDevices is undefined. 100ms SDK won't work on this website as WebRTC is not supported on HTTP endpoints(missing navigator.mediaDevices). Please ensure you're using the SDK either on localhost or a valid HTTPS endpoint.`,
+        '',
+        true,
+      );
+    },
   },
 
   MediaPluginErrors: {

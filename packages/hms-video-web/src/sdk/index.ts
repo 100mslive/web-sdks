@@ -52,6 +52,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '~interfaces/hls-config';
+import { isMediadevicesMissing } from '../utils/missing-mediaDevices';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -224,6 +225,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
+    if (isMediadevicesMissing()) {
+      return Promise.reject(ErrorFactory.GenericErrors.MissingMediaDevices());
+    }
+
     if (this.sdkState.isPreviewInProgress) {
       return Promise.reject(
         ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
@@ -283,6 +288,10 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
+    if (isMediadevicesMissing()) {
+      throw ErrorFactory.GenericErrors.MissingMediaDevices();
+    }
+
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
