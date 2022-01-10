@@ -1,7 +1,7 @@
 const { dependencyMapping } = require('./constants');
 const path = require('path');
 
-module.exports = ({ core }) => {
+module.exports = ({ core, name }) => {
   console.log(JSON.stringify(process.env));
   console.log(core);
   const versions = Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
@@ -10,5 +10,5 @@ module.exports = ({ core }) => {
     pkgVersions[pkgName] = version;
     return pkgVersions;
   }, {});
-  core.exportVariable('versions', JSON.stringify(versions));
+  core.exportVariable(name, JSON.stringify(versions));
 };

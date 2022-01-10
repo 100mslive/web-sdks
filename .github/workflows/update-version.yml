@@ -43,7 +43,7 @@ jobs:
         with:
           script: |
             const script = require('./scripts/setversions.js')
-            script({ core })
+            script({ core, name: 'mainVersions' })
 
       - uses: actions/checkout@v2
         with:
@@ -55,7 +55,7 @@ jobs:
         with:
           script: |
             const script = require('./scripts/setversions.js')
-            script({ core })
+            script({ core, name: 'currentVersions' })
 
       - name: Set git user
         run: |
@@ -66,8 +66,6 @@ jobs:
         uses: actions/github-script@v5
         env:
           changes: ${{ toJSON(needs.changes.outputs) }}
-          mainVersions: ${{ steps.main.outputs.versions }}
-          currentVersions: ${{ steps.branch.outputs.versions }}
           branch: ${{ github.head_ref }}
         with:
           script: |
