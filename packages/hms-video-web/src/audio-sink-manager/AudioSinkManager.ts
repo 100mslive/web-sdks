@@ -9,7 +9,7 @@ import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
 import { HMSRemotePeer } from '../sdk/models/peer';
-import { isMobile } from '../utils/support';
+import { isBrowser, isMobile } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 
 export interface AutoplayEvent {
@@ -39,7 +39,7 @@ export class AudioSinkManager {
   private volume = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
-  private audioContext?: AudioContext;
+  private audioContextList = new Map<string, AudioContext>();
   private listener?: HMSUpdateListener;
 
   constructor(
@@ -52,8 +52,6 @@ export class AudioSinkManager {
     this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.notificationManager.addEventListener('track-updated', this.handleTrackUpdate as EventListener);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
-    // Initiate a Audio Context so safari will play audio on speaker instead of earpiece
-    this.audioContext = new AudioContext();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -108,8 +106,10 @@ export class AudioSinkManager {
   cleanUp() {
     this.audioSink?.remove();
     this.audioSink = undefined;
-    this.audioContext?.close();
-    this.audioContext = undefined;
+    for (const context of this.audioContextList.values()) {
+      context.close();
+    }
+    this.audioContextList.clear();
     this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
     this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
     this.notificationManager.removeEventListener('track-updated', this.handleTrackUpdate as EventListener);
@@ -170,6 +170,7 @@ export class AudioSinkManager {
 
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
+    this.connectAudioContext(audioEl, track.trackId);
     HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
@@ -229,8 +230,9 @@ export class AudioSinkManager {
       return;
     }
     try {
-      if (this.audioContext?.state === 'suspended') {
-        this.audioContext?.resume();
+      const audioContext = this.audioContextList.get(track.trackId);
+      if (audioContext?.state === 'suspended') {
+        audioContext?.resume();
       }
       await audioEl.play();
       this.state.autoplayFailed = false;
@@ -273,5 +275,18 @@ export class AudioSinkManager {
     });
     // Return after all pending tracks are played
     await Promise.all(promises);
+  };
+
+  private connectAudioContext = (element: HTMLAudioElement, trackId: string) => {
+    if (!isBrowser || !window.HMS?.GAIN_VALUE) {
+      return;
+    }
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaElementSource(element);
+    const gain = audioContext.createGain();
+    gain.gain.value = window.HMS.GAIN_VALUE;
+    source.connect(gain);
+    gain.connect(audioContext.destination);
+    this.audioContextList.set(trackId, audioContext);
   };
 }

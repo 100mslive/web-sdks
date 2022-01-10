@@ -1,4 +1,3 @@
-/* eslint-disable */
 const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
