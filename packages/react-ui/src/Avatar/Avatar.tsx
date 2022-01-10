@@ -16,6 +16,10 @@ const getAvatarShape = (radii: string) => ({
 
 export const StyledAvatar = styled('div', {
   ...flexCenter,
+  position: 'absolute',
+  left: '50%',
+  top: '50%',
+  transform: 'translateX(-50%) translateY(-50%)',
   color: '$fg',
   width: '$4',
   height: '$4',
