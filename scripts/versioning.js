@@ -1,11 +1,5 @@
-const dependencyMapping = {
-  'hms-video-web': ['hms-video-web', 'hms-video-store', 'react-sdk', 'react-ui'],
-  'hms-video-store': ['hms-video-store', 'react-sdk', 'react-ui'],
-  'react-sdk': ['react-sdk'],
-  'react-icons': ['react-icons', 'react-ui'],
-  'react-ui': ['react-ui'],
-};
-
+/* eslint-disable complexity */
+const { dependencyMapping } = require('./constants');
 /**
  * lerna add will update the passed in package's version in the scoped package
  * lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact
@@ -13,29 +7,17 @@ const dependencyMapping = {
  * --exact use exact version instead of ^ prefix.
  * */
 const lernaCommands = [
-  'lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact',
-  'lerna add @100mslive/hms-video-store --scope=@100mslive/react-sdk --exact',
-  'lerna add @100mslive/react-icons --scope=@100mslive/react-ui --exact',
+  'lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact || echo "No changes"',
+  'lerna add @100mslive/hms-video-store --scope=@100mslive/react-sdk --exact || echo "No changes"',
+  'lerna add @100mslive/react-icons --scope=@100mslive/react-ui --exact || echo "No changes"',
   // Update deps in webapp
-  'lerna add @100mslive/react-ui --scope=100ms_edtech_template --exact',
-  'lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact',
-  'lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact',
+  'lerna add @100mslive/react-ui --scope=100ms_edtech_template --exact || echo "No changes"',
+  'lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact || echo "No changes"',
+  'lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact || echo "No changes"',
 ];
 
 const exec = require('child_process').exec;
 const path = require('path');
-
-/**
- * Get versions of all packages
- * @returns {}
- */
-function getVersionMap() {
-  return Object.keys(dependencyMapping).reduce((pkgVersions, pkgName) => {
-    const location = path.resolve(`packages/${pkgName}`);
-    const version = require(`${location}/package.json`).version;
-    pkgVersions[pkgName] = version;
-  }, {});
-}
 
 const execPromise = cmd => {
   return new Promise((resolve, reject) => {
@@ -44,6 +26,7 @@ const execPromise = cmd => {
         reject(err);
         return;
       }
+      console.log(out);
       resolve(out);
     });
   });
@@ -53,10 +36,14 @@ const execPromise = cmd => {
  * figure out packages which need version update for the changes in this PR and update the version properly if it's not already updated.
  * The already updated part we figure out by comparing the version to the version of that package in main branch.
  */
-module.exports = async ({ github, context, core }) => {
-  const { CHANGES } = process.env;
-  const changedPackages = JSON.parse(CHANGES);
+module.exports = async () => {
+  const { changes, mainVersions: main, currentVersions: current, branch } = process.env;
+  const changedPackages = JSON.parse(changes);
+  console.log({ current, main });
+  const mainVersions = JSON.parse(main);
+  const currentVersions = JSON.parse(current);
 
+  console.log({ mainVersions, currentVersions });
   const packagesToBeUpdated = new Set();
 
   for (const pkgName in changedPackages) {
@@ -64,27 +51,20 @@ module.exports = async ({ github, context, core }) => {
       (dependencyMapping[pkgName] || []).forEach(pkg => packagesToBeUpdated.add(pkg));
     }
   }
-
-  const currentVersions = getVersionMap();
-  await execPromise('git checkout main');
-  const mainVersions = getVersionMap();
   for (const pkg in currentVersions) {
     if (currentVersions[pkg] !== mainVersions[pkg]) {
       packagesToBeUpdated.delete(pkg); // Already updated delete from to be updated list
     }
   }
-  const branch = context.ref.split('refs/heads/')[1];
-  await execPromise(`git checkout ${branch}`);
+  console.log('packagesToBeUpdated', packagesToBeUpdated.values());
   for (const value of packagesToBeUpdated.values()) {
     const location = path.resolve(`packages/${value}`);
     await execPromise(`cd ${location}; npm version prerelease --preid=alpha --git-tag-version=false`);
   }
 
-  lernaCommands.forEach(cmd => {
-    exec(cmd, function (err, out) {});
-  });
-
-  await execPromise(`yarn install`);
+  for (const cmd of lernaCommands) {
+    await execPromise(cmd);
+  }
   await execPromise(`git commit -am 'build: update versions' || echo 'no changes'`);
   await execPromise(`git push origin ${branch}`);
 };
