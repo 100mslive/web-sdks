@@ -18,4 +18,6 @@ export class HMSInternalEvent<T> {
   removeAllListeners = () => {
     this.eventEmitter.removeAllListeners(this.eventName);
   };
+
+  getListeners = () => this.eventEmitter.listeners(this.eventName);
 }

@@ -98,7 +98,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     if (hasPropertyChanged('deviceId')) {
       const isLevelMonitored = Boolean(this.audioLevelMonitor);
-      const eventListeners = this.audioLevelMonitor?.listeners('AUDIO_LEVEL_UPDATE');
+      const eventListeners = this.eventBus.trackAudioLevelUpdate.getListeners();
       HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
       isLevelMonitored && this.destroyAudioLevelMonitor();
       await this.replaceTrackWith(newSettings);
@@ -172,8 +172,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   initAudioLevelMonitor(listeners?: EventReceiver<ITrackAudioLevelUpdate | undefined>[] | undefined) {
     HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
-    this.audioLevelMonitor = new TrackAudioLevelMonitor(this);
-    listeners?.forEach(listener => this.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', listener));
+    this.audioLevelMonitor = new TrackAudioLevelMonitor(this, this.eventBus.trackAudioLevelUpdate);
+    listeners?.forEach(listener => this.eventBus.trackAudioLevelUpdate.subscribe(listener));
     this.audioLevelMonitor.start();
   }
 

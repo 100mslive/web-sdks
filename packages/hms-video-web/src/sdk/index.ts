@@ -734,10 +734,11 @@ export class HMSSdk implements HMSInterface {
 
   private initPreviewTrackAudioLevelMonitor() {
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
-    this.localPeer?.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', audioLevelUpdate => {
-      const hmsSpeakers = audioLevelUpdate
-        ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
-        : [];
+    this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {
+      const hmsSpeakers =
+        audioLevelUpdate && audioLevelUpdate.track.trackId === this.localPeer?.audioTrack?.trackId
+          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
+          : [];
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });
