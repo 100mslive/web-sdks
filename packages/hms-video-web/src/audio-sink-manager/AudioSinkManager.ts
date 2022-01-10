@@ -278,10 +278,13 @@ export class AudioSinkManager {
   };
 
   private connectAudioContext = (element: HTMLAudioElement, trackId: string) => {
+    if (!isBrowser || !window.HMS?.GAIN_VALUE) {
+      return;
+    }
     const audioContext = new AudioContext();
     const source = audioContext.createMediaElementSource(element);
     const gain = audioContext.createGain();
-    gain.gain.value = isBrowser ? window.HMS?.GAIN_VALUE || 10 : 10;
+    gain.gain.value = window.HMS.GAIN_VALUE;
     source.connect(gain);
     gain.connect(audioContext.destination);
     this.audioContextList.set(trackId, audioContext);
