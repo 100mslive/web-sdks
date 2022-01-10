@@ -1,5 +1,8 @@
+import { VariantProps } from '@stitches/react';
 import { styled } from '../stitches.config';
 import { flexCenter } from '../utils/styles';
+import { getAvatarBg } from './getAvatarBg';
+import React from 'react';
 
 const getAvatarSize = (size: string, textSize: string) => ({
   width: size,
@@ -11,8 +14,9 @@ const getAvatarShape = (radii: string) => ({
   borderRadius: radii,
 });
 
-export const Avatar = styled('div', {
+export const StyledAvatar = styled('div', {
   ...flexCenter,
+  color: '$fg',
   width: '$4',
   height: '$4',
   fontWeight: '500',
@@ -33,3 +37,17 @@ export const Avatar = styled('div', {
     size: 'md',
   },
 });
+
+type Props = VariantProps<typeof StyledAvatar> &
+  React.ComponentProps<typeof StyledAvatar> & {
+    name: string;
+  };
+
+export const Avatar: React.FC<Props> = ({ name, size, ...props }) => {
+  const { initials, color } = getAvatarBg(name);
+  return (
+    <StyledAvatar css={{ bg: color }} size={size} {...props}>
+      {initials}
+    </StyledAvatar>
+  );
+};
