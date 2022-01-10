@@ -209,8 +209,8 @@ const SmallTilePeersView = ({
           overflow="scroll-x"
           compact={true}
           // dont show stats for small tiles during screenshare
-          videoTileProps={(p, t) => ({
-            ...videoTileProps(p, t),
+          videoTileProps={(peer, track) => ({
+            ...videoTileProps(peer, track),
             showStats: false,
           })}
         />

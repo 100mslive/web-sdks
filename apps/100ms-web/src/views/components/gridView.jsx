@@ -101,10 +101,12 @@ export const GridSidePaneView = ({
             maxRowCount={rowCount}
             compact={true}
             // show stats for upto 2 peers in sidepane
-            videoTileProps={(p, t) => ({
-              ...videoTileProps(p, t),
+            videoTileProps={(peer, track) => ({
+              ...videoTileProps(peer, track),
               showStats:
-                peers.length < 3 ? videoTileProps(p, t).showStats : false,
+                peers.length < 3
+                  ? videoTileProps(peer, track).showStats
+                  : false,
             })}
           />
         )}

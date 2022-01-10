@@ -69,8 +69,8 @@ export const ConferenceMainView = ({
         toggleChat={toggleChat}
         role={localPeer.roleName}
         isParticipantListOpen={isParticipantListOpen}
-        videoTileProps={(p, t) => ({
-          ...videoTileProps(p, t),
+        videoTileProps={(peer, track) => ({
+          ...videoTileProps(peer, track),
           showStats: showStatsOnTiles,
         })}
       />
