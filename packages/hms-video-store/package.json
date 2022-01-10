@@ -33,7 +33,7 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.40",
+    "@100mslive/hms-video": "0.1.41-alpha.0",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
