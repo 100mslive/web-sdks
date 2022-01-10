@@ -9,10 +9,13 @@ module.exports = ({ core }) => {
     pkgVersions[pkgName] = version;
     return pkgVersions;
   }, {});
+
+  // Verions is not present when the script is run for main branch
   if (!versions) {
     core.exportVariable('versions', JSON.stringify(currentVersions));
     return;
   }
   core.exportVariable('currentVersions', JSON.stringify(currentVersions));
+  // versions from main will also have to be exported from here
   core.exportVariable('mainVersions', versions);
 };
