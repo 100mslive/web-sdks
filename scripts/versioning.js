@@ -37,8 +37,10 @@ const execPromise = cmd => {
  * The already updated part we figure out by comparing the version to the version of that package in main branch.
  */
 module.exports = async () => {
-  const { changes, mainVersions, currentVersions, branch } = process.env;
+  let { changes, mainVersions, currentVersions, branch } = process.env;
   const changedPackages = JSON.parse(changes);
+  mainVersions = JSON.parse(mainVersions);
+  currentVersions = JSON.parse(currentVersions);
 
   console.log({ mainVersions, currentVersions });
   const packagesToBeUpdated = new Set();
