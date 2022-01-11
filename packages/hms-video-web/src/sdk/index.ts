@@ -226,7 +226,9 @@ export class HMSSdk implements HMSInterface {
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     if (isMediadevicesMissing()) {
-      return Promise.reject(ErrorFactory.GenericErrors.MissingMediaDevices());
+      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
+      HMSLogger.e(this.TAG, error);
+      return Promise.reject(error);
     }
 
     if (this.sdkState.isPreviewInProgress) {
@@ -289,7 +291,9 @@ export class HMSSdk implements HMSInterface {
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
     if (isMediadevicesMissing()) {
-      throw ErrorFactory.GenericErrors.MissingMediaDevices();
+      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
+      HMSLogger.e(this.TAG, error);
+      throw error;
     }
 
     if (this.sdkState.isPreviewInProgress) {
