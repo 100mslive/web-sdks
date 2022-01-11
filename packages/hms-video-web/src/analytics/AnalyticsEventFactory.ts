@@ -93,6 +93,10 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name: 'leave', level: AnalyticsEventLevel.INFO });
   }
 
+  static autoplayError() {
+    return new AnalyticsEvent({ name: 'autoplayError', level: AnalyticsEventLevel.ERROR });
+  }
+
   static deviceChange({
     selection,
     type,

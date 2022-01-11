@@ -11,6 +11,8 @@ import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../inte
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { isBrowser, isMobile } from '../utils/support';
 import { EventBus } from '../events/EventBus';
+import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
 export interface AutoplayEvent {
   error: HMSException;
@@ -244,6 +246,7 @@ export class AudioSinkManager {
       if (!this.state.autoplayFailed) {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+        analyticsEventsService.queue(AnalyticsEventFactory.autoplayError()).flush();
         this.eventEmitter.emit(AutoplayError, { error: ex });
       }
     }
