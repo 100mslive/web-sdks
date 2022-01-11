@@ -246,7 +246,7 @@ export class AudioSinkManager {
       if (!this.state.autoplayFailed) {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
-        analyticsEventsService.queue(AnalyticsEventFactory.autoplayError());
+        analyticsEventsService.queue(AnalyticsEventFactory.autoplayError()).flush();
         this.eventEmitter.emit(AutoplayError, { error: ex });
       }
     }
