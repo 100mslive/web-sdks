@@ -116,6 +116,8 @@ export const ErrorCodes = {
     INVALID_ROLE: 6008,
 
     PREVIEW_IN_PROGRESS: 6009,
+
+    MISSING_MEDIADEVICES: 6010,
   },
 
   PlaylistErrors: {

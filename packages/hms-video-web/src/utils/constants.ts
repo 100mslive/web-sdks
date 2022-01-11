@@ -27,4 +27,5 @@ export const HMSEvents = {
   RTC_STATS_UPDATE: 'rtc-stats-update', // emitted by RTCStatsMonitor
   TRACK_DEGRADED: 'track-degraded',
   TRACK_RESTORED: 'track-restored',
+  TRACK_AUDIO_LEVEL_UPDATE: 'track-audio-level-update',
 };
