@@ -1,6 +1,6 @@
 import React, { useState, Fragment } from "react";
-import { Button, PIPIcon } from "@100mslive/hms-video-react";
-
+import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { PipIcon } from "@100mslive/react-icons";
 import ActivatedPIP from "./ActivatedPIP";
 import { PictureInPicture } from "./PIPManager";
 
@@ -17,16 +17,17 @@ const PIPComponent = () => {
 
   return (
     <Fragment>
-      <Button
-        variant="no-fill"
-        iconSize="md"
-        shape="rectangle"
-        key="pip"
-        onClick={() => setIsPipOn(!isPipOn)}
-        classes={{ rootSizeMd: "pr-0" }}
+      <Tooltip
+        title={`${isPipOn ? "Deactivate" : "Activate"} Person in Person view`}
       >
-        <PIPIcon />
-      </Button>
+        <IconButton
+          active={!isPipOn}
+          key="pip"
+          onClick={() => setIsPipOn(!isPipOn)}
+        >
+          <PipIcon width={32} height={32} />
+        </IconButton>
+      </Tooltip>
       {isPipOn && <ActivatedPIP setIsPipOn={setIsPipOn} />}
     </Fragment>
   );
