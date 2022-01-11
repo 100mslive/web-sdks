@@ -18,7 +18,7 @@
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
+    "types:build": "tsc -p tsconfig.build.json",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**"
