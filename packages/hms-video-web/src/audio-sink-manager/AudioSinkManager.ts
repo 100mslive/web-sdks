@@ -11,8 +11,8 @@ import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../inte
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { isBrowser, isMobile } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import analyticsEventsService from '~analytics/AnalyticsEventsService';
-import AnalyticsEventFactory from '~analytics/AnalyticsEventFactory';
+import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
 export interface AutoplayEvent {
   error: HMSException;
