@@ -51,7 +51,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig } from '~interfaces/hls-config';
+import { HLSConfig } from '../interfaces/hls-config';
 import { isMediadevicesMissing } from '../utils/mediadevices-missing';
 
 // @DISCUSS: Adding it here as a hotfix

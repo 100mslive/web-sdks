@@ -2,7 +2,7 @@
  * Refer: https://github.com/cwilso/volume-meter/blob/master/volume-meter.js
  */
 
-import { HMSInternalEvent } from '~events/HMSInternalEvent';
+import { HMSInternalEvent } from '../events/HMSInternalEvent';
 import { HMSAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
 
