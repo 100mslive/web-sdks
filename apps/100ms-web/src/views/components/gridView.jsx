@@ -117,6 +117,18 @@ export const GridSidePaneView = ({
             isParticipantListOpen,
             totalPeers
           )}`}
+          // TODO: this is a temporary fix as we will be replacing with new components soon
+          style={
+            isMobile
+              ? {
+                  position: "fixed",
+                  bottom: 64,
+                  zIndex: 10,
+                  right: 0,
+                  left: 0,
+                }
+              : {}
+          }
         >
           <div className="w-full h-full">
             <ChatView toggleChat={toggleChat} />
