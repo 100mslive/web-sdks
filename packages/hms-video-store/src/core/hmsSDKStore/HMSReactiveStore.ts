@@ -19,7 +19,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { HMSStats } from '../webrtc-stats';
-import { storeNameWithTabTitle } from '../../common/storeName';
+import { getInstanceIDforStore, storeNameWithTabTitle } from '../../common/storeName';
 
 declare global {
   interface Window {
@@ -229,7 +229,7 @@ export class HMSReactiveStore {
         api.setState(fn);
       };
     }
-    const devtools = extension.connect(HMSReactiveStore.devtoolsOptions(prefix));
+    const devtools = extension.connect(HMSReactiveStore.devtoolsOptions(prefix, getInstanceIDforStore(prefix)));
     devtools.prefix = prefix ? `${prefix} > ` : '';
     const savedSetState = api.setState;
     api.setState = (fn: any) => {
@@ -251,10 +251,11 @@ export class HMSReactiveStore {
   /**
    * https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/API/Arguments.md
    */
-  private static devtoolsOptions(prefix: string) {
+  private static devtoolsOptions(prefix: string, instanceId: number) {
     return {
       name: prefix,
       actionsBlacklist: ['audioLevel', 'playlistProgress'], // very high frequency update, pollutes the action history
+      instanceId, // to uniquely identify each store in devtool
     };
   }
 
