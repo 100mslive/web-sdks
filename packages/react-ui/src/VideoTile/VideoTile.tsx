@@ -6,6 +6,7 @@ import { Video } from '../Video';
 import { Avatar } from '../Avatar';
 import { MicOffIcon } from '@100mslive/react-icons';
 import { TileMenu } from '../TileMenu';
+import { AudioLevel } from '../AudioLevel';
 
 interface Props {
   peer: HMSPeer;
@@ -18,22 +19,24 @@ export const VideoTile: React.FC<Props> = ({ peer, width, height }) => {
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peer.id));
   const [showTrigger, setShowTrigger] = useState(false);
   return (
-    <StyledVideoTile.Container
+    <StyledVideoTile.Root
       onMouseEnter={() => setShowTrigger(true)}
       onMouseLeave={() => {
         setShowTrigger(false);
       }}
-      css={{ width, height }}
     >
-      <Video isLocal={peer.isLocal} trackId={peer.videoTrack} />
-      {isVideoMuted ? <Avatar size="lg" name={peer.name} /> : null}
-      <StyledVideoTile.Info>{peer.name}</StyledVideoTile.Info>
-      {isAudioMuted ? (
-        <StyledVideoTile.AudioIndicator>
-          <MicOffIcon />
-        </StyledVideoTile.AudioIndicator>
-      ) : null}
-      {showTrigger && !peer.isLocal ? <TileMenu id={peer.id} /> : null}
-    </StyledVideoTile.Container>
+      <StyledVideoTile.Container css={{ width, height }}>
+        <AudioLevel audioTrack={peer.audioTrack} />
+        <Video isLocal={peer.isLocal} trackId={peer.videoTrack} />
+        {isVideoMuted ? <Avatar size="lg" name={peer.name} /> : null}
+        <StyledVideoTile.Info>{peer.name}</StyledVideoTile.Info>
+        {isAudioMuted ? (
+          <StyledVideoTile.AudioIndicator>
+            <MicOffIcon />
+          </StyledVideoTile.AudioIndicator>
+        ) : null}
+        {showTrigger && !peer.isLocal ? <TileMenu id={peer.id} /> : null}
+      </StyledVideoTile.Container>
+    </StyledVideoTile.Root>
   );
 };

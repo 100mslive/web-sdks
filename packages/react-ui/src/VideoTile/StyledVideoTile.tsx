@@ -1,16 +1,19 @@
 import { styled } from '../stitches.config';
 
+export const Root = styled('div', {
+  padding: '1rem',
+  // show videotile context menu on hover
+  // [`&:hover .tile-menu`]: {
+  //   display: 'inline-block',
+  // },
+});
+
 export const Container = styled('div', {
   position: 'relative',
   borderRadius: '$2',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '1rem',
-  // show videotile context menu on hover
-  // [`&:hover .tile-menu`]: {
-  //   display: 'inline-block',
-  // },
 });
 
 export const Overlay = styled('div', {
@@ -55,6 +58,7 @@ const AudioIndicator = styled('div', {
 });
 
 interface VideoTileType {
+  Root: typeof Root;
   Container: typeof Container;
   Overlay: typeof Overlay;
   Info: typeof Info;
@@ -63,6 +67,7 @@ interface VideoTileType {
 }
 
 export const StyledVideoTile: VideoTileType = {
+  Root,
   Container,
   Overlay,
   Info,

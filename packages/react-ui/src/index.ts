@@ -18,3 +18,4 @@ export * from './VideoList';
 export * from './Pagination';
 export * from './Video';
 export * from './TileMenu';
+export * from './AudioLevel';
