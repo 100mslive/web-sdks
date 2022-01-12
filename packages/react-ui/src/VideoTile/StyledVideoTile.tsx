@@ -29,7 +29,7 @@ export const Info = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   position: 'absolute',
-  bottom: '20px',
+  bottom: '10px',
   left: '50%',
   transform: 'translateX(-50%)',
 });
@@ -41,11 +41,17 @@ export const AvatarContainer = styled('div', {
   transform: 'translateX(-50%) translateY(-50%)',
 });
 
+export const HandRaiseBox = styled('div', {
+  position: 'absolute',
+  left: '20px',
+  top: '20px',
+});
+
 const AudioIndicator = styled('div', {
   position: 'absolute',
   left: '50%',
   transform: 'translateX(-50%)',
-  bottom: '50px',
+  bottom: '30px',
   color: '$fg',
   bg: '$redMain',
   borderRadius: '$round',
@@ -64,6 +70,7 @@ interface VideoTileType {
   Info: typeof Info;
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
+  HandRaiseBox: typeof HandRaiseBox;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -73,4 +80,5 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
+  HandRaiseBox,
 };

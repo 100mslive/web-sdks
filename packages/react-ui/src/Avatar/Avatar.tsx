@@ -23,13 +23,15 @@ export const StyledAvatar = styled('div', {
   color: '$fg',
   width: '$4',
   height: '$4',
-  fontWeight: '500',
+  fontWeight: 600,
   variants: {
     size: {
-      xs: getAvatarSize('$3', '$xs'),
-      sm: getAvatarSize('$5', '$sm'),
-      md: getAvatarSize('$6', '$md'),
-      lg: getAvatarSize('$7', '$lg'),
+      xs: getAvatarSize('20px', '8px'),
+      // TODO: very large difference in variants this should be ideally for phones
+      sm: getAvatarSize('36px', '16px'),
+      md: getAvatarSize('162px', '60px'),
+      // TODO: tell @nihal to look into this -> too large
+      lg: getAvatarSize('360px', '120px'),
     },
     shape: {
       circle: getAvatarShape('$round'),

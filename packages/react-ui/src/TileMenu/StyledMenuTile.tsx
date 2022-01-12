@@ -5,8 +5,8 @@ import { flexCenter } from '../utils/styles';
 
 export const StyledRoot = styled('div', {
   position: 'absolute',
-  top: '30px',
-  right: '30px',
+  top: '20px',
+  right: '20px',
   // display: 'none',
 });
 
