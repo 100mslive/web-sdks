@@ -7,6 +7,10 @@ export const Container = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   padding: '1rem',
+  // show videotile context menu on hover
+  // [`&:hover .tile-menu`]: {
+  //   display: 'inline-block',
+  // },
 });
 
 export const Overlay = styled('div', {
