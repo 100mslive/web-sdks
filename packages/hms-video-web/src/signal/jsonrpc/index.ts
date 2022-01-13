@@ -119,7 +119,7 @@ export default class JsonRpcSignal implements ISignal {
       this.socket = new WebSocket(uri); // @DISCUSS: Inject WebSocket as a dependency so that it can be easier to mock and test
 
       const errorListener = (error: Event) => {
-        HMSLogger.d(this.TAG, 'Error opening socket connection', error);
+        HMSLogger.e(this.TAG, 'Error opening socket connection', error);
         reject(
           ErrorFactory.WebSocketConnectionErrors.GenericConnect(HMSAction.JOIN, 'Error opening socket connection'),
         );
