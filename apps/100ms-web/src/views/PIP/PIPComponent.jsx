@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { PipIcon } from "@100mslive/react-icons";
 import ActivatedPIP from "./ActivatedPIP";
@@ -16,7 +16,7 @@ const PIPComponent = () => {
   }
 
   return (
-    <Fragment>
+    <div className="md:block hidden">
       <Tooltip
         title={`${isPipOn ? "Deactivate" : "Activate"} Person in Person view`}
       >
@@ -29,7 +29,7 @@ const PIPComponent = () => {
         </IconButton>
       </Tooltip>
       {isPipOn && <ActivatedPIP setIsPipOn={setIsPipOn} />}
-    </Fragment>
+    </div>
   );
 };
 
