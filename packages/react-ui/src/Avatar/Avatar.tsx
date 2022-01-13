@@ -27,11 +27,9 @@ export const StyledAvatar = styled('div', {
   variants: {
     size: {
       xs: getAvatarSize('20px', '8px'),
-      // TODO: very large difference in variants this should be ideally for phones
-      sm: getAvatarSize('36px', '16px'),
+      sm: getAvatarSize('84px', '32px'),
       md: getAvatarSize('162px', '60px'),
-      // TODO: tell @nihal to look into this -> too large
-      lg: getAvatarSize('360px', '120px'),
+      lg: getAvatarSize('273px', '120px'),
     },
     shape: {
       circle: getAvatarShape('$round'),

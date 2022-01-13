@@ -31,15 +31,15 @@ import {
 } from './StyledMenuTile';
 
 interface Props {
-  id: HMSPeerID;
+  peerId: HMSPeerID;
 }
 
-export const TileMenu: React.FC<Props> = ({ id }) => {
+export const TileMenu: React.FC<Props> = ({ peerId }) => {
   const actions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   // TODO: selectTrackByID vs selectVideoTrackByPeerID
-  const videoTrack = useHMSStore(selectVideoTrackByPeerID(id));
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(id));
+  const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
+  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const canMuteVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
   const canMuteAudio = audioTrack?.enabled ? permissions?.mute : permissions?.unmute;
   const toggleTrackEnabled = async (track?: HMSTrack | null) => {
@@ -51,9 +51,9 @@ export const TileMenu: React.FC<Props> = ({ id }) => {
       }
     }
   };
-  const trackVolume = useHMSStore(selectAudioVolumeByPeerID(id));
+  const trackVolume = useHMSStore(selectAudioVolumeByPeerID(peerId));
   return (
-    <StyledRoot className="tile-menu">
+    <StyledRoot>
       <Popover.Root>
         <StyledTrigger>
           <HorizontalMenuIcon />
@@ -73,23 +73,25 @@ export const TileMenu: React.FC<Props> = ({ id }) => {
             </StyledItemButton>
           ) : null}
 
-          <StyledVolumeItem>
-            <Flex>
-              <SpeakerIcon /> <span>Volume ({trackVolume})</span>
-            </Flex>
-            <Slider
-              css={{ my: '0.5rem' }}
-              step={5}
-              value={[trackVolume || 0]}
-              onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
-            />
-          </StyledVolumeItem>
+          {audioTrack ? (
+            <StyledVolumeItem>
+              <Flex>
+                <SpeakerIcon /> <span>Volume ({trackVolume})</span>
+              </Flex>
+              <Slider
+                css={{ my: '0.5rem' }}
+                step={5}
+                value={[trackVolume || 0]}
+                onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
+              />
+            </StyledVolumeItem>
+          ) : null}
 
           {permissions?.removeOthers ? (
             <RemoveMenuItem
               onClick={async () => {
                 try {
-                  await actions.removePeer(id, '');
+                  await actions.removePeer(peerId, '');
                 } catch (error) {
                   // TODO: Toast here
                 }

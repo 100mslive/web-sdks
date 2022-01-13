@@ -36,7 +36,7 @@ export const VideoTile: React.FC<Props> = ({ peer, width, height }) => {
             <MicOffIcon />
           </StyledVideoTile.AudioIndicator>
         ) : null}
-        {showTrigger && !peer.isLocal ? <TileMenu id={peer.id} /> : null}
+        {showTrigger && !peer.isLocal ? <TileMenu peerId={peer.id} /> : null}
         {isHandRaised ? (
           <StyledVideoTile.HandRaiseBox>
             <HandRaiseFilledIcon width={40} height={40} />

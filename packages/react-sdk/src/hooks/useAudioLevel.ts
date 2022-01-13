@@ -19,7 +19,6 @@ export function useAudioLevel({
           return;
         }
         const styles = getStyle(level);
-        console.log(styles, level);
         for (const key in styles) {
           ref.current.style[key] = styles[key];
         }

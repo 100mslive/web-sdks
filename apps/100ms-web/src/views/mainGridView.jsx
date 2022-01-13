@@ -6,6 +6,7 @@ import {
 } from "@100mslive/hms-video-react";
 import { GridCenterView, GridSidePaneView } from "./components/gridView";
 import { AppContext } from "../store/AppContext";
+import { VideoList } from "@100mslive/react-ui";
 
 export const MainGridView = ({
   isChatOpen,
@@ -46,27 +47,8 @@ export const MainGridView = ({
 
   return (
     <React.Fragment>
-      <GridCenterView
-        peers={showSidePane ? centerPeers : peers}
-        maxTileCount={maxTileCount}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
-        allowRemoteMute={false}
-        hideSidePane={!showSidePane}
-        isParticipantListOpen={isParticipantListOpen}
-        totalPeers={peers.length}
-        videoTileProps={videoTileProps}
-      />
-      {showSidePane && (
-        <GridSidePaneView
-          peers={sidebarPeers}
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
-          isParticipantListOpen={isParticipantListOpen}
-          totalPeers={peers.length}
-          videoTileProps={videoTileProps}
-        />
-      )}
+      <VideoList peers={showSidePane ? centerPeers : peers} />
+      {showSidePane && <VideoList peers={sidebarPeers} />}
     </React.Fragment>
   );
 };
