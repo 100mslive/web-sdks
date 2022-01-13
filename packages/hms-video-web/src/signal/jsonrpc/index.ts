@@ -121,7 +121,10 @@ export default class JsonRpcSignal implements ISignal {
       const errorListener = (error: Event) => {
         HMSLogger.e(this.TAG, 'Error opening socket connection', error);
         reject(
-          ErrorFactory.WebSocketConnectionErrors.GenericConnect(HMSAction.JOIN, 'Error opening socket connection'),
+          ErrorFactory.WebSocketConnectionErrors.GenericConnect(
+            HMSAction.JOIN,
+            `Error opening socket connection - ${error}`,
+          ),
         );
       };
       this.socket.addEventListener('error', errorListener);
