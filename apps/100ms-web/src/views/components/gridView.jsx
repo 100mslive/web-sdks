@@ -28,7 +28,7 @@ export const GridCenterView = ({
   isParticipantListOpen,
   hideSidePane,
   totalPeers,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   return (
     <div
@@ -83,7 +83,7 @@ export const GridSidePaneView = ({
   toggleChat,
   isParticipantListOpen,
   totalPeers,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   const isMobile = isMobileDevice();
   const rowCount = isMobile ? 1 : undefined;
