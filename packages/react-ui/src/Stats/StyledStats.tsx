@@ -13,7 +13,7 @@ export const Root = styled('div', {
   variants: {
     contract: {
       true: {
-        height: '130px',
+        height: '100px',
         fontSize: '10px',
         overflowY: 'scroll',
         overflowX: 'scroll',

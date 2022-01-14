@@ -17,11 +17,10 @@ export const StyledTrigger = styled(Popover.Trigger, {
   borderRadius: '$round',
   backgroundColor: '$menuBg',
   ...flexCenter,
-  // TODO: default focus applied cause issues with this style
-  // '&:not([disabled]):focus': {
-  //   outline: 'none',
-  //   boxShadow: '0 0 0 3px $colors$brandTint',
-  // },
+  '&:not([disabled]):focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px $colors$brandTint',
+  },
 });
 
 export const StyledContent = styled(Popover.Content, {
@@ -49,9 +48,10 @@ export const StyledItemButton = styled('button', {
   '&:hover': {
     backgroundColor: '$grey3',
   },
+  // TODO: default focus applied cause issues with this style
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$grey3',
+    // backgroundColor: '$grey3',
   },
   '& > * + *': {
     marginRight: '0',

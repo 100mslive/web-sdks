@@ -1,11 +1,8 @@
 import React from "react";
-import {
-  VideoList,
-  FirstPersonDisplay,
-  isMobileDevice,
-} from "@100mslive/hms-video-react";
+import { FirstPersonDisplay, isMobileDevice } from "@100mslive/hms-video-react";
 import { ChatView } from "./chatView";
 import { getBlurClass } from "../../common/utils";
+import { VideoList } from "@100mslive/react-ui";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -39,12 +36,7 @@ export const GridCenterView = ({
       {peers && peers.length > 0 ? (
         <VideoList
           peers={peers}
-          classes={{
-            videoTileContainer: "rounded-lg",
-          }}
           maxTileCount={isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount}
-          allowRemoteMute={allowRemoteMute}
-          videoTileProps={videoTileProps}
         />
       ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
         <div className="h-full w-full grid place-items-center p-5">

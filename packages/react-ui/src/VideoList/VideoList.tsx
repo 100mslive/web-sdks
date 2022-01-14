@@ -7,11 +7,14 @@ import { Pagination } from '../Pagination';
 
 interface Props {
   peers: HMSPeer[];
+  maxTileCount?: number;
 }
 
-export const VideoList: React.FC<Props> = ({ peers }) => {
+// TODO: set good default ask team
+export const VideoList: React.FC<Props> = ({ peers, maxTileCount = 4 }) => {
   const { ref, chunkedTracksWithPeer } = useVideoList({
     peers,
+    maxTileCount,
   });
   const [page, setPage] = React.useState(0);
   React.useEffect(() => {

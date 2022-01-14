@@ -58,14 +58,13 @@ export const TileMenu: React.FC<Props> = ({ peerId }) => {
         <StyledTrigger>
           <HorizontalMenuIcon />
         </StyledTrigger>
-        <StyledContent align="start" sideOffset={10}>
+        <StyledContent side="left" align="start" sideOffset={10}>
           {canMuteVideo ? (
             <StyledItemButton onClick={() => toggleTrackEnabled(videoTrack)}>
               {videoTrack?.enabled ? <VideoOnIcon /> : <VideoOffIcon />}
               <span>{`${videoTrack?.enabled ? 'Mute' : 'Unmute'} Video`}</span>
             </StyledItemButton>
           ) : null}
-
           {canMuteAudio ? (
             <StyledItemButton onClick={() => toggleTrackEnabled(audioTrack)}>
               {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}

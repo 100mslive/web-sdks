@@ -51,7 +51,7 @@ export const VideoTile: React.FC<Props> = ({ peer, width, height }) => {
 };
 
 const getAvatarSize = (width: number): 'lg' | 'md' | 'sm' | 'xs' => {
-  if (width < 300) {
+  if (width < 200) {
     return 'xs';
   } else if (width < 500) {
     return 'sm';
