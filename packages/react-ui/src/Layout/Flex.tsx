@@ -40,5 +40,13 @@ export const Flex = styled('div', {
         alignItems: 'stretch',
       },
     },
+    direction: {
+      row: {
+        flexDirection: 'row',
+      },
+      column: {
+        flexDirection: 'column',
+      },
+    },
   },
 });
