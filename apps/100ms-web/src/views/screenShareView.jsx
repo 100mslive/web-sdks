@@ -21,7 +21,7 @@ export const ScreenShareView = ({
   isChatOpen,
   toggleChat,
   isParticipantListOpen,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   const peers = useHMSStore(selectPeers);
   const localPeer = useHMSStore(selectLocalPeer);
@@ -105,7 +105,7 @@ export const SidePane = ({
   smallTilePeers,
   isParticipantListOpen,
   totalPeers,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   // The main peer's screenshare is already being shown in center view
   const shouldShowScreenFn = useCallback(
@@ -147,7 +147,7 @@ const ScreenShareComponent = ({
   amIPresenting,
   peerPresenting,
   peerSharingPlaylist,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   const hmsActions = useHMSActions();
   const screenshareTrack = useHMSStore(
@@ -219,7 +219,7 @@ const SmallTilePeersView = ({
   isChatOpen,
   smallTilePeers,
   shouldShowScreenFn,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   return (
     <Flex
@@ -240,17 +240,17 @@ const SmallTilePeersView = ({
           overflow="scroll-x"
           compact={true}
           // dont show stats for small tiles during screenshare
-          videoTileProps={(peer, track) => ({
-            ...videoTileProps(peer, track),
-            showStats: false,
-          })}
+          videoTileProps={videoTileProps}
         />
       )}
     </Flex>
   );
 };
 
-const LargeTilePeerView = ({ peerScreenSharing, videoTileProps }) => {
+const LargeTilePeerView = ({
+  peerScreenSharing,
+  videoTileProps = () => ({}),
+}) => {
   return (
     <Box
       css={{
