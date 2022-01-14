@@ -11,6 +11,9 @@ jobs:
     outputs:
       hms-video-web: ${{ steps.filter.outputs.hms-video-web }}
       hms-video-store: ${{ steps.filter.outputs.hms-video-store }}
+      react-sdk: ${{ steps.filter.outputs.react-sdk }}
+      react-ui: ${{ steps.filter.outputs.react-ui }}
+      react-icons: ${{ steps.filter.outputs.react-icons }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
@@ -22,11 +25,11 @@ jobs:
             hms-video-store:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
             react-sdk:
-              - 'packages/react-sdk/src/**/*.ts'
+              - 'packages/react-sdk/src/**'
             react-ui:
-              - 'packages/react-ui/src/**/*.(ts|tsx)'
+              - 'packages/react-ui/src/**'
             react-icons:
-              - 'packages/react-icons/src/**/*.tsx'
+              - 'packages/react-icons/src/**'
 
   # run this job only if the above job succeeds
   update-version:
