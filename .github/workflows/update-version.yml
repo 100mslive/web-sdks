@@ -22,11 +22,11 @@ jobs:
             hms-video-store:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
             react-sdk:
-              - 'packages/react-sdk/src/**'
+              - 'packages/react-sdk/src/**/*.ts'
             react-ui:
-              - 'packages/react-ui/src/**'
+              - 'packages/react-ui/src/**/*.(ts|tsx)'
             react-icons:
-              - 'packages/react-icons/src/**'
+              - 'packages/react-icons/src/**/*.tsx'
 
   # run this job only if the above job succeeds
   update-version:
