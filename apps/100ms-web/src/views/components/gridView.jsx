@@ -34,9 +34,8 @@ export const GridCenterView = ({
   return (
     <Box
       css={{
-        width: hideSidePane && !isChatOpen ? "100%" : "80%",
+        flex: "1 1 0%",
         height: "100%",
-        "@md": { width: "100%" },
       }}
     >
       {peers && peers.length > 0 ? (
