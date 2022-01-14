@@ -9,6 +9,8 @@ export const Root = styled('div', {
 });
 
 export const Container = styled('div', {
+  width: '100%',
+  height: '100%',
   position: 'relative',
   borderRadius: '$2',
   display: 'flex',

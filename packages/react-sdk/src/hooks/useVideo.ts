@@ -32,7 +32,6 @@ export const useVideo = (trackId: HMSPeerID) => {
           }
         } else {
           // TODO: add logging functions here
-          console.log('****** DETACH VIDEO *******');
           await actions.detachVideo(hmsStoreVideoTrack.id, videoRef.current);
         }
       }

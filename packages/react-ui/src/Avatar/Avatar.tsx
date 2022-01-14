@@ -26,7 +26,8 @@ export const StyledAvatar = styled('div', {
   fontWeight: 600,
   variants: {
     size: {
-      xs: getAvatarSize('20px', '8px'),
+      // TODO: review `xs` size from nihal
+      xs: getAvatarSize('40px', '12px'),
       sm: getAvatarSize('84px', '32px'),
       md: getAvatarSize('162px', '60px'),
       lg: getAvatarSize('273px', '120px'),

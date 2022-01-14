@@ -12,7 +12,6 @@ interface Props {
 export const VideoList: React.FC<Props> = ({ peers }) => {
   const { ref, chunkedTracksWithPeer } = useVideoList({
     peers,
-    maxTileCount: 2,
   });
   const [page, setPage] = React.useState(0);
   React.useEffect(() => {

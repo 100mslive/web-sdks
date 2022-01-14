@@ -109,7 +109,7 @@ export function EdtechComponent({
           actions={hmsReactiveStore.getActions()}
           store={hmsReactiveStore.getStore()}
           notifications={hmsReactiveStore.getNotifications()}
-          webrtcInternals={
+          stats={
             FeatureFlags.enableStatsForNerds
               ? hmsReactiveStore.getStats()
               : undefined

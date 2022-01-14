@@ -11,20 +11,18 @@ const Container = styled('div', {
   height: '100%',
   width: '100%',
   position: 'relative',
-  padding: '$5',
-  overflowX: 'hidden',
   display: 'flex',
   alignItems: 'center',
 });
 
 const View = styled('div', {
+  height: '100%',
+  width: '100%',
   position: 'absolute',
   display: 'flex',
   placeContent: 'center',
   flexWrap: 'wrap',
   alignItems: 'center',
-  width: '100%',
-  height: '100%',
 });
 
 interface VideoListType {
