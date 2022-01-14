@@ -76,7 +76,7 @@ export const ScreenShareView = ({
             p: "$2",
             width: "20%",
             height: "100%",
-            "@md": { height: "33%", width: "100%" },
+            "@md": { height: "30%", width: "100%" },
           }}
         >
           <SidePane
@@ -255,8 +255,8 @@ const LargeTilePeerView = ({
     <Box
       css={{
         width: "100%",
-        height: "30%",
-        "@md": { width: "50%", height: "100%" },
+        height: "35%",
+        "@md": { width: "50%", height: "100%", p: "$3" },
       }}
     >
       {peerScreenSharing && (
