@@ -138,7 +138,7 @@ export const metadataProps = function (peer, track) {
 export const chatStyle = {
   position: "fixed",
   bottom: 64,
-  zIndex: 31,
+  zIndex: 40,
   right: 0,
   width: "100%",
   maxWidth: 300,
