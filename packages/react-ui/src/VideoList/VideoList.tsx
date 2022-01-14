@@ -31,7 +31,7 @@ export const VideoList: React.FC<Props> = ({ peers, maxTileCount = 4 }) => {
           ? chunkedTracksWithPeer.map((l, i) => (
               <StyledVideoList.View css={{ left: getLeft(i, page), transition: 'left 0.3s ease-in-out' }} key={i}>
                 {l.map(p => (
-                  <VideoTile key={p.peer.id} width={p.width} height={p.height} peer={p.peer} />
+                  <VideoTile key={p.peer.id} width={p.width} height={p.height} peerId={p.peer.id} />
                 ))}
               </StyledVideoList.View>
             ))
