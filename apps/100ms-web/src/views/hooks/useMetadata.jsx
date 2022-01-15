@@ -8,17 +8,16 @@ import {
 export const useMetadata = () => {
   const hmsActions = useHMSActions();
   const peer = useHMSStore(selectLocalPeer);
-  const isHandRaised =
-    useHMSStore(selectPeerMetadata(peer.id))?.isHandRaised || false;
+  const metadata = useHMSStore(selectPeerMetadata(peer.id));
   /**
    * @param isHandRaised {boolean}
    */
   const setIsHandRaised = async isHandRaised => {
     try {
-      await hmsActions.changeMetadata({ isHandRaised: isHandRaised });
+      await hmsActions.changeMetadata({ ...metadata, isHandRaised });
     } catch (error) {
       console.error("failed to set isHandRaised", error);
     }
   };
-  return { isHandRaised: isHandRaised, setIsHandRaised: setIsHandRaised };
+  return { ...metadata, setIsHandRaised: setIsHandRaised };
 };
