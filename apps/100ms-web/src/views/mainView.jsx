@@ -15,6 +15,7 @@ import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as videoTileProps } from "../common/utils";
+import { useWhiteboardState, WhiteboardView } from "./whiteboard";
 
 export const ConferenceMainView = ({
   isChatOpen,
@@ -25,6 +26,7 @@ export const ConferenceMainView = ({
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
+  const { whiteboardPeer } = useWhiteboardState();
   const roomState = useHMSStore(selectRoomState);
   const hmsActions = useHMSActions();
   const {
@@ -51,6 +53,8 @@ export const ConferenceMainView = ({
   let ViewComponent;
   if (localPeer.roleName === HLS_VIEWER_ROLE) {
     ViewComponent = HLSView;
+  } else if (whiteboardPeer) {
+    ViewComponent = WhiteboardView;
   } else if (
     (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
     peerSharingPlaylist

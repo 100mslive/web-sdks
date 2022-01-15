@@ -36,7 +36,9 @@ import {
   VirtualBackgroundIcon,
   ShareScreenIcon,
   MusicIcon,
+  PencilDrawIcon,
 } from "@100mslive/react-icons";
+import { useWhiteboardState } from "./whiteboard";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -55,6 +57,11 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
   const { isHandRaised, setIsHandRaised } = useMetadata();
+  const {
+    whiteboardPeer: whiteboardEnabled,
+    amIWhiteboardPeer,
+    setWhiteboardEnabled,
+  } = useWhiteboardState();
   const isNoiseSuppression = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
@@ -225,6 +232,20 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
         </IconButton>
       </Tooltip>
     );
+    leftComponents.push(
+      <Tooltip
+        title={`${!whiteboardEnabled ? "Start" : "Stop"} Whiteboard`}
+        key="whiteboard"
+      >
+        <IconButton
+          onClick={() => setWhiteboardEnabled(!whiteboardEnabled)}
+          active={!whiteboardEnabled}
+          disabled={whiteboardEnabled && !amIWhiteboardPeer}
+        >
+          <PencilDrawIcon />
+        </IconButton>
+      </Tooltip>
+    );
   } else {
     leftComponents.push(
       <Button
@@ -246,6 +267,16 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
         active={!isHandRaised}
       >
         <HandIcon />
+      </IconButton>
+    );
+    leftComponents.push(
+      <IconButton
+        onClick={() => setWhiteboardEnabled(!whiteboardEnabled)}
+        active={!whiteboardEnabled}
+        disabled={whiteboardEnabled && !amIWhiteboardPeer}
+        key="whiteboard"
+      >
+        <PencilDrawIcon />
       </IconButton>
     );
   }
