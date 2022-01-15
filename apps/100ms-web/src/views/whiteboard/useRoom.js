@@ -1,28 +1,55 @@
 // @ts-check
 import {
+  HMSNotificationTypes,
   selectBroadcastMessages,
   useHMSActions,
+  useHMSNotifications,
   useHMSStore,
 } from "@100mslive/hms-video-react";
 import EventEmitter from "events";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useWhiteboardState } from "./useWhiteboardState";
 
 const whiteboardEmitter = new EventEmitter();
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
 
-export const useWhiteboardMessages = () => {
+export const whiteboardLog = (...args) => console.log("Whiteboard", ...args);
+
+const useWhiteboardMessages = () => {
   const messages = useHMSStore(selectBroadcastMessages);
-  console.log("Whiteboard Messages", { messages });
   return messages
     .filter(message => message.type === "whiteboard")
     .map(message => ({ ...message, message: JSON.parse(message.message) }));
 };
 
+const usePeerJoinStateSync = () => {
+  const peerJoinCallback = useRef(null);
+  const { amIWhiteboardPeer } = useWhiteboardState();
+  const notification = useHMSNotifications();
+
+  useEffect(() => {
+    if (
+      notification &&
+      notification.type === HMSNotificationTypes.PEER_JOINED &&
+      amIWhiteboardPeer &&
+      typeof peerJoinCallback.current === "function"
+    ) {
+      peerJoinCallback.current();
+    }
+  }, [notification]);
+
+  return {
+    setPeerJoinCallback: (/** @type {(() => void)} */ cb) =>
+      (peerJoinCallback.current = cb),
+  };
+};
+
 export const useRoom = () => {
   const hmsActions = useHMSActions();
   const messages = useWhiteboardMessages();
+  const { setPeerJoinCallback } = usePeerJoinStateSync();
 
   const getBoardState = messages => {
     const lastMessage = messages.at(messages.length - 1);
@@ -36,7 +63,7 @@ export const useRoom = () => {
 
   useEffect(() => {
     const newBoardState = getBoardState(messages);
-    console.log(
+    whiteboardLog(
       "Emitting",
       "shapeState",
       newBoardState.shapes,
@@ -61,7 +88,7 @@ export const useRoom = () => {
     },
 
     broadcastEvent: (/** @type {any} */ eventName, /** @type {any} */ arg) => {
-      console.log(
+      whiteboardLog(
         "Broadcast event",
         arg,
         stringifyWithNull({ eventName, ...arg })
@@ -83,5 +110,6 @@ export const useRoom = () => {
         ),
       };
     },
+    setPeerJoinCallback,
   };
 };

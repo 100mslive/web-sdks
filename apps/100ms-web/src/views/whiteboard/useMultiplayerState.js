@@ -1,15 +1,17 @@
 // @ts-check
 import * as React from "react";
-import { useRoom } from "./useRoom";
+import { useRoom, whiteboardLog } from "./useRoom";
 
 export function useMultiplayerState(roomId) {
-  const [app, setApp] = React.useState();
+  const [app, setApp] = React.useState(null);
   const [error, setError] = React.useState();
   const [loading, setLoading] = React.useState(true);
+
   const room = useRoom();
   // const onUndo = useUndo();
   // const onRedo = useRedo();
   // const updateMyPresence = useUpdateMyPresence();
+
   const rLiveShapes = React.useRef(new Map());
   const rLiveBindings = React.useRef(new Map());
   // const rLiveAssets = React.useRef<LiveMap<string, TDAsset>>();
@@ -74,7 +76,7 @@ export function useMultiplayerState(roomId) {
   // Update the live shapes when the app's shapes change.
   const onChangePage = React.useCallback((_app, shapes, bindings, _assets) => {
     mergeShapes(shapes, bindings);
-    console.log("onChangePage", {
+    whiteboardLog("onChangePage", {
       shapes,
       bindings,
       rLiveShapes,
@@ -85,19 +87,34 @@ export function useMultiplayerState(roomId) {
 
   // Handle presence updates when the user's pointer / selection changes
   // const onChangePresence = React.useCallback(
-  //   (app: TldrawApp, user: TDUser) => {
-  //     updateMyPresence({ id: app.room?.userId, user });
+  //   /**
+  //    *
+  //    * @param {import("@tldraw/tldraw").TldrawApp} app
+  //    * @param {import("@tldraw/tldraw").TDUser} user
+  //    */
+  //   (app, user) => {
+  //     whiteboardLog({ id: app.room?.userId, user });
+  //     // updateMyPresence({ id: app.room?.userId, user });
   //   },
-  //   [updateMyPresence]
+  //   []
+  //   // [updateMyPresence]
   // );
 
   // Document Changes --------
   React.useEffect(() => {
     const unsubs = [];
-    console.log({ app, room });
     if (!(app && room)) return;
+
+    room.setPeerJoinCallback(() => {
+      room.broadcastEvent("shapeState", {
+        shapes: Object.fromEntries(rLiveShapes.current),
+        bindings: Object.fromEntries(rLiveBindings.current),
+      });
+    });
+
     // Handle errors
     unsubs.push(room.subscribe("error", error => setError(error)));
+
     // Handle changes to other users' presence
     unsubs.push(
       room.subscribe("others", others => {
@@ -110,6 +127,7 @@ export function useMultiplayerState(roomId) {
         );
       })
     );
+
     // Handle events from the room
     unsubs.push(
       room.subscribe("event", e => {
@@ -123,6 +141,7 @@ export function useMultiplayerState(roomId) {
         }
       })
     );
+
     // Send the exit event when the tab closes
     function handleExit() {
       if (!(room && (app === null || app === void 0 ? void 0 : app.room)))
@@ -139,11 +158,14 @@ export function useMultiplayerState(roomId) {
     unsubs.push(() => window.removeEventListener("beforeunload", handleExit));
 
     let stillAlive = true;
+
     // Setup the document's storage and subscriptions
     async function setupDocument() {
       const storage = await room.getStorage();
+
       // Migrate previous versions
       // const version = storage.root.get("version");
+
       // Initialize (get or create) maps for shapes/bindings/assets
       let lShapes = storage.root.get("shapes");
       // if (!lShapes || !("_serialize" in lShapes)) {
@@ -151,12 +173,14 @@ export function useMultiplayerState(roomId) {
       //   lShapes = storage.root.get("shapes");
       // }
       rLiveShapes.current = lShapes;
+
       let lBindings = storage.root.get("bindings");
       // if (!lBindings || !("_serialize" in lBindings)) {
       //   storage.root.set("bindings", new LiveMap<string, TDBinding>());
       //   lBindings = storage.root.get("bindings");
       // }
       rLiveBindings.current = lBindings;
+
       // let lAssets: LiveMap<string, TDAsset> = storage.root.get("assets");
       // if (!lAssets || !("_serialize" in lAssets)) {
       //   storage.root.set("assets", new LiveMap<string, TDAsset>());
@@ -191,18 +215,21 @@ export function useMultiplayerState(roomId) {
       //     // Object.values(assets).forEach(asset => lAssets.set(asset.id, asset));
       //   }
       // }
+
       // Save the version number for future migrations
       // storage.root.set("version", 2.1);
+
       // Subscribe to changes
       const handleChanges = (shapes, bindings) => {
         mergeShapes(shapes, bindings);
         const newLiveObjects = getObjectFromLiveMaps();
-        console.log("Handle shapeState", {
+        whiteboardLog("Handle shapeState", {
           shapes,
           bindings,
           rLiveShapes,
           rLiveBindings,
         });
+
         app === null || app === void 0
           ? void 0
           : app.replacePageContent(
@@ -211,6 +238,7 @@ export function useMultiplayerState(roomId) {
               {} // Object.fromEntries(lAssets.entries())
             );
       };
+
       if (stillAlive) {
         unsubs.push(room.subscribe("shapeState", handleChanges));
         // Update the document with initial content
@@ -218,12 +246,15 @@ export function useMultiplayerState(roomId) {
         setLoading(false);
       }
     }
+
     setupDocument();
+
     return () => {
       stillAlive = false;
       unsubs.forEach(unsub => unsub());
     };
   }, [app]);
+
   return {
     onMount,
     onChangePage,
