@@ -17,9 +17,9 @@ useMultiplayerState and useRoom are internal hooks for Whiteboard functionalites
 
 ## Public Hooks
 
-### `useWhiteboardState`
+### `useWhiteboardMetadata`
 
-- hook providing the state of the Whiteboard in the room - enabled, which peer started the whiteboard, method to set the enable/disable the whiteboard.
+- hook providing the metadata of the Whiteboard in the room - enabled, which peer started the whiteboard, method to set the enable/disable the whiteboard.
 - Uses peer.metadata to handle whiteboard state(peer who started it will have peer.metadata.whiteboardEnabled = true - whiteboard owner).
 
 ## Workflow:

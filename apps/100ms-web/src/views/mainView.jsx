@@ -15,7 +15,7 @@ import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as videoTileProps } from "../common/utils";
-import { useWhiteboardState, WhiteboardView } from "./whiteboard";
+import { useWhiteboardMetadata, WhiteboardView } from "./whiteboard";
 
 export const ConferenceMainView = ({
   isChatOpen,
@@ -26,7 +26,7 @@ export const ConferenceMainView = ({
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const { whiteboardPeer } = useWhiteboardState();
+  const { whiteboardPeer } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   const hmsActions = useHMSActions();
   const {

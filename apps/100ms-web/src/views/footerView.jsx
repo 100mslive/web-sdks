@@ -38,7 +38,7 @@ import {
   MusicIcon,
   PencilDrawIcon,
 } from "@100mslive/react-icons";
-import { useWhiteboardState } from "./whiteboard";
+import { useWhiteboardMetadata } from "./whiteboard";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -61,7 +61,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     whiteboardPeer: whiteboardEnabled,
     amIWhiteboardPeer,
     setWhiteboardEnabled,
-  } = useWhiteboardState();
+  } = useWhiteboardMetadata();
   const isNoiseSuppression = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );

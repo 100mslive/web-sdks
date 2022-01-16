@@ -21,7 +21,7 @@ const selectWhiteboardPeer = createSelector(selectPeersMap, peersMap => {
   return undefined;
 });
 
-export const useWhiteboardState = () => {
+export const useWhiteboardMetadata = () => {
   const hmsActions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const metadata = useHMSStore(selectPeerMetadata(localPeerID));

@@ -1,2 +1,2 @@
 export { WhiteboardView } from "./WhiteboardView";
-export { useWhiteboardState } from "./useWhiteboardState";
+export { useWhiteboardMetadata } from "./useWhiteboardMetadata";

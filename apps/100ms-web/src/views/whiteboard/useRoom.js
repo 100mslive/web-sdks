@@ -8,7 +8,7 @@ import {
 } from "@100mslive/hms-video-react";
 import EventEmitter from "events";
 import { useEffect, useRef } from "react";
-import { useWhiteboardState } from "./useWhiteboardState";
+import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
 
 const whiteboardEmitter = new EventEmitter();
 
@@ -26,7 +26,7 @@ const useWhiteboardMessages = () => {
 
 const usePeerJoinStateSync = () => {
   const peerJoinCallback = useRef(null);
-  const { amIWhiteboardPeer } = useWhiteboardState();
+  const { amIWhiteboardPeer } = useWhiteboardMetadata();
   const notification = useHMSNotifications();
 
   useEffect(() => {
