@@ -226,7 +226,7 @@ export function useMultiplayerState(roomId) {
       // storage.root.set("version", 2.1);
 
       // Subscribe to changes
-      const handleChanges = (shapes, bindings) => {
+      const handleChanges = ({ shapes, bindings }) => {
         mergeShapes(shapes, bindings);
         const newLiveObjects = getObjectFromLiveMaps();
         whiteboardLog("Handle shapeState", {
@@ -248,7 +248,10 @@ export function useMultiplayerState(roomId) {
       if (stillAlive) {
         unsubs.push(room.subscribe("shapeState", handleChanges));
         // Update the document with initial content
-        handleChanges();
+        handleChanges({
+          shapes: Object.fromEntries(rLiveShapes.current),
+          bindings: Object.fromEntries(rLiveBindings.current),
+        });
         setLoading(false);
       }
     }

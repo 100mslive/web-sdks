@@ -51,30 +51,14 @@ export const useRoom = () => {
   const messages = useWhiteboardMessages();
   const { setPeerJoinCallback } = usePeerJoinStateSync();
 
-  const getBoardState = messages => {
-    const lastMessage = messages.at(messages.length - 1);
-    const state = lastMessage?.message;
-
-    return {
-      shapes: state?.shapes,
-      bindings: state?.bindings,
-    };
-  };
+  const lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
-    const newBoardState = getBoardState(messages);
-    whiteboardLog(
-      "Emitting",
-      "shapeState",
-      newBoardState.shapes,
-      newBoardState.bindings
-    );
-    whiteboardEmitter.emit(
-      "shapeState",
-      newBoardState.shapes,
-      newBoardState.bindings
-    );
-  }, [messages]);
+    if (lastMessage && lastMessage.message && lastMessage.message.eventName) {
+      const newState = lastMessage.message;
+      whiteboardEmitter.emit(newState.eventName, newState);
+    }
+  }, [lastMessage?.id]);
 
   return {
     subscribe: (
