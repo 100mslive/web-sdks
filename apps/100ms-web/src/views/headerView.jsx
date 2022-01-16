@@ -16,12 +16,17 @@ import {
   selectLocalPeer,
 } from "@100mslive/hms-video-react";
 import { useContext } from "react";
-import { SpeakerIcon, RecordIcon } from "@100mslive/react-icons";
+import {
+  SpeakerIcon,
+  RecordIcon,
+  PencilDrawIcon,
+} from "@100mslive/react-icons";
 import { Text } from "@100mslive/react-ui";
 import { useHMSActions } from "@100mslive/react-sdk";
 import PIPComponent from "./PIP/PIPComponent";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
+import { useWhiteboardMetadata } from "./whiteboard";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -198,6 +203,24 @@ const StreamingRecording = () => {
   );
 };
 
+const Whiteboard = () => {
+  const { whiteboardPeer, amIWhiteboardPeer } = useWhiteboardMetadata();
+
+  if (!whiteboardPeer) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center">
+      <PencilDrawIcon />
+      <Text variant="body" css={{ mx: "$1" }}>
+        {amIWhiteboardPeer ? "You are" : `${whiteboardPeer.name} is`} sharing
+        Whiteboard
+      </Text>
+    </div>
+  );
+};
+
 export const ConferenceHeader = ({ onParticipantListOpen }) => {
   const { HLS_VIEWER_ROLE } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
@@ -208,7 +231,8 @@ export const ConferenceHeader = ({ onParticipantListOpen }) => {
           <LogoButton key={0} />,
           <Music key={1} />,
           <PlaylistMusic key={2} />,
-          <StreamingRecording key={3} />,
+          <Whiteboard key={3} />,
+          <StreamingRecording key={4} />,
         ]}
         centerComponents={[<SpeakerTag key={0} />]}
         rightComponents={[
