@@ -38,7 +38,7 @@ const usePeerJoinStateSync = () => {
     ) {
       peerJoinCallback.current();
     }
-  }, [notification]);
+  }, [notification, amIWhiteboardPeer]);
 
   return {
     setPeerJoinCallback: (/** @type {(() => void)} */ cb) =>
@@ -97,18 +97,6 @@ export const useRoom = () => {
         stringifyWithNull({ eventName, ...arg }),
         "whiteboard"
       );
-    },
-
-    getStorage: () => {
-      const boardState = getBoardState(messages);
-      return {
-        root: new Map(
-          Object.entries({
-            shapes: new Map(Object.entries(boardState?.shapes || {})),
-            bindings: new Map(Object.entries(boardState?.bindings || {})),
-          })
-        ),
-      };
     },
     setPeerJoinCallback,
   };

@@ -27,7 +27,7 @@ import {
   StarIcon,
   ChangeTextIcon,
 } from "@100mslive/hms-video-react";
-import { InfoIcon, PencilDrawIcon } from "@100mslive/react-icons";
+import { InfoIcon } from "@100mslive/react-icons";
 import { AppContext } from "../../store/AppContext";
 import { hmsToast } from "./notifications/hms-toast";
 import { arrayIntersection, setFullScreenEnabled } from "../../common/utils";

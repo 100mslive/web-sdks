@@ -12,6 +12,9 @@ export function useMultiplayerState(roomId) {
   // const onRedo = useRedo();
   // const updateMyPresence = useUpdateMyPresence();
 
+  /**
+   * Stores current state(shapes, bindings, [assets]) of the whiteboard
+   */
   const rLiveShapes = React.useRef(new Map());
   const rLiveBindings = React.useRef(new Map());
   // const rLiveAssets = React.useRef<LiveMap<string, TDAsset>>();
@@ -83,6 +86,7 @@ export function useMultiplayerState(roomId) {
       rLiveBindings,
     });
     room.broadcastEvent("shapeState", { shapes, bindings });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle presence updates when the user's pointer / selection changes
@@ -138,6 +142,8 @@ export function useMultiplayerState(roomId) {
               : app.removeUser(e.event.userId);
             break;
           }
+          default:
+            break;
         }
       })
     );
@@ -161,25 +167,25 @@ export function useMultiplayerState(roomId) {
 
     // Setup the document's storage and subscriptions
     async function setupDocument() {
-      const storage = await room.getStorage();
+      // const storage = await room.getStorage();
 
       // Migrate previous versions
       // const version = storage.root.get("version");
 
       // Initialize (get or create) maps for shapes/bindings/assets
-      let lShapes = storage.root.get("shapes");
+      // let lShapes = storage.root.get("shapes");
       // if (!lShapes || !("_serialize" in lShapes)) {
       //   storage.root.set("shapes", new LiveMap<string, TDShape>());
       //   lShapes = storage.root.get("shapes");
       // }
-      rLiveShapes.current = lShapes;
+      // rLiveShapes.current = lShapes;
 
-      let lBindings = storage.root.get("bindings");
+      // let lBindings = storage.root.get("bindings");
       // if (!lBindings || !("_serialize" in lBindings)) {
       //   storage.root.set("bindings", new LiveMap<string, TDBinding>());
       //   lBindings = storage.root.get("bindings");
       // }
-      rLiveBindings.current = lBindings;
+      // rLiveBindings.current = lBindings;
 
       // let lAssets: LiveMap<string, TDAsset> = storage.root.get("assets");
       // if (!lAssets || !("_serialize" in lAssets)) {
@@ -253,6 +259,7 @@ export function useMultiplayerState(roomId) {
       stillAlive = false;
       unsubs.forEach(unsub => unsub());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app]);
 
   return {

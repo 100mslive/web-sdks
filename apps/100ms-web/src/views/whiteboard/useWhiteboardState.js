@@ -6,7 +6,7 @@ import {
   selectPeersMap,
   selectPeerMetadata,
 } from "@100mslive/hms-video-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 const getPeerMetaData = peer =>
   peer?.metadata && peer.metadata !== "" ? JSON.parse(peer.metadata) : {};
@@ -34,22 +34,26 @@ export const useWhiteboardState = () => {
   /**
    * @param enabled {boolean}
    */
-  const setWhiteboardEnabled = async enabled => {
-    try {
-      if (!whiteboardPeer || amIWhiteboardPeer) {
-        await hmsActions.changeMetadata({
-          ...metadata,
-          whiteboardEnabled: enabled,
-        });
-      } else {
-        console.warn(
-          "Cannot toggle whiteboard as it was shared by another peer"
-        );
+  const setWhiteboardEnabled = useCallback(
+    async enabled => {
+      try {
+        if (!whiteboardPeer || amIWhiteboardPeer) {
+          await hmsActions.changeMetadata({
+            ...metadata,
+            whiteboardEnabled: enabled,
+          });
+        } else {
+          console.warn(
+            "Cannot toggle whiteboard as it was shared by another peer"
+          );
+        }
+      } catch (error) {
+        console.error("failed to set whiteboardEnabled", error);
       }
-    } catch (error) {
-      console.error("failed to set whiteboardEnabled", error);
-    }
-  };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hmsActions]
+  );
   window.setWhiteboardEnabled = setWhiteboardEnabled;
   return { whiteboardPeer, amIWhiteboardPeer, setWhiteboardEnabled };
 };
