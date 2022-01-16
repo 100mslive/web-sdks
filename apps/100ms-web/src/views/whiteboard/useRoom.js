@@ -7,7 +7,7 @@ import {
   useHMSStore,
 } from "@100mslive/hms-video-react";
 import EventEmitter from "events";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
 
 const whiteboardEmitter = new EventEmitter();
@@ -25,7 +25,7 @@ const useWhiteboardMessages = () => {
 };
 
 const usePeerJoinStateSync = () => {
-  const peerJoinCallback = useRef(null);
+  const [peerJoinCallback, setPeerJoinCallback] = useState(null);
   const { amIWhiteboardPeer } = useWhiteboardMetadata();
   const notification = useHMSNotifications();
 
@@ -34,32 +34,36 @@ const usePeerJoinStateSync = () => {
       notification &&
       notification.type === HMSNotificationTypes.PEER_JOINED &&
       amIWhiteboardPeer &&
-      typeof peerJoinCallback.current === "function"
+      typeof peerJoinCallback === "function"
     ) {
-      peerJoinCallback.current();
+      peerJoinCallback();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notification, amIWhiteboardPeer]);
 
-  return {
-    setPeerJoinCallback: (/** @type {(() => void)} */ cb) =>
-      (peerJoinCallback.current = cb),
-  };
+  return { peerJoinCallback, setPeerJoinCallback };
 };
 
 export const useRoom = () => {
   const hmsActions = useHMSActions();
   const messages = useWhiteboardMessages();
-  const { setPeerJoinCallback } = usePeerJoinStateSync();
+  const { peerJoinCallback, setPeerJoinCallback } = usePeerJoinStateSync();
 
   const lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
-    if (lastMessage && lastMessage.message && lastMessage.message.eventName) {
+    // When peerJoinCallback is set, we consider board has subcribed to all required events and is ready
+    if (
+      peerJoinCallback &&
+      lastMessage &&
+      lastMessage.message &&
+      lastMessage.message.eventName
+    ) {
       const newState = lastMessage.message;
       whiteboardEmitter.emit(newState.eventName, newState);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastMessage?.id]);
+  }, [lastMessage?.id, peerJoinCallback]);
 
   return {
     subscribe: (

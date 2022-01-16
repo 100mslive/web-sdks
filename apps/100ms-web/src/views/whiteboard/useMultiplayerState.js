@@ -109,7 +109,7 @@ export function useMultiplayerState(roomId) {
     const unsubs = [];
     if (!(app && room)) return;
 
-    room.setPeerJoinCallback(() => {
+    room.setPeerJoinCallback(() => () => {
       room.broadcastEvent("shapeState", {
         shapes: Object.fromEntries(rLiveShapes.current),
         bindings: Object.fromEntries(rLiveBindings.current),
