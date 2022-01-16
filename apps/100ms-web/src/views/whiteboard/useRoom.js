@@ -58,6 +58,7 @@ export const useRoom = () => {
       const newState = lastMessage.message;
       whiteboardEmitter.emit(newState.eventName, newState);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage?.id]);
 
   return {
@@ -72,11 +73,11 @@ export const useRoom = () => {
     },
 
     broadcastEvent: (/** @type {any} */ eventName, /** @type {any} */ arg) => {
-      whiteboardLog(
-        "Broadcast event",
-        arg,
-        stringifyWithNull({ eventName, ...arg })
-      );
+      // whiteboardLog(
+      //   "Broadcast event",
+      //   arg,
+      //   stringifyWithNull({ eventName, ...arg })
+      // );
       hmsActions.sendBroadcastMessage(
         stringifyWithNull({ eventName, ...arg }),
         "whiteboard"

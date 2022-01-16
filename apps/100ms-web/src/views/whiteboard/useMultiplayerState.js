@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from "react";
-import { useRoom, whiteboardLog } from "./useRoom";
+import { useRoom } from "./useRoom";
 
 export function useMultiplayerState(roomId) {
   const [app, setApp] = React.useState(null);
@@ -70,7 +70,7 @@ export function useMultiplayerState(roomId) {
     app => {
       app.loadRoom(roomId);
       app.pause(); // Turn off the app's own undo / redo stack
-      window.app = app;
+      // window.app = app;
       setApp(app);
     },
     [roomId]
@@ -79,12 +79,12 @@ export function useMultiplayerState(roomId) {
   // Update the live shapes when the app's shapes change.
   const onChangePage = React.useCallback((_app, shapes, bindings, _assets) => {
     mergeShapes(shapes, bindings);
-    whiteboardLog("onChangePage", {
-      shapes,
-      bindings,
-      rLiveShapes,
-      rLiveBindings,
-    });
+    // whiteboardLog("onChangePage", {
+    //   shapes,
+    //   bindings,
+    //   rLiveShapes,
+    //   rLiveBindings,
+    // });
     room.broadcastEvent("shapeState", { shapes, bindings });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -229,12 +229,12 @@ export function useMultiplayerState(roomId) {
       const handleChanges = ({ shapes, bindings }) => {
         mergeShapes(shapes, bindings);
         const newLiveObjects = getObjectFromLiveMaps();
-        whiteboardLog("Handle shapeState", {
-          shapes,
-          bindings,
-          rLiveShapes,
-          rLiveBindings,
-        });
+        // whiteboardLog("Handle shapeState", {
+        //   shapes,
+        //   bindings,
+        //   rLiveShapes,
+        //   rLiveBindings,
+        // });
 
         app === null || app === void 0
           ? void 0
