@@ -69,10 +69,11 @@ export const GridCenterView = ({
             position: "absolute",
             zIndex: 40,
             right: "$2",
-            bottom: "$2",
+            bottom: "$9",
             "@md": chatStyle,
             "@ls": {
               minHeight: "70%",
+              bottom: "$7",
             },
           }}
         >
