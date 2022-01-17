@@ -17,6 +17,7 @@ export const Root = styled('div', {
         fontSize: '10px',
         overflowY: 'scroll',
         overflowX: 'scroll',
+        left: `min('0.5rem', '10000000rem')`,
       },
     },
   },

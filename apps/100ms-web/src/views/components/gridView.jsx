@@ -2,7 +2,8 @@ import React from "react";
 import { FirstPersonDisplay, isMobileDevice } from "@100mslive/hms-video-react";
 import { ChatView } from "./chatView";
 import { getBlurClass } from "../../common/utils";
-import { VideoList } from "@100mslive/react-ui";
+import { VideoList as HmsVideoList } from "@100mslive/react-ui";
+import { VideoList } from "@100mslive/hms-video-react";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -27,6 +28,9 @@ export const GridCenterView = ({
   totalPeers,
   videoTileProps,
 }) => {
+  const isMobile = isMobileDevice();
+  const rowCount = isMobile ? 1 : undefined;
+  const isNewComponents = process.env.REACT_APP_ENABLE_NEW_COMPONENTS;
   return (
     <div
       className={`h-full ${
@@ -34,10 +38,30 @@ export const GridCenterView = ({
       }`}
     >
       {peers && peers.length > 0 ? (
-        <VideoList
-          peers={peers}
-          maxTileCount={isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount}
-        />
+        isNewComponents === "true" ? (
+          <HmsVideoList
+            peers={peers}
+            maxTileCount={
+              isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
+            }
+          />
+        ) : (
+          <VideoList
+            peers={peers}
+            classes={{
+              root: "",
+              videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+            }}
+            maxTileCount={
+              isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
+            }
+            maxColCount={2}
+            maxRowCount={rowCount}
+            compact={peers.length > 2}
+            // show stats for upto 2 peers in sidepane
+            videoTileProps={videoTileProps}
+          />
+        )
       ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
         <div className="h-full w-full grid place-items-center p-5">
           <a href={webinarInfoLink} target="_blank" rel="noreferrer">

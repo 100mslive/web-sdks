@@ -6,7 +6,6 @@ import {
 } from "@100mslive/hms-video-react";
 import { GridCenterView, GridSidePaneView } from "./components/gridView";
 import { AppContext } from "../store/AppContext";
-import { VideoList } from "@100mslive/react-ui";
 
 export const MainGridView = ({
   isChatOpen,
