@@ -65,7 +65,7 @@ export const GridCenterView = ({
         <Box
           className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           css={{
-            height: "50%",
+            height: "45%",
             position: "absolute",
             zIndex: 40,
             right: "$2",
