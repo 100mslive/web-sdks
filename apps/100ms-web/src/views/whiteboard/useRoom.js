@@ -41,6 +41,15 @@ const usePeerJoinStateSync = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notification, amIWhiteboardPeer]);
 
+  useEffect(() => {
+    if (peerJoinCallback) {
+      return () => {
+        whiteboardLog("Closing whiteboard", peerJoinCallback);
+        peerJoinCallback();
+      };
+    }
+  }, [peerJoinCallback]);
+
   return { peerJoinCallback, setPeerJoinCallback };
 };
 
