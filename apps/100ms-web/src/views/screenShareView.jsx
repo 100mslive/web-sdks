@@ -154,7 +154,17 @@ const ScreenShareComponent = ({
 
   if (peerSharingPlaylist) {
     return (
-      <Box css={{ mx: "$2", flex: "1 1 0%" }}>
+      <Box
+        css={{
+          mx: "$2",
+          flex: "1 1 0%",
+          "@md": {
+            "& video": {
+              objectFit: "contain",
+            },
+          },
+        }}
+      >
         <VideoPlayer peer={peerSharingPlaylist} />
       </Box>
     );
