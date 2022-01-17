@@ -114,32 +114,30 @@ export const SidePane = ({
   );
 
   return (
-    <Box css={{ size: "100%", position: "relative" }}>
-      <Flex
-        css={{ size: "100%" }}
-        direction={{ "@initial": "column", "@md": "row" }}
-      >
-        {!isPresenterInSmallTiles && (
-          <LargeTilePeerView
-            peerScreenSharing={peerScreenSharing}
-            isChatOpen={isChatOpen}
-            videoTileProps={videoTileProps}
-          />
-        )}
-        <SmallTilePeersView
+    <Flex
+      css={{ size: "100%" }}
+      direction={{ "@initial": "column", "@md": "row" }}
+    >
+      {!isPresenterInSmallTiles && (
+        <LargeTilePeerView
+          peerScreenSharing={peerScreenSharing}
           isChatOpen={isChatOpen}
-          smallTilePeers={smallTilePeers}
-          shouldShowScreenFn={shouldShowScreenFn}
           videoTileProps={videoTileProps}
         />
-        <CustomChatView
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
-          isParticipantListOpen={isParticipantListOpen}
-          totalPeers={totalPeers}
-        />
-      </Flex>
-    </Box>
+      )}
+      <SmallTilePeersView
+        isChatOpen={isChatOpen}
+        smallTilePeers={smallTilePeers}
+        shouldShowScreenFn={shouldShowScreenFn}
+        videoTileProps={videoTileProps}
+      />
+      <CustomChatView
+        isChatOpen={isChatOpen}
+        toggleChat={toggleChat}
+        isParticipantListOpen={isParticipantListOpen}
+        totalPeers={totalPeers}
+      />
+    </Flex>
   );
 };
 
@@ -262,7 +260,7 @@ const LargeTilePeerView = ({
   peerScreenSharing,
   videoTileProps = () => ({}),
 }) => {
-  return (
+  return peerScreenSharing ? (
     <Box
       css={{
         width: "100%",
@@ -270,14 +268,12 @@ const LargeTilePeerView = ({
         "@md": { width: "50%", height: "100%", p: "$3" },
       }}
     >
-      {peerScreenSharing && (
-        <VideoTile
-          peer={peerScreenSharing}
-          compact={true}
-          hmsVideoTrackId={peerScreenSharing.videoTrack}
-          {...videoTileProps(peerScreenSharing, peerScreenSharing.videoTrack)}
-        />
-      )}
+      <VideoTile
+        peer={peerScreenSharing}
+        compact={true}
+        hmsVideoTrackId={peerScreenSharing.videoTrack}
+        {...videoTileProps(peerScreenSharing, peerScreenSharing.videoTrack)}
+      />
     </Box>
-  );
+  ) : null;
 };
