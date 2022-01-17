@@ -57,7 +57,7 @@ export const Conference = () => {
   }
 
   return (
-    <Flex css={{ size: "100%" }} direction="column" className="dark:bg-black">
+    <Flex css={{ size: "100%", bg: "$bg" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$6", "@md": { h: "$header" } }}>
           <ConferenceHeader onParticipantListOpen={onParticipantListOpen} />
@@ -71,7 +71,7 @@ export const Conference = () => {
         />
       </Box>
       {!isHeadless && (
-        <Box className="dark:bg-black" css={{ h: "10%" }}>
+        <Box css={{ h: "10%", bg: "$bg" }}>
           <ConferenceFooter isChatOpen={isChatOpen} toggleChat={toggleChat} />
         </Box>
       )}
