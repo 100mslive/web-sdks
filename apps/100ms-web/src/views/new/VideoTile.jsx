@@ -1,32 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
+  AudioLevel,
+  Avatar,
+  StyledVideoTile,
+  TileMenu,
+  Video,
+  VideoTileStats,
+} from "@100mslive/react-ui";
+import {
+  useHMSStore,
   selectIsPeerAudioEnabled,
   selectIsPeerVideoEnabled,
   selectPeerByID,
   selectPeerMetadata,
-  useHMSStore,
-  HMSPeerID,
-} from '@100mslive/react-sdk';
-import { StyledVideoTile } from './StyledVideoTile';
-import { Video } from '../Video';
-import { Avatar } from '../Avatar';
-import { MicOffIcon, HandRaiseFilledIcon } from '@100mslive/react-icons';
-import { TileMenu } from '../TileMenu';
-import { AudioLevel } from '../AudioLevel';
-import { VideoTileStats } from '../Stats';
+} from "@100mslive/react-sdk";
+import { MicOffIcon, HandRaiseFilledIcon } from "@100mslive/react-icons";
 
-interface Props {
-  peerId: HMSPeerID;
-  width: number;
-  height: number;
-}
-
-export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
+const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
   const [showTrigger, setShowTrigger] = useState(false);
-  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
+  const isHandRaised =
+    useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
   return (
     <StyledVideoTile.Root
       css={{ width, height }}
@@ -36,10 +32,18 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
       }}
     >
       <StyledVideoTile.Container>
-        <VideoTileStats height={height} audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
+        {showStatsOnTiles ? (
+          <VideoTileStats
+            height={height}
+            audioTrackID={peer?.audioTrack}
+            videoTrackID={peer?.videoTrack}
+          />
+        ) : null}
         <AudioLevel audioTrack={peer?.audioTrack} />
         <Video isLocal={peer?.isLocal || false} trackId={peer?.videoTrack} />
-        {isVideoMuted ? <Avatar size={getAvatarSize(width)} name={peer?.name || ''} /> : null}
+        {isVideoMuted ? (
+          <Avatar size={getAvatarSize(width)} name={peer?.name || ""} />
+        ) : null}
         <StyledVideoTile.Info>{peer?.name}</StyledVideoTile.Info>
         {isAudioMuted ? (
           <StyledVideoTile.AudioIndicator>
@@ -57,12 +61,14 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
   );
 };
 
-const getAvatarSize = (width: number): 'lg' | 'md' | 'sm' | 'xs' => {
+export default VideoTile;
+
+const getAvatarSize = width => {
   if (width < 200) {
-    return 'xs';
+    return "xs";
   } else if (width < 500) {
-    return 'sm';
+    return "sm";
   } else {
-    return 'md';
+    return "md";
   }
 };

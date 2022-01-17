@@ -8,7 +8,7 @@ export const Root = styled('div', {
   // },
 });
 
-export const Container = styled('div', {
+const Container = styled('div', {
   width: '100%',
   height: '100%',
   position: 'relative',
@@ -18,13 +18,13 @@ export const Container = styled('div', {
   alignItems: 'center',
 });
 
-export const Overlay = styled('div', {
+const Overlay = styled('div', {
   position: 'absolute',
   width: '100%',
   height: '100%',
 });
 
-export const Info = styled('div', {
+const Info = styled('div', {
   color: '$fg',
   display: 'flex',
   flexDirection: 'column',
@@ -36,14 +36,14 @@ export const Info = styled('div', {
   transform: 'translateX(-50%)',
 });
 
-export const AvatarContainer = styled('div', {
+const AvatarContainer = styled('div', {
   position: 'absolute',
   left: '50%',
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
 });
 
-export const HandRaiseBox = styled('div', {
+const HandRaiseBox = styled('div', {
   position: 'absolute',
   left: '20px',
   top: '20px',

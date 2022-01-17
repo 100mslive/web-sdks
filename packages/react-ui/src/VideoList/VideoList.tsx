@@ -1,7 +1,6 @@
 import { useVideoList, HMSPeer } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
 import React from 'react';
-import getLeft from './getLeft';
 import { VideoTile } from '../VideoTile';
 import { Pagination } from '../Pagination';
 
@@ -40,4 +39,25 @@ export const VideoList: React.FC<Props> = ({ peers, maxTileCount = 4 }) => {
       {chunkedTracksWithPeer.length > 1 ? <Pagination page={page} setPage={setPage} list={list} /> : null}
     </StyledVideoList.Root>
   );
+};
+
+export const getLeft = (index: number, currentPageIndex: number) => {
+  //active slide
+  if (index === currentPageIndex) {
+    return 0;
+  }
+  //prev slide
+  if (index + 1 === currentPageIndex) {
+    return '-100%';
+  }
+  //next slide
+  if (index - 1 === currentPageIndex) {
+    return '100%';
+  }
+  //all slides before prev
+  if (index < currentPageIndex) {
+    return '-200%';
+  }
+  //all slides after next
+  return '200%';
 };

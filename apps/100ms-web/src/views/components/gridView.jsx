@@ -2,7 +2,7 @@ import React from "react";
 import { FirstPersonDisplay, isMobileDevice } from "@100mslive/hms-video-react";
 import { ChatView } from "./chatView";
 import { getBlurClass } from "../../common/utils";
-import { VideoList as HmsVideoList } from "@100mslive/react-ui";
+import { HmsVideoList } from "../UIComponents";
 import { VideoList } from "@100mslive/hms-video-react";
 
 const MAX_TILES_FOR_MOBILE = 4;
@@ -27,6 +27,7 @@ export const GridCenterView = ({
   hideSidePane,
   totalPeers,
   videoTileProps,
+  showStatsOnTiles,
 }) => {
   const isMobile = isMobileDevice();
   const rowCount = isMobile ? 1 : undefined;
@@ -40,6 +41,7 @@ export const GridCenterView = ({
       {peers && peers.length > 0 ? (
         isNewComponents === "true" ? (
           <HmsVideoList
+            showStatsOnTiles={showStatsOnTiles}
             peers={peers}
             maxTileCount={
               isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
