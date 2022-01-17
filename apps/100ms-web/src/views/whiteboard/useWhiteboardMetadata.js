@@ -7,6 +7,7 @@ import {
   selectPeerMetadata,
 } from "@100mslive/hms-video-react";
 import { useCallback, useMemo } from "react";
+import { useCommunication } from "./useCommunication";
 
 const getPeerMetaData = peer =>
   peer?.metadata && peer.metadata !== "" ? JSON.parse(peer.metadata) : {};
@@ -23,6 +24,11 @@ const selectWhiteboardPeer = createSelector(selectPeersMap, peersMap => {
 
 export const useWhiteboardMetadata = () => {
   const hmsActions = useHMSActions();
+  /**
+   * Initializes CommunicationProvider even before whiteboard is opened,
+   * to store incoming state messages that need to be applied after it has opened.
+   */
+  useCommunication();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const metadata = useHMSStore(selectPeerMetadata(localPeerID));
   const whiteboardPeer = useHMSStore(selectWhiteboardPeer);
@@ -52,7 +58,7 @@ export const useWhiteboardMetadata = () => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hmsActions]
+    [hmsActions, metadata, whiteboardPeer]
   );
   window.setWhiteboardEnabled = setWhiteboardEnabled;
   return { whiteboardPeer, amIWhiteboardPeer, setWhiteboardEnabled };

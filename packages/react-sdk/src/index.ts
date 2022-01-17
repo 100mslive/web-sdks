@@ -1,5 +1,6 @@
 export {
   HMSRoomProvider,
+  HMSContext,
   useHMSStore,
   useHMSActions,
   useHMSNotifications,
