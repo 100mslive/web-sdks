@@ -6,6 +6,12 @@ import { useContext, useEffect } from "react";
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
 
+/**
+ * Base class which can be extended to use various realtime communication services.
+ * Methods to broadcast and subscribe to events.
+ *
+ * Stores the last message received/broadcasted to resend when required(when board is ready)
+ */
 class BaseCommunicationProvider {
   constructor() {
     /** @private */
