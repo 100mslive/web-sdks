@@ -30,39 +30,47 @@ export function useMultiplayerState(roomId) {
     };
   }, []);
 
-  const mergeShapes = React.useCallback((shapes, bindings) => {
-    const lShapes = rLiveShapes.current;
-    const lBindings = rLiveBindings.current;
-    // const lAssets = rLiveAssets.current;
+  const mergeShapes = React.useCallback(
+    ({ shapes, bindings, merge = true }) => {
+      if (!(shapes && bindings)) return;
 
-    // if (!(lShapes && lBindings && lAssets)) return;
-    if (!(lShapes && lBindings)) return;
-    if (!(shapes && bindings)) return;
+      if (merge) {
+        const lShapes = rLiveShapes.current;
+        const lBindings = rLiveBindings.current;
+        // const lAssets = rLiveAssets.current;
 
-    Object.entries(shapes).forEach(([id, shape]) => {
-      if (!shape) {
-        lShapes.delete(id);
+        // if (!(lShapes && lBindings && lAssets)) return;
+        if (!(lShapes && lBindings)) return;
+        Object.entries(shapes).forEach(([id, shape]) => {
+          if (!shape) {
+            lShapes.delete(id);
+          } else {
+            lShapes.set(shape.id, shape);
+          }
+        });
+
+        Object.entries(bindings).forEach(([id, binding]) => {
+          if (!binding) {
+            lBindings.delete(id);
+          } else {
+            lBindings.set(binding.id, binding);
+          }
+        });
+
+        // Object.entries(assets).forEach(([id, asset]) => {
+        //   if (!asset) {
+        //     lAssets.delete(id);
+        //   } else {
+        //     lAssets.set(asset.id, asset);
+        //   }
+        // });
       } else {
-        lShapes.set(shape.id, shape);
+        rLiveShapes.current = new Map(Object.entries(shapes));
+        rLiveBindings.current = new Map(Object.entries(bindings));
       }
-    });
-
-    Object.entries(bindings).forEach(([id, binding]) => {
-      if (!binding) {
-        lBindings.delete(id);
-      } else {
-        lBindings.set(binding.id, binding);
-      }
-    });
-
-    // Object.entries(assets).forEach(([id, asset]) => {
-    //   if (!asset) {
-    //     lAssets.delete(id);
-    //   } else {
-    //     lAssets.set(asset.id, asset);
-    //   }
-    // });
-  }, []);
+    },
+    []
+  );
 
   // Callbacks --------------
   // Put the state into the window, for debugging.
@@ -78,14 +86,14 @@ export function useMultiplayerState(roomId) {
 
   // Update the live shapes when the app's shapes change.
   const onChangePage = React.useCallback((_app, shapes, bindings, _assets) => {
-    mergeShapes(shapes, bindings);
+    mergeShapes({ shapes, bindings });
     // whiteboardLog("onChangePage", {
     //   shapes,
     //   bindings,
     //   rLiveShapes,
     //   rLiveBindings,
     // });
-    room.broadcastEvent("shapeState", { shapes, bindings });
+    room.broadcastEvent("stateChange", { shapes, bindings });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,7 +118,7 @@ export function useMultiplayerState(roomId) {
     if (!(app && room)) return;
 
     room.setPeerJoinCallback(() => () => {
-      room.broadcastEvent("shapeState", {
+      room.broadcastEvent("currentState", {
         shapes: Object.fromEntries(rLiveShapes.current),
         bindings: Object.fromEntries(rLiveBindings.current),
       });
@@ -226,10 +234,11 @@ export function useMultiplayerState(roomId) {
       // storage.root.set("version", 2.1);
 
       // Subscribe to changes
-      const handleChanges = ({ shapes, bindings }) => {
-        mergeShapes(shapes, bindings);
+      const handleChanges = ({ shapes, bindings, eventName }) => {
+        mergeShapes({ shapes, bindings, merge: eventName === "stateChange" });
         const newLiveObjects = getObjectFromLiveMaps();
         // whiteboardLog("Handle shapeState", {
+        //   eventName,
         //   shapes,
         //   bindings,
         //   rLiveShapes,
@@ -246,12 +255,14 @@ export function useMultiplayerState(roomId) {
       };
 
       if (stillAlive) {
-        unsubs.push(room.subscribe("shapeState", handleChanges));
+        unsubs.push(room.subscribe("stateChange", handleChanges));
+        unsubs.push(room.subscribe("currentState", handleChanges));
         // Update the document with initial content
-        handleChanges({
-          shapes: Object.fromEntries(rLiveShapes.current),
-          bindings: Object.fromEntries(rLiveBindings.current),
-        });
+        // handleChanges({
+        //   shapes: Object.fromEntries(rLiveShapes.current),
+        //   bindings: Object.fromEntries(rLiveBindings.current),
+        //   eventName: "currentState",
+        // });
         setLoading(false);
       }
     }

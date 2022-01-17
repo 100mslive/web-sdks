@@ -42,13 +42,17 @@ const usePeerJoinStateSync = () => {
   }, [notification, amIWhiteboardPeer]);
 
   useEffect(() => {
-    if (peerJoinCallback) {
+    if (peerJoinCallback && amIWhiteboardPeer) {
       return () => {
-        whiteboardLog("Closing whiteboard", peerJoinCallback);
+        // whiteboardLog(
+        //   "Closing whiteboard",
+        //   { amIWhiteboardPeer },
+        //   peerJoinCallback
+        // );
         peerJoinCallback();
       };
     }
-  }, [peerJoinCallback]);
+  }, [peerJoinCallback, amIWhiteboardPeer]);
 
   return { peerJoinCallback, setPeerJoinCallback };
 };
@@ -86,11 +90,7 @@ export const useRoom = () => {
     },
 
     broadcastEvent: (/** @type {any} */ eventName, /** @type {any} */ arg) => {
-      // whiteboardLog(
-      //   "Broadcast event",
-      //   arg,
-      //   stringifyWithNull({ eventName, ...arg })
-      // );
+      whiteboardLog("Broadcast event", { eventName, ...arg });
       hmsActions.sendBroadcastMessage(
         stringifyWithNull({ eventName, ...arg }),
         "whiteboard"
