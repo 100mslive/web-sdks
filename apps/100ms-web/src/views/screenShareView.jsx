@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, Fragment } from "react";
 import {
   useHMSStore,
   useHMSActions,
@@ -14,6 +14,7 @@ import {
 } from "@100mslive/hms-video-react";
 import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./components/chatView";
+import { useWindowSize } from "./hooks/useWindowSize";
 import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
 
@@ -53,45 +54,43 @@ export const ScreenShareView = ({
   }
 
   return (
-    <React.Fragment>
+    <Flex
+      css={{
+        size: "100%",
+      }}
+      direction={{
+        "@initial": "row",
+        "@lg": "column",
+      }}
+    >
+      <ScreenShareComponent
+        amIPresenting={amIPresenting}
+        peerPresenting={peerPresenting}
+        peerSharingPlaylist={peerSharingPlaylist}
+        videoTileProps={videoTileProps}
+      />
       <Flex
+        direction={{ "@initial": "column", "@lg": "row" }}
         css={{
-          size: "100%",
-        }}
-        direction={{
-          "@initial": "row",
-          "@md": "column",
+          overflow: "hidden",
+          p: "$2",
+          w: "20%",
+          h: "100%",
+          "@lg": { h: "30%", w: "100%" },
         }}
       >
-        <ScreenShareComponent
-          amIPresenting={amIPresenting}
-          peerPresenting={peerPresenting}
-          peerSharingPlaylist={peerSharingPlaylist}
+        <SidePane
+          isChatOpen={isChatOpen}
+          toggleChat={toggleChat}
+          peerScreenSharing={peerPresenting}
+          isPresenterInSmallTiles={showPresenterInSmallTile}
+          smallTilePeers={smallTilePeers}
+          isParticipantListOpen={isParticipantListOpen}
+          totalPeers={peers.length}
           videoTileProps={videoTileProps}
         />
-        <Flex
-          css={{
-            flexWrap: "wrap",
-            overflow: "hidden",
-            p: "$2",
-            width: "20%",
-            height: "100%",
-            "@md": { height: "30%", width: "100%" },
-          }}
-        >
-          <SidePane
-            isChatOpen={isChatOpen}
-            toggleChat={toggleChat}
-            peerScreenSharing={peerPresenting}
-            isPresenterInSmallTiles={showPresenterInSmallTile}
-            smallTilePeers={smallTilePeers}
-            isParticipantListOpen={isParticipantListOpen}
-            totalPeers={peers.length}
-            videoTileProps={videoTileProps}
-          />
-        </Flex>
       </Flex>
-    </React.Fragment>
+    </Flex>
   );
 };
 
@@ -114,10 +113,7 @@ export const SidePane = ({
   );
 
   return (
-    <Flex
-      css={{ size: "100%" }}
-      direction={{ "@initial": "column", "@md": "row" }}
-    >
+    <Fragment>
       {!isPresenterInSmallTiles && (
         <LargeTilePeerView
           peerScreenSharing={peerScreenSharing}
@@ -137,7 +133,7 @@ export const SidePane = ({
         isParticipantListOpen={isParticipantListOpen}
         totalPeers={totalPeers}
       />
-    </Flex>
+    </Fragment>
   );
 };
 
@@ -176,7 +172,7 @@ const ScreenShareComponent = ({
         flex: "1 1 0%",
         mx: "$2",
         ml: "$3",
-        "@md": { ml: "$2" },
+        "@lg": { ml: "$2" },
       }}
     >
       {peerPresenting &&
@@ -216,13 +212,13 @@ const CustomChatView = ({
       <Box
         className={getBlurClass(isParticipantListOpen, totalPeers)}
         css={{
-          height: "45%",
+          h: "45%",
           flexShrink: 0,
           "@md": chatStyle,
           "@ls": {
             position: "absolute",
             top: 0,
-            height: "100%",
+            h: "100%",
             minHeight: 300,
             zIndex: 40,
           },
@@ -235,19 +231,19 @@ const CustomChatView = ({
 };
 
 const SmallTilePeersView = ({
-  isChatOpen,
   smallTilePeers,
   shouldShowScreenFn,
   videoTileProps = () => ({}),
 }) => {
+  const { width } = useWindowSize();
+  let rows = undefined;
+  if (width <= 1024 && width >= 768) {
+    rows = 1;
+  }
   return (
     <Flex
       css={{
-        width: "100%",
         flex: "1 1 0%",
-        "@md": {
-          width: "50%",
-        },
       }}
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
@@ -256,6 +252,7 @@ const SmallTilePeersView = ({
           showScreenFn={shouldShowScreenFn}
           classes={{ videoTileContainer: "rounded-lg " }}
           maxColCount={2}
+          maxRowCount={rows}
           overflow="scroll-x"
           compact={true}
           // dont show stats for small tiles during screenshare
@@ -268,14 +265,15 @@ const SmallTilePeersView = ({
 
 const LargeTilePeerView = ({
   peerScreenSharing,
+  isChatOpen,
   videoTileProps = () => ({}),
 }) => {
   return peerScreenSharing ? (
     <Box
       css={{
-        width: "100%",
-        height: "35%",
-        "@md": { width: "50%", height: "100%", p: "$3" },
+        w: "100%",
+        h: isChatOpen ? "25%" : "35%",
+        "@lg": { w: "40%", h: "100%", mr: "$2" },
       }}
     >
       <VideoTile
