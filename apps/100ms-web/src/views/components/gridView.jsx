@@ -36,7 +36,7 @@ export const GridCenterView = ({
     <Fragment>
       <Box
         css={{
-          flex: "3 1 0",
+          flex: "1 1 0",
           height: "100%",
           "@md": { flex: "2 1 0" },
         }}
@@ -72,7 +72,7 @@ export const GridCenterView = ({
           className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           css={{
             height: "45%",
-            flex: "1 1 0",
+            flex: "0 0 20%",
             zIndex: 40,
             mr: "$2",
             alignSelf: "flex-end",
