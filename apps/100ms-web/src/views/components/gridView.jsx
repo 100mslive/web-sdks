@@ -111,8 +111,11 @@ export const GridSidePaneView = ({
     <Flex
       direction="column"
       css={{
-        flex: "1 1 0",
+        flex: "0 0 20%",
         mx: "$2",
+        "@lg": {
+          flex: "1 1 0",
+        },
       }}
     >
       <Flex css={{ flex: "1 1 0" }} align="end">

@@ -74,7 +74,10 @@ export const ScreenShareView = ({
         css={{
           overflow: "hidden",
           p: "$2",
-          flex: "1 1 0",
+          flex: "0 0 20%",
+          "@lg": {
+            flex: "1 1 0",
+          },
         }}
       >
         <SidePane
