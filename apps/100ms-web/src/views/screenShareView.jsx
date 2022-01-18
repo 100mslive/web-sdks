@@ -281,6 +281,7 @@ const LargeTilePeerView = ({
           py: 0,
         },
         "@sm": {
+          height: "100%",
           maxHeight: "75%",
           alignSelf: "center",
         },
