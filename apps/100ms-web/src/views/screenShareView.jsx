@@ -267,7 +267,6 @@ const SmallTilePeersView = ({
 
 const LargeTilePeerView = ({
   peerScreenSharing,
-  isChatOpen,
   videoTileProps = () => ({}),
 }) => {
   return peerScreenSharing ? (
@@ -275,9 +274,11 @@ const LargeTilePeerView = ({
       css={{
         flex: "1 1 0",
         minHeight: "25%",
+        py: "$2",
         "@lg": {
           mr: "$2",
           minHeight: "unset",
+          py: 0,
         },
         "@sm": {
           maxHeight: "75%",
