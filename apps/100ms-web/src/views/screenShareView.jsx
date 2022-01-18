@@ -74,9 +74,7 @@ export const ScreenShareView = ({
         css={{
           overflow: "hidden",
           p: "$2",
-          w: "20%",
-          h: "100%",
-          "@lg": { h: "30%", w: "100%" },
+          flex: "1 1 0",
         }}
       >
         <SidePane
@@ -153,8 +151,9 @@ const ScreenShareComponent = ({
       <Box
         css={{
           mx: "$2",
-          flex: "1 1 0%",
-          "@md": {
+          flex: "3 1 0",
+          "@lg": {
+            flex: "2 1 0",
             "& video": {
               objectFit: "contain",
             },
@@ -169,7 +168,7 @@ const ScreenShareComponent = ({
   return (
     <Box
       css={{
-        flex: "1 1 0%",
+        flex: "3 1 0",
         mx: "$2",
         ml: "$3",
         "@lg": { ml: "$2" },
@@ -243,7 +242,7 @@ const SmallTilePeersView = ({
   return (
     <Flex
       css={{
-        flex: "1 1 0%",
+        flex: "2 1 0",
       }}
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
@@ -271,9 +270,16 @@ const LargeTilePeerView = ({
   return peerScreenSharing ? (
     <Box
       css={{
-        w: "100%",
-        h: isChatOpen ? "25%" : "35%",
-        "@lg": { w: "40%", h: "100%", mr: "$2" },
+        flex: "1 1 0",
+        minHeight: "25%",
+        "@lg": {
+          mr: "$2",
+          minHeight: "unset",
+        },
+        "@sm": {
+          maxHeight: "75%",
+          alignSelf: "center",
+        },
       }}
     >
       <VideoTile
