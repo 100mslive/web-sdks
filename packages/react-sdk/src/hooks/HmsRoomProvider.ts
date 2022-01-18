@@ -25,7 +25,7 @@ export interface HMSRoomProviderProps {
  * only one context is being created currently. This would need to be changed if multiple
  * rooms have to be supported, where every room will have its own context, provider, store and actions.
  */
-export const HMSContext = createContext<HMSContextProviderProps | null>(null);
+const HMSContext = createContext<HMSContextProviderProps | null>(null);
 
 let providerProps: HMSContextProviderProps;
 export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
@@ -125,6 +125,15 @@ export const useHMSVanillaStore = () => {
   }
 
   return HMSContextConsumer.store;
+};
+
+export const useHMSVanillaNotifications = () => {
+  const HMSContextConsumer = useContext(HMSContext);
+  if (!HMSContextConsumer) {
+    throw new Error(hooksErrorMessage);
+  }
+
+  return HMSContextConsumer.notifications;
 };
 
 /*

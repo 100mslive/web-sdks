@@ -1,7 +1,11 @@
 // @ts-check
 
-import { HMSContext, HMSNotificationTypes } from "@100mslive/react-sdk";
-import { useContext, useEffect } from "react";
+import {
+  useHMSActions,
+  useHMSVanillaNotifications,
+  HMSNotificationTypes,
+} from "@100mslive/react-sdk";
+import { useEffect } from "react";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
@@ -161,7 +165,8 @@ export const provider =
     : new HMSCommunicationProvider();
 
 export const useCommunication = () => {
-  const { actions, notifications } = useContext(HMSContext);
+  const actions = useHMSActions();
+  const notifications = useHMSVanillaNotifications();
 
   useEffect(() => {
     if (notifications && actions) {

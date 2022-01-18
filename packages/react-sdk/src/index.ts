@@ -1,10 +1,10 @@
 export {
   HMSRoomProvider,
-  HMSContext,
   useHMSStore,
   useHMSActions,
   useHMSNotifications,
   useHMSVanillaStore,
+  useHMSVanillaNotifications,
   useHMSStatsStore,
 } from './hooks/HmsRoomProvider';
 export { chunkElements, getModeAspectRatio, calculateLayoutSizes } from './utils/layout';
