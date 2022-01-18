@@ -1,11 +1,10 @@
 // @ts-check
 import * as React from "react";
-import { useRoom } from "./useRoom";
+import { useRoom, whiteboardLog } from "./useRoom";
 
 export function useMultiplayerState(roomId) {
   const [app, setApp] = React.useState(null);
-  const [error, setError] = React.useState();
-  const [loading, setLoading] = React.useState(true);
+  const [isReady, setIsReady] = React.useState(false);
 
   const room = useRoom();
   // const onUndo = useUndo();
@@ -19,7 +18,7 @@ export function useMultiplayerState(roomId) {
   const rLiveBindings = React.useRef(new Map());
   // const rLiveAssets = React.useRef<LiveMap<string, TDAsset>>();
 
-  const getObjectFromLiveMaps = React.useCallback(() => {
+  const getCurrentState = React.useCallback(() => {
     return {
       shapes: rLiveShapes.current
         ? Object.fromEntries(rLiveShapes.current)
@@ -28,6 +27,12 @@ export function useMultiplayerState(roomId) {
         ? Object.fromEntries(rLiveBindings.current)
         : {},
     };
+  }, []);
+
+  const sendCurrentState = React.useCallback(() => {
+    if (room.amIWhiteboardPeer) {
+      room.broadcastEvent("currentState", getCurrentState());
+    }
   }, []);
 
   const mergeShapes = React.useCallback(
@@ -117,55 +122,53 @@ export function useMultiplayerState(roomId) {
     const unsubs = [];
     if (!(app && room)) return;
 
-    room.setPeerJoinCallback(() => () => {
-      room.broadcastEvent("currentState", {
-        shapes: Object.fromEntries(rLiveShapes.current),
-        bindings: Object.fromEntries(rLiveBindings.current),
-      });
-    });
-
     // Handle errors
-    unsubs.push(room.subscribe("error", error => setError(error)));
+    // unsubs.push(room.subscribe("error", error => setError(error)));
 
     // Handle changes to other users' presence
-    unsubs.push(
-      room.subscribe("others", others => {
-        app.updateUsers(
-          others
-            .toArray()
-            .filter(other => other.presence)
-            .map(other => other.presence.user)
-            .filter(Boolean)
-        );
-      })
-    );
+    // unsubs.push(
+    //   room.subscribe("others", others => {
+    //     app.updateUsers(
+    //       others
+    //         .toArray()
+    //         .filter(other => other.presence)
+    //         .map(other => other.presence.user)
+    //         .filter(Boolean)
+    //     );
+    //   })
+    // );
 
     // Handle events from the room
-    unsubs.push(
-      room.subscribe("event", e => {
-        switch (e.event.name) {
-          case "exit": {
-            app === null || app === void 0
-              ? void 0
-              : app.removeUser(e.event.userId);
-            break;
-          }
-          default:
-            break;
-        }
-      })
-    );
+    // unsubs.push(
+    //   room.subscribe("event", e => {
+    //     switch (e.event.name) {
+    //       case "exit": {
+    //         app === null || app === void 0
+    //           ? void 0
+    //           : app.removeUser(e.event.userId);
+    //         break;
+    //       }
+    //       default:
+    //         break;
+    //     }
+    //   })
+    // );
 
     // Send the exit event when the tab closes
     function handleExit() {
       if (!(room && (app === null || app === void 0 ? void 0 : app.room)))
         return;
-      room === null || room === void 0
-        ? void 0
-        : room.broadcastEvent("exit", {
-            name: "exit",
-            userId: app.room.userId,
-          });
+      // room === null || room === void 0
+      //   ? void 0
+      //   : room.broadcastEvent("exit", {
+      //       name: "exit",
+      //       userId: app.room.userId,
+      //     });
+
+      if (room.amIWhiteboardPeer && isReady) {
+        whiteboardLog("Closing Whitebaord", app, isReady);
+        sendCurrentState();
+      }
     }
 
     window.addEventListener("beforeunload", handleExit);
@@ -234,9 +237,14 @@ export function useMultiplayerState(roomId) {
       // storage.root.set("version", 2.1);
 
       // Subscribe to changes
-      const handleChanges = ({ shapes, bindings, eventName }) => {
+      const handleChanges = state => {
+        if (!state) {
+          return;
+        }
+
+        const { shapes, bindings, eventName } = state;
         mergeShapes({ shapes, bindings, merge: eventName === "stateChange" });
-        const newLiveObjects = getObjectFromLiveMaps();
+        const currentState = getCurrentState();
         // whiteboardLog("Handle shapeState", {
         //   eventName,
         //   shapes,
@@ -248,8 +256,8 @@ export function useMultiplayerState(roomId) {
         app === null || app === void 0
           ? void 0
           : app.replacePageContent(
-              newLiveObjects.shapes,
-              newLiveObjects.bindings,
+              currentState.shapes,
+              currentState.bindings,
               {} // Object.fromEntries(lAssets.entries())
             );
       };
@@ -257,13 +265,19 @@ export function useMultiplayerState(roomId) {
       if (stillAlive) {
         unsubs.push(room.subscribe("stateChange", handleChanges));
         unsubs.push(room.subscribe("currentState", handleChanges));
-        // Update the document with initial content
-        // handleChanges({
-        //   shapes: Object.fromEntries(rLiveShapes.current),
-        //   bindings: Object.fromEntries(rLiveBindings.current),
-        //   eventName: "currentState",
-        // });
-        setLoading(false);
+
+        // On peer join, send whole current state to update the new peer's whiteboard
+        unsubs.push(room.subscribe("peerJoin", sendCurrentState));
+
+        setIsReady(true);
+
+        // Ready to receive current state from whitboard owner
+        if (!room.amIWhiteboardPeer) {
+          room.broadcastEvent("peerJoin");
+        }
+
+        // Update the document with initial/stored content
+        handleChanges(room.getStoredState("currentState"));
       }
     }
 
@@ -271,6 +285,7 @@ export function useMultiplayerState(roomId) {
 
     return () => {
       stillAlive = false;
+      handleExit();
       unsubs.forEach(unsub => unsub());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -279,7 +294,5 @@ export function useMultiplayerState(roomId) {
   return {
     onMount,
     onChangePage,
-    error,
-    loading,
   };
 }

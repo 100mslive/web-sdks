@@ -1,14 +1,22 @@
 // @ts-check
-
 import {
   useHMSActions,
   useHMSVanillaNotifications,
   HMSNotificationTypes,
+  useHMSStore,
+  selectRoom,
 } from "@100mslive/react-sdk";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
+
+/**
+ * @typedef ProviderInitOptions
+ * @property {string} roomId
+ * @property {import("@100mslive/hms-video-store").HMSActions} hmsActions
+ * @property {import("@100mslive/hms-video-store").HMSNotifications} hmsNotifications
+ */
 
 /**
  * Base class which can be extended to use various realtime communication services.
@@ -55,19 +63,21 @@ class BaseCommunicationProvider {
 
   /**
    * @param {string} eventName
+   * @param {Object} message
    */
-  resendLastMessage = eventName => {
-    if (!this.getLastMessage(eventName)) {
-      return;
-    }
+  selfSendEvent = (eventName, message) => {
     if (this.callbacks[eventName]) {
       for (const cb of this.callbacks[eventName]) {
-        cb(this.getLastMessage(eventName));
+        cb(message);
       }
     }
   };
 
-  broadcastEvent(eventName, message) {
+  /**
+   * @param {string} eventName
+   * @param {Object} message
+   */
+  broadcastEvent(eventName, message = {}) {
     this.setLastMessage(eventName, { eventName, ...message });
 
     /**
@@ -78,7 +88,7 @@ class BaseCommunicationProvider {
      *
      * Refer: https://github.com/tldraw/tldraw/blob/main/packages/tldraw/src/state/TldrawApp.ts#L684
      */
-    this.resendLastMessage(eventName);
+    this.selfSendEvent(eventName, { eventName, ...message });
   }
 }
 
@@ -89,10 +99,9 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
   }
 
   /**
-   * @param {import("@100mslive/hms-video-store").HMSActions} hmsActions
-   * @param {import("@100mslive/hms-video-store").HMSNotifications} hmsNotifications
+   * @param {ProviderInitOptions} options
    */
-  init = (hmsActions, hmsNotifications) => {
+  init = ({ hmsActions, hmsNotifications }) => {
     if (this.initialized) {
       return;
     }
@@ -126,7 +135,7 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
    * @param {string} eventName
    * @param {Object} arg
    */
-  broadcastEvent = (eventName, arg) => {
+  broadcastEvent = (eventName, arg = {}) => {
     super.broadcastEvent(eventName, arg);
     this.hmsActions.sendBroadcastMessage(
       stringifyWithNull({ eventName, ...arg }),
@@ -165,14 +174,20 @@ export const provider =
     : new HMSCommunicationProvider();
 
 export const useCommunication = () => {
-  const actions = useHMSActions();
-  const notifications = useHMSVanillaNotifications();
+  const room = useHMSStore(selectRoom);
+  const roomId = useMemo(() => room.id, [room]);
+  const hmsActions = useHMSActions();
+  const hmsNotifications = useHMSVanillaNotifications();
 
   useEffect(() => {
-    if (notifications && actions) {
-      provider.init(actions, notifications);
+    if (roomId && hmsNotifications && hmsActions) {
+      provider.init({
+        roomId,
+        hmsActions,
+        hmsNotifications,
+      });
     }
-  }, [notifications, actions]);
+  }, [roomId, hmsNotifications, hmsActions]);
 
   return provider;
 };
