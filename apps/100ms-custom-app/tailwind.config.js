@@ -8,7 +8,7 @@ module.exports = {
     },
     minHeight: {
       '50vh': '50vh',
-      '720px': '720px'
+      '720px': '720px',
     },
     extend: {
       colors: {
@@ -20,30 +20,30 @@ module.exports = {
           cool4: '#3B3B3B',
           cool5: '#B0C3DB',
           cool6: '#1E232C',
-          cool7: '#282D37'
+          cool7: '#282D37',
         },
         blue: {
           standard: '#2F80FF',
-          tint: '#74AAFF'
+          tint: '#74AAFF',
         },
         red: {
-          standard: '#ED4C5A'
+          standard: '#ED4C5A',
         },
         green: {
-          3: '#6FCF97'
+          3: '#6FCF97',
         },
         transparent: {
-          backdrop: 'rgba(0, 0, 0, 0.5)'
-        }
+          backdrop: 'rgba(0, 0, 0, 0.5)',
+        },
       },
       zIndex: {
-        '9999': '9999',
-        '-10': '-10'
-      }
+        9999: '9999',
+        '-10': '-10',
+      },
     },
   },
   variants: {
     extend: {},
   },
   plugins: [],
-}
+};

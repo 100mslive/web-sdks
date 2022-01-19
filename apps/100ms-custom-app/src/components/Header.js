@@ -16,8 +16,8 @@ import iconCode from '../assets/images/icons/icon-code.svg';
 
 const getRandomColor = () => {
   const h = Math.floor(Math.random() * 360),
-    s = Math.floor(Math.random() * 100) + '%',
-    l = Math.floor(Math.random() * 60) + '%';
+    s = `${Math.floor(Math.random() * 100)}%`,
+    l = `${Math.floor(Math.random() * 60)}%`;
   return `hsl(${h},${s},${l})`;
 };
 
@@ -46,7 +46,9 @@ export default function Header({
     let roomId = '';
     if (pathName.startsWith('/preview') || pathName.startsWith('/meeting') || pathName.startsWith('/leave')) {
       let index = 9;
-      if (pathName.startsWith('/leave')) index = 7;
+      if (pathName.startsWith('/leave')) {
+        index = 7;
+      }
       for (let i = index; i < pathName.length; i++) {
         if (pathName[i] === '/') {
           break;
@@ -66,11 +68,15 @@ export default function Header({
     let initials = '';
     email = email.toLowerCase();
     for (let i = 0; i < email.length; i++) {
-      if (email[i] === '@') break;
+      if (email[i] === '@') {
+        break;
+      }
       if (email[i] >= 'a' && email[i] <= 'z') {
         initials += email[i];
       }
-      if (initials.length === 2) break;
+      if (initials.length === 2) {
+        break;
+      }
     }
     return initials;
   };
@@ -82,9 +88,9 @@ export default function Header({
       settings.plugins.chat
     }\nREACT_APP_SHOW_SCREENSHARE=${
       settings.plugins['screen-share']
-    }\nREACT_APP_VIDEO_AVATAR=true\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${
-      process.env.REACT_APP_BACKEND_API + window.location.hostname + '/'
-    }\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
+    }\nREACT_APP_VIDEO_AVATAR=true\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
+      process.env.REACT_APP_BACKEND_API + window.location.hostname
+    }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
   };
 
   const downloadCode = async () => {
@@ -93,7 +99,7 @@ export default function Header({
 
       const data = generateEnvData(logo);
 
-      envFile.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+      envFile.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
 
       envFile.download = 'example.env';
 
@@ -231,7 +237,7 @@ export default function Header({
                 {Object.keys(roomLinks).map((role, index) => {
                   const roomRole = roomLinks[role];
                   if (roomRole.is_active) {
-                    let role_url = 'https://' + window.location.hostname + '/preview/' + roomRole.identifier;
+                    let role_url = `https://${window.location.hostname}/preview/${roomRole.identifier}`;
                     return (
                       <React.Fragment key={index}>
                         <li className="my-4 flex items-center">

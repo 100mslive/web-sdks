@@ -27,7 +27,7 @@ export default function Token() {
     }
     const code = extractUrlCode();
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = process.env.REACT_APP_BACKEND_API + 'get-token';
+    const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
 
     var headers = {};
     if (jwt) {

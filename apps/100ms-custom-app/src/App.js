@@ -120,7 +120,7 @@ class App extends Component {
   getRoomDetails = async (jwt, name) => {
     const code = this.extractUrlCode();
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = process.env.REACT_APP_BACKEND_API + 'get-token';
+    const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
     var headers = {};
     if (jwt) {
       headers = {
@@ -159,10 +159,14 @@ class App extends Component {
     if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
       roomCode = '';
       for (let i = 9; i < path.length; i++) {
-        if (path[i] === '/') break;
+        if (path[i] === '/') {
+          break;
+        }
         roomCode += path[i];
       }
-      if (roomCode.trim() === '') roomCode = null;
+      if (roomCode.trim() === '') {
+        roomCode = null;
+      }
     }
     this.setState({ roomCode });
     return roomCode;
@@ -184,8 +188,9 @@ class App extends Component {
   fetchData = async () => {
     const jwt = this.getToken();
     axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    var url =
-      process.env.REACT_APP_BACKEND_API + 'apps/get-details?domain=' + hostname + '&room_id=' + this.extractUrlCode();
+    var url = `${
+      process.env.REACT_APP_BACKEND_API
+    }apps/get-details?domain=${hostname}&room_id=${this.extractUrlCode()}`;
 
     console.log('url', url);
     let headers = {};
@@ -201,9 +206,13 @@ class App extends Component {
     }
 
     let mapTileShape = shape => {
-      if (shape === 'SQUARE') return '1-1';
-      else if (shape === 'WIDE') return '16-9';
-      else if (shape === 'LANDSCAPE') return '4-3';
+      if (shape === 'SQUARE') {
+        return '1-1';
+      } else if (shape === 'WIDE') {
+        return '16-9';
+      } else if (shape === 'LANDSCAPE') {
+        return '4-3';
+      }
       return shape;
     };
 
@@ -333,7 +342,9 @@ class App extends Component {
     const currentSettings = this.state.temporary_state;
     const logoFile = currentSettings.logo_obj;
     let formData = new FormData();
-    if (logoFile) formData.append('logo', logoFile);
+    if (logoFile) {
+      formData.append('logo', logoFile);
+    }
 
     formData.append('color', currentSettings.brand_color);
     formData.append('font', currentSettings.font.toUpperCase());
@@ -356,7 +367,7 @@ class App extends Component {
     this.setState({ savingData: true });
 
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = process.env.REACT_APP_BACKEND_API + 'apps/details';
+    const url = `${process.env.REACT_APP_BACKEND_API}apps/details`;
 
     const headers = {
       Authorization: `Bearer ${jwt}`,
@@ -432,10 +443,10 @@ class App extends Component {
 
   saveDetails = () => {
     const token = this.getToken();
-    Object.keys(this.state.temporary_state).forEach(key => {
-      if (this.state.temporary_state[key] !== this.state.final_state[key]) {
-      }
-    });
+    // Object.keys(this.state.temporary_state).forEach(key => {
+    //   if (this.state.temporary_state[key] !== this.state.final_state[key]) {
+    //   }
+    // });
     this.setState({
       final_state: this.state.temporary_state,
       modal: false,
@@ -470,7 +481,7 @@ class App extends Component {
               />
             )}
             <HMSEdtechTemplate
-              tokenEndpoint={process.env.REACT_APP_BACKEND_API + hostname + '/'}
+              tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
               themeConfig={{
                 aspectRatio: this.state.temporary_state.tile_shape,
                 font: this.state.temporary_state.font,
@@ -975,7 +986,7 @@ function Plugins(props) {
       return (
         <React.Fragment key={index}>
           <div className="flex justify-end items-start mt-5 mb-5 text-gray-cool5">
-            <img className="w-5 mt-0.5" src={plugin.icon} alt={plugin.name + ' pluggin'} />
+            <img className="w-5 mt-0.5" src={plugin.icon} alt={`${plugin.name} pluggin`} />
             <div className="flex flex-col flex-grow">
               <div className="flex justify-between items-center ml-2">
                 <div className="text-base font-normal">{plugin.name}</div>
@@ -988,10 +999,10 @@ function Plugins(props) {
                 onChange={handlePlugins}
                 data-pluggin={plugin.id}
                 type="checkbox"
-                id={plugin.id + '-pluggin'}
+                id={`${plugin.id}-pluggin`}
                 checked={props.settings.plugins[plugin.id]}
               />
-              <label className="custom-toggle-label" htmlFor={plugin.id + '-pluggin'}></label>
+              <label className="custom-toggle-label" htmlFor={`${plugin.id}-pluggin`}></label>
             </div>
           </div>
           <Devider />
