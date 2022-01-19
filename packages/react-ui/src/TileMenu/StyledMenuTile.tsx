@@ -7,6 +7,7 @@ export const StyledRoot = styled('div', {
   position: 'absolute',
   top: '20px',
   right: '20px',
+  zIndex: 20,
   // display: 'none',
 });
 

@@ -1,6 +1,7 @@
 export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
+export { default as BrbIcon } from './BrbIcon';
 export { default as ChatIcon } from './ChatIcon';
 export { default as CheckIcon } from './CheckIcon';
 export { default as ChevronDownIcon } from './ChevronDownIcon';
