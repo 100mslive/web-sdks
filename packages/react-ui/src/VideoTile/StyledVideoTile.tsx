@@ -33,7 +33,9 @@ const Info = styled('div', {
   position: 'absolute',
   bottom: '10px',
   left: '50%',
+  fontSize: '14px',
   transform: 'translateX(-50%)',
+  textAlign: 'center',
 });
 
 const AvatarContainer = styled('div', {

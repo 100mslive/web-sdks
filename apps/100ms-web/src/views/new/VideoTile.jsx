@@ -13,6 +13,8 @@ import {
   selectIsPeerVideoEnabled,
   selectPeerByID,
   selectPeerMetadata,
+  selectVideoTrackByPeerID,
+  selectIsAudioLocallyMuted,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -28,6 +30,17 @@ const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   const isHandRaised =
     useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
   const isBRB = useHMSStore(selectPeerMetadata(peerId))?.isBRB || false;
+  const storeHmsVideoTrack = useHMSStore(selectVideoTrackByPeerID(peer.id));
+  const storeIsLocallyMuted = useHMSStore(
+    selectIsAudioLocallyMuted(peer.audioTrack)
+  );
+  const label = getVideoTileLabel(
+    peer.name,
+    peer.isLocal,
+    storeHmsVideoTrack?.source,
+    storeIsLocallyMuted,
+    storeHmsVideoTrack?.degraded
+  );
   return (
     <StyledVideoTile.Root
       css={{ width, height }}
@@ -49,7 +62,7 @@ const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
         {isVideoMuted ? (
           <Avatar size={getAvatarSize(width)} name={peer?.name || ""} />
         ) : null}
-        <StyledVideoTile.Info>{peer?.name}</StyledVideoTile.Info>
+        <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
         {isAudioMuted ? (
           <StyledVideoTile.AudioIndicator>
             <MicOffIcon />
@@ -82,4 +95,33 @@ const getAvatarSize = width => {
   } else {
     return "md";
   }
+};
+
+export const getVideoTileLabel = (
+  peerName,
+  isLocal,
+  videoSource = "regular",
+  isLocallyMuted,
+  degraded
+) => {
+  // Map [isLocal, videoSource] to the label to be displayed.
+  const labelMap = new Map([
+    [[true, "screen"].toString(), "Your Screen"],
+    [[true, "playlist"].toString(), "Your Video"],
+    [[true, "regular"].toString(), `You (${peerName})`],
+    [[false, "screen"].toString(), `${peerName}'s Screen`],
+    [[false, "playlist"].toString(), `${peerName}'s Video`],
+    [[false, "regular"].toString(), peerName],
+    [[false, undefined].toString(), peerName],
+  ]);
+
+  let label = labelMap.get([isLocal, videoSource].toString());
+  label = `${label}${degraded ? "(Degraded)" : ""}`;
+  if (
+    (isLocallyMuted === undefined || isLocallyMuted === null) &&
+    videoSource === "regular"
+  ) {
+    return label;
+  }
+  return `${label}${isLocallyMuted ? " (Muted for you)" : ""}`;
 };
