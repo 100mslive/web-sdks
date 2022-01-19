@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "100ms_edtech_template": "0.1.4",
     "@craco/craco": "^6.1.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -23,7 +24,7 @@
     "build": "yarn build:style && craco build --profile",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "build:style": "cd ../100ms-web && yarn build:style && mv tailwind.css ../",
+    "build:style": "cd ../100ms-web && yarn build:style && mv tailwind.css ../100ms-custom-app/src",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write src/**/*.js"
