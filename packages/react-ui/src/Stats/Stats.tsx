@@ -1,6 +1,5 @@
 import React from 'react';
-import { HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/hms-video-store';
-import { useHMSStatsStore } from '@100mslive/react-sdk';
+import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
 
