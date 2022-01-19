@@ -8,12 +8,17 @@
   and updates changes from remote peers in local whiteboard.
 - Returns event handlers which as passed to `<Tldraw />`.
 
+### `useCommunication`
+
+- Initializes the right whiteboard communication provider(HMS or pusher). Communication Provider is a class to subscribe to, broadcast and store events.
+
+- A custom communication provider using any service could be implemented by extending `BaseCommunicationProvider` and implementing `init`, `broadcastEvent` and `subscribe` methods(Refer PusherCommunicationProvider).
+
 ### `useRoom`
 
-- hook that provides subscribe and broadcast methods to be used in useMultiplayerState.
-- Abstracts over HMS messaging(filtering only whiteboard messages,...) to provide only relevant stuff to useMultiplayerState
+- Simple abstraction over provider and metadata as room object for useMultiplayerState
 
-useMultiplayerState and useRoom are internal hooks for Whiteboard functionalites
+useMultiplayerState, useCommunication and useRoom are internal hooks for Whiteboard functionalites
 
 ## Public Hooks
 
