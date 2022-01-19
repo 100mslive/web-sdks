@@ -1,6 +1,6 @@
 // @ts-check
 import * as React from "react";
-import { useRoom, whiteboardLog } from "./useRoom";
+import { useRoom } from "./useRoom";
 
 export function useMultiplayerState(roomId) {
   const [app, setApp] = React.useState(null);
@@ -30,12 +30,12 @@ export function useMultiplayerState(roomId) {
   }, []);
 
   const sendCurrentState = React.useCallback(() => {
-    if (room.amIWhiteboardPeer) {
+    if (room.amIWhiteboardPeer && isReady) {
       room.broadcastEvent("currentState", getCurrentState());
     }
-  }, []);
+  }, [room, isReady, getCurrentState]);
 
-  const mergeShapes = React.useCallback(
+  const updateLocalState = React.useCallback(
     ({ shapes, bindings, merge = true }) => {
       if (!(shapes && bindings)) return;
 
@@ -77,6 +77,19 @@ export function useMultiplayerState(roomId) {
     []
   );
 
+  const applyStateToBoard = React.useCallback(
+    state => {
+      app === null || app === void 0
+        ? void 0
+        : app.replacePageContent(
+            state.shapes,
+            state.bindings,
+            {} // Object.fromEntries(lAssets.entries())
+          );
+    },
+    [app]
+  );
+
   // Callbacks --------------
   // Put the state into the window, for debugging.
   const onMount = React.useCallback(
@@ -90,17 +103,29 @@ export function useMultiplayerState(roomId) {
   );
 
   // Update the live shapes when the app's shapes change.
-  const onChangePage = React.useCallback((_app, shapes, bindings, _assets) => {
-    mergeShapes({ shapes, bindings });
-    // whiteboardLog("onChangePage", {
-    //   shapes,
-    //   bindings,
-    //   rLiveShapes,
-    //   rLiveBindings,
-    // });
-    room.broadcastEvent("stateChange", { shapes, bindings });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onChangePage = React.useCallback(
+    (_app, shapes, bindings, _assets) => {
+      updateLocalState({ shapes, bindings });
+      // whiteboardLog("onChangePage", {
+      //   shapes,
+      //   bindings,
+      //   rLiveShapes,
+      //   rLiveBindings,
+      // });
+      room.broadcastEvent("stateChange", { shapes, bindings });
+
+      /**
+       * Tldraw thinks that the next update passed to replacePageContent after onChangePage is the own update triggered by onChangePage
+       * and the replacePageContent doesn't have any effect if it is a valid update from remote.
+       *
+       * To overcome this replacePageContent locally onChangePage(not costly - returns from first line).
+       *
+       * Refer: https://github.com/tldraw/tldraw/blob/main/packages/tldraw/src/state/TldrawApp.ts#L684
+       */
+      applyStateToBoard(getCurrentState());
+    },
+    [room, updateLocalState, applyStateToBoard, getCurrentState]
+  );
 
   // Handle presence updates when the user's pointer / selection changes
   // const onChangePresence = React.useCallback(
@@ -165,10 +190,7 @@ export function useMultiplayerState(roomId) {
       //       userId: app.room.userId,
       //     });
 
-      if (room.amIWhiteboardPeer && isReady) {
-        whiteboardLog("Closing Whitebaord", app, isReady);
-        sendCurrentState();
-      }
+      sendCurrentState();
     }
 
     window.addEventListener("beforeunload", handleExit);
@@ -243,8 +265,11 @@ export function useMultiplayerState(roomId) {
         }
 
         const { shapes, bindings, eventName } = state;
-        mergeShapes({ shapes, bindings, merge: eventName === "stateChange" });
-        const currentState = getCurrentState();
+        updateLocalState({
+          shapes,
+          bindings,
+          merge: eventName === "stateChange",
+        });
         // whiteboardLog("Handle shapeState", {
         //   eventName,
         //   shapes,
@@ -253,13 +278,7 @@ export function useMultiplayerState(roomId) {
         //   rLiveBindings,
         // });
 
-        app === null || app === void 0
-          ? void 0
-          : app.replacePageContent(
-              currentState.shapes,
-              currentState.bindings,
-              {} // Object.fromEntries(lAssets.entries())
-            );
+        applyStateToBoard(getCurrentState());
       };
 
       if (stillAlive) {
@@ -271,13 +290,18 @@ export function useMultiplayerState(roomId) {
 
         setIsReady(true);
 
-        // Ready to receive current state from whitboard owner
-        if (!room.amIWhiteboardPeer) {
+        if (room.amIWhiteboardPeer) {
+          // On board open, update the document with initial/stored content
+          handleChanges(room.getStoredState("currentState"));
+          // Send current state to other peers in the room currently
+          sendCurrentState();
+        } else if (room.shouldRequestState()) {
+          /**
+           * Newly joined peers request the owner(send peerJoin) for current state
+           * and update their boards when they receive "currentState"
+           */
           room.broadcastEvent("peerJoin");
         }
-
-        // Update the document with initial/stored content
-        handleChanges(room.getStoredState("currentState"));
       }
     }
 

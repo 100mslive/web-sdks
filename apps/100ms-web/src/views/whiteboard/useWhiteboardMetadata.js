@@ -60,6 +60,6 @@ export const useWhiteboardMetadata = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hmsActions, metadata, whiteboardPeer]
   );
-  window.setWhiteboardEnabled = setWhiteboardEnabled;
+
   return { whiteboardPeer, amIWhiteboardPeer, setWhiteboardEnabled };
 };
