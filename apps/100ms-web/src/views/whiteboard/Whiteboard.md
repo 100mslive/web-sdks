@@ -26,9 +26,9 @@ useMultiplayerState and useRoom are internal hooks for Whiteboard functionalites
 
 - `onChangePage` handler is called when there's any change in the state(shapes, bindings, [assets]) of the board with newly added shapes, bindings as args.
 
-- In onChangePage handler, the newly added shapes, bindings are broadcasted to all remote peers in room as 'stateChange' event. Along with this, the newly added state is merged with current state and stored locally(in `rLiveShapes`, `rLiveBindings`)
+- In onChangePage handler, the newly added shapes, bindings are broadcasted to all remote peers in room as 'state-change' event. Along with this, the newly added state is merged with current state and stored locally(in `rLiveShapes`, `rLiveBindings`)
 
-- The remote peer on receiving the 'stateChange' event, receives the only the new state, merges it with the current state and updates the whiteboard page.
+- The remote peer on receiving the 'state-change' event, receives the only the new state, merges it with the current state and updates the whiteboard page.
 
 ## Special Cases
 
@@ -36,13 +36,19 @@ useMultiplayerState and useRoom are internal hooks for Whiteboard functionalites
 
 - Newly joined peer has the whiteboard metadata(enabled, owner) already from peer metadata but doesn't have the current state(shapes, bindings) of the whiteboard.
 
-- Hence, the owner will broadcast their board's current state(as 'currentState') when they receive a PEER_JOINED notification and the newly joined peers update their boards.
+- Hence, the newly joined peer will send a 'request-state' event when it is ready(subscribed to all events)
+
+- On receiving this request, the owner will broadcast their board's current state(as 'current-state') and the newly joined peers receive and update their boards.
+
+- **Not using HMS PEER_JOIN notification** on the owner end to broadcast current state as this notification is too early and the newly joined peer's whiteboard has not subscribed yet, losing the current-state event.
 
 ### Opening/Closing Whiteboard within a call
 
 - Desired behaviour is to persist state across multiple opens/closes of whiteboard within a call.
 
-- To achieve this, the owner will broadcast current state with 'currentState' event before closing the whiteboard. On reopening the whiteboard, the state from the last whiteboard message with store event is retrieved and updated in the whiteboard.
+- To achieve this, the owner will broadcast current state event before closing the whiteboard, this event is stored all the peers.
+
+- On reopening the whiteboard, the state from the stored current-state event is fetched by the owner and is broadcast to all other peers. Broadcasting is required because newly joined peers(who joined after the board was closed previously) won't have the last state.
 
 ### `stateChange` vs `currentState`
 
