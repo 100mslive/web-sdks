@@ -20,5 +20,16 @@ export const useMetadata = () => {
       console.error("failed to set isHandRaised", error);
     }
   };
-  return { isHandRaised: isHandRaised, setIsHandRaised: setIsHandRaised };
+  const isBRB = useHMSStore(selectPeerMetadata(peer.id))?.isBRB || false;
+  /**
+   * @param isBRB {boolean}
+   */
+  const setIsBRB = async isBRB => {
+    try {
+      await hmsActions.changeMetadata({ isBRB: isBRB });
+    } catch (error) {
+      console.error("failed to set BBR", error);
+    }
+  };
+  return { isHandRaised, isBRB, setIsHandRaised, setIsBRB };
 };

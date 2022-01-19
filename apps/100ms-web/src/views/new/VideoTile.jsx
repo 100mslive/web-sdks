@@ -14,7 +14,11 @@ import {
   selectPeerByID,
   selectPeerMetadata,
 } from "@100mslive/react-sdk";
-import { MicOffIcon, HandRaiseFilledIcon } from "@100mslive/react-icons";
+import {
+  MicOffIcon,
+  HandRaiseFilledIcon,
+  BrbIcon,
+} from "@100mslive/react-icons";
 
 const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -23,6 +27,7 @@ const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   const [showTrigger, setShowTrigger] = useState(false);
   const isHandRaised =
     useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
+  const isBRB = useHMSStore(selectPeerMetadata(peerId))?.isBRB || false;
   return (
     <StyledVideoTile.Root
       css={{ width, height }}
@@ -51,9 +56,15 @@ const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
           </StyledVideoTile.AudioIndicator>
         ) : null}
         {showTrigger && !peer?.isLocal ? <TileMenu peerId={peerId} /> : null}
+
         {isHandRaised ? (
           <StyledVideoTile.HandRaiseBox>
             <HandRaiseFilledIcon width={40} height={40} />
+          </StyledVideoTile.HandRaiseBox>
+        ) : null}
+        {isBRB ? (
+          <StyledVideoTile.HandRaiseBox css={{ c: "white" }}>
+            <BrbIcon width={40} height={40} />
           </StyledVideoTile.HandRaiseBox>
         ) : null}
       </StyledVideoTile.Container>

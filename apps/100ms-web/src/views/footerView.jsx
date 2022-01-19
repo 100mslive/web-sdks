@@ -24,7 +24,12 @@ import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
 import { useMetadata } from "./hooks/useMetadata";
 import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
-import { HandIcon, ShareScreenIcon, MusicIcon } from "@100mslive/react-icons";
+import {
+  HandIcon,
+  ShareScreenIcon,
+  MusicIcon,
+  BrbIcon,
+} from "@100mslive/react-icons";
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
@@ -39,7 +44,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
-  const { isHandRaised, setIsHandRaised } = useMetadata();
+  const { isHandRaised, setIsHandRaised, isBRB, setIsBRB } = useMetadata();
 
   const initialModalProps = {
     show: false,
@@ -155,12 +160,22 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
+  leftComponents.push(
+    <Tooltip title={` Turn ${!isBRB ? "on" : "off"} BRB`} key="brb">
+      <IconButton
+        css={{ mx: "$2", "@md": { display: "none" } }}
+        onClick={() => setIsBRB(!isBRB)}
+        active={!isBRB}
+      >
+        <BrbIcon />
+      </IconButton>
+    </Tooltip>
+  );
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {
     return null;
   }
-
   return (
     <>
       <ControlBar
@@ -174,8 +189,8 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
             >
               <IconButton
                 active={!isScreenShared}
-                className="mx-2"
                 onClick={() => toggleScreenShare(!isScreenShared)}
+                css={{ mx: "$2", "@md": { display: "none" } }}
               >
                 <ShareScreenIcon />
               </IconButton>
