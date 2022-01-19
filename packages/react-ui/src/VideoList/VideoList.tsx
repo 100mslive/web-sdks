@@ -1,6 +1,6 @@
+import React from 'react';
 import { useVideoList, HMSPeer } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
-import React from 'react';
 import { VideoTile } from '../VideoTile';
 import { Pagination } from '../Pagination';
 
