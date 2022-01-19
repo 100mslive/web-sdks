@@ -1,5 +1,5 @@
-import { StyledPagination } from './StyledPagination';
 import React from 'react';
+import { StyledPagination } from './StyledPagination';
 
 interface Props {
   page: number;

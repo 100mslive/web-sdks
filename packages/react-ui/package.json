@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@100mslive/react-icons": "0.0.5-alpha.1",
-    "@100mslive/react-sdk": "0.0.4",
+    "@100mslive/react-sdk": "0.0.5-alpha.0",
     "@radix-ui/react-dialog": "^0.1.1",
     "@radix-ui/react-popover": "^0.1.4",
     "@radix-ui/react-slider": "^0.1.1",
