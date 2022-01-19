@@ -42,6 +42,15 @@
     gifuct-js "^2.1.2"
     wasm-check "^2.0.2"
 
+"@100mslive/react-sdk@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.0.4.tgz#1f60453d93e65b48d3075834d6cc83e6b4ff8cf3"
+  integrity sha512-mt1hWaqEHSiO3RArwR4b/5VCX5ScXadZKtWY3Dc9+clu14vzhWB9XD4VK+J2Gww/md9MqDdUoKwfTdOI7ZJeEA==
+  dependencies:
+    "@100mslive/hms-video-store" "0.2.87"
+    react-intersection-observer "^8.33.1"
+    zustand "^3.6.2"
+
 "@babel/code-frame@7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
