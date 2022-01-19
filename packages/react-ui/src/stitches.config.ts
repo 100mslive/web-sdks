@@ -46,6 +46,7 @@ const HmsStitches = createStitches({
       '6': '4rem',
       '7': '6rem',
       '8': '8rem',
+      header: '3.5rem',
     },
     fontSizes: {
       xs: '0.75rem',
@@ -86,6 +87,12 @@ const HmsStitches = createStitches({
     size: (value: Stitches.ScaleValue<'size'> | number | string) => ({
       height: value,
       width: value,
+    }),
+    w: (value: Stitches.ScaleValue<'size'> | number | string) => ({
+      width: value,
+    }),
+    h: (value: Stitches.ScaleValue<'size'> | number | string) => ({
+      height: value,
     }),
     p: (value: Stitches.ScaleValue<'space'> | number | string) => ({
       padding: value,
@@ -141,6 +148,7 @@ const HmsStitches = createStitches({
     lg: '(max-width: 1024px)',
     xl: '(max-width: 1280px)',
     '2xl': '(max-width: 1536px)',
+    ls: '(max-width: 1024px) and (orientation: landscape)',
   },
 });
 

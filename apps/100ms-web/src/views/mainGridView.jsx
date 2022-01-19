@@ -4,6 +4,7 @@ import {
   selectPeers,
   useHMSStore,
 } from "@100mslive/hms-video-react";
+import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "./components/gridView";
 import { AppContext } from "../store/AppContext";
 
@@ -11,11 +12,10 @@ export const MainGridView = ({
   isChatOpen,
   toggleChat,
   isParticipantListOpen,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
   const {
     maxTileCount,
-    showStatsOnTiles,
     appPolicyConfig: { center: centerRoles = [], sidepane: sidepaneRoles = [] },
   } = useContext(AppContext);
   const peers = useHMSStore(selectPeers);
@@ -46,7 +46,15 @@ export const MainGridView = ({
   }
 
   return (
-    <React.Fragment>
+    <Flex
+      css={{
+        size: "100%",
+      }}
+      direction={{
+        "@initial": "row",
+        "@md": "column",
+      }}
+    >
       <GridCenterView
         peers={showSidePane ? centerPeers : peers}
         maxTileCount={maxTileCount}
@@ -57,9 +65,8 @@ export const MainGridView = ({
         isParticipantListOpen={isParticipantListOpen}
         totalPeers={peers.length}
         videoTileProps={videoTileProps}
-        showStatsOnTiles={showStatsOnTiles}
       />
-      {showSidePane ? (
+      {showSidePane && (
         <GridSidePaneView
           peers={sidebarPeers}
           isChatOpen={isChatOpen}
@@ -68,7 +75,7 @@ export const MainGridView = ({
           totalPeers={peers.length}
           videoTileProps={videoTileProps}
         />
-      ) : null}
-    </React.Fragment>
+      )}
+    </Flex>
   );
 };

@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.4-alpha.3",
+  "version": "0.0.5-alpha.2",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -18,7 +18,7 @@
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
+    "types:build": "tsc -p tsconfig.build.json",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**"
@@ -32,8 +32,7 @@
     "react-dom": "^17.0.1"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.0.3",
-    "@100mslive/react-sdk": "0.0.4-alpha.2",
+    "@100mslive/react-icons": "0.0.5-alpha.0",
     "@radix-ui/react-dialog": "^0.1.1",
     "@radix-ui/react-popover": "^0.1.4",
     "@radix-ui/react-slider": "^0.1.1",

@@ -51,7 +51,8 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig } from '~interfaces/hls-config';
+import { HLSConfig } from '../interfaces/hls-config';
+import { isMediadevicesMissing } from '../utils/mediadevices-missing';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -224,6 +225,12 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
+    if (isMediadevicesMissing()) {
+      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
+      HMSLogger.e(this.TAG, error);
+      return Promise.reject(error);
+    }
+
     if (this.sdkState.isPreviewInProgress) {
       return Promise.reject(
         ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
@@ -283,6 +290,12 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
+    if (isMediadevicesMissing()) {
+      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
+      HMSLogger.e(this.TAG, error);
+      throw error;
+    }
+
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
@@ -734,10 +747,11 @@ export class HMSSdk implements HMSInterface {
 
   private initPreviewTrackAudioLevelMonitor() {
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
-    this.localPeer?.audioTrack?.audioLevelMonitor?.on('AUDIO_LEVEL_UPDATE', audioLevelUpdate => {
-      const hmsSpeakers = audioLevelUpdate
-        ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
-        : [];
+    this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {
+      const hmsSpeakers =
+        audioLevelUpdate && audioLevelUpdate.track.trackId === this.localPeer?.audioTrack?.trackId
+          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
+          : [];
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });

@@ -11,6 +11,9 @@ jobs:
     outputs:
       hms-video-web: ${{ steps.filter.outputs.hms-video-web }}
       hms-video-store: ${{ steps.filter.outputs.hms-video-store }}
+      react-sdk: ${{ steps.filter.outputs.react-sdk }}
+      react-ui: ${{ steps.filter.outputs.react-ui }}
+      react-icons: ${{ steps.filter.outputs.react-icons }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2

@@ -1,9 +1,14 @@
-import React from "react";
-import { FirstPersonDisplay, isMobileDevice } from "@100mslive/hms-video-react";
+import React, { Fragment } from "react";
+import {
+  VideoList,
+  FirstPersonDisplay,
+  isMobileDevice,
+} from "@100mslive/hms-video-react";
+import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
-import { getBlurClass } from "../../common/utils";
+import { useWindowSize } from "../hooks/useWindowSize";
+import { chatStyle, getBlurClass } from "../../common/utils";
 import { HmsVideoList } from "../UIComponents";
-import { VideoList } from "@100mslive/hms-video-react";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -26,70 +31,81 @@ export const GridCenterView = ({
   isParticipantListOpen,
   hideSidePane,
   totalPeers,
-  videoTileProps,
   showStatsOnTiles,
+  videoTileProps = () => ({}),
 }) => {
   const isMobile = isMobileDevice();
   const rowCount = isMobile ? 1 : undefined;
   const isNewComponents = process.env.REACT_APP_ENABLE_NEW_COMPONENTS;
   return (
-    <div
-      className={`h-full ${
-        hideSidePane && !isChatOpen ? "w-full" : "w-full md:w-4/5"
-      }`}
-    >
-      {peers && peers.length > 0 ? (
-        isNewComponents === "true" ? (
-          <HmsVideoList
-            showStatsOnTiles={showStatsOnTiles}
-            peers={peers}
-            maxTileCount={
-              isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
-            }
-          />
-        ) : (
-          <VideoList
-            peers={peers}
-            classes={{
-              root: "",
-              videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
-            }}
-            maxTileCount={
-              isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
-            }
-            maxColCount={2}
-            maxRowCount={rowCount}
-            compact={peers.length > 2}
-            // show stats for upto 2 peers in sidepane
-            videoTileProps={videoTileProps}
-          />
-        )
-      ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
-        <div className="h-full w-full grid place-items-center p-5">
-          <a href={webinarInfoLink} target="_blank" rel="noreferrer">
-            <img
-              className="w-full rounded-lg shadow-lg p-2"
-              alt=""
-              src={eventsImg}
+    <Fragment>
+      <Box
+        css={{
+          flex: "1 1 0",
+          height: "100%",
+          "@md": { flex: "2 1 0" },
+        }}
+      >
+        {peers && peers.length > 0 ? (
+          isNewComponents === "true" ? (
+            <HmsVideoList
+              showStatsOnTiles={showStatsOnTiles}
+              peers={peers}
+              maxTileCount={
+                isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
+              }
             />
-          </a>
-        </div>
-      ) : (
-        <FirstPersonDisplay classes={{ rootBg: "h-full" }} />
-      )}
+          ) : (
+            <VideoList
+              peers={peers}
+              classes={{
+                root: "",
+                videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+              }}
+              maxTileCount={
+                isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
+              }
+              maxColCount={2}
+              maxRowCount={rowCount}
+              compact={peers.length > 2}
+              // show stats for upto 2 peers in sidepane
+              videoTileProps={videoTileProps}
+            />
+          )
+        ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
+          <div className="h-full w-full grid place-items-center p-5">
+            <a href={webinarInfoLink} target="_blank" rel="noreferrer">
+              <img
+                className="w-full rounded-lg shadow-lg p-2"
+                alt=""
+                src={eventsImg}
+              />
+            </a>
+          </div>
+        ) : (
+          <FirstPersonDisplay classes={{ rootBg: "h-full" }} />
+        )}
+      </Box>
       {isChatOpen && hideSidePane && (
-        <div
-          className={`h-1/2 ${
-            isMobileDevice() ? `w-3/4` : `w-2/10`
-          } absolute z-40 bottom-20 right-0 ${getBlurClass(
-            isParticipantListOpen,
-            totalPeers
-          )}`}
+        <Flex
+          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
+          css={{
+            height: "45%",
+            flex: "0 0 20%",
+            zIndex: 40,
+            mr: "$2",
+            alignSelf: "flex-end",
+            "@md": chatStyle,
+            "@ls": {
+              minHeight: "100%", // no sidepeer tiles will be present
+              bottom: "$7",
+            },
+          }}
         >
           <ChatView toggleChat={toggleChat} />
-        </div>
+        </Flex>
       )}
-    </div>
+    </Fragment>
   );
 };
 
@@ -100,47 +116,63 @@ export const GridSidePaneView = ({
   toggleChat,
   isParticipantListOpen,
   totalPeers,
-  videoTileProps,
+  videoTileProps = () => ({}),
 }) => {
-  const isMobile = isMobileDevice();
-  const rowCount = isMobile ? 1 : undefined;
+  const { width } = useWindowSize();
+  let rows = undefined;
+  if (width < 768) {
+    rows = 2;
+  } else if (width === 768) {
+    rows = 1;
+  }
 
   return (
-    <div className="flex flex-col w-full h-1/4 md:w-1/5 md:h-full pl-3 pr-3 md:pl-0 md:pr-0">
-      <div className="flex flex-1 items-end w-full">
+    <Flex
+      direction="column"
+      css={{
+        flex: "0 0 20%",
+        mx: "$2",
+        "@lg": {
+          flex: "1 1 0",
+        },
+      }}
+    >
+      <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
           <VideoList
             peers={peers}
             classes={{
               root: "",
-              videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+              videoTileContainer: `rounded-lg ${
+                width <= 768 ? "p-0 mr-2" : ""
+              }`,
             }}
             maxColCount={2}
-            maxRowCount={rowCount}
-            compact={true}
+            maxRowCount={rows}
+            compact={peers.length > 2}
             // show stats for upto 2 peers in sidepane
-            videoTileProps={(peer, track) => ({
-              ...videoTileProps(peer, track),
-              showStats:
-                peers.length < 3
-                  ? videoTileProps(peer, track).showStats
-                  : false,
-            })}
+            videoTileProps={videoTileProps}
           />
         )}
-      </div>
+      </Flex>
       {isChatOpen && (
-        <div
-          className={`flex h-1/2 items-end p-2 ${getBlurClass(
-            isParticipantListOpen,
-            totalPeers
-          )}`}
+        <Flex
+          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
+          align="end"
+          css={{
+            flex: "1 1 0",
+            h: "50%",
+            p: "$2",
+            "@md": chatStyle,
+            "@ls": {
+              ...chatStyle,
+              minHeight: "85%",
+            },
+          }}
         >
-          <div className="w-full h-full">
-            <ChatView toggleChat={toggleChat} />
-          </div>
-        </div>
+          <ChatView toggleChat={toggleChat} />
+        </Flex>
       )}
-    </div>
+    </Flex>
   );
 };

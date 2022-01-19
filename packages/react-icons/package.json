@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.3",
+  "version": "0.0.5-alpha.0",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -14,7 +14,7 @@
   "scripts": {
     "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
     "build:only": "yarn svg-build && node ../../scripts/build",
-    "types": "tsc -p tsconfig.build.json && tsconfig-replace-paths -p tsconfig.build.json",
+    "types": "tsc -p tsconfig.build.json",
     "build": "yarn build:only && yarn types",
     "format": "prettier -w src/**",
     "lint": "eslint",

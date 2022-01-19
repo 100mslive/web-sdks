@@ -2,8 +2,9 @@
  * Refer: https://github.com/cwilso/volume-meter/blob/master/volume-meter.js
  */
 
+import { HMSInternalEvent } from '../events/HMSInternalEvent';
 import { HMSAudioTrack } from '../media/tracks';
-import { TypedEventEmitter } from './typed-event-emitter';
+import HMSLogger from './logger';
 
 const THRESHOLD = 35;
 const UPDATE_THRESHOLD = 5;
@@ -13,14 +14,13 @@ export interface ITrackAudioLevelUpdate {
   audioLevel: number;
 }
 
-export class TrackAudioLevelMonitor extends TypedEventEmitter<{
-  AUDIO_LEVEL_UPDATE: ITrackAudioLevelUpdate | undefined;
-}> {
+export class TrackAudioLevelMonitor {
+  private readonly TAG = '[TrackAudioLevelMonitor]';
   private interval?: number;
-  private audioContext: AudioContext;
-  private audioSource: MediaStreamAudioSourceNode;
+  private audioContext?: AudioContext;
+  private audioSource?: MediaStreamAudioSourceNode;
   // @TODO: ScriptProcessorNode Deprecated - Replace with audio analyer node
-  private processor: ScriptProcessorNode;
+  private processor?: ScriptProcessorNode;
   private averaging = 0.99;
   private audioLevel = 0;
   private rawLevel = 0;
@@ -30,18 +30,21 @@ export class TrackAudioLevelMonitor extends TypedEventEmitter<{
     if (audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD) {
       this.audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
       const audioLevelUpdate = this.audioLevel ? { track: this.track, audioLevel: this.audioLevel } : undefined;
-      this.emit('AUDIO_LEVEL_UPDATE', audioLevelUpdate);
+      this.audioLevelEvent.publish(audioLevelUpdate);
     }
   }
 
-  constructor(private track: HMSAudioTrack) {
-    super();
-    this.audioContext = new AudioContext();
-    this.audioSource = this.audioContext.createMediaStreamSource(new MediaStream([this.track.nativeTrack]));
-    this.processor = this.audioContext.createScriptProcessor(512);
-    this.processor.addEventListener('audioprocess', this.processVolume);
-    this.audioSource.connect(this.processor);
-    this.processor.connect(this.audioContext.destination);
+  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
+    try {
+      this.audioContext = new AudioContext();
+      this.audioSource = this.audioContext.createMediaStreamSource(new MediaStream([this.track.nativeTrack]));
+      this.processor = this.audioContext.createScriptProcessor(512);
+      this.processor.addEventListener('audioprocess', this.processVolume);
+      this.audioSource.connect(this.processor);
+      this.processor.connect(this.audioContext.destination);
+    } catch (ex) {
+      HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
+    }
   }
 
   private processVolume = (event: AudioProcessingEvent) => {
@@ -56,6 +59,11 @@ export class TrackAudioLevelMonitor extends TypedEventEmitter<{
   };
 
   start() {
+    if (!this.isInitialized()) {
+      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      return;
+    }
+
     let prev = -1;
     this.interval = window.setTimeout(() => {
       if (this.rawLevel !== prev) {
@@ -68,8 +76,17 @@ export class TrackAudioLevelMonitor extends TypedEventEmitter<{
   }
 
   stop() {
+    if (!this.isInitialized()) {
+      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      return;
+    }
+
     this.updateAudioLevel(0);
     window.clearInterval(this.interval);
     this.interval = undefined;
+  }
+
+  isInitialized() {
+    return Boolean(this.audioContext && this.audioSource && this.processor);
   }
 }

@@ -3,9 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "baseUrl": "src",
-    "paths": {
-      "~*": ["./*"]
-    },
+
     "outDir": "dist"
   },
   "include": ["./src/*", "types/global.d.ts"],
