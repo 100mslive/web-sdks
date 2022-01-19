@@ -48,7 +48,6 @@ class BaseCommunicationProvider {
    * @param {any} message
    */
   storeEvent = (eventName, message) => {
-    console.log("Whiteboard storing", { eventName, message });
     this.lastMessage[eventName] = message;
   };
 
@@ -159,7 +158,7 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
       return;
     }
 
-    Pusher.logToConsole = true;
+    // Pusher.logToConsole = true;
 
     /** @private */
     this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
@@ -210,7 +209,6 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
   resendLastEvents = () => {
     for (const eventName in this.lastMessage) {
       if (this.lastMessage[eventName]) {
-        console.log("Pusher Resending", eventName, this.lastMessage[eventName]);
         this.channel.trigger(
           `client-${eventName}`,
           this.lastMessage[eventName]
@@ -226,6 +224,8 @@ export const provider =
   process.env.REACT_APP_PUSHER_AUTHENDPOINT
     ? new PusherCommunicationProvider()
     : new HMSCommunicationProvider();
+
+window.whiteboardProvider = provider;
 
 export const useCommunication = () => {
   const room = useHMSStore(selectRoom);
