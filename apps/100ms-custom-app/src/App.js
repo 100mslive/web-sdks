@@ -513,7 +513,7 @@ class App extends Component {
                         data-dismiss="modal"
                         aria-label="Close"
                       >
-                        <span className={`focus:outline-none  text-2xl text-gray-cool4 text-white`} aria-hidden="true">
+                        <span className={`focus:outline-none  text-2xl text-white`} aria-hidden="true">
                           &times;
                         </span>
                       </button>
