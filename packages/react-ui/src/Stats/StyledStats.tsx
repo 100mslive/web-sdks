@@ -1,7 +1,7 @@
 import { styled } from '../stitches.config';
 
 export const Root = styled('div', {
-  backgroundColor: 'rgba(0,0,0,0.75)',
+  backgroundColor: '$statsBg',
   position: 'absolute',
   top: '0.5rem',
   left: '0.5rem',

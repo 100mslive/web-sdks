@@ -46,7 +46,7 @@ const AvatarContainer = styled('div', {
 const HandRaiseBox = styled('div', {
   position: 'absolute',
   left: '20px',
-  top: '20px',
+  bottom: '20px',
 });
 
 const AudioIndicator = styled('div', {
@@ -54,7 +54,7 @@ const AudioIndicator = styled('div', {
   left: '50%',
   transform: 'translateX(-50%)',
   bottom: '30px',
-  color: '$fg',
+  color: 'white',
   bg: '$redMain',
   borderRadius: '$round',
   width: '36px',

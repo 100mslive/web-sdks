@@ -24,6 +24,7 @@ const HmsStitches = createStitches({
       trans: 'rgba(255, 255, 255, 0.25)',
       disabled: 'rgba(196, 196, 196, 0.21)',
       menuBg: 'rgba(119, 119, 119, 0.5)',
+      statsBg: 'rgba(0,0,0,0.75)',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
@@ -165,6 +166,7 @@ export const lightTheme = createTheme({
     iconBtn: '#3B3B3B',
     trans: 'rgba(0, 0, 0, 0.22)',
     disabled: 'rgba(59, 59, 59, 0.13)',
+    statsBg: 'rgba(255,255,255,0.75)',
   },
 });
 

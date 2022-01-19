@@ -20,7 +20,7 @@ export const StyledAvatar = styled('div', {
   left: '50%',
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  color: '$fg',
+  color: 'white',
   width: '$4',
   height: '$4',
   fontWeight: 600,
