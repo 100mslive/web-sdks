@@ -7,6 +7,7 @@ import {
   selectRoom,
 } from "@100mslive/react-sdk";
 import { useEffect, useMemo } from "react";
+import Pusher from "pusher-js";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
@@ -19,6 +20,17 @@ const stringifyWithNull = obj =>
  */
 
 /**
+ * On whiteboard close, owner sends current state to remote peers.
+ * Remote peers tear down too quickly(unsubscribing listeners) and are unable to store the last state.
+ *
+ * Hack: To overcome this, attach 2 listeners:
+ * one for storing the message(won't be unsubscribed),
+ * one for calling the actual whiteboard callback(will be unsubscribed on whiteboard close)
+ *
+ * This way the last state is always received and stored
+ */
+
+/**
  * Base class which can be extended to use various realtime communication services.
  * Methods to broadcast and subscribe to events.
  *
@@ -26,10 +38,8 @@ const stringifyWithNull = obj =>
  */
 class BaseCommunicationProvider {
   constructor() {
-    /** @private */
+    /** @protected */
     this.lastMessage = {};
-    /** @private */
-    this.callbacks = {};
   }
 
   /**
@@ -37,27 +47,16 @@ class BaseCommunicationProvider {
    * @param {string} eventName
    * @param {any} message
    */
-  setLastMessage = (eventName, message) => {
+  storeEvent = (eventName, message) => {
+    console.log("Whiteboard storing", { eventName, message });
     this.lastMessage[eventName] = message;
-  };
-
-  /**
-   * @protected
-   * @param {string} eventName
-   * @param {Function} cb
-   */
-  addCallback = (eventName, cb) => {
-    if (!this.callbacks[eventName]) {
-      this.callbacks[eventName] = [];
-    }
-    this.callbacks[eventName].push(cb);
   };
 
   /**
    * @param {string} eventName
    * @returns {any}
    */
-  getLastMessage = eventName => {
+  getStoredEvent = eventName => {
     return this.lastMessage[eventName];
   };
 
@@ -65,36 +64,15 @@ class BaseCommunicationProvider {
    * @param {string} eventName
    * @param {Object} message
    */
-  selfSendEvent = (eventName, message) => {
-    if (this.callbacks[eventName]) {
-      for (const cb of this.callbacks[eventName]) {
-        cb(message);
-      }
-    }
-  };
-
-  /**
-   * @param {string} eventName
-   * @param {Object} message
-   */
   broadcastEvent(eventName, message = {}) {
-    this.setLastMessage(eventName, { eventName, ...message });
-
-    /**
-     * Tldraw thinks that the next update passed to replacePageContent after onChangePage is the own update triggered by onChangePage
-     * and the replacePageContent doesn't have any effect if it is a valid update from remote.
-     *
-     * To overcome this own broadcast is sent to the app to use in replacePageContent.
-     *
-     * Refer: https://github.com/tldraw/tldraw/blob/main/packages/tldraw/src/state/TldrawApp.ts#L684
-     */
-    this.selfSendEvent(eventName, { eventName, ...message });
+    this.storeEvent(eventName, { eventName, ...message });
   }
 }
 
 class HMSCommunicationProvider extends BaseCommunicationProvider {
   constructor() {
     super();
+    /** @private */
     this.initialized = false;
   }
 
@@ -124,14 +102,15 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
         const message = notification.data?.message
           ? JSON.parse(notification.data?.message)
           : {};
-        this.setLastMessage(message.eventName, message);
+        this.storeEvent(message.eventName, message);
       }
     });
+
+    console.log("Whiteboard initialized communication through HMS Messaging");
     this.initialized = true;
   };
 
   /**
-   *
    * @param {string} eventName
    * @param {Object} arg
    */
@@ -144,13 +123,10 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
   };
 
   /**
-   *
    * @param {string} eventName
-   * @param {{ (...args: any[]): void; (...args: any[]): void; }} cb
-   * @returns
+   * @param {Function} cb
    */
   subscribe = (eventName, cb) => {
-    this.addCallback(eventName, cb);
     return this.hmsNotifications.onNotification(notification => {
       if (
         notification.type === HMSNotificationTypes.NEW_MESSAGE &&
@@ -168,9 +144,86 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
   };
 }
 
+class PusherCommunicationProvider extends BaseCommunicationProvider {
+  constructor() {
+    super();
+    /** @private */
+    this.initialized = false;
+  }
+
+  /**
+   * @param {ProviderInitOptions} options
+   */
+  init = ({ roomId }) => {
+    if (this.initialized) {
+      return;
+    }
+
+    Pusher.logToConsole = true;
+
+    /** @private */
+    this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
+      cluster: "ap2",
+      authEndpoint: "http://localhost:5001/api/pusher/auth",
+    });
+
+    /** @private */
+    this.channel = this.pusher.subscribe(`private-${roomId}`);
+
+    /**
+     * When events(peer-join) are sent too early before subscribing to a channel,
+     * resend last event after subscription has succeeded.
+     */
+    this.channel.bind("pusher:subscription_succeeded", this.resendLastEvents);
+
+    console.log("Whiteboard initialized communication through Pusher");
+    this.initialized = true;
+  };
+
+  /**
+   * @param {string} eventName
+   * @param {Object} arg
+   */
+  broadcastEvent = (eventName, arg = {}) => {
+    super.broadcastEvent(eventName, arg);
+    this.channel.trigger(
+      `client-${eventName}`,
+      stringifyWithNull({ eventName, ...arg })
+    );
+  };
+
+  /**
+   *
+   * @param {string} eventName
+   * @param {Function} cb
+   */
+  subscribe = (eventName, cb) => {
+    this.channel.bind(`client-${eventName}`, message =>
+      this.storeEvent(eventName, message)
+    );
+    this.channel.bind(`client-${eventName}`, cb);
+    return () => {
+      this.channel.unbind(`client-${eventName}`, cb);
+    };
+  };
+
+  resendLastEvents = () => {
+    for (const eventName in this.lastMessage) {
+      if (this.lastMessage[eventName]) {
+        console.log("Pusher Resending", eventName, this.lastMessage[eventName]);
+        this.channel.trigger(
+          `client-${eventName}`,
+          this.lastMessage[eventName]
+        );
+      }
+    }
+  };
+}
+
 export const provider =
-  process.env.REACT_APP_WHITEBOARD_COMMUNICATION_PROVIDER === "pusher"
-    ? null
+  process.env.REACT_APP_WHITEBOARD_COMMUNICATION_PROVIDER === "pusher" &&
+  process.env.REACT_APP_PUSHER_APP_KEY
+    ? new PusherCommunicationProvider()
     : new HMSCommunicationProvider();
 
 export const useCommunication = () => {
