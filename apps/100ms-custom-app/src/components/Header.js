@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import Modal from "./Modal";
-import Devider from "./Devider";
-import DownloadCodeModal from "./DownloadCodeModal";
-import {AppAnalytics} from '../helpers/analytics_helpers'
+import React, { useState, useEffect } from 'react';
+import Modal from './Modal';
+import Devider from './Devider';
+import DownloadCodeModal from './DownloadCodeModal';
+import { AppAnalytics } from '../helpers/analytics_helpers';
 
 // images
-import logo from "../assets/images/100ms_logo.svg";
-import darkLogo from "../assets/images/100ms_dark.svg";
+import logo from '../assets/images/100ms_logo.svg';
+import darkLogo from '../assets/images/100ms_dark.svg';
 
 // icons
-import copy from "../assets/images/icons/copy.svg";
-import copyWhite from "../assets/images/icons/copy-white.svg";
-import iconEdit from "../assets/images/icons/icon-edit.svg";
-import iconCode from "../assets/images/icons/icon-code.svg";
+import copy from '../assets/images/icons/copy.svg';
+import copyWhite from '../assets/images/icons/copy-white.svg';
+import iconEdit from '../assets/images/icons/icon-edit.svg';
+import iconCode from '../assets/images/icons/icon-code.svg';
 
 const getRandomColor = () => {
   const h = Math.floor(Math.random() * 360),
-    s = Math.floor(Math.random() * 100) + "%",
-    l = Math.floor(Math.random() * 60) + "%";
+    s = Math.floor(Math.random() * 100) + '%',
+    l = Math.floor(Math.random() * 60) + '%';
   return `hsl(${h},${s},${l})`;
 };
 
@@ -31,7 +31,7 @@ export default function Header({
   roomLinks,
   onlyEmail,
   email,
-  theme = "dark",
+  theme = 'dark',
   toggleModal,
 }) {
   const [modal, togModal] = useState(false);
@@ -43,16 +43,12 @@ export default function Header({
 
   useEffect(() => {
     const pathName = window.location.pathname;
-    let roomId = "";
-    if (
-      pathName.startsWith("/preview") ||
-      pathName.startsWith("/meeting") ||
-      pathName.startsWith("/leave")
-    ) {
+    let roomId = '';
+    if (pathName.startsWith('/preview') || pathName.startsWith('/meeting') || pathName.startsWith('/leave')) {
       let index = 9;
-      if (pathName.startsWith("/leave")) index = 7;
+      if (pathName.startsWith('/leave')) index = 7;
       for (let i = index; i < pathName.length; i++) {
-        if (pathName[i] === "/") {
+        if (pathName[i] === '/') {
           break;
         }
         roomId += pathName[i];
@@ -67,11 +63,11 @@ export default function Header({
   }, []);
 
   const getEmailInitials = () => {
-    let initials = "";
+    let initials = '';
     email = email.toLowerCase();
     for (let i = 0; i < email.length; i++) {
-      if (email[i] === "@") break;
-      if (email[i] >= "a" && email[i] <= "z") {
+      if (email[i] === '@') break;
+      if (email[i] >= 'a' && email[i] <= 'z') {
         initials += email[i];
       }
       if (initials.length === 2) break;
@@ -79,36 +75,29 @@ export default function Header({
     return initials;
   };
 
-  const generateEnvData = (logo) => {
-    return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${
-      settings.theme
-    }\nREACT_APP_COLOR=${settings.brand_color}\nREACT_APP_LOGO=${
-      logo || ""
-    }\nREACT_APP_FONT=${settings.font}\nREACT_APP_SHOW_CHAT=${
+  const generateEnvData = logo => {
+    return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
+      settings.brand_color
+    }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_SHOW_CHAT=${
       settings.plugins.chat
     }\nREACT_APP_SHOW_SCREENSHARE=${
-      settings.plugins["screen-share"]
+      settings.plugins['screen-share']
     }\nREACT_APP_VIDEO_AVATAR=true\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${
-      process.env.REACT_APP_BACKEND_API + window.location.hostname + "/"
-    }\nREACT_APP_ENV=${
-      process.env.REACT_APP_ENV
-    }\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
+      process.env.REACT_APP_BACKEND_API + window.location.hostname + '/'
+    }\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
   };
 
   const downloadCode = async () => {
-    await refreshData().then((logo) => {
-      var envFile = document.createElement("a");
+    await refreshData().then(logo => {
+      var envFile = document.createElement('a');
 
       const data = generateEnvData(logo);
 
-      envFile.setAttribute(
-        "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(data)
-      );
+      envFile.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
 
-      envFile.download = "example.env";
+      envFile.download = 'example.env';
 
-      envFile.style.display = "none";
+      envFile.style.display = 'none';
 
       document.body.appendChild(envFile);
 
@@ -118,18 +107,18 @@ export default function Header({
     });
   };
 
-  const copyToClipboard = (containerid) => {
+  const copyToClipboard = containerid => {
     const cont = document.getElementById(containerid);
     let str = cont.innerHTML;
-    cont.style.color = "#2A70DE";
-    const el = document.createElement("textarea");
+    cont.style.color = '#2A70DE';
+    const el = document.createElement('textarea');
     el.value = str;
     document.body.appendChild(el);
     el.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     document.body.removeChild(el);
     setTimeout(() => {
-      cont.style.color = "#B0C3DB";
+      cont.style.color = '#B0C3DB';
     }, 2000);
   };
 
@@ -137,7 +126,7 @@ export default function Header({
     <>
       <div
         className={`${
-          theme === "dark" ? "text-white bg-black" : "text-black bg-white"
+          theme === 'dark' ? 'text-white bg-black' : 'text-black bg-white'
         } w-100 p-3 bg-transparent flex justify-between items-center border-b border-gray-cool4`}
       >
         <img
@@ -145,7 +134,7 @@ export default function Header({
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
           }}
           className="h-6 hover:cursor-pointer"
-          src={theme === "dark" ? logo : darkLogo}
+          src={theme === 'dark' ? logo : darkLogo}
           alt="100ms logo"
         />
         <div className="flex items-center">
@@ -158,18 +147,12 @@ export default function Header({
                     AppAnalytics.track('invite.clicked');
                   }}
                   className={`rounded-lg px-3 py-1.5 hover:bg-opacity-80 text-sm focus:outline-none mr-4 sm:flex sm:items-center ${
-                    theme === "dark"
-                      ? "bg-blue-standard text-white"
-                      : " bg-white border hover:bg-gray-3 hover:bg-opacity-10 shadow-sm text-black"
+                    theme === 'dark'
+                      ? 'bg-blue-standard text-white'
+                      : ' bg-white border hover:bg-gray-3 hover:bg-opacity-10 shadow-sm text-black'
                   }`}
                 >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       fillRule="evenodd"
                       clipRule="evenodd"
@@ -195,9 +178,7 @@ export default function Header({
                 className=" rounded-lg relative px-3 py-1.5 bg-gray-cool2 text-white hover:bg-opacity-80 mr-4 text-sm focus:outline-none flex items-center"
               >
                 <img alt="code" src={iconCode} />
-                {savingData && (
-                  <div className="w-full h-full z-50 absolute top-0 left-0 bg-black opacity-40"></div>
-                )}
+                {savingData && <div className="w-full h-full z-50 absolute top-0 left-0 bg-black opacity-40"></div>}
               </button>
               <button
                 onClick={toggleModal}
@@ -216,19 +197,13 @@ export default function Header({
         </div>
       </div>
       {codeModal && (
-        <DownloadCodeModal
-          downloadEnv={downloadCode}
-          theme={theme}
-          closeModal={() => setCodeModal(false)}
-        />
+        <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
       )}
       {modal && (
         <Modal>
           <div
             className={`max-w-screen-md min-h-[530px] flex flex-col w-3/4 py-4 px-5 rounded-xl ${
-              theme === "dark"
-                ? "bg-gray-cool1 text-white"
-                : "bg-white shadow-lg text-black"
+              theme === 'dark' ? 'bg-gray-cool1 text-white' : 'bg-white shadow-lg text-black'
             }`}
           >
             <div className="flex justify-between mb-4">
@@ -242,7 +217,7 @@ export default function Header({
               >
                 <span
                   className={`focus:outline-none font-semibold text-xl ${
-                    theme === "dark" ? "text-white" : " text-black"
+                    theme === 'dark' ? 'text-white' : ' text-black'
                   }`}
                   aria-hidden="true"
                 >
@@ -256,11 +231,7 @@ export default function Header({
                 {Object.keys(roomLinks).map((role, index) => {
                   const roomRole = roomLinks[role];
                   if (roomRole.is_active) {
-                    let role_url =
-                      "https://" +
-                      window.location.hostname +
-                      "/preview/" +
-                      roomRole.identifier;
+                    let role_url = 'https://' + window.location.hostname + '/preview/' + roomRole.identifier;
                     return (
                       <React.Fragment key={index}>
                         <li className="my-4 flex items-center">
@@ -269,9 +240,7 @@ export default function Header({
                           </div>
                           <div
                             className={`overflow-hidden flex flex-grow justify-between text-sm font-medium py-1.5 px-2 border rounded-md border-gray-cool3 ${
-                              theme === "dark"
-                                ? "bg-gray-cool1 text-gray-cool5"
-                                : " bg-white"
+                              theme === 'dark' ? 'bg-gray-cool1 text-gray-cool5' : ' bg-white'
                             }`}
                           >
                             <div
@@ -286,7 +255,7 @@ export default function Header({
                               }}
                             >
                               <img
-                                src={theme === "dark" ? copyWhite : copy}
+                                src={theme === 'dark' ? copyWhite : copy}
                                 className="w-4 cursor-pointer"
                                 alt="copy icon"
                               />
