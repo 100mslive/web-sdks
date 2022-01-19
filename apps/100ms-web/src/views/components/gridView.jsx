@@ -1,14 +1,11 @@
 import React, { Fragment } from "react";
-import {
-  VideoList,
-  FirstPersonDisplay,
-  isMobileDevice,
-} from "@100mslive/hms-video-react";
+import { VideoList, FirstPersonDisplay } from "@100mslive/hms-video-react";
 import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
 import { useWindowSize } from "../hooks/useWindowSize";
 import { chatStyle, getBlurClass } from "../../common/utils";
 import { HmsVideoList } from "../UIComponents";
+import { FeatureFlags } from "../../store/FeatureFlags";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -35,8 +32,8 @@ export const GridCenterView = ({
   videoTileProps = () => ({}),
 }) => {
   const { width } = useWindowSize();
+  const isMobile = width < 760;
   const rowCount = width < 760 ? 1 : undefined;
-  const isNewComponents = process.env.REACT_APP_ENABLE_NEW_COMPONENTS;
   return (
     <Fragment>
       <Box
@@ -47,24 +44,20 @@ export const GridCenterView = ({
         }}
       >
         {peers && peers.length > 0 ? (
-          isNewComponents === "true" ? (
+          FeatureFlags.enableNewComponents ? (
             <HmsVideoList
               showStatsOnTiles={showStatsOnTiles}
               peers={peers}
-              maxTileCount={width < 760 ? MAX_TILES_FOR_MOBILE : maxTileCount}
+              maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
             />
           ) : (
             <VideoList
               peers={peers}
               classes={{
                 root: "",
-                videoTileContainer: `rounded-lg ${
-                  width < 760 ? "p-0 mr-2" : ""
-                }`,
+                videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
               }}
-              maxTileCount={
-                isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
-              }
+              maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
               maxColCount={2}
               maxRowCount={rowCount}
               compact={peers.length > 2}
