@@ -164,7 +164,7 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
     /** @private */
     this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
       cluster: "ap2",
-      authEndpoint: "http://localhost:5001/api/pusher/auth",
+      authEndpoint: process.env.REACT_APP_PUSHER_AUTHENDPOINT,
     });
 
     /** @private */
@@ -222,7 +222,8 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
 
 export const provider =
   process.env.REACT_APP_WHITEBOARD_COMMUNICATION_PROVIDER === "pusher" &&
-  process.env.REACT_APP_PUSHER_APP_KEY
+  process.env.REACT_APP_PUSHER_APP_KEY &&
+  process.env.REACT_APP_PUSHER_AUTHENDPOINT
     ? new PusherCommunicationProvider()
     : new HMSCommunicationProvider();
 
