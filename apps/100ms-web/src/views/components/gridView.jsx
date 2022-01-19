@@ -34,8 +34,8 @@ export const GridCenterView = ({
   showStatsOnTiles,
   videoTileProps = () => ({}),
 }) => {
-  const isMobile = isMobileDevice();
-  const rowCount = isMobile ? 1 : undefined;
+  const { width } = useWindowSize();
+  const rowCount = width < 760 ? 1 : undefined;
   const isNewComponents = process.env.REACT_APP_ENABLE_NEW_COMPONENTS;
   return (
     <Fragment>
@@ -51,16 +51,16 @@ export const GridCenterView = ({
             <HmsVideoList
               showStatsOnTiles={showStatsOnTiles}
               peers={peers}
-              maxTileCount={
-                isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount
-              }
+              maxTileCount={width < 760 ? MAX_TILES_FOR_MOBILE : maxTileCount}
             />
           ) : (
             <VideoList
               peers={peers}
               classes={{
                 root: "",
-                videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+                videoTileContainer: `rounded-lg ${
+                  width < 760 ? "p-0 mr-2" : ""
+                }`,
               }}
               maxTileCount={
                 isMobileDevice() ? MAX_TILES_FOR_MOBILE : maxTileCount

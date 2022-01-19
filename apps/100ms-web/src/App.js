@@ -46,8 +46,6 @@ if (window.location.host.includes("localhost")) {
 
 document.title = `${appName}'s ${document.title}`;
 
-const hmsReactiveStore = new HMSReactiveStore();
-
 export function EdtechComponent({
   roomId = "",
   tokenEndpoint = defaultTokenEndpoint,
