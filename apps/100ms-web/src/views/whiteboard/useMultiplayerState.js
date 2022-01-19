@@ -178,7 +178,7 @@ export function useMultiplayerState(roomId) {
       unsubs.forEach(unsub => unsub());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app]);
+  }, [app, isReady]);
 
   return {
     onMount,
