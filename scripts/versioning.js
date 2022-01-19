@@ -39,13 +39,11 @@ const execPromise = cmd => {
 module.exports = async () => {
   const { changes, mainVersions: main, currentVersions: current, branch } = process.env;
   const changedPackages = JSON.parse(changes);
-  console.log({ current, main });
   const mainVersions = JSON.parse(main);
   const currentVersions = JSON.parse(current);
 
-  console.log({ mainVersions, currentVersions });
+  console.log({ mainVersions, currentVersions, changedPackages });
   const packagesToBeUpdated = new Set();
-
   for (const pkgName in changedPackages) {
     if (changedPackages[pkgName] === 'true') {
       (dependencyMapping[pkgName] || []).forEach(pkg => packagesToBeUpdated.add(pkg));
