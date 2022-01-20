@@ -30,10 +30,32 @@
     twind "^0.16.12"
     zustand "3.5.7"
 
-"@100mslive/hms-virtual-background@1.3.6":
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.3.6.tgz#7578a2a7eff3a52d2e48b7f6ada2fe707b0846e7"
-  integrity sha512-msePTwAVfUCQbJqPGCKd+alxYUkF7nYH5SbBlafSLKZwEuvE3C1DXpj/AEvOWSmR9nw62N7Z6BTVikbHY9Km2Q==
+"@100mslive/hms-video-store@0.2.87":
+  version "0.2.87"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.87.tgz#bf862ba83aef1fbd1eb50f9a9d91cec7c2033010"
+  integrity sha512-KiGtwwo+rXifNT0XfQK3I8UG7w8+DmLn2Mk50QmiHTphu62jS1KCAgolmqpRfuFaGA8iG49xaeS9LsmOoy9PAw==
+  dependencies:
+    "@100mslive/hms-video" "0.1.41"
+    eventemitter2 "^6.4.5"
+    immer "^9.0.6"
+    reselect "4.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-video@0.1.41":
+  version "0.1.41"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.41.tgz#97c895b2dc6b98ad39d0906cdcefddd5c6e926b0"
+  integrity sha512-VA7PQogmCSxku8/ys7jVJ7K8+flsziEp2NRc1rwF6mBkcz1WC25W9VwgCeZozZ5N0va03sX1CMYtLH9T2tDZBA==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-virtual-background@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.3.7.tgz#0826efa680e90c7e938246b2835e2b65342157ae"
+  integrity sha512-AMMk7t3PTl68zLhUk8hZCivkZlhn7g40rnSTt/sptOo24QAbh9V3MzO1Th4px44GpPKVBZETHB9Pghz6lZ4pvQ==
   dependencies:
     "@tensorflow/tfjs-backend-webgl" "^3.3.0"
     "@tensorflow/tfjs-core" "^3.3.0"
