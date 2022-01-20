@@ -30,10 +30,10 @@
     twind "^0.16.12"
     zustand "3.5.7"
 
-"@100mslive/hms-virtual-background@1.3.6":
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.3.6.tgz#7578a2a7eff3a52d2e48b7f6ada2fe707b0846e7"
-  integrity sha512-msePTwAVfUCQbJqPGCKd+alxYUkF7nYH5SbBlafSLKZwEuvE3C1DXpj/AEvOWSmR9nw62N7Z6BTVikbHY9Km2Q==
+"@100mslive/hms-virtual-background@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.3.7.tgz#0826efa680e90c7e938246b2835e2b65342157ae"
+  integrity sha512-AMMk7t3PTl68zLhUk8hZCivkZlhn7g40rnSTt/sptOo24QAbh9V3MzO1Th4px44GpPKVBZETHB9Pghz6lZ4pvQ==
   dependencies:
     "@tensorflow/tfjs-backend-webgl" "^3.3.0"
     "@tensorflow/tfjs-core" "^3.3.0"
