@@ -175,8 +175,8 @@ class App extends Component {
   getToken = () => {
     try {
       const authUser = JSON.parse(cookies.getItem('authUser'));
-      const token = authUser.token;
-      this.setState({ userEmail: authUser.email });
+      const token = authUser?.token;
+      this.setState({ userEmail: authUser?.email });
       return token;
     } catch (e) {
       // user not logged in
