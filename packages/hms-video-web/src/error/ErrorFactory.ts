@@ -382,6 +382,17 @@ export const ErrorFactory = {
         true,
       );
     },
+
+    MissingRTCPeerConnection() {
+      return new HMSException(
+        ErrorCodes.GenericErrors.MISSION_RTCPEERCONNECTION,
+        'MissingRTCPeerConnection',
+        HMSAction.JOIN,
+        `RTCPeerConnection which is a core requirement for WebRTC call was not found, this could be due to an unsupported browser or browser extensions blocking WebRTC`,
+        '',
+        true,
+      );
+    },
   },
 
   MediaPluginErrors: {

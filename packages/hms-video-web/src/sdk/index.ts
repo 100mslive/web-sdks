@@ -53,6 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { isMediadevicesMissing } from '../utils/mediadevices-missing';
+import { isMissingRTCPeerMissing } from '../utils/rtcconnection-missing';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -227,6 +228,12 @@ export class HMSSdk implements HMSInterface {
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
     if (isMediadevicesMissing()) {
       const error = ErrorFactory.GenericErrors.MissingMediaDevices();
+      HMSLogger.e(this.TAG, error);
+      return Promise.reject(error);
+    }
+
+    if (isMissingRTCPeerMissing()) {
+      const error = ErrorFactory.GenericErrors.MissingRTCPeerConnection();
       HMSLogger.e(this.TAG, error);
       return Promise.reject(error);
     }
