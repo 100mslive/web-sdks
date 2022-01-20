@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import cookies from 'js-cookies';
 import axios from 'axios';
-import { EdtechComponent as HMSEdtechTemplate } from '100ms-edtech-template';
+import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 
 // components
 import Modal from './components/Modal';
