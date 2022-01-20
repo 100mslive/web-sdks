@@ -119,8 +119,7 @@ export const ErrorCodes = {
 
     MISSING_MEDIADEVICES: 6010,
 
-    // RTCPeerConnection missing
-    MISSION_RTCPEERCONNECTION: 6011,
+    MISSING_RTCPEERCONNECTION: 6011,
   },
 
   PlaylistErrors: {
