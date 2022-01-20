@@ -40,7 +40,7 @@ async function main() {
     });
 
     let esmSize = 0;
-    Object.values(esmResult.metafile.outputs).forEach(output => {
+    Object.values(esmResult.metafile?.outputs || {}).forEach(output => {
       esmSize += output.bytes;
     });
 
