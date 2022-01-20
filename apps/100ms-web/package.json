@@ -34,8 +34,8 @@
   "scripts": {
     "start": "craco start",
     "dev": "node ../../scripts/dev-webapp",
-    "build": "node ../../scripts/build-webapp",
-    "bundle": "craco build --profile",
+    "esbuild": "node ../../scripts/build-webapp",
+    "build": "craco build --profile",
     "test": "craco test",
     "eject": "react-scripts eject",
     "build:style": "NODE_ENV=production npx tailwindcss-cli@latest build ./src/index.css -o tailwind.css"
