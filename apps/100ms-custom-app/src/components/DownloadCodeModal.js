@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Modal from './Modal';
-import Devider from './Devider';
+import Divider from './Divider';
 
 import iconDownload from '../assets/images/icons/icon-download.svg';
 import iconGithub from '../assets/images/icons/icon-github.svg';
@@ -112,7 +112,7 @@ class DownloadCodeModal extends Component {
               </span>
             </button>
           </div>
-          <Devider />
+          <Divider />
           <div className="mt-8">
             {this.accordions.map((accordion, index) => {
               const isOpened = index === openedIndex;

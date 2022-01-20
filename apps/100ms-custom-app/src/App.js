@@ -6,7 +6,7 @@ import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 // components
 import Modal from './components/Modal';
 import Header from './components/Header';
-import Devider from './components/Devider';
+import Divider from './components/Divider';
 import ErrorModal from './components/ErrorModal';
 
 // icons
@@ -518,7 +518,7 @@ class App extends Component {
                         </span>
                       </button>
                     </div>
-                    <Devider />
+                    <Divider />
                     <div className="mt-4 mb-10 flex">
                       <div className="w-60">
                         {/* <div onClick={() => {
@@ -557,7 +557,7 @@ class App extends Component {
                     </div>
                   </div>
                   <div>
-                    <Devider />
+                    <Divider />
                     <div className="mt-5 justify-end items-end flex">
                       <button
                         onClick={() => {
@@ -628,7 +628,7 @@ class Layout extends Component {
             }}
           />
         </div>
-        <Devider />
+        <Divider />
         <div className="flex justify-between items-center mt-4 mb-4">
           <span className=" text-gray-cool5 text-sm font-normal">Sidebar should show...</span>
           <Dropdown
@@ -638,7 +638,7 @@ class Layout extends Component {
             }}
           />
         </div>
-        <Devider />
+        <Divider />
         <div className=" text-xl mt-10">What a student sees</div>
         <div className="flex justify-between items-center mt-5 mb-4">
           <span className=" text-gray-cool5 text-sm font-normal">Layout</span>
@@ -669,7 +669,7 @@ class Layout extends Component {
             }}
           />
         </div>
-        <Devider />
+        <Divider />
         <div className="flex justify-between items-center mt-4 mb-4">
           <span className=" text-gray-cool5 text-sm font-normal">Allowed on stage</span>
           <Dropdown
@@ -679,7 +679,7 @@ class Layout extends Component {
             }}
           />
         </div>
-        <Devider />
+        <Divider />
         <div className=" text-gray-cool5 text-sm font-normal mt-10">
           You can add more roles from{' '}
           <a
@@ -738,7 +738,7 @@ function RoomSettings(props) {
           </button>
         </div>
       </div>
-      <Devider />
+      <Divider />
       <div className="flex justify-between items-center mb-4 mt-4">
         <span className=" text-gray-cool5 text-sm font-normal">Appearance</span>
         <div className=" flex bg-gray-cool2 text-gray-cool5 rounded-lg max-w-xsm">
@@ -764,7 +764,7 @@ function RoomSettings(props) {
           </button>
         </div>
       </div>
-      <Devider />
+      <Divider />
       <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Brand color</span>
         <div className=" flex bg-gray-cool2 text-gray-cool5 rounded-lg max-w-xsm overflow-hidden">
@@ -794,7 +794,7 @@ function RoomSettings(props) {
           </button>
         </div>
       </div>
-      <Devider />
+      <Divider />
       <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Tile shape</span>
         <div className=" flex items-center text-gray-cool5 duration-500 rounded-lg max-w-xsm">
@@ -830,7 +830,7 @@ function RoomSettings(props) {
           </button>
         </div>
       </div>
-      <Devider />
+      <Divider />
       <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Font</span>
         <div className="relative">
@@ -856,7 +856,7 @@ function RoomSettings(props) {
           />
         </div>
       </div>
-      <Devider />
+      <Divider />
       <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Video-off avatars</span>
         <Dropdown
@@ -888,7 +888,7 @@ function RoomSettings(props) {
           }}
         />
       </div>
-      <Devider />
+      <Divider />
       {props.settings.metadataFields.clicks > 4 && (
         <>
           <div className="flex justify-between items-center mt-4 mb-4">
@@ -907,7 +907,7 @@ function RoomSettings(props) {
               />
             </div>
           </div>
-          <Devider />
+          <Divider />
         </>
       )}
       <input
@@ -1005,7 +1005,7 @@ function Plugins(props) {
               <label className="custom-toggle-label" htmlFor={`${plugin.id}-pluggin`}></label>
             </div>
           </div>
-          <Devider />
+          <Divider />
         </React.Fragment>
       );
     });
@@ -1029,7 +1029,7 @@ function Roles(props) {
           }}
         />
       </div>
-      <Devider />
+      <Divider />
       <div className=" text-xl mt-10">Participants in room</div>
       <div className="flex justify-between mt-5 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Sanjana Mishra (You)</span>
@@ -1040,7 +1040,7 @@ function Roles(props) {
           }}
         />
       </div>
-      <Devider />
+      <Divider />
       {Object.keys(props.settings.participantsLive).map((key, index) => {
         return (
           <React.Fragment key={index}>
@@ -1056,7 +1056,7 @@ function Roles(props) {
                 }}
               />
             </div>
-            <Devider />
+            <Divider />
           </React.Fragment>
         );
       })}

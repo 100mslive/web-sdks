@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import Devider from './Devider';
+import Divider from './Divider';
 import DownloadCodeModal from './DownloadCodeModal';
 import { AppAnalytics } from '../helpers/analytics_helpers';
 
@@ -231,7 +231,7 @@ export default function Header({
                 </span>
               </button>
             </div>
-            <Devider />
+            <Divider />
             <div className="mt-4 px-2">
               <ul>
                 {Object.keys(roomLinks).map((role, index) => {
@@ -268,7 +268,7 @@ export default function Header({
                             </button>
                           </div>
                         </li>
-                        <Devider />
+                        <Divider />
                       </React.Fragment>
                     );
                   }
