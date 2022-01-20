@@ -25,7 +25,7 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "build:style": "cd ../100ms-web && yarn build:style && mv tailwind.css ../100ms-custom-app/src",
-    "lint": "eslint -c ../../.eslintrc .",
+    "lint": "eslint src/**/*.js",
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write src/**/*.js"
   },
