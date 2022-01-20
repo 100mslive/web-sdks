@@ -26,7 +26,7 @@ import {
   HMSReactiveStore,
 } from "@100mslive/react-sdk";
 import { FeatureFlags } from "./store/FeatureFlags";
-import { lightTheme, globalStyles } from "@100mslive/react-ui";
+import { lightTheme } from "@100mslive/react-ui";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -45,6 +45,8 @@ if (window.location.host.includes("localhost")) {
 }
 
 document.title = `${appName}'s ${document.title}`;
+
+const hmsReactiveStore = new HMSReactiveStore();
 
 export function EdtechComponent({
   roomId = "",
@@ -66,8 +68,6 @@ export function EdtechComponent({
   getUserToken = defaultGetUserToken,
   policyConfig = envPolicyConfig,
 }) {
-  globalStyles();
-  const hmsReactiveStore = new HMSReactiveStore();
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));

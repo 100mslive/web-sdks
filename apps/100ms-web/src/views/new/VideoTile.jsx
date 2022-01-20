@@ -22,7 +22,7 @@ import {
   BrbIcon,
 } from "@100mslive/react-icons";
 
-const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
+const HmsVideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
@@ -85,7 +85,7 @@ const VideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
   );
 };
 
-export default VideoTile;
+export default HmsVideoTile;
 
 const getAvatarSize = width => {
   if (width < 200) {

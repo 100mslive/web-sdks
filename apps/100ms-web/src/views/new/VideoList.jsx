@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { StyledVideoList, getLeft, Pagination } from "@100mslive/react-ui";
 import { useVideoList } from "@100mslive/react-sdk";
-import VideoTile from "./VideoTile";
+import HmsVideoTile from "./VideoTile";
 
-const HmsVideoList = ({ maxTileCount, peers, showStatsOnTiles }) => {
+const HmsVideoList = ({
+  maxTileCount,
+  peers,
+  showStatsOnTiles,
+  maxColCount,
+  maxRowCount,
+}) => {
   const { ref, chunkedTracksWithPeer } = useVideoList({
     peers,
     maxTileCount,
+    maxColCount,
+    maxRowCount,
   });
   const [page, setPage] = useState(0);
   useEffect(() => {
@@ -29,7 +37,7 @@ const HmsVideoList = ({ maxTileCount, peers, showStatsOnTiles }) => {
                 key={i}
               >
                 {l.map(p => (
-                  <VideoTile
+                  <HmsVideoTile
                     showStatsOnTiles={showStatsOnTiles}
                     key={p.peer.id}
                     width={p.width}
