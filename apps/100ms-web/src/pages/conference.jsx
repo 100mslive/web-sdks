@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { AppContext } from "../store/AppContext";
 import { useHistory, useParams } from "react-router-dom";
-import { ConferenceHeader } from "../views/headerView";
+import { Header } from "../views/Header";
 import { ConferenceFooter } from "../views/footerView";
 import { ConferenceMainView } from "../views/mainView";
 import {
@@ -20,7 +20,7 @@ export const Conference = () => {
   const { roomId, role } = useParams();
   const context = useContext(AppContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isParticipantListOpen, setIsParticipantListOpen] = useState(false);
+  const [isParticipantListOpen] = useState(false);
   const toggleChat = useCallback(() => {
     setIsChatOpen(open => !open);
   }, []);
@@ -28,9 +28,9 @@ export const Conference = () => {
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const hmsActions = useHMSActions();
 
-  const onParticipantListOpen = useCallback(value => {
-    setIsParticipantListOpen(value);
-  }, []);
+  // const onParticipantListOpen = useCallback(value => {
+  //   setIsParticipantListOpen(value);
+  // }, []);
 
   const { loginInfo } = context;
   const isHeadless = loginInfo.isHeadlessMode;
@@ -60,7 +60,8 @@ export const Conference = () => {
     <Flex css={{ size: "100%", bg: "$bg" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$6", "@md": { h: "$header" } }}>
-          <ConferenceHeader onParticipantListOpen={onParticipantListOpen} />
+          <Header />
+          {/* <ConferenceHeader onParticipantListOpen={onParticipantListOpen} /> */}
         </Box>
       )}
       <Box css={{ w: "100%", flex: "1 1 0" }}>
