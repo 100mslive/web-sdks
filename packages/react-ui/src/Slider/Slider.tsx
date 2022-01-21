@@ -9,8 +9,6 @@ const Root = styled(BaseSlider.Root, {
   userSelect: 'none',
   touchAction: 'none',
   width: '100%',
-  marginTop: '1rem',
-  marginBottom: '1.5rem',
   '&[data-orientation="horizontal"]': {
     height: 20,
   },
@@ -39,7 +37,7 @@ const Thumb = styled(BaseSlider.Thumb, {
   backgroundColor: 'white',
   boxShadow: `0 2px 10px $colors$grey4`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: '$grey4' },
+  '&:hover': { backgroundColor: '$grey6' },
   '&:focus': { boxShadow: `0 0 0 5px $colors$grey2` },
 });
 
