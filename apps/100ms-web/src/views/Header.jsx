@@ -33,11 +33,18 @@ import { metadataProps as participantInListProps } from "../common/utils";
 import { usePlaylistMusic } from "./hooks/usePlaylistMusic";
 
 const SpeakerTag = () => {
-  const dominantSpeaker = useHMSStore(selectDominantSpeaker) || {
-    name: "sbfdshbfhdshfbdsfdsfbdsfsd",
-  };
+  const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
-    <Flex align="center" css={{ ml: "auto", mr: "auto" }}>
+    <Flex
+      align="center"
+      justify="center"
+      css={{
+        position: "absolute",
+        size: "100%",
+        left: 0,
+        top: 0,
+      }}
+    >
       <IconButton css={{ height: "max-content" }}>
         <SpeakerIcon width={24} height={24} />
       </IconButton>
@@ -175,40 +182,43 @@ export const Header = () => {
   const { HLS_VIEWER_ROLE } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
   return (
-    <Flex>
-      <LogoButton />
-      <PlaylistMusic />
-      <StreamingRecording />
+    <Flex justify="between" css={{ position: "relative" }}>
+      <Flex>
+        <LogoButton />
+        <PlaylistMusic />
+        <StreamingRecording />
+      </Flex>
       <SpeakerTag />
-      <Dropdown>
-        <DropdownTrigger asChild>
-          <IconButton
-            css={{
-              ml: "auto",
-              mr: "$2",
-              height: "max-content",
-              alignSelf: "center",
-              display: "none",
-              "@md": { display: "block" },
-            }}
-          >
-            <ChevronDownIcon />
-          </IconButton>
-        </DropdownTrigger>
-        <DropdownContent sideOffset={5} align="end">
-          <DropdownItem>Hello</DropdownItem>
-          <DropdownItem>Test</DropdownItem>
-          <DropdownItemSeparator />
-          <DropdownItem>Test1</DropdownItem>
-        </DropdownContent>
-      </Dropdown>
-      {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
-      <Box>
-        <ParticipantList
-          key={1}
-          participantInListProps={participantInListProps}
-        />
-      </Box>
+      <Flex>
+        <Dropdown>
+          <DropdownTrigger asChild>
+            <IconButton
+              css={{
+                mr: "$2",
+                height: "max-content",
+                alignSelf: "center",
+                display: "none",
+                "@md": { display: "block" },
+              }}
+            >
+              <ChevronDownIcon />
+            </IconButton>
+          </DropdownTrigger>
+          <DropdownContent sideOffset={5} align="end">
+            <DropdownItem>Hello</DropdownItem>
+            <DropdownItem>Test</DropdownItem>
+            <DropdownItemSeparator />
+            <DropdownItem>Test1</DropdownItem>
+          </DropdownContent>
+        </Dropdown>
+        {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
+        <Box css={{ mx: "$2" }}>
+          <ParticipantList
+            key={1}
+            participantInListProps={participantInListProps}
+          />
+        </Box>
+      </Flex>
     </Flex>
   );
 };
