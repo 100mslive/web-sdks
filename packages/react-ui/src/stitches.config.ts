@@ -45,6 +45,7 @@ const HmsStitches = createStitches({
       '7': '6rem',
       '8': '8rem',
       header: '3.5rem',
+      menu: '16rem',
     },
     fontSizes: {
       xs: '0.75rem',
