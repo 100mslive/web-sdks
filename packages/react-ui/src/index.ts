@@ -17,3 +17,4 @@ export * from './VideoTile';
 export * from './VideoList';
 export * from './Pagination';
 export * from './Dropdown';
+export * from './utils';
