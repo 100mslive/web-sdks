@@ -18,3 +18,7 @@ export * from './VideoList';
 export * from './Pagination';
 export * from './Dropdown';
 export * from './utils';
+export * from './Video';
+export * from './TileMenu';
+export * from './AudioLevel';
+export * from './Stats';
