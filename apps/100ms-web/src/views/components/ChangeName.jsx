@@ -11,11 +11,13 @@ import {
   Text,
   useHMSActions,
   useHMSStatsStore,
-  selectHMSStats,
   useHMSStore,
+} from "@100mslive/hms-video-react";
+import {
+  selectHMSStats,
   selectTracksMap,
   selectPeerNameByID,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/hms-video-store";
 import { Switch } from "@100mslive/react-ui";
 import { hmsToast } from "./notifications/hms-toast";
 import { USERNAME_KEY } from "../../common/constants";

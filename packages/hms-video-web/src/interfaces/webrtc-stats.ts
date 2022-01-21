@@ -1,5 +1,3 @@
-import { HMSPeerConnectionStats as SDKHMSPeerConnectionStats } from '@100mslive/hms-video';
-
 type WithBitrate = { bitrate: number };
 
 /**
@@ -19,7 +17,7 @@ type MissingRTCTrackStats = {
   qualityLimitationReason?: string;
 };
 
-export type HMSPeerConnectionStats = Pick<SDKHMSPeerConnectionStats, 'type' | 'packetsLost' | 'jitter'>;
+export type PeerConnectionType = 'publish' | 'subscribe';
 
 export type HMSTrackStats = RTCRtpStreamStats & { peerID?: string; peerName?: string } & WithBitrate &
   MissingRTCTrackStats;
@@ -33,7 +31,8 @@ type AdditionalPeerStats = {
   packetsLostRate: number;
   jitter: number;
 };
-export type HMSPeerStats = {
+
+export interface HMSPeerStats {
   publish?: RTCIceCandidatePairStats & WithBitrate;
   subscribe?: RTCIceCandidatePairStats & WithBitrate & AdditionalPeerStats;
-};
+}

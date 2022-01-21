@@ -9,4 +9,3 @@ export * from './error';
 export * from './requests';
 export * from './device-change';
 export * from './playlist';
-export * from './webrtc-stats';

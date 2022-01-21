@@ -177,6 +177,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
   }
 
+  getTrackBeingSent() {
+    return this.processedTrack || this.nativeTrack;
+  }
+
   /**
    * called when the video is unmuted
    * @private

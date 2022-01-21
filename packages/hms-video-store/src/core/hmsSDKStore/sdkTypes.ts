@@ -26,13 +26,14 @@ import {
   HMSRTMP,
   HMSWebrtcInternals,
   HMSWebrtcStats,
-  HMSPeerConnectionStats,
   HMSAudioPluginType,
   HMSVideoPluginType,
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
   HMSHLS,
+  HMSPeerStats,
+  HMSTrackStats,
 } from '@100mslive/hms-video';
 
 export {
@@ -68,9 +69,10 @@ export type {
   HMSRTMP,
   HMSWebrtcInternals,
   HMSWebrtcStats,
-  HMSPeerConnectionStats,
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
   HMSHLS,
+  HMSPeerStats,
+  HMSTrackStats,
 };

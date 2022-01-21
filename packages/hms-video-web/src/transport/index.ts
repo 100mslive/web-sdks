@@ -48,7 +48,6 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { EventBus } from '../events/EventBus';
-import { getTrackIDBeingSent } from '../utils/track';
 
 const TAG = '[HMSTransport]:';
 
@@ -84,8 +83,8 @@ export default class HMSTransport implements ITransport {
     private eventBus: EventBus,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
+      this.store,
       this.eventBus,
-      trackID => getTrackIDBeingSent(this.store, trackID),
       this.publishConnection?.nativeConnection,
       this.subscribeConnection?.nativeConnection,
     );
@@ -715,7 +714,7 @@ export default class HMSTransport implements ITransport {
     if (this.store.getSubscribeDegradationParams()) {
       this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
       this.eventBus.statsUpdate.subscribe(stats => {
-        this.trackDegradationController?.handleRtcStatsChange(stats.getSubscribeStats().packetsLost);
+        this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
       });
       this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();

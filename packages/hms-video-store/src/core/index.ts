@@ -26,4 +26,6 @@ export type {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSPeerStats,
+  HMSTrackStats,
 } from './hmsSDKStore/sdkTypes';

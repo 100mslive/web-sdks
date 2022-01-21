@@ -1,19 +1,15 @@
 import { RTCStatsMonitor } from './RTCStatsMonitor';
 import { EventBus } from '../events/EventBus';
-import { PeerConnectionType } from '.';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
+import { IStore } from '../sdk/store';
 
 export class HMSWebrtcInternals {
   private statsMonitor?: RTCStatsMonitor;
-  private currentHmsStats?: HMSWebrtcStats;
+  private hmsStats?: HMSWebrtcStats;
 
   constructor(
+    private readonly store: IStore,
     private readonly eventBus: EventBus,
-    /**
-     * Local track's stats are changed based on the native track ID which changes on mute/unmute/plugins.
-     * This method is to get the track ID being sent(the active one in webrtc stats) given the original track ID.
-     */
-    private readonly getTrackIDBeingSent: (trackID: string) => string | undefined,
     private publishConnection?: RTCPeerConnection,
     private subscribeConnection?: RTCPeerConnection,
   ) {}
@@ -26,10 +22,6 @@ export class HMSWebrtcInternals {
     return this.subscribeConnection;
   }
 
-  getHMSStats() {
-    return this.currentHmsStats;
-  }
-
   onStatsChange(statsChangeCb: (stats: HMSWebrtcStats) => void) {
     this.eventBus.statsUpdate.subscribe(statsChangeCb);
     return () => {
@@ -37,12 +29,9 @@ export class HMSWebrtcInternals {
     };
   }
 
-  private handleStatsUpdate = (stats: Record<PeerConnectionType, RTCStatsReport>) => {
-    /**
-     * @TODO send prevStats when creating new HMSWebrtcStats to calculate bitrate based on delta
-     */
-    this.currentHmsStats = new HMSWebrtcStats(stats, this.getTrackIDBeingSent);
-    this.eventBus.statsUpdate.publish(this.currentHmsStats);
+  private handleStatsUpdate = async () => {
+    await this.hmsStats?.updateStats(this.hmsStats);
+    this.eventBus.statsUpdate.publish(this.hmsStats);
   };
 
   /**
@@ -67,6 +56,13 @@ export class HMSWebrtcInternals {
         this.publishConnection && { publish: this.publishConnection },
         this.subscribeConnection && { subscribe: this.subscribeConnection },
       ),
+    );
+    this.hmsStats = new HMSWebrtcStats(
+      {
+        publish: this.publishConnection?.getStats.bind(this.publishConnection),
+        subscribe: this.subscribeConnection?.getStats.bind(this.subscribeConnection),
+      },
+      this.store,
     );
     this.eventBus.rtcStatsUpdate.subscribe(this.handleStatsUpdate);
   }
