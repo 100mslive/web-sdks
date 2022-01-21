@@ -22,7 +22,7 @@ import {
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
-import { useMetadata } from "./hooks/useMetadata";
+import { useMyMetadata } from "./hooks/useMetadata";
 import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
 import {
   HandIcon,
@@ -44,7 +44,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
-  const { isHandRaised, setIsHandRaised, isBRB, setIsBRB } = useMetadata();
+  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
   const initialModalProps = {
     show: false,
@@ -152,20 +152,17 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}
       key="raise-hand"
     >
-      <IconButton
-        onClick={() => setIsHandRaised(!isHandRaised)}
-        active={!isHandRaised}
-      >
+      <IconButton onClick={toggleHandRaise} active={!isHandRaised}>
         <HandIcon />
       </IconButton>
     </Tooltip>
   );
   leftComponents.push(
-    <Tooltip title={` Turn ${!isBRB ? "on" : "off"} BRB`} key="brb">
+    <Tooltip title={` Turn ${!isBRBOn ? "on" : "off"} BRB`} key="brb">
       <IconButton
         css={{ mx: "$2", "@md": { display: "none" } }}
-        onClick={() => setIsBRB(!isBRB)}
-        active={!isBRB}
+        onClick={toggleBRB}
+        active={!isBRBOn}
       >
         <BrbIcon />
       </IconButton>
