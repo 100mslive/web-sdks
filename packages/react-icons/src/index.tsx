@@ -10,6 +10,7 @@ export { default as ChevronUpIcon } from './ChevronUpIcon';
 export { default as ComputerIcon } from './ComputerIcon';
 export { default as CrossIcon } from './CrossIcon';
 export { default as ExitIcon } from './ExitIcon';
+export { default as GlobeIcon } from './GlobeIcon';
 export { default as HandIcon } from './HandIcon';
 export { default as HangUpIcon } from './HangUpIcon';
 export { default as HorizontalMenuIcon } from './HorizontalMenuIcon';
