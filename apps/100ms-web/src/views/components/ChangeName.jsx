@@ -17,7 +17,7 @@ import {
   selectHMSStats,
   selectTracksMap,
   selectPeerNameByID,
-} from "@100mslive/hms-video-store";
+} from "@100mslive/react-sdk";
 import { Switch } from "@100mslive/react-ui";
 import { hmsToast } from "./notifications/hms-toast";
 import { USERNAME_KEY } from "../../common/constants";
