@@ -1,4 +1,4 @@
-import { HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSLocalTrack } from 'index';
+import { HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSLocalTrack } from '../media/tracks';
 import { HMSPeerStats, HMSTrackStats, PeerConnectionType, RTCTrackStats } from '../interfaces/webrtc-stats';
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
