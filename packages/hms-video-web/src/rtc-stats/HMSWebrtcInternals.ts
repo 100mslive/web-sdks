@@ -1,10 +1,14 @@
-import { RTCStatsMonitor } from './RTCStatsMonitor';
 import { EventBus } from '../events/EventBus';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
+import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
+import { sleep } from '../utils/timer-utils';
 
 export class HMSWebrtcInternals {
-  private statsMonitor?: RTCStatsMonitor;
+  private readonly TAG = '[HMSWebrtcInternals]';
+  private readonly interval = RTC_STATS_MONITOR_INTERVAL;
+  private isMonitored = false;
   private hmsStats?: HMSWebrtcStats;
 
   constructor(
@@ -35,13 +39,6 @@ export class HMSWebrtcInternals {
   };
 
   /**
-   * @internal
-   */
-  getStatsMonitor() {
-    return this.statsMonitor;
-  }
-
-  /**
    *
    * @internal
    */
@@ -49,14 +46,6 @@ export class HMSWebrtcInternals {
     this.publishConnection = publish;
     this.subscribeConnection = subscribe;
 
-    this.statsMonitor = new RTCStatsMonitor(
-      this.eventBus.rtcStatsUpdate,
-      Object.assign(
-        {},
-        this.publishConnection && { publish: this.publishConnection },
-        this.subscribeConnection && { subscribe: this.subscribeConnection },
-      ),
-    );
     this.hmsStats = new HMSWebrtcStats(
       {
         publish: this.publishConnection?.getStats.bind(this.publishConnection),
@@ -64,15 +53,34 @@ export class HMSWebrtcInternals {
       },
       this.store,
     );
-    this.eventBus.rtcStatsUpdate.subscribe(this.handleStatsUpdate);
+  }
+
+  /**
+   * @internal
+   */
+  async start() {
+    this.stop();
+    this.isMonitored = true;
+    HMSLogger.d(this.TAG, 'Starting Webrtc Stats Monitor');
+    this.startLoop().then(() => HMSLogger.d(this.TAG, 'Stopping Webrtc Stats Monitor'));
+  }
+
+  private stop() {
+    this.isMonitored = false;
+  }
+
+  private async startLoop() {
+    while (this.isMonitored) {
+      await this.handleStatsUpdate();
+      await sleep(this.interval);
+    }
   }
 
   /**
    * @internal
    */
   cleanUp() {
-    this.statsMonitor?.stop();
-    this.eventBus.rtcStatsUpdate.removeAllListeners();
+    this.stop();
     this.eventBus.statsUpdate.removeAllListeners();
   }
 }

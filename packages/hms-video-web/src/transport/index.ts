@@ -725,7 +725,7 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
-    await this.webrtcInternals?.getStatsMonitor()?.start();
+    await this.webrtcInternals?.start();
   }
 
   private retryPublishIceFailedTask = async () => {
