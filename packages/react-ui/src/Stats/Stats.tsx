@@ -19,16 +19,19 @@ const StatsRow = ({ label = '', value = '' }) => {
 };
 
 const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : stats?.packetsLostRate) + '/s';
+  if (!(isNullish(stats?.packetsLost) && isNullish(stats?.packetsLostRate))) {
+    return null;
+  }
 
+  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : stats?.packetsLostRate) + '/s';
   const trackType = stats && stats?.kind.charAt(0).toUpperCase() + stats?.kind.slice(1);
 
-  return isNullish(stats?.packetsLost) && isNullish(stats?.packetsLostRate) ? (
+  return (
     <StatsRow
       label={`Packet Loss (${trackType === 'Video' ? 'V' : 'A'})`}
       value={`${stats?.packetsLost}(${packetsLostRate})`}
     />
-  ) : null;
+  );
 };
 
 export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTileStatsProps) {
@@ -59,26 +62,20 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
             />
           ) : null}
           {isNullish(videoTrackStats?.bitrate) ? (
-            <StatsRow
-              label={videoTrackStats?.type.includes('inbound') ? 'Bitrate (V)' : 'Bitrate (V)'}
-              value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
-            />
+            <StatsRow label={'Bitrate (V)'} value={formatBytes(videoTrackStats?.bitrate, 'b/s')} />
           ) : null}
           {isNullish(audioTrackStats?.bitrate) ? (
-            <StatsRow
-              label={audioTrackStats?.type.includes('inbound') ? 'Bitrate (A)' : 'Bitrate (A)'}
-              value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
-            />
+            <StatsRow label={'Bitrate (A)'} value={formatBytes(audioTrackStats?.bitrate, 'b/s')} />
           ) : null}
 
           <TrackPacketsLostRow stats={videoTrackStats} />
           <TrackPacketsLostRow stats={audioTrackStats} />
 
           {isNullish(videoTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (V)" value={videoTrackStats?.jitter?.toString()} />
+            <StatsRow label="Jitter (V)" value={videoTrackStats?.jitter?.toFixed(4).toString()} />
           ) : null}
           {isNullish(audioTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (A)" value={audioTrackStats?.jitter?.toString()} />
+            <StatsRow label="Jitter (A)" value={audioTrackStats?.jitter?.toFixed(4).toString()} />
           ) : null}
         </tbody>
       </table>
