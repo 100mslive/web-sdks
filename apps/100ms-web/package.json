@@ -25,7 +25,7 @@
     "worker-timers": "^7.0.40"
   },
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "rm -rf build && webpack --mode production",
     "start": "webpack serve --mode development",
     "build:style": "NODE_ENV=production npx tailwindcss-cli@latest build ./src/index.css -o tailwind.css"
   },

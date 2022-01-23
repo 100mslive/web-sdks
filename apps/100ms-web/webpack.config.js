@@ -12,7 +12,7 @@ module.exports = {
   context: path.resolve(__dirname, "src"),
   entry: "./index.js",
   output: {
-    path: path.resolve(__dirname, "./dist"),
+    path: path.resolve(__dirname, "./build"),
     filename: "[name].[chunkhash].js",
     chunkFilename: "[name].[chunkhash]..js",
     publicPath: "/",
@@ -83,7 +83,7 @@ module.exports = {
       patterns: [
         {
           from: path.resolve(__dirname, "./public"),
-          to: path.resolve(__dirname, "./dist"),
+          to: path.resolve(__dirname, "./build"),
           filter: async resourcePath => {
             if (/index.html|manifest.json/.test(resourcePath)) {
               return false;
