@@ -4,27 +4,34 @@ type WithBitrate = { bitrate: number };
  * Missing properties in TS eventhough WebRTC supports it.
  * Ref: https://www.w3.org/TR/webrtc-stats/#summary
  */
-type MissingRTCTrackStats = {
+interface MissingOutboundStats extends RTCOutboundRtpStreamStats {
+  bytesSent?: number;
+  packetsSent?: number;
+  qualityLimitationReason?: string;
+  roundTripTime?: number;
+  totalRoundTripTime?: number;
+}
+
+interface MissingInboundStats extends RTCInboundRtpStreamStats {
   bytesReceived?: number;
   frameHeight?: number;
   frameWidth?: number;
   framesDropped?: number;
   framesPerSecond?: number;
-  bytesSent?: number;
   jitter?: number;
   packetsLost?: number;
   packetsLostRate?: number;
-  qualityLimitationReason?: string;
-};
+  packetsReceived?: number;
+}
 
 export type PeerConnectionType = 'publish' | 'subscribe';
 
-export type HMSTrackStats = RTCRtpStreamStats & { peerID?: string; peerName?: string } & WithBitrate &
-  MissingRTCTrackStats;
-export type HMSInboundTrackStats = HMSTrackStats & RTCInboundRtpStreamStats;
-export type HMSOutboundTrackStats = HMSTrackStats & RTCOutboundRtpStreamStats;
+type BaseTrackStats = RTCRtpStreamStats & { peerID?: string; peerName?: string } & WithBitrate;
+export type HMSTrackStats = BaseTrackStats & MissingInboundStats & MissingOutboundStats;
+export type HMSLocalTrackStats = BaseTrackStats & MissingInboundStats;
+export type HMSRemoteTrackStats = BaseTrackStats & MissingOutboundStats;
 
-export type RTCTrackStats = RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats;
+export type RTCTrackStats = MissingInboundStats | MissingOutboundStats;
 
 type AdditionalPeerStats = {
   packetsLost: number;

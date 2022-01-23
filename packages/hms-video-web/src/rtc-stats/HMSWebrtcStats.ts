@@ -3,7 +3,7 @@ import { PeerConnectionType, HMSPeerStats, HMSTrackStats } from '../interfaces/w
 import {
   union,
   computeNumberRate,
-  getTrackStatsFromReport,
+  getTrackStats,
   getLocalPeerStatsFromReport,
   getPacketsLostAndJitterFromReport,
 } from './utils';
@@ -72,7 +72,7 @@ export class HMSWebrtcStats {
       const track = tracks[trackID];
       const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
       if (track) {
-        this.trackStats[trackID] = await getTrackStatsFromReport(this.getStats, track, peerName, prevStats);
+        this.trackStats[trackID] = await getTrackStats(this.getStats, track, peerName, prevStats);
       } else {
         delete this.trackStats[trackID];
       }

@@ -3,9 +3,7 @@ import { HMSPeerStats, HMSTrackStats, PeerConnectionType, RTCTrackStats } from '
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 
-const TRACK_STATS_TO_FILER = ['track', 'inbound-rtp', 'outbound-rtp']; // 'remote-inbound-rtp', 'remote-outbound-rtp'];
-
-export const getTrackStatsFromReport = async (
+export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
   track: HMSTrack,
   peerName?: string,
@@ -14,19 +12,15 @@ export const getTrackStatsFromReport = async (
   const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
   const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
   const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
-  const trackReport = await getStats[peerConnectionType]?.(nativeTrack);
-  const filteredTrackStats: RTCTrackStats[] = [];
-  trackReport?.forEach(stat => {
-    if (TRACK_STATS_TO_FILER.includes(stat.type)) {
-      filteredTrackStats.push(stat);
-    }
-  });
 
-  const trackStats = Object.assign({}, ...filteredTrackStats);
+  const trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+  const trackStats = getRelevantStatsFromTrackReport(trackReport);
+  const prevTrackStats = prevStats && prevStats.getTrackStats(track.trackId);
+
   const bitrate = computeBitrate(
     (peerConnectionType === 'publish' ? 'bytesSent' : 'bytesReceived') as any,
     trackStats,
-    prevStats && prevStats.getTrackStats(track.trackId),
+    prevTrackStats,
   );
 
   return Object.assign(trackStats, {
@@ -34,6 +28,39 @@ export const getTrackStatsFromReport = async (
     peerId: track.peerId,
     peerName,
   });
+};
+
+const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
+  let streamStats: RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined;
+  // Valid by Webrtc spec, not in TS
+  // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
+  let remoteStreamStats: Partial<{ roundTripTime: number; totalRoundTripTime: number }> | undefined;
+  trackReport?.forEach(stat => {
+    switch (stat.type) {
+      case 'inbound-rtp':
+        streamStats = stat;
+        break;
+      case 'outbound-rtp':
+        streamStats = stat;
+        break;
+      case 'remote-inbound-rtp':
+        remoteStreamStats = stat;
+        break;
+      case 'remote-outbound-rtp':
+        remoteStreamStats = stat;
+        break;
+      default:
+        break;
+    }
+  });
+
+  return (
+    streamStats &&
+    Object.assign(streamStats, {
+      roundTripTime: remoteStreamStats?.roundTripTime,
+      totalRoundTripTime: remoteStreamStats?.totalRoundTripTime,
+    })
+  );
 };
 
 export const getLocalPeerStatsFromReport = (
@@ -103,14 +130,14 @@ export const union = <T>(arr1: T[], arr2: T[]): T[] => {
  */
 export const computeBitrate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
   statName: keyof T,
-  newReport?: T,
-  oldReport?: T,
+  newReport?: Partial<T>,
+  oldReport?: Partial<T>,
 ): number => computeStatRate(statName, newReport, oldReport) * 8; // Bytes to bits
 
 const computeStatRate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
   statName: keyof T,
-  newReport?: T,
-  oldReport?: T,
+  newReport?: Partial<T>,
+  oldReport?: Partial<T>,
 ): number => {
   const newVal = newReport && newReport[statName];
   const oldVal = oldReport ? oldReport[statName] : null;
