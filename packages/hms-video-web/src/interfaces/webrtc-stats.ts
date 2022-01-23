@@ -4,7 +4,13 @@ type WithBitrate = { bitrate: number };
  * Missing properties in TS eventhough WebRTC supports it.
  * Ref: https://www.w3.org/TR/webrtc-stats/#summary
  */
-interface MissingOutboundStats extends RTCOutboundRtpStreamStats {
+interface MissingCommonStats {
+  frameHeight?: number;
+  frameWidth?: number;
+  framesPerSecond?: number;
+}
+
+interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonStats {
   bytesSent?: number;
   packetsSent?: number;
   qualityLimitationReason?: string;
@@ -12,12 +18,9 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats {
   totalRoundTripTime?: number;
 }
 
-interface MissingInboundStats extends RTCInboundRtpStreamStats {
+interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCommonStats {
   bytesReceived?: number;
-  frameHeight?: number;
-  frameWidth?: number;
   framesDropped?: number;
-  framesPerSecond?: number;
   jitter?: number;
   packetsLost?: number;
   packetsLostRate?: number;
