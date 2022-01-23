@@ -8,7 +8,7 @@ export const getTrackStats = async (
   track: HMSTrack,
   peerName?: string,
   prevStats?: HMSWebrtcStats,
-): Promise<HMSTrackStats> => {
+): Promise<HMSTrackStats | undefined> => {
   const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
   const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
   const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
@@ -23,11 +23,14 @@ export const getTrackStats = async (
     prevTrackStats,
   );
 
-  return Object.assign(trackStats, {
-    bitrate,
-    peerId: track.peerId,
-    peerName,
-  });
+  return (
+    trackStats &&
+    Object.assign(trackStats, {
+      bitrate,
+      peerId: track.peerId,
+      peerName,
+    })
+  );
 };
 
 const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {

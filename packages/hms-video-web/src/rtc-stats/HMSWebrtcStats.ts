@@ -71,8 +71,9 @@ export class HMSWebrtcStats {
     for (const trackID of trackIDs) {
       const track = tracks[trackID];
       const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
-      if (track) {
-        this.trackStats[trackID] = await getTrackStats(this.getStats, track, peerName, prevStats);
+      const trackStats = await getTrackStats(this.getStats, track, peerName, prevStats);
+      if (track && trackStats) {
+        this.trackStats[trackID] = trackStats;
       } else {
         delete this.trackStats[trackID];
       }
