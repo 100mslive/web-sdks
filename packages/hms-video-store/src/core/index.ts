@@ -28,4 +28,6 @@ export type {
   HMSRTMP,
   HMSPeerStats,
   HMSTrackStats,
+  HMSLocalTrackStats,
+  HMSRemoteTrackStats,
 } from './hmsSDKStore/sdkTypes';

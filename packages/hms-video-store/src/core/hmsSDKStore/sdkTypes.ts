@@ -34,6 +34,8 @@ import {
   HMSHLS,
   HMSPeerStats,
   HMSTrackStats,
+  HMSLocalTrackStats,
+  HMSRemoteTrackStats,
 } from '@100mslive/hms-video';
 
 export {
@@ -75,4 +77,6 @@ export type {
   HMSHLS,
   HMSPeerStats,
   HMSTrackStats,
+  HMSLocalTrackStats,
+  HMSRemoteTrackStats,
 };
