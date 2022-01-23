@@ -31,8 +31,8 @@ export type PeerConnectionType = 'publish' | 'subscribe';
 
 type BaseTrackStats = RTCRtpStreamStats & { peerID?: string; peerName?: string } & WithBitrate;
 export type HMSTrackStats = BaseTrackStats & MissingInboundStats & MissingOutboundStats;
-export type HMSLocalTrackStats = BaseTrackStats & MissingInboundStats;
-export type HMSRemoteTrackStats = BaseTrackStats & MissingOutboundStats;
+export type HMSLocalTrackStats = BaseTrackStats & MissingOutboundStats;
+export type HMSRemoteTrackStats = BaseTrackStats & MissingInboundStats;
 
 export type RTCTrackStats = MissingInboundStats | MissingOutboundStats;
 
