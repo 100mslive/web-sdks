@@ -23,7 +23,6 @@ const HmsVideoList = ({
       setPage(0);
     }
   }, [pagesWithTiles.length, page]);
-  const list = new Array(pagesWithTiles.length).fill("");
   return (
     <StyledVideoList.Root>
       <StyledVideoList.Container ref={ref}>
@@ -50,7 +49,11 @@ const HmsVideoList = ({
           : null}
       </StyledVideoList.Container>
       {pagesWithTiles.length > 1 ? (
-        <Pagination page={page} setPage={setPage} list={list} />
+        <Pagination
+          page={page}
+          setPage={setPage}
+          numPages={pagesWithTiles.length}
+        />
       ) : null}
     </StyledVideoList.Root>
   );

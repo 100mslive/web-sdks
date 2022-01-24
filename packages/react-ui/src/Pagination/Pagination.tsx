@@ -10,10 +10,10 @@ interface Props {
 export const Pagination: React.FC<Props> = ({ page, setPage, numPages }) => {
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
-  const prevPage = () => {
+  const nextPage = () => {
     setPage(Math.min(page + 1, numPages - 1));
   };
-  const nextPage = () => {
+  const prevPage = () => {
     setPage(Math.max(page - 1, 0));
   };
   return (

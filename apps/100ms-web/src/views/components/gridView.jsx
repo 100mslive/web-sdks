@@ -53,8 +53,7 @@ export const GridCenterView = ({
             <VideoList
               peers={peers}
               classes={{
-                root: "",
-                videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+                videoTileContainer: "rounded-lg",
               }}
               maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
               // show stats for upto 2 peers in sidepane

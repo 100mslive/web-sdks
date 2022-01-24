@@ -77,7 +77,7 @@ const HmsVideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
           </StyledVideoTile.AttributeBox>
         ) : null}
         {isBRB ? (
-          <StyledVideoTile.AttributeBox css={{ c: "white" }}>
+          <StyledVideoTile.AttributeBox>
             <BrbIcon width={40} height={40} />
           </StyledVideoTile.AttributeBox>
         ) : null}
