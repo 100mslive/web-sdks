@@ -1,6 +1,7 @@
 export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
+export { default as BrbIcon } from './BrbIcon';
 export { default as ChatIcon } from './ChatIcon';
 export { default as CheckIcon } from './CheckIcon';
 export { default as ChevronDownIcon } from './ChevronDownIcon';
@@ -11,6 +12,9 @@ export { default as ComputerIcon } from './ComputerIcon';
 export { default as CrossIcon } from './CrossIcon';
 export { default as ExitIcon } from './ExitIcon';
 export { default as HandIcon } from './HandIcon';
+export { default as HandRaiseFilledIcon } from './HandRaiseFilledIcon';
+export { default as HandRaiseIcon } from './HandRaiseIcon';
+export { default as HandRaiseSlashed } from './HandRaiseSlashed';
 export { default as HangUpIcon } from './HangUpIcon';
 export { default as HorizontalMenuIcon } from './HorizontalMenuIcon';
 export { default as InfoIcon } from './InfoIcon';
