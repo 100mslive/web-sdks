@@ -13,8 +13,7 @@ module.exports = {
   entry: "./index.js",
   output: {
     path: path.resolve(__dirname, "./build"),
-    filename: "[name].[chunkhash].js",
-    chunkFilename: "[name].[chunkhash]..js",
+    filename: "[name].[chunkhash:8].js",
     publicPath: "/",
     clean: true,
   },
@@ -36,7 +35,7 @@ module.exports = {
             loader: "esbuild-loader",
             options: {
               loader: "jsx",
-              target: "es2015",
+              target: "es6",
             },
           },
         ],
@@ -58,17 +57,24 @@ module.exports = {
   stats: "errors-only",
   optimization: {
     splitChunks: {
+      chunks: "all",
       cacheGroups: {
         vendor: {
           chunks: "initial",
           name: "vendor",
           enforce: true,
           test: /[\\/]node_modules[\\/]/,
+          reuseExistingChunk: true,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
         },
       },
     },
     runtimeChunk: true,
-    minimize: false,
+    minimize: true,
     minimizer: [
       // Use esbuild to minify
       new ESBuildMinifyPlugin(),
@@ -78,7 +84,9 @@ module.exports = {
     new webpack.ProgressPlugin(),
     new ESLintPlugin(),
     new WebpackManifestPlugin(),
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "[name].[chunkhash:8].css",
+    }),
     new CopyPlugin({
       patterns: [
         {
