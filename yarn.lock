@@ -41,32 +41,10 @@
     reselect "4.0.0"
     zustand "3.5.7"
 
-"@100mslive/hms-video-store@0.2.88-alpha.0":
-  version "0.2.88-alpha.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.88-alpha.0.tgz#51d41a0da11df7e356e5f822cdd06884505e025a"
-  integrity sha512-Mq5Et5Y0tAq3WOF8RD65jejXx+RNYQ1ejnToIcMWNg1zKGLqDPuVIVHgK8vicgYqSa0PrVR8CfpklQbI0d63Kg==
-  dependencies:
-    "@100mslive/hms-video" "0.1.42-alpha.0"
-    eventemitter2 "^6.4.5"
-    immer "^9.0.6"
-    reselect "4.0.0"
-    zustand "3.5.7"
-
 "@100mslive/hms-video@0.1.41":
   version "0.1.41"
   resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.41.tgz#97c895b2dc6b98ad39d0906cdcefddd5c6e926b0"
   integrity sha512-VA7PQogmCSxku8/ys7jVJ7K8+flsziEp2NRc1rwF6mBkcz1WC25W9VwgCeZozZ5N0va03sX1CMYtLH9T2tDZBA==
-  dependencies:
-    eventemitter2 "^6.4.5"
-    sdp-transform "^2.14.1"
-    ua-parser-js "^1.0.1"
-    uuid "^8.3.2"
-    webrtc-adapter "^8.0.0"
-
-"@100mslive/hms-video@0.1.42-alpha.0":
-  version "0.1.42-alpha.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.42-alpha.0.tgz#f3463e813fe0c3bc363540d28edd6b087fed7d47"
-  integrity sha512-Whk4H6VA/wVQLpeclm+pf6oOr5152v1Pp/UiX8bIADz6x4sJ5+RDxczKY4pScZtRdnB6CHXR7t4gleO+WCBBAQ==
   dependencies:
     eventemitter2 "^6.4.5"
     sdp-transform "^2.14.1"
@@ -85,16 +63,6 @@
     "@webassemblyjs/wasm-gen" "^1.11.0"
     gifuct-js "^2.1.2"
     wasm-check "^2.0.2"
-
-"@100mslive/react-sdk@0.0.5-alpha.1":
-  version "0.0.5-alpha.1"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.0.5-alpha.1.tgz#9abbb574f9d6831a18c2052bfe3e7820b475c691"
-  integrity sha512-ZLl+Q2VyaXVWkMd1y962q70kn66zBbHPmhD0RiGznJX3Q27m68mV2aO/hJmp48vn1jge18rjkLHaVlr3lbtsPw==
-  dependencies:
-    "@100mslive/hms-video-store" "0.2.88-alpha.0"
-    react-intersection-observer "^8.33.1"
-    react-resize-detector "^7.0.0"
-    zustand "^3.6.2"
 
 "@babel/code-frame@7.10.4":
   version "7.10.4"
