@@ -83,7 +83,7 @@ module.exports = {
   },
   plugins: [
     new webpack.ProgressPlugin(),
-    new ESLintPlugin(),
+    new ESLintPlugin({ fix: true }),
     new WebpackManifestPlugin(),
     new MiniCssExtractPlugin({
       filename: "[name].[chunkhash:8].css",
