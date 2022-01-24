@@ -63,10 +63,16 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     }
     if (this.source === 'regular') {
+      let track: MediaStreamTrack;
       if (value) {
-        await this.replaceTrackWith(this.settings);
+        track = await this.replaceTrackWith(this.settings);
       } else {
-        await this.replaceTrackWithBlank();
+        track = await this.replaceTrackWithBlank();
+      }
+      await this.replaceSender(track);
+      this.nativeTrack = track;
+      if (value) {
+        await this.pluginsManager.waitForRestart();
       }
     }
     await super.setEnabled(value);
@@ -189,16 +195,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
-    const localStream = this.stream as HMSLocalStream;
-    // change nativeTrack so plugin can start its work
-    await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
-    await localStream.replaceStreamTrack(prevTrack, newTrack);
-    this.nativeTrack = newTrack;
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
     }
-    await this.pluginsManager.waitForRestart();
+    return newTrack;
   }
 
   /**
@@ -209,11 +210,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
-    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    return LocalTrackManager.getEmptyVideoTrack(prevTrack);
+  }
+
+  private async replaceSender(newTrack: MediaStreamTrack) {
     const localStream = this.stream as HMSLocalStream;
     await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
-    this.nativeTrack = newTrack;
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
