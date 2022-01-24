@@ -9,6 +9,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 require("dotenv").config();
 
 module.exports = {
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
   context: path.resolve(__dirname, "src"),
   entry: "./index.js",
   output: {
