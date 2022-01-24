@@ -7,8 +7,9 @@ function ErrorPage({ error }) {
   const theme = useHMSTheme().appBuilder.theme;
   return (
     <div
-      className={`${theme === "dark" ? "text-white" : "text-black"
-        } w-full h-full flex items-center justify-center`}
+      className={`${
+        theme === "dark" ? "text-white" : "text-black"
+      } w-full h-full flex items-center justify-center`}
     >
       <div className="relative rounded-xl overflow-hidden">
         <img

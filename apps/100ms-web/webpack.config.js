@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 require("dotenv").config();
 
 module.exports = {
@@ -46,45 +47,42 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
       },
       {
-        test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+        test: /\.(?:ico|gif|png|jpg|jpeg|svg)$/i,
         type: "asset/resource",
       },
       {
-        test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
+        test: /\.(woff(2)?|eot|ttf|otf|)$/,
         type: "asset/inline",
       },
     ],
   },
-  stats: "errors-only",
   optimization: {
     splitChunks: {
-      chunks: "all",
       cacheGroups: {
         vendor: {
-          chunks: "initial",
           name: "vendor",
           enforce: true,
           test: /[\\/]node_modules[\\/]/,
           reuseExistingChunk: true,
+          chunks: "all",
         },
         default: {
-          minChunks: 2,
-          priority: -20,
           reuseExistingChunk: true,
+          chunks: "all",
         },
       },
     },
     runtimeChunk: true,
-    minimize: true,
-    minimizer: [
-      // Use esbuild to minify
-      new ESBuildMinifyPlugin(),
-    ],
+    minimize: process.env.NODE_ENV === "production",
+    minimizer: [new ESBuildMinifyPlugin()],
   },
   plugins: [
     new webpack.ProgressPlugin(),
     new ESLintPlugin({ fix: true }),
     new WebpackManifestPlugin(),
+    ...(process.env.NODE_ENV !== "production"
+      ? [new BundleAnalyzerPlugin()]
+      : []),
     new MiniCssExtractPlugin({
       filename: "[name].[chunkhash:8].css",
     }),
