@@ -1,6 +1,9 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
+const PostCssPlugin = require('esbuild-plugin-postcss2');
+const autoprefixer = require('autoprefixer');
+const tailwindcss = require('tailwindcss');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -14,8 +17,13 @@ async function main() {
   const source = './src/App.js';
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'file' };
+  const plugins = [
+    PostCssPlugin.default({
+      plugins: [tailwindcss, autoprefixer],
+    }),
+  ];
   try {
-    esbuild.buildSync({
+    esbuild.build({
       entryPoints: [source],
       outfile: 'dist/index.cjs.js',
       minify: false,
@@ -25,6 +33,7 @@ async function main() {
       external,
       metafile: true,
       loader,
+      plugins,
     });
 
     const esmResult = esbuild.build({
@@ -37,6 +46,7 @@ async function main() {
       external,
       metafile: true,
       loader,
+      plugins,
     });
 
     let esmSize = 0;

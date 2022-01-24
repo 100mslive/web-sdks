@@ -27,8 +27,7 @@ import SpeakerLayout from './assets/images/icons/speaker-view.svg';
 import initialIcons from './assets/images/icons/initial-icons.svg';
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
-import 'react-toastify/dist/ReactToastify.css';
-import './tailwind.css';
+import '100ms_edtech_template/dist/index.css';
 
 const hostname = window.location.hostname;
 
