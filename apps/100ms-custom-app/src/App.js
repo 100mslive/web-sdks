@@ -174,7 +174,9 @@ class App extends Component {
 
   getToken = () => {
     try {
-      const authUser = JSON.parse(cookies.getItem('authUser'));
+      const cookieName =
+        process.env.REACT_APP_ENV === "qa" ? "authUser-qa" : "authUser";
+      const authUser = JSON.parse(cookies.getItem(cookieName));
       const token = authUser?.token;
       this.setState({ userEmail: authUser?.email });
       return token;
