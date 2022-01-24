@@ -4,8 +4,6 @@ import {
   ControlBar,
   AudioPlaylist,
   Button,
-  ChatIcon,
-  ChatUnreadIcon,
   VideoPlaylistIcon,
   VerticalDivider,
   MessageModal,
@@ -29,6 +27,8 @@ import {
   ShareScreenIcon,
   MusicIcon,
   BrbIcon,
+  ChatUnreadIcon,
+  ChatIcon,
 } from "@100mslive/react-icons";
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
@@ -119,17 +119,11 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     );
   }
   leftComponents.push(
-    <Button
-      key="chat"
-      iconOnly
-      variant="no-fill"
-      iconSize="md"
-      shape="rectangle"
-      onClick={toggleChat}
-      active={isChatOpen}
-    >
-      {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
-    </Button>
+    <Tooltip title={`${isChatOpen ? "Close" : "Open"} chat`}>
+      <IconButton key="chat" onClick={toggleChat} active={!isChatOpen}>
+        {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
+      </IconButton>
+    </Tooltip>
   );
   isAllowedToPublish.screen &&
     leftComponents.push(
