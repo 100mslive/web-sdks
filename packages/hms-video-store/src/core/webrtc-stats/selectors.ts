@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { HMSLocalTrackStats } from '../hmsSDKStore/sdkTypes';
 import { HMSStatsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
@@ -124,12 +125,12 @@ export const packetsLostByTrackID = byIDCurry(
 
 export const localAudioTrackStats = createSelector(
   [selectTrackStatsMap, selectLocalAudioTrackID],
-  (trackStatsMap, trackID) => (trackID ? trackStatsMap[trackID] : undefined),
+  (trackStatsMap, trackID) => (trackID ? (trackStatsMap[trackID] as HMSLocalTrackStats) : undefined),
 );
 
 export const localVideoTrackStats = createSelector(
   [selectTrackStatsMap, selectLocalVideoTrackID],
-  (trackStatsMap, trackID) => (trackID ? trackStatsMap[trackID] : undefined),
+  (trackStatsMap, trackID) => (trackID ? (trackStatsMap[trackID] as HMSLocalTrackStats) : undefined),
 );
 
 export const localAudioTrackBitrate = createSelector(localAudioTrackStats, stats => stats?.bitrate);

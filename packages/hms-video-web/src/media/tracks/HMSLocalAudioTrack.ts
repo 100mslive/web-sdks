@@ -194,6 +194,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
   }
 
+  /**
+   * @internal
+   */
+  getTrackBeingSent() {
+    return this.processedTrack || this.nativeTrack;
+  }
+
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
     const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
     const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
