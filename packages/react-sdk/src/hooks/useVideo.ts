@@ -1,14 +1,17 @@
-import { selectTrackByID, HMSPeerID } from '@100mslive/hms-video-store';
+import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
 import { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useHMSActions, useHMSStore } from './HmsRoomProvider';
 
-// TODO: add some types, we are returning node here causes issue in passing as ref
-export const useVideo = (trackId: HMSPeerID) => {
+/**
+ *
+ * @param trackId {HMSTrackID}
+ * @returns
+ */
+export const useVideo = (trackId: HMSTrackID) => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
-  // TODO: need some help here
   const setRefs = useCallback(
     node => {
       videoRef.current = node;
@@ -16,33 +19,31 @@ export const useVideo = (trackId: HMSPeerID) => {
     },
     [inViewRef],
   );
-  const hmsStoreVideoTrack = useHMSStore(selectTrackByID(trackId));
+  const track = useHMSStore(selectTrackByID(trackId));
   useEffect(() => {
     (async () => {
-      if (videoRef.current && hmsStoreVideoTrack) {
+      if (videoRef.current && track) {
         if (inView) {
-          if (hmsStoreVideoTrack.enabled) {
-            // TODO: add logging functions here
+          if (track.enabled) {
             // attach when in view and enabled
-            await actions.attachVideo(hmsStoreVideoTrack.id, videoRef.current);
+            await actions.attachVideo(track.id, videoRef.current);
           } else {
-            // TODO: add logging functions here
             // detach when in view but not enabled
-            await actions.detachVideo(hmsStoreVideoTrack.id, videoRef.current);
+            await actions.detachVideo(track.id, videoRef.current);
           }
         } else {
-          // TODO: add logging functions here
-          await actions.detachVideo(hmsStoreVideoTrack.id, videoRef.current);
+          await actions.detachVideo(track.id, videoRef.current);
         }
       }
     })();
-  }, [
-    inView,
-    videoRef,
-    hmsStoreVideoTrack?.id,
-    hmsStoreVideoTrack?.enabled,
-    hmsStoreVideoTrack?.deviceID,
-    hmsStoreVideoTrack?.plugins,
-  ]);
+  }, [inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins]);
+  useEffect(() => {
+    return () => {
+      if (videoRef.current && track) {
+        actions.detachVideo(track.id, videoRef.current);
+      }
+    };
+  }, []);
+
   return setRefs;
 };

@@ -17,6 +17,9 @@ interface UseVideoListProps {
   maxTileCount?: number;
   maxRowCount?: number;
   maxColCount?: number;
+  /**
+   * Given a screensharing peer the function should return true if their screenshare should be included for the video tile, and false otherwise. This can be useful if there are multiple screenshares in the room where you may want to show one in the center view and others in video list along side other tiles.
+   */
   showScreenFn?: (peer: HMSPeer) => boolean;
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
@@ -51,7 +54,7 @@ export const useVideoList = ({
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
 }: UseVideoListProps): {
-  chunkedTracksWithPeer: (TrackWithPeer & {
+  pagesWithTiles: (TrackWithPeer & {
     width: number;
     height: number;
   })[][];
@@ -123,7 +126,7 @@ export const useVideoList = ({
     ],
   );
   return {
-    chunkedTracksWithPeer,
+    pagesWithTiles: chunkedTracksWithPeer,
     ref,
   };
 };

@@ -9,12 +9,16 @@ export interface VideoTileStatsProps {
   height: number;
 }
 
-const StatsRow = ({ label = '', value = '' }) => {
+const StatsRow = ({ label = '', value = '', show = true }) => {
   return (
-    <Stats.Row>
-      <Stats.Label>{label}</Stats.Label>
-      {value === '' ? <Stats.Value /> : <Stats.Value>{value}</Stats.Value>}
-    </Stats.Row>
+    <>
+      {show ? (
+        <Stats.Row>
+          <Stats.Label>{label}</Stats.Label>
+          {value === '' ? <Stats.Value /> : <Stats.Value>{value}</Stats.Value>}
+        </Stats.Row>
+      ) : null}
+    </>
   );
 };
 
@@ -23,12 +27,13 @@ const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
 
   const trackType = stats && stats?.kind.charAt(0).toUpperCase() + stats?.kind.slice(1);
 
-  return isNullish(stats?.packetsLost) && isNullish(stats?.packetsLostRate) ? (
+  return (
     <StatsRow
+      show={isNotNullish(stats?.packetsLost) && isNotNullish(stats?.packetsLostRate)}
       label={`Packet Loss (${trackType === 'Video' ? 'V' : 'A'})`}
       value={`${stats?.packetsLost}(${packetsLostRate})`}
     />
-  ) : null;
+  );
 };
 
 export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTileStatsProps) {
@@ -50,36 +55,41 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
           {videoTrackStats?.frameHeight ? (
             <StatsRow label="Height" value={videoTrackStats?.frameHeight.toString()} />
           ) : null}
-          {videoTrackStats?.framesPerSecond ? (
-            <StatsRow
-              label="FPS"
-              value={`${videoTrackStats?.framesPerSecond} ${
-                isNullish(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
-              }`}
-            />
-          ) : null}
-          {isNullish(videoTrackStats?.bitrate) ? (
-            <StatsRow
-              label={videoTrackStats?.type.includes('inbound') ? 'Bitrate (V)' : 'Bitrate (V)'}
-              value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
-            />
-          ) : null}
-          {isNullish(audioTrackStats?.bitrate) ? (
-            <StatsRow
-              label={audioTrackStats?.type.includes('inbound') ? 'Bitrate (A)' : 'Bitrate (A)'}
-              value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
-            />
-          ) : null}
+
+          <StatsRow
+            show={isNotNullish(videoTrackStats?.framesPerSecond)}
+            label="FPS"
+            value={`${videoTrackStats?.framesPerSecond} ${
+              isNotNullish(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
+            }`}
+          />
+
+          <StatsRow
+            show={isNotNullish(videoTrackStats?.bitrate)}
+            label={videoTrackStats?.type.includes('inbound') ? 'Bitrate (V)' : 'Bitrate (V)'}
+            value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
+          />
+
+          <StatsRow
+            show={isNotNullish(audioTrackStats?.bitrate)}
+            label={audioTrackStats?.type.includes('inbound') ? 'Bitrate (A)' : 'Bitrate (A)'}
+            value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
+          />
 
           <TrackPacketsLostRow stats={videoTrackStats} />
           <TrackPacketsLostRow stats={audioTrackStats} />
 
-          {isNullish(videoTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (V)" value={videoTrackStats?.jitter?.toString()} />
-          ) : null}
-          {isNullish(audioTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (A)" value={audioTrackStats?.jitter?.toString()} />
-          ) : null}
+          <StatsRow
+            show={isNotNullish(videoTrackStats?.jitter)}
+            label="Jitter (V)"
+            value={videoTrackStats?.jitter?.toString()}
+          />
+
+          <StatsRow
+            show={isNotNullish(audioTrackStats?.jitter)}
+            label="Jitter (A)"
+            value={audioTrackStats?.jitter?.toString()}
+          />
         </tbody>
       </table>
     </Stats.Root>
@@ -90,6 +100,6 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNullish(value: any) {
+export function isNotNullish(value: any) {
   return value !== undefined && value !== null;
 }

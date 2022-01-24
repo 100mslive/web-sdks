@@ -45,7 +45,7 @@ const AvatarContainer = styled('div', {
   transform: 'translateX(-50%) translateY(-50%)',
 });
 
-const HandRaiseBox = styled('div', {
+const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
@@ -74,7 +74,7 @@ interface VideoTileType {
   Info: typeof Info;
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
-  HandRaiseBox: typeof HandRaiseBox;
+  AttributeBox: typeof AttributeBox;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -84,5 +84,5 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
-  HandRaiseBox,
+  AttributeBox: AttributeBox,
 };

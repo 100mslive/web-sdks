@@ -10,7 +10,7 @@ const HmsVideoList = ({
   maxColCount,
   maxRowCount,
 }) => {
-  const { ref, chunkedTracksWithPeer } = useVideoList({
+  const { ref, pagesWithTiles } = useVideoList({
     peers,
     maxTileCount,
     maxColCount,
@@ -19,37 +19,37 @@ const HmsVideoList = ({
   const [page, setPage] = useState(0);
   useEffect(() => {
     // currentPageIndex should not exceed pages length
-    if (page >= chunkedTracksWithPeer.length) {
+    if (page >= pagesWithTiles.length) {
       setPage(0);
     }
-  }, [chunkedTracksWithPeer.length, page]);
-  const list = new Array(chunkedTracksWithPeer.length).fill("");
+  }, [pagesWithTiles.length, page]);
+  const list = new Array(pagesWithTiles.length).fill("");
   return (
     <StyledVideoList.Root>
       <StyledVideoList.Container ref={ref}>
-        {chunkedTracksWithPeer && chunkedTracksWithPeer.length > 0
-          ? chunkedTracksWithPeer.map((l, i) => (
+        {pagesWithTiles && pagesWithTiles.length > 0
+          ? pagesWithTiles.map((tiles, pageNo) => (
               <StyledVideoList.View
                 css={{
-                  left: getLeft(i, page),
+                  left: getLeft(pageNo, page),
                   transition: "left 0.3s ease-in-out",
                 }}
-                key={i}
+                key={pageNo}
               >
-                {l.map(p => (
+                {tiles.map(tile => (
                   <HmsVideoTile
                     showStatsOnTiles={showStatsOnTiles}
-                    key={p.peer.id}
-                    width={p.width}
-                    height={p.height}
-                    peerId={p.peer.id}
+                    key={tile.peer.id}
+                    width={tile.width}
+                    height={tile.height}
+                    peerId={tile.peer.id}
                   />
                 ))}
               </StyledVideoList.View>
             ))
           : null}
       </StyledVideoList.Container>
-      {chunkedTracksWithPeer.length > 1 ? (
+      {pagesWithTiles.length > 1 ? (
         <Pagination page={page} setPage={setPage} list={list} />
       ) : null}
     </StyledVideoList.Root>

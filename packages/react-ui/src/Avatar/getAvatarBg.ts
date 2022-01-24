@@ -11,6 +11,9 @@ const getInitials = (name: string | undefined) => {
   }
 };
 
+/**
+  calculates the initials of the name and choose a background color based on the first later of the initials
+ */
 export const getAvatarBg = (name: string): { initials: string; color: string } => {
   const initials = getInitials(name);
   const indexFactor = 20;

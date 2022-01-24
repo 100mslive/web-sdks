@@ -9,34 +9,35 @@ interface Props {
   maxTileCount?: number;
 }
 
-// TODO: set good default ask team
 export const VideoList: React.FC<Props> = ({ peers, maxTileCount = 4 }) => {
-  const { ref, chunkedTracksWithPeer } = useVideoList({
+  const { ref, pagesWithTiles } = useVideoList({
     peers,
     maxTileCount,
   });
   const [page, setPage] = React.useState(0);
   React.useEffect(() => {
     // currentPageIndex should not exceed pages length
-    if (page >= chunkedTracksWithPeer.length) {
+    if (page >= pagesWithTiles.length) {
       setPage(0);
     }
-  }, [chunkedTracksWithPeer.length, page]);
-  const list = new Array(chunkedTracksWithPeer.length).fill('');
+  }, [pagesWithTiles.length, page]);
   return (
     <StyledVideoList.Root>
       <StyledVideoList.Container ref={ref}>
-        {chunkedTracksWithPeer && chunkedTracksWithPeer.length > 0
-          ? chunkedTracksWithPeer.map((l, i) => (
-              <StyledVideoList.View css={{ left: getLeft(i, page), transition: 'left 0.3s ease-in-out' }} key={i}>
-                {l.map(p => (
-                  <VideoTile key={p.peer.id} width={p.width} height={p.height} peerId={p.peer.id} />
+        {pagesWithTiles && pagesWithTiles.length > 0
+          ? pagesWithTiles.map((tile, pageNo) => (
+              <StyledVideoList.View
+                css={{ left: getLeft(pageNo, page), transition: 'left 0.3s ease-in-out' }}
+                key={pageNo}
+              >
+                {tile.map(tile => (
+                  <VideoTile key={tile.peer.id} width={tile.width} height={tile.height} peerId={tile.peer.id} />
                 ))}
               </StyledVideoList.View>
             ))
           : null}
       </StyledVideoList.Container>
-      {chunkedTracksWithPeer.length > 1 ? <Pagination page={page} setPage={setPage} list={list} /> : null}
+      {pagesWithTiles.length > 1 ? <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} /> : null}
     </StyledVideoList.Root>
   );
 };

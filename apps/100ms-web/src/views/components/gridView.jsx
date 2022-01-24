@@ -33,7 +33,6 @@ export const GridCenterView = ({
 }) => {
   const { width } = useWindowSize();
   const isMobile = width < 760;
-  const rowCount = width < 760 ? 1 : undefined;
   return (
     <Fragment>
       <Box
@@ -58,9 +57,6 @@ export const GridCenterView = ({
                 videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
               }}
               maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
-              maxColCount={2}
-              maxRowCount={rowCount}
-              compact={peers.length > 2}
               // show stats for upto 2 peers in sidepane
               videoTileProps={videoTileProps}
             />

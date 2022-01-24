@@ -158,7 +158,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     </Tooltip>
   );
   leftComponents.push(
-    <Tooltip title={` Turn ${!isBRBOn ? "on" : "off"} BRB`} key="brb">
+    <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`} key="brb">
       <IconButton
         css={{ mx: "$2", "@md": { display: "none" } }}
         onClick={toggleBRB}
