@@ -5,15 +5,11 @@ import React, {
   useContext,
   useEffect,
 } from "react";
+import { Button, MessageModal, Text } from "@100mslive/hms-video-react";
 import {
-  Button,
-  MessageModal,
-  Text,
   useHMSActions,
   useHMSStatsStore,
   useHMSStore,
-} from "@100mslive/hms-video-react";
-import {
   selectHMSStats,
   selectTracksMap,
   selectPeerNameByID,
