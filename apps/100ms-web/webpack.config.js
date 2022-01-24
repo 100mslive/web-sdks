@@ -15,10 +15,12 @@ module.exports = {
   entry: "./index.js",
   output: {
     path: path.resolve(__dirname, "./build"),
-    filename: "[name].[chunkhash:8].js",
+    filename: "static/js/[name].[chunkhash:8].js",
+    assetModuleFilename: "static/media/[name].[hash][ext]",
     publicPath: "/",
     clean: true,
   },
+  devtool: "source-map",
   target: "web",
   resolve: {
     extensions: [".js", ".jsx", ".css", ".svg"],
@@ -84,7 +86,7 @@ module.exports = {
       ? [new BundleAnalyzerPlugin()]
       : []),
     new MiniCssExtractPlugin({
-      filename: "[name].[chunkhash:8].css",
+      filename: "static/css/[name].[chunkhash:8].css",
     }),
     new CopyPlugin({
       patterns: [
