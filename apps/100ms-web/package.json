@@ -2,6 +2,11 @@
   "name": "100ms_edtech_template",
   "version": "0.1.4",
   "private": true,
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist/**"
+  ],
   "dependencies": {
     "@100mslive/hms-noise-suppression": "0.1.6",
     "@100mslive/hms-video-react": "0.3.116-alpha.0",
@@ -29,6 +34,7 @@
     "prebuild": "rm -rf build",
     "build": "NODE_ENV=production webpack",
     "start": "webpack serve",
+    "esbuild": "node ../../scripts/build-webapp",
     "build:style": "NODE_ENV=production npx tailwindcss-cli@latest build ./src/index.css -o tailwind.css"
   },
   "browserslist": {
