@@ -118,14 +118,7 @@ export const getPacketsLostAndJitterFromReport = (report?: RTCStatsReport): { pa
 };
 
 export const union = <T>(arr1: T[], arr2: T[]): T[] => {
-  const set: Set<T> = new Set();
-  for (const elem of arr1) {
-    set.add(elem);
-  }
-  for (const elem of arr2) {
-    set.add(elem);
-  }
-  return Array.from(set);
+  return Array.from(new Set(arr1.concat(arr2)));
 };
 
 /**

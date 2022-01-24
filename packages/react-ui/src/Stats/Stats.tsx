@@ -62,20 +62,20 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
             />
           ) : null}
           {isNullish(videoTrackStats?.bitrate) ? (
-            <StatsRow label={'Bitrate (V)'} value={formatBytes(videoTrackStats?.bitrate, 'b/s')} />
+            <StatsRow label="Bitrate (V)" value={formatBytes(videoTrackStats?.bitrate, 'b/s')} />
           ) : null}
           {isNullish(audioTrackStats?.bitrate) ? (
-            <StatsRow label={'Bitrate (A)'} value={formatBytes(audioTrackStats?.bitrate, 'b/s')} />
+            <StatsRow label="Bitrate (A)" value={formatBytes(audioTrackStats?.bitrate, 'b/s')} />
           ) : null}
 
           <TrackPacketsLostRow stats={videoTrackStats} />
           <TrackPacketsLostRow stats={audioTrackStats} />
 
           {isNullish(videoTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (V)" value={videoTrackStats?.jitter?.toFixed(4).toString()} />
+            <StatsRow label="Jitter (V)" value={videoTrackStats?.jitter?.toFixed(4)} />
           ) : null}
           {isNullish(audioTrackStats?.jitter) ? (
-            <StatsRow label="Jitter (A)" value={audioTrackStats?.jitter?.toFixed(4).toString()} />
+            <StatsRow label="Jitter (A)" value={audioTrackStats?.jitter?.toFixed(4)} />
           ) : null}
         </tbody>
       </table>
