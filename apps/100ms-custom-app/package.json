@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "webpack serve",
-    "build": "webpack",
+    "build": "NODE_ENV=production webpack",
     "lint": "eslint src/**/*.js",
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write src/**/*.js"
