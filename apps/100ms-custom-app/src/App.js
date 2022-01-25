@@ -31,6 +31,8 @@ import '100ms_edtech_template/dist/index.css';
 
 const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
+console.log(hostname, process.env.REACT_APP_HOST_NAME);
+
 class App extends Component {
   constructor() {
     super();
@@ -173,8 +175,7 @@ class App extends Component {
 
   getToken = () => {
     try {
-      const cookieName =
-        process.env.REACT_APP_ENV === "qa" ? "authUser-qa" : "authUser";
+      const cookieName = process.env.REACT_APP_ENV === 'qa' ? 'authUser-qa' : 'authUser';
       const authUser = JSON.parse(cookies.getItem(cookieName));
       const token = authUser?.token;
       this.setState({ userEmail: authUser?.email });
