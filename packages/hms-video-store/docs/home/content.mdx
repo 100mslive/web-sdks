@@ -37,6 +37,7 @@ title: @100mslive/hms-video-store
 - [HMSDeviceChangeEvent](/api-reference/javascript/v2/interfaces/HMSDeviceChangeEvent)
 - [HMSException](/api-reference/javascript/v2/interfaces/HMSException)
 - [HMSLeaveRoomRequest](/api-reference/javascript/v2/interfaces/HMSLeaveRoomRequest)
+- [HMSLocalTrackStats](/api-reference/javascript/v2/interfaces/HMSLocalTrackStats)
 - [HMSMediaSettings](/api-reference/javascript/v2/interfaces/HMSMediaSettings)
 - [HMSMessage](/api-reference/javascript/v2/interfaces/HMSMessage)
 - [HMSNotification](/api-reference/javascript/v2/interfaces/HMSNotification)
@@ -50,6 +51,7 @@ title: @100mslive/hms-video-store
 - [HMSPublishAllowed](/api-reference/javascript/v2/interfaces/HMSPublishAllowed)
 - [HMSRTMP](/api-reference/javascript/v2/interfaces/HMSRTMP)
 - [HMSRecording](/api-reference/javascript/v2/interfaces/HMSRecording)
+- [HMSRemoteTrackStats](/api-reference/javascript/v2/interfaces/HMSRemoteTrackStats)
 - [HMSRole](/api-reference/javascript/v2/interfaces/HMSRole)
 - [HMSRoleChangeRequest](/api-reference/javascript/v2/interfaces/HMSRoleChangeRequest)
 - [HMSRoleChangeStoreRequest](/api-reference/javascript/v2/interfaces/HMSRoleChangeStoreRequest)
@@ -59,6 +61,7 @@ title: @100mslive/hms-video-store
 - [HMSStatsStoreWrapper](/api-reference/javascript/v2/interfaces/HMSStatsStoreWrapper)
 - [HMSStore](/api-reference/javascript/v2/interfaces/HMSStore)
 - [HMSTrack](/api-reference/javascript/v2/interfaces/HMSTrack)
+- [HMSTrackStats](/api-reference/javascript/v2/interfaces/HMSTrackStats)
 - [HMSVideoTrackSettings](/api-reference/javascript/v2/interfaces/HMSVideoTrackSettings)
 - [IHMSPlaylistActions](/api-reference/javascript/v2/interfaces/IHMSPlaylistActions)
 - [IHMSStatsStore](/api-reference/javascript/v2/interfaces/IHMSStatsStore)
@@ -71,12 +74,6 @@ title: @100mslive/hms-video-store
 ### DeviceMap
 
 Ƭ **DeviceMap**: `Omit`<`HMSDeviceManager`, `"outputDevice"` \| `"hasWebcamPermission"` \| `"hasMicrophonePermission"`\>
-
----
-
-### HMSLocalTrackStats
-
-Ƭ **HMSLocalTrackStats**: `BaseTrackStats` & `MissingOutboundStats`
 
 ---
 
@@ -112,12 +109,6 @@ title: @100mslive/hms-video-store
 
 ---
 
-### HMSRemoteTrackStats
-
-Ƭ **HMSRemoteTrackStats**: `BaseTrackStats` & `MissingInboundStats`
-
----
-
 ### HMSRoleName
 
 Ƭ **HMSRoleName**: `string`
@@ -145,12 +136,6 @@ title: @100mslive/hms-video-store
 ### HMSTrackSource
 
 Ƭ **HMSTrackSource**: `"regular"` \| `"screen"` \| `"plugin"` \| `"audioplaylist"` \| `"videoplaylist"` \| `string`
-
----
-
-### HMSTrackStats
-
-Ƭ **HMSTrackStats**: `BaseTrackStats` & `MissingInboundStats` & `MissingOutboundStats`
 
 ---
 

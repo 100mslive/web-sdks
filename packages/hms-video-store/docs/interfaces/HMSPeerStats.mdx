@@ -6,10 +6,10 @@ title: HMSPeerStats
 
 ### publish
 
-• `Optional` **publish**: `RTCIceCandidatePairStats` & `WithBitrate`
+• `Optional` **publish**: `RTCIceCandidatePairStats` & { `bitrate`: `number` }
 
 ---
 
 ### subscribe
 
-• `Optional` **subscribe**: `RTCIceCandidatePairStats` & `WithBitrate` & `AdditionalPeerStats`
+• `Optional` **subscribe**: `RTCIceCandidatePairStats` & { `bitrate`: `number` ; `jitter`: `number` ; `packetsLost`: `number` ; `packetsLostRate`: `number` }
