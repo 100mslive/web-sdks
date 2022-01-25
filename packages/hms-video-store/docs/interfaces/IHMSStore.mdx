@@ -8,6 +8,7 @@ and get a callback when the value changes.
 ## Hierarchy
 
 - `IStore`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore)\>
+
   ↳ **`IHMSStore`**
 
 ## Properties
@@ -25,7 +26,9 @@ IStore.destroy
 ### getState
 
 • **getState**: `GetState`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore)\>
+
 Get a part of store using a selector which is true at the current point of time.
+
 Usage: `store.getState(selectDominantSpeaker);`
 
 #### Inherited from
@@ -47,8 +50,10 @@ IStore.setState
 ### subscribe
 
 • **subscribe**: `Subscribe`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore)\>
+
 Subscribe to a part of store using selectors, whenever the subscribed part changes, the callback
 is called with both the latest and previous value of the changed part.
+
 Usage:
 
 ```
@@ -61,4 +66,3 @@ store.subscribe(onSpeakerUpdate, selectDominantSpeaker);
 #### Inherited from
 
 IStore.subscribe
-e

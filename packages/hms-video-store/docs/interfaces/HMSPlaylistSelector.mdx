@@ -9,6 +9,7 @@ Helpful selectors for audio and video playlist
 ### currentTime
 
 ▸ **currentTime**(`store`): `number`
+
 returns the current time of the playlist in seconds
 
 #### Parameters
@@ -26,6 +27,7 @@ returns the current time of the playlist in seconds
 ### list
 
 ▸ **list**<`T`\>(`store`): [`HMSPlaylistItem`](/api-reference/javascript/v2/interfaces/HMSPlaylistItem)<`T`\>[]
+
 returns the playlist items list as set initially
 
 #### Type parameters
@@ -49,6 +51,7 @@ returns the playlist items list as set initially
 ### playbackRate
 
 ▸ **playbackRate**(`store`): `number`
+
 returns the playback rate, a number between 0.25-2.0.
 
 #### Parameters
@@ -66,6 +69,7 @@ returns the playback rate, a number between 0.25-2.0.
 ### progress
 
 ▸ **progress**(`store`): `number`
+
 returns the current progress percentage, a number between 0-100
 
 #### Parameters
@@ -83,6 +87,7 @@ returns the current progress percentage, a number between 0-100
 ### selectedItem
 
 ▸ **selectedItem**<`T`\>(`store`): [`HMSPlaylistItem`](/api-reference/javascript/v2/interfaces/HMSPlaylistItem)<`T`\>
+
 This returns playlist item for corresponding Id in selection
 
 #### Type parameters
@@ -106,6 +111,7 @@ This returns playlist item for corresponding Id in selection
 ### selection
 
 ▸ **selection**(`store`): [`HMSPlaylistSelection`](/api-reference/javascript/v2/interfaces/HMSPlaylistSelection)
+
 This returns playlist selection with {id, hasNext, hasPrev}
 
 #### Parameters
@@ -123,6 +129,7 @@ This returns playlist selection with {id, hasNext, hasPrev}
 ### volume
 
 ▸ **volume**(`store`): `number`
+
 returns the current volume the playlist is playing at, a number between 0-100
 
 #### Parameters
@@ -130,10 +137,6 @@ returns the current volume the playlist is playing at, a number between 0-100
 | Name    | Type                                                           |
 | :------ | :------------------------------------------------------------- |
 | `store` | [`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore) |
-
-#### Returns
-
-`number`
 
 #### Returns
 

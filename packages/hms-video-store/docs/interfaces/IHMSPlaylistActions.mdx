@@ -7,6 +7,7 @@ title: IHMSPlaylistActions
 ### pause
 
 ▸ **pause**(): `Promise`<`void`\>
+
 Pauses current playing item
 
 #### Returns
@@ -18,6 +19,7 @@ Pauses current playing item
 ### play
 
 ▸ **play**(`id`): `Promise`<`void`\>
+
 Pass the id of the item to be played
 
 #### Parameters
@@ -35,6 +37,7 @@ Pass the id of the item to be played
 ### playNext
 
 ▸ **playNext**(): `Promise`<`void`\>
+
 PlayNext
 
 #### Returns
@@ -46,6 +49,7 @@ PlayNext
 ### playPrevious
 
 ▸ **playPrevious**(): `Promise`<`void`\>
+
 PlayPrevious
 
 #### Returns
@@ -57,6 +61,7 @@ PlayPrevious
 ### seek
 
 ▸ **seek**(`seekValue`): `void`
+
 seek passing seekValue - this is relative to current position
 
 #### Parameters
@@ -74,6 +79,7 @@ seek passing seekValue - this is relative to current position
 ### seekTo
 
 ▸ **seekTo**(`seekValue`): `void`
+
 seek passing seekValue - seekValue will be absolute
 
 #### Parameters
@@ -91,6 +97,7 @@ seek passing seekValue - seekValue will be absolute
 ### setIsAutoplayOn
 
 ▸ **setIsAutoplayOn**(`autoplay`): `void`
+
 set whether to autoplay next item in playlist after the current one ends
 
 #### Parameters
@@ -108,6 +115,7 @@ set whether to autoplay next item in playlist after the current one ends
 ### setList
 
 ▸ **setList**<`T`\>(`list`): `void`
+
 pass list to set playlist
 
 #### Type parameters
@@ -131,6 +139,7 @@ pass list to set playlist
 ### setPlaybackRate
 
 ▸ **setPlaybackRate**(`playbackRate`): `void`
+
 Control the playback speed - 1.0 being normal, less than 1.0 will play it slowly
 and more than 1.0 will play it faster.
 
@@ -149,6 +158,7 @@ and more than 1.0 will play it faster.
 ### setVolume
 
 ▸ **setVolume**(`volume`): `void`
+
 set volume passing volume
 
 #### Parameters
@@ -166,12 +176,8 @@ set volume passing volume
 ### stop
 
 ▸ **stop**(): `Promise`<`void`\>
+
 Stop the current playback and remove the tracks
-
-#### Returns
-
-`Promise`<`void`\>
-the tracks
 
 #### Returns
 

@@ -10,6 +10,7 @@ In case you use react, we also provide a HMSProvider class with very powerful ho
 and out of box components which you can use to setup your website in minutes. Our
 components have in built integration with this interface and you won't have to worry
 about passing props if you use them.
+
 **`remarks`**
 There is a one to one mapping between an instance of this class and a 100ms room,
 in case you're creating multiple rooms please create new instance per room.
@@ -19,6 +20,7 @@ in case you're creating multiple rooms please create new instance per room.
 ### audioPlaylist
 
 • **audioPlaylist**: [`IHMSPlaylistActions`](/api-reference/javascript/v2/interfaces/IHMSPlaylistActions)
+
 audio Playlist contains all actions that can be performed on the audio playlist
 This will be available after joining the room
 
@@ -27,6 +29,7 @@ This will be available after joining the room
 ### videoPlaylist
 
 • **videoPlaylist**: [`IHMSPlaylistActions`](/api-reference/javascript/v2/interfaces/IHMSPlaylistActions)
+
 video Playlist contains all actions that can be performed on the video playlist
 This will be available after joining the room
 
@@ -35,6 +38,7 @@ This will be available after joining the room
 ### acceptChangeRole
 
 ▸ **acceptChangeRole**(`request`): `Promise`<`void`\>
+
 Accept the role change request received
 
 #### Parameters
@@ -68,9 +72,11 @@ Accept the role change request received
 ### addPluginToVideoTrack
 
 ▸ **addPluginToVideoTrack**(`plugin`, `pluginFrameRate?`): `Promise`<`void`\>
+
 Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
 Video plugins can be added/removed at any time after the join is successful.
 pluginFrameRate is the rate at which the output plugin will do processing
+
 **`see`** HMSVideoPlugin
 
 #### Parameters
@@ -89,6 +95,7 @@ pluginFrameRate is the rate at which the output plugin will do processing
 ### addTrack
 
 ▸ **addTrack**(`track`, `type`): `Promise`<`void`\>
+
 You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
 This method adds the track to the local peer's list of auxiliary tracks and publishes it to make it available to remote peers.
 
@@ -108,6 +115,7 @@ This method adds the track to the local peer's list of auxiliary tracks and publ
 ### attachVideo
 
 ▸ **attachVideo**(`localTrackID`, `videoElement`): `Promise`<`void`\>
+
 You can use the attach and detach video function
 to add/remove video from an element for a track ID. The benefit of using this
 instead of removing the video yourself is that it'll also auto unsubscribe to
@@ -129,7 +137,9 @@ the stream coming from server saving significant bandwidth for the user.
 ### changeMetadata
 
 ▸ **changeMetadata**(`metadata`): `Promise`<`void`\>
+
 If you want to update the metadata of peer.
+
 **`beta`**
 
 #### Parameters
@@ -147,7 +157,9 @@ If you want to update the metadata of peer.
 ### changeName
 
 ▸ **changeName**(`name`): `Promise`<`void`\>
+
 If you want to update the name of peer.
+
 **`beta`**
 
 #### Parameters
@@ -165,6 +177,7 @@ If you want to update the name of peer.
 ### changeRole
 
 ▸ **changeRole**(`forPeerId`, `toRole`, `force?`): `Promise`<`void`\>
+
 Request for a role change of a remote peer. Can be forced.
 
 #### Parameters
@@ -184,6 +197,7 @@ Request for a role change of a remote peer. Can be forced.
 ### detachVideo
 
 ▸ **detachVideo**(`localTrackID`, `videoElement`): `Promise`<`void`\>
+
 **`see`** attachVideo
 
 #### Parameters
@@ -202,6 +216,7 @@ Request for a role change of a remote peer. Can be forced.
 ### endRoom
 
 ▸ **endRoom**(`lock`, `reason`): `Promise`<`void`\>
+
 If you have the **endRoom** permission, you can end the room. That means everyone will be kicked out.
 If lock is passed as true, the room cannot be used further.
 
@@ -221,8 +236,10 @@ If lock is passed as true, the room cannot be used further.
 ### join
 
 ▸ **join**(`config`): `void`
+
 join function can be used to join the room, if the room join is successful,
 current details of participants and track details are populated in the store.
+
 **`remarks`**
 If join is called while an earlier join is in progress for the room id, it
 is ignored
@@ -242,6 +259,7 @@ is ignored
 ### leave
 
 ▸ **leave**(): `Promise`<`void`\>
+
 This function can be used to leave the room, if the call is repeated it's ignored.
 
 #### Returns
@@ -269,6 +287,7 @@ This function can be used to leave the room, if the call is repeated it's ignore
 ### rejectChangeRole
 
 ▸ **rejectChangeRole**(`request`): `void`
+
 Reject pending role change request
 
 #### Parameters
@@ -286,6 +305,7 @@ Reject pending role change request
 ### removePeer
 
 ▸ **removePeer**(`peerID`, `reason`): `Promise`<`void`\>
+
 If you have **removeOthers** permission, you can remove a peer from the room.
 
 #### Parameters
@@ -320,6 +340,7 @@ If you have **removeOthers** permission, you can remove a peer from the room.
 ### removePluginFromVideoTrack
 
 ▸ **removePluginFromVideoTrack**(`plugin`): `Promise`<`void`\>
+
 **`see`** addPluginToVideoTrack
 
 #### Parameters
@@ -337,6 +358,7 @@ If you have **removeOthers** permission, you can remove a peer from the room.
 ### removeTrack
 
 ▸ **removeTrack**(`trackId`): `Promise`<`void`\>
+
 You can use the removeTrack method to remove an auxiliary track.
 This method removes the track from the local peer's list of auxiliary tracks and unpublishes it.
 
@@ -355,6 +377,7 @@ This method removes the track from the local peer's list of auxiliary tracks and
 ### sendBroadcastMessage
 
 ▸ **sendBroadcastMessage**(`message`, `type?`): `Promise`<`void`\>
+
 Send a plain text message to all the other participants in the room.
 
 #### Parameters
@@ -409,7 +432,9 @@ Send a plain text message to all the other participants in the room.
 ### sendMessage
 
 ▸ **sendMessage**(`message`): `void`
+
 **`deprecated`** The method should not be used
+
 **`see`** sendBroadcastMessage
 Send a plain text message to all the other participants in the room.
 
@@ -428,6 +453,7 @@ Send a plain text message to all the other participants in the room.
 ### setAudioOutputDevice
 
 ▸ **setAudioOutputDevice**(`deviceId`): `void`
+
 Set the audio output(speaker) device
 
 #### Parameters
@@ -445,6 +471,7 @@ Set the audio output(speaker) device
 ### setAudioSettings
 
 ▸ **setAudioSettings**(`settings`): `Promise`<`void`\>
+
 Change settings of the local peer's audio track
 
 #### Parameters
@@ -479,6 +506,7 @@ Change settings of the local peer's audio track
 ### setLocalAudioEnabled
 
 ▸ **setLocalAudioEnabled**(`enabled`): `Promise`<`void`\>
+
 This function can be used to enable/disable(unmute/mute) local audio track
 
 #### Parameters
@@ -496,6 +524,7 @@ This function can be used to enable/disable(unmute/mute) local audio track
 ### setLocalVideoEnabled
 
 ▸ **setLocalVideoEnabled**(`enabled`): `Promise`<`void`\>
+
 This function can be used to enable/disable(unmute/mute) local video track
 
 #### Parameters
@@ -513,7 +542,9 @@ This function can be used to enable/disable(unmute/mute) local video track
 ### setLogLevel
 
 ▸ **setLogLevel**(`level`): `void`
+
 Set the type of logs from the SDK you want to be logged in the browser console.
+
 Note that HMSLogLevel is decremental meaning,
 
 - HMSLogLevel.VERBOSE(0) - will log every message from SDK.
@@ -522,7 +553,8 @@ Note that HMSLogLevel is decremental meaning,
 - HMSLogLevel.WARN(3) - will log warnings and errors.
 - HMSLogLevel.ERROR(4) - will log only errors.
 - HMSLogLevel.NONE(5) - won't log anything.
-  Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
+
+Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
 
 #### Parameters
 
@@ -539,6 +571,7 @@ Note that HMSLogLevel is decremental meaning,
 ### setMessageRead
 
 ▸ **setMessageRead**(`readStatus`, `messageId?`): `void`
+
 If just readStatus argument is passed, the function will set read flag of every message
 as the readStatus argument passed.
 If both readStatus and messageId argument is passed, then just read flag of message
@@ -561,6 +594,7 @@ found in store, no change in store will take place.
 ### setPreferredLayer
 
 ▸ **setPreferredLayer**(`trackId`, `layer`): `void`
+
 set the quality of the selected videoTrack
 
 #### Parameters
@@ -579,6 +613,7 @@ set the quality of the selected videoTrack
 ### setRemoteTrackEnabled
 
 ▸ **setRemoteTrackEnabled**(`forRemoteTrackID`, `enabled`): `Promise`<`void`\>
+
 Change track state a remote peer's track
 This can be used to mute/unmute a remote peer's track
 
@@ -598,6 +633,7 @@ This can be used to mute/unmute a remote peer's track
 ### setRemoteTracksEnabled
 
 ▸ **setRemoteTracksEnabled**(`params`): `Promise`<`void`\>
+
 Use this to mute/unmute multipe tracks by source, role or type
 
 #### Parameters
@@ -615,6 +651,7 @@ Use this to mute/unmute multipe tracks by source, role or type
 ### setScreenShareEnabled
 
 ▸ **setScreenShareEnabled**(`enabled`, `audioOnly?`): `Promise`<`void`\>
+
 If you want to enable screenshare for the local peer this class can be called.
 The store will be populated with the incoming track, and the subscriber(or
 react component if our hook is used) will be notified/rerendered
@@ -635,6 +672,7 @@ react component if our hook is used) will be notified/rerendered
 ### setVideoSettings
 
 ▸ **setVideoSettings**(`settings`): `Promise`<`void`\>
+
 Change settings of the local peer's video track
 
 #### Parameters
@@ -652,6 +690,7 @@ Change settings of the local peer's video track
 ### setVolume
 
 ▸ **setVolume**(`value`, `trackId?`): `void`
+
 Set the output volume of audio tracks(overall/particular audio track)
 
 #### Parameters
@@ -670,6 +709,7 @@ Set the output volume of audio tracks(overall/particular audio track)
 ### startHLSStreaming
 
 ▸ **startHLSStreaming**(`params`): `Promise`<`void`\>
+
 If you want to start HLS streaming.
 
 #### Parameters
@@ -687,6 +727,7 @@ If you want to start HLS streaming.
 ### startRTMPOrRecording
 
 ▸ **startRTMPOrRecording**(`params`): `Promise`<`void`\>
+
 If you want to start RTMP streaming or recording.
 
 #### Parameters
@@ -704,6 +745,7 @@ If you want to start RTMP streaming or recording.
 ### stopHLSStreaming
 
 ▸ **stopHLSStreaming**(`params?`): `Promise`<`void`\>
+
 If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
 
 #### Parameters
@@ -721,6 +763,7 @@ If you want to stop HLS streaming. The passed in arguments is not considered at 
 ### stopRTMPAndRecording
 
 ▸ **stopRTMPAndRecording**(): `Promise`<`void`\>
+
 If you want to stop both RTMP streaming and recording.
 
 #### Returns
@@ -732,15 +775,8 @@ If you want to stop both RTMP streaming and recording.
 ### unblockAudio
 
 ▸ **unblockAudio**(): `Promise`<`void`\>
+
 Method to be called with some UI interaction after autoplay error is received
-Most browsers have limitations where an audio can not be played if there was no user interaction.
-SDK throws an autoplay error in this case, this method can be called after an UI interaction
-to resolve the autoplay error
-
-#### Returns
-
-`Promise`<`void`\>
-teraction after autoplay error is received
 Most browsers have limitations where an audio can not be played if there was no user interaction.
 SDK throws an autoplay error in this case, this method can be called after an UI interaction
 to resolve the autoplay error
