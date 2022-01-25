@@ -50,6 +50,9 @@ export interface GetState<T extends State> {
   <StateSlice>(selector?: StateSelector<T, StateSlice>): StateSlice;
 }
 
+/**
+ * @internal
+ */
 export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'namedSetState' | 'destroy'>;
 
 /**

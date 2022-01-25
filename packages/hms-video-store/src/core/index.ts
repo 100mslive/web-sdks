@@ -1,4 +1,5 @@
 export type {
+  IStoreReadOnly,
   IHMSStore,
   IHMSStoreReadOnly as HMSStoreWrapper,
   IHMSStatsStore,
