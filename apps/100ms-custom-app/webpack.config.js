@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 require('dotenv').config();
 
 module.exports = {
@@ -97,7 +97,7 @@ module.exports = {
         };
       },
     }),
-    ...(process.env.NODE_ENV !== 'production' ? [new BundleAnalyzerPlugin()] : []),
+    // ...(process.env.NODE_ENV !== 'production' ? [new BundleAnalyzerPlugin()] : []),
     new MiniCssExtractPlugin({
       filename: 'static/css/[name].[chunkhash:8].css',
     }),
