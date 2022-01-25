@@ -12,7 +12,7 @@ import shallow from 'zustand/shallow';
 import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
-import { IStore } from '../IHMSStore';
+import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
 import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
@@ -118,9 +118,8 @@ export class HMSReactiveStore {
 
   /**
    * @alpha
-   * @internal
    */
-  getStats = (): HMSStats => {
+  getStats = (): IHMSStatsStoreReadOnly => {
     if (!this.stats) {
       this.stats = new HMSStats(this.store, this.sdk);
     }
