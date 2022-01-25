@@ -10,6 +10,7 @@ async function main() {
   esbuild.build({
     entryPoints: [source],
     outfile: 'dist/index.cjs.js',
+    assetNames: '[name]',
     minify: true,
     bundle: true,
     format: 'cjs',
@@ -31,6 +32,7 @@ async function main() {
   esbuild.build({
     entryPoints: [source],
     outfile: 'dist/index.js',
+    assetNames: '[name]',
     minify: false,
     bundle: true,
     format: 'esm',
