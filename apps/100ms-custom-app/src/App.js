@@ -29,7 +29,7 @@ import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 import '100ms_edtech_template/dist/index.css';
 
-const hostname = window.location.hostname;
+const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
 class App extends Component {
   constructor() {
