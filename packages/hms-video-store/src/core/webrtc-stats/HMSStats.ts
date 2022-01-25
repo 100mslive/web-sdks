@@ -1,19 +1,14 @@
 import { HMSSdk } from '@100mslive/hms-video';
 import { Subscribe } from 'zustand/vanilla';
 import { storeNameWithTabTitle } from '../../common/storeName';
-import {
-  createDefaultStatsStore,
-  HMSStatsStore,
-  HMSReactiveStore,
-  IHMSStore,
-  IHMSStatsStore,
-  HMSStatsStoreWrapper,
-  GetState,
-  selectRoomState,
-} from '..';
+import { createDefaultStatsStore, HMSStatsStore, HMSReactiveStore, selectRoomState } from '..';
+import { IHMSStore, IHMSStatsStore, IHMSStatsStoreReadOnly, GetState } from '../IHMSStore';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 
-export class HMSStats implements HMSStatsStoreWrapper {
+/**
+ * @internal
+ */
+export class HMSStats implements IHMSStatsStoreReadOnly {
   readonly getState: GetState<HMSStatsStore>;
   readonly subscribe: Subscribe<HMSStatsStore>;
   readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;

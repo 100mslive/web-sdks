@@ -1,9 +1,7 @@
 export type {
-  IStore,
   IStoreReadOnly,
   IHMSStore,
   IHMSStoreReadOnly as HMSStoreWrapper,
-  GetState,
   IHMSStatsStore,
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
