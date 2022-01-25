@@ -13,14 +13,14 @@ export const StyledVideo = styled('video', {
   objectFit: 'cover',
   background: '$grey1',
   variants: {
-    isLocal: {
+    mirror: {
       true: {
         transform: 'scaleX(-1)',
       },
     },
   },
   defaultVariants: {
-    isLocal: false,
+    mirror: false,
   },
 });
 
@@ -34,12 +34,12 @@ interface Props {
   /**
    * flips the video if local peer rendered
    */
-  isLocal: HMSPeer['isLocal'];
+  mirror: HMSPeer['isLocal'];
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, isLocal, ...props }) => {
+export const Video: React.FC<Props & StyledProps> = ({ trackId, mirror, ...props }) => {
   const ref = useVideo(trackId || '');
-  return <StyledVideo isLocal={isLocal} autoPlay muted playsInline ref={ref} {...props} />;
+  return <StyledVideo mirror={mirror} autoPlay muted playsInline ref={ref} {...props} />;
 };
 
 export default Video;

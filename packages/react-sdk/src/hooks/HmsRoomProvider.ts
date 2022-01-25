@@ -131,7 +131,7 @@ export const useHMSVanillaStore = () => {
 };
 
 /*
- * `useHMSActions` is a write ony hook which can be used to dispatch actions.
+ * `useHMSActions` is a write only hook which can be used to dispatch actions.
  */
 export const useHMSActions = () => {
   const HMSContextConsumer = useContext(HMSContext);
