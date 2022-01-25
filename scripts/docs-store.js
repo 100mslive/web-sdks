@@ -31,7 +31,10 @@ const replaceTitleWithMetadata = content => {
     return;
   }
   const firstLineParts = firstLine.split(' ');
-  const title = firstLineParts.at(2) || firstLineParts.at(1);
+  let title = firstLineParts.at(2) || firstLineParts.at(1);
+  if (title === "@100mslive/hms-video-store") {
+    title = "Web SDK API Reference"; // for the root content.mdx
+  }
   const meta = `---\ntitle: ${title}\n---`;
   lines.splice(0, 1, meta);
   return lines.join('\n');
