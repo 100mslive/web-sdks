@@ -66,13 +66,13 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
 
           <StatsRow
             show={isNotNullish(videoTrackStats?.bitrate)}
-            label={videoTrackStats?.type.includes('inbound') ? 'Bitrate (V)' : 'Bitrate (V)'}
+            label="Bitrate (V)"
             value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
           />
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.bitrate)}
-            label={audioTrackStats?.type.includes('inbound') ? 'Bitrate (A)' : 'Bitrate (A)'}
+            label="Bitrate (A)"
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 

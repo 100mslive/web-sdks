@@ -1,7 +1,7 @@
 import { styled } from '../stitches.config';
 
 export const Root = styled('div', {
-  padding: '1rem',
+  padding: '0.75rem',
   // show videotile context menu on hover
   // [`&:hover .tile-menu`]: {
   //   display: 'inline-block',
