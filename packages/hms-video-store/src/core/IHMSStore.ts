@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+
+/**
+ * Disabling this lint option so that
+ * IHMSStore, IHMSStoreReadOnly, IHMSStatsStore, IHMSStatsStoreReadOnly
+ * are exported as interfaces to include tsdoc comments with them.
+ */
+
 import { HMSStore, HMSStatsStore } from './schema';
 import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
 import { NamedSetState } from './hmsSDKStore/internalTypes';
