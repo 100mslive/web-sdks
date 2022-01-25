@@ -2,13 +2,18 @@
   "name": "100ms_edtech_template",
   "version": "0.1.4",
   "private": true,
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist/**"
+  ],
   "dependencies": {
     "@100mslive/hms-noise-suppression": "0.1.6",
     "@100mslive/hms-video-react": "0.3.116-alpha.0",
     "@100mslive/hms-virtual-background": "1.3.7",
     "@100mslive/react-icons": "0.0.5-alpha.1",
-    "@100mslive/react-sdk": "0.0.5-alpha.1",
-    "@100mslive/react-ui": "0.0.5-alpha.4",
+    "@100mslive/react-sdk": "0.0.5-alpha.3",
+    "@100mslive/react-ui": "0.0.5-alpha.6",
     "@craco/craco": "^6.1.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -28,6 +33,8 @@
   },
   "scripts": {
     "start": "craco start",
+    "dev": "node ../../scripts/dev-webapp",
+    "esbuild": "node ../../scripts/build-webapp",
     "build": "craco build --profile",
     "test": "craco test",
     "eject": "react-scripts eject",
