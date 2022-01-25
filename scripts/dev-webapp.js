@@ -5,7 +5,7 @@ async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = 'src/App.js';
   const external = Object.keys(pkg.dependencies || {});
-  const loader = { '.js': 'jsx', '.svg': 'file' };
+  const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'file' };
 
   esbuild.build({
     entryPoints: [source],
