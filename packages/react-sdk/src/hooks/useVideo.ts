@@ -6,7 +6,7 @@ import { useHMSActions, useHMSStore } from './HmsRoomProvider';
 /**
  *
  * @param trackId {HMSTrackID}
- * @returns
+ * the returned ref can be used to set on a video element meant to display the video for the passed in track id. The hook will take care of attaching and detaching video, and will automatically detach when the video goes out of view to save on bandwidth.
  */
 export const useVideo = (trackId: HMSTrackID) => {
   const actions = useHMSActions();
