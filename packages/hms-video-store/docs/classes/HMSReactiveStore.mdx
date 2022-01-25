@@ -18,11 +18,24 @@ title: HMSReactiveStore
 
 ## Methods
 
+### getActions
+
+▸ **getActions**(): [`HMSActions`](/api-reference/javascript/v2/interfaces/HMSActions)
+Any action which may modify the store or may need to talk to the SDK will happen
+through the IHMSActions instance returned by this
+
+#### Returns
+
+[`HMSActions`](/api-reference/javascript/v2/interfaces/HMSActions)
+
+---
+
 ### getHMSActions
 
 ▸ **getHMSActions**(): [`HMSActions`](/api-reference/javascript/v2/interfaces/HMSActions)
 Any action which may modify the store or may need to talk to the SDK will happen
 through the IHMSActions instance returned by this
+**`deprecated`** use getActions
 
 #### Returns
 
@@ -40,6 +53,17 @@ for analytics
 #### Returns
 
 [`HMSNotifications`](/api-reference/javascript/v2/interfaces/HMSNotifications)
+
+---
+
+### getStats
+
+▸ **getStats**(): [`HMSStatsStoreWrapper`](/api-reference/javascript/v2/interfaces/HMSStatsStoreWrapper)
+**`alpha`**
+
+#### Returns
+
+[`HMSStatsStoreWrapper`](/api-reference/javascript/v2/interfaces/HMSStatsStoreWrapper)
 
 ---
 
@@ -67,5 +91,8 @@ This will be an irreversible change
 Note: you don't need this if you're using our react hooks, it takes care of this requirement.
 
 #### Returns
+
+`void`
+s
 
 `void`

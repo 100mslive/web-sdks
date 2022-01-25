@@ -12,7 +12,7 @@ HMS store can be used to:
 
 ## Hierarchy
 
-- `Omit`<[`IHMSStore`](/api-reference/javascript/v2/interfaces/IHMSStore), `"setState"` \| `"namedSetState"` \| `"destroy"`\>
+- `IStoreReadOnly`<[`HMSStore`](/api-reference/javascript/v2/interfaces/HMSStore)\>
   ↳ **`HMSStoreWrapper`**
 
 ## Properties
@@ -25,7 +25,7 @@ Usage: `store.getState(selectDominantSpeaker);`
 
 #### Inherited from
 
-Omit.getState
+IStoreReadOnly.getState
 
 ---
 
@@ -45,4 +45,4 @@ store.subscribe(onSpeakerUpdate, selectDominantSpeaker);
 
 #### Inherited from
 
-Omit.subscribe
+IStoreReadOnly.subscribe

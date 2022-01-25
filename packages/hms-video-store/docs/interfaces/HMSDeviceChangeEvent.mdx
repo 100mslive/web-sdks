@@ -1,0 +1,29 @@
+---
+title: HMSDeviceChangeEvent
+---
+
+Test fails when adding InputDeviceInfo[error TS2304: Cannot find name 'InputDeviceInfo'.]
+
+So, `selection?: MediaDeviceInfo` instead of `selection?: InputDeviceInfo | MediaDeviceInfo` is valid
+
+## Properties
+
+### devices
+
+---
+
+### error
+
+• `Optional` **error**: [`HMSException`](/api-reference/javascript/v2/interfaces/HMSException)
+
+---
+
+### selection
+
+• `Optional` **selection**: `MediaDeviceInfo`
+
+---
+
+### type
+
+• **type**: `"audioInput"` \| `"audioOutput"` \| `"video"`
