@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish_packages:
+  generate_api_reference:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
