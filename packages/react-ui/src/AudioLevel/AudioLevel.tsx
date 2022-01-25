@@ -15,6 +15,9 @@ interface Props {
   audioTrack: HMSPeer['audioTrack'];
 }
 
+/**
+ * displays audio level for peer based on the audioTrack id
+ */
 export const AudioLevel: React.FC<Props> = ({ audioTrack }) => {
   const color = '#0F6CFF';
   const getStyle = useCallback((level: number) => {

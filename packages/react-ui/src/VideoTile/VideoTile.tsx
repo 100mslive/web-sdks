@@ -38,7 +38,7 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
       <StyledVideoTile.Container>
         <VideoTileStats height={height} audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
         <AudioLevel audioTrack={peer?.audioTrack} />
-        <Video isLocal={peer?.isLocal || false} trackId={peer?.videoTrack} />
+        <Video mirror={peer?.isLocal || false} trackId={peer?.videoTrack} />
         {isVideoMuted ? <Avatar size={getAvatarSize(width)} name={peer?.name || ''} /> : null}
         <StyledVideoTile.Info>{peer?.name}</StyledVideoTile.Info>
         {isAudioMuted ? (
@@ -48,9 +48,9 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
         ) : null}
         {showTrigger && !peer?.isLocal ? <TileMenu peerId={peerId} /> : null}
         {isHandRaised ? (
-          <StyledVideoTile.HandRaiseBox>
+          <StyledVideoTile.AttributeBox>
             <HandRaiseFilledIcon width={40} height={40} />
-          </StyledVideoTile.HandRaiseBox>
+          </StyledVideoTile.AttributeBox>
         ) : null}
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
