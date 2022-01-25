@@ -51,7 +51,6 @@
     "format": "lerna run format --stream",
     "test": "yarn build && lerna run test --stream",
     "start": "lerna run start --stream",
-    "prebuild": "lerna run esbuild",
     "build": "lerna run build --stream",
     "size": "lerna run size --stream",
     "build:only": "lerna run build:only --stream",
