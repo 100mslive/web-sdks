@@ -1,7 +1,6 @@
 import {
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
-  HMSPeerConnectionStats,
   HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
@@ -194,13 +193,6 @@ export class SDKToHMS {
       selected: isSelected,
       playing: isSelected && isPlaying,
     };
-  }
-
-  static convertConnectionStats(stats: HMSPeerConnectionStats) {
-    const serialized: any = { ...stats };
-    delete serialized['rawStatsArray'];
-    delete serialized['rawStats'];
-    return serialized;
   }
 
   private static getConvertedPlaylistType(playlistManager: sdkTypes.HMSPlaylistManager, type: HMSPlaylistType) {

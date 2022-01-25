@@ -43,6 +43,7 @@ export interface IStore {
   getRemotePeers(): HMSRemotePeer[];
   getPeers(): HMSPeer[];
 
+  getTracksMap(): Record<string, HMSTrack>;
   getTracks(): HMSTrack[];
   getVideoTracks(): HMSVideoTrack[];
   getAudioTracks(): HMSAudioTrack[];

@@ -1,112 +1,82 @@
-import { PeerConnectionType } from '.';
-
-export class HMSPeerConnectionStats {
-  packetsLost = 0;
-  jitter = 0;
-  private rawStatsArray: RTCStats[] = [];
-
-  constructor(
-    public type: PeerConnectionType,
-    private rawStats: RTCStatsReport,
-    private readonly getTrackIDBeingSent: (trackID: string) => string | undefined,
-  ) {
-    /**
-     * @TODO Instead of traversing through all stats to get packetsLost, jitter, etc.,
-     * filter for those stat types which have these properties.
-     *
-     * Stat type -> properties can be found here: https://www.w3.org/TR/webrtc-stats/#summary
-     */
-    this.rawStats.forEach(r => {
-      if (r.packetsLost) {
-        this.packetsLost += r.packetsLost;
-      }
-      if (r.jitter > this.jitter) {
-        this.jitter = r.jitter;
-      }
-      this.rawStatsArray.push(r);
-    });
-    // console.log(
-    //   'Stats',
-    //   type,
-    //   this,
-    //   this.rawStatsArray.map(r => [r.type, r.id, r]),
-    // );
-  }
-
-  getTrackStats(trackId: string): RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined {
-    const statsTrackId = this.getTrackIDBeingSent(trackId);
-    // Get track stats by filtering using trackIdentifer
-    const trackStats = this.rawStatsArray.find(
-      // @ts-expect-error
-      rawStat => rawStat.type === 'track' && rawStat.trackIdentifier === statsTrackId,
-    );
-
-    // The 'id' of the trackStats should match the trackId of the 'inbound-rtp' streamStats
-    const streamStats =
-      trackStats &&
-      (this.rawStatsArray.find(
-        rawStat =>
-          // @ts-expect-error
-          (rawStat.type === 'inbound-rtp' || rawStat.type === 'outbound-rtp') && rawStat.trackId === trackStats.id,
-      ) as RTCRtpStreamStats);
-
-    return trackStats && streamStats && Object.assign({}, trackStats, streamStats);
-  }
-
-  getLocalPeerStats(): RTCIceCandidatePairStats | undefined {
-    let activeCandidatePair: RTCIceCandidatePairStats | undefined;
-    this.rawStats.forEach(report => {
-      if (report.type === 'transport') {
-        // TS doesn't have correct types for RTCStatsReports
-        // @ts-expect-error
-        activeCandidatePair = this.rawStats.get(report.selectedCandidatePairId);
-      }
-    });
-    // Fallback for Firefox.
-    if (!activeCandidatePair) {
-      this.rawStats.forEach(report => {
-        if (report.type === 'candidate-pair' && report.selected) {
-          activeCandidatePair = report;
-        }
-      });
-    }
-
-    return activeCandidatePair;
-  }
-}
+import { IStore } from '../sdk/store';
+import { PeerConnectionType, HMSPeerStats, HMSTrackStats } from '../interfaces/webrtc-stats';
+import {
+  union,
+  computeNumberRate,
+  getTrackStats,
+  getLocalPeerStatsFromReport,
+  getPacketsLostAndJitterFromReport,
+} from './utils';
 
 export class HMSWebrtcStats {
-  private publishStats: HMSPeerConnectionStats;
-  private subscribeStats: HMSPeerConnectionStats;
+  private localPeerID?: string;
+  private peerStats: Record<string, HMSPeerStats> = {};
+  private trackStats: Record<string, HMSTrackStats> = {};
+
   constructor(
-    rawStats: Record<PeerConnectionType, RTCStatsReport>,
-    getTrackIDBeingSent: (trackID: string) => string | undefined,
+    private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
+    private store: IStore,
   ) {
-    this.publishStats = new HMSPeerConnectionStats('publish', rawStats.publish, getTrackIDBeingSent);
-    this.subscribeStats = new HMSPeerConnectionStats('subscribe', rawStats.subscribe, getTrackIDBeingSent);
+    this.localPeerID = this.store.getLocalPeer()?.peerId;
   }
 
-  getSubscribeStats() {
-    return this.subscribeStats;
+  getLocalPeerStats(): HMSPeerStats | undefined {
+    if (!this.localPeerID) {
+      return;
+    }
+    return this.peerStats[this.localPeerID];
   }
 
-  getPublishStats() {
-    return this.publishStats;
+  getTrackStats(trackId: string): HMSTrackStats | undefined {
+    return this.trackStats[trackId];
   }
 
-  getPacketsLost() {
-    return this.subscribeStats.packetsLost;
+  /**
+   * @internal
+   */
+  async updateStats(prevStats?: HMSWebrtcStats) {
+    await this.updateLocalPeerStats(prevStats?.getLocalPeerStats());
+    await this.updateTrackStats(prevStats);
   }
 
-  getJitter() {
-    return this.subscribeStats.jitter;
+  private async updateLocalPeerStats(prevLocalPeerStats?: HMSPeerStats) {
+    if (!this.localPeerID) {
+      return;
+    }
+
+    const publishReport = await this.getStats.publish?.();
+    const publishStats: HMSPeerStats['publish'] | undefined =
+      publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
+
+    const subscribeReport = await this.getStats.subscribe?.();
+    const baseSubscribeStats =
+      subscribeReport && getLocalPeerStatsFromReport('subscribe', subscribeReport, prevLocalPeerStats);
+    const { packetsLost, jitter } = getPacketsLostAndJitterFromReport(subscribeReport);
+    const packetsLostRate = computeNumberRate(
+      packetsLost,
+      prevLocalPeerStats?.subscribe?.packetsLost,
+      baseSubscribeStats?.timestamp,
+      prevLocalPeerStats?.subscribe?.timestamp,
+    );
+
+    const subscribeStats: HMSPeerStats['subscribe'] =
+      baseSubscribeStats && Object.assign(baseSubscribeStats, { packetsLostRate, jitter, packetsLost });
+
+    this.peerStats[this.localPeerID] = { publish: publishStats, subscribe: subscribeStats };
   }
 
-  getLocalPeerStats() {
-    return { publish: this.publishStats.getLocalPeerStats(), subscribe: this.subscribeStats.getLocalPeerStats() };
-  }
-
-  getTrackStats(trackId: string): RTCRtpStreamStats | undefined {
-    return this.subscribeStats.getTrackStats(trackId) || this.publishStats.getTrackStats(trackId);
+  private async updateTrackStats(prevStats?: HMSWebrtcStats) {
+    const tracks = this.store.getTracksMap();
+    const trackIDs = union(Object.keys(this.trackStats), Object.keys(tracks));
+    for (const trackID of trackIDs) {
+      const track = tracks[trackID];
+      const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
+      const trackStats = await getTrackStats(this.getStats, track, peerName, prevStats);
+      if (track && trackStats) {
+        this.trackStats[trackID] = trackStats;
+      } else {
+        delete this.trackStats[trackID];
+      }
+    }
   }
 }
