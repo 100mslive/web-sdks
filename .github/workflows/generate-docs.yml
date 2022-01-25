@@ -40,36 +40,15 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           repository: 100mslive/100ms-docs
           path: 100ms-docs
-          
-      - name: ls on root
-        run: ls
-          
-      - name: go to 100ms-docs
-        run: cd 100ms-docs
-        
-      - name: ls in 100ms-docs
-        run: ls
-        
-      - name: ls in root again
-        run: ls ..
-        
-      - name: ls in packages
-        run: ls ../packages
-        
-      - name: ls in hms-video-store
-        run: ls ../hms-video-store
-        
-      - name: ls in docs
-        run: ls ../packages/hms-video-store/docs
         
       - name: copy over api reference
-        run: cp -R ../packages/hms-video-store/docs docs/api-reference/javascript
+        run: cp -R ./packages/hms-video-store/docs ./100ms-docs/docs/api-reference/javascript
         
-      - name: delete earlier api reference
-        run: rm -r v2
-        
-      - name: rename api reference folder
-        run: mv docs v2
+      - name: replace old api-reference
+        working-directory: ./100ms-docs/docs/api-reference/javascript
+        run: |
+          rm -r v2
+          mv docs v2
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v3
