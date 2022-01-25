@@ -26,16 +26,16 @@ const Overlay = styled('div', {
 
 const Info = styled('div', {
   color: '$fg',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
   position: 'absolute',
   bottom: '10px',
   left: '50%',
   fontSize: '$sm',
   transform: 'translateX(-50%)',
   textAlign: 'center',
+  width: '80%',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
 });
 
 const AvatarContainer = styled('div', {
@@ -49,6 +49,7 @@ const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
+  color: '$fg',
 });
 
 const AudioIndicator = styled('div', {

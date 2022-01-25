@@ -23,7 +23,9 @@ import {
   BrbIcon,
 } from "@100mslive/react-icons";
 
-const HmsVideoTile = ({ peerId, width, height, showStatsOnTiles }) => {
+const HmsVideoTile = ({ peerId, showStatsOnTiles }) => {
+  const width = 200;
+  const height = 200;
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
