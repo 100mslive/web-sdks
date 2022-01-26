@@ -12,6 +12,7 @@ export enum HMSNotificationMethod {
   TRACK_UPDATE = 'on-track-update',
   CHANGE_TRACK_MUTE_STATE_UPDATE = 'on-change-track-mute-state-request',
   ACTIVE_SPEAKERS = 'active-speakers',
+  SFU_STATS = 'sfu-stats',
   BROADCAST = 'on-broadcast',
   ROLE_CHANGE = 'on-role-change',
   POLICY_CHANGE = 'on-policy-change',

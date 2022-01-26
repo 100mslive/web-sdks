@@ -72,6 +72,11 @@ export class NotificationManager {
     if (method !== HMSNotificationMethod.ACTIVE_SPEAKERS) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
+    if (method === HMSNotificationMethod.SFU_STATS) {
+      if (window.HMS) {
+        window.HMS.ON_SFU_STATS(message.params);
+      }
+    }
 
     this.roomUpdateManager.handleNotification(method, notification);
     this.peerManager.handleNotification(method, notification);
