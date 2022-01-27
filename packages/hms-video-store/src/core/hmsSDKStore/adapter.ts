@@ -112,6 +112,7 @@ export class SDKToHMS {
       hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
+      peerCount: sdkRoom.peerCount,
     };
   }
 

@@ -43,12 +43,13 @@ export class RoomUpdateManager {
   private handlePreviewRoomState(notification: PeriodicRoomState) {
     const { session, room } = notification;
     session.name = room.name;
-    this.onPeerList(session);
+    this.onPeerList(session, notification.peer_count);
   }
 
-  private onPeerList(roomNotification: SessionState) {
+  private onPeerList(roomNotification: SessionState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
+    room.peerCount = peerCount;
     room.name = name;
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();
