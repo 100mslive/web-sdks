@@ -1,6 +1,14 @@
-import { RecordingNotification, PeerListNotification, HLSNotification, RTMPNotification } from '../HMSNotifications';
+/* eslint-disable complexity */
+import {
+  RecordingNotification,
+  PeerListNotification,
+  HLSNotification,
+  RTMPNotification,
+  PeriodicRoomState,
+  SessionState,
+} from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
+import { HMSUpdateListener, HMSRoomUpdate, HMSHLS } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 
 export class RoomUpdateManager {
@@ -9,7 +17,7 @@ export class RoomUpdateManager {
   handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
-        this.onPeerList(notification as PeerListNotification);
+        this.onPeerList((notification as PeerListNotification).room);
         break;
       case HMSNotificationMethod.RTMP_START:
         this.onRTMPStart(notification as RTMPNotification);
@@ -23,15 +31,26 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.RECORDING_STOP:
         this.onRecordingStop(notification as RecordingNotification);
         break;
+      case HMSNotificationMethod.ROOM_STATE:
+        this.handlePreviewRoomState(notification as PeriodicRoomState);
+        break;
       default:
         this.onHLS(method, notification as HLSNotification);
         break;
     }
   }
 
-  private onPeerList(notification: PeerListNotification) {
-    const { recording, streaming, session_id, started_at } = notification.room;
+  private handlePreviewRoomState(notification: PeriodicRoomState) {
+    const { session, room } = notification;
+    session.name = room.name;
+    this.onPeerList(session, notification.peer_count);
+  }
+
+  private onPeerList(roomNotification: SessionState, peerCount?: number) {
+    const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
+    room.peerCount = peerCount;
+    room.name = name;
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();
     }
@@ -40,29 +59,20 @@ export class RoomUpdateManager {
         running: false,
       };
     }
-    if (!room.hls) {
-      room.hls = {
-        running: false,
-        variants: [],
-      };
-    }
     room.recording.server.running = recording.sfu.enabled;
     room.recording.browser.running = recording.beam.enabled;
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
-    room.rtmp.startedAt = streaming.rtmp?.started_at ? new Date(streaming.rtmp?.started_at) : undefined;
-    room.hls.running = streaming.hls?.enabled;
-    // update variants
-    streaming.hls?.variants?.map(variant => {
-      room.hls?.variants.push({
-        meetingURL: variant.meeting_url,
-        url: variant.url,
-        metadata: variant.metadata,
-        startedAt: variant.started_at ? new Date(variant.started_at) : undefined,
-      });
-    });
+    room.rtmp.startedAt = this.getAsDate(streaming.rtmp?.started_at);
+    room.recording.server.startedAt = this.getAsDate(recording.sfu.started_at);
+    room.recording.browser.startedAt = this.getAsDate(recording.beam.started_at);
+    room.hls = this.convertHls(streaming.hls);
     room.sessionId = session_id;
-    room.startedAt = started_at ? new Date(started_at) : undefined;
+    room.startedAt = this.getAsDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
+  }
+
+  private getAsDate(dateNum?: number): Date | undefined {
+    return dateNum ? new Date(dateNum) : undefined;
   }
 
   private onRTMPStart(notification: RTMPNotification) {
@@ -74,7 +84,7 @@ export class RoomUpdateManager {
   }
 
   private onRecordingStart(notification: RecordingNotification) {
-    this.setRecordingStatus(notification.type, true);
+    this.setRecordingStatus(notification.type, true, notification.started_at);
   }
 
   private onRecordingStop(notification: RecordingNotification) {
@@ -86,23 +96,25 @@ export class RoomUpdateManager {
       return;
     }
     const room = this.store.getRoom();
-    if (!room.hls) {
-      room.hls = {
-        running: false,
-        variants: [],
-      };
-    }
-    if (method === HMSNotificationMethod.HLS_START) {
-      room.hls.running = true;
-      room.hls.variants = notification.variants;
-    } else {
-      room.hls.running = false;
-      room.hls.variants = [];
-    }
+    notification.enabled = method === HMSNotificationMethod.HLS_START;
+    room.hls = this.convertHls(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
-  private setRecordingStatus(type: 'sfu' | 'Browser', running: boolean) {
+  private convertHls(hlsNotification: HLSNotification) {
+    const hls: HMSHLS = { running: hlsNotification.enabled, variants: [] };
+    hlsNotification?.variants?.map(variant => {
+      hls?.variants.push({
+        meetingURL: variant.meeting_url,
+        url: variant.url,
+        metadata: variant.metadata,
+        startedAt: this.getAsDate(variant.started_at),
+      });
+    });
+    return hls;
+  }
+
+  private setRecordingStatus(type: 'sfu' | 'Browser', running: boolean, startedAt?: number) {
     const room = this.store.getRoom();
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();
@@ -110,6 +122,7 @@ export class RoomUpdateManager {
     let action = -1;
     if (type === 'sfu') {
       room.recording.server.running = running;
+      room.recording.server.startedAt = this.getAsDate(startedAt);
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else {
       room.recording.browser.running = running;
@@ -123,7 +136,7 @@ export class RoomUpdateManager {
     if (!room.rtmp) {
       room.rtmp = {
         running: false,
-        startedAt: startedAt ? new Date(startedAt) : undefined,
+        startedAt: this.getAsDate(startedAt),
       };
     }
     room.rtmp.running = running;

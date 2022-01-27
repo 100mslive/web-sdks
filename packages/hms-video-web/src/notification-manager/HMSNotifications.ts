@@ -70,27 +70,54 @@ export interface PeerNotification {
   };
 }
 
+export interface FlatPeerNotification {
+  peer_id: string;
+  name: string;
+  user_id: string;
+  joined_at: string;
+  role: string;
+  data: string;
+}
+
+export interface SessionState {
+  name: string;
+  session_id: string;
+  started_at: number;
+  recording: {
+    sfu: {
+      started_at?: number;
+      enabled: boolean;
+    };
+    beam: {
+      started_at?: number;
+      enabled: boolean;
+    };
+  };
+  streaming: {
+    enabled: boolean;
+    rtmp: { enabled: boolean; started_at?: number };
+    hls: HLSNotification;
+  };
+}
+
+export interface RoomState {
+  room_id: string;
+  name: string;
+}
+
 export interface PeerListNotification {
   peers: {
     [peer_id: string]: PeerNotification;
   };
-  room: {
-    name: string;
-    session_id: string;
-    started_at: number;
-    recording: {
-      sfu: {
-        enabled: boolean;
-      };
-      beam: {
-        enabled: boolean;
-      };
-    };
-    streaming: {
-      enabled: boolean;
-      rtmp: { enabled: boolean; started_at?: number };
-      hls: { enabled: boolean; variants: Array<HLSVariantInfo> };
-    };
+  room: SessionState;
+}
+
+export interface PeriodicRoomState {
+  peer_count: number;
+  room: RoomState;
+  session: SessionState;
+  peers: {
+    [peer_id: string]: FlatPeerNotification;
   };
 }
 
@@ -164,6 +191,7 @@ export interface MessageNotificationInfo {
 
 export interface RecordingNotification {
   type: 'sfu' | 'Browser';
+  started_at?: number;
   peer: PeerNotificationInfo;
 }
 
@@ -181,5 +209,5 @@ export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
   metadata?: string;
-  started_at?: string;
+  started_at?: number;
 }

@@ -773,6 +773,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
@@ -842,7 +843,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+      this.store.setRoom(new HMSRoom(roomId, this.store));
     }
   }
 

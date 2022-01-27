@@ -6,7 +6,7 @@ export enum HMSRoomType {
 
 export interface HMSRoom {
   id: string;
-  name: string;
+  name?: string;
   sessionId?: string;
   startedAt?: Date;
   localPeer: HMSLocalPeer;
@@ -17,14 +17,17 @@ export interface HMSRoom {
   recording?: HMSRecording;
   rtmp?: HMSRTMP;
   hls?: HMSHLS;
+  peerCount?: number;
 }
 
 export interface HMSRecording {
   browser: {
     running: boolean;
+    startedAt?: Date;
   };
   server: {
     running: boolean;
+    startedAt?: Date;
   };
 }
 
