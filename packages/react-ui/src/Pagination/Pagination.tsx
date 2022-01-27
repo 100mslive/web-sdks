@@ -1,57 +1,71 @@
-import { styled } from '../stitches.config';
+import React from 'react';
+import { StyledPagination } from './StyledPagination';
 
-const Root = styled('div', {
-  height: '2rem',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  '& > * + *': {
-    marginRight: '0',
-    marginLeft: '0.5rem',
-  },
-});
-
-const Chevron = styled('button', {
-  '&[disabled]': {
-    cursor: 'not-allowed',
-    color: '$grey4',
-  },
-});
-
-const Dots = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  '& > * + *': {
-    marginRight: '0',
-    marginLeft: '0.5rem',
-  },
-});
-
-const Dot = styled('button', {
-  borderRadius: '9999px',
-  width: '0.5rem',
-  height: '0.5rem',
-  backgroundColor: '$grey3',
-  variants: {
-    active: {
-      true: {
-        backgroundColor: '$grey7',
-      },
-    },
-  },
-});
-
-interface PaginationType {
-  Root: typeof Root;
-  Chevron: typeof Chevron;
-  Dots: typeof Dots;
-  Dot: typeof Dot;
+interface Props {
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  numPages: number;
 }
 
-export const Pagination: PaginationType = {
-  Root,
-  Chevron,
-  Dots,
-  Dot,
+export const Pagination: React.FC<Props> = ({ page, setPage, numPages }) => {
+  const disableLeft = page === 0;
+  const disableRight = page === numPages - 1;
+  const nextPage = () => {
+    setPage(Math.min(page + 1, numPages - 1));
+  };
+  const prevPage = () => {
+    setPage(Math.max(page - 1, 0));
+  };
+  return (
+    <StyledPagination.Root>
+      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>
+        <ChevronLeft disabled={disableLeft} />
+      </StyledPagination.Chevron>
+      <StyledPagination.Dots>
+        {[...Array(numPages)].map((_, i) => (
+          <StyledPagination.Dot key={i} active={page === i} onClick={() => setPage(i)} />
+        ))}
+      </StyledPagination.Dots>
+      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage}>
+        <ChevronRight disabled={disableRight} />
+      </StyledPagination.Chevron>
+    </StyledPagination.Root>
+  );
 };
+
+interface ChevronProp {
+  disabled: boolean;
+}
+
+const ChevronLeft: React.FC<ChevronProp> = ({ disabled }) => (
+  <svg
+    width={14}
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    fill="none"
+    shapeRendering="geometricPrecision"
+    style={{ cursor: `${disabled ? 'not-allowed' : 'pointer'}` }}
+  >
+    <path d="M15 18l-6-6 6-6" />
+  </svg>
+);
+
+const ChevronRight: React.FC<ChevronProp> = ({ disabled }) => (
+  <svg
+    width={14}
+    height={14}
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    fill="none"
+    shapeRendering="geometricPrecision"
+    style={{ cursor: `${disabled ? 'not-allowed' : 'pointer'}` }}
+  >
+    <path d="M9 18l6-6-6-6" />
+  </svg>
+);

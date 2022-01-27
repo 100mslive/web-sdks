@@ -243,7 +243,7 @@ export const ConferenceHeader = ({ onParticipantListOpen }) => {
             participantInListProps={participantInListProps}
           />,
         ]}
-        classes={{ root: "h-full" }}
+        classes={{ root: "h-full", rightRoot: "items-center" }}
       />
     </>
   );

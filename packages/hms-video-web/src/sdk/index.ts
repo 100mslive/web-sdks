@@ -52,7 +52,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
-import { isMediadevicesMissing } from '../utils/mediadevices-missing';
+import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -225,11 +225,8 @@ export class HMSSdk implements HMSInterface {
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
-    if (isMediadevicesMissing()) {
-      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
-      HMSLogger.e(this.TAG, error);
-      return Promise.reject(error);
-    }
+    validateMediaDevicesExistence();
+    validateRTCPeerConnection();
 
     if (this.sdkState.isPreviewInProgress) {
       return Promise.reject(
@@ -290,11 +287,8 @@ export class HMSSdk implements HMSInterface {
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
-    if (isMediadevicesMissing()) {
-      const error = ErrorFactory.GenericErrors.MissingMediaDevices();
-      HMSLogger.e(this.TAG, error);
-      throw error;
-    }
+    validateMediaDevicesExistence();
+    validateRTCPeerConnection();
 
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
@@ -779,6 +773,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
@@ -848,7 +843,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+      this.store.setRoom(new HMSRoom(roomId, this.store));
     }
   }
 

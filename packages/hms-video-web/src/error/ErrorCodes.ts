@@ -118,6 +118,8 @@ export const ErrorCodes = {
     PREVIEW_IN_PROGRESS: 6009,
 
     MISSING_MEDIADEVICES: 6010,
+
+    MISSING_RTCPEERCONNECTION: 6011,
   },
 
   PlaylistErrors: {

@@ -27,6 +27,7 @@ import {
 } from "@100mslive/react-sdk";
 import { FeatureFlags } from "./store/FeatureFlags";
 import { lightTheme } from "@100mslive/react-ui";
+import "./index.css";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -111,7 +112,7 @@ export function EdtechComponent({
           actions={hmsReactiveStore.getActions()}
           store={hmsReactiveStore.getStore()}
           notifications={hmsReactiveStore.getNotifications()}
-          webrtcInternals={
+          stats={
             FeatureFlags.enableStatsForNerds
               ? hmsReactiveStore.getStats()
               : undefined
