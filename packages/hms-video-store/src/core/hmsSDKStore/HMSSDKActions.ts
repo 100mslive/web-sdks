@@ -561,6 +561,8 @@ export class HMSSDKActions implements IHMSActions {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onRoomUpdate: this.onRoomUpdate.bind(this),
+      onPeerUpdate: this.onPeerUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
