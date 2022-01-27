@@ -85,9 +85,11 @@ export interface SessionState {
   started_at: number;
   recording: {
     sfu: {
+      started_at?: number;
       enabled: boolean;
     };
     beam: {
+      started_at?: number;
       enabled: boolean;
     };
   };
@@ -111,6 +113,7 @@ export interface PeerListNotification {
 }
 
 export interface PeriodicRoomState {
+  peer_count: number;
   room: RoomState;
   session: SessionState;
   peers: {

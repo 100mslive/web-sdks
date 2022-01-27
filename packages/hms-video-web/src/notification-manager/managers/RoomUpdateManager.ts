@@ -5,6 +5,7 @@ import {
   HLSNotification,
   RTMPNotification,
   PeriodicRoomState,
+  SessionState,
 } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
@@ -16,7 +17,7 @@ export class RoomUpdateManager {
   handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
-        this.onPeerList(notification as PeerListNotification);
+        this.onPeerList((notification as PeerListNotification).room);
         break;
       case HMSNotificationMethod.RTMP_START:
         this.onRTMPStart(notification as RTMPNotification);
@@ -41,35 +42,12 @@ export class RoomUpdateManager {
 
   private handlePreviewRoomState(notification: PeriodicRoomState) {
     const { session, room } = notification;
-    const roomStore = this.store.getRoom();
-    const { recording, rtmp, hls } = roomStore;
-    roomStore.id = room.room_id;
-    roomStore.name = room.name;
-    roomStore.sessionId = session.session_id;
-    roomStore.startedAt = session.started_at ? new Date(session.started_at) : undefined;
-    if (recording) {
-      recording.server.running = session.recording.sfu.enabled;
-      recording.browser.running = session.recording.beam.enabled;
-    }
-    if (rtmp) {
-      rtmp.running = session.streaming.rtmp.enabled || session.streaming.enabled;
-      rtmp.startedAt = session.streaming.rtmp?.started_at ? new Date(session.streaming.rtmp?.started_at) : undefined;
-    }
-    if (hls) {
-      session.streaming.hls?.variants?.map(variant => {
-        hls?.variants.push({
-          meetingURL: variant.meeting_url,
-          url: variant.url,
-          metadata: variant.metadata,
-          startedAt: variant.started_at ? new Date(variant.started_at) : undefined,
-        });
-      });
-    }
-    this.listener?.onRoomUpdate(HMSRoomUpdate.ROOM_STATE, roomStore);
+    session.name = room.name;
+    this.onPeerList(session);
   }
 
-  private onPeerList(notification: PeerListNotification) {
-    const { recording, streaming, session_id, started_at } = notification.room;
+  private onPeerList(roomNotification: SessionState) {
+    const { recording, streaming, session_id, started_at } = roomNotification;
     const room = this.store.getRoom();
     if (!room.recording) {
       room.recording = this.getDefaultRecordingState();

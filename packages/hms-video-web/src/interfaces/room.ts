@@ -17,6 +17,7 @@ export interface HMSRoom {
   recording?: HMSRecording;
   rtmp?: HMSRTMP;
   hls?: HMSHLS;
+  peerCount?: number;
 }
 
 export interface HMSRecording {
