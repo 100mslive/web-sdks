@@ -843,7 +843,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+      this.store.setRoom(new HMSRoom(roomId, this.store));
     }
   }
 

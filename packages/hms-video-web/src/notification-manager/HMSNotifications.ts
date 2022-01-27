@@ -96,7 +96,7 @@ export interface SessionState {
   streaming: {
     enabled: boolean;
     rtmp: { enabled: boolean; started_at?: number };
-    hls: { enabled: boolean; variants: Array<HLSVariantInfo> };
+    hls: HLSNotification;
   };
 }
 
@@ -191,6 +191,7 @@ export interface MessageNotificationInfo {
 
 export interface RecordingNotification {
   type: 'sfu' | 'Browser';
+  started_at?: number;
   peer: PeerNotificationInfo;
 }
 
@@ -208,5 +209,5 @@ export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
   metadata?: string;
-  started_at?: string;
+  started_at?: number;
 }
