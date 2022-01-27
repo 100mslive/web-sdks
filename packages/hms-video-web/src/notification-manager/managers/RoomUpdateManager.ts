@@ -49,6 +49,7 @@ export class RoomUpdateManager {
   private onPeerList(roomNotification: SessionState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
+    const oldStringifiedRoom = JSON.stringify(room);
     room.peerCount = peerCount;
     room.name = name;
     if (!room.recording) {
@@ -68,7 +69,9 @@ export class RoomUpdateManager {
     room.hls = this.convertHls(streaming.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
-    this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
+    if (oldStringifiedRoom !== JSON.stringify(room)) {
+      this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
+    }
   }
 
   private getAsDate(dateNum?: number): Date | undefined {
