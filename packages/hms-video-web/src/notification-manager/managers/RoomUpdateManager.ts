@@ -1,4 +1,11 @@
-import { RecordingNotification, PeerListNotification, HLSNotification, RTMPNotification } from '../HMSNotifications';
+/* eslint-disable complexity */
+import {
+  RecordingNotification,
+  PeerListNotification,
+  HLSNotification,
+  RTMPNotification,
+  PeriodicRoomState,
+} from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate } from '../../interfaces';
 import { IStore } from '../../sdk/store';
@@ -23,10 +30,42 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.RECORDING_STOP:
         this.onRecordingStop(notification as RecordingNotification);
         break;
+      case HMSNotificationMethod.ROOM_STATE:
+        this.handlePreviewRoomState(notification as PeriodicRoomState);
+        break;
       default:
         this.onHLS(method, notification as HLSNotification);
         break;
     }
+  }
+
+  private handlePreviewRoomState(notification: PeriodicRoomState) {
+    const { session, room } = notification;
+    const roomStore = this.store.getRoom();
+    const { recording, rtmp, hls } = roomStore;
+    roomStore.id = room.room_id;
+    roomStore.name = room.name;
+    roomStore.sessionId = session.session_id;
+    roomStore.startedAt = session.started_at ? new Date(session.started_at) : undefined;
+    if (recording) {
+      recording.server.running = session.recording.sfu.enabled;
+      recording.browser.running = session.recording.beam.enabled;
+    }
+    if (rtmp) {
+      rtmp.running = session.streaming.rtmp.enabled || session.streaming.enabled;
+      rtmp.startedAt = session.streaming.rtmp?.started_at ? new Date(session.streaming.rtmp?.started_at) : undefined;
+    }
+    if (hls) {
+      session.streaming.hls?.variants?.map(variant => {
+        hls?.variants.push({
+          meetingURL: variant.meeting_url,
+          url: variant.url,
+          metadata: variant.metadata,
+          startedAt: variant.started_at ? new Date(variant.started_at) : undefined,
+        });
+      });
+    }
+    this.listener?.onRoomUpdate(HMSRoomUpdate.ROOM_STATE, roomStore);
   }
 
   private onPeerList(notification: PeerListNotification) {
