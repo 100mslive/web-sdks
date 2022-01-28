@@ -8,9 +8,6 @@ on:
         default: 'alpha'
   repository_dispatch:
     types: [publish-command]
-  push:
-    branches:
-      - main
 
 jobs:
   publish_packages:
