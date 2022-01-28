@@ -22,6 +22,7 @@ import { FeatureFlags } from "../store/FeatureFlags";
 import { AppContext } from "../store/AppContext";
 
 export const ScreenShareView = ({
+  showStats,
   isChatOpen,
   toggleChat,
   isParticipantListOpen,
@@ -84,6 +85,7 @@ export const ScreenShareView = ({
         }}
       >
         <SidePane
+          showStats={showStats}
           isChatOpen={isChatOpen}
           toggleChat={toggleChat}
           peerScreenSharing={peerPresenting}
@@ -101,6 +103,7 @@ export const ScreenShareView = ({
 // Sidepane will show the camera stream of the main peer who is screensharing
 // and both camera + screen(if applicable) of others
 export const SidePane = ({
+  showStats,
   isChatOpen,
   toggleChat,
   isPresenterInSmallTiles,
@@ -115,8 +118,6 @@ export const SidePane = ({
     peer => peerScreenSharing && peer.id !== peerScreenSharing.id,
     [peerScreenSharing]
   );
-  const { showStatsOnTiles } = useContext(AppContext);
-
   return (
     <Fragment>
       {!isPresenterInSmallTiles && (
@@ -124,7 +125,7 @@ export const SidePane = ({
           peerScreenSharing={peerScreenSharing}
           isChatOpen={isChatOpen}
           videoTileProps={videoTileProps}
-          showStatsOnTiles={showStatsOnTiles}
+          showStatsOnTiles={showStats}
         />
       )}
       <SmallTilePeersView
@@ -132,7 +133,7 @@ export const SidePane = ({
         smallTilePeers={smallTilePeers}
         shouldShowScreenFn={shouldShowScreenFn}
         videoTileProps={videoTileProps}
-        showStatsOnTiles={showStatsOnTiles}
+        showStatsOnTiles={showStats}
       />
       <CustomChatView
         isChatOpen={isChatOpen}

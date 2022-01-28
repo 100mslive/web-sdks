@@ -6,7 +6,6 @@ import { Stats } from './StyledStats';
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
   audioTrackID?: HMSTrackID;
-  height: number;
 }
 
 const StatsRow = ({ label = '', value = '', show = true }) => {
@@ -36,16 +35,16 @@ const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
   );
 };
 
-export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTileStatsProps) {
+export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
 
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
   const rootRef = useRef<HTMLDivElement>(null);
-  const compact = height < 300;
   const containerStyle: React.CSSProperties = {};
+  const parentHeight = rootRef.current?.parentElement?.clientHeight || 0;
+  const parentWidth = rootRef.current?.parentElement?.clientWidth || 0;
+  const compact = parentHeight < 300;
   if (compact) {
-    const parentHeight = rootRef.current?.parentElement?.clientHeight || 0;
-    const parentWidth = rootRef.current?.parentElement?.clientWidth || 0;
     containerStyle.width = `calc(${parentWidth}px - 1rem)`;
     containerStyle.maxHeight = parentHeight * 0.75;
     containerStyle.overflowY = 'auto';
