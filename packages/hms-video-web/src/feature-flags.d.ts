@@ -5,5 +5,6 @@ interface Window {
     AUDIO_SINK?: boolean;
     NEW_BEAM_STATE?: boolean;
     GAIN_VALUE: 10;
+    ON_SFU_STATS: (params: any) => void;
   };
 }
