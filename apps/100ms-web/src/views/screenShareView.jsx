@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, Fragment } from "react";
+import React, { useCallback, useMemo, Fragment, useContext } from "react";
 import {
   useHMSStore,
   useHMSActions,
@@ -17,6 +17,9 @@ import { ChatView } from "./components/chatView";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
+import { HmsVideoList, HmsVideoTile } from "./UIComponents";
+import { FeatureFlags } from "../store/FeatureFlags";
+import { AppContext } from "../store/AppContext";
 
 export const ScreenShareView = ({
   isChatOpen,
@@ -112,6 +115,7 @@ export const SidePane = ({
     peer => peerScreenSharing && peer.id !== peerScreenSharing.id,
     [peerScreenSharing]
   );
+  const { showStatsOnTiles } = useContext(AppContext);
 
   return (
     <Fragment>
@@ -120,6 +124,7 @@ export const SidePane = ({
           peerScreenSharing={peerScreenSharing}
           isChatOpen={isChatOpen}
           videoTileProps={videoTileProps}
+          showStatsOnTiles={showStatsOnTiles}
         />
       )}
       <SmallTilePeersView
@@ -127,6 +132,7 @@ export const SidePane = ({
         smallTilePeers={smallTilePeers}
         shouldShowScreenFn={shouldShowScreenFn}
         videoTileProps={videoTileProps}
+        showStatsOnTiles={showStatsOnTiles}
       />
       <CustomChatView
         isChatOpen={isChatOpen}
@@ -235,6 +241,7 @@ const CustomChatView = ({
 const SmallTilePeersView = ({
   smallTilePeers,
   shouldShowScreenFn,
+  showStatsOnTiles,
   videoTileProps = () => ({}),
 }) => {
   const { width } = useWindowSize();
@@ -249,17 +256,30 @@ const SmallTilePeersView = ({
       }}
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
-        <VideoList
-          peers={smallTilePeers}
-          showScreenFn={shouldShowScreenFn}
-          classes={{ videoTileContainer: "rounded-lg " }}
-          maxColCount={2}
-          maxRowCount={rows}
-          overflow="scroll-x"
-          compact={true}
-          // dont show stats for small tiles during screenshare
-          videoTileProps={videoTileProps}
-        />
+        <>
+          {FeatureFlags.enableNewComponents ? (
+            <HmsVideoList
+              peers={smallTilePeers}
+              maxColCount={2}
+              maxRowCount={rows}
+              showScreenFn={shouldShowScreenFn}
+              overflow="scroll-x"
+              showStatsOnTiles={showStatsOnTiles}
+            />
+          ) : (
+            <VideoList
+              peers={smallTilePeers}
+              showScreenFn={shouldShowScreenFn}
+              classes={{ videoTileContainer: "rounded-lg " }}
+              maxColCount={2}
+              maxRowCount={rows}
+              overflow="scroll-x"
+              compact={true}
+              // dont show stats for small tiles during screenshare
+              videoTileProps={videoTileProps}
+            />
+          )}
+        </>
       )}
     </Flex>
   );
@@ -267,6 +287,7 @@ const SmallTilePeersView = ({
 
 const LargeTilePeerView = ({
   peerScreenSharing,
+  showStatsOnTiles,
   videoTileProps = () => ({}),
 }) => {
   return peerScreenSharing ? (
@@ -287,12 +308,21 @@ const LargeTilePeerView = ({
         },
       }}
     >
-      <VideoTile
-        peer={peerScreenSharing}
-        compact={true}
-        hmsVideoTrackId={peerScreenSharing.videoTrack}
-        {...videoTileProps(peerScreenSharing, peerScreenSharing.videoTrack)}
-      />
+      {FeatureFlags.enableNewComponents ? (
+        <HmsVideoTile
+          showStatsOnTiles={showStatsOnTiles}
+          width="100%"
+          height="100%"
+          peerId={peerScreenSharing.id}
+        />
+      ) : (
+        <VideoTile
+          peer={peerScreenSharing}
+          compact={true}
+          hmsVideoTrackId={peerScreenSharing.videoTrack}
+          {...videoTileProps(peerScreenSharing, peerScreenSharing.videoTrack)}
+        />
+      )}
     </Box>
   ) : null;
 };
