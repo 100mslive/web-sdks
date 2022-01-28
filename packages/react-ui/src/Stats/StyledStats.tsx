@@ -5,19 +5,14 @@ export const Root = styled('div', {
   position: 'absolute',
   top: '0.5rem',
   left: '0.5rem',
-  // z-10 rounded-lg p-3 text-sm'
   zIndex: 10,
   borderRadius: '$2',
-  padding: '0.5rem',
+  padding: '10px',
   fontSize: '12px',
   variants: {
-    contract: {
+    compact: {
       true: {
-        height: '100px',
-        fontSize: '10px',
-        overflowY: 'scroll',
-        overflowX: 'scroll',
-        left: `min('0.5rem', '10000000rem')`,
+        padding: '5px',
       },
     },
   },
@@ -28,13 +23,15 @@ export const Table = styled('table', {});
 export const Row = styled('tr', {
   width: '100%',
   '& > * + *': {
-    paddingLeft: '1rem',
+    paddingLeft: '0.5rem',
   },
+  whiteSpace: 'nowrap',
+  textAlign: 'left',
 });
 
 export const Label = styled('td', {
   color: '$grey5',
-  fontWeight: 600,
+  fontWeight: 400,
 });
 
 export const Value = styled('td', {

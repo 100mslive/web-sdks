@@ -36,7 +36,7 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
       }}
     >
       <StyledVideoTile.Container>
-        <VideoTileStats height={height} audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
+        <VideoTileStats audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
         <AudioLevel audioTrack={peer?.audioTrack} />
         <Video mirror={peer?.isLocal || false} trackId={peer?.videoTrack} />
         {isVideoMuted ? <Avatar size={getAvatarSize(width)} name={peer?.name || ''} /> : null}

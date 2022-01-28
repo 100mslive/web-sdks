@@ -35,9 +35,6 @@ interface UseVideoListProps {
 }
 
 const DEFAULTS = {
-  maxTileCount: 4,
-  maxColCount: 4,
-  maxRowCount: 2,
   aspectRatio: {
     width: 1,
     height: 1,
@@ -45,9 +42,9 @@ const DEFAULTS = {
 };
 
 export const useVideoList = ({
-  maxTileCount = DEFAULTS.maxTileCount,
-  maxColCount = DEFAULTS.maxColCount,
-  maxRowCount = DEFAULTS.maxRowCount,
+  maxTileCount,
+  maxColCount,
+  maxRowCount,
   showScreenFn = () => false,
   peers,
   overflow = 'scroll-x',
