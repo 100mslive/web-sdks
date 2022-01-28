@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
@@ -40,13 +40,22 @@ export function VideoTileStats({ videoTrackID, audioTrackID, height }: VideoTile
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
 
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
-
+  const rootRef = useRef<HTMLDivElement>(null);
+  const compact = height < 300;
+  const containerStyle: React.CSSProperties = {};
+  if (compact) {
+    const parentHeight = rootRef.current?.parentElement?.clientHeight || 0;
+    const parentWidth = rootRef.current?.parentElement?.clientWidth || 0;
+    containerStyle.width = `calc(${parentWidth}px - 1rem)`;
+    containerStyle.maxHeight = parentHeight * 0.75;
+    containerStyle.overflowY = 'auto';
+  }
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
   }
   return (
-    <Stats.Root contract={height < 300}>
+    <Stats.Root style={containerStyle} ref={rootRef} compact={compact}>
       <table>
         <tbody>
           {videoTrackStats?.frameWidth ? (
