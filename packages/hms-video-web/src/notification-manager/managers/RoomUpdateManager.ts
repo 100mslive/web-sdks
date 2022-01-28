@@ -60,11 +60,11 @@ export class RoomUpdateManager {
       };
     }
     room.recording.server.running = recording.sfu.enabled;
-    room.recording.browser.running = recording.beam.enabled;
+    room.recording.browser.running = recording.browser.enabled;
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
     room.rtmp.startedAt = this.getAsDate(streaming.rtmp?.started_at);
     room.recording.server.startedAt = this.getAsDate(recording.sfu.started_at);
-    room.recording.browser.startedAt = this.getAsDate(recording.beam.started_at);
+    room.recording.browser.startedAt = this.getAsDate(recording.browser.started_at);
     room.hls = this.convertHls(streaming.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);

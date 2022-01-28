@@ -88,7 +88,7 @@ export interface SessionState {
       started_at?: number;
       enabled: boolean;
     };
-    beam: {
+    browser: {
       started_at?: number;
       enabled: boolean;
     };
