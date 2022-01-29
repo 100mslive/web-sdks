@@ -2,6 +2,20 @@
  * Missing properties in TS eventhough WebRTC supports it.
  * Ref: https://www.w3.org/TR/webrtc-stats/#summary
  */
+
+/**
+ * @internal
+ * Ref: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
+ */
+export interface RTCRemoteInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
+  localId: string;
+  roundTripTime?: number;
+  totalRoundTripTime?: number;
+  fractionLost?: number;
+  reportsReceived?: number;
+  roundTripTimeMeasurements?: number;
+}
+
 interface MissingCommonStats {
   frameHeight?: number;
   frameWidth?: number;
@@ -33,19 +47,27 @@ interface BaseTrackStats extends RTCRtpStreamStats {
   bitrate: number;
 }
 
-export interface HMSTrackStats extends BaseTrackStats, MissingInboundStats, MissingOutboundStats {}
-
 /**
  * Extends RTCOutboundRtpStreamStats
+ * Ref: https://www.w3.org/TR/webrtc-stats/#dom-rtcoutboundrtpstreamstats
  */
-export interface HMSLocalTrackStats extends BaseTrackStats, MissingOutboundStats {}
+export interface HMSLocalTrackStats extends BaseTrackStats, MissingOutboundStats {
+  /**
+   * Stats perceived by the server(SFU) while receiving the local track sent by the peer
+   * Ref:
+   * https://www.w3.org/TR/webrtc-stats/#dom-rtcstatstype-remote-inbound-rtp
+   * https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
+   */
+  remote?: RTCRemoteInboundRtpStreamStats & { packetsLostRate?: number };
+}
 
 /**
  * Extends RTCInboundRtpStreamStats
+ * Ref: https://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats
  */
 export interface HMSRemoteTrackStats extends BaseTrackStats, MissingInboundStats {}
 
-export type RTCTrackStats = MissingInboundStats | MissingOutboundStats;
+export interface HMSTrackStats extends HMSLocalTrackStats, HMSRemoteTrackStats {}
 
 export interface HMSPeerStats {
   publish?: RTCIceCandidatePairStats & {

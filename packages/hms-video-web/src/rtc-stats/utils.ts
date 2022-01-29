@@ -1,5 +1,10 @@
 import { HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSLocalTrack } from '../media/tracks';
-import { HMSPeerStats, HMSTrackStats, PeerConnectionType, RTCTrackStats } from '../interfaces/webrtc-stats';
+import {
+  HMSPeerStats,
+  HMSTrackStats,
+  PeerConnectionType,
+  RTCRemoteInboundRtpStreamStats,
+} from '../interfaces/webrtc-stats';
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 
@@ -23,10 +28,19 @@ export const getTrackStats = async (
     prevTrackStats,
   );
 
+  const packetsLostRate = computeStatRate('packetsLost', trackStats, prevTrackStats);
+
+  if (trackStats?.remote) {
+    Object.assign(trackStats.remote, {
+      packetsLostRate: computeStatRate('packetsLost', trackStats.remote, prevTrackStats?.remote),
+    });
+  }
+
   return (
     trackStats &&
     Object.assign(trackStats, {
       bitrate,
+      packetsLostRate,
       peerId: track.peerId,
       peerName,
     })
@@ -37,7 +51,7 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   let streamStats: RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined;
   // Valid by Webrtc spec, not in TS
   // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
-  let remoteStreamStats: Partial<{ roundTripTime: number; totalRoundTripTime: number }> | undefined;
+  let remoteStreamStats: RTCRemoteInboundRtpStreamStats | undefined;
   trackReport?.forEach(stat => {
     switch (stat.type) {
       case 'inbound-rtp':
@@ -49,21 +63,12 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
       case 'remote-inbound-rtp':
         remoteStreamStats = stat;
         break;
-      case 'remote-outbound-rtp':
-        remoteStreamStats = stat;
-        break;
       default:
         break;
     }
   });
 
-  return (
-    streamStats &&
-    Object.assign(streamStats, {
-      roundTripTime: remoteStreamStats?.roundTripTime,
-      totalRoundTripTime: remoteStreamStats?.totalRoundTripTime,
-    })
-  );
+  return streamStats && Object.assign(streamStats, { remote: remoteStreamStats });
 };
 
 export const getLocalPeerStatsFromReport = (
@@ -124,13 +129,13 @@ export const union = <T>(arr1: T[], arr2: T[]): T[] => {
 /**
  * Ref: https://github.dev/peermetrics/webrtc-stats/blob/b5c1fed68325543e6f563c6d3f4450a4b51e12b7/src/utils.ts#L62
  */
-export const computeBitrate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
+export const computeBitrate = <T extends HMSTrackStats>(
   statName: keyof T,
   newReport?: Partial<T>,
   oldReport?: Partial<T>,
 ): number => computeStatRate(statName, newReport, oldReport) * 8; // Bytes to bits
 
-const computeStatRate = <T extends RTCIceCandidatePairStats | RTCTrackStats>(
+const computeStatRate = <T extends HMSTrackStats>(
   statName: keyof T,
   newReport?: Partial<T>,
   oldReport?: Partial<T>,
