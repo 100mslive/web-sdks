@@ -92,9 +92,8 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
 
   useEffect(() => {
     if (isBrowser) {
-      window.onunload = () => {
-        providerProps.actions.leave();
-      };
+      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      window.addEventListener('onunload', () => providerProps.actions.leave());
     }
   }, []);
 

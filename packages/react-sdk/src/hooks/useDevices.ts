@@ -1,7 +1,8 @@
-import { selectLocalMediaSettings, selectDevices, selectIsAllowedToPublish } from '@100mslive/hms-video-store';
+import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
 import { useHMSActions, useHMSStore } from './HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
+import { hooksErrHandler } from './types';
 
 enum DeviceType {
   videoInput = 'videoInput',
@@ -12,6 +13,13 @@ enum DeviceType {
 type DeviceTypeInfo<T> = {
   [key in DeviceType]?: T;
 };
+
+export interface useDevicesInput {
+  /**
+   * function to handle errors happening during manual device change
+   */
+  handleError?: hooksErrHandler;
+}
 
 export interface useDevicesResult {
   allDevices: DeviceTypeInfo<MediaDeviceInfo[]>;
@@ -30,7 +38,7 @@ export interface useDevicesResult {
  * - Changing devices manually work best in combination with remembering the user's selection for the next time, do
  *   pass the rememberDeviceSelection flag at time of join for this to happen.
  */
-export const useDevices = ({ handleError } = { handleError: logErrorHandler }) => {
+export const useDevices = ({ handleError = logErrorHandler }: useDevicesInput): useDevicesResult => {
   const hmsActions = useHMSActions();
   const allDevices: DeviceTypeInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
@@ -72,10 +80,9 @@ export const useDevices = ({ handleError } = { handleError: logErrorHandler }) =
     [hmsActions],
   );
 
-  const result: useDevicesResult = {
+  return {
     allDevices,
     selectedDeviceIDs,
     updateDevice,
   };
-  return result;
 };
