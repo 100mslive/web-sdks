@@ -3,19 +3,15 @@ import { styled } from '../stitches.config';
 export const Root = styled('div', {
   backgroundColor: '$statsBg',
   position: 'absolute',
-  top: '0.5rem',
-  left: '0.5rem',
+  top: '0.3rem',
+  left: '0.3rem',
   zIndex: 10,
   borderRadius: '$2',
-  padding: '10px',
+  padding: '5px',
   fontSize: '12px',
-  variants: {
-    compact: {
-      true: {
-        padding: '5px',
-      },
-    },
-  },
+  overflowY: 'auto',
+  maxHeight: '75%',
+  maxWidth: '75%',
 });
 
 export const Table = styled('table', {});
