@@ -5,8 +5,13 @@ import {
 } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
 import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { logErrorHandler } from '../utils/commons';
 
-export const useAVToggle = () => {
+/**
+ * Use this hook to implement mute/unmute for audio and video.
+ * isAllowedToPublish can be used to decide whether to show the toggle buttons in the UI.
+ */
+export const useAVToggle = ({ handleError } = { handleError: logErrorHandler }) => {
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -16,17 +21,17 @@ export const useAVToggle = () => {
     try {
       await hmsActions.setLocalAudioEnabled(!isLocalAudioEnabled);
     } catch (err) {
-      console.error('Cannot toggle audio', err);
+      handleError(err as Error, 'toggleAudio');
     }
-  }, [isLocalAudioEnabled]); //eslint-disable-line
+  }, [isLocalAudioEnabled, hmsActions]);
 
   const toggleVideo = useCallback(async () => {
     try {
       await hmsActions.setLocalVideoEnabled(!isLocalVideoEnabled);
     } catch (err) {
-      console.error('Cannot toggle video', err);
+      handleError(err as Error, 'toggleVideo');
     }
-  }, [isLocalVideoEnabled]); //eslint-disable-line
+  }, [isLocalVideoEnabled, hmsActions]);
 
   return {
     isLocalAudioEnabled,

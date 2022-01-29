@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import { styled } from '../stitches.config';
-import { useAudioLevel, HMSPeer } from '@100mslive/react-sdk';
+import { HMSPeer, useAudioLevelStyles } from '@100mslive/react-sdk';
 
 const StyledAudioLevel = styled('div', {
   width: '100%',
@@ -30,7 +30,7 @@ export const AudioLevel: React.FC<Props> = ({ audioTrack }) => {
     return style;
   }, []);
   const ref = useRef(null);
-  useAudioLevel({
+  useAudioLevelStyles({
     trackId: audioTrack,
     getStyle,
     ref,

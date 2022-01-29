@@ -1,6 +1,7 @@
 import { selectLocalMediaSettings, selectDevices, selectIsAllowedToPublish } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
 import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { logErrorHandler } from '../utils/commons';
 
 enum DeviceType {
   videoInput = 'videoInput',
@@ -29,7 +30,7 @@ export interface useDevicesResult {
  * - Changing devices manually work best in combination with remembering the user's selection for the next time, do
  *   pass the rememberDeviceSelection flag at time of join for this to happen.
  */
-export const useDevices: () => useDevicesResult = () => {
+export const useDevices = ({ handleError } = { handleError: logErrorHandler }) => {
   const hmsActions = useHMSActions();
   const allDevices: DeviceTypeInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
@@ -52,24 +53,29 @@ export const useDevices: () => useDevicesResult = () => {
 
   const updateDevice = useCallback(
     async ({ deviceType, deviceId }) => {
-      switch (deviceType) {
-        case DeviceType.audioInput:
-          await hmsActions.setAudioSettings({ deviceId });
-          break;
-        case DeviceType.videoInput:
-          await hmsActions.setVideoSettings({ deviceId });
-          break;
-        case DeviceType.audioOutput:
-          await hmsActions.setAudioOutputDevice(deviceId);
-          break;
+      try {
+        switch (deviceType) {
+          case DeviceType.audioInput:
+            await hmsActions.setAudioSettings({ deviceId });
+            break;
+          case DeviceType.videoInput:
+            await hmsActions.setVideoSettings({ deviceId });
+            break;
+          case DeviceType.audioOutput:
+            await hmsActions.setAudioOutputDevice(deviceId);
+            break;
+        }
+      } catch (err) {
+        handleError(err as Error, 'updateDevices');
       }
     },
     [hmsActions],
   );
 
-  return {
+  const result: useDevicesResult = {
     allDevices,
     selectedDeviceIDs,
     updateDevice,
   };
+  return result;
 };
