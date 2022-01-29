@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
@@ -8,7 +8,7 @@ export interface VideoTileStatsProps {
   audioTrackID?: HMSTrackID;
 }
 
-const StatsRow = ({ label = '', value = '', show = true }) => {
+const RawStatsRow = ({ label = '', value = '', show = true }) => {
   return (
     <>
       {show ? (
@@ -21,15 +21,16 @@ const StatsRow = ({ label = '', value = '', show = true }) => {
   );
 };
 
-const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : stats?.packetsLostRate) + '/s';
+// memoize so only the rows which change rerender
+const StatsRow = React.memo(RawStatsRow);
 
-  const trackType = stats && stats?.kind.charAt(0).toUpperCase() + stats?.kind.slice(1);
+const TrackPacketsLostRow = ({ stats, label }: { stats?: HMSTrackStats; label: string }) => {
+  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
 
   return (
     <StatsRow
-      show={isNotNullish(stats?.packetsLost) && isNotNullish(stats?.packetsLostRate)}
-      label={`Packet Loss (${trackType === 'Video' ? 'V' : 'A'})`}
+      show={isNotNullishAndNot0(stats?.packetsLost)}
+      label={label}
       value={`${stats?.packetsLost}(${packetsLostRate})`}
     />
   );
@@ -37,65 +38,57 @@ const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
 
 export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
-
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
-  const rootRef = useRef<HTMLDivElement>(null);
-  const containerStyle: React.CSSProperties = {};
-  const parentHeight = rootRef.current?.parentElement?.clientHeight || 0;
-  const parentWidth = rootRef.current?.parentElement?.clientWidth || 0;
-  const compact = parentHeight < 300;
-  if (compact) {
-    containerStyle.width = `calc(${parentWidth}px - 1rem)`;
-    containerStyle.maxHeight = parentHeight * 0.75;
-    containerStyle.overflowY = 'auto';
-  }
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
   }
   return (
-    <Stats.Root style={containerStyle} ref={rootRef} compact={compact}>
+    <Stats.Root>
       <table>
         <tbody>
-          {videoTrackStats?.frameWidth ? (
-            <StatsRow label="Width" value={videoTrackStats?.frameWidth.toString()} />
-          ) : null}
-          {videoTrackStats?.frameHeight ? (
-            <StatsRow label="Height" value={videoTrackStats?.frameHeight.toString()} />
-          ) : null}
-
           <StatsRow
-            show={isNotNullish(videoTrackStats?.framesPerSecond)}
+            show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+            label="Width"
+            value={videoTrackStats?.frameWidth?.toString()}
+          />
+          <StatsRow
+            show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+            label="Height"
+            value={videoTrackStats?.frameHeight?.toString()}
+          />
+          <StatsRow
+            show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
             label="FPS"
             value={`${videoTrackStats?.framesPerSecond} ${
-              isNotNullish(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
+              isNotNullishAndNot0(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
             }`}
           />
 
           <StatsRow
             show={isNotNullish(videoTrackStats?.bitrate)}
-            label="Bitrate (V)"
+            label="Bitrate(V)"
             value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
           />
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.bitrate)}
-            label="Bitrate (A)"
+            label="Bitrate(A)"
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 
-          <TrackPacketsLostRow stats={videoTrackStats} />
-          <TrackPacketsLostRow stats={audioTrackStats} />
+          <TrackPacketsLostRow label="Packet Loss(V)" stats={videoTrackStats} />
+          <TrackPacketsLostRow label="Packet Loss(A)" stats={audioTrackStats} />
 
           <StatsRow
             show={isNotNullish(videoTrackStats?.jitter)}
-            label="Jitter (V)"
+            label="Jitter(V)"
             value={videoTrackStats?.jitter?.toString()}
           />
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.jitter)}
-            label="Jitter (A)"
+            label="Jitter(A)"
             value={audioTrackStats?.jitter?.toString()}
           />
         </tbody>
@@ -104,10 +97,14 @@ export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsPro
   );
 }
 
+export function isNotNullishAndNot0(value: number | undefined | null) {
+  return isNotNullish(value) && value !== 0;
+}
+
 /**
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNotNullish(value: any) {
+export function isNotNullish(value: number | undefined | null) {
   return value !== undefined && value !== null;
 }
