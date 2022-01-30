@@ -1,14 +1,15 @@
 import { HMSRoomState, selectIsConnectedToRoom, selectRoomState } from '@100mslive/hms-video-store';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useHMSActions, useHMSStore } from '../hooks/HmsRoomProvider';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
+import { HMSConfig } from '@100mslive/hms-video';
 
 export interface usePreviewInput {
   /**
-   * name of user who is joining
+   * name of user who is joining, this is only required if join is called
    */
-  name: string;
+  name?: string;
   /**
    * app side authentication token
    */
@@ -40,12 +41,13 @@ export interface usePreviewResult {
 }
 
 /**
- * this hook can be used to build a preview UI component, this lets you call preview everytime the passed in
- * token changes. This hook is best used in combination with useDevices for changing devices and useAVToggle for
- * muting/unmuting. Any device change or mute/unmute will be carried across to join.
+ * This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
+ * token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
+ * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
+ * Any device change or mute/unmute will be carried across to join.
  */
 export const usePreview = ({
-  name,
+  name = '',
   token,
   metadata,
   handleError = logErrorHandler,
@@ -54,34 +56,38 @@ export const usePreview = ({
   const roomState = useHMSStore(selectRoomState);
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
   const enableJoin = roomState === HMSRoomState.Preview;
+
+  const config: HMSConfig = useMemo(() => {
+    return {
+      userName: name,
+      authToken: token,
+      metaData: metadata,
+      rememberDeviceSelection: true,
+    };
+  }, [name, token, metadata]);
+
   useEffect(() => {
     (async () => {
-      if (!token || roomState !== HMSRoomState.Disconnected) {
+      if (!token) {
         return;
       }
+      if (roomState !== HMSRoomState.Disconnected) {
+        await actions.leave();
+      }
       try {
-        await actions.preview({
-          userName: name,
-          authToken: token,
-          rememberDeviceSelection: true,
-        });
+        await actions.preview(config);
       } catch (err) {
         handleError(err as Error, 'preview');
       }
     })();
-  }, [roomState, actions, token]);
+  }, [actions, token]);
 
   const join = useCallback(async () => {
     if (!token) {
       return;
     }
     try {
-      await actions.join({
-        userName: name,
-        authToken: token,
-        metaData: metadata,
-        rememberDeviceSelection: true,
-      });
+      await actions.join(config);
     } catch (err) {
       handleError(err as Error, 'join');
     }
