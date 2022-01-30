@@ -12,7 +12,7 @@ export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
   track: HMSTrack,
   peerName?: string,
-  prevStats?: HMSWebrtcStats,
+  prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
   const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
   const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
@@ -20,7 +20,6 @@ export const getTrackStats = async (
 
   const trackReport = await getStats[peerConnectionType]?.(nativeTrack);
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
-  const prevTrackStats = prevStats && prevStats.getTrackStats(track.trackId);
 
   const bitrate = computeBitrate(
     (peerConnectionType === 'publish' ? 'bytesSent' : 'bytesReceived') as any,
