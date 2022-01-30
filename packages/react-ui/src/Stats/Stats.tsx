@@ -24,7 +24,13 @@ const RawStatsRow = ({ label = '', value = '', show = true }) => {
 // memoize so only the rows which change rerender
 const StatsRow = React.memo(RawStatsRow);
 
-const TrackPacketsLostRow = ({ stats, label }: { stats?: HMSTrackStats; label: string }) => {
+const TrackPacketsLostRow = ({
+  stats,
+  label,
+}: {
+  stats?: Pick<HMSTrackStats, 'packetsLost' | 'packetsLostRate'>;
+  label: string;
+}) => {
   const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
 
   return (
@@ -33,6 +39,27 @@ const TrackPacketsLostRow = ({ stats, label }: { stats?: HMSTrackStats; label: s
       label={label}
       value={`${stats?.packetsLost}(${packetsLostRate})`}
     />
+  );
+};
+
+const RemoteStats = ({
+  audioTrackStats,
+  videoTrackStats,
+  remote = false,
+}: {
+  audioTrackStats?: HMSTrackStats;
+  videoTrackStats?: HMSTrackStats;
+  remote?: boolean;
+}) => {
+  const audioStats = remote ? audioTrackStats?.remote : audioTrackStats;
+  const videoStats = remote ? videoTrackStats?.remote : videoTrackStats;
+  return (
+    <>
+      <TrackPacketsLostRow label="Packet Loss(V)" stats={videoStats} />
+      <TrackPacketsLostRow label="Packet Loss(A)" stats={audioStats} />
+      <StatsRow show={isNotNullish(videoStats?.jitter)} label="Jitter(V)" value={videoStats?.jitter?.toFixed(4)} />
+      <StatsRow show={isNotNullish(audioStats?.jitter)} label="Jitter(A)" value={audioStats?.jitter?.toFixed(4)} />
+    </>
   );
 };
 
@@ -76,20 +103,10 @@ export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsPro
             label="Bitrate(A)"
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
-
-          <TrackPacketsLostRow label="Packet Loss(V)" stats={videoTrackStats} />
-          <TrackPacketsLostRow label="Packet Loss(A)" stats={audioTrackStats} />
-
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.jitter)}
-            label="Jitter(V)"
-            value={videoTrackStats?.jitter?.toString()}
-          />
-
-          <StatsRow
-            show={isNotNullish(audioTrackStats?.jitter)}
-            label="Jitter(A)"
-            value={audioTrackStats?.jitter?.toString()}
+          <RemoteStats
+            audioTrackStats={audioTrackStats}
+            videoTrackStats={videoTrackStats}
+            remote={audioTrackStats?.type.includes('outbound')}
           />
         </tbody>
       </table>
