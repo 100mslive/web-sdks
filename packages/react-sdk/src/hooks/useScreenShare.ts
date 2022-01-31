@@ -1,5 +1,4 @@
 import { hooksErrHandler } from './types';
-import { logErrorHandler } from '../utils/commons';
 import { HMSPeerID, HMSTrackID } from '@100mslive/hms-video-store';
 
 export interface useScreenShareInput {
