@@ -29,8 +29,7 @@ export const LeaveRoom = () => {
   };
 
   const leaveRoom = () => {
-    hmsActions.leave();
-    redirectToLeavePage();
+    hmsActions.leave().then(redirectToLeavePage).catch(console.error);
   };
 
   return (
@@ -143,8 +142,10 @@ export const LeaveRoom = () => {
             <Button
               variant="danger"
               onClick={() => {
-                hmsActions.endRoom(lockRoom, "End Room");
-                redirectToLeavePage();
+                hmsActions
+                  .endRoom(lockRoom, "End Room")
+                  .then(redirectToLeavePage)
+                  .catch(console.error);
               }}
             >
               End Room
