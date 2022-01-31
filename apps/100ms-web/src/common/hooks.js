@@ -1,25 +1,29 @@
+// @ts-check
 import { useHMSActions } from "@100mslive/hms-video-react";
 import { useHMSStore, selectPeerCount } from "@100mslive/react-sdk";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../store/AppContext";
 
 /**
- * @param {Function} cb
+ * Hook to execute a callback when alone in room(after a certain threshold of time)
+ * @param {Function} cb The callback to execute
+ * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
+ * starting from the instant when alone in room.
+ * note: the cb is not called when another peer joins during this period.
  */
-const useWhenAloneInRoom = (cb, threshold = 5 * 60 * 1000) => {
+const useWhenAloneInRoom = (cb, thresholdMs = 5 * 60 * 1000) => {
   const peerCount = useHMSStore(selectPeerCount);
-  const [cbTimeout, setCbTimeout] = useState(null);
+  const cbTimeout = useRef(null);
   const alone = peerCount === 1;
 
   useEffect(() => {
     if (alone) {
-      setCbTimeout(setTimeout(cb, threshold));
+      cbTimeout.current = setTimeout(cb, thresholdMs);
     } else {
-      cbTimeout && clearTimeout(cbTimeout);
-      setCbTimeout(null);
+      cbTimeout.current && clearTimeout(cbTimeout.current);
+      cbTimeout.current = null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alone]);
+  }, [alone, cb, thresholdMs]);
 };
 
 export const useBeamAutoLeave = () => {
