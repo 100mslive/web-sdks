@@ -1,7 +1,7 @@
 import { styled } from '../stitches.config';
 
 export const Root = styled('div', {
-  padding: '1rem',
+  padding: '0.75rem',
   // show videotile context menu on hover
   // [`&:hover .tile-menu`]: {
   //   display: 'inline-block',
@@ -26,16 +26,16 @@ const Overlay = styled('div', {
 
 const Info = styled('div', {
   color: '$fg',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
   position: 'absolute',
-  bottom: '10px',
+  bottom: '5px',
   left: '50%',
   fontSize: '$sm',
   transform: 'translateX(-50%)',
   textAlign: 'center',
+  width: '80%',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
 });
 
 const AvatarContainer = styled('div', {
@@ -45,22 +45,23 @@ const AvatarContainer = styled('div', {
   transform: 'translateX(-50%) translateY(-50%)',
 });
 
-const HandRaiseBox = styled('div', {
+const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
+  color: '$fg',
 });
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
   left: '50%',
   transform: 'translateX(-50%)',
-  bottom: '30px',
+  bottom: '20px',
   color: 'white',
   bg: '$redMain',
   borderRadius: '$round',
-  width: '36px',
-  height: '36px',
+  width: '28px',
+  height: '28px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -74,7 +75,7 @@ interface VideoTileType {
   Info: typeof Info;
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
-  HandRaiseBox: typeof HandRaiseBox;
+  AttributeBox: typeof AttributeBox;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -84,5 +85,5 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
-  HandRaiseBox,
+  AttributeBox: AttributeBox,
 };

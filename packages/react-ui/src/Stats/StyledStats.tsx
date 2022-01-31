@@ -3,24 +3,15 @@ import { styled } from '../stitches.config';
 export const Root = styled('div', {
   backgroundColor: '$statsBg',
   position: 'absolute',
-  top: '0.5rem',
-  left: '0.5rem',
-  // z-10 rounded-lg p-3 text-sm'
+  top: '0.3rem',
+  left: '0.3rem',
   zIndex: 10,
   borderRadius: '$2',
-  padding: '0.5rem',
+  padding: '5px',
   fontSize: '12px',
-  variants: {
-    contract: {
-      true: {
-        height: '100px',
-        fontSize: '10px',
-        overflowY: 'scroll',
-        overflowX: 'scroll',
-        left: `min('0.5rem', '10000000rem')`,
-      },
-    },
-  },
+  overflowY: 'auto',
+  maxHeight: '75%',
+  maxWidth: '75%',
 });
 
 export const Table = styled('table', {});
@@ -28,13 +19,15 @@ export const Table = styled('table', {});
 export const Row = styled('tr', {
   width: '100%',
   '& > * + *': {
-    paddingLeft: '1rem',
+    paddingLeft: '0.5rem',
   },
+  whiteSpace: 'nowrap',
+  textAlign: 'left',
 });
 
 export const Label = styled('td', {
   color: '$grey5',
-  fontWeight: 600,
+  fontWeight: 400,
 });
 
 export const Value = styled('td', {

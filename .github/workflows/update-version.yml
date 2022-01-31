@@ -1,4 +1,4 @@
-name: PR checks
+name: Size and Version Update
 on:
   pull_request:
     branches:
@@ -31,49 +31,49 @@ jobs:
             react-icons:
               - 'packages/react-icons/src/**'
 
-  # run this job only if the above job succeeds
-  update-version:
-    runs-on: ubuntu-latest
-    needs: changes
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: main
+#   # run this job only if the above job succeeds
+#   update-version:
+#     runs-on: ubuntu-latest
+#     needs: changes
+#     steps:
+#       - uses: actions/checkout@v2
+#         with:
+#           ref: main
 
-      - name: Set versions
-        uses: actions/github-script@v5
-        id: main
-        with:
-          script: |
-            const script = require('./scripts/setversions.js')
-            script({ core })
+#       - name: Set versions
+#         uses: actions/github-script@v5
+#         id: main
+#         with:
+#           script: |
+#             const script = require('./scripts/setversions.js')
+#             script({ core })
 
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
+#       - uses: actions/checkout@v2
+#         with:
+#           ref: ${{ github.head_ref }}
 
-      - name: Set versions
-        uses: actions/github-script@v5
-        id: branch
-        with:
-          script: |
-            const script = require('./scripts/setversions.js')
-            script({ core })
+#       - name: Set versions
+#         uses: actions/github-script@v5
+#         id: branch
+#         with:
+#           script: |
+#             const script = require('./scripts/setversions.js')
+#             script({ core })
 
-      - name: Set git user
-        run: |
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
+#       - name: Set git user
+#         run: |
+#           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#           git config user.name "github-actions[bot]"
 
-      - name: Update versions
-        uses: actions/github-script@v5
-        env:
-          changes: ${{ toJSON(needs.changes.outputs) }}
-          branch: ${{ github.head_ref }}
-        with:
-          script: |
-            const script = require('./scripts/versioning.js')
-            await script()
+#       - name: Update versions
+#         uses: actions/github-script@v5
+#         env:
+#           changes: ${{ toJSON(needs.changes.outputs) }}
+#           branch: ${{ github.head_ref }}
+#         with:
+#           script: |
+#             const script = require('./scripts/versioning.js')
+#             await script()
 
   size:
     runs-on: ubuntu-latest

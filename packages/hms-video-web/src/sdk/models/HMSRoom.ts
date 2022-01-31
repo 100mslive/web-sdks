@@ -10,6 +10,7 @@ export default class Room implements HMSRoom {
   recording?: HMSRecording | undefined;
   rtmp?: HMSRTMP | undefined;
   hls?: HMSHLS | undefined;
+  name?: string;
 
   public get localPeer() {
     return this.store.getLocalPeer()!;
@@ -19,5 +20,5 @@ export default class Room implements HMSRoom {
     return this.store.getPeers();
   }
 
-  constructor(public id: string, public name: string, private store: IStore) {}
+  constructor(public id: string, private store: IStore) {}
 }

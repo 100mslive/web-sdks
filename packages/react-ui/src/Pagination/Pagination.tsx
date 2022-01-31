@@ -4,28 +4,17 @@ import { StyledPagination } from './StyledPagination';
 interface Props {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
-  list: string[];
+  numPages: number;
 }
 
-export const Pagination: React.FC<Props> = ({ page, setPage, list }) => {
-  const disableLeft = list.length - page === list.length;
-  const disableRight = list.length - page === 1;
-  console.log(disableLeft, disableRight);
+export const Pagination: React.FC<Props> = ({ page, setPage, numPages }) => {
+  const disableLeft = page === 0;
+  const disableRight = page === numPages - 1;
   const nextPage = () => {
-    // last
-    if (page === list.length - 1) {
-      setPage(list.length - 1);
-    } else {
-      setPage(page + 1);
-    }
+    setPage(Math.min(page + 1, numPages - 1));
   };
   const prevPage = () => {
-    // prev
-    if (page === 0) {
-      setPage(0);
-    } else {
-      setPage(page - 1);
-    }
+    setPage(Math.max(page - 1, 0));
   };
   return (
     <StyledPagination.Root>
@@ -33,7 +22,7 @@ export const Pagination: React.FC<Props> = ({ page, setPage, list }) => {
         <ChevronLeft disabled={disableLeft} />
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
-        {list.map((_, i) => (
+        {[...Array(numPages)].map((_, i) => (
           <StyledPagination.Dot key={i} active={page === i} onClick={() => setPage(i)} />
         ))}
       </StyledPagination.Dots>

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish_packages:
+  generate_api_reference:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -26,17 +26,39 @@ jobs:
 
       - name: Install packages
         run: yarn install --frozen-lockfile
+        
+      - name: Build
+        run: yarn build
 
       - name: Generate API Reference
         working-directory: ./packages/hms-video-store
         run: yarn docs
+        
+      - name: checkout 100ms-docs
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: 100mslive/100ms-docs
+          path: 100ms-docs
+        
+      - name: copy over api reference
+        run: cp -R ./packages/hms-video-store/docs ./100ms-docs/docs/api-reference/javascript
+        
+      - name: replace old api-reference
+        working-directory: ./100ms-docs/docs/api-reference/javascript
+        run: |
+          rm -r v2
+          mv docs v2
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v3
         with:
-          commit-message: 'docs(store): update api reference'
-          title: 'docs(store): update api reference'
-          branch: api-reference
-          branch-suffix: timestamp
+          path: 100ms-docs
+          token: ${{ secrets.PAT_TOKEN }}
+          commit-message: 'docs(web): update api reference'
+          title: 'docs(web): update api reference'
+          labels: automated pr
+          branch: web-api-reference
           base: main
+          reviewers: triptu
           delete-branch: true

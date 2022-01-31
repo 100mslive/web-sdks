@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+
+/**
+ * Disabling this lint option so that
+ * IHMSStore, IHMSStoreReadOnly, IHMSStatsStore, IHMSStatsStoreReadOnly
+ * are exported as interfaces to include tsdoc comments with them.
+ */
+
 import { HMSStore, HMSStatsStore } from './schema';
 import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
 import { NamedSetState } from './hmsSDKStore/internalTypes';
@@ -43,18 +51,7 @@ export interface GetState<T extends State> {
 }
 
 /**
- * HMS store can be used to:
- * - Get a part of the current store or state(getState)
- * - Subscribe to different parts of the store using selectors and execute a callback when the value changes.
- *
- * Both getState and subscribe use selectors to query a part the store.
- *
- *
- * Selectors are functions with HMSStore as an argument and returns a part of the store.
- *
- * **StoreSelector** is a type alias for this type of function.
- *
- * @category Core
+ * @internal
  */
 export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'namedSetState' | 'destroy'>;
 
@@ -62,7 +59,7 @@ export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'name
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export type IHMSStore = IStore<HMSStore>;
+export interface IHMSStore extends IStore<HMSStore> {}
 
 /**
  * HMS store can be used to:
@@ -78,7 +75,7 @@ export type IHMSStore = IStore<HMSStore>;
  *
  * @category Core
  */
-export type IHMSStoreReadOnly = IStoreReadOnly<HMSStore>;
+export interface IHMSStoreReadOnly extends IStoreReadOnly<HMSStore> {}
 
-export type IHMSStatsStore = IStore<HMSStatsStore>;
-export type IHMSStatsStoreReadOnly = IStoreReadOnly<HMSStatsStore>;
+export interface IHMSStatsStore extends IStore<HMSStatsStore> {}
+export interface IHMSStatsStoreReadOnly extends IStoreReadOnly<HMSStatsStore> {}

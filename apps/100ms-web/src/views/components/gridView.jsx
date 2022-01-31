@@ -33,7 +33,6 @@ export const GridCenterView = ({
 }) => {
   const { width } = useWindowSize();
   const isMobile = width < 760;
-  const rowCount = width < 760 ? 1 : undefined;
   return (
     <Fragment>
       <Box
@@ -54,13 +53,9 @@ export const GridCenterView = ({
             <VideoList
               peers={peers}
               classes={{
-                root: "",
-                videoTileContainer: `rounded-lg ${isMobile ? "p-0 mr-2" : ""}`,
+                videoTileContainer: "rounded-lg",
               }}
               maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
-              maxColCount={2}
-              maxRowCount={rowCount}
-              compact={peers.length > 2}
               // show stats for upto 2 peers in sidepane
               videoTileProps={videoTileProps}
             />
@@ -109,6 +104,7 @@ export const GridSidePaneView = ({
   toggleChat,
   isParticipantListOpen,
   totalPeers,
+  showStatsOnTiles,
   videoTileProps = () => ({}),
 }) => {
   const { width } = useWindowSize();
@@ -134,22 +130,31 @@ export const GridSidePaneView = ({
       }}
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
-        {peers && peers.length > 0 && (
-          <VideoList
-            peers={peers}
-            classes={{
-              root: "",
-              videoTileContainer: `rounded-lg ${
-                width <= 768 ? "p-0 mr-2" : ""
-              }`,
-            }}
-            maxColCount={2}
-            maxRowCount={rows}
-            compact={peers.length > 2}
-            // show stats for upto 2 peers in sidepane
-            videoTileProps={videoTileProps}
-          />
-        )}
+        {peers &&
+          peers.length > 0 &&
+          (FeatureFlags.enableNewComponents ? (
+            <HmsVideoList
+              showStatsOnTiles={showStatsOnTiles}
+              peers={peers}
+              maxColCount={2}
+              maxRowCount={rows}
+            />
+          ) : (
+            <VideoList
+              peers={peers}
+              classes={{
+                root: "",
+                videoTileContainer: `rounded-lg ${
+                  width <= 768 ? "p-0 mr-2" : ""
+                }`,
+              }}
+              maxColCount={2}
+              maxRowCount={rows}
+              compact={peers.length > 2}
+              // show stats for upto 2 peers in sidepane
+              videoTileProps={videoTileProps}
+            />
+          ))}
       </Flex>
       {isChatOpen && (
         <Flex

@@ -41,7 +41,7 @@ beforeEach(() => {
   changeMultiTrackStateRequestHandler = jest.fn();
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
-  store.setRoom(new HMSRoom('1234', 'test', store));
+  store.setRoom(new HMSRoom('1234', store));
 
   listener = {
     onJoin: joinHandler,
