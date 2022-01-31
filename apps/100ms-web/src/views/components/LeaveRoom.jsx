@@ -20,13 +20,17 @@ export const LeaveRoom = () => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
 
-  const leaveRoom = () => {
-    hmsActions.leave();
+  const redirectToLeavePage = () => {
     if (params.role) {
       history.push("/leave/" + params.roomId + "/" + params.role);
     } else {
       history.push("/leave/" + params.roomId);
     }
+  };
+
+  const leaveRoom = () => {
+    hmsActions.leave();
+    redirectToLeavePage();
   };
 
   return (
@@ -140,7 +144,7 @@ export const LeaveRoom = () => {
               variant="danger"
               onClick={() => {
                 hmsActions.endRoom(lockRoom, "End Room");
-                leaveRoom();
+                redirectToLeavePage();
               }}
             >
               End Room
