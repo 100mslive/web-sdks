@@ -3,6 +3,7 @@ import {
   ContextMenu,
   ContextMenuItem,
   MessageModal,
+  ProgressIcon,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -17,6 +18,7 @@ export const LeaveRoom = () => {
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
 
@@ -29,10 +31,44 @@ export const LeaveRoom = () => {
   };
 
   const leaveRoom = () => {
-    hmsActions.leave().then(redirectToLeavePage).catch(console.error);
+    setDisconnecting(true);
+    hmsActions
+      .leave()
+      .then(redirectToLeavePage)
+      .catch(error => {
+        setDisconnecting(false);
+        console.error(error);
+      });
   };
 
-  return (
+  const endRoom = () => {
+    setDisconnecting(true);
+    hmsActions
+      .endRoom(lockRoom, "End Room")
+      .then(redirectToLeavePage)
+      .catch(error => {
+        setDisconnecting(false);
+        console.error(error);
+      });
+  };
+
+  const LeaveRoomButton = () => {
+    return (
+      <Button variant="danger" key="LeaveRoom">
+        {disconnecting ? (
+          <ProgressIcon key="leaving" />
+        ) : (
+          <HangUpIcon key="hangUp" />
+        )}
+        <Text variant="body" css={{ ml: "$2", "@md": { display: "none" } }}>
+          {disconnecting ? "Leaving" : "Leave"} Room
+        </Text>
+      </Button>
+    );
+  };
+
+  // Show Menu only when end room is permitted
+  return permissions.endRoom ? (
     <Fragment>
       <ContextMenu
         classes={{
@@ -50,14 +86,7 @@ export const LeaveRoom = () => {
         }}
         menuOpen={showMenu}
         key="LeaveAction"
-        trigger={
-          <Button variant="danger" key="LeaveRoom">
-            <HangUpIcon key="hangUp" />
-            <Text variant="body" css={{ ml: "$2", "@md": { display: "none" } }}>
-              Leave Room
-            </Text>
-          </Button>
-        }
+        trigger={<LeaveRoomButton />}
         menuProps={{
           anchorOrigin: {
             vertical: "top",
@@ -139,20 +168,17 @@ export const LeaveRoom = () => {
             >
               Cancel
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                hmsActions
-                  .endRoom(lockRoom, "End Room")
-                  .then(redirectToLeavePage)
-                  .catch(console.error);
-              }}
-            >
-              End Room
+            <Button variant="danger" onClick={endRoom}>
+              {disconnecting && <ProgressIcon key="ending" />}
+              {disconnecting ? "Ending" : "End"} Room
             </Button>
           </div>
         }
       />
     </Fragment>
+  ) : (
+    <div onClick={leaveRoom}>
+      <LeaveRoomButton />
+    </div>
   );
 };
