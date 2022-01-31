@@ -5,7 +5,7 @@ import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../store/AppContext";
 
 /**
- * Hook to execute a callback when alone in room(after a certain threshold of time)
+ * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {Function} cb The callback to execute
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
  * starting from the instant when alone in room.
@@ -33,7 +33,11 @@ export const useBeamAutoLeave = () => {
   } = useContext(AppContext);
   useWhenAloneInRoom(() => {
     if (isHeadless) {
-      hmsActions.leave();
+      /**
+       * End room after 5 minutes of being alone in the room to stop beam
+       * Note: Leave doesn't stop beam
+       */
+      hmsActions.endRoom(false, "Stop Beam");
     }
   });
 };
