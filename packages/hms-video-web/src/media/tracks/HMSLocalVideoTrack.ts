@@ -96,14 +96,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
-
+    await this.handleDeviceChange(newSettings, internal);
     if (!this.enabled) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-
-    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
@@ -246,7 +244,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      await this.replaceTrackWith(settings);
+      this.enabled && (await this.replaceTrackWith(settings));
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
