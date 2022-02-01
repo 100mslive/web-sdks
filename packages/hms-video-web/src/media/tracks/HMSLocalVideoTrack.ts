@@ -96,15 +96,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
-
+    await this.handleDeviceChange(newSettings, internal);
     if (!this.enabled) {
-      await this.handleDeviceChange(newSettings, internal); // call this to update local storage
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-
-    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }

@@ -86,39 +86,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
 
+    this.handleDeviceChange(newSettings, internal);
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-
-    const stream = this.stream as HMSLocalStream;
-    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-
-    if (hasPropertyChanged('deviceId')) {
-      const isLevelMonitored = Boolean(this.audioLevelMonitor);
-      HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
-      isLevelMonitored && this.destroyAudioLevelMonitor();
-      await this.replaceTrackWith(newSettings);
-      isLevelMonitored && this.initAudioLevelMonitor();
-      if (!internal) {
-        DeviceStorageManager.updateSelection('audioInput', {
-          deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
-        });
-      }
-    }
-
-    if (hasPropertyChanged('maxBitrate')) {
-      if (newSettings.maxBitrate) {
-        await stream.setMaxBitrate(newSettings.maxBitrate, this);
-      }
-    }
-
-    if (hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(newSettings.toConstraints());
-    }
-
+    this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
 
@@ -206,4 +180,39 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
     return newSettings;
   }
+
+  private handleSettingsChange = async (settings: HMSAudioTrackSettings) => {
+    const stream = this.stream as HMSLocalStream;
+    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
+    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
+      await stream.setMaxBitrate(settings.maxBitrate, this);
+    }
+
+    if (hasPropertyChanged('advanced')) {
+      await this.nativeTrack.applyConstraints(settings.toConstraints());
+    }
+  };
+
+  /**
+   * Replace audio track with new track on device change if enabled
+   * @param settings - AudioSettings Object constructed with new settings
+   * @param internal - whether the change was because of internal sdk call or external client call
+   */
+  private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
+    const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
+
+    if (hasPropertyChanged('deviceId')) {
+      const isLevelMonitored = Boolean(this.audioLevelMonitor);
+      HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
+      isLevelMonitored && this.destroyAudioLevelMonitor();
+      this.enabled && (await this.replaceTrackWith(settings));
+      isLevelMonitored && this.initAudioLevelMonitor();
+      if (!internal) {
+        DeviceStorageManager.updateSelection('audioInput', {
+          deviceId: settings.deviceId,
+          groupId: this.nativeTrack.getSettings().groupId,
+        });
+      }
+    }
+  };
 }
