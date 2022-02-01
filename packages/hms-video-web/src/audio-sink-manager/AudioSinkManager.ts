@@ -14,6 +14,13 @@ import { EventBus } from '../events/EventBus';
 import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
+/**
+ * Following are the errors thrown when autoplay is blocked in different browsers
+ * Firefox - DOMException: The play method is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+ * Safari - NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+ * Chrome - DOMException: play() failed because the user didn't interact with the document first.
+ * Brave - DOMException: play() can only be initiated by a user gesture.
+ */
 export interface AutoplayEvent {
   error: HMSException;
 }
@@ -243,7 +250,7 @@ export class AudioSinkManager {
     } catch (error) {
       this.autoPausedTracks.add(track);
       HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
-      if (!this.state.autoplayFailed) {
+      if (!this.state.autoplayFailed && !(error as Error).message.includes('new load request')) {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
         analyticsEventsService.queue(AnalyticsEventFactory.autoplayError()).flush();
