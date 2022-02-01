@@ -91,10 +91,6 @@ export interface RoomState {
   };
 }
 
-export interface PeriodicSessionState extends RoomState {
-  room_id: string;
-}
-
 export interface PeerListNotification {
   peers: {
     [peer_id: string]: PeerNotification;
@@ -104,7 +100,7 @@ export interface PeerListNotification {
 
 export interface PeriodicRoomState {
   peer_count: number;
-  room: PeriodicSessionState;
+  room: RoomState;
   peers: {
     [peer_id: string]: PeerNotification;
   };
