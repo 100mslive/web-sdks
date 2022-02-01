@@ -1,5 +1,5 @@
 import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   calculateLayoutSizes,
   chunkElements,
@@ -10,17 +10,27 @@ import {
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import { useResizeDetector } from 'react-resize-detector';
 
-interface UseVideoListProps {
+export interface useVideoListInput {
   /**
    * Max tiles in a  page. Overrides maxRowCount and maxColCount
    */
   maxTileCount?: number;
+  /**
+   * max number of rows for tiles
+   */
   maxRowCount?: number;
+  /**
+   * max number of columns for tiles
+   */
   maxColCount?: number;
   /**
-   * Given a screensharing peer the function should return true if their screenshare should be included for the video tile, and false otherwise. This can be useful if there are multiple screenshares in the room where you may want to show one in the center view and others in video list along side other tiles.
+   * Given a screensharing peer the function should return true if their screenshare should be
+   * included for the video tile, and false otherwise.
+   * This can be useful if there are multiple screenshares in the room where you may want to show one in the
+   * center view and others in video list along side other tiles.
+   * e.g. showScreenFn
    */
-  showScreenFn?: (peer: HMSPeer) => boolean;
+  includeScreenShare?: (peer: HMSPeer) => boolean;
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
   /**
@@ -45,12 +55,12 @@ export const useVideoList = ({
   maxTileCount,
   maxColCount,
   maxRowCount,
-  showScreenFn = () => false,
+  includeScreenShare = () => false,
   peers,
   overflow = 'scroll-x',
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
-}: UseVideoListProps): {
+}: useVideoListInput): {
   pagesWithTiles: (TrackWithPeer & {
     width: number;
     height: number;
@@ -63,7 +73,7 @@ export const useVideoList = ({
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
     peers,
     tracksMap,
-    showScreenFn,
+    includeScreenShare,
     filterNonPublishingPeers,
   );
   const finalAspectRatio = useMemo(() => {
