@@ -61,21 +61,7 @@ export class PeerListManager {
 
   private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
     const roomPeers = roomState.peers;
-    const peersMap: Record<string, PeerNotification> = {};
-    for (const peerId in roomPeers) {
-      const roomPeer = roomPeers[peerId];
-      peersMap[peerId] = {
-        peer_id: peerId,
-        role: roomPeer.role,
-        info: {
-          name: roomPeer.name,
-          data: roomPeer.data,
-          user_id: roomPeer.user_id,
-        },
-        tracks: {},
-      };
-    }
-    this.handleRepeatedPeerList(peersMap);
+    this.handleRepeatedPeerList(roomPeers);
   };
 
   private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {

@@ -70,15 +70,6 @@ export interface PeerNotification {
   };
 }
 
-export interface FlatPeerNotification {
-  peer_id: string;
-  name: string;
-  user_id: string;
-  joined_at: string;
-  role: string;
-  data: string;
-}
-
 export interface SessionState {
   name: string;
   session_id: string;
@@ -100,9 +91,8 @@ export interface SessionState {
   };
 }
 
-export interface RoomState {
+export interface PeriodicSessionState extends SessionState {
   room_id: string;
-  name: string;
 }
 
 export interface PeerListNotification {
@@ -114,10 +104,9 @@ export interface PeerListNotification {
 
 export interface PeriodicRoomState {
   peer_count: number;
-  room: RoomState;
-  session: SessionState;
+  room: PeriodicSessionState;
   peers: {
-    [peer_id: string]: FlatPeerNotification;
+    [peer_id: string]: PeerNotification;
   };
 }
 

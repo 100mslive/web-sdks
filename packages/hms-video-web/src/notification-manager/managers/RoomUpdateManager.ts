@@ -41,9 +41,8 @@ export class RoomUpdateManager {
   }
 
   private handlePreviewRoomState(notification: PeriodicRoomState) {
-    const { session, room } = notification;
-    session.name = room.name;
-    this.onPeerList(session, notification.peer_count);
+    const { room } = notification;
+    this.onPeerList(room, notification.peer_count);
   }
 
   private onPeerList(roomNotification: SessionState, peerCount?: number) {
