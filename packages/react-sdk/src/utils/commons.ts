@@ -1,9 +1,9 @@
-import { hooksErrHandler } from '../primitives/types';
+import { hooksErrHandler } from '../hooks/types';
 import HMSLogger from './logger';
 
 const TAG = 'react-sdk';
 
-export const logErrorHandler: hooksErrHandler = (err: Error, method) => HMSLogger.e(TAG, method, err);
+export const logErrorHandler: hooksErrHandler = (err: Error, method?: string) => HMSLogger.e(TAG, method, err);
 
 /**
  * pass in this error handler to get the error thrown back to the UI for further handling, showing toast etc.
