@@ -1,5 +1,4 @@
 import {
-  HMSPublishAllowed,
   selectIsAllowedToPublish,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
@@ -15,9 +14,16 @@ export interface useAVToggleResult {
    */
   isLocalAudioEnabled: boolean;
   isLocalVideoEnabled: boolean;
-  toggleAudio: () => void;
-  toggleVideo: () => void;
-  isAllowedToPublish: HMSPublishAllowed;
+  /**
+   * use this function to toggle audio state, the function will only be present if the user
+   * has permission to unmute audio
+   */
+  toggleAudio?: () => void;
+  /**
+   * use this function to toggle video state, the function will only be present if the user
+   * has permission to unmute video
+   */
+  toggleVideo?: () => void;
 }
 
 /**
@@ -50,8 +56,7 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
   return {
     isLocalAudioEnabled,
     isLocalVideoEnabled,
-    toggleAudio,
-    toggleVideo,
-    isAllowedToPublish,
+    toggleAudio: isAllowedToPublish?.audio ? toggleAudio : undefined,
+    toggleVideo: isAllowedToPublish?.video ? toggleVideo : undefined,
   };
 };
