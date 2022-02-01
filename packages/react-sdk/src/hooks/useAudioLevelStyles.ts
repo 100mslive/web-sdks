@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { selectTrackAudioByID } from '@100mslive/hms-video-store';
-import { useHMSVanillaStore } from './HmsRoomProvider';
+import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 
 /**
  * This hook can be used to apply css properties on an element based on the current audio level for the passed in track.

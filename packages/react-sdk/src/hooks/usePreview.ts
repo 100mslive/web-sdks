@@ -1,7 +1,7 @@
 import { HMSRoomState, selectIsConnectedToRoom, selectRoomState } from '@100mslive/hms-video-store';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useHMSActions, useHMSStore } from '../hooks/HmsRoomProvider';
-import { hooksErrHandler } from './types';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { hooksErrHandler } from '../hooks/types';
 import { logErrorHandler } from '../utils/commons';
 import { HMSConfig } from '@100mslive/hms-video';
 

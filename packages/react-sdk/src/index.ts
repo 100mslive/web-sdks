@@ -5,7 +5,7 @@ export {
   useHMSNotifications,
   useHMSVanillaStore,
   useHMSStatsStore,
-} from './hooks/HmsRoomProvider';
+} from './primitives/HmsRoomProvider';
 export { usePreview } from './hooks/usePreview';
 export { useAVToggle } from './hooks/useAVToggle';
 export { useDevices } from './hooks/useDevices';
@@ -20,5 +20,8 @@ export * from '@100mslive/hms-video-store';
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
-export type { useAVToggleInput, useAVToggleResult } from './hooks/useAVToggle';
-export type { useDevicesInput, useDevicesResult } from './hooks/useDevices';
+export type { useAVToggleResult } from './hooks/useAVToggle';
+export type { useDevicesResult } from './hooks/useDevices';
+
+// helpers
+export { throwErrorHandler } from './utils/commons';

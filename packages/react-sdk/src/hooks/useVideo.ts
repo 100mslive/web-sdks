@@ -1,7 +1,7 @@
 import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
 import { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
 /**

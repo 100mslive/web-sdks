@@ -5,16 +5,9 @@ import {
   selectIsLocalVideoEnabled,
 } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
-import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { hooksErrHandler } from './types';
-
-export interface useAVToggleInput {
-  /**
-   * function to handle errors happening during manual device change
-   */
-  handleError?: hooksErrHandler;
-}
+import { hooksErrHandler } from '../hooks/types';
 
 export interface useAVToggleResult {
   /**
@@ -31,7 +24,7 @@ export interface useAVToggleResult {
  * Use this hook to implement mute/unmute for audio and video.
  * isAllowedToPublish can be used to decide whether to show the toggle buttons in the UI.
  */
-export const useAVToggle = ({ handleError = logErrorHandler }: useAVToggleInput): useAVToggleResult => {
+export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): useAVToggleResult => {
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);

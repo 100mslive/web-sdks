@@ -1,5 +1,5 @@
 import { HMSTrackID, selectAudioTrackVolume } from '@100mslive/hms-video-store';
-import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { useCallback } from 'react';
 
 /**

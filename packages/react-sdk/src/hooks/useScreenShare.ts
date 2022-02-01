@@ -1,4 +1,4 @@
-import { hooksErrHandler } from './types';
+import { hooksErrHandler } from '../hooks/types';
 import {
   HMSPeerID,
   HMSTrackID,
@@ -6,14 +6,7 @@ import {
   selectPeerScreenSharing,
   selectPeerSharingAudio,
 } from '@100mslive/react-sdk';
-import { useHMSActions, useHMSStore } from './HmsRoomProvider';
-
-export interface useScreenShareInput {
-  /**
-   * function to handle errors happening during manual device change
-   */
-  handleError?: hooksErrHandler;
-}
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
 export interface useScreenShareResult {
   /**
@@ -43,13 +36,14 @@ const logErrorHandler = (e: Error) => console.log('Error: ', e);
 
 /**
  * This hook can be used to implement a screenshare toggle button as well as know about the screenshare in the room.
- * This works best if your application only needs to show one screenshare in large view at a time. For any complicated
- * requirement with multiple screenshares it's best to use the store directly.
+ * This works best if your application only needs to show one screenshare in large view at a time with other screenshares
+ * similar to normal user tiles.
+ * For any complicated requirement with multiple screenshares it's best to use the store directly.
  * For viewing the screenshare this hook is best used in combination with useVideo.
  * For implementing control bar for local peer, this is used based with useAVToggle.
  * @param handleError
  */
-export const useScreenShare = ({ handleError = logErrorHandler }: useScreenShareInput): useScreenShareResult => {
+export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): useScreenShareResult => {
   const action = useHMSActions();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const toggleScreenShare = () => {

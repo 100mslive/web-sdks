@@ -7,7 +7,7 @@ import {
   getVideoTracksFromPeers,
   TrackWithPeer,
 } from '../utils/layout';
-import { useHMSVanillaStore } from './HmsRoomProvider';
+import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import { useResizeDetector } from 'react-resize-detector';
 
 interface UseVideoListProps {
