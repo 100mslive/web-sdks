@@ -61,6 +61,7 @@ export default interface HMS {
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;
+  addAudioTrackFromUrl(url: string): Promise<void>;
   removeTrack(trackId: string): Promise<void>;
 
   setLogLevel(level: HMSLogLevel): void;

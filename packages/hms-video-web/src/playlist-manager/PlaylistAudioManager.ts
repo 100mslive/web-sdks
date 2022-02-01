@@ -1,3 +1,4 @@
+import { processAudioThroughRTC } from 'utils/rtcloopback';
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
@@ -50,7 +51,8 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
           if (!this.track) {
             await this.audioElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
-            this.track = audioTrack;
+            const stream = await processAudioThroughRTC(new MediaStream([audioTrack]));
+            this.track = stream.getAudioTracks()[0];
             resolve([audioTrack]);
           } else {
             if (!this.seeked) {

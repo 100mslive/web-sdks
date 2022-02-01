@@ -199,6 +199,16 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
             <span key="SettingsRightSpace" className="mx-2 md:mx-3"></span>
           ),
           <MoreSettings key="MoreSettings" />,
+          <IconButton
+            key="customAudio"
+            onClick={async () => {
+              await hmsActions.addAudioTrackFromUrl(
+                "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio1.mp3"
+              );
+            }}
+          >
+            <MusicIcon />
+          </IconButton>,
         ]}
         rightComponents={[<LeaveRoom key="leaveRoom" />]}
       />

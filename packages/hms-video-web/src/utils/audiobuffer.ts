@@ -9,8 +9,8 @@ export async function createStreamFromUrl(url: string): Promise<MediaStream> {
 
   const streamDestination = audioContext.createMediaStreamDestination();
 
+  source.connect(audioContext.destination);
   source.connect(streamDestination);
-  source.loop = true;
   source.start();
   return streamDestination.stream;
 }

@@ -213,6 +213,10 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('addTrack');
   }
 
+  async addAudioTrackFromUrl(url: string) {
+    await this.sdk.addAudioTrackFromUrl(url);
+  }
+
   async removeTrack(trackId: string) {
     await this.sdk.removeTrack(trackId);
     this.syncRoomState('removeTrack');
