@@ -23,6 +23,7 @@ export interface useAVToggleResult {
 /**
  * Use this hook to implement mute/unmute for audio and video.
  * isAllowedToPublish can be used to decide whether to show the toggle buttons in the UI.
+ * @param handleError to handle any error during toggle of audio/video
  */
 export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): useAVToggleResult => {
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);

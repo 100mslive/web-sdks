@@ -4,9 +4,10 @@ import {
   HMSTrackID,
   selectIsLocalScreenShared,
   selectPeerScreenSharing,
-  selectPeerSharingAudio,
-} from '@100mslive/react-sdk';
+  selectScreenSharesByPeerId,
+} from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { useCallback } from 'react';
 
 export interface useScreenShareResult {
   /**
@@ -41,28 +42,27 @@ const logErrorHandler = (e: Error) => console.log('Error: ', e);
  * For any complicated requirement with multiple screenshares it's best to use the store directly.
  * For viewing the screenshare this hook is best used in combination with useVideo.
  * For implementing control bar for local peer, this is used based with useAVToggle.
- * @param handleError
+ * @param handleError to handle any errors during screenshare toggle
  */
 export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): useScreenShareResult => {
-  const action = useHMSActions();
+  const actions = useHMSActions();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
-  const toggleScreenShare = () => {
+  const screenSharePeer = useHMSStore(selectPeerScreenSharing);
+  const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
+
+  const toggleScreenShare = useCallback(async () => {
     try {
-      action.setScreenShareEnabled(!amIScreenSharing);
+      await actions.setScreenShareEnabled(!amIScreenSharing);
     } catch (error) {
       handleError(error as Error);
     }
-  };
-  const screenSharePeer = useHMSStore(selectPeerScreenSharing);
-  const screenShareVideoTrackId = screenSharePeer?.videoTrack;
-  const audioSharePeer = useHMSStore(selectPeerSharingAudio);
-  const screenShareAudioTrackId = audioSharePeer?.audioTrack;
-  const screenSharingPeerId = screenSharePeer?.id;
+  }, [actions]);
+
   return {
     amIScreenSharing,
+    screenSharingPeerId: screenSharePeer?.id,
+    screenShareVideoTrackId: screenShare?.video?.id,
+    screenShareAudioTrackId: screenShare?.audio?.id,
     toggleScreenShare,
-    screenShareVideoTrackId,
-    screenSharingPeerId,
-    screenShareAudioTrackId,
   };
 };
