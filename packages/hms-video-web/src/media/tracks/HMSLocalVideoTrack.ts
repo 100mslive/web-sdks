@@ -98,6 +98,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const newSettings = this.buildNewSettings(settings);
 
     if (!this.enabled) {
+      await this.handleDeviceChange(newSettings, internal); // call this to update local storage
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
@@ -246,7 +247,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      await this.replaceTrackWith(settings);
+      this.enabled && (await this.replaceTrackWith(settings));
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
