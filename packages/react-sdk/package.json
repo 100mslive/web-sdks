@@ -21,7 +21,8 @@
     "types:build": "tsc -p tsconfig.build.json",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "format": "prettier -w src/**"
+    "format": "prettier -w src/**",
+    "docs": "typedoc src/index.ts --plugin none"
   },
   "devDependencies": {
     "@types/react": "^17.0.38",
