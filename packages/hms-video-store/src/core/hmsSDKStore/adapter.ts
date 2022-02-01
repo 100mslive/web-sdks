@@ -102,16 +102,11 @@ export class SDKToHMS {
       localPeer: sdkRoom.localPeer?.peerId ?? '',
       hasWaitingRoom: sdkRoom.hasWaitingRoom,
       shareableLink: sdkRoom.shareableLink,
-      recording: {
-        browser: {
-          running: !!sdkRoom.recording?.browser.running,
-        },
-        server: { running: !!sdkRoom.recording?.server.running },
-      },
-      rtmp: { running: !!sdkRoom.rtmp?.running },
-      hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
+      recording: sdkRoom.recording,
+      rtmp: sdkRoom.rtmp,
+      hls: sdkRoom.hls,
       sessionId: sdkRoom.sessionId,
-      startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
+      startedAt: sdkRoom.startedAt,
       peerCount: sdkRoom.peerCount,
     };
   }
