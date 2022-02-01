@@ -9,6 +9,7 @@ export enum HMSRoomState {
   Connecting = 'Connecting',
   Connected = 'Connected',
   Reconnecting = 'Reconnecting',
+  Disconnecting = 'Disconnecting',
   Failed = 'Failed',
 }
 
