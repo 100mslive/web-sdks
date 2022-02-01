@@ -415,7 +415,12 @@ export class HMSSDKActions implements IHMSActions {
       HMSLogger.w('You are not allowed to perform this action - endRoom');
       return;
     }
-    await this.sdk.endRoom(lock, reason);
+    try {
+      await this.sdk.endRoom(lock, reason);
+      this.resetState('endRoom');
+    } catch (err) {
+      HMSLogger.e('error in ending room - ', err);
+    }
   }
 
   async removePeer(peerID: string, reason: string) {
