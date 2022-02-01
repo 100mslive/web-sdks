@@ -244,7 +244,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      this.enabled && (await this.replaceTrackWith(settings));
+      if (this.enabled) {
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track);
+        this.nativeTrack = track;
+      }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
