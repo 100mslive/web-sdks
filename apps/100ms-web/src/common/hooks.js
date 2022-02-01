@@ -1,6 +1,10 @@
 // @ts-check
-import { useHMSActions } from "@100mslive/hms-video-react";
-import { useHMSStore, selectPeerCount } from "@100mslive/react-sdk";
+import {
+  useHMSActions,
+  useHMSStore,
+  selectPeerCount,
+  selectPermissions,
+} from "@100mslive/react-sdk";
 import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../store/AppContext";
 
@@ -28,11 +32,12 @@ const useWhenAloneInRoom = (cb, thresholdMs = 5 * 60 * 1000) => {
 
 export const useBeamAutoLeave = () => {
   const hmsActions = useHMSActions();
+  const permissions = useHMSStore(selectPermissions);
   const {
     loginInfo: { isHeadless },
   } = useContext(AppContext);
   useWhenAloneInRoom(() => {
-    if (isHeadless) {
+    if (isHeadless && permissions.endRoom) {
       /**
        * End room after 5 minutes of being alone in the room to stop beam
        * Note: Leave doesn't stop beam
