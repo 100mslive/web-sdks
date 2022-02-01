@@ -14,9 +14,9 @@ export interface HMSRoom {
   shareableLink: string;
   type: HMSRoomType;
   hasWaitingRoom: boolean;
-  recording?: HMSRecording;
-  rtmp?: HMSRTMP;
-  hls?: HMSHLS;
+  recording: HMSRecording;
+  rtmp: HMSRTMP;
+  hls: HMSHLS;
   peerCount?: number;
 }
 
