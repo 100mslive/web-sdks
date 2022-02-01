@@ -53,15 +53,12 @@ export const LeaveRoom = () => {
   };
 
   const LeaveRoomButton = () => {
+    const loading = !showEndRoomModal && disconnecting;
     return (
       <Button variant="danger" key="LeaveRoom">
-        {disconnecting ? (
-          <ProgressIcon key="leaving" />
-        ) : (
-          <HangUpIcon key="hangUp" />
-        )}
+        {loading ? <ProgressIcon key="leaving" /> : <HangUpIcon key="hangUp" />}
         <Text variant="body" css={{ ml: "$2", "@md": { display: "none" } }}>
-          {disconnecting ? "Leaving" : "Leave"} Room
+          {loading ? "Leaving" : "Leave"} Room
         </Text>
       </Button>
     );
