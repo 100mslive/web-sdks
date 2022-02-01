@@ -35,3 +35,6 @@ the below things -
   an explicit handleError to call.
 - make sure to use await for async calls, else try catch won't have an effect
 - Pull all usage of hooks on top before defining any functions. 
+- Prefer IDs to objects for both input arguments and in result object. This
+  facilitates writing optimised code on the app layer, as objects are prone to change
+  leading to unnecessary re renders on different levels.
