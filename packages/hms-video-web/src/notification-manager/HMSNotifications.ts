@@ -70,7 +70,7 @@ export interface PeerNotification {
   };
 }
 
-export interface SessionState {
+export interface RoomState {
   name: string;
   session_id: string;
   started_at: number;
@@ -91,7 +91,7 @@ export interface SessionState {
   };
 }
 
-export interface PeriodicSessionState extends SessionState {
+export interface PeriodicSessionState extends RoomState {
   room_id: string;
 }
 
@@ -99,7 +99,7 @@ export interface PeerListNotification {
   peers: {
     [peer_id: string]: PeerNotification;
   };
-  room: SessionState;
+  room: RoomState;
 }
 
 export interface PeriodicRoomState {

@@ -61,6 +61,9 @@ export class PeerListManager {
 
   private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
     const roomPeers = roomState.peers;
+    Object.keys(roomPeers).forEach(peer => {
+      roomPeers[peer]['tracks'] = {};
+    });
     this.handleRepeatedPeerList(roomPeers);
   };
 

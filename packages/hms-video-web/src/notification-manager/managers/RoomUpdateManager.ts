@@ -5,7 +5,7 @@ import {
   HLSNotification,
   RTMPNotification,
   PeriodicRoomState,
-  SessionState,
+  RoomState,
 } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate, HMSHLS } from '../../interfaces';
@@ -45,7 +45,7 @@ export class RoomUpdateManager {
     this.onPeerList(room, notification.peer_count);
   }
 
-  private onPeerList(roomNotification: SessionState, peerCount?: number) {
+  private onPeerList(roomNotification: RoomState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     room.peerCount = peerCount;
