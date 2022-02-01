@@ -69,7 +69,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         track = await this.replaceTrackWithBlank();
       }
-      await this.replaceSender(track);
+      await this.replaceSender(track, value);
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
@@ -211,9 +211,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return LocalTrackManager.getEmptyVideoTrack(prevTrack);
   }
 
-  private async replaceSender(newTrack: MediaStreamTrack) {
+  private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
     const localStream = this.stream as HMSLocalStream;
-    await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    if (enabled) {
+      await localStream.replaceSenderTrack(this.nativeTrack, this.processedTrack || newTrack);
+    } else {
+      await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    }
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
   }
 
@@ -246,7 +250,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
         const track = await this.replaceTrackWith(settings);
-        await this.replaceSender(track);
+        await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
       }
       if (!internal) {
