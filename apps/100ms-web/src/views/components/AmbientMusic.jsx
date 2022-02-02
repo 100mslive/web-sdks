@@ -5,6 +5,10 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useWhenAloneInRoom } from "../../common/hooks";
 import { AppContext } from "../../store/AppContext";
 
+const ambientMusicURL =
+  process.env.REACT_APP_AMBIENT_MUSIC ||
+  "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3";
+
 /**
  *
  * @param {string} url The URL of an audio file(preferably mp3) of the music to be played
@@ -16,10 +20,7 @@ import { AppContext } from "../../store/AppContext";
  *
  * toggleAmbientMusic - function to play/pause the music
  */
-const useAmbientMusic = (
-  url = "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3",
-  threshold = 5 * 1000
-) => {
+const useAmbientMusic = (url = ambientMusicURL, threshold = 5 * 1000) => {
   const audioRef = useRef(new Audio(url));
   const { enableAmbientMusic, setEnableAmbientMusic } = useContext(AppContext);
   const [playing, setPlaying] = useState(false);
