@@ -537,6 +537,11 @@ export class HMSSdk implements HMSInterface {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
+  /**
+   * @alpha
+   * @param {string} url
+   * This method create an audio track from provided url and plays it without causing any feedback
+   */
   async addAudioTrackFromUrl(url: string) {
     new URL(url);
     if (!this.localPeer) {
@@ -544,6 +549,9 @@ export class HMSSdk implements HMSInterface {
     }
     const track = await RTCLoopback.getInstance().processAudioFromUrl(url);
     const nativeStream = new MediaStream([track]);
+    const audio = new Audio();
+    audio.srcObject = nativeStream;
+    await audio.play();
     const hmsStream = new HMSLocalStream(nativeStream);
     const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
     await this.transport?.publish([hmsTrack]);
