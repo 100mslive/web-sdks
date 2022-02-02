@@ -540,7 +540,7 @@ export class HMSSdk implements HMSInterface {
   /**
    * @alpha
    * @param {string} url
-   * This method create an audio track from provided url and plays it without causing any feedback
+   * This method publishes an audio track from provided url and plays it without causing any feedback
    */
   async addAudioTrackFromUrl(url: string) {
     new URL(url);
