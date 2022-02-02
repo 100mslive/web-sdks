@@ -8,19 +8,24 @@ import {
   TrackWithPeer,
 } from '../utils/layout';
 import { useHMSVanillaStore } from './HmsRoomProvider';
+import { useResizeDetector } from 'react-resize-detector';
 
 interface UseVideoListProps {
   /**
    * Max tiles in a  page. Overrides maxRowCount and maxColCount
    */
-  maxTileCount: number;
-  maxRowCount: number;
-  maxColCount: number;
-  width: number;
-  height: number;
+  maxTileCount?: number;
+  maxRowCount?: number;
+  maxColCount?: number;
+  /**
+   * Given a screensharing peer the function should return true if their screenshare should be included for the video tile, and false otherwise. This can be useful if there are multiple screenshares in the room where you may want to show one in the center view and others in video list along side other tiles.
+   */
   showScreenFn?: (peer: HMSPeer) => boolean;
   peers: HMSPeer[];
   overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
+  /**
+   * Aspect ratio of VideoTiles
+   */
   aspectRatio?: { width: number; height: number };
   /**
    * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
@@ -29,18 +34,30 @@ interface UseVideoListProps {
   filterNonPublishingPeers?: boolean;
 }
 
+const DEFAULTS = {
+  aspectRatio: {
+    width: 1,
+    height: 1,
+  },
+};
+
 export const useVideoList = ({
   maxTileCount,
   maxColCount,
   maxRowCount,
-  width,
-  height,
   showScreenFn = () => false,
   peers,
   overflow = 'scroll-x',
-  aspectRatio,
+  aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
-}: UseVideoListProps) => {
+}: UseVideoListProps): {
+  pagesWithTiles: (TrackWithPeer & {
+    width: number;
+    height: number;
+  })[][];
+  ref: React.MutableRefObject<any>;
+} => {
+  const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
@@ -106,6 +123,7 @@ export const useVideoList = ({
     ],
   );
   return {
-    chunkedTracksWithPeer,
+    pagesWithTiles: chunkedTracksWithPeer,
+    ref,
   };
 };

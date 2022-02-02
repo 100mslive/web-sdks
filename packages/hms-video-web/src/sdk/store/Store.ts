@@ -89,6 +89,10 @@ class Store implements IStore {
     return undefined;
   }
 
+  getTracksMap() {
+    return this.tracks;
+  }
+
   getTracks() {
     return Object.values(this.tracks);
   }

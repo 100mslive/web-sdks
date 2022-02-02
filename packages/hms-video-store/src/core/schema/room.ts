@@ -26,4 +26,5 @@ export interface HMSRoom {
   hls: HMSHLS;
   sessionId: string;
   startedAt?: Date;
+  peerCount?: number;
 }

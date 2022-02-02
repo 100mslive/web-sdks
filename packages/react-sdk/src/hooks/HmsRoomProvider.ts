@@ -6,18 +6,22 @@ import {
   HMSNotification,
   HMSNotifications,
   HMSStatsStore,
+  IStoreReadOnly,
   HMSStats,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
-import create from 'zustand';
+import create, { EqualityChecker, StateSelector } from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
+export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
+  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
+}
 export interface HMSRoomProviderProps {
   actions?: HMSActions;
   store?: HMSStoreWrapper;
   notifications?: HMSNotifications;
-  webrtcInternals?: HMSStats;
+  stats?: HMSStats;
   isHMSStatsOn?: boolean;
 }
 
@@ -33,7 +37,7 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
   actions,
   store,
   notifications,
-  webrtcInternals,
+  stats,
   isHMSStatsOn = false,
 }) => {
   if (!providerProps) {
@@ -44,8 +48,8 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
     };
     if (actions && store) {
       providerProps = {
-        actions,
-        store: create({
+        actions: actions,
+        store: create<HMSStore>({
           ...store,
           setState: errFn,
           destroy: errFn,
@@ -54,20 +58,18 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
       if (notifications) {
         providerProps.notifications = notifications;
       }
-      if (webrtcInternals) {
-        const hmsInternals = webrtcInternals;
+      if (stats) {
         providerProps.statsStore = create<HMSStatsStore>({
-          getState: hmsInternals.getState,
-          subscribe: hmsInternals.subscribe,
+          getState: stats.getState,
+          subscribe: stats.subscribe,
           setState: errFn,
           destroy: errFn,
         });
       }
     } else {
       const hmsReactiveStore = new HMSReactiveStore();
-
       providerProps = {
-        actions: hmsReactiveStore.getHMSActions(),
+        actions: hmsReactiveStore.getActions(),
         store: create<HMSStore>({
           ...hmsReactiveStore.getStore(),
           setState: errFn,
@@ -77,16 +79,17 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
       };
 
       if (isHMSStatsOn) {
-        const hmsInternals = hmsReactiveStore.getStats();
+        const stats = hmsReactiveStore.getStats();
         providerProps.statsStore = create<HMSStatsStore>({
-          getState: hmsInternals.getState,
-          subscribe: hmsInternals.subscribe,
+          getState: stats.getState,
+          subscribe: stats.subscribe,
           setState: errFn,
           destroy: errFn,
         });
       }
     }
   }
+
   useEffect(() => {
     if (isBrowser) {
       window.onunload = () => {
@@ -153,13 +156,16 @@ export const useHMSNotifications = () => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification(
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      (notification: HMSNotification) => setNotification(notification),
+    const unsubscribe = HMSContextConsumer.notifications.onNotification((notification: HMSNotification) =>
+      setNotification(notification),
     );
-    // eslint-disable-next-line consistent-return
     return unsubscribe;
   }, [HMSContextConsumer.notifications]);
 
   return notification;
+};
+
+export const useIsHMSStatsOn = () => {
+  const HMSContextConsumer = useContext(HMSContext);
+  return Boolean(HMSContextConsumer?.statsStore);
 };

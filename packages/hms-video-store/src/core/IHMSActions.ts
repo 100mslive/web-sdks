@@ -71,6 +71,8 @@ export interface IHMSActions {
    */
   addTrack(track: MediaStreamTrack, type: HMSTrackSource): Promise<void>;
 
+  addAudioTrackFromUrl(url: string): Promise<void>;
+
   /**
    * You can use the removeTrack method to remove an auxiliary track.
    * This method removes the track from the local peer's list of auxiliary tracks and unpublishes it.

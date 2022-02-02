@@ -4,8 +4,6 @@ import {
   ControlBar,
   AudioPlaylist,
   Button,
-  ChatIcon,
-  ChatUnreadIcon,
   VideoPlaylistIcon,
   VerticalDivider,
   MessageModal,
@@ -22,9 +20,16 @@ import {
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
-import { useMetadata } from "./hooks/useMetadata";
+import { useMyMetadata } from "./hooks/useMetadata";
 import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
-import { HandIcon, ShareScreenIcon, MusicIcon } from "@100mslive/react-icons";
+import {
+  HandIcon,
+  ShareScreenIcon,
+  MusicIcon,
+  BrbIcon,
+  ChatUnreadIcon,
+  ChatIcon,
+} from "@100mslive/react-icons";
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
@@ -39,7 +44,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
-  const { isHandRaised, setIsHandRaised } = useMetadata();
+  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
   const initialModalProps = {
     show: false,
@@ -114,17 +119,11 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     );
   }
   leftComponents.push(
-    <Button
-      key="chat"
-      iconOnly
-      variant="no-fill"
-      iconSize="md"
-      shape="rectangle"
-      onClick={toggleChat}
-      active={isChatOpen}
-    >
-      {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
-    </Button>
+    <Tooltip title={`${isChatOpen ? "Close" : "Open"} chat`}>
+      <IconButton key="chat" onClick={toggleChat} active={!isChatOpen}>
+        {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
+      </IconButton>
+    </Tooltip>
   );
   isAllowedToPublish.screen &&
     leftComponents.push(
@@ -147,11 +146,19 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}
       key="raise-hand"
     >
-      <IconButton
-        onClick={() => setIsHandRaised(!isHandRaised)}
-        active={!isHandRaised}
-      >
+      <IconButton onClick={toggleHandRaise} active={!isHandRaised}>
         <HandIcon />
+      </IconButton>
+    </Tooltip>
+  );
+  leftComponents.push(
+    <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`} key="brb">
+      <IconButton
+        css={{ mx: "$2", "@md": { display: "none" } }}
+        onClick={toggleBRB}
+        active={!isBRBOn}
+      >
+        <BrbIcon />
       </IconButton>
     </Tooltip>
   );
@@ -160,7 +167,6 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   if (!isConnected) {
     return null;
   }
-
   return (
     <>
       <ControlBar
@@ -174,8 +180,8 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
             >
               <IconButton
                 active={!isScreenShared}
-                className="mx-2"
                 onClick={() => toggleScreenShare(!isScreenShared)}
+                css={{ mx: "$2", "@md": { display: "none" } }}
               >
                 <ShareScreenIcon />
               </IconButton>
@@ -193,6 +199,16 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
             <span key="SettingsRightSpace" className="mx-2 md:mx-3"></span>
           ),
           <MoreSettings key="MoreSettings" />,
+          <IconButton
+            key="customAudio"
+            onClick={async () => {
+              await hmsActions.addAudioTrackFromUrl(
+                "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio1.mp3"
+              );
+            }}
+          >
+            <MusicIcon />
+          </IconButton>,
         ]}
         rightComponents={[<LeaveRoom key="leaveRoom" />]}
       />

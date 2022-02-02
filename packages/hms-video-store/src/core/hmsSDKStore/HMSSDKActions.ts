@@ -213,6 +213,10 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('addTrack');
   }
 
+  async addAudioTrackFromUrl(url: string) {
+    await this.sdk.addAudioTrackFromUrl(url);
+  }
+
   async removeTrack(trackId: string) {
     await this.sdk.removeTrack(trackId);
     this.syncRoomState('removeTrack');
@@ -561,6 +565,8 @@ export class HMSSDKActions implements IHMSActions {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
+      onRoomUpdate: this.onRoomUpdate.bind(this),
+      onPeerUpdate: this.onPeerUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),

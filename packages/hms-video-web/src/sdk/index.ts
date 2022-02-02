@@ -53,6 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
+import { RTCLoopback } from 'utils/rtcloopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -536,6 +537,22 @@ export class HMSSdk implements HMSInterface {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
+  async addAudioTrackFromUrl(url: string) {
+    new URL(url);
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
+    }
+    const loopback = new RTCLoopback();
+    const track = await loopback.processAudioFromUrl(url);
+    const nativeStream = new MediaStream([track]);
+    const hmsStream = new HMSLocalStream(nativeStream);
+    const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
+    await this.transport?.publish([hmsTrack]);
+    hmsTrack.peerId = this.localPeer?.peerId;
+    this.localPeer?.auxiliaryTracks.push(hmsTrack);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
+  }
+
   async removeTrack(trackId: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot removeTrack');
@@ -773,6 +790,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSPreviewListener} listener
    */
   private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+    this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
@@ -842,7 +860,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, config.userName, this.store));
+      this.store.setRoom(new HMSRoom(roomId, this.store));
     }
   }
 

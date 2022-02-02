@@ -39,9 +39,13 @@ export const ConferenceMainView = ({
     if (roomState !== HMSRoomState.Connected) {
       return;
     }
-    hmsActions.videoPlaylist.setList(videoPlaylist);
-    hmsActions.audioPlaylist.setList(audioPlaylist);
-  }, [roomState]); //eslint-disable-line
+    if (videoPlaylist.length > 0) {
+      hmsActions.videoPlaylist.setList(videoPlaylist);
+    }
+    if (audioPlaylist.length > 0) {
+      hmsActions.audioPlaylist.setList(audioPlaylist);
+    }
+  }, [roomState, videoPlaylist, audioPlaylist, hmsActions]);
 
   if (!localPeer) {
     // we don't know the role yet to decide how to render UI
@@ -68,6 +72,7 @@ export const ConferenceMainView = ({
         isChatOpen={isChatOpen}
         toggleChat={toggleChat}
         role={localPeer.roleName}
+        showStats={showStatsOnTiles}
         isParticipantListOpen={isParticipantListOpen}
         videoTileProps={(peer, track) => ({
           ...videoTileProps(peer, track),

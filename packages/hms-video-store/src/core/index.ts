@@ -1,9 +1,7 @@
 export type {
-  IStore,
   IStoreReadOnly,
   IHMSStore,
   IHMSStoreReadOnly as HMSStoreWrapper,
-  GetState,
   IHMSStatsStore,
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
@@ -26,4 +24,8 @@ export type {
   RTMPRecordingConfig,
   HMSRecording,
   HMSRTMP,
+  HMSPeerStats,
+  HMSTrackStats,
+  HMSLocalTrackStats,
+  HMSRemoteTrackStats,
 } from './hmsSDKStore/sdkTypes';
