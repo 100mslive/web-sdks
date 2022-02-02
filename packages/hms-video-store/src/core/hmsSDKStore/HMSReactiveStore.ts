@@ -59,7 +59,9 @@ export class HMSReactiveStore {
 
     this.initialTriggerOnSubscribe = false;
 
-    window.__hms = this;
+    if (typeof window !== 'undefined') {
+      window.__hms = this;
+    }
   }
 
   /**
