@@ -67,4 +67,15 @@ class Loopback {
   }
 }
 
-export const RTCLoopback = new Loopback();
+export const RTCLoopback = (() => {
+  let loopback: Loopback | null = null;
+
+  return {
+    getInstance: function () {
+      if (!loopback) {
+        loopback = new Loopback();
+      }
+      return loopback;
+    },
+  };
+})();
