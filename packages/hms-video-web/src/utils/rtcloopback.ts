@@ -8,7 +8,14 @@ class Loopback {
     offerToReceiveAudio: false,
     offerToReceiveVideo: false,
   };
-  constructor() {}
+  constructor() {
+    this.rtcConnection.onicecandidate = e => {
+      e.candidate && this.rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
+    };
+    this.rtcLoopbackConnection.onicecandidate = e => {
+      e.candidate && this.rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
+    };
+  }
 
   async processAudioFromUrl(url: string) {
     const track = await this.createAudioTrackFromUrl(url);
@@ -16,9 +23,6 @@ class Loopback {
       this.rtcConnection.addTrack(track);
       this.rtcLoopbackConnection.ontrack = e => {
         resolve(e.track);
-        const audio = new Audio();
-        audio.srcObject = new MediaStream([e.track]);
-        audio.play();
       };
       this.setOfferAnswer();
     });
@@ -50,13 +54,6 @@ class Loopback {
   }
 
   private async setOfferAnswer() {
-    this.rtcConnection.onicecandidate = e => {
-      e.candidate && this.rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
-    };
-    this.rtcLoopbackConnection.onicecandidate = e => {
-      e.candidate && this.rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
-    };
-
     const offer: RTCSessionDescriptionInit = await this.rtcConnection.createOffer(this.offerOptions);
     await this.rtcConnection.setLocalDescription(offer);
     await this.rtcLoopbackConnection.setRemoteDescription(offer);
