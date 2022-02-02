@@ -53,7 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import { RTCLoopback } from 'utils/rtcloopback';
+import { RTCLoopback } from '../utils/rtcloopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
