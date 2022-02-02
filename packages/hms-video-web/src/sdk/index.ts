@@ -542,18 +542,15 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
     }
-    const loopback = new RTCLoopback({
-      onTrackAdd: async track => {
-        const nativeStream = new MediaStream([track]);
-        const hmsStream = new HMSLocalStream(nativeStream);
-        const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
-        await this.transport?.publish([hmsTrack]);
-        hmsTrack.peerId = this.localPeer?.peerId;
-        this.localPeer?.auxiliaryTracks.push(hmsTrack);
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
-      },
-    });
-    loopback.processAudioFromUrl(url);
+    const loopback = new RTCLoopback();
+    const track = await loopback.processAudioFromUrl(url);
+    const nativeStream = new MediaStream([track]);
+    const hmsStream = new HMSLocalStream(nativeStream);
+    const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
+    await this.transport?.publish([hmsTrack]);
+    hmsTrack.peerId = this.localPeer?.peerId;
+    this.localPeer?.auxiliaryTracks.push(hmsTrack);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
   async removeTrack(trackId: string) {
