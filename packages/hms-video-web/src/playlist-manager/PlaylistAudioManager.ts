@@ -1,3 +1,4 @@
+import { RTCLoopback } from 'utils/rtcloopback';
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
@@ -50,8 +51,13 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
           if (!this.track) {
             await this.audioElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
-            this.track = audioTrack;
-            resolve([audioTrack]);
+            const loopback = new RTCLoopback({
+              onTrackAdd: async track => {
+                this.track = track;
+                resolve([track]);
+              },
+            });
+            await loopback.processAudioFromTrack(audioTrack);
           } else {
             if (!this.seeked) {
               // if this was called in response to a play call

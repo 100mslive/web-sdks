@@ -49,12 +49,11 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { isBrowser, isNode } from '../utils/support';
+import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import { createStreamFromUrl } from 'utils/audiobuffer';
-import { processAudioThroughRTC } from 'utils/rtcloopback';
+import { RTCLoopback } from 'utils/rtcloopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -543,19 +542,18 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
     }
-    let stream = await createStreamFromUrl(url);
-    if (isBrowser && window.HMS?.LOOPBACK) {
-      stream = await processAudioThroughRTC(stream);
-    }
-    const track = stream.getAudioTracks()[0];
-    const nativeStream = new MediaStream([track]);
-    const hmsStream = new HMSLocalStream(nativeStream);
-    console.error({ track });
-    const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
-    await this.transport?.publish([hmsTrack]);
-    hmsTrack.peerId = this.localPeer?.peerId;
-    this.localPeer?.auxiliaryTracks.push(hmsTrack);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
+    const loopback = new RTCLoopback({
+      onTrackAdd: async track => {
+        const nativeStream = new MediaStream([track]);
+        const hmsStream = new HMSLocalStream(nativeStream);
+        const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
+        await this.transport?.publish([hmsTrack]);
+        hmsTrack.peerId = this.localPeer?.peerId;
+        this.localPeer?.auxiliaryTracks.push(hmsTrack);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
+      },
+    });
+    loopback.processAudioFromUrl(url);
   }
 
   async removeTrack(trackId: string) {
