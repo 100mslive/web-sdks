@@ -21,7 +21,7 @@ export * from '@100mslive/hms-video-store';
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
-export type { useVideoListInput } from './hooks/useVideoList';
+export type { useVideoListInput, useVideoResult, useVideoListTile } from './hooks/useVideoList';
 export type { useAVToggleResult } from './hooks/useAVToggle';
 export type { useDevicesResult } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';

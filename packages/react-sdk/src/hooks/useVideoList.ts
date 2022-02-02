@@ -12,7 +12,7 @@ import { useResizeDetector } from 'react-resize-detector';
 
 export interface useVideoListInput {
   /**
-   * peers is the list of all peers you need to render.
+   * peers is the list of all peers you need to display
    */
   peers: HMSPeer[];
   /**
@@ -20,17 +20,17 @@ export interface useVideoListInput {
    */
   maxTileCount?: number;
   /**
-   * max number of rows for tiles
+   * Max rows in a  page. Only applied if maxTileCount is not present
    */
   maxRowCount?: number;
   /**
-   * max number of columns for tiles
+   * Max columns in a  page. Only applied if maxTileCount and maxRowCount are not present
    */
   maxColCount?: number;
   /**
-   * Given a screensharing peer the function should return true if their screenShare should be
-   * included for the video tile, and false otherwise.
-   * This can be useful if there are multiple screenshares in the room where you may want to show one in the
+   * A function which tells whether to show the screenShare for a peer who is screensharing. A peer is passed
+   * and a boolean value is expected.
+   * This can be useful if there are multiple screenShares in the room where you may want to show the main one in the
    * center view and others in video list along side other tiles. No screenShare is included by default.
    * e.g. includeScreenShare = (peer) => return peer.id !== mainScreenSharingPeer.id
    */
@@ -51,14 +51,16 @@ export interface useVideoListInput {
   filterNonPublishingPeers?: boolean;
 }
 
+export interface useVideoListTile extends TrackWithPeer {
+  width: number;
+  height: number;
+}
+
 export interface useVideoResult {
   /**
    * This returns a list of all pages with every page containing the list of all tiles on it.
    */
-  pagesWithTiles: (TrackWithPeer & {
-    width: number;
-    height: number;
-  })[][];
+  pagesWithTiles: useVideoListTile[][];
   ref: React.MutableRefObject<any>;
 }
 
@@ -72,7 +74,7 @@ const DEFAULTS = {
 /**
  * This hook can be used to build a paginated gallery view of video tiles. You can give the hook
  * a list of all the peers which need to be shown and it tells you how to structure the UI by giving
- * a list of pages with every page having a 2D matrix of video tiles, tiles showing per row.
+ * a list of pages with every page having a list of video tiles.
  * Please check the documentation of input and output types for more details.
  */
 export const useVideoList = ({
