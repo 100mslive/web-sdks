@@ -18,7 +18,7 @@ import { AppContext } from "../../store/AppContext";
  */
 const useAmbientMusic = (
   url = "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3",
-  threshold = 15 * 1000
+  threshold = 5 * 1000
 ) => {
   const audioRef = useRef(new Audio(url));
   const { enableAmbientMusic, setEnableAmbientMusic } = useContext(AppContext);
@@ -87,7 +87,7 @@ export const AmbientMusic = () => {
   return (
     <Tooltip
       title={`${playing ? `Disable Ambient Music` : `Play Ambient Music`}`}
-      key="brb"
+      key="ambient-music"
     >
       <IconButton
         css={{ mx: "$2" }}
