@@ -5,9 +5,16 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useWhenAloneInRoom } from "../../common/hooks";
 import { AppContext } from "../../store/AppContext";
 
-const ambientMusicURL =
-  process.env.REACT_APP_AMBIENT_MUSIC ||
-  "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3";
+const ambientMusicURL = process.env.REACT_APP_AMBIENT_MUSIC;
+/**
+ * @type HTMLAudioElement
+ */
+let ambientAudio = null;
+try {
+  ambientAudio = new Audio(ambientMusicURL);
+} catch (err) {
+  console.error(err);
+}
 
 /**
  *
@@ -21,21 +28,21 @@ const ambientMusicURL =
  * toggleAmbientMusic - function to play/pause the music
  */
 const useAmbientMusic = (url = ambientMusicURL, threshold = 5 * 1000) => {
-  const audioRef = useRef(new Audio(url));
+  const audioRef = useRef(ambientAudio);
   const { enableAmbientMusic, setEnableAmbientMusic } = useContext(AppContext);
   const [playing, setPlaying] = useState(false);
   const [timedout, setTimedout] = useState(false);
 
   const alone = useWhenAloneInRoom(() => {
-    if (enableAmbientMusic) {
-      play();
-    }
+    play();
     setTimedout(true);
   }, threshold);
 
   const play = useCallback(() => {
     if (alone && enableAmbientMusic) {
-      audioRef.current.play();
+      audioRef.current
+        .play()
+        .catch(err => console.error("Unable to play Ambient Music", err));
       setPlaying(true);
     }
   }, [alone, enableAmbientMusic]);
@@ -53,17 +60,14 @@ const useAmbientMusic = (url = ambientMusicURL, threshold = 5 * 1000) => {
   useEffect(() => {
     audioRef.current.volume = 0.2;
     audioRef.current.loop = true;
-
-    return () => {
-      pause();
-    };
-  }, [pause]);
-
-  useEffect(() => {
     if (!alone) {
       pause();
       setTimedout(false);
     }
+
+    return () => {
+      pause();
+    };
   }, [alone, pause]);
 
   useEffect(() => {
