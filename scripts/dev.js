@@ -18,6 +18,7 @@ async function main() {
     target: 'es6',
     tsconfig: 'tsconfig.json',
     external,
+    sourcemap: true,
     metafile: true,
     watch: {
       onRebuild(error) {
