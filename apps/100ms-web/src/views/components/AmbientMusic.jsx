@@ -18,7 +18,6 @@ try {
 
 /**
  *
- * @param {string} url The URL of an audio file(preferably mp3) of the music to be played
  * @param {number} threshold the threshold after which the music is played(from the starting to be alone in the room)
  * @returns {Object}
  * ready: boolean - the threshold has passed and the music can be played,
@@ -27,7 +26,7 @@ try {
  *
  * toggleAmbientMusic - function to play/pause the music
  */
-const useAmbientMusic = (url = ambientMusicURL, threshold = 5 * 1000) => {
+const useAmbientMusic = (threshold = 5 * 1000) => {
   const audioRef = useRef(ambientAudio);
   const { enableAmbientMusic, setEnableAmbientMusic } = useContext(AppContext);
   const [playing, setPlaying] = useState(false);
