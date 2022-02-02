@@ -19,8 +19,6 @@ export class FeatureFlags {
     // ask permissions in preview even if role doesn't have it
     window.HMS.ALWAYS_REQUEST_PERMISSIONS = false;
 
-    window.HMS.LOOPBACK = true;
-
     if (parsedUserAgent.getOS().name.toLowerCase() === "ios") {
       window.HMS.GAIN_VALUE = 10;
     }
