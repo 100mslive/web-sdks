@@ -67,7 +67,7 @@ export class RoomUpdateManager {
   }
 
   private onRTMPStart(notification: RTMPNotification) {
-    this.setRTMPStatus(true, notification);
+    this.setRTMPStatus(!notification.error, notification);
   }
 
   private onRTMPStop(notification: RTMPNotification) {
@@ -75,7 +75,7 @@ export class RoomUpdateManager {
   }
 
   private onRecordingStart(notification: RecordingNotification) {
-    this.setRecordingStatus(true, notification);
+    this.setRecordingStatus(!notification.error, notification);
   }
 
   private onRecordingStop(notification: RecordingNotification) {
@@ -87,7 +87,7 @@ export class RoomUpdateManager {
       return;
     }
     const room = this.store.getRoom();
-    notification.enabled = method === HMSNotificationMethod.HLS_START;
+    notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error;
     room.hls = this.convertHls(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
