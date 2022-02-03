@@ -350,7 +350,11 @@ describe('LocalTrackManager', () => {
       });
       const mockVideoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
-        { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
+        {
+          id: 'video-track-id',
+          kind: 'video',
+          getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
+        } as MediaStreamTrack,
         'regular',
         testEventBus,
       );
@@ -381,7 +385,11 @@ describe('LocalTrackManager', () => {
       });
       localPeer.videoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
-        { id: 'video-track-id', kind: 'video' } as MediaStreamTrack,
+        {
+          id: 'video-track-id',
+          kind: 'video',
+          getSettings: () => ({ deviceId: 'video-device-id', groupId: 'video-group-id' }),
+        } as MediaStreamTrack,
         'regular',
         testEventBus,
       );

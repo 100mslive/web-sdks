@@ -189,6 +189,10 @@ export class HMSSDKActions implements IHMSActions {
       this.logPossibleInconsistency('room leave is called when no room is connected');
       return; // ignore
     }
+    const currentRoomState = this.store.getState(selectRoomState);
+    this.setState(store => {
+      store.room.roomState = HMSRoomState.Disconnecting;
+    }, 'leaving');
     return this.sdk
       .leave()
       .then(() => {
@@ -197,6 +201,9 @@ export class HMSSDKActions implements IHMSActions {
       })
       .catch(err => {
         HMSLogger.e('error in leaving room - ', err);
+        this.setState(store => {
+          store.room.roomState = currentRoomState;
+        }, 'revertLeave');
       });
   }
 
@@ -419,7 +426,19 @@ export class HMSSDKActions implements IHMSActions {
       HMSLogger.w('You are not allowed to perform this action - endRoom');
       return;
     }
-    await this.sdk.endRoom(lock, reason);
+    const currentRoomState = this.store.getState(selectRoomState);
+    this.setState(store => {
+      store.room.roomState = HMSRoomState.Disconnecting;
+    }, 'endingRoom');
+    try {
+      await this.sdk.endRoom(lock, reason);
+      this.resetState('endRoom');
+    } catch (err) {
+      HMSLogger.e('error in ending room - ', err);
+      this.setState(store => {
+        store.room.roomState = currentRoomState;
+      }, 'revertEndRoom');
+    }
   }
 
   async removePeer(peerID: string, reason: string) {

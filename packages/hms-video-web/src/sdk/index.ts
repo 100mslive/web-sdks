@@ -605,6 +605,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot end room');
     }
     await this.transport?.endRoom(lock, reason);
+    await this.leave();
   }
 
   async removePeer(peer: HMSRemotePeer, reason: string) {

@@ -69,7 +69,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       } else {
         track = await this.replaceTrackWithBlank();
       }
-      await this.replaceSender(track);
+      await this.replaceSender(track, value);
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
@@ -96,14 +96,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
-
+    await this.handleDeviceChange(newSettings, internal);
     if (!this.enabled) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-
-    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
@@ -213,9 +211,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return LocalTrackManager.getEmptyVideoTrack(prevTrack);
   }
 
-  private async replaceSender(newTrack: MediaStreamTrack) {
+  private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
     const localStream = this.stream as HMSLocalStream;
-    await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    if (enabled) {
+      await localStream.replaceSenderTrack(this.nativeTrack, this.processedTrack || newTrack);
+    } else {
+      await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    }
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
   }
 
@@ -246,7 +248,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      await this.replaceTrackWith(settings);
+      if (this.enabled) {
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+      }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,

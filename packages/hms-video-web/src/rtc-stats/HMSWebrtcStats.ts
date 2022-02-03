@@ -34,15 +34,17 @@ export class HMSWebrtcStats {
   /**
    * @internal
    */
-  async updateStats(prevStats?: HMSWebrtcStats) {
-    await this.updateLocalPeerStats(prevStats?.getLocalPeerStats());
-    await this.updateTrackStats(prevStats);
+  async updateStats() {
+    await this.updateLocalPeerStats();
+    await this.updateTrackStats();
   }
 
-  private async updateLocalPeerStats(prevLocalPeerStats?: HMSPeerStats) {
+  private async updateLocalPeerStats() {
     if (!this.localPeerID) {
       return;
     }
+
+    const prevLocalPeerStats = this.getLocalPeerStats();
 
     const publishReport = await this.getStats.publish?.();
     const publishStats: HMSPeerStats['publish'] | undefined =
@@ -65,14 +67,15 @@ export class HMSWebrtcStats {
     this.peerStats[this.localPeerID] = { publish: publishStats, subscribe: subscribeStats };
   }
 
-  private async updateTrackStats(prevStats?: HMSWebrtcStats) {
+  private async updateTrackStats() {
     const tracks = this.store.getTracksMap();
     const trackIDs = union(Object.keys(this.trackStats), Object.keys(tracks));
     for (const trackID of trackIDs) {
       const track = tracks[trackID];
       if (track) {
         const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
-        const trackStats = await getTrackStats(this.getStats, track, peerName, prevStats);
+        const prevTrackStats = this.getTrackStats(track.trackId);
+        const trackStats = await getTrackStats(this.getStats, track, peerName, prevTrackStats);
         if (trackStats) {
           this.trackStats[trackID] = trackStats;
         }
