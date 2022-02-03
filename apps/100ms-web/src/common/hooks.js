@@ -47,7 +47,7 @@ export const useBeamAutoLeave = () => {
   const {
     loginInfo: { isHeadless },
   } = useContext(AppContext);
-  const { aloneForLong } = useWhenAloneInRoom(10 * 1000);
+  const { aloneForLong } = useWhenAloneInRoom();
 
   /**
    * End room after 5 minutes of being alone in the room to stop beam
