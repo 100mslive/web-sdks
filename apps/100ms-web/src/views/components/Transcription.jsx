@@ -22,7 +22,7 @@ export function TranscriptionButton() {
       transcriber.current = new Transcriber();
       transcriber.current.enabled = false;
       transcriber.current.setBroadcast((data) => {
-        hmsActions.sendBroadcastMessage(data, "Transcription")
+          hmsActions.sendBroadcastMessage(data, "Transcription")
       });
     }
     transcriber.current.enableTranscription(setas || !isTranscriptionEnabled);
@@ -74,6 +74,7 @@ class Transcriber {
         this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`);
         const texts = {};
         let startTime,endTime;
+        document.getElementById("speechtxt").innerText = ""
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
             if(res.text != "" && startTime){
@@ -142,7 +143,7 @@ class Transcriber {
 
   enableTranscription(enable) {
     if (enable && !this.enabled) {
-      document.getElementById("speechtxt").innerText = "[  Initializing.. ]";
+      document.getElementById("speechtxt").innerText = "[  Transcription is initializing.. ]";
       this.enabled = true;
       this.listen()
     } else if (!enable && this.enabled) {
