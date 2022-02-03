@@ -1,5 +1,14 @@
 import { styled } from '../stitches.config';
 
+const gapStyles = (value: number) => {
+  return {
+    '& > * + *': {
+      marginRight: '0',
+      marginLeft: 0.25 * value + 'rem',
+    },
+  };
+};
+
 export const Flex = styled('div', {
   display: 'flex',
   variants: {
@@ -47,6 +56,12 @@ export const Flex = styled('div', {
       column: {
         flexDirection: 'column',
       },
+    },
+    gap: {
+      1: gapStyles(1),
+      2: gapStyles(2),
+      3: gapStyles(3),
+      4: gapStyles(4),
     },
   },
 });
