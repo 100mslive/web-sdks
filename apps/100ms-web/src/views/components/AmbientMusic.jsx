@@ -5,8 +5,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useWhenAloneInRoom } from "../../common/hooks";
 import { AppContext } from "../../store/AppContext";
 
-const ambientMusicURL =
-  process.env.REACT_APP_AMBIENT_MUSIC;
+const ambientMusicURL = process.env.REACT_APP_AMBIENT_MUSIC;
 /**
  * @type HTMLAudioElement
  */
@@ -34,16 +33,8 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
   const { enableAmbientMusic: userHasEnabled, setEnableAmbientMusic } =
     useContext(AppContext); // user settings
   const [playing, setPlaying] = useState(false);
-  const [aloneForLong, setAloneForLong] = useState(false);
 
-  const aloneRightNow = useWhenAloneInRoom(() => {
-    setAloneForLong(true);
-  }, threshold);
-
-  if (!aloneRightNow && aloneForLong) {
-    // someone else has joined let's reset alone for long
-    setAloneForLong(false);
-  }
+  const { alone: aloneRightNow, aloneForLong } = useWhenAloneInRoom(threshold);
 
   // play if user has enabled the setting and been alone for some time
   const shouldMusicBePlayed = !playing && userHasEnabled && aloneForLong;
@@ -66,6 +57,11 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
       audioRef.current.pause();
       setPlaying(false);
     }
+
+    return () => {
+      audioRef.current.pause();
+      setPlaying(false);
+    };
   }, [shouldMusicBePaused]);
 
   const toggleAmbientMusic = useCallback(
