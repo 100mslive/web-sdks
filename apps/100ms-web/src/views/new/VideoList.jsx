@@ -41,7 +41,7 @@ const HmsVideoList = ({
                     key={tile.peer.id}
                     width={tile.width}
                     height={tile.height}
-                    peerId={tile.peer.id}
+                    trackId={tile.peer.videoTrack}
                   />
                 ))}
               </StyledVideoList.View>

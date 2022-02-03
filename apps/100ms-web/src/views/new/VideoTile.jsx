@@ -1,4 +1,3 @@
-// @ts-check
 import React, { useState } from "react";
 import {
   AudioLevel,
@@ -14,8 +13,8 @@ import {
   selectIsPeerVideoEnabled,
   selectPeerByID,
   selectPeerMetadata,
-  selectVideoTrackByPeerID,
   selectIsAudioLocallyMuted,
+  selectTrackByID,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -23,24 +22,24 @@ import {
   BrbIcon,
 } from "@100mslive/react-icons";
 
-const HmsVideoTile = ({ peerId, showStatsOnTiles, width, height }) => {
-  const peer = useHMSStore(selectPeerByID(peerId));
-  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
-  const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
+const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
+  const track = useHMSStore(selectTrackByID(trackId));
+  const peer = useHMSStore(selectPeerByID(track.peerId));
+  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track.peerId));
+  const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track.peerId));
   const [showTrigger, setShowTrigger] = useState(false);
   const isHandRaised =
-    useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
-  const isBRB = useHMSStore(selectPeerMetadata(peerId))?.isBRBOn || false;
-  const videoTrack = useHMSStore(selectVideoTrackByPeerID(peer.id));
+    useHMSStore(selectPeerMetadata(track.peerId))?.isHandRaised || false;
+  const isBRB = useHMSStore(selectPeerMetadata(track.peerId))?.isBRBOn || false;
   const isLocallyMuted = useHMSStore(
     selectIsAudioLocallyMuted(peer.audioTrack)
   );
   const label = getVideoTileLabel(
     peer.name,
     peer.isLocal,
-    videoTrack?.source,
+    track?.source,
     isLocallyMuted,
-    videoTrack?.degraded
+    track?.degraded
   );
   return (
     <StyledVideoTile.Root
@@ -68,7 +67,9 @@ const HmsVideoTile = ({ peerId, showStatsOnTiles, width, height }) => {
             <MicOffIcon />
           </StyledVideoTile.AudioIndicator>
         ) : null}
-        {showTrigger && !peer?.isLocal ? <TileMenu peerId={peerId} /> : null}
+        {showTrigger && !peer?.isLocal ? (
+          <TileMenu peerId={track.peerId} />
+        ) : null}
 
         {isHandRaised ? (
           <StyledVideoTile.AttributeBox>
