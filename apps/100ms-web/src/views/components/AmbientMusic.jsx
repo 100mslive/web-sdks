@@ -6,8 +6,7 @@ import { useWhenAloneInRoom } from "../../common/hooks";
 import { AppContext } from "../../store/AppContext";
 
 const ambientMusicURL =
-  process.env.REACT_APP_AMBIENT_MUSIC ||
-  "https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3";
+  process.env.REACT_APP_AMBIENT_MUSIC;
 /**
  * @type HTMLAudioElement
  */
