@@ -18,6 +18,12 @@ export const StyledVideo = styled('video', {
         transform: 'scaleX(-1)',
       },
     },
+    screenShare: {
+      true: {
+        objectFit: 'contain',
+        background: 'transparent',
+      },
+    },
   },
   defaultVariants: {
     mirror: false,
