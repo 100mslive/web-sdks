@@ -1,5 +1,6 @@
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
+import { ServerError } from '../interfaces/internal';
 import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
 
@@ -178,16 +179,19 @@ export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
   peer: PeerNotificationInfo;
+  error?: ServerError;
 }
 
 export interface RTMPNotification {
   peer: PeerNotificationInfo;
   started_at?: number;
+  error?: ServerError;
 }
 
 export interface HLSNotification {
   enabled: boolean;
   variants: Array<HLSVariantInfo>;
+  error?: ServerError;
 }
 
 export interface HLSVariantInfo {
