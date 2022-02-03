@@ -239,35 +239,23 @@ export class SDKToHMS {
         browser: {
           running: !!recording?.browser?.running,
           startedAt: recording?.browser?.startedAt,
-          error: recording?.browser?.error && {
-            code: recording?.browser?.error?.code,
-            message: recording?.browser?.error?.message,
-          },
+          error: recording?.browser?.error,
         },
         server: {
           running: !!recording?.server?.running,
           startedAt: recording?.server?.startedAt,
-          error: recording?.server?.error && {
-            code: recording?.server?.error?.code,
-            message: recording?.server.error?.message,
-          },
+          error: recording?.server?.error,
         },
       },
       rtmp: {
         running: !!rtmp?.running,
         startedAt: rtmp?.startedAt,
-        error: rtmp?.error && {
-          code: rtmp.error.code,
-          message: rtmp.error.message,
-        },
+        error: rtmp?.error,
       },
       hls: {
         variants: hls?.variants?.map(variant => variant) || [],
         running: !!hls?.running,
-        error: hls?.error && {
-          code: hls.error.code,
-          message: hls.error.message,
-        },
+        error: hls?.error,
       },
     };
   }
