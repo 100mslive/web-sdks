@@ -57,12 +57,15 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
       audioRef.current.pause();
       setPlaying(false);
     }
+  }, [shouldMusicBePaused]);
 
+  useEffect(() => {
+    // Stop on leave
     return () => {
       audioRef.current.pause();
       setPlaying(false);
     };
-  }, [shouldMusicBePaused]);
+  }, []);
 
   const toggleAmbientMusic = useCallback(
     () => setEnableAmbientMusic(!playing), // save user settings
