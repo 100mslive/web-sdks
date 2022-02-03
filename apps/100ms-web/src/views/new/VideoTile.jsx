@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   AudioLevel,
   Avatar,
   StyledVideoTile,
-  TileMenu,
+  styled,
   Video,
   VideoTileStats,
 } from "@100mslive/react-ui";
@@ -15,14 +15,26 @@ import {
   selectPeerMetadata,
   selectIsAudioLocallyMuted,
   selectTrackByID,
+  selectScreenShareByPeerID,
+  selectCameraStreamByPeerID,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
   HandRaiseFilledIcon,
   BrbIcon,
+  ExpandIcon,
+  ShrinkIcon,
 } from "@100mslive/react-icons";
+import { useFullscreen, useToggle } from "react-use";
+import { HmsTileMenu } from "../UIComponents";
 
-const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
+const HmsVideoTile = ({
+  trackId,
+  showStatsOnTiles,
+  width,
+  height,
+  showScreen = false,
+}) => {
   const track = useHMSStore(selectTrackByID(trackId));
   const peer = useHMSStore(selectPeerByID(track.peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track.peerId));
@@ -34,43 +46,63 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const isLocallyMuted = useHMSStore(
     selectIsAudioLocallyMuted(peer.audioTrack)
   );
+  const selectVideoByPeerID = showScreen
+    ? selectScreenShareByPeerID
+    : selectCameraStreamByPeerID;
+
+  const storeHmsVideoTrack = useHMSStore(selectVideoByPeerID(peer.id));
   const label = getVideoTileLabel(
     peer.name,
     peer.isLocal,
-    track?.source,
+    storeHmsVideoTrack?.source,
     isLocallyMuted,
-    track?.degraded
+    storeHmsVideoTrack?.degraded
   );
+  const ref = useRef(null);
+  const [show, toggle] = useToggle(false);
+  const isFullscreen = useFullscreen(ref, show, {
+    onClose: () => toggle(false),
+  });
   return (
-    <StyledVideoTile.Root
-      css={{ width, height }}
-      onMouseEnter={() => setShowTrigger(true)}
-      onMouseLeave={() => {
-        setShowTrigger(false);
-      }}
-    >
-      <StyledVideoTile.Container>
+    <StyledVideoTile.Root css={{ width, height }}>
+      <StyledVideoTile.Container
+        ref={ref}
+        onMouseEnter={() => setShowTrigger(true)}
+        onMouseLeave={() => {
+          setShowTrigger(false);
+        }}
+      >
         {showStatsOnTiles ? (
           <VideoTileStats
             audioTrackID={peer?.audioTrack}
             videoTrackID={peer?.videoTrack}
           />
         ) : null}
+        {showScreen ? (
+          <FullScreenButton onClick={() => toggle()}>
+            {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
+          </FullScreenButton>
+        ) : null}
         <AudioLevel audioTrack={peer?.audioTrack} />
-        <Video mirror={peer?.isLocal || false} trackId={peer?.videoTrack} />
-        {isVideoMuted ? (
+        {storeHmsVideoTrack ? (
+          <Video
+            screenShare={showScreen}
+            mirror={peer?.isLocal || false}
+            trackId={storeHmsVideoTrack.id}
+          />
+        ) : null}
+        {isVideoMuted && !showScreen ? (
           <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
         ) : null}
         <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-        {isAudioMuted ? (
+        {isAudioMuted && !showScreen ? (
           <StyledVideoTile.AudioIndicator>
             <MicOffIcon />
           </StyledVideoTile.AudioIndicator>
         ) : null}
         {showTrigger && !peer?.isLocal ? (
-          <TileMenu peerId={track.peerId} />
+          <HmsTileMenu peerId={track.peerId} />
         ) : null}
-
         {isHandRaised ? (
           <StyledVideoTile.AttributeBox>
             <HandRaiseFilledIcon width={40} height={40} />
@@ -133,3 +165,22 @@ export const getVideoTileLabel = (
   }
   return `${label}${isLocallyMuted ? " (Muted for you)" : ""}`;
 };
+
+const FullScreenButton = styled("button", {
+  width: "36px",
+  height: "36px",
+  color: "white",
+  borderRadius: "$round",
+  backgroundColor: "$menuBg",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "absolute",
+  bottom: "1rem",
+  right: "1rem",
+  zIndex: 20,
+  "&:not([disabled]):focus": {
+    outline: "none",
+    boxShadow: "0 0 0 3px $colors$brandTint",
+  },
+});

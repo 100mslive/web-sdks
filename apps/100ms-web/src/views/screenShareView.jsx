@@ -198,12 +198,11 @@ const ScreenShareComponent = ({
             />
           </div>
         ) : (
-          <VideoTile
-            peer={peerPresenting}
+          <HmsVideoTile
+            trackId={peerPresenting.videoTrack}
+            width="100%"
+            height="100%"
             showScreen={true}
-            objectFit="contain"
-            hmsVideoTrackId={screenshareTrack?.id}
-            {...videoTileProps(peerPresenting, screenshareTrack)}
           />
         ))}
     </Box>
