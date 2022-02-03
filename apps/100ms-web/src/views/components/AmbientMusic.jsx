@@ -66,7 +66,7 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
       audioRef.current.pause();
       setPlaying(false);
     }
-  }, [shouldMusicBePaused, aloneRightNow]);
+  }, [shouldMusicBePaused]);
 
   const toggleAmbientMusic = useCallback(
     () => setEnableAmbientMusic(!playing), // save user settings
