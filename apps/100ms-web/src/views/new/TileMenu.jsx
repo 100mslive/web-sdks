@@ -1,5 +1,5 @@
-import * as Popover from '@radix-ui/react-popover';
-import React from 'react';
+import * as Popover from "@radix-ui/react-popover";
+import React from "react";
 import {
   HorizontalMenuIcon,
   MicOffIcon,
@@ -8,33 +8,30 @@ import {
   MicOnIcon,
   SpeakerIcon,
   RemoveUserIcon,
-} from '@100mslive/react-icons';
+} from "@100mslive/react-icons";
 import {
   useHMSStore,
   selectVideoTrackByPeerID,
-  HMSPeerID,
   selectPermissions,
   selectAudioTrackByPeerID,
   useHMSActions,
-  HMSTrack,
   selectAudioVolumeByPeerID,
-} from '@100mslive/react-sdk';
-import { Slider } from '../Slider';
-import { Flex, StyledMenuTile } from './StyledMenuTile';
+} from "@100mslive/react-sdk";
+import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
 
-interface Props {
-  peerId: HMSPeerID;
-}
-
-export const TileMenu: React.FC<Props> = ({ peerId }) => {
+const HmsTileMenu = ({ peerId }) => {
   const actions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   // TODO: selectTrackByID vs selectVideoTrackByPeerID
   const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const canMuteVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
-  const canMuteAudio = audioTrack?.enabled ? permissions?.mute : permissions?.unmute;
-  const toggleTrackEnabled = async (track?: HMSTrack | null) => {
+  const canMuteVideo = videoTrack?.enabled
+    ? permissions?.mute
+    : permissions?.unmute;
+  const canMuteAudio = audioTrack?.enabled
+    ? permissions?.mute
+    : permissions?.unmute;
+  const toggleTrackEnabled = async track => {
     if (track) {
       try {
         await actions.setRemoteTrackEnabled(track.id, !track.enabled);
@@ -52,25 +49,29 @@ export const TileMenu: React.FC<Props> = ({ peerId }) => {
         </StyledMenuTile.Trigger>
         <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
           {canMuteVideo ? (
-            <StyledMenuTile.ItemButton onClick={() => toggleTrackEnabled(videoTrack)}>
+            <StyledMenuTile.ItemButton
+              onClick={() => toggleTrackEnabled(videoTrack)}
+            >
               {videoTrack?.enabled ? <VideoOnIcon /> : <VideoOffIcon />}
-              <span>{`${videoTrack?.enabled ? 'Mute' : 'Unmute'} Video`}</span>
+              <span>{`${videoTrack?.enabled ? "Mute" : "Unmute"} Video`}</span>
             </StyledMenuTile.ItemButton>
           ) : null}
           {canMuteAudio ? (
-            <StyledMenuTile.ItemButton onClick={() => toggleTrackEnabled(audioTrack)}>
+            <StyledMenuTile.ItemButton
+              onClick={() => toggleTrackEnabled(audioTrack)}
+            >
               {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}
-              <span>{`${audioTrack?.enabled ? 'Mute' : 'Unmute'} Audio`}</span>
+              <span>{`${audioTrack?.enabled ? "Mute" : "Unmute"} Audio`}</span>
             </StyledMenuTile.ItemButton>
           ) : null}
 
           {audioTrack ? (
             <StyledMenuTile.VolumeItem>
-              <Flex>
+              <Flex align="center" gap={1}>
                 <SpeakerIcon /> <span>Volume ({trackVolume})</span>
               </Flex>
               <Slider
-                css={{ my: '0.5rem' }}
+                css={{ my: "0.5rem" }}
                 step={5}
                 value={[trackVolume || 0]}
                 onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
@@ -82,7 +83,7 @@ export const TileMenu: React.FC<Props> = ({ peerId }) => {
             <StyledMenuTile.RemoveItem
               onClick={async () => {
                 try {
-                  await actions.removePeer(peerId, '');
+                  await actions.removePeer(peerId, "");
                 } catch (error) {
                   // TODO: Toast here
                 }
@@ -97,3 +98,5 @@ export const TileMenu: React.FC<Props> = ({ peerId }) => {
     </StyledMenuTile.Root>
   );
 };
+
+export default HmsTileMenu;
