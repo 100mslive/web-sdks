@@ -4,6 +4,9 @@ import {
   useHMSStore,
   selectPeerCount,
   selectPermissions,
+  selectHLSState,
+  selectRTMPState,
+  selectRecordingState,
 } from "@100mslive/react-sdk";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "../store/AppContext";
@@ -48,14 +51,29 @@ export const useBeamAutoLeave = () => {
     loginInfo: { isHeadless },
   } = useContext(AppContext);
   const { aloneForLong } = useWhenAloneInRoom();
+  const hls = useHMSStore(selectHLSState);
+  const rtmp = useHMSStore(selectRTMPState);
+  const recording = useHMSStore(selectRecordingState);
 
   /**
    * End room after 5 minutes of being alone in the room to stop beam
    * Note: Leave doesn't stop beam
    */
   useEffect(() => {
-    if (aloneForLong && isHeadless && permissions.endRoom) {
-      hmsActions.endRoom(false, "Stop Beam");
+    if (aloneForLong && isHeadless) {
+      if (permissions.endRoom) {
+        hmsActions.endRoom(false, "Stop Beam");
+      } else {
+        const stopBeam = () => {
+          if (hls.running) {
+            hmsActions.stopHLSStreaming();
+          }
+          if (rtmp.running || recording.browser.running) {
+            hmsActions.stopRTMPAndRecording();
+          }
+        };
+        stopBeam();
+      }
     }
-  }, [aloneForLong, isHeadless, hmsActions, permissions]);
+  }, [aloneForLong, isHeadless, hmsActions, permissions, hls, recording, rtmp]);
 };
