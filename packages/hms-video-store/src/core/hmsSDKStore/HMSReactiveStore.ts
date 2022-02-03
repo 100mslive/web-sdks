@@ -9,7 +9,7 @@ import create, {
   State,
 } from 'zustand/vanilla';
 import shallow from 'zustand/shallow';
-import { HMSSdk } from '@100mslive/hms-video';
+import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
@@ -59,7 +59,9 @@ export class HMSReactiveStore {
 
     this.initialTriggerOnSubscribe = false;
 
-    window.__hms = this;
+    if (isBrowser) {
+      window.__hms = this;
+    }
   }
 
   /**

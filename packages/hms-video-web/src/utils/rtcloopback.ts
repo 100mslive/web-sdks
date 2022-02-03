@@ -1,24 +1,28 @@
-const rtcConnection = new RTCPeerConnection();
-const rtcLoopbackConnection = new RTCPeerConnection();
-const audioContext = new AudioContext();
-const offerOptions = {
-  offerVideo: true,
-  offerAudio: true,
-  offerToReceiveAudio: false,
-  offerToReceiveVideo: false,
-};
-export class RTCLoopback {
-  constructor() {}
+class Loopback {
+  rtcConnection = new RTCPeerConnection();
+  rtcLoopbackConnection = new RTCPeerConnection();
+  audioContext = new AudioContext();
+  offerOptions = {
+    offerVideo: true,
+    offerAudio: true,
+    offerToReceiveAudio: false,
+    offerToReceiveVideo: false,
+  };
+  constructor() {
+    this.rtcConnection.onicecandidate = e => {
+      e.candidate && this.rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
+    };
+    this.rtcLoopbackConnection.onicecandidate = e => {
+      e.candidate && this.rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
+    };
+  }
 
   async processAudioFromUrl(url: string) {
     const track = await this.createAudioTrackFromUrl(url);
     return new Promise<MediaStreamTrack>(resolve => {
-      rtcConnection.addTrack(track);
-      rtcLoopbackConnection.ontrack = e => {
+      this.rtcConnection.addTrack(track);
+      this.rtcLoopbackConnection.ontrack = e => {
         resolve(e.track);
-        const audio = new Audio();
-        audio.srcObject = new MediaStream([e.track]);
-        audio.play();
       };
       this.setOfferAnswer();
     });
@@ -26,8 +30,8 @@ export class RTCLoopback {
 
   async processAudioFromTrack(track: MediaStreamTrack) {
     return new Promise<MediaStreamTrack>(resolve => {
-      rtcConnection.addTrack(track);
-      rtcLoopbackConnection.ontrack = e => {
+      this.rtcConnection.addTrack(track);
+      this.rtcLoopbackConnection.ontrack = e => {
         resolve(e.track);
       };
       this.setOfferAnswer();
@@ -38,11 +42,11 @@ export class RTCLoopback {
     const BlobURL = await fetch(url);
 
     const buffer = await BlobURL.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(buffer);
-    const source = audioContext.createBufferSource();
+    const audioBuffer = await this.audioContext.decodeAudioData(buffer);
+    const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
 
-    const streamDestination = audioContext.createMediaStreamDestination();
+    const streamDestination = this.audioContext.createMediaStreamDestination();
 
     source.connect(streamDestination);
     source.start();
@@ -50,19 +54,25 @@ export class RTCLoopback {
   }
 
   private async setOfferAnswer() {
-    rtcConnection.onicecandidate = e => {
-      e.candidate && rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
-    };
-    rtcLoopbackConnection.onicecandidate = e => {
-      e.candidate && rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
-    };
-    const offer: RTCSessionDescriptionInit = await rtcConnection.createOffer(offerOptions);
-    await rtcConnection.setLocalDescription(offer);
+    const offer: RTCSessionDescriptionInit = await this.rtcConnection.createOffer(this.offerOptions);
+    await this.rtcConnection.setLocalDescription(offer);
+    await this.rtcLoopbackConnection.setRemoteDescription(offer);
 
-    await rtcLoopbackConnection.setRemoteDescription(offer);
-    const answer: RTCSessionDescriptionInit = await rtcLoopbackConnection.createAnswer();
-    await rtcLoopbackConnection.setLocalDescription(answer);
-
-    await rtcConnection.setRemoteDescription(answer);
+    const answer: RTCSessionDescriptionInit = await this.rtcLoopbackConnection.createAnswer();
+    await this.rtcLoopbackConnection.setLocalDescription(answer);
+    await this.rtcConnection.setRemoteDescription(answer);
   }
 }
+
+export const RTCLoopback = (() => {
+  let loopback: Loopback | null = null;
+
+  return {
+    getInstance: function () {
+      if (!loopback) {
+        loopback = new Loopback();
+      }
+      return loopback;
+    },
+  };
+})();

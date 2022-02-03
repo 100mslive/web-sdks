@@ -53,7 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import { RTCLoopback } from 'utils/rtcloopback';
+import { RTCLoopback } from '../utils/rtcloopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -537,14 +537,21 @@ export class HMSSdk implements HMSInterface {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
+  /**
+   * @alpha
+   * @param {string} url
+   * This method publishes an audio track from provided url and plays it without causing any feedback
+   */
   async addAudioTrackFromUrl(url: string) {
     new URL(url);
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
     }
-    const loopback = new RTCLoopback();
-    const track = await loopback.processAudioFromUrl(url);
+    const track = await RTCLoopback.getInstance().processAudioFromUrl(url);
     const nativeStream = new MediaStream([track]);
+    const audio = new Audio();
+    audio.srcObject = nativeStream;
+    await audio.play();
     const hmsStream = new HMSLocalStream(nativeStream);
     const hmsTrack = new HMSLocalAudioTrack(hmsStream, track, 'regular', this.eventBus);
     await this.transport?.publish([hmsTrack]);
@@ -598,6 +605,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot end room');
     }
     await this.transport?.endRoom(lock, reason);
+    await this.leave();
   }
 
   async removePeer(peer: HMSRemotePeer, reason: string) {

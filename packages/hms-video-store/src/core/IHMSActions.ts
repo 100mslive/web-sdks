@@ -71,6 +71,11 @@ export interface IHMSActions {
    */
   addTrack(track: MediaStreamTrack, type: HMSTrackSource): Promise<void>;
 
+  /**
+   * @alpha
+   * @param url
+   * This method publishes an audio track from provided url and plays it without causing any feedback
+   */
   addAudioTrackFromUrl(url: string): Promise<void>;
 
   /**
