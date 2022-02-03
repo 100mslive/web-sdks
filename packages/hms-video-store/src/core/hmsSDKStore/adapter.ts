@@ -238,9 +238,9 @@ export class SDKToHMS {
           running: !!recording?.browser?.running,
           startedAt: recording?.browser?.startedAt,
         },
-        server: { running: !!recording?.server?.running, startedAt: recording?.browser?.startedAt },
+        server: { running: !!recording?.server?.running, startedAt: recording?.server?.startedAt },
       },
-      rtmp: { running: !!rtmp?.running, startedAt: recording?.browser?.startedAt },
+      rtmp: { running: !!rtmp?.running, startedAt: rtmp?.startedAt },
       hls: { variants: hls?.variants || [], running: !!hls?.running },
     };
   }

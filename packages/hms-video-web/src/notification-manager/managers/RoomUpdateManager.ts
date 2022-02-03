@@ -50,14 +50,6 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     room.peerCount = peerCount;
     room.name = name;
-    if (!room.recording) {
-      room.recording = this.getDefaultRecordingState();
-    }
-    if (!room.rtmp) {
-      room.rtmp = {
-        running: false,
-      };
-    }
     room.recording.server.running = recording.sfu.enabled;
     room.recording.browser.running = recording.browser.enabled;
     room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
@@ -115,16 +107,12 @@ export class RoomUpdateManager {
 
   private setRecordingStatus(type: 'sfu' | 'Browser', running: boolean, startedAt?: number) {
     const room = this.store.getRoom();
-    if (!room.recording) {
-      room.recording = this.getDefaultRecordingState();
-    }
-    let action = -1;
+    let action: number;
     if (type === 'sfu') {
-      room.recording.server.running = running;
-      room.recording.server.startedAt = this.getAsDate(startedAt);
+      room.recording.server = { running, startedAt: running ? this.getAsDate(startedAt) : undefined };
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else {
-      room.recording.browser.running = running;
+      room.recording.browser = { running, startedAt: running ? this.getAsDate(startedAt) : undefined };
       action = HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED;
     }
     this.listener?.onRoomUpdate(action, room);
@@ -132,24 +120,7 @@ export class RoomUpdateManager {
 
   private setRTMPStatus(running: boolean, startedAt?: number) {
     const room = this.store.getRoom();
-    if (!room.rtmp) {
-      room.rtmp = {
-        running: false,
-        startedAt: this.getAsDate(startedAt),
-      };
-    }
-    room.rtmp.running = running;
+    room.rtmp = { running, startedAt: running ? this.getAsDate(startedAt) : undefined };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
-  }
-
-  private getDefaultRecordingState() {
-    return {
-      browser: {
-        running: false,
-      },
-      server: {
-        running: false,
-      },
-    };
   }
 }
