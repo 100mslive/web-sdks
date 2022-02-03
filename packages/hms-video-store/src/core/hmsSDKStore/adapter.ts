@@ -28,6 +28,8 @@ import { areArraysEqual } from './sdkUtils/storeMergeUtils';
  * This file has conversion functions from schema defined in sdk to normalised schema defined in store.
  * A lot of conversions below involve deep clone as once the object goes into store it becomes unmodifiable
  * due to immer, so it can't be mutated later.
+ *
+ * Objects directly from the SDK are not stored as is and cloned because the SDK might modify it later
  */
 
 export class SDKToHMS {
@@ -241,7 +243,7 @@ export class SDKToHMS {
         server: { running: !!recording?.server?.running, startedAt: recording?.browser?.startedAt },
       },
       rtmp: { running: !!rtmp?.running, startedAt: recording?.browser?.startedAt },
-      hls: { variants: hls?.variants || [], running: !!hls?.running },
+      hls: { variants: hls?.variants?.map(variant => variant) || [], running: !!hls?.running },
     };
   }
 }
