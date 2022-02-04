@@ -10,13 +10,22 @@ enum DeviceType {
   audioOutput = 'audioOutput',
 }
 
-type DeviceTypeInfo<T> = {
+export type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
 };
 
 export interface useDevicesResult {
-  allDevices: DeviceTypeInfo<MediaDeviceInfo[]>;
-  selectedDeviceIDs: DeviceTypeInfo<string>;
+  /**
+   * list of all devices by type
+   */
+  allDevices: DeviceTypeAndInfo<MediaDeviceInfo[]>;
+  /**
+   * selected device ids for all types
+   */
+  selectedDeviceIDs: DeviceTypeAndInfo<string>;
+  /**
+   * function to call to update device
+   */
   updateDevice: ({ deviceType, deviceId }: { deviceType: DeviceType; deviceId: string }) => Promise<void>;
 }
 
@@ -24,7 +33,7 @@ export interface useDevicesResult {
  * This hook can be used to implement a UI component which allows the user to manually change their
  * audio/video device. It returns the list of all devices as well as the currently selected one. The input
  * devices will be returned based on what the user is allowed to publish, so a audio only user won't get
- * the videInput field.
+ * the videInput field. This can be used to show the UI dropdowns properly.
  *
  * Note:
  * - Browsers give access to the list of devices only if the user has given permission to access them
@@ -35,11 +44,11 @@ export interface useDevicesResult {
  */
 export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useDevicesResult => {
   const hmsActions = useHMSActions();
-  const sdkAllDevices: DeviceTypeInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
+  const sdkAllDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
-  const selectedDeviceIDs: DeviceTypeInfo<string> = {
+  const selectedDeviceIDs: DeviceTypeAndInfo<string> = {
     [DeviceType.audioOutput]: sdkSelectedDevices.audioOutputDeviceId,
   };
 
