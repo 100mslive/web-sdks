@@ -25,10 +25,10 @@ const HmsTileMenu = ({ peerId }) => {
   // TODO: selectTrackByID vs selectVideoTrackByPeerID
   const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const canMuteVideo = videoTrack?.enabled
+  const canToggleVideo = videoTrack?.enabled
     ? permissions?.mute
     : permissions?.unmute;
-  const canMuteAudio = audioTrack?.enabled
+  const canToggleAudio = audioTrack?.enabled
     ? permissions?.mute
     : permissions?.unmute;
   const toggleTrackEnabled = async track => {
@@ -48,7 +48,7 @@ const HmsTileMenu = ({ peerId }) => {
           <HorizontalMenuIcon />
         </StyledMenuTile.Trigger>
         <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
-          {canMuteVideo ? (
+          {canToggleVideo ? (
             <StyledMenuTile.ItemButton
               onClick={() => toggleTrackEnabled(videoTrack)}
             >
@@ -56,7 +56,7 @@ const HmsTileMenu = ({ peerId }) => {
               <span>{`${videoTrack?.enabled ? "Mute" : "Unmute"} Video`}</span>
             </StyledMenuTile.ItemButton>
           ) : null}
-          {canMuteAudio ? (
+          {canToggleAudio ? (
             <StyledMenuTile.ItemButton
               onClick={() => toggleTrackEnabled(audioTrack)}
             >

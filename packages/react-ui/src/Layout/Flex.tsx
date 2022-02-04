@@ -4,7 +4,7 @@ const gapStyles = (value: number) => {
   return {
     '& > * + *': {
       marginRight: '0',
-      marginLeft: 0.25 * value + 'rem',
+      marginLeft: `${0.25 * value}rem`,
     },
   };
 };

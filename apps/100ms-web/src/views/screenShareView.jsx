@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, Fragment, useContext } from "react";
+import React, { useCallback, useMemo, Fragment } from "react";
 import {
   useHMSStore,
   useHMSActions,
@@ -19,7 +19,6 @@ import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
 import { HmsVideoList, HmsVideoTile } from "./UIComponents";
 import { FeatureFlags } from "../store/FeatureFlags";
-import { AppContext } from "../store/AppContext";
 
 export const ScreenShareView = ({
   showStats,
@@ -68,6 +67,7 @@ export const ScreenShareView = ({
       }}
     >
       <ScreenShareComponent
+        showStats={showStats}
         amIPresenting={amIPresenting}
         peerPresenting={peerPresenting}
         peerSharingPlaylist={peerSharingPlaylist}
@@ -146,6 +146,7 @@ export const SidePane = ({
 };
 
 const ScreenShareComponent = ({
+  showStats,
   amIPresenting,
   peerPresenting,
   peerSharingPlaylist,
@@ -198,12 +199,24 @@ const ScreenShareComponent = ({
             />
           </div>
         ) : (
-          <HmsVideoTile
-            trackId={peerPresenting.videoTrack}
-            width="100%"
-            height="100%"
-            showScreen={true}
-          />
+          <>
+            {FeatureFlags.enableNewComponents ? (
+              <HmsVideoTile
+                showStatsOnTiles={showStats}
+                trackId={screenshareTrack.id}
+                width="100%"
+                height="100%"
+              />
+            ) : (
+              <VideoTile
+                peer={peerPresenting}
+                showScreen={true}
+                objectFit="contain"
+                hmsVideoTrackId={screenshareTrack?.id}
+                {...videoTileProps(peerPresenting, screenshareTrack)}
+              />
+            )}
+          </>
         ))}
     </Box>
   );

@@ -15,8 +15,6 @@ import {
   selectPeerMetadata,
   selectIsAudioLocallyMuted,
   selectTrackByID,
-  selectScreenShareByPeerID,
-  selectCameraStreamByPeerID,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -28,14 +26,9 @@ import {
 import { useFullscreen, useToggle } from "react-use";
 import { HmsTileMenu } from "../UIComponents";
 
-const HmsVideoTile = ({
-  trackId,
-  showStatsOnTiles,
-  width,
-  height,
-  showScreen = false,
-}) => {
+const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectTrackByID(trackId));
+  const isScreenShare = track.source === "screen";
   const peer = useHMSStore(selectPeerByID(track.peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track.peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track.peerId));
@@ -46,17 +39,12 @@ const HmsVideoTile = ({
   const isLocallyMuted = useHMSStore(
     selectIsAudioLocallyMuted(peer.audioTrack)
   );
-  const selectVideoByPeerID = showScreen
-    ? selectScreenShareByPeerID
-    : selectCameraStreamByPeerID;
-
-  const storeHmsVideoTrack = useHMSStore(selectVideoByPeerID(peer.id));
   const label = getVideoTileLabel(
     peer.name,
     peer.isLocal,
-    storeHmsVideoTrack?.source,
+    track?.source,
     isLocallyMuted,
-    storeHmsVideoTrack?.degraded
+    track?.degraded
   );
   const ref = useRef(null);
   const [show, toggle] = useToggle(false);
@@ -75,27 +63,27 @@ const HmsVideoTile = ({
         {showStatsOnTiles ? (
           <VideoTileStats
             audioTrackID={peer?.audioTrack}
-            videoTrackID={peer?.videoTrack}
+            videoTrackID={track.id}
           />
         ) : null}
-        {showScreen ? (
+        {isScreenShare ? (
           <FullScreenButton onClick={() => toggle()}>
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </FullScreenButton>
         ) : null}
         <AudioLevel audioTrack={peer?.audioTrack} />
-        {storeHmsVideoTrack ? (
+        {track ? (
           <Video
-            screenShare={showScreen}
-            mirror={peer?.isLocal || false}
-            trackId={storeHmsVideoTrack.id}
+            screenShare={isScreenShare}
+            mirror={peer.isLocal && track?.source === "regular"}
+            trackId={track.id}
           />
         ) : null}
-        {isVideoMuted && !showScreen ? (
+        {isVideoMuted && !isScreenShare ? (
           <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
         ) : null}
         <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-        {isAudioMuted && !showScreen ? (
+        {isAudioMuted && !isScreenShare ? (
           <StyledVideoTile.AudioIndicator>
             <MicOffIcon />
           </StyledVideoTile.AudioIndicator>
@@ -167,8 +155,8 @@ export const getVideoTileLabel = (
 };
 
 const FullScreenButton = styled("button", {
-  width: "36px",
-  height: "36px",
+  width: "2.25rem",
+  height: "2.25rem",
   color: "white",
   borderRadius: "$round",
   backgroundColor: "$menuBg",

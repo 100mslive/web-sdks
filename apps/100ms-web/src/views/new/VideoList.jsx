@@ -38,10 +38,10 @@ const HmsVideoList = ({
                 {tiles.map(tile => (
                   <HmsVideoTile
                     showStatsOnTiles={showStatsOnTiles}
-                    key={tile.peer.id}
+                    key={tile.track.id}
                     width={tile.width}
                     height={tile.height}
-                    trackId={tile.peer.videoTrack}
+                    trackId={tile.track.id}
                   />
                 ))}
               </StyledVideoList.View>
