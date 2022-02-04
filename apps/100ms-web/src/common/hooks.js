@@ -58,15 +58,15 @@ export const useBeamAutoLeave = () => {
       if (permissions.endRoom) {
         hmsActions.endRoom(false, "Stop Beam");
       } else {
-        const stopBeam = () => {
-          if (hls.running) {
-            hmsActions.stopHLSStreaming();
-          }
-          if (rtmp.running || recording.browser.running) {
-            hmsActions.stopRTMPAndRecording();
-          }
-        };
-        stopBeam();
+        if (hls.running && permissions.streaming) {
+          hmsActions.stopHLSStreaming();
+        }
+        if (
+          (rtmp.running && permissions.streaming) ||
+          (recording.browser.running && permissions.recording)
+        ) {
+          hmsActions.stopRTMPAndRecording();
+        }
       }
     }
   }, [aloneForLong, isHeadless, hmsActions, permissions, hls, recording, rtmp]);
