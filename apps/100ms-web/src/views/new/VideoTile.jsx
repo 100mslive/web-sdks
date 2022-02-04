@@ -27,7 +27,6 @@ import { useFullscreen, useToggle } from "react-use";
 import { HmsTileMenu } from "../UIComponents";
 
 const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
-  console.log("TRACKID", trackId);
   const track = useHMSStore(selectTrackByID(trackId));
   const isScreenShare = track.source === "screen";
   const peer = useHMSStore(selectPeerByID(track.peerId));

@@ -1,4 +1,3 @@
-import * as Popover from "@radix-ui/react-popover";
 import React from "react";
 import {
   HorizontalMenuIcon,
@@ -43,58 +42,56 @@ const HmsTileMenu = ({ peerId }) => {
   const trackVolume = useHMSStore(selectAudioVolumeByPeerID(peerId));
   return (
     <StyledMenuTile.Root>
-      <Popover.Root>
-        <StyledMenuTile.Trigger>
-          <HorizontalMenuIcon />
-        </StyledMenuTile.Trigger>
-        <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
-          {canToggleVideo ? (
-            <StyledMenuTile.ItemButton
-              onClick={() => toggleTrackEnabled(videoTrack)}
-            >
-              {videoTrack?.enabled ? <VideoOnIcon /> : <VideoOffIcon />}
-              <span>{`${videoTrack?.enabled ? "Mute" : "Unmute"} Video`}</span>
-            </StyledMenuTile.ItemButton>
-          ) : null}
-          {canToggleAudio ? (
-            <StyledMenuTile.ItemButton
-              onClick={() => toggleTrackEnabled(audioTrack)}
-            >
-              {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}
-              <span>{`${audioTrack?.enabled ? "Mute" : "Unmute"} Audio`}</span>
-            </StyledMenuTile.ItemButton>
-          ) : null}
+      <StyledMenuTile.Trigger>
+        <HorizontalMenuIcon />
+      </StyledMenuTile.Trigger>
+      <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
+        {canToggleVideo ? (
+          <StyledMenuTile.ItemButton
+            onClick={() => toggleTrackEnabled(videoTrack)}
+          >
+            {videoTrack?.enabled ? <VideoOnIcon /> : <VideoOffIcon />}
+            <span>{`${videoTrack?.enabled ? "Mute" : "Unmute"} Video`}</span>
+          </StyledMenuTile.ItemButton>
+        ) : null}
+        {canToggleAudio ? (
+          <StyledMenuTile.ItemButton
+            onClick={() => toggleTrackEnabled(audioTrack)}
+          >
+            {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}
+            <span>{`${audioTrack?.enabled ? "Mute" : "Unmute"} Audio`}</span>
+          </StyledMenuTile.ItemButton>
+        ) : null}
 
-          {audioTrack ? (
-            <StyledMenuTile.VolumeItem>
-              <Flex align="center" gap={1}>
-                <SpeakerIcon /> <span>Volume ({trackVolume})</span>
-              </Flex>
-              <Slider
-                css={{ my: "0.5rem" }}
-                step={5}
-                value={[trackVolume || 0]}
-                onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
-              />
-            </StyledMenuTile.VolumeItem>
-          ) : null}
+        {audioTrack ? (
+          <StyledMenuTile.VolumeItem>
+            <Flex align="center" gap={1}>
+              <SpeakerIcon /> <span>Volume ({trackVolume})</span>
+            </Flex>
+            <Slider
+              css={{ my: "0.5rem" }}
+              step={5}
+              value={[trackVolume || 0]}
+              onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
+            />
+          </StyledMenuTile.VolumeItem>
+        ) : null}
 
-          {permissions?.removeOthers ? (
-            <StyledMenuTile.RemoveItem
-              onClick={async () => {
-                try {
-                  await actions.removePeer(peerId, "");
-                } catch (error) {
-                  // TODO: Toast here
-                }
-              }}
-            >
-              <RemoveUserIcon />
-              <span>Remove Participant</span>
-            </StyledMenuTile.RemoveItem>
-          ) : null}
-        </StyledMenuTile.Content>
-      </Popover.Root>
+        {permissions?.removeOthers ? (
+          <StyledMenuTile.RemoveItem
+            onClick={async () => {
+              try {
+                await actions.removePeer(peerId, "");
+              } catch (error) {
+                // TODO: Toast here
+              }
+            }}
+          >
+            <RemoveUserIcon />
+            <span>Remove Participant</span>
+          </StyledMenuTile.RemoveItem>
+        ) : null}
+      </StyledMenuTile.Content>
     </StyledMenuTile.Root>
   );
 };

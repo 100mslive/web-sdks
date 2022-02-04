@@ -3,15 +3,13 @@ import { styled } from '../stitches.config';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
 
-const StyledRoot = styled('div', {
+const Root = Popover.Root;
+
+const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
   top: '10px',
   right: '10px',
   zIndex: 20,
-  // display: 'none',
-});
-
-const StyledTrigger = styled(Popover.Trigger, {
   width: '36px',
   height: '36px',
   color: 'white',
@@ -82,7 +80,7 @@ const RemoveMenuItem = styled(StyledItemButton, {
 });
 
 interface MenuTileType {
-  Root: typeof StyledRoot;
+  Root: typeof Root;
   Trigger: typeof StyledTrigger;
   Content: typeof StyledContent;
   ItemButton: typeof StyledItemButton;
@@ -91,7 +89,7 @@ interface MenuTileType {
 }
 
 export const StyledMenuTile: MenuTileType = {
-  Root: StyledRoot,
+  Root,
   Trigger: StyledTrigger,
   Content: StyledContent,
   ItemButton: StyledItemButton,
