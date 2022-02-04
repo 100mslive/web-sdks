@@ -103,10 +103,6 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
 const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
-    // Not used by UI
-    // store.publishStats = SDKToHMS.convertConnectionStats(stats.getPublishStats());
-    // store.subscribeStats = SDKToHMS.convertConnectionStats(stats.getSubscribeStats());
-
     const newTrackStats: Record<HMSTrackID, HMSTrackStats> = {};
     const trackIDs = Object.keys(tracks);
 

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
@@ -8,7 +8,100 @@ export interface VideoTileStatsProps {
   audioTrackID?: HMSTrackID;
 }
 
-const StatsRow = ({ label = '', value = '', show = true }) => {
+/**
+ * This component can be used to overlay webrtc stats over the Video Tile. For the local tracks it also includes
+ * remote inbound stats as sent by the SFU in receiver report.
+ */
+export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
+  const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
+  const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+  // Viewer role - no stats to show
+  if (!(audioTrackStats || videoTrackStats)) {
+    return null;
+  }
+  return (
+    <Stats.Root>
+      <table>
+        <tbody>
+          <StatsRow
+            show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+            label="Width"
+            value={videoTrackStats?.frameWidth?.toString()}
+          />
+          <StatsRow
+            show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+            label="Height"
+            value={videoTrackStats?.frameHeight?.toString()}
+          />
+          <StatsRow
+            show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
+            label="FPS"
+            value={`${videoTrackStats?.framesPerSecond} ${
+              isNotNullishAndNot0(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
+            }`}
+          />
+
+          <StatsRow
+            show={isNotNullish(videoTrackStats?.bitrate)}
+            label="Bitrate(V)"
+            value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
+          />
+
+          <StatsRow
+            show={isNotNullish(audioTrackStats?.bitrate)}
+            label="Bitrate(A)"
+            value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
+          />
+
+          <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
+        </tbody>
+      </table>
+    </Stats.Root>
+  );
+}
+
+const PacketLostAndJitter = ({
+  audioTrackStats,
+  videoTrackStats,
+}: {
+  audioTrackStats?: HMSTrackStats;
+  videoTrackStats?: HMSTrackStats;
+}) => {
+  // for local peer, we'll use the remote inbound stats to get packet loss and jitter, to know whether the track is
+  // local we check if the stats type has outbound in it as it's being published from local. Both audio and video
+  // tracks are checked in case the user has permission to publish only one of them.
+  const isLocalPeer = audioTrackStats?.type.includes('outbound') || videoTrackStats?.type.includes('outbound');
+  const audioStats = isLocalPeer ? audioTrackStats?.remote : audioTrackStats;
+  const videoStats = isLocalPeer ? videoTrackStats?.remote : videoTrackStats;
+  return (
+    <>
+      <TrackPacketsLostRow label="Packet Loss(V)" stats={videoStats} />
+      <TrackPacketsLostRow label="Packet Loss(A)" stats={audioStats} />
+      <StatsRow show={isNotNullish(videoStats?.jitter)} label="Jitter(V)" value={videoStats?.jitter?.toFixed(4)} />
+      <StatsRow show={isNotNullish(audioStats?.jitter)} label="Jitter(A)" value={audioStats?.jitter?.toFixed(4)} />
+    </>
+  );
+};
+
+const TrackPacketsLostRow = ({
+  stats,
+  label,
+}: {
+  stats?: Pick<HMSTrackStats, 'packetsLost' | 'packetsLostRate'>;
+  label: string;
+}) => {
+  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
+
+  return (
+    <StatsRow
+      show={isNotNullishAndNot0(stats?.packetsLost)}
+      label={label}
+      value={`${stats?.packetsLost}(${packetsLostRate})`}
+    />
+  );
+};
+
+const RawStatsRow = ({ label = '', value = '', show = true }) => {
   return (
     <>
       {show ? (
@@ -21,93 +114,17 @@ const StatsRow = ({ label = '', value = '', show = true }) => {
   );
 };
 
-const TrackPacketsLostRow = ({ stats }: { stats?: HMSTrackStats }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : stats?.packetsLostRate) + '/s';
+// memoize so only the rows which change rerender
+const StatsRow = React.memo(RawStatsRow);
 
-  const trackType = stats && stats?.kind.charAt(0).toUpperCase() + stats?.kind.slice(1);
-
-  return (
-    <StatsRow
-      show={isNotNullish(stats?.packetsLost) && isNotNullish(stats?.packetsLostRate)}
-      label={`Packet Loss (${trackType === 'Video' ? 'V' : 'A'})`}
-      value={`${stats?.packetsLost}(${packetsLostRate})`}
-    />
-  );
-};
-
-export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
-  const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
-
-  const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
-  const rootRef = useRef<HTMLDivElement>(null);
-  const containerStyle: React.CSSProperties = {};
-  const parentHeight = rootRef.current?.parentElement?.clientHeight || 0;
-  const parentWidth = rootRef.current?.parentElement?.clientWidth || 0;
-  const compact = parentHeight < 300;
-  if (compact) {
-    containerStyle.width = `calc(${parentWidth}px - 1rem)`;
-    containerStyle.maxHeight = parentHeight * 0.75;
-    containerStyle.overflowY = 'auto';
-  }
-  // Viewer role - no stats to show
-  if (!(audioTrackStats || videoTrackStats)) {
-    return null;
-  }
-  return (
-    <Stats.Root style={containerStyle} ref={rootRef} compact={compact}>
-      <table>
-        <tbody>
-          {videoTrackStats?.frameWidth ? (
-            <StatsRow label="Width" value={videoTrackStats?.frameWidth.toString()} />
-          ) : null}
-          {videoTrackStats?.frameHeight ? (
-            <StatsRow label="Height" value={videoTrackStats?.frameHeight.toString()} />
-          ) : null}
-
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.framesPerSecond)}
-            label="FPS"
-            value={`${videoTrackStats?.framesPerSecond} ${
-              isNotNullish(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
-            }`}
-          />
-
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.bitrate)}
-            label="Bitrate (V)"
-            value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
-          />
-
-          <StatsRow
-            show={isNotNullish(audioTrackStats?.bitrate)}
-            label="Bitrate (A)"
-            value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
-          />
-
-          <TrackPacketsLostRow stats={videoTrackStats} />
-          <TrackPacketsLostRow stats={audioTrackStats} />
-
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.jitter)}
-            label="Jitter (V)"
-            value={videoTrackStats?.jitter?.toString()}
-          />
-
-          <StatsRow
-            show={isNotNullish(audioTrackStats?.jitter)}
-            label="Jitter (A)"
-            value={audioTrackStats?.jitter?.toString()}
-          />
-        </tbody>
-      </table>
-    </Stats.Root>
-  );
+export function isNotNullishAndNot0(value: number | undefined | null) {
+  return isNotNullish(value) && value !== 0;
 }
 
 /**
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNotNullish(value: any) {
+export function isNotNullish(value: number | undefined | null) {
   return value !== undefined && value !== null;
 }

@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.5-alpha.8",
+  "version": "0.0.5",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -32,7 +32,7 @@
     "react": "^17.0.1"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.2.88-alpha.6",
+    "@100mslive/hms-video-store": "0.2.88",
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"

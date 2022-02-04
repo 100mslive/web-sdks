@@ -34,7 +34,7 @@ export class HMSWebrtcInternals {
   }
 
   private handleStatsUpdate = async () => {
-    await this.hmsStats?.updateStats(this.hmsStats);
+    await this.hmsStats?.updateStats();
     this.eventBus.statsUpdate.publish(this.hmsStats);
   };
 

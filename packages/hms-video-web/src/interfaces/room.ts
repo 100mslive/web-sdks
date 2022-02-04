@@ -1,4 +1,5 @@
 import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
+import { ServerError } from './internal';
 
 export enum HMSRoomType {
   DEFAULT,
@@ -14,9 +15,9 @@ export interface HMSRoom {
   shareableLink: string;
   type: HMSRoomType;
   hasWaitingRoom: boolean;
-  recording?: HMSRecording;
-  rtmp?: HMSRTMP;
-  hls?: HMSHLS;
+  recording: HMSRecording;
+  rtmp: HMSRTMP;
+  hls: HMSHLS;
   peerCount?: number;
 }
 
@@ -24,10 +25,12 @@ export interface HMSRecording {
   browser: {
     running: boolean;
     startedAt?: Date;
+    error?: ServerError;
   };
   server: {
     running: boolean;
     startedAt?: Date;
+    error?: ServerError;
   };
 }
 
@@ -37,11 +40,13 @@ export interface HMSRTMP {
    * @alpha
    **/
   startedAt?: Date;
+  error?: ServerError;
 }
 
 export interface HMSHLS {
   running: boolean;
   variants: Array<HLSVariant>;
+  error?: ServerError;
 }
 
 export interface HLSVariant {
