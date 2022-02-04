@@ -62,7 +62,7 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
   useEffect(() => {
     // Stop on leave
     return () => {
-      audioRef.current.pause();
+      audioRef.current?.pause();
       setPlaying(false);
     };
   }, []);
