@@ -7,7 +7,8 @@ export function TranscriptionButton() {
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
   const transcriber = useRef(null);
 
-  const hmsActions = useHMSActions()
+  //Commenting the Brodcasting part to ensure the local transcription working
+  /*const hmsActions = useHMSActions()
   const notification = useHMSNotifications()
   useEffect(() => {
     if(notification && notification.type === "NEW_MESSAGE" && notification.data?.type === "Transcription" && notification.data?.message){
@@ -15,17 +16,17 @@ export function TranscriptionButton() {
         document.getElementById("speechtxt").innerText = showTxt || ""
         enableTranscription(true)
     }
-  }, [notification])
+  }, [notification])*/
 
-  const enableTranscription = (setas) => {
+  const enableTranscription = () => {
     if (!transcriber.current) {
       transcriber.current = new Transcriber();
       transcriber.current.enabled = false;
-      transcriber.current.setBroadcast((data) => {
+      /*transcriber.current.setBroadcast((data) => {
           hmsActions.sendBroadcastMessage(data, "Transcription")
-      });
+      });*/
     }
-    transcriber.current.enableTranscription(setas || !isTranscriptionEnabled);
+    transcriber.current.enableTranscription(!isTranscriptionEnabled);
     setIsTranscriptionEnabled(!isTranscriptionEnabled);
   };
 
@@ -65,6 +66,12 @@ class Transcriber {
 
   async listen(){
     try {
+      let streams = []
+      window.__hms.sdk.getPeers().map(p => {
+        if (!p.isLocal) {
+          streams.push(new MediaStream([p.audioTrack.nativeTrack]))
+        }
+      }).filter(x => !!x)
       let url = process.env.REACT_APP_DYNAMIC_STT_TOKEN_GENERATION_ENDPOINT
       let res = await fetch(url);
       let body = await res.json();
@@ -77,7 +84,12 @@ class Transcriber {
         document.getElementById("speechtxt").innerText = ""
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
-            if(res.text != "" && startTime){
+            if(res.text && res.text != "" && this.enabled){
+              document.getElementById("speechtxt").innerText = res.text;
+            }
+
+            //Temporarly Commenting Broadcasting part 
+            /*if(res.text != "" && startTime){
               this.broadcast(res.text)
               this.totalCount++
               endTime = performance.now();
@@ -85,7 +97,7 @@ class Transcriber {
               if(this.totalCount % 100 === 0 || this.totalCount < 2){
                 console.log("Average Transcription Latency:", this.totalTimeDiff / this.totalCount, " ms")
               }
-            }
+            }*/
         };
   
         this.socket.onerror = (event) => {
@@ -96,41 +108,16 @@ class Transcriber {
         this.socket.onclose = event => {
             console.log(event);
             this.socket = null;
+            if(this.enabled){
+              this.listen()
+            }
         }
   
         this.socket.onopen = () => {
           document.getElementById("speechtxt").style.display = '';
-          navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation : true })
-          .then((stream) => {
-              let recorder = new RecordRTC(stream, {
-              type: 'audio',
-              mimeType: 'audio/webm;codecs=pcm',
-              recorderType: StereoAudioRecorder,
-              timeSlice: 250,
-              desiredSampRate: 16000,
-              numberOfAudioChannels: 1,
-              bufferSize: 4096,
-              audioBitsPerSecond: 128000,
-              ondataavailable: (blob) => {
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                  const base64data = reader.result;
-                  if (this.socket && this.enabled) {
-                    try{
-                      startTime = performance.now();
-                      this.socket.send(JSON.stringify({ audio_data: base64data.split('base64,')[1] }));
-                    } catch (err) {
-                      console.log(err)
-                    }
-                  }
-                  };
-                  reader.readAsDataURL(blob);
-              },
-              });
-  
-              recorder.startRecording();
-          })
-          .catch((err) => console.error(err));
+          for (let stream of streams) {
+            this.observeStream(stream)
+          }
         };
       }else{
         console.log("Unable to fetch dynamic token!!")
@@ -141,9 +128,37 @@ class Transcriber {
     }
   }
 
+  observeStream(stream) {
+    let recorder = new RecordRTC(stream, {
+      type: 'audio',
+      mimeType: 'audio/webm;codecs=pcm',
+      recorderType: StereoAudioRecorder,
+      timeSlice: 250,
+      desiredSampRate: 16000,
+      numberOfAudioChannels: 1,
+      bufferSize: 4096,
+      audioBitsPerSecond: 128000,
+      ondataavailable: (blob) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+          const base64data = reader.result;
+          if (this.socket && this.enabled) {
+            try{
+              this.socket.send(JSON.stringify({ audio_data: base64data.split('base64,')[1] }));
+            } catch (err) {
+              console.log(err)
+            }
+          }
+          };
+          reader.readAsDataURL(blob);
+      },
+    });
+    recorder.startRecording();
+  }
+
   enableTranscription(enable) {
     if (enable && !this.enabled) {
-      document.getElementById("speechtxt").innerText = "[  Transcription is initializing.. ]";
+      document.getElementById("speechtxt").innerText = "[ Initializing Transcription.. ]";
       this.enabled = true;
       this.listen()
     } else if (!enable && this.enabled) {
