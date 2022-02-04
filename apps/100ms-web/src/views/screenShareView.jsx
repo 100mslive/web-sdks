@@ -326,7 +326,7 @@ const LargeTilePeerView = ({
           showStatsOnTiles={showStatsOnTiles}
           width="100%"
           height="100%"
-          peerId={peerScreenSharing.id}
+          trackId={peerScreenSharing.videoTrack}
         />
       ) : (
         <VideoTile
