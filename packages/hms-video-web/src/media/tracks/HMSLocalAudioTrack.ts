@@ -200,12 +200,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-
     if (hasPropertyChanged('deviceId')) {
       const isLevelMonitored = Boolean(this.audioLevelMonitor);
       HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
       isLevelMonitored && this.destroyAudioLevelMonitor();
-      this.enabled && (await this.replaceTrackWith(settings));
+      await this.replaceTrackWith(settings);
       isLevelMonitored && this.initAudioLevelMonitor();
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {
