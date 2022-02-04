@@ -35,23 +35,21 @@ export interface useDevicesResult {
  */
 export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useDevicesResult => {
   const hmsActions = useHMSActions();
-  const allDevices: DeviceTypeInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
+  const sdkAllDevices: DeviceTypeInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
   const selectedDeviceIDs: DeviceTypeInfo<string> = {
-    [DeviceType.audioInput]: sdkSelectedDevices.audioInputDeviceId,
     [DeviceType.audioOutput]: sdkSelectedDevices.audioOutputDeviceId,
-    [DeviceType.videoInput]: sdkSelectedDevices.videoInputDeviceId,
   };
 
-  if (!isAllowedToPublish.video) {
-    delete allDevices[DeviceType.videoInput];
-    delete selectedDeviceIDs[DeviceType.videoInput];
+  if (isAllowedToPublish.video) {
+    sdkAllDevices[DeviceType.videoInput] = sdkAllDevices.videoInput;
+    selectedDeviceIDs[DeviceType.videoInput] = sdkSelectedDevices.videoInputDeviceId;
   }
-  if (!isAllowedToPublish.audio) {
-    delete allDevices[DeviceType.audioInput];
-    delete selectedDeviceIDs[DeviceType.audioInput];
+  if (isAllowedToPublish.audio) {
+    sdkAllDevices[DeviceType.audioInput] = sdkAllDevices.audioInput;
+    selectedDeviceIDs[DeviceType.audioInput] = sdkSelectedDevices.audioInputDeviceId;
   }
 
   const updateDevice = useCallback(
@@ -76,7 +74,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   );
 
   return {
-    allDevices,
+    allDevices: sdkAllDevices,
     selectedDeviceIDs,
     updateDevice,
   };
