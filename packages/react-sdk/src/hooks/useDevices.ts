@@ -51,13 +51,16 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   const selectedDeviceIDs: DeviceTypeAndInfo<string> = {
     [DeviceType.audioOutput]: sdkSelectedDevices.audioOutputDeviceId,
   };
+  const allDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = {
+    [DeviceType.audioOutput]: sdkAllDevices.audioOutput,
+  };
 
   if (isAllowedToPublish.video) {
-    sdkAllDevices[DeviceType.videoInput] = sdkAllDevices.videoInput;
+    allDevices[DeviceType.videoInput] = sdkAllDevices.videoInput;
     selectedDeviceIDs[DeviceType.videoInput] = sdkSelectedDevices.videoInputDeviceId;
   }
   if (isAllowedToPublish.audio) {
-    sdkAllDevices[DeviceType.audioInput] = sdkAllDevices.audioInput;
+    allDevices[DeviceType.audioInput] = sdkAllDevices.audioInput;
     selectedDeviceIDs[DeviceType.audioInput] = sdkSelectedDevices.audioInputDeviceId;
   }
 
@@ -83,7 +86,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   );
 
   return {
-    allDevices: sdkAllDevices,
+    allDevices,
     selectedDeviceIDs,
     updateDevice,
   };
