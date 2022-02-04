@@ -24,21 +24,15 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
   const alone = peerCount === 1;
 
   useEffect(() => {
-    if (alone) {
+    if (alone && !cbTimeout.current) {
       cbTimeout.current = setTimeout(() => {
         setAloneForLong(true);
       }, thresholdMs);
-    } else {
+    } else if (!alone) {
       cbTimeout.current && clearTimeout(cbTimeout.current);
       cbTimeout.current = null;
       setAloneForLong(false);
     }
-
-    return () => {
-      cbTimeout.current && clearTimeout(cbTimeout.current);
-      cbTimeout.current = null;
-      setAloneForLong(false);
-    };
   }, [alone, thresholdMs]);
 
   return { alone, aloneForLong };
