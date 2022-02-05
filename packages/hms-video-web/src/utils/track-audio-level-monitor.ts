@@ -1,12 +1,9 @@
-/**
- * Refer: https://github.com/cwilso/volume-meter/blob/master/volume-meter.js
- */
-
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
 import { HMSAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
+import { sleep } from './timer-utils';
 
-const THRESHOLD = 35;
+const THRESHOLD = 15;
 const UPDATE_THRESHOLD = 5;
 
 export interface ITrackAudioLevelUpdate {
@@ -16,77 +13,89 @@ export interface ITrackAudioLevelUpdate {
 
 export class TrackAudioLevelMonitor {
   private readonly TAG = '[TrackAudioLevelMonitor]';
-  private interval?: number;
-  private audioContext?: AudioContext;
-  private audioSource?: MediaStreamAudioSourceNode;
-  // @TODO: ScriptProcessorNode Deprecated - Replace with audio analyer node
-  private processor?: ScriptProcessorNode;
-  private averaging = 0.99;
+  private isMonitored = false;
+  private interval = 1000;
+  private analyserNode?: AnalyserNode;
   private audioLevel = 0;
-  private rawLevel = 0;
 
-  private updateAudioLevel(value: number) {
-    const audioLevel = Math.ceil(Math.min(value * 400, 100));
-    if (audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD) {
+  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
+    try {
+      const stream = new MediaStream([this.track.nativeTrack]);
+      this.analyserNode = this.createAnalyserNodeForStream(stream);
+    } catch (ex) {
+      HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
+    }
+  }
+
+  start() {
+    this.stop();
+    this.isMonitored = true;
+    HMSLogger.d(this.TAG, 'Starting track Monitor', this.track);
+    this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', this.track));
+  }
+
+  stop() {
+    if (!this.analyserNode) {
+      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      return;
+    }
+
+    this.updateAudioLevel(0);
+    this.isMonitored = false;
+  }
+
+  private async loop() {
+    while (this.isMonitored) {
+      this.updateAudioLevel(this.calculateAudioLevel());
+      await sleep(this.interval);
+    }
+  }
+
+  private updateAudioLevel(audioLevel = 0) {
+    const isSignificantChange =
+      audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
+    if (isSignificantChange) {
       this.audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
       const audioLevelUpdate = this.audioLevel ? { track: this.track, audioLevel: this.audioLevel } : undefined;
       this.audioLevelEvent.publish(audioLevelUpdate);
     }
   }
 
-  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
-    try {
-      this.audioContext = new AudioContext();
-      this.audioSource = this.audioContext.createMediaStreamSource(new MediaStream([this.track.nativeTrack]));
-      this.processor = this.audioContext.createScriptProcessor(512);
-      this.processor.addEventListener('audioprocess', this.processVolume);
-      this.audioSource.connect(this.processor);
-      this.processor.connect(this.audioContext.destination);
-    } catch (ex) {
-      HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
-    }
-  }
-
-  private processVolume = (event: AudioProcessingEvent) => {
-    const input = event.inputBuffer.getChannelData(0);
-    // Calculating root mean square
-    let sum = 0.0;
-    for (let i = 0; i < input.length; ++i) {
-      sum += input[i] * input[i];
-    }
-    const rms = Math.sqrt(sum / input.length);
-    this.rawLevel = Math.max(rms, this.rawLevel * this.averaging);
-  };
-
-  start() {
-    if (!this.isInitialized()) {
+  /**
+   * Ref: https://github.com/aws/amazon-chime-sdk-js/blob/main/demos/browser/app/meetingV2/meetingV2.ts#L2738-L2745
+   */
+  private calculateAudioLevel() {
+    if (!this.analyserNode) {
       HMSLogger.w(this.TAG, 'AudioContext not initialized');
       return;
     }
 
-    let prev = -1;
-    this.interval = window.setTimeout(() => {
-      if (this.rawLevel !== prev) {
-        // only send an update when there is a change
-        prev = this.rawLevel;
-        this.updateAudioLevel(this.rawLevel);
-      }
-      this.start();
-    }, 1000);
-  }
+    const data = new Uint8Array(this.analyserNode.fftSize);
+    this.analyserNode.getByteTimeDomainData(data);
+    const lowest = 0.009;
+    let max = lowest;
+    for (const f of data) {
+      max = Math.max(max, (f - 128) / 128);
+    }
+    const normalized = (Math.log(lowest) - Math.log(max)) / Math.log(lowest);
+    const percent = Math.ceil(Math.min(Math.max(normalized * 100, 0), 100));
 
-  stop() {
-    if (!this.isInitialized()) {
-      HMSLogger.w(this.TAG, 'AudioContext not initialized');
-      return;
+    /**
+     * Running Average on the difference between 100ms SFU audio leveland calculated percent
+     * showed a difference of 15, hence adding 15 to compensate
+     */
+    if (percent !== 0) {
+      return percent + 15;
     }
 
-    this.updateAudioLevel(0);
-    window.clearInterval(this.interval);
-    this.interval = undefined;
+    return percent;
   }
 
-  isInitialized() {
-    return Boolean(this.audioContext && this.audioSource && this.processor);
+  private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser() as AnalyserNode;
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    return analyser;
   }
 }
