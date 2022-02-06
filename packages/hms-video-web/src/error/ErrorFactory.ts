@@ -186,6 +186,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    NoAudioDetected(action: HMSAction, description = 'Please check the mic or use another audio input') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.NO_AUDIO_DETECTED,
+        'NoAudioDetected',
+        action,
+        'No audio input detected from microphone',
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {
