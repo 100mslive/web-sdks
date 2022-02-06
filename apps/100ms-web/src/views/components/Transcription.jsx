@@ -54,6 +54,8 @@ class Transcriber {
     this.socket = null;
     this.totalTimeDiff = 0
     this.totalCount = 0
+    this.allstreams = {};
+    this.streams = {}
   }
 
   setBroadcast(cb){
@@ -66,11 +68,9 @@ class Transcriber {
 
   async listen(){
     try {
-      let streams = []
-      window.__hms.sdk.getPeers().map(p => {
-        if (!p.isLocal) {
-          streams.push(new MediaStream([p.audioTrack.nativeTrack]))
-        }
+      this.allstreams = window.__hms.sdk.getPeers()
+      this.allstreams.map(p => {
+        this.streams[p.peerId] = { "stream" : new MediaStream([p.audioTrack.nativeTrack]) , "name" : p.name}
       }).filter(x => !!x)
       let url = process.env.REACT_APP_DYNAMIC_STT_TOKEN_GENERATION_ENDPOINT
       let res = await fetch(url);
@@ -115,20 +115,19 @@ class Transcriber {
   
         this.socket.onopen = () => {
           document.getElementById("speechtxt").style.display = '';
-          for (let stream of streams) {
-            this.observeStream(stream)
+          for(let i in this.streams) {
+            this.observeStream(this.streams[i]["stream"], this.streams[i]["name"]);
           }
         };
       }else{
         console.log("Unable to fetch dynamic token!!")
       }
-      
     } catch (err) {
       console.log(err)
     }
   }
 
-  observeStream(stream) {
+  observeStream(stream, name = "") {
     let recorder = new RecordRTC(stream, {
       type: 'audio',
       mimeType: 'audio/webm;codecs=pcm',
@@ -139,18 +138,18 @@ class Transcriber {
       bufferSize: 4096,
       audioBitsPerSecond: 128000,
       ondataavailable: (blob) => {
-          const reader = new FileReader();
-          reader.onload = () => {
+        const reader = new FileReader();
+        reader.onload = () => {
           const base64data = reader.result;
-          if (this.socket && this.enabled) {
+          if (this.socket && this.enabled && this.socket.readyState && this.socket.readyState === 1) {
             try{
               this.socket.send(JSON.stringify({ audio_data: base64data.split('base64,')[1] }));
             } catch (err) {
               console.log(err)
             }
           }
-          };
-          reader.readAsDataURL(blob);
+        };
+        reader.readAsDataURL(blob);
       },
     });
     recorder.startRecording();
