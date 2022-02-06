@@ -3,7 +3,7 @@ import { HMSAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
 import { sleep } from './timer-utils';
 
-const THRESHOLD = 15;
+const THRESHOLD = 35;
 const UPDATE_THRESHOLD = 5;
 
 export interface ITrackAudioLevelUpdate {
@@ -13,12 +13,16 @@ export interface ITrackAudioLevelUpdate {
 
 export class TrackAudioLevelMonitor {
   private readonly TAG = '[TrackAudioLevelMonitor]';
+  private audioLevel = 0;
+  private analyserNode?: AnalyserNode;
   private isMonitored = false;
   private interval = 1000;
-  private analyserNode?: AnalyserNode;
-  private audioLevel = 0;
+  private silenceTimeout?: ReturnType<typeof setTimeout>;
 
-  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
+  constructor(
+    private track: HMSAudioTrack,
+    private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate | undefined>,
+  ) {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
@@ -26,6 +30,30 @@ export class TrackAudioLevelMonitor {
       HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
     }
   }
+
+  /**
+   * Detects silence by resolving to true if the audio track remains silent for threshold ms.
+   * Resolves to false on valid audio input
+   */
+  detectSilence = async (threshold = 5000) => {
+    let thresholdPassed = false;
+    this.silenceTimeout = setTimeout(() => {
+      thresholdPassed = true;
+    }, threshold);
+
+    /**
+     * Stop when cleaned up(timeout cleared) or threshold has passed
+     */
+    while (this.silenceTimeout && !thresholdPassed) {
+      const level = this.calculateAudioLevel();
+      if (level !== 0) {
+        return false;
+      }
+      await sleep(300);
+    }
+
+    return true;
+  };
 
   start() {
     this.stop();
@@ -52,6 +80,14 @@ export class TrackAudioLevelMonitor {
   }
 
   private updateAudioLevel(audioLevel = 0) {
+    /**
+     * Running Average on the difference between 100ms SFU audio leveland calculated percent
+     * showed a difference of 15, hence adding 15 to compensate
+     */
+    if (audioLevel !== 0) {
+      audioLevel = Math.min(audioLevel + 15, 100); // if exceeds 100
+    }
+
     const isSignificantChange =
       audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
     if (isSignificantChange) {
@@ -79,15 +115,6 @@ export class TrackAudioLevelMonitor {
     }
     const normalized = (Math.log(lowest) - Math.log(max)) / Math.log(lowest);
     const percent = Math.ceil(Math.min(Math.max(normalized * 100, 0), 100));
-
-    /**
-     * Running Average on the difference between 100ms SFU audio leveland calculated percent
-     * showed a difference of 15, hence adding 15 to compensate
-     */
-    if (percent !== 0) {
-      return percent + 15;
-    }
-
     return percent;
   }
 
