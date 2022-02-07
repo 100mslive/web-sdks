@@ -22,6 +22,7 @@ import {
   HMSLocalVideoTrack,
   HMSRemoteTrack,
   HMSRemoteVideoTrack,
+  HMSAudioTrack,
   HMSTrackSource,
   HMSTrackType,
 } from '../media/tracks';
@@ -149,6 +150,17 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getAudioElementForTrack(trackId: string) {
+    const track = this.store.getTrackById(trackId);
+    if (!track) {
+      throw Error('Track not found');
+    }
+    if (track.type !== 'audio') {
+      throw Error('Passed trackId is not of audio track');
+    }
+    return (track as HMSAudioTrack).getAudioElement();
   }
 
   private handleAutoplayError = (event: AutoplayEvent) => {

@@ -166,6 +166,13 @@ export interface IHMSActions {
   detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
 
   /**
+   * Get the audio element that plays the remote audio. This can be used to apply any effects to the
+   * eg: sptial audio
+   * @param trackId
+   */
+  getAudioElementForTrack(trackId: HMSTrackID): HTMLAudioElement | null;
+
+  /**
    * Set the output volume of audio tracks(overall/particular audio track)
    * @param value number between 0-100
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track

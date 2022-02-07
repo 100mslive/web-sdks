@@ -27,6 +27,7 @@ export default interface HMS {
   getAudioOutput(): IAudioOutputManager;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
+  getAudioElementForTrack(trackId: string): HTMLAudioElement | null;
 
   changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;

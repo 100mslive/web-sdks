@@ -111,6 +111,11 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
+  getAudioElementForTrack(trackId: string) {
+    const track = this.hmsSDKTracks[trackId];
+    return this.sdk.getAudioElementForTrack(track.trackId);
+  }
+
   setVolume(value: number, trackId?: HMSTrackID): void {
     if (trackId) {
       this.setTrackVolume(value, trackId);
