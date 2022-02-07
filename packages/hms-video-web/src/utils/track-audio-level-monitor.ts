@@ -16,7 +16,8 @@ export class TrackAudioLevelMonitor {
   private audioLevel = 0;
   private analyserNode?: AnalyserNode;
   private isMonitored = false;
-  private interval = 500;
+  private interval = 1000;
+  private queryInterval = 100;
   private silenceTimeout?: ReturnType<typeof setTimeout>;
 
   constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
@@ -65,25 +66,18 @@ export class TrackAudioLevelMonitor {
       return;
     }
 
-    this.updateAudioLevel(0);
+    this.sendAudioLevel(0);
     this.isMonitored = false;
   }
 
   private async loop() {
     while (this.isMonitored) {
-      this.updateAudioLevel(this.calculateAudioLevel());
-      await sleep(this.interval);
+      const audioLevel = await this.getMaxAudioLevelOverPeriod();
+      this.sendAudioLevel(audioLevel);
     }
   }
 
-  private updateAudioLevel(audioLevel = 0) {
-    /**
-     * Running Average on the difference between 100ms SFU audio leveland calculated percent
-     * showed a difference of 15, hence adding 15 to compensate
-     */
-    if (audioLevel !== 0) {
-      audioLevel = Math.min(audioLevel + 15, 100); // if exceeds 100
-    }
+  private sendAudioLevel(audioLevel = 0) {
     audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
     const isSignificantChange =
       audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
@@ -92,6 +86,24 @@ export class TrackAudioLevelMonitor {
       const audioLevelUpdate: ITrackAudioLevelUpdate = { track: this.track, audioLevel: this.audioLevel };
       this.audioLevelEvent.publish(audioLevelUpdate);
     }
+  }
+
+  private async getMaxAudioLevelOverPeriod() {
+    if (!this.analyserNode) {
+      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      return;
+    }
+
+    let iterationsleft = this.interval / this.queryInterval;
+    let audioLevel = 0;
+    while (iterationsleft) {
+      const newAudioLevel = this.calculateAudioLevel() || 0;
+      audioLevel = Math.max(newAudioLevel, audioLevel);
+      iterationsleft--;
+      await sleep(this.queryInterval);
+    }
+
+    return audioLevel;
   }
 
   /**
