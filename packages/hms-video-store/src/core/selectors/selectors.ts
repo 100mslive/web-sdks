@@ -73,7 +73,9 @@ export const selectIsConnectedToRoom = createSelector([selectRoom], room => room
 
 /**
  * selectPeerCount gives the number of peers Inside the room. This doesn't count the local peer if
- * they're still in preview and haven't yet joined the room.
+ * they're still in preview and haven't yet joined the room. Note that this will not necessarily equal the
+ * number of peers received through selectPeers, it's possible to know total number of people in the room
+ * without having details of everyone depending on dashboard settings.
  */
 export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
   if (isConnected) {
