@@ -18,7 +18,6 @@ export class TrackAudioLevelMonitor {
   private isMonitored = false;
   private interval = 1000;
   private queryInterval = 100;
-  private silenceTimeout?: ReturnType<typeof setTimeout>;
 
   constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
     try {
@@ -35,22 +34,24 @@ export class TrackAudioLevelMonitor {
    */
   detectSilence = async (threshold = 5000) => {
     let thresholdPassed = false;
-    this.silenceTimeout = setTimeout(() => {
+    setTimeout(() => {
       thresholdPassed = true;
     }, threshold);
 
-    /**
-     * Stop when cleaned up(timeout cleared) or threshold has passed
-     */
-    while (this.silenceTimeout && !thresholdPassed) {
-      const level = this.calculateAudioLevel();
-      if (level !== 0) {
+    let mutedWhileProcessing = !this.track.enabled;
+
+    while (!thresholdPassed) {
+      mutedWhileProcessing = !this.track.enabled;
+      if (this.track.enabled && !this.isSilentThisInstant()) {
         return false;
       }
       await sleep(300);
     }
 
-    return true;
+    /**
+     * If the track remained muted while processing, return false as no actual checking happened on muted track
+     */
+    return !mutedWhileProcessing;
   };
 
   start() {
@@ -125,6 +126,19 @@ export class TrackAudioLevelMonitor {
     const normalized = (Math.log(lowest) - Math.log(max)) / Math.log(lowest);
     const percent = Math.ceil(Math.min(Math.max(normalized * 100, 0), 100));
     return percent;
+  }
+
+  private isSilentThisInstant() {
+    if (!this.analyserNode) {
+      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      return;
+    }
+
+    const data = new Uint8Array(this.analyserNode.fftSize);
+    this.analyserNode.getByteTimeDomainData(data);
+
+    // For absolute silence(in case of mic/software failures), all frequencies are 128 or 0.
+    return !data.some(frequency => frequency !== 128 && frequency !== 0);
   }
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
