@@ -28,14 +28,14 @@ import { HmsTileMenu } from "../UIComponents";
 
 const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectTrackByID(trackId));
-  const isScreenShare = track.source === "screen";
-  const peer = useHMSStore(selectPeerByID(track.peerId));
-  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track.peerId));
-  const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track.peerId));
+  const isScreenShare = track?.source === "screen";
+  const peer = useHMSStore(selectPeerByID(track?.peerId));
+  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track?.peerId));
+  const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track?.peerId));
   const [showTrigger, setShowTrigger] = useState(false);
-  const isHandRaised =
-    useHMSStore(selectPeerMetadata(track.peerId))?.isHandRaised || false;
-  const isBRB = useHMSStore(selectPeerMetadata(track.peerId))?.isBRBOn || false;
+  const metaData = useHMSStore(selectPeerMetadata(track?.peerId));
+  const isHandRaised = metaData?.isHandRaised || false;
+  const isBRB = metaData?.isBRBOn || false;
   const isLocallyMuted = useHMSStore(
     selectIsAudioLocallyMuted(peer.audioTrack)
   );
