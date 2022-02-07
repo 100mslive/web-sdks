@@ -37,11 +37,11 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
   const isLocallyMuted = useHMSStore(
-    selectIsAudioLocallyMuted(peer.audioTrack)
+    selectIsAudioLocallyMuted(peer?.audioTrack)
   );
   const label = getVideoTileLabel(
-    peer.name,
-    peer.isLocal,
+    peer?.name,
+    peer?.isLocal,
     track?.source,
     isLocallyMuted,
     track?.degraded
@@ -53,55 +53,57 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   });
   return (
     <StyledVideoTile.Root css={{ width, height }}>
-      <StyledVideoTile.Container
-        ref={ref}
-        onMouseEnter={() => setShowTrigger(true)}
-        onMouseLeave={() => {
-          setShowTrigger(false);
-        }}
-      >
-        {showStatsOnTiles ? (
-          <VideoTileStats
-            audioTrackID={peer?.audioTrack}
-            videoTrackID={track.id}
-          />
-        ) : null}
-        {isScreenShare ? (
-          <FullScreenButton onClick={() => toggle()}>
-            {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
-          </FullScreenButton>
-        ) : null}
-        <AudioLevel audioTrack={peer?.audioTrack} />
-        {track ? (
-          <Video
-            screenShare={isScreenShare}
-            mirror={peer.isLocal && track?.source === "regular"}
-            trackId={track.id}
-          />
-        ) : null}
-        {isVideoMuted && !isScreenShare ? (
-          <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
-        ) : null}
-        <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-        {isAudioMuted && !isScreenShare ? (
-          <StyledVideoTile.AudioIndicator>
-            <MicOffIcon />
-          </StyledVideoTile.AudioIndicator>
-        ) : null}
-        {showTrigger && !peer?.isLocal ? (
-          <HmsTileMenu peerId={track.peerId} />
-        ) : null}
-        {isHandRaised ? (
-          <StyledVideoTile.AttributeBox>
-            <HandRaiseFilledIcon width={40} height={40} />
-          </StyledVideoTile.AttributeBox>
-        ) : null}
-        {isBRB ? (
-          <StyledVideoTile.AttributeBox>
-            <BrbIcon width={40} height={40} />
-          </StyledVideoTile.AttributeBox>
-        ) : null}
-      </StyledVideoTile.Container>
+      {peer ? (
+        <StyledVideoTile.Container
+          ref={ref}
+          onMouseEnter={() => setShowTrigger(true)}
+          onMouseLeave={() => {
+            setShowTrigger(false);
+          }}
+        >
+          {showStatsOnTiles ? (
+            <VideoTileStats
+              audioTrackID={peer?.audioTrack}
+              videoTrackID={track?.id}
+            />
+          ) : null}
+          {isScreenShare ? (
+            <FullScreenButton onClick={() => toggle()}>
+              {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
+            </FullScreenButton>
+          ) : null}
+          <AudioLevel audioTrack={peer?.audioTrack} />
+          {track ? (
+            <Video
+              screenShare={isScreenShare}
+              mirror={peer.isLocal && track?.source === "regular"}
+              trackId={track.id}
+            />
+          ) : null}
+          {isVideoMuted && !isScreenShare ? (
+            <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
+          ) : null}
+          <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
+          {isAudioMuted && !isScreenShare ? (
+            <StyledVideoTile.AudioIndicator>
+              <MicOffIcon />
+            </StyledVideoTile.AudioIndicator>
+          ) : null}
+          {showTrigger && !peer?.isLocal ? (
+            <HmsTileMenu peerId={track.peerId} />
+          ) : null}
+          {isHandRaised ? (
+            <StyledVideoTile.AttributeBox>
+              <HandRaiseFilledIcon width={40} height={40} />
+            </StyledVideoTile.AttributeBox>
+          ) : null}
+          {isBRB ? (
+            <StyledVideoTile.AttributeBox>
+              <BrbIcon width={40} height={40} />
+            </StyledVideoTile.AttributeBox>
+          ) : null}
+        </StyledVideoTile.Container>
+      ) : null}
     </StyledVideoTile.Root>
   );
 };
