@@ -28,10 +28,10 @@ export function useAudioLevelStyles({
           return;
         }
         const styles = getStyle(level);
-        for (const key in styles) {
+        for (const key in Object.keys(styles)) {
           ref.current.style[key] = styles[key];
         }
       }, selectTrackAudioByID(trackId)),
-    [trackId],
+    [getStyle, ref, store, trackId],
   );
 }

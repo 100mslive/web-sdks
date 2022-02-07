@@ -72,7 +72,7 @@ export const useRemoteAVToggle = (
 
   const toggleVideo = useCallback(async () => {
     await toggleTrackEnabled(actions, videoTrack, handleError);
-  }, [actions, audioTrack, handleError]);
+  }, [actions, handleError, videoTrack]);
 
   const setVolume = useCallback(
     (volume: number) => {
@@ -87,8 +87,8 @@ export const useRemoteAVToggle = (
     isAudioEnabled: !!audioTrack?.enabled,
     isVideoEnabled: !!videoTrack?.enabled,
     volume,
-    toggleAudio: canToggleAudio ? toggleAudio : undefined,
-    toggleVideo: canToggleVideo ? toggleVideo : undefined,
+    toggleAudio: audioTrack && canToggleAudio ? toggleAudio : undefined,
+    toggleVideo: videoTrack && canToggleVideo ? toggleVideo : undefined,
     setVolume: audioTrack ? setVolume : undefined,
   };
 };

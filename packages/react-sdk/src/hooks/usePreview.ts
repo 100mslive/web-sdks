@@ -67,7 +67,7 @@ export const usePreview = ({
       rememberDeviceSelection: true,
       initEndpoint: initEndpoint,
     };
-  }, [name, token, metadata]);
+  }, [name, token, metadata, initEndpoint]);
 
   useEffect(() => {
     (async () => {
@@ -83,7 +83,7 @@ export const usePreview = ({
         handleError(err as Error, 'preview');
       }
     })();
-  }, [actions, token]);
+  }, [actions, config, handleError, roomState, token]);
 
   const join = useCallback(() => {
     if (!token) {
@@ -94,7 +94,7 @@ export const usePreview = ({
     } catch (err) {
       handleError(err as Error, 'join');
     }
-  }, [actions, token]);
+  }, [actions, config, handleError, token]);
 
   return {
     enableJoin,

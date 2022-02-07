@@ -43,7 +43,7 @@ export interface useDevicesResult {
  * @param handleError error handler for any errors during device change
  */
 export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useDevicesResult => {
-  const hmsActions = useHMSActions();
+  const actions = useHMSActions();
   const sdkAllDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -69,20 +69,20 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
       try {
         switch (deviceType) {
           case DeviceType.audioInput:
-            await hmsActions.setAudioSettings({ deviceId });
+            await actions.setAudioSettings({ deviceId });
             break;
           case DeviceType.videoInput:
-            await hmsActions.setVideoSettings({ deviceId });
+            await actions.setVideoSettings({ deviceId });
             break;
           case DeviceType.audioOutput:
-            await hmsActions.setAudioOutputDevice(deviceId);
+            await actions.setAudioOutputDevice(deviceId);
             break;
         }
       } catch (err) {
         handleError(err as Error, 'updateDevices');
       }
     },
-    [hmsActions],
+    [handleError, actions],
   );
 
   return {
