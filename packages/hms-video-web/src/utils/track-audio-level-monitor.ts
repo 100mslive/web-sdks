@@ -84,11 +84,11 @@ export class TrackAudioLevelMonitor {
     if (audioLevel !== 0) {
       audioLevel = Math.min(audioLevel + 15, 100); // if exceeds 100
     }
-
+    audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
     const isSignificantChange =
       audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
     if (isSignificantChange) {
-      this.audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
+      this.audioLevel = audioLevel;
       const audioLevelUpdate: ITrackAudioLevelUpdate = { track: this.track, audioLevel: this.audioLevel };
       this.audioLevelEvent.publish(audioLevelUpdate);
     }
