@@ -170,14 +170,24 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     </Tooltip>
   );
   leftComponents.push(
-    <IconButton
-      onClick={() => setWhiteboardEnabled(!whiteboardEnabled)}
-      active={!whiteboardEnabled}
-      disabled={whiteboardEnabled && !amIWhiteboardPeer}
+    <Tooltip
+      title={`${
+        whiteboardEnabled
+          ? amIWhiteboardPeer
+            ? `Stop whiteboard`
+            : `Can't stop whiteboard`
+          : "Start whiteboard"
+      }`}
       key="whiteboard"
     >
-      <PencilDrawIcon />
-    </IconButton>
+      <IconButton
+        onClick={() => setWhiteboardEnabled(!whiteboardEnabled)}
+        active={!whiteboardEnabled}
+        disabled={whiteboardEnabled && !amIWhiteboardPeer}
+      >
+        <PencilDrawIcon />
+      </IconButton>
+    </Tooltip>
   );
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
