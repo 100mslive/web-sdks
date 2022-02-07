@@ -110,8 +110,8 @@ export class TrackAudioLevelMonitor {
     this.analyserNode.getByteTimeDomainData(data);
     const lowest = 0.009;
     let max = lowest;
-    for (const f of data) {
-      max = Math.max(max, (f - 128) / 128);
+    for (const frequency of data) {
+      max = Math.max(max, (frequency - 128) / 128);
     }
     const normalized = (Math.log(lowest) - Math.log(max)) / Math.log(lowest);
     const percent = Math.ceil(Math.min(Math.max(normalized * 100, 0), 100));
@@ -120,7 +120,7 @@ export class TrackAudioLevelMonitor {
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
     const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser() as AnalyserNode;
+    const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
     return analyser;
