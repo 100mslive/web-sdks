@@ -916,7 +916,7 @@ export class HMSSdk implements HMSInterface {
     const localAudioTrack = this.localPeer?.audioTrack;
     if (!localAudioTrack?.enabled && isSilent) {
       const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-      analyticsEventsService.queue(AnalyticsEventFactory.audioPublishFail(error)).flush();
+      analyticsEventsService.queue(AnalyticsEventFactory.audioDetectionFail(error)).flush();
       this.listener?.onError(error);
     }
   };

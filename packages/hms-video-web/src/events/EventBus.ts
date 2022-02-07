@@ -23,7 +23,7 @@ export class EventBus {
   /**
    * Emits audio level updates for audio tracks(used with local track in preview)
    */
-  readonly trackAudioLevelUpdate = new HMSInternalEvent<ITrackAudioLevelUpdate | undefined>(
+  readonly trackAudioLevelUpdate = new HMSInternalEvent<ITrackAudioLevelUpdate>(
     HMSEvents.TRACK_AUDIO_LEVEL_UPDATE,
     this.eventEmitter,
   );

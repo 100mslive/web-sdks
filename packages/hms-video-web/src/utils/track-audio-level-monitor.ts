@@ -19,10 +19,7 @@ export class TrackAudioLevelMonitor {
   private interval = 1000;
   private silenceTimeout?: ReturnType<typeof setTimeout>;
 
-  constructor(
-    private track: HMSAudioTrack,
-    private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate | undefined>,
-  ) {
+  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
@@ -92,7 +89,7 @@ export class TrackAudioLevelMonitor {
       audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
     if (isSignificantChange) {
       this.audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
-      const audioLevelUpdate = this.audioLevel ? { track: this.track, audioLevel: this.audioLevel } : undefined;
+      const audioLevelUpdate: ITrackAudioLevelUpdate = { track: this.track, audioLevel: this.audioLevel };
       this.audioLevelEvent.publish(audioLevelUpdate);
     }
   }
