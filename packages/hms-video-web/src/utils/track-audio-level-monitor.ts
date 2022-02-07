@@ -16,7 +16,7 @@ export class TrackAudioLevelMonitor {
   private audioLevel = 0;
   private analyserNode?: AnalyserNode;
   private isMonitored = false;
-  private interval = 1000;
+  private interval = 500;
   private silenceTimeout?: ReturnType<typeof setTimeout>;
 
   constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
