@@ -22,7 +22,7 @@ export interface usePreviewInput {
    * function to handle errors happening during preview
    */
   handleError?: hooksErrHandler;
-  env?: string;
+  initEndpoint?: string;
 }
 
 export interface usePreviewResult {
@@ -52,7 +52,7 @@ export const usePreview = ({
   token,
   metadata,
   handleError = logErrorHandler,
-  env = 'prod',
+  initEndpoint = 'prod',
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -65,7 +65,7 @@ export const usePreview = ({
       authToken: token,
       metaData: metadata,
       rememberDeviceSelection: true,
-      env: env,
+      initEndpoint: initEndpoint,
     };
   }, [name, token, metadata]);
 

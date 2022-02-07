@@ -11,7 +11,7 @@ export { useAVToggle } from './hooks/useAVToggle';
 export { useDevices } from './hooks/useDevices';
 export { useVideo } from './hooks/useVideo';
 export { useScreenShare } from './hooks/useScreenShare';
-export { useAudio } from './hooks/useAudio';
+export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';
 export { useVideoList } from './hooks/useVideoList';
 export { useAudioLevelStyles } from './hooks/useAudioLevelStyles';
 
@@ -22,6 +22,7 @@ export type { useVideoListInput, useVideoResult, useVideoListTile } from './hook
 export type { useAVToggleResult } from './hooks/useAVToggle';
 export type { useDevicesResult } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';
+export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';
