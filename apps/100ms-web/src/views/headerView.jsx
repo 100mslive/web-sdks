@@ -22,6 +22,7 @@ import { useHMSActions } from "@100mslive/react-sdk";
 import PIPComponent from "./PIP/PIPComponent";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
+import { AmbientMusic } from "./components/AmbientMusic";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -198,9 +199,16 @@ const StreamingRecording = () => {
   );
 };
 
-export const ConferenceHeader = ({ onParticipantListOpen }) => {
-  const { HLS_VIEWER_ROLE } = useContext(AppContext);
+export const ConferenceHeader = ({
+  onParticipantListOpen,
+  isPreview = false,
+}) => {
+  const {
+    HLS_VIEWER_ROLE,
+    loginInfo: { isHeadless },
+  } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
+  const showPip = localPeer.roleName !== HLS_VIEWER_ROLE && !isPreview;
   return (
     <>
       <Header
@@ -210,16 +218,17 @@ export const ConferenceHeader = ({ onParticipantListOpen }) => {
           <PlaylistMusic key={2} />,
           <StreamingRecording key={3} />,
         ]}
-        centerComponents={[<SpeakerTag key={0} />]}
+        centerComponents={[!isPreview ? <SpeakerTag key={0} /> : null]}
         rightComponents={[
-          localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />,
+          !isHeadless ? <AmbientMusic key={2} /> : null,
+          showPip ? <PIPComponent key={0} /> : null,
           <ParticipantList
             key={1}
             onToggle={onParticipantListOpen}
             participantInListProps={participantInListProps}
           />,
         ]}
-        classes={{ root: "h-full" }}
+        classes={{ root: "h-full", rightRoot: "items-center" }}
       />
     </>
   );

@@ -7,9 +7,11 @@ export default class Room implements HMSRoom {
   hasWaitingRoom!: boolean;
   sessionId?: string;
   startedAt?: Date;
-  recording?: HMSRecording | undefined;
-  rtmp?: HMSRTMP | undefined;
-  hls?: HMSHLS | undefined;
+  recording: HMSRecording = { server: { running: false }, browser: { running: false } };
+  rtmp: HMSRTMP = { running: false };
+  hls: HMSHLS = { running: false, variants: [] };
+  name?: string;
+  peerCount?: number;
 
   public get localPeer() {
     return this.store.getLocalPeer()!;
@@ -19,5 +21,5 @@ export default class Room implements HMSRoom {
     return this.store.getPeers();
   }
 
-  constructor(public id: string, public name: string, private store: IStore) {}
+  constructor(public id: string, private store: IStore) {}
 }

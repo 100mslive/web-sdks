@@ -3,7 +3,7 @@ import { HMSDeviceChangeEvent } from '../interfaces';
 import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
 import { HMSRemoteVideoTrack } from '../media/tracks';
-import { HMSWebrtcStats, RTCStatsUpdate } from '../rtc-stats';
+import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
 export class EventBus {
@@ -17,10 +17,6 @@ export class EventBus {
    */
   readonly statsUpdate = new HMSInternalEvent<HMSWebrtcStats>(HMSEvents.STATS_UPDATE, this.eventEmitter);
 
-  /**
-   * Fetches and emits raw RTC stats from peer connections
-   */
-  readonly rtcStatsUpdate = new HMSInternalEvent<RTCStatsUpdate>(HMSEvents.RTC_STATS_UPDATE, this.eventEmitter);
   readonly trackDegraded = new HMSInternalEvent<HMSRemoteVideoTrack>(HMSEvents.TRACK_DEGRADED, this.eventEmitter);
   readonly trackRestored = new HMSInternalEvent<HMSRemoteVideoTrack>(HMSEvents.TRACK_RESTORED, this.eventEmitter);
 

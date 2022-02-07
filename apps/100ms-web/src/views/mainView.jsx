@@ -15,6 +15,7 @@ import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as videoTileProps } from "../common/utils";
+import { useBeamAutoLeave } from "../common/hooks";
 
 export const ConferenceMainView = ({
   isChatOpen,
@@ -26,6 +27,7 @@ export const ConferenceMainView = ({
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const roomState = useHMSStore(selectRoomState);
+  useBeamAutoLeave();
   const hmsActions = useHMSActions();
   const {
     audioPlaylist,
@@ -39,9 +41,13 @@ export const ConferenceMainView = ({
     if (roomState !== HMSRoomState.Connected) {
       return;
     }
-    hmsActions.videoPlaylist.setList(videoPlaylist);
-    hmsActions.audioPlaylist.setList(audioPlaylist);
-  }, [roomState]); //eslint-disable-line
+    if (videoPlaylist.length > 0) {
+      hmsActions.videoPlaylist.setList(videoPlaylist);
+    }
+    if (audioPlaylist.length > 0) {
+      hmsActions.audioPlaylist.setList(audioPlaylist);
+    }
+  }, [roomState, videoPlaylist, audioPlaylist, hmsActions]);
 
   if (!localPeer) {
     // we don't know the role yet to decide how to render UI
@@ -68,6 +74,7 @@ export const ConferenceMainView = ({
         isChatOpen={isChatOpen}
         toggleChat={toggleChat}
         role={localPeer.roleName}
+        showStats={showStatsOnTiles}
         isParticipantListOpen={isParticipantListOpen}
         videoTileProps={(peer, track) => ({
           ...videoTileProps(peer, track),

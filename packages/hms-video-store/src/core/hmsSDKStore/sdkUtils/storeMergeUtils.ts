@@ -1,4 +1,5 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSPeerStats, HMSTrackStats } from '../../schema';
+import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes

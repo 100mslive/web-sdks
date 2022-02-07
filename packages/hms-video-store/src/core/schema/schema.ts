@@ -2,12 +2,11 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap } from '../hmsSDKStore/sdkTypes';
+import { DeviceMap, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
 import { HMSPlaylist } from './playlist';
-import { HMSPeerConnectionStats, HMSPeerStats, HMSTrackStats } from './webrtc-stats';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -31,8 +30,6 @@ export interface HMSStore {
 }
 
 export interface HMSStatsStore {
-  publishStats?: HMSPeerConnectionStats;
-  subscribeStats?: HMSPeerConnectionStats;
   trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
   localPeer: {

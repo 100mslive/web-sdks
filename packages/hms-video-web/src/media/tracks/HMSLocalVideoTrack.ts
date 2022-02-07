@@ -63,10 +63,16 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     }
     if (this.source === 'regular') {
+      let track: MediaStreamTrack;
       if (value) {
-        await this.replaceTrackWith(this.settings);
+        track = await this.replaceTrackWith(this.settings);
       } else {
-        await this.replaceTrackWithBlank();
+        track = await this.replaceTrackWithBlank();
+      }
+      await this.replaceSender(track, value);
+      this.nativeTrack = track;
+      if (value) {
+        await this.pluginsManager.waitForRestart();
       }
     }
     await super.setEnabled(value);
@@ -90,14 +96,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
-
+    await this.handleDeviceChange(newSettings, internal);
     if (!this.enabled) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-
-    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
@@ -177,6 +181,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
   }
 
+  getTrackBeingSent() {
+    return this.processedTrack || this.nativeTrack;
+  }
+
   /**
    * called when the video is unmuted
    * @private
@@ -185,16 +193,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
-    const localStream = this.stream as HMSLocalStream;
-    // change nativeTrack so plugin can start its work
-    await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
-    await localStream.replaceStreamTrack(prevTrack, newTrack);
-    this.nativeTrack = newTrack;
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
     }
-    await this.pluginsManager.waitForRestart();
+    return newTrack;
   }
 
   /**
@@ -205,11 +208,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
     prevTrack?.stop();
-    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    return LocalTrackManager.getEmptyVideoTrack(prevTrack);
+  }
+
+  private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
     const localStream = this.stream as HMSLocalStream;
-    await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    if (enabled) {
+      await localStream.replaceSenderTrack(this.nativeTrack, this.processedTrack || newTrack);
+    } else {
+      await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+    }
     await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
-    this.nativeTrack = newTrack;
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
@@ -239,7 +248,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
-      await this.replaceTrackWith(settings);
+      if (this.enabled) {
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+      }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,

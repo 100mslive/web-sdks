@@ -4,7 +4,7 @@ import { HMSTrackUpdate } from '../../interfaces';
 import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { PeerListNotification, PeerNotification } from '../HMSNotifications';
+import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
 import { PeerManager } from './PeerManager';
 import { TrackManager } from './TrackManager';
 
@@ -34,16 +34,19 @@ export class PeerListManager {
   }
 
   handleNotification(method: string, notification: any, isReconnecting: boolean) {
-    if (method !== HMSNotificationMethod.PEER_LIST) {
-      return;
-    }
-    const peerList = notification as PeerListNotification;
-    if (isReconnecting) {
-      HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
-      this.handleReconnectPeerList(peerList);
-    } else {
-      HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
-      this.handleInitialPeerList(peerList);
+    if (method === HMSNotificationMethod.PEER_LIST) {
+      const peerList = notification as PeerListNotification;
+      if (isReconnecting) {
+        HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
+        this.handleReconnectPeerList(peerList);
+      } else {
+        // TODO: Don't call initial peerlist if atleast 1room state had happen
+        HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
+        this.handleInitialPeerList(peerList);
+      }
+    } else if (method === HMSNotificationMethod.ROOM_STATE) {
+      const roomState = notification as PeriodicRoomState;
+      this.handlePreviewRoomState(roomState);
     }
   }
 
@@ -53,10 +56,24 @@ export class PeerListManager {
   };
 
   private handleReconnectPeerList = (peerList: PeerListNotification) => {
-    const currentPeerList = this.store.getRemotePeers();
-    const peers = Object.values(peerList.peers);
-    const peersToRemove = currentPeerList.filter(hmsPeer => !peerList.peers[hmsPeer.peerId]);
+    this.handleRepeatedPeerList(peerList.peers);
+  };
 
+  private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
+    const roomPeers = roomState.peers;
+    // we don't get tracks inside the peer object in room state, we're adding
+    // an empty value here so rest of the code flow can ignore this change, the below
+    // can be changed when tracks will be sent as a separate object in future
+    Object.keys(roomPeers).forEach(peer => {
+      roomPeers[peer]['tracks'] = {};
+    });
+    this.handleRepeatedPeerList(roomPeers);
+  };
+
+  private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {
+    const currentPeerList = this.store.getRemotePeers();
+    const peers = Object.values(peersMap);
+    const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
     HMSLogger.d(this.TAG, { peersToRemove });
 
     // Send peer-leave updates to all the missing peers
