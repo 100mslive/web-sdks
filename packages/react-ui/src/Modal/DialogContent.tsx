@@ -46,7 +46,7 @@ type DialogContentProps = React.ComponentProps<typeof StyledDialogContent> & {
   close?: boolean;
 };
 
-export const DialogContent: React.FC<DialogContentProps> = ({ children, close, title, ...props }) => (
+export const DialogContent: React.FC<DialogContentProps> = ({ children, close = true, title, ...props }) => (
   <>
     <StyledOverlay />
     <StyledDialogContent {...props}>
