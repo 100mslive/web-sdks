@@ -20,8 +20,7 @@ export const LeaveRoom = () => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
 
-  const leaveRoom = () => {
-    hmsActions.leave();
+  const redirectToLeavePage = () => {
     if (params.role) {
       history.push("/leave/" + params.roomId + "/" + params.role);
     } else {
@@ -29,6 +28,15 @@ export const LeaveRoom = () => {
     }
   };
 
+  const leaveRoom = () => {
+    hmsActions.leave();
+    redirectToLeavePage();
+  };
+
+  const endRoom = () => {
+    hmsActions.endRoom(lockRoom, "End Room");
+    redirectToLeavePage();
+  };
   return (
     <Fragment>
       <ContextMenu
@@ -94,13 +102,7 @@ export const LeaveRoom = () => {
             menuItemChildren: "my-1 w-full overflow-hidden",
           }}
         >
-          <Button
-            variant="danger"
-            className="w-full"
-            onClick={() => {
-              leaveRoom();
-            }}
-          >
+          <Button variant="danger" className="w-full" onClick={leaveRoom}>
             Just Leave
           </Button>
         </ContextMenuItem>
@@ -136,13 +138,7 @@ export const LeaveRoom = () => {
             >
               Cancel
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                hmsActions.endRoom(lockRoom, "End Room");
-                leaveRoom();
-              }}
-            >
+            <Button variant="danger" onClick={endRoom}>
               End Room
             </Button>
           </div>

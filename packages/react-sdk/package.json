@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.5-alpha.7",
+  "version": "0.0.6",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -21,7 +21,8 @@
     "types:build": "tsc -p tsconfig.build.json",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "format": "prettier -w src/**"
+    "format": "prettier -w src/**",
+    "docs": "typedoc src/index.ts --plugin none"
   },
   "devDependencies": {
     "@types/react": "^17.0.38",
@@ -31,7 +32,7 @@
     "react": "^17.0.1"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.2.88-alpha.5",
+    "@100mslive/hms-video-store": "0.2.89",
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"

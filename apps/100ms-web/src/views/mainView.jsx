@@ -16,6 +16,7 @@ import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as videoTileProps } from "../common/utils";
 import { useWhiteboardMetadata, WhiteboardView } from "./whiteboard";
+import { useBeamAutoLeave } from "../common/hooks";
 
 export const ConferenceMainView = ({
   isChatOpen,
@@ -28,6 +29,7 @@ export const ConferenceMainView = ({
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const { whiteboardPeer } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
+  useBeamAutoLeave();
   const hmsActions = useHMSActions();
   const {
     audioPlaylist,
@@ -76,6 +78,7 @@ export const ConferenceMainView = ({
         isChatOpen={isChatOpen}
         toggleChat={toggleChat}
         role={localPeer.roleName}
+        showStats={showStatsOnTiles}
         isParticipantListOpen={isParticipantListOpen}
         videoTileProps={(peer, track) => ({
           ...videoTileProps(peer, track),

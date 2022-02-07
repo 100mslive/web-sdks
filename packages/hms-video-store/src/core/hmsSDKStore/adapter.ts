@@ -24,6 +24,14 @@ import {
 import * as sdkTypes from './sdkTypes';
 import { areArraysEqual } from './sdkUtils/storeMergeUtils';
 
+/**
+ * This file has conversion functions from schema defined in sdk to normalised schema defined in store.
+ * A lot of conversions below involve deep clone as once the object goes into store it becomes unmodifiable
+ * due to immer, so it can't be mutated later.
+ *
+ * Objects directly from the SDK are not stored as is and cloned because the SDK might modify it later
+ */
+
 export class SDKToHMS {
   static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
     return {
@@ -96,22 +104,22 @@ export class SDKToHMS {
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom): Partial<HMSRoom> {
+    const { recording, rtmp, hls } = SDKToHMS.convertRecordingStreamingState(
+      sdkRoom?.recording,
+      sdkRoom?.rtmp,
+      sdkRoom?.hls,
+    );
     return {
       id: sdkRoom.id,
       name: sdkRoom.name,
       localPeer: sdkRoom.localPeer?.peerId ?? '',
       hasWaitingRoom: sdkRoom.hasWaitingRoom,
       shareableLink: sdkRoom.shareableLink,
-      recording: {
-        browser: {
-          running: !!sdkRoom.recording?.browser.running,
-        },
-        server: { running: !!sdkRoom.recording?.server.running },
-      },
-      rtmp: { running: !!sdkRoom.rtmp?.running },
-      hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
+      recording,
+      rtmp,
+      hls,
       sessionId: sdkRoom.sessionId,
-      startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
+      startedAt: sdkRoom.startedAt,
       peerCount: sdkRoom.peerCount,
     };
   }
@@ -222,19 +230,33 @@ export class SDKToHMS {
   }
 
   static convertRecordingStreamingState(
-    recording: sdkTypes.HMSRecording | undefined,
-    rtmp: sdkTypes.HMSRTMP | undefined,
-    hls: sdkTypes.HMSHLS | undefined,
+    recording?: sdkTypes.HMSRecording,
+    rtmp?: sdkTypes.HMSRTMP,
+    hls?: sdkTypes.HMSHLS,
   ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
     return {
       recording: {
         browser: {
           running: !!recording?.browser?.running,
+          startedAt: recording?.browser?.startedAt,
+          error: recording?.browser?.error,
         },
-        server: { running: !!recording?.server?.running },
+        server: {
+          running: !!recording?.server?.running,
+          startedAt: recording?.server?.startedAt,
+          error: recording?.server?.error,
+        },
       },
-      rtmp: { running: !!rtmp?.running },
-      hls: { variants: hls?.variants || [], running: !!hls?.running },
+      rtmp: {
+        running: !!rtmp?.running,
+        startedAt: rtmp?.startedAt,
+        error: rtmp?.error,
+      },
+      hls: {
+        variants: hls?.variants?.map(variant => variant) || [],
+        running: !!hls?.running,
+        error: hls?.error,
+      },
     };
   }
 }
