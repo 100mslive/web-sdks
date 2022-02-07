@@ -36,10 +36,6 @@ export interface useVideoListInput {
    */
   includeScreenShareForPeer?: (peer: HMSPeer) => boolean;
   /**
-   *
-   */
-  overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
-  /**
    * Aspect ratio of VideoTiles, ideally this should be the same as the aspect ratio selected for
    * capture in the dashboard template.
    */
@@ -61,6 +57,10 @@ export interface useVideoResult {
    * This returns a list of all pages with every page containing the list of all tiles on it.
    */
   pagesWithTiles: useVideoListTile[][];
+  /**
+   * add the ref to the element going to render the video list, this is used to measure the available
+   * space/dimensions in order to calculate the best fit
+   */
   ref: React.MutableRefObject<any>;
 }
 
@@ -83,12 +83,12 @@ export const useVideoList = ({
   maxColCount,
   maxRowCount,
   includeScreenShareForPeer = () => false,
-  overflow = 'scroll-x',
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
 }: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
+  // using vanilla store as we don't need re-rendering everytime something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
     peers,
@@ -117,7 +117,6 @@ export const useVideoList = ({
     isLastPageDifferentFromFirstPage,
   } = useMemo(
     () =>
-      // Flooring since there's a bug in react-slick where it converts width into a number
       calculateLayoutSizes({
         count,
         parentWidth: Math.floor(width),
@@ -134,7 +133,7 @@ export const useVideoList = ({
       chunkElements<TrackWithPeer>({
         elements: tracksWithPeer,
         tilesInFirstPage,
-        onlyOnePage: overflow === 'hidden',
+        onlyOnePage: false,
         isLastPageDifferentFromFirstPage,
         defaultWidth,
         defaultHeight,
@@ -144,7 +143,6 @@ export const useVideoList = ({
     [
       tracksWithPeer,
       tilesInFirstPage,
-      overflow,
       isLastPageDifferentFromFirstPage,
       defaultWidth,
       defaultHeight,
