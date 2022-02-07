@@ -17,7 +17,7 @@ export class RoomUpdateManager {
   handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
-        this.onPeerList((notification as PeerListNotification).room);
+        this.onRoomState((notification as PeerListNotification).room);
         break;
       case HMSNotificationMethod.RTMP_START:
         this.onRTMPStart(notification as RTMPNotification);
@@ -42,10 +42,10 @@ export class RoomUpdateManager {
 
   private handlePreviewRoomState(notification: PeriodicRoomState) {
     const { room } = notification;
-    this.onPeerList(room, notification.peer_count);
+    this.onRoomState(room, notification.peer_count);
   }
 
-  private onPeerList(roomNotification: RoomState, peerCount?: number) {
+  private onRoomState(roomNotification: RoomState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     room.peerCount = peerCount;

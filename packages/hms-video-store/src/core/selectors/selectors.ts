@@ -71,7 +71,7 @@ export const selectSpeakers = (store: HMSStore) => {
  */
 export const selectIsConnectedToRoom = createSelector([selectRoom], room => room && room.isConnected);
 
-export const selectPeerCount = createSelector(selectRoom, room => room.peers.length);
+export const selectPeerCount = createSelector(selectRoom, room => room.peerCount || room.peers.length);
 
 /**
  * Select an array of peers(remote peers and your local peer) present in the room.
