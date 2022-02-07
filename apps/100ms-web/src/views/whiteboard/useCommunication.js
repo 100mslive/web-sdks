@@ -225,8 +225,6 @@ export const provider =
     ? new PusherCommunicationProvider()
     : new HMSCommunicationProvider();
 
-window.whiteboardProvider = provider;
-
 export const useCommunication = () => {
   const room = useHMSStore(selectRoom);
   const roomId = useMemo(() => room.id, [room]);
