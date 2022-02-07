@@ -16,6 +16,7 @@ export const InvalidRoleModal = ({ notification }) => {
         onInteractOutside={e => e.preventDefault()}
         onEscapeKeyDown={e => e.preventDefault()}
         onPointerDownOutside={e => e.preventDefault()}
+        close={false}
       >
         <Text variant="body">
           Invalid Role. The role does not exist for the given room. Try again
