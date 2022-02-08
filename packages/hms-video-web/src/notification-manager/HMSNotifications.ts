@@ -75,7 +75,7 @@ export interface RoomState {
   name: string;
   session_id: string;
   started_at: number;
-  recording: {
+  recording?: {
     sfu: {
       started_at?: number;
       enabled: boolean;
@@ -85,7 +85,7 @@ export interface RoomState {
       enabled: boolean;
     };
   };
-  streaming: {
+  streaming?: {
     enabled: boolean;
     rtmp: { enabled: boolean; started_at?: number };
     hls: HLSNotification;
@@ -102,7 +102,7 @@ export interface PeerListNotification {
 export interface PeriodicRoomState {
   peer_count: number;
   room: RoomState;
-  peers: {
+  peers?: {
     [peer_id: string]: PeerNotification;
   };
 }

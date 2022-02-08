@@ -50,13 +50,13 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     room.peerCount = peerCount;
     room.name = name;
-    room.recording.server.running = recording.sfu.enabled;
-    room.recording.browser.running = recording.browser.enabled;
-    room.rtmp.running = streaming.rtmp?.enabled || streaming.enabled;
-    room.rtmp.startedAt = this.getAsDate(streaming.rtmp?.started_at);
-    room.recording.server.startedAt = this.getAsDate(recording.sfu.started_at);
-    room.recording.browser.startedAt = this.getAsDate(recording.browser.started_at);
-    room.hls = this.convertHls(streaming.hls);
+    room.recording.server.running = !!recording?.sfu.enabled;
+    room.recording.browser.running = !!recording?.browser.enabled;
+    room.rtmp.running = !!streaming?.rtmp?.enabled;
+    room.rtmp.startedAt = this.getAsDate(streaming?.rtmp?.started_at);
+    room.recording.server.startedAt = this.getAsDate(recording?.sfu.started_at);
+    room.recording.browser.startedAt = this.getAsDate(recording?.browser.started_at);
+    room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
@@ -92,14 +92,14 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
-  private convertHls(hlsNotification: HLSNotification) {
+  private convertHls(hlsNotification?: HLSNotification) {
     const hls: HMSHLS = {
-      running: hlsNotification.enabled,
+      running: !!hlsNotification?.enabled,
       variants: [],
-      error: hlsNotification.error?.code ? hlsNotification.error : undefined,
+      error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
     };
     hlsNotification?.variants?.map(variant => {
-      hls?.variants.push({
+      hls.variants.push({
         meetingURL: variant.meeting_url,
         url: variant.url,
         metadata: variant.metadata,
