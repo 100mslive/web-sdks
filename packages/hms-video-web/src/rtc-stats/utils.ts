@@ -17,8 +17,12 @@ export const getTrackStats = async (
   const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
   const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
   const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
-
-  const trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+  let trackReport: RTCStatsReport | undefined;
+  try {
+    trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+  } catch (err) {
+    console.error('Error in getting track stats', track, nativeTrack, err);
+  }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
   const bitrate = computeBitrate(
