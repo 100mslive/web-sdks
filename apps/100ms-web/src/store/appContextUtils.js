@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
 import LogRocket from "logrocket";
 import { FeatureFlags } from "./FeatureFlags";
@@ -109,7 +109,12 @@ export const useDidIJoinRecently = () => {
     }
   }, [isConnected]);
 
-  return (threshold = 500) => {
-    return Date.now() - joinTimestamp <= threshold;
-  };
+  const didIJoinRecently = useCallback(
+    (threshold = 500) => {
+      return Date.now() - joinTimestamp <= threshold;
+    },
+    [joinTimestamp]
+  );
+
+  return didIJoinRecently;
 };
