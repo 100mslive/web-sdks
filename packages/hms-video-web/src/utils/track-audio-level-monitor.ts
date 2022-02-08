@@ -40,23 +40,30 @@ export class TrackAudioLevelMonitor {
   }
 
   /**
-   * Detects silence by resolving to true if the audio track remains silent for threshold ms.
-   * Resolves to false on valid audio input
+   * To detect silence we check if the track is unmuted and silent in the current moment
+   * periodically. If the track is found to be silent more than a threshold number of times
+   * we send the event. The threshold number of time is there to reduce the chance of false
+   * positives.
    */
   detectSilence = async () => {
+    const tickInterval = 30;
+    const tickThreshold = 10;
     let silenceCounter = 0;
 
     while (this.isMonitored) {
       if (this.track.enabled) {
         if (this.isSilentThisInstant()) {
           silenceCounter++;
-          if (silenceCounter > 10) {
+          if (silenceCounter > tickThreshold) {
             this.silenceEvent.publish({ track: this.track });
             break;
           }
+        } else {
+          // bail out immediately if sound is found
+          break;
         }
       }
-      await sleep(30);
+      await sleep(tickInterval);
     }
   };
 
