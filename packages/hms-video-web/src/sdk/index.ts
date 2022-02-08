@@ -752,8 +752,7 @@ export class HMSSdk implements HMSInterface {
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });
-
-    localAudioTrack?.audioLevelMonitor?.detectSilence().then(this.sendAudioPresenceFailed);
+    this.eventBus.localAudioSilence.subscribe(this.sendAudioPresenceFailed);
   }
 
   private get publishParams() {
@@ -912,12 +911,10 @@ export class HMSSdk implements HMSInterface {
     return tracks;
   }
 
-  private sendAudioPresenceFailed = (isSilent: boolean) => {
-    const localAudioTrack = this.localPeer?.audioTrack;
-    if (localAudioTrack?.enabled && isSilent) {
-      const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-      analyticsEventsService.queue(AnalyticsEventFactory.audioDetectionFail(error)).flush();
-      this.listener?.onError(error);
-    }
+  private sendAudioPresenceFailed = () => {
+    const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
+    analyticsEventsService.queue(AnalyticsEventFactory.audioDetectionFail(error)).flush();
+    // @TODO: start sending if error is less frequent
+    // this.listener?.onError(error);
   };
 }

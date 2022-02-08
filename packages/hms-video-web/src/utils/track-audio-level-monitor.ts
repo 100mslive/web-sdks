@@ -1,14 +1,17 @@
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
-import { HMSAudioTrack } from '../media/tracks';
+import { HMSLocalAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
-import { FixedSizeQueue } from './queue';
+import { Queue } from './queue';
 import { sleep } from './timer-utils';
 
+/** Send update only if audio level is above THRESHOLD */
 const THRESHOLD = 35;
+
+/** Send update only if audio level is changed by UPDATE_THRESHOLD */
 const UPDATE_THRESHOLD = 5;
 
 export interface ITrackAudioLevelUpdate {
-  track: HMSAudioTrack;
+  track: HMSLocalAudioTrack;
   audioLevel: number;
 }
 
@@ -17,11 +20,17 @@ export class TrackAudioLevelMonitor {
   private audioLevel = 0;
   private analyserNode?: AnalyserNode;
   private isMonitored = false;
+  /** Frequency of polling audio level from track */
   private interval = 100;
-  private historyInterval = 1000;
-  private history = new FixedSizeQueue(this.historyInterval / this.interval);
+  /** Store past audio levels for this duration */
+  private historyInterval = 700;
+  private history = new Queue<number>(this.historyInterval / this.interval);
 
-  constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
+  constructor(
+    private track: HMSLocalAudioTrack,
+    private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>,
+    private silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
+  ) {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
@@ -34,26 +43,21 @@ export class TrackAudioLevelMonitor {
    * Detects silence by resolving to true if the audio track remains silent for threshold ms.
    * Resolves to false on valid audio input
    */
-  detectSilence = async (threshold = 5000) => {
-    let thresholdPassed = false;
-    setTimeout(() => {
-      thresholdPassed = true;
-    }, threshold);
+  detectSilence = async () => {
+    let silenceCounter = 0;
 
-    let mutedWhileProcessing = !this.track.enabled;
-
-    while (!thresholdPassed) {
-      mutedWhileProcessing = !this.track.enabled;
-      if (this.track.enabled && !this.isSilentThisInstant()) {
-        return false;
+    while (this.isMonitored) {
+      if (this.track.enabled) {
+        if (this.isSilentThisInstant()) {
+          silenceCounter++;
+          if (silenceCounter > 10) {
+            this.silenceEvent.publish({ track: this.track });
+            break;
+          }
+        }
       }
-      await sleep(300);
+      await sleep(30);
     }
-
-    /**
-     * If the track remained muted while processing, return false as no actual checking happened on muted track
-     */
-    return !mutedWhileProcessing;
   };
 
   start() {
@@ -65,7 +69,7 @@ export class TrackAudioLevelMonitor {
 
   stop() {
     if (!this.analyserNode) {
-      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
 
@@ -82,8 +86,7 @@ export class TrackAudioLevelMonitor {
 
   private sendAudioLevel(audioLevel = 0) {
     audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
-    const isSignificantChange =
-      audioLevel < this.audioLevel - UPDATE_THRESHOLD || audioLevel > this.audioLevel + UPDATE_THRESHOLD;
+    const isSignificantChange = Math.abs(this.audioLevel - audioLevel) > UPDATE_THRESHOLD;
     if (isSignificantChange) {
       this.audioLevel = audioLevel;
       const audioLevelUpdate: ITrackAudioLevelUpdate = { track: this.track, audioLevel: this.audioLevel };
@@ -93,20 +96,17 @@ export class TrackAudioLevelMonitor {
 
   private getMaxAudioLevelOverPeriod() {
     if (!this.analyserNode) {
-      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
     const newLevel = this.calculateAudioLevel();
     newLevel !== undefined && this.history.enqueue(newLevel);
-    return this.history.getMax();
+    return this.history.aggregate(values => Math.max(...values));
   }
 
-  /**
-   * Ref: https://github.com/aws/amazon-chime-sdk-js/blob/main/demos/browser/app/meetingV2/meetingV2.ts#L2738-L2745
-   */
   private calculateAudioLevel() {
     if (!this.analyserNode) {
-      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
 
@@ -124,7 +124,7 @@ export class TrackAudioLevelMonitor {
 
   private isSilentThisInstant() {
     if (!this.analyserNode) {
-      HMSLogger.w(this.TAG, 'AudioContext not initialized');
+      HMSLogger.d(this.TAG, 'AudioContext not initialized');
       return;
     }
 
