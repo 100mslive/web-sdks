@@ -28,7 +28,7 @@ export function useAudioLevelStyles({
           return;
         }
         const styles = getStyle(level);
-        for (const key in Object.keys(styles)) {
+        for (const key in styles) {
           ref.current.style[key] = styles[key];
         }
       }, selectTrackAudioByID(trackId)),
