@@ -15,11 +15,15 @@ export const NoiseSuppression = () => {
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
 
+  const createPlugin = () => {
+    if (!pluginRef.current) {
+      pluginRef.current = new HMSNoiseSuppressionPlugin();
+    }
+  };
+
   const addPlugin = useCallback(async () => {
     try {
-      if (!pluginRef.current) {
-        pluginRef.current = new HMSNoiseSuppressionPlugin();
-      }
+      createPlugin();
       await hmsActions.addPluginToAudioTrack(pluginRef.current);
     } catch (err) {
       console.error("adding noise suppression plugin failed", err);
@@ -27,7 +31,11 @@ export const NoiseSuppression = () => {
   }, [hmsActions]);
 
   useEffect(() => {
-    addPlugin();
+    if (process.env.REACT_APP_ENV === "qa") {
+      addPlugin();
+    } else {
+      createPlugin();
+    }
   }, [addPlugin]);
 
   async function removePlugin() {
