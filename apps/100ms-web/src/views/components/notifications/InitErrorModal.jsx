@@ -31,9 +31,9 @@ export const InitErrorModal = ({ notification }) => {
         onInteractOutside={e => e.preventDefault()}
         onEscapeKeyDown={e => e.preventDefault()}
         onPointerDownOutside={e => e.preventDefault()}
-        close={info.title === "Invalid Role"}
+        close={info.title !== "Invalid Role"}
       >
-        <Text variant="body">
+        <Text variant="body" css={{ wordBreak: "break-all" }}>
           {info.description}
           <br />
           {window.location.href}
