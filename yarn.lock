@@ -7,12 +7,12 @@
   resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-suppression/-/hms-noise-suppression-0.1.7.tgz#5137f615544fc4bad5c7e3a1e1ff1cfde9545d09"
   integrity sha512-66PBjFXaEfX//PoFkjsxNn9JUoOGHqS8v7nm7zFmDeJVXwiyXDpX9Bu8c34HsbrBmw3kLdwgK8AggvLf+l+Q0g==
 
-"@100mslive/hms-video-react@0.3.116-alpha.1":
-  version "0.3.116-alpha.1"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-react/-/hms-video-react-0.3.116-alpha.1.tgz#f33dee907b6959ea05637c3d41b5a3e3ef33d170"
-  integrity sha512-3XdrwtriRpi+4l6WIIcuGYwbJs/LvGG9bAfE0gza77eCJC00K+sC/9HgnsjOr/VKgJ4nPtXuwM/Jyb0WhISklA==
+"@100mslive/hms-video-react@0.3.117-alpha.0":
+  version "0.3.117-alpha.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-react/-/hms-video-react-0.3.117-alpha.0.tgz#184cd03934cd82bed426400efbbb9145a6df9bd4"
+  integrity sha512-TaOrB0KNm9gaodOlYWTpx5jsh+wN9zq24uFYPKtno41KNqRGjn6R8NtxW3E8OZQxUbvRe1BHW6x9WbNSbuw9vA==
   dependencies:
-    "@100mslive/hms-video-store" "0.2.88-alpha.0"
+    "@100mslive/hms-video-store" "0.2.90-alpha.0"
     "@material-ui/core" "^4.11.3"
     "@twind/aspect-ratio" "^0.1.4"
     autoprefixer "^9.8.6"
@@ -29,28 +29,6 @@
     tailwindcss "npm:@tailwindcss/postcss7-compat@^2.1.2"
     twind "^0.16.12"
     zustand "3.5.7"
-
-"@100mslive/hms-video-store@0.2.88-alpha.0":
-  version "0.2.88-alpha.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.88-alpha.0.tgz#51d41a0da11df7e356e5f822cdd06884505e025a"
-  integrity sha512-Mq5Et5Y0tAq3WOF8RD65jejXx+RNYQ1ejnToIcMWNg1zKGLqDPuVIVHgK8vicgYqSa0PrVR8CfpklQbI0d63Kg==
-  dependencies:
-    "@100mslive/hms-video" "0.1.42-alpha.0"
-    eventemitter2 "^6.4.5"
-    immer "^9.0.6"
-    reselect "4.0.0"
-    zustand "3.5.7"
-
-"@100mslive/hms-video@0.1.42-alpha.0":
-  version "0.1.42-alpha.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.42-alpha.0.tgz#f3463e813fe0c3bc363540d28edd6b087fed7d47"
-  integrity sha512-Whk4H6VA/wVQLpeclm+pf6oOr5152v1Pp/UiX8bIADz6x4sJ5+RDxczKY4pScZtRdnB6CHXR7t4gleO+WCBBAQ==
-  dependencies:
-    eventemitter2 "^6.4.5"
-    sdp-transform "^2.14.1"
-    ua-parser-js "^1.0.1"
-    uuid "^8.3.2"
-    webrtc-adapter "^8.0.0"
 
 "@100mslive/hms-virtual-background@1.3.7":
   version "1.3.7"

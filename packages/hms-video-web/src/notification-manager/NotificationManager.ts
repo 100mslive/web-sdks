@@ -25,6 +25,12 @@ export class NotificationManager {
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
   private eventEmitter: EventEmitter = new EventEmitter();
+  /**
+   * room state can be sent before join in preview stage as well but that is outdated, based on
+   * eventual consistency and doesn't have all data. If we get at least one consistent room update
+   * from that point onwards we can rely on live server updates and ignore periodic room state messages
+   */
+  private hasConsistentRoomStateArrived = false;
 
   constructor(private store: IStore, private listener?: HMSUpdateListener, private audioListener?: HMSAudioListener) {
     this.trackManager = new TrackManager(this.store, this.eventEmitter, this.listener);
@@ -78,6 +84,10 @@ export class NotificationManager {
       }
     }
 
+    if (this.ignoreNotification(method)) {
+      return;
+    }
+
     this.roomUpdateManager.handleNotification(method, notification);
     this.peerManager.handleNotification(method, notification);
     this.requestManager.handleNotification(method, notification);
@@ -105,6 +115,16 @@ export class NotificationManager {
         break;
     }
   }
+
+  ignoreNotification = (method: string): boolean => {
+    if (method === HMSNotificationMethod.PEER_LIST) {
+      this.hasConsistentRoomStateArrived = true;
+    } else if (method === HMSNotificationMethod.ROOM_STATE) {
+      // ignore periodic inconsistent room state if consistent one has arrived at least once
+      return this.hasConsistentRoomStateArrived;
+    }
+    return false;
+  };
 
   handleTrackAdd = (track: HMSRemoteTrack) => {
     this.trackManager.handleTrackAdd(track);

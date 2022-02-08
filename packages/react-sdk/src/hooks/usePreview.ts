@@ -22,6 +22,7 @@ export interface usePreviewInput {
    * function to handle errors happening during preview
    */
   handleError?: hooksErrHandler;
+  initEndpoint?: string;
 }
 
 export interface usePreviewResult {
@@ -51,6 +52,7 @@ export const usePreview = ({
   token,
   metadata,
   handleError = logErrorHandler,
+  initEndpoint,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -63,8 +65,9 @@ export const usePreview = ({
       authToken: token,
       metaData: metadata,
       rememberDeviceSelection: true,
+      initEndpoint: initEndpoint,
     };
-  }, [name, token, metadata]);
+  }, [name, token, metadata, initEndpoint]);
 
   useEffect(() => {
     (async () => {
@@ -80,18 +83,18 @@ export const usePreview = ({
         handleError(err as Error, 'preview');
       }
     })();
-  }, [actions, token]);
+  }, [actions, config, handleError, roomState, token]);
 
-  const join = useCallback(async () => {
+  const join = useCallback(() => {
     if (!token) {
       return;
     }
     try {
-      await actions.join(config);
+      actions.join(config);
     } catch (err) {
       handleError(err as Error, 'join');
     }
-  }, [actions, token]);
+  }, [actions, config, handleError, token]);
 
   return {
     enableJoin,
