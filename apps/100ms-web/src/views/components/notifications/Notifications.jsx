@@ -158,7 +158,7 @@ export function Notifications() {
         if (notification.data?.code === 3008) {
           return;
         }
-        if (notification.data?.description?.includes("role is invalid")) {
+        if (notification.data?.action === "INIT") {
           return;
         }
         if (!subscribedNotifications.ERROR) return;
