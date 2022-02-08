@@ -1,6 +1,7 @@
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
 import { HMSAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
+import { FixedSizeQueue } from './queue';
 import { sleep } from './timer-utils';
 
 const THRESHOLD = 35;
@@ -16,8 +17,9 @@ export class TrackAudioLevelMonitor {
   private audioLevel = 0;
   private analyserNode?: AnalyserNode;
   private isMonitored = false;
-  private interval = 1000;
-  private queryInterval = 100;
+  private interval = 100;
+  private historyInterval = 1000;
+  private history = new FixedSizeQueue(this.historyInterval / this.interval);
 
   constructor(private track: HMSAudioTrack, private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>) {
     try {
@@ -73,8 +75,8 @@ export class TrackAudioLevelMonitor {
 
   private async loop() {
     while (this.isMonitored) {
-      const audioLevel = await this.getMaxAudioLevelOverPeriod();
-      this.sendAudioLevel(audioLevel);
+      this.sendAudioLevel(this.getMaxAudioLevelOverPeriod());
+      await sleep(this.interval);
     }
   }
 
@@ -89,22 +91,14 @@ export class TrackAudioLevelMonitor {
     }
   }
 
-  private async getMaxAudioLevelOverPeriod() {
+  private getMaxAudioLevelOverPeriod() {
     if (!this.analyserNode) {
       HMSLogger.w(this.TAG, 'AudioContext not initialized');
       return;
     }
-
-    let iterationsleft = this.interval / this.queryInterval;
-    let audioLevel = 0;
-    while (iterationsleft) {
-      const newAudioLevel = this.calculateAudioLevel() || 0;
-      audioLevel = Math.max(newAudioLevel, audioLevel);
-      iterationsleft--;
-      await sleep(this.queryInterval);
-    }
-
-    return audioLevel;
+    const newLevel = this.calculateAudioLevel();
+    newLevel !== undefined && this.history.enqueue(newLevel);
+    return this.history.getMax();
   }
 
   /**

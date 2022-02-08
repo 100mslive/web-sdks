@@ -7,7 +7,7 @@ export interface IQueue<T> {
 export class Queue<T> implements IQueue<T> {
   protected storage: T[] = [];
 
-  constructor(private capacity: number = Infinity) {}
+  constructor(protected capacity: number = Infinity) {}
 
   size() {
     return this.storage.length;
@@ -22,5 +22,22 @@ export class Queue<T> implements IQueue<T> {
 
   dequeue() {
     return this.storage.shift();
+  }
+}
+
+export class FixedSizeQueue<T extends number> extends Queue<T> {
+  enqueue(item: T) {
+    if (this.size() === this.capacity) {
+      this.dequeue();
+    }
+    this.storage.push(item);
+  }
+
+  dequeue() {
+    return this.storage.shift();
+  }
+
+  getMax() {
+    return Math.max(...this.storage);
   }
 }
