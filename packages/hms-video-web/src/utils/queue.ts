@@ -5,7 +5,7 @@ export interface IQueue<T> {
 }
 
 export class Queue<T> implements IQueue<T> {
-  private storage: T[] = [];
+  protected storage: T[] = [];
 
   constructor(private capacity: number = Infinity) {}
 
