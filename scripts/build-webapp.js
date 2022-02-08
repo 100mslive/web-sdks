@@ -13,10 +13,12 @@ async function main() {
       }
     });
   }
+  require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/App.js';
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
+  const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
     PostCssPlugin.default({
       plugins: [tailwindcss, autoprefixer],
@@ -35,6 +37,7 @@ async function main() {
       metafile: true,
       loader,
       plugins,
+      define,
     });
 
     const esmResult = esbuild.build({
@@ -49,6 +52,7 @@ async function main() {
       metafile: true,
       loader,
       plugins,
+      define,
     });
 
     let esmSize = 0;
