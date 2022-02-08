@@ -52,7 +52,7 @@ export const usePreview = ({
   token,
   metadata,
   handleError = logErrorHandler,
-  initEndpoint = 'prod',
+  initEndpoint,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
