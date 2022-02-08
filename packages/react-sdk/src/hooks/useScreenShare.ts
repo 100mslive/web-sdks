@@ -56,7 +56,7 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
     } catch (error) {
       handleError(error as Error);
     }
-  }, [actions]);
+  }, [actions, amIScreenSharing, handleError]);
 
   return {
     amIScreenSharing,

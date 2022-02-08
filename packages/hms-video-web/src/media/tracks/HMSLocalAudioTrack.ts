@@ -144,8 +144,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   initAudioLevelMonitor() {
     HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
-    this.audioLevelMonitor = new TrackAudioLevelMonitor(this, this.eventBus.trackAudioLevelUpdate);
+    this.audioLevelMonitor = new TrackAudioLevelMonitor(
+      this,
+      this.eventBus.trackAudioLevelUpdate,
+      this.eventBus.localAudioSilence,
+    );
     this.audioLevelMonitor.start();
+    this.audioLevelMonitor.detectSilence();
   }
 
   destroyAudioLevelMonitor() {

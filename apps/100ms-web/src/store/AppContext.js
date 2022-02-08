@@ -66,7 +66,7 @@ const defaultUiSettings = {
   },
   uiViewMode: "grid",
   showStatsOnTiles: false,
-  enableAmbientMusic: true,
+  enableAmbientMusic: false,
 };
 
 const uiSettingsFromStorage = localStorage.getItem(UI_SETTINGS_KEY)

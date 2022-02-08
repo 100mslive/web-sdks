@@ -4,8 +4,8 @@ import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../stitches.config';
 import { dialogClose, dialogOpen } from '../utils/animations';
 import { IconButton } from '../IconButton';
-import { HorizontalDivider } from '../Divider';
-import { Flex, Text } from '..';
+import { Flex, Box } from '../Layout';
+import { Text } from '../Text';
 
 export const DialogClose = styled(Close, {});
 
@@ -17,16 +17,16 @@ const StyledOverlay = styled(Overlay, {
 
 const StyledDialogContent = styled(Content, {
   color: 'white',
-  backgroundColor: '$grey1',
+  backgroundColor: '$dialogBg',
   borderRadius: '8px',
   position: 'fixed',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '90vw',
-  maxWidth: '480px',
+  maxWidth: '26rem',
   maxHeight: '85vh',
-  padding: '20px',
+  padding: '1.5rem',
   '@allowMotion': {
     '&[data-state="open"]': {
       animation: `${dialogOpen} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
@@ -40,22 +40,29 @@ const StyledDialogContent = styled(Content, {
 
 type DialogContentProps = React.ComponentProps<typeof StyledDialogContent> & {
   title: string;
+  /**
+   * Whether to render close button
+   */
+  close?: boolean;
 };
 
-export const DialogContent: React.FC<DialogContentProps> = ({ children, title, ...props }) => (
+export const DialogContent: React.FC<DialogContentProps> = ({ children, close = true, title, ...props }) => (
   <>
     <StyledOverlay />
     <StyledDialogContent {...props}>
       <Flex justify="between">
-        <Text variant="heading-md">{title}</Text>
-        <DialogClose asChild>
-          <IconButton>
-            <CrossIcon />
-          </IconButton>
-        </DialogClose>
+        <Text variant="heading-md" css={{ mb: '$1' }}>
+          {title}
+        </Text>
+        {close && (
+          <DialogClose asChild>
+            <IconButton>
+              <CrossIcon />
+            </IconButton>
+          </DialogClose>
+        )}
       </Flex>
-      <HorizontalDivider space={4} />
-      {children}
+      <Box css={{ color: 'rgba(255,255,255, 0.7)' }}>{children}</Box>
     </StyledDialogContent>
   </>
 );

@@ -32,6 +32,6 @@ export function useAudioLevelStyles({
           ref.current.style[key] = styles[key];
         }
       }, selectTrackAudioByID(trackId)),
-    [trackId],
+    [getStyle, ref, store, trackId],
   );
 }
