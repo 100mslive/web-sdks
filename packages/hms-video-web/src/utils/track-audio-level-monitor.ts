@@ -40,7 +40,10 @@ export class TrackAudioLevelMonitor {
   }
 
   /**
-   * Detects silence by sending silence event on absolute silence for `tickThreshold` consecutive ticks `tickInterval` apart.
+   * To detect silence we check if the track is unmuted and silent in the current moment
+   * periodically. If the track is found to be silent more than a threshold number of times
+   * we send the event. The threshold number of time is there to reduce the chance of false
+   * positives.
    */
   detectSilence = async () => {
     const tickInterval = 30;
@@ -56,6 +59,7 @@ export class TrackAudioLevelMonitor {
             break;
           }
         } else {
+          // bail out immediately if sound is found
           break;
         }
       }
