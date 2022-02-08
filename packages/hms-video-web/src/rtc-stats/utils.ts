@@ -7,6 +7,7 @@ import {
 } from '../interfaces/webrtc-stats';
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
+import HMSLogger from '../utils/logger';
 
 export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
@@ -21,7 +22,7 @@ export const getTrackStats = async (
   try {
     trackReport = await getStats[peerConnectionType]?.(nativeTrack);
   } catch (err) {
-    console.error('Error in getting track stats', track, nativeTrack, err);
+    HMSLogger.e('[HMSWebrtcStats]', 'Error in getting track stats', track, nativeTrack, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
