@@ -60,7 +60,7 @@ export class PeerListManager {
   };
 
   private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
-    const roomPeers = roomState.peers;
+    const roomPeers = roomState.peers || {};
     // we don't get tracks inside the peer object in room state, we're adding
     // an empty value here so rest of the code flow can ignore this change, the below
     // can be changed when tracks will be sent as a separate object in future

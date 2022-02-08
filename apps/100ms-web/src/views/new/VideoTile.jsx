@@ -143,9 +143,10 @@ export const getVideoTileLabel = (
 ) => {
   // Map [isLocal, videoSource] to the label to be displayed.
 
-  let label = labelMap
-    .get([isLocal, videoSource].toString())
-    .replace(PEER_NAME_PLACEHOLDER, peerName);
+  let label = labelMap.get([isLocal, videoSource].toString());
+  if (label) {
+    label.replace(PEER_NAME_PLACEHOLDER, peerName);
+  }
   label = `${label}${degraded ? "(Degraded)" : ""}`;
   if (
     (isLocallyMuted === undefined || isLocallyMuted === null) &&
