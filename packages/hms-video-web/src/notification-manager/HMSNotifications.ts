@@ -73,8 +73,8 @@ export interface PeerNotification {
 
 export interface RoomState {
   name: string;
-  session_id: string;
-  started_at: number;
+  session_id?: string;
+  started_at?: number;
   recording?: {
     sfu: {
       started_at?: number;
