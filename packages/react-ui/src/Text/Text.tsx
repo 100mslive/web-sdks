@@ -4,6 +4,7 @@ export const Text = styled('p', {
   fontFamily: '$sans',
   fontWeight: 500,
   margin: 0,
+  color: '$fg',
   variants: {
     variant: {
       'heading-lg': {
