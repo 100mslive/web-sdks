@@ -176,6 +176,7 @@ export const lightTheme = createTheme({
     trans: 'rgba(0, 0, 0, 0.22)',
     disabled: 'rgba(59, 59, 59, 0.13)',
     statsBg: 'rgba(255,255,255,0.75)',
+    dialogBg: '#FFFFFF',
   },
 });
 
