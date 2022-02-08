@@ -1,5 +1,5 @@
 import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   calculateLayoutSizes,
   chunkElements,
@@ -10,28 +10,58 @@ import {
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import { useResizeDetector } from 'react-resize-detector';
 
-interface UseVideoListProps {
+export interface useVideoListInput {
+  /**
+   * peers is the list of all peers you need to display
+   */
+  peers: HMSPeer[];
   /**
    * Max tiles in a  page. Overrides maxRowCount and maxColCount
    */
   maxTileCount?: number;
+  /**
+   * Max rows in a  page. Only applied if maxTileCount is not present
+   */
   maxRowCount?: number;
+  /**
+   * Max columns in a  page. Only applied if maxTileCount and maxRowCount are not present
+   */
   maxColCount?: number;
   /**
-   * Given a screensharing peer the function should return true if their screenshare should be included for the video tile, and false otherwise. This can be useful if there are multiple screenshares in the room where you may want to show one in the center view and others in video list along side other tiles.
+   * A function which tells whether to show the screenShare for a peer who is screensharing. A peer is passed
+   * and a boolean value is expected.
+   * This can be useful if there are multiple screenShares in the room where you may want to show the main one in the
+   * center view and others in video list along side other tiles. No screenShare is included by default.
+   * e.g. includeScreenShare = (peer) => return peer.id !== mainScreenSharingPeer.id
    */
-  showScreenFn?: (peer: HMSPeer) => boolean;
-  peers: HMSPeer[];
-  overflow?: 'scroll-x' | 'scroll-y' | 'hidden';
+  includeScreenShareForPeer?: (peer: HMSPeer) => boolean;
   /**
-   * Aspect ratio of VideoTiles
+   * Aspect ratio of VideoTiles, ideally this should be the same as the aspect ratio selected for
+   * capture in the dashboard template.
    */
   aspectRatio?: { width: number; height: number };
   /**
    * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
-   * will be filtered by default. If you wish to show all peers, pass false for this.
+   * will be filtered. If you wish to show all peers, pass false for this.
    */
   filterNonPublishingPeers?: boolean;
+}
+
+export interface useVideoListTile extends TrackWithPeer {
+  width: number;
+  height: number;
+}
+
+export interface useVideoResult {
+  /**
+   * This returns a list of all pages with every page containing the list of all tiles on it.
+   */
+  pagesWithTiles: useVideoListTile[][];
+  /**
+   * add the ref to the element going to render the video list, this is used to measure the available
+   * space/dimensions in order to calculate the best fit
+   */
+  ref: React.MutableRefObject<any>;
 }
 
 const DEFAULTS = {
@@ -41,29 +71,29 @@ const DEFAULTS = {
   },
 };
 
+/**
+ * This hook can be used to build a paginated gallery view of video tiles. You can give the hook
+ * a list of all the peers which need to be shown and it tells you how to structure the UI by giving
+ * a list of pages with every page having a list of video tiles.
+ * Please check the documentation of input and output types for more details.
+ */
 export const useVideoList = ({
+  peers,
   maxTileCount,
   maxColCount,
   maxRowCount,
-  showScreenFn = () => false,
-  peers,
-  overflow = 'scroll-x',
+  includeScreenShareForPeer = () => false,
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
-}: UseVideoListProps): {
-  pagesWithTiles: (TrackWithPeer & {
-    width: number;
-    height: number;
-  })[][];
-  ref: React.MutableRefObject<any>;
-} => {
+}: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
+  // using vanilla store as we don't need re-rendering everytime something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
     peers,
     tracksMap,
-    showScreenFn,
+    includeScreenShareForPeer,
     filterNonPublishingPeers,
   );
   const finalAspectRatio = useMemo(() => {
@@ -87,7 +117,6 @@ export const useVideoList = ({
     isLastPageDifferentFromFirstPage,
   } = useMemo(
     () =>
-      // Flooring since there's a bug in react-slick where it converts width into a number
       calculateLayoutSizes({
         count,
         parentWidth: Math.floor(width),
@@ -104,7 +133,7 @@ export const useVideoList = ({
       chunkElements<TrackWithPeer>({
         elements: tracksWithPeer,
         tilesInFirstPage,
-        onlyOnePage: overflow === 'hidden',
+        onlyOnePage: false,
         isLastPageDifferentFromFirstPage,
         defaultWidth,
         defaultHeight,
@@ -114,7 +143,6 @@ export const useVideoList = ({
     [
       tracksWithPeer,
       tilesInFirstPage,
-      overflow,
       isLastPageDifferentFromFirstPage,
       defaultWidth,
       defaultHeight,

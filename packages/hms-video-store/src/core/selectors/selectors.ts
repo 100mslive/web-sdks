@@ -71,7 +71,23 @@ export const selectSpeakers = (store: HMSStore) => {
  */
 export const selectIsConnectedToRoom = createSelector([selectRoom], room => room && room.isConnected);
 
-export const selectPeerCount = createSelector(selectRoom, room => room.peers.length);
+/**
+ * selectPeerCount gives the number of peers Inside the room. This doesn't count the local peer if
+ * they're still in preview and haven't yet joined the room. Note that this will not necessarily equal the
+ * number of peers received through selectPeers, it's possible to know total number of people in the room
+ * without having details of everyone depending on dashboard settings.
+ */
+export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
+  if (isConnected) {
+    // if we have peer count from server return that else return number of peers in the store.
+    return room.peerCount || room.peers.length;
+  } else {
+    // if we have peer count from server return that, else return number of peers except the local one because local is
+    // not joined yet.
+    // Math.max to ensure we're not returning -1, if the selector is called before local peer is put in the store
+    return Math.max(room.peerCount || room.peers.length - 1, 0);
+  }
+});
 
 /**
  * Select an array of peers(remote peers and your local peer) present in the room.

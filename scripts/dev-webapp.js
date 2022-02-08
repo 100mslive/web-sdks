@@ -6,6 +6,8 @@ async function main() {
   const source = 'src/App.js';
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
+  require('dotenv').config();
+  const define = { 'process.env': JSON.stringify(process.env) };
 
   esbuild.build({
     entryPoints: [source],
@@ -17,7 +19,9 @@ async function main() {
     target: 'es6',
     external,
     metafile: true,
+    sourcemap: true,
     loader,
+    define,
     watch: {
       onRebuild(error) {
         if (error) {
@@ -39,6 +43,7 @@ async function main() {
     target: 'es6',
     external,
     loader,
+    define,
     sourcemap: true,
     incremental: true,
     treeShaking: true,

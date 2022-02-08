@@ -57,6 +57,9 @@ export const ErrorCodes = {
 
     // Over constrained error - device hardware unable to satisfy requested constraints
     OVER_CONSTRAINED: 3009,
+
+    // No audio detected from track, indicates problem with device hardware
+    NO_AUDIO_DETECTED: 3010,
   },
 
   WebrtcErrors: {

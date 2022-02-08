@@ -53,6 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -741,15 +742,17 @@ export class HMSSdk implements HMSInterface {
   }
 
   private initPreviewTrackAudioLevelMonitor() {
-    this.localPeer?.audioTrack?.initAudioLevelMonitor();
+    const localAudioTrack = this.localPeer?.audioTrack;
+    localAudioTrack?.initAudioLevelMonitor();
     this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {
       const hmsSpeakers =
-        audioLevelUpdate && audioLevelUpdate.track.trackId === this.localPeer?.audioTrack?.trackId
-          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
+        audioLevelUpdate && audioLevelUpdate.track.trackId === localAudioTrack?.trackId
+          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: localAudioTrack! }]
           : [];
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });
+    this.eventBus.localAudioSilence.subscribe(this.sendAudioPresenceFailed);
   }
 
   private get publishParams() {
@@ -907,4 +910,11 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
+
+  private sendAudioPresenceFailed = () => {
+    const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
+    analyticsEventsService.queue(AnalyticsEventFactory.audioDetectionFail(error)).flush();
+    // @TODO: start sending if error is less frequent
+    // this.listener?.onError(error);
+  };
 }
