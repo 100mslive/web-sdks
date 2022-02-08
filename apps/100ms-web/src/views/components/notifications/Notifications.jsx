@@ -17,7 +17,7 @@ import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { AppContext } from "../../../store/AppContext";
 import { TrackMuteAllModal } from "./TrackMuteAllModal";
 import { getMetadata } from "../../../common/utils";
-import { InvalidRoleModal } from "./InvalidRoleModal";
+import { InitErrorModal } from "./InitErrorModal";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -256,7 +256,7 @@ export function Notifications() {
       {!isHeadless && <TrackUnmuteModal notification={notification} />}
       {!isHeadless && <TrackMuteAllModal notification={notification} />}
       <AutoplayBlockedModal notification={notification} />
-      <InvalidRoleModal notification={notification} />
+      <InitErrorModal notification={notification} />
     </>
   );
 }
