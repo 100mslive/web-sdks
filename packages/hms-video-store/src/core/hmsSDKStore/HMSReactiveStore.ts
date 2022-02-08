@@ -166,7 +166,7 @@ export class HMSReactiveStore {
       }
       return prevGetState();
     };
-    HMSReactiveStore.useShallowCheckInSubscribe(hmsStore);
+    HMSReactiveStore.compareWithShallowCheckInSubscribe(hmsStore);
     const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, storeName);
     return { ...hmsStore, namedSetState };
   }
@@ -196,7 +196,7 @@ export class HMSReactiveStore {
    * and a shallow check avoids that triggering.
    * @private
    */
-  private static useShallowCheckInSubscribe<T extends State>(hmsStore: StoreApi<T>) {
+  private static compareWithShallowCheckInSubscribe<T extends State>(hmsStore: StoreApi<T>) {
     const prevSubscribe = hmsStore.subscribe;
     hmsStore.subscribe = <StateSlice>(
       listener: StateSliceListener<StateSlice>,

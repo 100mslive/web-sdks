@@ -2,7 +2,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSDeviceChangeEvent } from '../interfaces';
 import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
-import { HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
@@ -25,6 +25,11 @@ export class EventBus {
    */
   readonly trackAudioLevelUpdate = new HMSInternalEvent<ITrackAudioLevelUpdate>(
     HMSEvents.TRACK_AUDIO_LEVEL_UPDATE,
+    this.eventEmitter,
+  );
+
+  readonly localAudioSilence = new HMSInternalEvent<{ track: HMSLocalAudioTrack }>(
+    HMSEvents.LOCAL_AUDIO_SILENCE,
     this.eventEmitter,
   );
 }
