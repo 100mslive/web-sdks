@@ -62,7 +62,9 @@ export class HMSWebrtcInternals {
     this.stop();
     this.isMonitored = true;
     HMSLogger.d(this.TAG, 'Starting Webrtc Stats Monitor');
-    this.startLoop().then(() => HMSLogger.d(this.TAG, 'Stopping Webrtc Stats Monitor'));
+    this.startLoop()
+      .then(() => HMSLogger.d(this.TAG, 'Stopping Webrtc Stats Monitor'))
+      .catch(e => HMSLogger.e(this.TAG, e.message));
   }
 
   private stop() {
