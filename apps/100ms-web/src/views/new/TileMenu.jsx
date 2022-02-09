@@ -46,7 +46,7 @@ const HmsTileMenu = ({
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
-        {toggleVideo && !isScreenshare ? (
+        {toggleVideo ? (
           <StyledMenuTile.ItemButton onClick={toggleVideo}>
             {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
             <span>{`${isVideoEnabled ? "Mute" : "Unmute"} Video`}</span>
@@ -58,7 +58,6 @@ const HmsTileMenu = ({
             <span>{`${isAudioEnabled ? "Mute" : "Unmute"} Audio`}</span>
           </StyledMenuTile.ItemButton>
         ) : null}
-
         {audioTrackID ? (
           <StyledMenuTile.VolumeItem>
             <Flex align="center" gap={1}>

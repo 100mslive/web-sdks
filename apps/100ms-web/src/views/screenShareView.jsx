@@ -3,7 +3,6 @@ import {
   useHMSStore,
   useHMSActions,
   VideoList,
-  VideoTile,
   selectPeers,
   selectLocalPeer,
   selectPeerScreenSharing,
@@ -199,22 +198,10 @@ const ScreenShareComponent = ({
             />
           </div>
         ) : (
-          <>
-            {FeatureFlags.enableNewComponents ? (
-              <HmsScreenshareTile
-                showStatsOnTiles={showStats}
-                trackId={screenshareTrack.id}
-              />
-            ) : (
-              <VideoTile
-                peer={peerPresenting}
-                showScreen={true}
-                objectFit="contain"
-                hmsVideoTrackId={screenshareTrack?.id}
-                {...videoTileProps(peerPresenting, screenshareTrack)}
-              />
-            )}
-          </>
+          <HmsScreenshareTile
+            showStatsOnTiles={showStats}
+            trackId={screenshareTrack.id}
+          />
         ))}
     </Box>
   );
@@ -268,28 +255,14 @@ const SmallTilePeersView = ({
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
         <>
-          {FeatureFlags.enableNewComponents ? (
-            <HmsVideoList
-              peers={smallTilePeers}
-              maxColCount={2}
-              maxRowCount={rows}
-              includeScreenShareForPeer={shouldShowScreenFn}
-              overflow="scroll-x"
-              showStatsOnTiles={showStatsOnTiles}
-            />
-          ) : (
-            <VideoList
-              peers={smallTilePeers}
-              showScreenFn={shouldShowScreenFn}
-              classes={{ videoTileContainer: "rounded-lg " }}
-              maxColCount={2}
-              maxRowCount={rows}
-              overflow="scroll-x"
-              compact={true}
-              // dont show stats for small tiles during screenshare
-              videoTileProps={videoTileProps}
-            />
-          )}
+          <HmsVideoList
+            peers={smallTilePeers}
+            maxColCount={2}
+            maxRowCount={rows}
+            includeScreenShareForPeer={shouldShowScreenFn}
+            overflow="scroll-x"
+            showStatsOnTiles={showStatsOnTiles}
+          />
         </>
       )}
     </Flex>
@@ -319,21 +292,12 @@ const LargeTilePeerView = ({
         },
       }}
     >
-      {FeatureFlags.enableNewComponents ? (
-        <HmsVideoTile
-          showStatsOnTiles={showStatsOnTiles}
-          width="100%"
-          height="100%"
-          trackId={peerScreenSharing.videoTrack}
-        />
-      ) : (
-        <VideoTile
-          peer={peerScreenSharing}
-          compact={true}
-          hmsVideoTrackId={peerScreenSharing.videoTrack}
-          {...videoTileProps(peerScreenSharing, peerScreenSharing.videoTrack)}
-        />
-      )}
+      <HmsVideoTile
+        showStatsOnTiles={showStatsOnTiles}
+        width="100%"
+        height="100%"
+        trackId={peerScreenSharing.videoTrack}
+      />
     </Box>
   ) : null;
 };
