@@ -204,8 +204,6 @@ const ScreenShareComponent = ({
               <HmsScreenshareTile
                 showStatsOnTiles={showStats}
                 trackId={screenshareTrack.id}
-                width="100%"
-                height="100%"
               />
             ) : (
               <VideoTile
@@ -275,7 +273,7 @@ const SmallTilePeersView = ({
               peers={smallTilePeers}
               maxColCount={2}
               maxRowCount={rows}
-              showScreenFn={shouldShowScreenFn}
+              includeScreenShareForPeer={shouldShowScreenFn}
               overflow="scroll-x"
               showStatsOnTiles={showStatsOnTiles}
             />

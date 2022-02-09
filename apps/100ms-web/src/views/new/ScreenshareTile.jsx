@@ -1,55 +1,57 @@
+// @ts-check
 import React, { useRef, useState } from "react";
-import {
-  StyledVideoTile,
-  styled,
-  Video,
-  VideoTileStats,
-} from "@100mslive/react-ui";
+import { StyledVideoTile, Video, VideoTileStats } from "@100mslive/react-ui";
 import {
   useHMSStore,
   selectPeerByID,
   selectTrackByID,
+  selectScreenShareAudioByPeerID,
 } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
-import { useFullscreen, useToggle } from "react-use";
+import { useFullscreen } from "react-use";
 import { HmsTileMenu } from "../UIComponents";
-import { getVideoTileLabel } from "./utils";
+import { getVideoTileLabel } from "./peerTileUtils";
 
-const HmsScreenshareTile = ({ trackId, showStatsOnTiles, width, height }) => {
+const HmsScreenshareTile = ({
+  trackId,
+  showStatsOnTiles,
+  width = "100%",
+  height = "100%",
+}) => {
   const track = useHMSStore(selectTrackByID(trackId));
   const peer = useHMSStore(selectPeerByID(track?.peerId));
-  const [showTrigger, setShowTrigger] = useState(false);
-  const label = getVideoTileLabel(
-    peer?.name,
-    peer?.isLocal,
-    track?.source,
-    track?.degraded
-  );
-  const ref = useRef(null);
-  const [show, toggle] = useToggle(false);
-  const isFullscreen = useFullscreen(ref, show, {
-    onClose: () => toggle(false),
+  const [isMouseHovered, setIsMouseHovered] = useState(false);
+  const label = getVideoTileLabel(peer, track);
+  const fullscreenRef = useRef(null);
+  // fullscreen is for desired state
+  const [fullscreen, setFullscreen] = useState(false);
+  // isFullscreen is for true state
+  const isFullscreen = useFullscreen(fullscreenRef, fullscreen, {
+    onClose: () => setFullscreen(false),
   });
+  const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
   return (
     <StyledVideoTile.Root css={{ width, height }}>
       {peer ? (
         <StyledVideoTile.Container
-          ref={ref}
-          onMouseEnter={() => setShowTrigger(true)}
+          transparentBg
+          ref={fullscreenRef}
+          onMouseEnter={() => setIsMouseHovered(true)}
           onMouseLeave={() => {
-            setShowTrigger(false);
+            setIsMouseHovered(false);
           }}
         >
           {showStatsOnTiles ? (
             <VideoTileStats
-              audioTrackID={peer?.audioTrack}
+              audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
             />
           ) : null}
-
-          <FullScreenButton onClick={() => toggle()}>
+          <StyledVideoTile.FullScreenButton
+            onClick={() => setFullscreen(!fullscreen)}
+          >
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
-          </FullScreenButton>
+          </StyledVideoTile.FullScreenButton>
           {track ? (
             <Video
               screenShare={true}
@@ -57,10 +59,14 @@ const HmsScreenshareTile = ({ trackId, showStatsOnTiles, width, height }) => {
               trackId={track.id}
             />
           ) : null}
-
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-          {showTrigger && !peer?.isLocal ? (
-            <HmsTileMenu peerId={track.peerId} />
+          {isMouseHovered && !peer?.isLocal ? (
+            <HmsTileMenu
+              isScreenshare
+              peerID={peer?.id}
+              audioTrackID={audioTrack?.id}
+              videoTrackID={track?.id}
+            />
           ) : null}
         </StyledVideoTile.Container>
       ) : null}
@@ -69,22 +75,3 @@ const HmsScreenshareTile = ({ trackId, showStatsOnTiles, width, height }) => {
 };
 
 export default HmsScreenshareTile;
-
-const FullScreenButton = styled("button", {
-  width: "2.25rem",
-  height: "2.25rem",
-  color: "white",
-  borderRadius: "$round",
-  backgroundColor: "$menuBg",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  position: "absolute",
-  bottom: "1rem",
-  right: "1rem",
-  zIndex: 20,
-  "&:not([disabled]):focus": {
-    outline: "none",
-    boxShadow: "0 0 0 3px $colors$brandTint",
-  },
-});

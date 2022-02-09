@@ -1,5 +1,8 @@
 import { styled } from '../stitches.config';
 
+/**
+ * @see https://tailwindcss.com/docs/space
+ */
 const gapStyles = (value: number) => {
   return {
     '& > * + *': {

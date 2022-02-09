@@ -11,7 +11,6 @@ export const StyledVideo = styled('video', {
   alignItems: 'center',
   borderRadius: '$2',
   objectFit: 'cover',
-  background: '$grey1',
   variants: {
     mirror: {
       true: {
@@ -21,7 +20,6 @@ export const StyledVideo = styled('video', {
     screenShare: {
       true: {
         objectFit: 'contain',
-        background: 'transparent',
       },
     },
   },

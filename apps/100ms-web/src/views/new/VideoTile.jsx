@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useRef, useState } from "react";
 import {
   AudioLevel,
@@ -12,7 +13,6 @@ import {
   selectIsPeerVideoEnabled,
   selectPeerByID,
   selectPeerMetadata,
-  selectIsAudioLocallyMuted,
   selectTrackByID,
 } from "@100mslive/react-sdk";
 import {
@@ -21,42 +21,31 @@ import {
   BrbIcon,
 } from "@100mslive/react-icons";
 import { HmsTileMenu } from "../UIComponents";
-import { getVideoTileLabel } from "./utils";
+import { getVideoTileLabel } from "./peerTileUtils";
 
-const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
+const VideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectTrackByID(trackId));
   const peer = useHMSStore(selectPeerByID(track?.peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track?.peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track?.peerId));
-  const [showTrigger, setShowTrigger] = useState(false);
+  const [isMouseHovered, setIsMouseHovered] = useState(false);
   const metaData = useHMSStore(selectPeerMetadata(track?.peerId));
   const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
-  const isLocallyMuted = useHMSStore(
-    selectIsAudioLocallyMuted(peer?.audioTrack)
-  );
-  const label = getVideoTileLabel(
-    peer?.name,
-    peer?.isLocal,
-    track?.source,
-    isLocallyMuted,
-    track?.degraded
-  );
-  const ref = useRef(null);
+  const label = getVideoTileLabel(peer, track);
   return (
     <StyledVideoTile.Root css={{ width, height }}>
       {peer ? (
         <StyledVideoTile.Container
-          ref={ref}
-          onMouseEnter={() => setShowTrigger(true)}
+          onMouseEnter={() => setIsMouseHovered(true)}
           onMouseLeave={() => {
-            setShowTrigger(false);
+            setIsMouseHovered(false);
           }}
         >
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={peer?.audioTrack}
-              videoTrackID={track?.id}
+              videoTrackID={peer?.videoTrack}
             />
           ) : null}
 
@@ -76,8 +65,12 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {showTrigger && !peer?.isLocal ? (
-            <HmsTileMenu peerId={track.peerId} />
+          {isMouseHovered && !peer?.isLocal ? (
+            <HmsTileMenu
+              peerID={peer?.id}
+              audioTrackID={peer?.audioTrack}
+              videoTrackID={peer?.videoTrack}
+            />
           ) : null}
           {isHandRaised ? (
             <StyledVideoTile.AttributeBox>
@@ -94,6 +87,8 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
     </StyledVideoTile.Root>
   );
 };
+
+const HmsVideoTile = React.memo(VideoTile);
 
 export default HmsVideoTile;
 

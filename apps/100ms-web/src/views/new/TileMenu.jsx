@@ -1,3 +1,4 @@
+// @ts-check
 import React from "react";
 import {
   HorizontalMenuIcon,
@@ -10,78 +11,73 @@ import {
 } from "@100mslive/react-icons";
 import {
   useHMSStore,
-  selectVideoTrackByPeerID,
   selectPermissions,
-  selectAudioTrackByPeerID,
   useHMSActions,
-  selectAudioVolumeByPeerID,
+  useRemoteAVToggle,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
 
-const HmsTileMenu = ({ peerId }) => {
+/**
+ * Taking peerID as peer won't necesarilly have tracks
+ */
+const HmsTileMenu = ({
+  audioTrackID,
+  videoTrackID,
+  peerID,
+  isScreenshare = false,
+}) => {
   const actions = useHMSActions();
-  const permissions = useHMSStore(selectPermissions);
-  // TODO: selectTrackByID vs selectVideoTrackByPeerID
-  const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const canToggleVideo = videoTrack?.enabled
-    ? permissions?.mute
-    : permissions?.unmute;
-  const canToggleAudio = audioTrack?.enabled
-    ? permissions?.mute
-    : permissions?.unmute;
-  const toggleTrackEnabled = async track => {
-    if (track) {
-      try {
-        await actions.setRemoteTrackEnabled(track.id, !track.enabled);
-      } catch (error) {
-        // TODO: add toast here
-      }
-    }
-  };
-  const trackVolume = useHMSStore(selectAudioVolumeByPeerID(peerId));
+  let { removeOthers } = useHMSStore(selectPermissions);
+  removeOthers = removeOthers && !isScreenshare;
+  const {
+    isAudioEnabled,
+    isVideoEnabled,
+    setVolume,
+    toggleAudio,
+    toggleVideo,
+    volume,
+  } = useRemoteAVToggle(audioTrackID, videoTrackID);
+  if (!(removeOthers || toggleAudio || toggleVideo || setVolume)) {
+    return null;
+  }
   return (
     <StyledMenuTile.Root>
       <StyledMenuTile.Trigger>
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
-        {canToggleVideo ? (
-          <StyledMenuTile.ItemButton
-            onClick={() => toggleTrackEnabled(videoTrack)}
-          >
-            {videoTrack?.enabled ? <VideoOnIcon /> : <VideoOffIcon />}
-            <span>{`${videoTrack?.enabled ? "Mute" : "Unmute"} Video`}</span>
+        {toggleVideo && !isScreenshare ? (
+          <StyledMenuTile.ItemButton onClick={toggleVideo}>
+            {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
+            <span>{`${isVideoEnabled ? "Mute" : "Unmute"} Video`}</span>
           </StyledMenuTile.ItemButton>
         ) : null}
-        {canToggleAudio ? (
-          <StyledMenuTile.ItemButton
-            onClick={() => toggleTrackEnabled(audioTrack)}
-          >
-            {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}
-            <span>{`${audioTrack?.enabled ? "Mute" : "Unmute"} Audio`}</span>
+        {toggleAudio ? (
+          <StyledMenuTile.ItemButton onClick={toggleAudio}>
+            {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
+            <span>{`${isAudioEnabled ? "Mute" : "Unmute"} Audio`}</span>
           </StyledMenuTile.ItemButton>
         ) : null}
 
-        {audioTrack ? (
+        {audioTrackID ? (
           <StyledMenuTile.VolumeItem>
             <Flex align="center" gap={1}>
-              <SpeakerIcon /> <span>Volume ({trackVolume})</span>
+              <SpeakerIcon /> <span>Volume ({volume})</span>
             </Flex>
             <Slider
               css={{ my: "0.5rem" }}
               step={5}
-              value={[trackVolume || 0]}
-              onValueChange={e => actions.setVolume(e[0], audioTrack?.id)}
+              value={[volume]}
+              onValueChange={e => setVolume(e[0])}
             />
           </StyledMenuTile.VolumeItem>
         ) : null}
 
-        {permissions?.removeOthers ? (
+        {removeOthers ? (
           <StyledMenuTile.RemoveItem
             onClick={async () => {
               try {
-                await actions.removePeer(peerId, "");
+                await actions.removePeer(peerID, "");
               } catch (error) {
                 // TODO: Toast here
               }
