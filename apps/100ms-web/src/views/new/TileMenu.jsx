@@ -20,7 +20,7 @@ import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
-const HmsTileMenu = ({
+const TileMenu = ({
   audioTrackID,
   videoTrackID,
   peerID,
@@ -91,4 +91,4 @@ const HmsTileMenu = ({
   );
 };
 
-export default HmsTileMenu;
+export default TileMenu;

@@ -4,7 +4,7 @@ import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
 import { useWindowSize } from "../hooks/useWindowSize";
 import { chatStyle, getBlurClass } from "../../common/utils";
-import { HmsVideoList } from "../UIComponents";
+import VideoList from "../new/VideoList";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -42,7 +42,7 @@ export const GridCenterView = ({
         }}
       >
         {peers && peers.length > 0 ? (
-          <HmsVideoList
+          <VideoList
             showStatsOnTiles={showStatsOnTiles}
             peers={peers}
             maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
@@ -115,7 +115,7 @@ export const GridSidePaneView = ({
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
-          <HmsVideoList
+          <VideoList
             showStatsOnTiles={showStatsOnTiles}
             peers={peers}
             maxColCount={2}

@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, Fragment } from "react";
 import {
   useHMSStore,
   useHMSActions,
-  VideoList,
   selectPeers,
   selectLocalPeer,
   selectPeerScreenSharing,
@@ -16,8 +15,9 @@ import { ChatView } from "./components/chatView";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
-import { HmsScreenshareTile, HmsVideoList, HmsVideoTile } from "./UIComponents";
-import { FeatureFlags } from "../store/FeatureFlags";
+import ScreenshareTile from "./new/ScreenshareTile";
+import VideoList from "./new/VideoList";
+import VideoTile from "./new/VideoTile";
 
 export const ScreenShareView = ({
   showStats,
@@ -198,7 +198,7 @@ const ScreenShareComponent = ({
             />
           </div>
         ) : (
-          <HmsScreenshareTile
+          <ScreenshareTile
             showStatsOnTiles={showStats}
             trackId={screenshareTrack.id}
           />
@@ -254,16 +254,14 @@ const SmallTilePeersView = ({
       }}
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
-        <>
-          <HmsVideoList
-            peers={smallTilePeers}
-            maxColCount={2}
-            maxRowCount={rows}
-            includeScreenShareForPeer={shouldShowScreenFn}
-            overflow="scroll-x"
-            showStatsOnTiles={showStatsOnTiles}
-          />
-        </>
+        <VideoList
+          peers={smallTilePeers}
+          maxColCount={2}
+          maxRowCount={rows}
+          includeScreenShareForPeer={shouldShowScreenFn}
+          overflow="scroll-x"
+          showStatsOnTiles={showStatsOnTiles}
+        />
       )}
     </Flex>
   );
@@ -292,7 +290,7 @@ const LargeTilePeerView = ({
         },
       }}
     >
-      <HmsVideoTile
+      <VideoTile
         showStatsOnTiles={showStatsOnTiles}
         width="100%"
         height="100%"
