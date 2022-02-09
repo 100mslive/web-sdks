@@ -1,7 +1,7 @@
 import React from 'react';
 import { useVideoList, HMSPeer } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
-import { VideoTile } from '../VideoTile';
+import { VideoTile } from '../VideoTile/VideoTile';
 import { Pagination } from '../Pagination';
 
 interface Props {

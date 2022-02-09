@@ -3,15 +3,13 @@ import { styled } from '../stitches.config';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
 
-export const StyledRoot = styled('div', {
+const Root = Popover.Root;
+
+const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
   top: '10px',
   right: '10px',
   zIndex: 20,
-  // display: 'none',
-});
-
-export const StyledTrigger = styled(Popover.Trigger, {
   width: '36px',
   height: '36px',
   color: 'white',
@@ -24,7 +22,7 @@ export const StyledTrigger = styled(Popover.Trigger, {
   },
 });
 
-export const StyledContent = styled(Popover.Content, {
+const StyledContent = styled(Popover.Content, {
   backgroundColor: '$grey2',
   padding: '10px 0px',
   display: 'flex',
@@ -34,7 +32,7 @@ export const StyledContent = styled(Popover.Content, {
   ...popoverAnimation,
 });
 
-export const styledItem = {
+const styledItem = {
   fontSize: '14px',
   color: '$fg',
   display: 'flex',
@@ -43,7 +41,7 @@ export const styledItem = {
   width: '100%',
 };
 
-export const StyledItemButton = styled('button', {
+const StyledItemButton = styled('button', {
   ...styledItem,
   height: '40px',
   '&:hover': {
@@ -60,7 +58,7 @@ export const StyledItemButton = styled('button', {
   },
 });
 
-export const StyledVolumeItem = styled('div', {
+const StyledVolumeItem = styled('div', {
   // TODO: maybe keep this as base comp and extend button variant
   ...styledItem,
   alignItems: 'start',
@@ -76,7 +74,25 @@ export const Flex = styled('div', {
   },
 });
 
-export const RemoveMenuItem = styled(StyledItemButton, {
+const RemoveMenuItem = styled(StyledItemButton, {
   color: '$redMain',
   borderTop: '1px solid $grey4',
 });
+
+interface MenuTileType {
+  Root: typeof Root;
+  Trigger: typeof StyledTrigger;
+  Content: typeof StyledContent;
+  ItemButton: typeof StyledItemButton;
+  VolumeItem: typeof StyledVolumeItem;
+  RemoveItem: typeof RemoveMenuItem;
+}
+
+export const StyledMenuTile: MenuTileType = {
+  Root,
+  Trigger: StyledTrigger,
+  Content: StyledContent,
+  ItemButton: StyledItemButton,
+  VolumeItem: StyledVolumeItem,
+  RemoveItem: RemoveMenuItem,
+};
