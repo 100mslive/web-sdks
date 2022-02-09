@@ -17,6 +17,16 @@ export interface TrackStateNotification {
   peer: PeerNotificationInfo;
 }
 
+export interface OnTrackLayerUpdateNotification {
+  tracks: {
+    [track_id: string]: {
+      current_layer: string;
+      expected_layer: string;
+      track_id: string;
+    };
+  };
+}
+
 export interface PeerNotificationInfo {
   peer_id: string;
   info: Info;

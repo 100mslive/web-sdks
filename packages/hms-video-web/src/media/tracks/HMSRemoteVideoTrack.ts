@@ -67,7 +67,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       this._degradedAt = new Date();
     }
 
-    this.updateLayer();
+    // this.updateLayer();
   }
 
   private updateLayer() {

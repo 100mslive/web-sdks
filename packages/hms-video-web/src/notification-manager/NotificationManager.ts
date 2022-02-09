@@ -4,7 +4,7 @@ import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
-import { PolicyParams, SpeakerList, TrackStateNotification } from './HMSNotifications';
+import { OnTrackLayerUpdateNotification, PolicyParams, SpeakerList, TrackStateNotification } from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { PeerListManager } from './managers/PeerListManager';
@@ -101,6 +101,10 @@ export class NotificationManager {
       }
       case HMSNotificationMethod.TRACK_UPDATE: {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
+        break;
+      }
+      case HMSNotificationMethod.ON_TRACK_LAYER_UPDATE: {
+        this.trackManager.handleTrackLayerUpdate(notification as OnTrackLayerUpdateNotification);
         break;
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
