@@ -17,7 +17,7 @@ import { ChatView } from "./components/chatView";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
-import { HmsVideoList, HmsVideoTile } from "./UIComponents";
+import { HmsScreenshareTile, HmsVideoList, HmsVideoTile } from "./UIComponents";
 import { FeatureFlags } from "../store/FeatureFlags";
 
 export const ScreenShareView = ({
@@ -201,7 +201,7 @@ const ScreenShareComponent = ({
         ) : (
           <>
             {FeatureFlags.enableNewComponents ? (
-              <HmsVideoTile
+              <HmsScreenshareTile
                 showStatsOnTiles={showStats}
                 trackId={screenshareTrack.id}
                 width="100%"

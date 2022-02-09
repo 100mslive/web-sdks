@@ -3,7 +3,6 @@ import {
   AudioLevel,
   Avatar,
   StyledVideoTile,
-  styled,
   Video,
   VideoTileStats,
 } from "@100mslive/react-ui";
@@ -20,15 +19,12 @@ import {
   MicOffIcon,
   HandRaiseFilledIcon,
   BrbIcon,
-  ExpandIcon,
-  ShrinkIcon,
 } from "@100mslive/react-icons";
-import { useFullscreen, useToggle } from "react-use";
 import { HmsTileMenu } from "../UIComponents";
+import { getVideoTileLabel } from "./utils";
 
 const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectTrackByID(trackId));
-  const isScreenShare = track?.source === "screen";
   const peer = useHMSStore(selectPeerByID(track?.peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(track?.peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(track?.peerId));
@@ -47,10 +43,6 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
     track?.degraded
   );
   const ref = useRef(null);
-  const [show, toggle] = useToggle(false);
-  const isFullscreen = useFullscreen(ref, show, {
-    onClose: () => toggle(false),
-  });
   return (
     <StyledVideoTile.Root css={{ width, height }}>
       {peer ? (
@@ -67,24 +59,19 @@ const HmsVideoTile = ({ trackId, showStatsOnTiles, width, height }) => {
               videoTrackID={track?.id}
             />
           ) : null}
-          {isScreenShare ? (
-            <FullScreenButton onClick={() => toggle()}>
-              {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
-            </FullScreenButton>
-          ) : null}
+
           <AudioLevel audioTrack={peer?.audioTrack} />
           {track ? (
             <Video
-              screenShare={isScreenShare}
               mirror={peer.isLocal && track?.source === "regular"}
               trackId={track.id}
             />
           ) : null}
-          {isVideoMuted && !isScreenShare ? (
+          {isVideoMuted ? (
             <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
           ) : null}
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-          {isAudioMuted && !isScreenShare ? (
+          {isAudioMuted ? (
             <StyledVideoTile.AudioIndicator>
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
@@ -122,56 +109,3 @@ const getAvatarSize = height => {
     return "md";
   }
 };
-
-const PEER_NAME_PLACEHOLDER = "peerName";
-const labelMap = new Map([
-  [[true, "screen"].toString(), "Your Screen"],
-  [[true, "playlist"].toString(), "Your Playlist"],
-  [[true, "regular"].toString(), `You (${PEER_NAME_PLACEHOLDER})`],
-  [[false, "screen"].toString(), `${PEER_NAME_PLACEHOLDER}'s Screen`],
-  [[false, "playlist"].toString(), `${PEER_NAME_PLACEHOLDER}'s Video`],
-  [[false, "regular"].toString(), PEER_NAME_PLACEHOLDER],
-  [[false, undefined].toString(), PEER_NAME_PLACEHOLDER],
-]);
-
-export const getVideoTileLabel = (
-  peerName,
-  isLocal,
-  videoSource = "regular",
-  isLocallyMuted,
-  degraded
-) => {
-  // Map [isLocal, videoSource] to the label to be displayed.
-
-  let label = labelMap.get([isLocal, videoSource].toString());
-  if (label) {
-    label.replace(PEER_NAME_PLACEHOLDER, peerName);
-  }
-  label = `${label}${degraded ? "(Degraded)" : ""}`;
-  if (
-    (isLocallyMuted === undefined || isLocallyMuted === null) &&
-    videoSource === "regular"
-  ) {
-    return label;
-  }
-  return `${label}${isLocallyMuted ? " (Muted for you)" : ""}`;
-};
-
-const FullScreenButton = styled("button", {
-  width: "2.25rem",
-  height: "2.25rem",
-  color: "white",
-  borderRadius: "$round",
-  backgroundColor: "$menuBg",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  position: "absolute",
-  bottom: "1rem",
-  right: "1rem",
-  zIndex: 20,
-  "&:not([disabled]):focus": {
-    outline: "none",
-    boxShadow: "0 0 0 3px $colors$brandTint",
-  },
-});
