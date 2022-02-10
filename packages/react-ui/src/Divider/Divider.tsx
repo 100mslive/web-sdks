@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 
 const getVerticalSpace = (space: string) => ({
   marginLeft: space,

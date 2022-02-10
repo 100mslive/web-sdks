@@ -1,6 +1,6 @@
 import React from 'react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 import type { VariantProps } from '@stitches/react';
 
 export const StyledVideo = styled('video', {

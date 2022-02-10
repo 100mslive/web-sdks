@@ -1,7 +1,7 @@
 import React from 'react';
 import { Close, Content, Overlay } from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 import { dialogClose, dialogOpen } from '../utils/animations';
 import { IconButton } from '../IconButton';
 import { Flex, Box } from '../Layout';

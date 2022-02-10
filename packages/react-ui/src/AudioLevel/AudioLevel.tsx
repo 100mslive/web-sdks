@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 import { HMSPeer, useAudioLevelStyles } from '@100mslive/react-sdk';
 
 const StyledAudioLevel = styled('div', {

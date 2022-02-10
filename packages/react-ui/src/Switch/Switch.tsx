@@ -1,6 +1,6 @@
 import * as BaseSwitch from '@radix-ui/react-switch';
 import React from 'react';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 
 const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',

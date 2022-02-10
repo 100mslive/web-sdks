@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 
 export const Text = styled('p', {
   fontFamily: '$sans',

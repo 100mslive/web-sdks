@@ -1,5 +1,5 @@
 import * as Popover from '@radix-ui/react-popover';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme/stitches.config';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
 

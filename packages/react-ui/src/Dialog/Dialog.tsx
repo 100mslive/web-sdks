@@ -1,5 +1,5 @@
 import { Dialog as Root, DialogContent, DialogClose, DialogOverlay, DialogTrigger } from '@radix-ui/react-dialog';
-import { styled, keyframes } from '../stitches.config';
+import { styled, keyframes } from '../Theme/stitches.config';
 
 const contentShow = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
