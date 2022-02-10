@@ -74,6 +74,7 @@ export const RecordingAndRTMPModal = ({
         isHlsOn
           ? await hmsActions.startHLSStreaming({
               variants: [{ meetingURL: meetingURL }],
+              recording: isRecordingOn ? {} : undefined,
             })
           : await hmsActions.startRTMPOrRecording({
               meetingURL,
@@ -210,7 +211,6 @@ export const RecordingAndRTMPForm = ({
           <SwitchInput
             inputName="Recording:"
             checked={isRecordingOn || recordingStatus}
-            disabled={hlsStatus || isHlsOn}
             onChangeHandler={setIsRecordingOn}
           />
         )}
