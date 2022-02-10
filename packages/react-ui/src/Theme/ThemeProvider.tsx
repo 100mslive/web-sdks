@@ -26,3 +26,5 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>
 }) => {
   return <ThemeContext.Provider value={{ type, theme, appBuilder }}>{children}</ThemeContext.Provider>;
 };
+
+export const useTheme = () => React.useContext(ThemeContext);
