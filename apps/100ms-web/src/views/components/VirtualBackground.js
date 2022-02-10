@@ -31,7 +31,7 @@ export const VirtualBackground = () => {
       window.HMS.virtualBackground = pluginRef.current;
       await pluginRef.current.setBackground(getRandomVirtualBackground());
       //Running VB on every alternate frame rate for optimized cpu usage
-      await hmsActions.addPluginToVideoTrack(pluginRef.current, 15);
+      await hmsActions.addPluginToVideoTrack(pluginRef.current, 10);
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }
