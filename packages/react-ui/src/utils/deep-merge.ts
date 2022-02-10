@@ -1,4 +1,11 @@
 /* eslint-disable complexity */
+/**
+ * Performs recursive merging of object by comparing keys. The last object's key will be the final winner
+ * when keys clash.
+ * @param result - Object where the result of the operation is stored
+ * @param rest: any[] -  pass objects that are to be merged in result
+ * @returns {Record<string, any>} merged object
+ */
 export default function deepMerge(result: Record<string, any>, ...rest: any[]) {
   const stack = rest;
   let item;
