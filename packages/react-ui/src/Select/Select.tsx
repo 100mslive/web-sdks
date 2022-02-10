@@ -3,7 +3,7 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme/stitches.config';
 
 const Root = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
   height: '40px',
@@ -20,7 +20,7 @@ const SelectRoot = styled('select', {
   fontSize: '16px',
   fontWeight: '500',
   appearance: 'none',
-  color: '$fg',
+  color: '$textPrimary',
   width: '100%',
   paddingLeft: '12px',
   paddingRight: '30px',

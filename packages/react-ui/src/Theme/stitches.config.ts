@@ -34,7 +34,15 @@ export type Theme = typeof HmsStitches.theme;
  * @param { type: ThemeType; className: string; theme: Theme }
  * @returns
  */
-export const createTheme = ({ type, theme, className }: { type: ThemeType; className: string; theme: Theme }) => {
+export const createTheme = ({
+  type,
+  theme,
+  className,
+}: {
+  type: ThemeType;
+  className?: string;
+  theme?: Partial<Theme>;
+}) => {
   if (!type) {
     throw new Error('Theme type is required');
   }

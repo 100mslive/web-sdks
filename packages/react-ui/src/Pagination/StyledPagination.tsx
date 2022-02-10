@@ -13,7 +13,7 @@ const Root = styled('div', {
 });
 
 const Chevron = styled('button', {
-  color: '$fg',
+  color: '$textPrimary',
   '&:focus': {
     outline: 'none',
   },

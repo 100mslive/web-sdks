@@ -33,7 +33,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -57,7 +57,7 @@ const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 const AudioIndicator = styled('div', {

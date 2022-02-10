@@ -31,7 +31,7 @@ export const Label = styled('td', {
 });
 
 export const Value = styled('td', {
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 interface StatsType {

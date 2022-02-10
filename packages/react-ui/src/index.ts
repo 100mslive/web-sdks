@@ -20,3 +20,4 @@ export * from './Video';
 export * from './TileMenu';
 export * from './AudioLevel';
 export * from './Stats';
+export * from './Theme';

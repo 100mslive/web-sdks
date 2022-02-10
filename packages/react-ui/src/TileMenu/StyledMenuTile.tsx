@@ -34,7 +34,7 @@ const StyledContent = styled(Popover.Content, {
 
 const styledItem = {
   fontSize: '14px',
-  color: '$fg',
+  color: '$textPrimary',
   display: 'flex',
   alignItems: 'center',
   padding: '8px 12px',

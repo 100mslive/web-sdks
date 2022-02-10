@@ -17,7 +17,7 @@ const StyledOverlay = styled(Overlay, {
 
 const StyledDialogContent = styled(Content, {
   color: 'white',
-  backgroundColor: '$dialogBg',
+  backgroundColor: '$bgPrimaryPrimary',
   borderRadius: '8px',
   position: 'fixed',
   top: '50%',

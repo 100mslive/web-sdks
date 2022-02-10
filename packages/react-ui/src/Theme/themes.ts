@@ -6,6 +6,8 @@ export const darkTheme = {
     textPrimary: 'rgba(255,255,255, 0.9)',
     textSecondary: 'rgba(255,255,255, 0.72)',
     textDisabled: 'rgba(255,255,255, 0.38)',
+    textInvert: 'rgba(0,0,0,0.9)',
+    iconBtn: '#FFFFFF',
   },
 };
 
@@ -18,5 +20,7 @@ export const lightTheme = {
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',
     textDisabled: 'rgba(0,0,0, 0.38)',
+    textInvert: 'rgba(255,255,255, 0.9)',
+    iconBtn: '#3b3b3b',
   },
 };
