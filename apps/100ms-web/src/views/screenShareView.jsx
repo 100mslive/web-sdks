@@ -5,14 +5,12 @@ import {
   selectPeers,
   selectLocalPeer,
   selectPeerScreenSharing,
-  ScreenShareDisplay,
   selectPeerSharingVideoPlaylist,
-  VideoPlayer,
   selectScreenShareByPeerID,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
+import { VideoPlayer, ScreenShareDisplay } from "@100mslive/hms-video-react";
 import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./components/chatView";
-import { useWindowSize } from "./hooks/useWindowSize";
 import { ROLES } from "../common/roles";
 import { chatStyle, getBlurClass } from "../common/utils";
 import ScreenshareTile from "./new/ScreenshareTile";
@@ -240,13 +238,7 @@ const SmallTilePeersView = ({
   smallTilePeers,
   shouldShowScreenFn,
   showStatsOnTiles,
-  videoTileProps = () => ({}),
 }) => {
-  const { width } = useWindowSize();
-  let rows = undefined;
-  if (width <= 1024 && width >= 768) {
-    rows = 1;
-  }
   return (
     <Flex
       css={{
@@ -257,9 +249,7 @@ const SmallTilePeersView = ({
         <VideoList
           peers={smallTilePeers}
           maxColCount={2}
-          maxRowCount={rows}
           includeScreenShareForPeer={shouldShowScreenFn}
-          overflow="scroll-x"
           showStatsOnTiles={showStatsOnTiles}
         />
       )}

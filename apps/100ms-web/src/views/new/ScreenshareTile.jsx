@@ -12,7 +12,7 @@ import { useFullscreen } from "react-use";
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 
-const HmsScreenshareTile = ({
+const Tile = ({
   trackId,
   showStatsOnTiles,
   width = "100%",
@@ -74,4 +74,6 @@ const HmsScreenshareTile = ({
   );
 };
 
-export default HmsScreenshareTile;
+const ScreenshareTile = React.memo(Tile);
+
+export default ScreenshareTile;
