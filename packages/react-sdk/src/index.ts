@@ -4,7 +4,6 @@ export {
   useHMSActions,
   useHMSNotifications,
   useHMSVanillaStore,
-  useHMSVanillaNotifications,
   useHMSStatsStore,
 } from './primitives/HmsRoomProvider';
 export { usePreview } from './hooks/usePreview';

@@ -134,15 +134,6 @@ export const useHMSVanillaStore = () => {
   return HMSContextConsumer.store;
 };
 
-export const useHMSVanillaNotifications = () => {
-  const HMSContextConsumer = useContext(HMSContext);
-  if (!HMSContextConsumer) {
-    throw new Error(hooksErrorMessage);
-  }
-
-  return HMSContextConsumer.notifications;
-};
-
 /*
  * `useHMSActions` is a write only hook which can be used to dispatch actions.
  */
