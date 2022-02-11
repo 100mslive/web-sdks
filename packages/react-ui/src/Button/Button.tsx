@@ -47,7 +47,7 @@ export const Button = styled('button', {
     },
     icon: {
       true: {
-        gap: '$2',
+        gap: '$4',
       },
     },
   },
