@@ -14,6 +14,7 @@ export const baseConfig = {
       borderLight: 'rgba(255, 255, 255, 0.24)',
       success: '#36B37E',
       error: '#ED4C5A',
+      errorTint: 'rgba(237,76, 90, 0.9)',
       warning: '#FFAB00',
       brandLight: '#74AAFF',
       brandDefault: '#2F80FF',
