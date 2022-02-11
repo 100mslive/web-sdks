@@ -9,6 +9,7 @@ export const darkTheme = {
     textInvert: 'rgba(0,0,0,0.9)',
     iconBtn: '$white',
     mainBg: '$black',
+    tileBg: '#212121',
   },
 };
 
@@ -24,5 +25,6 @@ export const lightTheme = {
     textInvert: 'rgba(255,255,255, 0.9)',
     iconBtn: '#3b3b3b',
     mainBg: '$white',
+    tileBg: '#F2F2F2',
   },
 };
