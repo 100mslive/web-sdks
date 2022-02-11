@@ -10,6 +10,7 @@ export const darkTheme = {
     iconBtn: '$white',
     mainBg: '$black',
     tileBg: '#212121',
+    statsBg: 'rgba(0,0,0,0.75)',
   },
 };
 
@@ -26,5 +27,6 @@ export const lightTheme = {
     iconBtn: '#3b3b3b',
     mainBg: '$white',
     tileBg: '#F2F2F2',
+    statsBg: 'rgba(255,255,255,0.75)',
   },
 };
