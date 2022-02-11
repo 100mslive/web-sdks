@@ -104,7 +104,14 @@ export class TrackManager {
     for (const trackId in params.tracks) {
       const trackEntry = params.tracks[trackId];
       const track = this.store.getTrackById(trackId);
+      if (!track) {
+        continue;
+      }
+
       const peer = this.store.getPeerByTrackId(trackId)!;
+      if (!peer) {
+        continue;
+      }
 
       if (track instanceof HMSRemoteVideoTrack) {
         const isDegraded = trackEntry.current_layer === HMSSimulcastLayer.NONE;

@@ -16,6 +16,7 @@ import {
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
+  SERVER_SUB_DEGRADE,
 } from '../utils/constants';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
@@ -713,9 +714,11 @@ export default class HMSTransport implements ITransport {
     });
     if (this.store.getSubscribeDegradationParams()) {
       this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-      this.eventBus.statsUpdate.subscribe(stats => {
-        this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
-      });
+      if (!SERVER_SUB_DEGRADE) {
+        this.eventBus.statsUpdate.subscribe(stats => {
+          this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
+        });
+      }
       this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
         this.observer.onTrackDegrade(track);

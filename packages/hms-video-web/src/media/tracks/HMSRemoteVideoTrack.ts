@@ -1,6 +1,7 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
+import { SERVER_SUB_DEGRADE } from '../../utils/constants';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
@@ -67,7 +68,9 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       this._degradedAt = new Date();
     }
 
-    // this.updateLayer();
+    if (!SERVER_SUB_DEGRADE) {
+      this.updateLayer();
+    }
   }
 
   private updateLayer() {

@@ -18,7 +18,7 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL, SERVER_SUB_DEGRADE } from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 
@@ -169,7 +169,7 @@ export default class JsonRpcSignal implements ISignal {
     offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
   ): Promise<RTCSessionDescriptionInit> {
-    const params = { name, disableVidAutoSub, data, offer };
+    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: SERVER_SUB_DEGRADE };
     const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
