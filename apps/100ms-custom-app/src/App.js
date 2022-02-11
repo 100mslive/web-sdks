@@ -495,7 +495,7 @@ class App extends Component {
                   (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
                 showAvatar: 'true',
                 avatarType: this.state.temporary_state.avatars,
-                logoClass: 'h-16',
+                logoClass: 'h-12',
                 headerPresent: this.state.showHeader.toString(),
                 metadata: this.state.temporary_state.metadataFields.metadata,
               }}
