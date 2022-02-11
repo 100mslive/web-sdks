@@ -26,7 +26,7 @@ export const Row = styled('tr', {
 });
 
 export const Label = styled('td', {
-  color: '$grey5',
+  color: '$textPrimary',
   fontWeight: 400,
 });
 
