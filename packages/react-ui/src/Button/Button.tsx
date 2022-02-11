@@ -9,7 +9,7 @@ import { flexCenter } from '../utils/styles';
  */
 const getButtonVariants = (base: string, hover: string, active: string) => ({
   bg: base,
-  c: 'white',
+  c: '$white',
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
