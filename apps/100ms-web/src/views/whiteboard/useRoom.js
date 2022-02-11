@@ -14,6 +14,7 @@ export const useRoom = () => {
     subscribe: provider.subscribe,
     broadcastEvent: provider.broadcastEvent,
     getStoredState: provider.getStoredEvent,
+    storeEvent: provider.storeEvent,
     shouldRequestState: didIJoinRecently,
     amIWhiteboardPeer,
   };

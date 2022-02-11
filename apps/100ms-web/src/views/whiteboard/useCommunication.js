@@ -31,12 +31,11 @@ class BaseCommunicationProvider {
   }
 
   /**
-   * @protected
    * @param {string} eventName
    * @param {any} message
    */
   storeEvent = (eventName, message) => {
-    this.lastMessage[eventName] = message;
+    this.lastMessage[eventName] = { eventName, ...message };
   };
 
   /**
@@ -52,7 +51,7 @@ class BaseCommunicationProvider {
    * @param {Object} message
    */
   broadcastEvent(eventName, message = {}) {
-    this.storeEvent(eventName, { eventName, ...message });
+    this.storeEvent(eventName, message);
   }
 }
 
@@ -68,7 +67,7 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
       return;
     }
 
-    // Pusher.logToConsole = true;
+    Pusher.logToConsole = true;
 
     /** @private */
     this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
@@ -116,6 +115,7 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
     };
   };
 
+  /** @private */
   resendLastEvents = () => {
     for (const eventName in this.lastMessage) {
       if (this.lastMessage[eventName]) {

@@ -51,7 +51,7 @@ useMultiplayerState, useCommunication and useRoom are internal hooks for Whitebo
 
 - Desired behaviour is to persist state across multiple opens/closes of whiteboard within a call.
 
-- To achieve this, the owner will broadcast current state event before closing the whiteboard, this event is stored all the peers.
+- To achieve this, each peer will store current state before closing the whiteboard.
 
 - On reopening the whiteboard, the state from the stored current-state event is fetched by the owner and is broadcast to all other peers. Broadcasting is required because newly joined peers(who joined after the board was closed previously) won't have the last state.
 
@@ -66,5 +66,5 @@ useMultiplayerState, useCommunication and useRoom are internal hooks for Whitebo
 - Consider scenario in which peers A, B are in a room.
   - A starts the whiteboard, draws some stuff, B receives and updates it.
   - A leaves the room(losing all the state) and joins again.
-  - Now when A starts the whiteboard, sends empty state(shapes: {}, bindings: {}) to the B. If used 'stateChange', B receives empty state and merges it with the old state it has, thereby diverging from A's state.
+  - Now when A starts the whiteboard, sends empty state(shapes: {}, bindings: {}) to B. If used 'stateChange', B receives empty state and merges it with the old state it has, thereby diverging from A's state.
   - To overcome this, we use 'currentState'

@@ -121,7 +121,9 @@ export function useMultiplayerState(roomId) {
     function handleExit() {
       if (!(room && (app === null || app === void 0 ? void 0 : app.room)))
         return;
-      sendCurrentState();
+      if (isReady && !room.shouldRequestState()) {
+        room.storeEvent(Events.CURRENT_STATE, getCurrentState());
+      }
     }
 
     window.addEventListener("beforeunload", handleExit);
@@ -155,7 +157,7 @@ export function useMultiplayerState(roomId) {
 
         setIsReady(true);
 
-        if (room.amIWhiteboardPeer) {
+        if (isReady && room.amIWhiteboardPeer) {
           // On board open, update the document with initial/stored content
           handleChanges(room.getStoredState(Events.CURRENT_STATE));
           // Send current state to other peers in the room currently
