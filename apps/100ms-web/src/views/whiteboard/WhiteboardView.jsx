@@ -4,7 +4,7 @@ import { Tldraw } from "@tldraw/tldraw";
 import { SidePane } from "../screenShareView";
 import { useMultiplayerState } from "./useMultiplayerState";
 
-const Editor = ({ roomId }) => {
+const Editor = React.memo(({ roomId }) => {
   const { error, ...events } = useMultiplayerState(roomId);
 
   return (
@@ -19,7 +19,7 @@ const Editor = ({ roomId }) => {
       />
     </div>
   );
-};
+});
 
 export const WhiteboardView = ({
   isChatOpen,

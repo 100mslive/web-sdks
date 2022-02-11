@@ -27,17 +27,15 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
     this.hmsNotifications.onNotification(notification => {
       if (
         notification.type === HMSNotificationTypes.NEW_MESSAGE &&
-        notification.data?.type === "whiteboard" &&
+        notification.data?.type === 'whiteboard' &&
         notification.data?.message
       ) {
-        const message = notification.data?.message
-          ? JSON.parse(notification.data?.message)
-          : {};
+        const message = notification.data?.message ? JSON.parse(notification.data?.message) : {};
         this.storeEvent(message.eventName, message);
       }
     });
 
-    console.log("Whiteboard initialized communication through HMS Messaging");
+    console.log('Whiteboard initialized communication through HMS Messaging');
     this.initialized = true;
   };
 
@@ -47,10 +45,7 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
    */
   broadcastEvent = (eventName, arg = {}) => {
     super.broadcastEvent(eventName, arg);
-    this.hmsActions.sendBroadcastMessage(
-      stringifyWithNull({ eventName, ...arg }),
-      "whiteboard"
-    );
+    this.hmsActions.sendBroadcastMessage(stringifyWithNull({ eventName, ...arg }), 'whiteboard');
   };
 
   /**
@@ -61,12 +56,10 @@ class HMSCommunicationProvider extends BaseCommunicationProvider {
     return this.hmsNotifications.onNotification(notification => {
       if (
         notification.type === HMSNotificationTypes.NEW_MESSAGE &&
-        notification.data?.type === "whiteboard" &&
+        notification.data?.type === 'whiteboard' &&
         notification.data?.message
       ) {
-        const message = notification.data?.message
-          ? JSON.parse(notification.data?.message)
-          : {};
+        const message = notification.data?.message ? JSON.parse(notification.data?.message) : {};
         if (message.eventName === eventName) {
           cb(message);
         }
