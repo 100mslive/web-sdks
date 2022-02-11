@@ -65,7 +65,7 @@ const AudioIndicator = styled('div', {
   left: '50%',
   transform: 'translateX(-50%)',
   bottom: '20px',
-  color: '$textInvert',
+  color: '$white',
   bg: '$error',
   borderRadius: '$round',
   width: '28px',
