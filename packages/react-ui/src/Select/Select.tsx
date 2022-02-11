@@ -17,7 +17,7 @@ const Root = styled('div', {
 
 // TODO: replace these with tokens
 const SelectRoot = styled('select', {
-  fontSize: '16px',
+  fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
   color: '$textPrimary',

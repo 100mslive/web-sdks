@@ -8,7 +8,7 @@ export const Root = styled('div', {
   zIndex: 10,
   borderRadius: '$2',
   padding: '5px',
-  fontSize: '12px',
+  fontSize: '$xs',
   overflowY: 'auto',
   maxHeight: '75%',
   maxWidth: '75%',
