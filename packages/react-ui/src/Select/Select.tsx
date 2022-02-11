@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDownIcon } from '@100mslive/react-icons';
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled('div', {
   color: '$textPrimary',

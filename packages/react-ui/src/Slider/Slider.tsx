@@ -1,6 +1,6 @@
 import * as BaseSlider from '@radix-ui/react-slider';
 import React from 'react';
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled(BaseSlider.Root, {
   position: 'relative',

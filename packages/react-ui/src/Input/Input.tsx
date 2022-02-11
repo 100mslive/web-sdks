@@ -1,4 +1,4 @@
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 
 export const Input = styled('input', {
   height: '30px',

@@ -1,4 +1,4 @@
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 
 export const Root = styled('div', {
   padding: '0.75rem',

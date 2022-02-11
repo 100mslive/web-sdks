@@ -1,4 +1,3 @@
-export * from './Theme/stitches.config';
 export * from './Button';
 export * from './Text';
 export * from './IconButton';

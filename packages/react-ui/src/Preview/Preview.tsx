@@ -1,4 +1,4 @@
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
 const Page = styled('div', {

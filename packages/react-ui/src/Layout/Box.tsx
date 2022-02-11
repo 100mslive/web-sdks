@@ -1,3 +1,3 @@
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 
 export const Box = styled('div', {});

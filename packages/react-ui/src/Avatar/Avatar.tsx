@@ -1,5 +1,5 @@
 import { VariantProps } from '@stitches/react';
-import { styled } from '../Theme/stitches.config';
+import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 import { getAvatarBg } from './getAvatarBg';
 import React from 'react';
