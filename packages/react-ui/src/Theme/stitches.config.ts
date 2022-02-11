@@ -46,7 +46,10 @@ export const createTheme = ({
   if (!type) {
     throw new Error('Theme type is required');
   }
-  return createThemeBase(className || `${type}-theme`, merge(type === 'dark' ? darkTheme : lightTheme, theme || {}));
+  return createThemeBase(
+    className || `${type}-theme`,
+    merge(baseConfig.theme, type === 'dark' ? darkTheme : lightTheme, theme || {}),
+  );
 };
 
 export type CSS = Stitches.CSS<typeof HmsStitches>;
