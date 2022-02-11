@@ -1,7 +1,7 @@
 import { createStitches } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
+import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
-import deepMerge from '../utils/deep-merge';
 import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
@@ -46,7 +46,7 @@ export const createTheme = ({
   if (!type) {
     throw new Error('Theme type is required');
   }
-  return createThemeBase(className || `${type}-theme`, deepMerge(type === 'dark' ? darkTheme : lightTheme, theme));
+  return createThemeBase(className || `${type}-theme`, merge(type === 'dark' ? darkTheme : lightTheme, theme || {}));
 };
 
 export type CSS = Stitches.CSS<typeof HmsStitches>;
