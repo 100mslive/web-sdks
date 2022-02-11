@@ -1,11 +1,11 @@
+/* eslint-disable complexity */
 import {
   HMSActions,
-  HMSPeerID,
   HMSTrack,
-  selectAudioTrackByPeerID,
+  HMSTrackID,
   selectAudioTrackVolume,
   selectPermissions,
-  selectVideoTrackByPeerID,
+  selectTrackByID,
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { useCallback } from 'react';
@@ -39,7 +39,11 @@ export interface useRemoteAVToggleResult {
   setVolume?: (volume: number) => void;
 }
 
-const toggleTrackEnabled = async (actions: HMSActions, track: HMSTrack | undefined, handleError: hooksErrHandler) => {
+const toggleTrackEnabled = async (
+  actions: HMSActions,
+  track: HMSTrack | undefined | null,
+  handleError: hooksErrHandler,
+) => {
   if (track) {
     try {
       await actions.setRemoteTrackEnabled(track.id, !track.enabled);
@@ -52,15 +56,18 @@ const toggleTrackEnabled = async (actions: HMSActions, track: HMSTrack | undefin
 /**
  * This hook can be used to implement remote mute/unmute + audio volume changer on tile level.
  * @param peerId of the peer whose tracks need to be managed
+ * @param audioTrackId of the peer whose tracks need to be managed
+ * @param videoTrackId of the peer whose tracks need to be managed
  * @param handleError to handle any error during toggle of audio/video
  */
 export const useRemoteAVToggle = (
-  peerId: HMSPeerID,
+  audioTrackId: HMSTrackID,
+  videoTrackId: HMSTrackID,
   handleError: hooksErrHandler = logErrorHandler,
 ): useRemoteAVToggleResult => {
   const actions = useHMSActions();
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
+  const audioTrack = useHMSStore(selectTrackByID(audioTrackId));
+  const videoTrack = useHMSStore(selectTrackByID(videoTrackId));
   const volume = useHMSStore(selectAudioTrackVolume(audioTrack?.id));
   const permissions = useHMSStore(selectPermissions);
   const canToggleVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
@@ -88,7 +95,7 @@ export const useRemoteAVToggle = (
     isVideoEnabled: !!videoTrack?.enabled,
     volume,
     toggleAudio: audioTrack && canToggleAudio ? toggleAudio : undefined,
-    toggleVideo: videoTrack && canToggleVideo ? toggleVideo : undefined,
+    toggleVideo: videoTrack?.source === 'regular' && canToggleVideo ? toggleVideo : undefined,
     setVolume: audioTrack ? setVolume : undefined,
   };
 };

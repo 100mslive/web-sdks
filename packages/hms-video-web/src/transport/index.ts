@@ -489,6 +489,12 @@ export default class HMSTransport implements ITransport {
         return hlsVariant;
       }),
     };
+    if (params.recording) {
+      hlsParams.recording = {
+        single_file_per_layer: params.recording.singleFilePerLayer,
+        hls_vod: params.recording.hlsVod,
+      };
+    }
     await this.signal.startHLSStreaming(hlsParams);
   }
 

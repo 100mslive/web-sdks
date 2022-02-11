@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { StyledVideoList, getLeft, Pagination } from "@100mslive/react-ui";
 import { useVideoList } from "@100mslive/react-sdk";
-import HmsVideoTile from "./VideoTile";
+import VideoTile from "./VideoTile";
+import ScreenshareTile from "./ScreenshareTile";
 
-const HmsVideoList = ({
+const List = ({
   maxTileCount,
   peers,
   showStatsOnTiles,
   maxColCount,
   maxRowCount,
+  includeScreenShareForPeer,
 }) => {
   const { ref, pagesWithTiles } = useVideoList({
     peers,
     maxTileCount,
     maxColCount,
     maxRowCount,
+    includeScreenShareForPeer,
   });
   const [page, setPage] = useState(0);
   useEffect(() => {
@@ -35,15 +38,25 @@ const HmsVideoList = ({
                 }}
                 key={pageNo}
               >
-                {tiles.map(tile => (
-                  <HmsVideoTile
-                    showStatsOnTiles={showStatsOnTiles}
-                    key={tile.peer.id}
-                    width={tile.width}
-                    height={tile.height}
-                    peerId={tile.peer.id}
-                  />
-                ))}
+                {tiles.map(tile =>
+                  tile.track?.source === "screen" ? (
+                    <ScreenshareTile
+                      showStatsOnTiles={showStatsOnTiles}
+                      key={tile.track.id}
+                      width={tile.width}
+                      height={tile.height}
+                      peerId={tile.peer.id}
+                    />
+                  ) : (
+                    <VideoTile
+                      showStatsOnTiles={showStatsOnTiles}
+                      key={tile.track?.id || tile.peer.id}
+                      width={tile.width}
+                      height={tile.height}
+                      peerId={tile.peer?.id}
+                    />
+                  )
+                )}
               </StyledVideoList.View>
             ))
           : null}
@@ -59,4 +72,6 @@ const HmsVideoList = ({
   );
 };
 
-export default HmsVideoList;
+const VideoList = React.memo(List);
+
+export default VideoList;

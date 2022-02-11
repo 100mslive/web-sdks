@@ -16,6 +16,14 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  background: '$grey1',
+  variants: {
+    transparentBg: {
+      true: {
+        background: 'transparent',
+      },
+    },
+  },
 });
 
 const Overlay = styled('div', {
@@ -68,6 +76,25 @@ const AudioIndicator = styled('div', {
   mb: '5px',
 });
 
+const FullScreenButton = styled('button', {
+  width: '2.25rem',
+  height: '2.25rem',
+  color: 'white',
+  borderRadius: '$round',
+  backgroundColor: '$menuBg',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'absolute',
+  bottom: '1rem',
+  right: '1rem',
+  zIndex: 20,
+  '&:not([disabled]):focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px $colors$brandTint',
+  },
+});
+
 interface VideoTileType {
   Root: typeof Root;
   Container: typeof Container;
@@ -76,6 +103,7 @@ interface VideoTileType {
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
   AttributeBox: typeof AttributeBox;
+  FullScreenButton: typeof FullScreenButton;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -85,5 +113,6 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
-  AttributeBox: AttributeBox,
+  AttributeBox,
+  FullScreenButton,
 };
