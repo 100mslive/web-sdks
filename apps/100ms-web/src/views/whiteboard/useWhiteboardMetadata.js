@@ -1,26 +1,17 @@
-import { createSelector } from "reselect";
 import {
   useHMSActions,
   useHMSStore,
   selectLocalPeerID,
-  selectPeersMap,
   selectPeerMetadata,
-} from "@100mslive/hms-video-react";
+  selectPeerByCondition,
+} from "@100mslive/react-sdk";
 import { useCallback, useMemo } from "react";
 import { useCommunication } from "./useCommunication";
 
-const getPeerMetaData = peer =>
-  peer?.metadata && peer.metadata !== "" ? JSON.parse(peer.metadata) : {};
-
-const selectWhiteboardPeer = createSelector(selectPeersMap, peersMap => {
-  for (const peerID in peersMap) {
-    const peer = peersMap[peerID];
-    if (getPeerMetaData(peer).whiteboardEnabled) {
-      return peer;
-    }
-  }
-  return undefined;
-});
+const isWhiteboardPeer = peer =>
+  peer?.metadata && peer.metadata !== ""
+    ? JSON.parse(peer.metadata).whiteboardEnabled
+    : false;
 
 export const useWhiteboardMetadata = () => {
   const hmsActions = useHMSActions();
@@ -31,7 +22,7 @@ export const useWhiteboardMetadata = () => {
   useCommunication();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const metadata = useHMSStore(selectPeerMetadata(localPeerID));
-  const whiteboardPeer = useHMSStore(selectWhiteboardPeer);
+  const whiteboardPeer = useHMSStore(selectPeerByCondition(isWhiteboardPeer));
   const amIWhiteboardPeer = useMemo(
     () => localPeerID === whiteboardPeer?.id,
     [localPeerID, whiteboardPeer]
