@@ -3,6 +3,9 @@ import * as React from "react";
 import { useRoom } from "./useRoom";
 import { WhiteboardEvents as Events } from "./WhiteboardEvents";
 
+/**
+ * Ref: https://github.com/tldraw/tldraw/blob/main/apps/www/hooks/useMultiplayerState.ts
+ */
 export function useMultiplayerState(roomId) {
   const [app, setApp] = React.useState(null);
   const [isReady, setIsReady] = React.useState(false);
