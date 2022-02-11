@@ -1,23 +1,10 @@
 // @ts-check
-import {
-  useHMSActions,
-  useHMSVanillaNotifications,
-  HMSNotificationTypes,
-  useHMSStore,
-  selectRoom,
-} from "@100mslive/react-sdk";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import Pusher from "pusher-js";
+import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
-
-/**
- * @typedef ProviderInitOptions
- * @property {string} roomId
- * @property {import("@100mslive/hms-video-store").HMSActions} hmsActions
- * @property {import("@100mslive/hms-video-store").HMSNotifications} hmsNotifications
- */
 
 /**
  * On whiteboard close, owner sends current state to remote peers.
@@ -68,81 +55,6 @@ class BaseCommunicationProvider {
   }
 }
 
-class HMSCommunicationProvider extends BaseCommunicationProvider {
-  constructor() {
-    super();
-    /** @private */
-    this.initialized = false;
-  }
-
-  /**
-   * @param {ProviderInitOptions} options
-   */
-  init = ({ hmsActions, hmsNotifications }) => {
-    if (this.initialized) {
-      return;
-    }
-
-    /**
-     * @private
-     */
-    this.hmsActions = hmsActions;
-    /**
-     * @private
-     */
-    this.hmsNotifications = hmsNotifications;
-
-    this.hmsNotifications.onNotification(notification => {
-      if (
-        notification.type === HMSNotificationTypes.NEW_MESSAGE &&
-        notification.data?.type === "whiteboard" &&
-        notification.data?.message
-      ) {
-        const message = notification.data?.message
-          ? JSON.parse(notification.data?.message)
-          : {};
-        this.storeEvent(message.eventName, message);
-      }
-    });
-
-    console.log("Whiteboard initialized communication through HMS Messaging");
-    this.initialized = true;
-  };
-
-  /**
-   * @param {string} eventName
-   * @param {Object} arg
-   */
-  broadcastEvent = (eventName, arg = {}) => {
-    super.broadcastEvent(eventName, arg);
-    this.hmsActions.sendBroadcastMessage(
-      stringifyWithNull({ eventName, ...arg }),
-      "whiteboard"
-    );
-  };
-
-  /**
-   * @param {string} eventName
-   * @param {Function} cb
-   */
-  subscribe = (eventName, cb) => {
-    return this.hmsNotifications.onNotification(notification => {
-      if (
-        notification.type === HMSNotificationTypes.NEW_MESSAGE &&
-        notification.data?.type === "whiteboard" &&
-        notification.data?.message
-      ) {
-        const message = notification.data?.message
-          ? JSON.parse(notification.data?.message)
-          : {};
-        if (message.eventName === eventName) {
-          cb(message);
-        }
-      }
-    });
-  };
-}
-
 class PusherCommunicationProvider extends BaseCommunicationProvider {
   constructor() {
     super();
@@ -150,9 +62,6 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
     this.initialized = false;
   }
 
-  /**
-   * @param {ProviderInitOptions} options
-   */
   init = ({ roomId }) => {
     if (this.initialized) {
       return;
@@ -219,27 +128,18 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
 }
 
 export const provider =
-  process.env.REACT_APP_WHITEBOARD_COMMUNICATION_PROVIDER === "pusher" &&
   process.env.REACT_APP_PUSHER_APP_KEY &&
-  process.env.REACT_APP_PUSHER_AUTHENDPOINT
-    ? new PusherCommunicationProvider()
-    : new HMSCommunicationProvider();
+  process.env.REACT_APP_PUSHER_AUTHENDPOINT &&
+  new PusherCommunicationProvider();
 
 export const useCommunication = () => {
   const room = useHMSStore(selectRoom);
-  const roomId = useMemo(() => room.id, [room]);
-  const hmsActions = useHMSActions();
-  const hmsNotifications = useHMSVanillaNotifications();
 
   useEffect(() => {
-    if (roomId && hmsNotifications && hmsActions) {
-      provider.init({
-        roomId,
-        hmsActions,
-        hmsNotifications,
-      });
+    if (room.id) {
+      provider.init({ roomId: room.id });
     }
-  }, [roomId, hmsNotifications, hmsActions]);
+  }, [room.id]);
 
   return provider;
 };
