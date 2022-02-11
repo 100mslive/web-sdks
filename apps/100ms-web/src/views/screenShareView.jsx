@@ -191,7 +191,7 @@ const ScreenShareComponent = ({
         ) : (
           <ScreenshareTile
             showStatsOnTiles={showStats}
-            peerId={screenshareTrack.peerId}
+            peerId={peerPresenting?.id}
           />
         ))}
     </Box>
