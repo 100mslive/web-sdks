@@ -1,7 +1,8 @@
 // @ts-check
 import { useEffect } from "react";
 import Pusher from "pusher-js";
-import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
+import { useHMSStore, selectRoomID } from "@100mslive/react-sdk";
+import { FeatureFlags } from "../../store/FeatureFlags";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
@@ -128,18 +129,16 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
 }
 
 export const provider =
-  process.env.REACT_APP_PUSHER_APP_KEY &&
-  process.env.REACT_APP_PUSHER_AUTHENDPOINT &&
-  new PusherCommunicationProvider();
+  FeatureFlags.enableWhiteboard && new PusherCommunicationProvider();
 
 export const useCommunication = () => {
-  const room = useHMSStore(selectRoom);
+  const roomId = useHMSStore(selectRoomID);
 
   useEffect(() => {
-    if (room.id) {
-      provider.init({ roomId: room.id });
+    if (roomId) {
+      provider.init({ roomId });
     }
-  }, [room.id]);
+  }, [roomId]);
 
   return provider;
 };
