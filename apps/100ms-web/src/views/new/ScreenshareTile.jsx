@@ -32,42 +32,44 @@ const Tile = ({
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
   return (
     <StyledVideoTile.Root css={{ width, height }}>
-      <StyledVideoTile.Container
-        transparentBg
-        ref={fullscreenRef}
-        onMouseEnter={() => setIsMouseHovered(true)}
-        onMouseLeave={() => {
-          setIsMouseHovered(false);
-        }}
-      >
-        {showStatsOnTiles ? (
-          <VideoTileStats
-            audioTrackID={audioTrack?.id}
-            videoTrackID={track?.id}
-          />
-        ) : null}
-        <StyledVideoTile.FullScreenButton
-          onClick={() => setFullscreen(!fullscreen)}
+      {peer ? (
+        <StyledVideoTile.Container
+          transparentBg
+          ref={fullscreenRef}
+          onMouseEnter={() => setIsMouseHovered(true)}
+          onMouseLeave={() => {
+            setIsMouseHovered(false);
+          }}
         >
-          {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
-        </StyledVideoTile.FullScreenButton>
-        {track ? (
-          <Video
-            screenShare={true}
-            mirror={peer.isLocal && track?.source === "regular"}
-            trackId={track.id}
-          />
-        ) : null}
-        <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-        {isMouseHovered && !peer?.isLocal ? (
-          <TileMenu
-            isScreenshare
-            peerID={peer?.id}
-            audioTrackID={audioTrack?.id}
-            videoTrackID={track?.id}
-          />
-        ) : null}
-      </StyledVideoTile.Container>
+          {showStatsOnTiles ? (
+            <VideoTileStats
+              audioTrackID={audioTrack?.id}
+              videoTrackID={track?.id}
+            />
+          ) : null}
+          <StyledVideoTile.FullScreenButton
+            onClick={() => setFullscreen(!fullscreen)}
+          >
+            {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
+          </StyledVideoTile.FullScreenButton>
+          {track ? (
+            <Video
+              screenShare={true}
+              mirror={peer.isLocal && track?.source === "regular"}
+              trackId={track.id}
+            />
+          ) : null}
+          <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
+          {isMouseHovered && !peer?.isLocal ? (
+            <TileMenu
+              isScreenshare
+              peerID={peer?.id}
+              audioTrackID={audioTrack?.id}
+              videoTrackID={track?.id}
+            />
+          ) : null}
+        </StyledVideoTile.Container>
+      ) : null}
     </StyledVideoTile.Root>
   );
 };

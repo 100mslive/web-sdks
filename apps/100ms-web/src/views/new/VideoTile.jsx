@@ -35,53 +35,55 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   const label = getVideoTileLabel(peer, track);
   return (
     <StyledVideoTile.Root css={{ width, height }}>
-      <StyledVideoTile.Container
-        onMouseEnter={() => setIsMouseHovered(true)}
-        onMouseLeave={() => {
-          setIsMouseHovered(false);
-        }}
-      >
-        {showStatsOnTiles ? (
-          <VideoTileStats
-            audioTrackID={peer?.audioTrack}
-            videoTrackID={peer?.videoTrack}
-          />
-        ) : null}
+      {peer ? (
+        <StyledVideoTile.Container
+          onMouseEnter={() => setIsMouseHovered(true)}
+          onMouseLeave={() => {
+            setIsMouseHovered(false);
+          }}
+        >
+          {showStatsOnTiles ? (
+            <VideoTileStats
+              audioTrackID={peer?.audioTrack}
+              videoTrackID={peer?.videoTrack}
+            />
+          ) : null}
 
-        <AudioLevel audioTrack={peer?.audioTrack} />
-        {track ? (
-          <Video
-            mirror={peer?.isLocal && track?.source === "regular"}
-            trackId={track?.id}
-          />
-        ) : null}
-        {isVideoMuted ? (
-          <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
-        ) : null}
-        <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
-        {isAudioMuted ? (
-          <StyledVideoTile.AudioIndicator>
-            <MicOffIcon />
-          </StyledVideoTile.AudioIndicator>
-        ) : null}
-        {isMouseHovered && !peer?.isLocal ? (
-          <TileMenu
-            peerID={peer?.id}
-            audioTrackID={peer?.audioTrack}
-            videoTrackID={peer?.videoTrack}
-          />
-        ) : null}
-        {isHandRaised ? (
-          <StyledVideoTile.AttributeBox>
-            <HandRaiseFilledIcon width={40} height={40} />
-          </StyledVideoTile.AttributeBox>
-        ) : null}
-        {isBRB ? (
-          <StyledVideoTile.AttributeBox>
-            <BrbIcon width={40} height={40} />
-          </StyledVideoTile.AttributeBox>
-        ) : null}
-      </StyledVideoTile.Container>
+          <AudioLevel audioTrack={peer?.audioTrack} />
+          {track ? (
+            <Video
+              mirror={peer?.isLocal && track?.source === "regular"}
+              trackId={track?.id}
+            />
+          ) : null}
+          {isVideoMuted ? (
+            <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
+          ) : null}
+          <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
+          {isAudioMuted ? (
+            <StyledVideoTile.AudioIndicator>
+              <MicOffIcon />
+            </StyledVideoTile.AudioIndicator>
+          ) : null}
+          {isMouseHovered && !peer?.isLocal ? (
+            <TileMenu
+              peerID={peer?.id}
+              audioTrackID={peer?.audioTrack}
+              videoTrackID={peer?.videoTrack}
+            />
+          ) : null}
+          {isHandRaised ? (
+            <StyledVideoTile.AttributeBox>
+              <HandRaiseFilledIcon width={40} height={40} />
+            </StyledVideoTile.AttributeBox>
+          ) : null}
+          {isBRB ? (
+            <StyledVideoTile.AttributeBox>
+              <BrbIcon width={40} height={40} />
+            </StyledVideoTile.AttributeBox>
+          ) : null}
+        </StyledVideoTile.Container>
+      ) : null}
     </StyledVideoTile.Root>
   );
 };
