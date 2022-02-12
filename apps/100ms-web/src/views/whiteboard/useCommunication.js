@@ -135,7 +135,7 @@ export const useCommunication = () => {
   const roomId = useHMSStore(selectRoomID);
 
   useEffect(() => {
-    if (roomId) {
+    if (provider && roomId) {
       provider.init({ roomId });
     }
   }, [roomId]);
