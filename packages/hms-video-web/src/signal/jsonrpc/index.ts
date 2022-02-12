@@ -355,7 +355,11 @@ export default class JsonRpcSignal implements ISignal {
     if (this.isConnected) {
       const pongTimeDiff = await this.ping(pingTimeout);
       if (pongTimeDiff > pingTimeout) {
-        HMSLogger.d(this.TAG, 'Pong timeout', { id });
+        let pageHidden = false;
+        if (typeof document !== undefined && document.hidden) {
+          pageHidden = true;
+        }
+        HMSLogger.d(this.TAG, `Pong timeout ${id}, pageHidden=${pageHidden}`);
         if (this.id === id) {
           this.isConnected = false;
         }
