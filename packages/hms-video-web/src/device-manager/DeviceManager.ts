@@ -105,14 +105,7 @@ export class DeviceManager implements HMSDeviceManager {
     navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
   }
 
-  private createIdentifier(deviceInfo?: DeviceAndGroup) {
-    if (!deviceInfo) {
-      return '';
-    }
-    return `${deviceInfo.deviceId}${deviceInfo.groupId}`;
-  }
-
-  private getCurrentSelection = (): SelectedDevices => {
+  getCurrentSelection = (): SelectedDevices => {
     const localPeer = this.store.getLocalPeer();
     const audioDevice = this.createIdentifier(localPeer?.audioTrack?.getMediaTrackSettings());
     const videoDevice = this.createIdentifier(localPeer?.videoTrack?.getMediaTrackSettings());
@@ -127,6 +120,13 @@ export class DeviceManager implements HMSDeviceManager {
       audioOutput: this.outputDevice,
     };
   };
+
+  private createIdentifier(deviceInfo?: DeviceAndGroup) {
+    if (!deviceInfo) {
+      return '';
+    }
+    return `${deviceInfo.deviceId}${deviceInfo.groupId}`;
+  }
 
   private computeChange = (prevDevices: string[], currentDevices: MediaDeviceInfo[]) => {
     if (prevDevices.length !== currentDevices.length) {
