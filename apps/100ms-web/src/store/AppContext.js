@@ -5,6 +5,7 @@ import {
   selectLocalPeer,
   selectAvailableRoleNames,
   selectRolesMap,
+  selectSessionId,
 } from "@100mslive/react-sdk";
 import { FeatureFlagsInit } from "./FeatureFlags";
 import {
@@ -20,7 +21,6 @@ import {
   DEFAULT_HLS_VIEWER_ROLE,
 } from "../common/constants";
 import { getMetadata } from "../common/utils";
-import { selectSessionId } from "@100mslive/hms-video-store/src";
 
 const AppContext = React.createContext(null);
 
