@@ -1,6 +1,5 @@
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
-import { ServerError } from '../interfaces/internal';
 import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
 
@@ -9,6 +8,11 @@ import { HMSLocalTrack } from '../media/tracks';
  * These messages are handled by NotificationManager
  * which will call the corresponding HMSUpdateListener callbacks.
  */
+
+export interface ServerError {
+  code: number;
+  message?: string;
+}
 
 export interface TrackStateNotification {
   tracks: {
@@ -192,6 +196,10 @@ export interface HLSNotification {
   enabled: boolean;
   variants: Array<HLSVariantInfo>;
   error?: ServerError;
+  hls_recording?: {
+    hls_vod: boolean;
+    single_file_per_layer: boolean;
+  };
 }
 
 export interface HLSVariantInfo {

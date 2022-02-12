@@ -8,7 +8,7 @@ import {
   RoomState,
 } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSUpdateListener, HMSRoomUpdate, HMSHLS } from '../../interfaces';
+import { HMSUpdateListener, HMSRoomUpdate, HMSHLS, HMSHLSRecording } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 
 export class RoomUpdateManager {
@@ -56,6 +56,7 @@ export class RoomUpdateManager {
     room.rtmp.startedAt = this.getAsDate(streaming?.rtmp?.started_at);
     room.recording.server.startedAt = this.getAsDate(recording?.sfu.started_at);
     room.recording.browser.startedAt = this.getAsDate(recording?.browser.started_at);
+    room.recording.hls = this.getHLSRecording(streaming?.hls);
     room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
@@ -89,6 +90,7 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error?.code;
     room.hls = this.convertHls(notification);
+    room.recording.hls = this.getHLSRecording(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
@@ -98,7 +100,7 @@ export class RoomUpdateManager {
       variants: [],
       error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
     };
-    hlsNotification?.variants?.map(variant => {
+    hlsNotification?.variants?.forEach(variant => {
       hls.variants.push({
         meetingURL: variant.meeting_url,
         url: variant.url,
@@ -107,6 +109,20 @@ export class RoomUpdateManager {
       });
     });
     return hls;
+  }
+
+  private getHLSRecording(hlsNotification?: HLSNotification): HMSHLSRecording {
+    let hlsRecording: HMSHLSRecording = { running: false };
+    if (hlsNotification?.hls_recording) {
+      hlsRecording = {
+        running: !!hlsNotification?.enabled,
+        singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
+        hlsVod: !!hlsNotification.hls_recording?.hls_vod,
+        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
+        error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
+      };
+    }
+    return hlsRecording;
   }
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
