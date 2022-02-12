@@ -23,12 +23,16 @@ export const convertLoginInfoToJoinConfig = loginInfo => {
   return joinConfig;
 };
 
-export const setUpLogRocket = (loginInfo, localPeer) => {
+export const setUpLogRocket = ({ localPeer, roomId, sessionId }) => {
   LogRocket.identify(localPeer.id, {
-    name: loginInfo.username,
-    role: loginInfo.role,
-    token: loginInfo.token,
-    roomID: loginInfo.roomID,
+    name: localPeer.name,
+    email: roomId,
+    role: localPeer.roleName,
+    roomId,
+    sessionId,
+  });
+  LogRocket.getSessionURL(url => {
+    window.logrocketURL = url;
   });
 };
 
