@@ -47,9 +47,10 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
   const {
-    whiteboardPeer: whiteboardEnabled,
-    amIWhiteboardPeer,
-    setWhiteboardEnabled,
+    whiteboardEnabled,
+    whiteboardOwner: whiteboardActive,
+    amIWhiteboardOwner,
+    toggleWhiteboard,
   } = useWhiteboardMetadata();
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
@@ -169,26 +170,27 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
-  leftComponents.push(
-    <Tooltip
-      title={`${
-        whiteboardEnabled
-          ? amIWhiteboardPeer
-            ? `Stop whiteboard`
-            : `Can't stop whiteboard`
-          : "Start whiteboard"
-      }`}
-      key="whiteboard"
-    >
-      <IconButton
-        onClick={() => setWhiteboardEnabled(!whiteboardEnabled)}
-        active={!whiteboardEnabled}
-        disabled={whiteboardEnabled && !amIWhiteboardPeer}
+  whiteboardEnabled &&
+    leftComponents.push(
+      <Tooltip
+        title={`${
+          whiteboardActive
+            ? amIWhiteboardOwner
+              ? `Stop whiteboard`
+              : `Can't stop whiteboard`
+            : "Start whiteboard"
+        }`}
+        key="whiteboard"
       >
-        <PencilDrawIcon />
-      </IconButton>
-    </Tooltip>
-  );
+        <IconButton
+          onClick={toggleWhiteboard}
+          active={!whiteboardActive}
+          disabled={whiteboardActive && !amIWhiteboardOwner}
+        >
+          <PencilDrawIcon />
+        </IconButton>
+      </Tooltip>
+    );
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {

@@ -14,7 +14,6 @@ import { MainGridView } from "./mainGridView";
 import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
-import { metadataProps as videoTileProps } from "../common/utils";
 import { useWhiteboardMetadata, WhiteboardView } from "./whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 
@@ -27,7 +26,7 @@ export const ConferenceMainView = ({
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const { whiteboardPeer } = useWhiteboardMetadata();
+  const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
   const hmsActions = useHMSActions();
@@ -59,7 +58,7 @@ export const ConferenceMainView = ({
   let ViewComponent;
   if (localPeer.roleName === HLS_VIEWER_ROLE) {
     ViewComponent = HLSView;
-  } else if (whiteboardPeer) {
+  } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
   } else if (
     (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||

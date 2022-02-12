@@ -7,7 +7,7 @@ import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
 export const whiteboardLog = (...args) => console.log("Whiteboard", ...args);
 
 export const useRoom = () => {
-  const { amIWhiteboardPeer } = useWhiteboardMetadata();
+  const { amIWhiteboardOwner } = useWhiteboardMetadata();
   const { didIJoinRecently } = useContext(AppContext);
 
   return {
@@ -16,6 +16,6 @@ export const useRoom = () => {
     getStoredState: provider.getStoredEvent,
     storeEvent: provider.storeEvent,
     shouldRequestState: didIJoinRecently,
-    amIWhiteboardPeer,
+    amIWhiteboardOwner,
   };
 };

@@ -205,9 +205,9 @@ const StreamingRecording = () => {
 };
 
 const Whiteboard = () => {
-  const { whiteboardPeer, amIWhiteboardPeer } = useWhiteboardMetadata();
+  const { whiteboardOwner, amIWhiteboardOwner } = useWhiteboardMetadata();
 
-  if (!whiteboardPeer) {
+  if (!whiteboardOwner) {
     return null;
   }
 
@@ -215,7 +215,7 @@ const Whiteboard = () => {
     <div className="flex items-center">
       <PencilDrawIcon />
       <Text variant="body" css={{ mx: "$1" }}>
-        {amIWhiteboardPeer ? "You are" : `${whiteboardPeer.name} is`} sharing
+        {amIWhiteboardOwner ? "You are" : `${whiteboardOwner.name} is`} sharing
         Whiteboard
       </Text>
     </div>

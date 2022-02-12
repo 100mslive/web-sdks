@@ -29,7 +29,7 @@ export function useMultiplayerState(roomId) {
   }, []);
 
   const sendCurrentState = React.useCallback(() => {
-    if (room.amIWhiteboardPeer && isReady) {
+    if (room.amIWhiteboardOwner && isReady) {
       room.broadcastEvent(Events.CURRENT_STATE, getCurrentState());
     }
   }, [room, isReady, getCurrentState]);
@@ -160,7 +160,7 @@ export function useMultiplayerState(roomId) {
 
         setIsReady(true);
 
-        if (isReady && room.amIWhiteboardPeer) {
+        if (isReady && room.amIWhiteboardOwner) {
           // On board open, update the document with initial/stored content
           handleChanges(room.getStoredState(Events.CURRENT_STATE));
           // Send current state to other peers in the room currently
