@@ -8,8 +8,10 @@ import './index.css';
 import '100ms_edtech_template/dist/index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
-  LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
-  setupLogRocketReact(LogRocket);
+  setTimeout(() => {
+    LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
+    setupLogRocketReact(LogRocket);
+  }, 5000);
 }
 
 ReactDOM.render(
