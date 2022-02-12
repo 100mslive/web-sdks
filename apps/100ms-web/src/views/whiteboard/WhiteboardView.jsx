@@ -1,6 +1,7 @@
 import React from "react";
-import { selectPeers, selectRoomID, useHMSStore } from "@100mslive/react-sdk";
 import { Tldraw } from "@tldraw/tldraw";
+import { selectPeers, selectRoomID, useHMSStore } from "@100mslive/react-sdk";
+import { Box, Flex } from "@100mslive/react-ui";
 import { SidePane } from "../screenShareView";
 import { useMultiplayerState } from "./useMultiplayerState";
 
@@ -8,7 +9,7 @@ const Editor = React.memo(({ roomId }) => {
   const { error, ...events } = useMultiplayerState(roomId);
 
   return (
-    <div className="w-full h-full relative">
+    <Box css={{ position: "relative", width: "100%", height: "100%" }}>
       <Tldraw
         autofocus
         disableAssets={true}
@@ -17,7 +18,7 @@ const Editor = React.memo(({ roomId }) => {
         showMenu={false}
         {...events}
       />
-    </div>
+    </Box>
   );
 });
 
@@ -29,24 +30,36 @@ export const WhiteboardView = ({
   const peers = useHMSStore(selectPeers);
   const roomId = useHMSStore(selectRoomID);
   return (
-    <React.Fragment>
-      <div className="w-full h-full flex flex-col md:flex-row">
-        <div className="mr-2 ml-2 md:ml-3 md:w-8/10 h-2/3 md:h-full">
-          <div className="object-contain h-full">
-            <Editor roomId={roomId} />
-          </div>
-        </div>
-        <div className="flex flex-wrap overflow-hidden p-2 w-full h-1/3 md:w-2/10 md:h-full ">
-          <SidePane
-            isChatOpen={isChatOpen}
-            toggleChat={toggleChat}
-            isPresenterInSmallTiles={true}
-            smallTilePeers={peers}
-            isParticipantListOpen={isParticipantListOpen}
-            totalPeers={peers.length}
-          />
-        </div>
-      </div>
-    </React.Fragment>
+    <Flex
+      css={{
+        size: "100%",
+      }}
+      direction={{
+        "@initial": "row",
+        "@lg": "column",
+      }}
+    >
+      <Editor roomId={roomId} />
+      <Flex
+        direction={{ "@initial": "column", "@lg": "row" }}
+        css={{
+          overflow: "hidden",
+          p: "$2",
+          flex: "0 0 20%",
+          "@lg": {
+            flex: "1 1 0",
+          },
+        }}
+      >
+        <SidePane
+          isChatOpen={isChatOpen}
+          toggleChat={toggleChat}
+          isPresenterInSmallTiles={true}
+          smallTilePeers={peers}
+          isParticipantListOpen={isParticipantListOpen}
+          totalPeers={peers.length}
+        />
+      </Flex>
+    </Flex>
   );
 };
