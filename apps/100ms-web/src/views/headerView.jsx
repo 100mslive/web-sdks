@@ -160,14 +160,19 @@ const StreamingRecording = () => {
       }
       title += "Server";
     }
-    if (recording.server.running) {
+    if (recording.hls.running) {
       if (title) {
         title += ", ";
       }
       title += "HLS";
     }
     return title;
-  }, [isRecordingOn, recording.browser.running, recording.server.running]);
+  }, [
+    isRecordingOn,
+    recording.browser.running,
+    recording.hls.running,
+    recording.server.running,
+  ]);
 
   if (!isRecordingOn && !isStreamingOn) {
     return null;
