@@ -83,7 +83,7 @@ export const usePreview = ({
         handleError(err as Error, 'preview');
       }
     })();
-  }, [actions, config, handleError, roomState, token]);
+  }, [actions, handleError, token]);
 
   const join = useCallback(() => {
     if (!token) {
