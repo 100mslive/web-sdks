@@ -20,14 +20,12 @@ import {
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
-import { useWhiteboardMetadata } from "./whiteboard";
 import { useMyMetadata } from "./hooks/useMetadata";
 import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
 import {
   HandIcon,
   ShareScreenIcon,
   MusicIcon,
-  PencilDrawIcon,
   BrbIcon,
   ChatUnreadIcon,
   ChatIcon,
@@ -35,6 +33,8 @@ import {
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
+import { FeatureFlags } from "../store/FeatureFlags";
+import { ToggleWhiteboard } from "./whiteboard";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -46,12 +46,6 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const activeVideoPlaylist = useHMSStore(selectVideoPlaylist.selection).id;
   const [shareAudioModal, setShareAudioModal] = useState(false);
-  const {
-    whiteboardEnabled,
-    whiteboardOwner: whiteboardActive,
-    amIWhiteboardOwner,
-    toggleWhiteboard,
-  } = useWhiteboardMetadata();
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
   const initialModalProps = {
@@ -170,27 +164,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
-  whiteboardEnabled &&
-    leftComponents.push(
-      <Tooltip
-        title={`${
-          whiteboardActive
-            ? amIWhiteboardOwner
-              ? `Stop whiteboard`
-              : `Can't stop whiteboard`
-            : "Start whiteboard"
-        }`}
-        key="whiteboard"
-      >
-        <IconButton
-          onClick={toggleWhiteboard}
-          active={!whiteboardActive}
-          disabled={whiteboardActive && !amIWhiteboardOwner}
-        >
-          <PencilDrawIcon />
-        </IconButton>
-      </Tooltip>
-    );
+  FeatureFlags.enableWhiteboard && leftComponents.push(<ToggleWhiteboard />);
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {
