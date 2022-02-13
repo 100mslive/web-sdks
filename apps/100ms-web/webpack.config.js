@@ -6,11 +6,13 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 require("dotenv").config();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 module.exports = {
-  mode: process.env.NODE_ENV === "production" ? "production" : "development",
+  mode: isProduction ? "production" : "development",
   context: path.resolve(__dirname, "src"),
   entry: "./index.js",
   output: {
@@ -19,8 +21,18 @@ module.exports = {
     assetModuleFilename: "static/media/[name].[hash][ext]",
     publicPath: "/",
     clean: true,
+    devtoolModuleFilenameTemplate: info => {
+      return path
+        .relative(path.resolve(__dirname, "src"), info.absoluteResourcePath)
+        .replace(/\\/g, "/");
+    },
   },
-  devtool: "source-map",
+  cache: {
+    type: "filesystem",
+    cacheDirectory: path.resolve(__dirname, ".cache"),
+  },
+  devtool: isProduction ? false : "cheap-module-source-map",
+  performance: false,
   target: "web",
   resolve: {
     extensions: [".js", ".jsx", ".css", ".svg"],
@@ -99,9 +111,7 @@ module.exports = {
         };
       },
     }),
-    ...(process.env.NODE_ENV !== "production"
-      ? [new BundleAnalyzerPlugin()]
-      : []),
+    // ...(!isProduction ? [new BundleAnalyzerPlugin()] : []),
     new MiniCssExtractPlugin({
       filename: "static/css/[name].[chunkhash:8].css",
     }),
