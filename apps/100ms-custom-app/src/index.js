@@ -8,17 +8,8 @@ import './index.css';
 import '100ms_edtech_template/dist/index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
-  /**
-   * TODO: starting logrocket in a timeout because it's not picking up the stitches styles otherwise for
-   * some reason, and the recording appears broken. The timeout appears to be somehow solving the issue,
-   * more details will be need to looked into to figure out the exact cause. It's likely that the stitches library
-   * is doing something at runtime after loading which needs to be waited on before styles are ready.
-   * It's probably related to the numbers here - https://stitches.dev/docs/benchmarks
-   */
-  setTimeout(() => {
-    LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
-    setupLogRocketReact(LogRocket);
-  }, 5000);
+  LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
+  setupLogRocketReact(LogRocket);
 }
 
 ReactDOM.render(
