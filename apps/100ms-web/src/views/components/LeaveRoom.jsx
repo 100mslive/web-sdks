@@ -120,5 +120,6 @@ const PopoverContent = styled(Popover.Content, {
   padding: "$6",
   borderRadius: "$2",
   backgroundColor: "$bgSecondary",
+  boxShadow: "$sm",
   ...popoverAnimation,
 });
