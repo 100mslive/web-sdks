@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID)
   setTimeout(() => {
     LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
     setupLogRocketReact(LogRocket);
-  }, 3000);
+  }, 5000);
 }
 
 ReactDOM.render(
