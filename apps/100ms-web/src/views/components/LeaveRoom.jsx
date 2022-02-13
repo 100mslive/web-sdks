@@ -7,8 +7,7 @@ import {
 } from "@100mslive/hms-video-react";
 import { useHistory, useParams } from "react-router-dom";
 import { HangUpIcon } from "@100mslive/react-icons";
-import { Button, popoverAnimation, styled, Text } from "@100mslive/react-ui";
-import * as Popover from "@radix-ui/react-popover";
+import { Button, styled, Text, Popover } from "@100mslive/react-ui";
 
 export const LeaveRoom = () => {
   const history = useHistory();
@@ -121,5 +120,4 @@ const PopoverContent = styled(Popover.Content, {
   borderRadius: "$2",
   backgroundColor: "$bgSecondary",
   boxShadow: "$sm",
-  ...popoverAnimation,
 });
