@@ -86,7 +86,7 @@ module.exports = {
         },
       },
     },
-    runtimeChunk: true,
+    runtimeChunk: false,
     minimize: process.env.NODE_ENV === "production",
     minimizer: [new ESBuildMinifyPlugin()],
   },
