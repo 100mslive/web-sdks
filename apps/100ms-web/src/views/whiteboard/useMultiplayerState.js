@@ -124,7 +124,7 @@ export function useMultiplayerState(roomId) {
     function handleExit() {
       if (!(room && (app === null || app === void 0 ? void 0 : app.room)))
         return;
-      if (isReady && !room.shouldRequestState()) {
+      if (isReady && !room.shouldRequestState) {
         room.storeEvent(Events.CURRENT_STATE, getCurrentState());
       }
     }
@@ -165,7 +165,8 @@ export function useMultiplayerState(roomId) {
           handleChanges(room.getStoredState(Events.CURRENT_STATE));
           // Send current state to other peers in the room currently
           sendCurrentState();
-        } else if (room.shouldRequestState()) {
+        } else if (room.shouldRequestState) {
+          console.log("Whiteboard requesting state", room.shouldRequestState);
           /**
            * Newly joined peers request the owner for current state
            * and update their boards when they receive it
