@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 
@@ -24,13 +24,18 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   appBuilder,
   children,
 }) => {
-  const theme = useMemo(() => {
+  const previousClassName = useRef('');
+  const updatedTheme = useMemo(() => {
     const updatedTheme = createTheme({ type, theme: userTheme || {} });
+    if (previousClassName.current) {
+      document.documentElement.classList.remove(previousClassName.current);
+    }
+    previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
     return updatedTheme;
   }, [userTheme, type]);
   return (
-    <ThemeContext.Provider value={{ type, theme: theme as unknown as Theme, appBuilder }}>
+    <ThemeContext.Provider value={{ type, theme: updatedTheme as unknown as Theme, appBuilder }}>
       {children}
     </ThemeContext.Provider>
   );

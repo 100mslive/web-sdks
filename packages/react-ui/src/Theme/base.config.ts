@@ -25,7 +25,6 @@ export const baseConfig = {
       grayDark: '#303740',
       grayDisabled: '#DCE4EF',
       menuBg: 'rgba(119, 119, 119, 0.5)',
-      statsBg: 'rgba(0, 0, 0, 0.75)',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',

@@ -9,7 +9,7 @@ import { flexCenter } from '../utils/styles';
  */
 const getButtonVariants = (base: string, hover: string, active: string) => ({
   bg: base,
-  c: 'white',
+  c: '$white',
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
@@ -41,7 +41,7 @@ export const Button = styled('button', {
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$greyDefault', '$greyLight', '$greyLight'),
+      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
       danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
       primary: getButtonVariants('$brandMain', '$brandTint', '$brandTint'),
     },

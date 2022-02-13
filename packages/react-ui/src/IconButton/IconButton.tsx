@@ -5,7 +5,7 @@ export const IconButton = styled('button', {
   ...flexCenter,
   outline: 'none',
   border: 'none',
-  padding: '$1',
+  padding: '$2',
   r: '$1',
   cursor: 'pointer',
   backgroundColor: 'transparent',
