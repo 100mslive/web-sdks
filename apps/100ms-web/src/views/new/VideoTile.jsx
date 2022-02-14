@@ -56,7 +56,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
               trackId={track?.id}
             />
           ) : null}
-          {isVideoMuted ? (
+          {isVideoMuted || track?.degraded ? (
             <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
           ) : null}
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
