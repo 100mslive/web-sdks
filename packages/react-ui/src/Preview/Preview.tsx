@@ -13,7 +13,7 @@ const Page = styled('div', {
 
 const Container = styled('div', {
   padding: '3rem 7.5rem',
-  borderRadius: '12px',
+  borderRadius: '$2',
   backgroundColor: '$grey1',
   display: 'flex',
   flexDirection: 'column',
@@ -28,7 +28,6 @@ const Controls = styled('div', {
   position: 'absolute',
   bottom: '10px',
   left: '50%',
-  zIndex: 20,
   transform: 'translate(-50%, 0)',
   display: 'flex',
   '& > * + *': {
@@ -41,7 +40,6 @@ const Setting = styled('div', {
   position: 'absolute',
   bottom: '10px',
   right: '20px',
-  zIndex: 20,
 });
 
 const BottomOverlay = styled('div', {
@@ -49,9 +47,8 @@ const BottomOverlay = styled('div', {
   position: 'absolute',
   bottom: ' 0px',
   width: '100%',
-  zIndex: 10,
   height: '100px',
-  borderRadius: '0.5rem',
+  borderRadius: '$2',
   background: 'linear-gradient(0deg,rgba(0,0,0,.8),transparent)',
 });
 
