@@ -8,7 +8,7 @@ export {
 } from './primitives/HmsRoomProvider';
 export { usePreview } from './hooks/usePreview';
 export { useAVToggle } from './hooks/useAVToggle';
-export { useDevices } from './hooks/useDevices';
+export { useDevices, DeviceType } from './hooks/useDevices';
 export { useVideo } from './hooks/useVideo';
 export { useScreenShare } from './hooks/useScreenShare';
 export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';

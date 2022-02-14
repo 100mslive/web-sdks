@@ -4,13 +4,13 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 import { hooksErrHandler } from '../hooks/types';
 
-enum DeviceType {
+export enum DeviceType {
   videoInput = 'videoInput',
   audioInput = 'audioInput',
   audioOutput = 'audioOutput',
 }
 
-export type DeviceTypeAndInfo<T> = {
+type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
 };
 
@@ -69,13 +69,14 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
       try {
         switch (deviceType) {
           case DeviceType.audioInput:
+            console.log('[deep] audio change');
             await actions.setAudioSettings({ deviceId });
             break;
           case DeviceType.videoInput:
             await actions.setVideoSettings({ deviceId });
             break;
           case DeviceType.audioOutput:
-            await actions.setAudioOutputDevice(deviceId);
+            actions.setAudioOutputDevice(deviceId);
             break;
         }
       } catch (err) {
