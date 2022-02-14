@@ -3,6 +3,10 @@ import { popoverAnimation } from '../utils/animations';
 import { styled } from 'Theme';
 
 const StyledContent = styled(Content, {
+  padding: '$6',
+  borderRadius: '$2',
+  backgroundColor: '$bgSecondary',
+  boxShadow: '$sm',
   ...popoverAnimation,
 });
 

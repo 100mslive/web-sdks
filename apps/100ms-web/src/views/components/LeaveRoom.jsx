@@ -7,7 +7,7 @@ import {
 } from "@100mslive/hms-video-react";
 import { useHistory, useParams } from "react-router-dom";
 import { HangUpIcon } from "@100mslive/react-icons";
-import { Button, styled, Text, Popover } from "@100mslive/react-ui";
+import { Button, Text, Popover } from "@100mslive/react-ui";
 
 export const LeaveRoom = () => {
   const history = useHistory();
@@ -48,7 +48,7 @@ export const LeaveRoom = () => {
               </Text>
             </Button>
           </Popover.Trigger>
-          <PopoverContent sideOffset={10}>
+          <Popover.Content sideOffset={10}>
             <Button
               variant="standard"
               className="w-full"
@@ -65,7 +65,7 @@ export const LeaveRoom = () => {
             >
               Just Leave
             </Button>
-          </PopoverContent>
+          </Popover.Content>
         </Popover.Root>
       ) : (
         <Button variant="danger" className="w-full" onClick={leaveRoom}>
@@ -114,10 +114,3 @@ export const LeaveRoom = () => {
     </Fragment>
   );
 };
-
-const PopoverContent = styled(Popover.Content, {
-  padding: "$6",
-  borderRadius: "$2",
-  backgroundColor: "$bgSecondary",
-  boxShadow: "$sm",
-});
