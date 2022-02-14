@@ -237,21 +237,16 @@ export class SDKToHMS {
     return {
       recording: {
         browser: {
-          running: !!recording?.browser?.running,
-          startedAt: recording?.browser?.startedAt,
-          error: recording?.browser?.error,
+          running: false,
+          ...recording?.browser,
         },
         server: {
-          running: !!recording?.server?.running,
-          startedAt: recording?.server?.startedAt,
-          error: recording?.server?.error,
+          running: false,
+          ...recording?.server,
         },
+        hls: { running: false, ...recording?.hls },
       },
-      rtmp: {
-        running: !!rtmp?.running,
-        startedAt: rtmp?.startedAt,
-        error: rtmp?.error,
-      },
+      rtmp: { running: false, ...rtmp },
       hls: {
         variants: hls?.variants?.map(variant => variant) || [],
         running: !!hls?.running,
