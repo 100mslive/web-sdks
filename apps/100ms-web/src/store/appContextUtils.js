@@ -35,6 +35,7 @@ export const setUpLogRocket = ({ localPeer, roomId, sessionId }) => {
   });
   LogRocket.getSessionURL(url => {
     window.logrocketURL = url;
+    console.debug("logrocket url - ", url);
     if (!logRocketInitialised) {
       LogRocketRecording.syncStyles();
       logRocketInitialised = true;
