@@ -42,19 +42,25 @@ const Arrow = styled('span', {
   height: '100%',
   position: 'absolute',
   right: 0,
-  pointerVvents: 'none',
+  pointerEvents: 'none',
   display: 'flex',
   alignItems: 'center',
   transition: 'border .2s ease 0s',
 });
 
+interface Props {
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
+  value: string | number;
+}
+
 // * NOTE: this is temporary implementation waiting for radix-select
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Select: React.FC = ({ children, props }: any) => (
+export const Select: React.FC<Props> = ({ onChange, value, children, ...props }) => (
   <Root>
     <Arrow>
       <ChevronDownIcon />
     </Arrow>
-    <SelectRoot {...props}>{children}</SelectRoot>
+    <SelectRoot onChange={onChange} value={value} {...props}>
+      {children}
+    </SelectRoot>
   </Root>
 );

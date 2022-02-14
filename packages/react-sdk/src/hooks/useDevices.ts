@@ -69,7 +69,6 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
       try {
         switch (deviceType) {
           case DeviceType.audioInput:
-            console.log('[deep] audio change');
             await actions.setAudioSettings({ deviceId });
             break;
           case DeviceType.videoInput:
