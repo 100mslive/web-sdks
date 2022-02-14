@@ -9,8 +9,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isProduction ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
   entry: './index.js',
   output: {
@@ -19,8 +20,11 @@ module.exports = {
     assetModuleFilename: 'static/media/[name].[hash][ext]',
     publicPath: '/',
     clean: true,
+    devtoolModuleFilenameTemplate: info => {
+      return path.relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath).replace(/\\/g, '/');
+    },
   },
-  devtool: 'source-map',
+  devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
   target: 'web',
   resolve: {
     extensions: ['.js', '.jsx', '.css', '.svg'],
@@ -58,6 +62,10 @@ module.exports = {
       },
     ],
   },
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '.cache'),
+  },
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -74,8 +82,8 @@ module.exports = {
         },
       },
     },
-    runtimeChunk: true,
-    minimize: process.env.NODE_ENV === 'production',
+    runtimeChunk: false,
+    minimize: isProduction,
     minimizer: [new ESBuildMinifyPlugin()],
   },
   plugins: [
