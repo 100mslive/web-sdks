@@ -24,42 +24,13 @@ const stringifyWithNull = obj =>
  *
  * Stores the last message received/broadcasted to resend when required(when board is ready)
  */
-class BaseCommunicationProvider {
+
+class PusherCommunicationProvider {
   constructor() {
-    /** @protected */
-    this.lastMessage = {};
-  }
-
-  /**
-   * @param {string} eventName
-   * @param {any} message
-   */
-  storeEvent = (eventName, message) => {
-    this.lastMessage[eventName] = { eventName, ...message };
-  };
-
-  /**
-   * @param {string} eventName
-   * @returns {any}
-   */
-  getStoredEvent = eventName => {
-    return this.lastMessage[eventName];
-  };
-
-  /**
-   * @param {string} eventName
-   * @param {Object} message
-   */
-  broadcastEvent(eventName, message = {}) {
-    this.storeEvent(eventName, message);
-  }
-}
-
-class PusherCommunicationProvider extends BaseCommunicationProvider {
-  constructor() {
-    super();
     /** @private */
     this.initialized = false;
+    /** @private */
+    this.lastMessage = {};
   }
 
   init = ({ roomId }) => {
@@ -90,10 +61,27 @@ class PusherCommunicationProvider extends BaseCommunicationProvider {
 
   /**
    * @param {string} eventName
+   * @param {any} message
+   */
+  storeEvent = (eventName, message) => {
+    this.lastMessage[eventName] = { eventName, ...message };
+  };
+
+  /**
+   * @param {string} eventName
+   * @returns {any}
+   */
+  getStoredEvent = eventName => {
+    return this.lastMessage[eventName];
+  };
+
+  /**
+   * @param {string} eventName
    * @param {Object} arg
    */
   broadcastEvent = (eventName, arg = {}) => {
-    super.broadcastEvent(eventName, arg);
+    this.storeEvent(eventName, arg);
+
     this.channel.trigger(
       `client-${eventName}`,
       stringifyWithNull({ eventName, ...arg })
