@@ -18,7 +18,7 @@ const StyledTrigger = styled(Popover.Trigger, {
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
 });
 
