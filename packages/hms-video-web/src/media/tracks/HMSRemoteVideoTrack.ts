@@ -67,14 +67,22 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       this._degradedAt = new Date();
     }
 
-    if (!(this.stream as HMSRemoteStream).serverSubDegrade()) {
-      this.updateLayer();
+    if (this.stream instanceof HMSRemoteStream && this.stream.serverSubDegrade()) {
+      // No need to degrade track, as server has done it already
+      return;
     }
+
+    this.updateLayer();
   }
 
   private updateLayer() {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     if (this.degraded) {
+      if (this.stream instanceof HMSRemoteStream && this.stream.serverSubDegrade()) {
+        // No need to send preferLayer(none)
+        return;
+      }
+
       newLayer = HMSSimulcastLayer.NONE;
     }
     (this.stream as HMSRemoteStream).setVideo(newLayer);
