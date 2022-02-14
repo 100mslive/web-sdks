@@ -166,7 +166,6 @@ export function useMultiplayerState(roomId) {
           // Send current state to other peers in the room currently
           sendCurrentState();
         } else if (room.shouldRequestState) {
-          console.log("Whiteboard requesting state", room.shouldRequestState);
           /**
            * Newly joined peers request the owner for current state
            * and update their boards when they receive it
@@ -184,7 +183,7 @@ export function useMultiplayerState(roomId) {
       unsubs.forEach(unsub => unsub());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app, isReady]);
+  }, [app, isReady, room]);
 
   return {
     onMount,
