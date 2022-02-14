@@ -43,7 +43,7 @@ export const Button = styled('button', {
     variant: {
       standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
       danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
-      primary: getButtonVariants('$brandDefault', '$brandTint', '$brandTint'),
+      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight'),
     },
     icon: {
       true: {

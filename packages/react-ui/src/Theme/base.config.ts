@@ -6,6 +6,7 @@ export const baseConfig = {
     colors: {
       white: '#ffffff',
       black: '#000000',
+      transparent: 'rgba(0, 0, 0, 0)',
       orange: '#F69133',
       yellow: '#FAC919',
       green: '#38EA9F',
