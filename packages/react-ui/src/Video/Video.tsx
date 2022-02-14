@@ -23,9 +23,10 @@ export const StyledVideo = styled('video', {
       },
     },
     degraded: {
-      // don't show the video when it's degraded so avatar can show on top of it. Video will be stuck frame in this case.
+      // send the video behind when it's degraded so avatar can show on top of it. Video will be stuck frame in this case.
+      // not hiding by using display none, because it will lead it to be detached as it will no longer be in view.
       true: {
-        display: 'none',
+        zIndex: -100,
       },
     },
   },
