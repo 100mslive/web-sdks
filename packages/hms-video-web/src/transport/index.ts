@@ -731,13 +731,11 @@ export default class HMSTransport implements ITransport {
     if (this.store.getSubscribeDegradationParams()) {
       if (!this.joinParameters?.serverSubDegrade) {
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-      }
-
-      if (!this.joinParameters?.autoSubscribeVideo) {
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
         });
       }
+
       this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
         this.observer.onTrackDegrade(track);
