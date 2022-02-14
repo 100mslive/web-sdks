@@ -43,6 +43,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
     return this.audio;
   }
 
+  serverSubDegrade() {
+    return this.connection.serverSubDegrade;
+  }
+
   private syncWithApiChannel() {
     const data = {
       streamId: this.id,

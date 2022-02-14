@@ -23,6 +23,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     data: string,
     offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
+    serverSubDegrade: boolean,
   ): Promise<RTCSessionDescriptionInit>;
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;

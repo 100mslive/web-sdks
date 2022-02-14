@@ -16,7 +16,6 @@ import {
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
-  SERVER_SUB_DEGRADE,
 } from '../utils/constants';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import HMSLogger from '../utils/logger';
@@ -290,6 +289,9 @@ export default class HMSTransport implements ITransport {
     customData: { name: string; metaData: string },
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
+
+    // TODO: set default to true on final release
+    serverSubDegrade = false,
   ): Promise<void> {
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
@@ -299,6 +301,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       initEndpoint,
       autoSubscribeVideo,
+      serverSubDegrade,
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -314,6 +317,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
+          serverSubDegrade,
         );
       }
     } catch (error) {
@@ -601,16 +605,22 @@ export default class HMSTransport implements ITransport {
     data: string,
     config: RTCConfiguration,
     autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ) {
     this.publishConnection = new HMSPublishConnection(this.signal, config, this.publishConnectionObserver, this);
-    this.subscribeConnection = new HMSSubscribeConnection(this.signal, config, this.subscribeConnectionObserver);
+    this.subscribeConnection = new HMSSubscribeConnection(
+      this.signal,
+      config,
+      this.subscribeConnectionObserver,
+      serverSubDegrade,
+    );
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection!.createOffer(constraints, new Map());
       await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo);
+      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo, serverSubDegrade);
       await this.publishConnection!.setRemoteDescription(answer);
       for (const candidate of this.publishConnection!.candidates || []) {
         await this.publishConnection!.addIceCandidate(candidate);
@@ -714,7 +724,7 @@ export default class HMSTransport implements ITransport {
     });
     if (this.store.getSubscribeDegradationParams()) {
       this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-      if (!SERVER_SUB_DEGRADE) {
+      if (!this.joinParameters?.autoSubscribeVideo) {
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
         });

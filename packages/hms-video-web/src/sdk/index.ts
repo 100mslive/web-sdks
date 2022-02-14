@@ -336,6 +336,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData || '' },
         config.initEndpoint,
         config.autoVideoSubscribe,
+        window.HMS?.SERVER_SUB_DEGRADE || false,
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);

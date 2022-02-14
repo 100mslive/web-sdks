@@ -6,5 +6,6 @@ export class JoinParameters {
     public data: string,
     public endpoint: string,
     public autoSubscribeVideo: boolean,
+    public serverSubDegrade: boolean,
   ) {}
 }
