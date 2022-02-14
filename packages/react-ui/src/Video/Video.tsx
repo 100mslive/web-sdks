@@ -22,6 +22,12 @@ export const StyledVideo = styled('video', {
         objectFit: 'contain',
       },
     },
+    degraded: {
+      // don't show the video when it's degraded so avatar can show on top of it. Video will be stuck frame in this case.
+      true: {
+        display: 'none',
+      },
+    },
   },
   defaultVariants: {
     mirror: false,
@@ -35,15 +41,11 @@ interface Props {
    * trackID for peer (videoTrack)
    */
   trackId: HMSPeer['videoTrack'];
-  /**
-   * flips the video if local peer rendered
-   */
-  mirror: HMSPeer['isLocal'];
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, mirror, ...props }) => {
+export const Video: React.FC<Props & StyledProps> = ({ trackId, ...props }) => {
   const ref = useVideo(trackId || '');
-  return <StyledVideo mirror={mirror} autoPlay muted playsInline ref={ref} {...props} />;
+  return <StyledVideo autoPlay muted playsInline ref={ref} {...props} />;
 };
 
 export default Video;
