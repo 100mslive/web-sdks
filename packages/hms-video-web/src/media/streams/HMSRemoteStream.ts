@@ -43,8 +43,8 @@ export default class HMSRemoteStream extends HMSMediaStream {
     return this.audio;
   }
 
-  serverSubDegrade() {
-    return this.connection.serverSubDegrade;
+  isServerHandlingDegradation() {
+    return this.connection.isServerHandlingDegradation;
   }
 
   private syncWithApiChannel() {

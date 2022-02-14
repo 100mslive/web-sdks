@@ -15,7 +15,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
 
   private readonly observer: ISubscribeConnectionObserver;
-  public readonly serverSubDegrade: boolean;
+  public readonly isServerHandlingDegradation: boolean;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -103,7 +103,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   ) {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
-    this.serverSubDegrade = serverSubDegrade;
+    this.isServerHandlingDegradation = serverSubDegrade;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.initNativeConnectionCallbacks();

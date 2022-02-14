@@ -75,7 +75,13 @@ export class NotificationManager {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
-    if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
+    if (
+      ![
+        HMSNotificationMethod.ACTIVE_SPEAKERS,
+        HMSNotificationMethod.SFU_STATS,
+        HMSNotificationMethod.ON_TRACK_LAYER_UPDATE,
+      ].includes(method)
+    ) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {

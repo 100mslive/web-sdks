@@ -38,13 +38,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    console.log(`addSink: ${this.type} ${this.trackId}`);
     this.updateLayer();
   }
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
-    console.log(`removeSink: ${this.type} ${this.trackId}`);
     this.updateLayer();
   }
 
@@ -69,7 +67,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       this._degradedAt = new Date();
     }
 
-    if (this.stream instanceof HMSRemoteStream && this.stream.serverSubDegrade()) {
+    if (this.stream instanceof HMSRemoteStream && this.stream.isServerHandlingDegradation()) {
       // No need to degrade track, as server has done it already
       return;
     }
@@ -80,7 +78,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private updateLayer() {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     if (this.degraded) {
-      if (this.stream instanceof HMSRemoteStream && this.stream.serverSubDegrade()) {
+      if (this.stream instanceof HMSRemoteStream && this.stream.isServerHandlingDegradation()) {
         return;
       }
 

@@ -1,9 +1,10 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { OnTrackLayerUpdateNotification, TrackStateNotification } from '../HMSNotifications';
+import { compareSimulcastLayers } from '../../interfaces/simulcast-layers';
 
 /**
  * Handles:
@@ -114,8 +115,7 @@ export class TrackManager {
       }
 
       if (track instanceof HMSRemoteVideoTrack) {
-        const isDegraded =
-          trackEntry.expected_layer !== HMSSimulcastLayer.NONE && trackEntry.current_layer === HMSSimulcastLayer.NONE;
+        const isDegraded = compareSimulcastLayers(trackEntry.current_layer, trackEntry.expected_layer) < 0;
         track.setDegraded(isDegraded);
         if (isDegraded) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
