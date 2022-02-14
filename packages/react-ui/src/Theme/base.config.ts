@@ -24,7 +24,7 @@ export const baseConfig = {
       grayDefault: '#657080',
       grayDark: '#303740',
       grayDisabled: '#DCE4EF',
-      menuBg: 'rgba(119, 119, 119, 0.5)',
+      menuBg: '$grayDark',
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',
