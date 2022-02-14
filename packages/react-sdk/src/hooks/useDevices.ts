@@ -4,7 +4,7 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 import { hooksErrHandler } from '../hooks/types';
 
-enum DeviceType {
+export enum DeviceType {
   videoInput = 'videoInput',
   audioInput = 'audioInput',
   audioOutput = 'audioOutput',

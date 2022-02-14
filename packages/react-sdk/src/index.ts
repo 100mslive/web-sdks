@@ -20,7 +20,7 @@ export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
 export type { useVideoListInput, useVideoResult, useVideoListTile } from './hooks/useVideoList';
 export type { useAVToggleResult } from './hooks/useAVToggle';
-export type { useDevicesResult } from './hooks/useDevices';
+export type { useDevicesResult, DeviceType, DeviceTypeAndInfo } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 
