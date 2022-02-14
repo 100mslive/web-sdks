@@ -17,7 +17,7 @@ import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
 
 export default interface HMS {
-  preview(config: HMSConfig, listener: HMSPreviewListener): void;
+  preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): void;
   leave(): Promise<void>;
 

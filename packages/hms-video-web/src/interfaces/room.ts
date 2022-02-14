@@ -32,6 +32,21 @@ export interface HMSRecording {
     startedAt?: Date;
     error?: ServerError;
   };
+  hls: HMSHLSRecording;
+}
+
+export interface HMSHLSRecording {
+  running: boolean;
+  startedAt?: Date;
+  error?: ServerError;
+  /**
+   * if the final output is one file or one file per hls layer
+   */
+  singleFilePerLayer?: boolean;
+  /**
+   * if video on demand needs to be turned on, false by default
+   */
+  hlsVod?: boolean;
 }
 
 export interface HMSRTMP {

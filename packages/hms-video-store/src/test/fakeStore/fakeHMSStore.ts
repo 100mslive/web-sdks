@@ -71,6 +71,9 @@ export const makeFakeStore = (): HMSStore => {
         server: {
           running: false,
         },
+        hls: {
+          running: false,
+        },
       },
       rtmp: {
         running: false,
