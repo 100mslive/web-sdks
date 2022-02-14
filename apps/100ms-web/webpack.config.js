@@ -31,7 +31,7 @@ module.exports = {
     type: "filesystem",
     cacheDirectory: path.resolve(__dirname, ".cache"),
   },
-  devtool: isProduction ? false : "cheap-module-source-map",
+  devtool: isProduction ? "source-map" : "cheap-module-source-map",
   performance: false,
   target: "web",
   resolve: {
