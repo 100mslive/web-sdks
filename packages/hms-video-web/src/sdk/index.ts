@@ -914,7 +914,9 @@ export class HMSSdk implements HMSInterface {
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-    analyticsEventsService.queue(AnalyticsEventFactory.audioDetectionFail(error)).flush();
+    analyticsEventsService
+      .queue(AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput))
+      .flush();
     // @TODO: start sending if error is less frequent
     // this.listener?.onError(error);
   };

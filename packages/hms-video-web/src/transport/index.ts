@@ -494,6 +494,12 @@ export default class HMSTransport implements ITransport {
         return hlsVariant;
       }),
     };
+    if (params.recording) {
+      hlsParams.recording = {
+        single_file_per_layer: params.recording.singleFilePerLayer,
+        hls_vod: params.recording.hlsVod,
+      };
+    }
     await this.signal.startHLSStreaming(hlsParams);
   }
 
@@ -560,7 +566,7 @@ export default class HMSTransport implements ITransport {
       await stream
         .setMaxBitrate(maxBitrate, track)
         .then(() => {
-          HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
+          HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
         .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }

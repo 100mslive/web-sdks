@@ -152,8 +152,8 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static audioDetectionFail(error: HMSException): AnalyticsEvent {
-    const properties = error.toAnalyticsProperties();
+  static audioDetectionFail(error: HMSException, device?: MediaDeviceInfo): AnalyticsEvent {
+    const properties = this.getPropertiesWithError({ device }, error);
     const level = AnalyticsEventLevel.ERROR;
     const name = 'audiopresence.failed';
 
