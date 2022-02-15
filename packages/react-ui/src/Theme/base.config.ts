@@ -26,6 +26,7 @@ export const baseConfig = {
       grayDark: '#303740',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
+      hoverBg: 'rgba(255, 255, 255, 0.25)',
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',

@@ -17,7 +17,7 @@ export const IconButton = styled('button', {
     outline: 'none',
   },
   '&:not([disabled]):hover': {
-    backgroundColor: '$transparent',
+    backgroundColor: '$hoverBg',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -37,7 +37,7 @@ export const IconButton = styled('button', {
       },
       true: {
         '&:not([disabled]):hover': {
-          backgroundColor: '$trans',
+          backgroundColor: '$hoverBg',
         },
       },
     },
