@@ -28,6 +28,7 @@ import {
 import { FeatureFlags } from "./store/FeatureFlags";
 import { lightTheme } from "@100mslive/react-ui";
 import "./index.css";
+import { NoSupport } from "./views/components/NoSupport";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -147,6 +148,7 @@ function AppRoutes({ getUserToken }) {
   return (
     <Router>
       <Notifications />
+      <NoSupport />
       <Switch>
         {/* <Route path="/createRoom">
               <CreateRoom />

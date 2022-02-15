@@ -1,3 +1,4 @@
+export { parsedUserAgent } from '@100mslive/hms-video';
 export type {
   IStoreReadOnly,
   IHMSStore,
