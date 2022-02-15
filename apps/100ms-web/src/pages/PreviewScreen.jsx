@@ -6,6 +6,7 @@ import {
   Preview,
   ProgressIcon,
 } from "@100mslive/hms-video-react";
+import { parsedUserAgent } from "@100mslive/react-sdk";
 import { v4 } from "uuid";
 import { AppContext } from "../store/AppContext";
 import getToken from "../services/tokenService";
@@ -54,6 +55,13 @@ const PreviewScreen = ({ getUserToken }) => {
       .
     </div>
   );
+
+  useEffect(() => {
+    const browser = parsedUserAgent.getBrowser();
+    if (!browser.name?.toLowerCase().includes("miui")) {
+      history.replace("/nosupport");
+    }
+  }, [history]);
 
   useEffect(() => {
     if (skipPreview) {

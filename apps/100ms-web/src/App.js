@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -28,7 +28,6 @@ import {
 import { FeatureFlags } from "./store/FeatureFlags";
 import { lightTheme } from "@100mslive/react-ui";
 import "./index.css";
-import { NoSupport } from "./views/components/NoSupport";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -148,11 +147,24 @@ function AppRoutes({ getUserToken }) {
   return (
     <Router>
       <Notifications />
-      <NoSupport />
       <Switch>
         {/* <Route path="/createRoom">
               <CreateRoom />
             </Route> */}
+        <Route
+          path="/nosupport"
+          render={() => (
+            <ErrorPage
+              title="No Support"
+              error={
+                <Fragment>
+                  This browser is not supported.
+                  <br /> Use Chrome or Firefox
+                </Fragment>
+              }
+            />
+          )}
+        />
         <Route
           path="/preview/:roomId/:role?"
           render={({ match }) => {

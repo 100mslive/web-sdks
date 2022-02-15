@@ -4,7 +4,7 @@ import errorBgLight from "../images/error-bg-light.svg";
 import { useHMSTheme } from "@100mslive/hms-video-react";
 import { Flex, Box, Text } from "@100mslive/react-ui";
 
-function ErrorPage({ error }) {
+function ErrorPage({ error, title }) {
   const theme = useHMSTheme().appBuilder.theme;
   return (
     <Flex
@@ -22,8 +22,13 @@ function ErrorPage({ error }) {
           direction="column"
           css={{ position: "absolute", size: "100%", top: "33.33%", left: 0 }}
         >
-          <Text css={{ fontSize: "2.25rem", lineHeight: "2.5rem" }}>404</Text>
-          <Text variant="heading-md" css={{ mt: "1.75rem" }}>
+          <Text css={{ fontSize: "2.25rem", lineHeight: "2.5rem" }}>
+            {title || "404"}
+          </Text>
+          <Text
+            variant="heading-md"
+            css={{ mt: "1.75rem", textAlign: "center" }}
+          >
             {error}
           </Text>
         </Flex>
