@@ -58,6 +58,7 @@ const PreviewScreen = ({ getUserToken }) => {
 
   useEffect(() => {
     const browser = parsedUserAgent.getBrowser();
+    window.alert(browser.name?.toLowerCase());
     if (browser.name?.toLowerCase().includes("miui")) {
       history.replace("/nosupport");
     }
