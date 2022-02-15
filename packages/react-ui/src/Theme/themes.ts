@@ -11,6 +11,7 @@ export const darkTheme = {
     mainBg: '$black',
     tileBg: '#212121',
     statsBg: 'rgba(0,0,0,0.75)',
+    menuBg: '$grayDark',
   },
 };
 
@@ -28,5 +29,6 @@ export const lightTheme = {
     mainBg: '$white',
     tileBg: '#F2F2F2',
     statsBg: 'rgba(255,255,255,0.75)',
+    menuBg: '#d9d9d9',
   },
 };
