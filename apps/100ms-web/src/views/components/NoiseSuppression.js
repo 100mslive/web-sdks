@@ -16,8 +16,9 @@ export const NoiseSuppression = () => {
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
-  // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  // const notification = useHMSNotifications();
+
+  /* const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  const notification = useHMSNotifications();*/
 
   const createPlugin = () => {
     if (!pluginRef.current) {
@@ -34,20 +35,21 @@ export const NoiseSuppression = () => {
     }
   }, [hmsActions]);
 
-  // useEffect(() => {
-  //   if (
-  //     !notification ||
-  //     notification.type !== HMSNotificationTypes.TRACK_ADDED ||
-  //     notification.data?.id !== localAudioTrackID
-  //   ) {
-  //     return;
-  //   }
-  //   if (process.env.REACT_APP_ENV === "qa") {
-  //     addPlugin();
-  //   } else {
-  //     createPlugin();
-  //   }
-  // }, [addPlugin, notification, localAudioTrackID]);
+  //Commenting by default NS add since its causing audio issues
+  /*useEffect(() => {
+    if (
+      !notification ||
+      notification.type !== HMSNotificationTypes.TRACK_ADDED ||
+      notification.data?.id !== localAudioTrackID
+    ) {
+      return;
+    }
+    if (process.env.REACT_APP_ENV === "qa") {
+      addPlugin();
+    } else {
+      createPlugin();
+    }
+  }, [addPlugin, notification, localAudioTrackID]);*/
 
   async function removePlugin() {
     if (pluginRef.current) {
