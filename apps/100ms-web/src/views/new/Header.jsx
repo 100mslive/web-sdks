@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 import {
   Flex,
   Dropdown,
@@ -17,12 +17,10 @@ import {
   RecordIcon,
   SpeakerIcon,
   GlobeIcon,
+  MusicIcon,
 } from "@100mslive/react-icons";
 import {
-  selectHLSState,
   selectLocalPeer,
-  selectRecordingState,
-  selectRTMPState,
   useHMSStore,
   selectDominantSpeaker,
 } from "@100mslive/react-sdk";
@@ -30,6 +28,7 @@ import { AppContext } from "../../store/AppContext";
 import PIPComponent from "../PIP/PIPComponent";
 import { metadataProps as participantInListProps } from "../../common/utils";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
+import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -53,6 +52,111 @@ const SpeakerTag = () => {
   );
 };
 
+const PlaylistAndStreaming = () => {
+  const playlist = usePlaylistMusic();
+  const {
+    isServerRecordingOn,
+    isBrowserRecordingOn,
+    isStreamingOn,
+    isHLSRunning,
+  } = useRecordingStreaming();
+  const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
+
+  return (
+    <Fragment>
+      {playlist && (
+        <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+          <MusicIcon width={24} height={24} />
+        </Flex>
+      )}
+      <Flex
+        align="center"
+        css={{
+          color: "$error",
+        }}
+      >
+        {isRecordingOn && (
+          <RecordIcon
+            width={24}
+            height={24}
+            style={{ marginRight: "0.25rem" }}
+          />
+        )}
+        {isStreamingOn && <GlobeIcon width={24} height={24} />}
+      </Flex>
+      <Dropdown>
+        <DropdownTrigger asChild>
+          <IconButton
+            css={{
+              mr: "$2",
+              alignSelf: "center",
+            }}
+          >
+            <ChevronDownIcon />
+          </IconButton>
+        </DropdownTrigger>
+        <DropdownContent sideOffset={5} align="end" css={{ w: "$60" }}>
+          {isRecordingOn && (
+            <DropdownItem css={{ color: "$error" }}>
+              <RecordIcon width={24} height={24} />
+              <Text variant="sm" css={{ ml: "$2" }}>
+                Recording
+              </Text>
+            </DropdownItem>
+          )}
+          {isStreamingOn && (
+            <DropdownItem css={{ color: "$error" }}>
+              <GlobeIcon width={24} height={24} />
+              <Text variant="sm" css={{ ml: "$2" }}>
+                Streaming ({isHLSRunning ? "HLS" : "RTMP"})
+              </Text>
+            </DropdownItem>
+          )}
+          {(isRecordingOn || isStreamingOn) && playlist && (
+            <DropdownItemSeparator />
+          )}
+          {playlist && (
+            <DropdownItem css={{ color: "$textPrimary" }}>
+              <MusicIcon width={24} height={24} />
+              <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
+                Playlist is playing
+              </Text>
+              {playlist.peer.isLocal ? (
+                <Text
+                  variant="sm"
+                  css={{ color: "$error", cursor: "pointer", ml: "$2" }}
+                  onClick={e => {
+                    e.preventDefault();
+                    playlist.selection.playing
+                      ? playlist.pause()
+                      : playlist.play(playlist.selection.id);
+                  }}
+                >
+                  {playlist.selection.playing ? "Pause" : "Play"}
+                </Text>
+              ) : (
+                <Text
+                  variant="sm"
+                  css={{ color: "$error", ml: "$2", cursor: "pointer" }}
+                  onClick={e => {
+                    e.preventDefault();
+                    playlist.setVolume(
+                      !playlist.track.volume ? 100 : 0,
+                      playlist.track.id
+                    );
+                  }}
+                >
+                  {playlist.track.volume === 0 ? "Unmute" : "Mute"}
+                </Text>
+              )}
+            </DropdownItem>
+          )}
+        </DropdownContent>
+      </Dropdown>
+    </Fragment>
+  );
+};
+
 const PlaylistMusic = () => {
   const playlist = usePlaylistMusic();
 
@@ -62,8 +166,11 @@ const PlaylistMusic = () => {
   const { peer, selection, track, play, pause, setVolume } = playlist;
 
   return (
-    <Flex align="center" css={{ color: "$textPrimary", ml: "$4" }}>
-      <SpeakerIcon width={24} height={24} />
+    <Flex
+      align="center"
+      css={{ color: "$textPrimary", ml: "$4", "@lg": { display: "none" } }}
+    >
+      <MusicIcon width={24} height={24} />
       <Text variant="md" css={{ mx: "$2" }}>
         Playlist is playing
       </Text>
@@ -97,32 +204,22 @@ const PlaylistMusic = () => {
 };
 
 const StreamingRecording = () => {
-  const recording = useHMSStore(selectRecordingState);
-  const rtmp = useHMSStore(selectRTMPState);
-  const hls = useHMSStore(selectHLSState);
-
-  if (
-    [
-      recording.browser.running,
-      recording.server.running,
-      hls.running,
-      rtmp.running,
-    ].every(value => !value)
-  ) {
-    return null;
-  }
-
-  const isRecordingOn = recording.browser.running || recording.server.running;
-  const isStreamingOn = hls.running || rtmp.running;
+  const {
+    isServerRecordingOn,
+    isBrowserRecordingOn,
+    isStreamingOn,
+    isHLSRunning,
+  } = useRecordingStreaming();
+  const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
   const getRecordingText = () => {
     if (!isRecordingOn) {
       return "";
     }
     let title = "";
-    if (recording.browser.running) {
+    if (isBrowserRecordingOn) {
       title += "Browser Recording: on";
     }
-    if (recording.server.running) {
+    if (isServerRecordingOn) {
       if (title) {
         title += "\n";
       }
@@ -133,7 +230,7 @@ const StreamingRecording = () => {
 
   const getStreamingText = () => {
     if (isStreamingOn) {
-      return hls.running ? "HLS" : "RTMP";
+      return isHLSRunning ? "HLS" : "RTMP";
     }
   };
 
@@ -183,27 +280,13 @@ export const Header = () => {
       </Flex>
       <SpeakerTag />
       <Flex align="center" css={{ position: "absolute", right: "$4" }}>
-        <Dropdown>
-          <DropdownTrigger asChild>
-            <IconButton
-              css={{
-                mr: "$2",
-                height: "max-content",
-                alignSelf: "center",
-                display: "none",
-                "@md": { display: "block" },
-              }}
-            >
-              <ChevronDownIcon />
-            </IconButton>
-          </DropdownTrigger>
-          <DropdownContent sideOffset={5} align="end">
-            <DropdownItem>Hello</DropdownItem>
-            <DropdownItem>Test</DropdownItem>
-            <DropdownItemSeparator />
-            <DropdownItem>Test1</DropdownItem>
-          </DropdownContent>
-        </Dropdown>
+        <Flex
+          align="center"
+          css={{ display: "none", "@lg": { display: "flex" } }}
+        >
+          <PlaylistAndStreaming />
+        </Flex>
+
         {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
         <Box css={{ mx: "$2" }}>
           <ParticipantList
