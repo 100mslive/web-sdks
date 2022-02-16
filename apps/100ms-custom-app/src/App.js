@@ -857,7 +857,7 @@ function RoomSettings(props) {
           />
         </div>
       </div>
-      <Divider />
+      {/* <Divider /> */}
       {/* <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Video-off avatars</span>
         <Dropdown
