@@ -11,6 +11,8 @@ export const DropdownItem = styled(Item, {
   color: '$textPrimary',
   p: '$4 $8',
   backgroundColor: '$grayDark',
+  display: 'flex',
+  alignItems: 'center',
   '&:hover': { backgroundColor: `rgba('$grayDark', 0.5)` },
 });
 
