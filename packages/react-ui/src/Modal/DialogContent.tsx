@@ -23,8 +23,7 @@ const StyledDialogContent = styled(Content, {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '90vw',
-  maxWidth: '26rem',
+  maxWidth: '760px',
   maxHeight: '85vh',
   padding: '1.5rem',
   '@allowMotion': {
