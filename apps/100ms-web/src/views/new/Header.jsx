@@ -27,10 +27,10 @@ import {
   useHMSStore,
   selectDominantSpeaker,
 } from "@100mslive/react-sdk";
-import { AppContext } from "../store/AppContext";
-import PIPComponent from "./PIP/PIPComponent";
-import { metadataProps as participantInListProps } from "../common/utils";
-import { usePlaylistMusic } from "./hooks/usePlaylistMusic";
+import { AppContext } from "../../store/AppContext";
+import PIPComponent from "../PIP/PIPComponent";
+import { metadataProps as participantInListProps } from "../../common/utils";
+import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -75,7 +75,7 @@ const PlaylistMusic = () => {
       <IconButton css={{ height: "max-content" }}>
         <SpeakerIcon width={24} height={24} />
       </IconButton>
-      <Text variant="body" css={{ mx: "$1" }}>
+      <Text variant="body" css={{ mx: "$4" }}>
         Playlist is playing
       </Text>
       {peer.isLocal ? (
@@ -149,15 +149,15 @@ const StreamingRecording = () => {
   };
 
   return (
-    <Flex align="center" css={{ mx: "$2" }}>
+    <Flex align="center" css={{ mx: "$4" }}>
       {isRecordingOn && (
         <Flex align="center" title={getRecordingText()}>
           <IconButton
-            css={{ height: "max-content", "& path": { fill: "$redMain" } }}
+            css={{ height: "max-content", "& path": { fill: "$error" } }}
           >
             <RecordIcon width={24} height={24} />
           </IconButton>
-          <Text variant="body" css={{ mx: "$1" }}>
+          <Text variant="body" css={{ mx: "$4" }}>
             Recording
           </Text>
         </Flex>
@@ -165,11 +165,11 @@ const StreamingRecording = () => {
       {isStreamingOn && (
         <Flex align="center" css={{ mx: "$2" }} title={getStreamingText()}>
           <IconButton
-            css={{ height: "max-content", "& path": { fill: "$redMain" } }}
+            css={{ height: "max-content", "& path": { fill: "$error" } }}
           >
             <GlobeIcon width={24} height={24} />
           </IconButton>
-          <Text variant="body" css={{ mx: "$1" }}>
+          <Text variant="body" css={{ mx: "$4" }}>
             Streaming
           </Text>
         </Flex>
@@ -182,19 +182,19 @@ export const Header = () => {
   const { HLS_VIEWER_ROLE } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
   return (
-    <Flex justify="between" css={{ position: "relative" }}>
-      <Flex>
+    <Flex justify="between" align="center" css={{ position: "relative" }}>
+      <Flex align="center">
         <LogoButton />
         <PlaylistMusic />
         <StreamingRecording />
       </Flex>
       <SpeakerTag />
-      <Flex>
+      <Flex align="center">
         <Dropdown>
           <DropdownTrigger asChild>
             <IconButton
               css={{
-                mr: "$2",
+                mr: "$4",
                 height: "max-content",
                 alignSelf: "center",
                 display: "none",
@@ -212,7 +212,7 @@ export const Header = () => {
           </DropdownContent>
         </Dropdown>
         {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
-        <Box css={{ mx: "$2" }}>
+        <Box css={{ mx: "$4" }}>
           <ParticipantList
             key={1}
             participantInListProps={participantInListProps}

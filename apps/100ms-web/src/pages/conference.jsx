@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { AppContext } from "../store/AppContext";
 import { useHistory, useParams } from "react-router-dom";
-import { Header } from "../views/Header";
+import { Header } from "../views/new/Header";
 import { ConferenceFooter } from "../views/footerView";
 import { ConferenceMainView } from "../views/mainView";
 import {

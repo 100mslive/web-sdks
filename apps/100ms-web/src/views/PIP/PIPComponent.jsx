@@ -21,7 +21,6 @@ const PIPComponent = () => {
         title={`${isPipOn ? "Deactivate" : "Activate"} Person in Person view`}
       >
         <IconButton
-          css={{ width: "40px", height: "40px" }}
           active={!isPipOn}
           key="pip"
           onClick={() => setIsPipOn(!isPipOn)}
