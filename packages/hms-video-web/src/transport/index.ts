@@ -728,6 +728,9 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
+
+    // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
+    //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
       if (!this.joinParameters?.serverSubDegrade) {
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
