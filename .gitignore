@@ -12,3 +12,4 @@ coverage
 cy-coverage
 tsconfig.tsbuildinfo
 docs
+.cache
