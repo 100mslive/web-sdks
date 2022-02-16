@@ -1,5 +1,5 @@
 import { Root, Trigger, Content, Item, Separator } from '@radix-ui/react-dropdown-menu';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Dropdown = styled(Root, {});
 
