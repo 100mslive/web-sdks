@@ -9,7 +9,6 @@ import { flexCenter } from '../utils/styles';
  */
 const getButtonVariants = (base: string, hover: string, active: string) => ({
   bg: base,
-  c: 'white',
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
@@ -24,7 +23,7 @@ const getButtonVariants = (base: string, hover: string, active: string) => ({
 
 export const Button = styled('button', {
   ...flexCenter,
-  fontFamily: '$sans',
+  color: '$textPrimary',
   outline: 'none',
   border: 'none',
   fs: '$md',
