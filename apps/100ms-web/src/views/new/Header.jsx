@@ -23,7 +23,6 @@ import {
   selectLocalPeer,
   selectRecordingState,
   selectRTMPState,
-  useHMSActions,
   useHMSStore,
   selectDominantSpeaker,
 } from "@100mslive/react-sdk";
@@ -38,19 +37,12 @@ const SpeakerTag = () => {
     <Flex
       align="center"
       justify="center"
-      css={{
-        position: "absolute",
-        size: "100%",
-        left: 0,
-        top: 0,
-      }}
+      css={{ flex: "1 1 0", color: "$textPrimary" }}
     >
-      <IconButton css={{ height: "max-content" }}>
-        <SpeakerIcon width={24} height={24} />
-      </IconButton>
+      <SpeakerIcon width={24} height={24} />
       <Text
-        variant="body"
-        css={{ ...truncate(200) }}
+        variant="md"
+        css={{ ...truncate(200), ml: "$2" }}
         title={dominantSpeaker.name}
       >
         {dominantSpeaker.name}
@@ -62,43 +54,40 @@ const SpeakerTag = () => {
 };
 
 const PlaylistMusic = () => {
-  const hmsActions = useHMSActions();
   const playlist = usePlaylistMusic();
 
   if (!playlist) {
     return null;
   }
-  const { peer, selection, track } = playlist;
+  const { peer, selection, track, play, pause, setVolume } = playlist;
 
   return (
-    <Flex align="center">
-      <IconButton css={{ height: "max-content" }}>
-        <SpeakerIcon width={24} height={24} />
-      </IconButton>
-      <Text variant="body" css={{ mx: "$4" }}>
+    <Flex align="center" css={{ color: "$textPrimary", ml: "$4" }}>
+      <SpeakerIcon width={24} height={24} />
+      <Text variant="md" css={{ mx: "$2" }}>
         Playlist is playing
       </Text>
       {peer.isLocal ? (
         <Text
-          variant="body"
+          variant="md"
           onClick={async () => {
             if (selection.playing) {
-              hmsActions.audioPlaylist.pause();
+              pause();
             } else {
-              await hmsActions.audioPlaylist.play(selection.id);
+              await play(selection.id);
             }
           }}
-          css={{ color: "$redMain", cursor: "pointer" }}
+          css={{ color: "$error", cursor: "pointer" }}
         >
           {selection.playing ? "Pause" : "Play"}
         </Text>
       ) : (
         <Text
-          variant="body"
+          variant="md"
           onClick={() => {
-            hmsActions.setVolume(!track.volume ? 100 : 0, track.id);
+            setVolume(!track.volume ? 100 : 0, track.id);
           }}
-          css={{ color: "$redMain", cursor: "pointer" }}
+          css={{ color: "$error", cursor: "pointer" }}
         >
           {track.volume === 0 ? "Unmute" : "Mute"}
         </Text>
@@ -157,7 +146,7 @@ const StreamingRecording = () => {
           >
             <RecordIcon width={24} height={24} />
           </IconButton>
-          <Text variant="body" css={{ mx: "$4" }}>
+          <Text variant="body" css={{ mx: "$2" }}>
             Recording
           </Text>
         </Flex>
@@ -169,7 +158,7 @@ const StreamingRecording = () => {
           >
             <GlobeIcon width={24} height={24} />
           </IconButton>
-          <Text variant="body" css={{ mx: "$4" }}>
+          <Text variant="body" css={{ mx: "$2" }}>
             Streaming
           </Text>
         </Flex>
@@ -182,19 +171,23 @@ export const Header = () => {
   const { HLS_VIEWER_ROLE } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
   return (
-    <Flex justify="between" align="center" css={{ position: "relative" }}>
-      <Flex align="center">
+    <Flex
+      justify="between"
+      align="center"
+      css={{ position: "relative", height: "100%" }}
+    >
+      <Flex align="center" css={{ position: "absolute", left: "$4" }}>
         <LogoButton />
         <PlaylistMusic />
         <StreamingRecording />
       </Flex>
       <SpeakerTag />
-      <Flex align="center">
+      <Flex align="center" css={{ position: "absolute", right: "$4" }}>
         <Dropdown>
           <DropdownTrigger asChild>
             <IconButton
               css={{
-                mr: "$4",
+                mr: "$2",
                 height: "max-content",
                 alignSelf: "center",
                 display: "none",
@@ -212,7 +205,7 @@ export const Header = () => {
           </DropdownContent>
         </Dropdown>
         {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
-        <Box css={{ mx: "$4" }}>
+        <Box css={{ mx: "$2" }}>
           <ParticipantList
             key={1}
             participantInListProps={participantInListProps}
