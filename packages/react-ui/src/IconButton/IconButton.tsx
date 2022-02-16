@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
 export const IconButton = styled('button', {
@@ -9,7 +9,7 @@ export const IconButton = styled('button', {
   r: '$1',
   cursor: 'pointer',
   backgroundColor: 'transparent',
-  color: '$fg',
+  color: '$textPrimary',
   '&:not([disabled]):focus-visible': {
     boxShadow: '0 0 0 3px $colors$brandTint',
   },
@@ -30,7 +30,7 @@ export const IconButton = styled('button', {
     active: {
       false: {
         backgroundColor: '$iconBtn',
-        color: '$bg',
+        color: '$textInvert',
         '&:not([disabled]):hover': {
           backgroundColor: '$iconBtn',
         },

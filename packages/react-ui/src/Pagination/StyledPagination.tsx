@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled('div', {
   height: '2rem',
@@ -13,7 +13,7 @@ const Root = styled('div', {
 });
 
 const Chevron = styled('button', {
-  color: '$fg',
+  color: '$textPrimary',
   '&:focus': {
     outline: 'none',
   },

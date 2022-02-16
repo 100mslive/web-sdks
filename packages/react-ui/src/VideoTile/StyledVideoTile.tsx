@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Root = styled('div', {
   padding: '0.75rem',
@@ -16,7 +16,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$grey1',
+  background: '$grayDark',
   variants: {
     transparentBg: {
       true: {
@@ -33,7 +33,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -57,7 +57,7 @@ const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 const AudioIndicator = styled('div', {
@@ -65,8 +65,8 @@ const AudioIndicator = styled('div', {
   left: '50%',
   transform: 'translateX(-50%)',
   bottom: '20px',
-  color: 'white',
-  bg: '$redMain',
+  color: '$textPrimary',
+  bg: '$error',
   borderRadius: '$round',
   width: '28px',
   height: '28px',

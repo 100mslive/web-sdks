@@ -1,5 +1,5 @@
 import * as Popover from '@radix-ui/react-popover';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
 
@@ -33,8 +33,8 @@ const StyledContent = styled(Popover.Content, {
 });
 
 const styledItem = {
-  fontSize: '14px',
-  color: '$fg',
+  fontSize: '$sm',
+  color: '$textPrimary',
   display: 'flex',
   alignItems: 'center',
   padding: '8px 12px',

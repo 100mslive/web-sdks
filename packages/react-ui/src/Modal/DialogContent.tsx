@@ -1,7 +1,7 @@
 import React from 'react';
 import { Close, Content, Overlay } from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import { dialogClose, dialogOpen } from '../utils/animations';
 import { IconButton } from '../IconButton';
 import { Flex, Box } from '../Layout';
@@ -17,7 +17,7 @@ const StyledOverlay = styled(Overlay, {
 
 const StyledDialogContent = styled(Content, {
   color: 'white',
-  backgroundColor: '$dialogBg',
+  backgroundColor: '$bgPrimary',
   borderRadius: '8px',
   position: 'fixed',
   top: '50%',
@@ -51,7 +51,7 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, close = 
     <StyledOverlay />
     <StyledDialogContent {...props}>
       <Flex justify="between">
-        <Text variant="heading-md" css={{ mb: '$1' }}>
+        <Text variant="h3" css={{ mb: '$1' }}>
           {title}
         </Text>
         {close && (

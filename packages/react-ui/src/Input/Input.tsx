@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Input = styled('input', {
   height: '30px',
@@ -8,7 +8,7 @@ export const Input = styled('input', {
   border: 'none',
   padding: '5px 10px',
   color: 'white',
-  fontSize: '16px',
+  fontSize: '$md',
   '&:focus': {
     boxShadow: '0 0 0 3px $colors$brandTint',
   },
