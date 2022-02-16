@@ -80,10 +80,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private updateLayer() {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     if (this.degraded) {
-      if (this.stream instanceof HMSRemoteStream && this.stream.isServerHandlingDegradation()) {
-        return;
-      }
-
       newLayer = HMSSimulcastLayer.NONE;
     }
     (this.stream as HMSRemoteStream).setVideo(newLayer);
