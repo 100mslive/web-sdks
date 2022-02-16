@@ -6,24 +6,27 @@ export const Dropdown = styled(Root, {});
 export const DropdownTrigger = styled(Trigger, {});
 
 export const DropdownItem = styled(Item, {
-  h: '$4',
+  h: '$14',
   w: '100%',
-  color: '$fg',
-  p: '$2 $3',
+  color: '$textPrimary',
+  p: '$4 $8',
+  backgroundColor: '$grayDark',
+  '&:hover': { backgroundColor: `rgba('$grayDark', 0.5)` },
 });
 
 export const DropdownItemSeparator = styled(Separator, {
   h: 1,
-  backgroundColor: '$grey2',
-  m: '$1 $3',
+  backgroundColor: '$grayDefault',
+  m: '$4 $8',
 });
 
 export const DropdownContent = styled(Content, {
-  w: '$menu',
-  maxHeight: '$menu',
+  w: '$56',
+  maxHeight: '$56',
   r: '$2',
-  p: '$2 0',
-  backgroundColor: '$grey1',
+  p: '$4 0',
+  backgroundColor: '$grayDark',
+  overflowY: 'auto',
 });
 
 Dropdown.displayName = 'Dropdown';
