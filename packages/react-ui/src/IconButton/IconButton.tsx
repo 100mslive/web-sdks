@@ -5,19 +5,19 @@ export const IconButton = styled('button', {
   ...flexCenter,
   outline: 'none',
   border: 'none',
-  padding: '$1',
+  padding: '$2',
   r: '$1',
   cursor: 'pointer',
   backgroundColor: 'transparent',
   color: '$textPrimary',
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
   '&:not([disabled]):focus': {
     outline: 'none',
   },
   '&:not([disabled]):hover': {
-    backgroundColor: '$trans',
+    backgroundColor: '$hoverBg',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -37,7 +37,7 @@ export const IconButton = styled('button', {
       },
       true: {
         '&:not([disabled]):hover': {
-          backgroundColor: '$trans',
+          backgroundColor: '$hoverBg',
         },
       },
     },

@@ -51,7 +51,7 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, close = 
     <StyledOverlay />
     <StyledDialogContent {...props}>
       <Flex justify="between">
-        <Text variant="h3" css={{ mb: '$1' }}>
+        <Text variant="h6" css={{ mb: '$2' }}>
           {title}
         </Text>
         {close && (

@@ -18,12 +18,12 @@ const StyledTrigger = styled(Popover.Trigger, {
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
 });
 
 const StyledContent = styled(Popover.Content, {
-  backgroundColor: '$grey2',
+  backgroundColor: '$menuBg',
   padding: '10px 0px',
   display: 'flex',
   flexDirection: 'column',
@@ -45,7 +45,7 @@ const StyledItemButton = styled('button', {
   ...styledItem,
   height: '40px',
   '&:hover': {
-    backgroundColor: '$grey3',
+    backgroundColor: '$menuBg',
   },
   // TODO: default focus applied cause issues with this style
   '&:focus': {
@@ -75,8 +75,8 @@ export const Flex = styled('div', {
 });
 
 const RemoveMenuItem = styled(StyledItemButton, {
-  color: '$redMain',
-  borderTop: '1px solid $grey4',
+  color: '$error',
+  borderTop: '1px solid $borderLight',
 });
 
 interface MenuTileType {

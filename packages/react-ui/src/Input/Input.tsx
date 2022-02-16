@@ -10,14 +10,14 @@ export const Input = styled('input', {
   color: 'white',
   fontSize: '$md',
   '&:focus': {
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
   marginBottom: '20px',
   variants: {
     error: {
       true: {
         '&:focus': {
-          boxShadow: '0 0 0 3px $colors$redMain',
+          boxShadow: '0 0 0 3px $colors$error',
         },
       },
     },

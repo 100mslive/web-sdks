@@ -37,7 +37,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$grey4',
+  color: '$grayDefault',
   width: '30px',
   height: '100%',
   position: 'absolute',

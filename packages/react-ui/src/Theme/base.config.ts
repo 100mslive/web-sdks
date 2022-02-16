@@ -6,6 +6,7 @@ export const baseConfig = {
     colors: {
       white: '#ffffff',
       black: '#000000',
+      transparent: 'rgba(0, 0, 0, 0)',
       orange: '#F69133',
       yellow: '#FAC919',
       green: '#38EA9F',
@@ -24,8 +25,11 @@ export const baseConfig = {
       grayDefault: '#657080',
       grayDark: '#303740',
       grayDisabled: '#DCE4EF',
-      menuBg: 'rgba(119, 119, 119, 0.5)',
-      statsBg: 'rgba(0, 0, 0, 0.75)',
+      menuBg: '$grayDark',
+      hoverBg: 'rgba(255, 255, 255, 0.25)',
+    },
+    shadows: {
+      sm: '0 0 4px 0 rgba(0,0,0,0.3)',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',

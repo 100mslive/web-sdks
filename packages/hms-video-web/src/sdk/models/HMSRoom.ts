@@ -7,7 +7,7 @@ export default class Room implements HMSRoom {
   hasWaitingRoom!: boolean;
   sessionId?: string;
   startedAt?: Date;
-  recording: HMSRecording = { server: { running: false }, browser: { running: false } };
+  recording: HMSRecording = { server: { running: false }, browser: { running: false }, hls: { running: false } };
   rtmp: HMSRTMP = { running: false };
   hls: HMSHLS = { running: false, variants: [] };
   name?: string;

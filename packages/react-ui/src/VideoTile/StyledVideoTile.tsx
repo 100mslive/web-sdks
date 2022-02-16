@@ -16,7 +16,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$grayDark',
+  background: '$tileBg',
   variants: {
     transparentBg: {
       true: {
@@ -65,7 +65,7 @@ const AudioIndicator = styled('div', {
   left: '50%',
   transform: 'translateX(-50%)',
   bottom: '20px',
-  color: '$textPrimary',
+  color: '$white',
   bg: '$error',
   borderRadius: '$round',
   width: '28px',
@@ -79,7 +79,7 @@ const AudioIndicator = styled('div', {
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
-  color: 'white',
+  color: '$white',
   borderRadius: '$round',
   backgroundColor: '$menuBg',
   display: 'flex',
@@ -91,7 +91,7 @@ const FullScreenButton = styled('button', {
   zIndex: 20,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
 });
 

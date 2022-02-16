@@ -561,7 +561,7 @@ export default class HMSTransport implements ITransport {
       await stream
         .setMaxBitrate(maxBitrate, track)
         .then(() => {
-          HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
+          HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
         .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }

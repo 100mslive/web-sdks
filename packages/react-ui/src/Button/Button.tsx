@@ -9,7 +9,7 @@ import { flexCenter } from '../utils/styles';
  */
 const getButtonVariants = (base: string, hover: string, active: string) => ({
   bg: base,
-  c: 'white',
+  c: '$white',
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
@@ -29,21 +29,21 @@ export const Button = styled('button', {
   border: 'none',
   fs: '$md',
   r: '$1',
-  backgroundColor: '$brandMain',
+  backgroundColor: '$brandDefault',
   fontWeight: '500',
   p: '$4 $8',
   '&:focus': {
     outline: 'none',
   },
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandMain',
+    boxShadow: '0 0 0 3px $colors$brandDefault',
   },
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$greyDefault', '$greyLight', '$greyLight'),
+      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
       danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
-      primary: getButtonVariants('$brandMain', '$brandTint', '$brandTint'),
+      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight'),
     },
     icon: {
       true: {
