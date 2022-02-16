@@ -24,18 +24,29 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.syncWithApiChannel();
   }
 
-  setVideo(layer: HMSSimulcastLayer, sync = true) {
+  /**
+   * Sets the video layer after receiving new state from SFU. This is used when server side subscribe
+   * degradation is ON.
+   * @param layer is simulcast layer to be set
+   */
+  setVideoLayer(layer: HMSSimulcastLayer) {
+    this.video = layer;
+    HMSLogger.d(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
+  }
+
+  /**
+   * Sets the video layer and updates the track state to SFU via api datachannel. This is used when client
+   * side subscribe degradation is ON or client unsubscribes the current track.
+   * @param layer is simulcast layer to be set
+   */
+  setVideo(layer: HMSSimulcastLayer) {
     if (this.video === layer) {
       HMSLogger.d(`[Remote stream] ${this.id}`, `Already on ${layer} layer`);
       return;
     }
 
-    this.video = layer;
-    HMSLogger.d(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
-
-    if (sync) {
-      this.syncWithApiChannel();
-    }
+    this.setVideoLayer(layer);
+    this.syncWithApiChannel();
   }
 
   getSimulcastLayer() {

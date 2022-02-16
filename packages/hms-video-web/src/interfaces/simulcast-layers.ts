@@ -5,23 +5,6 @@ export enum HMSSimulcastLayer {
   HIGH = 'high',
 }
 
-export function compareSimulcastLayers(a: HMSSimulcastLayer, b: HMSSimulcastLayer): number {
-  const toInt = (layer: HMSSimulcastLayer): number => {
-    switch (layer) {
-      case HMSSimulcastLayer.HIGH:
-        return 3;
-      case HMSSimulcastLayer.MEDIUM:
-        return 2;
-      case HMSSimulcastLayer.LOW:
-        return 1;
-      case HMSSimulcastLayer.NONE:
-        return 0;
-    }
-  };
-
-  return toInt(a) - toInt(b);
-}
-
 export interface SimulcastLayer {
   rid: string;
   scaleResolutionDownBy?: number;

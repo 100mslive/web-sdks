@@ -75,13 +75,7 @@ export class NotificationManager {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
-    if (
-      ![
-        HMSNotificationMethod.ACTIVE_SPEAKERS,
-        HMSNotificationMethod.SFU_STATS,
-        HMSNotificationMethod.ON_TRACK_LAYER_UPDATE,
-      ].includes(method)
-    ) {
+    if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {
@@ -109,7 +103,7 @@ export class NotificationManager {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
         break;
       }
-      case HMSNotificationMethod.ON_TRACK_LAYER_UPDATE: {
+      case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {
         this.trackManager.handleTrackLayerUpdate(notification as OnTrackLayerUpdateNotification);
         break;
       }
