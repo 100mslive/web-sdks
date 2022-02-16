@@ -69,6 +69,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
     if (this.stream instanceof HMSRemoteStream && this.stream.isServerHandlingDegradation()) {
       // No need to degrade track, as server has done it already
+      const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
+      (this.stream as HMSRemoteStream).setVideo(layer, false);
       return;
     }
 
