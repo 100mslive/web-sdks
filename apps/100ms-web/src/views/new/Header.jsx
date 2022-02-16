@@ -62,6 +62,10 @@ const PlaylistAndStreaming = () => {
   } = useRecordingStreaming();
   const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
 
+  if (!playlist && !isRecordingOn && !isStreamingOn) {
+    return null;
+  }
+
   return (
     <Fragment>
       {playlist && (
