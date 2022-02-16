@@ -8,7 +8,6 @@ export {
 } from './primitives/HmsRoomProvider';
 export { usePreview } from './hooks/usePreview';
 export { useAVToggle } from './hooks/useAVToggle';
-export { useDevices, DeviceType } from './hooks/useDevices';
 export { useVideo } from './hooks/useVideo';
 export { useScreenShare } from './hooks/useScreenShare';
 export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';
@@ -20,7 +19,7 @@ export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
 export type { useVideoListInput, useVideoResult, useVideoListTile } from './hooks/useVideoList';
 export type { useAVToggleResult } from './hooks/useAVToggle';
-export type { useDevicesResult, DeviceType, DeviceTypeAndInfo } from './hooks/useDevices';
+export type { useDevicesResult, DeviceType, useDevices } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 
