@@ -3,7 +3,17 @@ import { styled } from '../Theme';
 
 export const Dropdown = styled(Root, {});
 
-export const DropdownTrigger = styled(Trigger, {});
+export const DropdownTrigger = styled(Trigger, {
+  padding: '$2 $4',
+  cursor: 'pointer',
+  '&[data-state="open"]': {
+    backgroundColor: '$grayDark',
+    borderRadius: '$1',
+    '& > svg': {
+      transform: 'rotate(180deg)',
+    },
+  },
+});
 
 export const DropdownItem = styled(Item, {
   h: '$14',

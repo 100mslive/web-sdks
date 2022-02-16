@@ -11,7 +11,7 @@ import {
   truncate,
   Box,
 } from "@100mslive/react-ui";
-import { ParticipantList, LogoButton } from "@100mslive/hms-video-react";
+import { LogoButton } from "@100mslive/hms-video-react";
 import {
   ChevronDownIcon,
   RecordIcon,
@@ -26,9 +26,9 @@ import {
 } from "@100mslive/react-sdk";
 import { AppContext } from "../../store/AppContext";
 import PIPComponent from "../PIP/PIPComponent";
-import { metadataProps as participantInListProps } from "../../common/utils";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
+import { ParticipantList } from "./ParticipantList";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -293,10 +293,11 @@ export const Header = () => {
 
         {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
         <Box css={{ mx: "$2" }}>
-          <ParticipantList
+          <ParticipantList />
+          {/* <ParticipantList
             key={1}
             participantInListProps={participantInListProps}
-          />
+          /> */}
         </Box>
       </Flex>
     </Flex>

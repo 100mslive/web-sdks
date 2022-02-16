@@ -149,3 +149,16 @@ export const chatStyle = {
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
 };
+
+export const groupByRoles = peers => {
+  if (!peers || !Array.isArray(peers) || peers.length === 0) {
+    return {};
+  }
+  return peers.reduce((res, peer) => {
+    if (!res[peer.roleName]) {
+      res[peer.roleName] = [];
+    }
+    res[peer.roleName].push(peer);
+    return res;
+  }, {});
+};
