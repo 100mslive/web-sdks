@@ -2,7 +2,7 @@ import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
 const Container = styled('div', {
-  padding: '3rem 7.5rem',
+  padding: '2.875rem 7.5rem',
   borderRadius: '$2',
   backgroundColor: '$tileBg',
   display: 'flex',
@@ -10,7 +10,10 @@ const Container = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   '@md': {
-    padding: '3rem 0rem',
+    borderRadius: '0',
+    padding: '0',
+    width: '100%',
+    height: '100%',
   },
 });
 

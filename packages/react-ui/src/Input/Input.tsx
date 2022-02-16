@@ -10,7 +10,7 @@ export const Input = styled('input', {
   color: '$textPrimary',
   fontSize: '$md',
   '&:focus': {
-    boxShadow: '0 0 0 3px $colors$brandLight',
+    boxShadow: '0 0 0 3px $colors$brandDefault',
   },
   marginBottom: '20px',
   variants: {
