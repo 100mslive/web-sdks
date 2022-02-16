@@ -140,24 +140,24 @@ const StreamingRecording = () => {
   return (
     <Flex align="center" css={{ mx: "$4" }}>
       {isRecordingOn && (
-        <Flex align="center" title={getRecordingText()}>
-          <IconButton
-            css={{ height: "max-content", "& path": { fill: "$error" } }}
-          >
-            <RecordIcon width={24} height={24} />
-          </IconButton>
+        <Flex
+          align="center"
+          css={{ color: "$error" }}
+          title={getRecordingText()}
+        >
+          <RecordIcon width={24} height={24} />
           <Text variant="body" css={{ mx: "$2" }}>
             Recording
           </Text>
         </Flex>
       )}
       {isStreamingOn && (
-        <Flex align="center" css={{ mx: "$2" }} title={getStreamingText()}>
-          <IconButton
-            css={{ height: "max-content", "& path": { fill: "$error" } }}
-          >
-            <GlobeIcon width={24} height={24} />
-          </IconButton>
+        <Flex
+          align="center"
+          css={{ mx: "$2", color: "$error" }}
+          title={getStreamingText()}
+        >
+          <GlobeIcon width={24} height={24} />
           <Text variant="body" css={{ mx: "$2" }}>
             Streaming
           </Text>
