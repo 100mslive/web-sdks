@@ -1,7 +1,7 @@
 import { keyframes } from '@stitches/react';
 import * as BaseTooltip from '@radix-ui/react-tooltip';
 import React, { PropsWithChildren } from 'react';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 // TODO: move all keyframes in different file similiar to `styles.ts`
 const slideUpAndFade = keyframes({
@@ -26,10 +26,10 @@ const slideLeftAndFade = keyframes({
 
 const TooltipBox = styled(BaseTooltip.Content, {
   borderRadius: '$0',
-  padding: '$1 $2',
+  padding: '$3 $4',
   fontSize: '$xs',
-  color: 'white',
-  backgroundColor: '$grey3',
+  color: '$white',
+  backgroundColor: '$grayDefault',
   '@media (prefers-reduced-motion: no-preference)': {
     animationDuration: '400ms',
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',

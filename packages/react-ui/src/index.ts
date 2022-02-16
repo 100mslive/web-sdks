@@ -1,4 +1,3 @@
-export * from './stitches.config';
 export * from './Button';
 export * from './Text';
 export * from './IconButton';
@@ -21,4 +20,6 @@ export * from './utils';
 export * from './Video';
 export * from './TileMenu';
 export * from './AudioLevel';
+export * from './Popover';
 export * from './Stats';
+export * from './Theme';

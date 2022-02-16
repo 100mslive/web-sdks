@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "prettier"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "react-app"],
   "env": { "browser": true, "node": true },
   "overrides": [
     {
@@ -31,7 +31,20 @@
           "error",
           { "vars": "all", "args": "after-used", "ignoreRestSiblings": false, "argsIgnorePattern": "^_" }
         ],
-        "@typescript-eslint/no-explicit-any": 0
+        "@typescript-eslint/no-explicit-any": 0,
+        "react/jsx-curly-brace-presence": [
+          2,
+          {
+            "props": "never"
+          }
+        ],
+        "react/self-closing-comp": [
+          "error",
+          {
+            "component": true,
+            "html": false
+          }
+        ]
       }
     }
   ],

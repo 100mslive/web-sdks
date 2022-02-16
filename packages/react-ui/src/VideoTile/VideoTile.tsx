@@ -11,7 +11,7 @@ import { StyledVideoTile } from './StyledVideoTile';
 import { Video } from '../Video';
 import { Avatar } from '../Avatar';
 import { MicOffIcon, HandRaiseFilledIcon } from '@100mslive/react-icons';
-import { TileMenu } from '../TileMenu';
+import { TileMenu } from '../TileMenu/TileMenu';
 import { AudioLevel } from '../AudioLevel';
 import { VideoTileStats } from '../Stats';
 

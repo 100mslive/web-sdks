@@ -119,9 +119,17 @@ export default class JsonRpcSignal implements ISignal {
       this.socket = new WebSocket(uri); // @DISCUSS: Inject WebSocket as a dependency so that it can be easier to mock and test
 
       const errorListener = (error: Event) => {
-        HMSLogger.d(this.TAG, 'Error opening socket connection', error);
+        /**
+         * there was an error received from websocket leading to disconnection, this can happen either if server
+         * disconnects the websocket for some reason, there is a network disconnect or a firewall/antivirus on user's
+         * device is breaking the websocket connecting(which can happen even after a successful connect).
+         */
+        HMSLogger.e(this.TAG, 'Error from websocket', error);
         reject(
-          ErrorFactory.WebSocketConnectionErrors.GenericConnect(HMSAction.JOIN, 'Error opening socket connection'),
+          ErrorFactory.WebSocketConnectionErrors.GenericConnect(
+            HMSAction.JOIN,
+            `Error opening socket connection - ${error}`,
+          ),
         );
       };
       this.socket.addEventListener('error', errorListener);
@@ -347,7 +355,11 @@ export default class JsonRpcSignal implements ISignal {
     if (this.isConnected) {
       const pongTimeDiff = await this.ping(pingTimeout);
       if (pongTimeDiff > pingTimeout) {
-        HMSLogger.d(this.TAG, 'Pong timeout', { id });
+        let pageHidden = false;
+        if (typeof document !== undefined && document.hidden) {
+          pageHidden = true;
+        }
+        HMSLogger.d(this.TAG, `Pong timeout ${id}, pageHidden=${pageHidden}`);
         if (this.id === id) {
           this.isConnected = false;
         }

@@ -1,9 +1,9 @@
 import React from 'react';
 import { ChevronDownIcon } from '@100mslive/react-icons';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
   height: '40px',
@@ -17,10 +17,10 @@ const Root = styled('div', {
 
 // TODO: replace these with tokens
 const SelectRoot = styled('select', {
-  fontSize: '16px',
+  fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
-  color: '$fg',
+  color: '$textPrimary',
   width: '100%',
   paddingLeft: '12px',
   paddingRight: '30px',
@@ -37,7 +37,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$grey4',
+  color: '$grayDefault',
   width: '30px',
   height: '100%',
   position: 'absolute',

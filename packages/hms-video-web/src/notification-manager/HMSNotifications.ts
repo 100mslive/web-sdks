@@ -9,6 +9,11 @@ import { HMSLocalTrack } from '../media/tracks';
  * which will call the corresponding HMSUpdateListener callbacks.
  */
 
+export interface ServerError {
+  code: number;
+  message?: string;
+}
+
 export interface TrackStateNotification {
   tracks: {
     [track_id: string]: TrackState;
@@ -70,20 +75,11 @@ export interface PeerNotification {
   };
 }
 
-export interface FlatPeerNotification {
-  peer_id: string;
+export interface RoomState {
   name: string;
-  user_id: string;
-  joined_at: string;
-  role: string;
-  data: string;
-}
-
-export interface SessionState {
-  name: string;
-  session_id: string;
-  started_at: number;
-  recording: {
+  session_id?: string;
+  started_at?: number;
+  recording?: {
     sfu: {
       started_at?: number;
       enabled: boolean;
@@ -93,31 +89,25 @@ export interface SessionState {
       enabled: boolean;
     };
   };
-  streaming: {
+  streaming?: {
     enabled: boolean;
     rtmp: { enabled: boolean; started_at?: number };
     hls: HLSNotification;
   };
 }
 
-export interface RoomState {
-  room_id: string;
-  name: string;
-}
-
 export interface PeerListNotification {
   peers: {
     [peer_id: string]: PeerNotification;
   };
-  room: SessionState;
+  room: RoomState;
 }
 
 export interface PeriodicRoomState {
   peer_count: number;
   room: RoomState;
-  session: SessionState;
-  peers: {
-    [peer_id: string]: FlatPeerNotification;
+  peers?: {
+    [peer_id: string]: PeerNotification;
   };
 }
 
@@ -193,16 +183,23 @@ export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
   peer: PeerNotificationInfo;
+  error?: ServerError;
 }
 
 export interface RTMPNotification {
   peer: PeerNotificationInfo;
   started_at?: number;
+  error?: ServerError;
 }
 
 export interface HLSNotification {
   enabled: boolean;
   variants: Array<HLSVariantInfo>;
+  error?: ServerError;
+  hls_recording?: {
+    hls_vod: boolean;
+    single_file_per_layer: boolean;
+  };
 }
 
 export interface HLSVariantInfo {

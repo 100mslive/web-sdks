@@ -6,22 +6,21 @@ import {
   HMSNotification,
   HMSNotifications,
   HMSStatsStore,
-  IStoreReadOnly,
   HMSStats,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
-import create, { EqualityChecker, StateSelector } from 'zustand';
+import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
-export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
-  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
-}
 export interface HMSRoomProviderProps {
   actions?: HMSActions;
   store?: HMSStoreWrapper;
   notifications?: HMSNotifications;
   stats?: HMSStats;
+  /**
+   * if true this will enable webrtc stats collection
+   */
   isHMSStatsOn?: boolean;
 }
 
@@ -32,6 +31,12 @@ export interface HMSRoomProviderProps {
 const HMSContext = createContext<HMSContextProviderProps | null>(null);
 
 let providerProps: HMSContextProviderProps;
+/**
+ * top level wrapper for using react sdk hooks. This doesn't have any mandatory arguments, if you are already
+ * initialising the sdk on your side, you can pass in the primitives from there as well to use hooks for
+ * react part of your code.
+ * @constructor
+ */
 export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
   children,
   actions,
@@ -92,9 +97,8 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
 
   useEffect(() => {
     if (isBrowser) {
-      window.onunload = () => {
-        providerProps.actions.leave();
-      };
+      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      window.addEventListener('onunload', () => providerProps.actions.leave());
     }
   }, []);
 

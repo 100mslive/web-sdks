@@ -5,7 +5,8 @@ import {
   selectLocalPeer,
   selectAvailableRoleNames,
   selectRolesMap,
-} from "@100mslive/hms-video-react";
+  selectSessionId,
+} from "@100mslive/react-sdk";
 import { FeatureFlagsInit } from "./FeatureFlags";
 import {
   convertLoginInfoToJoinConfig,
@@ -65,6 +66,7 @@ const defaultUiSettings = {
   },
   uiViewMode: "grid",
   showStatsOnTiles: false,
+  enableAmbientMusic: false,
 };
 
 const uiSettingsFromStorage = localStorage.getItem(UI_SETTINGS_KEY)
@@ -72,7 +74,6 @@ const uiSettingsFromStorage = localStorage.getItem(UI_SETTINGS_KEY)
   : defaultUiSettings;
 
 const AppContextProvider = ({
-  roomId = "",
   tokenEndpoint = defaultTokenEndpoint,
   policyConfig = envPolicyConfig,
   audioPlaylist = envAudioPlaylist,
@@ -84,11 +85,11 @@ const AppContextProvider = ({
   const localPeer = useHMSStore(selectLocalPeer);
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
+  const sessionId = useHMSStore(selectSessionId);
   const appPolicyConfig = useMemo(
     () => normalizeAppPolicyConfig(roleNames, rolesMap, policyConfig),
     [roleNames, policyConfig, rolesMap]
   );
-  initialLoginInfo.roomId = roomId;
 
   const [state, setState] = useState({
     loginInfo: initialLoginInfo,
@@ -98,6 +99,7 @@ const AppContextProvider = ({
       uiSettingsFromStorage.subscribedNotifications || {},
     uiViewMode: uiSettingsFromStorage.uiViewMode || "grid",
     showStatsOnTiles: uiSettingsFromStorage.showStatsOnTiles || false,
+    enableAmbientMusic: uiSettingsFromStorage.enableAmbientMusic || false,
   });
 
   useEffect(() => {
@@ -108,6 +110,7 @@ const AppContextProvider = ({
         subscribedNotifications: state.subscribedNotifications,
         uiViewMode: state.uiViewMode,
         showStatsOnTiles: state.showStatsOnTiles,
+        enableAmbientMusic: state.enableAmbientMusic,
       })
     );
   }, [
@@ -115,6 +118,7 @@ const AppContextProvider = ({
     state.subscribedNotifications,
     state.uiViewMode,
     state.showStatsOnTiles,
+    state.enableAmbientMusic,
   ]);
 
   useEffect(() => {
@@ -144,9 +148,16 @@ const AppContextProvider = ({
   }, [state.loginInfo.token]); // to avoid calling join again, call it only when token is changed
 
   useEffect(() => {
-    localPeer && setUpLogRocket(state.loginInfo, localPeer);
+    localPeer &&
+      setUpLogRocket({ localPeer, sessionId, roomId: state.loginInfo.roomId });
     // eslint-disable-next-line
-  }, [localPeer?.id]);
+  }, [
+    localPeer?.id,
+    localPeer?.name,
+    localPeer?.roleName,
+    state.loginInfo.roomId,
+    sessionId,
+  ]);
 
   useEffect(() => {
     localPeer && deepSetAppPolicyConfig(appPolicyConfig[localPeer.roleName]);
@@ -183,6 +194,9 @@ const AppContextProvider = ({
   const deepSetShowStatsOnTiles = show =>
     setState(prevState => ({ ...prevState, showStatsOnTiles: show }));
 
+  const deepSetEnableAmbientMusic = enable =>
+    setState(prevState => ({ ...prevState, enableAmbientMusic: enable }));
+
   return (
     <AppContext.Provider
       value={{
@@ -191,6 +205,8 @@ const AppContextProvider = ({
         setSubscribedNotifications: deepSetSubscribedNotifications,
         setuiViewMode: deepSetuiViewMode,
         setShowStatsOnTiles: deepSetShowStatsOnTiles,
+        setEnableAmbientMusic: deepSetEnableAmbientMusic,
+        enableAmbientMusic: state.enableAmbientMusic,
         showStatsOnTiles: state.showStatsOnTiles,
         uiViewMode: state.uiViewMode,
         loginInfo: state.loginInfo,

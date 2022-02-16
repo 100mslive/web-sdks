@@ -1,27 +1,30 @@
 import {
   Header,
   ParticipantList,
-  useHMSStore,
   LogoButton,
+  GlobeIcon,
+} from "@100mslive/hms-video-react";
+import { useCallback, useContext } from "react";
+import { SpeakerIcon, RecordIcon } from "@100mslive/react-icons";
+import { Text } from "@100mslive/react-ui";
+import {
+  useHMSActions,
+  useHMSStore,
   selectDominantSpeaker,
   selectPeerSharingAudio,
   selectScreenShareAudioByPeerID,
   selectPeerSharingAudioPlaylist,
   selectAudioPlaylistTrackByPeerID,
-  GlobeIcon,
   selectRecordingState,
   selectRTMPState,
   selectAudioPlaylist,
   selectHLSState,
   selectLocalPeer,
-} from "@100mslive/hms-video-react";
-import { useContext } from "react";
-import { SpeakerIcon, RecordIcon } from "@100mslive/react-icons";
-import { Text } from "@100mslive/react-ui";
-import { useHMSActions } from "@100mslive/react-sdk";
+} from "@100mslive/react-sdk";
 import PIPComponent from "./PIP/PIPComponent";
 import { AppContext } from "../store/AppContext";
 import { metadataProps as participantInListProps } from "../common/utils";
+import { AmbientMusic } from "./components/AmbientMusic";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -31,7 +34,7 @@ const SpeakerTag = () => {
       <Text
         variant="body"
         className="truncate max-w-xs"
-        css={{ ml: "$1", flex: "1 1 0" }}
+        css={{ ml: "$2", flex: "1 1 0" }}
         title={dominantSpeaker.name}
       >
         {dominantSpeaker.name}
@@ -66,14 +69,8 @@ const Music = () => {
   return (
     <div className="flex items-center">
       <SpeakerIcon />
-      <Text variant="body" css={{ mx: "$1" }}>
-        Music is playing
-      </Text>
-      <Text
-        variant="body"
-        onClick={handleMute}
-        css={{ color: "$redMain", cursor: "pointer" }}
-      >
+      <Text css={{ mx: "$3" }}>Music is playing</Text>
+      <Text onClick={handleMute} css={{ color: "$error", cursor: "pointer" }}>
         {muted ? "Unmute" : "Mute"}
       </Text>
     </div>
@@ -101,20 +98,17 @@ const PlaylistMusic = () => {
   return (
     <div className="flex items-center">
       <SpeakerIcon />
-      <Text variant="body" css={{ mx: "$1" }}>
-        Playlist is playing
-      </Text>
+      <Text css={{ mx: "$3" }}>Playlist is playing</Text>
       {peer.isLocal ? (
         <Text
-          variant="body"
           onClick={async () => {
             if (selection.playing) {
-              hmsActions.audioPlaylist.pause();
+              await hmsActions.audioPlaylist.pause();
             } else {
               await hmsActions.audioPlaylist.play(selection.id);
             }
           }}
-          css={{ color: "$redMain", cursor: "pointer" }}
+          css={{ color: "$error", cursor: "pointer" }}
         >
           {selection.playing ? "Pause" : "Play"}
         </Text>
@@ -124,7 +118,7 @@ const PlaylistMusic = () => {
           onClick={() => {
             hmsActions.setVolume(!track.volume ? 100 : 0, track.id);
           }}
-          css={{ color: "$redMain", cursor: "pointer" }}
+          css={{ color: "$error", cursor: "pointer" }}
         >
           {track.volume === 0 ? "Unmute" : "Mute"}
         </Text>
@@ -137,34 +131,43 @@ const StreamingRecording = () => {
   const recording = useHMSStore(selectRecordingState);
   const rtmp = useHMSStore(selectRTMPState);
   const hls = useHMSStore(selectHLSState);
-
-  if (
-    !recording.browser.running &&
-    !recording.server.running &&
-    !hls.running &&
-    !rtmp.running
-  ) {
-    return null;
-  }
-
-  const isRecordingOn = recording.browser.running || recording.server.running;
+  const isRecordingOn =
+    recording.browser.running ||
+    recording.server.running ||
+    recording.hls.running;
   const isStreamingOn = hls.running || rtmp.running;
-  const getRecordingText = () => {
+
+  const getRecordingText = useCallback(() => {
     if (!isRecordingOn) {
       return "";
     }
     let title = "";
     if (recording.browser.running) {
-      title += "Browser Recording: on";
+      title += "Browser";
     }
     if (recording.server.running) {
       if (title) {
-        title += "\n";
+        title += ", ";
       }
-      title += "Server Recording: on";
+      title += "Server";
+    }
+    if (recording.hls.running) {
+      if (title) {
+        title += ", ";
+      }
+      title += "HLS";
     }
     return title;
-  };
+  }, [
+    isRecordingOn,
+    recording.browser.running,
+    recording.hls.running,
+    recording.server.running,
+  ]);
+
+  if (!isRecordingOn && !isStreamingOn) {
+    return null;
+  }
 
   const getStreamingText = () => {
     if (isStreamingOn) {
@@ -181,17 +184,13 @@ const StreamingRecording = () => {
             width="20"
             height="20"
           />
-          <Text variant="body" css={{ mx: "$1" }}>
-            Recording
-          </Text>
+          <Text css={{ mx: "$3" }}>Recording</Text>
         </div>
       )}
       {isStreamingOn && (
         <div className="flex items-center mx-2" title={getStreamingText()}>
           <GlobeIcon className="fill-current text-red-600" />
-          <Text variant="body" css={{ mx: "$1" }}>
-            Streaming
-          </Text>
+          <Text css={{ mx: "$1" }}>Streaming</Text>
         </div>
       )}
     </div>
@@ -202,9 +201,12 @@ export const ConferenceHeader = ({
   onParticipantListOpen,
   isPreview = false,
 }) => {
-  const { HLS_VIEWER_ROLE } = useContext(AppContext);
+  const {
+    HLS_VIEWER_ROLE,
+    loginInfo: { isHeadless },
+  } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
-  const showPip = localPeer.roleName !== HLS_VIEWER_ROLE && !isPreview;
+  const showPip = localPeer?.roleName !== HLS_VIEWER_ROLE && !isPreview;
   return (
     <>
       <Header
@@ -216,6 +218,7 @@ export const ConferenceHeader = ({
         ]}
         centerComponents={[!isPreview ? <SpeakerTag key={0} /> : null]}
         rightComponents={[
+          !isHeadless ? <AmbientMusic key={2} /> : null,
           showPip ? <PIPComponent key={0} /> : null,
           <ParticipantList
             key={1}

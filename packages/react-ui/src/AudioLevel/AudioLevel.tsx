@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
-import { styled } from '../stitches.config';
-import { useAudioLevel, HMSPeer } from '@100mslive/react-sdk';
+import { styled, useTheme } from '../Theme';
+import { HMSPeer, useAudioLevelStyles } from '@100mslive/react-sdk';
 
 const StyledAudioLevel = styled('div', {
   width: '100%',
@@ -19,18 +19,22 @@ interface Props {
  * displays audio level for peer based on the audioTrack id
  */
 export const AudioLevel: React.FC<Props> = ({ audioTrack }) => {
-  const color = '#0F6CFF';
-  const getStyle = useCallback((level: number) => {
-    const style: Record<string, string> = {
-      transition: 'box-shadow 0.4s ease-in-out',
-    };
-    style['box-shadow'] = level
-      ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
-      : '';
-    return style;
-  }, []);
+  const { theme } = useTheme();
+  const color = theme.colors.brandDefault.value;
+  const getStyle = useCallback(
+    (level: number) => {
+      const style: Record<string, string> = {
+        transition: 'box-shadow 0.4s ease-in-out',
+      };
+      style['box-shadow'] = level
+        ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
+        : '';
+      return style;
+    },
+    [color],
+  );
   const ref = useRef(null);
-  useAudioLevel({
+  useAudioLevelStyles({
     trackId: audioTrack,
     getStyle,
     ref,

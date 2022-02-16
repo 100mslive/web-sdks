@@ -6,6 +6,8 @@ import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 const DEFAULT_FRAME_RATE = 24;
+const DEFAULT_WIDTH = 320;
+const DEFAULT_HEIGHT = 240;
 const TAG = 'VideoPluginsManager';
 
 interface CanvasElement extends HTMLCanvasElement {
@@ -107,12 +109,6 @@ export class HMSVideoPluginsManager {
       HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
       return;
     }
-    const { width, height } = this.hmsTrack.getMediaTrackSettings();
-    if (!width || !height || width <= 0 || height <= 0) {
-      HMSLogger.i(TAG, 'Track width/height is not valid');
-      return;
-    }
-
     //TODO: assuming this inputFrameRate from getMediaTrackSettings will not change once set
     //TODO: even if it changes will not have the info/params to know the change
     const inputFrameRate = this.hmsTrack.getMediaTrackSettings().frameRate || DEFAULT_FRAME_RATE;
@@ -385,11 +381,7 @@ export class HMSVideoPluginsManager {
     if (!this.inputCanvas || !this.inputVideo) {
       return;
     }
-    const { width, height } = this.hmsTrack.getMediaTrackSettings();
-    if (!width || !height || width <= 0 || height <= 0) {
-      HMSLogger.w(TAG, 'Invalid width/height of videoTrack', width, height);
-      return;
-    }
+    const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = this.hmsTrack.getMediaTrackSettings();
     // TODO: should we reduce height/width to optimize?
     if (this.inputCanvas.height !== height) {
       this.inputCanvas.height = height;

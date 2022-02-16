@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Root = styled('div', {
   padding: '0.75rem',
@@ -16,6 +16,14 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  background: '$tileBg',
+  variants: {
+    transparentBg: {
+      true: {
+        background: 'transparent',
+      },
+    },
+  },
 });
 
 const Overlay = styled('div', {
@@ -25,7 +33,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -49,7 +57,7 @@ const AttributeBox = styled('div', {
   position: 'absolute',
   left: '20px',
   bottom: '20px',
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 const AudioIndicator = styled('div', {
@@ -57,8 +65,8 @@ const AudioIndicator = styled('div', {
   left: '50%',
   transform: 'translateX(-50%)',
   bottom: '20px',
-  color: 'white',
-  bg: '$redMain',
+  color: '$white',
+  bg: '$error',
   borderRadius: '$round',
   width: '28px',
   height: '28px',
@@ -66,6 +74,25 @@ const AudioIndicator = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   mb: '5px',
+});
+
+const FullScreenButton = styled('button', {
+  width: '2.25rem',
+  height: '2.25rem',
+  color: '$white',
+  borderRadius: '$round',
+  backgroundColor: '$menuBg',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'absolute',
+  bottom: '1rem',
+  right: '1rem',
+  zIndex: 20,
+  '&:not([disabled]):focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px $colors$brandLight',
+  },
 });
 
 interface VideoTileType {
@@ -76,6 +103,7 @@ interface VideoTileType {
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
   AttributeBox: typeof AttributeBox;
+  FullScreenButton: typeof FullScreenButton;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -85,5 +113,6 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
-  AttributeBox: AttributeBox,
+  AttributeBox,
+  FullScreenButton,
 };

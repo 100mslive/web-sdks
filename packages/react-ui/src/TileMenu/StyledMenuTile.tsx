@@ -1,17 +1,15 @@
 import * as Popover from '@radix-ui/react-popover';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import { popoverAnimation } from '../utils/animations';
 import { flexCenter } from '../utils/styles';
 
-export const StyledRoot = styled('div', {
+const Root = Popover.Root;
+
+const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
   top: '10px',
   right: '10px',
   zIndex: 20,
-  // display: 'none',
-});
-
-export const StyledTrigger = styled(Popover.Trigger, {
   width: '36px',
   height: '36px',
   color: 'white',
@@ -20,12 +18,12 @@ export const StyledTrigger = styled(Popover.Trigger, {
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandTint',
+    boxShadow: '0 0 0 3px $colors$brandLight',
   },
 });
 
-export const StyledContent = styled(Popover.Content, {
-  backgroundColor: '$grey2',
+const StyledContent = styled(Popover.Content, {
+  backgroundColor: '$menuBg',
   padding: '10px 0px',
   display: 'flex',
   flexDirection: 'column',
@@ -34,20 +32,20 @@ export const StyledContent = styled(Popover.Content, {
   ...popoverAnimation,
 });
 
-export const styledItem = {
-  fontSize: '14px',
-  color: '$fg',
+const styledItem = {
+  fontSize: '$sm',
+  color: '$textPrimary',
   display: 'flex',
   alignItems: 'center',
   padding: '8px 12px',
   width: '100%',
 };
 
-export const StyledItemButton = styled('button', {
+const StyledItemButton = styled('button', {
   ...styledItem,
   height: '40px',
   '&:hover': {
-    backgroundColor: '$grey3',
+    backgroundColor: '$menuBg',
   },
   // TODO: default focus applied cause issues with this style
   '&:focus': {
@@ -60,7 +58,7 @@ export const StyledItemButton = styled('button', {
   },
 });
 
-export const StyledVolumeItem = styled('div', {
+const StyledVolumeItem = styled('div', {
   // TODO: maybe keep this as base comp and extend button variant
   ...styledItem,
   alignItems: 'start',
@@ -76,7 +74,25 @@ export const Flex = styled('div', {
   },
 });
 
-export const RemoveMenuItem = styled(StyledItemButton, {
-  color: '$redMain',
-  borderTop: '1px solid $grey4',
+const RemoveMenuItem = styled(StyledItemButton, {
+  color: '$error',
+  borderTop: '1px solid $borderLight',
 });
+
+interface MenuTileType {
+  Root: typeof Root;
+  Trigger: typeof StyledTrigger;
+  Content: typeof StyledContent;
+  ItemButton: typeof StyledItemButton;
+  VolumeItem: typeof StyledVolumeItem;
+  RemoveItem: typeof RemoveMenuItem;
+}
+
+export const StyledMenuTile: MenuTileType = {
+  Root,
+  Trigger: StyledTrigger,
+  Content: StyledContent,
+  ItemButton: StyledItemButton,
+  VolumeItem: StyledVolumeItem,
+  RemoveItem: RemoveMenuItem,
+};

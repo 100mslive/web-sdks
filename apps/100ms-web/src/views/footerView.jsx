@@ -5,7 +5,6 @@ import {
   AudioPlaylist,
   Button,
   VideoPlaylistIcon,
-  VerticalDivider,
   MessageModal,
   useHMSActions,
   selectIsLocalScreenShared,
@@ -21,7 +20,7 @@ import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
 import { useMyMetadata } from "./hooks/useMetadata";
-import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
+import { Box, IconButton, Tooltip, VerticalDivider } from "@100mslive/react-ui";
 import {
   HandIcon,
   ShareScreenIcon,
@@ -154,7 +153,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   leftComponents.push(
     <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`} key="brb">
       <IconButton
-        css={{ mx: "$2", "@md": { display: "none" } }}
+        css={{ mx: "$4", "@md": { display: "none" } }}
         onClick={toggleBRB}
         active={!isBRBOn}
       >
@@ -181,7 +180,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
               <IconButton
                 active={!isScreenShared}
                 onClick={() => toggleScreenShare(!isScreenShared)}
-                css={{ mx: "$2", "@md": { display: "none" } }}
+                css={{ mx: "$4", "@md": { display: "none" } }}
               >
                 <ShareScreenIcon />
               </IconButton>

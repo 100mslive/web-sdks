@@ -9,7 +9,7 @@ import create, {
   State,
 } from 'zustand/vanilla';
 import shallow from 'zustand/shallow';
-import { HMSSdk } from '@100mslive/hms-video';
+import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
 import { HMSSDKActions } from './HMSSDKActions';
 import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
@@ -59,7 +59,9 @@ export class HMSReactiveStore {
 
     this.initialTriggerOnSubscribe = false;
 
-    window.__hms = this;
+    if (isBrowser) {
+      window.__hms = this;
+    }
   }
 
   /**
@@ -164,7 +166,7 @@ export class HMSReactiveStore {
       }
       return prevGetState();
     };
-    HMSReactiveStore.useShallowCheckInSubscribe(hmsStore);
+    HMSReactiveStore.compareWithShallowCheckInSubscribe(hmsStore);
     const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, storeName);
     return { ...hmsStore, namedSetState };
   }
@@ -194,7 +196,7 @@ export class HMSReactiveStore {
    * and a shallow check avoids that triggering.
    * @private
    */
-  private static useShallowCheckInSubscribe<T extends State>(hmsStore: StoreApi<T>) {
+  private static compareWithShallowCheckInSubscribe<T extends State>(hmsStore: StoreApi<T>) {
     const prevSubscribe = hmsStore.subscribe;
     hmsStore.subscribe = <StateSlice>(
       listener: StateSliceListener<StateSlice>,

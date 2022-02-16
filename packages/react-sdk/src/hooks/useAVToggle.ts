@@ -4,35 +4,59 @@ import {
   selectIsLocalVideoEnabled,
 } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
-import { useHMSActions, useHMSStore } from './HmsRoomProvider';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { logErrorHandler } from '../utils/commons';
+import { hooksErrHandler } from '../hooks/types';
 
-export const useAVToggle = () => {
+export interface useAVToggleResult {
+  /**
+   * true if unmuted and vice versa
+   */
+  isLocalAudioEnabled: boolean;
+  isLocalVideoEnabled: boolean;
+  /**
+   * use this function to toggle audio state, the function will only be present if the user
+   * has permission to unmute audio
+   */
+  toggleAudio?: () => void;
+  /**
+   * use this function to toggle video state, the function will only be present if the user
+   * has permission to unmute video
+   */
+  toggleVideo?: () => void;
+}
+
+/**
+ * Use this hook to implement mute/unmute for audio and video.
+ * isAllowedToPublish can be used to decide whether to show the toggle buttons in the UI.
+ * @param handleError to handle any error during toggle of audio/video
+ */
+export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): useAVToggleResult => {
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const hmsActions = useHMSActions();
+  const actions = useHMSActions();
 
   const toggleAudio = useCallback(async () => {
     try {
-      await hmsActions.setLocalAudioEnabled(!isLocalAudioEnabled);
+      await actions.setLocalAudioEnabled(!isLocalAudioEnabled);
     } catch (err) {
-      console.error('Cannot toggle audio', err);
+      handleError(err as Error, 'toggleAudio');
     }
-  }, [isLocalAudioEnabled]); //eslint-disable-line
+  }, [actions, isLocalAudioEnabled, handleError]);
 
   const toggleVideo = useCallback(async () => {
     try {
-      await hmsActions.setLocalVideoEnabled(!isLocalVideoEnabled);
+      await actions.setLocalVideoEnabled(!isLocalVideoEnabled);
     } catch (err) {
-      console.error('Cannot toggle video', err);
+      handleError(err as Error, 'toggleVideo');
     }
-  }, [isLocalVideoEnabled]); //eslint-disable-line
+  }, [actions, isLocalVideoEnabled, handleError]);
 
   return {
     isLocalAudioEnabled,
     isLocalVideoEnabled,
-    toggleAudio,
-    toggleVideo,
-    isAllowedToPublish,
+    toggleAudio: isAllowedToPublish?.audio ? toggleAudio : undefined,
+    toggleVideo: isAllowedToPublish?.video ? toggleVideo : undefined,
   };
 };

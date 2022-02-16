@@ -60,22 +60,14 @@ export class PeerListManager {
   };
 
   private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
-    const roomPeers = roomState.peers;
-    const peersMap: Record<string, PeerNotification> = {};
-    for (const peerId in roomPeers) {
-      const roomPeer = roomPeers[peerId];
-      peersMap[peerId] = {
-        peer_id: peerId,
-        role: roomPeer.role,
-        info: {
-          name: roomPeer.name,
-          data: roomPeer.data,
-          user_id: roomPeer.user_id,
-        },
-        tracks: {},
-      };
-    }
-    this.handleRepeatedPeerList(peersMap);
+    const roomPeers = roomState.peers || {};
+    // we don't get tracks inside the peer object in room state, we're adding
+    // an empty value here so rest of the code flow can ignore this change, the below
+    // can be changed when tracks will be sent as a separate object in future
+    Object.keys(roomPeers).forEach(peer => {
+      roomPeers[peer]['tracks'] = {};
+    });
+    this.handleRepeatedPeerList(roomPeers);
   };
 
   private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {
