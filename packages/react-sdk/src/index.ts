@@ -13,13 +13,14 @@ export { useScreenShare } from './hooks/useScreenShare';
 export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';
 export { useVideoList } from './hooks/useVideoList';
 export { useAudioLevelStyles } from './hooks/useAudioLevelStyles';
+export { useDevices, DeviceType } from './hooks/useDevices';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
 export type { useVideoListInput, useVideoResult, useVideoListTile } from './hooks/useVideoList';
 export type { useAVToggleResult } from './hooks/useAVToggle';
-export type { useDevicesResult, DeviceType, useDevices } from './hooks/useDevices';
+export type { useDevicesResult } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 

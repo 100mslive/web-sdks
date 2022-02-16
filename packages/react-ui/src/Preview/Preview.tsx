@@ -1,20 +1,10 @@
 import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
-const Page = styled('div', {
-  width: '100%',
-  height: '100vh',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: 'Black',
-});
-
 const Container = styled('div', {
   padding: '3rem 7.5rem',
   borderRadius: '$2',
-  backgroundColor: '$grey1',
+  backgroundColor: '$tileBg',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -84,7 +74,6 @@ const Video = styled('video', {
 });
 
 interface PreviewType {
-  Page: typeof Page;
   Container: typeof Container;
   Controls: typeof Controls;
   BottomOverlay: typeof BottomOverlay;
@@ -94,7 +83,6 @@ interface PreviewType {
 }
 
 export const Preview: PreviewType = {
-  Page,
   Container,
   Controls,
   BottomOverlay,

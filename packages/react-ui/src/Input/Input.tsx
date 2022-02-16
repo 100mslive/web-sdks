@@ -2,12 +2,12 @@ import { styled } from '../Theme';
 
 export const Input = styled('input', {
   height: '30px',
-  backgroundColor: '$grey2',
+  backgroundColor: '$grayDark',
   borderRadius: '8px',
   outline: 'none',
   border: 'none',
   padding: '5px 10px',
-  color: 'white',
+  color: '$textPrimary',
   fontSize: '$md',
   '&:focus': {
     boxShadow: '0 0 0 3px $colors$brandLight',
