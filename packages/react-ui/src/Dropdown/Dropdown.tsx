@@ -9,9 +9,6 @@ export const DropdownTrigger = styled(Trigger, {
   '&[data-state="open"]': {
     backgroundColor: '$grayDark',
     borderRadius: '$1',
-    '& > svg': {
-      transform: 'rotate(180deg)',
-    },
   },
 });
 
@@ -41,7 +38,10 @@ export const DropdownContent = styled(Content, {
   overflowY: 'auto',
 });
 
-export const DropdownLabel = styled(Label, {});
+export const DropdownLabel = styled(Label, {
+  display: 'flex',
+  alignItems: 'center',
+});
 export const DropdownGroup = styled(Group, {});
 
 Dropdown.displayName = 'Dropdown';

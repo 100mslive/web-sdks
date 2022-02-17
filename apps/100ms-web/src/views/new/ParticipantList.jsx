@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Dropdown,
   DropdownTrigger,
@@ -10,13 +11,18 @@ import {
   Text,
   Avatar,
 } from "@100mslive/react-ui";
-import { ChevronDownIcon, PeopleIcon } from "@100mslive/react-icons";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PeopleIcon,
+} from "@100mslive/react-icons";
 import { useParticipantList } from "../hooks/useParticipantList";
 
 export const ParticipantList = () => {
   const { roles, participantsByRoles, peerCount } = useParticipantList();
+  const [open, setOpen] = useState(false);
   return (
-    <Dropdown>
+    <Dropdown open={open} onOpenChange={value => setOpen(value)}>
       <DropdownTrigger asChild>
         <Flex
           css={{
@@ -35,7 +41,7 @@ export const ParticipantList = () => {
             <Text variant="md" css={{ mr: "$2" }}>
               &nbsp;in room
             </Text>
-            <ChevronDownIcon />
+            {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
           </Flex>
         </Flex>
       </DropdownTrigger>
@@ -57,9 +63,10 @@ export const ParticipantList = () => {
                 flexWrap: "wrap",
                 alignItems: "flex-start",
               }}
+              key={role}
             >
-              <DropdownLabel>
-                <Text variant="md" css={{ mb: "$8", pl: "$8" }}>
+              <DropdownLabel css={{ h: "$14" }}>
+                <Text variant="md" css={{ pl: "$8" }}>
                   {role}({participants.length})
                 </Text>
               </DropdownLabel>
