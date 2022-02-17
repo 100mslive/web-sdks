@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from "react";
+import React, { Fragment } from "react";
 import {
   Flex,
   Dropdown,
@@ -19,12 +19,8 @@ import {
   GlobeIcon,
   MusicIcon,
 } from "@100mslive/react-icons";
-import {
-  selectLocalPeer,
-  useHMSStore,
-  selectDominantSpeaker,
-} from "@100mslive/react-sdk";
-import { AppContext } from "../../store/AppContext";
+import { useHMSStore, selectDominantSpeaker } from "@100mslive/react-sdk";
+// import { AppContext } from "../../store/AppContext";
 // import PIPComponent from "../PIP/PIPComponent";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
@@ -269,8 +265,8 @@ const StreamingRecording = () => {
 };
 
 export const Header = () => {
-  const { HLS_VIEWER_ROLE } = useContext(AppContext);
-  const localPeer = useHMSStore(selectLocalPeer);
+  // const { HLS_VIEWER_ROLE } = useContext(AppContext);
+  // const localPeer = useHMSStore(selectLocalPeer);
   return (
     <Flex
       justify="between"
