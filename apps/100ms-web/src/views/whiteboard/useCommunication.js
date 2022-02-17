@@ -38,7 +38,7 @@ class PusherCommunicationProvider {
       return;
     }
 
-    Pusher.logToConsole = true;
+    // Pusher.logToConsole = true;
 
     /** @private */
     this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
