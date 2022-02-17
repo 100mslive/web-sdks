@@ -30,11 +30,11 @@ export const ParticipantList = () => {
           <Box css={{ display: "none", "@md": { display: "block", mr: "$2" } }}>
             <PeopleIcon />
           </Box>
-          <Text variant="md" css={{ mr: "$2" }}>
-            {peerCount}
-          </Text>
+          <Text variant="md">{peerCount}</Text>
           <Flex align="center" css={{ "@md": { display: "none" } }}>
-            <Text variant="md">&nbsp;in room</Text>
+            <Text variant="md" css={{ mr: "$2" }}>
+              &nbsp;in room
+            </Text>
             <ChevronDownIcon />
           </Flex>
         </Flex>
