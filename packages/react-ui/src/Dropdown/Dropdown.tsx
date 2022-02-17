@@ -1,4 +1,4 @@
-import { Root, Trigger, Content, Item, Separator } from '@radix-ui/react-dropdown-menu';
+import { Root, Trigger, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
 export const Dropdown = styled(Root, {});
@@ -41,7 +41,12 @@ export const DropdownContent = styled(Content, {
   overflowY: 'auto',
 });
 
+export const DropdownLabel = styled(Label, {});
+export const DropdownGroup = styled(Group, {});
+
 Dropdown.displayName = 'Dropdown';
 DropdownItem.displayName = 'DropdownItem';
 DropdownItemSeparator.displayName = 'DropdownItemSeparator';
 DropdownContent.displayName = 'DropdownContent';
+DropdownLabel.displayName = 'DropdownLabel';
+DropdownGroup.displayName = 'DropdownGroup';

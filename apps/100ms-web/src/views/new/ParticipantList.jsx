@@ -3,11 +3,14 @@ import {
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
+  DropdownGroup,
+  DropdownLabel,
   Flex,
+  Box,
   Text,
   Avatar,
 } from "@100mslive/react-ui";
-import { ChevronDownIcon } from "@100mslive/react-icons";
+import { ChevronDownIcon, PeopleIcon } from "@100mslive/react-icons";
 import { useParticipantList } from "../hooks/useParticipantList";
 
 export const ParticipantList = () => {
@@ -15,12 +18,25 @@ export const ParticipantList = () => {
   return (
     <Dropdown>
       <DropdownTrigger asChild>
-        <Flex css={{ color: "$textPrimary" }}>
-          <Text variant="md">{peerCount}</Text>
-          <Text variant="md" css={{ mx: "$2", "@md": { display: "none" } }}>
-            in room
+        <Flex
+          css={{
+            color: "$textPrimary",
+            "@md": {
+              borderRadius: "$1",
+              border: "1px solid $textPrimary",
+            },
+          }}
+        >
+          <Box css={{ display: "none", "@md": { display: "block", mr: "$2" } }}>
+            <PeopleIcon />
+          </Box>
+          <Text variant="md" css={{ mr: "$2" }}>
+            {peerCount}
           </Text>
-          <ChevronDownIcon />
+          <Flex align="center" css={{ "@md": { display: "none" } }}>
+            <Text variant="md">&nbsp;in room</Text>
+            <ChevronDownIcon />
+          </Flex>
         </Flex>
       </DropdownTrigger>
       <DropdownContent
@@ -34,7 +50,7 @@ export const ParticipantList = () => {
           }
           const participants = participantsByRoles[role];
           return (
-            <DropdownItem
+            <DropdownGroup
               css={{
                 h: "auto",
                 flexDirection: "column",
@@ -42,16 +58,14 @@ export const ParticipantList = () => {
                 alignItems: "flex-start",
               }}
             >
-              <Text variant="md" css={{ mb: "$8" }}>
-                {role}({participants.length})
-              </Text>
+              <DropdownLabel>
+                <Text variant="md" css={{ mb: "$8", pl: "$8" }}>
+                  {role}({participants.length})
+                </Text>
+              </DropdownLabel>
               {participants.map(peer => {
                 return (
-                  <Flex
-                    key={peer.id}
-                    align="center"
-                    css={{ w: "100%", h: "$14" }}
-                  >
+                  <DropdownItem key={peer.id} css={{ w: "100%", h: "$14" }}>
                     <Avatar
                       size="tiny"
                       shape="square"
@@ -59,10 +73,10 @@ export const ParticipantList = () => {
                       css={{ position: "unset", transform: "unset", mr: "$4" }}
                     />
                     <Text variant="md">{peer.name}</Text>
-                  </Flex>
+                  </DropdownItem>
                 );
               })}
-            </DropdownItem>
+            </DropdownGroup>
           );
         })}
       </DropdownContent>
