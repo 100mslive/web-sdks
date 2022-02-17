@@ -25,7 +25,7 @@ import {
   selectDominantSpeaker,
 } from "@100mslive/react-sdk";
 import { AppContext } from "../../store/AppContext";
-import PIPComponent from "../PIP/PIPComponent";
+// import PIPComponent from "../PIP/PIPComponent";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { ParticipantList } from "./ParticipantList";
@@ -291,7 +291,7 @@ export const Header = () => {
           <PlaylistAndStreaming />
         </Flex>
 
-        {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />}
+        {/* {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />} */}
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
           {/* <ParticipantList
