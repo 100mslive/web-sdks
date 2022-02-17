@@ -51,7 +51,6 @@ type Props = VariantProps<typeof StyledAvatar> &
 
 export const Avatar: React.FC<Props> = ({ name, size, css, ...props }) => {
   const { initials, color } = getAvatarBg(name);
-  console.error({ props, css });
   return (
     <StyledAvatar css={{ bg: color, ...css }} size={size} {...props}>
       {initials}
