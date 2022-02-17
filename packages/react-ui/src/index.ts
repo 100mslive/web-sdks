@@ -23,3 +23,4 @@ export * from './AudioLevel';
 export * from './Popover';
 export * from './Stats';
 export * from './Theme';
+export * from './Checkbox';

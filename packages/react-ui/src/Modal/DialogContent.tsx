@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Close, Content, Overlay } from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
@@ -27,6 +27,7 @@ const StyledDialogContent = styled(Content, {
   maxWidth: '26rem',
   maxHeight: '85vh',
   padding: '1.5rem',
+  zIndex: 999,
   '@allowMotion': {
     '&[data-state="open"]': {
       animation: `${dialogOpen} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
@@ -39,7 +40,7 @@ const StyledDialogContent = styled(Content, {
 });
 
 type DialogContentProps = React.ComponentProps<typeof StyledDialogContent> & {
-  title: string;
+  title: string | ReactNode;
   /**
    * Whether to render close button
    */

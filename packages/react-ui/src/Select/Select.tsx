@@ -6,13 +6,13 @@ const Root = styled('div', {
   color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
-  height: '40px',
-  width: '250px',
-  minWidth: '160px',
+  height: '$14',
+  width: 'auto',
+  minWidth: '$40',
   outline: 'none',
   overflow: 'hidden',
-  borderRadius: '8px',
-  backgroundColor: '$grey2',
+  borderRadius: '$1',
+  backgroundColor: '$grayDark',
 });
 
 // TODO: replace these with tokens
@@ -50,7 +50,7 @@ const Arrow = styled('span', {
 
 // * NOTE: this is temporary implementation waiting for radix-select
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Select: React.FC = ({ children, props }: any) => (
+export const Select: React.FC = ({ children, ...props }: any) => (
   <Root>
     <Arrow>
       <ChevronDownIcon />
