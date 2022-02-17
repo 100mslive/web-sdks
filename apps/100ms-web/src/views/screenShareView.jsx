@@ -241,7 +241,7 @@ const SmallTilePeersView = ({
       {smallTilePeers && smallTilePeers.length > 0 && (
         <VideoList
           peers={smallTilePeers}
-          maxColCount={2}
+          maxTileCount={2}
           includeScreenShareForPeer={shouldShowScreenFn}
           showStatsOnTiles={showStatsOnTiles}
         />
