@@ -6,6 +6,7 @@ export const Input = styled('input', {
   outline: 'none',
   border: 'none',
   padding: '0.5rem 0.75rem',
+  minHeight: '30px',
   color: '$textPrimary',
   fontSize: '$md',
   '&:focus': {
