@@ -7,7 +7,7 @@ export const DropdownTrigger = styled(Trigger, {
   padding: '$2 $4',
   cursor: 'pointer',
   '&[data-state="open"]': {
-    backgroundColor: '$grayDark',
+    backgroundColor: '$menuBg',
     borderRadius: '$1',
   },
 });
@@ -17,10 +17,9 @@ export const DropdownItem = styled(Item, {
   w: '100%',
   color: '$textPrimary',
   p: '$4 $8',
-  backgroundColor: '$grayDark',
+  backgroundColor: '$menuBg',
   display: 'flex',
   alignItems: 'center',
-  '&:hover': { backgroundColor: `rgba('$grayDark', 0.5)` },
 });
 
 export const DropdownItemSeparator = styled(Separator, {
@@ -34,7 +33,7 @@ export const DropdownContent = styled(Content, {
   maxHeight: '$56',
   r: '$2',
   p: '$4 0',
-  backgroundColor: '$grayDark',
+  backgroundColor: '$menuBg',
   overflowY: 'auto',
 });
 
