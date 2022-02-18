@@ -24,6 +24,7 @@ const StyledDialogContent = styled(Content, {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   maxWidth: '760px',
+  zIndex: 10,
   maxHeight: '85vh',
   padding: '1.5rem',
   '@allowMotion': {
