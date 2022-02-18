@@ -12,7 +12,7 @@ const Root = styled('div', {
   outline: 'none',
   overflow: 'hidden',
   borderRadius: '$1',
-  backgroundColor: '$grayDark',
+  backgroundColor: '$menuBg',
 });
 
 // TODO: replace these with tokens
