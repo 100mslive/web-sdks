@@ -3,7 +3,7 @@ import { styled } from '../Theme';
 
 export const Checkbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
-  backgroundColor: '$white',
+  border: '1px solid $brandDefault',
   width: '$8',
   height: '$8',
   borderRadius: '$0',
