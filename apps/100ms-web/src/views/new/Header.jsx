@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 import {
   Flex,
   Dropdown,
@@ -11,8 +11,8 @@ import {
   truncate,
   Box,
   Tooltip,
+  styled,
 } from "@100mslive/react-ui";
-import { LogoButton } from "@100mslive/hms-video-react";
 import {
   ChevronDownIcon,
   RecordIcon,
@@ -27,6 +27,7 @@ import { ParticipantList } from "./ParticipantList";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { getRecordingText, getStreamingText } from "../../common/utils";
+import { AppContext } from "../../store/AppContext";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -262,8 +263,16 @@ const StreamingRecording = () => {
   );
 };
 
+const LogoImg = styled("img", {
+  maxHeight: "$14",
+});
+
+const Logo = () => {
+  const { logo } = useContext(AppContext);
+  return <LogoImg src={logo} alt="Brand Logo" />;
+};
+
 export const Header = () => {
-  // const { HLS_VIEWER_ROLE } = useContext(AppContext);
   // const localPeer = useHMSStore(selectLocalPeer);
   return (
     <Flex
@@ -272,7 +281,7 @@ export const Header = () => {
       css={{ position: "relative", height: "100%" }}
     >
       <Flex align="center" css={{ position: "absolute", left: "$4" }}>
-        <LogoButton />
+        <Logo />
         <PlaylistMusic />
         <StreamingRecording />
       </Flex>
