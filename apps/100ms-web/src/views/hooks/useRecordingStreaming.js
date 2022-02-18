@@ -12,11 +12,13 @@ export const useRecordingStreaming = () => {
 
   const isServerRecordingOn = recording.server.running;
   const isBrowserRecordingOn = recording.browser.running;
+  const isHLSRecordingOn = recording.hls.running;
   const isStreamingOn = hls.running || rtmp.running;
 
   return {
     isServerRecordingOn,
     isBrowserRecordingOn,
+    isHLSRecordingOn,
     isStreamingOn,
     isHLSRunning: hls.running,
   };

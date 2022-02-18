@@ -55,10 +55,12 @@ const PlaylistAndStreaming = () => {
   const {
     isServerRecordingOn,
     isBrowserRecordingOn,
+    isHLSRecordingOn,
     isStreamingOn,
     isHLSRunning,
   } = useRecordingStreaming();
-  const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
+  const isRecordingOn =
+    isServerRecordingOn || isBrowserRecordingOn || isHLSRecordingOn;
 
   if (!playlist && !isRecordingOn && !isStreamingOn) {
     return null;
@@ -84,6 +86,7 @@ const PlaylistAndStreaming = () => {
             title={getRecordingText({
               isBrowserRecordingOn,
               isServerRecordingOn,
+              isHLSRecordingOn,
             })}
           >
             <Box>
@@ -226,10 +229,12 @@ const StreamingRecording = () => {
   const {
     isServerRecordingOn,
     isBrowserRecordingOn,
+    isHLSRecordingOn,
     isStreamingOn,
     isHLSRunning,
   } = useRecordingStreaming();
-  const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
+  const isRecordingOn =
+    isServerRecordingOn || isBrowserRecordingOn || isHLSRecordingOn;
 
   return (
     <Flex align="center" css={{ mx: "$4", "@lg": { display: "none" } }}>
@@ -238,6 +243,7 @@ const StreamingRecording = () => {
           title={getRecordingText({
             isBrowserRecordingOn,
             isServerRecordingOn,
+            isHLSRecordingOn,
           })}
         >
           <Flex align="center" css={{ color: "$error" }}>
