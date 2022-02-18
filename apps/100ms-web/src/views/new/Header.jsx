@@ -22,8 +22,7 @@ import {
 } from "@100mslive/react-icons";
 import { useHMSStore, selectDominantSpeaker } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
-// import { AppContext } from "../../store/AppContext";
-// import PIPComponent from "../PIP/PIPComponent";
+import PIPComponent from "../PIP/PIPComponent";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { getRecordingText, getStreamingText } from "../../common/utils";
@@ -276,7 +275,6 @@ const Logo = () => {
 };
 
 export const Header = () => {
-  // const localPeer = useHMSStore(selectLocalPeer);
   return (
     <Flex
       justify="between"
@@ -297,7 +295,7 @@ export const Header = () => {
           <PlaylistAndStreaming />
         </Flex>
 
-        {/* {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />} */}
+        <PIPComponent />
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
         </Box>
