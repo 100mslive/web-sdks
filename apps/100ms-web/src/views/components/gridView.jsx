@@ -3,7 +3,7 @@ import { FirstPersonDisplay } from "@100mslive/hms-video-react";
 import { Box, Flex } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
 import { useWindowSize } from "../hooks/useWindowSize";
-import { chatStyle, getBlurClass } from "../../common/utils";
+import { chatStyle } from "../../common/utils";
 import VideoList from "../new/VideoList";
 
 const MAX_TILES_FOR_MOBILE = 4;
@@ -62,7 +62,6 @@ export const GridCenterView = ({
       </Box>
       {isChatOpen && hideSidePane && (
         <Flex
-          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           css={{
             height: "45%",
             flex: "0 0 20%",
