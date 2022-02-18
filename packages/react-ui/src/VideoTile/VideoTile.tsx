@@ -39,7 +39,7 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
         <VideoTileStats audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
         <AudioLevel audioTrack={peer?.audioTrack} />
         <Video mirror={peer?.isLocal || false} trackId={peer?.videoTrack} />
-        {isVideoMuted ? <Avatar size={getAvatarSize(width)} name={peer?.name || ''} /> : null}
+        {isVideoMuted ? <Avatar name={peer?.name || ''} /> : null}
         <StyledVideoTile.Info>{peer?.name}</StyledVideoTile.Info>
         {isAudioMuted ? (
           <StyledVideoTile.AudioIndicator>
@@ -55,14 +55,4 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
   );
-};
-
-const getAvatarSize = (width: number): 'lg' | 'md' | 'sm' | 'xs' => {
-  if (width < 200) {
-    return 'xs';
-  } else if (width < 500) {
-    return 'sm';
-  } else {
-    return 'md';
-  }
 };

@@ -4,12 +4,6 @@ import { flexCenter } from '../utils/styles';
 import { getAvatarBg } from './getAvatarBg';
 import React from 'react';
 
-const getAvatarSize = (size: string, textSize: string) => ({
-  width: size,
-  height: size,
-  fontSize: textSize,
-});
-
 const getAvatarShape = (radii: string) => ({
   borderRadius: radii,
 });
@@ -21,17 +15,11 @@ export const StyledAvatar = styled('div', {
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
   color: 'white',
-  width: '$4',
-  height: '$4',
+  aspectRatio: 1,
+  padding: '5%',
   fontWeight: 600,
+  fontSize: '1.8rem',
   variants: {
-    size: {
-      // TODO: review `xs` size from nihal
-      xs: getAvatarSize('40px', '12px'),
-      sm: getAvatarSize('84px', '32px'),
-      md: getAvatarSize('162px', '60px'),
-      lg: getAvatarSize('273px', '120px'),
-    },
     shape: {
       circle: getAvatarShape('$round'),
       square: getAvatarShape('$2'),
@@ -39,7 +27,6 @@ export const StyledAvatar = styled('div', {
   },
   defaultVariants: {
     shape: 'circle',
-    size: 'md',
   },
 });
 
@@ -48,10 +35,10 @@ type Props = VariantProps<typeof StyledAvatar> &
     name: string;
   };
 
-export const Avatar: React.FC<Props> = ({ name, size, ...props }) => {
+export const Avatar: React.FC<Props> = ({ name, ...props }) => {
   const { initials, color } = getAvatarBg(name);
   return (
-    <StyledAvatar css={{ bg: color }} size={size} {...props}>
+    <StyledAvatar css={{ bg: color }} {...props}>
       {initials}
     </StyledAvatar>
   );
