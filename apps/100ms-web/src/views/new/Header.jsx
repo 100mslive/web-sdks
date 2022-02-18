@@ -265,6 +265,9 @@ const StreamingRecording = () => {
 
 const LogoImg = styled("img", {
   maxHeight: "$14",
+  "@md": {
+    maxHeight: "$12",
+  },
 });
 
 const Logo = () => {
