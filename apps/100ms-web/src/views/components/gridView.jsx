@@ -88,7 +88,6 @@ export const GridSidePaneView = ({
   peers,
   isChatOpen,
   toggleChat,
-  isParticipantListOpen,
   totalPeers,
   showStatsOnTiles,
 }) => {
@@ -126,7 +125,6 @@ export const GridSidePaneView = ({
       </Flex>
       {isChatOpen && (
         <Flex
-          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           align="end"
           css={{
             flex: "1 1 0",

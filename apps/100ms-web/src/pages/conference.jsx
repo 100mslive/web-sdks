@@ -20,18 +20,12 @@ export const Conference = () => {
   const { roomId, role } = useParams();
   const context = useContext(AppContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isParticipantListOpen] = useState(false);
   const toggleChat = useCallback(() => {
     setIsChatOpen(open => !open);
   }, []);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const hmsActions = useHMSActions();
-
-  // const onParticipantListOpen = useCallback(value => {
-  //   setIsParticipantListOpen(value);
-  // }, []);
-
   const { loginInfo } = context;
   const isHeadless = loginInfo.isHeadlessMode;
 
@@ -61,15 +55,10 @@ export const Conference = () => {
       {!isHeadless && (
         <Box css={{ h: "$18", "@md": { h: "$17" } }}>
           <Header />
-          {/* <ConferenceHeader onParticipantListOpen={onParticipantListOpen} /> */}
         </Box>
       )}
       <Box css={{ w: "100%", flex: "1 1 0" }}>
-        <ConferenceMainView
-          isChatOpen={isChatOpen}
-          isParticipantListOpen={isParticipantListOpen}
-          toggleChat={toggleChat}
-        />
+        <ConferenceMainView isChatOpen={isChatOpen} toggleChat={toggleChat} />
       </Box>
       {!isHeadless && (
         <Box css={{ h: "10%" }}>

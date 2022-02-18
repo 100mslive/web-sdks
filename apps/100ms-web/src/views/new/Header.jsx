@@ -21,11 +21,11 @@ import {
   MusicIcon,
 } from "@100mslive/react-icons";
 import { useHMSStore, selectDominantSpeaker } from "@100mslive/react-sdk";
+import { ParticipantList } from "./ParticipantList";
 // import { AppContext } from "../../store/AppContext";
 // import PIPComponent from "../PIP/PIPComponent";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
-import { ParticipantList } from "./ParticipantList";
 import { getRecordingText, getStreamingText } from "../../common/utils";
 
 const SpeakerTag = () => {
@@ -288,10 +288,6 @@ export const Header = () => {
         {/* {localPeer.roleName !== HLS_VIEWER_ROLE && <PIPComponent key={0} />} */}
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
-          {/* <ParticipantList
-            key={1}
-            participantInListProps={participantInListProps}
-          /> */}
         </Box>
       </Flex>
     </Flex>
