@@ -6,7 +6,7 @@ export {
   useHMSVanillaStore,
   useHMSStatsStore,
 } from './primitives/HmsRoomProvider';
-export { usePreview } from './hooks/usePreview';
+export { usePreviewJoin } from './hooks/usePreviewJoin';
 export { useAVToggle } from './hooks/useAVToggle';
 export { useVideo } from './hooks/useVideo';
 export { useScreenShare } from './hooks/useScreenShare';
@@ -17,7 +17,7 @@ export { useDevices, DeviceType } from './hooks/useDevices';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
-export type { usePreviewInput, usePreviewResult } from './hooks/usePreview';
+export type { usePreviewInput, usePreviewResult } from './hooks/usePreviewJoin';
 export type { useVideoListInput, useVideoResult, useVideoListTile } from './hooks/useVideoList';
 export type { useAVToggleResult } from './hooks/useAVToggle';
 export type { useDevicesResult } from './hooks/useDevices';
