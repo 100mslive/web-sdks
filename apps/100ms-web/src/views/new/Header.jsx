@@ -10,6 +10,7 @@ import {
   Text,
   truncate,
   Box,
+  Tooltip,
 } from "@100mslive/react-ui";
 import { LogoButton } from "@100mslive/hms-video-react";
 import {
@@ -25,6 +26,7 @@ import { useHMSStore, selectDominantSpeaker } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { ParticipantList } from "./ParticipantList";
+import { getRecordingText, getStreamingText } from "../../common/utils";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -65,9 +67,11 @@ const PlaylistAndStreaming = () => {
   return (
     <Fragment>
       {playlist && (
-        <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
-          <MusicIcon width={24} height={24} />
-        </Flex>
+        <Tooltip title="Playlist Music">
+          <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+            <MusicIcon width={24} height={24} />
+          </Flex>
+        </Tooltip>
       )}
       <Flex
         align="center"
@@ -76,13 +80,28 @@ const PlaylistAndStreaming = () => {
         }}
       >
         {isRecordingOn && (
-          <RecordIcon
-            width={24}
-            height={24}
-            style={{ marginRight: "0.25rem" }}
-          />
+          <Tooltip
+            title={getRecordingText({
+              isBrowserRecordingOn,
+              isServerRecordingOn,
+            })}
+          >
+            <Box>
+              <RecordIcon
+                width={24}
+                height={24}
+                style={{ marginRight: "0.25rem" }}
+              />
+            </Box>
+          </Tooltip>
         )}
-        {isStreamingOn && <GlobeIcon width={24} height={24} />}
+        {isStreamingOn && (
+          <Tooltip title={getStreamingText({ isStreamingOn, isHLSRunning })}>
+            <Box>
+              <GlobeIcon width={24} height={24} />
+            </Box>
+          </Tooltip>
+        )}
       </Flex>
       <Dropdown>
         <DropdownTrigger asChild>
@@ -211,54 +230,33 @@ const StreamingRecording = () => {
     isHLSRunning,
   } = useRecordingStreaming();
   const isRecordingOn = isServerRecordingOn || isBrowserRecordingOn;
-  const getRecordingText = () => {
-    if (!isRecordingOn) {
-      return "";
-    }
-    let title = "";
-    if (isBrowserRecordingOn) {
-      title += "Browser Recording: on";
-    }
-    if (isServerRecordingOn) {
-      if (title) {
-        title += "\n";
-      }
-      title += "Server Recording: on";
-    }
-    return title;
-  };
-
-  const getStreamingText = () => {
-    if (isStreamingOn) {
-      return isHLSRunning ? "HLS" : "RTMP";
-    }
-  };
 
   return (
-    <Flex align="center" css={{ mx: "$4" }}>
+    <Flex align="center" css={{ mx: "$4", "@lg": { display: "none" } }}>
       {isRecordingOn && (
-        <Flex
-          align="center"
-          css={{ color: "$error" }}
-          title={getRecordingText()}
+        <Tooltip
+          title={getRecordingText({
+            isBrowserRecordingOn,
+            isServerRecordingOn,
+          })}
         >
-          <RecordIcon width={24} height={24} />
-          <Text variant="body" css={{ mx: "$2" }}>
-            Recording
-          </Text>
-        </Flex>
+          <Flex align="center" css={{ color: "$error" }}>
+            <RecordIcon width={24} height={24} />
+            <Text variant="body" css={{ mx: "$2" }}>
+              Recording
+            </Text>
+          </Flex>
+        </Tooltip>
       )}
       {isStreamingOn && (
-        <Flex
-          align="center"
-          css={{ mx: "$2", color: "$error" }}
-          title={getStreamingText()}
-        >
-          <GlobeIcon width={24} height={24} />
-          <Text variant="body" css={{ mx: "$2" }}>
-            Streaming
-          </Text>
-        </Flex>
+        <Tooltip title={getStreamingText({ isStreamingOn, isHLSRunning })}>
+          <Flex align="center" css={{ mx: "$2", color: "$error" }}>
+            <GlobeIcon width={24} height={24} />
+            <Text variant="body" css={{ mx: "$2" }}>
+              Streaming
+            </Text>
+          </Flex>
+        </Tooltip>
       )}
     </Flex>
   );
