@@ -10,7 +10,7 @@ import {
   Box,
   Text,
   Avatar,
-  truncate,
+  textEllipsis,
   IconButton,
 } from "@100mslive/react-ui";
 import {
@@ -50,7 +50,7 @@ const ParticipantActions = React.memo(({ peerId, onSettings }) => {
 export const ParticipantList = () => {
   const { roles, participantsByRoles, peerCount } = useParticipantList();
   const [open, setOpen] = useState(false);
-  const [peerId, setPeerId] = useState(null);
+  const [selectedPeerId, setSelectedPeerId] = useState(null);
   return (
     <Fragment>
       <Dropdown open={open} onOpenChange={value => setOpen(value)}>
@@ -118,14 +118,14 @@ export const ParticipantList = () => {
                       />
                       <Text
                         variant="md"
-                        css={{ ...truncate(150), flex: "1 1 0" }}
+                        css={{ ...textEllipsis(150), flex: "1 1 0" }}
                       >
                         {peer.name}
                       </Text>
                       <ParticipantActions
                         peerId={peer.id}
                         onSettings={peerId => {
-                          setPeerId(peerId);
+                          setSelectedPeerId(peerId);
                         }}
                       />
                     </DropdownItem>
@@ -136,8 +136,11 @@ export const ParticipantList = () => {
           })}
         </DropdownContent>
       </Dropdown>
-      {peerId && (
-        <RoleChangeModal peerId={peerId} onClose={() => setPeerId(null)} />
+      {selectedPeerId && (
+        <RoleChangeModal
+          peerId={selectedPeerId}
+          onClose={() => setSelectedPeerId(null)}
+        />
       )}
     </Fragment>
   );

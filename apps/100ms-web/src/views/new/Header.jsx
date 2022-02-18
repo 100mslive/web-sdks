@@ -8,7 +8,7 @@ import {
   IconButton,
   DropdownItemSeparator,
   Text,
-  truncate,
+  textEllipsis,
   Box,
   Tooltip,
   styled,
@@ -39,7 +39,7 @@ const SpeakerTag = () => {
       <SpeakerIcon width={24} height={24} />
       <Text
         variant="md"
-        css={{ ...truncate(200), ml: "$2" }}
+        css={{ ...textEllipsis(200), ml: "$2" }}
         title={dominantSpeaker.name}
       >
         {dominantSpeaker.name}
@@ -123,7 +123,7 @@ const PlaylistAndStreaming = () => {
               <RecordIcon width={24} height={24} />
               <Text
                 variant="sm"
-                css={{ ml: "$2", flex: "1 1 0", ...truncate("80%") }}
+                css={{ ml: "$2", flex: "1 1 0", ...textEllipsis("80%") }}
               >
                 Recording(
                 {getRecordingText(
