@@ -162,15 +162,14 @@ export const groupByRoles = peers => {
   }, {});
 };
 
-export const getRecordingText = ({
-  isBrowserRecordingOn,
-  isServerRecordingOn,
-  isHLSRecordingOn,
-}) => {
-  if (!isBrowserRecordingOn && !isServerRecordingOn) {
+export const getRecordingText = (
+  { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
+  delimiter = ", "
+) => {
+  if (!isBrowserRecordingOn && !isServerRecordingOn && !isHLSRecordingOn) {
     return "";
   }
-  let title = [];
+  const title = [];
   if (isBrowserRecordingOn) {
     title.push("Browser");
   }
@@ -180,7 +179,7 @@ export const getRecordingText = ({
   if (isHLSRecordingOn) {
     title.push("HLS");
   }
-  return title.join(", ");
+  return title.join(delimiter);
 };
 
 export const getStreamingText = ({ isStreamingOn, isHLSRunning }) => {

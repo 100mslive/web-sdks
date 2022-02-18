@@ -121,8 +121,20 @@ const PlaylistAndStreaming = () => {
           {isRecordingOn && (
             <DropdownItem css={{ color: "$error" }}>
               <RecordIcon width={24} height={24} />
-              <Text variant="sm" css={{ ml: "$2" }}>
-                Recording
+              <Text
+                variant="sm"
+                css={{ ml: "$2", flex: "1 1 0", ...truncate("80%") }}
+              >
+                Recording(
+                {getRecordingText(
+                  {
+                    isBrowserRecordingOn,
+                    isServerRecordingOn,
+                    isHLSRecordingOn,
+                  },
+                  "|"
+                )}
+                )
               </Text>
             </DropdownItem>
           )}
