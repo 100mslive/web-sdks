@@ -16,10 +16,13 @@ export const Checkbox = styled(CheckboxPrimitive.Root, {
     boxShadow: 'none',
     outline: 'none',
   },
+  '&[data-state="checked"]': {
+    backgroundColor: '$brandDefault',
+  },
 });
 
 export const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
-  color: '$brandDefault',
+  color: '$white',
 });
 
 export const CheckboxLabel = styled('label', {
