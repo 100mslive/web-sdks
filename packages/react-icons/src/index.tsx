@@ -13,6 +13,7 @@ export { default as ComputerIcon } from './ComputerIcon';
 export { default as CrossIcon } from './CrossIcon';
 export { default as ExitIcon } from './ExitIcon';
 export { default as ExpandIcon } from './ExpandIcon';
+export { default as GlobeIcon } from './GlobeIcon';
 export { default as HandIcon } from './HandIcon';
 export { default as HandRaiseFilledIcon } from './HandRaiseFilledIcon';
 export { default as HandRaiseIcon } from './HandRaiseIcon';

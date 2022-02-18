@@ -31,6 +31,7 @@ export const StyledAvatar = styled('div', {
       sm: getAvatarSize('84px', '32px'),
       md: getAvatarSize('162px', '60px'),
       lg: getAvatarSize('273px', '120px'),
+      tiny: getAvatarSize('32px', '12px'),
     },
     shape: {
       circle: getAvatarShape('$round'),
@@ -48,10 +49,10 @@ type Props = VariantProps<typeof StyledAvatar> &
     name: string;
   };
 
-export const Avatar: React.FC<Props> = ({ name, size, ...props }) => {
+export const Avatar: React.FC<Props> = ({ name, size, css, ...props }) => {
   const { initials, color } = getAvatarBg(name);
   return (
-    <StyledAvatar css={{ bg: color }} size={size} {...props}>
+    <StyledAvatar css={{ bg: color, ...css }} size={size} {...props}>
       {initials}
     </StyledAvatar>
   );

@@ -2,13 +2,18 @@ import React, { useMemo, useRef } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 
-export type AppBuilder = {
+export type ThemeContextValue = {
+  themeType: 'dark' | 'light';
+  theme: Theme;
   aspectRatio: { width: number; height: number };
 };
-export type ThemeContextValue = { type: 'dark' | 'light'; theme: Theme; appBuilder: AppBuilder };
-export type ThemeProviderProps = { type: 'dark' | 'light'; theme?: Theme; appBuilder: AppBuilder };
+export type ThemeProviderProps = {
+  themeType: 'dark' | 'light';
+  theme?: Theme;
+  aspectRatio: { width: number; height: number };
+};
 
-const defaultContext = { type: 'dark', theme, appBuilder: { aspectRatio: { width: 1, height: 1 } } };
+const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 } };
 export const ThemeContext = React.createContext(defaultContext);
 
 /**
@@ -19,23 +24,23 @@ export const ThemeContext = React.createContext(defaultContext);
  * </ThemeProvider>
  */
 export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>> = ({
-  type,
+  themeType,
   theme: userTheme,
-  appBuilder,
+  aspectRatio,
   children,
 }) => {
   const previousClassName = useRef('');
   const updatedTheme = useMemo(() => {
-    const updatedTheme = createTheme({ type, theme: userTheme || {} });
+    const updatedTheme = createTheme({ themeType, theme: userTheme || {} });
     if (previousClassName.current) {
       document.documentElement.classList.remove(previousClassName.current);
     }
     previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
     return updatedTheme;
-  }, [userTheme, type]);
+  }, [userTheme, themeType]);
   return (
-    <ThemeContext.Provider value={{ type, theme: updatedTheme as unknown as Theme, appBuilder }}>
+    <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio }}>
       {children}
     </ThemeContext.Provider>
   );

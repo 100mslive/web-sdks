@@ -35,20 +35,20 @@ export type Theme = typeof HmsStitches.theme;
  * @returns
  */
 export const createTheme = ({
-  type,
+  themeType,
   theme,
   className,
 }: {
-  type: ThemeType;
+  themeType: ThemeType;
   className?: string;
   theme?: Partial<Theme>;
 }) => {
-  if (!type) {
+  if (!themeType) {
     throw new Error('Theme type is required');
   }
   return createThemeBase(
-    className || `${type}-theme`,
-    merge(baseConfig.theme, type === 'dark' ? darkTheme : lightTheme, theme || {}),
+    className || `${themeType}-theme`,
+    merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
   );
 };
 
