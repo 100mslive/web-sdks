@@ -33,8 +33,8 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
           </Flex>
         }
       >
-        <Flex align="center" css={{ px: "$4" }}>
-          <Text size="md" css={{ mr: "$2", flex: "1 1 0" }}>
+        <Flex align="center" css={{ px: "$4", mt: "$8" }}>
+          <Text size="md" css={{ mr: "$8" }}>
             Change role to:
           </Text>
           <Select
@@ -52,7 +52,7 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
             })}
           </Select>
         </Flex>
-        <Flex align="center" css={{ px: "$4" }}>
+        <Flex align="center" css={{ px: "$4", mt: "$4" }}>
           <Checkbox
             id="permissionCheckbox"
             onCheckedChange={value => setForceChange(value)}
@@ -65,7 +65,7 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
             Don't ask for permissions
           </CheckboxLabel>
         </Flex>
-        <Flex justify="end">
+        <Flex justify="end" css={{ mt: "$8" }}>
           <Button
             variant="primary"
             onClick={async () => {
