@@ -22,7 +22,7 @@ export const StyledAvatar = styled('div', {
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
-      square: getAvatarShape('$2'),
+      square: getAvatarShape('$1'),
     },
   },
   defaultVariants: {
