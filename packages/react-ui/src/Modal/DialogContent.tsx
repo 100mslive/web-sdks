@@ -1,5 +1,5 @@
 import React from 'react';
-import { Close, Content, Overlay } from '@radix-ui/react-dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 import { dialogClose, dialogOpen } from '../utils/animations';
@@ -7,15 +7,15 @@ import { IconButton } from '../IconButton';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
 
-export const DialogClose = styled(Close, {});
+export const DialogClose = styled(DialogPrimitive.Close, {});
 
-const StyledOverlay = styled(Overlay, {
+const StyledOverlay = styled(DialogPrimitive.Overlay, {
   backgroundColor: 'rgba(0, 0, 0, 0.5);',
   position: 'fixed',
   inset: 0,
 });
 
-const StyledDialogContent = styled(Content, {
+const StyledDialogContent = styled(DialogPrimitive.Content, {
   color: 'white',
   backgroundColor: '$bgPrimary',
   borderRadius: '8px',
@@ -23,9 +23,7 @@ const StyledDialogContent = styled(Content, {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  maxWidth: '760px',
   zIndex: 10,
-  maxHeight: '85vh',
   padding: '1.5rem',
   '@allowMotion': {
     '&[data-state="open"]': {

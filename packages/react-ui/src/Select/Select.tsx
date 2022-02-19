@@ -6,13 +6,11 @@ const Root = styled('div', {
   color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
-  height: '40px',
-  width: '250px',
-  minWidth: '160px',
   outline: 'none',
   overflow: 'hidden',
   borderRadius: '8px',
   backgroundColor: '$grey2',
+  maxWidth: '100%',
 });
 
 // TODO: replace these with tokens
@@ -21,7 +19,7 @@ const SelectRoot = styled('select', {
   fontWeight: '500',
   appearance: 'none',
   color: '$textPrimary',
-  width: '100%',
+  padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
@@ -48,19 +46,15 @@ const Arrow = styled('span', {
   transition: 'border .2s ease 0s',
 });
 
-interface Props {
-  onChange: React.ChangeEventHandler<HTMLSelectElement>;
-  value: string | number;
-}
-
-// * NOTE: this is temporary implementation waiting for radix-select
-export const Select: React.FC<Props> = ({ onChange, value, children, ...props }) => (
-  <Root>
-    <Arrow>
-      <ChevronDownIcon />
-    </Arrow>
-    <SelectRoot onChange={onChange} value={value} {...props}>
-      {children}
-    </SelectRoot>
-  </Root>
+const DefaultDownIcon = ({ ...props }) => (
+  <Arrow {...props}>
+    <ChevronDownIcon />
+  </Arrow>
 );
+
+export const Select = {
+  Root,
+  DownIcon: Arrow,
+  DefaultDownIcon,
+  Select: SelectRoot,
+};
