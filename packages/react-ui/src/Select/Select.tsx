@@ -8,8 +8,8 @@ const Root = styled('div', {
   position: 'relative',
   outline: 'none',
   overflow: 'hidden',
-  borderRadius: '8px',
-  backgroundColor: '$grey2',
+  borderRadius: '$1',
+  backgroundColor: '$menuBg',
   maxWidth: '100%',
 });
 

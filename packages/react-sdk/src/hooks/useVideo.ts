@@ -27,7 +27,7 @@ export const useVideo = (trackId: HMSTrackID): React.RefCallback<HTMLVideoElemen
 
   useEffect(() => {
     (async () => {
-      if (videoRef.current && track) {
+      if (videoRef.current && track?.id) {
         if (inView) {
           if (track.enabled) {
             // attach when in view and enabled
@@ -42,7 +42,7 @@ export const useVideo = (trackId: HMSTrackID): React.RefCallback<HTMLVideoElemen
         }
       }
     })();
-  }, [actions, inView, videoRef, track]);
+  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins]);
 
   // detach on unmount
   useEffect(() => {

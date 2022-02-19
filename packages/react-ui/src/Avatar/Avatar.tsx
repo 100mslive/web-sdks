@@ -35,10 +35,10 @@ type Props = VariantProps<typeof StyledAvatar> &
     name: string;
   };
 
-export const Avatar: React.FC<Props> = ({ name, ...props }) => {
+export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   const { initials, color } = getAvatarBg(name);
   return (
-    <StyledAvatar css={{ bg: color }} {...props}>
+    <StyledAvatar css={{ bg: color, ...css }} {...props}>
       {initials}
     </StyledAvatar>
   );

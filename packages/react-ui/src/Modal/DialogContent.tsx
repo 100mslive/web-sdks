@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
@@ -23,7 +23,7 @@ const StyledDialogContent = styled(DialogPrimitive.Content, {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  zIndex: 10,
+  zIndex: 999,
   padding: '1.5rem',
   '@allowMotion': {
     '&[data-state="open"]': {
@@ -37,7 +37,7 @@ const StyledDialogContent = styled(DialogPrimitive.Content, {
 });
 
 type DialogContentProps = React.ComponentProps<typeof StyledDialogContent> & {
-  title: string;
+  title: string | ReactNode;
   /**
    * Whether to render close button
    */
