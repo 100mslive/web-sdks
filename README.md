@@ -54,3 +54,10 @@ if there is only one remote, add webapp as a new remote.
 ## pull from webapp
 
 `git subtree pull --prefix=apps/100ms-web webapp main`
+
+
+## Tips and Tricks
+
+- `window.toggleUiTheme()` in console to switch between dark and light themes
+- Set directJoin to true in PreviewScreen.jsx to not have to click on join after 
+  page reload.
