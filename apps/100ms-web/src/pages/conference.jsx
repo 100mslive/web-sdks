@@ -4,40 +4,40 @@ import { useHistory, useParams } from "react-router-dom";
 import { Header } from "../views/new/Header";
 import { ConferenceFooter } from "../views/footerView";
 import { ConferenceMainView } from "../views/mainView";
+import { Button, MessageModal } from "@100mslive/hms-video-react";
 import {
-  Button,
-  MessageModal,
+  selectRoomState,
+  HMSRoomState,
   selectIsConnectedToRoom,
   selectRoleChangeRequest,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../views/components/FullPageSpinner";
 
 export const Conference = () => {
   const history = useHistory();
   const { roomId, role } = useParams();
-  const context = useContext(AppContext);
+  const { isHeadless } = useContext(AppContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const toggleChat = useCallback(() => {
     setIsChatOpen(open => !open);
   }, []);
+  const isConnectingToRoom =
+    useHMSStore(selectRoomState) === HMSRoomState.Connecting;
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const hmsActions = useHMSActions();
-  const { loginInfo } = context;
-  const isHeadless = loginInfo.isHeadlessMode;
 
   useEffect(() => {
     if (!roomId) {
       history.push(`/`);
     }
-    if (!loginInfo.token) {
+    if (!isConnectingToRoom || isConnectedToRoom) {
       // redirect to join if token not present
-      if (role)
-        history.push(`/preview/${loginInfo.roomId || roomId || ""}/${role}`);
-      else history.push(`/preview/${loginInfo.roomId || roomId || ""}`);
+      if (role) history.push(`/preview/${roomId || ""}/${role}`);
+      else history.push(`/preview/${roomId || ""}`);
     }
     return () => {
       // This is needed to handle mac touchpad swipe gesture

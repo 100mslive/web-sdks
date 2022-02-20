@@ -67,7 +67,7 @@ export class TrackState implements Track {
     this.description = '';
     if (track instanceof HMSTrack) {
       this.mute = !track.enabled;
-      this.track_id = track.publishedTrackId;
+      this.track_id = track.publishedTrackId!;
       this.stream_id = track.stream.id;
     } else {
       this.mute = track.mute;

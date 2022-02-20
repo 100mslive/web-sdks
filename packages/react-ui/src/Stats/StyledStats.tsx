@@ -11,7 +11,7 @@ export const Root = styled('div', {
   fontSize: '$xs',
   overflowY: 'auto',
   maxHeight: '75%',
-  maxWidth: '75%',
+  maxWidth: '85%',
 });
 
 export const Table = styled('table', {});

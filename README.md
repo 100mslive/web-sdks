@@ -2,6 +2,8 @@
 
 
 This monorepo will contain all packages related to core sdk and store.
+Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD)
+line by line.
 
 To setup locally, install lerna globally
 

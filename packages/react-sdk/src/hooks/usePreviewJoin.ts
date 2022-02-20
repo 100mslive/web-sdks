@@ -1,7 +1,12 @@
-import { HMSRoomState, selectIsConnectedToRoom, selectRoomState } from '@100mslive/hms-video-store';
-import { useCallback, useEffect, useMemo } from 'react';
+import {
+  HMSRoomState,
+  selectIsConnectedToRoom,
+  selectRoomState,
+  HMSConfigInitialSettings,
+} from '@100mslive/hms-video-store';
+import { useCallback, useMemo } from 'react';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { hooksErrHandler } from '../hooks/types';
+import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
 import { HMSConfig } from '@100mslive/hms-video';
 
@@ -23,6 +28,10 @@ export interface usePreviewInput {
    */
   handleError?: hooksErrHandler;
   initEndpoint?: string;
+  /**
+   * initial settings for audio/video and device to be used.
+   */
+  initialSettings?: HMSConfigInitialSettings;
 }
 
 export interface usePreviewResult {
@@ -39,6 +48,10 @@ export interface usePreviewResult {
    * to decide to show between preview form and conferencing component/video tiles.
    */
   isConnected: boolean;
+  /**
+   * call this function to join the room
+   */
+  preview: () => void;
 }
 
 /**
@@ -47,12 +60,13 @@ export interface usePreviewResult {
  * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
  * Any device change or mute/unmute will be carried across to join.
  */
-export const usePreview = ({
+export const usePreviewJoin = ({
   name = '',
   token,
   metadata,
   handleError = logErrorHandler,
   initEndpoint,
+  initialSettings,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -65,11 +79,12 @@ export const usePreview = ({
       authToken: token,
       metaData: metadata,
       rememberDeviceSelection: true,
+      settings: initialSettings,
       initEndpoint: initEndpoint,
     };
-  }, [name, token, metadata, initEndpoint]);
+  }, [name, token, metadata, initEndpoint, initialSettings]);
 
-  useEffect(() => {
+  const preview = useCallback(() => {
     (async () => {
       if (!token) {
         return;
@@ -83,7 +98,7 @@ export const usePreview = ({
         handleError(err as Error, 'preview');
       }
     })();
-  }, [actions, config, handleError, roomState, token]);
+  }, [actions, handleError, token, roomState, config]);
 
   const join = useCallback(() => {
     if (!token) {
@@ -100,5 +115,6 @@ export const usePreview = ({
     enableJoin,
     join,
     isConnected,
+    preview,
   };
 };

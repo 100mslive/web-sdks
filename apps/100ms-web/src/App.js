@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -169,9 +169,6 @@ function AppRoutes({ getUserToken }) {
     <Router>
       <Notifications />
       <Switch>
-        {/* <Route path="/createRoom">
-              <CreateRoom />
-            </Route> */}
         <Route
           path="/preview/:roomId/:role?"
           render={({ match }) => {
@@ -231,11 +228,18 @@ function AppRoutes({ getUserToken }) {
 }
 
 export default function App() {
+  const [theme, setTheme] = useState(process.env.REACT_APP_THEME || "dark");
+  useEffect(() => {
+    window.toggleUiTheme = () => {
+      setTheme(theme === "dark" ? "light" : "dark");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme]);
   return (
     <EdtechComponent
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
-        theme: process.env.REACT_APP_THEME,
+        theme: theme,
         color: process.env.REACT_APP_COLOR,
         logo: process.env.REACT_APP_LOGO,
         font: process.env.REACT_APP_FONT,

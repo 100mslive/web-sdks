@@ -8,10 +8,12 @@ export const darkTheme = {
     textDisabled: 'rgba(255,255,255, 0.38)',
     textInvert: 'rgba(0,0,0,0.9)',
     iconBtn: '$white',
+    iconHoverBg: 'rgba(255, 255, 255, 0.25)',
     mainBg: '$black',
     tileBg: '#212121',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
+    inputBg: '$menuBg',
   },
 };
 
@@ -26,6 +28,7 @@ export const lightTheme = {
     textDisabled: 'rgba(0,0,0, 0.38)',
     textInvert: 'rgba(255,255,255, 0.9)',
     iconBtn: '#3b3b3b',
+    iconHoverBg: 'rgba(0, 0, 0, 0.22)',
     mainBg: '$white',
     tileBg: '#F2F2F2',
     statsBg: 'rgba(255,255,255,0.75)',

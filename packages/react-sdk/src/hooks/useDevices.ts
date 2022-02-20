@@ -10,7 +10,7 @@ export enum DeviceType {
   audioOutput = 'audioOutput',
 }
 
-export type DeviceTypeAndInfo<T> = {
+type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
 };
 
@@ -75,7 +75,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
             await actions.setVideoSettings({ deviceId });
             break;
           case DeviceType.audioOutput:
-            await actions.setAudioOutputDevice(deviceId);
+            actions.setAudioOutputDevice(deviceId);
             break;
         }
       } catch (err) {
