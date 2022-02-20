@@ -120,6 +120,7 @@ export class SDKToHMS {
       hls,
       sessionId: sdkRoom.sessionId,
       startedAt: sdkRoom.startedAt,
+      joinedAt: sdkRoom.joinedAt,
       peerCount: sdkRoom.peerCount,
     };
   }
