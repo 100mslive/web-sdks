@@ -1,7 +1,7 @@
 import { styled } from '../Theme';
 
 export const Input = styled('input', {
-  backgroundColor: '$grayDark',
+  backgroundColor: '$inputBg',
   borderRadius: '8px',
   outline: 'none',
   border: 'none',

@@ -12,6 +12,7 @@ export const darkTheme = {
     tileBg: '#212121',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
+    inputBg: '$menuBg',
   },
 };
 
