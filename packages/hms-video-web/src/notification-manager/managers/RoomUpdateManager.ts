@@ -17,6 +17,7 @@ export class RoomUpdateManager {
   handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
+        this.setJoinedAt();
         this.onRoomState((notification as PeerListNotification).room);
         break;
       case HMSNotificationMethod.RTMP_START:
@@ -60,7 +61,6 @@ export class RoomUpdateManager {
     room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
-    room.joinedAt = new Date();
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
   }
 
@@ -155,5 +155,13 @@ export class RoomUpdateManager {
       error: notification.error?.code ? notification.error : undefined,
     };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
+  }
+
+  private setJoinedAt() {
+    const room = this.store.getRoom();
+    // update only once on join peer-list, do not update for reconnect peer-list
+    if (!room.joinedAt) {
+      room.joinedAt = new Date();
+    }
   }
 }
