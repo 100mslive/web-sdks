@@ -28,5 +28,4 @@ export const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
 export const CheckboxLabel = styled('label', {
   fontSize: '$md',
   color: '$textPrimary',
-  ml: '$4',
 });
