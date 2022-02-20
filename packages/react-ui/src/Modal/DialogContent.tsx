@@ -1,21 +1,19 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 import { dialogClose, dialogOpen } from '../utils/animations';
 import { IconButton } from '../IconButton';
-import { Flex, Box } from '../Layout';
-import { Text } from '../Text';
 
 export const DialogClose = styled(DialogPrimitive.Close, {});
 
-const StyledOverlay = styled(DialogPrimitive.Overlay, {
+export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
   backgroundColor: 'rgba(0, 0, 0, 0.5);',
   position: 'fixed',
   inset: 0,
 });
 
-const StyledDialogContent = styled(DialogPrimitive.Content, {
+export const StyledDialogContent = styled(DialogPrimitive.Content, {
   color: 'white',
   backgroundColor: '$bgPrimary',
   borderRadius: '8px',
@@ -36,31 +34,12 @@ const StyledDialogContent = styled(DialogPrimitive.Content, {
   '&:focus': { outline: 'none' },
 });
 
-type DialogContentProps = React.ComponentProps<typeof StyledDialogContent> & {
-  title: string | ReactNode;
-  /**
-   * Whether to render close button
-   */
-  close?: boolean;
-};
+export const DialogTitle = styled(DialogPrimitive.Title, {});
 
-export const DialogContent: React.FC<DialogContentProps> = ({ children, close = true, title, ...props }) => (
-  <>
-    <StyledOverlay />
-    <StyledDialogContent {...props}>
-      <Flex justify="between">
-        <Text variant="h6" css={{ mb: '$2' }}>
-          {title}
-        </Text>
-        {close && (
-          <DialogClose asChild>
-            <IconButton>
-              <CrossIcon />
-            </IconButton>
-          </DialogClose>
-        )}
-      </Flex>
-      <Box css={{ color: 'rgba(255,255,255, 0.7)' }}>{children}</Box>
-    </StyledDialogContent>
-  </>
+export const DialogDefaultCloseIcon = () => (
+  <DialogClose asChild>
+    <IconButton>
+      <CrossIcon />
+    </IconButton>
+  </DialogClose>
 );
