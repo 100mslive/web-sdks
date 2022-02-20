@@ -27,7 +27,6 @@ const StyledContent = styled(Popover.Content, {
   padding: '10px 0px',
   display: 'flex',
   flexDirection: 'column',
-  width: '200px',
   borderRadius: '12px',
   ...popoverAnimation,
 });
