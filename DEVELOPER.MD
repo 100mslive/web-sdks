@@ -134,5 +134,16 @@
   - Every file is more or less standalone and easy to understand
   - Components should be written for copy pasting not just to work in our UI. People
   should be able to have it working in their UI without any surprises.
+- Though to a lesser extent but again use composition, no component should be
+  super large. Break it down into subcomponents, the top level component
+  should be easier to read and understand. All subcomponents should be replaceable
+  by their different implementations.(see decoupling above).
+  - The top level component should be at the start of the file followed by
+    the sub components it is using.
+  - Usually in these cases, the subcomponents are pure functional component
+  - The top level gets the data and the subcomponents are purely for readability
+  and maintenance.
+  - In rare cases depending on the data being accessed, the store queries
+  can be moved to the sub components for increased performance.
     
 
