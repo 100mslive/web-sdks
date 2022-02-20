@@ -6,13 +6,13 @@
 ## Coding Guidelines
 
 - Prefer readability and maintenance over anything else.
-- Performance is the second preference, think of what happens when there
-  are ten thousand people in the room, what happens when there are two thousand
-  roles in the room. Don't optimise prematurely but don't iterate or create copies
+- Performance is the second preference. For performance, think of the behaviour when there
+  are ten thousand people in the room or when there are two thousand
+  roles in the room. Don't optimise prematurely but don't run a loop or create copies
   unnecessarily.
 - Use whole words in names, descriptive over cryptic names.
-  The reader shouldn't have to pause and decipher what a variable might be 
-  holding, a function might be doing.
+  The reader shouldn't have to pause and decipher/guess what a variable means,
+  or what a function is doing.
     ```ts
     let lYrCnt = 5; // ❌
     let leapYearCount = 5; // ✅
@@ -26,10 +26,10 @@
   Object.entries(tracksMap).forEach((trackId, track) => {}) // ✅
   ```
 - If any question related to the code is discussed in Slack, PR comments
-  etc. add it as a comment, or make the code readable enough, so the question
+  etc. add it as a comment. If something was not clear, make the code readable enough, so the question
   is answered by the code.
 - Within a file, type definitions should come first.
-- Withing a class order of functions is public, protected and private.
+- Within a class order of functions is public, protected and private.
 - Use undefined over null if you need to pick one.
 - Anything requiring logic, or algo should stay outside of React Lifecycle
   in a framework agnostic class. React Components if needed will only be a thin
@@ -37,15 +37,26 @@
 - Use **TSDoc** extensively especially for public APIs, document interfaces, fields
   etc. so there is no ambiguity, or lack of clarity for the developer using it.
 - Internal utility classes and helpers should be given the same due diligence as
-  external APIs, with respect to a well-defined API and proper documentation.
+  external APIs, with respect to a well-defined API and proper documentation. These
+  should ideally have a yes answer to - "Will an external user be able to know
+  what is this doing if we make this public?
 - Think of some possible ways the thing you're working on can evolve in the future.
   Design you code such that it's extensible and easy to update especially if you're not the person
   doing those future changes.
-- Internal APIs, util functions etc. should also be documented properly, every class
-  or a non trivial function should ideally have a yes answer to - "Will an external
-  user be able to know what is this doing if we make this public?".
 - **Explicitness over Implicitness** - code should be explicit of its intent,
-  use variables to abstract conditions, 
+  use variables to abstract conditions.
+  ```ts
+  // ❌ 😢
+  if (peers.length === 1 ||
+   (peers.filter(peer => peer.isPublishing)).length === 0) {}
+  
+  // ✅
+  const itsOnlyMeInTheRoom = peers.length === 1;
+  const peersPublishing = peers.filter(peer => peer.isPublishing);
+  const nooneIsPublishing = peersPublishing.length === 0;
+  const showWebinarBanner = itsOnlyMeInTheRoom || nooneIsPublishing;
+  if (showWebinarBanner) {}
+  ```
 - **Single Source of Truth** for business logic. For e.g. let's say that
   there are two peer related components who want to do sth special based on
   a condition. Both shouldn't independently evaluate the condition, either
@@ -58,7 +69,7 @@
   to reason about. Changing one part shouldn't break other. Every link should be
   explicitly put in code, every behaviour documented.
 - **Decoupled** - This will usually happen if above are in place. One piece shouldn't 
-  rely on internal details of how some other piece is working. And similarly, primitive
+  rely on internal details of how some other piece is working. Primitive
   pieces shouldn't decide things for their parent/users. If they start getting used in
   multiple places, changing sth simple will have a lot of unintended effects. If in 
   doubt about a field, let the parent pass it. Questions to ask about the new code - 
@@ -72,11 +83,12 @@
   put workarounds. The first step is figuring out the root cause, solving it is the second
   step.
   - If you are messing around with different inputs on UI side and found a
-  hack that works, it doesn't solve the underlying problem which is sth is fundamentally
-  broken with our packages.
+  hack that works, it doesn't solve the underlying problem which is sth is
+  broken with our packages. Which means some user/customer is going to hit the same
+    problem.
 - **Refactor** - Every change, new feature should be simple to do in good code. If it's
   not refactor it in a PR, so it becomes simple and then do the simple change. If you
-  find yourself copy pasting code refactor. Don't repeat yourself.
+  find yourself copy pasting code, refactor. Don't repeat yourself.
 
 ## Coding Guidelines(SDK, Store)
 
@@ -84,7 +96,6 @@
   interfaces following this which can't be changed now.
 - Use camelCase for function names.
 - Use PascalCase for enum values and type names.
-- Don't use
 
 ## Coding Guidelines(react-sdk)
 
@@ -95,15 +106,17 @@
 
 ## Coding Guidelines(react-ui)
 
-- Composibility is the most important factor, don't export `Dialog<title, body`,
+- Composibility is the most important factor, don't export `Dialog<title, body>`,
   export `Dialog.Root`, `Dialog.Header`, `Dialog.Title`, `Dialog.Close`, `Dialog.Body`,
   `Dialog.Footer`.
 - Consistency - the top level child for any component is called root and
   so on, refer to similar existing components.
-- There shouldn't be any media query based on viewport in react-ui, 
-  media queries. The problem with this is that they are based on the
-  size of whole page than the size of parent and even if they look good
-- No fixed height, width in pixels, avoid anything in pixels
+- There shouldn't be any media query based on viewport in react-ui. The problem with this is that they are based on the
+  size of whole page than the size of parent. And you don't know parent size of the component customer will
+  be putting it in.
+- If you can't think of a way to avoid media query(should be really rare for react-ui), make
+  variants, and use media query from app.
+- No fixed height, width in pixels, avoid anything in pixels, rem, percet are fine.
 - There is almost always a better and more responsive solution using
   css properties than going for pixel based dimensions or media queries.
 
@@ -123,16 +136,17 @@
   - No long files
   - No implicit links. Beware of thoughts like these while writing code -
     - we're putting only a left margin here because this
-    component we're using already puts a right margin.
+    child component we're using already puts a right margin. - Coupling
     - even though these are similar components only one will show because of how they
-      are internally using media queries.
+      are internally using media queries. Express this link through an explicit
+      variable and conditional rendering if required.
 - The repo also serves as a public reference for
   people implementing in their own app. With that in mind, components
   should be well documented and designed with a good public API. Ensure below -
   - Components shouldn't be context specific, no component should be aware of 
     whose child it's going to be or who are going to be its sibling components.
   - Every file is more or less standalone and easy to understand
-  - Components should be written for copy pasting not just to work in our UI. People
+  - Components should be written for copy pasting not only to work in our UI. People
   should be able to have it working in their UI without any surprises.
 - Though to a lesser extent but again use composition, no component should be
   super large. Break it down into subcomponents, the top level component
@@ -145,5 +159,3 @@
   and maintenance.
   - In rare cases depending on the data being accessed, the store queries
   can be moved to the sub components for increased performance.
-    
-
