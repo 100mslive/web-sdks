@@ -19,6 +19,11 @@ import {
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
 
 /**
+ * Select the ID of the current room to which you are connected.
+ */
+export const selectRoomID = createSelector(selectRoom, room => room.id);
+
+/**
  * @internal
  */
 export const selectPeersMap = (store: HMSStore): Record<HMSPeerID, HMSPeer> => store.peers;

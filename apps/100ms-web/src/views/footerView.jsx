@@ -32,6 +32,8 @@ import {
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
+import { FeatureFlags } from "../store/FeatureFlags";
+import { ToggleWhiteboard } from "./whiteboard";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -161,6 +163,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
+  FeatureFlags.enableWhiteboard && leftComponents.push(<ToggleWhiteboard />);
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {
