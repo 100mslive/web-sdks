@@ -41,13 +41,5 @@ export const IconButton = styled('button', {
         },
       },
     },
-    noHover: {
-      true: {
-        cursor: 'default',
-        '&:not([disabled]):hover': {
-          backgroundColor: 'unset',
-        },
-      },
-    },
   },
 });
