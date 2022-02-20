@@ -7,6 +7,10 @@ over the primitive ones.
 If someone is using class based react components, they'll be better off
 with using the core sdk directly.
 
+> If you're already using hooks from hms-video-react, this package will be a drop
+> in replacement. hms-video-react is planned to be deprecated so please move your code
+> to using this package instead.
+
 ### Primitive Hooks
 
 These are hooks wrapper over the sdk things.
