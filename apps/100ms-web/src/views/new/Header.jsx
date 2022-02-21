@@ -24,7 +24,6 @@ import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
-  selectPeerCount,
 } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
@@ -40,7 +39,7 @@ const SpeakerTag = () => {
     <Flex
       align="center"
       justify="center"
-      css={{ flex: "1 1 0", color: "$textPrimary" }}
+      css={{ flex: "1 1 0", color: "$textPrimary", "@md": { display: "none" } }}
     >
       <SpeakerIcon width={24} height={24} />
       <Text
