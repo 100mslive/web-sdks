@@ -1,9 +1,9 @@
 import { Root, Trigger, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
-export const Dropdown = styled(Root, {});
+const DropdownRoot = styled(Root, {});
 
-export const DropdownTrigger = styled(Trigger, {
+const DropdownTrigger = styled(Trigger, {
   padding: '$2 $4',
   cursor: 'pointer',
   '&[data-state="open"]': {
@@ -12,7 +12,7 @@ export const DropdownTrigger = styled(Trigger, {
   },
 });
 
-export const DropdownItem = styled(Item, {
+const DropdownItem = styled(Item, {
   h: '$14',
   w: '100%',
   color: '$textPrimary',
@@ -22,13 +22,13 @@ export const DropdownItem = styled(Item, {
   alignItems: 'center',
 });
 
-export const DropdownItemSeparator = styled(Separator, {
+const DropdownItemSeparator = styled(Separator, {
   h: 1,
   backgroundColor: '$grayDefault',
   m: '$4 $8',
 });
 
-export const DropdownContent = styled(Content, {
+const DropdownContent = styled(Content, {
   w: '$56',
   maxHeight: '$56',
   r: '$2',
@@ -37,15 +37,19 @@ export const DropdownContent = styled(Content, {
   overflowY: 'auto',
 });
 
-export const DropdownLabel = styled(Label, {
+const DropdownLabel = styled(Label, {
   display: 'flex',
   alignItems: 'center',
 });
-export const DropdownGroup = styled(Group, {});
 
-Dropdown.displayName = 'Dropdown';
-DropdownItem.displayName = 'DropdownItem';
-DropdownItemSeparator.displayName = 'DropdownItemSeparator';
-DropdownContent.displayName = 'DropdownContent';
-DropdownLabel.displayName = 'DropdownLabel';
-DropdownGroup.displayName = 'DropdownGroup';
+const DropdownGroup = styled(Group, {});
+
+export const Dropdown = {
+  Root: DropdownRoot,
+  Trigger: DropdownTrigger,
+  Content: DropdownContent,
+  Item: DropdownItem,
+  Label: DropdownLabel,
+  Group: DropdownGroup,
+  ItemSeparator: DropdownItemSeparator,
+};
