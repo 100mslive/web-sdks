@@ -1,11 +1,6 @@
 import React, { Fragment, useState } from "react";
 import {
   Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-  DropdownGroup,
-  DropdownLabel,
   Flex,
   Box,
   Text,
@@ -34,7 +29,7 @@ export const ParticipantList = () => {
   return (
     <Fragment>
       <Dropdown open={open} onOpenChange={value => setOpen(value)}>
-        <DropdownTrigger asChild>
+        <Dropdown.Trigger asChild>
           <Flex
             css={{
               color: "$textPrimary",
@@ -44,8 +39,8 @@ export const ParticipantList = () => {
           >
             <ParticipantCount peerCount={peerCount} />
           </Flex>
-        </DropdownTrigger>
-        <DropdownContent
+        </Dropdown.Trigger>
+        <Dropdown.Content
           sideOffset={5}
           align="end"
           css={{ height: "auto", maxHeight: "$96" }}
@@ -53,7 +48,7 @@ export const ParticipantList = () => {
           {roles.map(role => {
             const participants = participantsByRoles[role];
             return (
-              <DropdownGroup
+              <Dropdown.Group
                 css={{
                   h: "auto",
                   flexDirection: "column",
@@ -69,10 +64,10 @@ export const ParticipantList = () => {
                   showActions={isConnected}
                   onParticipantAction={setSelectedPeerId}
                 />
-              </DropdownGroup>
+              </Dropdown.Group>
             );
           })}
-        </DropdownContent>
+        </Dropdown.Content>
       </Dropdown>
       {selectedPeerId && (
         <RoleChangeModal
@@ -107,14 +102,14 @@ const ParticipantListInARole = ({
 }) => {
   return (
     <>
-      <DropdownLabel css={{ h: "$14" }}>
+      <Dropdown.Label css={{ h: "$14" }}>
         <Text variant="md" css={{ pl: "$8" }}>
           {roleName}({participants.length})
         </Text>
-      </DropdownLabel>
+      </Dropdown.Label>
       {participants.map(peer => {
         return (
-          <DropdownItem key={peer.id} css={{ w: "100%", h: "$14" }}>
+          <Dropdown.Item key={peer.id} css={{ w: "100%", h: "$14" }}>
             <Avatar
               shape="square"
               name={peer.name}
@@ -137,7 +132,7 @@ const ParticipantListInARole = ({
                 canChangeRole={canChangeRole}
               />
             )}
-          </DropdownItem>
+          </Dropdown.Item>
         );
       })}
     </>

@@ -2,11 +2,7 @@ import React, { Fragment, useContext } from "react";
 import {
   Flex,
   Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
   IconButton,
-  DropdownItemSeparator,
   Text,
   textEllipsis,
   Box,
@@ -110,7 +106,7 @@ const PlaylistAndStreaming = () => {
         )}
       </Flex>
       <Dropdown>
-        <DropdownTrigger asChild>
+        <Dropdown.Trigger asChild>
           <IconButton
             css={{
               mr: "$2",
@@ -119,10 +115,10 @@ const PlaylistAndStreaming = () => {
           >
             <ChevronDownIcon />
           </IconButton>
-        </DropdownTrigger>
-        <DropdownContent sideOffset={5} align="end" css={{ w: "$60" }}>
+        </Dropdown.Trigger>
+        <Dropdown.Content sideOffset={5} align="end" css={{ w: "$60" }}>
           {isRecordingOn && (
-            <DropdownItem css={{ color: "$error" }}>
+            <Dropdown.Item css={{ color: "$error" }}>
               <RecordIcon width={24} height={24} />
               <Text
                 variant="sm"
@@ -139,21 +135,21 @@ const PlaylistAndStreaming = () => {
                 )}
                 )
               </Text>
-            </DropdownItem>
+            </Dropdown.Item>
           )}
           {isStreamingOn && (
-            <DropdownItem css={{ color: "$error" }}>
+            <Dropdown.Item css={{ color: "$error" }}>
               <GlobeIcon width={24} height={24} />
               <Text variant="sm" css={{ ml: "$2" }}>
                 Streaming ({isHLSRunning ? "HLS" : "RTMP"})
               </Text>
-            </DropdownItem>
+            </Dropdown.Item>
           )}
           {(isRecordingOn || isStreamingOn) && playlist && (
-            <DropdownItemSeparator />
+            <Dropdown.ItemSeparator />
           )}
           {playlist && (
-            <DropdownItem css={{ color: "$textPrimary" }}>
+            <Dropdown.Item css={{ color: "$textPrimary" }}>
               <MusicIcon width={24} height={24} />
               <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
                 Playlist is playing
@@ -186,99 +182,11 @@ const PlaylistAndStreaming = () => {
                   {playlist.track.volume === 0 ? "Unmute" : "Mute"}
                 </Text>
               )}
-            </DropdownItem>
+            </Dropdown.Item>
           )}
-        </DropdownContent>
+        </Dropdown.Content>
       </Dropdown>
     </Fragment>
-  );
-};
-
-const PlaylistMusic = () => {
-  const playlist = usePlaylistMusic();
-
-  if (!playlist) {
-    return null;
-  }
-  const { peer, selection, track, play, pause, setVolume } = playlist;
-
-  return (
-    <Flex
-      align="center"
-      css={{ color: "$textPrimary", ml: "$4", "@lg": { display: "none" } }}
-    >
-      <MusicIcon width={24} height={24} />
-      <Text variant="md" css={{ mx: "$2" }}>
-        Playlist is playing
-      </Text>
-      {peer.isLocal ? (
-        <Text
-          variant="md"
-          onClick={async () => {
-            if (selection.playing) {
-              pause();
-            } else {
-              await play(selection.id);
-            }
-          }}
-          css={{ color: "$error", cursor: "pointer" }}
-        >
-          {selection.playing ? "Pause" : "Play"}
-        </Text>
-      ) : (
-        <Text
-          variant="md"
-          onClick={() => {
-            setVolume(!track.volume ? 100 : 0, track.id);
-          }}
-          css={{ color: "$error", cursor: "pointer" }}
-        >
-          {track.volume === 0 ? "Unmute" : "Mute"}
-        </Text>
-      )}
-    </Flex>
-  );
-};
-
-const StreamingRecording = () => {
-  const {
-    isServerRecordingOn,
-    isBrowserRecordingOn,
-    isHLSRecordingOn,
-    isStreamingOn,
-    isHLSRunning,
-    isRecordingOn,
-  } = useRecordingStreaming();
-
-  return (
-    <Flex align="center" css={{ mx: "$4", "@lg": { display: "none" } }}>
-      {isRecordingOn && (
-        <Tooltip
-          title={getRecordingText({
-            isBrowserRecordingOn,
-            isServerRecordingOn,
-            isHLSRecordingOn,
-          })}
-        >
-          <Flex align="center" css={{ color: "$error" }}>
-            <RecordIcon width={24} height={24} />
-            <Text variant="body" css={{ mx: "$2" }}>
-              Recording
-            </Text>
-          </Flex>
-        </Tooltip>
-      )}
-      {isStreamingOn && (
-        <Tooltip title={getStreamingText({ isStreamingOn, isHLSRunning })}>
-          <Flex align="center" css={{ mx: "$2", color: "$error" }}>
-            <GlobeIcon width={24} height={24} />
-            <Text variant="body" css={{ mx: "$2" }}>
-              Streaming
-            </Text>
-          </Flex>
-        </Tooltip>
-      )}
-    </Flex>
   );
 };
 
@@ -305,19 +213,13 @@ export const Header = ({ isPreview }) => {
     >
       <Flex align="center" css={{ position: "absolute", left: "$4" }}>
         <Logo />
-        <PlaylistMusic />
-        <StreamingRecording />
       </Flex>
       <SpeakerTag />
       <Flex align="center" css={{ position: "absolute", right: "$4" }}>
-        <Flex
-          align="center"
-          css={{ display: "none", "@lg": { display: "flex" } }}
-        >
+        {showPip && <PIPComponent />}
+        <Flex align="center" css={{ mx: "$2" }}>
           <PlaylistAndStreaming />
         </Flex>
-
-        {showPip && <PIPComponent />}
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
         </Box>
