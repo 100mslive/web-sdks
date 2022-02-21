@@ -54,7 +54,12 @@ export const PlaylistAndStreaming = () => {
     isRecordingOn,
   } = useRecordingStreaming();
   const [open, setOpen] = useState(false);
-  if (!playlist && !isRecordingOn && !isStreamingOn) {
+  const isPlaylistInActive = [
+    !playlist.peer || !playlist.track,
+    !playlist.peer?.isLocal && !playlist.track?.enabled,
+    playlist.peer?.isLocal && !playlist.selection,
+  ].some(Boolean);
+  if (isPlaylistInActive && !isRecordingOn && !isStreamingOn) {
     return null;
   }
 

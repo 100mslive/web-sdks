@@ -31,16 +31,5 @@ export const usePlaylistMusic = () => {
     [hmsActions]
   );
 
-  if (!peer || !track) {
-    return null;
-  }
-  // Don't show mute option if remote peer has disabled
-  if (!peer.isLocal && !track.enabled) {
-    return null;
-  }
-
-  if (peer.isLocal && !selection) {
-    return null;
-  }
   return { selection, peer, track, play, pause, setVolume };
 };
