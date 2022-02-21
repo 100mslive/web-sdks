@@ -135,29 +135,3 @@ export const chatStyle = {
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
 };
-
-export const getRecordingText = (
-  { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
-  delimiter = ", "
-) => {
-  if (!isBrowserRecordingOn && !isServerRecordingOn && !isHLSRecordingOn) {
-    return "";
-  }
-  const title = [];
-  if (isBrowserRecordingOn) {
-    title.push("Browser");
-  }
-  if (isServerRecordingOn) {
-    title.push("Server");
-  }
-  if (isHLSRecordingOn) {
-    title.push("HLS");
-  }
-  return title.join(delimiter);
-};
-
-export const getStreamingText = ({ isStreamingOn, isHLSRunning }) => {
-  if (isStreamingOn) {
-    return isHLSRunning ? "HLS" : "RTMP";
-  }
-};
