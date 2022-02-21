@@ -482,13 +482,22 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
-    await this.transport.publish(tracks);
-    tracks.forEach(track => {
-      track.peerId = this.localPeer?.peerId;
-      this.localPeer?.auxiliaryTracks.push(track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
-    });
+    if (this.localPeer) {
+      const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
+      if (!this.localPeer) {
+        HMSLogger.d(this.TAG, 'Screenshared when not connected');
+        tracks.forEach(track => {
+          track.cleanup();
+        });
+        return;
+      }
+      await this.transport.publish(tracks);
+      tracks.forEach(track => {
+        track.peerId = this.localPeer?.peerId;
+        this.localPeer?.auxiliaryTracks.push(track);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, this.localPeer!);
+      });
+    }
   }
 
   private async stopEndedScreenshare(onStop: () => void) {
