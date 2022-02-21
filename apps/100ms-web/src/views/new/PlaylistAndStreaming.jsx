@@ -57,19 +57,19 @@ export const PlaylistAndStreaming = () => {
   } = useRecordingStreaming();
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
-  const isPlaylistInActive = [
+  const isPlaylistInactive = [
     !playlist.peer || !playlist.track,
     !playlist.peer?.isLocal && !playlist.track?.enabled,
     playlist.peer?.isLocal && !playlist.selection,
   ].some(Boolean);
-  const isScreenshareInActive = [
+  const isScreenshareInactive = [
     !screenshareAudio.peer || !screenshareAudio.track,
     !screenshareAudio.peer?.isLocal && !screenshareAudio.track?.enabled,
   ].some(Boolean);
 
   if (
-    isPlaylistInActive &&
-    isScreenshareInActive &&
+    isPlaylistInactive &&
+    isScreenshareInactive &&
     !isRecordingOn &&
     !isStreamingOn
   ) {
@@ -87,14 +87,14 @@ export const PlaylistAndStreaming = () => {
             border: "1px solid $textPrimary",
           }}
         >
-          {!isScreenshareInActive && (
+          {!isScreenshareInactive && (
             <Tooltip title="Screenshare Audio">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <MusicIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
-          {!isPlaylistInActive && (
+          {!isPlaylistInactive && (
             <Tooltip title="Playlist Music">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <AudioPlayerIcon width={24} height={24} />
@@ -169,10 +169,10 @@ export const PlaylistAndStreaming = () => {
           </Dropdown.Item>
         )}
         {(isRecordingOn || isStreamingOn) &&
-          (!isPlaylistInActive || !isScreenshareInActive) && (
+          (!isPlaylistInactive || !isScreenshareInactive) && (
             <Dropdown.ItemSeparator />
           )}
-        {!isPlaylistInActive && (
+        {!isPlaylistInactive && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <AudioPlayerIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
@@ -205,7 +205,7 @@ export const PlaylistAndStreaming = () => {
             )}
           </Dropdown.Item>
         )}
-        {!isScreenshareInActive && (
+        {!isScreenshareInactive && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <MusicIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
