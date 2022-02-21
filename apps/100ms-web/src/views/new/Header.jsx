@@ -19,15 +19,16 @@ import {
   SpeakerIcon,
   GlobeIcon,
   MusicIcon,
+  PencilDrawIcon,
 } from "@100mslive/react-icons";
 import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
-  selectPeerCount,
 } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
+import { useWhiteboardMetadata } from "../whiteboard";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { getRecordingText, getStreamingText } from "../../common/utils";
@@ -286,6 +287,27 @@ const StreamingRecording = () => {
   );
 };
 
+const Whiteboard = () => {
+  const { whiteboardOwner, amIWhiteboardOwner } = useWhiteboardMetadata();
+
+  if (!whiteboardOwner) {
+    return null;
+  }
+
+  return (
+    <Flex
+      align="center"
+      css={{ color: "$textPrimary", ml: "$4", "@lg": { display: "none" } }}
+    >
+      <PencilDrawIcon />
+      <Text variant="md" css={{ mx: "$2" }}>
+        {amIWhiteboardOwner ? "You are" : `${whiteboardOwner.name} is`} sharing
+        Whiteboard
+      </Text>
+    </Flex>
+  );
+};
+
 const LogoImg = styled("img", {
   maxHeight: "$14",
   "@md": {
@@ -310,6 +332,7 @@ export const Header = ({ isPreview }) => {
       <Flex align="center" css={{ position: "absolute", left: "$4" }}>
         <Logo />
         <PlaylistMusic />
+        <Whiteboard />
         <StreamingRecording />
       </Flex>
       <SpeakerTag />
