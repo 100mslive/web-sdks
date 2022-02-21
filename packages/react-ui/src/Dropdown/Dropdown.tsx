@@ -1,5 +1,3 @@
-import React from 'react';
-import type * as Stitches from '@stitches/react';
 import { Root, Trigger, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
@@ -46,22 +44,12 @@ const DropdownLabel = styled(Label, {
 
 const DropdownGroup = styled(Group, {});
 
-type DropdownProps = Stitches.VariantProps<typeof DropdownRoot>;
-
-export const Dropdown: React.FC<DropdownProps> & {
-  Trigger: typeof Trigger;
-  Item: typeof DropdownItem;
-  Content: typeof DropdownContent;
-  ItemSeparator: typeof DropdownItemSeparator;
-  Label: typeof DropdownLabel;
-  Group: typeof DropdownGroup;
-} = props => <DropdownRoot {...props} />;
-
-Dropdown.Trigger = DropdownTrigger;
-Dropdown.Content = DropdownContent;
-Dropdown.Item = DropdownItem;
-Dropdown.Label = DropdownLabel;
-Dropdown.Group = DropdownGroup;
-Dropdown.ItemSeparator = DropdownItemSeparator;
-
-Dropdown.displayName = 'Dropdown';
+export const Dropdown = {
+  Root: DropdownRoot,
+  Trigger: DropdownTrigger,
+  Content: DropdownContent,
+  Item: DropdownItem,
+  Label: DropdownLabel,
+  Group: DropdownGroup,
+  ItemSeparator: DropdownItemSeparator,
+};
