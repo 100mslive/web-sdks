@@ -1,4 +1,5 @@
-import { selectHLSState, selectRecordingState, selectRTMPState, useHMSStore } from '..';
+import { selectHLSState, selectRecordingState, selectRTMPState } from '@100mslive/hms-video-store';
+import { useHMSStore } from '../primitives/HmsRoomProvider';
 
 export interface useRecordingStreamingResult {
   isServerRecordingOn: boolean;

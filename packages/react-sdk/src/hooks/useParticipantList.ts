@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   HMSPeer,
   HMSRoleName,
@@ -5,9 +6,8 @@ import {
   selectPeerCount,
   selectPeers,
   selectRemotePeers,
-  useHMSStore,
-} from '..';
-import { useMemo } from 'react';
+} from '@100mslive/hms-video-store';
+import { useHMSStore } from '../primitives/HmsRoomProvider';
 import { groupByRoles } from '../utils/groupBy';
 
 export interface useParticipantListResult {
