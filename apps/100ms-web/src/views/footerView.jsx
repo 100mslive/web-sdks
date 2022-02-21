@@ -1,21 +1,23 @@
 import { useState, useCallback } from "react";
 import {
-  useHMSStore,
   ControlBar,
   AudioPlaylist,
   Button,
   VideoPlaylistIcon,
   MessageModal,
+  VideoPlaylist,
+} from "@100mslive/hms-video-react";
+import {
   useHMSActions,
+  useHMSStore,
   selectIsLocalScreenShared,
   selectUnreadHMSMessagesCount,
   selectIsAllowedToPublish,
   selectLocalPeerID,
   selectScreenSharesByPeerId,
   selectVideoPlaylist,
-  VideoPlaylist,
   selectIsConnectedToRoom,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
@@ -32,6 +34,8 @@ import {
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
+import { FeatureFlags } from "../store/FeatureFlags";
+import { ToggleWhiteboard } from "./whiteboard";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -161,6 +165,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
+  FeatureFlags.enableWhiteboard && leftComponents.push(<ToggleWhiteboard />);
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {

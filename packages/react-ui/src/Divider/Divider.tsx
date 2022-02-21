@@ -16,13 +16,13 @@ export const VerticalDivider = styled('span', {
   variants: {
     space: {
       1: getVerticalSpace('$1'),
-      2: getVerticalSpace('$1'),
+      2: getVerticalSpace('$2'),
       3: getVerticalSpace('$3'),
       4: getVerticalSpace('$4'),
     },
   },
   defaultVariants: {
-    space: 2,
+    space: 1,
   },
 });
 
@@ -34,12 +34,12 @@ export const HorizontalDivider = styled('span', {
   variants: {
     space: {
       1: getHorizontalSpace('$1'),
-      2: getHorizontalSpace('$1'),
+      2: getHorizontalSpace('$2'),
       3: getHorizontalSpace('$3'),
       4: getHorizontalSpace('$4'),
     },
   },
   defaultVariants: {
-    space: 2,
+    space: 1,
   },
 });

@@ -483,6 +483,13 @@ export class HMSSdk implements HMSInterface {
     }
 
     const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
+    if (!this.localPeer) {
+      HMSLogger.d(this.TAG, 'Screenshared when not connected');
+      tracks.forEach(track => {
+        track.cleanup();
+      });
+      return;
+    }
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;

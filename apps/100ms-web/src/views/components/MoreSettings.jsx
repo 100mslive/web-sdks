@@ -11,7 +11,6 @@ import {
   ContextMenuItem,
   HamburgerMenuIcon,
   PersonIcon,
-  Settings,
   UiSettings,
   SettingsIcon,
   useHMSStore,
@@ -26,8 +25,8 @@ import {
   RecordIcon,
   StarIcon,
   ChangeTextIcon,
-  InfoIcon,
 } from "@100mslive/hms-video-react";
+import { InfoIcon } from "@100mslive/react-icons";
 import { AppContext } from "../../store/AppContext";
 import { hmsToast } from "./notifications/hms-toast";
 import { arrayIntersection, setFullScreenEnabled } from "../../common/utils";
@@ -36,6 +35,7 @@ import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { MuteAll } from "./MuteAll";
 import { ChangeName, StatsForNerds } from "./ChangeName";
 import { FeatureFlags } from "../../store/FeatureFlags";
+import Settings from "../new/Settings";
 
 export const MoreSettings = () => {
   const {
@@ -254,7 +254,7 @@ export const MoreSettings = () => {
         />
         {FeatureFlags.enableStatsForNerds && (
           <ContextMenuItem
-            icon={<InfoIcon width={24} />}
+            icon={<InfoIcon height={17} />}
             label="Stats for Nerds"
             key="stats"
             onClick={() => {
@@ -264,9 +264,8 @@ export const MoreSettings = () => {
         )}
       </ContextMenu>
       <Settings
-        className="hidden"
-        showModal={showSettings}
-        onModalClose={() => setShowSettings(false)}
+        open={showSettings}
+        onOpenChange={state => setShowSettings(state)}
       />
       <UiSettings
         {...uiSettingsProps}

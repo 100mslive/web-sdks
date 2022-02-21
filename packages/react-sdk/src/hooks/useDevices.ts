@@ -10,7 +10,7 @@ export enum DeviceType {
   audioOutput = 'audioOutput',
 }
 
-type DeviceTypeAndInfo<T> = {
+export type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
 };
 
@@ -33,7 +33,7 @@ export interface useDevicesResult {
  * This hook can be used to implement a UI component which allows the user to manually change their
  * audio/video device. It returns the list of all devices as well as the currently selected one. The input
  * devices will be returned based on what the user is allowed to publish, so a audio only user won't get
- * the videInput field. This can be used to show the UI dropdowns properly.
+ * the audioInput field. This can be used to show the UI dropdowns properly.
  *
  * Note:
  * - Browsers give access to the list of devices only if the user has given permission to access them
