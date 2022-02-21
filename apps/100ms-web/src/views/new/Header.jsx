@@ -128,7 +128,7 @@ const PlaylistAndStreaming = () => {
                 variant="sm"
                 css={{ ml: "$2", flex: "1 1 0", ...textEllipsis("80%") }}
               >
-                Recording(
+                Recording (
                 {getRecordingText(
                   {
                     isBrowserRecordingOn,
