@@ -329,6 +329,7 @@ class Store implements IStore {
       track.cleanup();
     }
     this.config = undefined;
+    this.localPeerId = undefined;
   }
 
   setErrorListener(listener: IErrorListener) {
