@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Flex,
   Dropdown,
@@ -7,7 +7,13 @@ import {
   Box,
   Tooltip,
 } from "@100mslive/react-ui";
-import { RecordIcon, GlobeIcon, MusicIcon } from "@100mslive/react-icons";
+import {
+  RecordIcon,
+  GlobeIcon,
+  MusicIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+} from "@100mslive/react-icons";
 import { useRecordingStreaming } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 
@@ -47,12 +53,13 @@ export const PlaylistAndStreaming = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
+  const [open, setOpen] = useState(false);
   if (!playlist && !isRecordingOn && !isStreamingOn) {
     return null;
   }
 
   return (
-    <Dropdown>
+    <Dropdown open={open} onOpenChange={setOpen}>
       <Dropdown.Trigger asChild>
         <Flex
           align="center"
@@ -102,6 +109,9 @@ export const PlaylistAndStreaming = () => {
               </Tooltip>
             )}
           </Flex>
+          <Box css={{ "@lg": { display: "none" } }}>
+            {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          </Box>
         </Flex>
       </Dropdown.Trigger>
       <Dropdown.Content sideOffset={5} align="end" css={{ w: "$60" }}>

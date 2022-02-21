@@ -8,7 +8,12 @@ import {
   textEllipsis,
   IconButton,
 } from "@100mslive/react-ui";
-import { PeopleIcon, SettingIcon } from "@100mslive/react-icons";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PeopleIcon,
+  SettingIcon,
+} from "@100mslive/react-icons";
 import {
   selectPermissions,
   useHMSStore,
@@ -38,6 +43,9 @@ export const ParticipantList = () => {
             }}
           >
             <ParticipantCount peerCount={peerCount} />
+            <Box css={{ ml: "$2", "@lg": { display: "none" } }}>
+              {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            </Box>
           </Flex>
         </Dropdown.Trigger>
         <Dropdown.Content
