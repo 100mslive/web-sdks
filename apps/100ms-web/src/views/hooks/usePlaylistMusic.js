@@ -26,9 +26,9 @@ export const usePlaylistMusic = () => {
 
   const setVolume = useCallback(
     value => {
-      hmsActions.audioPlaylist.setVolume(value);
+      hmsActions.setVolume(value, track?.id);
     },
-    [hmsActions]
+    [hmsActions, track]
   );
 
   return { selection, peer, track, play, pause, setVolume };
