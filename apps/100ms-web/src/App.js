@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -72,6 +72,12 @@ export function EdtechComponent({
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
+  const [themeType, setThemeType] = useState(theme);
+  useEffect(() => {
+    window.toggleUiTheme = () => {
+      setThemeType(themeType === "dark" ? "light" : "dark");
+    };
+  }, [themeType]);
   return (
     <HMSThemeProvider
       config={{
@@ -91,7 +97,7 @@ export function EdtechComponent({
         },
       }}
       appBuilder={{
-        theme: theme || "dark",
+        theme: themeType,
         enableChat: showChat === "true",
         enableScreenShare: showScreenshare === "true",
         logo: logo,
@@ -104,7 +110,7 @@ export function EdtechComponent({
       toast={(message, options = {}) => hmsToast(message, options)}
     >
       <ReactUIProvider
-        themeType={theme}
+        themeType={themeType}
         aspectRatio={{ width, height }}
         theme={{
           colors: {
@@ -169,9 +175,6 @@ function AppRoutes({ getUserToken }) {
     <Router>
       <Notifications />
       <Switch>
-        {/* <Route path="/createRoom">
-              <CreateRoom />
-            </Route> */}
         <Route
           path="/preview/:roomId/:role?"
           render={({ match }) => {

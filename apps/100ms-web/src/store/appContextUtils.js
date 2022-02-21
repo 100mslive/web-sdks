@@ -1,34 +1,15 @@
 import LogRocket from "logrocket";
-import { FeatureFlags } from "./FeatureFlags";
-
-export const convertLoginInfoToJoinConfig = loginInfo => {
-  const joinConfig = {
-    userName: loginInfo.username,
-    authToken: loginInfo.token,
-    metaData: "",
-    initEndpoint: loginInfo.env
-      ? `https://${loginInfo.env.split("-")[0]}-init.100ms.live/init`
-      : "https://prod-init.100ms.live/init",
-    settings: {
-      isAudioMuted: loginInfo.audioMuted,
-      isVideoMuted: loginInfo.videoMuted,
-      audioInputDeviceId: loginInfo.selectedAudioInput,
-      audioOutputDeviceId: loginInfo.selectedAudioOutput,
-      videoDeviceId: loginInfo.selectedVideoInput,
-    },
-    rememberDeviceSelection: true,
-    alwaysRequestPermissions: FeatureFlags.alwaysRequestPermissions(),
-  };
-  console.debug("app: Config is", joinConfig);
-  return joinConfig;
-};
 
 const logRocketKey = process.env.REACT_APP_LOGROCKET_ID;
 let logRocketInitialised;
 export const setUpLogRocket = ({ localPeer, roomId, sessionId }) => {
+  let domain;
+  if (typeof window !== undefined) {
+    domain = window.location.hostname;
+  }
   LogRocket.identify(localPeer.id, {
     name: localPeer.name,
-    email: roomId,
+    email: domain,
     role: localPeer.roleName,
     roomId,
     sessionId,

@@ -1,7 +1,7 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { styled } from '../Theme';
 
-export const Checkbox = styled(CheckboxPrimitive.Root, {
+const CheckboxRoot = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   border: '1px solid $brandDefault',
   width: '$8',
@@ -12,6 +12,7 @@ export const Checkbox = styled(CheckboxPrimitive.Root, {
   justifyContent: 'center',
   boxShadow: 'none',
   outline: 'none',
+  cursor: 'pointer',
   '&:focus': {
     boxShadow: 'none',
     outline: 'none',
@@ -21,12 +22,11 @@ export const Checkbox = styled(CheckboxPrimitive.Root, {
   },
 });
 
-export const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
+const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
   color: '$white',
 });
 
-export const CheckboxLabel = styled('label', {
-  fontSize: '$md',
-  color: '$textPrimary',
-  ml: '$4',
-});
+export const Checkbox = {
+  Root: CheckboxRoot,
+  Indicator: CheckboxIndicator,
+};

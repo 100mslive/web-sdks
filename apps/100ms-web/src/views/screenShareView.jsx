@@ -9,53 +9,43 @@ import {
   selectScreenShareByPeerID,
 } from "@100mslive/react-sdk";
 import { VideoPlayer, ScreenShareDisplay } from "@100mslive/hms-video-react";
-import { Box, Flex } from "@100mslive/react-ui";
+import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
 import { ChatView } from "./components/chatView";
-import { ROLES } from "../common/roles";
 import { chatStyle } from "../common/utils";
 import ScreenshareTile from "./new/ScreenshareTile";
 import VideoList from "./new/VideoList";
 import VideoTile from "./new/VideoTile";
+import { useMedia } from "react-use";
 
 export const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
+  // for smaller screen we will show sidebar in bottom
+  const mediaQueryLg = cssConfig.media.lg;
+  const showSidebarInBottom = useMedia(mediaQueryLg);
   const peers = useHMSStore(selectPeers);
   const localPeer = useHMSStore(selectLocalPeer);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const smallTilePeers = useMemo(
-    () => peers.filter(peer => peer.id !== peerPresenting?.id),
-    [peers, peerPresenting]
-  );
-
-  const amITeacher = localPeer?.roleName.toLowerCase() === ROLES.TEACHER;
-  const isPresenterTeacher =
-    peerPresenting?.roleName.toLowerCase() === ROLES.TEACHER;
+  const isPresenterFromMyRole =
+    peerPresenting?.roleName?.toLowerCase() ===
+    localPeer?.roleName?.toLowerCase();
   const amIPresenting = localPeer && localPeer.id === peerPresenting?.id;
   const showPresenterInSmallTile =
-    amIPresenting || (amITeacher && isPresenterTeacher);
+    showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
 
-  if (
-    showPresenterInSmallTile &&
-    !smallTilePeers.some(peer => peer.id === peerPresenting?.id)
-  ) {
-    if (amIPresenting) {
-      // put presenter on last page
-      smallTilePeers.push(peerPresenting);
-    } else {
-      // put on first page
-      smallTilePeers.unshift(peerPresenting);
+  const smallTilePeers = useMemo(() => {
+    const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
+    if (showPresenterInSmallTile) {
+      smallTilePeers.unshift(peerPresenting); // put presenter on first page
     }
-  }
+    return smallTilePeers;
+  }, [peers, peerPresenting, showPresenterInSmallTile]);
 
   return (
     <Flex
       css={{
         size: "100%",
       }}
-      direction={{
-        "@initial": "row",
-        "@lg": "column",
-      }}
+      direction={showSidebarInBottom ? "column" : "row"}
     >
       <ScreenShareComponent
         showStats={showStats}
@@ -75,6 +65,7 @@ export const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
         }}
       >
         <SidePane
+          showSidebarInBottom={showSidebarInBottom}
           showStats={showStats}
           isChatOpen={isChatOpen}
           toggleChat={toggleChat}
@@ -98,6 +89,7 @@ export const SidePane = ({
   peerScreenSharing, // the peer who is screensharing
   smallTilePeers,
   totalPeers,
+  showSidebarInBottom,
 }) => {
   // The main peer's screenshare is already being shown in center view
   const shouldShowScreenFn = useCallback(
@@ -114,6 +106,7 @@ export const SidePane = ({
         />
       )}
       <SmallTilePeersView
+        showSidebarInBottom={showSidebarInBottom}
         isChatOpen={isChatOpen}
         smallTilePeers={smallTilePeers}
         shouldShowScreenFn={shouldShowScreenFn}
@@ -217,6 +210,7 @@ const SmallTilePeersView = ({
   smallTilePeers,
   shouldShowScreenFn,
   showStatsOnTiles,
+  showSidebarInBottom,
 }) => {
   return (
     <Flex
@@ -227,7 +221,8 @@ const SmallTilePeersView = ({
       {smallTilePeers && smallTilePeers.length > 0 && (
         <VideoList
           peers={smallTilePeers}
-          maxColCount={2}
+          maxColCount={showSidebarInBottom ? undefined : 2}
+          maxRowCount={showSidebarInBottom ? 1 : undefined}
           includeScreenShareForPeer={shouldShowScreenFn}
           showStatsOnTiles={showStatsOnTiles}
         />

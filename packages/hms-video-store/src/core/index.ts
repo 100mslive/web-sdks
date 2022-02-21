@@ -16,6 +16,7 @@ export * from './webrtc-stats';
 
 export type {
   HMSConfig,
+  HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSSimulcastLayer,

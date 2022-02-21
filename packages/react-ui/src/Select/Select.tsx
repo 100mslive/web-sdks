@@ -6,13 +6,11 @@ const Root = styled('div', {
   color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
-  height: '$14',
-  width: 'auto',
-  minWidth: '$40',
   outline: 'none',
   overflow: 'hidden',
   borderRadius: '$1',
   backgroundColor: '$menuBg',
+  maxWidth: '100%',
 });
 
 // TODO: replace these with tokens
@@ -21,14 +19,14 @@ const SelectRoot = styled('select', {
   fontWeight: '500',
   appearance: 'none',
   color: '$textPrimary',
-  width: '100%',
+  padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: 'transparent',
+  backgroundColor: '$bgTertiary',
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandStandard',
+    boxShadow: '0 0 0 3px $colors$brandDefault',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -42,19 +40,21 @@ const Arrow = styled('span', {
   height: '100%',
   position: 'absolute',
   right: 0,
-  pointerVvents: 'none',
+  pointerEvents: 'none',
   display: 'flex',
   alignItems: 'center',
   transition: 'border .2s ease 0s',
 });
 
-// * NOTE: this is temporary implementation waiting for radix-select
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Select: React.FC = ({ children, ...props }: any) => (
-  <Root>
-    <Arrow>
-      <ChevronDownIcon />
-    </Arrow>
-    <SelectRoot {...props}>{children}</SelectRoot>
-  </Root>
+const DefaultDownIcon = ({ ...props }) => (
+  <Arrow {...props}>
+    <ChevronDownIcon />
+  </Arrow>
 );
+
+export const Select = {
+  Root,
+  DownIcon: Arrow,
+  DefaultDownIcon,
+  Select: SelectRoot,
+};
