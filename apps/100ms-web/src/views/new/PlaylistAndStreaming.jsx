@@ -77,7 +77,7 @@ export const PlaylistAndStreaming = () => {
   }
 
   return (
-    <Dropdown open={open} onOpenChange={setOpen}>
+    <Dropdown.Root open={open} onOpenChange={setOpen}>
       <Dropdown.Trigger asChild>
         <Flex
           align="center"
@@ -224,6 +224,6 @@ export const PlaylistAndStreaming = () => {
           </Dropdown.Item>
         )}
       </Dropdown.Content>
-    </Dropdown>
+    </Dropdown.Root>
   );
 };

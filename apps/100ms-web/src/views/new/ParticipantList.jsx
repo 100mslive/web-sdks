@@ -33,7 +33,7 @@ export const ParticipantList = () => {
 
   return (
     <Fragment>
-      <Dropdown open={open} onOpenChange={value => setOpen(value)}>
+      <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
         <Dropdown.Trigger
           css={{
             borderRadius: "$1",
@@ -79,7 +79,7 @@ export const ParticipantList = () => {
             );
           })}
         </Dropdown.Content>
-      </Dropdown>
+      </Dropdown.Root>
       {selectedPeerId && (
         <RoleChangeModal
           peerId={selectedPeerId}
