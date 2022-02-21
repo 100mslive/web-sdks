@@ -4,6 +4,7 @@ import {
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
   selectRolesMap,
+  selectRoom,
   selectTracksMap,
 } from './selectors';
 import { HMSPeer, HMSTrack } from '../schema';
@@ -64,3 +65,14 @@ export const selectPeersByCondition = (predicate: (peer: HMSPeer) => boolean) =>
   createSelector(selectPeers, peers => {
     return peers.filter(predicate);
   });
+
+/**
+ * Returns a boolean to indicate if the local peer joined within the past `timeMs` milliseconds.
+ *
+ * Ex: to know if the local peer joined within the last one second
+ * ```js
+ * const joinedWithinASecond = useHMSStore(selectDidIJoinWithin(1000));
+ * ```
+ */
+export const selectDidIJoinWithin = (timeMs: number) =>
+  createSelector(selectRoom, room => room.joinedAt && Date.now() - room.joinedAt.getTime() <= timeMs);
