@@ -159,3 +159,26 @@
   and maintenance.
   - In rare cases depending on the data being accessed, the store queries
   can be moved to the sub components for increased performance.
+    
+
+
+## Public API Design
+
+Public API should be clear,
+unambiguous, consistent, easy to reason about without going to docs, and have
+all docs available in editor available via intellisense and TSDoc.
+
+- Don't assume order of function calls, no API should be based on assumption of how
+  it's being used.
+- Don't make the developer suffer. Something works on chrome in one go but require
+  sth special in firefox? Do it within SDK. Video Input device can be changed
+  only if video is unmuted? Save the device id when it's changed on muted video
+  and apply later when it is unmuted. Don't throw unnecessary errors, make the sdk
+  smart.
+- Error reporting - For the times when an error has to be thrown make it really
+  descriptive and detailed. There should be no ambiguity for the developer reading
+  the error as to what failed, it should ideally answer - 
+  - Reason of the error
+  - What can be done to fix it
+- Think of how would you document the API in docs while writing it? If it
+  is going to take a wall of text, can you simplify the API?

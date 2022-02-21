@@ -10,7 +10,7 @@ export enum DeviceType {
   audioOutput = 'audioOutput',
 }
 
-type DeviceTypeAndInfo<T> = {
+export type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
 };
 
