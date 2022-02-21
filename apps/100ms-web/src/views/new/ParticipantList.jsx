@@ -14,8 +14,11 @@ import {
   IconButton,
 } from "@100mslive/react-ui";
 import { PeopleIcon, SettingIcon } from "@100mslive/react-icons";
-import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
-import { useParticipantList } from "../hooks/useParticipantList";
+import {
+  selectPermissions,
+  useHMSStore,
+  useParticipantList,
+} from "@100mslive/react-sdk";
 import { RoleChangeModal } from "./RoleChangeModal";
 
 export const ParticipantList = () => {

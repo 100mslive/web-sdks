@@ -24,11 +24,11 @@ import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
-import { useRecordingStreaming } from "../hooks/useRecordingStreaming";
 import { getRecordingText, getStreamingText } from "../../common/utils";
 import { AppContext } from "../../store/AppContext";
 import { DEFAULT_HLS_VIEWER_ROLE } from "../../common/constants";
@@ -63,10 +63,8 @@ const PlaylistAndStreaming = () => {
     isHLSRecordingOn,
     isStreamingOn,
     isHLSRunning,
+    isRecordingOn,
   } = useRecordingStreaming();
-  const isRecordingOn =
-    isServerRecordingOn || isBrowserRecordingOn || isHLSRecordingOn;
-
   if (!playlist && !isRecordingOn && !isStreamingOn) {
     return null;
   }
@@ -249,9 +247,8 @@ const StreamingRecording = () => {
     isHLSRecordingOn,
     isStreamingOn,
     isHLSRunning,
+    isRecordingOn,
   } = useRecordingStreaming();
-  const isRecordingOn =
-    isServerRecordingOn || isBrowserRecordingOn || isHLSRecordingOn;
 
   return (
     <Flex align="center" css={{ mx: "$4", "@lg": { display: "none" } }}>

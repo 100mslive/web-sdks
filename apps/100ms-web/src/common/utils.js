@@ -136,32 +136,6 @@ export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
 };
 
-/**
- * Give array like [
- * { name: 'peer1', id: 1, roleName: 'role1' },
- * { name: 'peer2', id: 2, roleName: 'role2' }
- *]
- * the output will be
- * {
- * 'role1': [{'name': 'peer1', id: 1, roleName: 'role1'}],
- * 'role2': [{ name: 'peer2', id: 2, roleName: 'role2' }]
- * }
- * @param {Array} peers
- * @returns
- */
-export const groupByRoles = peers => {
-  if (!peers || !Array.isArray(peers) || peers.length === 0) {
-    return {};
-  }
-  return peers.reduce((res, peer) => {
-    if (!res[peer.roleName]) {
-      res[peer.roleName] = [];
-    }
-    res[peer.roleName].push(peer);
-    return res;
-  }, {});
-};
-
 export const getRecordingText = (
   { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
   delimiter = ", "

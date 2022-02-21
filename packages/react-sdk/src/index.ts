@@ -14,7 +14,8 @@ export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';
 export { useVideoList } from './hooks/useVideoList';
 export { useAudioLevelStyles } from './hooks/useAudioLevelStyles';
 export { useDevices, DeviceType } from './hooks/useDevices';
-
+export { useParticipantList } from './hooks/useParticipantList';
+export { useRecordingStreaming } from './hooks/useRecordingStreaming';
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreviewJoin';
@@ -23,6 +24,8 @@ export type { useAVToggleResult } from './hooks/useAVToggle';
 export type { useDevicesResult } from './hooks/useDevices';
 export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
+export type { useRecordingStreamingResult } from './hooks/useRecordingStreaming';
+export type { useParticipantListResult } from './hooks/useParticipantList';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';
