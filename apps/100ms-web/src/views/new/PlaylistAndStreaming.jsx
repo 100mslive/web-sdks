@@ -13,9 +13,11 @@ import {
   MusicIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  AudioPlayerIcon,
 } from "@100mslive/react-icons";
 import { useRecordingStreaming } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
+import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
 
 const getRecordingText = (
   { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
@@ -53,13 +55,24 @@ export const PlaylistAndStreaming = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
+  const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
   const isPlaylistInActive = [
     !playlist.peer || !playlist.track,
     !playlist.peer?.isLocal && !playlist.track?.enabled,
     playlist.peer?.isLocal && !playlist.selection,
   ].some(Boolean);
-  if (isPlaylistInActive && !isRecordingOn && !isStreamingOn) {
+  const isScreenshareInActive = [
+    !screenshareAudio.peer || !screenshareAudio.track,
+    !screenshareAudio.peer?.isLocal && !screenshareAudio.track?.enabled,
+  ].some(Boolean);
+
+  if (
+    isPlaylistInActive &&
+    isScreenshareInActive &&
+    !isRecordingOn &&
+    !isStreamingOn
+  ) {
     return null;
   }
 
@@ -74,10 +87,17 @@ export const PlaylistAndStreaming = () => {
             border: "1px solid $textPrimary",
           }}
         >
-          {playlist && (
-            <Tooltip title="Playlist Music">
+          {!isScreenshareInActive && (
+            <Tooltip title="Screenshare Audio">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <MusicIcon width={24} height={24} />
+              </Flex>
+            </Tooltip>
+          )}
+          {!isPlaylistInActive && (
+            <Tooltip title="Playlist Music">
+              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+                <AudioPlayerIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
@@ -148,12 +168,13 @@ export const PlaylistAndStreaming = () => {
             </Text>
           </Dropdown.Item>
         )}
-        {(isRecordingOn || isStreamingOn) && playlist && (
-          <Dropdown.ItemSeparator />
-        )}
-        {playlist && (
+        {(isRecordingOn || isStreamingOn) &&
+          (!isPlaylistInActive || !isScreenshareInActive) && (
+            <Dropdown.ItemSeparator />
+          )}
+        {!isPlaylistInActive && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
-            <MusicIcon width={24} height={24} />
+            <AudioPlayerIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               Playlist is playing
             </Text>
@@ -176,15 +197,30 @@ export const PlaylistAndStreaming = () => {
                 css={{ color: "$error", ml: "$2", cursor: "pointer" }}
                 onClick={e => {
                   e.preventDefault();
-                  playlist.setVolume(
-                    !playlist.track.volume ? 100 : 0,
-                    playlist.track.id
-                  );
+                  playlist.setVolume(!playlist.track.volume ? 100 : 0);
                 }}
               >
                 {playlist.track.volume === 0 ? "Unmute" : "Mute"}
               </Text>
             )}
+          </Dropdown.Item>
+        )}
+        {!isScreenshareInActive && (
+          <Dropdown.Item css={{ color: "$textPrimary" }}>
+            <MusicIcon width={24} height={24} />
+            <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
+              Music is playing
+            </Text>
+            <Text
+              variant="sm"
+              css={{ color: "$error", ml: "$2", cursor: "pointer" }}
+              onClick={e => {
+                e.preventDefault();
+                screenshareAudio.onToggle();
+              }}
+            >
+              {screenshareAudio.muted ? "Unmute" : "Mute"}
+            </Text>
           </Dropdown.Item>
         )}
       </Dropdown.Content>
