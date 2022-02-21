@@ -122,7 +122,27 @@ class Store implements IStore {
   }
 
   getTrackById(trackId: string) {
-    return this.tracks[trackId];
+    const track = this.tracks[trackId];
+    if (track) {
+      return track;
+    }
+    const localPeer = this.getLocalPeer();
+    /**
+     * handle case of audio level coming from server for local peer's track where local peer
+     * didn't initially gave audio permission. So track.firstTrackId is that of dummy track and
+     * this.tracks[trackId] doesn't exist.
+     * Example repro which this solves -
+     * - call preview with audio muted, unmute audio in preview then join the room, now initial
+     * track id is that from dummy track but the track id which server knows will be different
+     */
+    if (localPeer) {
+      if (localPeer.audioTrack?.isPublishedTrackId(trackId)) {
+        return localPeer.audioTrack;
+      } else if (localPeer.videoTrack?.isPublishedTrackId(trackId)) {
+        return localPeer.videoTrack;
+      }
+    }
+    return undefined;
   }
 
   getPeerByTrackId(trackId: string) {
@@ -309,6 +329,7 @@ class Store implements IStore {
       track.cleanup();
     }
     this.config = undefined;
+    this.localPeerId = undefined;
   }
 
   setErrorListener(listener: IErrorListener) {

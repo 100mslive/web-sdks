@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Root = styled('div', {
   backgroundColor: '$statsBg',
@@ -8,10 +8,10 @@ export const Root = styled('div', {
   zIndex: 10,
   borderRadius: '$2',
   padding: '5px',
-  fontSize: '12px',
+  fontSize: '$xs',
   overflowY: 'auto',
   maxHeight: '75%',
-  maxWidth: '75%',
+  maxWidth: '85%',
 });
 
 export const Table = styled('table', {});
@@ -26,12 +26,12 @@ export const Row = styled('tr', {
 });
 
 export const Label = styled('td', {
-  color: '$grey5',
+  color: '$textPrimary',
   fontWeight: 400,
 });
 
 export const Value = styled('td', {
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 interface StatsType {

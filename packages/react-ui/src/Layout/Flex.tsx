@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 /**
  * @see https://tailwindcss.com/docs/space

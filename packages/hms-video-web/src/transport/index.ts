@@ -576,7 +576,7 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    if (this.trackStates.has(track.publishedTrackId)) {
+    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {
       // TODO: hotfix to unpublish replaced video track id, solve it properly

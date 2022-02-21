@@ -1,6 +1,6 @@
 import * as BaseSlider from '@radix-ui/react-slider';
 import React from 'react';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled(BaseSlider.Root, {
   position: 'relative',
@@ -15,7 +15,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$grey3',
+  backgroundColor: '$grayLight',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',
@@ -34,11 +34,12 @@ const Thumb = styled(BaseSlider.Thumb, {
   display: 'block',
   width: 15,
   height: 15,
-  backgroundColor: 'white',
-  boxShadow: `0 2px 10px $colors$grey4`,
+  backgroundColor: '$white',
+  cursor: 'pointer',
+  boxShadow: `0 2px 10px $colors$grayDefault`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: '$grey6' },
-  '&:focus': { boxShadow: `0 0 0 5px $colors$grey2` },
+  '&:hover': { backgroundColor: '$white' },
+  '&:focus': { boxShadow: 'none' },
 });
 
 type SliderProps = React.ComponentProps<typeof Root>;

@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
 /**
@@ -9,7 +9,7 @@ import { flexCenter } from '../utils/styles';
  */
 const getButtonVariants = (base: string, hover: string, active: string) => ({
   bg: base,
-  c: 'white',
+  c: '$white',
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'not-allowed',
@@ -29,25 +29,25 @@ export const Button = styled('button', {
   border: 'none',
   fs: '$md',
   r: '$1',
-  backgroundColor: '$brandMain',
+  backgroundColor: '$brandDefault',
   fontWeight: '500',
-  p: '$2 $4',
+  p: '$4 $8',
   '&:focus': {
     outline: 'none',
   },
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandMain',
+    boxShadow: '0 0 0 3px $colors$brandDefault',
   },
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$grey2', '$grey3', '$grey4'),
-      danger: getButtonVariants('$redMain', '$redTint', '$redTint'),
-      primary: getButtonVariants('$brandMain', '$brandTint', '$brandTint'),
+      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
+      danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
+      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight'),
     },
     icon: {
       true: {
-        gap: '$2',
+        gap: '$4',
       },
     },
   },

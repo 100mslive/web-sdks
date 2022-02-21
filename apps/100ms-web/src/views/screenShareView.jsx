@@ -9,58 +9,43 @@ import {
   selectScreenShareByPeerID,
 } from "@100mslive/react-sdk";
 import { VideoPlayer, ScreenShareDisplay } from "@100mslive/hms-video-react";
-import { Box, Flex } from "@100mslive/react-ui";
+import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
 import { ChatView } from "./components/chatView";
-import { ROLES } from "../common/roles";
-import { chatStyle, getBlurClass } from "../common/utils";
+import { chatStyle } from "../common/utils";
 import ScreenshareTile from "./new/ScreenshareTile";
 import VideoList from "./new/VideoList";
 import VideoTile from "./new/VideoTile";
+import { useMedia } from "react-use";
 
-export const ScreenShareView = ({
-  showStats,
-  isChatOpen,
-  toggleChat,
-  isParticipantListOpen,
-}) => {
+export const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
+  // for smaller screen we will show sidebar in bottom
+  const mediaQueryLg = cssConfig.media.lg;
+  const showSidebarInBottom = useMedia(mediaQueryLg);
   const peers = useHMSStore(selectPeers);
   const localPeer = useHMSStore(selectLocalPeer);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const smallTilePeers = useMemo(
-    () => peers.filter(peer => peer.id !== peerPresenting?.id),
-    [peers, peerPresenting]
-  );
-
-  const amITeacher = localPeer?.roleName.toLowerCase() === ROLES.TEACHER;
-  const isPresenterTeacher =
-    peerPresenting?.roleName.toLowerCase() === ROLES.TEACHER;
+  const isPresenterFromMyRole =
+    peerPresenting?.roleName?.toLowerCase() ===
+    localPeer?.roleName?.toLowerCase();
   const amIPresenting = localPeer && localPeer.id === peerPresenting?.id;
   const showPresenterInSmallTile =
-    amIPresenting || (amITeacher && isPresenterTeacher);
+    showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
 
-  if (
-    showPresenterInSmallTile &&
-    !smallTilePeers.some(peer => peer.id === peerPresenting?.id)
-  ) {
-    if (amIPresenting) {
-      // put presenter on last page
-      smallTilePeers.push(peerPresenting);
-    } else {
-      // put on first page
-      smallTilePeers.unshift(peerPresenting);
+  const smallTilePeers = useMemo(() => {
+    const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
+    if (showPresenterInSmallTile) {
+      smallTilePeers.unshift(peerPresenting); // put presenter on first page
     }
-  }
+    return smallTilePeers;
+  }, [peers, peerPresenting, showPresenterInSmallTile]);
 
   return (
     <Flex
       css={{
         size: "100%",
       }}
-      direction={{
-        "@initial": "row",
-        "@lg": "column",
-      }}
+      direction={showSidebarInBottom ? "column" : "row"}
     >
       <ScreenShareComponent
         showStats={showStats}
@@ -72,7 +57,7 @@ export const ScreenShareView = ({
         direction={{ "@initial": "column", "@lg": "row" }}
         css={{
           overflow: "hidden",
-          p: "$2",
+          p: "$4",
           flex: "0 0 20%",
           "@lg": {
             flex: "1 1 0",
@@ -80,13 +65,13 @@ export const ScreenShareView = ({
         }}
       >
         <SidePane
+          showSidebarInBottom={showSidebarInBottom}
           showStats={showStats}
           isChatOpen={isChatOpen}
           toggleChat={toggleChat}
           peerScreenSharing={peerPresenting}
           isPresenterInSmallTiles={showPresenterInSmallTile}
           smallTilePeers={smallTilePeers}
-          isParticipantListOpen={isParticipantListOpen}
           totalPeers={peers.length}
         />
       </Flex>
@@ -103,8 +88,8 @@ export const SidePane = ({
   isPresenterInSmallTiles,
   peerScreenSharing, // the peer who is screensharing
   smallTilePeers,
-  isParticipantListOpen,
   totalPeers,
+  showSidebarInBottom,
 }) => {
   // The main peer's screenshare is already being shown in center view
   const shouldShowScreenFn = useCallback(
@@ -121,6 +106,7 @@ export const SidePane = ({
         />
       )}
       <SmallTilePeersView
+        showSidebarInBottom={showSidebarInBottom}
         isChatOpen={isChatOpen}
         smallTilePeers={smallTilePeers}
         shouldShowScreenFn={shouldShowScreenFn}
@@ -129,7 +115,6 @@ export const SidePane = ({
       <CustomChatView
         isChatOpen={isChatOpen}
         toggleChat={toggleChat}
-        isParticipantListOpen={isParticipantListOpen}
         totalPeers={totalPeers}
       />
     </Fragment>
@@ -151,7 +136,7 @@ const ScreenShareComponent = ({
     return (
       <Box
         css={{
-          mx: "$2",
+          mx: "$4",
           flex: "3 1 0",
           "@lg": {
             flex: "2 1 0",
@@ -170,9 +155,9 @@ const ScreenShareComponent = ({
     <Box
       css={{
         flex: "3 1 0",
-        mx: "$2",
-        ml: "$3",
-        "@lg": { ml: "$2" },
+        mx: "$4",
+        ml: "$5",
+        "@lg": { ml: "$4" },
       }}
     >
       {peerPresenting &&
@@ -198,16 +183,10 @@ const ScreenShareComponent = ({
   );
 };
 
-const CustomChatView = ({
-  isChatOpen,
-  toggleChat,
-  isParticipantListOpen,
-  totalPeers,
-}) => {
+const CustomChatView = ({ isChatOpen, toggleChat, totalPeers }) => {
   return (
     isChatOpen && (
       <Box
-        className={getBlurClass(isParticipantListOpen, totalPeers)}
         css={{
           h: "45%",
           flexShrink: 0,
@@ -231,6 +210,7 @@ const SmallTilePeersView = ({
   smallTilePeers,
   shouldShowScreenFn,
   showStatsOnTiles,
+  showSidebarInBottom,
 }) => {
   return (
     <Flex
@@ -241,7 +221,8 @@ const SmallTilePeersView = ({
       {smallTilePeers && smallTilePeers.length > 0 && (
         <VideoList
           peers={smallTilePeers}
-          maxColCount={2}
+          maxColCount={showSidebarInBottom ? undefined : 2}
+          maxRowCount={showSidebarInBottom ? 1 : undefined}
           includeScreenShareForPeer={shouldShowScreenFn}
           showStatsOnTiles={showStatsOnTiles}
         />
@@ -256,9 +237,9 @@ const LargeTilePeerView = ({ peerScreenSharing, showStatsOnTiles }) => {
       css={{
         flex: "1 1 0",
         minHeight: "25%",
-        py: "$2",
+        py: "$4",
         "@lg": {
-          mr: "$2",
+          mr: "$4",
           minHeight: "unset",
           py: 0,
         },
