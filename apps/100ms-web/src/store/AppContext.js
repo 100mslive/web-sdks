@@ -12,7 +12,6 @@ import {
   convertLoginInfoToJoinConfig,
   normalizeAppPolicyConfig,
   setUpLogRocket,
-  useDidIJoinRecently,
 } from "./appContextUtils";
 import { getBackendEndpoint } from "../services/tokenService";
 import {
@@ -87,7 +86,6 @@ const AppContextProvider = ({
   const localPeer = useHMSStore(selectLocalPeer);
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
-  const didIJoinRecently = useDidIJoinRecently();
   const sessionId = useHMSStore(selectSessionId);
   const appPolicyConfig = useMemo(
     () => normalizeAppPolicyConfig(roleNames, rolesMap, policyConfig),
@@ -223,7 +221,6 @@ const AppContextProvider = ({
         audioPlaylist,
         videoPlaylist,
         logo,
-        didIJoinRecently,
       }}
     >
       {children}
