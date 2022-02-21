@@ -118,16 +118,18 @@ const ParticipantListInARole = ({
       {participants.map(peer => {
         return (
           <Dropdown.Item key={peer.id} css={{ w: "100%", h: "$14" }}>
-            <Avatar
-              shape="square"
-              name={peer.name}
-              css={{
-                position: "unset",
-                transform: "unset",
-                mr: "$4",
-                fontSize: "$sm",
-              }}
-            />
+            <Box css={{ width: "$13" }}>
+              <Avatar
+                shape="square"
+                name={peer.name}
+                css={{
+                  position: "unset",
+                  transform: "unset",
+                  mr: "$4",
+                  fontSize: "$sm",
+                }}
+              />
+            </Box>
             <Text variant="md" css={{ ...textEllipsis(150), flex: "1 1 0" }}>
               {peer.name}
             </Text>
