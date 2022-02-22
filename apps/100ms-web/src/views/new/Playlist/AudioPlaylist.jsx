@@ -36,7 +36,7 @@ export const AudioPlaylist = () => {
           align="center"
           css={{
             p: "$4 $8",
-            borderBottom: "1px solid $borderDefault",
+            borderBottom: "1px solid $borderLight",
           }}
         >
           <Text variant="md" css={{ flex: "1 1 0" }}>
