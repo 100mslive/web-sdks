@@ -6,6 +6,7 @@ const DropdownRoot = styled(Root, {});
 const DropdownTrigger = styled(Trigger, {
   padding: '$2 $4',
   cursor: 'pointer',
+  appearance: 'none !important',
   '&[data-state="open"]': {
     backgroundColor: '$menuBg',
     borderRadius: '$1',

@@ -1,4 +1,4 @@
-import { Root, Trigger } from '@radix-ui/react-dialog';
+import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
 import {
   DialogClose,
@@ -6,13 +6,14 @@ import {
   DialogTitle,
   StyledDialogContent,
   StyledDialogOverlay,
+  StyledDialogTrigger,
 } from './DialogContent';
 
 const StyledDialog = styled(Root, {});
 
 export const Dialog = {
   Root: StyledDialog,
-  Trigger: Trigger,
+  Trigger: StyledDialogTrigger,
   Overlay: StyledDialogOverlay,
   Content: StyledDialogContent,
   Title: DialogTitle,
