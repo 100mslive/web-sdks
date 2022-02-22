@@ -45,23 +45,42 @@ export const PlaylistControls = ({ type }) => {
     type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
   const active = useHMSStore(selector.selectedItem);
   const selection = useHMSStore(selector.selection);
+  const hmsActions = useHMSActions();
+  const playlistAction =
+    type === HMSPlaylistType.audio
+      ? hmsActions.audioPlaylist
+      : hmsActions.videoPlaylist;
   if (!active) {
     return null;
   }
   return (
     <Box css={{ p: "$8", borderTop: "1px solid $borderLight" }}>
       <Flex justify="center">
-        <IconButton disabled={!selection.hasPrevious}>
+        <IconButton
+          disabled={!selection.hasPrevious}
+          onClick={() => {
+            playlistAction.playPrevious();
+          }}
+        >
           <PrevIcon />
         </IconButton>
-        <IconButton>
+        <IconButton
+          onClick={() => {
+            active.playing ? playlistAction.pause() : playlistAction.play();
+          }}
+        >
           {active.playing ? (
             <PauseIcon width={32} height={32} />
           ) : (
             <PlayIcon width={32} height={32} />
           )}
         </IconButton>
-        <IconButton disabled={!selection.hasNext}>
+        <IconButton
+          disabled={!selection.hasNext}
+          onClick={() => {
+            playlistAction.playNext();
+          }}
+        >
           <NextIcon />
         </IconButton>
       </Flex>
