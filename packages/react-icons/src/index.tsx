@@ -36,6 +36,7 @@ export { default as PencilDrawIcon } from './PencilDrawIcon';
 export { default as PeopleIcon } from './PeopleIcon';
 export { default as PersonIcon } from './PersonIcon';
 export { default as PlayIcon } from './PlayIcon';
+export { default as PlaylistIcon } from './PlaylistIcon';
 export { default as PoorConnectivityIcon } from './PoorConnectivityIcon';
 export { default as PrevIcon } from './PrevIcon';
 export { default as RecordIcon } from './RecordIcon';
