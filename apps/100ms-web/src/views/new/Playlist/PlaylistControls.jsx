@@ -11,6 +11,7 @@ import {
   NextIcon,
   PlayIcon,
   PauseIcon,
+  PlaylistIcon,
 } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Slider, Text } from "@100mslive/react-ui";
 
@@ -39,7 +40,7 @@ const PlaylistProgress = ({ type, duration }) => {
   );
 };
 
-export const PlaylistControls = ({ type }) => {
+export const PlaylistControls = ({ type, onToggle }) => {
   const selector =
     type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
   const active = useHMSStore(selector.selectedItem);
@@ -87,10 +88,17 @@ export const PlaylistControls = ({ type }) => {
       </Flex>
       <PlaylistProgress type={type} duration={active.duration} />
       <Box css={{ mt: "$8" }}>
-        <Text variant="md">{active.name}</Text>
-        {active.metadata?.description && (
-          <Text variant="xs">{active.metadata?.description}</Text>
-        )}
+        <Flex justify="between" css={{ w: "100%" }}>
+          <Box>
+            <Text variant="md">{active.name}</Text>
+            {active.metadata?.description && (
+              <Text variant="xs">{active.metadata?.description}</Text>
+            )}
+          </Box>
+          <IconButton onClick={onToggle} css={{ alignSelf: "center" }}>
+            <PlaylistIcon />
+          </IconButton>
+        </Flex>
       </Box>
     </Box>
   );

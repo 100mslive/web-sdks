@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { AudioPlayerIcon, CrossIcon } from "@100mslive/react-icons";
-import { Dropdown, IconButton, Text, Flex, Tooltip } from "@100mslive/react-ui";
+import {
+  Dropdown,
+  IconButton,
+  Text,
+  Flex,
+  Tooltip,
+  Box,
+} from "@100mslive/react-ui";
 import {
   HMSPlaylistType,
   selectAudioPlaylist,
@@ -15,6 +22,7 @@ export const AudioPlaylist = () => {
   const active = useHMSStore(selectAudioPlaylist.selectedItem);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
+  const [collapse, setCollapse] = useState(false);
 
   if (playlist.length === 0) {
     return null;
@@ -63,19 +71,26 @@ export const AudioPlaylist = () => {
             <CrossIcon width={24} height={24} />
           </IconButton>
         </Flex>
-        {playlist.map(playlistItem => {
-          return (
-            <PlaylistItem
-              key={playlistItem.id}
-              {...playlistItem}
-              onClick={e => {
-                e.preventDefault();
-                hmsActions.audioPlaylist.play(playlistItem.id);
-              }}
-            />
-          );
-        })}
-        <PlaylistControls type={HMSPlaylistType.audio} />
+        {!collapse && (
+          <Box css={{ maxHeight: "$96", overflowY: "auto" }}>
+            {playlist.map(playlistItem => {
+              return (
+                <PlaylistItem
+                  key={playlistItem.id}
+                  {...playlistItem}
+                  onClick={e => {
+                    e.preventDefault();
+                    hmsActions.audioPlaylist.play(playlistItem.id);
+                  }}
+                />
+              );
+            })}
+          </Box>
+        )}
+        <PlaylistControls
+          type={HMSPlaylistType.audio}
+          onToggle={() => setCollapse(value => !value)}
+        />
       </Dropdown.Content>
     </Dropdown.Root>
   );
