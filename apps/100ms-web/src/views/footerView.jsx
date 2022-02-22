@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import {
   ControlBar,
-  AudioPlaylist as ReactAudioPlaylist,
   Button,
   VideoPlaylistIcon,
   MessageModal,
@@ -129,12 +128,6 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
-  isAllowedToPublish.screen &&
-    leftComponents.push(
-      <Box css={{ "@md": { display: "none" } }} key="audioPlaylist">
-        <ReactAudioPlaylist />
-      </Box>
-    );
   isAllowedToPublish.screen &&
     leftComponents.push(
       <Box css={{ "@md": { display: "none" } }} key="audioPlaylistNew">
