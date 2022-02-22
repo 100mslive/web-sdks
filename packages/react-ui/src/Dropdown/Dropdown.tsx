@@ -10,6 +10,9 @@ const DropdownTrigger = styled(Trigger, {
     backgroundColor: '$menuBg',
     borderRadius: '$1',
   },
+  '&:focus': {
+    outline: 'none',
+  },
 });
 
 const DropdownItem = styled(Item, {
