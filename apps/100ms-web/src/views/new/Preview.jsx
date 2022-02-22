@@ -121,7 +121,7 @@ const PreviewTile = ({ name }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        aspectRatio: 1.5,
+        aspectRatio: width / height,
         width: "unset",
         height: "min(360px, 60vh)",
         "@sm": {
