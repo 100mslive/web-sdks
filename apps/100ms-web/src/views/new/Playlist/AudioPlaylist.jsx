@@ -66,6 +66,7 @@ export const AudioPlaylist = () => {
                 hmsActions.audioPlaylist.stop();
               }
               setOpen(false);
+              setCollapse(false);
             }}
           >
             <CrossIcon width={24} height={24} />
