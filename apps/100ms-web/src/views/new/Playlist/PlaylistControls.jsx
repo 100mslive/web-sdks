@@ -53,7 +53,7 @@ export const PlaylistControls = ({ type }) => {
     return null;
   }
   return (
-    <Box css={{ p: "$8", borderTop: "1px solid $borderLight" }}>
+    <Box css={{ p: "$8", borderTop: "1px solid $borderLight", bg: "$menuBg" }}>
       <Flex justify="center">
         <IconButton
           disabled={!selection.hasPrevious}
