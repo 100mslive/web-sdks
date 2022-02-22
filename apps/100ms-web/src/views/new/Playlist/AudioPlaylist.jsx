@@ -34,12 +34,16 @@ export const AudioPlaylist = () => {
       >
         <Flex
           align="center"
-          css={{ p: "$4 $8", borderBottom: "1px solid $borderDefault" }}
+          css={{
+            p: "$4 $8",
+            borderBottom: "1px solid $borderDefault",
+          }}
         >
           <Text variant="md" css={{ flex: "1 1 0" }}>
             Audio Player
           </Text>
           <IconButton
+            css={{ mr: "-$4" }}
             onClick={() => {
               if (active) {
                 hmsActions.audioPlaylist.stop();
