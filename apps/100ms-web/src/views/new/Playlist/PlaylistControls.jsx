@@ -33,7 +33,6 @@ const PlaylistProgress = ({ type, duration }) => {
       step={1}
       value={[progress]}
       onValueChange={e => {
-        console.log(e[0]);
         playlistAction.seekTo(e[0] * 0.01 * duration);
       }}
     />
