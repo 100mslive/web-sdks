@@ -28,6 +28,7 @@ export const PlaylistItem = React.memo(
           p: "$8",
           "&:hover": {
             cursor: "pointer",
+            bg: "$menuBg",
           },
         }}
         onClick={onClick}
