@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import {
   ControlBar,
-  AudioPlaylist,
+  AudioPlaylist as ReactAudioPlaylist,
   Button,
   VideoPlaylistIcon,
   MessageModal,
@@ -36,6 +36,7 @@ import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
 import { FeatureFlags } from "../store/FeatureFlags";
 import { ToggleWhiteboard } from "./whiteboard";
+import { AudioPlaylist } from "./new/Playlist/AudioPlaylist";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -131,6 +132,12 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   isAllowedToPublish.screen &&
     leftComponents.push(
       <Box css={{ "@md": { display: "none" } }} key="audioPlaylist">
+        <ReactAudioPlaylist />
+      </Box>
+    );
+  isAllowedToPublish.screen &&
+    leftComponents.push(
+      <Box css={{ "@md": { display: "none" } }} key="audioPlaylistNew">
         <AudioPlaylist />
       </Box>
     );

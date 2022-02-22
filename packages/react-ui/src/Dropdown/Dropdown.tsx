@@ -20,6 +20,9 @@ const DropdownItem = styled(Item, {
   backgroundColor: '$menuBg',
   display: 'flex',
   alignItems: 'center',
+  '&:hover': {
+    cursor: 'pointer',
+  },
 });
 
 const DropdownItemSeparator = styled(Separator, {
