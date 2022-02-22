@@ -8,24 +8,21 @@ import {
   selectPeerSharingVideoPlaylist,
   selectRoomState,
   selectLocalPeer,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
 import { ScreenShareView } from "./screenShareView";
 import { MainGridView } from "./mainGridView";
 import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
 import { AppContext } from "../store/AppContext";
-import { metadataProps as videoTileProps } from "../common/utils";
+import { useWhiteboardMetadata, WhiteboardView } from "./whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 
-export const ConferenceMainView = ({
-  isChatOpen,
-  toggleChat,
-  isParticipantListOpen,
-}) => {
+export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
+  const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
   const hmsActions = useHMSActions();
@@ -57,6 +54,8 @@ export const ConferenceMainView = ({
   let ViewComponent;
   if (localPeer.roleName === HLS_VIEWER_ROLE) {
     ViewComponent = HLSView;
+  } else if (whiteboardShared) {
+    ViewComponent = WhiteboardView;
   } else if (
     (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
     peerSharingPlaylist
@@ -75,11 +74,6 @@ export const ConferenceMainView = ({
         toggleChat={toggleChat}
         role={localPeer.roleName}
         showStats={showStatsOnTiles}
-        isParticipantListOpen={isParticipantListOpen}
-        videoTileProps={(peer, track) => ({
-          ...videoTileProps(peer, track),
-          showStats: showStatsOnTiles,
-        })}
       />
     )
   );

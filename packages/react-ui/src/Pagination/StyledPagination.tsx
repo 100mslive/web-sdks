@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled('div', {
   height: '2rem',
@@ -13,12 +13,12 @@ const Root = styled('div', {
 });
 
 const Chevron = styled('button', {
-  color: '$fg',
+  color: '$textPrimary',
   '&:focus': {
     outline: 'none',
   },
   '&[disabled]': {
-    color: '$grey4',
+    color: '$grayDefault',
     cursor: 'not-allowed',
   },
 });
@@ -39,11 +39,11 @@ const Dot = styled('button', {
   borderRadius: '9999px',
   width: '0.5rem',
   height: '0.5rem',
-  backgroundColor: '$grey3',
+  backgroundColor: '$grayDark',
   variants: {
     active: {
       true: {
-        backgroundColor: '$grey7',
+        backgroundColor: '$grayDisabled',
       },
     },
   },

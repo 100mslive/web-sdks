@@ -1,5 +1,5 @@
 import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
-import { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
@@ -11,7 +11,7 @@ import HMSLogger from '../utils/logger';
  * goes out of view to save on bandwidth.
  * @param trackId {HMSTrackID}
  */
-export const useVideo = (trackId: HMSTrackID) => {
+export const useVideo = (trackId: HMSTrackID): React.RefCallback<HTMLVideoElement> => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectTrackByID(trackId));
@@ -27,7 +27,7 @@ export const useVideo = (trackId: HMSTrackID) => {
 
   useEffect(() => {
     (async () => {
-      if (videoRef.current && track) {
+      if (videoRef.current && track?.id) {
         if (inView) {
           if (track.enabled) {
             // attach when in view and enabled
@@ -42,7 +42,9 @@ export const useVideo = (trackId: HMSTrackID) => {
         }
       }
     })();
-  }, [inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins]);
+  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins]);
+
+  // detach on unmount
   useEffect(() => {
     return () => {
       (async () => {
@@ -56,6 +58,7 @@ export const useVideo = (trackId: HMSTrackID) => {
         }
       })();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return setRefs;

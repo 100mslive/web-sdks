@@ -197,8 +197,12 @@ export const getTileSizesWithColConstraint = ({
     Math.ceil(Math.sqrt((count * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
     maxCount,
   );
-  const width = parentWidth / cols;
-  const height = width / (aspectRatio.width / aspectRatio.height);
+  let width = parentWidth / cols;
+  let height = width / (aspectRatio.width / aspectRatio.height);
+  if (height > parentHeight) {
+    height = parentHeight;
+    width = height / (aspectRatio.height / aspectRatio.width);
+  }
   const rows = Math.floor(parentHeight / height);
   defaultHeight = height;
   defaultWidth = width;
@@ -210,8 +214,12 @@ export const getTileSizesWithColConstraint = ({
       Math.ceil(Math.sqrt((tilesinLastPage * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
       maxCount,
     );
-    const width = parentWidth / cols;
-    const height = width / (aspectRatio.width / aspectRatio.height);
+    let width = parentWidth / cols;
+    let height = width / (aspectRatio.width / aspectRatio.height);
+    if (height > parentHeight) {
+      height = parentHeight;
+      width = height / (aspectRatio.height / aspectRatio.width);
+    }
     lastPageHeight = height;
     lastPageWidth = width;
   }
@@ -407,34 +415,42 @@ export function calculateLayoutSizes({
   };
 }
 
+/**
+ * given list of peers and all tracks in the room, get a list of tile objects to show in the UI
+ * @param peers
+ * @param tracks
+ * @param includeScreenShareForPeer - fn will be called to check whether to include screenShare for the peer in returned tiles
+ * @param filterNonPublishingPeers - by default a peer with no tracks won't be counted towards final tiles
+ */
 export const getVideoTracksFromPeers = (
   peers: HMSPeer[],
   tracks: Record<HMSTrackID, HMSTrack>,
-  showScreenFn: (peer: HMSPeer) => boolean,
+  includeScreenShareForPeer: (peer: HMSPeer) => boolean,
   filterNonPublishingPeers = true,
 ) => {
-  if (!peers || !tracks || !showScreenFn) {
+  if (!peers || !tracks || !includeScreenShareForPeer) {
     return [];
   }
-  const videoTracks: TrackWithPeer[] = [];
+  const peerTiles: TrackWithPeer[] = [];
   for (const peer of peers) {
-    if (peer.videoTrack === undefined && peer.audioTrack && tracks[peer.audioTrack]) {
-      videoTracks.push({ peer: peer });
+    const onlyAudioTrack = peer.videoTrack === undefined && peer.audioTrack && tracks[peer.audioTrack];
+    if (onlyAudioTrack) {
+      peerTiles.push({ peer: peer });
     } else if (peer.videoTrack && tracks[peer.videoTrack]) {
-      videoTracks.push({ track: tracks[peer.videoTrack], peer: peer });
-    } else if (showScreenFn(peer) && peer.auxiliaryTracks.length > 0) {
+      peerTiles.push({ track: tracks[peer.videoTrack], peer: peer });
+    } else if (!filterNonPublishingPeers) {
+      peerTiles.push({ peer: peer });
+    }
+    if (includeScreenShareForPeer(peer) && peer.auxiliaryTracks.length > 0) {
       const screenShareTrackID = peer.auxiliaryTracks.find(trackID => {
         const track = tracks[trackID];
         return track?.type === 'video' && track?.source === 'screen';
       });
-
       // Don't show tile if screenshare only has audio
       if (screenShareTrackID) {
-        videoTracks.push({ track: tracks[screenShareTrackID], peer: peer });
+        peerTiles.push({ track: tracks[screenShareTrackID], peer: peer });
       }
-    } else if (!filterNonPublishingPeers) {
-      videoTracks.push({ peer: peer });
     }
   }
-  return videoTracks;
+  return peerTiles;
 };

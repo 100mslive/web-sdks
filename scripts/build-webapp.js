@@ -13,10 +13,12 @@ async function main() {
       }
     });
   }
+  require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/App.js';
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
+  const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
     PostCssPlugin.default({
       plugins: [tailwindcss, autoprefixer],
@@ -32,16 +34,17 @@ async function main() {
       format: 'cjs',
       target: 'es6',
       external,
-      metafile: true,
+      metafile: false,
       loader,
       plugins,
+      define,
     });
 
     const esmResult = esbuild.build({
       entryPoints: [source],
       outfile: 'dist/index.js',
       assetNames: '[name]',
-      minify: true,
+      minify: false,
       bundle: true,
       format: 'esm',
       target: 'es6',
@@ -49,6 +52,7 @@ async function main() {
       metafile: true,
       loader,
       plugins,
+      define,
     });
 
     let esmSize = 0;

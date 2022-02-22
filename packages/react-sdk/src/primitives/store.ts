@@ -1,9 +1,12 @@
 import { EqualityChecker, StateSelector } from 'zustand';
 import React, { useContext } from 'react';
 import shallow from 'zustand/shallow';
-import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore } from '@100mslive/hms-video-store';
+import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore, IStoreReadOnly } from '@100mslive/hms-video-store';
 import HMSLogger from '../utils/logger';
-import { IHMSReactStore } from './types';
+
+export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
+  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
+}
 
 export const hooksErrorMessage =
   'It seems like you forgot to add your component within a top level HMSRoomProvider, please refer to 100ms react docs(https://docs.100ms.live/javascript/v2/features/integration#react-hooks) to check on the required steps for using this hook.';
@@ -36,7 +39,7 @@ export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderPro
 }
 
 export function makeHMSStatsStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
-  const useHMSStore = <StateSlice>(
+  const useHMSStatsStore = <StateSlice>(
     selector: StateSelector<HMSStatsStore, StateSlice>,
     equalityFn: EqualityChecker<StateSlice> = shallow,
   ) => {
@@ -52,5 +55,5 @@ export function makeHMSStatsStoreHook(hmsContext: React.Context<HMSContextProvid
     const useStore = HMSContextConsumer.statsStore;
     return useStore?.(selector, equalityFn);
   };
-  return useHMSStore;
+  return useHMSStatsStore;
 }

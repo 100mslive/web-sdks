@@ -53,6 +53,7 @@ import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -335,6 +336,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData || '' },
         config.initEndpoint,
         config.autoVideoSubscribe,
+        window.HMS?.SERVER_SUB_DEGRADE || false,
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
@@ -481,6 +483,13 @@ export class HMSSdk implements HMSInterface {
     }
 
     const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
+    if (!this.localPeer) {
+      HMSLogger.d(this.TAG, 'Screenshared when not connected');
+      tracks.forEach(track => {
+        track.cleanup();
+      });
+      return;
+    }
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
@@ -741,15 +750,17 @@ export class HMSSdk implements HMSInterface {
   }
 
   private initPreviewTrackAudioLevelMonitor() {
-    this.localPeer?.audioTrack?.initAudioLevelMonitor();
+    const localAudioTrack = this.localPeer?.audioTrack;
+    localAudioTrack?.initAudioLevelMonitor();
     this.eventBus.trackAudioLevelUpdate.subscribe(audioLevelUpdate => {
       const hmsSpeakers =
-        audioLevelUpdate && audioLevelUpdate.track.trackId === this.localPeer?.audioTrack?.trackId
-          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: this.localPeer?.audioTrack! }]
+        audioLevelUpdate && audioLevelUpdate.track.trackId === localAudioTrack?.trackId
+          ? [{ audioLevel: audioLevelUpdate.audioLevel, peer: this.localPeer!, track: localAudioTrack! }]
           : [];
       this.store.updateSpeakers(hmsSpeakers);
       this.audioListener?.onAudioLevelUpdate(hmsSpeakers);
     });
+    this.eventBus.localAudioSilence.subscribe(this.sendAudioPresenceFailed);
   }
 
   private get publishParams() {
@@ -907,4 +918,13 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
+
+  private sendAudioPresenceFailed = () => {
+    const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
+    analyticsEventsService
+      .queue(AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput))
+      .flush();
+    // @TODO: start sending if error is less frequent
+    // this.listener?.onError(error);
+  };
 }

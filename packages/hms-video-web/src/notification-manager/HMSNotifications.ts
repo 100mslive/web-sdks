@@ -2,6 +2,7 @@ import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
 import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { HMSSimulcastLayer } from '../interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -9,11 +10,26 @@ import { HMSLocalTrack } from '../media/tracks';
  * which will call the corresponding HMSUpdateListener callbacks.
  */
 
+export interface ServerError {
+  code: number;
+  message?: string;
+}
+
 export interface TrackStateNotification {
   tracks: {
     [track_id: string]: TrackState;
   };
   peer: PeerNotificationInfo;
+}
+
+export interface OnTrackLayerUpdateNotification {
+  tracks: {
+    [track_id: string]: {
+      current_layer: HMSSimulcastLayer;
+      expected_layer: HMSSimulcastLayer;
+      track_id: string;
+    };
+  };
 }
 
 export interface PeerNotificationInfo {
@@ -51,7 +67,7 @@ export class TrackState implements Track {
     this.description = '';
     if (track instanceof HMSTrack) {
       this.mute = !track.enabled;
-      this.track_id = track.publishedTrackId;
+      this.track_id = track.publishedTrackId!;
       this.stream_id = track.stream.id;
     } else {
       this.mute = track.mute;
@@ -72,9 +88,9 @@ export interface PeerNotification {
 
 export interface RoomState {
   name: string;
-  session_id: string;
-  started_at: number;
-  recording: {
+  session_id?: string;
+  started_at?: number;
+  recording?: {
     sfu: {
       started_at?: number;
       enabled: boolean;
@@ -84,7 +100,7 @@ export interface RoomState {
       enabled: boolean;
     };
   };
-  streaming: {
+  streaming?: {
     enabled: boolean;
     rtmp: { enabled: boolean; started_at?: number };
     hls: HLSNotification;
@@ -101,7 +117,7 @@ export interface PeerListNotification {
 export interface PeriodicRoomState {
   peer_count: number;
   room: RoomState;
-  peers: {
+  peers?: {
     [peer_id: string]: PeerNotification;
   };
 }
@@ -178,16 +194,23 @@ export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
   peer: PeerNotificationInfo;
+  error?: ServerError;
 }
 
 export interface RTMPNotification {
   peer: PeerNotificationInfo;
   started_at?: number;
+  error?: ServerError;
 }
 
 export interface HLSNotification {
   enabled: boolean;
   variants: Array<HLSVariantInfo>;
+  error?: ServerError;
+  hls_recording?: {
+    hls_vod: boolean;
+    single_file_per_layer: boolean;
+  };
 }
 
 export interface HLSVariantInfo {

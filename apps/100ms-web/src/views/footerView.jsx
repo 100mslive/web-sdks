@@ -1,27 +1,26 @@
 import { useState, useCallback } from "react";
 import {
-  useHMSStore,
   ControlBar,
-  AudioPlaylist,
   Button,
-  VideoPlaylistIcon,
-  VerticalDivider,
   MessageModal,
+  VideoPlaylist,
+} from "@100mslive/hms-video-react";
+import {
   useHMSActions,
+  useHMSStore,
   selectIsLocalScreenShared,
   selectUnreadHMSMessagesCount,
   selectIsAllowedToPublish,
   selectLocalPeerID,
   selectScreenSharesByPeerId,
   selectVideoPlaylist,
-  VideoPlaylist,
   selectIsConnectedToRoom,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
 import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
 import { useMyMetadata } from "./hooks/useMetadata";
-import { Box, IconButton, Tooltip } from "@100mslive/react-ui";
+import { Box, IconButton, Tooltip, VerticalDivider } from "@100mslive/react-ui";
 import {
   HandIcon,
   ShareScreenIcon,
@@ -29,12 +28,15 @@ import {
   BrbIcon,
   ChatUnreadIcon,
   ChatIcon,
+  VideoPlayerIcon,
 } from "@100mslive/react-icons";
 import { VirtualBackground } from "./components/VirtualBackground";
 import { isScreenshareSupported } from "../common/utils";
 import { NoiseSuppression } from "./components/NoiseSuppression";
-import { TranscriptionButton } from "./components/Transcription";
 import { FeatureFlags } from "../store/FeatureFlags";
+import { ToggleWhiteboard } from "./whiteboard";
+import { AudioPlaylist } from "./new/Playlist/AudioPlaylist";
+import { TranscriptionButton } from "./components/Transcription";
 
 export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   const isScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -121,15 +123,15 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
     );
   }
   leftComponents.push(
-    <Tooltip title={`${isChatOpen ? "Close" : "Open"} chat`}>
-      <IconButton key="chat" onClick={toggleChat} active={!isChatOpen}>
+    <Tooltip key="chat" title={`${isChatOpen ? "Close" : "Open"} chat`}>
+      <IconButton onClick={toggleChat} active={!isChatOpen}>
         {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon />}
       </IconButton>
     </Tooltip>
   );
   isAllowedToPublish.screen &&
     leftComponents.push(
-      <Box css={{ "@md": { display: "none" } }} key="audioPlaylist">
+      <Box css={{ "@md": { display: "none" } }} key="audioPlaylistNew">
         <AudioPlaylist />
       </Box>
     );
@@ -138,7 +140,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       <Box css={{ "@md": { display: "none" } }} key="videoPlaylistIcon">
         <VideoPlaylist
           key="videoPlaylist"
-          trigger={<VideoPlaylistIcon />}
+          trigger={<VideoPlayerIcon />}
           active={activeVideoPlaylist}
         />
       </Box>
@@ -156,7 +158,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
   leftComponents.push(
     <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`} key="brb">
       <IconButton
-        css={{ mx: "$2", "@md": { display: "none" } }}
+        css={{ mx: "$4", "@md": { display: "none" } }}
         onClick={toggleBRB}
         active={!isBRBOn}
       >
@@ -164,6 +166,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
       </IconButton>
     </Tooltip>
   );
+  FeatureFlags.enableWhiteboard && leftComponents.push(<ToggleWhiteboard />);
 
   const isPublishing = isAllowedToPublish.video || isAllowedToPublish.audio;
   if (!isConnected) {
@@ -184,7 +187,7 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
               <IconButton
                 active={!isScreenShared}
                 onClick={() => toggleScreenShare(!isScreenShared)}
-                css={{ mx: "$2", "@md": { display: "none" } }}
+                css={{ mx: "$4", "@md": { display: "none" } }}
               >
                 <ShareScreenIcon />
               </IconButton>

@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const getVerticalSpace = (space: string) => ({
   marginLeft: space,
@@ -12,17 +12,17 @@ const getHorizontalSpace = (space: string) => ({
 export const VerticalDivider = styled('span', {
   height: '25px',
   width: '1px',
-  backgroundColor: '$grey2',
+  backgroundColor: '$grayDefault',
   variants: {
     space: {
       1: getVerticalSpace('$1'),
-      2: getVerticalSpace('$1'),
+      2: getVerticalSpace('$2'),
       3: getVerticalSpace('$3'),
       4: getVerticalSpace('$4'),
     },
   },
   defaultVariants: {
-    space: 2,
+    space: 1,
   },
 });
 
@@ -30,16 +30,16 @@ export const HorizontalDivider = styled('span', {
   height: '1px',
   width: '100%',
   display: 'block',
-  backgroundColor: '$grey2',
+  backgroundColor: '$grayDefault',
   variants: {
     space: {
       1: getHorizontalSpace('$1'),
-      2: getHorizontalSpace('$1'),
+      2: getHorizontalSpace('$2'),
       3: getHorizontalSpace('$3'),
       4: getHorizontalSpace('$4'),
     },
   },
   defaultVariants: {
-    space: 2,
+    space: 1,
   },
 });

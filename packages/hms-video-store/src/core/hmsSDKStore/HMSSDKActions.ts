@@ -542,8 +542,9 @@ export class HMSSDKActions implements IHMSActions {
       ...request,
       requestedBy: requestedBy || undefined,
     });
-    HMSLogger.i('resetting state after peer removed', request);
-    this.resetState(request.roomEnded || !requestedBy ? 'roomEnded' : 'removedFromRoom');
+    const action = request.roomEnded || !requestedBy ? 'roomEnded' : 'removedFromRoom';
+    HMSLogger.i(`resetting state after peer removed ${action}`, request);
+    this.resetState(action);
   }
 
   private onDeviceChange(event: sdkTypes.HMSDeviceChangeEvent) {

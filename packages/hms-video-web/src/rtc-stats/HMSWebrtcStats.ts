@@ -7,8 +7,10 @@ import {
   getLocalPeerStatsFromReport,
   getPacketsLostAndJitterFromReport,
 } from './utils';
+import HMSLogger from '../utils/logger';
 
 export class HMSWebrtcStats {
+  private readonly TAG = '[HMSWebrtcStats]';
   private localPeerID?: string;
   private peerStats: Record<string, HMSPeerStats> = {};
   private trackStats: Record<string, HMSTrackStats> = {};
@@ -45,12 +47,21 @@ export class HMSWebrtcStats {
     }
 
     const prevLocalPeerStats = this.getLocalPeerStats();
-
-    const publishReport = await this.getStats.publish?.();
+    let publishReport: RTCStatsReport | undefined;
+    try {
+      publishReport = await this.getStats.publish?.();
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'Error in getting publish stats', err);
+    }
     const publishStats: HMSPeerStats['publish'] | undefined =
       publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
 
-    const subscribeReport = await this.getStats.subscribe?.();
+    let subscribeReport: RTCStatsReport | undefined;
+    try {
+      subscribeReport = await this.getStats.subscribe?.();
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'Error in getting subscribe stats', err);
+    }
     const baseSubscribeStats =
       subscribeReport && getLocalPeerStatsFromReport('subscribe', subscribeReport, prevLocalPeerStats);
     const { packetsLost, jitter } = getPacketsLostAndJitterFromReport(subscribeReport);

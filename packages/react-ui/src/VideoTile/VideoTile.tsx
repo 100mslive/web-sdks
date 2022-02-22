@@ -11,9 +11,9 @@ import { StyledVideoTile } from './StyledVideoTile';
 import { Video } from '../Video';
 import { Avatar } from '../Avatar';
 import { MicOffIcon, HandRaiseFilledIcon } from '@100mslive/react-icons';
-import { TileMenu } from '../TileMenu';
-import { AudioLevel } from '../AudioLevel';
+import { TileMenu } from '../TileMenu/TileMenu';
 import { VideoTileStats } from '../Stats';
+import { useBorderAudioLevel } from '../AudioLevel';
 
 interface Props {
   peerId: HMSPeerID;
@@ -25,6 +25,7 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
+  const borderAudioRef = useBorderAudioLevel(peer?.audioTrack);
   const [showTrigger, setShowTrigger] = useState(false);
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised || false;
   return (
@@ -35,11 +36,10 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
         setShowTrigger(false);
       }}
     >
-      <StyledVideoTile.Container>
+      <StyledVideoTile.Container ref={borderAudioRef}>
         <VideoTileStats audioTrackID={peer?.audioTrack} videoTrackID={peer?.videoTrack} />
-        <AudioLevel audioTrack={peer?.audioTrack} />
         <Video mirror={peer?.isLocal || false} trackId={peer?.videoTrack} />
-        {isVideoMuted ? <Avatar size={getAvatarSize(width)} name={peer?.name || ''} /> : null}
+        {isVideoMuted ? <Avatar name={peer?.name || ''} /> : null}
         <StyledVideoTile.Info>{peer?.name}</StyledVideoTile.Info>
         {isAudioMuted ? (
           <StyledVideoTile.AudioIndicator>
@@ -55,14 +55,4 @@ export const VideoTile: React.FC<Props> = ({ peerId, width, height }) => {
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
   );
-};
-
-const getAvatarSize = (width: number): 'lg' | 'md' | 'sm' | 'xs' => {
-  if (width < 200) {
-    return 'xs';
-  } else if (width < 500) {
-    return 'sm';
-  } else {
-    return 'md';
-  }
 };

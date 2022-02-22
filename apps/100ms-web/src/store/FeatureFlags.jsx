@@ -6,8 +6,10 @@ export class FeatureFlags {
     process.env.REACT_APP_ENABLE_TRANSCRIPTION === "true";
   static enableStatsForNerds =
     process.env.REACT_APP_ENABLE_STATS_FOR_NERDS === "true";
-  static enableNewComponents =
-    process.env.REACT_APP_ENABLE_NEW_COMPONENTS === "true";
+  static enableWhiteboard =
+    process.env.REACT_APP_PUSHER_APP_KEY &&
+    process.env.REACT_APP_PUSHER_AUTHENDPOINT;
+
   static init() {
     if (!window.HMS) {
       window.HMS = {};
@@ -18,6 +20,9 @@ export class FeatureFlags {
     window.HMS.OPTIMISE_HLS_LATENCY = false;
     // ask permissions in preview even if role doesn't have it
     window.HMS.ALWAYS_REQUEST_PERMISSIONS = false;
+    // add support for server degradation
+    window.HMS.SERVER_SUB_DEGRADE =
+      process.env.REACT_APP_SERVER_SUB_DEGRADE === "true";
 
     if (parsedUserAgent.getOS().name.toLowerCase() === "ios") {
       window.HMS.GAIN_VALUE = 10;

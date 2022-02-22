@@ -6,17 +6,13 @@ import {
   HMSNotification,
   HMSNotifications,
   HMSStatsStore,
-  IStoreReadOnly,
   HMSStats,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
-import create, { EqualityChecker, StateSelector } from 'zustand';
+import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
-export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
-  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
-}
 export interface HMSRoomProviderProps {
   actions?: HMSActions;
   store?: HMSStoreWrapper;

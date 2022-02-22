@@ -1,43 +1,61 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 export const Text = styled('p', {
   fontFamily: '$sans',
   fontWeight: 500,
   margin: 0,
+  color: '$textPrimary',
   variants: {
     variant: {
-      'heading-lg': {
-        fontWeight: 600,
-        fontSize: '25px',
-        lineHeight: '32px',
+      h1: {
+        fontWeight: '$semiBold',
+        fontSize: '$h1',
+        lineHeight: '$h1',
       },
-      'heading-md': {
-        fontSize: '20px',
-        lineHeight: '28px',
+      h2: {
+        fontSize: '$h2',
+        lineHeight: '$h2',
       },
-      'heading-sm': {
-        fontSize: '17px',
-        lineHeight: '28px',
+      h3: {
+        fontSize: '$h3',
+        lineHeight: '$h3',
       },
-      button: {
-        fontSize: '17px',
-        lineHeight: '24px',
+      h4: {
+        fontSize: '$h4',
+        lineHeight: '$h4',
       },
-      body: {
-        fontSize: '15px',
-        lineHeight: '20px',
+      h5: {
+        fontSize: '$h5',
+        lineHeight: '$h5',
       },
-      'body-sm': {
-        fontSize: '13px',
-        lineHeight: '16px',
+      h6: {
+        fontSize: '$h6',
+        lineHeight: '$h6',
       },
-      'body-xs': {
-        fontSize: '10px',
-        lineHeight: '12px',
+      tiny: {
+        fontSize: '$tiny',
+        lineHeight: '$tiny',
+      },
+      xs: {
+        fontSize: '$xs',
+        lineHeight: '$xs',
+      },
+      sm: {
+        fontSize: '$sm',
+        lineHeight: '$sm',
+      },
+      md: {
+        fontSize: '$md',
+        lineHeight: '$md',
+      },
+    },
+    inline: {
+      true: {
+        display: 'inline',
       },
     },
   },
   defaultVariants: {
-    variant: 'body',
+    variant: 'md',
   },
 });

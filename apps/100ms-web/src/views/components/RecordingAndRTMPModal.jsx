@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Button, MessageModal, Text } from "@100mslive/hms-video-react";
+import { hmsToast } from "./notifications/hms-toast";
 import {
-  Button,
-  MessageModal,
   selectHLSState,
   selectRecordingState,
   selectRTMPState,
-  Text,
   useHMSStore,
   useHMSActions,
-} from "@100mslive/hms-video-react";
-import { hmsToast } from "./notifications/hms-toast";
+} from "@100mslive/react-sdk";
+import { SKIP_PREVIEW } from "../../common/constants";
 
 const defaultClasses = {
   iconContainer: "focus:outline-none mr-3 hover:bg-gray-200 p-2 rounded-lg",
@@ -35,11 +34,12 @@ const defaultClasses = {
 };
 
 const defaultMeetingUrl =
-  window.location.href.replace("meeting", "preview") + "?token=beam_recording";
+  window.location.href.replace("meeting", "preview") + `?${SKIP_PREVIEW}=true`;
 
 export const RecordingAndRTMPModal = ({
   showRecordingAndRTMPModal,
   setShowRecordingAndRTMPModal,
+  permissions,
 }) => {
   useEffect(() => {
     setMeetingURL(defaultMeetingUrl);
@@ -50,22 +50,27 @@ export const RecordingAndRTMPModal = ({
   const hls = useHMSStore(selectHLSState);
 
   const [meetingURL, setMeetingURL] = useState(defaultMeetingUrl);
-  const [rtmpURL, setRtmpURL] = useState("");
+  const [rtmpURL, setRTMPURL] = useState("");
   const [isHlsOn, setIsHlsOn] = useState(false);
   const [isRecordingOn, setIsRecordingOn] = useState(false);
 
   const getText = useCallback(() => {
     let text = "";
-    if (rtmp.running) {
+    if (rtmp.running || hls.running) {
       text += "Streaming";
     }
-    if (recording.browser.running) {
+    if (recording.browser.running || recording.hls.running) {
       if (text) text += "/";
       text += "Recording";
     }
     text += " is running";
     return text;
-  }, [recording.browser.running, rtmp.running]);
+  }, [
+    recording.browser.running,
+    recording.hls.running,
+    rtmp.running,
+    hls.running,
+  ]);
 
   const startStopRTMPRecordingHLS = async action => {
     try {
@@ -73,6 +78,7 @@ export const RecordingAndRTMPModal = ({
         isHlsOn
           ? await hmsActions.startHLSStreaming({
               variants: [{ meetingURL: meetingURL }],
+              recording: isRecordingOn ? {} : undefined,
             })
           : await hmsActions.startRTMPOrRecording({
               meetingURL,
@@ -91,7 +97,7 @@ export const RecordingAndRTMPModal = ({
       hmsToast(error.message);
     } finally {
       setMeetingURL("");
-      setRtmpURL("");
+      setRTMPURL("");
       setIsRecordingOn(false);
       setShowRecordingAndRTMPModal(false);
     }
@@ -101,23 +107,26 @@ export const RecordingAndRTMPModal = ({
     <MessageModal
       title="Start Streaming/Recording"
       body={
-        <RecordingAndRTMPForm
+        <RecordingAndStreamingForm
           meetingURL={meetingURL}
-          RTMPURLs={rtmpURL}
+          rtmpURL={rtmpURL}
           isRecordingOn={isRecordingOn}
-          recordingStatus={recording.browser.running}
-          rtmpStatus={rtmp.running}
+          isRecordingRunning={
+            recording.browser.running || recording.hls.running
+          }
+          isRTMPRunning={rtmp.running}
           setIsRecordingOn={setIsRecordingOn}
           setMeetingURL={setMeetingURL}
-          setRTMPURLs={setRtmpURL}
+          setRTMPURL={setRTMPURL}
           isHlsOn={isHlsOn}
           setIsHlsOn={setIsHlsOn}
-          hlsStatus={hls.running}
+          isHLSRunning={hls.running}
+          permissions={permissions}
         />
       }
       footer={
         <>
-          {(recording.browser.running || rtmp.running) && (
+          {(recording.browser.running || rtmp.running || hls.running) && (
             <Text
               variant="body"
               size="md"
@@ -135,7 +144,7 @@ export const RecordingAndRTMPModal = ({
                 !recording.browser.running && !rtmp.running && !hls.running
               }
             >
-              {isHlsOn || hls.running ? `Stop HLS` : `Stop All`}
+              Stop
             </Button>
             <Button
               variant="emphasized"
@@ -156,19 +165,21 @@ export const RecordingAndRTMPModal = ({
   );
 };
 
-export const RecordingAndRTMPForm = ({
-  meetingURL,
-  RTMPURLs,
+export const RecordingAndStreamingForm = ({
+  isRecordingRunning,
+  isRTMPRunning,
+  isHLSRunning,
   isRecordingOn,
-  recordingStatus,
-  rtmpStatus,
   setIsRecordingOn,
+  meetingURL,
   setMeetingURL,
-  setRTMPURLs,
+  rtmpURL,
+  setRTMPURL,
   isHlsOn,
   setIsHlsOn,
-  hlsStatus,
+  permissions,
 }) => {
+  const isAnythingRunning = isRecordingRunning || isRTMPRunning || isHLSRunning;
   return (
     <div>
       <form>
@@ -176,35 +187,35 @@ export const RecordingAndRTMPForm = ({
           inputName="Meeting URL:"
           value={meetingURL}
           onChangeHandler={setMeetingURL}
-          disabled={recordingStatus || rtmpStatus || hlsStatus}
+          disabled={isAnythingRunning}
         />
 
-        <SwitchInput
-          inputName="HLS:"
-          checked={isHlsOn || hlsStatus}
-          onChangeHandler={setIsHlsOn}
-          disabled={
-            isRecordingOn ||
-            RTMPURLs[0] ||
-            recordingStatus ||
-            rtmpStatus ||
-            hlsStatus
-          }
-        />
+        {permissions.streaming && (
+          <SwitchInput
+            inputName="HLS:"
+            checked={isHlsOn || isHLSRunning}
+            onChangeHandler={setIsHlsOn}
+            disabled={isAnythingRunning || rtmpURL[0]}
+          />
+        )}
 
-        <TextInput
-          inputName="RTMP"
-          value={RTMPURLs}
-          onChangeHandler={setRTMPURLs}
-          disabled={recordingStatus || rtmpStatus || hlsStatus || isHlsOn}
-        />
+        {permissions.streaming && (
+          <TextInput
+            inputName="RTMP"
+            value={rtmpURL}
+            onChangeHandler={setRTMPURL}
+            disabled={isAnythingRunning || isHlsOn}
+          />
+        )}
 
-        <SwitchInput
-          inputName="Recording:"
-          checked={isRecordingOn || recordingStatus}
-          disabled={hlsStatus || isHlsOn}
-          onChangeHandler={setIsRecordingOn}
-        />
+        {permissions.recording && (
+          <SwitchInput
+            inputName="Recording:"
+            checked={isRecordingOn || isRecordingRunning}
+            disabled={isAnythingRunning}
+            onChangeHandler={setIsRecordingOn}
+          />
+        )}
       </form>
     </div>
   );

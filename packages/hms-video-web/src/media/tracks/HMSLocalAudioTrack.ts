@@ -26,9 +26,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
   /**
+   * see the doc in HMSLocalVideoTrack
    * @internal
    */
-  publishedTrackId: string;
+  publishedTrackId?: string;
 
   constructor(
     stream: HMSLocalStream,
@@ -47,13 +48,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSAudioPluginsManager(this);
-    this.publishedTrackId = this.trackId;
     this.setFirstTrackId(track.id);
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
     const prevState = this.enabled;
+    const isLevelMonitored = Boolean(this.audioLevelMonitor);
     /**
      * Stop has to be called before getting newTrack as it would cause NotReadableError
      */
@@ -66,6 +67,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
     await localStream.replaceStreamTrack(prevTrack, newTrack);
     this.nativeTrack = newTrack;
+    isLevelMonitored && this.initAudioLevelMonitor();
     await this.pluginsManager.reprocessPlugins();
   }
 
@@ -83,16 +85,23 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
+  /**
+   * verify if the track id being passed is of this track for correlating server messages like audio level
+   */
+  isPublishedTrackId(trackId: string) {
+    return this.publishedTrackId === trackId;
+  }
+
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
 
-    this.handleDeviceChange(newSettings, internal);
+    await this.handleDeviceChange(newSettings, internal);
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
-    this.handleSettingsChange(newSettings);
+    await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
 
@@ -143,9 +152,17 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   initAudioLevelMonitor() {
+    if (this.audioLevelMonitor) {
+      this.destroyAudioLevelMonitor();
+    }
     HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
-    this.audioLevelMonitor = new TrackAudioLevelMonitor(this, this.eventBus.trackAudioLevelUpdate);
+    this.audioLevelMonitor = new TrackAudioLevelMonitor(
+      this,
+      this.eventBus.trackAudioLevelUpdate,
+      this.eventBus.localAudioSilence,
+    );
     this.audioLevelMonitor.start();
+    this.audioLevelMonitor.detectSilence();
   }
 
   destroyAudioLevelMonitor() {
@@ -200,13 +217,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-
     if (hasPropertyChanged('deviceId')) {
-      const isLevelMonitored = Boolean(this.audioLevelMonitor);
-      HMSLogger.d(TAG, 'Device change', { isLevelMonitored });
-      isLevelMonitored && this.destroyAudioLevelMonitor();
-      this.enabled && (await this.replaceTrackWith(settings));
-      isLevelMonitored && this.initAudioLevelMonitor();
+      await this.replaceTrackWith(settings);
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {
           deviceId: settings.deviceId,

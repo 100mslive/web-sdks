@@ -1,4 +1,4 @@
-import { keyframes } from '../stitches.config';
+import { keyframes } from '../Theme';
 
 export const dialogOpen = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },

@@ -7,6 +7,10 @@ over the primitive ones.
 If someone is using class based react components, they'll be better off
 with using the core sdk directly.
 
+> If you're already using hooks from hms-video-react, this package will be a drop
+> in replacement. hms-video-react is planned to be deprecated so please move your code
+> to using this package instead.
+
 ### Primitive Hooks
 
 These are hooks wrapper over the sdk things.
@@ -38,3 +42,44 @@ the below things -
 - Prefer IDs to objects for both input arguments and in result object. This
   facilitates writing optimised code on the app layer, as objects are prone to change
   leading to unnecessary re renders on different levels.
+
+
+### TODO Planned Hooks
+
+#### Breakout Rooms
+
+```ts
+function useBreakoutRoles({filter: regexOrArray, filterOut: regexOrArray}) {
+  {
+        allRoles, // all breakout roles options for this user
+        currRole,
+        switchToRole() // takes in a role name
+    }
+}
+```
+
+#### Waiting Room
+
+On the guest side who joins a waiting room - 
+```ts
+// onconfirm if role change is not forced, fn returns true/false
+// onapprovval - use this to play a tone maybe
+function useWaitingRoom({waitingRoomRole, postApprovalRole, onApproval}) {
+    {
+        amIInWaitingRoom,
+        isConfirmationPending, // boolean, true when role change is not forced
+        confirmOrDeny(confirm) // pass in true or false
+    }
+}
+```
+
+On the host side who needs to see who is in waiting room and let them in.
+```ts
+function useWaitingRoomApprover({waitingRoomRole, postApprovalRole, approverRoles: []}) {
+    {
+        peersInWaitingRoom,
+        approvePeer = (peerID, ask) // force role change to postApprovalRole
+    }
+}
+```
+

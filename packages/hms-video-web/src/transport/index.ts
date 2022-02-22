@@ -289,6 +289,9 @@ export default class HMSTransport implements ITransport {
     customData: { name: string; metaData: string },
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
+
+    // TODO: set default to true on final release
+    serverSubDegrade = false,
   ): Promise<void> {
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
@@ -298,6 +301,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       initEndpoint,
       autoSubscribeVideo,
+      serverSubDegrade,
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -313,6 +317,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
+          serverSubDegrade,
         );
       }
     } catch (error) {
@@ -489,6 +494,12 @@ export default class HMSTransport implements ITransport {
         return hlsVariant;
       }),
     };
+    if (params.recording) {
+      hlsParams.recording = {
+        single_file_per_layer: params.recording.singleFilePerLayer,
+        hls_vod: params.recording.hlsVod,
+      };
+    }
     await this.signal.startHLSStreaming(hlsParams);
   }
 
@@ -555,7 +566,7 @@ export default class HMSTransport implements ITransport {
       await stream
         .setMaxBitrate(maxBitrate, track)
         .then(() => {
-          HMSLogger.i(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
+          HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
         .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
@@ -565,7 +576,7 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    if (this.trackStates.has(track.publishedTrackId)) {
+    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {
       // TODO: hotfix to unpublish replaced video track id, solve it properly
@@ -600,16 +611,22 @@ export default class HMSTransport implements ITransport {
     data: string,
     config: RTCConfiguration,
     autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ) {
     this.publishConnection = new HMSPublishConnection(this.signal, config, this.publishConnectionObserver, this);
-    this.subscribeConnection = new HMSSubscribeConnection(this.signal, config, this.subscribeConnectionObserver);
+    this.subscribeConnection = new HMSSubscribeConnection(
+      this.signal,
+      config,
+      this.subscribeConnectionObserver,
+      serverSubDegrade,
+    );
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection!.createOffer(constraints, new Map());
       await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo);
+      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo, serverSubDegrade);
       await this.publishConnection!.setRemoteDescription(answer);
       for (const candidate of this.publishConnection!.candidates || []) {
         await this.publishConnection!.addIceCandidate(candidate);
@@ -711,11 +728,17 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
+
+    // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
+    //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
-      this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-      this.eventBus.statsUpdate.subscribe(stats => {
-        this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
-      });
+      if (!this.joinParameters?.serverSubDegrade) {
+        this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
+        this.eventBus.statsUpdate.subscribe(stats => {
+          this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
+        });
+      }
+
       this.eventBus.trackDegraded.subscribe(track => {
         analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
         this.observer.onTrackDegrade(track);
