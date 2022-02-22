@@ -4,6 +4,7 @@ import { styled } from '../Theme';
 const CheckboxRoot = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   border: '1px solid $brandDefault',
+  backgroundColor: '$white',
   width: '$8',
   height: '$8',
   borderRadius: '$0',
