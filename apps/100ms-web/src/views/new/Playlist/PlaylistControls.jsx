@@ -66,7 +66,9 @@ export const PlaylistControls = ({ type }) => {
         </IconButton>
         <IconButton
           onClick={() => {
-            active.playing ? playlistAction.pause() : playlistAction.play();
+            active.playing
+              ? playlistAction.pause()
+              : playlistAction.play(active.id);
           }}
         >
           {active.playing ? (
