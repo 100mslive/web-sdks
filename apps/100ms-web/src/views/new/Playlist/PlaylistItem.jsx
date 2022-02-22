@@ -21,7 +21,12 @@ export const PlaylistItem = React.memo(
   ({ name, metadata, duration, selected, onClick }) => {
     return (
       <Dropdown.Item
-        css={{ flexDirection: "column", alignItems: "flex-start", h: "$18" }}
+        css={{
+          flexDirection: "column",
+          alignItems: "flex-start",
+          h: "$18",
+          p: "$8",
+        }}
         onClick={onClick}
       >
         <Flex align="center" justify="between" css={{ width: "100%" }}>

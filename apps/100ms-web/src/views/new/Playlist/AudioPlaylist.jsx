@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { AudioPlayerIcon, CrossIcon } from "@100mslive/react-icons";
 import { Dropdown, IconButton, Text, Flex } from "@100mslive/react-ui";
 import {
+  HMSPlaylistType,
   selectAudioPlaylist,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { PlaylistItem } from "./PlaylistItem";
+import { PlaylistControls } from "./PlaylistControls";
 
 export const AudioPlaylist = () => {
   const playlist = useHMSStore(selectAudioPlaylist.list);
@@ -28,7 +30,7 @@ export const AudioPlaylist = () => {
       <Dropdown.Content
         sideOffset={5}
         align="center"
-        css={{ maxHeight: "unset" }}
+        css={{ maxHeight: "unset", width: "$60", p: "$0" }}
       >
         <Flex
           align="center"
@@ -60,6 +62,7 @@ export const AudioPlaylist = () => {
             />
           );
         })}
+        <PlaylistControls type={HMSPlaylistType.audio} />
       </Dropdown.Content>
     </Dropdown.Root>
   );
