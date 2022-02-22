@@ -20,7 +20,6 @@ const DropdownItem = styled(Item, {
   w: '100%',
   color: '$textPrimary',
   p: '$4 $8',
-  backgroundColor: '$menuBg',
   display: 'flex',
   alignItems: 'center',
 });
