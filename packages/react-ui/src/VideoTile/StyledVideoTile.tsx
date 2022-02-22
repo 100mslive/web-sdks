@@ -55,8 +55,6 @@ const AvatarContainer = styled('div', {
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  left: '20px',
-  bottom: '20px',
   color: '$textPrimary',
 });
 
