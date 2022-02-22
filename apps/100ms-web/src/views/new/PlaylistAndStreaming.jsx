@@ -137,7 +137,7 @@ export const PlaylistAndStreaming = () => {
               </Tooltip>
             )}
           </Flex>
-          <Box css={{ "@lg": { display: "none" } }}>
+          <Box css={{ "@lg": { display: "none" }, color: "$textDisabled" }}>
             {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
           </Box>
         </Flex>

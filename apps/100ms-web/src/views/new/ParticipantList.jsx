@@ -37,7 +37,7 @@ export const ParticipantList = () => {
         <Dropdown.Trigger
           css={{
             borderRadius: "$1",
-            border: "1px solid $textPrimary",
+            border: "1px solid $bgTertiary",
           }}
         >
           <Flex
@@ -46,7 +46,13 @@ export const ParticipantList = () => {
             }}
           >
             <ParticipantCount peerCount={peerCount} />
-            <Box css={{ ml: "$2", "@lg": { display: "none" } }}>
+            <Box
+              css={{
+                ml: "$2",
+                "@lg": { display: "none" },
+                color: "$textDisabled",
+              }}
+            >
               {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
             </Box>
           </Flex>
