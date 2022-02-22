@@ -81,7 +81,7 @@ export const PlaylistAndStreaming = () => {
       <Dropdown.Trigger
         css={{
           borderRadius: "$1",
-          border: "1px solid $textPrimary",
+          border: "1px solid $bgTertiary",
         }}
       >
         <Flex
