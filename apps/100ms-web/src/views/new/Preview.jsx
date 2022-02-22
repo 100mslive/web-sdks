@@ -95,6 +95,8 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
         >
           <Input
             css={{ mb: "1rem" }}
+            autoComplete="name"
+            type="text"
             required
             maxLength={20}
             value={name}
@@ -119,7 +121,7 @@ const PreviewTile = ({ name }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        aspectRatio: width / height,
+        aspectRatio: 1.5,
         width: "unset",
         height: "min(360px, 60vh)",
         "@sm": {
