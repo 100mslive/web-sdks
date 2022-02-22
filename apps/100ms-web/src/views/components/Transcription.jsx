@@ -1,30 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@100mslive/hms-video-react";
 import RecordRTC,  { StereoAudioRecorder } from 'recordrtc';
-import { useHMSActions, useHMSNotifications } from "@100mslive/react-sdk";
+import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
+import Pusher from "pusher-js";
+
+Pusher.logToConsole = true;
+
+const pusher = new Pusher("c6edf1e636510f716f39", {
+  cluster: "ap2",
+  authEndpoint: "https://whiteboard-server-git-transcription-100mslive.vercel.app/api/pusher/auth",
+});
+let channel = null;
 
 export function TranscriptionButton() {
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
   const transcriber = useRef(null);
-
-  //Commenting the Brodcasting part to ensure the local transcription working
-  /*const hmsActions = useHMSActions()
-  const notification = useHMSNotifications()
+  const roomId = useHMSStore(selectRoom)?.id;
   useEffect(() => {
-    if(notification && notification.type === "NEW_MESSAGE" && notification.data?.type === "Transcription" && notification.data?.message){
-        let showTxt = notification.data.senderName + ": " + notification.data.message
-        document.getElementById("speechtxt").innerText = showTxt || ""
-        enableTranscription(true)
-    }
-  }, [notification])*/
+    channel = pusher.subscribe(`private-${roomId}`);
+    channel.bind(`client-transcription`, ({text}) => {
+      document.getElementById("speechtxt").innerText = text || ""
+      setTimeout(() => {
+        document.getElementById("speechtxt").innerText = ""
+      }, 5000);
+    });
+  }, [roomId])
 
   const enableTranscription = () => {
     if (!transcriber.current) {
-      transcriber.current = new Transcriber();
+      transcriber.current = new Transcriber(roomId);
       transcriber.current.enabled = false;
-      /*transcriber.current.setBroadcast((data) => {
-          hmsActions.sendBroadcastMessage(data, "Transcription")
-      });*/
     }
     transcriber.current.enableTranscription(!isTranscriptionEnabled);
     setIsTranscriptionEnabled(!isTranscriptionEnabled);
@@ -48,56 +53,45 @@ export function TranscriptionButton() {
   );
 }
 class Transcriber {
-  constructor() {
-    this.broadcast = () => {};
+  constructor(roomId) {
     this.enabled = false;
     this.socket = null;
     this.totalTimeDiff = 0
     this.totalCount = 0
     this.allstreams = {};
     this.streams = {}
+    this.roomId = roomId;
+    this.initialized = false;
+    this.lastMessage = {};
   }
 
-  setBroadcast(cb){
-    this.broadcast = cb
-  }
-
-  displayCaption(text){
-    document.getElementById("speechtxt").innerText = text || ""
-  }
+  broadcast = (text, eventName = "transcription") => {
+    channel.trigger(
+      `client-${eventName}`,
+      { text, eventName }
+    );
+  };
 
   async listen(){
     try {
       this.allstreams = window.__hms.sdk.getPeers()
       this.allstreams.map(p => {
-        this.streams[p.peerId] = { "stream" : new MediaStream([p.audioTrack.nativeTrack]) , "name" : p.name}
+        if(p.isLocal){
+          this.streams[p.peerId] = { "stream" : new MediaStream([p.audioTrack.nativeTrack]) , "name" : p.name}
+        }
       }).filter(x => !!x)
       let url = process.env.REACT_APP_DYNAMIC_STT_TOKEN_GENERATION_ENDPOINT
       let res = await fetch(url);
       let body = await res.json();
-      let cnt = 0;
       if(body && body.token){
         const token = body.token
         this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`);
-        const texts = {};
-        let startTime,endTime;
         document.getElementById("speechtxt").innerText = ""
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
-            if(res.text && res.text != "" && this.enabled){
-              document.getElementById("speechtxt").innerText = res.text;
-            }
-
-            //Temporarly Commenting Broadcasting part 
-            /*if(res.text != "" && startTime){
+            if(res.text && this.enabled){
               this.broadcast(res.text)
-              this.totalCount++
-              endTime = performance.now();
-              this.totalTimeDiff += (endTime - startTime)
-              if(this.totalCount % 100 === 0 || this.totalCount < 2){
-                console.log("Average Transcription Latency:", this.totalTimeDiff / this.totalCount, " ms")
-              }
-            }*/
+            }
         };
   
         this.socket.onerror = (event) => {
