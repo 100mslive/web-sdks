@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AudioPlayerIcon, CrossIcon } from "@100mslive/react-icons";
-import { Dropdown, IconButton, Text, Flex } from "@100mslive/react-ui";
+import { Dropdown, IconButton, Text, Flex, Tooltip } from "@100mslive/react-ui";
 import {
   HMSPlaylistType,
   selectAudioPlaylist,
@@ -22,11 +22,13 @@ export const AudioPlaylist = () => {
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger asChild>
-        <IconButton active={!active}>
-          <AudioPlayerIcon />
-        </IconButton>
-      </Dropdown.Trigger>
+      <Tooltip title="Audio Playlist">
+        <Dropdown.Trigger asChild>
+          <IconButton active={!active}>
+            <AudioPlayerIcon />
+          </IconButton>
+        </Dropdown.Trigger>
+      </Tooltip>
       <Dropdown.Content
         sideOffset={5}
         align="center"
