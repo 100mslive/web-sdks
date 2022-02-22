@@ -26,6 +26,9 @@ export const PlaylistItem = React.memo(
           alignItems: "flex-start",
           h: "$18",
           p: "$8",
+          "&:hover": {
+            cursor: "pointer",
+          },
         }}
         onClick={onClick}
       >
