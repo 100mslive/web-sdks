@@ -78,13 +78,16 @@ export const PlaylistAndStreaming = () => {
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger asChild>
+      <Dropdown.Trigger
+        css={{
+          borderRadius: "$1",
+          border: "1px solid $textPrimary",
+        }}
+      >
         <Flex
           align="center"
           css={{
             color: "$textPrimary",
-            borderRadius: "$1",
-            border: "1px solid $textPrimary",
           }}
         >
           {!isScreenshareInactive && (
