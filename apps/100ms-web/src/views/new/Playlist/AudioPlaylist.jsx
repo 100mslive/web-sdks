@@ -32,7 +32,7 @@ export const AudioPlaylist = () => {
       >
         <Flex
           align="center"
-          css={{ p: "$4 $8", borderBottom: "1px solid $textPrimary" }}
+          css={{ p: "$4 $8", borderBottom: "1px solid $borderDefault" }}
         >
           <Text variant="md" css={{ flex: "1 1 0" }}>
             Audio Player
@@ -40,7 +40,7 @@ export const AudioPlaylist = () => {
           <IconButton
             onClick={() => {
               if (active) {
-                hmsActions.stop();
+                hmsActions.audioPlaylist.stop();
               }
               setOpen(false);
             }}
