@@ -10,7 +10,6 @@ export * from './Select';
 export * from './Slider';
 export * from './Modal';
 export * from './Loading';
-export * from './Preview';
 export * from './Input';
 export * from './VideoTile';
 export * from './VideoList';

@@ -8,7 +8,6 @@ import {
 } from "@100mslive/react-sdk";
 import {
   Loading,
-  Preview as StyledPreview,
   Button,
   StyledVideoTile,
   Video,
@@ -19,6 +18,7 @@ import {
   IconButton,
   useTheme,
   useBorderAudioLevel,
+  styled,
 } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../components/AudioVideoToggle";
 import { SettingIcon } from "@100mslive/react-icons";
@@ -77,7 +77,7 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
     onJoin,
   ]);
   return (
-    <StyledPreview.Container css={{ padding: "2rem 6rem" }}>
+    <Container>
       <PreviewTile name={name} />
       <Flex direction="column" align="center">
         <Text css={{ my: "1rem" }} variant="h5">
@@ -105,7 +105,7 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
           </Button>
         </Flex>
       </Flex>
-    </StyledPreview.Container>
+    </Container>
   );
 };
 
@@ -129,15 +129,15 @@ const PreviewTile = ({ name }) => {
         <>
           <Video mirror={true} trackId={localPeer.videoTrack} />
           {!isVideoOn ? <Avatar name={name} /> : null}
-          <StyledPreview.Controls>
+          <StyledVideoTile.AttributeBox css={controlStyles}>
             <AudioVideoToggle compact />
-          </StyledPreview.Controls>
+          </StyledVideoTile.AttributeBox>
           <Settings>
-            <StyledPreview.Setting>
+            <StyledVideoTile.AttributeBox css={settingStyles}>
               <IconButton>
                 <SettingIcon />
               </IconButton>
-            </StyledPreview.Setting>
+            </StyledVideoTile.AttributeBox>
           </Settings>
         </>
       ) : (
@@ -145,6 +145,38 @@ const PreviewTile = ({ name }) => {
       )}
     </StyledVideoTile.Container>
   );
+};
+
+const Container = styled("div", {
+  borderRadius: "$2",
+  backgroundColor: "$previewBg",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "2rem 6rem",
+  "@md": {
+    borderRadius: "0",
+    padding: "0",
+    width: "100%",
+    height: "100%",
+  },
+});
+
+const controlStyles = {
+  bottom: "10px",
+  left: "50%",
+  transform: "translate(-50%, 0)",
+  display: "flex",
+  "& > * + *": {
+    marginRight: "0",
+    marginLeft: "0.5rem",
+  },
+};
+
+const settingStyles = {
+  bottom: "10px",
+  right: "20px",
 };
 
 export default Preview;
