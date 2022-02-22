@@ -8,7 +8,7 @@ import { IconButton } from '../IconButton';
 export const DialogClose = styled(DialogPrimitive.Close, {});
 
 export const StyledDialogTrigger = styled(DialogPrimitive.Trigger, {
-  appearance: 'none !important',
+  appearance: 'none !important', // Needed for safari it shows white overlay
 });
 
 export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
