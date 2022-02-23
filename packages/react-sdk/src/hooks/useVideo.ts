@@ -15,6 +15,10 @@ export interface useVideoInput {
    */
   attach?: boolean;
 }
+
+export interface useVideoOutput {
+  videoRef: React.RefCallback<HTMLVideoElement>;
+}
 /**
  * This hooks can be used to implement a video tile component. Given a track id it will return a ref.
  * The returned ref can be used to set on a video element meant to display the video.
@@ -22,7 +26,7 @@ export interface useVideoInput {
  * goes out of view to save on bandwidth.
  * @param trackId {HMSTrackID}
  */
-export const useVideo = ({ trackId, attach }: useVideoInput): { videoRef: React.RefCallback<HTMLVideoElement> } => {
+export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectTrackByID(trackId));

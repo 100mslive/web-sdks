@@ -26,6 +26,7 @@ export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 export type { useRecordingStreamingResult } from './hooks/useRecordingStreaming';
 export type { useParticipantListResult } from './hooks/useParticipantList';
+export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';
