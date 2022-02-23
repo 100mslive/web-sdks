@@ -8,7 +8,7 @@ export interface useVideoInput {
   /**
    * TrackId that is to be rendered
    */
-  trackId: HMSTrackID;
+  trackId?: HMSTrackID;
   /**
    * Boolean stating whether to override the internal behaviour.
    * when attach is false, even if tile is inView or enabled, it won't be rendered
@@ -24,7 +24,6 @@ export interface useVideoOutput {
  * The returned ref can be used to set on a video element meant to display the video.
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
- * @param trackId {HMSTrackID}
  */
 export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
