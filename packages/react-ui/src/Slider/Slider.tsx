@@ -1,5 +1,6 @@
 import * as BaseSlider from '@radix-ui/react-slider';
 import React from 'react';
+import { Tooltip } from '../Tooltip';
 import { styled } from '../Theme';
 
 const Root = styled(BaseSlider.Root, {
@@ -50,7 +51,9 @@ export const Slider: React.FC<SliderProps> = props => (
     <Track>
       <Range />
     </Track>
-    <Thumb />
+    <Tooltip title={String(props.value?.[0])}>
+      <Thumb />
+    </Tooltip>
   </Root>
 );
 
