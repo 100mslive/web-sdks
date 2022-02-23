@@ -769,12 +769,14 @@ export class HMSSdk implements HMSInterface {
 
   private notifyJoin() {
     const localPeer = this.store.getLocalPeer();
+    const room = this.store.getRoom();
+    room.joinedAt = new Date();
 
     if (localPeer?.role) {
-      this.listener?.onJoin(this.store.getRoom());
+      this.listener?.onJoin(room);
     } else {
       this.notificationManager.once('policy-change', () => {
-        this.listener?.onJoin(this.store.getRoom());
+        this.listener?.onJoin(room);
       });
     }
   }

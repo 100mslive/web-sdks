@@ -37,6 +37,7 @@ import {
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
+  parsedUserAgent,
 } from '@100mslive/hms-video';
 
 export {
@@ -48,6 +49,7 @@ export {
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  parsedUserAgent,
 };
 
 export type {
