@@ -75,14 +75,18 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    if (!plugin.isSupported()) {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+
+    if (!plugin.isSupported(this.audioContext!.sampleRate)) {
       const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
         HMSAction.AUDIO_PLUGINS,
-        'platform not supported ',
+        'platform/SampleRate not supported, see docs',
       );
       this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
-      return;
+      HMSLogger.i(TAG, `Platform or sampleRate is not supported for plugin, see docs - ${plugin.getName()}`);
+      throw err;
     }
     try {
       if (this.pluginsMap.size === 0) {
@@ -148,16 +152,12 @@ export class HMSAudioPluginsManager {
   }
 
   private async initContextAndAudioNodes() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
-
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-      this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
+      this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
     }
     if (!this.destinationNode) {
-      this.destinationNode = this.audioContext.createMediaStreamDestination();
+      this.destinationNode = this.audioContext!.createMediaStreamDestination();
       this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
       try {
         await this.hmsTrack.setProcessedTrack(this.outputTrack);

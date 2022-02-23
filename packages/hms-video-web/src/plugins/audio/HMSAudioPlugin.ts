@@ -15,9 +15,9 @@ export interface HMSAudioPlugin {
 
   /**
    * This function will be called before the call to init, it is used to check whether the plugin supports current
-   * OS and device or not. An error will be thrown back to the user if they try to use an unsupported plugin.
+   * OS and audio device or not. An error will be thrown back to the user if they try to use an unsupported plugin.
    */
-  isSupported(): boolean;
+  isSupported(samplingRate: number): boolean;
 
   /**
    * This function will be called in the beginning for initialization which may include tasks like setting up
