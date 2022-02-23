@@ -42,15 +42,11 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
   useEffect(() => {
     (async () => {
       if (videoRef.current && track?.id) {
-        if (inView && track.enabled) {
+        if (inView && track.enabled && attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track.id, videoRef.current);
         } else {
           // detach when not in view
-          await actions.detachVideo(track.id, videoRef.current);
-        }
-        // override the previous action when attach is false
-        if (attach === false) {
           await actions.detachVideo(track.id, videoRef.current);
         }
       }
