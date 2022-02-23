@@ -19,6 +19,7 @@ const Track = styled(BaseSlider.Track, {
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',
+  cursor: 'pointer',
   '&[data-orientation="horizontal"]': { height: 3 },
 });
 

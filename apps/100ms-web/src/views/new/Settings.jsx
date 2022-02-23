@@ -13,7 +13,7 @@ const Settings = ({ open, onOpenChange, children }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <DialogContent Icon={SettingIcon} title="Settings">
         {videoInput?.length ? (
@@ -60,7 +60,7 @@ const Settings = ({ open, onOpenChange, children }) => {
           <TestAudio id={selectedDeviceIDs.audioOutput} />
         </DialogRow>
       </DialogContent>
-    </Dialog>
+    </Dialog.Root>
   );
 };
 

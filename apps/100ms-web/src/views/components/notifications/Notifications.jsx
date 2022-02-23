@@ -1,16 +1,17 @@
 /* eslint-disable no-case-declarations */
 import React, { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import { Text, Button } from "@100mslive/hms-video-react";
+import {
+  HandIcon,
+  PersonIcon,
+  ConnectivityIcon,
+  PoorConnectivityIcon,
+} from "@100mslive/react-icons";
 import {
   useHMSNotifications,
   HMSNotificationTypes,
-  Text,
-  PoorConnectivityIcon,
-  ConnectivityIcon,
-  PersonIcon,
-  Button,
-  HandIcon,
-} from "@100mslive/hms-video-react";
+} from "@100mslive/react-sdk";
 import { HMSToastContainer, hmsToast } from "./hms-toast";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
