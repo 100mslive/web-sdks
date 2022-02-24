@@ -23,7 +23,7 @@ export interface useAutoplayErrorResult {
  * @returns {useAutoplayErrorResult}
  */
 export const useAutoplayError = (): useAutoplayErrorResult => {
-  const notification = useHMSNotifications(HMSNotificationTypes.AUTOPLAY_ERROR);
+  const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [error, setError] = useState('');
   const actions = useHMSActions();
 
