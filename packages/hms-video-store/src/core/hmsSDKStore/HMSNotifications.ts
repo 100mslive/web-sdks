@@ -33,25 +33,22 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   onNotification = (cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
-    if (type) {
-      if (Array.isArray(type)) {
-        this.eventEmitter.on(type, cb);
-      } else {
-        this.eventEmitter.on(type, cb);
-      }
-    } else {
-      this.eventEmitter.on(HMS_NOTIFICATION_EVENT, cb);
-    }
-    return () => {
+    this.eventEmitter.on(HMS_NOTIFICATION_EVENT, (notification: HMSNotification) => {
       if (type) {
+        let matchesType: boolean;
         if (Array.isArray(type)) {
-          this.eventEmitter.off(type, cb);
+          matchesType = type.includes(notification.type as HMSNotificationTypes);
         } else {
-          this.eventEmitter.off(type, cb);
+          matchesType = type === (notification.type as HMSNotificationTypes);
         }
-      } else {
-        this.eventEmitter.off(HMS_NOTIFICATION_EVENT, cb);
+        if (!matchesType) {
+          return;
+        }
       }
+      cb(notification);
+    });
+    return () => {
+      this.eventEmitter.off(HMS_NOTIFICATION_EVENT, cb);
     };
   };
 
@@ -118,6 +115,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   sendError(error: HMSException) {
+    console.error({ errorCode: error.code });
     const notification = this.createNotification(
       error.code === 3008 ? HMSNotificationTypes.AUTOPLAY_ERROR : HMSNotificationTypes.ERROR,
       error,
