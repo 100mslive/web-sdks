@@ -16,7 +16,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$grayLight',
+  backgroundColor: '$brandLight',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',
@@ -26,7 +26,7 @@ const Track = styled(BaseSlider.Track, {
 
 const Range = styled(BaseSlider.Range, {
   position: 'absolute',
-  backgroundColor: 'white',
+  backgroundColor: '$brandDefault',
   borderRadius: '$round',
   height: '100%',
 });
@@ -36,11 +36,11 @@ const Thumb = styled(BaseSlider.Thumb, {
   display: 'block',
   width: 15,
   height: 15,
-  backgroundColor: '$white',
+  backgroundColor: '$brandDefault',
   cursor: 'pointer',
   boxShadow: `0 2px 10px $colors$grayDefault`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: '$white' },
+  '&:hover': { backgroundColor: '$brandDefault' },
   '&:focus': { boxShadow: 'none' },
 });
 
