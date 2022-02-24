@@ -223,7 +223,7 @@ export class HMSVideoPluginsManager {
     }
     // FF issue https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
     this.inputCanvas.getContext('2d');
-    this.outputCanvas.getContext('2d');
+    // this.outputCanvas.getContext('2d');
     // capture stream automatically uses the framerate at which the output canvas is changing
     const outputStream = this.outputCanvas.captureStream();
     this.outputTrack = outputStream.getVideoTracks()[0];
@@ -397,11 +397,11 @@ export class HMSVideoPluginsManager {
     if (!this.outputCanvas || !this.inputCanvas) {
       return;
     }
-    const outputCtx = this.outputCanvas.getContext('2d');
-    if (outputCtx) {
-      outputCtx.fillStyle = `rgb(0, 0, 0)`;
-      outputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    }
+    // const outputCtx = this.outputCanvas.getContext('2d');
+    // if (outputCtx) {
+    //   outputCtx.fillStyle = `rgb(0, 0, 0)`;
+    //   outputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    // }
     const inputCtx = this.inputCanvas.getContext('2d');
     if (inputCtx) {
       inputCtx.fillStyle = `rgb(0, 0, 0)`;
