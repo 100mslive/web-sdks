@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
 import { FirstPersonDisplay } from "@100mslive/hms-video-react";
-import { Box, Flex } from "@100mslive/react-ui";
+import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
 import { ChatView } from "./chatView";
-import { useWindowSize } from "../hooks/useWindowSize";
-import { chatStyle, getBlurClass } from "../../common/utils";
+import { chatStyle } from "../../common/utils";
 import VideoList from "../new/VideoList";
+import { useMedia } from "react-use";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -21,16 +21,13 @@ const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 export const GridCenterView = ({
   peers,
   maxTileCount,
-  allowRemoteMute,
   isChatOpen,
   toggleChat,
-  isParticipantListOpen,
   hideSidePane,
-  totalPeers,
   showStatsOnTiles,
 }) => {
-  const { width } = useWindowSize();
-  const isMobile = width < 760;
+  const mediaQueryLg = cssConfig.media.md;
+  const limitMaxTiles = useMedia(mediaQueryLg);
   return (
     <Fragment>
       <Box
@@ -44,7 +41,7 @@ export const GridCenterView = ({
           <VideoList
             showStatsOnTiles={showStatsOnTiles}
             peers={peers}
-            maxTileCount={isMobile ? MAX_TILES_FOR_MOBILE : maxTileCount}
+            maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
           />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
           <div className="h-full w-full grid place-items-center p-5">
@@ -62,12 +59,11 @@ export const GridCenterView = ({
       </Box>
       {isChatOpen && hideSidePane && (
         <Flex
-          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           css={{
             height: "45%",
             flex: "0 0 20%",
             zIndex: 40,
-            mr: "$2",
+            mr: "$4",
             alignSelf: "flex-end",
             "@md": chatStyle,
             "@ls": {
@@ -88,25 +84,18 @@ export const GridSidePaneView = ({
   peers,
   isChatOpen,
   toggleChat,
-  isParticipantListOpen,
-  totalPeers,
   showStatsOnTiles,
 }) => {
-  const { width } = useWindowSize();
-  let rows = undefined;
-  if (width < 768) {
-    rows = 2;
-  } else if (width === 768) {
-    rows = 1;
-  }
-
   return (
     <Flex
       direction="column"
       css={{
         flex: "0 0 20%",
-        mx: "$2",
+        mx: "$4",
         "@lg": {
+          flex: "0 0 25%",
+        },
+        "@md": {
           flex: "1 1 0",
         },
       }}
@@ -117,18 +106,16 @@ export const GridSidePaneView = ({
             showStatsOnTiles={showStatsOnTiles}
             peers={peers}
             maxColCount={2}
-            maxRowCount={rows}
           />
         )}
       </Flex>
       {isChatOpen && (
         <Flex
-          className={`${getBlurClass(isParticipantListOpen, totalPeers)}`}
           align="end"
           css={{
             flex: "1 1 0",
             h: "50%",
-            p: "$2",
+            p: "$4",
             "@md": chatStyle,
             "@ls": {
               ...chatStyle,

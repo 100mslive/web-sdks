@@ -336,6 +336,7 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData || '' },
         config.initEndpoint,
         config.autoVideoSubscribe,
+        window.HMS?.SERVER_SUB_DEGRADE || false,
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
@@ -482,6 +483,13 @@ export class HMSSdk implements HMSInterface {
     }
 
     const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
+    if (!this.localPeer) {
+      HMSLogger.d(this.TAG, 'Screenshared when not connected');
+      tracks.forEach(track => {
+        track.cleanup();
+      });
+      return;
+    }
     await this.transport.publish(tracks);
     tracks.forEach(track => {
       track.peerId = this.localPeer?.peerId;
@@ -761,12 +769,14 @@ export class HMSSdk implements HMSInterface {
 
   private notifyJoin() {
     const localPeer = this.store.getLocalPeer();
+    const room = this.store.getRoom();
+    room.joinedAt = new Date();
 
     if (localPeer?.role) {
-      this.listener?.onJoin(this.store.getRoom());
+      this.listener?.onJoin(room);
     } else {
       this.notificationManager.once('policy-change', () => {
-        this.listener?.onJoin(this.store.getRoom());
+        this.listener?.onJoin(room);
       });
     }
   }

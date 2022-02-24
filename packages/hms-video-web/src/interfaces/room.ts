@@ -9,6 +9,7 @@ export interface HMSRoom {
   id: string;
   name?: string;
   sessionId?: string;
+  joinedAt?: Date;
   startedAt?: Date;
   localPeer: HMSLocalPeer;
   peers: HMSPeer[];

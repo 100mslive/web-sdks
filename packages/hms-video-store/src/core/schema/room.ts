@@ -33,6 +33,7 @@ export interface HMSRoom {
   hls: HMSHLS;
   sessionId: string;
   startedAt?: Date;
+  joinedAt?: Date;
   /**
    * if this number is available room.peers is not guaranteed to have all the peers.
    */

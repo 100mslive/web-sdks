@@ -40,3 +40,5 @@ export interface HMSConfig {
    */
   alwaysRequestPermissions?: boolean;
 }
+
+export type { InitialSettings as HMSConfigInitialSettings };

@@ -24,7 +24,7 @@ import Dropdown from './components/Dropdown';
 import GridLayout from './assets/images/icons/grid-view.svg';
 import SpeakerLayout from './assets/images/icons/speaker-view.svg';
 // import pebbleIcons from './assets/images/icons/pebble-icons.svg'
-import initialIcons from './assets/images/icons/initial-icons.svg';
+// import initialIcons from './assets/images/icons/initial-icons.svg';
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 
@@ -495,7 +495,7 @@ class App extends Component {
                   (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
                 showAvatar: 'true',
                 avatarType: this.state.temporary_state.avatars,
-                logoClass: 'h-16',
+                logoClass: 'h-12',
                 headerPresent: this.state.showHeader.toString(),
                 metadata: this.state.temporary_state.metadataFields.metadata,
               }}
@@ -857,8 +857,8 @@ function RoomSettings(props) {
           />
         </div>
       </div>
-      <Divider />
-      <div className="flex justify-between items-center mt-4 mb-4">
+      {/* <Divider /> */}
+      {/* <div className="flex justify-between items-center mt-4 mb-4">
         <span className=" text-gray-cool5 text-sm font-normal">Video-off avatars</span>
         <Dropdown
           values={[
@@ -888,7 +888,7 @@ function RoomSettings(props) {
             props.change('avatars', avatarName);
           }}
         />
-      </div>
+      </div> */}
       <Divider />
       {props.settings.metadataFields.clicks > 4 && (
         <>

@@ -197,8 +197,12 @@ export const getTileSizesWithColConstraint = ({
     Math.ceil(Math.sqrt((count * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
     maxCount,
   );
-  const width = parentWidth / cols;
-  const height = width / (aspectRatio.width / aspectRatio.height);
+  let width = parentWidth / cols;
+  let height = width / (aspectRatio.width / aspectRatio.height);
+  if (height > parentHeight) {
+    height = parentHeight;
+    width = height / (aspectRatio.height / aspectRatio.width);
+  }
   const rows = Math.floor(parentHeight / height);
   defaultHeight = height;
   defaultWidth = width;
@@ -210,8 +214,12 @@ export const getTileSizesWithColConstraint = ({
       Math.ceil(Math.sqrt((tilesinLastPage * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
       maxCount,
     );
-    const width = parentWidth / cols;
-    const height = width / (aspectRatio.width / aspectRatio.height);
+    let width = parentWidth / cols;
+    let height = width / (aspectRatio.width / aspectRatio.height);
+    if (height > parentHeight) {
+      height = parentHeight;
+      width = height / (aspectRatio.height / aspectRatio.width);
+    }
     lastPageHeight = height;
     lastPageWidth = width;
   }

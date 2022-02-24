@@ -1,9 +1,9 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { TrackStateNotification } from '../HMSNotifications';
+import { OnTrackLayerUpdateNotification, TrackStateNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -28,6 +28,23 @@ export class TrackManager {
   }
 
   constructor(private store: IStore, private eventEmitter: EventEmitter, public listener?: HMSUpdateListener) {}
+
+  isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
+    const toInt = (layer: HMSSimulcastLayer): number => {
+      switch (layer) {
+        case HMSSimulcastLayer.HIGH:
+          return 3;
+        case HMSSimulcastLayer.MEDIUM:
+          return 2;
+        case HMSSimulcastLayer.LOW:
+          return 1;
+        case HMSSimulcastLayer.NONE:
+          return 0;
+      }
+    };
+
+    return toInt(newLayer) < toInt(prevLayer);
+  }
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
@@ -96,6 +113,31 @@ export class TrackManager {
 
     this.store.removeTrack(track.trackId);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+  };
+
+  handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
+    for (const trackId in params.tracks) {
+      const trackEntry = params.tracks[trackId];
+      const track = this.store.getTrackById(trackId);
+      if (!track) {
+        continue;
+      }
+
+      const peer = this.store.getPeerByTrackId(trackId)!;
+      if (!peer) {
+        continue;
+      }
+
+      if (track instanceof HMSRemoteVideoTrack) {
+        const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
+        track.setDegraded(isDegraded);
+        if (isDegraded) {
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
+        } else {
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
+        }
+      }
+    }
   };
 
   handleTrackUpdate = (params: TrackStateNotification) => {

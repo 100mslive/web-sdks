@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.7-alpha.0",
+  "version": "0.0.7-alpha.1",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -24,6 +24,7 @@
     "format": "prettier -w src/**"
   },
   "devDependencies": {
+    "@types/lodash.merge": "^4.6.6",
     "@types/react": "^17.0.38",
     "react": "^17.0.2"
   },
@@ -32,13 +33,16 @@
     "react-dom": "^17.0.1"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.0.7-alpha.0",
-    "@100mslive/react-sdk": "0.0.7-alpha.0",
+    "@100mslive/react-icons": "0.0.7-alpha.1",
+    "@100mslive/react-sdk": "0.0.7-alpha.1",
+    "@radix-ui/react-checkbox": "^0.1.4",
     "@radix-ui/react-dialog": "^0.1.1",
+    "@radix-ui/react-dropdown-menu": "^0.1.4",
     "@radix-ui/react-popover": "^0.1.4",
     "@radix-ui/react-slider": "^0.1.1",
     "@radix-ui/react-switch": "^0.1.1",
     "@radix-ui/react-tooltip": "^0.1.1",
-    "@stitches/react": "^1.2.5"
+    "@stitches/react": "^1.2.5",
+    "lodash.merge": "^4.6.2"
   }
 }

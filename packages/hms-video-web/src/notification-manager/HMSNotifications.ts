@@ -2,6 +2,7 @@ import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
 import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { HMSSimulcastLayer } from '../interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -19,6 +20,16 @@ export interface TrackStateNotification {
     [track_id: string]: TrackState;
   };
   peer: PeerNotificationInfo;
+}
+
+export interface OnTrackLayerUpdateNotification {
+  tracks: {
+    [track_id: string]: {
+      current_layer: HMSSimulcastLayer;
+      expected_layer: HMSSimulcastLayer;
+      track_id: string;
+    };
+  };
 }
 
 export interface PeerNotificationInfo {
@@ -56,7 +67,7 @@ export class TrackState implements Track {
     this.description = '';
     if (track instanceof HMSTrack) {
       this.mute = !track.enabled;
-      this.track_id = track.publishedTrackId;
+      this.track_id = track.publishedTrackId!;
       this.stream_id = track.stream.id;
     } else {
       this.mute = track.mute;

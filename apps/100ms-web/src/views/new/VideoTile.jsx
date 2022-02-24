@@ -1,11 +1,11 @@
 // @ts-check
 import React, { useState } from "react";
 import {
-  AudioLevel,
   Avatar,
   StyledVideoTile,
   Video,
   VideoTileStats,
+  useBorderAudioLevel,
 } from "@100mslive/react-ui";
 import {
   useHMSStore,
@@ -30,6 +30,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const metaData = useHMSStore(selectPeerMetadata(peerId));
+  const borderAudioRef = useBorderAudioLevel(peer?.audioTrack);
   const isVideoDegraded = track?.degraded;
   const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
@@ -42,6 +43,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
           onMouseLeave={() => {
             setIsMouseHovered(false);
           }}
+          ref={borderAudioRef}
         >
           {showStatsOnTiles ? (
             <VideoTileStats
@@ -50,7 +52,6 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
             />
           ) : null}
 
-          <AudioLevel audioTrack={peer?.audioTrack} />
           {track ? (
             <Video
               trackId={track?.id}
@@ -59,7 +60,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
             />
           ) : null}
           {isVideoMuted || isVideoDegraded ? (
-            <Avatar size={getAvatarSize(height)} name={peer?.name || ""} />
+            <Avatar name={peer?.name || ""} />
           ) : null}
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
           {isAudioMuted ? (
@@ -75,12 +76,12 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
             />
           ) : null}
           {isHandRaised ? (
-            <StyledVideoTile.AttributeBox>
+            <StyledVideoTile.AttributeBox css={metaStyles}>
               <HandRaiseFilledIcon width={40} height={40} />
             </StyledVideoTile.AttributeBox>
           ) : null}
           {isBRB ? (
-            <StyledVideoTile.AttributeBox>
+            <StyledVideoTile.AttributeBox css={metaStyles}>
               <BrbIcon width={40} height={40} />
             </StyledVideoTile.AttributeBox>
           ) : null}
@@ -90,19 +91,8 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   );
 };
 
+const metaStyles = { left: "20px", bottom: "20px" };
+
 const VideoTile = React.memo(Tile);
 
 export default VideoTile;
-
-const getAvatarSize = height => {
-  if (height === "100%") {
-    return "sm";
-  }
-  if (height < 200) {
-    return "xs";
-  } else if (height < 500) {
-    return "sm";
-  } else {
-    return "md";
-  }
-};

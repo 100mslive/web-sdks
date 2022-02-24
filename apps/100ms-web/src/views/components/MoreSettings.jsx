@@ -9,25 +9,28 @@ import {
   Button,
   ContextMenu,
   ContextMenuItem,
-  HamburgerMenuIcon,
-  PersonIcon,
-  Settings,
   UiSettings,
-  SettingsIcon,
+} from "@100mslive/hms-video-react";
+import {
+  selectPermissions,
+  useHMSActions,
   useHMSStore,
   selectAvailableRoleNames,
   selectLocalPeer,
-  TickIcon,
+} from "@100mslive/react-sdk";
+import {
+  InfoIcon,
+  MenuIcon,
+  PersonIcon,
+  CheckIcon,
+  SettingIcon,
+  SpotlightIcon,
   GridIcon,
   ArrowRightIcon,
-  useHMSActions,
-  selectPermissions,
-  FullScreenIcon,
+  ComputerIcon,
   RecordIcon,
-  StarIcon,
-  ChangeTextIcon,
-  InfoIcon,
-} from "@100mslive/hms-video-react";
+  TextboxIcon,
+} from "@100mslive/react-icons";
 import { AppContext } from "../../store/AppContext";
 import { hmsToast } from "./notifications/hms-toast";
 import { arrayIntersection, setFullScreenEnabled } from "../../common/utils";
@@ -36,6 +39,7 @@ import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { MuteAll } from "./MuteAll";
 import { ChangeName, StatsForNerds } from "./ChangeName";
 import { FeatureFlags } from "../../store/FeatureFlags";
+import Settings from "../new/Settings";
 
 export const MoreSettings = () => {
   const {
@@ -126,7 +130,7 @@ export const MoreSettings = () => {
             active={showMenu}
             key="hamburgerIcon"
           >
-            <HamburgerMenuIcon />
+            <MenuIcon />
           </Button>
         }
         menuProps={{
@@ -141,7 +145,7 @@ export const MoreSettings = () => {
         }}
       >
         <ContextMenuItem
-          icon={<ChangeTextIcon />}
+          icon={<TextboxIcon />}
           label="Change my name"
           key="change-name"
           onClick={() => setShowChangeNameModal(true)}
@@ -194,7 +198,7 @@ export const MoreSettings = () => {
                       }}
                       iconRight={
                         localPeer && localPeer.roleName === role ? (
-                          <TickIcon width={16} height={16} />
+                          <CheckIcon width={16} height={16} />
                         ) : null
                       }
                     />
@@ -216,7 +220,7 @@ export const MoreSettings = () => {
         )}
         {screenfull.isEnabled && (
           <ContextMenuItem
-            icon={<FullScreenIcon />}
+            icon={<ComputerIcon />}
             label={`${isFullScreenEnabled ? "Exit " : ""}Full Screen`}
             key="toggleFullScreen"
             onClick={() => {
@@ -227,7 +231,7 @@ export const MoreSettings = () => {
         {permissions.mute && (
           <ContextMenuItem
             label="Mute All"
-            icon={<StarIcon />}
+            icon={<SpotlightIcon />}
             onClick={() => {
               setShowMuteAll(true);
             }}
@@ -245,7 +249,7 @@ export const MoreSettings = () => {
           />
         )}
         <ContextMenuItem
-          icon={<SettingsIcon />}
+          icon={<SettingIcon />}
           label="Device Settings"
           key="settings"
           onClick={() => {
@@ -254,7 +258,7 @@ export const MoreSettings = () => {
         />
         {FeatureFlags.enableStatsForNerds && (
           <ContextMenuItem
-            icon={<InfoIcon width={24} />}
+            icon={<InfoIcon height={17} />}
             label="Stats for Nerds"
             key="stats"
             onClick={() => {
@@ -264,9 +268,8 @@ export const MoreSettings = () => {
         )}
       </ContextMenu>
       <Settings
-        className="hidden"
-        showModal={showSettings}
-        onModalClose={() => setShowSettings(false)}
+        open={showSettings}
+        onOpenChange={state => setShowSettings(state)}
       />
       <UiSettings
         {...uiSettingsProps}
