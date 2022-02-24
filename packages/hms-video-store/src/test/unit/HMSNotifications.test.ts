@@ -121,10 +121,8 @@ describe('hms notifications tests', () => {
 
   test('when type is passed and matches, callback to be called, ', () => {
     const callback = jest.fn(val => val);
-    notifications.onNotification(callback, HMSNotificationTypes.AUTOPLAY_ERROR);
-    const error = makeException('Test');
-    error.code = 3008;
-    notifications.sendError(error);
+    notifications.onNotification(callback, HMSNotificationTypes.RECONNECTED);
+    notifications.sendReconnected();
     expect(callback.mock.calls.length).toBe(1);
   });
 
