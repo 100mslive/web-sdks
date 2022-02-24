@@ -115,7 +115,6 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   sendError(error: HMSException) {
-    console.error({ errorCode: error.code });
     const notification = this.createNotification(
       error.code === 3008 ? HMSNotificationTypes.AUTOPLAY_ERROR : HMSNotificationTypes.ERROR,
       error,
