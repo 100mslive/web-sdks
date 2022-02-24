@@ -2,7 +2,6 @@
 
 This monorepo will contain all packages related to core sdk and store.
 
-
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
 ### Local Setup
@@ -43,6 +42,13 @@ Go to the path of the package ex: cd packages/hms-video-web and run the followin
 To update the same in dependent packages run
 `lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact`
 
+### Publishing Alpha/Experimental versions
+
+To publish an alpha/experimental from your `experimental` branch, run the 'Create Release PR' action on the `experimental` branch.
+This bumps the version of all the packages and creates a PR against your `experimental` branch.
+
+Merge this PR into your `experimental` branch and run the 'Publish Packages' on your branch to publish the packages.
+
 ### Syncing with webapp
 
 check the existing remotes with `git remote -v`;
@@ -57,9 +63,8 @@ if there is only one remote, add webapp as a new remote.
 
 `git subtree pull --prefix=apps/100ms-web webapp main`
 
-
 ## Tips and Tricks
 
 - `window.toggleUiTheme()` in console to switch between dark and light themes
-- Set directJoin to true in PreviewScreen.jsx to not have to click on join after 
+- Set directJoin to true in PreviewScreen.jsx to not have to click on join after
   page reload.
