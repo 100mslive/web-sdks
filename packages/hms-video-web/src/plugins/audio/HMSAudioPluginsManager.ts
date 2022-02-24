@@ -1,4 +1,4 @@
-import { HMSAudioPlugin } from './HMSAudioPlugin'; //HMSAudioPluginType
+import { HMSAudioPlugin, HMSAudioPluginSupportType } from './HMSAudioPlugin'; //HMSAudioPluginType
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -63,6 +63,9 @@ export class HMSAudioPluginsManager {
 
     try {
       await this.addPluginInternal(plugin);
+    } catch (err) {
+      console.log('error in adding');
+      throw err;
     } finally {
       this.pluginAddInProgress = false;
     }
@@ -79,7 +82,8 @@ export class HMSAudioPluginsManager {
       this.audioContext = new AudioContext();
     }
 
-    if (!plugin.isSupported(this.audioContext!.sampleRate)) {
+    const supportType = plugin.isSupported(this.audioContext!.sampleRate);
+    if (supportType === HMSAudioPluginSupportType.PLATFORM_NOT_SUPPORTED) {
       const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
         HMSAction.AUDIO_PLUGINS,
         'platform/SampleRate not supported, see docs',
@@ -87,7 +91,18 @@ export class HMSAudioPluginsManager {
       this.analytics.failure(name, err);
       HMSLogger.i(TAG, `Platform or sampleRate is not supported for plugin, see docs - ${plugin.getName()}`);
       throw err;
+    } else if (supportType === HMSAudioPluginSupportType.DEVICE_NOT_SUPPORTED) {
+      const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+        HMSAction.AUDIO_PLUGINS,
+        'audio device not supported, see docs',
+      );
+      this.analytics.failure(name, err);
+      HMSLogger.i(TAG, `audio device is not supported for plugin, see docs - ${plugin.getName()}`);
+      throw err;
+    } else if (supportType === HMSAudioPluginSupportType.PLUGIN_SUPPORTED) {
+      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     }
+
     try {
       if (this.pluginsMap.size === 0) {
         await this.initContextAndAudioNodes();

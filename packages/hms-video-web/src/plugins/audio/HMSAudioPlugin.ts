@@ -17,7 +17,7 @@ export interface HMSAudioPlugin {
    * This function will be called before the call to init, it is used to check whether the plugin supports current
    * OS and audio device or not. An error will be thrown back to the user if they try to use an unsupported plugin.
    */
-  isSupported(samplingRate: number): boolean;
+  isSupported(samplingRate: number): HMSAudioPluginSupportType;
 
   /**
    * This function will be called in the beginning for initialization which may include tasks like setting up
@@ -52,4 +52,10 @@ export interface HMSAudioPlugin {
 export enum HMSAudioPluginType {
   TRANSFORM = 'TRANSFORM',
   ANALYZE = 'ANALYZE',
+}
+
+export enum HMSAudioPluginSupportType {
+  PLUGIN_SUPPORTED = 'PLUGIN_SUPPORTED',
+  PLATFORM_NOT_SUPPORTED = 'PLATFORM_NOT_SUPPORTED',
+  DEVICE_NOT_SUPPORTED = 'DEVICE_NOT_SUPPORTED',
 }

@@ -35,6 +35,7 @@ export const NoiseSuppression = () => {
       createPlugin();
       await hmsActions.addPluginToAudioTrack(pluginRef.current);
     } catch (err) {
+      setRemoveButton(true);
       console.error("adding noise suppression plugin failed", err);
     }
   }, [hmsActions]);
@@ -76,11 +77,13 @@ export const NoiseSuppression = () => {
         onClick={async () => {
           if (!isPluginPresent) {
             try {
-              await addPlugin();
+              console.log("inside add plugin cta");
+              addPlugin();
             } catch (err) {
               //raise alert and hide button
               // hmsToast();
-              setRemoveButton(true);
+              console.log("plugin not supported");
+              // setRemoveButton(true);
             }
           } else {
             await removePlugin();
