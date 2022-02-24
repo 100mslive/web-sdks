@@ -42,6 +42,7 @@ class Store implements IStore {
   private config?: HMSConfig;
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
+  private roleDetailsArrived = false;
 
   getConfig() {
     return this.config;
@@ -164,7 +165,12 @@ class Store implements IStore {
 
   setKnownRoles(knownRoles: KnownRoles) {
     this.knownRoles = knownRoles;
+    this.roleDetailsArrived = true;
     this.updatePeersPolicy();
+  }
+
+  hasRoleDetailsArrived(): boolean {
+    return this.roleDetailsArrived;
   }
 
   setConfig(config: HMSConfig) {
@@ -330,6 +336,7 @@ class Store implements IStore {
     }
     this.config = undefined;
     this.localPeerId = undefined;
+    this.roleDetailsArrived = false;
   }
 
   setErrorListener(listener: IErrorListener) {
