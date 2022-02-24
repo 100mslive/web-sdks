@@ -1,5 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { IHMSNotifications } from '../IHMSNotifications';
+import { IHMSNotifications, HMSNotificationCallback } from '../IHMSNotifications';
 import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';
 import * as sdkTypes from './sdkTypes';
@@ -21,6 +21,7 @@ import {
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
+
 export class HMSNotifications implements IHMSNotifications {
   private id = 0;
   private eventEmitter: EventEmitter;
@@ -31,10 +32,26 @@ export class HMSNotifications implements IHMSNotifications {
     this.eventEmitter = new EventEmitter();
   }
 
-  onNotification = (cb: (notification: HMSNotification) => void): (() => void) => {
-    this.eventEmitter.addListener(HMS_NOTIFICATION_EVENT, cb);
+  onNotification = (cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
+    if (type) {
+      if (Array.isArray(type)) {
+        this.eventEmitter.on(type, cb);
+      } else {
+        this.eventEmitter.on(type, cb);
+      }
+    } else {
+      this.eventEmitter.on(HMS_NOTIFICATION_EVENT, cb);
+    }
     return () => {
-      this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, cb);
+      if (type) {
+        if (Array.isArray(type)) {
+          this.eventEmitter.off(type, cb);
+        } else {
+          this.eventEmitter.off(type, cb);
+        }
+      } else {
+        this.eventEmitter.off(HMS_NOTIFICATION_EVENT, cb);
+      }
     };
   };
 
