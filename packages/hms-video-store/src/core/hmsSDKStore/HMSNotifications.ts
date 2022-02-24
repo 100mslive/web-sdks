@@ -33,7 +33,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   onNotification = (cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
-    this.eventEmitter.on(HMS_NOTIFICATION_EVENT, (notification: HMSNotification) => {
+    const eventCallback = (notification: HMSNotification) => {
       if (type) {
         let matchesType: boolean;
         if (Array.isArray(type)) {
@@ -46,9 +46,10 @@ export class HMSNotifications implements IHMSNotifications {
         }
       }
       cb(notification);
-    });
+    };
+    this.eventEmitter.addListener(HMS_NOTIFICATION_EVENT, eventCallback);
     return () => {
-      this.eventEmitter.off(HMS_NOTIFICATION_EVENT, cb);
+      this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, eventCallback);
     };
   };
 
