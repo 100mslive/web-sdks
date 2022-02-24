@@ -63,6 +63,7 @@ class Transcriber {
     this.roomId = roomId;
     this.initialized = false;
     this.lastMessage = {};
+    this.localPeerId = null;
   }
 
   broadcast = (text, eventName = "transcription") => {
@@ -77,6 +78,7 @@ class Transcriber {
       this.allstreams = window.__hms.sdk.getPeers()
       this.allstreams.map(p => {
         if(p.isLocal){
+          this.localPeerId = p.peerId
           this.streams[p.peerId] = { "stream" : new MediaStream([p.audioTrack.nativeTrack]) , "name" : p.name}
         }
       }).filter(x => !!x)
@@ -85,12 +87,14 @@ class Transcriber {
       let body = await res.json();
       if(body && body.token){
         const token = body.token
-        this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`);
+        this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000&token=${token}`);
         document.getElementById("speechtxt").innerText = ""
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
             if(res.text && this.enabled){
-              this.broadcast(res.text)
+              let peername = this.streams[this.localPeerId]["name"]
+              peername = peername.toLowerCase().replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
+              this.broadcast(res.text + "\n[" + peername + "]")
             }
         };
   
@@ -127,10 +131,9 @@ class Transcriber {
       mimeType: 'audio/webm;codecs=pcm',
       recorderType: StereoAudioRecorder,
       timeSlice: 250,
-      desiredSampRate: 16000,
+      desiredSampRate: 8000,
       numberOfAudioChannels: 1,
-      bufferSize: 4096,
-      audioBitsPerSecond: 128000,
+      bufferSize: 256,
       ondataavailable: (blob) => {
         const reader = new FileReader();
         reader.onload = () => {
