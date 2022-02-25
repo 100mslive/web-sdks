@@ -1,4 +1,4 @@
-import { HMSAudioPlugin, HMSAudioPluginSupportType } from './HMSAudioPlugin'; //HMSAudioPluginType
+import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -82,25 +82,26 @@ export class HMSAudioPluginsManager {
       this.audioContext = new AudioContext();
     }
 
-    const supportType = plugin.isSupported(this.audioContext!.sampleRate);
-    if (supportType === HMSAudioPluginSupportType.PLATFORM_NOT_SUPPORTED) {
-      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
-        HMSAction.AUDIO_PLUGINS,
-        'platform/SampleRate not supported, see docs',
-      );
-      this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `Platform or sampleRate is not supported for plugin, see docs - ${plugin.getName()}`);
-      throw err;
-    } else if (supportType === HMSAudioPluginSupportType.DEVICE_NOT_SUPPORTED) {
-      const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
-        HMSAction.AUDIO_PLUGINS,
-        'audio device not supported, see docs',
-      );
-      this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `audio device is not supported for plugin, see docs - ${plugin.getName()}`);
-      throw err;
-    } else if (supportType === HMSAudioPluginSupportType.PLUGIN_SUPPORTED) {
+    const result = plugin.checkSupport(this.audioContext);
+    if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+    } else {
+      HMSLogger.i(TAG, `plugin -${plugin.getName()} support result type -${result.errType}`);
+      if (result.errType === HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'platform not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+      } else if (result.errType === HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'audio device not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+      }
+      await this.cleanup();
+      throw result.errMsg;
     }
 
     try {
@@ -119,6 +120,13 @@ export class HMSAudioPluginsManager {
       HMSLogger.e(TAG, 'failed to add plugin', err);
       throw err;
     }
+  }
+
+  validatePlugin(plugin: HMSAudioPlugin) {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+    return plugin.checkSupport(this.audioContext);
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {

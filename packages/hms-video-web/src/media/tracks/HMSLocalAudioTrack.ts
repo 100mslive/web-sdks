@@ -4,7 +4,7 @@ import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import HMSLogger from '../../utils/logger';
-import { HMSAudioPlugin } from '../../plugins';
+import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
@@ -124,6 +124,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   async removePlugin(plugin: HMSAudioPlugin): Promise<void> {
     return this.pluginsManager.removePlugin(plugin);
+  }
+
+  /**
+   * @see HMSAudioPlugin
+   */
+  validatePlugin(plugin: HMSAudioPlugin): HMSPluginSupportResult {
+    return this.pluginsManager.validatePlugin(plugin);
   }
 
   /**

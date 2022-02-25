@@ -10,6 +10,7 @@ import {
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
+import { hmsToast } from "./notifications/hms-toast";
 // import { hmsToast, HMSToastContainer } from "./notifications/hms-toast";
 
 const BUFFER_DURATION = 80;
@@ -34,10 +35,23 @@ export const NoiseSuppression = () => {
 
   const addPlugin = useCallback(async () => {
     try {
+      console.log("add plugin called");
+      setRemoveButton(false);
       createPlugin();
-      await hmsActions.addPluginToAudioTrack(pluginRef.current);
+      //check support its recommended
+      const pluginSupport = hmsActions.validateAudioPluginSupport(
+        pluginRef.current
+      );
+      if (pluginSupport.isSupported) {
+        console.log("plugin is supported");
+        await hmsActions.addPluginToAudioTrack(pluginRef.current);
+      } else {
+        console.log("plugin is not supported");
+      }
     } catch (err) {
+      hmsToast(err.message);
       setRemoveButton(true);
+      pluginRef.current = null;
       console.error("adding noise suppression plugin failed", err);
     }
   }, [hmsActions]);
@@ -60,6 +74,7 @@ export const NoiseSuppression = () => {
 
   async function removePlugin() {
     if (pluginRef.current) {
+      console.log("remove plugin called");
       await hmsActions.removePluginFromAudioTrack(pluginRef.current);
       pluginRef.current = null;
     }
@@ -81,15 +96,7 @@ export const NoiseSuppression = () => {
         disabled={removeButton}
         onClick={async () => {
           if (!isPluginPresent) {
-            try {
-              console.log("inside add plugin cta");
-              addPlugin();
-            } catch (err) {
-              //raise alert and hide button
-              // hmsToast();
-              console.log("plugin not supported");
-              // setRemoveButton(true);
-            }
+            await addPlugin();
           } else {
             await removePlugin();
           }

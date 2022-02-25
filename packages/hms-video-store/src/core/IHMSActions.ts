@@ -6,6 +6,7 @@ import {
   HMSLogLevel,
   HMSVideoPlugin,
   HMSAudioPlugin,
+  HMSPluginSupportResult,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -196,7 +197,20 @@ export interface IHMSActions {
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
+  /**
+   * Add or remove a audio plugin from/to the local peer audio track. Eg. Noise Suppression etc.
+   * Audio plugins can be added/removed at any time after the join is successful.
+   * @param plugin HMSAudioPlugin
+   * @see HMSAudioPlugin
+   */
   addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
+
+  /**
+   * To check the support of the plugin, based on browser, os and audio devices
+   * @param plugin HMSAudioPlugin
+   * @see HMSPluginSupportResult
+   */
+  validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult;
 
   /**
    * @see addPluginToVideoTrack
