@@ -37,8 +37,9 @@ import { arrayIntersection, setFullScreenEnabled } from "../../common/utils";
 import screenfull from "screenfull";
 import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { MuteAll } from "./MuteAll";
-import { ChangeName, StatsForNerds } from "./ChangeName";
+import { ChangeName } from "./ChangeName";
 import { FeatureFlags } from "../../store/FeatureFlags";
+import StatsForNerds from "../new/StatsForNerds";
 import Settings from "../new/Settings";
 
 export const MoreSettings = () => {
@@ -291,8 +292,8 @@ export const MoreSettings = () => {
       />
       {FeatureFlags.enableStatsForNerds && (
         <StatsForNerds
-          showModal={showStatsForNerds}
-          onCloseModal={() => setShowStatsForNerds(false)}
+          open={showStatsForNerds}
+          onOpenChange={setShowStatsForNerds}
         />
       )}
     </Fragment>
