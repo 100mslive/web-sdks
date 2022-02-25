@@ -79,5 +79,7 @@ export interface IStore {
   updateAudioOutputVolume(volume: number): void;
   updateAudioOutputDevice(device: MediaDeviceInfo): void;
 
+  hasRoleDetailsArrived(): boolean;
+
   cleanUp(): void;
 }
