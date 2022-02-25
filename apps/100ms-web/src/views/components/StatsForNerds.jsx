@@ -15,7 +15,7 @@ import {
 } from "@100mslive/react-ui";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../store/AppContext";
-import { DialogContent, DialogRow, DialogSelect } from "./DialogContent";
+import { DialogContent, DialogRow, DialogSelect } from "../new/DialogContent";
 
 const formatBytes = (bytes, unit = "B", decimals = 2) => {
   if (bytes === 0) return "0 " + unit;
@@ -118,7 +118,7 @@ const TrackStats = ({ trackID }) => {
   );
 };
 
-const StatsForNerds = ({ open, onOpenChange }) => {
+export const StatsForNerds = ({ open, onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(
     () => [
@@ -167,5 +167,3 @@ const StatsForNerds = ({ open, onOpenChange }) => {
     </Dialog.Root>
   );
 };
-
-export default StatsForNerds;
