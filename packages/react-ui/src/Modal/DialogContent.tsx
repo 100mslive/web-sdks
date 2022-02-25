@@ -19,7 +19,7 @@ export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
 
 export const StyledDialogContent = styled(DialogPrimitive.Content, {
   color: 'white',
-  backgroundColor: '$bgPrimary',
+  backgroundColor: '$menuBg',
   borderRadius: '8px',
   position: 'fixed',
   top: '50%',
