@@ -54,6 +54,7 @@ export class HMSAudioPluginsManager {
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
+      this.analytics.added(name);
       this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
       throw err;
@@ -86,22 +87,25 @@ export class HMSAudioPluginsManager {
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
-      HMSLogger.i(TAG, `plugin -${plugin.getName()} support result type -${result.errType}`);
+      //Needed to re-add in the reprocess case, to send error message in case of failure
+      this.analytics.added(name);
       if (result.errType === HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED) {
         const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
           HMSAction.AUDIO_PLUGINS,
           'platform not supported, see docs',
         );
         this.analytics.failure(name, err);
+        await this.cleanup();
+        throw err;
       } else if (result.errType === HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED) {
         const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
           HMSAction.AUDIO_PLUGINS,
           'audio device not supported, see docs',
         );
         this.analytics.failure(name, err);
+        await this.cleanup();
+        throw err;
       }
-      await this.cleanup();
-      throw result.errMsg;
     }
 
     try {
@@ -175,6 +179,9 @@ export class HMSAudioPluginsManager {
   }
 
   private async initContextAndAudioNodes() {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
