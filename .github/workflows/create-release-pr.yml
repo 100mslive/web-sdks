@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       versionBump:
-        description: 'which version to bump eg: patch, minor, major'
+        description: 'which version to bump eg: prerelease, patch'
         required: true
-        default: 'patch'
+        default: 'prerelease'
 
 jobs:
   create_pr:
