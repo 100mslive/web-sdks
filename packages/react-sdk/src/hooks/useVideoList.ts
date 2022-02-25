@@ -45,6 +45,10 @@ export interface useVideoListInput {
    * will be filtered. If you wish to show all peers, pass false for this.
    */
   filterNonPublishingPeers?: boolean;
+  /**
+   * Height that would be subtracted from the parent's height to give the available height, use case: if your pagination is inside the parent component then offsetY would be the height of pagination
+   */
+  offsetY?: number;
 }
 
 export interface useVideoListTile extends TrackWithPeer {
@@ -85,6 +89,7 @@ export const useVideoList = ({
   includeScreenShareForPeer = () => false,
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
+  offsetY = 0,
 }: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
@@ -120,13 +125,13 @@ export const useVideoList = ({
       calculateLayoutSizes({
         count,
         parentWidth: Math.floor(width),
-        parentHeight: Math.floor(height),
+        parentHeight: Math.floor(height) - Math.min(height, offsetY),
         maxTileCount,
         maxRowCount,
         maxColCount,
         aspectRatio: finalAspectRatio,
       }),
-    [count, width, height, maxTileCount, maxRowCount, maxColCount, finalAspectRatio],
+    [count, width, height, maxTileCount, maxRowCount, maxColCount, finalAspectRatio, offsetY],
   );
   const chunkedTracksWithPeer = useMemo(
     () =>
