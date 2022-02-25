@@ -39,7 +39,7 @@ import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { MuteAll } from "./MuteAll";
 import { ChangeName } from "./ChangeName";
 import { FeatureFlags } from "../../store/FeatureFlags";
-import StatsForNerds from "../new/StatsForNerds";
+import { StatsForNerds } from "./StatsForNerds";
 import Settings from "../new/Settings";
 
 export const MoreSettings = () => {

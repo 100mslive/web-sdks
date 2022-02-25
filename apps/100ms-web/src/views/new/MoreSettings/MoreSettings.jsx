@@ -10,7 +10,8 @@ import {
 } from "@100mslive/react-icons";
 import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
 import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
-import { ChangeName, StatsForNerds } from "../../components/ChangeName";
+import { ChangeName } from "../../components/ChangeName";
+import { StatsForNerds } from "../../components/StatsForNerds";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { RecordingAndRTMPModal } from "../../components/RecordingAndRTMPModal";
 import { FullScreenItem } from "./FullScreenItem";
@@ -139,8 +140,8 @@ export const MoreSettings = () => {
       />
       {FeatureFlags.enableStatsForNerds && (
         <StatsForNerds
-          showModal={showStatsForNerds}
-          onCloseModal={() => setShowStatsForNerds(false)}
+          open={showStatsForNerds}
+          onOpenChange={setShowStatsForNerds}
         />
       )}
       <UISettings
