@@ -5,6 +5,7 @@
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "version": "0.0.7-alpha.3",
+
   "author": "100ms",
   "license": "MIT",
   "files": [

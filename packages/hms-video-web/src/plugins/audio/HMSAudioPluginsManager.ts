@@ -1,4 +1,4 @@
-import { HMSAudioPlugin } from './HMSAudioPlugin'; //HMSAudioPluginType
+import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -63,6 +63,9 @@ export class HMSAudioPluginsManager {
 
     try {
       await this.addPluginInternal(plugin);
+    } catch (err) {
+      console.log('error in adding');
+      throw err;
     } finally {
       this.pluginAddInProgress = false;
     }
@@ -75,15 +78,32 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    if (!plugin.isSupported()) {
-      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
-        HMSAction.AUDIO_PLUGINS,
-        'platform not supported ',
-      );
-      this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
-      return;
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
     }
+
+    const result = plugin.checkSupport(this.audioContext);
+    if (result.isSupported) {
+      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+    } else {
+      HMSLogger.i(TAG, `plugin -${plugin.getName()} support result type -${result.errType}`);
+      if (result.errType === HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'platform not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+      } else if (result.errType === HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'audio device not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+      }
+      await this.cleanup();
+      throw result.errMsg;
+    }
+
     try {
       if (this.pluginsMap.size === 0) {
         await this.initContextAndAudioNodes();
@@ -100,6 +120,13 @@ export class HMSAudioPluginsManager {
       HMSLogger.e(TAG, 'failed to add plugin', err);
       throw err;
     }
+  }
+
+  validatePlugin(plugin: HMSAudioPlugin) {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+    return plugin.checkSupport(this.audioContext);
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
@@ -148,16 +175,12 @@ export class HMSAudioPluginsManager {
   }
 
   private async initContextAndAudioNodes() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
-
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-      this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
+      this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
     }
     if (!this.destinationNode) {
-      this.destinationNode = this.audioContext.createMediaStreamDestination();
+      this.destinationNode = this.audioContext!.createMediaStreamDestination();
       this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
       try {
         await this.hmsTrack.setProcessedTrack(this.outputTrack);

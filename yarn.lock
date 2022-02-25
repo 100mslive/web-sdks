@@ -2,10 +2,12 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-noise-suppression@0.1.7-alpha":
-  version "0.1.7-alpha"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-suppression/-/hms-noise-suppression-0.1.7-alpha.tgz#d69a48e6b4c674dcec3ec26e0bac4719c7d1608b"
-  integrity sha512-x8sBSWb1Xi19CiZR6pX6yS/D0toLj6IAAHGIErq814IrYRXSNwqTIoAqajM35MGhW0TDejtqY3J0IJFIQ2blKg==
+"@100mslive/hms-noise-suppression@0.1.7-alpha-3":
+  version "0.1.7-alpha-3"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-suppression/-/hms-noise-suppression-0.1.7-alpha-3.tgz#375ddf4bf5858fd73fb107ca3601d20f0c39278c"
+  integrity sha512-MR1x8decbwDpTMeygRdd2dFnpGcM/D/kXPWnUzL2BkhMu74nMm2Muy2AECReCH5jMzhlHzh1N89x5pCTQ/fcFw==
+  dependencies:
+    "@100mslive/hms-video" "^0.1.43"
 
 "@100mslive/hms-video-react@0.3.117-alpha.1":
   version "0.3.117-alpha.1"
@@ -45,6 +47,17 @@
   version "0.1.44-alpha.0"
   resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.44-alpha.0.tgz#110436b61303abee2cd5a84d523d4a6a3c01b8bb"
   integrity sha512-5Q9UrRJwGnmqNPmtbn9PGZI9q7JOcUZwyhpwUC3F2cY2oUCD7FLOJWrHll8f3UIWkeZcG5c5Ajp1IQCsc+MTaA==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-video@^0.1.43":
+  version "0.1.43"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.43.tgz#404776553f525e4e8fb6157b7423d7c1e6c6b94f"
+  integrity sha512-zb5Z55HCSqdvcl/JcR3A7nXlWqG/uQM8cf5hNnsHMTzSTgkCWeIWxL/mSP79DTWjdgJ9wAGLO26s/zGQBWfFjA==
   dependencies:
     eventemitter2 "^6.4.5"
     sdp-transform "^2.14.1"

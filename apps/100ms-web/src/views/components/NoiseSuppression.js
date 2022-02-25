@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   useHMSActions,
   useHMSStore,
@@ -10,11 +10,16 @@ import {
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
+import { hmsToast } from "./notifications/hms-toast";
+// import { hmsToast, HMSToastContainer } from "./notifications/hms-toast";
+
+const BUFFER_DURATION = 80;
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const hmsActions = useHMSActions();
+  const [removeButton, setRemoveButton] = useState(false);
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
@@ -24,15 +29,29 @@ export const NoiseSuppression = () => {
 
   const createPlugin = () => {
     if (!pluginRef.current) {
-      pluginRef.current = new HMSNoiseSuppressionPlugin();
+      pluginRef.current = new HMSNoiseSuppressionPlugin(BUFFER_DURATION);
     }
   };
 
   const addPlugin = useCallback(async () => {
     try {
+      console.log("add plugin called");
+      setRemoveButton(false);
       createPlugin();
-      await hmsActions.addPluginToAudioTrack(pluginRef.current);
+      //check support its recommended
+      const pluginSupport = hmsActions.validateAudioPluginSupport(
+        pluginRef.current
+      );
+      if (pluginSupport.isSupported) {
+        console.log("plugin is supported");
+        await hmsActions.addPluginToAudioTrack(pluginRef.current);
+      } else {
+        console.log("plugin is not supported");
+      }
     } catch (err) {
+      hmsToast(err.message);
+      setRemoveButton(true);
+      pluginRef.current = null;
       console.error("adding noise suppression plugin failed", err);
     }
   }, [hmsActions]);
@@ -55,6 +74,7 @@ export const NoiseSuppression = () => {
 
   async function removePlugin() {
     if (pluginRef.current) {
+      console.log("remove plugin called");
       await hmsActions.removePluginFromAudioTrack(pluginRef.current);
       pluginRef.current = null;
     }
@@ -73,8 +93,13 @@ export const NoiseSuppression = () => {
     >
       <IconButton
         active={!isPluginPresent}
-        onClick={() => {
-          !isPluginPresent ? addPlugin() : removePlugin();
+        disabled={removeButton}
+        onClick={async () => {
+          if (!isPluginPresent) {
+            await addPlugin();
+          } else {
+            await removePlugin();
+          }
         }}
         css={{ ml: "$4", "@md": { display: "none" } }}
       >
