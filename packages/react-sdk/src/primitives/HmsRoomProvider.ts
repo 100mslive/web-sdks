@@ -8,6 +8,7 @@ import {
   HMSStatsStore,
   HMSStats,
   HMSStoreWrapper,
+  HMSNotificationTypes,
 } from '@100mslive/hms-video-store';
 import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
@@ -148,7 +149,7 @@ export const useHMSActions = () => {
 /**
  * `useHMSNotifications` is a read only hook which gives the latest notification(HMSNotification) received.
  */
-export const useHMSNotifications = () => {
+export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
   const HMSContextConsumer = useContext(HMSContext);
   const [notification, setNotification] = useState<HMSNotification | null>(null);
 
@@ -160,11 +161,12 @@ export const useHMSNotifications = () => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification((notification: HMSNotification) =>
-      setNotification(notification),
+    const unsubscribe = HMSContextConsumer.notifications.onNotification(
+      (notification: HMSNotification) => setNotification(notification),
+      type,
     );
     return unsubscribe;
-  }, [HMSContextConsumer.notifications]);
+  }, [HMSContextConsumer.notifications, type]);
 
   return notification;
 };
