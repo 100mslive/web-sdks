@@ -506,8 +506,16 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
-  ignoreMessageTypes(msgTypes: string[]) {
-    this.ignoredMessageTypes = msgTypes;
+  ignoreMessageTypes(msgTypes: string[], replace = false) {
+    if (replace) {
+      this.ignoredMessageTypes = msgTypes;
+    } else {
+      for (const msgType of msgTypes) {
+        if (!this.ignoredMessageTypes.includes(msgType)) {
+          this.ignoredMessageTypes.push(msgType);
+        }
+      }
+    }
   }
 
   private resetState(reason = 'resetState') {

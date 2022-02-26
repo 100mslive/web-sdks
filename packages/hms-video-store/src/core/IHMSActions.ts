@@ -327,8 +327,11 @@ export interface IHMSActions {
    * stop screenshare, moderator messages, etc.). You can also use this to store messages on your own side if some additional
    * processing is required(the default type is "chat").
    * Notifications for the ignored messages will still be sent, it'll only not be put in the store.
+   * @param msgTypes list of messages types to ignore for storing
+   * @param replace (default is false) whether to replace the list of ignored messages. Types are appended to the existing
+   * list by default so you can call this method from different places and all will hold.
    */
-  ignoreMessageTypes(msgTypes: string[]): void;
+  ignoreMessageTypes(msgTypes: string[], replace?: boolean): void;
 
   /**
    * audio Playlist contains all actions that can be performed on the audio playlist
