@@ -319,6 +319,7 @@ export class HMSSDKActions implements IHMSActions {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = 'You';
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
     this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }
@@ -784,12 +785,13 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
     this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
 
   protected putMessageInStore(hmsMessage: HMSMessage) {
-    if (this.ignoredMessageTypes.includes(hmsMessage.type)) {
+    if (hmsMessage.ignored) {
       return;
     }
     this.setState(store => {
