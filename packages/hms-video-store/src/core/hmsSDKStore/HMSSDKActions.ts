@@ -784,13 +784,14 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    if (!this.ignoredMessageTypes.includes(hmsMessage.type)) {
-      this.putMessageInStore(hmsMessage);
-    }
+    this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
 
   protected putMessageInStore(hmsMessage: HMSMessage) {
+    if (this.ignoredMessageTypes.includes(hmsMessage.type)) {
+      return;
+    }
     this.setState(store => {
       hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
