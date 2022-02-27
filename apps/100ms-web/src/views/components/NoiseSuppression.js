@@ -105,7 +105,7 @@ export const NoiseSuppression = () => {
 
   if (
     !isAllowedToPublish.audio ||
-    (pluginRef.current && !pluginRef.current.checkSupport())
+    (pluginRef.current)
   ) {
     return null;
   }
