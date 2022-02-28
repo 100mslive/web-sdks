@@ -50,6 +50,7 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
       isVideoMuted: skipPreview ? true : previewPreference.isVideoMuted,
     },
   });
+  const localPeer = useHMSStore(selectLocalPeer);
   React.useEffect(() => {
     if (token) {
       if (skipPreview) {
@@ -60,6 +61,12 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+  React.useEffect(() => {
+    if (!localPeer) {
+      preview();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localPeer]);
   const savePreferenceAndJoin = React.useCallback(() => {
     setPreviewPreference({
       name,
