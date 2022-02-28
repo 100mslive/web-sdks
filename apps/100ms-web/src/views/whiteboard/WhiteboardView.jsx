@@ -31,7 +31,7 @@ const Editor = React.memo(({ roomId }) => {
     >
       <Box css={{ position: "relative", width: "100%", height: "100%" }}>
         <Box css={{ position: "absolute", zIndex: 4, p: "$3" }}>
-          {amIWhiteboardOwner ? "You are " : `${whiteboardOwner.name} `} sharing
+          {amIWhiteboardOwner ? "You are " : `${whiteboardOwner.name} is `} sharing
           whiteboard
         </Box>
         <Tldraw
