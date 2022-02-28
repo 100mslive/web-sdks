@@ -7,7 +7,10 @@ import { useMultiplayerState } from "./useMultiplayerState";
 import { useMedia } from "react-use";
 
 const Editor = React.memo(({ roomId }) => {
-  const { error, ...events } = useMultiplayerState(roomId);
+  const {
+    metadata: { amIWhiteboardOwner, whiteboardOwner },
+    events,
+  } = useMultiplayerState(roomId);
 
   return (
     <Box
@@ -23,6 +26,10 @@ const Editor = React.memo(({ roomId }) => {
       }}
     >
       <Box css={{ position: "relative", width: "100%", height: "100%" }}>
+        <Box css={{ position: "absolute", zIndex: 4, p: "$3" }}>
+          {amIWhiteboardOwner ? "You are " : `${whiteboardOwner.name} `} sharing
+          whiteboard
+        </Box>
         <Tldraw
           autofocus
           disableAssets={true}
