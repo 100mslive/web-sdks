@@ -16,18 +16,51 @@ import {
   DialogSwitch,
 } from "../new/DialogContent";
 
-const formatBytes = (bytes, unit = "B", decimals = 2) => {
-  if (bytes === 0) return "0 " + unit;
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["", "K", "M", "G", "T", "P", "E", "Z", "Y"].map(
-    size => size + unit
+export const StatsForNerds = ({ open, onOpenChange }) => {
+  const tracksWithLabels = useTracksWithLabel();
+  const statsOptions = useMemo(
+    () => [
+      { id: "local-peer", label: "Local Peer Stats" },
+      ...tracksWithLabels,
+    ],
+    [tracksWithLabels]
   );
+  const [selectedStat, setSelectedStat] = useState("local-peer");
+  const { showStatsOnTiles, setShowStatsOnTiles } = useContext(AppContext);
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  useEffect(() => {
+    if (
+      selectedStat !== "local-peer" &&
+      !tracksWithLabels.find(track => track.id === selectedStat)
+    ) {
+      setSelectedStat("local-peer");
+    }
+  }, [tracksWithLabels, selectedStat]);
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <DialogContent Icon={InfoIcon} title="Stats For Nerds">
+        <DialogSwitch
+          title="Show Stats on Tiles"
+          onChange={setShowStatsOnTiles}
+          value={showStatsOnTiles}
+        />
+        <DialogSelect
+          title="Stats For"
+          options={statsOptions}
+          keyField="id"
+          labelField="label"
+          selected={selectedStat}
+          onChange={setSelectedStat}
+        />
+        {selectedStat === "local-peer" ? (
+          <LocalPeerStats />
+        ) : (
+          <TrackStats trackID={selectedStat} />
+        )}
+      </DialogContent>
+    </Dialog.Root>
+  );
 };
 
 const useTracksWithLabel = () => {
@@ -46,13 +79,6 @@ const useTracksWithLabel = () => {
   );
   return tracksWithLabels;
 };
-
-const StatsRow = ({ label, value }) => (
-  <DialogRow justify="between" css={{ my: "0.5rem" }}>
-    <Box>{label}</Box>
-    <Box>{value}</Box>
-  </DialogRow>
-);
 
 const LocalPeerStats = () => {
   const stats = useHMSStatsStore(selectHMSStats.localPeerStats);
@@ -117,49 +143,23 @@ const TrackStats = ({ trackID }) => {
   );
 };
 
-export const StatsForNerds = ({ open, onOpenChange }) => {
-  const tracksWithLabels = useTracksWithLabel();
-  const statsOptions = useMemo(
-    () => [
-      { id: "local-peer", label: "Local Peer Stats" },
-      ...tracksWithLabels,
-    ],
-    [tracksWithLabels]
-  );
-  const [selectedStat, setSelectedStat] = useState("local-peer");
-  const { showStatsOnTiles, setShowStatsOnTiles } = useContext(AppContext);
+const StatsRow = ({ label, value }) => (
+  <DialogRow justify="between" css={{ my: "0.5rem" }}>
+    <Box>{label}</Box>
+    <Box>{value}</Box>
+  </DialogRow>
+);
 
-  useEffect(() => {
-    if (
-      selectedStat !== "local-peer" &&
-      !tracksWithLabels.find(track => track.id === selectedStat)
-    ) {
-      setSelectedStat("local-peer");
-    }
-  }, [tracksWithLabels, selectedStat]);
+const formatBytes = (bytes, unit = "B", decimals = 2) => {
+  if (bytes === 0) return "0 " + unit;
 
-  return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <DialogContent Icon={InfoIcon} title="Stats For Nerds">
-        <DialogSwitch
-          title="Show Stats on Tiles"
-          onChange={setShowStatsOnTiles}
-          value={showStatsOnTiles}
-        />
-        <DialogSelect
-          title="Stats For"
-          options={statsOptions}
-          keyField="id"
-          labelField="label"
-          selected={selectedStat}
-          onChange={setSelectedStat}
-        />
-        {selectedStat === "local-peer" ? (
-          <LocalPeerStats />
-        ) : (
-          <TrackStats trackID={selectedStat} />
-        )}
-      </DialogContent>
-    </Dialog.Root>
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["", "K", "M", "G", "T", "P", "E", "Z", "Y"].map(
+    size => size + unit
   );
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 };
