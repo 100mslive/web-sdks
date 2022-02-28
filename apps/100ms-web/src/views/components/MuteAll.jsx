@@ -53,7 +53,7 @@ export const MuteAll = ({ open, onOpenChange }) => {
   ]);
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Mute/Unmute Remote Tracks" Icon={MicOffIcon}>
         <DialogSelect
           title="Role"

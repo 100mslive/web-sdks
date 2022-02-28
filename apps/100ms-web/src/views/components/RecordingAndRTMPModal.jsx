@@ -19,7 +19,7 @@ import { SKIP_PREVIEW } from "../../common/constants";
 const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") + `?${SKIP_PREVIEW}=true`;
 
-export const RecordingAndRTMPModal = ({ open, onOpenChange }) => {
+export const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const {
@@ -80,7 +80,7 @@ export const RecordingAndRTMPModal = ({ open, onOpenChange }) => {
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Streaming/Recording" Icon={RecordIcon}>
         <Box as="form" onSubmit={e => e.preventDefault()}>
           <DialogInput
