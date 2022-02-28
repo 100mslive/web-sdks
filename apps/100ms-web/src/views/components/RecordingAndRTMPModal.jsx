@@ -19,7 +19,7 @@ import { SKIP_PREVIEW } from "../../common/constants";
 const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") + `?${SKIP_PREVIEW}=true`;
 
-export const RecordingAndRTMPModal = ({ show, onToggle }) => {
+export const RecordingAndRTMPModal = ({ open, onOpenChange }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const {
@@ -51,7 +51,7 @@ export const RecordingAndRTMPModal = ({ show, onToggle }) => {
 
   useEffect(() => {
     setMeetingURL(defaultMeetingUrl);
-  }, [show]);
+  }, [open]);
 
   const startStopRTMPRecordingHLS = async action => {
     try {
@@ -71,6 +71,7 @@ export const RecordingAndRTMPModal = ({ show, onToggle }) => {
           ? await hmsActions.stopHLSStreaming()
           : await hmsActions.stopRTMPAndRecording();
       }
+      onOpenChange(false);
     } catch (error) {
       console.error(
         `failed to start/stop ${
@@ -79,16 +80,11 @@ export const RecordingAndRTMPModal = ({ show, onToggle }) => {
         error
       );
       hmsToast(error.message);
-    } finally {
-      setMeetingURL("");
-      setRTMPURL("");
-      setRecording(false);
-      onToggle(false);
     }
   };
 
   return (
-    <Dialog.Root open={show} onOpenChange={onToggle}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <DialogContent title="Streaming/Recording" Icon={RecordIcon}>
         <Box as="form" onSubmit={e => e.preventDefault()}>
           <DialogInput
