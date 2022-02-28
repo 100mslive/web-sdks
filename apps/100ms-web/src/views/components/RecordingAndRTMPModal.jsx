@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   selectPermissions,
   useHMSActions,
@@ -48,10 +48,6 @@ export const RecordingAndRTMPModal = ({ open, onOpenChange }) => {
     text += " is running";
     return text;
   }, [isStreamingOn, isRecordingOn]);
-
-  useEffect(() => {
-    setMeetingURL(defaultMeetingUrl);
-  }, [open]);
 
   const startStopRTMPRecordingHLS = async action => {
     try {
