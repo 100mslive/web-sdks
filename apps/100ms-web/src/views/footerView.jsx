@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import {
   ControlBar,
-  Button,
   MessageModal,
   VideoPlaylist,
 } from "@100mslive/hms-video-react";
@@ -20,7 +19,13 @@ import { MoreSettings } from "./components/MoreSettings";
 import { AudioVideoToggle } from "./components/AudioVideoToggle";
 import { LeaveRoom } from "./components/LeaveRoom";
 import { useMyMetadata } from "./hooks/useMetadata";
-import { Box, IconButton, Tooltip, VerticalDivider } from "@100mslive/react-ui";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  VerticalDivider,
+  Button,
+} from "@100mslive/react-ui";
 import {
   HandIcon,
   ShareScreenIcon,
@@ -228,7 +233,6 @@ export const ConferenceFooter = ({ isChatOpen, toggleChat }) => {
         }
         footer={
           <Button
-            variant="emphasized"
             onClick={() => {
               setShareAudioModal(false);
               toggleScreenShare(!isAudioScreenshare, true);
