@@ -16,6 +16,7 @@ export { default as ExitIcon } from './ExitIcon';
 export { default as ExpandIcon } from './ExpandIcon';
 export { default as GlobeIcon } from './GlobeIcon';
 export { default as GridIcon } from './GridIcon';
+export { default as HamburgerMenuIcon } from './HamburgerMenuIcon';
 export { default as HandIcon } from './HandIcon';
 export { default as HandRaiseFilledIcon } from './HandRaiseFilledIcon';
 export { default as HandRaiseIcon } from './HandRaiseIcon';

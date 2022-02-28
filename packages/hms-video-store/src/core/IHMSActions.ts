@@ -180,9 +180,8 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): void;
 
   /**
-   * set the quality of the selected videoTrack
-   * @param trackId
-   * @param layer
+   * set the quality of the selected videoTrack for simulcast.
+   * @alpha
    */
   setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
 
@@ -190,12 +189,15 @@ export interface IHMSActions {
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the join is successful.
    * pluginFrameRate is the rate at which the output plugin will do processing
-   * @param plugin HMSVideoPlugin
-   * @param pluginFrameRate number
    * @see HMSVideoPlugin
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
+  /**
+   * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
+   * Audio plugins can be added/removed at any time after the join is successful.
+   * @see HMSAudioPlugin
+   */
   addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
@@ -203,6 +205,9 @@ export interface IHMSActions {
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
@@ -292,13 +297,12 @@ export interface IHMSActions {
 
   /**
    * If you want to update the name of peer.
-   * @beta
    */
   changeName(name: string): Promise<void>;
 
   /**
-   * If you want to update the metadata of peer.
-   * @beta
+   * If you want to update the metadata of local peer. If an object is passed, it should be serializable using
+   * JSON.stringify.
    */
   changeMetadata(metadata: string | any): Promise<void>;
 
@@ -311,11 +315,23 @@ export interface IHMSActions {
    * - HMSLogLevel.INFO(2) - will log important info, warnings and errors.
    * - HMSLogLevel.WARN(3) - will log warnings and errors.
    * - HMSLogLevel.ERROR(4) - will log only errors.
-   * - HMSLogLevel.NONE(5) - won't log anything.
+   * - HMSLogLevel.NONE(5) - won't log anything(Not recommended).
    *
    * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
    */
   setLogLevel(level: HMSLogLevel): void;
+
+  /**
+   * ignore messages with this type for storing in store. You can use this to have a clear segregation between
+   * chat messages(you would want to persist for the duration of the call) and one off custom events(emoji reactions,
+   * stop screenshare, moderator messages, etc.). You can also use this to store messages on your own side if some additional
+   * processing is required(the default type is "chat").
+   * Notifications for the ignored messages will still be sent, it'll only not be put in the store.
+   * @param msgTypes list of messages types to ignore for storing
+   * @param replace (default is false) whether to replace the list of ignored messages. Types are appended to the existing
+   * list by default so you can call this method from different places and all will hold.
+   */
+  ignoreMessageTypes(msgTypes: string[], replace?: boolean): void;
 
   /**
    * audio Playlist contains all actions that can be performed on the audio playlist

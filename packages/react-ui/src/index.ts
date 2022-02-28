@@ -24,3 +24,4 @@ export * from './Stats';
 export * from './Theme';
 export * from './Checkbox';
 export * from './Label';
+export * from './RadioGroup';

@@ -24,7 +24,7 @@ const SelectRoot = styled('select', {
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: '$bgTertiary',
+  backgroundColor: '$bgSecondary',
   '&:not([disabled]):focus-visible': {
     boxShadow: '0 0 0 3px $colors$brandDefault',
   },

@@ -4,6 +4,7 @@ export {
   useHMSActions,
   useHMSNotifications,
   useHMSVanillaStore,
+  useHMSVanillaNotifications,
   useHMSStatsStore,
 } from './primitives/HmsRoomProvider';
 export { usePreviewJoin } from './hooks/usePreviewJoin';
@@ -16,6 +17,8 @@ export { useAudioLevelStyles } from './hooks/useAudioLevelStyles';
 export { useDevices, DeviceType } from './hooks/useDevices';
 export { useParticipantList } from './hooks/useParticipantList';
 export { useRecordingStreaming } from './hooks/useRecordingStreaming';
+export { useAutoplayError } from './hooks/useAutoplayError';
+export { useCustomEvent } from './hooks/useCustomEvent';
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreviewJoin';
@@ -26,6 +29,9 @@ export type { useScreenShareResult } from './hooks/useScreenShare';
 export type { useRemoteAVToggleResult } from './hooks/useRemoteAVToggle';
 export type { useRecordingStreamingResult } from './hooks/useRecordingStreaming';
 export type { useParticipantListResult } from './hooks/useParticipantList';
+export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
+export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
+export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';

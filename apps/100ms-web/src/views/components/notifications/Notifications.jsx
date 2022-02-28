@@ -16,9 +16,9 @@ import { HMSToastContainer, hmsToast } from "./hms-toast";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { AppContext } from "../../../store/AppContext";
-import { TrackMuteAllModal } from "./TrackMuteAllModal";
 import { getMetadata } from "../../../common/utils";
 import { InitErrorModal } from "./InitErrorModal";
+import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -92,7 +92,8 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.NEW_MESSAGE:
-        if (!subscribedNotifications.NEW_MESSAGE) return;
+        if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
+          return;
         hmsToast(`New message from ${notification.data?.senderName}`);
         break;
       case HMSNotificationTypes.TRACK_ADDED:
@@ -253,9 +254,9 @@ export function Notifications() {
   return (
     <>
       <HMSToastContainer />
-      {!isHeadless && <TrackUnmuteModal notification={notification} />}
-      {!isHeadless && <TrackMuteAllModal notification={notification} />}
-      <AutoplayBlockedModal notification={notification} />
+      {!isHeadless && <TrackUnmuteModal />}
+      {!isHeadless && <TrackBulkUnmuteModal />}
+      <AutoplayBlockedModal />
       <InitErrorModal notification={notification} />
     </>
   );

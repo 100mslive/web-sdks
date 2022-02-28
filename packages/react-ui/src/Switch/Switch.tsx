@@ -6,10 +6,11 @@ const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
   width: 34,
   height: 14,
-  backgroundColor: '$grayDark',
+  backgroundColor: '$bgSecondary',
   borderRadius: '9999px',
   position: 'relative',
-  '&[data-state="checked"]': { backgroundColor: '$brandLight' },
+  cursor: 'pointer',
+  '&[data-state="checked"]': { backgroundColor: '$bgPrimary' },
   '&:focus': {
     outline: 'none',
   },

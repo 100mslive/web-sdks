@@ -14,7 +14,7 @@ export const darkTheme = {
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
-    inputBg: '$menuBg',
+    inputBg: '$bgSecondary',
   },
 };
 
@@ -35,5 +35,6 @@ export const lightTheme = {
     previewBg: '#FAFAFA',
     statsBg: 'rgba(255,255,255,0.75)',
     menuBg: '#d9d9d9',
+    inputBg: '$tileBg',
   },
 };
