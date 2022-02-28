@@ -37,6 +37,7 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
             title="Request Permission"
             value={requestPermission}
             onChange={setRequestPermission}
+            id="requestRoleChangePermission"
           />
         )}
         <DialogRow justify="end">

@@ -102,6 +102,7 @@ export const UISettings = ({ show, onToggle }) => {
           </Text>
           <DialogCheckbox
             title="Active Speaker Mode"
+            id="activeSpeakerMode"
             value={uiViewMode === "activeSpeaker"}
             onChange={value => {
               setuiViewMode(value ? "activeSpeaker" : "grid");

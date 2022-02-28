@@ -202,14 +202,24 @@ export const DialogSwitch = ({ title, value, onChange, disabled }) => {
   );
 };
 
-export const DialogCheckbox = ({ title, value, onChange, disabled, css }) => {
+export const DialogCheckbox = ({
+  title,
+  value,
+  onChange,
+  disabled,
+  css,
+  id,
+}) => {
   return (
     <DialogRow css={css}>
-      <Label>{title}:</Label>
+      <Label htmlFor={id} css={{ cursor: "pointer" }}>
+        {title}:
+      </Label>
       <Checkbox.Root
         checked={value}
         onCheckedChange={value => onChange(value)}
         disabled={disabled}
+        id={id}
       >
         <Checkbox.Indicator>
           <CheckIcon width={16} height={16} />
