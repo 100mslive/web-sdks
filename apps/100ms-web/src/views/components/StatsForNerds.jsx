@@ -6,16 +6,15 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import {
-  Box,
-  Dialog,
-  Flex,
-  HorizontalDivider,
-  Switch,
-} from "@100mslive/react-ui";
+import { Box, Dialog } from "@100mslive/react-ui";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../store/AppContext";
-import { DialogContent, DialogRow, DialogSelect } from "../new/DialogContent";
+import {
+  DialogContent,
+  DialogRow,
+  DialogSelect,
+  DialogSwitch,
+} from "../new/DialogContent";
 
 const formatBytes = (bytes, unit = "B", decimals = 2) => {
   if (bytes === 0) return "0 " + unit;
@@ -49,8 +48,8 @@ const useTracksWithLabel = () => {
 };
 
 const StatsRow = ({ label, value }) => (
-  <DialogRow justify="start" css={{ my: "0.5rem" }}>
-    <Box css={{ w: "50%" }}>{label}</Box>
+  <DialogRow justify="between" css={{ my: "0.5rem" }}>
+    <Box>{label}</Box>
     <Box>{value}</Box>
   </DialogRow>
 );
@@ -142,6 +141,11 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <DialogContent Icon={InfoIcon} title="Stats For Nerds">
+        <DialogSwitch
+          title="Show Stats on Tiles"
+          onChange={setShowStatsOnTiles}
+          value={showStatsOnTiles}
+        />
         <DialogSelect
           title="Stats For"
           options={statsOptions}
@@ -155,14 +159,6 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
         ) : (
           <TrackStats trackID={selectedStat} />
         )}
-        <HorizontalDivider css={{ my: "0.8rem" }} />
-        <Flex justify="evenly" align="center">
-          <h3>Show Stats on Tiles</h3>
-          <Switch
-            checked={showStatsOnTiles}
-            onCheckedChange={setShowStatsOnTiles}
-          />
-        </Flex>
       </DialogContent>
     </Dialog.Root>
   );
