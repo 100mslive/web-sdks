@@ -30,6 +30,10 @@ jobs:
               - 'packages/hms-video-web/**/*.(test|spec).ts'
             store-test: 
               - 'packages/hms-video-store/**/*.(test|spec).ts'
+            noise-suppression:
+              - 'packages/hms-noise-suppression/src/**'
+            virtual-background:
+              - 'packages/hms-virtual-background/src/**'
             cypress:
               - 'cypress/**'
             build: 
