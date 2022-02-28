@@ -46,7 +46,7 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
               await hmsActions.changeRole(
                 peerId,
                 selectedRole,
-                !requestPermission
+                peer.isLocal ? true : !requestPermission
               );
               onClose();
             }}
