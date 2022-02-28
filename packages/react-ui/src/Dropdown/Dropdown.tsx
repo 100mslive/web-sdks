@@ -1,4 +1,4 @@
-import { Root, Trigger, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
+import { Root, Trigger, TriggerItem, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
 const DropdownRoot = styled(Root, {});
@@ -14,6 +14,15 @@ const DropdownTrigger = styled(Trigger, {
   '&:focus': {
     outline: 'none',
   },
+});
+
+const DropdownTriggerItem = styled(TriggerItem, {
+  h: '$14',
+  w: '100%',
+  color: '$textPrimary',
+  p: '$4 $8',
+  display: 'flex',
+  alignItems: 'center',
 });
 
 const DropdownItem = styled(Item, {
@@ -50,6 +59,7 @@ const DropdownGroup = styled(Group, {});
 export const Dropdown = {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
+  TriggerItem: DropdownTriggerItem,
   Content: DropdownContent,
   Item: DropdownItem,
   Label: DropdownLabel,

@@ -119,7 +119,7 @@ export const NoiseSuppression = () => {
             await removePlugin();
           }
         }}
-        css={{ ml: "$4", "@md": { display: "none" } }}
+        css={{ mx: "$4" }}
       >
         <AudioLevelIcon />
       </IconButton>
