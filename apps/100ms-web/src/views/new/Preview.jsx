@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   usePreviewJoin,
   selectLocalPeer,
@@ -35,6 +35,7 @@ const defaultPreviewPreference = {
 };
 
 const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
+  const localPeer = useHMSStore(selectLocalPeer);
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
@@ -50,8 +51,7 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
       isVideoMuted: skipPreview ? true : previewPreference.isVideoMuted,
     },
   });
-  const localPeer = useHMSStore(selectLocalPeer);
-  React.useEffect(() => {
+  useEffect(() => {
     if (token) {
       if (skipPreview) {
         savePreferenceAndJoin();
@@ -61,13 +61,13 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (!localPeer) {
       preview();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localPeer]);
-  const savePreferenceAndJoin = React.useCallback(() => {
+  const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
       isAudioMuted: !isLocalAudioEnabled,
