@@ -35,7 +35,10 @@ const NotificationItem = ({ onClick, type, label, checked }) => {
           <CheckIcon width={16} height={16} />
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <Label htmlFor={label} css={{ ml: "$4", fontSize: "$sm" }}>
+      <Label
+        htmlFor={label}
+        css={{ ml: "$4", fontSize: "$sm", cursor: "pointer" }}
+      >
         {label}
       </Label>
     </Flex>
