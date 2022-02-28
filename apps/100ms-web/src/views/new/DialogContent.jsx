@@ -108,6 +108,7 @@ export const DialogRow = ({
 }) => {
   let finalCSS = {
     margin: "$10 0",
+    w: "100%",
   };
   if (breakSm) {
     finalCSS["@sm"] = {
@@ -201,9 +202,9 @@ export const DialogSwitch = ({ title, value, onChange, disabled }) => {
   );
 };
 
-export const DialogCheckbox = ({ title, value, onChange, disabled }) => {
+export const DialogCheckbox = ({ title, value, onChange, disabled, css }) => {
   return (
-    <DialogRow>
+    <DialogRow css={css}>
       <Label>{title}:</Label>
       <Checkbox.Root
         checked={value}

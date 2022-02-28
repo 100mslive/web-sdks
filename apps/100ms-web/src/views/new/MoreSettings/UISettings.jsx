@@ -8,8 +8,9 @@ import {
   Slider,
   Text,
   Box,
+  HorizontalDivider,
 } from "@100mslive/react-ui";
-import { DialogContent, DialogRow } from "../DialogContent";
+import { DialogCheckbox, DialogContent, DialogRow } from "../DialogContent";
 import { AppContext } from "../../../store/AppContext";
 
 const cssStyle = {
@@ -53,23 +54,8 @@ export const UISettings = ({ show, onToggle }) => {
   return (
     <Dialog.Root open={show} onOpenChange={onToggle}>
       <DialogContent title="UI Settings" Icon={GridIcon}>
-        <DialogRow css={{ "@md": { display: "none" } }}>
-          <Text variant="md">Tiles In View</Text>
-          <Flex justify="end" css={{ w: "70%" }}>
-            <Slider
-              step={1}
-              value={[maxTileCount]}
-              min={1}
-              max={49}
-              onValueChange={e => {
-                setMaxTileCount(e[0]);
-              }}
-              css={{ w: "70%" }}
-            />
-          </Flex>
-        </DialogRow>
         <DialogRow css={cssStyle}>
-          <Text variant="md" css={{ mb: "$8" }}>
+          <Text variant="md" css={{ mb: "$8", fontWeight: "$semiBold" }}>
             Configure Notifications
           </Text>
           <Flex justify="between" css={{ w: "100%" }}>
@@ -109,25 +95,33 @@ export const UISettings = ({ show, onToggle }) => {
             </Box>
           </Flex>
         </DialogRow>
+        <HorizontalDivider />
         <DialogRow css={cssStyle}>
-          <Text variant="md" css={{ mb: "$8" }}>
+          <Text variant="md" css={{ mb: "$4", fontWeight: "$semiBold" }}>
             View Layout
           </Text>
-          <Flex align="center">
-            <Checkbox.Root
-              id="viewMode"
-              checked={uiViewMode === "activeSpeaker"}
-              onCheckedChange={value => {
-                setuiViewMode(value ? "activeSpeaker" : "grid");
-              }}
-            >
-              <Checkbox.Indicator>
-                <CheckIcon width={16} height={16} />
-              </Checkbox.Indicator>
-            </Checkbox.Root>
-            <Label htmlFor="viewMode" css={{ ml: "$4", fontSize: "$sm" }}>
-              Active Speaker Mode
-            </Label>
+          <DialogCheckbox
+            title="Active Speaker Mode"
+            value={uiViewMode === "activeSpeaker"}
+            onChange={value => {
+              setuiViewMode(value ? "activeSpeaker" : "grid");
+            }}
+            css={{ margin: "$4 0" }}
+          />
+          <Flex css={{ w: "100%", "@md": { display: "none" } }}>
+            <Text variant="md">Tiles In View</Text>
+            <Flex justify="end" css={{ flex: "1 1 0" }}>
+              <Slider
+                step={1}
+                value={[maxTileCount]}
+                min={1}
+                max={49}
+                onValueChange={e => {
+                  setMaxTileCount(e[0]);
+                }}
+                css={{ w: "70%" }}
+              />
+            </Flex>
           </Flex>
         </DialogRow>
       </DialogContent>
