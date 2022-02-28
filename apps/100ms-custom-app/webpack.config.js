@@ -115,7 +115,7 @@ module.exports = {
           from: path.resolve(__dirname, './public'),
           to: path.resolve(__dirname, './build'),
           filter: async resourcePath => {
-            if (/index.html|manifest.json/.test(resourcePath)) {
+            if (/index.html/.test(resourcePath)) {
               return false;
             }
             return true;
