@@ -187,6 +187,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hello!',
           time: new Date(),
+          ignored: false,
         },
         '202': {
           id: '202',
@@ -198,6 +199,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hi!',
           time: new Date(),
+          ignored: false,
         },
         '203': {
           id: '203',
@@ -209,6 +211,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hi!',
           time: new Date(),
+          ignored: false,
         },
       },
       allIDs: ['201', '202', '203'],

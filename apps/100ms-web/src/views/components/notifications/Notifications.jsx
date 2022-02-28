@@ -92,7 +92,8 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.NEW_MESSAGE:
-        if (!subscribedNotifications.NEW_MESSAGE) return;
+        if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
+          return;
         hmsToast(`New message from ${notification.data?.senderName}`);
         break;
       case HMSNotificationTypes.TRACK_ADDED:
@@ -253,8 +254,8 @@ export function Notifications() {
   return (
     <>
       <HMSToastContainer />
-      {!isHeadless && <TrackUnmuteModal notification={notification} />}
-      {!isHeadless && <TrackBulkUnmuteModal notification={notification} />}
+      {!isHeadless && <TrackUnmuteModal />}
+      {!isHeadless && <TrackBulkUnmuteModal />}
       <AutoplayBlockedModal />
       <InitErrorModal notification={notification} />
     </>
