@@ -13,8 +13,10 @@ export interface useCustomEventInput<T> {
    * the handler function for when the custom event comes. It's recommended
    * to use `useCallback` for the function passed in here for performance
    * reasons.
+   * The callback is optional in case you want to decouple sending event and
+   * handling event in the UI.
    */
-  onEvent: (data: T) => void;
+  onEvent?: (data: T) => void;
   /**
    * function to handle errors happening during sending the event
    */
@@ -56,7 +58,7 @@ export const useCustomEvent = <T>({
       if (msg && msg.type === type) {
         try {
           const data = JSON.parse(msg.message);
-          onEvent(data as T);
+          onEvent?.(data as T);
         } catch (err) {
           handleError(err as Error, 'handleCustomEvent');
         }
@@ -71,7 +73,7 @@ export const useCustomEvent = <T>({
       try {
         const dataStr = JSON.stringify(data || '');
         await actions.sendBroadcastMessage(dataStr, type);
-        onEvent(data);
+        onEvent?.(data);
       } catch (err) {
         handleError(err as Error, 'sendCustomEvent');
       }
