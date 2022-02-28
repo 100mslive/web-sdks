@@ -63,6 +63,26 @@ if there is only one remote, add webapp as a new remote.
 
 `git subtree pull --prefix=apps/100ms-web webapp main`
 
+## Adding a new repo into the monorepo
+
+**To add an existing repo**
+
+`git clone <repourl>`
+
+- if commit history is not need directly copy the files.
+  `cd repo`
+  `rm -rf .git`
+  `git rm -r --cached`
+  `cp -r repo path-to-web-sdks/packages`
+- if commit history is needed
+  `lerna import path-to-repo --flatten --preserve-commit` (to be run at root level)
+
+**To Create a new repo**
+
+Follow the documentation [here](https://github.com/lerna/lerna/tree/main/commands/create#readme)
+
+> Note: Don't forget to update mapping in `scripts/constants.js`. Also update`lernaCommands` in `versioning.js` depending on the new repo's dependencies and dependents
+
 ## Tips and Tricks
 
 - `window.toggleUiTheme()` in console to switch between dark and light themes
