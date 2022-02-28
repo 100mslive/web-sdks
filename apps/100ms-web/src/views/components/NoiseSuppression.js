@@ -5,7 +5,6 @@ import {
   useHMSNotifications,
   HMSNotificationTypes,
   selectIsLocalAudioPluginPresent,
-  selectIsAllowedToPublish,
   // selectLocalAudioTrackID,
 } from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
@@ -17,7 +16,6 @@ const BUFFER_DURATION = 80;
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const hmsActions = useHMSActions();
   const [removeButton, setRemoveButton] = useState(false);
   const isPluginPresent = useHMSStore(
@@ -101,10 +99,6 @@ export const NoiseSuppression = () => {
       await hmsActions.removePluginFromAudioTrack(pluginRef.current);
       pluginRef.current = null;
     }
-  }
-
-  if (!isAllowedToPublish.audio || pluginRef.current) {
-    return null;
   }
 
   return (
