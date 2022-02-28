@@ -1,4 +1,4 @@
-import { InfoIcon } from "@100mslive/react-icons";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   selectHMSStats,
   selectPeersMap,
@@ -6,8 +6,8 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from "@100mslive/react-sdk";
+import { InfoIcon } from "@100mslive/react-icons";
 import { Dialog, Text } from "@100mslive/react-ui";
-import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../store/AppContext";
 import {
   DialogContent,
