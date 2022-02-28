@@ -1,5 +1,6 @@
 import {
   HMSNotificationSeverity,
+  HMSNotificationTypes,
   HMSPeer,
   HMSReactiveStore,
   HMSStore,
@@ -109,5 +110,35 @@ describe('hms notifications tests', () => {
     unsub();
     notifications.sendReconnected();
     expect(cb.mock.calls.length).toBe(0);
+  });
+
+  test('when type is passed and does not match, callback not to be called', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, HMSNotificationTypes.ERROR);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(0);
+  });
+
+  test('when type is passed and matches, callback to be called, ', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, HMSNotificationTypes.RECONNECTED);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(1);
+  });
+
+  test('when types are passed and does not match, callback not to be called', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, [HMSNotificationTypes.ERROR, HMSNotificationTypes.PEER_JOINED]);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(0);
+  });
+
+  test('when types are passed and matches, callback to be called', () => {
+    const callback = jest.fn(val => val);
+    const error = makeException('Test');
+    notifications.onNotification(callback, [HMSNotificationTypes.RECONNECTED, HMSNotificationTypes.RECONNECTING]);
+    notifications.sendReconnecting(error);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(2);
   });
 });
