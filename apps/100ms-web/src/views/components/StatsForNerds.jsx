@@ -6,7 +6,7 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Dialog } from "@100mslive/react-ui";
+import { Dialog, Text } from "@100mslive/react-ui";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../store/AppContext";
 import {
@@ -145,8 +145,8 @@ const TrackStats = ({ trackID }) => {
 
 const StatsRow = ({ label, value }) => (
   <DialogRow justify="between" css={{ my: "0.5rem" }}>
-    <Box>{label}</Box>
-    <Box>{value}</Box>
+    <Text>{label}</Text>
+    <Text>{value}</Text>
   </DialogRow>
 );
 
