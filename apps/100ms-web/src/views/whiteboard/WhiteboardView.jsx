@@ -12,6 +12,10 @@ const Editor = React.memo(({ roomId }) => {
     events,
   } = useMultiplayerState(roomId);
 
+  if (!whiteboardOwner) {
+    return null;
+  }
+
   return (
     <Box
       css={{
