@@ -4,13 +4,15 @@ import RecordRTC,  { StereoAudioRecorder } from 'recordrtc';
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
 
-Pusher.logToConsole = true;
-
 const pusher = new Pusher("c6edf1e636510f716f39", {
   cluster: "ap2",
   authEndpoint: "https://whiteboard-server-git-transcription-100mslive.vercel.app/api/pusher/auth",
 });
 let channel = null;
+
+function setTranscript(text = ""){
+  document.getElementById("voiceContent").innerText = text
+}
 
 export function TranscriptionButton() {
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
@@ -19,9 +21,9 @@ export function TranscriptionButton() {
   useEffect(() => {
     channel = pusher.subscribe(`private-${roomId}`);
     channel.bind(`client-transcription`, ({text}) => {
-      document.getElementById("speechtxt").innerText = text || ""
+      setTranscript(text)
       setTimeout(() => {
-        document.getElementById("speechtxt").innerText = ""
+        setTranscript()
       }, 5000);
     });
   }, [roomId])
@@ -37,6 +39,7 @@ export function TranscriptionButton() {
 
   return (
     <>
+      <div id="voiceContent" className="transcribe"></div>
       <Button
         iconOnly
         variant="no-fill"
@@ -88,7 +91,7 @@ class Transcriber {
       if(body && body.token){
         const token = body.token
         this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000&token=${token}`);
-        document.getElementById("speechtxt").innerText = ""
+        setTranscript()
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
             if(res.text && this.enabled){
@@ -112,7 +115,7 @@ class Transcriber {
         }
   
         this.socket.onopen = () => {
-          document.getElementById("speechtxt").style.display = '';
+          document.getElementById("voiceContent").style.display = '';
           for(let i in this.streams) {
             this.observeStream(this.streams[i]["stream"], this.streams[i]["name"]);
           }
@@ -154,7 +157,7 @@ class Transcriber {
 
   enableTranscription(enable) {
     if (enable && !this.enabled) {
-      document.getElementById("speechtxt").innerText = "[ Initializing Transcription.. ]";
+      setTranscript("[ Initializing Transcription.. ]");
       this.enabled = true;
       this.listen()
     } else if (!enable && this.enabled) {
@@ -162,24 +165,8 @@ class Transcriber {
       this.socket.close();
       this.socket = null;
       setTimeout(function(){
-        document.getElementById("speechtxt").innerText = "";
+        setTranscript();
       }, 200);
-    }
-  }
-
-  processResult(result) {
-    if (result.results.length > 0) {
-      let transcript = "";
-      const startIndex = Math.max(result.results.length - 10, 0);
-      for (let i = startIndex; i < result.results.length; ++i) {
-        if (!result.results[i].isFinal) {
-          transcript += result.results[i][0].transcript;
-        }
-      }
-      const elem = document.getElementById("speechtxt");
-      if (elem) {
-        elem.innerText = transcript;
-      }
     }
   }
 }
