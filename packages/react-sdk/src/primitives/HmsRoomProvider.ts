@@ -170,6 +170,9 @@ export const useHMSActions = () => {
 
 /**
  * `useHMSNotifications` is a read only hook which gives the latest notification(HMSNotification) received.
+ * @param type can be a string or an array of string for the types of notifications to listen to. If an array is passed
+ * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
+ * rerenders for performance reasons.
  */
 export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
   const HMSContextConsumer = useContext(HMSContext);
