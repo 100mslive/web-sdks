@@ -3,16 +3,16 @@ on:
   workflow_dispatch:
     inputs:
       versionBump:
-        description: 'which version to bump eg: patch, minor, major'
+        description: 'which version to bump eg: prerelease, patch'
         required: true
-        default: 'patch'
+        default: 'prerelease'
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
-        if: github.ref != 'refs/heads/main'
+        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/main'
         run: exit 1
 
       - uses: actions/checkout@v2
