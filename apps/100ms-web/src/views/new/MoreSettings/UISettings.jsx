@@ -42,7 +42,7 @@ const NotificationItem = ({ onClick, type, label, checked }) => {
   );
 };
 
-export const UISettings = ({ show, onToggle }) => {
+export const UISettings = ({ open, onOpenChange }) => {
   const {
     setMaxTileCount,
     maxTileCount,
@@ -52,7 +52,7 @@ export const UISettings = ({ show, onToggle }) => {
     setuiViewMode,
   } = useContext(AppContext);
   return (
-    <Dialog.Root open={show} onOpenChange={onToggle}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <DialogContent title="UI Settings" Icon={GridIcon}>
         <DialogRow css={cssStyle}>
           <Text variant="md" css={{ mb: "$8", fontWeight: "$semiBold" }}>

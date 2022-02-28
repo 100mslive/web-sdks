@@ -134,14 +134,14 @@ export const MoreSettings = () => {
       {showMuteAll && <MuteAll show={showMuteAll} onToggle={setShowMuteAll} />}
       {showChangeNameModal && (
         <ChangeName
-          show={showChangeNameModal}
-          onToggle={setShowChangeNameModal}
+          open={showChangeNameModal}
+          onOpenChange={setShowChangeNameModal}
         />
       )}
       {showRecordingModal && (
         <RecordingAndRTMPModal
-          show={showRecordingModal}
-          onToggle={setShowRecordingModal}
+          open={showRecordingModal}
+          onOpenChange={setShowRecordingModal}
         />
       )}
       {showDeviceSettings && (
@@ -157,14 +157,12 @@ export const MoreSettings = () => {
         />
       )}
       {showUISettings && (
-        <UISettings show={showUISettings} onToggle={setShowUISettings} />
+        <UISettings open={showUISettings} onOpenChange={setShowUISettings} />
       )}
       {showSelfRoleChange && (
         <RoleChangeModal
           peerId={localPeerId}
-          onClose={() => {
-            setShowSelfRoleChange(false);
-          }}
+          onOpenChange={setShowSelfRoleChange}
         />
       )}
     </Fragment>
