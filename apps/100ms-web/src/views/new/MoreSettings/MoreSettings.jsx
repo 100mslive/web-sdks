@@ -131,22 +131,17 @@ export const MoreSettings = () => {
           )}
         </Dropdown.Content>
       </Dropdown.Root>
-      {showMuteAll && (
-        <MuteAll
-          showModal={showMuteAll}
-          onCloseModal={() => setShowMuteAll(false)}
-        />
-      )}
+      {showMuteAll && <MuteAll show={showMuteAll} onToggle={setShowMuteAll} />}
       {showChangeNameModal && (
         <ChangeName
           show={showChangeNameModal}
-          onToggle={value => setShowChangeNameModal(value)}
+          onToggle={setShowChangeNameModal}
         />
       )}
       {showRecordingModal && (
         <RecordingAndRTMPModal
           show={showRecordingModal}
-          onToggle={value => setShowRecordingModal(value)}
+          onToggle={setShowRecordingModal}
         />
       )}
       {showDeviceSettings && (
@@ -162,10 +157,7 @@ export const MoreSettings = () => {
         />
       )}
       {showUISettings && (
-        <UISettings
-          show={showUISettings}
-          onToggle={value => setShowUISettings(value)}
-        />
+        <UISettings show={showUISettings} onToggle={setShowUISettings} />
       )}
       {showSelfRoleChange && (
         <RoleChangeModal
