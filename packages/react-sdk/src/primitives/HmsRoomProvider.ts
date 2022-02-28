@@ -136,6 +136,28 @@ export const useHMSVanillaStore = () => {
 };
 
 /*
+ * `useHMSVanillaNotifications` returns the vanilla HMSNotifications object. This makes it a bit easier to ensure
+ * a notification is processed only once in your components. The other way is to use the hook version and put
+ * the component high enough in the chain.
+ * Usage:
+ * ```
+ * useEffect(() => {
+ *   const unsub = notifications.onNotification((notification) => {
+ *     console.log(notification);
+ *   }, notificationType);
+ *   return unsub;
+ * }, [])
+ * ```
+ */
+export const useHMSVanillaNotifications = () => {
+  const HMSContextConsumer = useContext(HMSContext);
+  if (!HMSContextConsumer) {
+    throw new Error(hooksErrorMessage);
+  }
+  return HMSContextConsumer.notifications;
+};
+
+/*
  * `useHMSActions` is a write only hook which can be used to dispatch actions.
  */
 export const useHMSActions = () => {
