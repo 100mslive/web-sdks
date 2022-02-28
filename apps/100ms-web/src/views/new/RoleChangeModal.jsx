@@ -32,11 +32,13 @@ export const RoleChangeModal = ({ peerId, onClose }) => {
           selected={selectedRole}
           onChange={setRole}
         />
-        <DialogCheckbox
-          title="Request Permission"
-          value={requestPermission}
-          onChange={setRequestPermission}
-        />
+        {!peer.isLocal && (
+          <DialogCheckbox
+            title="Request Permission"
+            value={requestPermission}
+            onChange={setRequestPermission}
+          />
+        )}
         <DialogRow justify="end">
           <Button
             variant="primary"
