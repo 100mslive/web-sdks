@@ -85,7 +85,6 @@ export const ChangeName = ({ open, onOpenChange }) => {
               }
               onClick={async () => {
                 await changeName();
-                onOpenChange(false);
               }}
             >
               Change

@@ -131,7 +131,9 @@ export const MoreSettings = () => {
           )}
         </Dropdown.Content>
       </Dropdown.Root>
-      {showMuteAll && <MuteAll show={showMuteAll} onToggle={setShowMuteAll} />}
+      {showMuteAll && (
+        <MuteAll open={showMuteAll} onOpenChange={setShowMuteAll} />
+      )}
       {showChangeNameModal && (
         <ChangeName
           open={showChangeNameModal}
