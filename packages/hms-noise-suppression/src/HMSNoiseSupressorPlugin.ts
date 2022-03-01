@@ -173,7 +173,8 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       this.samplingRate = this.audioContext.sampleRate;
       this.channels = 1; //TODO:check this
       this.bufferSize = this.getBufferSize();
-      HMSNoiseSuppressionPlugin.log(TAG,
+      HMSNoiseSuppressionPlugin.log(
+        TAG,
         'sampling rate, channels, bufferSize, durationMs',
         this.samplingRate,
         this.channels,
