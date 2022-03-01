@@ -32,6 +32,15 @@ export const NoiseSuppression = () => {
     }
   };
 
+  const cleanup = async err => {
+    hmsToast(err);
+    setRemoveButton(true);
+    console.log("remove called in app");
+    await removePlugin();
+    pluginRef.current = null;
+    console.error(err);
+  };
+
   const addPlugin = useCallback(async () => {
     try {
       setRemoveButton(false);
@@ -45,20 +54,14 @@ export const NoiseSuppression = () => {
         await hmsActions.addPluginToAudioTrack(pluginRef.current);
       } else {
         const err = pluginSupport.errMsg;
-        hmsToast(pluginSupport.errMsg);
-        setRemoveButton(true);
-        pluginRef.current = null;
-        console.error(err);
+        await cleanup(err);
       }
     } catch (err) {
-      hmsToast(err.message);
-      setRemoveButton(true);
-      pluginRef.current = null;
-      console.error(err);
+      await cleanup(err);
     }
   }, [hmsActions]);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (!notification) {
       return;
     }
@@ -110,6 +113,7 @@ export const NoiseSuppression = () => {
           if (!pluginActive) {
             await addPlugin();
           } else {
+            console.log("remove plugin called from web");
             await removePlugin();
           }
         }}

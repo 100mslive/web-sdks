@@ -264,6 +264,7 @@ export class DeviceManager implements HMSDeviceManager {
       .deviceId(newSelection.deviceId)
       .build();
     try {
+      console.log("old device id and new device id",settings.deviceId, newAudioTrackSettings.deviceId);
       await audioTrack.setSettings(newAudioTrackSettings, true);
       this.eventBus.deviceChange.publish({
         devices: this.getDevices(),
