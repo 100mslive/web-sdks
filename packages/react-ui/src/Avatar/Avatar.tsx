@@ -34,10 +34,9 @@ export const StyledAvatar = styled('div', {
 type Props = VariantProps<typeof StyledAvatar> &
   React.ComponentProps<typeof StyledAvatar> & {
     name: string;
-    salt: number;
   };
 
-export const Avatar: React.FC<Props> = ({ name, salt, css, ...props }) => {
+export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   const { avatarSalt } = useTheme();
   const { initials, color } = getAvatarBg(name, avatarSalt);
   return (
