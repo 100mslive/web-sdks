@@ -14,6 +14,10 @@ export class GainPlugin implements HMSAudioPlugin {
     }
   }
 
+  checkSupport() {
+    return { isSupported: true };
+  }
+
   async processAudioTrack(ctx: AudioContext, source: AudioNode) {
     if (!ctx) {
       throw new Error('Audio context is not created');

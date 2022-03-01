@@ -40,7 +40,7 @@
     }
   ],
   "devDependencies": {
-    "@100mslive/hms-video": "0.1.44"
+    "@100mslive/hms-video": "0.1.44-alpha.4"
   },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
