@@ -3,11 +3,11 @@ import { Button } from "@100mslive/hms-video-react";
 import RecordRTC,  { StereoAudioRecorder } from 'recordrtc';
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
-import { Text } from "@100mslive/react-ui";
+import { Box } from "@100mslive/react-ui";
 
-const pusher = new Pusher("c6edf1e636510f716f39", {
+const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
   cluster: "ap2",
-  authEndpoint: "https://whiteboard-server-git-transcription-100mslive.vercel.app/api/pusher/auth",
+  authEndpoint: process.env.REACT_APP_PUSHER_AUTHENDPOINT,
 });
 let channel = null;
 
@@ -40,7 +40,7 @@ export function TranscriptionButton() {
 
   return (
     <>
-      <Text id="voiceContent" className="transcribe"></Text>
+      <Box id="voiceContent" className="transcribe"></Box>
       <Button
         iconOnly
         variant="no-fill"
