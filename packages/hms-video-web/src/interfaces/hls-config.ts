@@ -5,7 +5,7 @@ export interface HLSConfig {
    */
   variants: Array<HLSMeetingURLVariant>;
   /**
-   * Additionally recording can also be started by passing in a recording config with below fields
+   * pass in this field if recording needs to be turned on as well
    */
   recording?: {
     /**
