@@ -64,5 +64,15 @@ export const toastAnimation = {
     '&[data-state="open"]': {
       animationName: slideRightAndFade('-100%'),
     },
+    '&[data-swipe="move"]': {
+      transform: 'translateX(var(--radix-toast-swipe-move-x))',
+    },
+    '&[data-swipe="cancel"]': {
+      transform: 'translateX(0)',
+      transition: 'transform 200ms ease-out',
+    },
+    '&[data-swipe="end"]': {
+      animation: `${slideLeftAndFadeOut()} 100ms ease-out forwards`,
+    },
   },
 };
