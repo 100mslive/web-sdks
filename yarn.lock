@@ -36,6 +36,17 @@
     reselect "4.0.0"
     zustand "3.5.7"
 
+"@100mslive/hms-video@0.1.44":
+  version "0.1.44"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.44.tgz#03b62e9e7745d2e2d2d6f466a436120f0fa2ce39"
+  integrity sha512-ejPApnwh1dn5gMHojTDU/E5jRoeFUlAkT9I/yzr5RJmMbPHNblGqHlkwpy3zN9FsSNzqNI0x5YGNFDPXkij2eg==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
 "@100mslive/hms-video@0.1.44-alpha.0":
   version "0.1.44-alpha.0"
   resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.44-alpha.0.tgz#110436b61303abee2cd5a84d523d4a6a3c01b8bb"
