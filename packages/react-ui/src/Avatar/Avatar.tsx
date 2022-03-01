@@ -3,6 +3,7 @@ import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 import { getAvatarBg } from './getAvatarBg';
 import React from 'react';
+import { useTheme } from '../Theme';
 
 const getAvatarShape = (radii: string) => ({
   borderRadius: radii,
@@ -23,7 +24,7 @@ export const StyledAvatar = styled('div', {
       square: getAvatarShape('$1'),
     },
   },
-  width: 'calc(1rem + 20%)',
+  padding: 'calc(1rem + 5%)',
   height: 'calc(1rem + 20%)',
   defaultVariants: {
     shape: 'circle',
@@ -33,10 +34,12 @@ export const StyledAvatar = styled('div', {
 type Props = VariantProps<typeof StyledAvatar> &
   React.ComponentProps<typeof StyledAvatar> & {
     name: string;
+    salt: number;
   };
 
-export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
-  const { initials, color } = getAvatarBg(name);
+export const Avatar: React.FC<Props> = ({ name, salt, css, ...props }) => {
+  const { avatarSalt } = useTheme();
+  const { initials, color } = getAvatarBg(name, avatarSalt);
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
       {initials}

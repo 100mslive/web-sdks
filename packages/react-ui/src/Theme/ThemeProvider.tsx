@@ -6,14 +6,16 @@ export type ThemeContextValue = {
   themeType: 'dark' | 'light';
   theme: Theme;
   aspectRatio: { width: number; height: number };
+  avatarSalt?: number;
 };
 export type ThemeProviderProps = {
   themeType: 'dark' | 'light';
   theme?: Theme;
   aspectRatio: { width: number; height: number };
+  avatarSalt?: number;
 };
 
-const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 } };
+const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 }, avatarSalt: 0 };
 export const ThemeContext = React.createContext(defaultContext);
 
 /**
@@ -27,6 +29,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   themeType,
   theme: userTheme,
   aspectRatio,
+  avatarSalt = 0,
   children,
 }) => {
   const previousClassName = useRef('');
@@ -40,7 +43,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     return updatedTheme;
   }, [userTheme, themeType]);
   return (
-    <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio }}>
+    <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio, avatarSalt }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -82,6 +82,7 @@ export function EdtechComponent({
   useEffect(() => {
     setThemeType(theme);
   }, [theme]);
+  const avatarSalt = new Date().getDay();
   return (
     <HMSThemeProvider
       config={{
@@ -114,6 +115,7 @@ export function EdtechComponent({
       toast={(message, options = {}) => hmsToast(message, options)}
     >
       <ReactUIProvider
+        avatarSalt={avatarSalt}
         themeType={themeType}
         aspectRatio={{ width, height }}
         theme={{
