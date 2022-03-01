@@ -1,10 +1,10 @@
 // @ts-ignore
-import {NoiseModule} from './models/Noise';
+import { NoiseModule } from './models/Noise';
 import {
   HMSAudioPlugin,
   HMSAudioPluginType,
   HMSPluginSupportResult,
-  HMSPluginUnsupportedTypes
+  HMSPluginUnsupportedTypes,
 } from '@100mslive/hms-video';
 
 const TAG = 'NoiseSuppressionProcessor';
@@ -38,7 +38,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   sourceNode: MediaStreamAudioSourceNode | null;
   startTime: any;
 
-  constructor(durationInMs? : number) {
+  constructor(durationInMs?: number) {
     this.suppressNoise = true;
     this.nodesConnected = false;
     this.nodesCreated = false;
@@ -48,9 +48,9 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     this.audioContext = null;
     this.sourceNode = null;
     this.channels = 1;
-    if(durationInMs){
+    if (durationInMs) {
       this.durationInMs = durationInMs;
-    }else{
+    } else {
       this.durationInMs = DEFAULT_DURATION_MS;
     }
   }
@@ -63,7 +63,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
         preInit: [],
         preRun: [],
         postRun: [
-          function() {
+          function () {
             console.log(`Loaded Javascript Module OK`);
           },
         ],
@@ -89,29 +89,28 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   }
 
   checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
-
-    let result = {} as HMSPluginSupportResult;
+    const result = {} as HMSPluginSupportResult;
     let sampleRate = 48000; //using this as default
-    if(ctx){
+    if (ctx) {
       sampleRate = ctx?.sampleRate;
     }
 
-    if(sampleRate < MIN_SAMPLE_RATE || sampleRate > MAX_SAMPLE_RATE){
+    if (sampleRate < MIN_SAMPLE_RATE || sampleRate > MAX_SAMPLE_RATE) {
       result.isSupported = false;
       result.errType = HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED;
-      result.errMsg = "audio device not supported for plugin, see docs"
+      result.errMsg = 'audio device not supported for plugin, see docs';
       return result;
     }
     if (
       navigator.userAgent.indexOf('Chrome') != -1 ||
       navigator.userAgent.indexOf('Firefox') != -1 ||
       navigator.userAgent.indexOf('Edg') != -1
-    ){
+    ) {
       result.isSupported = true;
-    }else{
+    } else {
       result.isSupported = false;
       result.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
-      result.errMsg = "browser not supported for plugin, see docs"
+      result.errMsg = 'browser not supported for plugin, see docs';
     }
 
     return result;
@@ -125,11 +124,12 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     return HMSAudioPluginType.TRANSFORM;
   }
 
-  getBufferSize(): number{
-    const val = (this.samplingRate * this.channels * this.durationInMs)/1000;
+  getBufferSize(): number {
+    const val = (this.samplingRate * this.channels * this.durationInMs) / 1000;
     let bufferSize = 1;
-    while(bufferSize < val)
-      bufferSize*=2;
+    while (bufferSize < val) {
+      bufferSize *= 2;
+    }
 
     return bufferSize;
   }
@@ -147,8 +147,8 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     this.suppressNoise = value;
   }
   removeNoise(buffer: any, module: any) {
-    let ptr = module.ptr;
-    let st = module.st;
+    const ptr = module.ptr;
+    const st = module.st;
     for (let i = 0; i < RNNNOISE_SAMPLE_LENGTH; i++) {
       module.HEAPF32[(ptr >> 2) + i] = buffer[i] * 32768;
     }
@@ -158,10 +158,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     }
   }
 
-  processAudioTrack(
-    audioContext: AudioContext,
-    sourceNode: MediaStreamAudioSourceNode
-  ): Promise<AudioNode> {
+  processAudioTrack(audioContext: AudioContext, sourceNode: MediaStreamAudioSourceNode): Promise<AudioNode> {
     if (!audioContext) {
       throw new Error('Audio context is not created');
     }
@@ -176,7 +173,13 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       this.samplingRate = this.audioContext.sampleRate;
       this.channels = 1; //TODO:check this
       this.bufferSize = this.getBufferSize();
-      console.log("sampling rate, channels, bufferSize, durationMs", this.samplingRate, this.channels, this.bufferSize, this.durationInMs);
+      console.log(
+        'sampling rate, channels, bufferSize, durationMs',
+        this.samplingRate,
+        this.channels,
+        this.bufferSize,
+        this.durationInMs,
+      );
 
       if (!this.nodesCreated) {
         this.createNodes(audioContext);
@@ -192,7 +195,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       }
       HMSNoiseSuppressionPlugin.log(TAG, this.suppressNoise);
       this.onAudioProcess();
-    }else{
+    } else {
       //initialize if not being done by sdk
       this.init();
     }
@@ -204,14 +207,13 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   }
 
   private onAudioProcess() {
-
-    let frameBuffer: any = [];
-    let inputBuffer: any = [];
-    let outputBuffer: any = [];
+    const frameBuffer: any = [];
+    const inputBuffer: any = [];
+    const outputBuffer: any = [];
 
     this.processingNode.onaudioprocess = (e: any) => {
-      let input = e.inputBuffer.getChannelData(0);
-      let output = e.outputBuffer.getChannelData(0);
+      const input = e.inputBuffer.getChannelData(0);
+      const output = e.outputBuffer.getChannelData(0);
 
       // Drain input buffer.
       for (let i = 0; i < this.bufferSize; i++) {
@@ -239,10 +241,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     };
   }
 
-  private connectAudioNodes(
-    audioContext: AudioContext,
-    sourceNode: MediaStreamAudioSourceNode
-  ) {
+  private connectAudioNodes(audioContext: AudioContext, sourceNode: MediaStreamAudioSourceNode) {
     // nodes are connected to each other like in graph, output of one is passed to next in line
     if (this.addNoise && audioContext) {
       sourceNode.connect(this.noiseNode);
@@ -257,13 +256,13 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       this.processingNode = audioContext.createScriptProcessor(
         this.bufferSize,
         1, // no of input channels
-        1 // no of output channels
+        1, // no of output channels
       );
       if (this.addNoise) {
         this.noiseNode = audioContext.createScriptProcessor(
           this.bufferSize,
           1, // no of input channels
-          1 // no of output channels
+          1, // no of output channels
         );
       }
     } else {
@@ -278,7 +277,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
 
   private processNoiseNode() {
     const addNoise = this.addNoise;
-    this.noiseNode.onaudioprocess = function(e: any) {
+    this.noiseNode.onaudioprocess = function (e: any) {
       this.input = e.inputBuffer.getChannelData(0);
       this.output = e.outputBuffer.getChannelData(0);
       for (let i = 0; i < this.input.length; i++) {
