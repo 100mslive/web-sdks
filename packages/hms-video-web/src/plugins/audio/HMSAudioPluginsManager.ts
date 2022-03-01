@@ -82,7 +82,7 @@ export class HMSAudioPluginsManager {
       this.audioContext = new AudioContext();
     }
     const result = plugin.checkSupport(this.audioContext);
-    console.log("in add plugin processed track", this.outputTrack);
+    console.log('in add plugin processed track', this.outputTrack);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
@@ -103,7 +103,7 @@ export class HMSAudioPluginsManager {
         );
         this.analytics.failure(name, err);
         await this.cleanup();
-        console.log("in add plugin processed track before throwing", this.outputTrack);
+        console.log('in add plugin processed track before throwing', this.outputTrack);
         throw err;
       }
     }
@@ -135,7 +135,7 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     await this.removePluginInternal(plugin);
-    console.log("checking plugins map size", this.pluginsMap.size);
+    console.log('checking plugins map size', this.pluginsMap.size);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes
       await this.cleanup();
@@ -150,7 +150,7 @@ export class HMSAudioPluginsManager {
 
   async cleanup() {
     for (const plugin of this.pluginsMap.values()) {
-      console.log("clearing plugin");
+      console.log('clearing plugin');
       await this.removePluginInternal(plugin);
     }
 
@@ -171,7 +171,7 @@ export class HMSAudioPluginsManager {
 
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
-      console.log("plugin size is zero, returning", this.pluginsMap.size);
+      console.log('plugin size is zero, returning', this.pluginsMap.size);
       return;
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
