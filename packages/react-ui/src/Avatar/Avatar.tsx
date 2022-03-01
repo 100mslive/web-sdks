@@ -16,8 +16,6 @@ export const StyledAvatar = styled('div', {
   transform: 'translateX(-50%) translateY(-50%)',
   color: 'white',
   aspectRatio: 1,
-  padding: '5%',
-  fontWeight: 600,
   fontSize: '1.8rem',
   variants: {
     shape: {
@@ -25,6 +23,8 @@ export const StyledAvatar = styled('div', {
       square: getAvatarShape('$1'),
     },
   },
+  width: 'calc(1rem + 20%)',
+  height: 'calc(1rem + 20%)',
   defaultVariants: {
     shape: 'circle',
   },

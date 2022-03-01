@@ -13,7 +13,7 @@ const StyledTrigger = styled(Popover.Trigger, {
   width: '36px',
   height: '36px',
   color: 'white',
-  borderRadius: '$round',
+  borderRadius: '$2',
   backgroundColor: '$menuBg',
   ...flexCenter,
   '&:not([disabled]):focus': {

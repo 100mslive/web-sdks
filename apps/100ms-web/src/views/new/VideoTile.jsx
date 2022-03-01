@@ -91,7 +91,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   );
 };
 
-const metaStyles = { left: "20px", bottom: "20px" };
+const metaStyles = { left: "20px", bottom: "20px", color: "$textPrimary" };
 
 const VideoTile = React.memo(Tile);
 
