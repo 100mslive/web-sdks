@@ -17,14 +17,17 @@ const BUFFER_DURATION = 80;
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
-  const [removeButton, setRemoveButton] = useState(false);
+  const [disable, setDisabled] = useState(false);
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
-  const pluginActive = isPluginPresent && !removeButton;
+  const pluginActive = isPluginPresent && !disable;
 
   // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  const notification = useHMSNotifications();
+  const notificationDeviceChange = useHMSNotifications(
+    HMSNotificationTypes.DEVICE_CHANGE_UPDATE
+  );
+  const notificationError = useHMSNotifications(HMSNotificationTypes.ERROR);
 
   const createPlugin = () => {
     if (!pluginRef.current) {
@@ -34,7 +37,7 @@ export const NoiseSuppression = () => {
 
   const cleanup = async err => {
     hmsToast(err);
-    setRemoveButton(true);
+    setDisabled(true);
     await removePlugin();
     pluginRef.current = null;
     console.error(err);
@@ -42,7 +45,7 @@ export const NoiseSuppression = () => {
 
   const addPlugin = useCallback(async () => {
     try {
-      setRemoveButton(false);
+      setDisabled(false);
       createPlugin();
       //check support its recommended
       const pluginSupport = hmsActions.validateAudioPluginSupport(
@@ -60,24 +63,20 @@ export const NoiseSuppression = () => {
   }, [hmsActions]);
 
   useEffect(async () => {
-    if (!notification) {
-      return;
+    if (
+      notificationDeviceChange &&
+      notificationDeviceChange.data.type === "audioInput"
+    ) {
+      setDisabled(false);
     }
 
     if (
-      notification.type === HMSNotificationTypes.DEVICE_CHANGE_UPDATE &&
-      notification.data.type === "audioInput"
+      notificationError &&
+      notificationError.data?.code === 7005 //error code = 7005 for NoiseSuppression plugin support failure
     ) {
-      setRemoveButton(false);
+      setDisabled(true);
     }
-
-    if (
-      notification.type === HMSNotificationTypes.ERROR &&
-      notification.data?.code === 7005 //error code = 7005 for NoiseSuppression plugin support failure
-    ) {
-      setRemoveButton(true);
-    }
-  }, [notification]);
+  }, [notificationDeviceChange, notificationError]);
 
   //Commenting by default NS add since its causing audio issues
   /*useEffect(() => {
@@ -106,7 +105,7 @@ export const NoiseSuppression = () => {
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
       <IconButton
         active={!pluginActive}
-        disabled={removeButton}
+        disabled={disable}
         onClick={async () => {
           if (!pluginActive) {
             await addPlugin();
