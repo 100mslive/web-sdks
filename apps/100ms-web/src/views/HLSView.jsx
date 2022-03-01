@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, Fragment } from "react";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
-import { Box, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/react-ui";
 import Hls from "hls.js";
 import { ChatView } from "./components/chatView";
 import { FeatureFlags } from "../store/FeatureFlags";
@@ -36,11 +36,11 @@ export const HLSView = ({ isChatOpen, toggleChat }) => {
           controls
         />
       ) : (
-        <div className="flex items-center justify-center w-full">
+        <Flex align="center" justify="center" css={{ width: "100%" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...
           </Text>
-        </div>
+        </Flex>
       )}
       {isChatOpen && (
         <Box
