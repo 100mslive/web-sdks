@@ -112,13 +112,16 @@ export class RoomUpdateManager {
   }
 
   private getHLSRecording(hlsNotification?: HLSNotification): HMSHLSRecording {
-    let hlsRecording: HMSHLSRecording = { running: false };
+    let hlsRecording: HMSHLSRecording = {
+      running: !!hlsNotification?.enabled,
+      startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
+    };
     if (hlsNotification?.hls_recording) {
       hlsRecording = {
         running: !!hlsNotification?.enabled,
+        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
         singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification.hls_recording?.hls_vod,
-        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
         error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
       };
     }
