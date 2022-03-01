@@ -3,33 +3,35 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { styled } from '../Theme';
+import { toastAnimation } from '../utils';
 
 const ToastRoot = styled(ToastPrimitives.Root, {
   r: '$1',
   bg: '$menuBg',
   p: '$8',
-  display: 'grid',
-  gridTemplateAreas: '"title close" "description close"',
-  gridTemplateColumns: 'auto max-content',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  ...toastAnimation,
 });
 const ToastTitle = styled(ToastPrimitives.Title, {
-  gridArea: 'title',
   fontSize: '$md',
   color: '$textPrimary',
+  mr: '$12',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
-  gridArea: 'description',
   fontSize: '$sm',
   color: '$textSecondary',
+  mr: '$12',
+  mt: '$2',
 });
 const ToastClose = styled(ToastPrimitives.Close, {
-  gridArea: 'close',
-  h: 'max-content',
-  placeSelf: 'center',
+  position: 'absolute',
+  right: '$4',
+  top: '50%',
+  transform: 'translateY(-50%)',
 });
-const ToastAction = styled(ToastPrimitives.Action, {
-  gridArea: 'action',
-});
+const ToastAction = styled(ToastPrimitives.Action, {});
 const ToastViewport = styled(ToastPrimitives.Viewport, {
   position: 'fixed',
   bottom: 0,
