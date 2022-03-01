@@ -3,7 +3,7 @@ import { Button } from "@100mslive/hms-video-react";
 import RecordRTC,  { StereoAudioRecorder } from 'recordrtc';
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
-import { Box } from "@100mslive/react-ui";
+import { Box, Tooltip } from "@100mslive/react-ui";
 
 const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
   cluster: "ap2",
@@ -40,7 +40,17 @@ export function TranscriptionButton() {
 
   return (
     <>
-      <Box id="voiceContent" className="transcribe"></Box>
+      <Box id="voiceContent" css={{ 
+        textAlign: "center",
+        fontWeight: "$medium",
+        bottom: "120px",
+        position: "fixed",
+        width: "100%",
+        fontSize: "$20px",
+        zIndex: "1000000",
+        color: "white",
+        textShadow: "0px 0px 6px #000"
+      }}></Box>
       <Button
         iconOnly
         variant="no-fill"
@@ -49,9 +59,11 @@ export function TranscriptionButton() {
         onClick={enableTranscription}
         key="transcribe"
       >
-        <span title="Transcribe">
-          <b>T</b>
-        </span>
+        <Tooltip title={`Turn ${!isTranscriptionEnabled ? "on" : "off"} transcription`}>
+          <span>
+            <b>T</b>
+          </span>
+        </Tooltip>
       </Button>
     </>
   );
@@ -68,6 +80,12 @@ class Transcriber {
     this.initialized = false;
     this.lastMessage = {};
     this.localPeerId = null;
+    this.sttTuningConfig = {
+      timeSlice: 250,
+      desiredSampRate: 8000,
+      numberOfAudioChannels: 1,
+      bufferSize: 256
+    }
   }
 
   broadcast = (text, eventName = "transcription") => {
@@ -91,7 +109,7 @@ class Transcriber {
       let body = await res.json();
       if(body && body.token){
         const token = body.token
-        this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=8000&token=${token}`);
+        this.socket = await new WebSocket(`wss://api.assemblyai.com/v2/realtime/ws?sample_rate=${this.sttTuningConfig.desiredSampRate}&token=${token}`);
         setTranscript()
         this.socket.onmessage = (message) => {
             const res = JSON.parse(message.data);
@@ -129,15 +147,12 @@ class Transcriber {
     }
   }
 
-  observeStream(stream, name = "") {
+  observeStream(stream) {
     let recorder = new RecordRTC(stream, {
+      ...this.sttTuningConfig,
       type: 'audio',
       mimeType: 'audio/webm;codecs=pcm',
       recorderType: StereoAudioRecorder,
-      timeSlice: 250,
-      desiredSampRate: 8000,
-      numberOfAudioChannels: 1,
-      bufferSize: 256,
       ondataavailable: (blob) => {
         const reader = new FileReader();
         reader.onload = () => {
