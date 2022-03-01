@@ -10,7 +10,7 @@ import { ParticipantList } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
 import { AppContext } from "../../store/AppContext";
 import { DEFAULT_HLS_VIEWER_ROLE } from "../../common/constants";
-import { AdditionalRoomState } from "./PlaylistAndStreaming";
+import { AdditionalRoomState } from "./AdditionalRoomState";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
