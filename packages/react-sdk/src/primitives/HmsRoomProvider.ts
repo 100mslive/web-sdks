@@ -8,6 +8,7 @@ import {
   HMSStatsStore,
   HMSStats,
   HMSStoreWrapper,
+  HMSNotificationTypes,
 } from '@100mslive/hms-video-store';
 import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
@@ -135,6 +136,28 @@ export const useHMSVanillaStore = () => {
 };
 
 /*
+ * `useHMSVanillaNotifications` returns the vanilla HMSNotifications object. This makes it a bit easier to ensure
+ * a notification is processed only once in your components. The other way is to use the hook version and put
+ * the component high enough in the chain.
+ * Usage:
+ * ```
+ * useEffect(() => {
+ *   const unsub = notifications.onNotification((notification) => {
+ *     console.log(notification);
+ *   }, notificationType);
+ *   return unsub;
+ * }, [])
+ * ```
+ */
+export const useHMSVanillaNotifications = () => {
+  const HMSContextConsumer = useContext(HMSContext);
+  if (!HMSContextConsumer) {
+    throw new Error(hooksErrorMessage);
+  }
+  return HMSContextConsumer.notifications;
+};
+
+/*
  * `useHMSActions` is a write only hook which can be used to dispatch actions.
  */
 export const useHMSActions = () => {
@@ -147,8 +170,11 @@ export const useHMSActions = () => {
 
 /**
  * `useHMSNotifications` is a read only hook which gives the latest notification(HMSNotification) received.
+ * @param type can be a string or an array of string for the types of notifications to listen to. If an array is passed
+ * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
+ * rerenders for performance reasons.
  */
-export const useHMSNotifications = () => {
+export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
   const HMSContextConsumer = useContext(HMSContext);
   const [notification, setNotification] = useState<HMSNotification | null>(null);
 
@@ -160,11 +186,12 @@ export const useHMSNotifications = () => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification((notification: HMSNotification) =>
-      setNotification(notification),
+    const unsubscribe = HMSContextConsumer.notifications.onNotification(
+      (notification: HMSNotification) => setNotification(notification),
+      type,
     );
     return unsubscribe;
-  }, [HMSContextConsumer.notifications]);
+  }, [HMSContextConsumer.notifications, type]);
 
   return notification;
 };

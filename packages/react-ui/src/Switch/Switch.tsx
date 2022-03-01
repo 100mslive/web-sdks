@@ -27,7 +27,7 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   left: -3,
   width: 20,
   height: 20,
-  backgroundColor: '$brandDefault',
+  backgroundColor: '$grayDefault',
   borderRadius: '$round',
   transition: 'transform 100ms',
   transform: 'translateX(2px)',

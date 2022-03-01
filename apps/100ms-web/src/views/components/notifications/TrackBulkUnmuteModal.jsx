@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
-import { HMSNotificationTypes, useHMSActions } from "@100mslive/react-sdk";
+import {
+  HMSNotificationTypes,
+  useHMSActions,
+  useHMSNotifications,
+} from "@100mslive/react-sdk";
 import { RequestDialog } from "../../new/DialogContent";
+import { MicOnIcon } from "@100mslive/react-icons";
 
-export const TrackBulkUnmuteModal = ({ notification }) => {
+export const TrackBulkUnmuteModal = () => {
   const hmsActions = useHMSActions();
   const [muteNotification, setMuteNotification] = useState(null);
+  const notification = useHMSNotifications(
+    HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST
+  );
 
   useEffect(() => {
-    if (!notification || !notification.data) {
-      return;
-    }
-    if (
-      notification.type ===
-        HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST &&
-      notification.data.enabled
-    ) {
+    if (notification?.data.enabled) {
       setMuteNotification(notification.data);
     }
   }, [notification]);
@@ -28,7 +29,7 @@ export const TrackBulkUnmuteModal = ({ notification }) => {
   return (
     <RequestDialog
       title="Track Unmute Request"
-      body={`${peer?.name} requested to unmute your tracks`}
+      body={`${peer?.name} has requested you to unmute your tracks.`}
       onOpenChange={value => !value && setMuteNotification(null)}
       onAction={() => {
         tracks.forEach(track => {
@@ -36,6 +37,7 @@ export const TrackBulkUnmuteModal = ({ notification }) => {
         });
         setMuteNotification(null);
       }}
+      Icon={MicOnIcon}
     />
   );
 };

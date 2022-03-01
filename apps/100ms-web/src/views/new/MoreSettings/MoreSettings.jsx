@@ -8,16 +8,22 @@ import {
   SettingIcon,
   TextboxIcon,
 } from "@100mslive/react-icons";
-import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
+import {
+  selectLocalPeerID,
+  selectPermissions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
-import { ChangeName, StatsForNerds } from "../../components/ChangeName";
 import { ChangeSelfRole } from "./ChangeSelfRole";
-import { RecordingAndRTMPModal } from "../../components/RecordingAndRTMPModal";
 import { FullScreenItem } from "./FullScreenItem";
-import { MuteAll } from "../../components/MuteAll";
-import Settings from "../Settings";
-import { FeatureFlags } from "../../../store/FeatureFlags";
 import { UISettings } from "./UISettings";
+import Settings from "../Settings";
+import { ChangeName } from "../../components/ChangeName";
+import { StatsForNerds } from "../../components/StatsForNerds";
+import { RecordingAndRTMPModal } from "../../components/RecordingAndRTMPModal";
+import { MuteAll } from "../../components/MuteAll";
+import { FeatureFlags } from "../../../store/FeatureFlags";
+import { RoleChangeModal } from "../RoleChangeModal";
 
 const hoverStyles = {
   "&:hover": {
@@ -31,6 +37,7 @@ const hoverStyles = {
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showRecordingModal, setShowRecordingModal] = useState(false);
@@ -38,6 +45,7 @@ export const MoreSettings = () => {
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showUISettings, setShowUISettings] = useState(false);
+  const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
 
   return (
     <Fragment>
@@ -65,7 +73,10 @@ export const MoreSettings = () => {
               Change Name
             </Text>
           </Dropdown.Item>
-          <ChangeSelfRole css={hoverStyles} />
+          <ChangeSelfRole
+            css={hoverStyles}
+            onClick={() => setShowSelfRoleChange(true)}
+          />
           {(permissions.streaming || permissions.recording) && (
             <Dropdown.Item
               onClick={() => setShowRecordingModal(true)}
@@ -121,40 +132,31 @@ export const MoreSettings = () => {
           )}
         </Dropdown.Content>
       </Dropdown.Root>
-      {showMuteAll && (
-        <MuteAll
-          showModal={showMuteAll}
-          onCloseModal={() => setShowMuteAll(false)}
-        />
-      )}
+      {showMuteAll && <MuteAll onOpenChange={setShowMuteAll} />}
       {showChangeNameModal && (
-        <ChangeName
-          show={showChangeNameModal}
-          onToggle={value => setShowChangeNameModal(value)}
-        />
+        <ChangeName onOpenChange={setShowChangeNameModal} />
       )}
       {showRecordingModal && (
-        <RecordingAndRTMPModal
-          show={showRecordingModal}
-          onToggle={value => setShowRecordingModal(value)}
-        />
+        <RecordingAndRTMPModal onOpenChange={setShowRecordingModal} />
       )}
       {showDeviceSettings && (
-        <Settings
-          open={showDeviceSettings}
-          onOpenChange={setShowDeviceSettings}
-        />
+        <Settings open onOpenChange={setShowDeviceSettings} />
       )}
       {FeatureFlags.enableStatsForNerds && showStatsForNerds && (
         <StatsForNerds
-          showModal={showStatsForNerds}
-          onCloseModal={() => setShowStatsForNerds(false)}
+          open={showStatsForNerds}
+          onOpenChange={setShowStatsForNerds}
         />
       )}
-      <UISettings
-        show={showUISettings}
-        onToggle={value => setShowUISettings(value)}
-      />
+      {showUISettings && (
+        <UISettings open={showUISettings} onOpenChange={setShowUISettings} />
+      )}
+      {showSelfRoleChange && (
+        <RoleChangeModal
+          peerId={localPeerId}
+          onOpenChange={setShowSelfRoleChange}
+        />
+      )}
     </Fragment>
   );
 };
