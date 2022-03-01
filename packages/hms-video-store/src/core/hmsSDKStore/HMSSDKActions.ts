@@ -97,6 +97,7 @@ export class HMSSDKActions implements IHMSActions {
   private readonly store: IHMSStore;
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications;
+  private ignoredMessageTypes: string[] = [];
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
@@ -319,7 +320,8 @@ export class HMSSDKActions implements IHMSActions {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = 'You';
-    this.onHMSMessage(hmsMessage);
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }
 
@@ -526,6 +528,18 @@ export class HMSSDKActions implements IHMSActions {
   setLogLevel(level: HMSLogLevel) {
     HMSLogger.level = level;
     this.sdk.setLogLevel(level);
+  }
+
+  ignoreMessageTypes(msgTypes: string[], replace = false) {
+    if (replace) {
+      this.ignoredMessageTypes = msgTypes;
+    } else {
+      for (const msgType of msgTypes) {
+        if (!this.ignoredMessageTypes.includes(msgType)) {
+          this.ignoredMessageTypes.push(msgType);
+        }
+      }
+    }
   }
 
   private resetState(reason = 'resetState') {
@@ -794,11 +808,15 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    this.onHMSMessage(hmsMessage);
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
 
-  protected onHMSMessage(hmsMessage: HMSMessage) {
+  protected putMessageInStore(hmsMessage: HMSMessage) {
+    if (hmsMessage.ignored) {
+      return;
+    }
     this.setState(store => {
       hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
@@ -1134,8 +1152,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    let actionName = 'peerUpdate';
-    actionName = ACTION_TYPES[type];
+    const actionName = ACTION_TYPES[type];
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {

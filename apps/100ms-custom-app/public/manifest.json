@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "100ms App",
+  "name": "100ms React App Sample",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
