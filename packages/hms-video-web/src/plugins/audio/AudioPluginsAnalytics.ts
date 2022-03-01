@@ -46,7 +46,9 @@ export class AudioPluginsAnalytics {
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.audioPluginFailure(name, this.pluginSampleRate[name], error)).flush();
+      analyticsEventsService
+        .queue(MediaPluginsAnalyticsFactory.audioPluginFailure(name, this.pluginSampleRate[name], error))
+        .flush();
       //clean the plugin details
       this.clean(name);
     }
