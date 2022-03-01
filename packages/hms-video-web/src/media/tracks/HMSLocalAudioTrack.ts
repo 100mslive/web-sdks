@@ -53,7 +53,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
-    console.log('starting');
     const prevTrack = this.nativeTrack;
     const prevState = this.enabled;
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
@@ -66,9 +65,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     const localStream = this.stream as HMSLocalStream;
     // change nativeTrack so plugin can start its work
-    console.log('processed track', this.processedTrack);
-    console.log('new track', newTrack);
-    console.log('prev track', prevTrack);
     await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
     await localStream.replaceStreamTrack(prevTrack, newTrack);
     this.nativeTrack = newTrack;
@@ -103,8 +99,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
-    console.log('old settings', this.settings);
-    console.log('new settings', newSettings);
 
     await this.handleDeviceChange(newSettings, internal);
     if (isEmptyTrack(this.nativeTrack)) {
@@ -152,11 +146,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (!processedTrack) {
       if (this.processedTrack) {
         // remove, reset back to the native track
-        console.log('got undefined track, replace with native');
         await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
       }
       this.processedTrack = undefined;
-      console.log('set this.processed = undefined ');
       return;
     }
     if (processedTrack !== this.processedTrack) {
@@ -238,7 +230,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
-      console.log('replace track called on device change');
       await this.replaceTrackWith(settings);
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {

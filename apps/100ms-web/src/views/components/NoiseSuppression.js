@@ -35,7 +35,6 @@ export const NoiseSuppression = () => {
   const cleanup = async err => {
     hmsToast(err);
     setRemoveButton(true);
-    console.log("remove called in app");
     await removePlugin();
     pluginRef.current = null;
     console.error(err);
@@ -50,7 +49,6 @@ export const NoiseSuppression = () => {
         pluginRef.current
       );
       if (pluginSupport.isSupported) {
-        console.log("noise suppression plugin is supported");
         await hmsActions.addPluginToAudioTrack(pluginRef.current);
       } else {
         const err = pluginSupport.errMsg;
@@ -65,6 +63,7 @@ export const NoiseSuppression = () => {
     if (!notification) {
       return;
     }
+
     if (
       notification.type === HMSNotificationTypes.DEVICE_CHANGE_UPDATE &&
       notification.data.type === "audioInput"
@@ -98,7 +97,6 @@ export const NoiseSuppression = () => {
 
   async function removePlugin() {
     if (pluginRef.current) {
-      console.log("remove plugin called");
       await hmsActions.removePluginFromAudioTrack(pluginRef.current);
       pluginRef.current = null;
     }
@@ -113,7 +111,6 @@ export const NoiseSuppression = () => {
           if (!pluginActive) {
             await addPlugin();
           } else {
-            console.log("remove plugin called from web");
             await removePlugin();
           }
         }}

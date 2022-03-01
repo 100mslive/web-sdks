@@ -37,6 +37,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics();
+    this.audioContext = new AudioContext();
   }
 
   getPlugins(): string[] {
@@ -49,12 +50,17 @@ export class HMSAudioPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
+
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+
     if (this.pluginAddInProgress) {
       const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
-      this.analytics.added(name);
+      this.analytics.added(name, this.audioContext.sampleRate);
       this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
       throw err;
@@ -64,9 +70,6 @@ export class HMSAudioPluginsManager {
 
     try {
       await this.addPluginInternal(plugin);
-    } catch (err) {
-      console.log('error in adding');
-      throw err;
     } finally {
       this.pluginAddInProgress = false;
     }
@@ -78,16 +81,13 @@ export class HMSAudioPluginsManager {
       HMSLogger.w(TAG, `plugin - ${name} already added.`);
       return;
     }
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
+
     const result = plugin.checkSupport(this.audioContext);
-    console.log('in add plugin processed track', this.outputTrack);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
       //Needed to re-add in the reprocess case, to send error message in case of failure
-      this.analytics.added(name);
+      this.analytics.added(name, this.audioContext!.sampleRate);
       if (result.errType === HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED) {
         const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
           HMSAction.AUDIO_PLUGINS,
@@ -103,7 +103,6 @@ export class HMSAudioPluginsManager {
         );
         this.analytics.failure(name, err);
         await this.cleanup();
-        console.log('in add plugin processed track before throwing', this.outputTrack);
         throw err;
       }
     }
@@ -115,7 +114,7 @@ export class HMSAudioPluginsManager {
         // Previous node will be connected to destination. Disconnect that
         this.prevAudioNode.disconnect();
       }
-      this.analytics.added(name);
+      this.analytics.added(name, this.audioContext!.sampleRate);
       await this.analytics.initWithTime(name, async () => plugin.init());
       this.pluginsMap.set(name, plugin);
       await this.processPlugin(plugin);
@@ -135,7 +134,6 @@ export class HMSAudioPluginsManager {
 
   async removePlugin(plugin: HMSAudioPlugin) {
     await this.removePluginInternal(plugin);
-    console.log('checking plugins map size', this.pluginsMap.size);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes
       await this.cleanup();
@@ -150,7 +148,6 @@ export class HMSAudioPluginsManager {
 
   async cleanup() {
     for (const plugin of this.pluginsMap.values()) {
-      console.log('clearing plugin');
       await this.removePluginInternal(plugin);
     }
 
@@ -171,7 +168,6 @@ export class HMSAudioPluginsManager {
 
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
-      console.log('plugin size is zero, returning', this.pluginsMap.size);
       return;
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
