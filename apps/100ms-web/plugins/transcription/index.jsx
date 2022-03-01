@@ -3,6 +3,7 @@ import { Button } from "@100mslive/hms-video-react";
 import RecordRTC,  { StereoAudioRecorder } from 'recordrtc';
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
+import { Text } from "@100mslive/react-ui";
 
 const pusher = new Pusher("c6edf1e636510f716f39", {
   cluster: "ap2",
@@ -39,7 +40,7 @@ export function TranscriptionButton() {
 
   return (
     <>
-      <div id="voiceContent" className="transcribe"></div>
+      <Text id="voiceContent" className="transcribe"></Text>
       <Button
         iconOnly
         variant="no-fill"

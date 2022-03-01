@@ -30,7 +30,7 @@ import { MoreSettings } from "./MoreSettings/MoreSettings";
 import { AudioPlaylist } from "./Playlist/AudioPlaylist";
 import { Screenshare } from "./ScreenShare";
 import { ScreenShareHintModal } from "./ScreenshareHintModal";
-import { TranscriptionButton } from "../transcription";
+import { TranscriptionButton } from "../../../plugins/transcription"
 
 const ScreenshareAudio = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
