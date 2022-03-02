@@ -57,6 +57,7 @@ import {
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
+  HMSPluginSupportResult,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -372,6 +373,28 @@ export class HMSSDKActions implements IHMSActions {
   }
   async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
     return this.addRemoveAudioPlugin(plugin, 'add');
+  }
+
+  validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult {
+    let result = {} as HMSPluginSupportResult;
+    if (!plugin) {
+      HMSLogger.w('Invalid plugin received in store');
+      result.errMsg = 'trying to add invalid plugin, see docs for details';
+      return result;
+    }
+    const trackID = this.store.getState(selectLocalAudioTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
+        //TODO: check if it is required
+        // this.syncRoomState(`${action}AudioPlugin`);
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to validate plugin`);
+      }
+    }
+
+    return result;
   }
 
   async removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
@@ -915,6 +938,7 @@ export class HMSSDKActions implements IHMSActions {
         }, 'error');
       }
     }
+    this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);

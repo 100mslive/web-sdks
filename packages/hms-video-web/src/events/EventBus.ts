@@ -5,6 +5,7 @@ import { HMSInternalEvent } from './HMSInternalEvent';
 import { HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
+import { HMSException } from '../error/HMSException';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -27,6 +28,8 @@ export class EventBus {
     HMSEvents.TRACK_AUDIO_LEVEL_UPDATE,
     this.eventEmitter,
   );
+
+  readonly audioPluginFailed = new HMSInternalEvent<HMSException>(HMSEvents.AUDIO_PLUGIN_FAILED, this.eventEmitter);
 
   readonly localAudioSilence = new HMSInternalEvent<{ track: HMSLocalAudioTrack }>(
     HMSEvents.LOCAL_AUDIO_SILENCE,

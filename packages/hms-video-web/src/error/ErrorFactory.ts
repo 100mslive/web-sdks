@@ -427,6 +427,16 @@ export const ErrorFactory = {
     AddAlreadyInProgress(action: HMSAction, description = '') {
       return new HMSException(7004, 'AddAlreadyInProgress', action, 'Plugin add already in progress', description);
     },
+
+    DeviceNotSupported(action: HMSAction, description = '') {
+      return new HMSException(
+        7005,
+        'DeviceNotSupported',
+        action,
+        'Check HMS Docs to see the list of supported devices',
+        description,
+      );
+    },
   },
 
   PlaylistErrors: {

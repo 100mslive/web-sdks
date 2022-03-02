@@ -4,11 +4,12 @@ import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import HMSLogger from '../../utils/logger';
-import { HMSAudioPlugin } from '../../plugins';
+import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { EventBus } from '../../events/EventBus';
+import { HMSException } from '../../error/HMSException';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -68,7 +69,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await localStream.replaceStreamTrack(prevTrack, newTrack);
     this.nativeTrack = newTrack;
     isLevelMonitored && this.initAudioLevelMonitor();
-    await this.pluginsManager.reprocessPlugins();
+    try {
+      await this.pluginsManager.reprocessPlugins();
+    } catch (e) {
+      this.eventBus.audioPluginFailed.publish(e as HMSException);
+    }
   }
 
   async setEnabled(value: boolean) {
@@ -124,6 +129,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   async removePlugin(plugin: HMSAudioPlugin): Promise<void> {
     return this.pluginsManager.removePlugin(plugin);
+  }
+
+  /**
+   * @see HMSAudioPlugin
+   */
+  validatePlugin(plugin: HMSAudioPlugin): HMSPluginSupportResult {
+    return this.pluginsManager.validatePlugin(plugin);
   }
 
   /**

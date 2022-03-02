@@ -10,17 +10,20 @@ export class AudioPluginsAnalytics {
   private readonly initTime: Record<string, number>;
   private readonly addedTimestamps: Record<string, number>;
   private readonly pluginAdded: Record<string, boolean>;
+  private readonly pluginSampleRate: Record<string, number>;
 
   constructor() {
     this.initTime = {};
     this.addedTimestamps = {};
     this.pluginAdded = {};
+    this.pluginSampleRate = {};
   }
 
-  added(name: string) {
+  added(name: string, sampleRate: number) {
     this.pluginAdded[name] = true;
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
+    this.pluginSampleRate[name] = sampleRate;
   }
 
   removed(name: string) {
@@ -31,6 +34,7 @@ export class AudioPluginsAnalytics {
         // duration in seconds
         duration: Math.floor((Date.now() - this.addedTimestamps[name]) / 1000),
         loadTime: this.initTime[name],
+        sampleRate: this.pluginSampleRate[name],
       };
       //send stats
       analyticsEventsService.queue(MediaPluginsAnalyticsFactory.audioPluginStats(stats)).flush();
@@ -42,7 +46,9 @@ export class AudioPluginsAnalytics {
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.failure(name, error)).flush();
+      analyticsEventsService
+        .queue(MediaPluginsAnalyticsFactory.audioPluginFailure(name, this.pluginSampleRate[name], error))
+        .flush();
       //clean the plugin details
       this.clean(name);
     }
@@ -82,5 +88,6 @@ export class AudioPluginsAnalytics {
     delete this.addedTimestamps[name];
     delete this.initTime[name];
     delete this.pluginAdded[name];
+    delete this.pluginSampleRate[name];
   }
 }

@@ -22,7 +22,7 @@ import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../store/FeatureFlags";
 import { AudioVideoToggle } from "../components/AudioVideoToggle";
 import { LeaveRoom } from "../components/LeaveRoom";
-import { NoiseSuppression } from "../components/NoiseSuppression";
+import { NoiseSuppression } from "../../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../components/VirtualBackground";
 import { useMyMetadata } from "../hooks/useMetadata";
 import { ToggleWhiteboard } from "../whiteboard";
