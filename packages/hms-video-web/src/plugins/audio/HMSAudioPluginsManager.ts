@@ -236,7 +236,7 @@ export class HMSAudioPluginsManager {
     this.analytics.removed(name);
   }
 
-  private createAudioContext(){
+  private createAudioContext() {
     if (!this.audioContext) {
       this.audioContext = new AudioContext();
     }
