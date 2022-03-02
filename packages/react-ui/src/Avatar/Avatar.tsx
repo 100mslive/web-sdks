@@ -24,8 +24,8 @@ export const StyledAvatar = styled('div', {
       square: getAvatarShape('$1'),
     },
   },
-  padding: 'calc(1rem + 5%)',
-  height: 'calc(1rem + 20%)',
+  padding: 'calc(1.25rem + 5%)',
+  width: 'calc(1.5rem + 10%)',
   defaultVariants: {
     shape: 'circle',
   },
