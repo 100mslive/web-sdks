@@ -90,22 +90,14 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
 
   checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
     const result = {} as HMSPluginSupportResult;
-    let sampleRate = 48000; //using this as default
-    if (ctx) {
-      sampleRate = ctx?.sampleRate;
-    }
-
+    const sampleRate = ctx?.sampleRate || 48000; //using this as default
     if (sampleRate < MIN_SAMPLE_RATE || sampleRate > MAX_SAMPLE_RATE) {
       result.isSupported = false;
       result.errType = HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED;
       result.errMsg = 'audio device not supported for plugin, see docs';
       return result;
     }
-    if (
-      navigator.userAgent.indexOf('Chrome') != -1 ||
-      navigator.userAgent.indexOf('Firefox') != -1 ||
-      navigator.userAgent.indexOf('Edg') != -1
-    ) {
+    if (['Chrome', 'Firefox', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
       result.isSupported = true;
     } else {
       result.isSupported = false;
