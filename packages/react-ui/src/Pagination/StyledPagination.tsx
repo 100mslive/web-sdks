@@ -39,11 +39,11 @@ const Dot = styled('button', {
   borderRadius: '9999px',
   width: '0.5rem',
   height: '0.5rem',
-  backgroundColor: '$grayDark',
+  backgroundColor: '$textDisabled',
   variants: {
     active: {
       true: {
-        backgroundColor: '$grayDisabled',
+        backgroundColor: '$textPrimary',
       },
     },
   },

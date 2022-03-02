@@ -29,4 +29,5 @@ export type {
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
+  HLSConfig,
 } from './hmsSDKStore/sdkTypes';

@@ -16,7 +16,7 @@ import {
   DialogSwitch,
 } from "../new/DialogContent";
 
-export const StatsForNerds = ({ open, onOpenChange }) => {
+export const StatsForNerds = ({ onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(
     () => [
@@ -38,7 +38,7 @@ export const StatsForNerds = ({ open, onOpenChange }) => {
   }, [tracksWithLabels, selectedStat]);
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent Icon={InfoIcon} title="Stats For Nerds">
         <DialogSwitch
           title="Show Stats on Tiles"
@@ -145,7 +145,7 @@ const TrackStats = ({ trackID }) => {
 
 const StatsRow = ({ label, value }) => (
   <DialogRow justify="between" css={{ my: "0.5rem" }}>
-    <Text>{label}</Text>
+    <Text>{label}: </Text>
     <Text>{value}</Text>
   </DialogRow>
 );
