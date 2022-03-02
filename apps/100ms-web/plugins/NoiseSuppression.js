@@ -29,17 +29,29 @@ export const NoiseSuppression = () => {
 
   const createPlugin = () => {
     if (!pluginRef.current) {
-      pluginRef.current = new HMSNoiseSuppressionPlugin(process.env.NS_DURATION_TIME_IN_MS);
+      pluginRef.current = new HMSNoiseSuppressionPlugin(
+        process.env.NS_DURATION_TIME_IN_MS
+      );
     }
   };
 
-  const cleanup = async err => {
-    hmsToast(err);
-    setDisabled(true);
-    await removePlugin();
-    pluginRef.current = null;
-    console.error(err);
-  };
+  const removePlugin = useCallback(async () => {
+    if (pluginRef.current) {
+      await hmsActions.removePluginFromAudioTrack(pluginRef.current);
+      pluginRef.current = null;
+    }
+  }, [hmsActions]);
+
+  const cleanup = useCallback(
+    async err => {
+      hmsToast(err);
+      setDisabled(true);
+      await removePlugin();
+      pluginRef.current = null;
+      console.error(err);
+    },
+    [removePlugin]
+  );
 
   const addPlugin = useCallback(async () => {
     try {
@@ -58,7 +70,7 @@ export const NoiseSuppression = () => {
     } catch (err) {
       await cleanup(err);
     }
-  }, [hmsActions]);
+  }, [hmsActions, cleanup]);
 
   useEffect(() => {
     if (
@@ -91,13 +103,6 @@ export const NoiseSuppression = () => {
       createPlugin();
     }
   }, [addPlugin, notification, localAudioTrackID]);*/
-
-  async function removePlugin() {
-    if (pluginRef.current) {
-      await hmsActions.removePluginFromAudioTrack(pluginRef.current);
-      pluginRef.current = null;
-    }
-  }
 
   return (
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
