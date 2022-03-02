@@ -197,7 +197,7 @@ export interface IHMSActions {
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
   /**
-   * Add or remove a audio plugin from/to the local peer audio track. Eg. Noise Suppression etc.
+   * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
    * Audio plugins can be added/removed at any time after the join is successful.
    * @param plugin HMSAudioPlugin
    * @see HMSAudioPlugin
