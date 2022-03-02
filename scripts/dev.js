@@ -9,6 +9,9 @@ async function main() {
   if (isReact) {
     external.push('react');
   }
+  if (pkg.name === '@100mslive/hms-noise-suppression') {
+    external.push('fs', 'path');
+  }
   esbuild.build({
     entryPoints: [source],
     outfile: 'dist/index.cjs.js',
