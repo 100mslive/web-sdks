@@ -181,9 +181,8 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): void;
 
   /**
-   * set the quality of the selected videoTrack
-   * @param trackId
-   * @param layer
+   * set the quality of the selected videoTrack for simulcast.
+   * @alpha
    */
   setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
 

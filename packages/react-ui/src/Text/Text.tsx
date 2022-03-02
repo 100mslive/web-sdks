@@ -2,7 +2,7 @@ import { styled } from '../Theme';
 
 export const Text = styled('p', {
   fontFamily: '$sans',
-  fontWeight: 500,
+  fontWeight: '$regular',
   margin: 0,
   color: '$textPrimary',
   variants: {
