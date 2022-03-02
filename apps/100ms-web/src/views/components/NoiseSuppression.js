@@ -62,7 +62,7 @@ export const NoiseSuppression = () => {
     }
   }, [hmsActions]);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (
       notificationDeviceChange &&
       notificationDeviceChange.data.type === "audioInput"
