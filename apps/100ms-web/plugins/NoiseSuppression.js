@@ -10,9 +10,7 @@ import {
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
-import { hmsToast } from "./notifications/hms-toast";
-
-const BUFFER_DURATION = 80;
+import { hmsToast } from "../src/views/components/notifications/hms-toast";
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
@@ -31,7 +29,7 @@ export const NoiseSuppression = () => {
 
   const createPlugin = () => {
     if (!pluginRef.current) {
-      pluginRef.current = new HMSNoiseSuppressionPlugin(BUFFER_DURATION);
+      pluginRef.current = new HMSNoiseSuppressionPlugin( process.env["NS_DURATION_TIME_IN_MS"]);
     }
   };
 
