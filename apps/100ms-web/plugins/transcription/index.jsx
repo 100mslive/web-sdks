@@ -120,7 +120,14 @@ class Transcriber {
             peername = peername
               .toLowerCase()
               .replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase());
-            this.broadcast(res.text + "\n[" + peername + "]");
+            let messageText =
+              res.text.length >= 80
+                ? res.text
+                    .split(" ")
+                    .slice(Math.max(res.text.split(" ").length - 10, 1))
+                    .join(" ")
+                : res.text;
+            this.broadcast(messageText + "\n[" + peername + "]");
           }
         };
 
