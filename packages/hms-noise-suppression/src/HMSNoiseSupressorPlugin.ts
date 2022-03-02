@@ -54,12 +54,6 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       this.durationInMs = DEFAULT_DURATION_MS;
     }
   }
-  checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
-    console.log(ctx);
-    return {
-      isSupported: ['Chrome', 'Firefox', 'Edg'].some(browser => navigator.userAgent.includes(browser)),
-    };
-  }
 
   init(): Promise<void> | void {
     if (!this.module) {
