@@ -29,7 +29,7 @@ export const NoiseSuppression = () => {
 
   const createPlugin = () => {
     if (!pluginRef.current) {
-      pluginRef.current = new HMSNoiseSuppressionPlugin( process.env["NS_DURATION_TIME_IN_MS"]);
+      pluginRef.current = new HMSNoiseSuppressionPlugin(process.env.NS_DURATION_TIME_IN_MS);
     }
   };
 
