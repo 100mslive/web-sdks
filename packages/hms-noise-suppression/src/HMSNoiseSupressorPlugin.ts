@@ -1,6 +1,7 @@
 // @ts-ignore
 import { NoiseModule } from './models/Noise';
 import { HMSAudioPlugin, HMSAudioPluginType } from '@100mslive/hms-video';
+import type { HMSPluginSupportResult } from '@100mslive/hms-video';
 
 const TAG = 'NoiseSuppressionProcessor';
 const pkg = require('../package.json');
@@ -28,6 +29,12 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     this.nodesCreated = false;
     this.module = null;
   }
+  checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
+    console.log(ctx);
+    return {
+      isSupported: ['Chrome', 'Firefox', 'Edg'].some(browser => navigator.userAgent.includes(browser)),
+    };
+  }
 
   init(): Promise<void> | void {
     if (!this.module) {
@@ -54,7 +61,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   }
 
   isSupported(): boolean {
-    return ['Chrome', 'Firefox', 'Edg'].some(navigator.userAgent.includes);
+    return ['Chrome', 'Firefox', 'Edg'].some(browser => navigator.userAgent.includes(browser));
   }
 
   getName(): string {
