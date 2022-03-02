@@ -24,7 +24,7 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "0.1.44"
+    "@100mslive/hms-video": "^0.1.45-alpha.1"
   },
   "name": "@100mslive/hms-virtual-background",
   "author": "ashish17",
@@ -40,7 +40,7 @@
     }
   ],
   "devDependencies": {
-    "@100mslive/hms-video": "0.1.44-alpha.4"
+    "@100mslive/hms-video": "0.1.45-alpha.1"
   },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
