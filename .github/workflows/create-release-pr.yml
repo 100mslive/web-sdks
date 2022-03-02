@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
-        if: github.ref != 'refs/heads/main'
+        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/main'
         run: exit 1
 
       - uses: actions/checkout@v2
