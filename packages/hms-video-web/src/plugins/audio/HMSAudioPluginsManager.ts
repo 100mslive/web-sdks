@@ -51,16 +51,14 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
+    this.createAudioContext();
 
     if (this.pluginAddInProgress) {
       const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
-      this.analytics.added(name, this.audioContext.sampleRate);
+      this.analytics.added(name, this.audioContext!.sampleRate);
       this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
       throw err;
@@ -126,9 +124,7 @@ export class HMSAudioPluginsManager {
   }
 
   validatePlugin(plugin: HMSAudioPlugin) {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
+    this.createAudioContext();
     return plugin.checkSupport(this.audioContext);
   }
 
@@ -179,9 +175,7 @@ export class HMSAudioPluginsManager {
   }
 
   private async initContextAndAudioNodes() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
+    this.createAudioContext();
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
@@ -240,5 +234,11 @@ export class HMSAudioPluginsManager {
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
+  }
+
+  private createAudioContext() {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
   }
 }
