@@ -44,7 +44,7 @@ export const NoiseSuppression = () => {
 
   const cleanup = useCallback(
     async err => {
-      hmsToast(err);
+      hmsToast(err.message);
       setDisabled(true);
       await removePlugin();
       pluginRef.current = null;
