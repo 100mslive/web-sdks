@@ -10,7 +10,7 @@ async function main() {
     external.push('react');
   }
   if (pkg.name === '@100mslive/hms-noise-suppression') {
-    external.push('fs', 'path');
+    external.push('fs', 'path', './src/models/Noise.js');
   }
   esbuild.build({
     entryPoints: [source],
