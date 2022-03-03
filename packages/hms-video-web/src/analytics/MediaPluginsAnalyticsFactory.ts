@@ -11,14 +11,24 @@ export default class MediaPluginsAnalyticsFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static audioPluginFailure(pluginName: string, sampleRate: number, error: HMSException) {
+    const name = 'mediaPlugin.failed';
+    const level = AnalyticsEventLevel.ERROR;
+    const properties = { plugin_name: pluginName, sampleRate: sampleRate, ...error.toAnalyticsProperties() };
+
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
   static audioPluginStats({
     pluginName,
     duration,
     loadTime,
+    sampleRate,
   }: {
     pluginName: string;
     duration: number;
     loadTime: number;
+    sampleRate: number;
   }) {
     const name = 'mediaPlugin.stats';
     const level = AnalyticsEventLevel.INFO;
@@ -26,6 +36,7 @@ export default class MediaPluginsAnalyticsFactory {
       plugin_name: pluginName,
       duration: duration,
       load_time: loadTime,
+      sampleRate: sampleRate,
     };
     return new AnalyticsEvent({ name, level, properties });
   }
