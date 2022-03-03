@@ -1,5 +1,5 @@
 // @ts-ignore
-import { NoiseModule } from './models/Noise';
+import { NoiseModule } from './models/Noise.js';
 import {
   HMSAudioPlugin,
   HMSAudioPluginType,

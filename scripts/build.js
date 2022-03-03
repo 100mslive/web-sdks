@@ -19,7 +19,7 @@ async function main() {
     external.push('react');
   }
   if (pkg.name === '@100mslive/hms-noise-suppression') {
-    external.push('fs', 'path');
+    external.push('fs', 'path', './src/models/Noise.js');
   }
   if (['@100mslive/hms-noise-suppression', '@100mslive/hms-virtual-background'].includes(pkg.name)) {
     external.push('@100mslive/hms-video');
