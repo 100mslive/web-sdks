@@ -22,7 +22,7 @@ export const darkTheme = {
 export const lightTheme = {
   colors: {
     bgPrimary: '#FFFFFF',
-    bgSecondary: 'rgba(255,255,255, 0.72)',
+    bgSecondary: '#F5F5F5',
     bgTertiary: 'rgba(255,255,255, 0.38)',
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',

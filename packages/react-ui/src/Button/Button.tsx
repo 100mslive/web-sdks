@@ -7,20 +7,22 @@ import { flexCenter } from '../utils/styles';
  * @param active active state bg color
  * @returns CSS object based on the state
  */
-const getButtonVariants = (base: string, hover: string, active: string) => ({
-  bg: base,
-  c: '$white',
-  '&[disabled]': {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  },
-  '&:not([disabled]):hover': {
-    bg: hover,
-  },
-  '&:not([disabled]):active': {
-    bg: active,
-  },
-});
+const getButtonVariants = (base: string, hover: string, active: string) => {
+  return {
+    bg: base,
+    c: '$white',
+    '&[disabled]': {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+    },
+    '&:not([disabled]):hover': {
+      bg: hover,
+    },
+    '&:not([disabled]):active': {
+      bg: active,
+    },
+  };
+};
 
 export const Button = styled('button', {
   ...flexCenter,
