@@ -7,20 +7,22 @@ import { flexCenter } from '../utils/styles';
  * @param active active state bg color
  * @returns CSS object based on the state
  */
-const getButtonVariants = (base: string, hover: string, active: string) => ({
-  bg: base,
-  c: '$white',
-  '&[disabled]': {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  },
-  '&:not([disabled]):hover': {
-    bg: hover,
-  },
-  '&:not([disabled]):active': {
-    bg: active,
-  },
-});
+const getButtonVariants = (base: string, hover: string, active: string, isWhite: boolean) => {
+  return {
+    bg: base,
+    c: `${isWhite ? 'white' : '$textPrimary'}`,
+    '&[disabled]': {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+    },
+    '&:not([disabled]):hover': {
+      bg: hover,
+    },
+    '&:not([disabled]):active': {
+      bg: active,
+    },
+  };
+};
 
 export const Button = styled('button', {
   ...flexCenter,
@@ -41,9 +43,9 @@ export const Button = styled('button', {
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
-      danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
-      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight'),
+      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault', false),
+      danger: getButtonVariants('$error', '$errorTint', '$errorTint', true),
+      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight', true),
     },
     icon: {
       true: {
