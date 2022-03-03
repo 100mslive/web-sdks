@@ -35,7 +35,6 @@ async function main() {
       external,
       metafile: false,
       loader,
-      plugins,
       define,
     });
 
@@ -50,8 +49,14 @@ async function main() {
       external,
       metafile: true,
       loader,
-      plugins,
       define,
+    });
+
+    esbuild.build({
+      entryPoints: ['./src/index.css'],
+      outfile: 'dist/index.css',
+      bundle: true,
+      plugins,
     });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);

@@ -27,7 +27,6 @@ import {
 } from "@100mslive/react-sdk";
 import { FeatureFlags } from "./store/FeatureFlags";
 import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
-import "./index.css";
 import { Confetti } from "../plugins/confetti";
 
 const defaultTokenEndpoint = process.env
