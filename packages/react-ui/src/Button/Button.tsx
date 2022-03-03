@@ -7,10 +7,10 @@ import { flexCenter } from '../utils/styles';
  * @param active active state bg color
  * @returns CSS object based on the state
  */
-const getButtonVariants = (base: string, hover: string, active: string, isWhite: boolean) => {
+const getButtonVariants = (base: string, hover: string, active: string) => {
   return {
     bg: base,
-    c: `${isWhite ? 'white' : '$textPrimary'}`,
+    c: '$white',
     '&[disabled]': {
       opacity: 0.5,
       cursor: 'not-allowed',
@@ -43,9 +43,9 @@ export const Button = styled('button', {
   transition: 'all 0.2s  ease',
   variants: {
     variant: {
-      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault', false),
-      danger: getButtonVariants('$error', '$errorTint', '$errorTint', true),
-      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight', true),
+      standard: getButtonVariants('$grayDark', '$grayDefault', '$grayDefault'),
+      danger: getButtonVariants('$error', '$errorTint', '$errorTint'),
+      primary: getButtonVariants('$brandDefault', '$brandLight', '$brandLight'),
     },
     icon: {
       true: {
