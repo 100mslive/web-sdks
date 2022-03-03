@@ -21,6 +21,9 @@ async function main() {
   if (pkg.name === '@100mslive/hms-noise-suppression') {
     external.push('fs', 'path');
   }
+  if (['@100mslive/hms-noise-suppression', '@100mslive/hms-virtual-background'].includes(pkg.name)) {
+    external.push('@100mslive/hms-video');
+  }
   try {
     esbuild.buildSync({
       entryPoints: [source],
