@@ -56,9 +56,7 @@ export class RoomUpdateManager {
     room.rtmp.startedAt = this.getAsDate(streaming?.rtmp?.started_at);
     room.recording.server.startedAt = this.getAsDate(recording?.sfu.started_at);
     room.recording.browser.startedAt = this.getAsDate(recording?.browser.started_at);
-    const hlsRecording: HLSNotification | undefined =
-      recording?.hls && Object.assign(recording.hls, { hls_recording: recording?.hls.config });
-    room.recording.hls = this.getHLSRecording(hlsRecording);
+    room.recording.hls = this.getPeerListHLSRecording(recording);
     room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
@@ -114,20 +112,27 @@ export class RoomUpdateManager {
   }
 
   private getHLSRecording(hlsNotification?: HLSNotification): HMSHLSRecording {
-    let hlsRecording: HMSHLSRecording = {
-      running: !!hlsNotification?.enabled,
-      startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
-    };
+    let hlsRecording: HMSHLSRecording = { running: false };
     if (hlsNotification?.hls_recording) {
       hlsRecording = {
         running: !!hlsNotification?.enabled,
-        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
         singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification.hls_recording?.hls_vod,
+        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
         error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
       };
     }
     return hlsRecording;
+  }
+
+  private getPeerListHLSRecording(recording?: RoomState['recording']): HMSHLSRecording {
+    const hlsNotification = recording?.hls;
+    return {
+      running: !!hlsNotification?.enabled,
+      startedAt: this.getAsDate(hlsNotification?.started_at),
+      singleFilePerLayer: !!hlsNotification?.config?.single_file_per_layer,
+      hlsVod: !!hlsNotification?.config?.hls_vod,
+    };
   }
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
