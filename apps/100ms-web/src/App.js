@@ -10,6 +10,7 @@ import {
   HMSThemeProvider,
   PostLeaveDisplay,
 } from "@100mslive/hms-video-react";
+import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
 import PreviewScreen from "./pages/PreviewScreen";
 import { Conference } from "./pages/conference.jsx";
 import ErrorPage from "./pages/ErrorPage";
@@ -26,8 +27,8 @@ import {
   HMSReactiveStore,
 } from "@100mslive/react-sdk";
 import { FeatureFlags } from "./store/FeatureFlags";
-import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
 import { Confetti } from "../plugins/confetti";
+import "./index.css";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
