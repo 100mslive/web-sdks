@@ -52,7 +52,7 @@
     "test": "yarn build && lerna run test --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
-    "size": "lerna run size --stream",
+    "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
     "cypress:open": "cypress open"
@@ -86,6 +86,22 @@
     {
       "path": "packages/hms-video-store/dist/index.js",
       "limit": "100 KB"
+    },
+    {
+      "path": "packages/hms-virtual-background/dist/index.cjs.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/hms-virtual-background/dist/index.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/hms-noise-suppression/dist/index.cjs.js",
+      "limit": "200 KB"
+    },
+    {
+      "path": "packages/hms-noise-suppression/dist/index.js",
+      "limit": "200 KB"
     }
   ],
   "nyc": {

@@ -31,16 +31,6 @@
   "name": "@100mslive/hms-noise-suppression",
   "author": "vishaldhull09",
   "module": "dist/index.js",
-  "size-limit": [
-    {
-      "path": "dist/index.cjs.js",
-      "limit": "100 KB"
-    },
-    {
-      "path": "dist/index.js",
-      "limit": "100 KB"
-    }
-  ],
   "devDependencies": {
     "@100mslive/hms-video": "0.1.45-alpha.1"
   }

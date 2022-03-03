@@ -29,16 +29,6 @@
   "name": "@100mslive/hms-virtual-background",
   "author": "ashish17",
   "module": "dist/index.js",
-  "size-limit": [
-    {
-      "path": "dist/index.cjs.js",
-      "limit": "500 KB"
-    },
-    {
-      "path": "dist/index.js",
-      "limit": "500 KB"
-    }
-  ],
   "devDependencies": {
     "@100mslive/hms-video": "0.1.45-alpha.1"
   },
