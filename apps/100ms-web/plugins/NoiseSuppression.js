@@ -22,12 +22,12 @@ export const NoiseSuppression = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const pluginActive = isPluginPresent && !disable;
 
-  const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  const notification = useHMSNotifications();
-  const notificationDeviceChange = useHMSNotifications(
-    HMSNotificationTypes.DEVICE_CHANGE_UPDATE
-  );
-  const notificationError = useHMSNotifications(HMSNotificationTypes.ERROR);
+  // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  // // const notification = useHMSNotifications();
+  // const notificationDeviceChange = useHMSNotifications(
+  //   HMSNotificationTypes.DEVICE_CHANGE_UPDATE
+  // );
+  // const notificationError = useHMSNotifications(HMSNotificationTypes.ERROR);
 
   const createPlugin = () => {
     if (!pluginRef.current) {
@@ -114,7 +114,7 @@ export const NoiseSuppression = () => {
   // }, [notificationError]);
 
   //Commenting by default NS add since its causing audio issues
-  useEffect(() => {
+/*  useEffect(() => {
     if (
       !notification ||
       notification.type !== HMSNotificationTypes.TRACK_ADDED ||
@@ -127,7 +127,7 @@ export const NoiseSuppression = () => {
     } else {
       createPlugin();
     }
-  }, [addPlugin, notification, localAudioTrackID]);
+  }, [addPlugin, notification, localAudioTrackID]);*/
 
   return (
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
