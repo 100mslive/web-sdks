@@ -7103,10 +7103,10 @@ esbuild-openbsd-64@0.14.25:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.25.tgz#31ebf616aadf6e60674469f2b92cec92280d9930"
   integrity sha512-QgFJ37A15D7NIXBTYEqz29+uw3nNBOIyog+3kFidANn6kjw0GHZ0lEYQn+cwjyzu94WobR+fes7cTl/ZYlHb1A==
 
-esbuild-plugin-postcss2@^0.1.1:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.2.tgz#65b51ea859c883adf707637a8b0d7ebd4849ae40"
-  integrity sha512-c+024wQrSDGrNKEhK9lrhYUIssdmqnPfcQPwOxnBOi667wZOshoKbdQ7w2a4slRN86AqLZYOkPsNMIvFH1sB8Q==
+esbuild-plugin-postcss2@0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.1.tgz#f7d7964b26cb49f23f620ea437635aba654628f4"
+  integrity sha512-BMHnOTfZo+ghrzYnBtcXlHuMpOEwfTFarhGG4o6mivzPZGUXzeMn/hdFhtRpmCKzUvXsaxnZ3N72xA8CwdtZ3w==
   dependencies:
     autoprefixer "^10.2.5"
     fs-extra "^9.1.0"
