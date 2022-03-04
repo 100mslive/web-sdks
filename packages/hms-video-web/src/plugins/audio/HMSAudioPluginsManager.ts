@@ -5,6 +5,7 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 
 const TAG = 'AudioPluginsManager';
+const DEFAULT_SAMPLE_RATE = 48000;
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -99,14 +100,13 @@ export class HMSAudioPluginsManager {
         );
         this.analytics.failure(name, err);
         await this.cleanup();
-        console.log('sdk device not supported');
         throw err;
       }
     }
 
     try {
       if (this.pluginsMap.size === 0) {
-        await this.initContextAndAudioNodes();
+        await this.initAudioNodes();
       } else if (this.prevAudioNode) {
         // Previous node will be connected to destination. Disconnect that
         this.prevAudioNode.disconnect();
@@ -123,9 +123,7 @@ export class HMSAudioPluginsManager {
   }
 
   validatePlugin(plugin: HMSAudioPlugin) {
-    // this.createAudioContext();
-    const result = plugin.checkSupport(this.audioContext);
-    return result;
+    return plugin.checkSupport(this.audioContext);
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
@@ -148,8 +146,7 @@ export class HMSAudioPluginsManager {
     }
 
     await this.hmsTrack.setProcessedTrack(undefined);
-    // close context, disconnect nodes, stop track
-    // await this.audioContext?.close();
+    //disconnect nodes, stop track
     this.sourceNode?.disconnect();
     this.prevAudioNode?.disconnect();
     this.outputTrack?.stop();
@@ -157,40 +154,32 @@ export class HMSAudioPluginsManager {
     // reset all variables
     this.sourceNode = undefined;
     this.destinationNode = undefined;
-    // this.audioContext = undefined;
     this.prevAudioNode = undefined;
     this.outputTrack = undefined;
   }
 
-  async clearAll() {
+  //Keeping it separate since we are initializing context only once
+  async closeContext() {
     this.audioContext?.close();
     this.audioContext = undefined;
   }
 
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
-      //delete and recreate the audio context to handle device change from bluetooth to mic
-      console.log('inside reprocess sample rate', this.audioContext?.sampleRate);
-
-      // await this.audioContext?.close();
-      // this.audioContext = undefined;
-      // this.createAudioContext();
       return;
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
     await this.cleanup();
-    await this.initContextAndAudioNodes();
+    await this.initAudioNodes();
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
   }
 
-  private async initContextAndAudioNodes() {
-    // this.createAudioContext();
+  private async initAudioNodes() {
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
-      console.log('inside creating source node', this.sourceNode.context.sampleRate);
     }
     if (!this.destinationNode) {
       this.destinationNode = this.audioContext!.createMediaStreamDestination();
@@ -250,8 +239,7 @@ export class HMSAudioPluginsManager {
 
   private createAudioContext() {
     if (!this.audioContext) {
-      console.log('creating new audioContext');
-      this.audioContext = new AudioContext({ sampleRate: 48000 });
+      this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
     }
   }
 }

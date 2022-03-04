@@ -3,7 +3,6 @@ import {
   useHMSActions,
   useHMSStore,
   useHMSNotifications,
-  HMSNotificationTypes,
   selectIsLocalAudioPluginPresent, useDevices,
   selectLocalAudioTrackID,
 } from '@100mslive/react-sdk';
@@ -19,15 +18,11 @@ export const NoiseSuppression = () => {
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+  const { selectedDeviceIDs } = useDevices();
   const pluginActive = isPluginPresent && !disable;
 
   // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
   // // const notification = useHMSNotifications();
-  // const notificationDeviceChange = useHMSNotifications(
-  //   HMSNotificationTypes.DEVICE_CHANGE_UPDATE
-  // );
-  // const notificationError = useHMSNotifications(HMSNotificationTypes.ERROR);
 
   const createPlugin = () => {
     if (!pluginRef.current) {
@@ -80,13 +75,6 @@ export const NoiseSuppression = () => {
   }, [hmsActions, cleanup]);
 
   useEffect(() => {
-    // if (
-    //   notificationDeviceChange &&
-    //   notificationDeviceChange.data.type === "audioInput"
-    // ) {
-    //   console.log("notification on device change", notificationDeviceChange.data);
-    //   setDisabled(false);
-    // }
     if(pluginRef.current){
       const supported = hmsActions.validateAudioPluginSupport(
         pluginRef.current
@@ -101,17 +89,6 @@ export const NoiseSuppression = () => {
     }
 
   }, [selectedDeviceIDs.audioInput]);
-
-  // useEffect(() =>{
-  //   if (
-  //     notificationError &&
-  //     notificationError.data?.code === 7005 //error code = 7005 for NoiseSuppression plugin support failure
-  //   ) {
-  //     console.log("notification on error", notificationError);
-  //     setDisabled(true);
-  //   }
-  //
-  // }, [notificationError]);
 
   //Commenting by default NS add since its causing audio issues
 /*  useEffect(() => {

@@ -89,23 +89,32 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   }
 
   checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
-    const result = {} as HMSPluginSupportResult;
-    const sampleRate = ctx?.sampleRate || 48000; //using this as default
+    const deviceResult = {} as HMSPluginSupportResult;
+    const sampleRate = ctx?.sampleRate || MAX_SAMPLE_RATE; //using this as default
     if (sampleRate < MIN_SAMPLE_RATE || sampleRate > MAX_SAMPLE_RATE) {
-      result.isSupported = false;
-      result.errType = HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED;
-      result.errMsg = 'audio device not supported for plugin, see docs';
-      return result;
+      deviceResult.isSupported = false;
+      deviceResult.errType = HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED;
+      deviceResult.errMsg = 'audio device not supported for plugin, see docs';
+    }else{
+      deviceResult.isSupported = true;
     }
-    if (['Chrome', 'Firefox', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
-      result.isSupported = true;
+    //Removing Support for firefox because of AudioContext with different sample rate is not supported
+    const browserResult = {} as HMSPluginSupportResult;
+    if (['Chrome', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+      browserResult.isSupported = true;
     } else {
-      result.isSupported = false;
-      result.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
-      result.errMsg = 'browser not supported for plugin, see docs';
+      browserResult.isSupported = false;
+      browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
+      browserResult.errMsg = 'browser not supported for plugin, see docs';
     }
 
-    return result;
+    if(!deviceResult.isSupported){
+      return deviceResult;
+    }else if(!browserResult.isSupported){
+      return browserResult;
+    }else{
+      return deviceResult;
+    }
   }
 
   getName(): string {
