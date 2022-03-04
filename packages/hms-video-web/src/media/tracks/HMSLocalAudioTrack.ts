@@ -72,7 +72,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     try {
       await this.pluginsManager.reprocessPlugins();
     } catch (e) {
-      console.log('error in reprocess plugin', e.message);
       this.eventBus.audioPluginFailed.publish(e as HMSException);
     }
   }
