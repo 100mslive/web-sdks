@@ -1,29 +1,25 @@
 /* eslint-disable no-case-declarations */
 import React, { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { Text, Button } from "@100mslive/react-ui";
-import {
-  HandIcon,
-  PersonIcon,
-  ConnectivityIcon,
-  PoorConnectivityIcon,
-} from "@100mslive/react-icons";
+import LogRocket from "logrocket";
+import { HandIcon } from "@100mslive/react-icons";
 import {
   useHMSNotifications,
   HMSNotificationTypes,
 } from "@100mslive/react-sdk";
-import { HMSToastContainer, hmsToast } from "./hms-toast";
+import { Flex, Text, Button } from "@100mslive/react-ui";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { AppContext } from "../../../store/AppContext";
-import { getMetadata } from "../../../common/utils";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
-import LogRocket from "logrocket";
-
-const ToastText = ({ children }) => (
-  <Text css={{ display: "flex" }}>{children}</Text>
-);
+import { ToastManager } from "../../new/Toast/ToastManager";
+import { TrackNotifications } from "./TrackNotifications";
+import { TextWithIcon } from "./TextWithIcon";
+import { PeerNotifications } from "./PeerNotifications";
+import { ReconnectNotifications } from "./ReconnectNotifications";
+import { HMSToastContainer } from "./hms-toast";
+import { getMetadata } from "../../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -35,30 +31,6 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
-      case HMSNotificationTypes.PEER_LIST:
-        console.debug("[Peer List]", notification.data);
-        if (!subscribedNotifications.PEER_JOINED) return;
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <PersonIcon className="mr-2" />
-              {notification.data?.length} peers joined
-            </ToastText>
-          ),
-        });
-        break;
-      case HMSNotificationTypes.PEER_JOINED:
-        console.debug("[Peer Joined]", notification.data);
-        if (!subscribedNotifications.PEER_JOINED) return;
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <PersonIcon className="mr-2" />
-              {notification.data?.name} joined
-            </ToastText>
-          ),
-        });
-        break;
       case HMSNotificationTypes.METADATA_UPDATED:
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
@@ -67,14 +39,13 @@ export function Notifications() {
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <HandIcon className="mr-2" />
+        ToastManager.addToast({
+          title: (
+            <TextWithIcon Icon={HandIcon}>
               {notification.data?.name} raised their hand.
-            </ToastText>
+            </TextWithIcon>
           ),
-          autoClose: 2000,
+          duration: 2000,
         });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
@@ -84,63 +55,41 @@ export function Notifications() {
             notification.data.name
         );
         break;
-      case HMSNotificationTypes.PEER_LEFT:
-        console.debug("[Peer Left]", notification.data);
-        if (!subscribedNotifications.PEER_LEFT) return;
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <PersonIcon className="mr-2" />
-              {notification.data?.name} left
-            </ToastText>
-          ),
-        });
-        break;
       case HMSNotificationTypes.NEW_MESSAGE:
         if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
           return;
-        hmsToast(`New message from ${notification.data?.senderName}`);
-        break;
-      case HMSNotificationTypes.TRACK_ADDED:
-        console.debug("[Track Added] data", notification.data);
-        break;
-      case HMSNotificationTypes.TRACK_REMOVED:
-        console.debug("[Track Removed]", notification);
-        break;
-      case HMSNotificationTypes.TRACK_MUTED:
-        console.log("[Track Muted]", notification);
-        break;
-      case HMSNotificationTypes.TRACK_UNMUTED:
-        console.log("[Track Unmuted]", notification);
+        ToastManager.addToast({
+          title: `New message from ${notification.data?.senderName}`,
+        });
         break;
       case HMSNotificationTypes.ERROR:
         if (notification.data?.isTerminal) {
           if ([500, 6008].includes(notification.data?.code)) {
-            hmsToast("", {
-              left: <Text>{`Error: ${notification.data?.message}`}</Text>,
-              toastProps: {
-                autoClose: false,
-              },
+            ToastManager.addToast({
+              title: `Error: ${notification.data?.message}`,
             });
           } else {
             LogRocket.track("Disconnected");
             // show button action when the error is terminal
-            hmsToast("", {
-              center: (
-                <div className="flex">
-                  <Text css={{ mr: "0.5rem" }}>
+            ToastManager.addToast({
+              title: (
+                <Flex justify="between" css={{ w: "100%" }}>
+                  <Text css={{ mr: "$4" }}>
                     {notification.data?.message ||
                       "We couldn’t reconnect you. When you’re back online, try joining the room."}
                   </Text>
                   <Button
+                    variant="primary"
+                    css={{ mr: "$4" }}
                     onClick={() => {
                       window.location.reload();
                     }}
                   >
                     Rejoin
                   </Button>
-                </div>
+                </Flex>
               ),
+              close: false,
             });
           }
           // goto leave for terminal if any action is not performed within 2secs
@@ -161,33 +110,8 @@ export function Notifications() {
           return;
         }
         if (!subscribedNotifications.ERROR) return;
-        hmsToast("", {
-          left: (
-            <Text>
-              {`Error: ${notification.data?.message} - ${notification.data?.description}`}
-            </Text>
-          ),
-        });
-        break;
-      case HMSNotificationTypes.RECONNECTED:
-        LogRocket.track("Reconnected");
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <ConnectivityIcon className="mr-2" /> You are now connected
-            </ToastText>
-          ),
-        });
-        break;
-      case HMSNotificationTypes.RECONNECTING:
-        LogRocket.track("Reconnecting");
-        hmsToast("", {
-          left: (
-            <ToastText>
-              <PoorConnectivityIcon className="mr-2" /> You are offline for now.
-              while we try to reconnect, please check your internet connection.
-            </ToastText>
-          ),
+        ToastManager.addToast({
+          title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED:
@@ -195,34 +119,28 @@ export function Notifications() {
           return;
         }
         if (notification.data?.isLocal) {
-          hmsToast("", {
-            left: <Text>You are now a {notification.data.roleName}.</Text>,
+          ToastManager.addToast({
+            title: `You are now a ${notification.data.roleName}`,
           });
         }
         break;
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
         const track = notification.data?.track;
         if (!notification.data.enabled) {
-          hmsToast("", {
-            left: (
-              <Text>
-                Your {track.source} {track.type} was muted by{" "}
-                {notification.data.requestedBy.name}.
-              </Text>
-            ),
+          ToastManager.addToast({
+            title: `Your ${track.source} ${track.type} was muted by
+                ${notification.data.requestedBy?.name}.`,
           });
         }
         break;
       case HMSNotificationTypes.REMOVED_FROM_ROOM:
       case HMSNotificationTypes.ROOM_ENDED:
-        hmsToast("", {
-          left: (
-            <Text>
-              {`${notification.message}. `}
-              {notification.data.reason &&
-                `Reason: ${notification.data.reason}`}
-            </Text>
-          ),
+        ToastManager.addToast({
+          title: `${notification.message}. 
+              ${
+                notification.data.reason &&
+                `Reason: ${notification.data.reason}`
+              }`,
         });
         setTimeout(() => {
           const leaveLocation = history.location.pathname.replace(
@@ -233,20 +151,19 @@ export function Notifications() {
         }, 2000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
-        hmsToast("", {
-          left: <Text>{notification.message}.</Text>,
+        ToastManager.addToast({
+          title: notification.message,
         });
         break;
       default:
         break;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     history,
     notification,
     subscribedNotifications.ERROR,
     subscribedNotifications.NEW_MESSAGE,
-    subscribedNotifications.PEER_JOINED,
-    subscribedNotifications.PEER_LEFT,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
@@ -256,6 +173,9 @@ export function Notifications() {
       <HMSToastContainer />
       {!isHeadless && <TrackUnmuteModal />}
       {!isHeadless && <TrackBulkUnmuteModal />}
+      <TrackNotifications />
+      <PeerNotifications />
+      <ReconnectNotifications />
       <AutoplayBlockedModal />
       <InitErrorModal notification={notification} />
     </>
