@@ -7,7 +7,7 @@ import { toastAnimation } from '../utils';
 
 const ToastRoot = styled(ToastPrimitives.Root, {
   r: '$1',
-  bg: '$menuBg',
+  bg: '$toastBg',
   p: '$8',
   display: 'flex',
   flexDirection: 'column',
