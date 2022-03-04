@@ -4,7 +4,6 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
-import "./index.css";
 
 if (
   process.env.NODE_ENV === "production" &&

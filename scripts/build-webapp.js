@@ -36,6 +36,7 @@ async function main() {
       metafile: false,
       loader,
       define,
+      plugins,
     });
 
     esbuild.build({
@@ -50,12 +51,6 @@ async function main() {
       metafile: true,
       loader,
       define,
-    });
-
-    esbuild.build({
-      entryPoints: ['./src/index.css'],
-      outfile: 'dist/index.css',
-      bundle: true,
       plugins,
     });
   } catch (e) {
