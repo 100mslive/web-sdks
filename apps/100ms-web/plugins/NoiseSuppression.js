@@ -4,9 +4,9 @@ import {
   useHMSStore,
   useHMSNotifications,
   HMSNotificationTypes,
-  selectIsLocalAudioPluginPresent,
-  // selectLocalAudioTrackID,
-} from "@100mslive/react-sdk";
+  selectIsLocalAudioPluginPresent, useDevices,
+  selectLocalAudioTrackID,
+} from '@100mslive/react-sdk';
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
@@ -19,9 +19,11 @@ export const NoiseSuppression = () => {
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const pluginActive = isPluginPresent && !disable;
 
-  // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
+  const notification = useHMSNotifications();
   const notificationDeviceChange = useHMSNotifications(
     HMSNotificationTypes.DEVICE_CHANGE_UPDATE
   );
@@ -44,7 +46,12 @@ export const NoiseSuppression = () => {
 
   const cleanup = useCallback(
     async err => {
-      hmsToast(err.message);
+      if(err.message){
+        hmsToast(err.message);
+      }else{
+        hmsToast(err);
+      }
+
       setDisabled(true);
       await removePlugin();
       pluginRef.current = null;
@@ -73,23 +80,41 @@ export const NoiseSuppression = () => {
   }, [hmsActions, cleanup]);
 
   useEffect(() => {
-    if (
-      notificationDeviceChange &&
-      notificationDeviceChange.data.type === "audioInput"
-    ) {
-      setDisabled(false);
+    // if (
+    //   notificationDeviceChange &&
+    //   notificationDeviceChange.data.type === "audioInput"
+    // ) {
+    //   console.log("notification on device change", notificationDeviceChange.data);
+    //   setDisabled(false);
+    // }
+    if(pluginRef.current){
+      const supported = hmsActions.validateAudioPluginSupport(
+        pluginRef.current
+      );
+      if(supported.isSupported){
+        console.log("inside device change supported");
+        setDisabled(false);
+      }else{
+        console.log("inside device change not supported");
+        setDisabled(true);
+      }
     }
 
-    if (
-      notificationError &&
-      notificationError.data?.code === 7005 //error code = 7005 for NoiseSuppression plugin support failure
-    ) {
-      setDisabled(true);
-    }
-  }, [notificationDeviceChange, notificationError]);
+  }, [selectedDeviceIDs.audioInput]);
+
+  // useEffect(() =>{
+  //   if (
+  //     notificationError &&
+  //     notificationError.data?.code === 7005 //error code = 7005 for NoiseSuppression plugin support failure
+  //   ) {
+  //     console.log("notification on error", notificationError);
+  //     setDisabled(true);
+  //   }
+  //
+  // }, [notificationError]);
 
   //Commenting by default NS add since its causing audio issues
-  /*useEffect(() => {
+  useEffect(() => {
     if (
       !notification ||
       notification.type !== HMSNotificationTypes.TRACK_ADDED ||
@@ -102,7 +127,7 @@ export const NoiseSuppression = () => {
     } else {
       createPlugin();
     }
-  }, [addPlugin, notification, localAudioTrackID]);*/
+  }, [addPlugin, notification, localAudioTrackID]);
 
   return (
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>

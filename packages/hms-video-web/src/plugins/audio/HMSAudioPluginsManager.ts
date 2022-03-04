@@ -37,7 +37,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics();
-    this.audioContext = new AudioContext();
+    this.createAudioContext();
   }
 
   getPlugins(): string[] {
@@ -50,8 +50,6 @@ export class HMSAudioPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
-
-    this.createAudioContext();
 
     if (this.pluginAddInProgress) {
       const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
@@ -101,6 +99,7 @@ export class HMSAudioPluginsManager {
         );
         this.analytics.failure(name, err);
         await this.cleanup();
+        console.log("sdk device not supported");
         throw err;
       }
     }
@@ -124,8 +123,9 @@ export class HMSAudioPluginsManager {
   }
 
   validatePlugin(plugin: HMSAudioPlugin) {
-    this.createAudioContext();
-    return plugin.checkSupport(this.audioContext);
+    // this.createAudioContext();
+    const result = plugin.checkSupport(this.audioContext);
+    return result;
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
@@ -149,7 +149,7 @@ export class HMSAudioPluginsManager {
 
     await this.hmsTrack.setProcessedTrack(undefined);
     // close context, disconnect nodes, stop track
-    this.audioContext?.close();
+    // await this.audioContext?.close();
     this.sourceNode?.disconnect();
     this.prevAudioNode?.disconnect();
     this.outputTrack?.stop();
@@ -157,13 +157,24 @@ export class HMSAudioPluginsManager {
     // reset all variables
     this.sourceNode = undefined;
     this.destinationNode = undefined;
-    this.audioContext = undefined;
+    // this.audioContext = undefined;
     this.prevAudioNode = undefined;
     this.outputTrack = undefined;
   }
 
+  async clearAll(){
+    this.audioContext?.close();
+    this.audioContext = undefined;
+  }
+
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
+      //delete and recreate the audio context to handle device change from bluetooth to mic
+      console.log("inside reprocess sample rate", this.audioContext?.sampleRate);
+
+      // await this.audioContext?.close();
+      // this.audioContext = undefined;
+      // this.createAudioContext();
       return;
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
@@ -175,10 +186,11 @@ export class HMSAudioPluginsManager {
   }
 
   private async initContextAndAudioNodes() {
-    this.createAudioContext();
+    // this.createAudioContext();
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
+      console.log("inside creating source node",this.sourceNode.context.sampleRate);
     }
     if (!this.destinationNode) {
       this.destinationNode = this.audioContext!.createMediaStreamDestination();
@@ -237,8 +249,9 @@ export class HMSAudioPluginsManager {
   }
 
   private createAudioContext() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
+    if(!this.audioContext){
+      console.log("creating new audioContext");
+      this.audioContext = new AudioContext({sampleRate: 48000});
     }
   }
 }
