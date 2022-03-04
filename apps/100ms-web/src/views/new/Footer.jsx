@@ -1,3 +1,4 @@
+import { Fragment, useState } from "react";
 import {
   BrbIcon,
   ChatIcon,
@@ -18,23 +19,21 @@ import {
   Tooltip,
   VerticalDivider,
 } from "@100mslive/react-ui";
-import { Fragment, useState } from "react";
-import { isScreenshareSupported } from "../../common/utils";
-import { FeatureFlags } from "../../store/FeatureFlags";
 import { AudioVideoToggle } from "../components/AudioVideoToggle";
 import { LeaveRoom } from "../components/LeaveRoom";
 import { NoiseSuppression } from "../../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../components/VirtualBackground";
-import { useMyMetadata } from "../hooks/useMetadata";
 import { ToggleWhiteboard } from "../whiteboard";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
 import { Playlist } from "./Playlist/Playlist";
 import { Screenshare } from "./ScreenShare";
 import { ScreenShareHintModal } from "./ScreenshareHintModal";
 import { TranscriptionButton } from "../../../plugins/transcription";
+import { isScreenshareSupported } from "../../common/utils";
+import { useMyMetadata } from "../hooks/useMetadata";
+import { FeatureFlags } from "../../store/FeatureFlags";
 
 const ScreenshareAudio = () => {
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const {
     amIScreenSharing,
     screenShareVideoTrackId: video,
@@ -43,7 +42,7 @@ const ScreenshareAudio = () => {
   } = useScreenShare();
   const isAudioScreenshare = amIScreenSharing && !video && !!audio;
   const [showModal, setShowModal] = useState(false);
-  if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
+  if (!isScreenshareSupported()) {
     return null;
   }
   return (
@@ -108,6 +107,7 @@ const Chat = ({ isChatOpen, toggleChat }) => {
 };
 
 export const Footer = ({ isChatOpen, toggleChat }) => {
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   return (
     <Flex
       justify="between"
@@ -131,10 +131,14 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
           },
         }}
       >
-        <ScreenshareAudio />
-        <Playlist type={HMSPlaylistType.audio} />
-        <Playlist type={HMSPlaylistType.video} />
-        <VerticalDivider space={4} />
+        {isAllowedToPublish.screen && (
+          <Fragment>
+            <ScreenshareAudio />
+            <Playlist type={HMSPlaylistType.audio} />
+            <Playlist type={HMSPlaylistType.video} />
+            <VerticalDivider space={4} />
+          </Fragment>
+        )}
         <MetaActions />
         {FeatureFlags.enableWhiteboard && <ToggleWhiteboard />}
       </Flex>
@@ -144,7 +148,9 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
         <VirtualBackground />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
         <NoiseSuppression />
-        <VerticalDivider space={4} />
+        {(isAllowedToPublish.audio || isAllowedToPublish.video) && (
+          <VerticalDivider space={4} />
+        )}
         <MoreSettings />
         <Flex
           align="center"
