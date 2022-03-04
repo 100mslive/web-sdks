@@ -99,7 +99,7 @@ export class HMSAudioPluginsManager {
         );
         this.analytics.failure(name, err);
         await this.cleanup();
-        console.log("sdk device not supported");
+        console.log('sdk device not supported');
         throw err;
       }
     }
@@ -162,7 +162,7 @@ export class HMSAudioPluginsManager {
     this.outputTrack = undefined;
   }
 
-  async clearAll(){
+  async clearAll() {
     this.audioContext?.close();
     this.audioContext = undefined;
   }
@@ -170,7 +170,7 @@ export class HMSAudioPluginsManager {
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
       //delete and recreate the audio context to handle device change from bluetooth to mic
-      console.log("inside reprocess sample rate", this.audioContext?.sampleRate);
+      console.log('inside reprocess sample rate', this.audioContext?.sampleRate);
 
       // await this.audioContext?.close();
       // this.audioContext = undefined;
@@ -190,7 +190,7 @@ export class HMSAudioPluginsManager {
     if (!this.sourceNode) {
       const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
       this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
-      console.log("inside creating source node",this.sourceNode.context.sampleRate);
+      console.log('inside creating source node', this.sourceNode.context.sampleRate);
     }
     if (!this.destinationNode) {
       this.destinationNode = this.audioContext!.createMediaStreamDestination();
@@ -249,9 +249,9 @@ export class HMSAudioPluginsManager {
   }
 
   private createAudioContext() {
-    if(!this.audioContext){
-      console.log("creating new audioContext");
-      this.audioContext = new AudioContext({sampleRate: 48000});
+    if (!this.audioContext) {
+      console.log('creating new audioContext');
+      this.audioContext = new AudioContext({ sampleRate: 48000 });
     }
   }
 }

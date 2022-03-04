@@ -2,7 +2,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSAudioListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
-import HMSLogger from '../utils/logger';
+// import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import { OnTrackLayerUpdateNotification, PolicyParams, SpeakerList, TrackStateNotification } from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
@@ -15,7 +15,7 @@ import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
 
 export class NotificationManager {
-  private TAG = '[HMSNotificationManager]';
+  // private TAG = '[HMSNotificationManager]';
   private trackManager: TrackManager;
   private peerManager: PeerManager;
   private peerListManager: PeerListManager;
@@ -76,7 +76,7 @@ export class NotificationManager {
     const notification = message.params;
 
     if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
-      HMSLogger.d(this.TAG, 'Received notification', { method, notification });
+      // HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {
       if (window.HMS?.ON_SFU_STATS && typeof window.HMS?.ON_SFU_STATS === 'function') {
