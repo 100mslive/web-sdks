@@ -95,7 +95,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       deviceResult.isSupported = false;
       deviceResult.errType = HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED;
       deviceResult.errMsg = 'audio device not supported for plugin, see docs';
-    }else{
+    } else {
       deviceResult.isSupported = true;
     }
     //Removing Support for firefox because of AudioContext with different sample rate is not supported
@@ -108,11 +108,11 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       browserResult.errMsg = 'browser not supported for plugin, see docs';
     }
 
-    if(!deviceResult.isSupported){
+    if (!deviceResult.isSupported) {
       return deviceResult;
-    }else if(!browserResult.isSupported){
+    } else if (!browserResult.isSupported) {
       return browserResult;
-    }else{
+    } else {
       return deviceResult;
     }
   }
