@@ -33,7 +33,7 @@ class PusherCommunicationProvider {
     this.lastMessage = {};
   }
 
-  init = ({ roomId }) => {
+  init = (roomId = "") => {
     if (this.initialized) {
       return;
     }
@@ -116,17 +116,23 @@ class PusherCommunicationProvider {
   };
 }
 
-export const provider =
-  FeatureFlags.enableWhiteboard && new PusherCommunicationProvider();
+/**
+ * @type {PusherCommunicationProvider}
+ */
+export let provider;
 
-export const useCommunication = () => {
+export const useCommunication = (whiteboardActive = false) => {
   const roomId = useHMSStore(selectRoomID);
 
   useEffect(() => {
-    if (provider && roomId) {
-      provider.init({ roomId });
+    if (whiteboardActive && !provider) {
+      provider =
+        FeatureFlags.enableWhiteboard && new PusherCommunicationProvider();
+      // init could be merged with constructor now
+      provider.init(roomId);
+      console.log("usecomm", provider);
     }
-  }, [roomId]);
+  }, [roomId, whiteboardActive]);
 
   return provider;
 };

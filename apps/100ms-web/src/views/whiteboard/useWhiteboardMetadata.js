@@ -3,8 +3,9 @@ import {
   selectLocalPeerID,
   selectPeerByCondition,
 } from "@100mslive/react-sdk";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { getMetadata } from "../../common/utils";
+import { FeatureFlags } from "../../store/FeatureFlags";
 import { useMyMetadata } from "../hooks/useMetadata";
 import { useCommunication } from "./useCommunication";
 
@@ -13,11 +14,6 @@ const isWhiteboardOwner = peer => {
 };
 
 export const useWhiteboardMetadata = () => {
-  /**
-   * Initializes CommunicationProvider even before whiteboard is opened,
-   * to store incoming state messages that need to be applied after it has opened.
-   */
-  const provider = useCommunication();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const { updateMetaData } = useMyMetadata();
   const whiteboardOwner = useHMSStore(selectPeerByCondition(isWhiteboardOwner));
@@ -25,6 +21,7 @@ export const useWhiteboardMetadata = () => {
     () => localPeerID === whiteboardOwner?.id,
     [localPeerID, whiteboardOwner]
   );
+  const provider = useCommunication(Boolean(whiteboardOwner));
 
   /**
    * @param enabled {boolean}
@@ -46,9 +43,13 @@ export const useWhiteboardMetadata = () => {
     }
   }, [provider, whiteboardOwner, updateMetaData, amIWhiteboardOwner]);
 
+  useEffect(() => {
+    window.toggleWhiteboard = toggleWhiteboard;
+  }, [toggleWhiteboard]);
+
   return {
     /** is whiteboard enabled for the room */
-    whiteboardEnabled: !!provider,
+    whiteboardEnabled: FeatureFlags.enableWhiteboard,
     /** owner of the active whiteboard, can also be used to check if whiteboard is active */
     whiteboardOwner,
     amIWhiteboardOwner,
