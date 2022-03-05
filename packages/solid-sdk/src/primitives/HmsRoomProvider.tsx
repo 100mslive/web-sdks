@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import Solid, { createContext, createEffect, createSignal, useContext } from 'solid-js';
 import {
   HMSReactiveStore,
   HMSStore,
@@ -38,36 +38,29 @@ let providerProps: HMSContextProviderProps;
  * react part of your code.
  * @constructor
  */
-export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
-  children,
-  actions,
-  store,
-  notifications,
-  stats,
-  isHMSStatsOn = false,
-}) => {
+export const HMSRoomProvider: Solid.Component<HMSRoomProviderProps> = props => {
   if (!providerProps) {
     // adding a dummy function for setstate and destroy because zustan'd create expects them
     // to be present but we don't expose them from the store.
     const errFn = () => {
       throw new Error('modifying store is not allowed');
     };
-    if (actions && store) {
+    if (props.actions && props.store) {
       providerProps = {
-        actions: actions,
+        actions: props.actions,
         store: create<HMSStore>({
-          ...store,
+          ...props.store,
           setState: errFn,
           destroy: errFn,
         }),
       };
-      if (notifications) {
-        providerProps.notifications = notifications;
+      if (props.notifications) {
+        providerProps.notifications = props.notifications;
       }
-      if (stats) {
+      if (props.stats) {
         providerProps.statsStore = create<HMSStatsStore>({
-          getState: stats.getState,
-          subscribe: stats.subscribe,
+          getState: props.stats.getState,
+          subscribe: props.stats.subscribe,
           setState: errFn,
           destroy: errFn,
         });
@@ -84,7 +77,7 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
         notifications: hmsReactiveStore.getNotifications(),
       };
 
-      if (isHMSStatsOn) {
+      if (props.isHMSStatsOn) {
         const stats = hmsReactiveStore.getStats();
         providerProps.statsStore = create<HMSStatsStore>({
           getState: stats.getState,
@@ -96,14 +89,12 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
     }
   }
 
-  useEffect(() => {
-    if (isBrowser) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
-      window.addEventListener('onunload', () => providerProps.actions.leave());
-    }
-  }, []);
+  if (isBrowser) {
+    window.addEventListener('beforeunload', () => providerProps.actions.leave());
+    window.addEventListener('onunload', () => providerProps.actions.leave());
+  }
 
-  return React.createElement(HMSContext.Provider, { value: providerProps }, children);
+  return <HMSContext.Provider value={providerProps}>{props.children}</HMSContext.Provider>;
 };
 
 /**
@@ -176,13 +167,13 @@ export const useHMSActions = () => {
  */
 export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
   const HMSContextConsumer = useContext(HMSContext);
-  const [notification, setNotification] = useState<HMSNotification | null>(null);
+  const [notification, setNotification] = createSignal<HMSNotification | null>(null);
 
   if (!HMSContextConsumer) {
     throw new Error(hooksErrorMessage);
   }
 
-  useEffect(() => {
+  createEffect(() => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
@@ -191,7 +182,7 @@ export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificatio
       type,
     );
     return unsubscribe;
-  }, [HMSContextConsumer.notifications, type]);
+  });
 
   return notification;
 };

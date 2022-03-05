@@ -1,5 +1,5 @@
 import { EqualityChecker, StateSelector } from 'zustand';
-import React, { useContext } from 'react';
+import Solid, { useContext } from 'solid-js';
 import shallow from 'zustand/shallow';
 import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore, IStoreReadOnly } from '@100mslive/hms-video-store';
 import HMSLogger from '../utils/logger';
@@ -18,7 +18,7 @@ export interface HMSContextProviderProps {
   statsStore?: IHMSReactStore<HMSStatsStore>;
 }
 
-export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
+export function makeHMSStoreHook(hmsContext: Solid.Context<HMSContextProviderProps | null>) {
   const useHMSStore = <StateSlice>(
     selector: StateSelector<HMSStore, StateSlice>,
     equalityFn: EqualityChecker<StateSlice> = shallow,
@@ -38,7 +38,7 @@ export function makeHMSStoreHook(hmsContext: React.Context<HMSContextProviderPro
   return useHMSStore;
 }
 
-export function makeHMSStatsStoreHook(hmsContext: React.Context<HMSContextProviderProps | null>) {
+export function makeHMSStatsStoreHook(hmsContext: Solid.Context<HMSContextProviderProps | null>) {
   const useHMSStatsStore = <StateSlice>(
     selector: StateSelector<HMSStatsStore, StateSlice>,
     equalityFn: EqualityChecker<StateSlice> = shallow,
