@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import Pusher from "pusher-js";
 import { useHMSStore, selectRoomID } from "@100mslive/react-sdk";
-import { FeatureFlags } from "../../store/FeatureFlags";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
@@ -126,8 +125,7 @@ export const useCommunication = (whiteboardActive = false) => {
 
   useEffect(() => {
     if (whiteboardActive && !provider) {
-      provider =
-        FeatureFlags.enableWhiteboard && new PusherCommunicationProvider();
+      provider = new PusherCommunicationProvider();
       // init could be merged with constructor now
       provider.init(roomId);
       console.log("usecomm", provider);
