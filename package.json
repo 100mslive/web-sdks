@@ -19,6 +19,7 @@
     "dotenv": "^14.2.0",
     "esbuild": "^0.13.15",
     "esbuild-plugin-postcss2": "0.1.1",
+    "esbuild-plugin-solid": "^0.4.2",
     "eslint": "^8.9.0",
     "eslint-config-react-app": "^7.0.0",
     "eslint-plugin-prettier": "^4.0.0",

@@ -15,7 +15,7 @@
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ../../scripts/dev-react-sdk",
-    "build:only": "node ../../scripts/build",
+    "build:only": "node ../../scripts/build-solid",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json",
@@ -33,6 +33,7 @@
   "dependencies": {
     "@100mslive/hms-video-store": "0.2.91-alpha.1",
     "react-intersection-observer": "^8.33.1",
+    "solid-zustand": "^1.2.2",
     "zustand": "^3.6.2"
   }
 }
