@@ -1,6 +1,6 @@
 import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { createEffect, onCleanup } from 'solid-js';
+import { useInView } from '../ports/solid-intersection-observer';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
@@ -25,50 +25,46 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
+export const useVideo = (props: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const track = useHMSStore(selectTrackByID(trackId));
+  let videoRef: HTMLVideoElement;
+  const track = useHMSStore(selectTrackByID(props.trackId));
   const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
 
-  const setRefs = useCallback(
-    node => {
-      videoRef.current = node;
-      inViewRef(node);
-    },
-    [inViewRef],
-  );
+  const setRefs = (node: HTMLVideoElement) => {
+    videoRef = node;
+    inViewRef(node);
+  };
 
-  useEffect(() => {
+  createEffect(() => {
     (async () => {
-      if (videoRef.current && track?.id) {
-        if (inView && track.enabled && attach !== false) {
+      if (videoRef && track?.id) {
+        if (inView && track.enabled && props.attach !== false) {
           // attach when in view and enabled
-          await actions.attachVideo(track.id, videoRef.current);
+          await actions.attachVideo(track.id, videoRef);
         } else {
           // detach when not in view
-          await actions.detachVideo(track.id, videoRef.current);
+          await actions.detachVideo(track.id, videoRef);
         }
       }
     })();
-  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
+  });
 
   // detach on unmount
-  useEffect(() => {
-    return () => {
+  createEffect(() => {
+    onCleanup(() => {
       (async () => {
-        if (videoRef.current && track) {
+        if (videoRef && track) {
           try {
             // detach on unmount
-            await actions.detachVideo(track.id, videoRef.current);
+            await actions.detachVideo(track.id, videoRef);
           } catch (err) {
             HMSLogger.w('detach video error for track', track.id, err);
           }
         }
       })();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    });
+  });
 
   return { videoRef: setRefs };
 };
