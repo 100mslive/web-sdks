@@ -4,7 +4,7 @@ import {
   selectRoomState,
   HMSConfigInitialSettings,
 } from '@100mslive/hms-video-store';
-import { useCallback, useMemo } from 'react';
+import { createMemo, mergeProps } from 'solid-js';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
@@ -60,56 +60,48 @@ export interface usePreviewResult {
  * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
  * Any device change or mute/unmute will be carried across to join.
  */
-export const usePreviewJoin = ({
-  name = '',
-  token,
-  metadata,
-  handleError = logErrorHandler,
-  initEndpoint,
-  initialSettings,
-}: usePreviewInput): usePreviewResult => {
+export const usePreviewJoin = (props: usePreviewInput): usePreviewResult => {
+  props = mergeProps({ name: '', handleError: logErrorHandler }, props);
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
   const enableJoin = roomState === HMSRoomState.Preview;
 
-  const config: HMSConfig = useMemo(() => {
+  const config = createMemo<HMSConfig>(() => {
     return {
-      userName: name,
-      authToken: token,
-      metaData: metadata,
+      userName: props.name || '',
+      authToken: props.token,
+      metaData: props.metadata,
       rememberDeviceSelection: true,
-      settings: initialSettings,
-      initEndpoint: initEndpoint,
+      settings: props.initialSettings,
+      initEndpoint: props.initEndpoint,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings]);
+  });
 
-  const preview = useCallback(() => {
-    (async () => {
-      if (!token) {
-        return;
-      }
-      if (roomState !== HMSRoomState.Disconnected) {
-        await actions.leave();
-      }
-      try {
-        await actions.preview(config);
-      } catch (err) {
-        handleError(err as Error, 'preview');
-      }
-    })();
-  }, [actions, handleError, token, roomState, config]);
+  const preview = async () => {
+    if (!props.token) {
+      return;
+    }
+    if (roomState !== HMSRoomState.Disconnected) {
+      await actions.leave();
+    }
+    try {
+      await actions.preview(config());
+    } catch (err) {
+      props.handleError?.(err as Error, 'preview');
+    }
+  };
 
-  const join = useCallback(() => {
-    if (!token) {
+  const join = () => {
+    if (!props.token) {
       return;
     }
     try {
-      actions.join(config);
+      actions.join(config());
     } catch (err) {
-      handleError(err as Error, 'join');
+      props.handleError?.(err as Error, 'join');
     }
-  }, [actions, config, handleError, token]);
+  };
 
   return {
     enableJoin,

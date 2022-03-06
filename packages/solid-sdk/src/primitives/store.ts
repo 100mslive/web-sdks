@@ -1,5 +1,5 @@
-import { EqualityChecker, StateSelector } from 'zustand';
 import Solid, { useContext } from 'solid-js';
+import { EqualityChecker, StateSelector } from 'zustand';
 import shallow from 'zustand/shallow';
 import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore, IStoreReadOnly } from '@100mslive/hms-video-store';
 import HMSLogger from '../utils/logger';
