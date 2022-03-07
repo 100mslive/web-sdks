@@ -43,7 +43,7 @@ export const NoiseSuppression = () => {
       })
       }else{
         ToastManager.addToast({
-          title: err,
+          title: "adding Noise Suppression plugin failed, see docs",
         })
       }
 
