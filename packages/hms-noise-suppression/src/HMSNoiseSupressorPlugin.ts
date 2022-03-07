@@ -85,7 +85,10 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
   @depreceated
    */
   isSupported(): boolean {
-    return false;
+    return (
+      navigator.userAgent.indexOf('Chrome') != -1 ||
+      navigator.userAgent.indexOf('Edg') != -1
+    );
   }
 
   checkSupport(ctx?: AudioContext): HMSPluginSupportResult {
