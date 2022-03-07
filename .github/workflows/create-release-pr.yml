@@ -51,5 +51,4 @@ jobs:
             - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
           branch: release
           branch-suffix: timestamp
-          base: ${{ github.ref }}
           delete-branch: true
