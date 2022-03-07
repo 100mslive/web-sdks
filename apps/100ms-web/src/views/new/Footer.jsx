@@ -30,7 +30,7 @@ import { MoreSettings } from "./MoreSettings/MoreSettings";
 import { AudioPlaylist } from "./Playlist/AudioPlaylist";
 import { Screenshare } from "./ScreenShare";
 import { ScreenShareHintModal } from "./ScreenshareHintModal";
-import { TranscriptionButton } from "../../../plugins/transcription"
+import { TranscriptionButton } from "../../../plugins/transcription";
 
 const ScreenshareAudio = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -112,6 +112,7 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
       justify="between"
       align="center"
       css={{
+        padding: "1rem",
         position: "relative",
         height: "100%",
         "@md": { flexWrap: "wrap" },
@@ -132,23 +133,38 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
       >
         <ScreenshareAudio />
         <AudioPlaylist />
-        <MetaActions />
+
         {FeatureFlags.enableWhiteboard && <ToggleWhiteboard />}
+        <VerticalDivider space={4} />
+
+        <VirtualBackground />
+        <NoiseSuppression />
+        {FeatureFlags.enableTranscription && <TranscriptionButton />}
+        <Flex
+          align="center"
+          css={{
+            display: "none",
+            "@md": {
+              display: "flex",
+            },
+          }}
+        >
+          <VerticalDivider space={4} />
+          <MetaActions />
+        </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
         <AudioVideoToggle />
         <Screenshare css={{ mx: "$4" }} />
-        <VirtualBackground />
-        {FeatureFlags.enableTranscription && <TranscriptionButton />}
-        <NoiseSuppression />
-        <VerticalDivider space={4} />
+
         <MoreSettings />
+        <VerticalDivider space={4} />
+        <LeaveRoom />
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex", ml: "$4" } }}
         >
           <Chat isChatOpen={isChatOpen} toggleChat={toggleChat} />
-          <LeaveRoom />
         </Flex>
       </Flex>
       <Flex
@@ -161,8 +177,9 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
           },
         }}
       >
+        <MetaActions />
+        <VerticalDivider space={4} />
         <Chat isChatOpen={isChatOpen} toggleChat={toggleChat} />
-        <LeaveRoom />
       </Flex>
     </Flex>
   );
