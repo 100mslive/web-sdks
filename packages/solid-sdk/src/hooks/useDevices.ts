@@ -1,5 +1,4 @@
 import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
-import { useCallback } from 'react';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 import { hooksErrHandler } from '../hooks/types';
@@ -64,26 +63,23 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
     selectedDeviceIDs[DeviceType.audioInput] = sdkSelectedDevices.audioInputDeviceId;
   }
 
-  const updateDevice = useCallback(
-    async ({ deviceType, deviceId }) => {
-      try {
-        switch (deviceType) {
-          case DeviceType.audioInput:
-            await actions.setAudioSettings({ deviceId });
-            break;
-          case DeviceType.videoInput:
-            await actions.setVideoSettings({ deviceId });
-            break;
-          case DeviceType.audioOutput:
-            actions.setAudioOutputDevice(deviceId);
-            break;
-        }
-      } catch (err) {
-        handleError(err as Error, 'updateDevices');
+  const updateDevice: useDevicesResult['updateDevice'] = async ({ deviceType, deviceId }) => {
+    try {
+      switch (deviceType) {
+        case DeviceType.audioInput:
+          await actions.setAudioSettings({ deviceId });
+          break;
+        case DeviceType.videoInput:
+          await actions.setVideoSettings({ deviceId });
+          break;
+        case DeviceType.audioOutput:
+          actions.setAudioOutputDevice(deviceId);
+          break;
       }
-    },
-    [handleError, actions],
-  );
+    } catch (err) {
+      handleError(err as Error, 'updateDevices');
+    }
+  };
 
   return {
     allDevices,

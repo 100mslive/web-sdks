@@ -7,7 +7,6 @@ import {
   selectScreenSharesByPeerId,
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { useCallback } from 'react';
 
 export interface useScreenShareResult {
   /**
@@ -50,16 +49,13 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const screenSharePeer = useHMSStore(selectPeerScreenSharing);
   const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
 
-  const toggleScreenShare = useCallback(
-    async (audioOnly = false) => {
-      try {
-        await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
-      } catch (error) {
-        handleError(error as Error);
-      }
-    },
-    [actions, amIScreenSharing, handleError],
-  );
+  const toggleScreenShare = async (audioOnly = false) => {
+    try {
+      await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
+    } catch (error) {
+      handleError(error as Error);
+    }
+  };
 
   return {
     amIScreenSharing,

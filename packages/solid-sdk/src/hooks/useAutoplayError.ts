@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Accessor, createEffect, createSignal } from 'solid-js';
 import { HMSNotificationTypes } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSNotifications } from '../primitives/HmsRoomProvider';
 
@@ -6,7 +6,7 @@ export interface useAutoplayErrorResult {
   /*
    * Autoplay error message
    */
-  error: string;
+  error: Accessor<string>;
   /**
    * call this method on a UI element click to unblock the blocked audio autoplay.
    */
@@ -24,18 +24,18 @@ export interface useAutoplayErrorResult {
  */
 export const useAutoplayError = (): useAutoplayErrorResult => {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  const [error, setError] = useState('');
+  const [error, setError] = createSignal('');
   const actions = useHMSActions();
 
-  const unblockAudio = useCallback(async () => {
+  const unblockAudio = async () => {
     await actions.unblockAudio();
-  }, [actions]);
+  };
 
-  useEffect(() => {
-    if (notification?.data.code === 3008) {
-      setError(notification?.data.message);
+  createEffect(() => {
+    if (notification()?.data.code === 3008) {
+      setError(notification()?.data.message);
     }
-  }, [notification]);
+  });
 
   return { error, unblockAudio, resetError: () => setError('') };
 };
