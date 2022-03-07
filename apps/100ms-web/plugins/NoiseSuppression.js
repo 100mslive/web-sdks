@@ -4,8 +4,9 @@ import { ToastManager } from "../src/views/new/Toast/ToastManager";
 import {
   useHMSActions,
   useHMSStore,
-  selectIsLocalAudioPluginPresent, useDevices,
-} from '@100mslive/react-sdk';
+  selectIsLocalAudioPluginPresent,
+  useDevices,
+} from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
@@ -37,14 +38,14 @@ export const NoiseSuppression = () => {
 
   const cleanup = useCallback(
     async err => {
-      if(err.message){
-      ToastManager.addToast({
-        title: err.message,
-      })
-      }else{
+      if (err.message) {
+        ToastManager.addToast({
+          title: err.message,
+        });
+      } else {
         ToastManager.addToast({
           title: "adding Noise Suppression plugin failed, see docs",
-        })
+        });
       }
 
       setDisabled(true);
@@ -75,18 +76,17 @@ export const NoiseSuppression = () => {
   }, [hmsActions, cleanup]);
 
   useEffect(() => {
-    if(pluginRef.current){
+    if (pluginRef.current) {
       const supported = hmsActions.validateAudioPluginSupport(
         pluginRef.current
       );
-      if(supported.isSupported){
+      if (supported.isSupported) {
         setDisabled(false);
-      }else{
+      } else {
         setDisabled(true);
       }
     }
-
-  }, [selectedDeviceIDs.audioInput]);
+  }, [selectedDeviceIDs.audioInput, hmsActions]);
 
   return (
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
