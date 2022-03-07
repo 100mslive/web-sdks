@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { HMSVirtualBackgroundPlugin } from "@100mslive/hms-virtual-background";
-import { getRandomVirtualBackground } from "../../common/utils";
+import { getRandomVirtualBackground } from "../src/common/utils";
 import {
   useHMSActions,
   useHMSStore,
