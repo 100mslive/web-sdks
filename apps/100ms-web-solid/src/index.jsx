@@ -1,7 +1,13 @@
 /* @refresh reload */
+import { HMSRoomProvider } from '@100mslive/solid-sdk';
 import { render } from 'solid-js/web';
-
-import './index.css';
 import App from './App';
 
-render(App, document.getElementById('root'));
+render(
+  () => (
+    <HMSRoomProvider>
+      <App />
+    </HMSRoomProvider>
+  ),
+  document.getElementById('root'),
+);

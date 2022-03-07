@@ -1,18 +1,35 @@
-import styles from './App.module.css';
+// @ts-check
+import { createEffect } from 'solid-js';
+import { selectRoom, useHMSActions, useHMSStore } from '@100mslive/solid-sdk';
+import JoinForm from './components/JoinForm';
+import Header from './components/Header';
+import Conference from './components/Conference';
+import Footer from './components/Footer';
+import './styles.css';
 
-function App() {
+export default function App() {
+  const room = useHMSStore(selectRoom);
+  const hmsActions = useHMSActions();
+
+  createEffect(() => {
+    window.onunload = () => {
+      if (room.isConnected) {
+        hmsActions.leave();
+      }
+    };
+  });
+
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <p>
-          Edit <code>src/App.jsx</code> and save to reload.
-        </p>
-        <a class={styles.link} href="https://github.com/solidjs/solid" target="_blank" rel="noopener noreferrer">
-          Learn Solid
-        </a>
-      </header>
+    <div className="App">
+      <Header />
+      {room.isConnected ? (
+        <>
+          <Conference />
+          <Footer />
+        </>
+      ) : (
+        <JoinForm />
+      )}
     </div>
   );
 }
-
-export default App;
