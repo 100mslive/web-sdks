@@ -7,6 +7,7 @@ import {
   MusicIcon,
 } from "@100mslive/react-icons";
 import {
+  HMSPlaylistType,
   selectUnreadHMSMessagesCount,
   useHMSStore,
   useScreenShare,
@@ -130,7 +131,8 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
         }}
       >
         <ScreenshareAudio />
-        <Playlist />
+        <Playlist type={HMSPlaylistType.audio} />
+        <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard && <ToggleWhiteboard />}
         <VerticalDivider space={4} />
 
