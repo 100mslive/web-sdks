@@ -6,7 +6,6 @@ export class HMSAudioTrackSettingsBuilder {
   private _codec?: HMSAudioCodec = HMSAudioCodec.OPUS;
   private _maxBitrate?: number = 32;
   private _deviceId = 'default';
-  private _sampleRate = 48000;
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
     { googEchoCancellation: { exact: true } },
@@ -60,7 +59,6 @@ export class HMSAudioTrackSettingsBuilder {
       this._codec,
       this._maxBitrate,
       this._deviceId,
-      this._sampleRate,
       this._advanced,
     );
   }
@@ -79,21 +77,18 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
     codec?: HMSAudioCodec,
     maxBitrate?: number,
     deviceId?: string,
-    sampleRate?: number,
     advanced?: Array<MediaTrackConstraintSet>,
   ) {
     this.volume = volume;
     this.codec = codec;
     this.maxBitrate = maxBitrate;
     this.deviceId = deviceId;
-    this.sampleRate = sampleRate;
     this.advanced = advanced;
   }
 
   toConstraints(): MediaTrackConstraints {
     return {
       deviceId: this.deviceId,
-      // sampleRate: this.sampleRate,//TODO: keeping it commented so can be used if required
       advanced: this.advanced,
     };
   }

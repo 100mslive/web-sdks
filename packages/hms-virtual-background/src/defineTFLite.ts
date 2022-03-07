@@ -41,10 +41,10 @@ const loadTFLite = async () => {
   tfLite.HEAPU8.set(new Uint8Array(model), modelBufferOffset);
   tfLite._loadModel(model.byteLength);
 
-  console.log(TAG,'Input memory offset:', tfLite._getInputMemoryOffset())
-  console.log(TAG,'Input height:', tfLite._getInputHeight())
-  console.log(TAG,'Input width:', tfLite._getInputWidth())
-  console.log(TAG,'Input channels:', tfLite._getInputChannelCount())
+  console.debug(TAG,'Input memory offset:', tfLite._getInputMemoryOffset())
+  console.debug(TAG,'Input height:', tfLite._getInputHeight())
+  console.debug(TAG,'Input width:', tfLite._getInputWidth())
+  console.debug(TAG,'Input channels:', tfLite._getInputChannelCount())
 
   return tfLite;
 }

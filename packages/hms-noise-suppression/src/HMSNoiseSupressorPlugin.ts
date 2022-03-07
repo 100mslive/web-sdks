@@ -15,10 +15,10 @@ const MIN_SAMPLE_RATE = 44100;
 const MAX_SAMPLE_RATE = 48000;
 const DEFAULT_DURATION_MS = 80;
 
-//The buffer size in units of sample-frames, it will be in power of 2.
-//If specified, the bufferSize must be one of the following values: 256, 512, 1024, 2048, 4096, 8192, 16384
-//This value controls how frequently the audioprocess event is dispatched and how many sample-frames need to be processed each call.
-//Lower values for bufferSize will result in a lower(better) latency. Higher values will be necessary to avoid audio breakup and glitches.
+/*The buffer size in units of sample-frames, it will be in power of 2.
+If specified, the bufferSize must be one of the following values: 256, 512, 1024, 2048, 4096, 8192, 16384
+This value controls how frequently the audioprocess event is dispatched and how many sample-frames need to be processed each call.
+Lower values for bufferSize will result in a lower(better) latency. Higher values will be necessary to avoid audio breakup and glitches.*/
 
 //TODO: add implement HMSAudioPlugin after sdk changes
 export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
@@ -107,6 +107,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
       browserResult.errMsg = 'browser not supported for plugin, see docs';
     }
+
 
     if (!deviceResult.isSupported) {
       return deviceResult;

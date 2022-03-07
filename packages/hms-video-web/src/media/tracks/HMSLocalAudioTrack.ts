@@ -206,8 +206,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
-    const { volume, codec, maxBitrate, deviceId, sampleRate, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, sampleRate, advanced);
+    const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
+    const newSettings = new HMSAudioTrackSettings(volume, codec, maxBitrate, deviceId, advanced);
     return newSettings;
   }
 

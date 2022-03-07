@@ -1,15 +1,14 @@
 import { useCallback, useRef, useState, useEffect } from "react";
+import { ToastManager } from "../src/views/new/Toast/ToastManager";
+
 import {
   useHMSActions,
   useHMSStore,
-  useHMSNotifications,
   selectIsLocalAudioPluginPresent, useDevices,
-  selectLocalAudioTrackID,
 } from '@100mslive/react-sdk';
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
-import { hmsToast } from "../src/views/components/notifications/hms-toast";
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
@@ -20,9 +19,6 @@ export const NoiseSuppression = () => {
   );
   const { selectedDeviceIDs } = useDevices();
   const pluginActive = isPluginPresent && !disable;
-
-  // const localAudioTrackID = useHMSStore(selectLocalAudioTrackID);
-  // // const notification = useHMSNotifications();
 
   const createPlugin = () => {
     if (!pluginRef.current) {
@@ -42,9 +38,13 @@ export const NoiseSuppression = () => {
   const cleanup = useCallback(
     async err => {
       if(err.message){
-        hmsToast(err.message);
+      ToastManager.addToast({
+        title: err.message,
+      })
       }else{
-        hmsToast(err);
+        ToastManager.addToast({
+          title: err,
+        })
       }
 
       setDisabled(true);
@@ -80,31 +80,13 @@ export const NoiseSuppression = () => {
         pluginRef.current
       );
       if(supported.isSupported){
-        console.log("inside device change supported");
         setDisabled(false);
       }else{
-        console.log("inside device change not supported");
         setDisabled(true);
       }
     }
 
   }, [selectedDeviceIDs.audioInput]);
-
-  //Commenting by default NS add since its causing audio issues
-/*  useEffect(() => {
-    if (
-      !notification ||
-      notification.type !== HMSNotificationTypes.TRACK_ADDED ||
-      notification.data?.id !== localAudioTrackID
-    ) {
-      return;
-    }
-    if (process.env.REACT_APP_ENV === "qa") {
-      addPlugin();
-    } else {
-      createPlugin();
-    }
-  }, [addPlugin, notification, localAudioTrackID]);*/
 
   return (
     <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
