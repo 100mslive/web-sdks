@@ -26,5 +26,12 @@
         "endOfLine": "auto" // This is need to handle different end-of-line in windows/mac
       }
     ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx"]
+      }
+    }
   }
 }
