@@ -1,5 +1,5 @@
 import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
-import React, { useMemo } from 'react';
+import { Accessor, createMemo } from 'solid-js';
 import {
   calculateLayoutSizes,
   chunkElements,
@@ -60,12 +60,12 @@ export interface useVideoResult {
   /**
    * This returns a list of all pages with every page containing the list of all tiles on it.
    */
-  pagesWithTiles: useVideoListTile[][];
+  pagesWithTiles: Accessor<useVideoListTile[][]>;
   /**
    * add the ref to the element going to render the video list, this is used to measure the available
    * space/dimensions in order to calculate the best fit
    */
-  ref: React.MutableRefObject<any>;
+  ref: any;
 }
 
 const DEFAULTS = {
@@ -73,6 +73,9 @@ const DEFAULTS = {
     width: 1,
     height: 1,
   },
+  includeScreenShareForPeer: () => false,
+  filterNonPublishingPeers: true,
+  offsetY: 0,
 };
 
 /**
@@ -81,29 +84,21 @@ const DEFAULTS = {
  * a list of pages with every page having a list of video tiles.
  * Please check the documentation of input and output types for more details.
  */
-export const useVideoList = ({
-  peers,
-  maxTileCount,
-  maxColCount,
-  maxRowCount,
-  includeScreenShareForPeer = () => false,
-  aspectRatio = DEFAULTS.aspectRatio,
-  filterNonPublishingPeers = true,
-  offsetY = 0,
-}: useVideoListInput): useVideoResult => {
-  const { width = 0, height = 0, ref } = useResizeDetector();
+export const useVideoList = (props: useVideoListInput): useVideoResult => {
+  const { width = 0, height = 0 } = {};
+  let ref: any;
   const store = useHMSVanillaStore();
   // using vanilla store as we don't need re-rendering everytime something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
-    peers,
+    props.peers,
     tracksMap,
-    includeScreenShareForPeer,
-    filterNonPublishingPeers,
+    props.includeScreenShareForPeer || DEFAULTS.includeScreenShareForPeer,
+    props.filterNonPublishingPeers,
   );
-  const finalAspectRatio = useMemo(() => {
-    if (aspectRatio) {
-      return aspectRatio;
+  const finalAspectRatio = createMemo(() => {
+    if (props.aspectRatio) {
+      return props.aspectRatio;
     }
     const modeAspectRatio = getModeAspectRatio(tracksWithPeer);
     // Default to 1 if there are no video tracks
@@ -111,49 +106,30 @@ export const useVideoList = ({
       width: modeAspectRatio || 1,
       height: 1,
     };
-  }, [aspectRatio, tracksWithPeer]);
+  });
   const count = tracksWithPeer.length;
-  const {
-    tilesInFirstPage,
-    defaultWidth,
-    defaultHeight,
-    lastPageWidth,
-    lastPageHeight,
-    isLastPageDifferentFromFirstPage,
-  } = useMemo(
-    () =>
-      calculateLayoutSizes({
-        count,
-        parentWidth: Math.floor(width),
-        parentHeight: Math.floor(height) - Math.min(height, offsetY),
-        maxTileCount,
-        maxRowCount,
-        maxColCount,
-        aspectRatio: finalAspectRatio,
-      }),
-    [count, width, height, maxTileCount, maxRowCount, maxColCount, finalAspectRatio, offsetY],
+  const layoutSizes = createMemo(() =>
+    calculateLayoutSizes({
+      count,
+      parentWidth: Math.floor(width),
+      parentHeight: Math.floor(height) - Math.min(height, props.offsetY || DEFAULTS.offsetY),
+      maxTileCount: props.maxTileCount,
+      maxRowCount: props.maxRowCount,
+      maxColCount: props.maxColCount,
+      aspectRatio: finalAspectRatio(),
+    }),
   );
-  const chunkedTracksWithPeer = useMemo(
-    () =>
-      chunkElements<TrackWithPeer>({
-        elements: tracksWithPeer,
-        tilesInFirstPage,
-        onlyOnePage: false,
-        isLastPageDifferentFromFirstPage,
-        defaultWidth,
-        defaultHeight,
-        lastPageWidth,
-        lastPageHeight,
-      }),
-    [
-      tracksWithPeer,
-      tilesInFirstPage,
-      isLastPageDifferentFromFirstPage,
-      defaultWidth,
-      defaultHeight,
-      lastPageWidth,
-      lastPageHeight,
-    ],
+  const chunkedTracksWithPeer = createMemo(() =>
+    chunkElements<TrackWithPeer>({
+      elements: tracksWithPeer,
+      onlyOnePage: false,
+      tilesInFirstPage: layoutSizes().tilesInFirstPage,
+      isLastPageDifferentFromFirstPage: layoutSizes().isLastPageDifferentFromFirstPage,
+      defaultWidth: layoutSizes().defaultWidth,
+      defaultHeight: layoutSizes().defaultHeight,
+      lastPageWidth: layoutSizes().lastPageWidth,
+      lastPageHeight: layoutSizes().lastPageHeight,
+    }),
   );
   return {
     pagesWithTiles: chunkedTracksWithPeer,

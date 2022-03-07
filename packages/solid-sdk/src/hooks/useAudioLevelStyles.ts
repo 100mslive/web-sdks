@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { createEffect } from 'solid-js';
 import { selectTrackAudioByID } from '@100mslive/hms-video-store';
 import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 
@@ -11,27 +11,21 @@ import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
  * @param getStyle is a function which can take in current audio level and return the style to apply for the ref
  * @param ref is the ref of the element on which you want the css to apply
  */
-export function useAudioLevelStyles({
-  trackId,
-  getStyle,
-  ref,
-}: {
+export function useAudioLevelStyles(props: {
   trackId?: string;
   getStyle: (level: number) => Record<string, string>;
   ref: React.RefObject<any>;
 }) {
   const store = useHMSVanillaStore();
-  useEffect(
-    () =>
-      store.subscribe(level => {
-        if (!ref.current) {
-          return;
-        }
-        const styles = getStyle(level);
-        for (const key in styles) {
-          ref.current.style[key] = styles[key];
-        }
-      }, selectTrackAudioByID(trackId)),
-    [getStyle, ref, store, trackId],
+  createEffect(() =>
+    store.subscribe(level => {
+      if (!props.ref.current) {
+        return;
+      }
+      const styles = props.getStyle(level);
+      for (const key in styles) {
+        props.ref.current.style[key] = styles[key];
+      }
+    }, selectTrackAudioByID(props.trackId)),
   );
 }
