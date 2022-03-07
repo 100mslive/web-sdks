@@ -6,18 +6,18 @@ import {
   selectRolesMap,
   selectSessionId,
 } from "@100mslive/react-sdk";
-import { FeatureFlagsInit } from "./FeatureFlags";
+import { FeatureFlagsInit } from "../../services/FeatureFlags";
 import { normalizeAppPolicyConfig, setUpLogRocket } from "./appContextUtils";
-import { getBackendEndpoint } from "../services/tokenService";
+import { getBackendEndpoint } from "../../services/tokenService";
 import {
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
-} from "../common/constants";
-import { getMetadata } from "../common/utils";
+} from "../../common/constants";
+import { getMetadata } from "../../common/utils";
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../views/hooks/useUserPreferences";
+} from "../hooks/useUserPreferences";
 
 const AppContext = React.createContext(null);
 

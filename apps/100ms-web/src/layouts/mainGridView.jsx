@@ -6,7 +6,7 @@ import {
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "./components/gridView";
-import { AppContext } from "../store/AppContext";
+import { AppContext } from "../components/context/AppContext";
 
 export const MainGridView = ({ isChatOpen, toggleChat }) => {
   const {

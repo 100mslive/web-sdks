@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import Pusher from "pusher-js";
 import { useHMSStore, selectRoomID } from "@100mslive/react-sdk";
-import { FeatureFlags } from "../../store/FeatureFlags";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));

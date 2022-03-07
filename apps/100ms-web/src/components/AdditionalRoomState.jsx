@@ -17,8 +17,8 @@ import {
   PencilDrawIcon,
 } from "@100mslive/react-icons";
 import { useRecordingStreaming } from "@100mslive/react-sdk";
-import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
-import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
+import { usePlaylistMusic } from "../../components/hooks/usePlaylistMusic";
+import { useScreenshareAudio } from "../../components/hooks/useScreenshareAudio";
 import { useWhiteboardMetadata } from "../whiteboard/useWhiteboardMetadata";
 
 const getRecordingText = (

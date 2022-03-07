@@ -2,8 +2,8 @@
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { MusicIcon } from "@100mslive/react-icons";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useWhenAloneInRoom } from "../../common/hooks";
-import { AppContext } from "../../store/AppContext";
+import { AppContext } from "../store/AppContext";
+import { useWhenAloneInRoom } from "../common/hooks";
 
 const ambientMusicURL = process.env.REACT_APP_AMBIENT_MUSIC;
 /**

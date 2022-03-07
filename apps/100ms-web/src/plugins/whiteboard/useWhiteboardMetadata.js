@@ -5,7 +5,7 @@ import {
 } from "@100mslive/react-sdk";
 import { useCallback, useMemo } from "react";
 import { getMetadata } from "../../common/utils";
-import { useMyMetadata } from "../hooks/useMetadata";
+import { useMyMetadata } from "../../components/hooks/useMetadata";
 import { useCommunication } from "./useCommunication";
 
 const isWhiteboardOwner = peer => {

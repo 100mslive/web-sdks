@@ -8,12 +8,12 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
-import { Header } from "../views/new/Header";
-import { ConferenceMainView } from "../views/mainView";
-import { Footer } from "../views/new/Footer";
-import FullPageProgress from "../views/components/FullPageSpinner";
-import { RoleChangeRequestModal } from "../views/new/RoleChangeRequestModal";
-import { AppContext } from "../store/AppContext";
+import { Header } from "../layouts/new/Header";
+import { ConferenceMainView } from "../layouts/mainView";
+import { Footer } from "../layouts/new/Footer";
+import FullPageProgress from "../layouts/components/FullPageSpinner";
+import { RoleChangeRequestModal } from "../layouts/new/RoleChangeRequestModal";
+import { AppContext } from "./context/AppContext";
 
 export const Conference = () => {
   const history = useHistory();

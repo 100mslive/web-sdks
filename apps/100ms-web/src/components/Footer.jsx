@@ -21,7 +21,7 @@ import {
 } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../components/AudioVideoToggle";
 import { LeaveRoom } from "../components/LeaveRoom";
-import { NoiseSuppression } from "../components/NoiseSuppression";
+import { NoiseSuppression } from "../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../whiteboard";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
 import { Playlist } from "./Playlist/Playlist";
@@ -31,7 +31,7 @@ import { VirtualBackground } from "../../plugins/VirtualBackground";
 import { TranscriptionButton } from "../../plugins/transcription";
 import { isScreenshareSupported } from "../../common/utils";
 import { useMyMetadata } from "../../components/hooks/useMetadata";
-import { FeatureFlags } from "../../services/FeatureFlags";
+import { FeatureFlags } from "../../store/FeatureFlags";
 
 const ScreenshareAudio = () => {
   const {

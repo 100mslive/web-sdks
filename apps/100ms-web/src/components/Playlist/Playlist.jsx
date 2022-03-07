@@ -15,7 +15,7 @@ import {
 } from "@100mslive/react-ui";
 import { PlaylistItem } from "./PlaylistItem";
 import { AudioPlaylistControls } from "./PlaylistControls";
-import { usePlaylist } from "../../hooks/usePlaylist";
+import { usePlaylist } from "../../../components/hooks/usePlaylist";
 
 export const Playlist = ({ type }) => {
   const isAudioPlaylist = type === HMSPlaylistType.audio;

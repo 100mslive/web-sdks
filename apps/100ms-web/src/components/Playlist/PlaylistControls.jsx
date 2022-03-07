@@ -18,7 +18,7 @@ import {
   SpeakerIcon,
 } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Slider, Text } from "@100mslive/react-ui";
-import { usePlaylist } from "../../hooks/usePlaylist";
+import { usePlaylist } from "../../../components/hooks/usePlaylist";
 
 const Progress = ({ type, duration }) => {
   const selectPlaylist =

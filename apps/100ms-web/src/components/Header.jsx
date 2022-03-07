@@ -7,7 +7,7 @@ import {
   selectLocalPeer,
 } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
-import PIPComponent from "../PIP/PIPComponent";
+import PIPComponent from "../../components/PIP/PIPComponent";
 import { AppContext } from "../../store/AppContext";
 import { DEFAULT_HLS_VIEWER_ROLE } from "../../common/constants";
 import { AdditionalRoomState } from "./AdditionalRoomState";

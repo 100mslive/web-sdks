@@ -26,7 +26,7 @@ import Settings from "./Settings";
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../hooks/useUserPreferences";
+} from "../../components/hooks/useUserPreferences";
 
 const defaultPreviewPreference = {
   name: "",
