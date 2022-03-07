@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { HMSVirtualBackgroundPlugin } from "@100mslive/hms-virtual-background";
-import { getRandomVirtualBackground } from "../src/common/utils";
 import {
   useHMSActions,
   useHMSStore,
@@ -9,6 +8,7 @@ import {
 } from "@100mslive/react-sdk";
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { getRandomVirtualBackground } from "../common/utils";
 
 export const VirtualBackground = () => {
   const pluginRef = useRef(null);

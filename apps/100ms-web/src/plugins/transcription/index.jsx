@@ -4,7 +4,7 @@ import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
 import { Box, Tooltip } from "@100mslive/react-ui";
-import { FeatureFlags } from "../../src/store/FeatureFlags";
+import { FeatureFlags } from "../../store/FeatureFlags";
 
 const pusher =
   FeatureFlags.enableTranscription &&

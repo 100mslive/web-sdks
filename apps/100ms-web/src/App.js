@@ -21,7 +21,7 @@ import ErrorPage from "./pages/ErrorPage";
 import { AppContextProvider } from "./store/AppContext.js";
 import { hmsToast } from "./views/components/notifications/hms-toast";
 import { Notifications } from "./views/components/notifications/Notifications";
-import { Confetti } from "../plugins/confetti";
+import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./views/new/Toast/ToastContainer";
 import { FeatureFlags } from "./store/FeatureFlags";
 import { shadeColor } from "./common/utils";
