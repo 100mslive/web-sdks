@@ -4,7 +4,7 @@ import { Box, Loading } from "@100mslive/react-ui";
 import { v4 } from "uuid";
 import { AppContext } from "../store/AppContext";
 import Preview from "../views/new/Preview";
-import getToken from "../services/tokenService";
+import getToken from "../../services/tokenService";
 import { useSearchParam } from "react-use";
 import { SKIP_PREVIEW } from "../common/constants";
 import { Header } from "../views/new/Header";
