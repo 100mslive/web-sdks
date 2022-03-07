@@ -4,8 +4,8 @@ import {
   useHMSActions,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { RequestDialog } from "../../new/DialogContent";
 import { MicOnIcon } from "@100mslive/react-icons";
+import { RequestDialog } from "../../primitives/DialogContent";
 
 export const TrackBulkUnmuteModal = () => {
   const hmsActions = useHMSActions();

@@ -3,7 +3,7 @@ import { useMedia } from "react-use";
 import { Tldraw } from "@tldraw/tldraw";
 import { selectPeers, selectRoomID, useHMSStore } from "@100mslive/react-sdk";
 import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
-import { SidePane } from "../screenShareView";
+import { SidePane } from "./screenShareView";
 import { useMultiplayerState } from "../plugins/whiteboard/useMultiplayerState";
 
 const Editor = React.memo(({ roomId }) => {

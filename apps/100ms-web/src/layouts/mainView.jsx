@@ -13,8 +13,9 @@ import { ScreenShareView } from "./screenShareView";
 import { MainGridView } from "./mainGridView";
 import { ActiveSpeakerView } from "./ActiveSpeakerView";
 import { HLSView } from "./HLSView";
+import { WhiteboardView } from "./WhiteboardView";
 import { AppContext } from "../components/context/AppContext";
-import { useWhiteboardMetadata, WhiteboardView } from "./whiteboard";
+import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 
 export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {

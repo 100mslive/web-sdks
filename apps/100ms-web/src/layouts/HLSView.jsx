@@ -2,7 +2,7 @@ import React, { useEffect, useRef, Fragment } from "react";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import { Box, Flex, Text } from "@100mslive/react-ui";
 import Hls from "hls.js";
-import { ChatView } from "./components/chatView";
+import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 
 const defaultClasses = {

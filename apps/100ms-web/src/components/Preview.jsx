@@ -20,13 +20,13 @@ import {
   useBorderAudioLevel,
   styled,
 } from "@100mslive/react-ui";
-import { AudioVideoToggle } from "../components/AudioVideoToggle";
 import { SettingIcon } from "@100mslive/react-icons";
+import { AudioVideoToggle } from "./AudioVideoToggle";
 import Settings from "./Settings";
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../../components/hooks/useUserPreferences";
+} from "./hooks/useUserPreferences";
 
 const defaultPreviewPreference = {
   name: "",

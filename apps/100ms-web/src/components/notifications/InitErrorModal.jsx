@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text } from "@100mslive/react-ui";
-import { ErrorDialog } from "../../new/DialogContent";
+import { ErrorDialog } from "../../primitives/DialogContent";
 
 export const InitErrorModal = ({ notification }) => {
   const [showModal, setShowModal] = useState(false);

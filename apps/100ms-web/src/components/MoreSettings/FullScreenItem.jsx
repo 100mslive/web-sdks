@@ -1,7 +1,7 @@
 import React from "react";
 import { ComputerIcon } from "@100mslive/react-icons";
 import { Dropdown, Text } from "@100mslive/react-ui";
-import { useFullscreen } from "../../../components/hooks/useFullscreen";
+import { useFullscreen } from "../hooks/useFullscreen";
 
 export const FullScreenItem = ({ hoverStyles }) => {
   const { allowed, isFullscreen, toggleFullscreen } = useFullscreen();

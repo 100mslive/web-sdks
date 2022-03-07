@@ -4,9 +4,9 @@ import {
   selectRoleChangeRequest,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { RequestDialog } from "./DialogContent";
-import { AppContext } from "../../store/AppContext";
 import { PersonIcon } from "@100mslive/react-icons";
+import { RequestDialog } from "../primitives/DialogContent";
+import { AppContext } from "./context/AppContext";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();

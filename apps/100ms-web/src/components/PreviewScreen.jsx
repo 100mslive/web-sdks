@@ -1,14 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Box, Loading } from "@100mslive/react-ui";
-import { v4 } from "uuid";
-import { AppContext } from "./context/AppContext";
-import Preview from "../layouts/new/Preview";
-import getToken from "../services/tokenService";
 import { useSearchParam } from "react-use";
+import { v4 } from "uuid";
+import { Box, Loading } from "@100mslive/react-ui";
+import Preview from "./Preview";
+import { Header } from "./Header";
+import { ErrorDialog } from "../primitives/DialogContent";
+import { AppContext } from "./context/AppContext";
 import { SKIP_PREVIEW } from "../common/constants";
-import { Header } from "../layouts/new/Header";
-import { ErrorDialog } from "../layouts/new/DialogContent";
+import getToken from "../services/tokenService";
 
 const env = process.env.REACT_APP_ENV;
 // use this field to join directly for quick testing while in local

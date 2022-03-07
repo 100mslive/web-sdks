@@ -5,7 +5,7 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
-import { isScreenshareSupported } from "../../common/utils";
+import { isScreenshareSupported } from "../common/utils";
 
 export const Screenshare = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);

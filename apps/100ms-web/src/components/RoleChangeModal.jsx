@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogRow,
   DialogSelect,
-} from "./DialogContent";
+} from "../primitives/DialogContent";
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peer = useHMSStore(selectPeerByID(peerId));

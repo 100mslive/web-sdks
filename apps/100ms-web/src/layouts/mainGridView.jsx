@@ -5,7 +5,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
-import { GridCenterView, GridSidePaneView } from "./components/gridView";
+import { GridCenterView, GridSidePaneView } from "../components/gridView";
 import { AppContext } from "../components/context/AppContext";
 
 export const MainGridView = ({ isChatOpen, toggleChat }) => {

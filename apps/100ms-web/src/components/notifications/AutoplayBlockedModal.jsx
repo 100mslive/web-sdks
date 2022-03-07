@@ -1,7 +1,7 @@
 import React from "react";
 import { useAutoplayError } from "@100mslive/react-sdk";
 import { Dialog, Text, Button } from "@100mslive/react-ui";
-import { DialogContent, DialogRow } from "../../new/DialogContent";
+import { DialogContent, DialogRow } from "../../primitives/DialogContent";
 
 export function AutoplayBlockedModal() {
   const { error, resetError, unblockAudio } = useAutoplayError();

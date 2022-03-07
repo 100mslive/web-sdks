@@ -8,13 +8,13 @@ import {
 } from "@100mslive/react-sdk";
 import { InfoIcon } from "@100mslive/react-icons";
 import { Dialog, Text } from "@100mslive/react-ui";
-import { AppContext } from "../../store/AppContext";
+import { AppContext } from "./context/AppContext";
 import {
   DialogContent,
   DialogRow,
   DialogSelect,
   DialogSwitch,
-} from "../new/DialogContent";
+} from "../primitives/DialogContent";
 
 export const StatsForNerds = ({ onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();

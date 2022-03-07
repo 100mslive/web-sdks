@@ -11,11 +11,11 @@ import {
 } from "@100mslive/react-sdk";
 import { ScreenShareDisplay } from "@100mslive/hms-video-react";
 import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
-import { ChatView } from "./components/chatView";
-import ScreenshareTile from "./new/ScreenshareTile";
-import VideoList from "./new/VideoList";
-import VideoTile from "./new/VideoTile";
-import { VideoPlayer } from "./new/Playlist/VideoPlayer";
+import { ChatView } from "../components/chatView";
+import ScreenshareTile from "../components/ScreenshareTile";
+import VideoList from "../components/VideoList";
+import VideoTile from "../components/VideoTile";
+import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 import { chatStyle } from "../common/utils";
 
 export const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {

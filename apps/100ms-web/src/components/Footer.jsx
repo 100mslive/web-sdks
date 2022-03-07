@@ -19,19 +19,19 @@ import {
   Tooltip,
   VerticalDivider,
 } from "@100mslive/react-ui";
-import { AudioVideoToggle } from "../components/AudioVideoToggle";
-import { LeaveRoom } from "../components/LeaveRoom";
-import { NoiseSuppression } from "../plugins/NoiseSuppression";
-import { ToggleWhiteboard } from "../whiteboard";
+import { AudioVideoToggle } from "./AudioVideoToggle";
+import { LeaveRoom } from "./LeaveRoom";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
 import { Playlist } from "./Playlist/Playlist";
 import { Screenshare } from "./ScreenShare";
 import { ScreenShareHintModal } from "./ScreenshareHintModal";
-import { VirtualBackground } from "../../plugins/VirtualBackground";
-import { TranscriptionButton } from "../../plugins/transcription";
-import { isScreenshareSupported } from "../../common/utils";
-import { useMyMetadata } from "../../components/hooks/useMetadata";
-import { FeatureFlags } from "../../store/FeatureFlags";
+import { NoiseSuppression } from "../plugins/NoiseSuppression";
+import { ToggleWhiteboard } from "../plugins/whiteboard";
+import { VirtualBackground } from "../plugins/VirtualBackground";
+import { TranscriptionButton } from "../plugins/transcription";
+import { useMyMetadata } from "./hooks/useMetadata";
+import { FeatureFlags } from "../services/FeatureFlags";
+import { isScreenshareSupported } from "../common/utils";
 
 const ScreenshareAudio = () => {
   const {

@@ -2,7 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { useDevices, DeviceType } from "@100mslive/react-sdk";
 import { Dialog, Button, Text } from "@100mslive/react-ui";
 import { AudioLevelIcon, SettingIcon } from "@100mslive/react-icons";
-import { DialogContent, DialogRow, DialogSelect } from "./DialogContent";
+import {
+  DialogContent,
+  DialogRow,
+  DialogSelect,
+} from "../primitives/DialogContent";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,

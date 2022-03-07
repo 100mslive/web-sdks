@@ -10,8 +10,12 @@ import {
   Box,
   HorizontalDivider,
 } from "@100mslive/react-ui";
-import { DialogCheckbox, DialogContent, DialogRow } from "../DialogContent";
-import { AppContext } from "../../../store/AppContext";
+import {
+  DialogCheckbox,
+  DialogContent,
+  DialogRow,
+} from "../../primitives/DialogContent";
+import { AppContext } from "../context/AppContext";
 
 const cssStyle = {
   flexDirection: "column",

@@ -5,12 +5,16 @@ import {
   selectLocalPeer,
 } from "@100mslive/react-sdk";
 import { Dialog, Button } from "@100mslive/react-ui";
-import { DialogContent, DialogInput, DialogRow } from "../new/DialogContent";
+import {
+  DialogContent,
+  DialogInput,
+  DialogRow,
+} from "../primitives/DialogContent";
 import { hmsToast } from "./notifications/hms-toast";
 import {
   useUserPreferences,
   UserPreferencesKeys,
-} from "../hooks/useUserPreferences";
+} from "./hooks/useUserPreferences";
 import { TextboxIcon } from "@100mslive/react-icons";
 
 export const ChangeName = ({ onOpenChange }) => {

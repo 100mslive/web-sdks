@@ -19,11 +19,11 @@ import { FullScreenItem } from "./FullScreenItem";
 import { UISettings } from "./UISettings";
 import Settings from "../Settings";
 import { RoleChangeModal } from "../RoleChangeModal";
-import { ChangeName } from "../../components/ChangeName";
-import { StatsForNerds } from "../../components/StatsForNerds";
+import { ChangeName } from "../ChangeName";
+import { StatsForNerds } from "../StatsForNerds";
 import { RecordingAndRTMPModal } from "../../components/RecordingAndRTMPModal";
-import { MuteAll } from "../../components/MuteAll";
-import { FeatureFlags } from "../../../store/FeatureFlags";
+import { MuteAll } from "../MuteAll";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 const hoverStyles = {
   "&:hover": {

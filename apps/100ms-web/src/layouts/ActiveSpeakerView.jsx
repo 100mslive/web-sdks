@@ -5,7 +5,7 @@ import {
   selectDominantSpeaker,
   selectLocalPeer,
 } from "@100mslive/react-sdk";
-import { GridCenterView, GridSidePaneView } from "./components/gridView";
+import { GridCenterView, GridSidePaneView } from "../components/gridView";
 
 export const ActiveSpeakerView = ({
   isChatOpen,

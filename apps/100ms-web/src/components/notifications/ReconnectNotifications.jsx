@@ -5,7 +5,7 @@ import {
   useHMSNotifications,
 } from "@100mslive/react-sdk";
 import { ConnectivityIcon, PoorConnectivityIcon } from "@100mslive/react-icons";
-import { ToastManager } from "../../new/Toast/ToastManager";
+import { ToastManager } from "../Toast/ToastManager";
 import { TextWithIcon } from "./TextWithIcon";
 
 const notificationTypes = [

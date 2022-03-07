@@ -16,13 +16,13 @@ import {
 } from "@100mslive/react-sdk";
 import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
 import PreviewScreen from "./components/PreviewScreen";
-import { Conference } from "./components/conference.jsx";
-import ErrorPage from "./components/MoreSettings/ErrorPage";
+import { Conference } from "./components/conference";
+import ErrorPage from "./components/ErrorPage";
 import { AppContextProvider } from "./components/context/AppContext.js";
-import { hmsToast } from "./layouts/components/notifications/hms-toast";
-import { Notifications } from "./layouts/components/notifications/Notifications";
+import { hmsToast } from "./components/notifications/hms-toast";
+import { Notifications } from "./components/notifications/Notifications";
 import { Confetti } from "./plugins/confetti";
-import { ToastContainer } from "./layouts/new/Toast/ToastContainer";
+import { ToastContainer } from "./components/Toast/ToastContainer";
 import { FeatureFlags } from "./services/FeatureFlags";
 import { shadeColor } from "./common/utils";
 import {

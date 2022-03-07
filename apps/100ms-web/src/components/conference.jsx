@@ -8,11 +8,11 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
-import { Header } from "../layouts/new/Header";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import FullPageProgress from "./FullPageSpinner";
+import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
-import { Footer } from "../layouts/new/Footer";
-import FullPageProgress from "../layouts/components/FullPageSpinner";
-import { RoleChangeRequestModal } from "../layouts/new/RoleChangeRequestModal";
 import { AppContext } from "./context/AppContext";
 
 export const Conference = () => {

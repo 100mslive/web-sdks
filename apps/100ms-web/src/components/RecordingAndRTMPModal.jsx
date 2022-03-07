@@ -12,9 +12,9 @@ import {
   DialogContent,
   DialogInput,
   DialogRow,
-} from "../new/DialogContent";
+} from "../primitives/DialogContent";
 import { hmsToast } from "./notifications/hms-toast";
-import { SKIP_PREVIEW } from "../../common/constants";
+import { SKIP_PREVIEW } from "../common/constants";
 
 const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") + `?${SKIP_PREVIEW}=true`;

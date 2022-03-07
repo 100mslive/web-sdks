@@ -7,7 +7,11 @@ import {
 } from "@100mslive/react-sdk";
 import { HangUpIcon } from "@100mslive/react-icons";
 import { Button, Popover, Dialog, Tooltip, Box } from "@100mslive/react-ui";
-import { DialogCheckbox, DialogContent, DialogRow } from "../new/DialogContent";
+import {
+  DialogCheckbox,
+  DialogContent,
+  DialogRow,
+} from "../primitives/DialogContent";
 
 export const LeaveRoom = () => {
   const history = useHistory();

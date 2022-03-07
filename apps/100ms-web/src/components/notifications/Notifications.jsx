@@ -10,16 +10,16 @@ import {
 import { Flex, Text, Button } from "@100mslive/react-ui";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
-import { AppContext } from "../../../store/AppContext";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
-import { ToastManager } from "../../new/Toast/ToastManager";
+import { ToastManager } from "../Toast/ToastManager";
+import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
 import { TextWithIcon } from "./TextWithIcon";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { HMSToastContainer } from "./hms-toast";
-import { getMetadata } from "../../../common/utils";
+import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();

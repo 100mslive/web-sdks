@@ -4,12 +4,12 @@ import {
   useHMSNotifications,
 } from "@100mslive/react-sdk";
 import { PersonIcon } from "@100mslive/react-icons";
-import { ToastManager } from "../../new/Toast/ToastManager";
+import { ToastManager } from "../Toast/ToastManager";
 import { TextWithIcon } from "./TextWithIcon";
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../../hooks/useUserPreferences";
+} from "../hooks/useUserPreferences";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,

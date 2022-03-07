@@ -3,7 +3,7 @@ import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
 import { Toast as ToastPrimitive } from "@100mslive/react-ui";
 import { Toast } from "./Toast";
 import { ToastManager } from "./ToastManager";
-import { MAX_TOASTS } from "../../../common/constants";
+import { MAX_TOASTS } from "../../common/constants";
 
 export const ToastContainer = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);

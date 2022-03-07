@@ -13,7 +13,11 @@ import {
   Flex,
   Label,
 } from "@100mslive/react-ui";
-import { DialogContent, DialogRow, DialogSelect } from "../new/DialogContent";
+import {
+  DialogContent,
+  DialogRow,
+  DialogSelect,
+} from "../primitives/DialogContent";
 
 const trackSourceOptions = [
   { label: "All Track Sources", value: "" },
