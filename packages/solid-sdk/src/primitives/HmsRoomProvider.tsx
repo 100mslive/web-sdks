@@ -10,7 +10,7 @@ import {
   HMSStoreWrapper,
   HMSNotificationTypes,
 } from '@100mslive/hms-video-store';
-import create from 'solid-zustand';
+import create from '../ports/zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
