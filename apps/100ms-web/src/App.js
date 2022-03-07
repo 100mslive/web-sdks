@@ -28,7 +28,7 @@ import { shadeColor } from "./common/utils";
 import {
   getUserToken as defaultGetUserToken,
   getBackendEndpoint,
-} from "../services/tokenService";
+} from "./services/tokenService";
 import "./index.css";
 
 const defaultTokenEndpoint = process.env

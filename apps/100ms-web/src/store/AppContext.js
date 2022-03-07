@@ -8,7 +8,7 @@ import {
 } from "@100mslive/react-sdk";
 import { FeatureFlagsInit } from "./FeatureFlags";
 import { normalizeAppPolicyConfig, setUpLogRocket } from "./appContextUtils";
-import { getBackendEndpoint } from "../../services/tokenService";
+import { getBackendEndpoint } from "../services/tokenService";
 import {
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
