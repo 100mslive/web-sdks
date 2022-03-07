@@ -10,10 +10,10 @@ const defaultClasses = {
   boxRoot:
     'flex flex-col bg-gray-100 rounded-lg sm:items-start md:w-100 focus:outline-none rounded-tr-lg text-center font-normal sm:text-left md:text-base text-sm text-gray-500 px-5 py-5',
   header: 'flex flex-grow flex-row items-center mb-4',
-  title: 'flex flex-1 text-xl self-center items-center text-white font-medium',
+  title: 'flex flex-1 text-xl self-center items-center text-black font-medium',
   closeRoot: 'self-start',
   closeButton: 'w-full justify-end text-base font-medium rounded-xl focus:outline-none',
-  body: 'w-full text-white text-white',
+  body: 'w-full text-black',
   footer: 'mt-4 w-full flex justify-end',
 };
 
