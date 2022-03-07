@@ -108,7 +108,6 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
       browserResult.errMsg = 'browser not supported for plugin, see docs';
     }
 
-
     if (!deviceResult.isSupported) {
       return deviceResult;
     } else if (!browserResult.isSupported) {
