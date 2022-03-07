@@ -31,7 +31,7 @@ export const Playlist = ({ type }) => {
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild>
-          <IconButton active={!active}>
+          <IconButton css={{ mx: "$4" }} active={!active}>
             <Tooltip
               title={isAudioPlaylist ? "Audio Playlist" : "Video Playlist"}
             >

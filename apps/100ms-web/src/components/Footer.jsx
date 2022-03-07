@@ -9,6 +9,7 @@ import {
 import {
   HMSPlaylistType,
   selectUnreadHMSMessagesCount,
+  selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
@@ -39,9 +40,10 @@ const ScreenshareAudio = () => {
     screenShareAudioTrackId: audio,
     toggleScreenShare,
   } = useScreenShare();
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioScreenshare = amIScreenSharing && !video && !!audio;
   const [showModal, setShowModal] = useState(false);
-  if (!isScreenshareSupported()) {
+  if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
     return null;
   }
   return (
@@ -111,7 +113,7 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
       justify="between"
       align="center"
       css={{
-        padding: "1rem",
+        padding: "$2",
         position: "relative",
         height: "100%",
         "@md": { flexWrap: "wrap" },
