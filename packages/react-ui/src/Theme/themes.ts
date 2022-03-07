@@ -15,6 +15,7 @@ export const darkTheme = {
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
     inputBg: '$bgSecondary',
+    toastBg: '$menuBg',
   },
 };
 
@@ -22,7 +23,7 @@ export const darkTheme = {
 export const lightTheme = {
   colors: {
     bgPrimary: '#FFFFFF',
-    bgSecondary: 'rgba(255,255,255, 0.72)',
+    bgSecondary: '#F5F5F5',
     bgTertiary: 'rgba(255,255,255, 0.38)',
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',
@@ -36,5 +37,6 @@ export const lightTheme = {
     statsBg: 'rgba(255,255,255,0.75)',
     menuBg: '#d9d9d9',
     inputBg: '$tileBg',
+    toastBg: '$menuBg',
   },
 };
