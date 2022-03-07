@@ -54,13 +54,7 @@ export class HMSAudioTrackSettingsBuilder {
   }
 
   build() {
-    return new HMSAudioTrackSettings(
-      this._volume,
-      this._codec,
-      this._maxBitrate,
-      this._deviceId,
-      this._advanced,
-    );
+    return new HMSAudioTrackSettings(this._volume, this._codec, this._maxBitrate, this._deviceId, this._advanced);
   }
 }
 
