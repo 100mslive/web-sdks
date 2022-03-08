@@ -26,7 +26,6 @@ export { default as HorizontalMenuIcon } from './HorizontalMenuIcon';
 export { default as InfoIcon } from './InfoIcon';
 export { default as InviteIcon } from './InviteIcon';
 export { default as InviteStageIcon } from './InviteStageIcon';
-export { default as MenuIcon } from './MenuIcon';
 export { default as MicOffIcon } from './MicOffIcon';
 export { default as MicOnIcon } from './MicOnIcon';
 export { default as MusicIcon } from './MusicIcon';
