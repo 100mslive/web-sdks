@@ -1,4 +1,5 @@
 import React from "react";
+import { SunWithFace } from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -39,7 +40,8 @@ export const PostLeave = ({ history, match }) => {
               "linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%)",
           }}
         >
-          <Text variant="h5" css={{ fontWeight: "$semiBold" }}>
+          <SunWithFace width={72} height={72} />
+          <Text variant="h5" css={{ fontWeight: "$semiBold", mt: "$12" }}>
             You left the room
           </Text>
           <Text
