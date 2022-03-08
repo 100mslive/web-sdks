@@ -15,7 +15,7 @@ export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const [disable, setDisabled] = useState(false);
-  const [support, setPluginSupport] = useState(true);
+  const [pluginSupport, setPluginSupport] = useState(false);
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
@@ -39,15 +39,13 @@ export const NoiseSuppression = () => {
 
   const cleanup = useCallback(
     async err => {
+      let message = "adding Noise Suppression plugin failed, see docs";
       if (err.message) {
-        ToastManager.addToast({
-          title: err.message,
-        });
-      } else {
-        ToastManager.addToast({
-          title: "adding Noise Suppression plugin failed, see docs",
-        });
+        message = err.message;
       }
+      ToastManager.addToast({
+        title: message,
+      });
 
       setDisabled(true);
       await removePlugin();
@@ -77,33 +75,23 @@ export const NoiseSuppression = () => {
   }, [hmsActions, cleanup]);
 
   useEffect(() => {
-    if (pluginRef.current) {
-      const supported = hmsActions.validateAudioPluginSupport(
-        pluginRef.current
-      );
-      if (supported.isSupported) {
-        setDisabled(false);
-      } else {
-        setDisabled(true);
-      }
+    if (!pluginRef.current) {
+      createPlugin();
+    }
+
+    const pluginSupport = hmsActions.validateAudioPluginSupport(
+      pluginRef.current
+    );
+    if (pluginSupport.isSupported) {
+      setDisabled(false);
+      setPluginSupport(true);
+    } else {
+      setDisabled(true);
+      setPluginSupport(false);
     }
   }, [selectedDeviceIDs.audioInput, hmsActions]);
 
-  useEffect(() => {
-    if (!pluginRef.current) {
-      createPlugin();
-      const supported = hmsActions.validateAudioPluginSupport(
-        pluginRef.current
-      );
-      if (supported.isSupported) {
-        setPluginSupport(true);
-      } else {
-        setPluginSupport(false);
-      }
-    }
-  }, [hmsActions]);
-
-  if (support) {
+  if (pluginSupport) {
     return (
       <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
         <IconButton
