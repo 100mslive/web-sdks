@@ -3,46 +3,62 @@ import { Button } from "@100mslive/hms-video-react";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
-import { Box, Tooltip } from "@100mslive/react-ui";
-import { FeatureFlags } from "../../services/FeatureFlags";
+import { Text, Box, Tooltip } from "@100mslive/react-ui";
 
-const pusher =
-  FeatureFlags.enableTranscription &&
-  new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
-    cluster: "ap2",
-    authEndpoint: process.env.REACT_APP_PUSHER_AUTHENDPOINT,
-  });
+const pusher = new Pusher(process.env.REACT_APP_TRANSCRIPTION_PUSHER_APP_KEY, {
+  cluster: "ap2",
+  authEndpoint: process.env.REACT_APP_TRANSCRIPTION_PUSHER_AUTHENDPOINT,
+});
 let channel = null;
 
 export function TranscriptionButton() {
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [speakingPeer, setSpeakingPeer] = useState("");
   const transcriber = useRef(null);
   const roomId = useHMSStore(selectRoom)?.id;
   useEffect(() => {
     channel = pusher.subscribe(`private-${roomId}`);
     channel.bind(`client-transcription`, ({ text }) => {
-      setTranscript(text);
-      setTimeout(() => {
-        setTranscript("");
-      }, 5000);
+      if (text) {
+        let data = JSON.parse(text);
+        if (data && data.setTranscriptionStatus) {
+          !isTranscriptionEnabled &&
+          data.setTranscriptionStatus.setStatus === true
+            ? enableTranscription()
+            : data.setTranscriptionStatus.setStatus === false
+            ? enableTranscription(false)
+            : null;
+        } else if (data && data.peername && data.transcript != "") {
+          setTranscript(data.transcript);
+          setSpeakingPeer("[" + data.peername + "]");
+          if (data.isenabled === true && !isTranscriptionEnabled) {
+            enableTranscription();
+          }
+          setTimeout(() => {
+            setTranscript("");
+            setSpeakingPeer("");
+          }, 5000);
+        }
+      }
     });
   }, [roomId]);
 
-  const enableTranscription = () => {
+  const enableTranscription = (setStatus = null) => {
     if (!transcriber.current) {
-      transcriber.current = new Transcriber(setTranscript);
+      transcriber.current = new Transcriber(setTranscript, setSpeakingPeer);
       transcriber.current.enabled = false;
     }
-    transcriber.current.enableTranscription(!isTranscriptionEnabled);
-    setIsTranscriptionEnabled(!isTranscriptionEnabled);
+    let setFeature = setStatus === false ? setStatus : !isTranscriptionEnabled;
+    transcriber.current.enableTranscription(setFeature);
+    setIsTranscriptionEnabled(setFeature);
   };
 
   return (
     <>
       <Box
         css={{
-          textAlign: "center",
+          textAlign: "left",
           fontWeight: "$medium",
           bottom: "120px",
           position: "fixed",
@@ -52,9 +68,39 @@ export function TranscriptionButton() {
           color: "white",
           textShadow: "0px 0px 6px #000",
           whiteSpace: "pre-line",
+          paddingLeft: "40px",
+        }}
+      ></Box>
+      <Box
+        css={{
+          textAlign: "center",
+          fontWeight: "$medium",
+          bottom: "90px",
+          position: "fixed",
+          width: "100%",
+          fontSize: "$20px",
+          zIndex: "1000000",
+          color: "white",
+          textShadow: "0px 0px 6px #000",
+          whiteSpace: "pre-line",
         }}
       >
-        {transcript}
+        <Text
+          css={{
+            color: "white",
+            textShadow: "0px 0px 6px #000",
+          }}
+        >
+          {transcript}
+        </Text>
+        <Text
+          css={{
+            color: "#c0bbbb",
+            textShadow: "0px 0px 6px #000",
+          }}
+        >
+          {speakingPeer}
+        </Text>
       </Box>
       <Button
         iconOnly
@@ -76,13 +122,14 @@ export function TranscriptionButton() {
   );
 }
 class Transcriber {
-  constructor(setTranscript) {
+  constructor(setTranscript, setSpeakingPeer) {
     this.enabled = false;
     this.socket = null;
     this.totalTimeDiff = 0;
     this.totalCount = 0;
     this.streams = {};
     this.setTranscript = setTranscript;
+    this.setSpeakingPeer = setSpeakingPeer;
     this.initialized = false;
     this.lastMessage = {};
     this.localPeerId = null;
@@ -130,7 +177,19 @@ class Transcriber {
                     .slice(Math.max(res.text.split(" ").length - 10, 1))
                     .join(" ")
                 : res.text;
-            this.broadcast(messageText + "\n[" + peername + "]");
+            this.setTranscript(messageText);
+            this.setSpeakingPeer("[You]");
+            setTimeout(() => {
+              this.setTranscript("");
+              this.setSpeakingPeer("");
+            }, 5000);
+            this.broadcast(
+              JSON.stringify({
+                peername: peername,
+                transcript: messageText,
+                isenabled: this.enabled,
+              })
+            );
           }
         };
 
@@ -193,10 +252,15 @@ class Transcriber {
 
   enableTranscription(enable) {
     if (enable && !this.enabled) {
-      this.setTranscript("[ Initializing Transcription.. ]");
       this.enabled = true;
       this.listen();
+      this.broadcast(
+        JSON.stringify({ setTranscriptionStatus: { setStatus: true } })
+      );
     } else if (!enable && this.enabled) {
+      this.broadcast(
+        JSON.stringify({ setTranscriptionStatus: { setStatus: false } })
+      );
       this.enabled = false;
       this.socket.close();
       this.socket = null;
