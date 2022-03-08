@@ -1,8 +1,8 @@
 import MediaPluginsAnalyticsFactory from '../../analytics/MediaPluginsAnalyticsFactory';
-import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HMSException } from '../../error/HMSException';
+import { EventBus } from '../../events/EventBus';
 
 const TAG = 'AudioPluginsAnalytics';
 
@@ -11,7 +11,7 @@ export class AudioPluginsAnalytics {
   private readonly addedTimestamps: Record<string, number>;
   private readonly pluginAdded: Record<string, boolean>;
 
-  constructor() {
+  constructor(private eventBus: EventBus) {
     this.initTime = {};
     this.addedTimestamps = {};
     this.pluginAdded = {};
@@ -33,7 +33,7 @@ export class AudioPluginsAnalytics {
         loadTime: this.initTime[name],
       };
       //send stats
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.audioPluginStats(stats)).flush();
+      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.audioPluginStats(stats));
       //clean the plugin details
       this.clean(name);
     }
@@ -42,7 +42,7 @@ export class AudioPluginsAnalytics {
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.failure(name, error)).flush();
+      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.failure(name, error));
       //clean the plugin details
       this.clean(name);
     }

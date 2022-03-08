@@ -4,6 +4,7 @@ import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { EventBus } from '../../events/EventBus';
 
 const DEFAULT_FRAME_RATE = 24;
 const DEFAULT_WIDTH = 320;
@@ -54,13 +55,13 @@ export class HMSVideoPluginsManager {
   private pluginNumFramesSkipped: Record<string, number>;
   private canvases: Array<CanvasElement>; //array of canvases to store intermediate result
 
-  constructor(track: HMSLocalVideoTrack) {
+  constructor(track: HMSLocalVideoTrack, eventBus: EventBus) {
     this.hmsTrack = track;
     this.plugins = [];
     this.pluginsMap = {};
     this.pluginNumFramesToSkip = {};
     this.pluginNumFramesSkipped = {};
-    this.analytics = new VideoPluginsAnalytics();
+    this.analytics = new VideoPluginsAnalytics(eventBus);
     this.canvases = new Array<CanvasElement>();
   }
 

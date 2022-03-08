@@ -1,9 +1,9 @@
 import { RunningAverage } from '../../utils/math';
 import MediaPluginsAnalyticsFactory from '../../analytics/MediaPluginsAnalyticsFactory';
-import analyticsEventsService from '../../analytics/AnalyticsEventsService';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HMSException } from '../../error/HMSException';
+import { EventBus } from '../../events/EventBus';
 
 const TAG = 'VideoPluginsAnalytics';
 
@@ -16,7 +16,7 @@ export class VideoPluginsAnalytics {
   private readonly pluginInputFrameRate: Record<string, number>;
   private readonly pluginFrameRate: Record<string, number>;
 
-  constructor() {
+  constructor(private eventBus: EventBus) {
     this.initTime = {};
     this.preProcessingAvgs = new RunningAverage();
     this.addedTimestamps = {};
@@ -49,7 +49,7 @@ export class VideoPluginsAnalytics {
         pluginFrameRate: this.pluginFrameRate[name],
       };
       //send stats
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.stats(stats)).flush();
+      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.stats(stats));
       //clean the plugin details
       this.clean(name);
     }
@@ -58,7 +58,7 @@ export class VideoPluginsAnalytics {
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
-      analyticsEventsService.queue(MediaPluginsAnalyticsFactory.failure(name, error)).flush();
+      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.failure(name, error));
       //clean the plugin details
       this.clean(name);
     }

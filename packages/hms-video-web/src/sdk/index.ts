@@ -34,7 +34,7 @@ import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../m
 import { AudioSinkManager } from '../audio-sink-manager';
 import { AudioOutputManager, DeviceManager } from '../device-manager';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import analyticsEventsService from '../analytics/AnalyticsEventsService';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { TransportState } from '../transport/models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { ErrorCodes } from '../error/ErrorCodes';
@@ -54,6 +54,7 @@ import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -88,6 +89,7 @@ export class HMSSdk implements HMSInterface {
   private transportState: TransportState = TransportState.Disconnected;
   private roleChangeManager?: RoleChangeManager;
   private localTrackManager!: LocalTrackManager;
+  private analyticsEventsService!: AnalyticsEventsService;
   private eventBus!: EventBus;
   private sdkState = { ...INITIAL_STATE };
 
@@ -124,6 +126,8 @@ export class HMSSdk implements HMSInterface {
       this.localTrackManager,
       this.eventBus,
     );
+    this.analyticsEventsService = new AnalyticsEventsService();
+    this.eventBus.sendAnalyticsEvent.subscribe(this.sendAnalyticsEvent);
   }
 
   private validateJoined(name: string) {
@@ -561,7 +565,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   setAnalyticsLevel(level: HMSAnalyticsLevel) {
-    analyticsEventsService.level = level;
+    this.analyticsEventsService.level = level;
   }
 
   setLogLevel(level: HMSLogLevel) {
@@ -923,10 +927,14 @@ export class HMSSdk implements HMSInterface {
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-    analyticsEventsService
+    this.analyticsEventsService
       .queue(AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput))
       .flush();
     // @TODO: start sending if error is less frequent
     // this.listener?.onError(error);
+  };
+
+  private sendAnalyticsEvent = (event: AnalyticsEvent) => {
+    this.analyticsEventsService.queue(event).flush();
   };
 }
