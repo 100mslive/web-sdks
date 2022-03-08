@@ -1,5 +1,5 @@
 import React from "react";
-import PlaceholderBg from "../images/error-bg-dark.svg";
+import PlaceholderBg from "../images/first_person.png";
 import { Flex, Box, Text } from "@100mslive/react-ui";
 
 export const FirstPersonDisplay = () => {
