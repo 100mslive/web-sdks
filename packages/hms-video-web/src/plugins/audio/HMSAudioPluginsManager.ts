@@ -3,6 +3,7 @@ import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
+import { EventBus } from '../../events/EventBus';
 
 const TAG = 'AudioPluginsManager';
 const DEFAULT_SAMPLE_RATE = 48000;
@@ -34,10 +35,10 @@ export class HMSAudioPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
 
-  constructor(track: HMSLocalAudioTrack) {
+  constructor(track: HMSLocalAudioTrack, eventBus: EventBus) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
-    this.analytics = new AudioPluginsAnalytics();
+    this.analytics = new AudioPluginsAnalytics(eventBus);
     this.createAudioContext();
   }
 
@@ -51,7 +52,6 @@ export class HMSAudioPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
-
     if (this.pluginAddInProgress) {
       const err = ErrorFactory.MediaPluginErrors.AddAlreadyInProgress(
         HMSAction.AUDIO_PLUGINS,
@@ -103,7 +103,6 @@ export class HMSAudioPluginsManager {
         throw err;
       }
     }
-
     try {
       if (this.pluginsMap.size === 0) {
         await this.initAudioNodes();
@@ -144,7 +143,6 @@ export class HMSAudioPluginsManager {
     for (const plugin of this.pluginsMap.values()) {
       await this.removePluginInternal(plugin);
     }
-
     await this.hmsTrack.setProcessedTrack(undefined);
     //disconnect nodes, stop track
     this.sourceNode?.disconnect();
