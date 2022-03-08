@@ -31,21 +31,20 @@ export const PostLeave = ({ history, match }) => {
           css={{
             position: "absolute",
             w: "100%",
-            top: "20%",
+            top: 0,
             left: 0,
+            pt: "20%",
             textAlign: "center",
+            background:
+              "linear-gradient(rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%)",
           }}
         >
-          <Text
-            variant="h4"
-            css={{ "@md": { fontSize: "$md" }, fontWeight: "$semiBold" }}
-          >
+          <Text variant="h5" css={{ fontWeight: "$semiBold" }}>
             You left the room
           </Text>
           <Text
-            variant="h4"
+            variant="h5"
             css={{
-              "@md": { fontSize: "$md" },
               mt: "$8",
               fontWeight: "$semiBold",
             }}
