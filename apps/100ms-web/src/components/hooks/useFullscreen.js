@@ -9,6 +9,7 @@ export const useFullscreen = () => {
 
   const toggle = useCallback(async () => {
     if (!screenfull.isEnabled) {
+      ToastManager.addToast({ title: "Fullscreen feature not supported" });
       return;
     }
     try {
