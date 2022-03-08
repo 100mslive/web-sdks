@@ -6,7 +6,7 @@ import {
   useHMSStore,
   selectIsLocalAudioPluginPresent,
   useDevices,
-} from '@100mslive/react-sdk';
+} from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
@@ -89,23 +89,21 @@ export const NoiseSuppression = () => {
     }
   }, [selectedDeviceIDs.audioInput, hmsActions]);
 
-  useEffect(() =>{
-    if(!pluginRef.current){
+  useEffect(() => {
+    if (!pluginRef.current) {
       createPlugin();
       const supported = hmsActions.validateAudioPluginSupport(
         pluginRef.current
       );
-      if (supported.isSupported){
+      if (supported.isSupported) {
         setPluginSupport(true);
-      }
-      else{
+      } else {
         setPluginSupport(false);
       }
     }
-  }, [])
+  }, [hmsActions]);
 
-
-  if(support) {
+  if (support) {
     return (
       <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
         <IconButton
