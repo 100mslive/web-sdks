@@ -29,4 +29,5 @@ export const HMSEvents = {
   TRACK_RESTORED: 'track-restored',
   TRACK_AUDIO_LEVEL_UPDATE: 'track-audio-level-update',
   LOCAL_AUDIO_SILENCE: 'local-audio-silence',
+  SEND_ANALYTICS: 'send-analytics',
 };
