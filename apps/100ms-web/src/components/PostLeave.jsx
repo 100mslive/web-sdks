@@ -19,6 +19,7 @@ export const PostLeave = ({ history, match }) => {
           w: "37.5rem",
           maxWidth: "80%",
           h: "75%",
+          maxHeight: "42.5rem",
           r: "$3",
           m: "0 auto",
           backgroundImage: `url(${PlaceholderBg})`,
