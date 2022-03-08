@@ -119,14 +119,15 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
+    this.analyticsEventsService = new AnalyticsEventsService();
     this.transport = new HMSTransport(
       this.observer,
       this.deviceManager,
       this.store,
       this.localTrackManager,
       this.eventBus,
+      this.analyticsEventsService,
     );
-    this.analyticsEventsService = new AnalyticsEventsService();
     this.eventBus.sendAnalyticsEvent.subscribe(this.sendAnalyticsEvent);
   }
 
@@ -367,6 +368,7 @@ export class HMSSdk implements HMSInterface {
   private cleanUp() {
     this.store.cleanUp();
     this.cleanDeviceManagers();
+    this.eventBus.sendAnalyticsEvent.subscribe(this.sendAnalyticsEvent);
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     HMSLogger.cleanUp();
@@ -747,7 +749,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanDeviceManagers() {
-    this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.deviceChange.unsubscribe(this.handleDeviceChange);
     this.deviceManager.cleanUp();
     this.audioSinkManager.removeEventListener(AutoplayError, this.handleAutoplayError);
     this.audioSinkManager.cleanUp();
