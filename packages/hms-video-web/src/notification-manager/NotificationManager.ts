@@ -75,12 +75,20 @@ export class NotificationManager {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
+    console.log('[DEEP] METHOD: ', method);
+
     if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {
       if (window.HMS?.ON_SFU_STATS && typeof window.HMS?.ON_SFU_STATS === 'function') {
         window.HMS.ON_SFU_STATS(message.params);
+      }
+    }
+
+    if (method === HMSNotificationMethod.CONNECTION_QUALITY) {
+      if (window.HMS?.ON_CONNECTION_QUALITY && typeof window.HMS?.ON_CONNECTION_QUALITY === 'function') {
+        window.HMS.ON_CONNECTION_QUALITY(message.params);
       }
     }
 

@@ -5,6 +5,7 @@
  */
 
 export enum HMSNotificationMethod {
+  CONNECTION_QUALITY = 'on-connection-quality-update',
   ROOM_STATE = 'room-state',
   PEER_JOIN = 'on-peer-join',
   PEER_LEAVE = 'on-peer-leave',
