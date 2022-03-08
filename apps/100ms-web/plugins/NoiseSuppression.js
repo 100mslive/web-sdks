@@ -6,7 +6,7 @@ import {
   useHMSStore,
   selectIsLocalAudioPluginPresent,
   useDevices,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
@@ -15,6 +15,7 @@ export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const [disable, setDisabled] = useState(false);
+  const [support, setPluginSupport] = useState(true);
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
@@ -88,22 +89,42 @@ export const NoiseSuppression = () => {
     }
   }, [selectedDeviceIDs.audioInput, hmsActions]);
 
-  return (
-    <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
-      <IconButton
-        active={!pluginActive}
-        disabled={disable}
-        onClick={async () => {
-          if (!pluginActive) {
-            await addPlugin();
-          } else {
-            await removePlugin();
-          }
-        }}
-        css={{ mx: "$4" }}
-      >
-        <AudioLevelIcon />
-      </IconButton>
-    </Tooltip>
-  );
+  useEffect(() =>{
+    if(!pluginRef.current){
+      createPlugin();
+      const supported = hmsActions.validateAudioPluginSupport(
+        pluginRef.current
+      );
+      if (supported.isSupported){
+        setPluginSupport(true);
+      }
+      else{
+        setPluginSupport(false);
+      }
+    }
+  }, [])
+
+
+  if(support) {
+    return (
+      <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
+        <IconButton
+          active={!pluginActive}
+          disabled={disable}
+          onClick={async () => {
+            if (!pluginActive) {
+              await addPlugin();
+            } else {
+              await removePlugin();
+            }
+          }}
+          css={{ mx: "$4" }}
+        >
+          <AudioLevelIcon />
+        </IconButton>
+      </Tooltip>
+    );
+  }
+
+  return null;
 };
