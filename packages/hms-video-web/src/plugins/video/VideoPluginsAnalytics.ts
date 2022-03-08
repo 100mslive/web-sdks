@@ -49,7 +49,7 @@ export class VideoPluginsAnalytics {
         pluginFrameRate: this.pluginFrameRate[name],
       };
       //send stats
-      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.stats(stats));
+      this.eventBus.analytics.publish(MediaPluginsAnalyticsFactory.stats(stats));
       //clean the plugin details
       this.clean(name);
     }
@@ -58,7 +58,7 @@ export class VideoPluginsAnalytics {
   failure(name: string, error: HMSException) {
     // send failure event
     if (this.pluginAdded[name]) {
-      this.eventBus.sendAnalyticsEvent.publish(MediaPluginsAnalyticsFactory.failure(name, error));
+      this.eventBus.analytics.publish(MediaPluginsAnalyticsFactory.failure(name, error));
       //clean the plugin details
       this.clean(name);
     }

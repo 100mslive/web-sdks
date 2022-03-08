@@ -34,5 +34,5 @@ export class EventBus {
     this.eventEmitter,
   );
 
-  readonly sendAnalyticsEvent = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.SEND_ANALYTICS, this.eventEmitter);
+  readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
 }

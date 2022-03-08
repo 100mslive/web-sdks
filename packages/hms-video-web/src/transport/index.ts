@@ -126,7 +126,7 @@ export default class HMSTransport implements ITransport {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
 
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.subscribeFail(ex));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
         throw ex;
       }
     },
@@ -267,7 +267,7 @@ export default class HMSTransport implements ITransport {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
       if (error instanceof HMSException) {
-        this.eventBus.sendAnalyticsEvent.publish(
+        this.eventBus.analytics.publish(
           AnalyticsEventFactory.publish({
             error,
             devices: this.deviceManager.getDevices(),
@@ -324,7 +324,7 @@ export default class HMSTransport implements ITransport {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error));
       }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
@@ -387,7 +387,7 @@ export default class HMSTransport implements ITransport {
       }
     } catch (err) {
       if (err instanceof HMSException) {
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.disconnect(err));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
       }
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
     } finally {
@@ -402,7 +402,7 @@ export default class HMSTransport implements ITransport {
         await this.publishTrack(track);
       } catch (error) {
         if (error instanceof HMSException) {
-          this.eventBus.sendAnalyticsEvent.publish(
+          this.eventBus.analytics.publish(
             AnalyticsEventFactory.publish({
               devices: this.deviceManager.getDevices(),
               error,
@@ -697,9 +697,7 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.flush();
     } catch (error) {
       if (error instanceof HMSException) {
-        this.eventBus.sendAnalyticsEvent.publish(
-          AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint),
-        );
+        this.eventBus.analytics.publish(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint));
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;
@@ -738,11 +736,11 @@ export default class HMSTransport implements ITransport {
       }
 
       this.eventBus.trackDegraded.subscribe(track => {
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.degradationStats(track, true));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, true));
         this.observer.onTrackDegrade(track);
       });
       this.eventBus.trackRestored.subscribe(track => {
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.degradationStats(track, false));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, false));
         this.observer.onTrackRestore(track);
       });
     }

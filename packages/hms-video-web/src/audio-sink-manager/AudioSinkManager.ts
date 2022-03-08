@@ -253,7 +253,7 @@ export class AudioSinkManager {
       if (!this.state.autoplayFailed && !(error as Error)?.message?.includes('new load request')) {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
-        this.eventBus.sendAnalyticsEvent.publish(AnalyticsEventFactory.autoplayError());
+        this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
         this.eventEmitter.emit(AutoplayError, { error: ex });
       }
     }

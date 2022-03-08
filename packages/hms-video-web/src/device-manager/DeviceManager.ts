@@ -76,7 +76,7 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
       }
     });
-    this.eventBus.sendAnalyticsEvent.publish(
+    this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
         type: 'list',
@@ -166,7 +166,7 @@ export class DeviceManager implements HMSDeviceManager {
 
   private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
-    this.eventBus.sendAnalyticsEvent.publish(
+    this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
         type: 'list',
@@ -268,7 +268,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.logDevices('Audio Device Change Success');
     } catch (error) {
       HMSLogger.e(this.TAG, '[Audio Device Change]', error);
-      this.eventBus.sendAnalyticsEvent.publish(
+      this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
           devices: this.getDevices(),
@@ -320,7 +320,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.logDevices('Video Device Change Success');
     } catch (error) {
       HMSLogger.e(this.TAG, '[Video Device Change]', error);
-      this.eventBus.sendAnalyticsEvent.publish(
+      this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
           devices: this.getDevices(),

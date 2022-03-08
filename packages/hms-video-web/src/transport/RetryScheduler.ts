@@ -185,7 +185,7 @@ export class RetryScheduler {
         event = AnalyticsEventFactory.subscribeFail(error);
         break;
     }
-    this.eventBus.sendAnalyticsEvent.publish(event!);
+    this.eventBus.analytics.publish(event!);
   }
 
   private getDelayForRetryCount(n: number) {

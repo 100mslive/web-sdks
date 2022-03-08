@@ -128,7 +128,7 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
     );
-    this.eventBus.sendAnalyticsEvent.subscribe(this.sendAnalyticsEvent);
+    this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
   }
 
   private validateJoined(name: string) {
@@ -368,7 +368,7 @@ export class HMSSdk implements HMSInterface {
   private cleanUp() {
     this.store.cleanUp();
     this.cleanDeviceManagers();
-    this.eventBus.sendAnalyticsEvent.subscribe(this.sendAnalyticsEvent);
+    this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     HMSLogger.cleanUp();
