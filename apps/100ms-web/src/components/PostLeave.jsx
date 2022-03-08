@@ -55,7 +55,7 @@ export const PostLeave = ({ history, match }) => {
             Have a nice day!
           </Text>
           <HorizontalDivider
-            css={{ bg: "$textPrimary", maxWidth: "70%", m: "$10 0" }}
+            css={{ bg: "$textPrimary", maxWidth: "50%", m: "$10 0" }}
           />
           <Flex justify="center">
             <Button
