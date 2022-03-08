@@ -5,6 +5,7 @@ import { HMSInternalEvent } from './HMSInternalEvent';
 import { HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -32,4 +33,6 @@ export class EventBus {
     HMSEvents.LOCAL_AUDIO_SILENCE,
     this.eventEmitter,
   );
+
+  readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
 }
