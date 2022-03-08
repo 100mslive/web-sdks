@@ -52,6 +52,3 @@ export class AnalyticsEventsService {
     }
   }
 }
-
-const analyticsEventsService = new AnalyticsEventsService();
-export default analyticsEventsService;
