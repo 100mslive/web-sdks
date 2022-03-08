@@ -16,7 +16,6 @@ import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
@@ -150,15 +149,13 @@ export class LocalTrackManager {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
       if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-              settings,
-            }),
-          )
-          .flush();
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error,
+            settings,
+          }),
+        );
       }
       throw error;
     }
