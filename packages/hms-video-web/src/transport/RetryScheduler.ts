@@ -1,7 +1,7 @@
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
@@ -24,17 +24,15 @@ type RetryTask = () => Promise<boolean>;
 const TAG = '[RetryScheduler]';
 
 export class RetryScheduler {
-  private analyticsEventsService: AnalyticsEventsService;
   private onStateChange: (state: TransportState, error?: HMSException) => void;
 
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(
-    analyticsEventsService: AnalyticsEventsService,
+    private eventBus: EventBus,
     onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
   ) {
-    this.analyticsEventsService = analyticsEventsService;
     this.onStateChange = onStateChange;
   }
 
@@ -187,7 +185,7 @@ export class RetryScheduler {
         event = AnalyticsEventFactory.subscribeFail(error);
         break;
     }
-    this.analyticsEventsService.queue(event!).flush();
+    this.eventBus.analytics.publish(event!);
   }
 
   private getDelayForRetryCount(n: number) {
