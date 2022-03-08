@@ -368,7 +368,7 @@ export class HMSSdk implements HMSInterface {
   private cleanUp() {
     this.store.cleanUp();
     this.cleanDeviceManagers();
-    this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
+    this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     HMSLogger.cleanUp();
