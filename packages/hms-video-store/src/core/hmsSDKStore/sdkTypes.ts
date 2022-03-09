@@ -38,6 +38,7 @@ import {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   parsedUserAgent,
+  HMSConnectionQuality,
 } from '@100mslive/hms-video';
 
 export {
@@ -83,4 +84,5 @@ export type {
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
+  HMSConnectionQuality,
 };

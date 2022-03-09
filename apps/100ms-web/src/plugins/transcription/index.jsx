@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@100mslive/hms-video-react";
+import Pusher from "pusher-js";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import {
   useHMSStore,
   selectRoom,
   selectIsAllowedToPublish,
 } from "@100mslive/react-sdk";
+import { Box, Tooltip, IconButton, Text } from "@100mslive/react-ui";
+import { FeatureFlags } from "../../services/FeatureFlags";
 import Pusher from "pusher-js";
-import { Text, Box, Tooltip } from "@100mslive/react-ui";
 
 const pusher = new Pusher(process.env.REACT_APP_TRANSCRIPTION_PUSHER_APP_KEY, {
   cluster: "ap2",
