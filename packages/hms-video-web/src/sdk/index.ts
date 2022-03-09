@@ -1,6 +1,7 @@
 import {
   HMSChangeMultiTrackStateParams,
   HMSConfig,
+  HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
   HMSMessageInput,
   HMSRole,
@@ -571,6 +572,10 @@ export class HMSSdk implements HMSInterface {
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
     this.notificationManager.setAudioListener(audioListener);
+  }
+
+  addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {
+    this.notificationManager.setConnectionQualityListener(qualityListener);
   }
 
   async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
