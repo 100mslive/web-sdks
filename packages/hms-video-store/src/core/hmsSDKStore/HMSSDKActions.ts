@@ -847,7 +847,11 @@ export class HMSSDKActions implements IHMSActions {
           return;
         }
         currentPeerIDs.add(peerID);
-        store.connectionQualities[peerID] = sdkUpdate;
+        if (!store.connectionQualities[peerID]) {
+          store.connectionQualities[peerID] = sdkUpdate;
+        } else {
+          Object.assign(store.connectionQualities[peerID], sdkUpdate);
+        }
       });
       const peerIDsStored = Object.keys(store.connectionQualities);
       for (const storedPeerID of peerIDsStored) {

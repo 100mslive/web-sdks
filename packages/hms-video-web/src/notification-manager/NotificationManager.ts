@@ -94,8 +94,6 @@ export class NotificationManager {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
-    console.log('[DEEP] METHOD: ', method);
-
     if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
