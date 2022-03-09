@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@100mslive/hms-video-react";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
-import { useHMSStore, selectRoom } from "@100mslive/react-sdk";
+import {
+  useHMSStore,
+  selectRoom,
+  selectIsAllowedToPublish,
+} from "@100mslive/react-sdk";
 import Pusher from "pusher-js";
 import { Text, Box, Tooltip } from "@100mslive/react-ui";
 
@@ -17,6 +21,7 @@ export function TranscriptionButton() {
   const [speakingPeer, setSpeakingPeer] = useState("");
   const transcriber = useRef(null);
   const roomId = useHMSStore(selectRoom)?.id;
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   useEffect(() => {
     channel = pusher.subscribe(`private-${roomId}`);
     channel.bind(`client-transcription`, ({ text }) => {
@@ -102,22 +107,26 @@ export function TranscriptionButton() {
           {speakingPeer}
         </Text>
       </Box>
-      <Button
-        iconOnly
-        variant="no-fill"
-        shape="rectangle"
-        active={isTranscriptionEnabled}
-        onClick={enableTranscription}
-        key="transcribe"
-      >
-        <Tooltip
-          title={`Turn ${!isTranscriptionEnabled ? "on" : "off"} transcription`}
+      {isAllowedToPublish.audio && (
+        <Button
+          iconOnly
+          variant="no-fill"
+          shape="rectangle"
+          active={isTranscriptionEnabled}
+          onClick={enableTranscription}
+          key="transcribe"
         >
-          <span>
-            <b>T</b>
-          </span>
-        </Tooltip>
-      </Button>
+          <Tooltip
+            title={`Turn ${
+              !isTranscriptionEnabled ? "on" : "off"
+            } transcription`}
+          >
+            <span>
+              <b>T</b>
+            </span>
+          </Tooltip>
+        </Button>
+      )}
     </>
   );
 }
