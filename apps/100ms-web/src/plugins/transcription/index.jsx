@@ -27,18 +27,25 @@ export function TranscriptionButton() {
     channel = pusher.subscribe(`private-${roomId}`);
     channel.bind(`client-transcription`, ({ text }) => {
       if (text) {
-        let data = JSON.parse(text);
-        if (data && data.setTranscriptionStatus) {
-          !isTranscriptionEnabled &&
-          data.setTranscriptionStatus.setStatus === true
-            ? enableTranscription()
-            : data.setTranscriptionStatus.setStatus === false
-            ? enableTranscription(false)
-            : null;
-        } else if (data && data.peername && data.transcript != "") {
-          setTranscript(data.transcript);
-          setSpeakingPeer("[" + data.peername + "]");
-          if (data.isenabled === true && !isTranscriptionEnabled) {
+        let remoteTranscription = JSON.parse(text);
+        if (remoteTranscription && remoteTranscription.transcriptionConfig) {
+          // Remote Peer is enabled/disabled the transcription feature
+          enableTranscription(
+            (isTranscriptionEnabled ? false : true) &&
+              remoteTranscription.transcriptionConfig.isEnabled
+          );
+        } else if (
+          remoteTranscription &&
+          remoteTranscription.peername &&
+          remoteTranscription.transcript != ""
+        ) {
+          /**
+           *  Remote Peername and his Transcripts should be there on results. If those are missing, something goes wrong in the broadcast flow.
+           *  If any failure happens, we won't display any subtitle texts on the UI.
+           **/
+          setTranscript(remoteTranscription.transcript);
+          setSpeakingPeer("[" + remoteTranscription.peername + "]");
+          if (remoteTranscription.isEnabled && !isTranscriptionEnabled) {
             enableTranscription();
           }
           setTimeout(() => {
@@ -50,14 +57,16 @@ export function TranscriptionButton() {
     });
   }, [roomId]);
 
-  const enableTranscription = (setStatus = null) => {
+  const enableTranscription = (enabled = null) => {
     if (!transcriber.current) {
       transcriber.current = new Transcriber(setTranscript, setSpeakingPeer);
       transcriber.current.enabled = false;
     }
-    let setFeature = setStatus === false ? setStatus : !isTranscriptionEnabled;
-    transcriber.current.enableTranscription(setFeature);
-    setIsTranscriptionEnabled(setFeature);
+    if (enabled !== false) {
+      enabled = !isTranscriptionEnabled;
+    }
+    transcriber.current.enableTranscription(enabled);
+    setIsTranscriptionEnabled(enabled);
   };
 
   return (
@@ -197,7 +206,7 @@ class Transcriber {
               JSON.stringify({
                 peername: peername,
                 transcript: messageText,
-                isenabled: this.enabled,
+                isEnabled: this.enabled,
               })
             );
           }
@@ -265,11 +274,11 @@ class Transcriber {
       this.enabled = true;
       this.listen();
       this.broadcast(
-        JSON.stringify({ setTranscriptionStatus: { setStatus: true } })
+        JSON.stringify({ transcriptionConfig: { isEnabled: true } })
       );
     } else if (!enable && this.enabled) {
       this.broadcast(
-        JSON.stringify({ setTranscriptionStatus: { setStatus: false } })
+        JSON.stringify({ transcriptionConfig: { isEnabled: false } })
       );
       this.enabled = false;
       this.socket.close();

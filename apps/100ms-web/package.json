@@ -34,8 +34,7 @@
     "screenfull": "^5.1.0",
     "uuid": "^8.3.2",
     "web-vitals": "^1.0.1",
-    "worker-timers": "^7.0.40",
-    "recordrtc": "^5.6.2"
+    "worker-timers": "^7.0.40"
   },
   "scripts": {
     "prebuild": "rm -rf build",
