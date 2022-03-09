@@ -70,6 +70,7 @@ import {
   selectPeersByRole,
   selectPeers,
   selectPeerMetadata,
+  selectConnectionQualities,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -152,6 +153,10 @@ describe('secondary selectors', () => {
       trackID: peerScreenSharing.audioTrack!,
     };
     expect(selectDominantSpeaker(fakeStore)).toBe(localPeer);
+  });
+
+  test('connectionQualities', () => {
+    expect(selectConnectionQualities(fakeStore)).toBe(fakeStore.connectionQualities);
   });
 
   test('remote peers', () => {
