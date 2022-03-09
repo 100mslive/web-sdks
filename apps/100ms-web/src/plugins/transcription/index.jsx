@@ -8,7 +8,7 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, Tooltip, IconButton, Text } from "@100mslive/react-ui";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import Pusher from "pusher-js";
+import { Button } from "@100mslive/hms-video-react";
 
 const pusher = new Pusher(process.env.REACT_APP_TRANSCRIPTION_PUSHER_APP_KEY, {
   cluster: "ap2",
