@@ -36,6 +36,11 @@ For starting sdk and store locally, run `yarn start` in both folders.
 
 ### Update a packages version
 
+Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to 
+update all versions.
+
+#### Updating single ones
+
 Go to the path of the package ex: cd packages/hms-video-web and run the following command
 `npm version prerelease --preid=alpha --git-tag-version=false`
 
@@ -44,7 +49,7 @@ To update the same in dependent packages run
 
 ### Publishing Alpha/Experimental versions
 
-To publish an alpha/experimental from your `experimental` branch, run the 'Create Release PR' action on the `experimental` branch.
+To publish an alpha/experimental from your `experimental` branch, run the '[Create Release PR](https://github.com/100mslive/web-sdks/actions/workflows/publish.yml)' action on the `experimental` branch.
 This bumps the version of all the packages and creates a PR against your `experimental` branch.
 
 Merge this PR into your `experimental` branch and run the 'Publish Packages' on your branch to publish the packages.

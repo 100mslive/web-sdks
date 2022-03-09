@@ -571,6 +571,9 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
+    });
   }
 
   private onRemovedFromRoom(request: SDKHMSLeaveRoomRequest) {
@@ -853,6 +856,34 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
     }, 'audioLevel');
+  }
+
+  /**
+   * The connection quality update is sent for all peers(one needs to know of) every time.
+   */
+  protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
+    this.setState(store => {
+      const currentPeerIDs = new Set();
+      newQualities.forEach(sdkUpdate => {
+        const peerID = sdkUpdate.peerID;
+        if (!peerID) {
+          return;
+        }
+        currentPeerIDs.add(peerID);
+        if (!store.connectionQualities[peerID]) {
+          store.connectionQualities[peerID] = sdkUpdate;
+        } else {
+          Object.assign(store.connectionQualities[peerID], sdkUpdate);
+        }
+      });
+      const peerIDsStored = Object.keys(store.connectionQualities);
+      for (const storedPeerID of peerIDsStored) {
+        if (!currentPeerIDs.has(storedPeerID)) {
+          // peer is likely no longer there, it wasn't in the update sent by the server
+          delete store.connectionQualities[storedPeerID];
+        }
+      }
+    }, 'connectionQuality');
   }
 
   protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {
