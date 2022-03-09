@@ -5,6 +5,8 @@ import {
   useHMSStore,
   selectRoom,
   selectIsAllowedToPublish,
+  useHMSNotifications,
+  HMSNotificationTypes,
 } from "@100mslive/react-sdk";
 import { Box, Tooltip, IconButton, Text } from "@100mslive/react-ui";
 import { FeatureFlags } from "../../services/FeatureFlags";
@@ -23,6 +25,7 @@ export function TranscriptionButton() {
   const transcriber = useRef(null);
   const roomId = useHMSStore(selectRoom)?.id;
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const notification = useHMSNotifications();
   useEffect(() => {
     channel = pusher.subscribe(`private-${roomId}`);
     channel.bind(`client-transcription`, ({ text }) => {
@@ -56,6 +59,21 @@ export function TranscriptionButton() {
       }
     });
   }, [roomId]);
+
+  useEffect(() => {
+    if (!notification) {
+      return;
+    }
+    if (
+      transcriber.current &&
+      isTranscriptionEnabled &&
+      notification.type == HMSNotificationTypes.PEER_JOINED
+    ) {
+      transcriber.current.broadcast(
+        JSON.stringify({ transcriptionConfig: { isEnabled: true } })
+      );
+    }
+  }, [notification]);
 
   const enableTranscription = (enabled = null) => {
     if (!transcriber.current) {
