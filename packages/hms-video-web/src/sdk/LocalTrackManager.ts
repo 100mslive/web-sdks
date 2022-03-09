@@ -1,4 +1,4 @@
-import { HMSAudioCodec, HMSVideoCodec, PublishParams } from '../interfaces';
+import { HMSAudioCodec, HMSVideoCodec } from '../interfaces';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -43,52 +43,14 @@ export class LocalTrackManager {
   ) {}
 
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
-    const publishParams = this.store.getPublishParams();
-    if (!publishParams) {
-      return [];
-    }
-
-    const { allowed } = publishParams;
-    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
-    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-
-    if (!canPublishAudio && !canPublishVideo) {
-      return [];
-    }
+    const trackSettings = this.getTrackSettings(initialSettings);
+    const canPublishAudio = !!trackSettings.audio;
+    const canPublishVideo = !!trackSettings.video;
     let tracksToPublish: Array<HMSLocalTrack> = [];
-
-    const trackSettings = this.getTrackSettings(initialSettings, publishParams);
-
-    if (!trackSettings) {
-      return [];
-    }
-
-    const localTracks = this.store.getLocalPeerTracks();
-    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
-      | HMSLocalVideoTrack
-      | undefined;
-    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
-      | HMSLocalAudioTrack
-      | undefined;
-    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
-      | HMSLocalVideoTrack
-      | undefined;
-
+    const { videoTrack, audioTrack } = await this.updateCurrentLocalTrackSettings(trackSettings);
     // The track gets added to the store only after it is published.
     const isVideoTrackPublished = Boolean(videoTrack && this.store.getTrackById(videoTrack.trackId));
     const isAudioTrackPublished = Boolean(audioTrack && this.store.getTrackById(audioTrack.trackId));
-
-    if (videoTrack && trackSettings.video) {
-      await videoTrack.setSettings(trackSettings.video);
-    }
-
-    if (audioTrack && trackSettings.audio) {
-      await audioTrack.setSettings(trackSettings.audio);
-    }
-
-    if (screenTrack && trackSettings.screen) {
-      screenTrack.setSettings(trackSettings.screen);
-    }
 
     if (isVideoTrackPublished && isAudioTrackPublished) {
       // there is nothing to publish
@@ -292,56 +254,10 @@ export class LocalTrackManager {
     }
   }
 
-  private getTrackSettings(initialSettings: InitialSettings, publishParams: PublishParams): HMSTrackSettings | null {
-    const { audio, video, screen, allowed } = publishParams;
-    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
-    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-    const canPublishScreen = Boolean(allowed && allowed.includes('screen'));
-
-    if (!canPublishAudio && !canPublishVideo) {
-      return null;
-    }
-    const localPeer = this.store.getLocalPeer();
-    const videoTrack = localPeer?.videoTrack;
-    const audioTrack = localPeer?.audioTrack;
-    // Get device from the tracks already added in preview
-    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
-    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
-
-    let audioSettings: HMSAudioTrackSettings | null = null;
-    let videoSettings: HMSVideoTrackSettings | null = null;
-    let screenSettings: HMSVideoTrackSettings | null = null;
-    if (canPublishAudio) {
-      audioSettings = new HMSAudioTrackSettingsBuilder()
-        .codec(audio.codec as HMSAudioCodec)
-        .maxBitrate(audio.bitRate)
-        .deviceId(audioDeviceId || defaultSettings.audioInputDeviceId)
-        .build();
-    }
-    if (canPublishVideo) {
-      const dimensions = this.store.getSimulcastDimensions('regular');
-      videoSettings = new HMSVideoTrackSettingsBuilder()
-        .codec(video.codec as HMSVideoCodec)
-        .maxBitrate(video.bitRate)
-        .maxFramerate(video.frameRate)
-        .setWidth(dimensions?.width || video.width) // take simulcast width if available
-        .setHeight(dimensions?.height || video.height) // take simulcast width if available
-        .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
-        .build();
-    }
-    if (canPublishScreen) {
-      const dimensions = this.store.getSimulcastDimensions('screen');
-      screenSettings = new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build();
-    }
-
+  private getTrackSettings(initialSettings: InitialSettings): HMSTrackSettings {
+    const audioSettings = this.getAudioSettings(initialSettings);
+    const videoSettings = this.getVideoSettings(initialSettings);
+    const screenSettings = this.getScreenSettings();
     return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
   }
 
@@ -432,5 +348,90 @@ export class LocalTrackManager {
       nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
     }
     return nativeTracks;
+  }
+
+  private async updateCurrentLocalTrackSettings(trackSettings: HMSTrackSettings) {
+    const localTracks = this.store.getLocalPeerTracks();
+    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
+      | HMSLocalVideoTrack
+      | undefined;
+    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
+      | HMSLocalAudioTrack
+      | undefined;
+    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
+      | HMSLocalVideoTrack
+      | undefined;
+
+    if (trackSettings.video) {
+      await videoTrack?.setSettings(trackSettings.video);
+    }
+
+    if (trackSettings.audio) {
+      await audioTrack?.setSettings(trackSettings.audio);
+    }
+
+    if (trackSettings.screen) {
+      await screenTrack?.setSettings(trackSettings.screen);
+    }
+
+    return { videoTrack, audioTrack };
+  }
+
+  private getAudioSettings(initialSettings: InitialSettings) {
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed.includes('audio')) {
+      return null;
+    }
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    // Get device from the tracks already added in preview
+    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
+
+    return new HMSAudioTrackSettingsBuilder()
+      .codec(publishParams.audio.codec as HMSAudioCodec)
+      .maxBitrate(publishParams.audio.bitRate)
+      .deviceId(audioDeviceId || defaultSettings.audioInputDeviceId)
+      .build();
+  }
+
+  private getVideoSettings(initialSettings: InitialSettings) {
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed.includes('video')) {
+      return null;
+    }
+    const localPeer = this.store.getLocalPeer();
+    const videoTrack = localPeer?.videoTrack;
+    // Get device from the tracks already added in preview
+    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
+    const video = publishParams.video;
+    const { width = video.width, height = video.height } = this.store.getSimulcastDimensions('regular') || {};
+    return new HMSVideoTrackSettingsBuilder()
+      .codec(video.codec as HMSVideoCodec)
+      .maxBitrate(video.bitRate)
+      .maxFramerate(video.frameRate)
+      .setWidth(width) // take simulcast width if available
+      .setHeight(height) // take simulcast width if available
+      .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
+      .build();
+  }
+
+  private getScreenSettings() {
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed.includes('screen')) {
+      return null;
+    }
+    const screen = publishParams.screen;
+    const { width = screen.width, height = screen.height } = this.store.getSimulcastDimensions('screen') || {};
+    return (
+      new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(width)
+        .setHeight(height)
+        .build()
+    );
   }
 }
