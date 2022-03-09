@@ -173,6 +173,7 @@ class Store implements IStore {
     return this.roleDetailsArrived;
   }
 
+  // eslint-disable-next-line complexity
   setConfig(config: HMSConfig) {
     DeviceStorageManager.rememberDevices(Boolean(config.rememberDeviceSelection));
     if (config.rememberDeviceSelection) {
@@ -311,22 +312,21 @@ class Store implements IStore {
     } else if (source === 'screen') {
       simulcastLayers = publishParams.screenSimulcastLayers;
     }
-    if (!simulcastLayers || !simulcastLayers.layers || simulcastLayers.layers.length === 0) {
-      return [];
-    }
-    const width = simulcastLayers.width;
-    const height = simulcastLayers.height;
-    return simulcastLayers.layers.map(value => {
-      const layer = simulcastMapping[value.rid as RID];
-      const resolution = {
-        width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
-        height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
-      };
-      return {
-        layer,
-        resolution,
-      } as SimulcastLayerDefinition;
-    });
+    const width = simulcastLayers?.width;
+    const height = simulcastLayers?.height;
+    return (
+      simulcastLayers?.layers?.map(value => {
+        const layer = simulcastMapping[value.rid as RID];
+        const resolution = {
+          width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
+          height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
+        };
+        return {
+          layer,
+          resolution,
+        } as SimulcastLayerDefinition;
+      }) || []
+    );
   }
 
   cleanUp() {
