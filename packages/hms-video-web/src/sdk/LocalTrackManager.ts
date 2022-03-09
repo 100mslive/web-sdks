@@ -287,31 +287,16 @@ export class LocalTrackManager {
 
       return stream.getVideoTracks().concat(stream.getAudioTracks());
     } catch (error) {
-      let videoError = false;
-      let audioError = false;
-
       await this.deviceManager.init();
-
-      if (!this.deviceManager.hasWebcamPermission && settings.video) {
-        videoError = true;
-      }
-
-      if (!this.deviceManager.hasMicrophonePermission && settings.audio) {
-        audioError = true;
-      }
-
+      const videoError = !!(!this.deviceManager.hasWebcamPermission && settings.video);
+      const audioError = !!(!this.deviceManager.hasMicrophonePermission && settings.audio);
       /**
        * TODO: Only permission error throws correct device info in error(audio or video or both),
        * Right now for other errors such as overconstrained error we are unable to get whether audio/video failure.
        * Fix this by checking the native error message.
        */
-      if (videoError && audioError) {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.AV);
-      } else if (videoError) {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
-      } else {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
-      }
+      const errorType = this.getErrorType(videoError, audioError);
+      throw BuildGetMediaError(error as Error, errorType);
     }
   }
 
@@ -433,5 +418,15 @@ export class LocalTrackManager {
       this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
       return [];
     }
+  }
+
+  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+    if (videoError && audioError) {
+      return HMSGetMediaActions.AV;
+    }
+    if (videoError) {
+      return HMSGetMediaActions.VIDEO;
+    }
+    return HMSGetMediaActions.AUDIO;
   }
 }
