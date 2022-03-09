@@ -23,10 +23,16 @@ function ErrorPage({ error, title = "404" }) {
         <Flex
           align="center"
           direction="column"
-          css={{ position: "absolute", size: "100%", top: "33.33%", left: 0 }}
+          css={{
+            position: "absolute",
+            size: "100%",
+            top: "33.33%",
+            left: 0,
+            textAlign: "center",
+          }}
         >
-          <Text variant="h2">{title}</Text>
-          <Text variant="h4" css={{ mt: "1.75rem" }}>
+          <Text variant="h3">{title}</Text>
+          <Text variant="h5" css={{ mt: "1.75rem" }}>
             {error}
           </Text>
         </Flex>

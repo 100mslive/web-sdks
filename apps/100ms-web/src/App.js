@@ -16,8 +16,10 @@ import { Conference } from "./components/conference";
 import ErrorPage from "./components/ErrorPage";
 import { AppContextProvider } from "./components/context/AppContext.js";
 import { hmsToast, Notifications } from "./components/Notifications";
-import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
+import { PostLeave } from "./components/PostLeave";
+import { NoSupportRedirect } from "./components/NoSupportRedirect";
+import { Confetti } from "./plugins/confetti";
 import { FeatureFlags } from "./services/FeatureFlags";
 import { shadeColor } from "./common/utils";
 import {
@@ -25,7 +27,6 @@ import {
   getBackendEndpoint,
 } from "./services/tokenService";
 import "./index.css";
-import { PostLeave } from "./components/PostLeave";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -177,6 +178,7 @@ function AppRoutes({ getUserToken }) {
       <ToastContainer />
       <Notifications />
       <Confetti />
+      <NoSupportRedirect />
       <Switch>
         <Route
           path="/nosupport"
