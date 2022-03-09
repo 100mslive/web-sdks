@@ -101,6 +101,13 @@ export const selectPeerAudioByID = byIDCurry(
   createSelector(selectSpeakerByPeerID, speaker => speaker?.audioLevel || 0),
 );
 
+export const selectConnectionQualityByPeerID = byIDCurry((store: HMSStore, peerID: HMSPeerID | undefined) => {
+  if (peerID) {
+    return store.connectionQualities[peerID];
+  }
+  return undefined;
+});
+
 /**
  * Select the first auxiliary audio track of a peer given a peer ID.
  */
@@ -293,10 +300,7 @@ const selectMessagesByRoleInternal = createSelector([selectHMSMessages, selectRo
 
 export const selectBroadcastMessages = createSelector(selectHMSMessages, messages => {
   return messages.filter(message => {
-    if (!message.recipientPeer && !message.recipientRoles?.length) {
-      return true;
-    }
-    return false;
+    return !message.recipientPeer && !message.recipientRoles?.length;
   });
 });
 

@@ -1,5 +1,5 @@
 import { HMSConfig } from './config';
-import { HMSAudioListener, HMSUpdateListener } from './update-listener';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -66,4 +66,5 @@ export default interface HMS {
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
+  addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
 }
