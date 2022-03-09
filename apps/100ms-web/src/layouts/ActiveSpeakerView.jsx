@@ -34,7 +34,7 @@ export const ActiveSpeakerView = ({
   }, [dominantSpeaker]);
 
   return (
-    <Flex css={{ size: "100%" }}>
+    <Flex css={{ size: "100%", "@lg": { flexDirection: "column" } }}>
       <GridCenterView
         peers={[activeSpeaker]}
         maxTileCount={1}
