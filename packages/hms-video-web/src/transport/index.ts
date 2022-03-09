@@ -159,16 +159,13 @@ export default class HMSTransport implements ITransport {
       }
     },
 
-    onOffline: async () => {
+    onOffline: async (reason: string) => {
       HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
       try {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
           this.retryScheduler.schedule(
             TransportFailureCategory.SignalDisconnect,
-            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
-              HMSAction.RECONNECT_SIGNAL,
-              'Network offline',
-            ),
+            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
             this.retrySignalDisconnectTask,
           );
         }
