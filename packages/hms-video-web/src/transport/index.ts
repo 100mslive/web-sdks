@@ -696,7 +696,7 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();
     } catch (error) {
-      if (error instanceof HMSException) {
+      if (error instanceof HMSException && this.state !== TransportState.Reconnecting) {
         this.eventBus.analytics.publish(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint));
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
