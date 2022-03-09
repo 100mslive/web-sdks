@@ -95,7 +95,7 @@ export class HMSAudioTrack extends HMSTrack {
       return;
     }
     const srcObject = this.audioElement.srcObject;
-    if (srcObject !== null && srcObject instanceof MediaStream) {
+    if (srcObject instanceof MediaStream) {
       const existingTrackID = srcObject.getAudioTracks()[0]?.id;
       if (existingTrackID === this.nativeTrack.id) {
         // it's already attached, no need to attach again

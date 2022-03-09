@@ -179,17 +179,16 @@ export class AudioSinkManager {
     // @ts-ignore
     if (window.HMS?.AUDIO_SINK) {
       // No need to play if track is not enabled
-      if (!track.enabled) {
-        track.removeSink();
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
-        return;
-      }
-      track.addSink();
+      track.enabled ? track.addSink() : track.removeSink();
     } else {
       audioEl.srcObject = new MediaStream([track.nativeTrack]);
     }
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
-    /**
+    await this.handleAutoplayError(track);
+  };
+
+  private handleAutoplayError = async (track: HMSAudioTrack) => {
+    /**async async
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
     if (this.state.autoplayFailed === undefined) {
