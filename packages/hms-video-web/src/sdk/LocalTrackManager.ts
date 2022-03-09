@@ -175,15 +175,7 @@ export class LocalTrackManager {
     if (trackSettings.audio || trackSettings.video) {
       nativeTracks.push(...(await this.getAVTracks(trackSettings)));
     }
-
-    if (fetchTrackOptions.audio === 'empty') {
-      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
-    }
-
-    if (fetchTrackOptions.video === 'empty') {
-      nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
-    }
-
+    nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
 
@@ -428,5 +420,17 @@ export class LocalTrackManager {
       return HMSGetMediaActions.VIDEO;
     }
     return HMSGetMediaActions.AUDIO;
+  }
+
+  private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
+    const nativeTracks: MediaStreamTrack[] = [];
+    if (fetchTrackOptions.audio === 'empty') {
+      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
+    }
+
+    if (fetchTrackOptions.video === 'empty') {
+      nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
+    }
+    return nativeTracks;
   }
 }
