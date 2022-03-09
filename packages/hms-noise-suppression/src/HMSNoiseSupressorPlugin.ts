@@ -100,7 +100,7 @@ export class HMSNoiseSuppressionPlugin implements HMSAudioPlugin {
     }
     //Removing Support for firefox because of AudioContext with different sample rate is not supported
     const browserResult = {} as HMSPluginSupportResult;
-    if (['Chrome', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+    if (['Chrome', 'Firefox', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
       browserResult.isSupported = true;
     } else {
       browserResult.isSupported = false;
