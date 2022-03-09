@@ -51,6 +51,7 @@ export default class HMSLogger {
     performance.clearMeasures();
   }
 
+  // eslint-disable-next-line complexity
   private static log(level: HMSLogLevel, tag: string, ...data: any[]) {
     if (this.level.valueOf() > level.valueOf()) {
       return;
