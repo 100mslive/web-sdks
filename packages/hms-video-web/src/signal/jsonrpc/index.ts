@@ -23,7 +23,7 @@ import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 
 export default class JsonRpcSignal implements ISignal {
-  private readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[ SIGNAL ]: ';
   readonly observer: ISignalEventsObserver;
 
   /**
