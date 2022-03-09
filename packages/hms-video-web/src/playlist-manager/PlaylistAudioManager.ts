@@ -15,18 +15,14 @@ import { AudioContextManager } from './AudioContextManager';
  *    - The track is passed to playlist manager to publish
  */
 export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
-  private audioElement: HTMLAudioElement | null;
+  private audioElement: HTMLAudioElement | null = null;
   private track?: MediaStreamTrack;
   private audioContextManager!: AudioContextManager;
   // This is to handle audio playing when seekTo is called when audio is paused
   private seeked = false;
 
-  constructor() {
-    super();
-    this.audioElement = this.getAudioElement();
-  }
-
   async play(url: string) {
+    this.audioElement = this.getAudioElement();
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
       this.audioElement = this.getAudioElement();
       this.audioElement.src = url;

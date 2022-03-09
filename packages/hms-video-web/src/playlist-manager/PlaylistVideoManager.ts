@@ -19,7 +19,7 @@ import { AudioContextManager } from './AudioContextManager';
  *    - The audio and video tracks are passed to playlist manager to publish
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
-  private videoElement: HTMLVideoElement | null;
+  private videoElement: HTMLVideoElement | null = null;
   private canvasContext: CanvasRenderingContext2D | null;
   private canvas!: HTMLCanvasElement;
   private timer: any;
@@ -31,12 +31,12 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
 
   constructor() {
     super();
-    this.videoElement = this.getVideoElement();
     this.canvas = document.createElement('canvas');
     this.canvasContext = this.canvas.getContext('2d');
   }
 
   play(url: string) {
+    this.videoElement = this.getVideoElement();
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
       this.videoElement = this.getVideoElement();
       this.videoElement.src = url;
