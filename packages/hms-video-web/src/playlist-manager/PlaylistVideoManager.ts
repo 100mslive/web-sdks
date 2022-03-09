@@ -20,7 +20,7 @@ import { AudioContextManager } from './AudioContextManager';
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
   private videoElement: HTMLVideoElement | null = null;
-  private canvasContext: CanvasRenderingContext2D | null;
+  private canvasContext: CanvasRenderingContext2D | null = null;
   private canvas!: HTMLCanvasElement;
   private timer: any;
   private tracks: MediaStreamTrack[] = [];
@@ -29,14 +29,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
 
-  constructor() {
-    super();
-    this.canvas = document.createElement('canvas');
-    this.canvasContext = this.canvas.getContext('2d');
-  }
-
   play(url: string) {
     this.videoElement = this.getVideoElement();
+    this.createCanvas();
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
       this.videoElement = this.getVideoElement();
       this.videoElement.src = url;
@@ -142,6 +137,13 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     });
     this.audioContextManager = new AudioContextManager(videoElement);
     return videoElement;
+  }
+
+  private createCanvas() {
+    if (!this.canvas) {
+      this.canvas = document.createElement('canvas');
+      this.canvasContext = this.canvas.getContext('2d');
+    }
   }
 
   private get TAG() {
