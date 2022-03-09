@@ -1,34 +1,32 @@
 import React from 'react';
 import { ChevronDownIcon } from '@100mslive/react-icons';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 const Root = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   display: 'inline-flex',
   position: 'relative',
-  height: '40px',
-  width: '250px',
-  minWidth: '160px',
   outline: 'none',
   overflow: 'hidden',
-  borderRadius: '8px',
-  backgroundColor: '$grey2',
+  borderRadius: '$1',
+  backgroundColor: '$menuBg',
+  maxWidth: '100%',
 });
 
 // TODO: replace these with tokens
 const SelectRoot = styled('select', {
-  fontSize: '16px',
+  fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
-  color: '$fg',
-  width: '100%',
+  color: '$textPrimary',
+  padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: 'transparent',
+  backgroundColor: '$bgSecondary',
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandStandard',
+    boxShadow: '0 0 0 3px $colors$brandDefault',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -37,24 +35,26 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$grey4',
+  color: '$grayDefault',
   width: '30px',
   height: '100%',
   position: 'absolute',
   right: 0,
-  pointerVvents: 'none',
+  pointerEvents: 'none',
   display: 'flex',
   alignItems: 'center',
   transition: 'border .2s ease 0s',
 });
 
-// * NOTE: this is temporary implementation waiting for radix-select
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Select: React.FC = ({ children, props }: any) => (
-  <Root>
-    <Arrow>
-      <ChevronDownIcon />
-    </Arrow>
-    <SelectRoot {...props}>{children}</SelectRoot>
-  </Root>
+const DefaultDownIcon = ({ ...props }) => (
+  <Arrow {...props}>
+    <ChevronDownIcon />
+  </Arrow>
 );
+
+export const Select = {
+  Root,
+  DownIcon: Arrow,
+  DefaultDownIcon,
+  Select: SelectRoot,
+};

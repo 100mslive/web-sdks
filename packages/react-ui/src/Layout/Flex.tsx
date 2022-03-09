@@ -1,4 +1,4 @@
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 
 /**
  * @see https://tailwindcss.com/docs/space
@@ -58,6 +58,12 @@ export const Flex = styled('div', {
       },
       column: {
         flexDirection: 'column',
+      },
+      rowReverse: {
+        flexDirection: 'row-reverse',
+      },
+      columnReverse: {
+        flexDirection: 'column-reverse',
       },
     },
     gap: {

@@ -10,7 +10,7 @@ import {
   selectIsConnectedToRoom,
 } from "@100mslive/react-sdk";
 import { useContext, useEffect, useRef, useState } from "react";
-import { AppContext } from "../store/AppContext";
+import { AppContext } from "../components/context/AppContext";
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -37,15 +37,19 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
     }
   }, [alone, thresholdMs]);
 
+  useEffect(() => {
+    return () => {
+      clearTimeout(cbTimeout.current);
+    };
+  }, []);
+
   return { alone, aloneForLong };
 };
 
 export const useBeamAutoLeave = () => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
-  const {
-    loginInfo: { isHeadless },
-  } = useContext(AppContext);
+  const { isHeadless } = useContext(AppContext);
   const { aloneForLong } = useWhenAloneInRoom();
   const hls = useHMSStore(selectHLSState);
   const rtmp = useHMSStore(selectRTMPState);

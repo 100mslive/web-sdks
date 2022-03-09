@@ -23,7 +23,6 @@ import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '
 import { TrackState } from '../notification-manager';
 import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import analyticsEventsService from '../analytics/AnalyticsEventsService';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
 import { InitConfig } from '../signal/init/models';
@@ -48,6 +47,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { EventBus } from '../events/EventBus';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 
 const TAG = '[HMSTransport]:';
 
@@ -66,12 +66,7 @@ export default class HMSTransport implements ITransport {
   private initConfig?: InitConfig;
   private endpoint!: string;
   private joinParameters?: JoinParameters;
-  private retryScheduler = new RetryScheduler(analyticsEventsService, async (state, error) => {
-    if (state !== this.state) {
-      this.state = state;
-      await this.observer.onStateChange(this.state, error);
-    }
-  });
+  private retryScheduler: RetryScheduler;
   private trackDegradationController?: TrackDegradationController;
   private webrtcInternals?: HMSWebrtcInternals;
 
@@ -81,6 +76,7 @@ export default class HMSTransport implements ITransport {
     private store: IStore,
     private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
+    private analyticsEventsService: AnalyticsEventsService,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -88,6 +84,12 @@ export default class HMSTransport implements ITransport {
       this.publishConnection?.nativeConnection,
       this.subscribeConnection?.nativeConnection,
     );
+    this.retryScheduler = new RetryScheduler(this.eventBus, async (state, error) => {
+      if (state !== this.state) {
+        this.state = state;
+        await this.observer.onStateChange(this.state, error);
+      }
+    });
   }
 
   /**
@@ -124,7 +126,7 @@ export default class HMSTransport implements ITransport {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
 
-        analyticsEventsService.queue(AnalyticsEventFactory.subscribeFail(ex)).flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
         throw ex;
       }
     },
@@ -265,15 +267,13 @@ export default class HMSTransport implements ITransport {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(
-            AnalyticsEventFactory.publish({
-              error,
-              devices: this.deviceManager.getDevices(),
-              settings: new HMSTrackSettings(videoSettings, audioSettings, false),
-            }),
-          )
-          .flush();
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            error,
+            devices: this.deviceManager.getDevices(),
+            settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+          }),
+        );
       }
       throw error;
     }
@@ -289,6 +289,9 @@ export default class HMSTransport implements ITransport {
     customData: { name: string; metaData: string },
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
+
+    // TODO: set default to true on final release
+    serverSubDegrade = false,
   ): Promise<void> {
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
@@ -298,6 +301,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       initEndpoint,
       autoSubscribeVideo,
+      serverSubDegrade,
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -313,13 +317,14 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
+          serverSubDegrade,
         );
       }
     } catch (error) {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error)).flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error));
       }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
@@ -365,7 +370,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    analyticsEventsService.removeTransport(this.analyticsSignalTransport);
+    this.analyticsEventsService.removeTransport(this.analyticsSignalTransport);
 
     this.retryScheduler.reset();
     this.joinParameters = undefined;
@@ -382,7 +387,7 @@ export default class HMSTransport implements ITransport {
       }
     } catch (err) {
       if (err instanceof HMSException) {
-        analyticsEventsService.queue(AnalyticsEventFactory.disconnect(err)).flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
       }
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
     } finally {
@@ -397,14 +402,12 @@ export default class HMSTransport implements ITransport {
         await this.publishTrack(track);
       } catch (error) {
         if (error instanceof HMSException) {
-          analyticsEventsService
-            .queue(
-              AnalyticsEventFactory.publish({
-                devices: this.deviceManager.getDevices(),
-                error,
-              }),
-            )
-            .flush();
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.publish({
+              devices: this.deviceManager.getDevices(),
+              error,
+            }),
+          );
         }
       }
     }
@@ -490,7 +493,7 @@ export default class HMSTransport implements ITransport {
       }),
     };
     if (params.recording) {
-      hlsParams.recording = {
+      hlsParams.hls_recording = {
         single_file_per_layer: params.recording.singleFilePerLayer,
         hls_vod: params.recording.hlsVod,
       };
@@ -571,7 +574,7 @@ export default class HMSTransport implements ITransport {
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
     HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
-    if (this.trackStates.has(track.publishedTrackId)) {
+    if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {
       // TODO: hotfix to unpublish replaced video track id, solve it properly
@@ -606,16 +609,22 @@ export default class HMSTransport implements ITransport {
     data: string,
     config: RTCConfiguration,
     autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ) {
     this.publishConnection = new HMSPublishConnection(this.signal, config, this.publishConnectionObserver, this);
-    this.subscribeConnection = new HMSSubscribeConnection(this.signal, config, this.subscribeConnectionObserver);
+    this.subscribeConnection = new HMSSubscribeConnection(
+      this.signal,
+      config,
+      this.subscribeConnectionObserver,
+      serverSubDegrade,
+    );
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection!.createOffer(constraints, new Map());
       await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo);
+      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo, serverSubDegrade);
       await this.publishConnection!.setRemoteDescription(answer);
       for (const candidate of this.publishConnection!.candidates || []) {
         await this.publishConnection!.addIceCandidate(candidate);
@@ -684,13 +693,11 @@ export default class HMSTransport implements ITransport {
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
-      analyticsEventsService.addTransport(this.analyticsSignalTransport);
-      analyticsEventsService.flush();
+      this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
+      this.analyticsEventsService.flush();
     } catch (error) {
       if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint))
-          .flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint));
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;
@@ -717,17 +724,23 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
+
+    // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
+    //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
-      this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-      this.eventBus.statsUpdate.subscribe(stats => {
-        this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
-      });
+      if (!this.joinParameters?.serverSubDegrade) {
+        this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
+        this.eventBus.statsUpdate.subscribe(stats => {
+          this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
+        });
+      }
+
       this.eventBus.trackDegraded.subscribe(track => {
-        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, true)).flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, true));
         this.observer.onTrackDegrade(track);
       });
       this.eventBus.trackRestored.subscribe(track => {
-        analyticsEventsService.queue(AnalyticsEventFactory.degradationStats(track, false)).flush();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, false));
         this.observer.onTrackRestore(track);
       });
     }

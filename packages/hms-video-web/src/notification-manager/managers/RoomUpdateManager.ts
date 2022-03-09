@@ -56,7 +56,7 @@ export class RoomUpdateManager {
     room.rtmp.startedAt = this.getAsDate(streaming?.rtmp?.started_at);
     room.recording.server.startedAt = this.getAsDate(recording?.sfu.started_at);
     room.recording.browser.startedAt = this.getAsDate(recording?.browser.started_at);
-    room.recording.hls = this.getHLSRecording(streaming?.hls);
+    room.recording.hls = this.getPeerListHLSRecording(recording);
     room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
     room.startedAt = this.getAsDate(started_at);
@@ -123,6 +123,16 @@ export class RoomUpdateManager {
       };
     }
     return hlsRecording;
+  }
+
+  private getPeerListHLSRecording(recording?: RoomState['recording']): HMSHLSRecording {
+    const hlsNotification = recording?.hls;
+    return {
+      running: !!hlsNotification?.enabled,
+      startedAt: this.getAsDate(hlsNotification?.started_at),
+      singleFilePerLayer: !!hlsNotification?.config?.single_file_per_layer,
+      hlsVod: !!hlsNotification?.config?.hls_vod,
+    };
   }
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {

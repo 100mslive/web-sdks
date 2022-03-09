@@ -31,8 +31,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * It won't be same as native track id, as the native track can change post join(and publish), when the nativetrack
    * changes, replacetrack is used which doesn't involve republishing which means from server's point of view, the track id
    * is same as what was initially published.
+   * This will only be available if the track was actually published and won't be set for preview tracks.
    */
-  publishedTrackId: string;
+  publishedTrackId?: string;
 
   constructor(
     stream: HMSLocalStream,
@@ -49,8 +50,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (settings.deviceId === 'default' && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSVideoPluginsManager(this);
-    this.publishedTrackId = this.trackId;
+    this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
   }
 
@@ -78,6 +78,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
     this.eventBus.localVideoEnabled.publish(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
+  }
+
+  /**
+   * verify if the track id being passed is of this track for correlating server messages like degradation
+   */
+  isPublishedTrackId(trackId: string) {
+    return this.publishedTrackId === trackId;
   }
 
   /**

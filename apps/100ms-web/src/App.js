@@ -1,33 +1,31 @@
-import React, { Fragment } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
+import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
 import {
-  HMSRoomProvider,
-  HMSThemeProvider,
-  PostLeaveDisplay,
-} from "@100mslive/hms-video-react";
-import PreviewScreen from "./pages/PreviewScreen";
-import { Conference } from "./pages/conference.jsx";
-import ErrorPage from "./pages/ErrorPage";
-import { AppContextProvider } from "./store/AppContext.js";
+  HMSRoomProvider as ReactRoomProvider,
+  HMSReactiveStore,
+} from "@100mslive/react-sdk";
+import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
+import PreviewScreen from "./components/PreviewScreen";
+import { Conference } from "./components/conference";
+import ErrorPage from "./components/ErrorPage";
+import { AppContextProvider } from "./components/context/AppContext.js";
+import { hmsToast, Notifications } from "./components/Notifications";
+import { Confetti } from "./plugins/confetti";
+import { ToastContainer } from "./components/Toast/ToastContainer";
+import { FeatureFlags } from "./services/FeatureFlags";
 import { shadeColor } from "./common/utils";
 import {
   getUserToken as defaultGetUserToken,
   getBackendEndpoint,
 } from "./services/tokenService";
-import { hmsToast } from "./views/components/notifications/hms-toast";
-import { Notifications } from "./views/components/notifications/Notifications";
-import {
-  HMSRoomProvider as ReactRoomProvider,
-  HMSReactiveStore,
-} from "@100mslive/react-sdk";
-import { FeatureFlags } from "./store/FeatureFlags";
-import { lightTheme } from "@100mslive/react-ui";
 import "./index.css";
+import { PostLeave } from "./components/PostLeave";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -72,41 +70,60 @@ export function EdtechComponent({
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
+  const [themeType, setThemeType] = useState(theme);
+  useEffect(() => {
+    window.toggleUiTheme = () => {
+      setThemeType(themeType === "dark" ? "light" : "dark");
+    };
+  }, [themeType]);
+  useEffect(() => {
+    setThemeType(theme);
+  }, [theme]);
   return (
-    <div
-      className={`w-full dark:bg-black ${
-        headerPresent === "true" ? "flex-1" : "h-full"
-      } ${theme === "light" ? lightTheme : ""}`}
-    >
-      <HMSThemeProvider
-        config={{
-          theme: {
-            extend: {
-              fontFamily: {
-                sans: [font, "Inter", "sans-serif"],
-                body: [font, "Inter", "sans-serif"],
-              },
-              colors: {
-                brand: {
-                  main: color,
-                  tint: shadeColor(color, 30),
-                },
+    <HMSThemeProvider
+      config={{
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [font, "Inter", "sans-serif"],
+              body: [font, "Inter", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                main: color,
+                tint: shadeColor(color, 30),
               },
             },
           },
+        },
+      }}
+      appBuilder={{
+        theme: themeType,
+        enableChat: showChat === "true",
+        enableScreenShare: showScreenshare === "true",
+        logo: logo,
+        logoClass: logoClass,
+        headerPresent: headerPresent === "true",
+        videoTileAspectRatio: { width, height },
+        showAvatar: showAvatar === "true",
+        avatarType: avatarType,
+      }}
+      toast={(message, options = {}) => hmsToast(message, options)}
+    >
+      <ReactUIProvider
+        themeType={themeType}
+        aspectRatio={{ width, height }}
+        theme={{
+          colors: {
+            brandDefault: color,
+            brandDark: shadeColor(color, -30),
+            brandLight: shadeColor(color, 30),
+            brandDisabled: shadeColor(color, 10),
+          },
+          fonts: {
+            sans: [font, "Inter", "sans-serif"],
+          },
         }}
-        appBuilder={{
-          theme: theme || "dark",
-          enableChat: showChat === "true",
-          enableScreenShare: showScreenshare === "true",
-          logo: logo,
-          logoClass: logoClass,
-          headerPresent: headerPresent === "true",
-          videoTileAspectRatio: { width, height },
-          showAvatar: showAvatar === "true",
-          avatarType: avatarType,
-        }}
-        toast={(message, options = {}) => hmsToast(message, options)}
       >
         <ReactRoomProvider
           actions={hmsReactiveStore.getActions()}
@@ -133,24 +150,34 @@ export function EdtechComponent({
               tokenEndpoint={tokenEndpoint}
               policyConfig={policyConfig}
               appDetails={metadata}
+              logo={logo}
             >
-              <AppRoutes getUserToken={getUserToken} />
+              <Box
+                css={{
+                  bg: "$mainBg",
+                  w: "100%",
+                  ...(headerPresent === "true"
+                    ? { flex: "1 1 0" }
+                    : { h: "100%" }),
+                }}
+              >
+                <AppRoutes getUserToken={getUserToken} />
+              </Box>
             </AppContextProvider>
           </HMSRoomProvider>
         </ReactRoomProvider>
-      </HMSThemeProvider>
-    </div>
+      </ReactUIProvider>
+    </HMSThemeProvider>
   );
 }
 
 function AppRoutes({ getUserToken }) {
   return (
     <Router>
+      <ToastContainer />
       <Notifications />
+      <Confetti />
       <Switch>
-        {/* <Route path="/createRoom">
-              <CreateRoom />
-            </Route> */}
         <Route
           path="/nosupport"
           render={() => (
@@ -184,24 +211,7 @@ function AppRoutes({ getUserToken }) {
         <Route path="/meeting/:roomId/:role?">
           <Conference />
         </Route>
-        <Route
-          path="/leave/:roomId/:role?"
-          render={({ history, match }) => (
-            <PostLeaveDisplay
-              goToDashboardOnClick={() => {
-                window.open("https://dashboard.100ms.live/", "_blank");
-              }}
-              joinRoomOnClick={() => {
-                let previewUrl = "/preview/" + match.params.roomId;
-                if (match.params.role) previewUrl += "/" + match.params.role;
-                history.push(previewUrl);
-              }}
-              getFeedbackOnClick={setShowModal => {
-                setShowModal(true);
-              }}
-            />
-          )}
-        />
+        <Route path="/leave/:roomId/:role?" component={PostLeave} />
         <Route
           path="/:roomId/:role?"
           render={({ match }) => {

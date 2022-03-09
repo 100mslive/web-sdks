@@ -168,8 +168,9 @@ export default class JsonRpcSignal implements ISignal {
     data: string,
     offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
+    serverSubDegrade: boolean,
   ): Promise<RTCSessionDescriptionInit> {
-    const params = { name, disableVidAutoSub, data, offer };
+    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
     const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;

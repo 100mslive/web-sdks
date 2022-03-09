@@ -10,6 +10,7 @@ import {
   HMSRoom,
   HMSMessage,
   HMSConfig,
+  HMSConfigInitialSettings,
   HMSSpeaker,
   HMSRole,
   HMSLocalPeer,
@@ -36,6 +37,8 @@ import {
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
+  parsedUserAgent,
+  HMSConnectionQuality,
 } from '@100mslive/hms-video';
 
 export {
@@ -47,6 +50,7 @@ export {
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  parsedUserAgent,
 };
 
 export type {
@@ -56,6 +60,7 @@ export type {
   HMSMessage,
   HMSSpeaker,
   HMSConfig,
+  HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSRole,
@@ -79,4 +84,5 @@ export type {
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
+  HMSConnectionQuality,
 };

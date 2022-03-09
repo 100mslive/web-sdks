@@ -2,6 +2,7 @@ import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
 import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { HMSSimulcastLayer } from '../interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -19,6 +20,16 @@ export interface TrackStateNotification {
     [track_id: string]: TrackState;
   };
   peer: PeerNotificationInfo;
+}
+
+export interface OnTrackLayerUpdateNotification {
+  tracks: {
+    [track_id: string]: {
+      current_layer: HMSSimulcastLayer;
+      expected_layer: HMSSimulcastLayer;
+      track_id: string;
+    };
+  };
 }
 
 export interface PeerNotificationInfo {
@@ -56,7 +67,7 @@ export class TrackState implements Track {
     this.description = '';
     if (track instanceof HMSTrack) {
       this.mute = !track.enabled;
-      this.track_id = track.publishedTrackId;
+      this.track_id = track.publishedTrackId!;
       this.stream_id = track.stream.id;
     } else {
       this.mute = track.mute;
@@ -87,6 +98,14 @@ export interface RoomState {
     browser: {
       started_at?: number;
       enabled: boolean;
+    };
+    hls: {
+      started_at?: number;
+      enabled: boolean;
+      config?: {
+        hls_vod: boolean;
+        single_file_per_layer: boolean;
+      };
     };
   };
   streaming?: {
@@ -119,6 +138,15 @@ interface Speaker {
 
 export interface SpeakerList {
   'speaker-list': Speaker[];
+}
+
+interface ConnectionQuality {
+  peer_id: string;
+  downlink_score: number;
+}
+
+export interface ConnectionQualityList {
+  peers: ConnectionQuality[];
 }
 
 /**
@@ -194,7 +222,7 @@ export interface RTMPNotification {
 
 export interface HLSNotification {
   enabled: boolean;
-  variants: Array<HLSVariantInfo>;
+  variants?: Array<HLSVariantInfo>;
   error?: ServerError;
   hls_recording?: {
     hls_vod: boolean;

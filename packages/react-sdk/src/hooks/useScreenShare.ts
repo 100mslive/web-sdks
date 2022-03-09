@@ -50,13 +50,16 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const screenSharePeer = useHMSStore(selectPeerScreenSharing);
   const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
 
-  const toggleScreenShare = useCallback(async () => {
-    try {
-      await actions.setScreenShareEnabled(!amIScreenSharing);
-    } catch (error) {
-      handleError(error as Error);
-    }
-  }, [actions, amIScreenSharing, handleError]);
+  const toggleScreenShare = useCallback(
+    async (audioOnly = false) => {
+      try {
+        await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
+      } catch (error) {
+        handleError(error as Error);
+      }
+    },
+    [actions, amIScreenSharing, handleError],
+  );
 
   return {
     amIScreenSharing,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
-import { styled } from '../stitches.config';
+import { styled } from '../Theme';
 import type { VariantProps } from '@stitches/react';
 
 export const StyledVideo = styled('video', {
@@ -45,8 +45,8 @@ interface Props {
 }
 
 export const Video: React.FC<Props & StyledProps> = ({ trackId, ...props }) => {
-  const ref = useVideo(trackId || '');
-  return <StyledVideo autoPlay muted playsInline ref={ref} {...props} />;
+  const { videoRef } = useVideo({ trackId });
+  return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
 };
 
 export default Video;

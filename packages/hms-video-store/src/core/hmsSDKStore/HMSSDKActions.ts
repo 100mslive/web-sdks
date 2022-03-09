@@ -96,6 +96,7 @@ export class HMSSDKActions implements IHMSActions {
   private readonly store: IHMSStore;
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications;
+  private ignoredMessageTypes: string[] = [];
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
@@ -318,7 +319,8 @@ export class HMSSDKActions implements IHMSActions {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = 'You';
-    this.onHMSMessage(hmsMessage);
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }
 
@@ -505,6 +507,18 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
+  ignoreMessageTypes(msgTypes: string[], replace = false) {
+    if (replace) {
+      this.ignoredMessageTypes = msgTypes;
+    } else {
+      for (const msgType of msgTypes) {
+        if (!this.ignoredMessageTypes.includes(msgType)) {
+          this.ignoredMessageTypes.push(msgType);
+        }
+      }
+    }
+  }
+
   private resetState(reason = 'resetState') {
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
@@ -533,6 +547,9 @@ export class HMSSDKActions implements IHMSActions {
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
     });
   }
 
@@ -771,11 +788,15 @@ export class HMSSDKActions implements IHMSActions {
   protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = false;
-    this.onHMSMessage(hmsMessage);
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    this.putMessageInStore(hmsMessage);
     this.hmsNotifications.sendMessageReceived(hmsMessage);
   }
 
-  protected onHMSMessage(hmsMessage: HMSMessage) {
+  protected putMessageInStore(hmsMessage: HMSMessage) {
+    if (hmsMessage.ignored) {
+      return;
+    }
     this.setState(store => {
       hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
@@ -812,6 +833,34 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
     }, 'audioLevel');
+  }
+
+  /**
+   * The connection quality update is sent for all peers(one needs to know of) every time.
+   */
+  protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
+    this.setState(store => {
+      const currentPeerIDs = new Set();
+      newQualities.forEach(sdkUpdate => {
+        const peerID = sdkUpdate.peerID;
+        if (!peerID) {
+          return;
+        }
+        currentPeerIDs.add(peerID);
+        if (!store.connectionQualities[peerID]) {
+          store.connectionQualities[peerID] = sdkUpdate;
+        } else {
+          Object.assign(store.connectionQualities[peerID], sdkUpdate);
+        }
+      });
+      const peerIDsStored = Object.keys(store.connectionQualities);
+      for (const storedPeerID of peerIDsStored) {
+        if (!currentPeerIDs.has(storedPeerID)) {
+          // peer is likely no longer there, it wasn't in the update sent by the server
+          delete store.connectionQualities[storedPeerID];
+        }
+      }
+    }, 'connectionQuality');
   }
 
   protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {
@@ -1110,8 +1159,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    let actionName = 'peerUpdate';
-    actionName = ACTION_TYPES[type];
+    const actionName = ACTION_TYPES[type];
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {
