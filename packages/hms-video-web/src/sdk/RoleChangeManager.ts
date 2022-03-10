@@ -1,6 +1,7 @@
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
 import { IStore } from './store';
 
@@ -14,7 +15,7 @@ export default class RoleChangeManager {
     private store: IStore,
     private transport: ITransport,
     private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
-    private removeAuxillaryTrack: (trackId: string) => void,
+    private removeAuxiliaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
   ) {}
 
@@ -25,37 +26,16 @@ export default class RoleChangeManager {
       return;
     }
 
-    const wasPublishing = oldRole.publishParams.allowed || [];
-    const isPublishing = newRole.publishParams.allowed || [];
+    const wasPublishing = new Set(oldRole.publishParams.allowed || []);
+    const isPublishing = new Set(newRole.publishParams.allowed || []);
 
-    const toRemove = {
-      removeVideo: false,
-      removeAudio: false,
-      removeScreen: false,
-    };
+    const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
+    const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
+    const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
 
-    if (wasPublishing.length > 0) {
-      // check if we have to remove any tracks
-      if (isPublishing.length === 0) {
-        toRemove.removeVideo = true;
-        toRemove.removeAudio = true;
-        toRemove.removeScreen = true;
-      } else {
-        if (wasPublishing.includes('video') && !isPublishing.includes('video')) {
-          toRemove.removeVideo = true;
-        }
-
-        if (wasPublishing.includes('audio') && !isPublishing.includes('audio')) {
-          toRemove.removeAudio = true;
-        }
-
-        if (wasPublishing.includes('screen') && !isPublishing.includes('screen')) {
-          toRemove.removeScreen = true;
-        }
-      }
-    }
-
-    await this.removeLocalTracks(toRemove);
+    await this.removeVideoTracks(removeVideo);
+    await this.removeAudioTrack(removeAudio);
+    await this.removeScreenTracks(removeScreen);
     this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
@@ -71,48 +51,55 @@ export default class RoleChangeManager {
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
-  private async removeLocalTracks({
-    removeVideo,
-    removeAudio,
-    removeScreen,
-  }: {
-    removeVideo: boolean;
-    removeAudio: boolean;
-    removeScreen: boolean;
-  }) {
-    const localPeer = this.store.getLocalPeer();
-
-    if (!localPeer) {
+  private async removeVideoTracks(removeVideo: boolean) {
+    if (!removeVideo) {
       return;
     }
-
-    const tracksToUnpublish = [];
-
+    const localPeer = this.store.getLocalPeer();
     // TODO check auxillary tracks for regular audio and video too
-    if (localPeer?.videoTrack && removeVideo) {
+    if (localPeer?.videoTrack) {
       // TODO: stop processed track and cleanup plugins loop non async
       // vb can throw change role off otherwise
-      tracksToUnpublish.push(localPeer.videoTrack);
+      await this.transport.unpublish([localPeer.videoTrack]);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = undefined;
     }
+    await this.removeAuxTracks(track => track.source !== 'screen' && track.type === 'video');
+  }
 
-    if (localPeer?.audioTrack && removeAudio) {
-      tracksToUnpublish.push(localPeer.audioTrack);
+  private async removeAudioTrack(removeAudio: boolean) {
+    if (!removeAudio) {
+      return;
+    }
+    const localPeer = this.store.getLocalPeer();
+    if (localPeer?.audioTrack) {
+      await this.transport.unpublish([localPeer.audioTrack]);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = undefined;
     }
+    await this.removeAuxTracks(track => track.source !== 'screen' && track.type === 'audio');
+  }
 
-    await this.transport.unpublish(tracksToUnpublish);
-    for (const track of tracksToUnpublish) {
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, localPeer);
+  private async removeScreenTracks(removeScreen: boolean) {
+    if (!removeScreen) {
+      return;
     }
+    await this.removeAuxTracks(track => track.source === 'screen');
+  }
 
-    if (localPeer.auxiliaryTracks && removeScreen) {
+  private async removeAuxTracks(predicate: (track: HMSLocalTrack) => boolean) {
+    const localPeer = this.store.getLocalPeer();
+    if (localPeer?.auxiliaryTracks) {
       const localAuxTracks = [...localPeer.auxiliaryTracks];
       for (const track of localAuxTracks) {
-        if (track.source === 'screen') {
-          await this.removeAuxillaryTrack(track.trackId);
+        if (predicate(track)) {
+          await this.removeAuxiliaryTrack(track.trackId);
         }
       }
     }
+  }
+
+  private removeTrack(wasPublishing: Set<string>, isPublishing: Set<string>, type: string) {
+    return wasPublishing.has(type) && !isPublishing.has(type);
   }
 }
