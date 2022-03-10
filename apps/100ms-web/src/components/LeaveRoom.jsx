@@ -30,8 +30,9 @@ export const LeaveRoom = () => {
   };
 
   const leaveRoom = () => {
-    hmsActions.leave();
-    redirectToLeavePage();
+    hmsActions.leave().then(() => {
+      redirectToLeavePage();
+    });
   };
 
   const endRoom = () => {
