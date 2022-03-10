@@ -303,9 +303,6 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
 
     if (!this.localPeer) {
-      this.eventBus.policyChange.subscribe((e: any) => {
-        this.store.setPublishParams(e.detail.params.role.publishParams);
-      });
       this.createAndAddLocalPeerToStore(config, role, userId);
     } else {
       this.localPeer.name = config.userName;
