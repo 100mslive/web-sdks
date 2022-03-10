@@ -883,6 +883,7 @@ export default class HMSTransport implements ITransport {
         subscribe: subscribeBitrate,
       },
       max_sub_bitrate: this.maxSubscribeBitrate,
+      recent_pong_response_times: this.signal.getPongResponseTimes(),
     };
   }
 }

@@ -18,13 +18,19 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import {
+  DEFAULT_SIGNAL_PING_TIMEOUT,
+  DEFAULT_SIGNAL_PING_INTERVAL,
+  PONG_RESPONSE_TIMES_SIZE,
+} from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
+import { Queue } from '../../utils/queue';
 
 export default class JsonRpcSignal implements ISignal {
   private readonly TAG = '[ SIGNAL ]: ';
   readonly observer: ISignalEventsObserver;
+  readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
   /**
    * Sometimes before [join] is completed, there could be a lot of trickles
@@ -78,6 +84,10 @@ export default class JsonRpcSignal implements ISignal {
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
     this.onMessageHandler = this.onMessageHandler.bind(this);
+  }
+
+  getPongResponseTimes() {
+    return this.pongResponseTimes.toList();
   }
 
   private async call<T>(method: string, params: any): Promise<T> {
@@ -355,6 +365,7 @@ export default class JsonRpcSignal implements ISignal {
     const pingTimeout = window.HMS?.PING_TIMEOUT || DEFAULT_SIGNAL_PING_TIMEOUT;
     if (this.isConnected) {
       const pongTimeDiff = await this.ping(pingTimeout);
+      this.pongResponseTimes.enqueue(pongTimeDiff);
       if (pongTimeDiff > pingTimeout) {
         let pageHidden = false;
         if (typeof document !== undefined && document.hidden) {

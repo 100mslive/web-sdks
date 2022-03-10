@@ -13,6 +13,10 @@ export class Queue<T> implements IQueue<T> {
     return this.storage.length;
   }
 
+  toList() {
+    return this.storage.slice(0);
+  }
+
   enqueue(item: T) {
     if (this.size() === this.capacity) {
       this.dequeue();
