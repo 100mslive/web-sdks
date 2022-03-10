@@ -44,6 +44,9 @@ export class LocalTrackManager {
 
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
     const trackSettings = this.getTrackSettings(initialSettings);
+    if (!trackSettings) {
+      return [];
+    }
     const canPublishAudio = !!trackSettings.audio;
     const canPublishVideo = !!trackSettings.video;
     let tracksToPublish: Array<HMSLocalTrack> = [];
@@ -254,9 +257,12 @@ export class LocalTrackManager {
     }
   }
 
-  private getTrackSettings(initialSettings: InitialSettings): HMSTrackSettings {
+  private getTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
     const audioSettings = this.getAudioSettings(initialSettings);
     const videoSettings = this.getVideoSettings(initialSettings);
+    if (!audioSettings && !videoSettings) {
+      return null;
+    }
     const screenSettings = this.getScreenSettings();
     return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
   }
@@ -350,7 +356,7 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  private async updateCurrentLocalTrackSettings(trackSettings: HMSTrackSettings) {
+  private async updateCurrentLocalTrackSettings(trackSettings: HMSTrackSettings | null) {
     const localTracks = this.store.getLocalPeerTracks();
     const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
       | HMSLocalVideoTrack
@@ -362,15 +368,15 @@ export class LocalTrackManager {
       | HMSLocalVideoTrack
       | undefined;
 
-    if (trackSettings.video) {
+    if (trackSettings?.video) {
       await videoTrack?.setSettings(trackSettings.video);
     }
 
-    if (trackSettings.audio) {
+    if (trackSettings?.audio) {
       await audioTrack?.setSettings(trackSettings.audio);
     }
 
-    if (trackSettings.screen) {
+    if (trackSettings?.screen) {
       await screenTrack?.setSettings(trackSettings.screen);
     }
 
@@ -379,7 +385,7 @@ export class LocalTrackManager {
 
   private getAudioSettings(initialSettings: InitialSettings) {
     const publishParams = this.store.getPublishParams();
-    if (!publishParams || !publishParams.allowed.includes('audio')) {
+    if (!publishParams || !publishParams.allowed?.includes('audio')) {
       return null;
     }
     const localPeer = this.store.getLocalPeer();
@@ -396,7 +402,7 @@ export class LocalTrackManager {
 
   private getVideoSettings(initialSettings: InitialSettings) {
     const publishParams = this.store.getPublishParams();
-    if (!publishParams || !publishParams.allowed.includes('video')) {
+    if (!publishParams || !publishParams.allowed?.includes('video')) {
       return null;
     }
     const localPeer = this.store.getLocalPeer();
@@ -417,7 +423,7 @@ export class LocalTrackManager {
 
   private getScreenSettings() {
     const publishParams = this.store.getPublishParams();
-    if (!publishParams || !publishParams.allowed.includes('screen')) {
+    if (!publishParams || !publishParams.allowed?.includes('screen')) {
       return null;
     }
     const screen = publishParams.screen;
