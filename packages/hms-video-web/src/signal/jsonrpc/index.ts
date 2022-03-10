@@ -28,7 +28,7 @@ import { HMSException } from '../../error/HMSException';
 import { Queue } from '../../utils/queue';
 
 export default class JsonRpcSignal implements ISignal {
-  private readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[ SIGNAL ]: ';
   readonly observer: ISignalEventsObserver;
   readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
