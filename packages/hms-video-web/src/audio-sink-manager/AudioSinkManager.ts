@@ -158,7 +158,7 @@ export class AudioSinkManager {
   };
 
   private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
-    /**async async
+    /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
     if (this.state.autoplayFailed === undefined) {
