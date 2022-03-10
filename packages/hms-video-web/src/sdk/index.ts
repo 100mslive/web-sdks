@@ -246,7 +246,6 @@ export class HMSSdk implements HMSInterface {
 
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        this.eventBus.policyChange.unsubscribe(policyHandler);
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
@@ -256,7 +255,7 @@ export class HMSSdk implements HMSInterface {
         resolve();
       };
 
-      this.eventBus.policyChange.subscribe(policyHandler);
+      this.eventBus.policyChange.subscribeOnce(policyHandler);
 
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
