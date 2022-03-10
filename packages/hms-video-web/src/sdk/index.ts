@@ -4,6 +4,7 @@ import {
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
   HMSMessageInput,
+  HMSPlaylistType,
   HMSRole,
   HMSRoleChangeRequest,
   HMSVideoCodec,
@@ -545,6 +546,12 @@ export class HMSSdk implements HMSInterface {
     if (trackIndex > -1) {
       const track = this.localPeer.auxiliaryTracks[trackIndex];
       await this.transport!.unpublish([track]);
+      // Stop local playback when playlist track is removed
+      if (track.source === 'audioplaylist') {
+        this.playlistManager.stop(HMSPlaylistType.audio);
+      } else if (track.source === 'videoplaylist') {
+        this.playlistManager.stop(HMSPlaylistType.video);
+      }
       this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
     } else {
