@@ -6,6 +6,22 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 const TAG = 'InitService';
 
 export default class InitService {
+  private static async handleError(response: Response) {
+    const body = await response.json();
+    switch (response.status) {
+      case 404:
+        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
+      case 200:
+        break;
+      default:
+        throw ErrorFactory.InitAPIErrors.ServerErrors(
+          body.code || response.status,
+          HMSAction.INIT,
+          body.message || response?.statusText,
+        );
+    }
+  }
+
   static async fetchInitConfig(
     token: string,
     peerId: string,
@@ -14,34 +30,23 @@ export default class InitService {
   ): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
     const url = getUrl(initEndpoint, peerId, region);
-    let response, config;
     try {
-      response = await fetch(url, {
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const body = await response.json();
-      if (response.status === 404) {
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
-      }
-      if (response?.status !== 200) {
-        throw ErrorFactory.InitAPIErrors.ServerErrors(
-          body.code || response.status,
-          HMSAction.INIT,
-          body.message || response?.statusText,
-        );
-      }
-      config = body;
+      const config = await response.json();
+      this.handleError(response);
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+      return transformInitConfig(config);
     } catch (err) {
       const error = err as Error;
-      if (error.message === 'Failed to fetch' || error.message.includes('NetworkError')) {
+      if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
         throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
       }
       throw error;
     }
-    return transformInitConfig(config);
   }
 }
 
