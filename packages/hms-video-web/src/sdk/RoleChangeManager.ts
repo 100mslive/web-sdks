@@ -18,14 +18,12 @@ export default class RoleChangeManager {
     private listener?: HMSUpdateListener,
   ) {}
 
-  public handleLocalPeerRoleUpdate = async (event: any) => {
+  public handleLocalPeerRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     const localPeer = this.store.getLocalPeer();
 
     if (!localPeer) {
       return;
     }
-    const oldRole = event.detail.oldRole as HMSRole;
-    const newRole = event.detail.newRole as HMSRole;
 
     const wasPublishing = oldRole.publishParams.allowed || [];
     const isPublishing = newRole.publishParams.allowed || [];

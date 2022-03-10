@@ -108,14 +108,9 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.eventBus = new EventBus();
     this.playlistManager = new PlaylistManager(this);
-    this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
+    this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
-    this.audioSinkManager = new AudioSinkManager(
-      this.store,
-      this.notificationManager,
-      this.deviceManager,
-      this.eventBus,
-    );
+    this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.setListener(this.listener);
     this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
@@ -251,7 +246,7 @@ export class HMSSdk implements HMSInterface {
 
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        this.notificationManager.removeEventListener('policy-change', policyHandler);
+        this.eventBus.policyChange.unsubscribe(policyHandler);
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
@@ -261,7 +256,7 @@ export class HMSSdk implements HMSInterface {
         resolve();
       };
 
-      this.notificationManager.addEventListener('policy-change', policyHandler);
+      this.eventBus.policyChange.subscribe(policyHandler);
 
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
@@ -308,7 +303,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
 
     if (!this.localPeer) {
-      this.notificationManager.addEventListener('role-change', (e: any) => {
+      this.eventBus.policyChange.subscribe((e: any) => {
         this.store.setPublishParams(e.detail.params.role.publishParams);
       });
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -326,10 +321,7 @@ export class HMSSdk implements HMSInterface {
       this.removeTrack.bind(this),
       this.listener,
     );
-    this.notificationManager.addEventListener(
-      'local-peer-role-update',
-      this.roleChangeManager.handleLocalPeerRoleUpdate,
-    );
+    this.eventBus.localRoleUpdate.subscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
 
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
@@ -386,10 +378,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.listener = undefined;
     if (this.roleChangeManager) {
-      this.notificationManager.removeEventListener(
-        'local-peer-role-update',
-        this.roleChangeManager.handleLocalPeerRoleUpdate,
-      );
+      this.eventBus.localRoleUpdate.unsubscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
     }
   }
 
@@ -786,7 +775,7 @@ export class HMSSdk implements HMSInterface {
     if (localPeer?.role) {
       this.listener?.onJoin(room);
     } else {
-      this.notificationManager.once('policy-change', () => {
+      this.eventBus.policyChange.subscribeOnce(() => {
         this.listener?.onJoin(room);
       });
     }

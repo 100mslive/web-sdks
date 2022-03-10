@@ -1,4 +1,3 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
@@ -20,6 +19,7 @@ import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
+import { EventBus } from '../events/EventBus';
 
 export class NotificationManager {
   private TAG = '[HMSNotificationManager]';
@@ -32,7 +32,7 @@ export class NotificationManager {
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
-  private eventEmitter: EventEmitter = new EventEmitter();
+  // private eventEmitter: EventEmitter = new EventEmitter();
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
@@ -42,15 +42,16 @@ export class NotificationManager {
 
   constructor(
     private store: IStore,
+    eventBus: EventBus,
     private listener?: HMSUpdateListener,
     private audioListener?: HMSAudioListener,
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
-    this.trackManager = new TrackManager(this.store, this.eventEmitter, this.listener);
+    this.trackManager = new TrackManager(this.store, eventBus, this.listener);
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
-    this.policyChangeManager = new PolicyChangeManager(this.store, this.eventEmitter);
+    this.policyChangeManager = new PolicyChangeManager(this.store, eventBus);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
     this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
@@ -76,18 +77,6 @@ export class NotificationManager {
   setConnectionQualityListener(qualityListener?: HMSConnectionQualityListener) {
     this.connectionQualityListener = qualityListener;
     this.connectionQualityManager.listener = qualityListener;
-  }
-
-  addEventListener(event: string, listener: EventListener) {
-    this.eventEmitter.addListener(event, listener);
-  }
-
-  removeEventListener(event: string, listener: EventListener) {
-    this.eventEmitter.removeListener(event, listener);
-  }
-
-  once(event: string, listener: EventListener) {
-    this.eventEmitter.once(event, listener);
   }
 
   handleNotification(message: { method: string; params: any }, isReconnecting = false) {

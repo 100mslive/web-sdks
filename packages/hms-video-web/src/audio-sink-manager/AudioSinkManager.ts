@@ -1,8 +1,7 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
-import { HMSAudioTrack } from '../media/tracks';
+import { HMSRemoteAudioTrack } from '../media/tracks';
 import { DeviceManager } from '../device-manager';
-import { NotificationManager } from '../notification-manager/NotificationManager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
 import { HMSException } from '../error/HMSException';
@@ -42,22 +41,17 @@ const INITIAL_STATE: AudioSinkState = {
 
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
-  private autoPausedTracks: Set<HMSAudioTrack> = new Set();
+  private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
   private volume = 100;
   private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
 
-  constructor(
-    private store: IStore,
-    private notificationManager: NotificationManager,
-    private deviceManager: DeviceManager,
-    private eventBus: EventBus,
-  ) {
-    this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
-    this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
-    this.notificationManager.addEventListener('track-updated', this.handleTrackUpdate as EventListener);
+  constructor(private store: IStore, private deviceManager: DeviceManager, private eventBus: EventBus) {
+    this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
+    this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
+    this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
   }
 
@@ -113,9 +107,9 @@ export class AudioSinkManager {
   cleanUp() {
     this.audioSink?.remove();
     this.audioSink = undefined;
-    this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
-    this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
-    this.notificationManager.removeEventListener('track-updated', this.handleTrackUpdate as EventListener);
+    this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
+    this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
+    this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
@@ -137,19 +131,18 @@ export class AudioSinkManager {
         // Play after a delay since mobile devices don't call onDevice change event
         setTimeout(async () => {
           if (audioTrack) {
-            await this.playAudioFor(audioTrack as HMSAudioTrack);
+            await this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
           }
         }, 500);
       } else {
-        this.autoPausedTracks.add(audioTrack as HMSAudioTrack);
+        this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       }
     }
   };
 
-  private handleTrackUpdate = (event: CustomEvent<{ track: HMSAudioTrack; enabled: boolean }>) => {
+  private handleTrackUpdate = ({ track, enabled }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
     // @ts-ignore
     if (window.HMS?.AUDIO_SINK) {
-      const { track, enabled } = event.detail;
       if (enabled) {
         track.addSink();
         this.playAudioFor(track);
@@ -159,13 +152,7 @@ export class AudioSinkManager {
     }
   };
 
-  private handleTrackAdd = (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
-    this.handleTrackAddAsync(event);
-  };
-
-  private handleTrackAddAsync = async (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
-    const { track, peer } = event.detail;
-
+  private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
@@ -187,7 +174,7 @@ export class AudioSinkManager {
     await this.handleAutoplayError(track);
   };
 
-  private handleAutoplayError = async (track: HMSAudioTrack) => {
+  private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
     /**async async
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
@@ -224,7 +211,7 @@ export class AudioSinkManager {
    * @param track
    * @private
    */
-  private async playAudioFor(track: HMSAudioTrack) {
+  private async playAudioFor(track: HMSRemoteAudioTrack) {
     const audioEl = track.getAudioElement();
     if (!audioEl) {
       HMSLogger.w(this.TAG, 'No audio element found on track', track.trackId);
@@ -248,8 +235,7 @@ export class AudioSinkManager {
     }
   }
 
-  private handleTrackRemove = (event: CustomEvent<HMSAudioTrack>) => {
-    const track = event.detail;
+  private handleTrackRemove = (track: HMSRemoteAudioTrack) => {
     this.autoPausedTracks.delete(track);
     const audioEl = document.getElementById(track.trackId) as HTMLAudioElement;
     if (audioEl) {
