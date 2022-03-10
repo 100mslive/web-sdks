@@ -2,20 +2,18 @@
 import { isBrowser } from './support';
 
 export const getNetworkInfo = () => {
-  if (!isBrowser) {
+  if (!isBrowser || typeof navigator.connection === 'undefined') {
     return;
   }
 
-  try {
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    const networkInfo = {
-      downlink: connection.downlink,
-      downlinkMax: connection.downlinkMax,
-      effectiveType: connection.effectiveType,
-      rtt: connection.rtt,
-      saveData: connection.saveData,
-      type: connection.type,
-    };
-    return networkInfo;
-  } catch (error) {}
+  const connection = navigator.connection;
+  const networkInfo = {
+    downlink: connection.downlink,
+    downlinkMax: connection.downlinkMax,
+    effectiveType: connection.effectiveType,
+    rtt: connection.rtt,
+    saveData: connection.saveData,
+    type: connection.type,
+  };
+  return networkInfo;
 };
