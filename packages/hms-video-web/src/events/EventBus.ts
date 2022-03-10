@@ -53,4 +53,9 @@ export class EventBus {
     HMSEvents.AUDIO_TRACK_ADDED,
     this.eventEmitter,
   );
+
+  readonly audioTrackRemoved = new HMSInternalEvent<HMSRemoteAudioTrack>(
+    HMSEvents.AUDIO_TRACK_ADDED,
+    this.eventEmitter,
+  );
 }
