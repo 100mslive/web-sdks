@@ -48,6 +48,9 @@ import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { EventBus } from '../events/EventBus';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
+import { getNetworkInfo } from '../utils/network-info';
 
 const TAG = '[HMSTransport]:';
 
@@ -84,12 +87,14 @@ export default class HMSTransport implements ITransport {
       this.publishConnection?.nativeConnection,
       this.subscribeConnection?.nativeConnection,
     );
-    this.retryScheduler = new RetryScheduler(this.eventBus, async (state, error) => {
+
+    const onStateChange = async (state: TransportState, error?: HMSException) => {
       if (state !== this.state) {
         this.state = state;
         await this.observer.onStateChange(this.state, error);
       }
-    });
+    };
+    this.retryScheduler = new RetryScheduler(onStateChange, this.sendErrorAnalyticsEvent.bind(this));
   }
 
   /**
@@ -694,7 +699,15 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.flush();
     } catch (error) {
       if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.connect(error, connectRequestedAt, new Date(), endpoint));
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.connect(
+            error,
+            this.getAdditionalAnalyticsProperties(),
+            connectRequestedAt,
+            new Date(),
+            endpoint,
+          ),
+        );
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;
@@ -826,5 +839,35 @@ export default class HMSTransport implements ITransport {
       this.state = TransportState.Connecting;
       this.observer.onStateChange(this.state);
     }
+  }
+
+  private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
+    const additionalProps = this.getAdditionalAnalyticsProperties();
+    let event: AnalyticsEvent;
+    switch (category) {
+      case TransportFailureCategory.ConnectFailed:
+        event = AnalyticsEventFactory.connect(error, additionalProps);
+        break;
+      case TransportFailureCategory.SignalDisconnect:
+        event = AnalyticsEventFactory.disconnect(error, additionalProps);
+        break;
+      case TransportFailureCategory.PublishIceConnectionFailed:
+        event = AnalyticsEventFactory.publish({ error });
+        break;
+      case TransportFailureCategory.SubscribeIceConnectionFailed:
+        event = AnalyticsEventFactory.subscribeFail(error);
+        break;
+    }
+    this.eventBus.analytics.publish(event!);
+  }
+
+  getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
+    const network_info = getNetworkInfo();
+    const document_hidden = typeof document !== undefined && document.hidden;
+
+    return {
+      network_info,
+      document_hidden,
+    };
   }
 }
