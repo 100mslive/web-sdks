@@ -8,6 +8,7 @@ import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { PolicyParams } from '../notification-manager';
 import { HMSRemotePeer } from '../sdk/models/peer';
+import { HMSException } from '../error/HMSException';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -59,4 +60,6 @@ export class EventBus {
     HMSEvents.AUDIO_TRACK_ADDED,
     this.eventEmitter,
   );
+
+  readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
 }

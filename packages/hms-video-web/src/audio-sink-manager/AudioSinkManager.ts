@@ -1,10 +1,8 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { DeviceManager } from '../device-manager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
-import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
 import { HMSRemotePeer } from '../sdk/models/peer';
@@ -19,12 +17,6 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
  * Chrome - DOMException: play() failed because the user didn't interact with the document first.
  * Brave - DOMException: play() can only be initiated by a user gesture.
  */
-export interface AutoplayEvent {
-  error: HMSException;
-}
-
-export const AutoplayError = 'autoplay-error';
-
 type AudioSinkState = {
   autoplayFailed?: boolean;
   initialized: boolean;
@@ -44,7 +36,6 @@ export class AudioSinkManager {
   private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
   private volume = 100;
-  private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
 
@@ -57,14 +48,6 @@ export class AudioSinkManager {
 
   setListener(listener?: HMSUpdateListener) {
     this.listener = listener;
-  }
-
-  addEventListener(event: string, listener: (event: AutoplayEvent) => void) {
-    this.eventEmitter.addListener(event, listener);
-  }
-
-  removeEventListener(event: string, listener: (event: AutoplayEvent) => void) {
-    this.eventEmitter.removeListener(event, listener);
   }
 
   private get outputDevice() {
@@ -230,7 +213,7 @@ export class AudioSinkManager {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
         this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
-        this.eventEmitter.emit(AutoplayError, { error: ex });
+        this.eventBus.autoplayError.publish(ex);
       }
     }
   }

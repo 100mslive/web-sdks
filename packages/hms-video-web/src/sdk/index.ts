@@ -45,7 +45,6 @@ import { IErrorListener } from '../interfaces/error-listener';
 import { IStore, Store } from './store';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import RoleChangeManager from './RoleChangeManager';
-import { AutoplayError, AutoplayEvent } from '../audio-sink-manager/AudioSinkManager';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
@@ -114,7 +113,7 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.setListener(this.listener);
-    this.audioSinkManager.addEventListener(AutoplayError, this.handleAutoplayError);
+    this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
     this.analyticsEventsService = new AnalyticsEventsService();
     this.transport = new HMSTransport(
@@ -154,8 +153,8 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.hls;
   }
 
-  private handleAutoplayError = (event: AutoplayEvent) => {
-    this.errorListener?.onError?.(event.error);
+  private handleAutoplayError = (error: HMSException) => {
+    this.errorListener?.onError?.(error);
   };
 
   private get localPeer(): HMSLocalPeer | undefined {
@@ -747,8 +746,8 @@ export class HMSSdk implements HMSInterface {
 
   private cleanDeviceManagers() {
     this.eventBus.deviceChange.unsubscribe(this.handleDeviceChange);
+    this.eventBus.autoplayError.unsubscribe(this.handleAutoplayError);
     this.deviceManager.cleanUp();
-    this.audioSinkManager.removeEventListener(AutoplayError, this.handleAutoplayError);
     this.audioSinkManager.cleanUp();
   }
 
