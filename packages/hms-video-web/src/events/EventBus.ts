@@ -1,11 +1,12 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSDeviceChangeEvent } from '../interfaces';
+import { HMSDeviceChangeEvent, HMSPeer, HMSRole } from '../interfaces';
 import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
-import { HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSRemoteAudioTrack, HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import { PolicyParams } from '../notification-manager';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -35,4 +36,21 @@ export class EventBus {
   );
 
   readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
+
+  readonly policyChange = new HMSInternalEvent<PolicyParams>(HMSEvents.POLICY_CHANGE, this.eventEmitter);
+
+  readonly localRoleUpdate = new HMSInternalEvent<{ oldRole: HMSRole; newRole: HMSRole }>(
+    HMSEvents.LOCAL_ROLE_UPDATE,
+    this.eventEmitter,
+  );
+
+  readonly audioTrackUpdate = new HMSInternalEvent<{ track: HMSRemoteAudioTrack; enabled?: boolean }>(
+    HMSEvents.AUDIO_TRACK_UPDATE,
+    this.eventEmitter,
+  );
+
+  readonly audioTrackAdded = new HMSInternalEvent<{ track: HMSRemoteAudioTrack; peer: HMSPeer }>(
+    HMSEvents.AUDIO_TRACK_ADDED,
+    this.eventEmitter,
+  );
 }

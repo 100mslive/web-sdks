@@ -30,4 +30,8 @@ export const HMSEvents = {
   TRACK_AUDIO_LEVEL_UPDATE: 'track-audio-level-update',
   LOCAL_AUDIO_SILENCE: 'local-audio-silence',
   ANALYTICS: 'analytics',
+  POLICY_CHANGE: 'policy-change',
+  LOCAL_ROLE_UPDATE: 'local-role-update',
+  AUDIO_TRACK_UPDATE: 'audio-track-update',
+  AUDIO_TRACK_ADDED: 'audio-track-added',
 };
