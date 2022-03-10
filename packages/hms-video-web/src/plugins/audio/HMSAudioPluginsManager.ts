@@ -8,6 +8,11 @@ import { EventBus } from '../../events/EventBus';
 const TAG = 'AudioPluginsManager';
 const DEFAULT_SAMPLE_RATE = 48000;
 
+//Handling sample rate error in case of firefox
+const checkBrowserSupport = () => {
+  return navigator.userAgent.indexOf('Firefox') !== -1;
+};
+
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
  * are called in the order they were added. Plugins which do not need to modify the audio are called
@@ -237,7 +242,16 @@ export class HMSAudioPluginsManager {
 
   private createAudioContext() {
     if (!this.audioContext) {
-      this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
+      if (checkBrowserSupport()) {
+        /**
+        Not setting default sample rate for firefox since connecting
+        audio nodes from context with different sample rate is not
+        supported in firefox
+ */
+        this.audioContext = new AudioContext();
+      } else {
+        this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
+      }
     }
   }
 }
