@@ -106,6 +106,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     this.videoElement?.pause();
     this.videoElement?.removeAttribute('src');
     this.videoElement = null;
+    this.audioContextManager?.cleanup();
     this.clearCanvasAndTracks();
   }
 

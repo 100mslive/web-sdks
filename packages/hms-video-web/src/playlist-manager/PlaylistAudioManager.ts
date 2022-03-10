@@ -81,7 +81,7 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     this.audioElement?.pause();
     this.audioElement?.removeAttribute('src');
     this.audioElement = null;
-    this.audioContextManager.cleanup();
+    this.audioContextManager?.cleanup();
     this.track = undefined;
   }
 
