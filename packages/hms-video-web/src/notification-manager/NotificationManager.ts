@@ -32,7 +32,6 @@ export class NotificationManager {
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
-  // private eventEmitter: EventEmitter = new EventEmitter();
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
