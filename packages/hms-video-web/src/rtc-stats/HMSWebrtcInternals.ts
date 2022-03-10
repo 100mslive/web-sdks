@@ -26,6 +26,10 @@ export class HMSWebrtcInternals {
     return this.subscribeConnection;
   }
 
+  getCurrentStats() {
+    return this.hmsStats;
+  }
+
   onStatsChange(statsChangeCb: (stats: HMSWebrtcStats) => void) {
     this.eventBus.statsUpdate.subscribe(statsChangeCb);
     return () => {

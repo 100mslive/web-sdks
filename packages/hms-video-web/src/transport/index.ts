@@ -72,6 +72,7 @@ export default class HMSTransport implements ITransport {
   private retryScheduler: RetryScheduler;
   private trackDegradationController?: TrackDegradationController;
   private webrtcInternals?: HMSWebrtcInternals;
+  private maxSubscribeBitrate = 0;
 
   constructor(
     private observer: ITransportObserver,
@@ -95,6 +96,11 @@ export default class HMSTransport implements ITransport {
       }
     };
     this.retryScheduler = new RetryScheduler(onStateChange, this.sendErrorAnalyticsEvent.bind(this));
+
+    this.eventBus.statsUpdate.subscribe(stats => {
+      const currentSubscribeBitrate = stats.getLocalPeerStats()?.subscribe?.bitrate || 0;
+      this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
+    });
   }
 
   /**
@@ -864,10 +870,19 @@ export default class HMSTransport implements ITransport {
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
     const network_info = getNetworkInfo();
     const document_hidden = typeof document !== undefined && document.hidden;
+    const num_degraded_tracks = this.store.getRemoteVideoTracks().filter(track => track.degraded).length;
+    const publishBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.publish?.bitrate;
+    const subscribeBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.subscribe?.bitrate;
 
     return {
       network_info,
       document_hidden,
+      num_degraded_tracks,
+      bitrate: {
+        publish: publishBitrate,
+        subscribe: subscribeBitrate,
+      },
+      max_sub_bitrate: this.maxSubscribeBitrate,
     };
   }
 }
