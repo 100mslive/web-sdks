@@ -167,7 +167,7 @@ export default class JsonRpcSignal implements ISignal {
 
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     this.socket!.close(1000, 'Normal Close');
-    this.setIsConnected(false, 'code: 1000, normal close');
+    this.setIsConnected(false, 'code: 1000, normal websocket close');
     this.socket!.removeEventListener('close', this.onCloseHandler);
     this.socket!.removeEventListener('message', this.onMessageHandler);
     return p;
