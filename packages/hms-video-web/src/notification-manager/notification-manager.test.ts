@@ -5,6 +5,7 @@ import HMSRoom from '../sdk/models/HMSRoom';
 import { NotificationManager } from './NotificationManager';
 import { Store } from '../sdk/store';
 import { fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList, FAKE_PEER_ID } from './fixtures';
+import { EventBus } from '../events/EventBus';
 
 let joinHandler: jest.Mock<any, any>;
 let roomUpdateHandler: jest.Mock<any, any>;
@@ -25,6 +26,7 @@ let listener: HMSUpdateListener;
 let audioListener: HMSAudioListener;
 const store: Store = new Store();
 let notificationManager: NotificationManager;
+let eventBus: EventBus;
 
 beforeEach(() => {
   joinHandler = jest.fn();
@@ -41,6 +43,7 @@ beforeEach(() => {
   changeMultiTrackStateRequestHandler = jest.fn();
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
+  eventBus = new EventBus();
   store.setRoom(new HMSRoom('1234', store));
 
   listener = {
@@ -61,7 +64,7 @@ beforeEach(() => {
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
 
-  notificationManager = new NotificationManager(store, listener, audioListener);
+  notificationManager = new NotificationManager(store, eventBus, listener, audioListener);
 });
 
 describe('Notification Manager', () => {
