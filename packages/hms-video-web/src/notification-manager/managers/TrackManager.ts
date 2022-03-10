@@ -4,7 +4,7 @@ import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType 
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { OnTrackLayerUpdateNotification, TrackStateNotification } from '../HMSNotifications';
+import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -141,13 +141,9 @@ export class TrackManager {
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
-        if (currentTrackStateInfo.mute !== trackEntry.mute) {
-          const eventype = trackEntry.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
-          this.listener?.onTrackUpdate(eventype, track, hmsPeer);
-          track.type === HMSTrackType.AUDIO &&
-            this.eventBus.audioTrackUpdate.publish({ track: track as HMSRemoteAudioTrack, enabled: !trackEntry.mute });
-        } else if (currentTrackStateInfo.description !== trackEntry.description) {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
+        const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
+        if (eventType) {
+          this.listener?.onTrackUpdate(eventType, track, hmsPeer);
         }
       }
     }
@@ -170,27 +166,8 @@ export class TrackManager {
       track.source = state.trackInfo.source;
       track.peerId = hmsPeer.peerId;
       track.setEnabled(!state.trackInfo.mute);
-
-      switch (track.type) {
-        case HMSTrackType.AUDIO:
-          if (!hmsPeer.audioTrack && track.source === 'regular') {
-            hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
-          } else {
-            hmsPeer.auxiliaryTracks.push(track);
-          }
-          break;
-        case HMSTrackType.VIDEO: {
-          const remoteTrack = track as HMSRemoteVideoTrack;
-          const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
-          remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-          if (!hmsPeer.videoTrack && track.source === 'regular') {
-            hmsPeer.videoTrack = remoteTrack;
-          } else {
-            hmsPeer.auxiliaryTracks.push(remoteTrack);
-          }
-        }
-      }
-
+      this.addAudioTrack(hmsPeer, track);
+      this.addVideoTrack(hmsPeer, track);
       /**
        * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
        * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
@@ -226,5 +203,43 @@ export class TrackManager {
         }
       }
     }
+  }
+
+  private addAudioTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    if (track.type !== HMSTrackType.AUDIO) {
+      return;
+    }
+    if (!hmsPeer.audioTrack && track.source === 'regular') {
+      hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
+    } else {
+      hmsPeer.auxiliaryTracks.push(track);
+    }
+  }
+
+  private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    if (track.type !== HMSTrackType.VIDEO) {
+      return;
+    }
+    const remoteTrack = track as HMSRemoteVideoTrack;
+    const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
+    remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
+    if (!hmsPeer.videoTrack && track.source === 'regular') {
+      hmsPeer.videoTrack = remoteTrack;
+    } else {
+      hmsPeer.auxiliaryTracks.push(remoteTrack);
+    }
+  }
+
+  private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
+    let eventType;
+    track.setEnabled(!trackState.mute);
+    if (currentTrackState.mute !== trackState.mute) {
+      eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
+      track.type === HMSTrackType.AUDIO &&
+        this.eventBus.audioTrackUpdate.publish({ track: track as HMSRemoteAudioTrack, enabled: !trackState.mute });
+    } else if (currentTrackState.description !== trackState.description) {
+      eventType = HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED;
+    }
+    return eventType;
   }
 }
