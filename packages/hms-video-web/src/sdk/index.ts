@@ -56,6 +56,8 @@ import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import { InitConfig } from '../signal/init/models';
+import { NetworkTestManager } from './NetworkTestManager';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -92,6 +94,7 @@ export class HMSSdk implements HMSInterface {
   private localTrackManager!: LocalTrackManager;
   private analyticsEventsService!: AnalyticsEventsService;
   private eventBus!: EventBus;
+  private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
@@ -107,6 +110,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.networkTestManager = new NetworkTestManager(this.listener);
     this.playlistManager = new PlaylistManager(this);
     this.notificationManager = new NotificationManager(this.store, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
@@ -265,6 +269,14 @@ export class HMSSdk implements HMSInterface {
 
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
+        .then((initConfig: InitConfig | void) => {
+          console.log(initConfig);
+
+          this.networkTestManager.start({
+            url: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3',
+            timeout: 1000,
+          });
+        })
         .catch(ex => {
           this.errorListener?.onError(ex as HMSException);
           this.sdkState.isPreviewInProgress = false;
