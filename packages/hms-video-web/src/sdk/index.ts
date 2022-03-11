@@ -270,12 +270,9 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
-          console.log(initConfig);
-
-          this.networkTestManager.start({
-            url: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3',
-            timeout: 3000,
-          });
+          if (initConfig) {
+            this.networkTestManager.start(initConfig.config.networkHealth);
+          }
         })
         .catch(ex => {
           this.errorListener?.onError(ex as HMSException);

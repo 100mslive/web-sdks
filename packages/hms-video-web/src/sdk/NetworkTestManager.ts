@@ -1,11 +1,12 @@
 import { HMSException } from '../error/HMSException';
 import { HMSUpdateListener } from '../interfaces';
+import { NetworkHealth, ScoreMap } from '../signal/init/models';
 import { sleep } from '../utils/timer-utils';
 
 export class NetworkTestManager {
   constructor(private listener?: HMSUpdateListener) {}
 
-  start = async ({ url, timeout }: { url: string; timeout: number }) => {
+  start = async ({ url, timeout, scoreMap }: NetworkHealth) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -37,8 +38,10 @@ export class NetworkTestManager {
           const totalTimeInSecs = (Date.now() - startTime) / 1000;
           const sizeInKB = downloadedSize / 1024;
           const bitrate = (sizeInKB / totalTimeInSecs) * 8;
+          const score = this.calculateScore(scoreMap, bitrate);
+          console.error({ score });
           if (!res) {
-            this.listener?.onNetworkQuality?.(bitrate);
+            this.listener?.onNetworkQuality?.(score);
           }
           console.error({ sizeInKB, bitrate, totalTimeInSecs });
         })
@@ -48,5 +51,15 @@ export class NetworkTestManager {
     } catch (error) {
       this.listener?.onError(error as HMSException);
     }
+  };
+
+  calculateScore = (scoreMap: ScoreMap, bitrate: number) => {
+    for (const key in scoreMap) {
+      const map = scoreMap[key];
+      if (bitrate >= map.low && (!map.high || bitrate <= map.high)) {
+        return Number(key);
+      }
+    }
+    return -1;
   };
 }
