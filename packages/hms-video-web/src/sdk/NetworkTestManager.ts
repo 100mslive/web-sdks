@@ -1,3 +1,4 @@
+import { HMSException } from '../error/HMSException';
 import { HMSUpdateListener } from '../interfaces';
 import { sleep } from '../utils/timer-utils';
 
@@ -14,34 +15,38 @@ export class NetworkTestManager {
       controller.abort();
       return true;
     });
-    const res = await fetch(url, { signal });
-    const reader = res.body?.getReader();
-    if (!reader) {
-      throw Error('unable to process request');
-    }
-    const readData = async () => {
+    try {
+      const res = await fetch(url, { signal });
+      const reader = res.body?.getReader();
       if (!reader) {
-        return;
+        throw Error('unable to process request');
       }
-      const { value, done } = await reader.read();
-      if (!done) {
-        downloadedSize += value.byteLength;
-        await readData();
-      }
-    };
-
-    return Promise.race([readData(), timeoutPromise])
-      .then(res => {
-        const totalTimeInSecs = (Date.now() - startTime) / 1000;
-        const sizeInKB = downloadedSize / 1024;
-        const bitrate = (sizeInKB / totalTimeInSecs) * 8;
-        if (!res) {
-          this.listener?.onNetworkQuality?.(bitrate);
+      const readData = async () => {
+        if (!reader) {
+          return;
         }
-        console.error({ sizeInKB, bitrate, totalTimeInSecs });
-      })
-      .catch(error => {
-        this.listener?.onError(error);
-      });
+        const { value, done } = await reader.read();
+        if (!done) {
+          downloadedSize += value.byteLength;
+          await readData();
+        }
+      };
+
+      return Promise.race([readData(), timeoutPromise])
+        .then(res => {
+          const totalTimeInSecs = (Date.now() - startTime) / 1000;
+          const sizeInKB = downloadedSize / 1024;
+          const bitrate = (sizeInKB / totalTimeInSecs) * 8;
+          if (!res) {
+            this.listener?.onNetworkQuality?.(bitrate);
+          }
+          console.error({ sizeInKB, bitrate, totalTimeInSecs });
+        })
+        .catch(error => {
+          this.listener?.onError(error);
+        });
+    } catch (error) {
+      this.listener?.onError(error as HMSException);
+    }
   };
 }
