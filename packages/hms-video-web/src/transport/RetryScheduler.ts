@@ -1,6 +1,3 @@
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { HMSException } from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
@@ -24,19 +21,13 @@ type RetryTask = () => Promise<boolean>;
 const TAG = '[RetryScheduler]';
 
 export class RetryScheduler {
-  private analyticsEventsService: AnalyticsEventsService;
-  private onStateChange: (state: TransportState, error?: HMSException) => void;
-
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(
-    analyticsEventsService: AnalyticsEventsService,
-    onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
-  ) {
-    this.analyticsEventsService = analyticsEventsService;
-    this.onStateChange = onStateChange;
-  }
+    private onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
+    private sendEvent: (error: HMSException, category: TFC) => void,
+  ) {}
 
   async schedule(
     category: TFC,
@@ -169,25 +160,6 @@ export class RetryScheduler {
     } else {
       await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
     }
-  }
-
-  private sendEvent(error: HMSException, category: TFC) {
-    let event: AnalyticsEvent;
-    switch (category) {
-      case TFC.ConnectFailed:
-        event = AnalyticsEventFactory.connect(error);
-        break;
-      case TFC.SignalDisconnect:
-        event = AnalyticsEventFactory.disconnect(error);
-        break;
-      case TFC.PublishIceConnectionFailed:
-        event = AnalyticsEventFactory.publish({ error });
-        break;
-      case TFC.SubscribeIceConnectionFailed:
-        event = AnalyticsEventFactory.subscribeFail(error);
-        break;
-    }
-    this.analyticsEventsService.queue(event!).flush();
   }
 
   private getDelayForRetryCount(n: number) {

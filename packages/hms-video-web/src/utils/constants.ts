@@ -13,6 +13,7 @@ export const MAX_TRANSPORT_RETRY_DELAY = 60;
 
 export const DEFAULT_SIGNAL_PING_TIMEOUT = 12000;
 export const DEFAULT_SIGNAL_PING_INTERVAL = 1000;
+export const PONG_RESPONSE_TIMES_SIZE = 5;
 
 export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID';
 export const SUBSCRIBE_TIMEOUT = 60000;
@@ -29,4 +30,5 @@ export const HMSEvents = {
   TRACK_RESTORED: 'track-restored',
   TRACK_AUDIO_LEVEL_UPDATE: 'track-audio-level-update',
   LOCAL_AUDIO_SILENCE: 'local-audio-silence',
+  ANALYTICS: 'analytics',
 };
