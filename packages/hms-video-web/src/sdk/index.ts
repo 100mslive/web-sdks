@@ -274,7 +274,7 @@ export class HMSSdk implements HMSInterface {
 
           this.networkTestManager.start({
             url: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3',
-            timeout: 1000,
+            timeout: 3000,
           });
         })
         .catch(ex => {
