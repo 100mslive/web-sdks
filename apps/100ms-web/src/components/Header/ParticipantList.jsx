@@ -21,7 +21,7 @@ import {
   useParticipantList,
 } from "@100mslive/react-sdk";
 import { RoleChangeModal } from "../RoleChangeModal";
-import ConnectionIndicator from "../Connection/ConnectionIndicator";
+import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 
 export const ParticipantList = () => {
   const { roles, participantsByRoles, peerCount, isConnected } =

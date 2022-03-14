@@ -3,6 +3,8 @@ export const getText = num => {
     return "Good Connection";
   } else if (num === 2) {
     return "Moderate Connection";
+  } else if (num === 0) {
+    return "Reconnecting";
   } else {
     return "Poor Connection";
   }

@@ -3,7 +3,7 @@ import {
   useHMSStore,
   selectConnectionQualityByPeerID,
 } from "@100mslive/react-sdk";
-import { styled, Tooltip } from "@100mslive/react-ui";
+import { styled, Tooltip, useTheme } from "@100mslive/react-ui";
 import { getColor, getText } from "./utils";
 
 const Wrapper = styled("span", {
@@ -17,14 +17,15 @@ const Wrapper = styled("span", {
   marginRight: "0.25rem",
 });
 
-const ConnectionIndicator = ({ peerId }) => {
+export const ConnectionIndicator = ({ peerId }) => {
   const downlinkScore = useHMSStore(
     selectConnectionQualityByPeerID(peerId)
   )?.downlinkScore;
+  const { theme } = useTheme();
+  const defaultColor = theme.colors.bgTertiary;
   if (downlinkScore === -1 || downlinkScore === undefined) {
     return null;
   }
-  const defaultColor = `var(--hms-ui-colors-grayDefault)`;
   return (
     <Tooltip title={getText(downlinkScore)}>
       <Wrapper>
@@ -64,5 +65,3 @@ const ConnectionIndicator = ({ peerId }) => {
     </Tooltip>
   );
 };
-
-export default ConnectionIndicator;

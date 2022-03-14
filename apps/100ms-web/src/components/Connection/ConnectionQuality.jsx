@@ -1,4 +1,8 @@
 import React from "react";
+import {
+  useHMSStore,
+  selectConnectionQualityByPeerID,
+} from "@100mslive/react-sdk";
 import { styled, Tooltip } from "@100mslive/react-ui";
 import { getColor, getText } from "./utils";
 
@@ -28,7 +32,10 @@ const Container = styled("div", {
 
 const dots = [1, 2, 3, 4, 5];
 
-const ConnectionQuality = ({ downlinkScore }) => {
+export const ConnectionQuality = ({ peerId }) => {
+  const downlinkScore = useHMSStore(
+    selectConnectionQualityByPeerID(peerId)
+  )?.downlinkScore;
   if (downlinkScore === -1 || downlinkScore === undefined) {
     return null;
   }
@@ -45,5 +52,3 @@ const ConnectionQuality = ({ downlinkScore }) => {
     </Tooltip>
   );
 };
-
-export default ConnectionQuality;

@@ -14,7 +14,6 @@ import {
   selectPeerByID,
   selectPeerMetadata,
   selectVideoTrackByPeerID,
-  selectConnectionQualityByPeerID,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -23,7 +22,7 @@ import {
 } from "@100mslive/react-icons";
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
-import ConnectionQuality from "./Connection/ConnectionQuality";
+import { ConnectionQuality } from "./Connection/ConnectionQuality";
 
 const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
@@ -37,9 +36,6 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
   const label = getVideoTileLabel(peer, track);
-  const downlinkScore = useHMSStore(
-    selectConnectionQualityByPeerID(peerId)
-  )?.downlinkScore;
   return (
     <StyledVideoTile.Root css={{ width, height }}>
       {peer ? (
@@ -50,7 +46,7 @@ const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
           }}
           ref={borderAudioRef}
         >
-          <ConnectionQuality downlinkScore={downlinkScore} />
+          <ConnectionQuality peerId={peerId} />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={peer?.audioTrack}
