@@ -1,9 +1,10 @@
-import { HMSException } from '../error/HMSException';
 import { HMSUpdateListener } from '../interfaces';
 import { NetworkHealth, ScoreMap } from '../signal/init/models';
+import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
 
 export class NetworkTestManager {
+  private TAG = 'NetworkTestManager';
   constructor(private listener?: HMSUpdateListener) {}
 
   start = async ({ timeout, scoreMap }: NetworkHealth) => {
@@ -47,11 +48,13 @@ export class NetworkTestManager {
           console.error({ sizeInKB, bitrate, totalTimeInSecs });
         })
         .catch(error => {
-          this.listener?.onError(error);
+          HMSLogger.e(this.TAG, error);
+          this.listener?.onNetworkQuality?.(-1);
         });
     } catch (error) {
+      HMSLogger.e(this.TAG, error);
       if ((error as Error).name !== 'AbortError') {
-        this.listener?.onError(error as HMSException);
+        this.listener?.onNetworkQuality?.(-1);
       }
     }
   };
