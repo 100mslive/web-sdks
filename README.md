@@ -36,7 +36,7 @@ For starting sdk and store locally, run `yarn start` in both folders.
 
 ### Update a packages version
 
-Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to 
+Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to
 update all versions.
 
 #### Updating single ones
@@ -62,7 +62,7 @@ if there is only one remote, add webapp as a new remote.
 
 ## push to webapp
 
-`git subtree push --prefix=apps/100ms-web webapp sync-web-app`
+`git subtree push --prefix=apps/100ms-web webapp sync-webapp`
 
 ## pull from webapp
 
