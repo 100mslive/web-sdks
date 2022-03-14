@@ -10,6 +10,9 @@ export const getText = connectionScore => {
   }
 };
 
+/**
+ position is needed here as we don't want all the dots/arcs to be colored, the non colored ones will be passed in the default color
+ */
 export const getColor = (position, connectionScore, defaultColor) => {
   if (connectionScore > 3) {
     return "#37F28D";
