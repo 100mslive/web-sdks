@@ -72,15 +72,13 @@ export const LeaveRoom = () => {
           </Popover.Content>
         </Popover.Root>
       ) : (
-        <Tooltip title="Leave Room">
-          <Button
-            variant="danger"
-            onClick={leaveRoom}
-            css={{ p: "$2 $6", "@md": { p: "$2 $4" } }}
-          >
-            <HangUpIcon />
-          </Button>
-        </Tooltip>
+        <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom">
+          <Tooltip title="Leave Room">
+            <Box>
+              <HangUpIcon key="hangUp" />
+            </Box>
+          </Tooltip>
+        </LeaveIconButton>
       )}
 
       <Dialog.Root
@@ -111,7 +109,7 @@ export const LeaveRoom = () => {
 };
 
 const LeaveIconButton = styled(IconButton, {
-  ml: "$4",
+  mx: "$4",
   bg: "$error",
   "&:not([disabled]):hover": {
     bg: "$errorTint",
