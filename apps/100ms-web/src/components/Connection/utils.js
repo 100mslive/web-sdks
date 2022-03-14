@@ -1,23 +1,23 @@
-export const getText = num => {
-  if (num > 2) {
+export const getText = connectionScore => {
+  if (connectionScore > 2) {
     return "Good Connection";
-  } else if (num === 2) {
+  } else if (connectionScore === 2) {
     return "Moderate Connection";
-  } else if (num === 0) {
+  } else if (connectionScore === 0) {
     return "Reconnecting";
   } else {
     return "Poor Connection";
   }
 };
 
-export const getColor = (index, value, defaultColor) => {
-  if (value > 3) {
+export const getColor = (position, connectionScore, defaultColor) => {
+  if (connectionScore > 3) {
     return "#37F28D";
-  } else if (value === 3) {
-    return index < 3 ? "#37F28D" : defaultColor;
-  } else if (value === 2) {
-    return index < 2 ? "#FAC919" : defaultColor;
+  } else if (connectionScore === 3) {
+    return position < 3 ? "#37F28D" : defaultColor;
+  } else if (connectionScore === 2) {
+    return position < 2 ? "#FAC919" : defaultColor;
   } else {
-    return index === 0 ? "#ED4C5A" : defaultColor;
+    return position === 0 ? "#ED4C5A" : defaultColor;
   }
 };
