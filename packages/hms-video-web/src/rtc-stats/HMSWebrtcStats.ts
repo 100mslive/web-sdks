@@ -51,7 +51,7 @@ export class HMSWebrtcStats {
     try {
       publishReport = await this.getStats.publish?.();
     } catch (err) {
-      HMSLogger.e(this.TAG, 'Error in getting publish stats', err);
+      HMSLogger.w(this.TAG, 'Error in getting publish stats', err);
     }
     const publishStats: HMSPeerStats['publish'] | undefined =
       publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
@@ -60,7 +60,7 @@ export class HMSWebrtcStats {
     try {
       subscribeReport = await this.getStats.subscribe?.();
     } catch (err) {
-      HMSLogger.e(this.TAG, 'Error in getting subscribe stats', err);
+      HMSLogger.w(this.TAG, 'Error in getting subscribe stats', err);
     }
     const baseSubscribeStats =
       subscribeReport && getLocalPeerStatsFromReport('subscribe', subscribeReport, prevLocalPeerStats);

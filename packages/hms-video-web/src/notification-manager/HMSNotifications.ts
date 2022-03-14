@@ -140,6 +140,15 @@ export interface SpeakerList {
   'speaker-list': Speaker[];
 }
 
+interface ConnectionQuality {
+  peer_id: string;
+  downlink_score: number;
+}
+
+export interface ConnectionQualityList {
+  peers: ConnectionQuality[];
+}
+
 /**
  * Represents the role change request received from the server
  */
