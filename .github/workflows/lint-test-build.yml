@@ -42,3 +42,4 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           event-type: automation
+          repository: 100mslive/playwright-automation
