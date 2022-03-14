@@ -29,12 +29,17 @@ const Container = styled("div", {
 const dots = [1, 2, 3, 4, 5];
 
 const ConnectionQuality = ({ downlinkScore }) => {
-  const score = Math.round(downlinkScore / 20);
+  if (downlinkScore === -1 || downlinkScore === undefined) {
+    return null;
+  }
   return (
-    <Tooltip title={getText(score)}>
+    <Tooltip title={getText(downlinkScore)}>
       <Container>
         {dots.map((_, i) => (
-          <Dot css={{ bg: getColor(i, score, "$bgTertiary") }} key={i} />
+          <Dot
+            css={{ bg: getColor(i, downlinkScore, "$bgTertiary") }}
+            key={i}
+          />
         ))}
       </Container>
     </Tooltip>
