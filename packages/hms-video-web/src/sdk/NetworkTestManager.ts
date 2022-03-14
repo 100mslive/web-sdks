@@ -6,7 +6,7 @@ import { sleep } from '../utils/timer-utils';
 export class NetworkTestManager {
   constructor(private listener?: HMSUpdateListener) {}
 
-  start = async ({ url, timeout, scoreMap }: NetworkHealth) => {
+  start = async ({ timeout, scoreMap }: NetworkHealth) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -17,6 +17,7 @@ export class NetworkTestManager {
       return true;
     });
     try {
+      const url = 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3';
       const res = await fetch(url, { signal });
       const reader = res.body?.getReader();
       if (!reader) {
