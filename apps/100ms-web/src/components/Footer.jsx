@@ -109,9 +109,6 @@ const Chat = ({ isChatOpen, toggleChat }) => {
 };
 
 export const Footer = ({ isChatOpen, toggleChat }) => {
-  const isVBPresent = useHMSStore(
-    selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
-  );
   return (
     <Flex
       justify="between"
@@ -140,9 +137,7 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
-        {FeatureFlags.enableWhiteboard && isVBPresent ? (
-          <VerticalDivider space={4} />
-        ) : null}
+        <LeftDivider />
         <VirtualBackground />
         <NoiseSuppression />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
@@ -187,5 +182,18 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
         <Chat isChatOpen={isChatOpen} toggleChat={toggleChat} />
       </Flex>
     </Flex>
+  );
+};
+
+const LeftDivider = () => {
+  const isVBPresent = useHMSStore(
+    selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
+  );
+  return (
+    <>
+      {FeatureFlags.enableWhiteboard && isVBPresent ? (
+        <VerticalDivider space={4} />
+      ) : null}
+    </>
   );
 };
