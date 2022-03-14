@@ -12,6 +12,7 @@ import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
+  selectIsLocalVideoPluginPresent,
 } from "@100mslive/react-sdk";
 import {
   Flex,
@@ -108,6 +109,9 @@ const Chat = ({ isChatOpen, toggleChat }) => {
 };
 
 export const Footer = ({ isChatOpen, toggleChat }) => {
+  const isVBPresent = useHMSStore(
+    selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
+  );
   return (
     <Flex
       justify="between"
@@ -136,7 +140,9 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
-        {FeatureFlags.enableWhiteboard ? <VerticalDivider space={4} /> : null}
+        {FeatureFlags.enableWhiteboard && isVBPresent ? (
+          <VerticalDivider space={4} />
+        ) : null}
         <VirtualBackground />
         <NoiseSuppression />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
