@@ -50,7 +50,9 @@ export class NetworkTestManager {
           this.listener?.onError(error);
         });
     } catch (error) {
-      this.listener?.onError(error as HMSException);
+      if ((error as Error).name !== 'AbortError') {
+        this.listener?.onError(error as HMSException);
+      }
     }
   };
 
