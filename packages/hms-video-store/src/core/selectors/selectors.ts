@@ -373,3 +373,4 @@ export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
+export const selectNetworkQuality = createSelector(selectRoom, room => room.networkQuality);
