@@ -7,7 +7,7 @@ export class NetworkTestManager {
   private TAG = 'NetworkTestManager';
   constructor(private listener?: HMSUpdateListener) {}
 
-  start = async ({ timeout, scoreMap }: NetworkHealth) => {
+  start = async ({ url, timeout, scoreMap }: NetworkHealth) => {
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -18,7 +18,6 @@ export class NetworkTestManager {
       return true;
     });
     try {
-      const url = 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3';
       const res = await fetch(url, { signal });
       const reader = res.body?.getReader();
       if (!reader) {
@@ -28,24 +27,24 @@ export class NetworkTestManager {
         if (!reader) {
           return;
         }
-        const { value, done } = await reader.read();
-        if (!done) {
-          downloadedSize += value.byteLength;
-          await readData();
+        try {
+          const { value, done } = await reader.read();
+          if (!done) {
+            downloadedSize += value.byteLength;
+            await readData();
+          }
+        } catch (error) {
+          HMSLogger.e(this.TAG, error);
         }
       };
 
       return Promise.race([readData(), timeoutPromise])
-        .then(res => {
+        .then(() => {
           const totalTimeInSecs = (Date.now() - startTime) / 1000;
           const sizeInKB = downloadedSize / 1024;
           const bitrate = (sizeInKB / totalTimeInSecs) * 8;
           const score = this.calculateScore(scoreMap, bitrate);
-          console.error({ score });
-          if (!res) {
-            this.listener?.onNetworkQuality?.(score);
-          }
-          console.error({ sizeInKB, bitrate, totalTimeInSecs });
+          this.listener?.onNetworkQuality?.(score);
         })
         .catch(error => {
           HMSLogger.e(this.TAG, error);
