@@ -150,7 +150,11 @@ export function EdtechComponent({
               tokenEndpoint={tokenEndpoint}
               policyConfig={policyConfig}
               appDetails={metadata}
-              logo={logo}
+              logo={
+                logo || theme === "dark"
+                  ? require("./images/logo-light.svg")
+                  : require("./images/logo-dark.svg")
+              }
             >
               <Box
                 css={{
