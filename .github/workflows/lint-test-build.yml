@@ -36,3 +36,11 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        if: github.ref == 'main' || github.ref == 'production'
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          event-type: automation
+          repository: 100mslive/playwright-automation
