@@ -610,8 +610,9 @@ export class HMSSDKActions implements IHMSActions {
 
   private onNetworkQuality(quality: number) {
     this.setState(store => {
-      store.room.networkQuality = quality;
-    });
+      const peerId = store.room.localPeer;
+      store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
+    }, 'ConnectionQuality');
   }
 
   private async startScreenShare(audioOnly?: boolean) {
