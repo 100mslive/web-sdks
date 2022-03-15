@@ -22,7 +22,7 @@ export const getTrackStats = async (
   try {
     trackReport = await getStats[peerConnectionType]?.(nativeTrack);
   } catch (err) {
-    HMSLogger.e('[HMSWebrtcStats]', 'Error in getting track stats', track, nativeTrack, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, nativeTrack, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 

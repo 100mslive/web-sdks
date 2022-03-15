@@ -33,17 +33,13 @@ export abstract class AnalyticsTransport {
 
   private sendSingleEvent(event: AnalyticsEvent) {
     try {
-      HMSLogger.d(this.TAG, 'Sending event', { event });
       this.transportProvider.sendEvent(event);
+      HMSLogger.d(this.TAG, 'Sent event', event.name, event);
     } catch (error) {
-      HMSLogger.w(
-        this.TAG,
-        `${this.transportProvider.constructor.name}.sendEvent failed, adding to local storage events`,
-        {
-          event,
-          error,
-        },
-      );
+      HMSLogger.w(this.TAG, `${this.transportProvider.TAG}.sendEvent failed, adding to local storage events`, {
+        event,
+        error,
+      });
       this.failedEvents.enqueue(event);
       throw error;
     }

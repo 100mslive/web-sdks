@@ -70,6 +70,10 @@ export const selectSpeakers = (store: HMSStore) => {
   return store.speakers;
 };
 
+export const selectConnectionQualities = (store: HMSStore) => {
+  return store.connectionQualities;
+};
+
 /**
  * Select a boolean flag denoting whether you've joined a room.
  * NOTE: Returns true only after join, returns false during preview.

@@ -2,7 +2,7 @@ import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
 import { HMSMessage, HMSMessageID } from './message';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
+import { DeviceMap, HMSPeerStats, HMSTrackStats, HMSConnectionQuality } from '../hmsSDKStore/sdkTypes';
 import { HMSRole } from './role';
 import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSException } from './error';
@@ -16,6 +16,7 @@ export interface HMSStore {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
+  connectionQualities: Record<HMSPeerID, HMSConnectionQuality>;
   tracks: Record<HMSTrackID, HMSTrack>;
   playlist: HMSPlaylist<any>;
   messages: {
@@ -93,6 +94,7 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     messages: { byID: {}, allIDs: [] },
     speakers: {},
+    connectionQualities: {},
     settings: {
       audioInputDeviceId: '',
       audioOutputDeviceId: '',

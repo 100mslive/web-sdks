@@ -1,10 +1,16 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSAudioListener, HMSUpdateListener } from '../interfaces';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
-import { OnTrackLayerUpdateNotification, PolicyParams, SpeakerList, TrackStateNotification } from './HMSNotifications';
+import {
+  ConnectionQualityList,
+  OnTrackLayerUpdateNotification,
+  PolicyParams,
+  SpeakerList,
+  TrackStateNotification,
+} from './HMSNotifications';
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { PeerListManager } from './managers/PeerListManager';
@@ -13,6 +19,7 @@ import { PolicyChangeManager } from './managers/PolicyChangeManager';
 import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
+import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
 
 export class NotificationManager {
   private TAG = '[HMSNotificationManager]';
@@ -20,6 +27,7 @@ export class NotificationManager {
   private peerManager: PeerManager;
   private peerListManager: PeerListManager;
   private activeSpeakerManager: ActiveSpeakerManager;
+  private connectionQualityManager: ConnectionQualityManager;
   private broadcastManager: BroadcastManager;
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
@@ -32,7 +40,12 @@ export class NotificationManager {
    */
   private hasConsistentRoomStateArrived = false;
 
-  constructor(private store: IStore, private listener?: HMSUpdateListener, private audioListener?: HMSAudioListener) {
+  constructor(
+    private store: IStore,
+    private listener?: HMSUpdateListener,
+    private audioListener?: HMSAudioListener,
+    private connectionQualityListener?: HMSConnectionQualityListener,
+  ) {
     this.trackManager = new TrackManager(this.store, this.eventEmitter, this.listener);
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
@@ -40,6 +53,7 @@ export class NotificationManager {
     this.policyChangeManager = new PolicyChangeManager(this.store, this.eventEmitter);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
+    this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
   }
 
@@ -59,6 +73,11 @@ export class NotificationManager {
     this.activeSpeakerManager.audioListener = audioListener;
   }
 
+  setConnectionQualityListener(qualityListener?: HMSConnectionQualityListener) {
+    this.connectionQualityListener = qualityListener;
+    this.connectionQualityManager.listener = qualityListener;
+  }
+
   addEventListener(event: string, listener: EventListener) {
     this.eventEmitter.addListener(event, listener);
   }
@@ -75,7 +94,13 @@ export class NotificationManager {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
-    if (![HMSNotificationMethod.ACTIVE_SPEAKERS, HMSNotificationMethod.SFU_STATS].includes(method)) {
+    if (
+      ![
+        HMSNotificationMethod.ACTIVE_SPEAKERS,
+        HMSNotificationMethod.SFU_STATS,
+        HMSNotificationMethod.CONNECTION_QUALITY,
+      ].includes(method)
+    ) {
       HMSLogger.d(this.TAG, 'Received notification', { method, notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {
@@ -93,7 +118,11 @@ export class NotificationManager {
     this.requestManager.handleNotification(method, notification);
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
+    this.handleIsolatedMethods(method, notification);
+  }
 
+  // eslint-disable-next-line complexity
+  handleIsolatedMethods(method: string, notification: any) {
     switch (method) {
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
         this.trackManager.handleTrackMetadataAdd(notification as TrackStateNotification);
@@ -109,6 +138,10 @@ export class NotificationManager {
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:
         this.activeSpeakerManager.handleActiveSpeakers(notification as SpeakerList);
+        break;
+
+      case HMSNotificationMethod.CONNECTION_QUALITY:
+        this.connectionQualityManager.handleQualityUpdate(notification as ConnectionQualityList);
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:

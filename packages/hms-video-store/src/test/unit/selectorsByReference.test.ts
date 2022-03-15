@@ -1,5 +1,10 @@
-import { localAudio, localVideo, makeFakeStore } from '../fakeStore';
-import { HMSStore, selectIsLocalVideoPluginPresent, selectIsLocalAudioPluginPresent } from '../../core';
+import { localAudio, localPeer, localVideo, makeFakeStore } from '../fakeStore';
+import {
+  HMSStore,
+  selectIsLocalVideoPluginPresent,
+  selectIsLocalAudioPluginPresent,
+  selectConnectionQualityByPeerID,
+} from '../../core';
 
 let fakeStore: HMSStore;
 
@@ -19,5 +24,14 @@ describe('test selectors by reference', () => {
     expect(selectIsLocalAudioPluginPresent('plugin1')(fakeStore)).toBe(true);
     expect(selectIsLocalAudioPluginPresent('plugin2')(fakeStore)).toBe(true);
     expect(selectIsLocalAudioPluginPresent('plugin3')(fakeStore)).toBe(false);
+  });
+
+  test('connection quality', () => {
+    const score = 70;
+    fakeStore.connectionQualities[localPeer.id] = {
+      peerID: localPeer.id,
+      downlinkScore: score,
+    };
+    expect(selectConnectionQualityByPeerID(localPeer.id)(fakeStore)?.downlinkScore).toBe(score);
   });
 });

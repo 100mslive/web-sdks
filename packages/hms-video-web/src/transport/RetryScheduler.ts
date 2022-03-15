@@ -1,7 +1,4 @@
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { HMSException } from '../error/HMSException';
-import { EventBus } from '../events/EventBus';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
@@ -24,17 +21,13 @@ type RetryTask = () => Promise<boolean>;
 const TAG = '[RetryScheduler]';
 
 export class RetryScheduler {
-  private onStateChange: (state: TransportState, error?: HMSException) => void;
-
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(
-    private eventBus: EventBus,
-    onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
-  ) {
-    this.onStateChange = onStateChange;
-  }
+    private onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
+    private sendEvent: (error: HMSException, category: TFC) => void,
+  ) {}
 
   async schedule(
     category: TFC,
@@ -167,25 +160,6 @@ export class RetryScheduler {
     } else {
       await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
     }
-  }
-
-  private sendEvent(error: HMSException, category: TFC) {
-    let event: AnalyticsEvent;
-    switch (category) {
-      case TFC.ConnectFailed:
-        event = AnalyticsEventFactory.connect(error);
-        break;
-      case TFC.SignalDisconnect:
-        event = AnalyticsEventFactory.disconnect(error);
-        break;
-      case TFC.PublishIceConnectionFailed:
-        event = AnalyticsEventFactory.publish({ error });
-        break;
-      case TFC.SubscribeIceConnectionFailed:
-        event = AnalyticsEventFactory.subscribeFail(error);
-        break;
-    }
-    this.eventBus.analytics.publish(event!);
   }
 
   private getDelayForRetryCount(n: number) {

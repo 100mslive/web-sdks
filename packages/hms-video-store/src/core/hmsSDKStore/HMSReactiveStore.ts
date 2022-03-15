@@ -255,7 +255,7 @@ export class HMSReactiveStore {
   private static devtoolsOptions(prefix: string) {
     return {
       name: prefix,
-      actionsBlacklist: ['audioLevel', 'playlistProgress'], // very high frequency update, pollutes the action history
+      actionsBlacklist: ['audioLevel', 'playlistProgress', 'connectionQuality'], // very high frequency update, pollutes the action history
     };
   }
 

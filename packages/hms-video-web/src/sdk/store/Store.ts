@@ -334,6 +334,7 @@ class Store implements IStore {
     for (const track of tracks) {
       track.cleanup();
     }
+    this.room = undefined;
     this.config = undefined;
     this.localPeerId = undefined;
     this.roleDetailsArrived = false;

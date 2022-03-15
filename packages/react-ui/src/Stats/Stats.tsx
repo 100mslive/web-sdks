@@ -1,20 +1,30 @@
 import React from 'react';
-import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
+import {
+  useHMSStatsStore,
+  HMSTrackID,
+  HMSTrackStats,
+  selectHMSStats,
+  HMSPeerID,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
+import { selectConnectionQualityByPeerID } from '@100mslive/hms-video-store';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
   audioTrackID?: HMSTrackID;
+  peerID?: HMSPeerID;
 }
 
 /**
  * This component can be used to overlay webrtc stats over the Video Tile. For the local tracks it also includes
  * remote inbound stats as sent by the SFU in receiver report.
  */
-export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
+export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTileStatsProps) {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+  const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkScore;
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
@@ -52,6 +62,8 @@ export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsPro
             label="Bitrate(A)"
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
+
+          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
 
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
