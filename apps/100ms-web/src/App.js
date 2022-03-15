@@ -153,7 +153,7 @@ export function EdtechComponent({
               tokenEndpoint={tokenEndpoint}
               policyConfig={policyConfig}
               appDetails={metadata}
-              logo={logo ? logo : theme === "dark" ? LogoForDark : LogoForLight}
+              logo={logo || (theme === "dark" ? LogoForDark : LogoForLight)}
             >
               <Box
                 css={{
