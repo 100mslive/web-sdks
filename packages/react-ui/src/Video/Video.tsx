@@ -42,10 +42,11 @@ interface Props {
    * trackID for peer (videoTrack)
    */
   trackId: HMSPeer['videoTrack'];
+  attach?: boolean;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, ...props }) => {
-  const { videoRef } = useVideo({ trackId });
+export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
+  const { videoRef } = useVideo({ trackId, attach });
   return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
 };
 
