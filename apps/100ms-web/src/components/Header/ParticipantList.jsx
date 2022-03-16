@@ -21,7 +21,7 @@ import {
   useParticipantList,
 } from "@100mslive/react-sdk";
 import { RoleChangeModal } from "../RoleChangeModal";
-import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
+import { ConnectionIndicatorInList } from "../Connection/ConnectionIndicatorInList";
 
 export const ParticipantList = () => {
   const { roles, participantsByRoles, peerCount, isConnected } =
@@ -147,7 +147,7 @@ const ParticipantListInARole = ({
             <Text variant="md" css={{ ...textEllipsis(150), flex: "1 1 0" }}>
               {peer.name}
             </Text>
-            <ConnectionIndicator peerId={peer.id} />
+            <ConnectionIndicatorInList peerId={peer.id} />
             {showActions && (
               <ParticipantActions
                 peerId={peer.id}

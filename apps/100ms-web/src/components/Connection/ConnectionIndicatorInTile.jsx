@@ -32,7 +32,7 @@ const Container = styled("div", {
 
 const dots = [1, 2, 3, 4, 5];
 
-export const ConnectionQuality = ({ peerId }) => {
+export const ConnectionIndicatorInTile = ({ peerId }) => {
   const downlinkScore = useHMSStore(
     selectConnectionQualityByPeerID(peerId)
   )?.downlinkScore;
@@ -42,10 +42,10 @@ export const ConnectionQuality = ({ peerId }) => {
   return (
     <Tooltip title={getText(downlinkScore)}>
       <Container>
-        {dots.map((_, i) => (
+        {dots.map(position => (
           <Dot
-            css={{ bg: getColor(i, downlinkScore, "$bgTertiary") }}
-            key={i}
+            css={{ bg: getColor(position, downlinkScore, "$bgTertiary") }}
+            key={position}
           />
         ))}
       </Container>
