@@ -8,7 +8,7 @@ export class NetworkTestManager {
   constructor(private listener?: HMSUpdateListener) {}
 
   start = async ({ url, timeout, scoreMap }: NetworkHealth) => {
-    if (!window.HMS?.NETWORT_TEST) {
+    if (!window.HMS?.NETWORK_TEST) {
       return;
     }
     const controller = new AbortController();
