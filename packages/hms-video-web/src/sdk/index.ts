@@ -8,6 +8,7 @@ import {
   HMSRoleChangeRequest,
   HMSVideoCodec,
   PublishParams,
+  ScreenShareConfig,
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import HMSInterface from '../interfaces/hms';
@@ -471,7 +472,7 @@ export class HMSSdk implements HMSInterface {
     return hmsMessage;
   }
 
-  async startScreenShare(onStop: () => void, audioOnly = false) {
+  async startScreenShare(onStop: () => void, config: ScreenShareConfig = { audioOnly: false, videoOnly: false }) {
     const publishParams = this.publishParams;
     if (!publishParams) {
       return;
@@ -489,7 +490,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const tracks = await this.getScreenshareTracks(publishParams, onStop, audioOnly);
+    const tracks = await this.getScreenshareTracks(publishParams, onStop, config);
     if (!this.localPeer) {
       HMSLogger.d(this.TAG, 'Screenshared when not connected');
       tracks.forEach(track => {
@@ -890,10 +891,10 @@ export class HMSSdk implements HMSInterface {
    * Get screenshare based on policy and audioOnly flag
    * @param {PublishParams} publishParams
    * @param {function} onStop
-   * @param {boolean} audioOnly
+   * @param config
    * @returns
    */
-  private async getScreenshareTracks(publishParams: PublishParams, onStop: () => void, audioOnly: boolean) {
+  private async getScreenshareTracks(publishParams: PublishParams, onStop: () => void, config: ScreenShareConfig) {
     const { screen } = publishParams;
     const dimensions = this.store.getSimulcastDimensions('screen');
     const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
@@ -906,7 +907,7 @@ export class HMSSdk implements HMSInterface {
         .setWidth(dimensions?.width || screen.width)
         .setHeight(dimensions?.height || screen.height)
         .build(),
-      new HMSAudioTrackSettingsBuilder().build(),
+      config.videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
     );
 
     const handleEnded = () => {
@@ -914,7 +915,7 @@ export class HMSSdk implements HMSInterface {
     };
 
     const tracks = [];
-    if (audioOnly) {
+    if (config.audioOnly) {
       videoTrack.nativeTrack.stop();
       if (!audioTrack) {
         throw Error('Select share audio when sharing screen');

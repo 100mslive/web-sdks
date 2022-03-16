@@ -187,20 +187,23 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings: HMSAudioTrackSettings) {
-    const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
-    // remove advanced constraints as it not supported for screenshare audio
-    delete audioConstraints.advanced;
+  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings?: HMSAudioTrackSettings) {
     const constraints = {
       video: videosettings.toConstraints(),
-      audio: {
+    } as MediaStreamConstraints;
+    if (audioSettings) {
+      const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
+      // remove advanced constraints as it not supported for screenshare audio
+      delete audioConstraints.advanced;
+      constraints.audio = {
         ...audioConstraints,
         autoGainControl: false,
         noiseSuppression: false,
+        // @ts-ignore
         googAutoGainControl: false,
         echoCancellation: false,
-      },
-    } as MediaStreamConstraints;
+      };
+    }
     let stream;
     try {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
