@@ -1,3 +1,7 @@
+/**
+ * Thresholds for the network quality scores in kbps.
+ * ex: { 1: { low: 300, high: 400 }}
+ */
 export type ScoreMap = Record<
   number,
   {
@@ -6,6 +10,11 @@ export type ScoreMap = Record<
   }
 >;
 
+/**
+ * Informantion necessary to test network quality. it provides a url to be
+ * downloaded and timeout for the url download. And also the scores to be
+ * assigned based on the downloaded data and time.
+ */
 export interface NetworkHealth {
   url: string;
   timeout: number;
