@@ -18,7 +18,7 @@ export class NetworkTestManager {
       return true;
     });
     try {
-      const res = await fetch(url, { signal });
+      const res = await fetch(`${url}?${Date.now()}`, { signal });
       const reader = res.body?.getReader();
       if (!reader) {
         throw Error('unable to process request');
@@ -28,10 +28,13 @@ export class NetworkTestManager {
           return;
         }
         try {
-          const { value, done } = await reader.read();
-          if (!done) {
-            downloadedSize += value.byteLength;
-            await readData();
+          let completed = false;
+          while (!completed) {
+            const { value, done } = await reader.read();
+            completed = done;
+            if (value) {
+              downloadedSize += value.byteLength;
+            }
           }
         } catch (error) {
           HMSLogger.e(this.TAG, error);
@@ -59,10 +62,10 @@ export class NetworkTestManager {
   };
 
   calculateScore = (scoreMap: ScoreMap, bitrate: number) => {
-    for (const key in scoreMap) {
-      const map = scoreMap[key];
-      if (bitrate >= map.low && (!map.high || bitrate <= map.high)) {
-        return Number(key);
+    for (const score in scoreMap) {
+      const thresholds = scoreMap[score];
+      if (bitrate >= thresholds.low && (!thresholds.high || bitrate <= thresholds.high)) {
+        return Number(score);
       }
     }
     return -1;
