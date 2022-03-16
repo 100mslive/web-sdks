@@ -188,7 +188,7 @@ const LeftDivider = () => {
   const allowedToPublish = useHMSStore(selectIsAllowedToPublish);
   return (
     <>
-      {allowedToPublish.video && allowedToPublish.audio ? (
+      {allowedToPublish.screen || FeatureFlags.enableWhiteboard ? (
         <VerticalDivider space={4} />
       ) : null}
     </>
