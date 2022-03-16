@@ -345,7 +345,7 @@ export default class HMSTransport implements ITransport {
     this.observer.onStateChange(this.state);
   }
 
-  async connect(token: string, endpoint: string, peerId: string) {
+  async connect(token: string, endpoint: string, peerId: string): Promise<InitConfig | void> {
     try {
       return await this.internalConnect(token, endpoint, peerId);
     } catch (error) {
@@ -703,6 +703,7 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();
+      return this.initConfig;
     } catch (error) {
       if (error instanceof HMSException && this.state !== TransportState.Reconnecting) {
         this.eventBus.analytics.publish(

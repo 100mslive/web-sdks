@@ -551,6 +551,7 @@ export class HMSSDKActions implements IHMSActions {
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -607,10 +608,18 @@ export class HMSSDKActions implements IHMSActions {
       onDeviceChange: this.onDeviceChange.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
+  }
+
+  private onNetworkQuality(quality: number) {
+    this.setState(store => {
+      const peerId = store.room.localPeer;
+      store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
+    }, 'ConnectionQuality');
   }
 
   private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
