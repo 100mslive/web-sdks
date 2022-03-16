@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 import useSSR from './useSSR';
