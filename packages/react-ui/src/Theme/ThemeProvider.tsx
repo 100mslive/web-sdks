@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 import useSSR from './useSSR';
@@ -31,19 +31,9 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   children,
 }) => {
   const previousClassName = useRef('');
-<<<<<<< HEAD
-  const [updatedTheme, setTheme] = useState(createTheme({ themeType, theme: userTheme || {} }));
-  const { isBrowser } = useSSR();
-
-  useEffect(() => {
-    if (!isBrowser) {
-      return;
-    }
-=======
   const { isBrowser } = useSSR();
 
   const updatedTheme = useMemo(() => {
->>>>>>> main
     const updatedTheme = createTheme({ themeType, theme: userTheme || {} });
     if (!isBrowser) {
       return updatedTheme;
@@ -53,14 +43,9 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     }
     previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
-<<<<<<< HEAD
-    setTheme(updatedTheme);
-  }, [isBrowser, userTheme, themeType]);
-=======
     return updatedTheme;
   }, [userTheme, themeType, isBrowser]);
 
->>>>>>> main
   return (
     <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio }}>
       {children}
