@@ -42,9 +42,11 @@ export const baseConfig = {
       primaryLight: '#6DA6FF',
       primaryDefault: '#2F80FF',
       primaryDark: '#184080',
+      primaryDisabled: '#D8E7FF',
       secondaryLight: '#505863',
       secondaryDefault: '#657080',
       secondaryDark: '#1E2329',
+      secondaryDisabled: '#DCE4EF',
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',
