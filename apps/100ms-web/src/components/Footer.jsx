@@ -12,8 +12,6 @@ import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
-  selectIsLocalVideoPluginPresent,
-  selectIsLocalAudioPluginPresent,
 } from "@100mslive/react-sdk";
 import {
   Flex,
@@ -187,17 +185,10 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
 };
 
 const LeftDivider = () => {
-  const isVBPresent = useHMSStore(
-    selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
-  );
-  const isNSPresent = useHMSStore(
-    selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
-  );
   const allowedToPublish = useHMSStore(selectIsAllowedToPublish);
   return (
     <>
-      {(allowedToPublish.screen || FeatureFlags.enableWhiteboard) &&
-      (isVBPresent || isNSPresent) ? (
+      {allowedToPublish.video && allowedToPublish.audio ? (
         <VerticalDivider space={4} />
       ) : null}
     </>
