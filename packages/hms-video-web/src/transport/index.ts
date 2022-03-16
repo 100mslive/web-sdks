@@ -269,7 +269,7 @@ export default class HMSTransport implements ITransport {
 
   async getLocalScreen(
     videoSettings: HMSVideoTrackSettings,
-    audioSettings: HMSAudioTrackSettings,
+    audioSettings?: HMSAudioTrackSettings,
   ): Promise<Array<HMSLocalTrack>> {
     try {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
