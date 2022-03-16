@@ -16,7 +16,6 @@ async function main() {
   const external = Object.keys(pkg.dependencies || {});
   if (isReact) {
     external.push('react');
-    external.push('react-dom');
   }
   try {
     esbuild.buildSync({
