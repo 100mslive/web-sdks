@@ -31,6 +31,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   children,
 }) => {
   const previousClassName = useRef('');
+<<<<<<< HEAD
   const [updatedTheme, setTheme] = useState(createTheme({ themeType, theme: userTheme || {} }));
   const { isBrowser } = useSSR();
 
@@ -38,14 +39,28 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     if (!isBrowser) {
       return;
     }
+=======
+  const { isBrowser } = useSSR();
+
+  const updatedTheme = useMemo(() => {
+>>>>>>> main
     const updatedTheme = createTheme({ themeType, theme: userTheme || {} });
+    if (!isBrowser) {
+      return updatedTheme;
+    }
     if (previousClassName.current) {
       document.documentElement.classList.remove(previousClassName.current);
     }
     previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
+<<<<<<< HEAD
     setTheme(updatedTheme);
   }, [isBrowser, userTheme, themeType]);
+=======
+    return updatedTheme;
+  }, [userTheme, themeType, isBrowser]);
+
+>>>>>>> main
   return (
     <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio }}>
       {children}
