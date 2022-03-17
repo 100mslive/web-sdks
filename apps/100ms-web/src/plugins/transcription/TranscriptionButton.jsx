@@ -10,11 +10,14 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, Tooltip, Text } from "@100mslive/react-ui";
 import { Button } from "@100mslive/hms-video-react";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
-const pusher = new Pusher(process.env.REACT_APP_TRANSCRIPTION_PUSHER_APP_KEY, {
-  cluster: "ap2",
-  authEndpoint: process.env.REACT_APP_TRANSCRIPTION_PUSHER_AUTHENDPOINT,
-});
+const pusher =
+  FeatureFlags.enableTranscription &&
+  new Pusher(process.env.REACT_APP_TRANSCRIPTION_PUSHER_APP_KEY, {
+    cluster: "ap2",
+    authEndpoint: process.env.REACT_APP_TRANSCRIPTION_PUSHER_AUTHENDPOINT,
+  });
 let channel = null;
 
 export function TranscriptionButton() {
