@@ -25,10 +25,9 @@ import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionQuality } from "./Connection/ConnectionQuality";
 import { AppContext } from "./context/AppContext";
 
-const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
+const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
-  const { isAudioOnly } = useContext(AppContext);
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
   const [isMouseHovered, setIsMouseHovered] = useState(false);
