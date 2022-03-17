@@ -793,7 +793,7 @@ export class HMSSdk implements HMSInterface {
     const room = this.store.getRoom();
     room.joinedAt = new Date();
     if (localPeer) {
-      localPeer.joinedAt = new Date();
+      localPeer.joinedAt = room.joinedAt;
     }
 
     if (localPeer?.role) {
