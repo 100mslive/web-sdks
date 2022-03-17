@@ -119,7 +119,7 @@ export const UISettings = ({ open, onOpenChange }) => {
             css={{ margin: "0 0" }}
           />
           <DialogCheckbox
-            title="Audio only mode"
+            title="Audio Only Mode"
             id="audioOnlyMode"
             value={isAudioOnly}
             onChange={value => {
