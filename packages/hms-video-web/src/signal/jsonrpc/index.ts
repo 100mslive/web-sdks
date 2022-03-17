@@ -18,13 +18,19 @@ import { PromiseCallbacks } from '../../utils/promise';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
-import { DEFAULT_SIGNAL_PING_TIMEOUT, DEFAULT_SIGNAL_PING_INTERVAL } from '../../utils/constants';
+import {
+  DEFAULT_SIGNAL_PING_TIMEOUT,
+  DEFAULT_SIGNAL_PING_INTERVAL,
+  PONG_RESPONSE_TIMES_SIZE,
+} from '../../utils/constants';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
+import { Queue } from '../../utils/queue';
 
 export default class JsonRpcSignal implements ISignal {
-  private readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[ SIGNAL ]: ';
   readonly observer: ISignalEventsObserver;
+  readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
   /**
    * Sometimes before [join] is completed, there could be a lot of trickles
@@ -48,7 +54,7 @@ export default class JsonRpcSignal implements ISignal {
     return this._isConnected;
   }
 
-  public set isConnected(newValue: boolean) {
+  public setIsConnected(newValue: boolean, reason = '') {
     HMSLogger.d(this.TAG, 'isConnected set', { id: this.id, old: this._isConnected, new: newValue });
     if (this._isConnected === newValue) {
       return;
@@ -57,7 +63,7 @@ export default class JsonRpcSignal implements ISignal {
     if (this._isConnected && !newValue) {
       // went offline
       this._isConnected = newValue;
-      this.observer.onOffline();
+      this.observer.onOffline(reason);
     } else if (!this._isConnected && newValue) {
       // went online
       this._isConnected = newValue;
@@ -69,7 +75,7 @@ export default class JsonRpcSignal implements ISignal {
     this.observer = observer;
     window.addEventListener('offline', () => {
       HMSLogger.d(this.TAG, 'Window network offline');
-      this.isConnected = false;
+      this.setIsConnected(false, 'Window network offline');
     });
 
     window.addEventListener('online', () => {
@@ -78,6 +84,10 @@ export default class JsonRpcSignal implements ISignal {
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
     this.onMessageHandler = this.onMessageHandler.bind(this);
+  }
+
+  getPongResponseTimes() {
+    return this.pongResponseTimes.toList();
   }
 
   private async call<T>(method: string, params: any): Promise<T> {
@@ -136,7 +146,7 @@ export default class JsonRpcSignal implements ISignal {
 
       const openHandler = () => {
         resolve();
-        this.isConnected = true;
+        this.setIsConnected(true);
         this.id++;
         this.socket!.removeEventListener('open', openHandler);
         this.socket!.removeEventListener('error', errorListener);
@@ -157,7 +167,7 @@ export default class JsonRpcSignal implements ISignal {
 
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     this.socket!.close(1000, 'Normal Close');
-    this.isConnected = false;
+    this.setIsConnected(false, 'code: 1000, normal websocket close');
     this.socket!.removeEventListener('close', this.onCloseHandler);
     this.socket!.removeEventListener('message', this.onMessageHandler);
     return p;
@@ -280,7 +290,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private onCloseHandler(event: CloseEvent) {
     HMSLogger.d(`Websocket closed code=${event.code}`);
-    this.isConnected = false;
+    this.setIsConnected(false, `code: ${event.code},  unexpected websocket close`);
     // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 
     // @DISCUSS: onOffline would have thrown error already.
@@ -355,6 +365,7 @@ export default class JsonRpcSignal implements ISignal {
     const pingTimeout = window.HMS?.PING_TIMEOUT || DEFAULT_SIGNAL_PING_TIMEOUT;
     if (this.isConnected) {
       const pongTimeDiff = await this.ping(pingTimeout);
+      this.pongResponseTimes.enqueue(pongTimeDiff);
       if (pongTimeDiff > pingTimeout) {
         let pageHidden = false;
         if (typeof document !== undefined && document.hidden) {
@@ -362,7 +373,7 @@ export default class JsonRpcSignal implements ISignal {
         }
         HMSLogger.d(this.TAG, `Pong timeout ${id}, pageHidden=${pageHidden}`);
         if (this.id === id) {
-          this.isConnected = false;
+          this.setIsConnected(false, 'ping pong failure');
         }
       } else {
         setTimeout(() => this.pingPongLoop(id), window.HMS?.PING_INTERVAL || DEFAULT_SIGNAL_PING_INTERVAL);
