@@ -15,4 +15,3 @@ jobs:
           skip-branches: '^(main|production|hotfix)$'
           skip-comments: true
           pr-threshold: 1000
-          validate_issue_status	: true
