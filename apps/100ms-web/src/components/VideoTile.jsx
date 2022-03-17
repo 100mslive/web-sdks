@@ -22,8 +22,7 @@ import {
 } from "@100mslive/react-icons";
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
-import { ConnectionQuality } from "./Connection/ConnectionQuality";
-import { AppContext } from "./context/AppContext";
+import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 
 const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
@@ -47,7 +46,7 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
           }}
           ref={borderAudioRef}
         >
-          <ConnectionQuality peerId={peerId} />
+          <ConnectionIndicator isTile peerId={peerId} />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={peer?.audioTrack}

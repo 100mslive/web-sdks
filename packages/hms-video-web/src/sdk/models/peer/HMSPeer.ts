@@ -9,6 +9,7 @@ export type HMSPeerInit = {
   customerUserId?: string;
   metadata?: string;
   role?: HMSRole;
+  joinedAt?: Date;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -21,13 +22,15 @@ export class HMSPeer implements IHMSPeer {
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[] = [];
   role?: HMSRole;
+  joinedAt?: Date;
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
     this.customerUserId = customerUserId;
     this.metadata = metadata;
+    this.joinedAt = joinedAt;
 
     if (role) {
       this.role = role;
