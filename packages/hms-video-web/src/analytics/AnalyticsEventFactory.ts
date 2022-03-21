@@ -6,6 +6,7 @@ import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
 import { HMSRemoteVideoTrack } from '../media/tracks';
+import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -13,6 +14,7 @@ export default class AnalyticsEventFactory {
 
   static connect(
     error?: HMSException,
+    additionalProperties?: AdditionalAnalyticsProperties,
     requestedAt: Date = new Date(),
     respondedAt: Date = new Date(),
     endpoint?: string,
@@ -22,6 +24,7 @@ export default class AnalyticsEventFactory {
 
     const properties = this.getPropertiesWithError(
       {
+        ...additionalProperties,
         [this.KEY_REQUESTED_AT]: requestedAt?.getTime(),
         [this.KEY_RESPONDED_AT]: respondedAt?.getTime(),
         endpoint,
@@ -32,10 +35,10 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static disconnect(error?: HMSException) {
+  static disconnect(error?: HMSException, additionalProperties?: AdditionalAnalyticsProperties) {
     const name = 'disconnected';
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-    const properties = this.getPropertiesWithError({}, error);
+    const properties = this.getPropertiesWithError(additionalProperties, error);
 
     return new AnalyticsEvent({ name, level, properties });
   }

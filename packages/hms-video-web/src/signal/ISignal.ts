@@ -16,6 +16,8 @@ import {
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
 
+  getPongResponseTimes: () => number[];
+
   open(uri: string): Promise<void>;
 
   join(
