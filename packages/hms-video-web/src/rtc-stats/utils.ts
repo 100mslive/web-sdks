@@ -153,7 +153,7 @@ const computeStatRate = <T extends HMSTrackStats>(
   const newVal = newReport && newReport[statName];
   const oldVal = oldReport ? oldReport[statName] : null;
   const conditions = [newReport, oldReport, isPresent(newVal), isPresent(oldVal)];
-  if (conditions.every(value => !!value)) {
+  if (conditions.every(condition => !!condition)) {
     // Type not null checked in `isPresent`
     // * 1000 - ms to s
     return (
