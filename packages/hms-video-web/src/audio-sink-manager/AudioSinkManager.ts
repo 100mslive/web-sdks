@@ -205,13 +205,14 @@ export class AudioSinkManager {
       this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);
       HMSLogger.d(this.TAG, 'Played track', track.trackId);
-    } catch (error) {
+    } catch (err) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
-      // TODO: the below check is workaround put in place to not throw autoplay error when the error is 'the play() request was interrupted by a new load request' till the root cause of the error can be found and resolved
-      if (!this.state.autoplayFailed && !(error as Error)?.message?.includes('interrupted')) {
+      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, err as Error);
+      const error = err as Error;
+      if (!this.state.autoplayFailed && error.name === 'NotAllowedError') {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+        ex.addNativeError(error);
         this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
         this.eventBus.autoplayError.publish(ex);
       }
