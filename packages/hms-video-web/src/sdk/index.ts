@@ -111,7 +111,7 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.eventBus = new EventBus();
     this.networkTestManager = new NetworkTestManager(this.listener);
-    this.playlistManager = new PlaylistManager(this);
+    this.playlistManager = new PlaylistManager(this, this.eventBus);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);

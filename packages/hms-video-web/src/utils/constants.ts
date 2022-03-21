@@ -37,4 +37,5 @@ export const HMSEvents = {
   AUDIO_TRACK_ADDED: 'audio-track-added',
   AUDIO_TRACK_REMOVED: 'audio-track-removed',
   AUTOPLAY_ERROR: 'autoplay-error',
+  PAUSE_PLAYLIST: 'pause-playlist',
 };

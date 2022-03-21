@@ -1,5 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
+import { HMSDeviceChangeEvent, HMSPlaylistType, HMSRole } from '../interfaces';
 import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
 import { HMSRemoteAudioTrack, HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
@@ -62,4 +62,6 @@ export class EventBus {
   );
 
   readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
+
+  readonly pausePlaylist = new HMSInternalEvent<HMSPlaylistType>(HMSEvents.PAUSE_PLAYLIST, this.eventEmitter);
 }

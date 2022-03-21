@@ -6,7 +6,7 @@ import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import HMSLogger from '../../utils/logger';
 import { HMSAudioPlugin } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
-import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
+import { HMSAudioTrackSettings as IHMSAudioTrackSettings, HMSPlaylistType } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { EventBus } from '../../events/EventBus';
 
@@ -82,6 +82,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     await super.setEnabled(value);
     this.eventBus.localAudioEnabled.publish(value);
+    this.sendToPlaylist(value);
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
@@ -225,6 +226,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }
+    }
+  };
+
+  private sendToPlaylist = (enabled: boolean) => {
+    console.trace({ enabled: enabled });
+    if (this.source?.includes('playlist') && !enabled) {
+      this.eventBus.pausePlaylist.publish(
+        this.source === 'audioplaylist' ? HMSPlaylistType.audio : HMSPlaylistType.video,
+      );
     }
   };
 }

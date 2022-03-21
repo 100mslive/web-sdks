@@ -5,6 +5,7 @@ import { PlaylistVideoManager } from './PlaylistVideoManager';
 import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
+import { EventBus } from '../events/EventBus';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -44,7 +45,7 @@ export class PlaylistManager
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
 
-  constructor(private sdk: HMSSdk) {
+  constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();
     this.audioManager = new PlaylistAudioManager();
     this.videoManager = new PlaylistVideoManager();
@@ -218,6 +219,7 @@ export class PlaylistManager
 
   cleanup() {
     this.state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
+    this.eventBus.pausePlaylist.unsubscribe(this.handlePausePlaylist);
     this.audioManager.stop();
     this.videoManager.stop();
   }
@@ -311,9 +313,17 @@ export class PlaylistManager
     }
   }
 
+  private handlePausePlaylist = async (type: HMSPlaylistType) => {
+    const { list, currentIndex } = this.state[type];
+    if (list[currentIndex]) {
+      await this.pause(list[currentIndex].url, type);
+    }
+  };
+
   private addListeners() {
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
+    this.eventBus.pausePlaylist.subscribe(this.handlePausePlaylist);
   }
 
   /**
