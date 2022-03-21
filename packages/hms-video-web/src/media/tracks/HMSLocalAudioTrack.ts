@@ -230,7 +230,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   };
 
   private sendToPlaylist = (enabled: boolean) => {
-    console.trace({ enabled: enabled });
     if (this.source?.includes('playlist') && !enabled) {
       this.eventBus.pausePlaylist.publish(
         this.source === 'audioplaylist' ? HMSPlaylistType.audio : HMSPlaylistType.video,
