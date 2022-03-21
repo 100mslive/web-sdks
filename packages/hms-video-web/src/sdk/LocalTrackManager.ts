@@ -21,6 +21,7 @@ import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { EventBus } from '../events/EventBus';
+import { HMSAudioContextHandler } from '../utils/media';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -214,7 +215,7 @@ export class LocalTrackManager {
   }
 
   static getEmptyAudioTrack(): MediaStreamTrack {
-    const ctx = new AudioContext();
+    const ctx = HMSAudioContextHandler.getAudioContext();
     const oscillator = ctx.createOscillator();
     const dst = ctx.createMediaStreamDestination();
     oscillator.connect(dst);

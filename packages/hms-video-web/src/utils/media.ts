@@ -39,3 +39,22 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
   }
 }
+
+export interface HMSAudioContext {
+  audioContext: AudioContext | null;
+  getAudioContext: () => AudioContext;
+  resumeContext: () => void;
+}
+
+export const HMSAudioContextHandler: HMSAudioContext = {
+  audioContext: null,
+  getAudioContext() {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
+    return this.audioContext;
+  },
+  resumeContext() {
+    this.getAudioContext().resume().catch(console.error);
+  },
+};

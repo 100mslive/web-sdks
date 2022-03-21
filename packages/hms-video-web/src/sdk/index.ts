@@ -58,6 +58,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
+import { HMSAudioContextHandler } from '../utils/media';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -343,6 +344,7 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+        HMSAudioContextHandler.resumeContext();
         this.notifyJoin();
         if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);
