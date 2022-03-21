@@ -8,7 +8,6 @@ const DropdownTrigger = styled(Trigger, {
   appearance: 'none !important',
   '&[data-state="open"]': {
     backgroundColor: '$menuBg',
-    borderRadius: '$1',
   },
   '&:focus': {
     outline: 'none',
