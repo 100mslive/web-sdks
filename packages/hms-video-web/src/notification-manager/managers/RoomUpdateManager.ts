@@ -10,6 +10,7 @@ import {
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener, HMSRoomUpdate, HMSHLS, HMSHLSRecording } from '../../interfaces';
 import { IStore } from '../../sdk/store';
+import { convertDateNumToDate } from '../../utils/date';
 
 export class RoomUpdateManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
@@ -53,18 +54,14 @@ export class RoomUpdateManager {
     room.recording.server.running = !!recording?.sfu.enabled;
     room.recording.browser.running = !!recording?.browser.enabled;
     room.rtmp.running = !!streaming?.rtmp?.enabled;
-    room.rtmp.startedAt = this.getAsDate(streaming?.rtmp?.started_at);
-    room.recording.server.startedAt = this.getAsDate(recording?.sfu.started_at);
-    room.recording.browser.startedAt = this.getAsDate(recording?.browser.started_at);
+    room.rtmp.startedAt = convertDateNumToDate(streaming?.rtmp?.started_at);
+    room.recording.server.startedAt = convertDateNumToDate(recording?.sfu.started_at);
+    room.recording.browser.startedAt = convertDateNumToDate(recording?.browser.started_at);
     room.recording.hls = this.getPeerListHLSRecording(recording);
     room.hls = this.convertHls(streaming?.hls);
     room.sessionId = session_id;
-    room.startedAt = this.getAsDate(started_at);
+    room.startedAt = convertDateNumToDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
-  }
-
-  private getAsDate(dateNum?: number): Date | undefined {
-    return dateNum ? new Date(dateNum) : undefined;
   }
 
   private onRTMPStart(notification: RTMPNotification) {
@@ -105,7 +102,7 @@ export class RoomUpdateManager {
         meetingURL: variant.meeting_url,
         url: variant.url,
         metadata: variant.metadata,
-        startedAt: this.getAsDate(variant.started_at),
+        startedAt: convertDateNumToDate(variant.started_at),
       });
     });
     return hls;
@@ -118,7 +115,7 @@ export class RoomUpdateManager {
         running: !!hlsNotification?.enabled,
         singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification.hls_recording?.hls_vod,
-        startedAt: this.getAsDate(hlsNotification?.variants?.[0].started_at),
+        startedAt: convertDateNumToDate(hlsNotification?.variants?.[0].started_at),
         error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
       };
     }
@@ -129,7 +126,7 @@ export class RoomUpdateManager {
     const hlsNotification = recording?.hls;
     return {
       running: !!hlsNotification?.enabled,
-      startedAt: this.getAsDate(hlsNotification?.started_at),
+      startedAt: convertDateNumToDate(hlsNotification?.started_at),
       singleFilePerLayer: !!hlsNotification?.config?.single_file_per_layer,
       hlsVod: !!hlsNotification?.config?.hls_vod,
     };
@@ -141,14 +138,14 @@ export class RoomUpdateManager {
     if (notification.type === 'sfu') {
       room.recording.server = {
         running,
-        startedAt: running ? this.getAsDate(notification.started_at) : undefined,
+        startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
         error: notification.error?.code ? notification.error : undefined,
       };
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else {
       room.recording.browser = {
         running,
-        startedAt: running ? this.getAsDate(notification.started_at) : undefined,
+        startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
         error: notification.error?.code ? notification.error : undefined,
       };
       action = HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED;
@@ -160,7 +157,7 @@ export class RoomUpdateManager {
     const room = this.store.getRoom();
     room.rtmp = {
       running,
-      startedAt: running ? this.getAsDate(notification.started_at) : undefined,
+      startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
       error: notification.error?.code ? notification.error : undefined,
     };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
