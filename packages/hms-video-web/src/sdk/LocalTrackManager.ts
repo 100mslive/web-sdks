@@ -216,9 +216,9 @@ export class LocalTrackManager {
   static getEmptyAudioTrack(): MediaStreamTrack {
     const ctx = new AudioContext();
     const oscillator = ctx.createOscillator();
-    const dst = oscillator.connect(ctx.createMediaStreamDestination());
+    const dst = ctx.createMediaStreamDestination();
+    oscillator.connect(dst);
     oscillator.start();
-    // @ts-expect-error
     const emptyTrack = dst.stream.getAudioTracks()[0];
     emptyTrack.enabled = false;
     return emptyTrack;
