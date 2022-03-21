@@ -146,15 +146,16 @@ const computeStatRate = <T extends HMSTrackStats>(
 ): number => {
   const newVal = newReport && newReport[statName];
   const oldVal = oldReport ? oldReport[statName] : null;
-  if (newReport && oldReport && isPresent(newVal) && isPresent(oldVal)) {
+  const conditions = [newReport, oldReport, isPresent(newVal), isPresent(oldVal)];
+  if (conditions.every(value => !!value)) {
     // Type not null checked in `isPresent`
     // * 1000 - ms to s
     return (
       computeNumberRate(
         newVal as unknown as number,
         oldVal as unknown as number,
-        newReport.timestamp,
-        oldReport.timestamp,
+        newReport?.timestamp,
+        oldReport?.timestamp,
       ) * 1000
     );
   } else {
