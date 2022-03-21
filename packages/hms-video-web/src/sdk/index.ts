@@ -271,7 +271,7 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
-          if (initConfig) {
+          if (initConfig && initConfig?.config?.networkHealth) {
             this.networkTestManager.start(initConfig.config.networkHealth);
           }
         })
