@@ -1,4 +1,4 @@
-import { HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSLocalTrack } from '../media/tracks';
+import { HMSTrack, HMSLocalTrack } from '../media/tracks';
 import {
   HMSPeerStats,
   HMSTrackStats,
@@ -8,6 +8,14 @@ import {
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 import HMSLogger from '../utils/logger';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+
+const getTrackAndConnectionType = (track: HMSTrack) => {
+  const outbound = track.stream instanceof HMSLocalStream;
+  const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
+  const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
+  return { peerConnectionType, nativeTrack };
+};
 
 export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
@@ -15,9 +23,7 @@ export const getTrackStats = async (
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
-  const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
-  const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
-  const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
+  const { peerConnectionType, nativeTrack } = getTrackAndConnectionType(track);
   let trackReport: RTCStatsReport | undefined;
   try {
     trackReport = await getStats[peerConnectionType]?.(nativeTrack);
