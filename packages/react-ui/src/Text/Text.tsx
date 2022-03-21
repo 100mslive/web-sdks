@@ -49,6 +49,11 @@ export const Text = styled('p', {
         lineHeight: '$md',
       },
     },
+    color: {
+      white: {
+        color: 'white',
+      },
+    },
     inline: {
       true: {
         display: 'inline',
