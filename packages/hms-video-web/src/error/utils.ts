@@ -33,13 +33,12 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSExc
   /**
    * Note: Adapter detects all chromium browsers as 'chrome'
    */
-  const conditions = [
-    deviceInfo === 'screen',
-    adapter.browserDetails.browser === 'chrome',
-    err.name === 'NotAllowedError',
-    err.message.includes('denied by system'),
-  ];
-  if (conditions.every(condition => !!condition)) {
+  const deniedBySystem =
+    deviceInfo === 'screen' &&
+    adapter.browserDetails.browser === 'chrome' &&
+    err.name === 'NotAllowedError' &&
+    err.message.includes('denied by system');
+  if (deniedBySystem) {
     return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
   }
 
