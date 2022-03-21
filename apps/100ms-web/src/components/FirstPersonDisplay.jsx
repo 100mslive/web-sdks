@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text } from "@100mslive/react-ui";
+import { Flex, Box, Text, styled } from "@100mslive/react-ui";
 import PlaceholderBg from "../images/first_person.png";
 
 export const FirstPersonDisplay = () => {
@@ -29,16 +29,20 @@ export const FirstPersonDisplay = () => {
           textAlign: "center",
         }}
       >
-        <Text variant="h4" css={{ "@md": { fontSize: "$md" } }}>
+        <CustomText variant="h4" css={{ "@md": { fontSize: "$md" } }}>
           Welcome!
-        </Text>
-        <Text variant="h6" css={{ mt: "$4", "@md": { fontSize: "$sm" } }}>
+        </CustomText>
+        <CustomText variant="h6" css={{ mt: "$4", "@md": { fontSize: "$sm" } }}>
           You’re the first one here.
-        </Text>
-        <Text variant="h6" css={{ mt: "$2", "@md": { fontSize: "$sm" } }}>
+        </CustomText>
+        <CustomText variant="h6" css={{ mt: "$2", "@md": { fontSize: "$sm" } }}>
           Sit back and relax till the others join.
-        </Text>
+        </CustomText>
       </Flex>
     </Box>
   );
 };
+
+const CustomText = styled(Text, {
+  color: "white",
+});
