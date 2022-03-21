@@ -144,6 +144,7 @@ export function TranscriptionButton() {
           title={`Turn ${!isTranscriptionEnabled ? "on" : "off"} transcription`}
         >
           <IconButton
+            css={{ mx: "$4" }}
             active={!isTranscriptionEnabled}
             onClick={enableTranscription}
           >
