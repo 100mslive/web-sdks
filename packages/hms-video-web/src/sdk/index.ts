@@ -8,7 +8,6 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSVideoCodec,
-  PublishParams,
   ScreenShareConfig,
 } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
@@ -345,7 +344,7 @@ export class HMSSdk implements HMSInterface {
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         this.notifyJoin();
-        if (this.publishParams && !this.sdkState.published && !isNode) {
+        if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);
         }
       })
@@ -467,7 +466,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async startScreenShare(onStop: () => void, config: ScreenShareConfig = { audioOnly: false, videoOnly: false }) {
-    const publishParams = this.publishParams;
+    const publishParams = this.store.getPublishParams();
     if (!publishParams) {
       return;
     }
@@ -484,7 +483,7 @@ export class HMSSdk implements HMSInterface {
       throw Error('Cannot share multiple screens');
     }
 
-    const tracks = await this.getScreenshareTracks(publishParams, onStop, config);
+    const tracks = await this.getScreenshareTracks(onStop, config);
     if (!this.localPeer) {
       HMSLogger.d(this.TAG, 'Screenshared when not connected');
       tracks.forEach(track => {
@@ -775,10 +774,6 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localAudioSilence.subscribe(this.sendAudioPresenceFailed);
   }
 
-  private get publishParams() {
-    return this.store?.getPublishParams();
-  }
-
   private notifyJoin() {
     const localPeer = this.store.getLocalPeer();
     const room = this.store.getRoom();
@@ -897,21 +892,9 @@ export class HMSSdk implements HMSInterface {
    * @param config
    * @returns
    */
-  private async getScreenshareTracks(publishParams: PublishParams, onStop: () => void, config: ScreenShareConfig) {
-    const { screen } = publishParams;
-    const dimensions = this.store.getSimulcastDimensions('screen');
-    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(
-      new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build(),
-      config.videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
-    );
+  private async getScreenshareTracks(onStop: () => void, config: ScreenShareConfig) {
+    const { video, audio } = this.getScreenshareSettings(config.videoOnly);
+    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(video, audio);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);
@@ -935,6 +918,24 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
+
+  private getScreenshareSettings = (videoOnly: boolean) => {
+    const { screen } = this.store.getPublishParams()!;
+    const dimensions = this.store.getSimulcastDimensions('screen');
+
+    return {
+      video: new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build(),
+      audio: videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
+    };
+  };
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
