@@ -1,6 +1,6 @@
 import { HMSDeviceManager } from '../interfaces/HMSDeviceManager';
 import type { DeviceMap } from '../interfaces/HMSDeviceManager';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack } from '../media/tracks';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSDeviceChangeEvent } from '../interfaces';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
@@ -58,19 +58,15 @@ export class DeviceManager implements HMSDeviceManager {
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.localVideoEnabled.subscribeOnce(async ({ enabled, track }) => {
-      if (!enabled || track.source !== 'regular') {
-        return;
-      }
+    const predicate = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
+      enabled && track.source === 'regular';
+    this.eventBus.localVideoEnabled.waitFor(predicate).then(async () => {
       await this.enumerateDevices();
       if (this.videoInputChanged) {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
       }
     });
-    this.eventBus.localAudioEnabled.subscribeOnce(async ({ enabled, track }) => {
-      if (!enabled || track.source !== 'regular') {
-        return;
-      }
+    this.eventBus.localAudioEnabled.waitFor(predicate).then(async () => {
       await this.enumerateDevices();
       if (this.audioInputChanged) {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
