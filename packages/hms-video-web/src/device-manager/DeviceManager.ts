@@ -58,8 +58,8 @@ export class DeviceManager implements HMSDeviceManager {
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.localVideoEnabled.subscribeOnce(async (enabled: boolean) => {
-      if (!enabled) {
+    this.eventBus.localVideoEnabled.subscribeOnce(async ({ enabled, track }) => {
+      if (!enabled || track.source !== 'regular') {
         return;
       }
       await this.enumerateDevices();
@@ -67,8 +67,8 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
       }
     });
-    this.eventBus.localAudioEnabled.subscribeOnce(async (enabled: boolean) => {
-      if (!enabled) {
+    this.eventBus.localAudioEnabled.subscribeOnce(async ({ enabled, track }) => {
+      if (!enabled || track.source !== 'regular') {
         return;
       }
       await this.enumerateDevices();

@@ -4,7 +4,7 @@ import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings
 import { getVideoTrack } from '../../utils/track';
 import { HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSPlaylistType, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
+import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { EventBus } from '../../events/EventBus';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
@@ -76,8 +76,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
     }
     await super.setEnabled(value);
-    this.eventBus.localVideoEnabled.publish(value);
-    this.sendToPlaylist(value);
+    this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
@@ -267,12 +266,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }
-    }
-  };
-
-  private sendToPlaylist = (enabled: boolean) => {
-    if (this.source === 'videoplaylist' && !enabled) {
-      this.eventBus.pausePlaylist.publish(HMSPlaylistType.video);
     }
   };
 }

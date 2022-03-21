@@ -1,8 +1,8 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSDeviceChangeEvent, HMSPlaylistType, HMSRole } from '../interfaces';
+import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
 import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
-import { HMSRemoteAudioTrack, HMSLocalAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSRemoteAudioTrack, HMSLocalAudioTrack, HMSRemoteVideoTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -13,8 +13,14 @@ import { HMSException } from '../error/HMSException';
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
   readonly deviceChange = new HMSInternalEvent<HMSDeviceChangeEvent>(HMSEvents.DEVICE_CHANGE, this.eventEmitter);
-  readonly localAudioEnabled = new HMSInternalEvent<boolean>(HMSEvents.LOCAL_AUDIO_ENABLED, this.eventEmitter);
-  readonly localVideoEnabled = new HMSInternalEvent<boolean>(HMSEvents.LOCAL_VIDEO_ENABLED, this.eventEmitter);
+  readonly localAudioEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalAudioTrack }>(
+    HMSEvents.LOCAL_AUDIO_ENABLED,
+    this.eventEmitter,
+  );
+  readonly localVideoEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalVideoTrack }>(
+    HMSEvents.LOCAL_VIDEO_ENABLED,
+    this.eventEmitter,
+  );
 
   /**
    * Emitter which processes raw RTC stats from rtcStatsUpdate and calls client callback
@@ -62,6 +68,4 @@ export class EventBus {
   );
 
   readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
-
-  readonly pausePlaylist = new HMSInternalEvent<HMSPlaylistType>(HMSEvents.PAUSE_PLAYLIST, this.eventEmitter);
 }
