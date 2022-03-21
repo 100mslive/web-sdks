@@ -47,13 +47,13 @@ export class HMSTrackSettingsBuilder {
 
 export class HMSTrackSettings implements IAnalyticsPropertiesProvider {
   readonly video: HMSVideoTrackSettings | null;
-  readonly audio: HMSAudioTrackSettings | null;
+  readonly audio: HMSAudioTrackSettings | null | undefined;
   readonly screen: HMSVideoTrackSettings | null;
   readonly simulcast: boolean;
 
   constructor(
     video: HMSVideoTrackSettings | null,
-    audio: HMSAudioTrackSettings | null,
+    audio: HMSAudioTrackSettings | null | undefined,
     simulcast: boolean,
     screen: HMSVideoTrackSettings | null = null,
   ) {
