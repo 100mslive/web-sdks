@@ -616,15 +616,16 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private onNetworkQuality(quality: number) {
-    const unsub = this.store.subscribe(localPeer => {
-      if (localPeer?.id) {
-        this.setState(store => {
-          const peerId = localPeer.id;
-          store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
-        }, 'ConnectionQuality');
-        unsub();
+    this.setState(store => {
+      /*
+       * if store does not have peerId yet, fetch from sdk directly.
+       * sdk will have the localpeer already set.
+       */
+      const peerId = store.room.localPeer || this.sdk.getLocalPeer()?.peerId;
+      if (peerId) {
+        store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
       }
-    }, selectLocalPeer);
+    }, 'ConnectionQuality');
   }
 
   private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
