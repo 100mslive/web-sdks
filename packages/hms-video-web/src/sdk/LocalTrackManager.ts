@@ -95,21 +95,7 @@ export class LocalTrackManager {
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
-      const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
-      const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
-      const local = new HMSLocalStream(new MediaStream(nativeTracks));
-
-      const tracks: Array<HMSLocalTrack> = [];
-      if (nativeAudioTrack && settings?.audio) {
-        const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
-        tracks.push(audioTrack);
-      }
-
-      if (nativeVideoTrack && settings?.video) {
-        const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
-        tracks.push(videoTrack);
-      }
-      return tracks;
+      return this.createHMSLocalTracks(nativeTracks, settings);
     } catch (error) {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
@@ -442,5 +428,23 @@ export class LocalTrackManager {
         .setHeight(height)
         .build()
     );
+  }
+
+  private createHMSLocalTracks(nativeTracks: MediaStreamTrack[], settings: HMSTrackSettings) {
+    const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
+    const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
+    const local = new HMSLocalStream(new MediaStream(nativeTracks));
+
+    const tracks: Array<HMSLocalTrack> = [];
+    if (nativeAudioTrack && settings?.audio) {
+      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
+      tracks.push(audioTrack);
+    }
+
+    if (nativeVideoTrack && settings?.video) {
+      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
+      tracks.push(videoTrack);
+    }
+    return tracks;
   }
 }
