@@ -15,9 +15,7 @@ export class AnalyticsEventsService {
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
   addTransport(transport: AnalyticsTransport) {
-    if (!this.transports.includes(transport)) {
-      this.transports.push(transport);
-    }
+    this.transports.push(transport);
   }
 
   removeTransport(transport: AnalyticsTransport) {

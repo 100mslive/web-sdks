@@ -33,7 +33,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     uiViewMode,
     HLS_VIEWER_ROLE,
     showStatsOnTiles,
-    isAudioOnly,
   } = useContext(AppContext);
   useEffect(() => {
     // set list only when room state is connected
@@ -76,7 +75,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
         toggleChat={toggleChat}
         role={localPeer.roleName}
         showStats={showStatsOnTiles}
-        isAudioOnly={isAudioOnly}
       />
     )
   );

@@ -5,7 +5,6 @@ export interface HMSPeer {
   peerId: string;
   name: string;
   isLocal: boolean;
-  joinedAt?: Date;
   customerUserId?: string;
   metadata?: string;
   audioTrack?: HMSAudioTrack;

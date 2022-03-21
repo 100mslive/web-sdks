@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   StyledVideoTile,
@@ -22,9 +22,9 @@ import {
 } from "@100mslive/react-icons";
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
-import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
+import { ConnectionQuality } from "./Connection/ConnectionQuality";
 
-const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
+const Tile = ({ peerId, showStatsOnTiles, width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -46,7 +46,7 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
           }}
           ref={borderAudioRef}
         >
-          <ConnectionIndicator isTile peerId={peerId} />
+          <ConnectionQuality peerId={peerId} />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={peer?.audioTrack}
@@ -58,12 +58,11 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
           {track ? (
             <Video
               trackId={track?.id}
-              attach={!isAudioOnly}
               mirror={peer?.isLocal && track?.source === "regular"}
               degraded={isVideoDegraded}
             />
           ) : null}
-          {isVideoMuted || isVideoDegraded || isAudioOnly ? (
+          {isVideoMuted || isVideoDegraded ? (
             <Avatar name={peer?.name || ""} />
           ) : null}
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>

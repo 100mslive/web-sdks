@@ -208,16 +208,9 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
-    const sdkConfig = { audioOnly: false, videoOnly: false };
-    if (typeof config === 'object') {
-      Object.assign(sdkConfig, config);
-    } else if (typeof config === 'boolean') {
-      // for backward compatibility
-      sdkConfig.audioOnly = config;
-    }
+  async setScreenShareEnabled(enabled: boolean, audioOnly?: boolean) {
     if (enabled) {
-      await this.startScreenShare(sdkConfig);
+      await this.startScreenShare(audioOnly);
     } else {
       await this.stopScreenShare();
     }
@@ -551,7 +544,6 @@ export class HMSSDKActions implements IHMSActions {
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
-      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -608,30 +600,16 @@ export class HMSSDKActions implements IHMSActions {
       onDeviceChange: this.onDeviceChange.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
-      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
   }
 
-  private onNetworkQuality(quality: number) {
-    this.setState(store => {
-      /*
-       * if store does not have peerId yet, fetch from sdk directly.
-       * sdk will have the localpeer already set.
-       */
-      const peerId = store.room.localPeer || this.sdk.getLocalPeer()?.peerId;
-      if (peerId) {
-        store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
-      }
-    }, 'ConnectionQuality');
-  }
-
-  private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
+  private async startScreenShare(audioOnly?: boolean) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
-      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);
+      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), audioOnly);
       this.syncRoomState('startScreenShare');
     } else {
       this.logPossibleInconsistency("start screenshare is called while it's on");

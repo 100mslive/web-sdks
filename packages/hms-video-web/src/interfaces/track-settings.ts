@@ -25,8 +25,3 @@ export interface HMSVideoTrackSettings {
   deviceId?: string;
   advanced?: Array<MediaTrackConstraintSet>;
 }
-
-export interface ScreenShareConfig {
-  audioOnly: boolean;
-  videoOnly: boolean;
-}

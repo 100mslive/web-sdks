@@ -3,7 +3,7 @@ import { styled } from '../Theme';
 export const Root = styled('div', {
   backgroundColor: '$statsBg',
   position: 'absolute',
-  top: '0.3rem',
+  top: '1.2rem',
   left: '0.3rem',
   zIndex: 10,
   borderRadius: '$2',

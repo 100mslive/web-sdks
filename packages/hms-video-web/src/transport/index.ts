@@ -269,7 +269,7 @@ export default class HMSTransport implements ITransport {
 
   async getLocalScreen(
     videoSettings: HMSVideoTrackSettings,
-    audioSettings?: HMSAudioTrackSettings,
+    audioSettings: HMSAudioTrackSettings,
   ): Promise<Array<HMSLocalTrack>> {
     try {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
@@ -345,7 +345,7 @@ export default class HMSTransport implements ITransport {
     this.observer.onStateChange(this.state);
   }
 
-  async connect(token: string, endpoint: string, peerId: string): Promise<InitConfig | void> {
+  async connect(token: string, endpoint: string, peerId: string) {
     try {
       return await this.internalConnect(token, endpoint, peerId);
     } catch (error) {
@@ -703,7 +703,6 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();
-      return this.initConfig;
     } catch (error) {
       if (error instanceof HMSException && this.state !== TransportState.Reconnecting) {
         this.eventBus.analytics.publish(

@@ -74,5 +74,4 @@ export interface HMSUpdateListener extends DeviceChangeListener {
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
   onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
-  onNetworkQuality?(score: number): void;
 }

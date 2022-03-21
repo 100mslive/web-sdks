@@ -16,7 +16,6 @@ import screenfull from "screenfull";
 const Tile = ({
   peerId,
   showStatsOnTiles,
-  isAudioOnly,
   width = "100%",
   height = "100%",
 }) => {
@@ -61,7 +60,6 @@ const Tile = ({
             <Video
               screenShare={true}
               mirror={peer.isLocal && track?.source === "regular"}
-              attach={!isAudioOnly}
               trackId={track.id}
             />
           ) : null}

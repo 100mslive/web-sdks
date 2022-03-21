@@ -57,8 +57,6 @@ export const UISettings = ({ open, onOpenChange }) => {
     setSubscribedNotifications,
     uiViewMode,
     setuiViewMode,
-    isAudioOnly,
-    setIsAudioOnly,
   } = useContext(AppContext);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -115,15 +113,6 @@ export const UISettings = ({ open, onOpenChange }) => {
             value={uiViewMode === "activeSpeaker"}
             onChange={value => {
               setuiViewMode(value ? "activeSpeaker" : "grid");
-            }}
-            css={{ margin: "0 0" }}
-          />
-          <DialogCheckbox
-            title="Audio Only Mode"
-            id="audioOnlyMode"
-            value={isAudioOnly}
-            onChange={value => {
-              setIsAudioOnly(value);
             }}
             css={{ margin: "$4 0" }}
           />

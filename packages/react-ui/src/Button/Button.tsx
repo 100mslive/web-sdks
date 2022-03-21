@@ -33,7 +33,6 @@ export const Button = styled('button', {
   r: '$1',
   backgroundColor: '$brandDefault',
   fontWeight: '500',
-  whiteSpace: 'nowrap',
   p: '$4 $8',
   '&:focus': {
     outline: 'none',

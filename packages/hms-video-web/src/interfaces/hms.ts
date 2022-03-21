@@ -15,7 +15,6 @@ import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
-import { ScreenShareConfig } from './track-settings';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
@@ -58,7 +57,7 @@ export default interface HMS {
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
-  startScreenShare(onStop: () => void, config: ScreenShareConfig): Promise<void>;
+  startScreenShare(onStop: () => void, audioOnly: boolean): Promise<void>;
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;

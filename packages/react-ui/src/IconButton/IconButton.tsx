@@ -6,7 +6,7 @@ export const IconButton = styled('button', {
   outline: 'none',
   border: 'none',
   padding: '$2',
-  r: '$0',
+  r: '$1',
   cursor: 'pointer',
   backgroundColor: 'transparent',
   color: '$textPrimary',

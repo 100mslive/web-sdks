@@ -5,7 +5,6 @@ import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { PeerNotification } from '../HMSNotifications';
 import { TrackManager } from './TrackManager';
-import { convertDateNumToDate } from '../../utils/date';
 
 /**
  * Handles:
@@ -124,7 +123,6 @@ export class PeerManager {
       customerUserId: peer.info.user_id,
       metadata: peer.info.data,
       role: this.store.getPolicyForRole(peer.role),
-      joinedAt: convertDateNumToDate(peer.joined_at) || new Date(),
     });
 
     this.store.addPeer(hmsPeer);

@@ -6,15 +6,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { HangUpIcon } from "@100mslive/react-icons";
-import {
-  Button,
-  Popover,
-  Dialog,
-  Tooltip,
-  Box,
-  IconButton,
-  styled,
-} from "@100mslive/react-ui";
+import { Button, Popover, Dialog, Tooltip, Box } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
   DialogContent,
@@ -49,13 +41,17 @@ export const LeaveRoom = () => {
       {permissions.endRoom ? (
         <Popover.Root>
           <Popover.Trigger asChild>
-            <LeaveIconButton variant="danger" key="LeaveRoom">
+            <Button
+              variant="danger"
+              key="LeaveRoom"
+              css={{ p: "$2 $6", "@md": { p: "$2 $4" } }}
+            >
               <Tooltip title="Leave Room">
                 <Box>
                   <HangUpIcon key="hangUp" />
                 </Box>
               </Tooltip>
-            </LeaveIconButton>
+            </Button>
           </Popover.Trigger>
           <Popover.Content sideOffset={10}>
             <Button
@@ -72,13 +68,15 @@ export const LeaveRoom = () => {
           </Popover.Content>
         </Popover.Root>
       ) : (
-        <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom">
-          <Tooltip title="Leave Room">
-            <Box>
-              <HangUpIcon key="hangUp" />
-            </Box>
-          </Tooltip>
-        </LeaveIconButton>
+        <Tooltip title="Leave Room">
+          <Button
+            variant="danger"
+            onClick={leaveRoom}
+            css={{ p: "$2 $6", "@md": { p: "$2 $4" } }}
+          >
+            <HangUpIcon />
+          </Button>
+        </Tooltip>
       )}
 
       <Dialog.Root
@@ -107,15 +105,3 @@ export const LeaveRoom = () => {
     </Fragment>
   );
 };
-
-const LeaveIconButton = styled(IconButton, {
-  width: "45px",
-  mx: "$4",
-  bg: "$error",
-  "&:not([disabled]):hover": {
-    bg: "$errorTint",
-  },
-  "&:not([disabled]):active": {
-    bg: "$errorTint",
-  },
-});

@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, Fragment } from "react";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
-import { Box, Flex, styled, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/react-ui";
 import Hls from "hls.js";
 import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 
-const HLSVideo = styled("video", {
-  h: "100%",
-  margin: "0 auto",
-});
+const defaultClasses = {
+  HLSVideo: "h-full m-auto",
+};
 
 export const HLSView = ({ isChatOpen, toggleChat }) => {
   const videoRef = useRef(null);
@@ -30,9 +29,14 @@ export const HLSView = ({ isChatOpen, toggleChat }) => {
   return (
     <Fragment>
       {hlsState.variants[0]?.url ? (
-        <HLSVideo ref={videoRef} autoPlay controls />
+        <video
+          className={defaultClasses.HLSVideo}
+          ref={videoRef}
+          autoPlay
+          controls
+        />
       ) : (
-        <Flex align="center" justify="center" css={{ size: "100%" }}>
+        <Flex align="center" justify="center" css={{ width: "100%" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...
           </Text>

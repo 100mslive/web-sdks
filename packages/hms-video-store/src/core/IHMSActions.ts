@@ -59,13 +59,9 @@ export interface IHMSActions {
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
-   * @param config it can also be boolean to ensure backward compatibility where it stands
-   * for audioOnly flag
+   * @param audioOnly boolean To publish only audio from screenshare
    */
-  setScreenShareEnabled(
-    enabled: boolean,
-    config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean,
-  ): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, audioOnly?: boolean): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
