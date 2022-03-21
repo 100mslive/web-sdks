@@ -9,6 +9,7 @@ export { default as ChevronDownIcon } from './ChevronDownIcon';
 export { default as ChevronLeftIcon } from './ChevronLeftIcon';
 export { default as ChevronRightIcon } from './ChevronRightIcon';
 export { default as ChevronUpIcon } from './ChevronUpIcon';
+export { default as ClosedCaptionIcon } from './ClosedCaptionIcon';
 export { default as ComputerIcon } from './ComputerIcon';
 export { default as ConnectivityIcon } from './ConnectivityIcon';
 export { default as CrossIcon } from './CrossIcon';
