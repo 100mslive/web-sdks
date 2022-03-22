@@ -28,6 +28,7 @@ async function main() {
       tsconfig: 'tsconfig.json',
       external,
       metafile: true,
+      treeShaking: true,
     });
 
     const esmResult = esbuild.buildSync({
@@ -40,6 +41,7 @@ async function main() {
       tsconfig: 'tsconfig.build.json',
       external,
       metafile: true,
+      treeShaking: true,
     });
 
     let esmSize = 0;

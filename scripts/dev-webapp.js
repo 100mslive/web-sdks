@@ -20,6 +20,7 @@ async function main() {
     external,
     metafile: true,
     sourcemap: true,
+    treeShaking: true,
     loader,
     define,
     watch: {
