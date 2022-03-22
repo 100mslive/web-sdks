@@ -72,7 +72,7 @@ module.exports = {
         lib: {
           name: '100ms',
           enforce: true,
-          test: /[\\/]node_modules[\\/](@100mslive|100ms_*)[\\/]/,
+          test: /[\\/]node_modules[\\/](@100mslive|100ms_edtech_template)[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
           maxSize: 1048576,
