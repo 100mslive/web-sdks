@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 // @ts-ignore
 import { NoiseModule } from './models/Noise.js';
 import {

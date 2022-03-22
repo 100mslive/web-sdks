@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { loadTFLite } from './defineTFLite';
 import '@tensorflow/tfjs-backend-webgl';
 import { parseGIF, decompressFrames } from 'gifuct-js';

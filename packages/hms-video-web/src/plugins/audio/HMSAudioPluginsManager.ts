@@ -77,6 +77,7 @@ export class HMSAudioPluginsManager {
     }
   }
 
+  // eslint-disable-next-line complexity
   private async addPluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
     if (this.pluginsMap.get(name)) {
