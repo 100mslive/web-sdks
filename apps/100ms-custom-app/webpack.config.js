@@ -10,7 +10,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 require('dotenv').config();
 
 const isProduction = process.env.NODE_ENV === 'production';
-const MAX_CHUNK_SIZE = 51200;
+const MAX_CHUNK_SIZE = 204800;
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
