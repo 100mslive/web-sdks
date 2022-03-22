@@ -43,6 +43,7 @@ export class LocalTrackManager {
     private eventBus: EventBus,
   ) {}
 
+  // eslint-disable-next-line complexity
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
     const trackSettings = this.getTrackSettings(initialSettings);
     if (!trackSettings) {
@@ -257,6 +258,7 @@ export class LocalTrackManager {
     return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
   }
 
+  // eslint-disable-next-line complexity
   private async retryGetLocalTracks(
     error: unknown,
     trackSettings: HMSTrackSettings,
