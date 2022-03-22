@@ -81,6 +81,7 @@ export interface PeerNotification {
   peer_id: string;
   info: Info;
   role: string;
+  joined_at?: number;
   tracks: {
     [track_id: string]: TrackState;
   };
