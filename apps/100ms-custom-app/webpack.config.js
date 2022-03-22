@@ -69,14 +69,31 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        lib: {
+          name: '100ms',
+          enforce: true,
+          test: /[\\/]node_modules[\\/](@100mslive|100ms_*)[\\/]/,
+          reuseExistingChunk: true,
+          chunks: 'all',
+          maxSize: 1048576,
+        },
+        react: {
+          name: 'react',
+          enforce: true,
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          reuseExistingChunk: true,
+          chunks: 'all',
+          maxSize: 1048576,
+        },
         vendor: {
           name: 'vendor',
           enforce: true,
           test: /[\\/]node_modules[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: 1048576,
         },
-        default: {
+        main: {
           reuseExistingChunk: true,
           chunks: 'all',
         },
@@ -115,7 +132,7 @@ module.exports = {
           from: path.resolve(__dirname, './public'),
           to: path.resolve(__dirname, './build'),
           filter: async resourcePath => {
-            if (/index.html|manifest.json/.test(resourcePath)) {
+            if (/index.html/.test(resourcePath)) {
               return false;
             }
             return true;
