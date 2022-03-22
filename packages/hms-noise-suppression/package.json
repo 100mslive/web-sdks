@@ -32,6 +32,6 @@
   "author": "vishaldhull09",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.1.48-alpha.0"
+    "@100mslive/hms-video": "0.1.48-alpha.1"
   }
 }
