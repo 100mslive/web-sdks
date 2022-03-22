@@ -38,6 +38,7 @@ let providerProps: HMSContextProviderProps;
  * react part of your code.
  * @constructor
  */
+// eslint-disable-next-line complexity
 export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
   children,
   actions,
