@@ -69,7 +69,6 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      maxSize: MAX_CHUNK_SIZE,
       cacheGroups: {
         lib: {
           name: '100ms',
@@ -77,6 +76,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/](@100mslive|100ms_edtech_template)[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: MAX_CHUNK_SIZE,
         },
         react: {
           name: 'react',
@@ -84,6 +84,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: MAX_CHUNK_SIZE,
         },
         vendor: {
           name: 'vendor',
@@ -91,10 +92,12 @@ module.exports = {
           test: /[\\/]node_modules[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: MAX_CHUNK_SIZE,
         },
         main: {
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: MAX_CHUNK_SIZE,
         },
       },
     },
