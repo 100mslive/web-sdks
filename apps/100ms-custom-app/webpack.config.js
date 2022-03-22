@@ -10,6 +10,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 require('dotenv').config();
 
 const isProduction = process.env.NODE_ENV === 'production';
+const MAX_CHUNK_SIZE = 51200;
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
@@ -75,7 +76,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/](@100mslive|100ms_edtech_template)[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
-          maxSize: 1048576,
+          maxSize: MAX_CHUNK_SIZE,
         },
         react: {
           name: 'react',
@@ -83,7 +84,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
-          maxSize: 1048576,
+          maxSize: MAX_CHUNK_SIZE,
         },
         vendor: {
           name: 'vendor',
@@ -91,7 +92,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
-          maxSize: 1048576,
+          maxSize: MAX_CHUNK_SIZE,
         },
         main: {
           reuseExistingChunk: true,
