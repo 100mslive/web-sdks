@@ -76,7 +76,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
     }
     await super.setEnabled(value);
-    this.eventBus.localVideoEnabled.publish(value);
+    this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 

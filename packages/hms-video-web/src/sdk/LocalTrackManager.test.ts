@@ -290,6 +290,7 @@ describe('LocalTrackManager', () => {
       expect(mockDenyGetUserMedia).toHaveBeenCalledTimes(1);
     });
 
+    // eslint-disable-next-line complexity
     it('handles overconstrained error', async () => {
       global.navigator.mediaDevices.enumerateDevices = mockEnumerateDevices({
         videoInput: true,

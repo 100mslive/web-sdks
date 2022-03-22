@@ -1,15 +1,12 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
-import { HMSAudioTrack } from '../media/tracks';
+import { HMSRemoteAudioTrack } from '../media/tracks';
 import { DeviceManager } from '../device-manager';
-import { NotificationManager } from '../notification-manager/NotificationManager';
 import HMSLogger from '../utils/logger';
 import { IStore } from '../sdk/store';
-import { HMSException } from '../error/HMSException';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
 import { HMSRemotePeer } from '../sdk/models/peer';
-import { isBrowser, isMobile } from '../utils/support';
+import { isMobile } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 
@@ -20,12 +17,6 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
  * Chrome - DOMException: play() failed because the user didn't interact with the document first.
  * Brave - DOMException: play() can only be initiated by a user gesture.
  */
-export interface AutoplayEvent {
-  error: HMSException;
-}
-
-export const AutoplayError = 'autoplay-error';
-
 type AudioSinkState = {
   autoplayFailed?: boolean;
   initialized: boolean;
@@ -42,36 +33,21 @@ const INITIAL_STATE: AudioSinkState = {
 
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
-  private autoPausedTracks: Set<HMSAudioTrack> = new Set();
+  private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
   private TAG = '[AudioSinkManager]:';
   private volume = 100;
-  private eventEmitter: EventEmitter = new EventEmitter();
   private state = { ...INITIAL_STATE };
-  private audioContextList = new Map<string, AudioContext>();
   private listener?: HMSUpdateListener;
 
-  constructor(
-    private store: IStore,
-    private notificationManager: NotificationManager,
-    private deviceManager: DeviceManager,
-    private eventBus: EventBus,
-  ) {
-    this.notificationManager.addEventListener('track-added', this.handleTrackAdd as EventListener);
-    this.notificationManager.addEventListener('track-removed', this.handleTrackRemove as EventListener);
-    this.notificationManager.addEventListener('track-updated', this.handleTrackUpdate as EventListener);
+  constructor(private store: IStore, private deviceManager: DeviceManager, private eventBus: EventBus) {
+    this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
+    this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
+    this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
   }
 
   setListener(listener?: HMSUpdateListener) {
     this.listener = listener;
-  }
-
-  addEventListener(event: string, listener: (event: AutoplayEvent) => void) {
-    this.eventEmitter.addListener(event, listener);
-  }
-
-  removeEventListener(event: string, listener: (event: AutoplayEvent) => void) {
-    this.eventEmitter.removeListener(event, listener);
   }
 
   private get outputDevice() {
@@ -114,13 +90,9 @@ export class AudioSinkManager {
   cleanUp() {
     this.audioSink?.remove();
     this.audioSink = undefined;
-    for (const context of this.audioContextList.values()) {
-      context.close();
-    }
-    this.audioContextList.clear();
-    this.notificationManager.removeEventListener('track-added', this.handleTrackAdd as EventListener);
-    this.notificationManager.removeEventListener('track-removed', this.handleTrackRemove as EventListener);
-    this.notificationManager.removeEventListener('track-updated', this.handleTrackUpdate as EventListener);
+    this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
+    this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
+    this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
     this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
@@ -142,19 +114,18 @@ export class AudioSinkManager {
         // Play after a delay since mobile devices don't call onDevice change event
         setTimeout(async () => {
           if (audioTrack) {
-            await this.playAudioFor(audioTrack as HMSAudioTrack);
+            await this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
           }
         }, 500);
       } else {
-        this.autoPausedTracks.add(audioTrack as HMSAudioTrack);
+        this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       }
     }
   };
 
-  private handleTrackUpdate = (event: CustomEvent<{ track: HMSAudioTrack; enabled: boolean }>) => {
+  private handleTrackUpdate = ({ track, enabled }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
     // @ts-ignore
     if (window.HMS?.AUDIO_SINK) {
-      const { track, enabled } = event.detail;
       if (enabled) {
         track.addSink();
         this.playAudioFor(track);
@@ -164,13 +135,7 @@ export class AudioSinkManager {
     }
   };
 
-  private handleTrackAdd = (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
-    this.handleTrackAddAsync(event);
-  };
-
-  private handleTrackAddAsync = async (event: CustomEvent<{ track: HMSAudioTrack; peer: HMSRemotePeer }>) => {
-    const { track, peer } = event.detail;
-
+  private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
@@ -178,23 +143,21 @@ export class AudioSinkManager {
 
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
-    this.connectAudioContext(audioEl, track.trackId);
     HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     // @ts-ignore
     if (window.HMS?.AUDIO_SINK) {
       // No need to play if track is not enabled
-      if (!track.enabled) {
-        track.removeSink();
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
-        return;
-      }
-      track.addSink();
+      track.enabled ? track.addSink() : track.removeSink();
     } else {
       audioEl.srcObject = new MediaStream([track.nativeTrack]);
     }
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
+    await this.handleAutoplayError(track);
+  };
+
+  private handleAutoplayError = async (track: HMSRemoteAudioTrack) => {
     /**
      * if it's not known whether autoplay will succeed, wait for it to be known
      */
@@ -231,36 +194,32 @@ export class AudioSinkManager {
    * @param track
    * @private
    */
-  private async playAudioFor(track: HMSAudioTrack) {
+  private async playAudioFor(track: HMSRemoteAudioTrack) {
     const audioEl = track.getAudioElement();
     if (!audioEl) {
       HMSLogger.w(this.TAG, 'No audio element found on track', track.trackId);
       return;
     }
     try {
-      const audioContext = this.audioContextList.get(track.trackId);
-      if (audioContext?.state === 'suspended') {
-        audioContext?.resume();
-      }
       await audioEl.play();
       this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);
       HMSLogger.d(this.TAG, 'Played track', track.trackId);
-    } catch (error) {
+    } catch (err) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, error);
-      // TODO: the below check is workaround put in place to not throw autoplay error when the error is 'the play() request was inerrupted by a new load request' till the root cause of the error can be found and resolved
-      if (!this.state.autoplayFailed && !(error as Error)?.message?.includes('new load request')) {
+      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, err as Error);
+      const error = err as Error;
+      if (!this.state.autoplayFailed && error.name === 'NotAllowedError') {
         this.state.autoplayFailed = true;
         const ex = ErrorFactory.TracksErrors.AutoplayBlocked(HMSAction.AUTOPLAY, '');
+        ex.addNativeError(error);
         this.eventBus.analytics.publish(AnalyticsEventFactory.autoplayError());
-        this.eventEmitter.emit(AutoplayError, { error: ex });
+        this.eventBus.autoplayError.publish(ex);
       }
     }
   }
 
-  private handleTrackRemove = (event: CustomEvent<HMSAudioTrack>) => {
-    const track = event.detail;
+  private handleTrackRemove = (track: HMSRemoteAudioTrack) => {
     this.autoPausedTracks.delete(track);
     const audioEl = document.getElementById(track.trackId) as HTMLAudioElement;
     if (audioEl) {
@@ -285,18 +244,5 @@ export class AudioSinkManager {
     });
     // Return after all pending tracks are played
     await Promise.all(promises);
-  };
-
-  private connectAudioContext = (element: HTMLAudioElement, trackId: string) => {
-    if (!isBrowser || !window.HMS?.GAIN_VALUE) {
-      return;
-    }
-    const audioContext = new AudioContext();
-    const source = audioContext.createMediaElementSource(element);
-    const gain = audioContext.createGain();
-    gain.gain.value = window.HMS.GAIN_VALUE;
-    source.connect(gain);
-    gain.connect(audioContext.destination);
-    this.audioContextList.set(trackId, audioContext);
   };
 }
