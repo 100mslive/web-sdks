@@ -65,25 +65,25 @@ export const Text = styled('p', {
           lineHeight: '1.5rem',
         },
       },
-      s1: {
+      sub1: {
         fontSize: '$md',
         lineHeight: '$h5',
         fontWeight: '$medium',
         letterSpacing: '0.15px',
       },
-      s2: {
+      sub2: {
         fontSize: '$sm',
         lineHeight: '$sm',
         fontWeight: '$medium',
         letterSpacing: '0.1px',
       },
-      b1: {
+      body1: {
         fontSize: '$md',
         lineHeight: '$h6',
         fontWeight: '$medium',
         letterSpacing: '0.1px',
       },
-      b2: {
+      body2: {
         fontSize: '0.875rem',
         lineHeight: '1.25rem',
         fontWeight: '$medium',
