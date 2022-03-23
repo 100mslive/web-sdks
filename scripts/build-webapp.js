@@ -3,7 +3,6 @@ const esbuild = require('esbuild');
 const { gzip } = require('zlib');
 const PostCssPlugin = require('esbuild-plugin-postcss2');
 const autoprefixer = require('autoprefixer');
-const tailwindcss = require('tailwindcss');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -21,7 +20,7 @@ async function main() {
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
     PostCssPlugin.default({
-      plugins: [tailwindcss, autoprefixer],
+      plugins: [autoprefixer],
     }),
   ];
   try {
