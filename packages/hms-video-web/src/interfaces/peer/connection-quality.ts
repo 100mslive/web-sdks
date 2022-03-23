@@ -9,5 +9,5 @@
  */
 export interface HMSConnectionQuality {
   peerID: string;
-  downlinkScore: number;
+  downlinkQuality: number;
 }

@@ -623,7 +623,7 @@ export class HMSSDKActions implements IHMSActions {
        */
       const peerId = store.room.localPeer || this.sdk.getLocalPeer()?.peerId;
       if (peerId) {
-        store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
+        store.connectionQualities[peerId] = { peerID: peerId, downlinkQuality: quality };
       }
     }, 'ConnectionQuality');
   }
