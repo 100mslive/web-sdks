@@ -111,7 +111,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
-    this.networkTestManager = new NetworkTestManager(this.listener);
+    this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
@@ -941,9 +941,9 @@ export class HMSSdk implements HMSInterface {
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-    this.analyticsEventsService
-      .queue(AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput))
-      .flush();
+    this.sendAnalyticsEvent(
+      AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
+    );
     // @TODO: start sending if error is less frequent
     // this.listener?.onError(error);
   };

@@ -1,3 +1,5 @@
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { EventBus } from '../events/EventBus';
 import { HMSUpdateListener } from '../interfaces';
 import { NetworkHealth, ScoreMap } from '../signal/init/models';
 import HMSLogger from '../utils/logger';
@@ -5,7 +7,7 @@ import { sleep } from '../utils/timer-utils';
 
 export class NetworkTestManager {
   private TAG = 'NetworkTestManager';
-  constructor(private listener?: HMSUpdateListener) {}
+  constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
 
   start = async (networkHealth: NetworkHealth) => {
     if (!window.HMS?.NETWORK_TEST || !networkHealth) {
@@ -52,15 +54,24 @@ export class NetworkTestManager {
           const bitrate = (sizeInKB / totalTimeInSecs) * 8;
           const score = this.calculateScore(scoreMap, bitrate);
           this.listener?.onNetworkQuality?.(score);
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.previewNetworkQuality({ score, downLink: bitrate.toFixed(2) }),
+          );
         })
         .catch(error => {
           HMSLogger.e(this.TAG, error);
-          this.listener?.onNetworkQuality?.(-1);
+          this.listener?.onNetworkQuality?.(0);
+          this.eventBus.analytics.publish(
+            AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
+          );
         });
     } catch (error) {
       HMSLogger.e(this.TAG, error);
       if ((error as Error).name !== 'AbortError') {
-        this.listener?.onNetworkQuality?.(-1);
+        this.listener?.onNetworkQuality?.(0);
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
+        );
       }
     }
   };
