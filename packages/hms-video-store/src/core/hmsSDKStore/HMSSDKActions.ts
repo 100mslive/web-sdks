@@ -216,10 +216,15 @@ export class HMSSDKActions implements IHMSActions {
       // for backward compatibility
       sdkConfig.audioOnly = config;
     }
-    if (enabled) {
-      await this.startScreenShare(sdkConfig);
-    } else {
-      await this.stopScreenShare();
+    try {
+      if (enabled) {
+        await this.startScreenShare(sdkConfig);
+      } else {
+        await this.stopScreenShare();
+      }
+    } catch (error) {
+      this.hmsNotifications.sendError(SDKToHMS.convertException(error as SDKHMSException));
+      throw error;
     }
   }
 
