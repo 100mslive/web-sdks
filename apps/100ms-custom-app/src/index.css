@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  min-height: 0;
+  min-width: 0;
+}
+
 html,
 body,
 #root {
