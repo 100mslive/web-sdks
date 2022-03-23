@@ -6,6 +6,7 @@ import { sleep } from '../../utils/timer-utils';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
+import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;
 const DEFAULT_WIDTH = 320;
@@ -131,14 +132,26 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
-    if (!plugin.isSupported()) {
-      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
-        HMSAction.VIDEO_PLUGINS,
-        'platform not supported ',
-      );
-      this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
-      return;
+    const result = plugin.checkSupport();
+    if (result.isSupported) {
+      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+    } else {
+      switch (result.errType) {
+        case HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED:
+          const error = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+            HMSAction.VIDEO_PLUGINS,
+            'platform not supported, see docs',
+          );
+          this.analytics.failure(name, error);
+          throw error;
+        case HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED:
+          const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+            HMSAction.VIDEO_PLUGINS,
+            'video device not supported, see docs',
+          );
+          this.analytics.failure(name, err);
+          throw err;
+      }
     }
     try {
       await this.analytics.initWithTime(name, async () => await plugin.init());

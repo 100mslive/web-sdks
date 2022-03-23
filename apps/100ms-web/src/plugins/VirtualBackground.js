@@ -14,6 +14,7 @@ export const VirtualBackground = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const [pluginSupport, setPluginSupport] = useState(false);
   const isVBPresent = useHMSStore(
     selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
   );
@@ -25,6 +26,13 @@ export const VirtualBackground = () => {
   }
   useEffect(() => {
     createPlugin();
+    //check support of plugin
+    const result = pluginRef.current.checkSupport();
+    if (result.isSupported) {
+      setPluginSupport(true);
+    } else {
+      setPluginSupport(false);
+    }
   }, []);
 
   async function addPlugin() {
@@ -46,10 +54,7 @@ export const VirtualBackground = () => {
     }
   }
 
-  if (
-    !isAllowedToPublish.video ||
-    (pluginRef.current && !pluginRef.current.isSupported())
-  ) {
+  if (!isAllowedToPublish.video || (pluginRef.current && !pluginSupport)) {
     return null;
   }
 

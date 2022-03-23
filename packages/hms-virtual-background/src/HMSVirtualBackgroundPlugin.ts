@@ -2,7 +2,12 @@
 import { loadTFLite } from './defineTFLite';
 import '@tensorflow/tfjs-backend-webgl';
 import { parseGIF, decompressFrames } from 'gifuct-js';
-import { HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
+import {
+  HMSPluginSupportResult,
+  HMSPluginUnsupportedTypes,
+  HMSVideoPlugin,
+  HMSVideoPluginType,
+} from '@100mslive/hms-video';
 
 const TAG = 'VBProcessor';
 const DEFAULT_DELAY = 33;
@@ -103,6 +108,9 @@ export class HMSVirtualBackgroundPlugin implements HMSVideoPlugin {
     }
   }
 
+  /*
+  @depreceated
+   */
   isSupported(): boolean {
     //support chrome, firefox, edge TODO: check this
     return (
@@ -110,6 +118,19 @@ export class HMSVirtualBackgroundPlugin implements HMSVideoPlugin {
       navigator.userAgent.indexOf('Firefox') !== -1 ||
       navigator.userAgent.indexOf('Edg') !== -1
     );
+  }
+
+  checkSupport(): HMSPluginSupportResult {
+    const browserResult = {} as HMSPluginSupportResult;
+    if (['Chrome', 'Firefox', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+      browserResult.isSupported = true;
+    } else {
+      browserResult.isSupported = false;
+      browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
+      browserResult.errMsg = 'browser not supported for plugin, see docs';
+    }
+
+    return browserResult;
   }
 
   getName(): string {
