@@ -9,6 +9,17 @@ export enum HMSGetMediaActions {
   SCREEN = 'screen',
 }
 
+function getDefaultError(error: string, deviceInfo: string) {
+  const message = error.toLowerCase();
+  if (message.includes('device not found')) {
+    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, error);
+  } else if (message.includes('permission denied')) {
+    return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, error);
+  } else {
+    return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, error);
+  }
+}
+
 /**
  * # Edge Cases:
  * - Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
@@ -17,18 +28,17 @@ export enum HMSGetMediaActions {
  * User blocked - NotAllowedError - Permission denied
  * System blocked - NotAllowedError - Permission denied by system
  */
+// eslint-disable-next-line complexity
 function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSException {
-  const message = err.message.toLowerCase();
-
   /**
    * Note: Adapter detects all chromium browsers as 'chrome'
    */
-  if (
+  const deniedBySystem =
     deviceInfo === 'screen' &&
     adapter.browserDetails.browser === 'chrome' &&
     err.name === 'NotAllowedError' &&
-    err.message.includes('denied by system')
-  ) {
+    err.message.includes('denied by system');
+  if (deniedBySystem) {
     return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
   }
 
@@ -48,13 +58,7 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSExc
     case 'TypeError':
       return ErrorFactory.TracksErrors.NothingToReturn(HMSAction.TRACK, err.message);
     default:
-      if (message.includes('device not found')) {
-        return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
-      } else if (message.includes('permission denied')) {
-        return ErrorFactory.TracksErrors.CantAccessCaptureDevice(HMSAction.TRACK, deviceInfo, err.message);
-      } else {
-        return ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, err.message);
-      }
+      return getDefaultError(err.message, deviceInfo);
   }
 }
 

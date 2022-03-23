@@ -3,6 +3,7 @@ import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
+import { EventBus } from '../../events/EventBus';
 
 const TAG = 'AudioPluginsManager';
 
@@ -33,10 +34,10 @@ export class HMSAudioPluginsManager {
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
 
-  constructor(track: HMSLocalAudioTrack) {
+  constructor(track: HMSLocalAudioTrack, eventBus: EventBus) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
-    this.analytics = new AudioPluginsAnalytics();
+    this.analytics = new AudioPluginsAnalytics(eventBus);
   }
 
   getPlugins(): string[] {

@@ -65,6 +65,7 @@ export const fakePeerList: PeerListNotification = {
     recording: {
       sfu: { enabled: false },
       browser: { enabled: false },
+      hls: { enabled: false },
     },
     streaming: {
       enabled: false,
@@ -130,6 +131,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
     recording: {
       sfu: { enabled: false },
       browser: { enabled: false },
+      hls: { enabled: false },
     },
     streaming: {
       enabled: false,

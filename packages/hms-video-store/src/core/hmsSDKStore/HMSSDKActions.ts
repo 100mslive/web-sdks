@@ -208,9 +208,16 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, audioOnly?: boolean) {
+  async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
+    const sdkConfig = { audioOnly: false, videoOnly: false };
+    if (typeof config === 'object') {
+      Object.assign(sdkConfig, config);
+    } else if (typeof config === 'boolean') {
+      // for backward compatibility
+      sdkConfig.audioOnly = config;
+    }
     if (enabled) {
-      await this.startScreenShare(audioOnly);
+      await this.startScreenShare(sdkConfig);
     } else {
       await this.stopScreenShare();
     }
@@ -544,9 +551,13 @@ export class HMSSDKActions implements IHMSActions {
       onChangeTrackStateRequest: this.onChangeTrackStateRequest.bind(this),
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
+    });
+    this.sdk.addConnectionQualityListener({
+      onConnectionQualityUpdate: this.onConnectionQualityUpdate.bind(this),
     });
   }
 
@@ -597,16 +608,30 @@ export class HMSSDKActions implements IHMSActions {
       onDeviceChange: this.onDeviceChange.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });
   }
 
-  private async startScreenShare(audioOnly?: boolean) {
+  private onNetworkQuality(quality: number) {
+    this.setState(store => {
+      /*
+       * if store does not have peerId yet, fetch from sdk directly.
+       * sdk will have the localpeer already set.
+       */
+      const peerId = store.room.localPeer || this.sdk.getLocalPeer()?.peerId;
+      if (peerId) {
+        store.connectionQualities[peerId] = { peerID: peerId, downlinkQuality: quality };
+      }
+    }, 'ConnectionQuality');
+  }
+
+  private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
-      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), audioOnly);
+      await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);
       this.syncRoomState('startScreenShare');
     } else {
       this.logPossibleInconsistency("start screenshare is called while it's on");
@@ -830,6 +855,34 @@ export class HMSSDKActions implements IHMSActions {
         }
       }
     }, 'audioLevel');
+  }
+
+  /**
+   * The connection quality update is sent for all peers(one needs to know of) every time.
+   */
+  protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
+    this.setState(store => {
+      const currentPeerIDs = new Set();
+      newQualities.forEach(sdkUpdate => {
+        const peerID = sdkUpdate.peerID;
+        if (!peerID) {
+          return;
+        }
+        currentPeerIDs.add(peerID);
+        if (!store.connectionQualities[peerID]) {
+          store.connectionQualities[peerID] = sdkUpdate;
+        } else {
+          Object.assign(store.connectionQualities[peerID], sdkUpdate);
+        }
+      });
+      const peerIDsStored = Object.keys(store.connectionQualities);
+      for (const storedPeerID of peerIDsStored) {
+        if (!currentPeerIDs.has(storedPeerID)) {
+          // peer is likely no longer there, it wasn't in the update sent by the server
+          delete store.connectionQualities[storedPeerID];
+        }
+      }
+    }, 'connectionQuality');
   }
 
   protected onChangeTrackStateRequest(request: SDKHMSChangeTrackStateRequest) {

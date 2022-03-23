@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { HMSPeer, HMSTrack, HMSTrackID } from '@100mslive/hms-video-store';

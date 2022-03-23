@@ -1,8 +1,7 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-
 import { IStore } from '../../sdk/store';
 import { PolicyParams } from '../HMSNotifications';
 import { PublishParams } from '../../interfaces';
+import { EventBus } from '../../events/EventBus';
 
 /**
  * Handles:
@@ -11,7 +10,7 @@ import { PublishParams } from '../../interfaces';
  * - Emit 'policy-change' to finish preview before calling listener.onPreview
  */
 export class PolicyChangeManager {
-  constructor(private store: IStore, private eventEmitter: EventEmitter) {}
+  constructor(private store: IStore, private eventBus: EventBus) {}
 
   handlePolicyChange(params: PolicyParams) {
     const localPeer = this.store.getLocalPeer();
@@ -33,9 +32,9 @@ export class PolicyChangeManager {
       const newRole = this.store.getPolicyForRole(params.name);
       const oldRole = localPeer.role;
       localPeer.updateRole(newRole);
-      this.eventEmitter.emit('local-peer-role-update', { detail: { oldRole, newRole } });
+      this.eventBus.localRoleUpdate.publish({ oldRole, newRole });
     }
-    this.eventEmitter.emit('policy-change', { detail: { params } });
+    this.eventBus.policyChange.publish(params);
   }
 
   setSimulcastLayers(publishParams?: PublishParams) {

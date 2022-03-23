@@ -1,5 +1,6 @@
-import * as BaseSlider from '@radix-ui/react-slider';
 import React from 'react';
+import { CSS } from '@stitches/react';
+import * as BaseSlider from '@radix-ui/react-slider';
 import { Tooltip } from '../Tooltip';
 import { styled } from '../Theme';
 
@@ -16,7 +17,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$brandLight',
+  backgroundColor: '$grayDefault',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',
@@ -34,8 +35,8 @@ const Range = styled(BaseSlider.Range, {
 const Thumb = styled(BaseSlider.Thumb, {
   all: 'unset',
   display: 'block',
-  width: 15,
-  height: 15,
+  width: '$8',
+  height: '$8',
   backgroundColor: '$brandDefault',
   cursor: 'pointer',
   boxShadow: `0 2px 10px $colors$grayDefault`,
@@ -44,15 +45,15 @@ const Thumb = styled(BaseSlider.Thumb, {
   '&:focus': { boxShadow: 'none' },
 });
 
-type SliderProps = React.ComponentProps<typeof Root>;
+type SliderProps = React.ComponentProps<typeof Root> & { thumbStyles?: CSS };
 
-export const Slider: React.FC<SliderProps> = props => (
+export const Slider: React.FC<SliderProps> = ({ thumbStyles, ...props }) => (
   <Root {...props}>
     <Track>
       <Range />
     </Track>
     <Tooltip title={String(props.value?.[0])}>
-      <Thumb />
+      <Thumb css={thumbStyles} />
     </Tooltip>
   </Root>
 );

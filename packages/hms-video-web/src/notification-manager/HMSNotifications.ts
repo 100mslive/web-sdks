@@ -81,6 +81,7 @@ export interface PeerNotification {
   peer_id: string;
   info: Info;
   role: string;
+  joined_at?: number;
   tracks: {
     [track_id: string]: TrackState;
   };
@@ -98,6 +99,14 @@ export interface RoomState {
     browser: {
       started_at?: number;
       enabled: boolean;
+    };
+    hls: {
+      started_at?: number;
+      enabled: boolean;
+      config?: {
+        hls_vod: boolean;
+        single_file_per_layer: boolean;
+      };
     };
   };
   streaming?: {
@@ -130,6 +139,15 @@ interface Speaker {
 
 export interface SpeakerList {
   'speaker-list': Speaker[];
+}
+
+interface ConnectionQuality {
+  peer_id: string;
+  downlink_score: number;
+}
+
+export interface ConnectionQualityList {
+  peers: ConnectionQuality[];
 }
 
 /**
@@ -205,7 +223,7 @@ export interface RTMPNotification {
 
 export interface HLSNotification {
   enabled: boolean;
-  variants: Array<HLSVariantInfo>;
+  variants?: Array<HLSVariantInfo>;
   error?: ServerError;
   hls_recording?: {
     hls_vod: boolean;

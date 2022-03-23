@@ -50,7 +50,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (settings.deviceId === 'default' && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSVideoPluginsManager(this);
+    this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
   }
 
@@ -76,7 +76,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
     }
     await super.setEnabled(value);
-    this.eventBus.localVideoEnabled.publish(value);
+    this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 

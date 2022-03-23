@@ -9,11 +9,11 @@ export interface HLSConfig {
    */
   recording?: {
     /**
-     * if the final output should be one file or one file per hls layer, false by default
+     * if the desired end result is a mp4 file per HLS layer, false by default
      */
     singleFilePerLayer?: boolean;
     /**
-     * if video on demand needs to be turned on, false by default
+     * if the desired end result is a zip of m3u8 and all the chunks, false by default
      */
     hlsVod?: boolean;
   };

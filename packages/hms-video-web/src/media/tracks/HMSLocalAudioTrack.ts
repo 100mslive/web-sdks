@@ -47,7 +47,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (settings.deviceId === 'default' && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSAudioPluginsManager(this);
+    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
   }
 
@@ -81,7 +81,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
-    this.eventBus.localAudioEnabled.publish(value);
+    this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
   }
 

@@ -15,6 +15,10 @@ export class HMSWebrtcStats {
   private peerStats: Record<string, HMSPeerStats> = {};
   private trackStats: Record<string, HMSTrackStats> = {};
 
+  /**
+   * Removed localPeerID check in other places as it will be present before
+   * this is initialized
+   */
   constructor(
     private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
     private store: IStore,
@@ -23,10 +27,7 @@ export class HMSWebrtcStats {
   }
 
   getLocalPeerStats(): HMSPeerStats | undefined {
-    if (!this.localPeerID) {
-      return;
-    }
-    return this.peerStats[this.localPeerID];
+    return this.peerStats[this.localPeerID!];
   }
 
   getTrackStats(trackId: string): HMSTrackStats | undefined {
@@ -42,16 +43,12 @@ export class HMSWebrtcStats {
   }
 
   private async updateLocalPeerStats() {
-    if (!this.localPeerID) {
-      return;
-    }
-
     const prevLocalPeerStats = this.getLocalPeerStats();
     let publishReport: RTCStatsReport | undefined;
     try {
       publishReport = await this.getStats.publish?.();
     } catch (err) {
-      HMSLogger.e(this.TAG, 'Error in getting publish stats', err);
+      HMSLogger.w(this.TAG, 'Error in getting publish stats', err);
     }
     const publishStats: HMSPeerStats['publish'] | undefined =
       publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
@@ -60,7 +57,7 @@ export class HMSWebrtcStats {
     try {
       subscribeReport = await this.getStats.subscribe?.();
     } catch (err) {
-      HMSLogger.e(this.TAG, 'Error in getting subscribe stats', err);
+      HMSLogger.w(this.TAG, 'Error in getting subscribe stats', err);
     }
     const baseSubscribeStats =
       subscribeReport && getLocalPeerStatsFromReport('subscribe', subscribeReport, prevLocalPeerStats);
@@ -75,7 +72,7 @@ export class HMSWebrtcStats {
     const subscribeStats: HMSPeerStats['subscribe'] =
       baseSubscribeStats && Object.assign(baseSubscribeStats, { packetsLostRate, jitter, packetsLost });
 
-    this.peerStats[this.localPeerID] = { publish: publishStats, subscribe: subscribeStats };
+    this.peerStats[this.localPeerID!] = { publish: publishStats, subscribe: subscribeStats };
   }
 
   private async updateTrackStats() {

@@ -59,6 +59,12 @@ export const Flex = styled('div', {
       column: {
         flexDirection: 'column',
       },
+      rowReverse: {
+        flexDirection: 'row-reverse',
+      },
+      columnReverse: {
+        flexDirection: 'column-reverse',
+      },
     },
     gap: {
       1: gapStyles(1),

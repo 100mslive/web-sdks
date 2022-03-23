@@ -223,6 +223,16 @@ export const makeFakeStore = (): HMSStore => {
         trackID: '102',
       },
     },
+    connectionQualities: {
+      '1': {
+        peerID: '1',
+        downlinkQuality: 50,
+      },
+      '2': {
+        peerID: '2',
+        downlinkQuality: 80,
+      },
+    },
     settings: {
       audioInputDeviceId: 'testAudioIn',
       audioOutputDeviceId: 'testAudioOut',

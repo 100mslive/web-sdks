@@ -1,5 +1,5 @@
 import { HMSConfig } from './config';
-import { HMSAudioListener, HMSUpdateListener } from './update-listener';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -15,6 +15,7 @@ import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
+import { ScreenShareConfig } from './track-settings';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
@@ -57,7 +58,7 @@ export default interface HMS {
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
-  startScreenShare(onStop: () => void, audioOnly: boolean): Promise<void>;
+  startScreenShare(onStop: () => void, config: ScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;
@@ -66,4 +67,5 @@ export default interface HMS {
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
+  addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
 }

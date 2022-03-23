@@ -8,6 +8,7 @@ import { HMSSpeaker } from './speaker';
 import { DeviceChangeListener } from './device-change-listener';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
 import { HMSLeaveRoomRequest } from './leave-room-request';
+import { HMSConnectionQuality } from './peer';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -55,6 +56,10 @@ export interface HMSAudioListener {
   onAudioLevelUpdate(speakers: HMSSpeaker[]): void;
 }
 
+export interface HMSConnectionQualityListener {
+  onConnectionQualityUpdate(qualityUpdates: HMSConnectionQuality[]): void;
+}
+
 export interface HMSUpdateListener extends DeviceChangeListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
@@ -69,4 +74,5 @@ export interface HMSUpdateListener extends DeviceChangeListener {
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
   onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
+  onNetworkQuality?(score: number): void;
 }
