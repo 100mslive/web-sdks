@@ -285,9 +285,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private onCloseHandler(event: CloseEvent) {
     HMSLogger.d(`Websocket closed code=${event.code}`);
-    if (event.code !== 1000) {
-      this.setIsConnected(false, `code: ${event.code},  unexpected websocket close`);
-    }
+    this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
     // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 
     // @DISCUSS: onOffline would have thrown error already.
