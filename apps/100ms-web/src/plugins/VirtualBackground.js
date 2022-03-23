@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HMSVirtualBackgroundPlugin } from "@100mslive/hms-virtual-background";
 import {
   useHMSActions,
