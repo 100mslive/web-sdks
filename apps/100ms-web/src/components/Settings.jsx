@@ -12,13 +12,17 @@ const RefreshDevices = () => {
   const hmsActions = useHMSActions();
   return (
     <Button
-      onClick={async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
-        stream.getTracks().forEach(track => track.stop());
-        hmsActions.refreshDevices();
+      onClick={() => {
+        navigator.mediaDevices
+          .getUserMedia({
+            audio: true,
+            video: true,
+          })
+          .then(stream => {
+            stream.getTracks().forEach(track => track.stop());
+            hmsActions.refreshDevices();
+          })
+          .catch(console.error);
       }}
     >
       Refresh Devices
