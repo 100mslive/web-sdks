@@ -29,6 +29,7 @@ import { PostLeave } from "./components/PostLeave";
 import { ToastManager } from "./components/Toast/ToastManager";
 import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
+import { InputManager } from "./components/Input/InputManager";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -175,6 +176,7 @@ export function EdtechComponent({
 }
 
 function AppRoutes({ getUserToken }) {
+  InputManager().bindAllShortcuts();
   return (
     <Router>
       <ToastContainer />

@@ -14,7 +14,9 @@ export const AudioVideoToggle = ({ compact = false }) => {
   return (
     <Fragment>
       {toggleAudio ? (
-        <Tooltip title={`Turn ${isLocalAudioEnabled ? "off" : "on"} audio`}>
+        <Tooltip
+          title={`Turn ${isLocalAudioEnabled ? "off" : "on"} audio (ctrl + m)`}
+        >
           <IconButton
             css={{ mr: compact ? "$2" : "$4" }}
             active={isLocalAudioEnabled}
