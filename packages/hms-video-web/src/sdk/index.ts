@@ -270,7 +270,7 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
-          if (initConfig) {
+          if (initConfig && this.listener?.onNetworkQuality) {
             this.networkTestManager.start(initConfig.config?.networkHealth);
           }
         })
@@ -309,6 +309,7 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
+    this.networkTestManager.stop();
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
@@ -398,6 +399,7 @@ export class HMSSdk implements HMSInterface {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
+      this.networkTestManager.stop();
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed

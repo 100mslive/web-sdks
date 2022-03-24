@@ -7,6 +7,7 @@ import { sleep } from '../utils/timer-utils';
 
 export class NetworkTestManager {
   private TAG = 'NetworkTestManager';
+  private controller = new AbortController();
   constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
 
   start = async (networkHealth: NetworkHealth) => {
@@ -14,13 +15,12 @@ export class NetworkTestManager {
       return;
     }
     const { url, timeout, scoreMap } = networkHealth;
-    const controller = new AbortController();
-    const signal = controller.signal;
+    const signal = this.controller.signal;
 
     const startTime = Date.now();
     let downloadedSize = 0;
     const timeoutPromise = sleep(timeout).then(() => {
-      controller.abort();
+      this.controller.abort();
       return true;
     });
     try {
@@ -76,7 +76,13 @@ export class NetworkTestManager {
     }
   };
 
-  calculateScore = (scoreMap: ScoreMap, bitrate: number) => {
+  stop = () => {
+    if (!this.controller.signal.aborted) {
+      this.controller.abort();
+    }
+  };
+
+  private calculateScore = (scoreMap: ScoreMap, bitrate: number) => {
     for (const score in scoreMap) {
       const thresholds = scoreMap[score];
       if (bitrate >= thresholds.low && (!thresholds.high || bitrate <= thresholds.high)) {
