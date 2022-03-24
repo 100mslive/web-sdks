@@ -254,6 +254,14 @@ export class HMSSdk implements HMSInterface {
       });
     }
 
+    let initSuccessful = false;
+    let networkTestFinished = false;
+    const timerId = setTimeout(() => {
+      // If init or network is not done by 3s send -1
+      if (!initSuccessful || !networkTestFinished) {
+        this.listener?.onNetworkQuality?.(-1);
+      }
+    }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
@@ -270,8 +278,12 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
+          initSuccessful = true;
+          clearTimeout(timerId);
           if (initConfig && this.listener?.onNetworkQuality) {
-            this.networkTestManager.start(initConfig.config?.networkHealth);
+            this.networkTestManager.start(initConfig.config?.networkHealth).then(() => {
+              networkTestFinished = true;
+            });
           }
         })
         .catch(ex => {
