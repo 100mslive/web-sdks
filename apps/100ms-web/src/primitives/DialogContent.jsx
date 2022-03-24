@@ -39,7 +39,7 @@ export const DialogContent = ({
                 {title}
               </Text>
             </Flex>
-            {closeable && <Dialog.DefaultClose />}
+            {closeable && <Dialog.DefaultClose data-testid="test" />}
           </Flex>
         </Dialog.Title>
         <HorizontalDivider css={{ mt: "0.8rem" }} />
