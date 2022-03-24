@@ -34,7 +34,6 @@ export class DeviceManager implements HMSDeviceManager {
   private audioInputChanged = false;
 
   constructor(private store: IStore, private eventBus: EventBus) {
-    navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
     this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
@@ -65,6 +64,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (this.initialized && !force) {
       return;
     }
+    !this.initialized && navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     this.initialized = true;
     await this.enumerateDevices();
     this.logDevices('Init');
