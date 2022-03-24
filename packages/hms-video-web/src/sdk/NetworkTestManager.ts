@@ -21,7 +21,6 @@ export class NetworkTestManager {
     let downloadedSize = 0;
     const timeoutPromise = sleep(timeout).then(() => {
       this.controller.abort();
-      return true;
     });
     try {
       const res = await fetch(`${url}?${Date.now()}`, { signal });
@@ -40,6 +39,7 @@ export class NetworkTestManager {
             completed = done;
             if (value) {
               downloadedSize += value.byteLength;
+              this.sendScore({ scoreMap, downloadedSize, startTime });
             }
           }
         } catch (error) {
@@ -49,14 +49,7 @@ export class NetworkTestManager {
 
       return Promise.race([readData(), timeoutPromise])
         .then(() => {
-          const totalTimeInSecs = (Date.now() - startTime) / 1000;
-          const sizeInKB = downloadedSize / 1024;
-          const bitrate = (sizeInKB / totalTimeInSecs) * 8;
-          const score = this.calculateScore(scoreMap, bitrate);
-          this.listener?.onNetworkQuality?.(score);
-          this.eventBus.analytics.publish(
-            AnalyticsEventFactory.previewNetworkQuality({ score, downLink: bitrate.toFixed(2) }),
-          );
+          this.sendScore({ scoreMap, downloadedSize, startTime });
         })
         .catch(error => {
           HMSLogger.e(this.TAG, error);
@@ -82,13 +75,28 @@ export class NetworkTestManager {
     }
   };
 
-  private calculateScore = (scoreMap: ScoreMap, bitrate: number) => {
+  private sendScore = ({
+    scoreMap,
+    downloadedSize,
+    startTime,
+  }: {
+    scoreMap: ScoreMap;
+    downloadedSize: number;
+    startTime: number;
+  }) => {
+    const totalTimeInSecs = (Date.now() - startTime) / 1000;
+    const sizeInKB = downloadedSize / 1024;
+    const bitrate = (sizeInKB / totalTimeInSecs) * 8;
+    let calculatedScore = -1;
     for (const score in scoreMap) {
       const thresholds = scoreMap[score];
       if (bitrate >= thresholds.low && (!thresholds.high || bitrate <= thresholds.high)) {
-        return Number(score);
+        calculatedScore = Number(score);
       }
     }
-    return -1;
+    this.listener?.onNetworkQuality?.(calculatedScore);
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.previewNetworkQuality({ score: calculatedScore, downLink: bitrate.toFixed(2) }),
+    );
   };
 }
