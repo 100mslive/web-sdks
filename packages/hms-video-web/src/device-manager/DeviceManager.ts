@@ -6,7 +6,6 @@ import { HMSDeviceChangeEvent } from '../interfaces';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from './DeviceStorage';
 import { IStore } from '../sdk/store';
-import { debounce } from '../utils/timer-utils';
 import HMSLogger from '../utils/logger';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
@@ -34,7 +33,23 @@ export class DeviceManager implements HMSDeviceManager {
   private videoInputChanged = false;
   private audioInputChanged = false;
 
-  constructor(private store: IStore, private eventBus: EventBus) {}
+  constructor(private store: IStore, private eventBus: EventBus) {
+    navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
+    const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
+      enabled && track.source === 'regular';
+    this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {
+      await this.enumerateDevices();
+      if (this.videoInputChanged) {
+        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+      }
+    });
+    this.eventBus.localAudioEnabled.waitFor(isLocalTrackEnabled).then(async () => {
+      await this.enumerateDevices();
+      if (this.audioInputChanged) {
+        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
+      }
+    });
+  }
 
   updateOutputDevice = (deviceId?: string) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
@@ -51,27 +66,12 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
     this.initialized = true;
-    navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     await this.enumerateDevices();
     this.logDevices('Init');
     this.setOutputDevice();
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    const predicate = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
-      enabled && track.source === 'regular';
-    this.eventBus.localVideoEnabled.waitFor(predicate).then(async () => {
-      await this.enumerateDevices();
-      if (this.videoInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
-    });
-    this.eventBus.localAudioEnabled.waitFor(predicate).then(async () => {
-      await this.enumerateDevices();
-      if (this.audioInputChanged) {
-        this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
-      }
-    });
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
@@ -160,7 +160,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = debounce(async () => {
+  private handleDeviceChange = async () => {
     await this.enumerateDevices();
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
@@ -174,7 +174,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.setOutputDevice(true);
     await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
-  }, 500).bind(this);
+  };
 
   /**
    * Function to get the device after device change
