@@ -46,8 +46,8 @@ export class DeviceManager implements HMSDeviceManager {
     return newDevice;
   };
 
-  async init() {
-    if (this.initialized) {
+  async init(force = false) {
+    if (this.initialized && !force) {
       return;
     }
     this.initialized = true;

@@ -138,6 +138,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  refreshDevices(): void {
+    this.validateJoined('refreshDevices');
+    this.deviceManager.init(true);
+  }
+
   getWebrtcInternals() {
     return this.transport?.getWebrtcInternals();
   }
