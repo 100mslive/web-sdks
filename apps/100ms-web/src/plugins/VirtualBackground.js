@@ -27,13 +27,15 @@ export const VirtualBackground = () => {
   useEffect(() => {
     createPlugin();
     //check support of plugin
-    const result = pluginRef.current.checkSupport();
-    if (result.isSupported) {
+    const pluginSupport = hmsActions.validateVideoPluginSupport(
+      pluginRef.current
+    );
+    if (pluginSupport.isSupported) {
       setPluginSupport(true);
     } else {
       setPluginSupport(false);
     }
-  }, []);
+  }, [hmsActions]);
 
   async function addPlugin() {
     try {

@@ -132,7 +132,7 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
-    const result = plugin.checkSupport();
+    const result = this.validatePlugin(plugin);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
@@ -169,6 +169,10 @@ export class HMSVideoPluginsManager {
       await this.removePlugin(plugin);
       throw err;
     }
+  }
+
+  validatePlugin(plugin: HMSVideoPlugin) {
+    return plugin.checkSupport();
   }
 
   async removePlugin(plugin: HMSVideoPlugin) {

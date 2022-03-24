@@ -85,7 +85,7 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    const result = plugin.checkSupport(this.audioContext);
+    const result = this.validatePlugin(plugin);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
