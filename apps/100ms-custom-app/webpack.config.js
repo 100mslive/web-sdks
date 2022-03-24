@@ -69,12 +69,20 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        react: {
+          name: 'react',
+          enforce: true,
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          reuseExistingChunk: true,
+          chunks: 'all',
+        },
         vendor: {
           name: 'vendor',
           enforce: true,
           test: /[\\/]node_modules[\\/]/,
           reuseExistingChunk: true,
           chunks: 'all',
+          maxSize: 204800,
         },
         default: {
           reuseExistingChunk: true,
