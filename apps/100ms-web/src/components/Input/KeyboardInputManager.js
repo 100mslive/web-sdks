@@ -1,19 +1,14 @@
-import {
-  selectIsLocalAudioEnabled,
-  useHMSActions,
-  useHMSVanillaStore,
-} from "@100mslive/react-sdk";
+import { selectIsLocalAudioEnabled } from "@100mslive/react-sdk";
 
 let isEvenListenersAttached = false;
 
-export function InputManager() {
-  const hmsStore = useHMSVanillaStore();
-  const hmsActions = useHMSActions();
+export function KeyboardInputManager(hmsReactiveStore) {
   let isShortcutExecuted = false;
-
+  const hmsActions = hmsReactiveStore.getActions();
+  const hmsVanillaStore = hmsReactiveStore.getStore();
   const toggleAudio = async () => {
     if (!isShortcutExecuted) {
-      const enabled = hmsStore.getState(selectIsLocalAudioEnabled);
+      const enabled = hmsVanillaStore.getState(selectIsLocalAudioEnabled);
       await hmsActions.setLocalAudioEnabled(!enabled);
       isShortcutExecuted = true;
     }
