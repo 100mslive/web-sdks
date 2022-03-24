@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import {
   HMSPlaylistType,
   useHMSStore,
@@ -27,6 +27,7 @@ export const Playlist = ({ type }) => {
   const { active, list: playlist, actions } = usePlaylist(type);
   const [open, setOpen] = useState(false);
   const [collapse, setCollapse] = useState(false);
+  const inputRef = useRef(null);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   if (
     !isAllowedToPublish.screen ||
@@ -39,7 +40,10 @@ export const Playlist = ({ type }) => {
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
-        <Dropdown.Trigger asChild data-testid={type === HMSPlaylistType.audio ? 'audio_playlist':'video_playlist'}>
+        <Dropdown.Trigger
+          asChild
+          data-testid={isAudioPlaylist ? "audio_playlist" : "video_playlist"}
+        >
           <IconButton css={{ mx: "$4" }} active={!active}>
             <Tooltip
               title={isAudioPlaylist ? "Audio Playlist" : "Video Playlist"}
@@ -72,6 +76,33 @@ export const Playlist = ({ type }) => {
             <Text variant="md" css={{ flex: "1 1 0" }}>
               {isAudioPlaylist ? "Audio Player" : "Video Playlist"}
             </Text>
+            <Text
+              onClick={() => {
+                inputRef.current.click();
+              }}
+              css={{ cursor: "pointer" }}
+            >
+              Browse
+            </Text>
+            <input
+              type="file"
+              ref={inputRef}
+              accept={isAudioPlaylist ? "audio/*" : "video/*"}
+              onChange={e => {
+                const file = e.target.files[0];
+                const id = file.lastModified;
+                actions.setList([
+                  {
+                    type,
+                    id: file.lastModified,
+                    name: file.name,
+                    url: URL.createObjectURL(file),
+                  },
+                ]);
+                actions.play(id);
+              }}
+              style={{ display: "none" }}
+            />
             <IconButton
               css={{ mr: "-$4" }}
               onClick={async () => {
