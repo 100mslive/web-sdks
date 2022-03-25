@@ -49,7 +49,7 @@ export class NetworkTestManager {
 
       return Promise.race([readData(), timeoutPromise])
         .then(() => {
-          this.sendScore({ scoreMap, downloadedSize, startTime });
+          this.sendScore({ scoreMap, downloadedSize, startTime, finished: true });
         })
         .catch(error => {
           HMSLogger.e(this.TAG, error);
@@ -79,10 +79,12 @@ export class NetworkTestManager {
     scoreMap,
     downloadedSize,
     startTime,
+    finished = false,
   }: {
     scoreMap: ScoreMap;
     downloadedSize: number;
     startTime: number;
+    finished?: boolean;
   }) => {
     const totalTimeInSecs = (Date.now() - startTime) / 1000;
     const sizeInKB = downloadedSize / 1024;
@@ -95,8 +97,10 @@ export class NetworkTestManager {
       }
     }
     this.listener?.onNetworkQuality?.(calculatedScore);
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.previewNetworkQuality({ score: calculatedScore, downLink: bitrate.toFixed(2) }),
-    );
+    if (finished) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.previewNetworkQuality({ score: calculatedScore, downLink: bitrate.toFixed(2) }),
+      );
+    }
   };
 }
