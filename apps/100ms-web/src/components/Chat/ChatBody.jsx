@@ -34,7 +34,7 @@ export const ChatBody = ({ role, peerId }) => {
     <Fragment>
       {messages.map(message => {
         return (
-          <Flex css={{ flexWrap: "wrap" }} key={message.time}>
+          <Flex css={{ flexWrap: "wrap", p: "$8" }} key={message.time}>
             <Text variant="sm" css={{ color: "$textMedEmp" }}>
               {message.senderName}
             </Text>

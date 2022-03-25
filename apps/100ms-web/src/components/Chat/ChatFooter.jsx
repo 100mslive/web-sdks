@@ -27,6 +27,7 @@ export const ChatFooter = ({ role, peerId }) => {
   };
   return (
     <Flex
+      align="center"
       css={{
         borderTop: "1px solid $borderDefault",
         bg: "$menuBg",
@@ -48,7 +49,10 @@ export const ChatFooter = ({ role, peerId }) => {
           }
         }}
       />
-      <IconButton onClick={sendMessage}>
+      <IconButton
+        onClick={sendMessage}
+        css={{ ml: "auto", height: "max-content", mr: "$4" }}
+      >
         <SendIcon />
       </IconButton>
     </Flex>

@@ -25,11 +25,16 @@ export const ChatHeader = ({
         borderTopLeftRadius: "$2",
         borderTopRightRadius: "$2",
         pl: "$8",
+        pr: "$4",
       }}
     >
       <Text css={{ mr: "$2" }}>{selection}</Text>
       {unreadCount && <ChatDotIcon />}
-      {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+      {open ? (
+        <ChevronUpIcon width={18} height={18} />
+      ) : (
+        <ChevronDownIcon width={18} height={18} />
+      )}
       <IconButton css={{ ml: "auto" }} onClick={onClose}>
         <CrossIcon />
       </IconButton>
