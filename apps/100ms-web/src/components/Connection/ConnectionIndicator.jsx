@@ -39,7 +39,11 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
   if (downlinkQuality === 0) {
     return (
       <Tooltip title={getTooltipText(downlinkQuality)}>
-        <Wrapper isTile={isTile} css={{ color: "#ED4C5A" }}>
+        <Wrapper
+          isTile={isTile}
+          css={{ color: "#ED4C5A" }}
+          data-testid="tile_network"
+        >
           <PoorConnectivityIcon />
         </Wrapper>
       </Tooltip>
@@ -47,7 +51,7 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
   }
   return (
     <Tooltip title={getTooltipText(downlinkQuality)}>
-      <Wrapper isTile={isTile}>
+      <Wrapper isTile={isTile} data-testid="tile_network">
         <svg
           width={16}
           height={16}
