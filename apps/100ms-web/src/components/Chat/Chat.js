@@ -9,21 +9,16 @@ export const Chat = ({ onClose }) => {
   const [chatOptions, setChatOptions] = useState({
     role: "",
     peerId: "",
-    everyone: true,
-    value: "Everyone",
-    selectorOpen: false,
-    unreadCount: 0,
+    selection: "Everyone",
   });
+  const [selectorOpen, setSelectorOpen] = useState(false);
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
-        open={chatOptions.selectorOpen}
-        selection={chatOptions.value}
+        open={selectorOpen}
+        selection={chatOptions.selection}
         onToggle={() => {
-          setChatOptions(state => ({
-            ...state,
-            selectorOpen: !state.selectorOpen,
-          }));
+          setSelectorOpen(value => !value);
         }}
         onClose={onClose}
       />
@@ -37,7 +32,7 @@ export const Chat = ({ onClose }) => {
         }}
       >
         <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-        {chatOptions.selectorOpen && (
+        {selectorOpen && (
           <ChatSelector
             role={chatOptions.role}
             peerId={chatOptions.peerId}
@@ -45,8 +40,8 @@ export const Chat = ({ onClose }) => {
               setChatOptions(state => ({
                 ...state,
                 ...data,
-                selectorOpen: false,
               }));
+              setSelectorOpen(false);
             }}
           />
         )}

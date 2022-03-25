@@ -3,19 +3,30 @@ import {
   selectAvailableRoleNames,
   selectRemotePeers,
   useHMSStore,
+  selectUnreadHMSMessagesCount,
+  selectMessagesUnreadCountByRole,
+  selectMessagesUnreadCountByPeerID,
 } from "@100mslive/react-sdk";
 import { Flex, HorizontalDivider, Text } from "@100mslive/react-ui";
 import { ChatDotIcon } from "./ChatDotIcon";
+import { CheckIcon } from "@100mslive/react-icons";
 
-const SelectorItem = ({ value, active, onClick }) => {
+const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
     <Flex
       onClick={onClick}
-      css={{ cursor: "pointer", p: "$4 $8", "&:hover": { bg: "$menuBg" } }}
+      css={{
+        cursor: "pointer",
+        p: "$4 $8",
+        "&:hover": { bg: "$menuBg" },
+      }}
       align="center"
     >
       <Text variant="sm">{value}</Text>
-      {active && <ChatDotIcon css={{ ml: "auto" }} />}
+      <Flex align="center" css={{ ml: "auto", color: "$textPrimary" }}>
+        {unreadCount > 0 && <ChatDotIcon />}
+        {active && <CheckIcon width={16} height={16} />}
+      </Flex>
     </Flex>
   );
 };
@@ -31,6 +42,48 @@ const SelectorHeader = ({ children }) => {
   );
 };
 
+const Everyone = ({ onSelect, active }) => {
+  const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
+  return (
+    <SelectorItem
+      value="Everyone"
+      active={active}
+      unreadCount={unreadCount}
+      onClick={() => {
+        onSelect({ role: "", peerId: "", selection: "Everyone" });
+      }}
+    />
+  );
+};
+
+const RoleItem = ({ onSelect, role, active }) => {
+  const unreadCount = useHMSStore(selectMessagesUnreadCountByRole(role));
+  return (
+    <SelectorItem
+      value={role}
+      active={active}
+      unreadCount={unreadCount}
+      onClick={() => {
+        onSelect({ role: role, selection: role });
+      }}
+    />
+  );
+};
+
+const PeerItem = ({ onSelect, peerId, name, active }) => {
+  const unreadCount = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
+  return (
+    <SelectorItem
+      value={name}
+      active={active}
+      unreadCount={unreadCount}
+      onClick={() => {
+        onSelect({ role: "", peerId, selection: name });
+      }}
+    />
+  );
+};
+
 export const ChatSelector = ({ role, peerId, onSelect }) => {
   const roles = useHMSStore(selectAvailableRoleNames);
   const peers = useHMSStore(selectRemotePeers);
@@ -43,36 +96,30 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         top: 0,
         left: 0,
         bg: "$bgSecondary",
+        pt: "$4",
       }}
     >
-      <SelectorItem
-        value="Everyone"
-        active={!role && !peerId}
-        onClick={() => {
-          onSelect({ role: "", peerId: "", value: "Everyone" });
-        }}
-      />
+      <Everyone onSelect={onSelect} active={!role && !peerId} />
       <SelectorHeader>Roles</SelectorHeader>
       {roles.map(userRole => {
         return (
-          <SelectorItem
-            value={userRole}
+          <RoleItem
+            key={userRole}
             active={role === userRole}
-            onClick={() => {
-              onSelect({ role: userRole, value: userRole });
-            }}
+            role={userRole}
+            onSelect={onSelect}
           />
         );
       })}
       <SelectorHeader>Participants</SelectorHeader>
       {peers.map(peer => {
         return (
-          <SelectorItem
-            value={peer.name}
+          <PeerItem
+            key={peer.id}
+            name={peer.name}
+            peerId={peer.id}
             active={peer.id === peerId}
-            onClick={() => {
-              onSelect({ peerId: peer.id, role: "", value: peer.name });
-            }}
+            onSelect={onSelect}
           />
         );
       })}
