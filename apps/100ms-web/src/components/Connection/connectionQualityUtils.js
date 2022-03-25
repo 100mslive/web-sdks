@@ -1,7 +1,7 @@
 const connectionTooltip = {
   0: "Reconnecting",
-  1: "Bad Connection",
-  2: "Poor Connection",
+  1: "Very Bad Connection",
+  2: "Bad Connection",
   3: "Moderate Connection",
   4: "Good Connection",
   5: "Excellent Connection",
