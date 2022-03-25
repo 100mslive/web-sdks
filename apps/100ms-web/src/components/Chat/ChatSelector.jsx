@@ -108,11 +108,11 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         top: 0,
         left: 0,
         bg: "$bgSecondary",
-        pt: "$4",
+        py: "$4",
       }}
     >
       <Everyone onSelect={onSelect} active={!role && !peerId} />
-      <SelectorHeader>Roles</SelectorHeader>
+      {roles.length > 0 && <SelectorHeader>Roles</SelectorHeader>}
       {roles.map(userRole => {
         return (
           <RoleItem
@@ -123,7 +123,7 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
           />
         );
       })}
-      <SelectorHeader>Participants</SelectorHeader>
+      {peers.length > 0 && <SelectorHeader>Participants</SelectorHeader>}
       {peers.map(peer => {
         return (
           <PeerItem

@@ -4,8 +4,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CrossIcon,
+  PeopleIcon,
 } from "@100mslive/react-icons";
-import { ChatDotIcon } from "./ChatDotIcon";
 
 export const ChatHeader = ({
   selection,
@@ -28,14 +28,20 @@ export const ChatHeader = ({
         pr: "$4",
       }}
     >
-      <Text css={{ mr: "$2" }}>{selection}</Text>
-      {unreadCount && <ChatDotIcon />}
+      <PeopleIcon />
+      <Text css={{ mx: "$2" }}>{selection}</Text>
       {open ? (
         <ChevronUpIcon width={18} height={18} />
       ) : (
         <ChevronDownIcon width={18} height={18} />
       )}
-      <IconButton css={{ ml: "auto" }} onClick={onClose}>
+      <IconButton
+        css={{ ml: "auto" }}
+        onClick={e => {
+          e.stopPropagation();
+          open ? onToggle() : onClose();
+        }}
+      >
         <CrossIcon />
       </IconButton>
     </Flex>
