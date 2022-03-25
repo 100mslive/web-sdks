@@ -4,7 +4,7 @@ import {
   selectConnectionQualityByPeerID,
 } from "@100mslive/react-sdk";
 import { styled, Tooltip, useTheme } from "@100mslive/react-ui";
-import { getColor, getText } from "./utils";
+import { getColor, getTooltipText } from "./connectionQualityUtils";
 import { PoorConnectivityIcon } from "@100mslive/react-icons";
 
 const Wrapper = styled("span", {
@@ -38,7 +38,7 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
   }
   if (downlinkQuality === 0) {
     return (
-      <Tooltip title="Reconnecting">
+      <Tooltip title={getTooltipText(downlinkQuality)}>
         <Wrapper isTile={isTile} css={{ color: "#ED4C5A" }}>
           <PoorConnectivityIcon />
         </Wrapper>
@@ -46,7 +46,7 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
     );
   }
   return (
-    <Tooltip title={getText(downlinkQuality)}>
+    <Tooltip title={getTooltipText(downlinkQuality)}>
       <Wrapper isTile={isTile}>
         <svg
           width={16}

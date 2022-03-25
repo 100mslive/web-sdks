@@ -8,12 +8,10 @@ const connectionTooltip = {
 };
 connectionTooltip[-1] = "Network Unknown";
 
-// 0 should be no dots
-
 /**
  * @param connectionScore -> 1-5 connection score for network quality
  */
-export const getText = connectionScore => {
+export const getTooltipText = connectionScore => {
   return connectionTooltip[connectionScore];
 };
 
