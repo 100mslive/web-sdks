@@ -35,4 +35,5 @@ export const getColor = (position, connectionScore, defaultColor) => {
   } else if (connectionScore >= 1) {
     return "#ED4C5A";
   }
+  return defaultColor;
 };
