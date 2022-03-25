@@ -82,7 +82,8 @@ export const Playlist = ({ type }) => {
               onClick={() => {
                 inputRef.current.click();
               }}
-              css={{ cursor: "pointer" }}
+              variant="sm"
+              css={{ cursor: "pointer", mr: "$2" }}
             >
               Browse
             </Text>
@@ -96,7 +97,7 @@ export const Playlist = ({ type }) => {
                 actions.setList([
                   {
                     type,
-                    id: file.lastModified,
+                    id,
                     name: file.name,
                     url: URL.createObjectURL(file),
                   },
