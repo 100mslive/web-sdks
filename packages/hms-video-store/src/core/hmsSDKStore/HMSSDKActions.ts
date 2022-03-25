@@ -386,8 +386,8 @@ export class HMSSDKActions implements IHMSActions {
     let result = {} as HMSPluginSupportResult;
     result.isSupported = false; //Setting default to false
     if (!plugin) {
-      HMSLogger.w('Invalid plugin received in store');
-      result.errMsg = 'trying to add invalid plugin, see docs for details';
+      HMSLogger.w('no plugin passed in for checking support');
+      result.errMsg = 'no plugin passed in for checking support';
       return result;
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
