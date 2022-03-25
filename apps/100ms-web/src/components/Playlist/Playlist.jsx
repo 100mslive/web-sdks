@@ -42,7 +42,9 @@ export const Playlist = ({ type }) => {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger
           asChild
-          data-testid={isAudioPlaylist ? "audio_playlist" : "video_playlist"}
+          data-testid={
+            type === HMSPlaylistType.audio ? "audio_playlist" : "video_playlist"
+          }
         >
           <IconButton css={{ mx: "$4" }} active={!active}>
             <Tooltip
