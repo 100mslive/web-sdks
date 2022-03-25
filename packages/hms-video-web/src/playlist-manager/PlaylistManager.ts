@@ -5,6 +5,8 @@ import { PlaylistVideoManager } from './PlaylistVideoManager';
 import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
+import { EventBus } from '../events/EventBus';
+import { HMSLocalTrack } from '../media/tracks';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -44,7 +46,7 @@ export class PlaylistManager
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
 
-  constructor(private sdk: HMSSdk) {
+  constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();
     this.audioManager = new PlaylistAudioManager();
     this.videoManager = new PlaylistVideoManager();
@@ -218,6 +220,8 @@ export class PlaylistManager
 
   cleanup() {
     this.state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
+    this.eventBus.localAudioEnabled.unsubscribe(this.handlePausePlaylist);
+    this.eventBus.localVideoEnabled.unsubscribe(this.handlePausePlaylist);
     this.audioManager.stop();
     this.videoManager.stop();
   }
@@ -311,9 +315,28 @@ export class PlaylistManager
     }
   }
 
+  private handlePausePlaylist = async ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) => {
+    if (enabled) {
+      return;
+    }
+    let type: HMSPlaylistType | undefined = undefined;
+    if (track.source === 'audioplaylist') {
+      type = HMSPlaylistType.audio;
+    }
+    if (track.source === 'videoplaylist') {
+      type = HMSPlaylistType.video;
+    }
+    if (!type) {
+      return;
+    }
+    this.getElement(type)?.pause();
+  };
+
   private addListeners() {
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
+    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
+    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
   }
 
   /**

@@ -10,4 +10,5 @@ export interface HMSPreviewListener extends DeviceChangeListener {
   onError(exception: HMSException): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
+  onNetworkQuality?(score: number): void;
 }

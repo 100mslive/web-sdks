@@ -9,7 +9,7 @@ export class ConnectionQualityManager {
     const hmsPeers: HMSConnectionQuality[] = peers.map(peer => {
       return {
         peerID: peer.peer_id,
-        downlinkScore: peer.downlink_score,
+        downlinkQuality: peer.downlink_score,
       };
     });
     this.listener?.onConnectionQualityUpdate(hmsPeers);

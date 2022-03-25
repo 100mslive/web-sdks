@@ -30,8 +30,8 @@ describe('test selectors by reference', () => {
     const score = 70;
     fakeStore.connectionQualities[localPeer.id] = {
       peerID: localPeer.id,
-      downlinkScore: score,
+      downlinkQuality: score,
     };
-    expect(selectConnectionQualityByPeerID(localPeer.id)(fakeStore)?.downlinkScore).toBe(score);
+    expect(selectConnectionQualityByPeerID(localPeer.id)(fakeStore)?.downlinkQuality).toBe(score);
   });
 });

@@ -24,7 +24,7 @@ export interface VideoTileStatsProps {
 export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTileStatsProps) {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
-  const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkScore;
+  const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;

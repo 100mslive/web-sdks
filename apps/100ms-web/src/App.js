@@ -5,11 +5,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import {
-  HMSRoomProvider,
-  HMSThemeProvider,
-  PostLeaveDisplay,
-} from "@100mslive/hms-video-react";
+import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
 import {
   HMSRoomProvider as ReactRoomProvider,
   HMSReactiveStore,
@@ -19,7 +15,7 @@ import PreviewScreen from "./components/PreviewScreen";
 import { Conference } from "./components/conference";
 import ErrorPage from "./components/ErrorPage";
 import { AppContextProvider } from "./components/context/AppContext.js";
-import { hmsToast, Notifications } from "./components/Notifications";
+import { Notifications } from "./components/Notifications";
 import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { FeatureFlags } from "./services/FeatureFlags";
@@ -29,6 +25,10 @@ import {
   getBackendEndpoint,
 } from "./services/tokenService";
 import "./index.css";
+import { PostLeave } from "./components/PostLeave";
+import { ToastManager } from "./components/Toast/ToastManager";
+import LogoForLight from "./images/logo-dark.svg";
+import LogoForDark from "./images/logo-light.svg";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -111,7 +111,7 @@ export function EdtechComponent({
         showAvatar: showAvatar === "true",
         avatarType: avatarType,
       }}
-      toast={(message, options = {}) => hmsToast(message, options)}
+      toast={message => ToastManager.addToast({ title: message })}
     >
       <ReactUIProvider
         themeType={themeType}
@@ -153,7 +153,7 @@ export function EdtechComponent({
               tokenEndpoint={tokenEndpoint}
               policyConfig={policyConfig}
               appDetails={metadata}
-              logo={logo}
+              logo={logo || (theme === "dark" ? LogoForDark : LogoForLight)}
             >
               <Box
                 css={{
@@ -200,24 +200,7 @@ function AppRoutes({ getUserToken }) {
         <Route path="/meeting/:roomId/:role?">
           <Conference />
         </Route>
-        <Route
-          path="/leave/:roomId/:role?"
-          render={({ history, match }) => (
-            <PostLeaveDisplay
-              goToDashboardOnClick={() => {
-                window.open("https://dashboard.100ms.live/", "_blank");
-              }}
-              joinRoomOnClick={() => {
-                let previewUrl = "/preview/" + match.params.roomId;
-                if (match.params.role) previewUrl += "/" + match.params.role;
-                history.push(previewUrl);
-              }}
-              getFeedbackOnClick={setShowModal => {
-                setShowModal(true);
-              }}
-            />
-          )}
-        />
+        <Route path="/leave/:roomId/:role?" component={PostLeave} />
         <Route
           path="/:roomId/:role?"
           render={({ match }) => {

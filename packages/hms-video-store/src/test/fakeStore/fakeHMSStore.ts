@@ -226,11 +226,11 @@ export const makeFakeStore = (): HMSStore => {
     connectionQualities: {
       '1': {
         peerID: '1',
-        downlinkScore: 50,
+        downlinkQuality: 50,
       },
       '2': {
         peerID: '2',
-        downlinkScore: 80,
+        downlinkQuality: 80,
       },
     },
     settings: {

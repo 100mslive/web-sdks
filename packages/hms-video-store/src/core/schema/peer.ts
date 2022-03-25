@@ -23,6 +23,7 @@ export interface HMSPeer {
   auxiliaryTracks: HMSTrackID[];
   customerUserId?: string;
   metadata?: string;
+  joinedAt?: Date;
   /**
    * @deprecated
    * Use metadata field instead.
