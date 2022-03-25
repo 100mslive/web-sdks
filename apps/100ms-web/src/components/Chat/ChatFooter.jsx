@@ -1,10 +1,22 @@
 import React, { useCallback, useRef } from "react";
-import { Flex, IconButton, Input } from "@100mslive/react-ui";
+import { Flex, IconButton, styled } from "@100mslive/react-ui";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { ToastManager } from "../Toast/ToastManager";
 import { SendIcon } from "@100mslive/react-icons";
 
-export const ChatFooter = ({ role, peerId }) => {
+const TextArea = styled("textarea", {
+  width: "100%",
+  bg: "transparent",
+  p: "$2 $3",
+  pl: "$8",
+  color: "$textPrimary",
+  resize: "none",
+  "&:focus": {
+    boxShadow: "none",
+  },
+});
+
+export const ChatFooter = ({ role, peerId, onSend, children }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const sendMessage = useCallback(async () => {
@@ -21,10 +33,11 @@ export const ChatFooter = ({ role, peerId }) => {
         await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = "";
+      onSend();
     } catch (error) {
       ToastManager.addToast({ title: error.message });
     }
-  }, [role, peerId, hmsActions]);
+  }, [role, peerId, hmsActions, onSend]);
   return (
     <Flex
       align="center"
@@ -33,13 +46,13 @@ export const ChatFooter = ({ role, peerId }) => {
         bg: "$menuBg",
         minHeight: "$16",
         maxHeight: "$24",
+        position: "relative",
       }}
     >
-      <Input
-        type="text"
+      {children}
+      <TextArea
         placeholder="Write something here"
         ref={inputRef}
-        css={{ bg: "transparent", "&:focus": { boxShadow: "none" } }}
         onKeyPress={async event => {
           if (event.key === "Enter") {
             if (!event.shiftKey) {

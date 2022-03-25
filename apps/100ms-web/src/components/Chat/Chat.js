@@ -1,9 +1,44 @@
-import React, { useState } from "react";
-import { Box, Flex } from "@100mslive/react-ui";
+import React, { useCallback, useRef, useState } from "react";
+import { Box, Button, Flex } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { ChatBody } from "./ChatBody";
 import { ChatSelector } from "./ChatSelector";
+import {
+  selectMessagesUnreadCountByPeerID,
+  selectMessagesUnreadCountByRole,
+  selectUnreadHMSMessagesCount,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import { ChevronDownIcon } from "@100mslive/react-icons";
+
+const NewMessageIndicator = ({ role, peerId, onClick }) => {
+  const unreadCountSelector = role
+    ? selectMessagesUnreadCountByRole(role)
+    : peerId
+    ? selectMessagesUnreadCountByPeerID(peerId)
+    : selectUnreadHMSMessagesCount;
+
+  const unreadCount = useHMSStore(unreadCountSelector);
+  if (!unreadCount) {
+    return null;
+  }
+  return (
+    <Flex
+      justify="center"
+      css={{
+        width: "100%",
+        transform: "translatey(-100%)",
+        position: "absolute",
+      }}
+    >
+      <Button onClick={onClick} css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}>
+        New Messages
+        <ChevronDownIcon width={16} height={16} />
+      </Button>
+    </Flex>
+  );
+};
 
 export const Chat = ({ onClose }) => {
   const [chatOptions, setChatOptions] = useState({
@@ -12,6 +47,15 @@ export const Chat = ({ onClose }) => {
     selection: "Everyone",
   });
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const bodyRef = useRef(null);
+  const scrollToBottom = useCallback(() => {
+    if (!bodyRef.current) {
+      return;
+    }
+    bodyRef.current.scrollTo({
+      top: bodyRef.current.scrollHeight,
+    });
+  }, []);
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
@@ -27,9 +71,10 @@ export const Chat = ({ onClose }) => {
           flex: "1 1 0",
           overflowY: "auto",
           bg: "$bgSecondary",
-          position: "relative",
           pt: "$4",
+          position: "relative",
         }}
+        ref={bodyRef}
       >
         <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
         {selectorOpen && (
@@ -46,7 +91,18 @@ export const Chat = ({ onClose }) => {
           />
         )}
       </Box>
-      <ChatFooter role={chatOptions.role} peerId={chatOptions.peerId} />
+
+      <ChatFooter
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        onSend={scrollToBottom}
+      >
+        <NewMessageIndicator
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+          onClick={scrollToBottom}
+        />
+      </ChatFooter>
     </Flex>
   );
 };
