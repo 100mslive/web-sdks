@@ -42,8 +42,6 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         position: "absolute",
         top: 0,
         left: 0,
-        pt: "$4",
-
         bg: "$bgSecondary",
       }}
     >

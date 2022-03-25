@@ -33,6 +33,7 @@ export const Chat = ({ onClose }) => {
           overflowY: "auto",
           bg: "$bgSecondary",
           position: "relative",
+          pt: "$4",
         }}
       >
         <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />

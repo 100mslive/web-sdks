@@ -22,10 +22,10 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
-const MessageType = message => {
+const MessageType = ({ message }) => {
   if (message.recipientPeer) {
     return (
-      <Text variant="sm">
+      <Text variant="sm" css={{ mx: "$4" }}>
         to me
         <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
           (Privately)
@@ -36,18 +36,18 @@ const MessageType = message => {
 
   if (message.recipientRoles?.length) {
     return (
-      <Text variant="sm">
-        to role
+      <Text variant="sm" css={{ mx: "$4" }}>
+        to
         <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
-          (Privately)
+          (Role)
         </Text>
       </Text>
     );
   }
   return (
-    <Text variant="sm">
+    <Text variant="sm" css={{ mx: "$4" }}>
       to
-      <Text as="span" variant="sm" css={{ color: "$brandDefault" }}>
+      <Text as="span" variant="sm" css={{ color: "$brandDefault", mx: "$4" }}>
         Everyone
       </Text>
     </Text>
@@ -74,7 +74,7 @@ export const ChatBody = ({ role, peerId }) => {
     <Fragment>
       {messages.map(message => {
         return (
-          <Flex css={{ flexWrap: "wrap", p: "$8" }} key={message.time}>
+          <Flex css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
             <Text variant="sm" css={{ color: "$textSecondary" }}>
               {message.senderName}
             </Text>
@@ -82,7 +82,7 @@ export const ChatBody = ({ role, peerId }) => {
             <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
               {formatTime(message.time)}
             </Text>
-            <Text css={{ w: "100%", mt: "$4" }}>{message.message}</Text>
+            <Text css={{ w: "100%", my: "$2" }}>{message.message}</Text>
           </Flex>
         );
       })}

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { Flex, IconButton, Input } from "@100mslive/react-ui";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { ToastManager } from "../Toast/ToastManager";
@@ -7,7 +7,7 @@ import { SendIcon } from "@100mslive/react-icons";
 export const ChatFooter = ({ role, peerId }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
       return;
@@ -24,7 +24,7 @@ export const ChatFooter = ({ role, peerId }) => {
     } catch (error) {
       ToastManager.addToast({ title: error.message });
     }
-  };
+  }, [role, peerId, hmsActions]);
   return (
     <Flex
       align="center"
