@@ -54,6 +54,28 @@ const MessageType = ({ message }) => {
   );
 };
 
+const URL_REGEX =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
+const ChatLink = ({ message }) => {
+  return (
+    <>
+      {message
+        .trim()
+        .split(" ")
+        .map(part =>
+          URL_REGEX.test(part) ? (
+            <a href={part} key={part} target="_blank" rel="noopener noreferrer">
+              {part}
+            </a>
+          ) : (
+            part
+          )
+        )}
+    </>
+  );
+};
+
 export const ChatBody = ({ role, peerId }) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
@@ -82,7 +104,9 @@ export const ChatBody = ({ role, peerId }) => {
             <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
               {formatTime(message.time)}
             </Text>
-            <Text css={{ w: "100%", my: "$2" }}>{message.message}</Text>
+            <Text css={{ w: "100%", my: "$2" }}>
+              <ChatLink message={message.message} />
+            </Text>
           </Flex>
         );
       })}
