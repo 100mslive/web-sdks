@@ -108,6 +108,10 @@ export class HMSSDKActions implements IHMSActions {
     // this.actionBatcher = new ActionBatcher(store);
   }
 
+  refreshDevices(): void {
+    this.sdk.refreshDevices();
+  }
+
   async unblockAudio() {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
@@ -216,10 +220,15 @@ export class HMSSDKActions implements IHMSActions {
       // for backward compatibility
       sdkConfig.audioOnly = config;
     }
-    if (enabled) {
-      await this.startScreenShare(sdkConfig);
-    } else {
-      await this.stopScreenShare();
+    try {
+      if (enabled) {
+        await this.startScreenShare(sdkConfig);
+      } else {
+        await this.stopScreenShare();
+      }
+    } catch (error) {
+      this.hmsNotifications.sendError(SDKToHMS.convertException(error as SDKHMSException));
+      throw error;
     }
   }
 
@@ -623,7 +632,7 @@ export class HMSSDKActions implements IHMSActions {
        */
       const peerId = store.room.localPeer || this.sdk.getLocalPeer()?.peerId;
       if (peerId) {
-        store.connectionQualities[peerId] = { peerID: peerId, downlinkScore: quality };
+        store.connectionQualities[peerId] = { peerID: peerId, downlinkQuality: quality };
       }
     }, 'ConnectionQuality');
   }

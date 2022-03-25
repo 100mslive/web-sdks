@@ -15,7 +15,7 @@
         "@typescript-eslint/no-empty-function": 0,
         "@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
-        "complexity": ["warn", 6], // if a function is getting too complex it should be broken down
+        "complexity": ["error", 6], // if a function is getting too complex it should be broken down
         "curly": ["error", "all"], // use curly brace even for single line functions
         "comma-dangle": ["error", "always-multiline"], // easier to see git diff
         "prefer-template": ["error"], // easier to read code when variables are used,

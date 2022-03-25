@@ -45,6 +45,7 @@ export class RetryScheduler {
     this.inProgress.clear();
   }
 
+  // eslint-disable-next-line complexity
   private async scheduleTask(
     category: TFC,
     error: HMSException,

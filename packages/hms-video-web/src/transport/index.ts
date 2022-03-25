@@ -389,10 +389,8 @@ export default class HMSTransport implements ITransport {
       this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
-      if (this.signal.isConnected) {
-        this.signal.leave();
-        await this.signal.close();
-      }
+      this.signal.leave();
+      await this.signal.close();
     } catch (err) {
       if (err instanceof HMSException) {
         this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
