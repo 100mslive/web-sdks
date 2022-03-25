@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import {
-  selectBroadcastMessages,
+  selectHMSMessages,
   selectMessagesByPeerID,
   selectMessagesByRole,
   useHMSStore,
@@ -22,26 +22,67 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
+const MessageType = message => {
+  if (message.recipientPeer) {
+    return (
+      <Text variant="sm">
+        to me
+        <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
+          (Privately)
+        </Text>
+      </Text>
+    );
+  }
+
+  if (message.recipientRoles?.length) {
+    return (
+      <Text variant="sm">
+        to role
+        <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
+          (Privately)
+        </Text>
+      </Text>
+    );
+  }
+  return (
+    <Text variant="sm">
+      to
+      <Text as="span" variant="sm" css={{ color: "$brandDefault" }}>
+        Everyone
+      </Text>
+    </Text>
+  );
+};
+
 export const ChatBody = ({ role, peerId }) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
     ? selectMessagesByPeerID(peerId)
-    : selectBroadcastMessages;
+    : selectHMSMessages;
   const messages = useHMSStore(storeMessageSelector) || [];
+
+  if (messages.length === 0) {
+    return (
+      <Flex css={{ size: "100%" }} align="center" justify="center">
+        <Text>There are no messages here</Text>
+      </Flex>
+    );
+  }
 
   return (
     <Fragment>
       {messages.map(message => {
         return (
           <Flex css={{ flexWrap: "wrap", p: "$8" }} key={message.time}>
-            <Text variant="sm" css={{ color: "$textMedEmp" }}>
+            <Text variant="sm" css={{ color: "$textSecondary" }}>
               {message.senderName}
             </Text>
+            <MessageType message={message} />
             <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
               {formatTime(message.time)}
             </Text>
-            <Text css={{ w: "100%" }}>{message.message}</Text>
+            <Text css={{ w: "100%", mt: "$4" }}>{message.message}</Text>
           </Flex>
         );
       })}
