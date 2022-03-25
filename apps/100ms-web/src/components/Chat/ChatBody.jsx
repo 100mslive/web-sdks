@@ -1,8 +1,10 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import {
   selectHMSMessages,
   selectMessagesByPeerID,
   selectMessagesByRole,
+  useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex, Text } from "@100mslive/react-ui";
@@ -22,8 +24,8 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
-const MessageType = ({ message }) => {
-  if (message.recipientPeer) {
+const MessageType = ({ hasPeer, hasRoles }) => {
+  if (hasPeer) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
         to me
@@ -34,7 +36,7 @@ const MessageType = ({ message }) => {
     );
   }
 
-  if (message.recipientRoles?.length) {
+  if (hasRoles) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
         to
@@ -59,22 +61,50 @@ const URL_REGEX =
 
 const ChatLink = ({ message }) => {
   return (
-    <>
+    <Fragment>
       {message
         .trim()
         .split(" ")
         .map(part =>
           URL_REGEX.test(part) ? (
             <a href={part} key={part} target="_blank" rel="noopener noreferrer">
-              {part}
+              {part}{" "}
             </a>
           ) : (
-            part
+            `${part} `
           )
         )}
-    </>
+    </Fragment>
   );
 };
+
+const ChatMessage = React.memo(
+  ({ id, sender, message, time, read, hasPeer, hasRoles }) => {
+    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+    const hmsActions = useHMSActions();
+
+    useEffect(() => {
+      if (id && !read && inView) {
+        hmsActions.setMessageRead(true, id);
+      }
+    }, [read, hmsActions, inView, id]);
+
+    return (
+      <Flex ref={ref} css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
+        <Text variant="sm" css={{ color: "$textSecondary" }}>
+          {sender}
+        </Text>
+        <MessageType hasPeer={hasPeer} hasRoles={hasRoles} />
+        <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
+          {formatTime(time)}
+        </Text>
+        <Text css={{ w: "100%", my: "$2" }}>
+          <ChatLink message={message} />
+        </Text>
+      </Flex>
+    );
+  }
+);
 
 export const ChatBody = ({ role, peerId }) => {
   const storeMessageSelector = role
@@ -96,18 +126,16 @@ export const ChatBody = ({ role, peerId }) => {
     <Fragment>
       {messages.map(message => {
         return (
-          <Flex css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
-            <Text variant="sm" css={{ color: "$textSecondary" }}>
-              {message.senderName}
-            </Text>
-            <MessageType message={message} />
-            <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
-              {formatTime(message.time)}
-            </Text>
-            <Text css={{ w: "100%", my: "$2" }}>
-              <ChatLink message={message.message} />
-            </Text>
-          </Flex>
+          <ChatMessage
+            key={message.id}
+            id={message.id}
+            sender={message.senderName}
+            time={message.time}
+            message={message.message}
+            read={message.read}
+            hasPeer={message.recipientPeer}
+            hasRoles={message.recipientRoles?.length}
+          />
         );
       })}
     </Fragment>
