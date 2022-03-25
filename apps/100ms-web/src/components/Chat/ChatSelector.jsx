@@ -7,7 +7,13 @@ import {
   selectMessagesUnreadCountByRole,
   selectMessagesUnreadCountByPeerID,
 } from "@100mslive/react-sdk";
-import { Flex, HorizontalDivider, Text } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  HorizontalDivider,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
 import { ChatDotIcon } from "./ChatDotIcon";
 import { CheckIcon } from "@100mslive/react-icons";
 
@@ -24,7 +30,13 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
     >
       <Text variant="sm">{value}</Text>
       <Flex align="center" css={{ ml: "auto", color: "$textPrimary" }}>
-        {unreadCount > 0 && <ChatDotIcon />}
+        {unreadCount > 0 && (
+          <Tooltip title={`${unreadCount} unread`}>
+            <Box css={{ mr: active ? "$3" : 0 }}>
+              <ChatDotIcon />
+            </Box>
+          </Tooltip>
+        )}
         {active && <CheckIcon width={16} height={16} />}
       </Flex>
     </Flex>
