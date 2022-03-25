@@ -24,14 +24,15 @@ export const getTooltipText = connectionScore => {
  * @param defaultColor -> color for components not taking the connection color
  */
 export const getColor = (position, connectionScore, defaultColor) => {
-  let color = defaultColor;
-  if (connectionScore >= 4) {
-    color = "#37F28D";
-  } else if (connectionScore >= 3) {
-    color = "#FAC919";
-  } else if (connectionScore >= 1) {
-    color = "#ED4C5A";
-  }
   const shouldBeColored = position <= connectionScore;
-  return shouldBeColored ? color : defaultColor;
+  if (!shouldBeColored) {
+    return defaultColor;
+  }
+  if (connectionScore >= 4) {
+    return "#37F28D";
+  } else if (connectionScore >= 3) {
+    return "#FAC919";
+  } else if (connectionScore >= 1) {
+    return "#ED4C5A";
+  }
 };
