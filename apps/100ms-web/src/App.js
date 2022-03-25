@@ -5,7 +5,6 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
 import {
   HMSRoomProvider as ReactRoomProvider,
   HMSReactiveStore,
@@ -26,7 +25,6 @@ import {
 } from "./services/tokenService";
 import "./index.css";
 import { PostLeave } from "./components/PostLeave";
-import { ToastManager } from "./components/Toast/ToastManager";
 import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
 
@@ -83,94 +81,50 @@ export function EdtechComponent({
     setThemeType(theme);
   }, [theme]);
   return (
-    <HMSThemeProvider
-      config={{
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: [font, "Inter", "sans-serif"],
-              body: [font, "Inter", "sans-serif"],
-            },
-            colors: {
-              brand: {
-                main: color,
-                tint: shadeColor(color, 30),
-              },
-            },
-          },
+    <ReactUIProvider
+      themeType={themeType}
+      aspectRatio={{ width, height }}
+      theme={{
+        colors: {
+          brandDefault: color,
+          brandDark: shadeColor(color, -30),
+          brandLight: shadeColor(color, 30),
+          brandDisabled: shadeColor(color, 10),
+        },
+        fonts: {
+          sans: [font, "Inter", "sans-serif"],
         },
       }}
-      appBuilder={{
-        theme: themeType,
-        enableChat: showChat === "true",
-        enableScreenShare: showScreenshare === "true",
-        logo: logo,
-        logoClass: logoClass,
-        headerPresent: headerPresent === "true",
-        videoTileAspectRatio: { width, height },
-        showAvatar: showAvatar === "true",
-        avatarType: avatarType,
-      }}
-      toast={message => ToastManager.addToast({ title: message })}
     >
-      <ReactUIProvider
-        themeType={themeType}
-        aspectRatio={{ width, height }}
-        theme={{
-          colors: {
-            brandDefault: color,
-            brandDark: shadeColor(color, -30),
-            brandLight: shadeColor(color, 30),
-            brandDisabled: shadeColor(color, 10),
-          },
-          fonts: {
-            sans: [font, "Inter", "sans-serif"],
-          },
-        }}
+      <ReactRoomProvider
+        actions={hmsReactiveStore.getActions()}
+        store={hmsReactiveStore.getStore()}
+        notifications={hmsReactiveStore.getNotifications()}
+        stats={
+          FeatureFlags.enableStatsForNerds
+            ? hmsReactiveStore.getStats()
+            : undefined
+        }
       >
-        <ReactRoomProvider
-          actions={hmsReactiveStore.getActions()}
-          store={hmsReactiveStore.getStore()}
-          notifications={hmsReactiveStore.getNotifications()}
-          stats={
-            FeatureFlags.enableStatsForNerds
-              ? hmsReactiveStore.getStats()
-              : undefined
-          }
+        <AppContextProvider
+          roomId={roomId}
+          tokenEndpoint={tokenEndpoint}
+          policyConfig={policyConfig}
+          appDetails={metadata}
+          logo={logo || (theme === "dark" ? LogoForDark : LogoForLight)}
         >
-          <HMSRoomProvider
-            actions={hmsReactiveStore.getActions()}
-            store={hmsReactiveStore.getStore()}
-            notifications={hmsReactiveStore.getNotifications()}
-            stats={
-              FeatureFlags.enableStatsForNerds
-                ? hmsReactiveStore.getStats()
-                : undefined
-            }
+          <Box
+            css={{
+              bg: "$mainBg",
+              w: "100%",
+              ...(headerPresent === "true" ? { flex: "1 1 0" } : { h: "100%" }),
+            }}
           >
-            <AppContextProvider
-              roomId={roomId}
-              tokenEndpoint={tokenEndpoint}
-              policyConfig={policyConfig}
-              appDetails={metadata}
-              logo={logo || (theme === "dark" ? LogoForDark : LogoForLight)}
-            >
-              <Box
-                css={{
-                  bg: "$mainBg",
-                  w: "100%",
-                  ...(headerPresent === "true"
-                    ? { flex: "1 1 0" }
-                    : { h: "100%" }),
-                }}
-              >
-                <AppRoutes getUserToken={getUserToken} />
-              </Box>
-            </AppContextProvider>
-          </HMSRoomProvider>
-        </ReactRoomProvider>
-      </ReactUIProvider>
-    </HMSThemeProvider>
+            <AppRoutes getUserToken={getUserToken} />
+          </Box>
+        </AppContextProvider>
+      </ReactRoomProvider>
+    </ReactUIProvider>
   );
 }
 
