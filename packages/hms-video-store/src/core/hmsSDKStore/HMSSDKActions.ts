@@ -1,5 +1,6 @@
 import {
   createDefaultStoreState,
+  HMSChangeMultiTrackStateParams,
   HMSMediaSettings,
   HMSMessage,
   HMSMessageInput,
@@ -11,7 +12,6 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
-  HMSChangeMultiTrackStateParams,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -24,6 +24,7 @@ import {
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
   selectLocalAudioTrackID,
+  selectLocalMediaSettings,
   selectLocalPeer,
   selectLocalTrackIDs,
   selectLocalVideoTrackID,
@@ -32,7 +33,6 @@ import {
   selectRolesMap,
   selectRoomStarted,
   selectRoomState,
-  selectLocalMediaSettings,
   selectTrackByID,
   selectTracksMap,
 } from '../selectors';
@@ -40,24 +40,24 @@ import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
+  HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
+  HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
+  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSException as SDKHMSException,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalTrack as SDKHMSLocalTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLogLevel,
+  HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
-  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
-  HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
-  HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
-  HMSPluginSupportResult,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
 
@@ -384,6 +384,7 @@ export class HMSSDKActions implements IHMSActions {
 
   validateVideoPluginSupport(plugin: HMSVideoPlugin): HMSPluginSupportResult {
     let result = {} as HMSPluginSupportResult;
+    result.isSupported = false; //Setting default to false
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');
       result.errMsg = 'trying to add invalid plugin, see docs for details';
@@ -395,7 +396,8 @@ export class HMSSDKActions implements IHMSActions {
       if (sdkTrack) {
         result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to validate plugin`);
+        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
       }
     }
 
@@ -404,6 +406,7 @@ export class HMSSDKActions implements IHMSActions {
 
   validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult {
     let result = {} as HMSPluginSupportResult;
+    result.isSupported = false; //Setting default to false
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');
       result.errMsg = 'trying to add invalid plugin, see docs for details';
@@ -417,7 +420,8 @@ export class HMSSDKActions implements IHMSActions {
         //TODO: check if it is required
         // this.syncRoomState(`${action}AudioPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to validate plugin`);
+        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
       }
     }
 

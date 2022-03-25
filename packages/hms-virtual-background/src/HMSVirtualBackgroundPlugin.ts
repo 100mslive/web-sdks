@@ -116,13 +116,14 @@ export class HMSVirtualBackgroundPlugin implements HMSVideoPlugin {
     return (
       navigator.userAgent.indexOf('Chrome') !== -1 ||
       navigator.userAgent.indexOf('Firefox') !== -1 ||
-      navigator.userAgent.indexOf('Edg') !== -1
+      navigator.userAgent.indexOf('Edg') !== -1 ||
+      navigator.userAgent.indexOf('Edge') !== -1
     );
   }
 
   checkSupport(): HMSPluginSupportResult {
     const browserResult = {} as HMSPluginSupportResult;
-    if (['Chrome', 'Firefox', 'Edg'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+    if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
       browserResult.isSupported = true;
     } else {
       browserResult.isSupported = false;

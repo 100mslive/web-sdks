@@ -132,6 +132,31 @@ export class HMSVideoPluginsManager {
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
+    this.validateAndThrow(name, plugin);
+
+    try {
+      await this.analytics.initWithTime(name, async () => await plugin.init());
+      this.plugins.push(name);
+      this.pluginsMap[name] = plugin;
+      // add new canvases according to new added plugins
+      if (this.plugins.length + 1 > this.canvases.length) {
+        for (let i = this.canvases.length; i <= this.plugins.length; i++) {
+          this.canvases[i] = document.createElement('canvas') as CanvasElement;
+        }
+      }
+      await this.startPluginsLoop();
+    } catch (err) {
+      HMSLogger.e(TAG, 'failed to add plugin', err);
+      await this.removePlugin(plugin);
+      throw err;
+    }
+  }
+
+  validatePlugin(plugin: HMSVideoPlugin) {
+    return plugin.checkSupport();
+  }
+
+  validateAndThrow(name: string, plugin: HMSVideoPlugin) {
     const result = this.validatePlugin(plugin);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
@@ -153,26 +178,6 @@ export class HMSVideoPluginsManager {
           throw err;
       }
     }
-    try {
-      await this.analytics.initWithTime(name, async () => await plugin.init());
-      this.plugins.push(name);
-      this.pluginsMap[name] = plugin;
-      // add new canvases according to new added plugins
-      if (this.plugins.length + 1 > this.canvases.length) {
-        for (let i = this.canvases.length; i <= this.plugins.length; i++) {
-          this.canvases[i] = document.createElement('canvas') as CanvasElement;
-        }
-      }
-      await this.startPluginsLoop();
-    } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin', err);
-      await this.removePlugin(plugin);
-      throw err;
-    }
-  }
-
-  validatePlugin(plugin: HMSVideoPlugin) {
-    return plugin.checkSupport();
   }
 
   async removePlugin(plugin: HMSVideoPlugin) {
