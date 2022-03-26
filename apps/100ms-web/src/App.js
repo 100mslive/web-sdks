@@ -5,11 +5,8 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import {
-  HMSRoomProvider as ReactRoomProvider,
-  HMSReactiveStore,
-} from "@100mslive/react-sdk";
-import { HMSThemeProvider as ReactUIProvider, Box } from "@100mslive/react-ui";
+import { HMSRoomProvider } from "@100mslive/react-sdk";
+import { HMSThemeProvider, Box } from "@100mslive/react-ui";
 import PreviewScreen from "./components/PreviewScreen";
 import { Conference } from "./components/conference";
 import ErrorPage from "./components/ErrorPage";
@@ -46,8 +43,6 @@ if (window.location.host.includes("localhost")) {
 
 document.title = `${appName}'s ${document.title}`;
 
-const hmsReactiveStore = new HMSReactiveStore();
-
 export function EdtechComponent({
   roomId = "",
   tokenEndpoint = defaultTokenEndpoint,
@@ -56,13 +51,8 @@ export function EdtechComponent({
     font = "Roboto",
     color = "#2F80FF",
     theme = "dark",
-    showChat = "true",
-    showScreenshare = "true",
     logo = "",
-    showAvatar = "true",
-    avatarType = "initial",
     headerPresent = "false",
-    logoClass = "",
     metadata = "",
   },
   getUserToken = defaultGetUserToken,
@@ -81,7 +71,7 @@ export function EdtechComponent({
     setThemeType(theme);
   }, [theme]);
   return (
-    <ReactUIProvider
+    <HMSThemeProvider
       themeType={themeType}
       aspectRatio={{ width, height }}
       theme={{
@@ -96,16 +86,7 @@ export function EdtechComponent({
         },
       }}
     >
-      <ReactRoomProvider
-        actions={hmsReactiveStore.getActions()}
-        store={hmsReactiveStore.getStore()}
-        notifications={hmsReactiveStore.getNotifications()}
-        stats={
-          FeatureFlags.enableStatsForNerds
-            ? hmsReactiveStore.getStats()
-            : undefined
-        }
-      >
+      <HMSRoomProvider isHMSStatsOn={FeatureFlags.enableStatsForNerds}>
         <AppContextProvider
           roomId={roomId}
           tokenEndpoint={tokenEndpoint}
@@ -123,8 +104,8 @@ export function EdtechComponent({
             <AppRoutes getUserToken={getUserToken} />
           </Box>
         </AppContextProvider>
-      </ReactRoomProvider>
-    </ReactUIProvider>
+      </HMSRoomProvider>
+    </HMSThemeProvider>
   );
 }
 
