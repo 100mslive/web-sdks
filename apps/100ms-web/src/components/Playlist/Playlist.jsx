@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useState } from "react";
 import {
   HMSPlaylistType,
   useHMSStore,
@@ -23,13 +23,11 @@ import { usePlaylist } from "../hooks/usePlaylist";
 import { isScreenshareSupported } from "../../common/utils";
 
 const BrowseAndPlayFromLocal = ({ type, actions }) => {
-  const inputRef = useRef(null);
   return (
     <Fragment>
       <Text
-        onClick={() => {
-          inputRef.current.click();
-        }}
+        as="label"
+        htmlFor={`${type}PlaylistBrowse`}
         variant="sm"
         css={{ cursor: "pointer", mr: "$2" }}
       >
@@ -37,7 +35,7 @@ const BrowseAndPlayFromLocal = ({ type, actions }) => {
       </Text>
       <input
         type="file"
-        ref={inputRef}
+        id={`${type}PlaylistBrowse`}
         accept={type === HMSPlaylistType.audio ? "audio/*" : "video/*"}
         onChange={e => {
           const file = e.target.files[0];
