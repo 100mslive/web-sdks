@@ -2,6 +2,7 @@
 import { selectPeers, useHMSStore } from '@100mslive/solid-sdk';
 import Peer from './Peer';
 import DeviceSettings from './DeviceSettings';
+import { For } from 'solid-js';
 
 function Conference() {
   const peers = useHMSStore(selectPeers);
@@ -11,9 +12,7 @@ function Conference() {
       <h2>Conference</h2>
       <DeviceSettings />
       <div className="peers-container">
-        {peers.map(peer => (
-          <Peer key={peer.id} peer={peer} />
-        ))}
+        <For each={peers()}>{peer => <Peer key={peer.id} peer={peer} />}</For>
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ export default function App() {
 
   createEffect(() => {
     window.onunload = () => {
-      if (room.isConnected) {
+      if (room().isConnected) {
         hmsActions.leave();
       }
     };
@@ -22,7 +22,7 @@ export default function App() {
   return (
     <div className="App">
       <Header />
-      {room.isConnected ? (
+      {room().isConnected ? (
         <>
           <Conference />
           <Footer />
