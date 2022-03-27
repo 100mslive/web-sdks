@@ -8,35 +8,35 @@ import {
   selectTrackByID,
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { useCallback } from 'react';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
+import { Accessor, createMemo } from 'solid-js';
 
 export interface useRemoteAVToggleResult {
   /**
    * true if unmuted and vice versa
    */
-  isAudioEnabled: boolean;
-  isVideoEnabled: boolean;
+  isAudioEnabled: Accessor<boolean>;
+  isVideoEnabled: Accessor<boolean>;
   /**
    * current volume of the audio track
    */
-  volume?: number;
+  volume: Accessor<Accessor<number | undefined>>;
   /**
    * use this function to toggle audio state, the function will only be present if the user
    * has permission to mute/unmute remote audio
    */
-  toggleAudio?: () => void;
+  toggleAudio: Accessor<(() => void) | undefined>;
   /**
    * use this function to toggle video state, the function will only be present if the user
    * has permission to mute/unmute remote video
    */
-  toggleVideo?: () => void;
+  toggleVideo: Accessor<(() => void) | undefined>;
   /**
    * use this function to set the volume of peer's audio track for the local user, the function will
    * only be present if the remote peer has an audio track to change volume for
    */
-  setVolume?: (volume: number) => void;
+  setVolume: Accessor<((volume: number) => void) | undefined>;
 }
 
 const toggleTrackEnabled = async (
@@ -68,34 +68,32 @@ export const useRemoteAVToggle = (
   const actions = useHMSActions();
   const audioTrack = useHMSStore(selectTrackByID(audioTrackId));
   const videoTrack = useHMSStore(selectTrackByID(videoTrackId));
-  const volume = useHMSStore(selectAudioTrackVolume(audioTrack?.id));
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const volume = createMemo(() => useHMSStore(selectAudioTrackVolume(audioTrack()?.id)));
   const permissions = useHMSStore(selectPermissions);
-  const canToggleVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
-  const canToggleAudio = audioTrack?.enabled ? permissions?.mute : permissions?.unmute;
+  const canToggleVideo = () => (videoTrack()?.enabled ? permissions()?.mute : permissions()?.unmute);
+  const canToggleAudio = () => (audioTrack()?.enabled ? permissions()?.mute : permissions()?.unmute);
 
-  const toggleAudio = useCallback(async () => {
-    await toggleTrackEnabled(actions, audioTrack, handleError);
-  }, [actions, audioTrack, handleError]);
+  const toggleAudio = async () => {
+    await toggleTrackEnabled(actions, audioTrack(), handleError);
+  };
 
-  const toggleVideo = useCallback(async () => {
-    await toggleTrackEnabled(actions, videoTrack, handleError);
-  }, [actions, handleError, videoTrack]);
+  const toggleVideo = async () => {
+    await toggleTrackEnabled(actions, videoTrack(), handleError);
+  };
 
-  const setVolume = useCallback(
-    (volume: number) => {
-      if (audioTrack) {
-        actions.setVolume(volume, audioTrack.id);
-      }
-    },
-    [actions, audioTrack],
-  );
+  const setVolume = (volume: number) => {
+    if (audioTrack) {
+      actions.setVolume(volume, audioTrack()?.id);
+    }
+  };
 
   return {
-    isAudioEnabled: !!audioTrack?.enabled,
-    isVideoEnabled: !!videoTrack?.enabled,
+    isAudioEnabled: () => !!audioTrack()?.enabled,
+    isVideoEnabled: () => !!videoTrack()?.enabled,
     volume,
-    toggleAudio: audioTrack && canToggleAudio ? toggleAudio : undefined,
-    toggleVideo: videoTrack?.source === 'regular' && canToggleVideo ? toggleVideo : undefined,
-    setVolume: audioTrack ? setVolume : undefined,
+    toggleAudio: () => (audioTrack() && canToggleAudio() ? toggleAudio : undefined),
+    toggleVideo: () => (videoTrack()?.source === 'regular' && canToggleVideo() ? toggleVideo : undefined),
+    setVolume: () => (audioTrack() ? setVolume : undefined),
   };
 };

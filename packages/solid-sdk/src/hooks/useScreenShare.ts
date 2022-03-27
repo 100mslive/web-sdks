@@ -7,29 +7,30 @@ import {
   selectScreenSharesByPeerId,
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { Accessor, createMemo } from 'solid-js';
 
 export interface useScreenShareResult {
   /**
    * true if the local user is screensharing, false otherwise
    */
-  amIScreenSharing: boolean;
+  amIScreenSharing: Accessor<boolean>;
   /**
    * toggle screenshare for the local user, will only be present if the user has the permission to toggle
    */
-  toggleScreenShare?: () => void;
+  toggleScreenShare: Accessor<(() => void) | undefined>;
   /**
    * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
    * In case of multiple screenshares, the behaviour of which one is picked is not defined.
    */
-  screenSharingPeerId?: HMSPeerID;
+  screenSharingPeerId: Accessor<HMSPeerID | undefined>;
   /**
    * screenShare audio track id, will only be present if there is a screenshare with video track
    */
-  screenShareVideoTrackId?: HMSTrackID;
+  screenShareVideoTrackId: Accessor<HMSTrackID | undefined>;
   /**
    * screenShare audio track id, will only be present if there is a screenshare with audio track
    */
-  screenShareAudioTrackId?: HMSTrackID;
+  screenShareAudioTrackId: Accessor<HMSTrackID | undefined>;
 }
 
 const logErrorHandler = (e: Error) => console.log('Error: ', e);
@@ -47,11 +48,12 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const actions = useHMSActions();
   const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
   const screenSharePeer = useHMSStore(selectPeerScreenSharing);
-  const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const screenShare = createMemo(() => useHMSStore(selectScreenSharesByPeerId(screenSharePeer()?.id)));
 
   const toggleScreenShare = async (audioOnly = false) => {
     try {
-      await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
+      await actions.setScreenShareEnabled(!amIScreenSharing(), audioOnly);
     } catch (error) {
       handleError(error as Error);
     }
@@ -59,9 +61,9 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
 
   return {
     amIScreenSharing,
-    screenSharingPeerId: screenSharePeer?.id,
-    screenShareVideoTrackId: screenShare?.video?.id,
-    screenShareAudioTrackId: screenShare?.audio?.id,
-    toggleScreenShare,
+    screenSharingPeerId: () => screenSharePeer()?.id,
+    screenShareVideoTrackId: () => screenShare()()?.video?.id,
+    screenShareAudioTrackId: () => screenShare()()?.audio?.id,
+    toggleScreenShare: () => toggleScreenShare,
   };
 };

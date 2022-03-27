@@ -17,7 +17,7 @@ export interface useVideoInput {
 }
 
 export interface useVideoOutput {
-  videoRef: React.RefCallback<HTMLVideoElement>;
+  videoRef: (node: HTMLVideoElement) => void;
 }
 /**
  * This hooks can be used to implement a video tile component. Given a track id it will return a ref.
@@ -38,13 +38,13 @@ export const useVideo = (props: useVideoInput): useVideoOutput => {
 
   createEffect(() => {
     (async () => {
-      if (videoRef && track?.id) {
-        if (inView && track.enabled && props.attach !== false) {
+      if (videoRef && track()?.id) {
+        if (inView && track()!.enabled && props.attach !== false) {
           // attach when in view and enabled
-          await actions.attachVideo(track.id, videoRef);
+          await actions.attachVideo(track()!.id, videoRef);
         } else {
           // detach when not in view
-          await actions.detachVideo(track.id, videoRef);
+          await actions.detachVideo(track()!.id, videoRef);
         }
       }
     })();
@@ -54,12 +54,12 @@ export const useVideo = (props: useVideoInput): useVideoOutput => {
   createEffect(() => {
     onCleanup(() => {
       (async () => {
-        if (videoRef && track) {
+        if (videoRef && track()) {
           try {
             // detach on unmount
-            await actions.detachVideo(track.id, videoRef);
+            await actions.detachVideo(track()!.id, videoRef);
           } catch (err) {
-            HMSLogger.w('detach video error for track', track.id, err);
+            HMSLogger.w('detach video error for track', track()?.id, err);
           }
         }
       })();

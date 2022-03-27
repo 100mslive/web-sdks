@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { Accessor, createMemo } from 'solid-js';
 import {
   HMSPeer,
   HMSRoleName,
@@ -11,17 +11,18 @@ import { useHMSStore } from '../primitives/HmsRoomProvider';
 import { groupByRoles } from '../utils/groupBy';
 
 export interface useParticipantListResult {
-  roles: HMSRoleName[];
-  participantsByRoles: Record<string, HMSPeer[]>;
-  peerCount: number;
-  isConnected: boolean;
+  roles: Accessor<HMSRoleName[]>;
+  participantsByRoles: Accessor<Record<string, HMSPeer[]>>;
+  peerCount: Accessor<number>;
+  isConnected: Accessor<boolean | undefined>;
 }
 
-export const useParticipantList = () => {
+export const useParticipantList = (): useParticipantListResult => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const participantList = useHMSStore(isConnected ? selectPeers : selectRemotePeers);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const participantList = createMemo(() => useHMSStore(isConnected() ? selectPeers : selectRemotePeers));
   const peerCount = useHMSStore(selectPeerCount);
-  const participantsByRoles = useMemo(() => groupByRoles(participantList), [participantList]);
-  const roles = Object.keys(participantsByRoles);
+  const participantsByRoles = createMemo(() => groupByRoles(participantList()()));
+  const roles = () => Object.keys(participantsByRoles());
   return { roles, participantsByRoles, peerCount, isConnected };
 };

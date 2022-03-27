@@ -1,7 +1,9 @@
+import { Accessor, createEffect, createSignal } from 'solid-js';
 import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 import { hooksErrHandler } from '../hooks/types';
+import { Store } from 'solid-js/store';
 
 export enum DeviceType {
   videoInput = 'videoInput',
@@ -17,11 +19,11 @@ export interface useDevicesResult {
   /**
    * list of all devices by type
    */
-  allDevices: DeviceTypeAndInfo<MediaDeviceInfo[]>;
+  allDevices: Accessor<DeviceTypeAndInfo<Store<MediaDeviceInfo[]>>>;
   /**
    * selected device ids for all types
    */
-  selectedDeviceIDs: DeviceTypeAndInfo<string>;
+  selectedDeviceIDs: Accessor<DeviceTypeAndInfo<string>>;
   /**
    * function to call to update device
    */
@@ -43,25 +45,27 @@ export interface useDevicesResult {
  */
 export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useDevicesResult => {
   const actions = useHMSActions();
-  const sdkAllDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
+  const sdkAllDevices = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
-  const selectedDeviceIDs: DeviceTypeAndInfo<string> = {
-    [DeviceType.audioOutput]: sdkSelectedDevices.audioOutputDeviceId,
-  };
-  const allDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = {
-    [DeviceType.audioOutput]: sdkAllDevices.audioOutput,
-  };
+  const [selectedDeviceIDs, setSelectedDeviceIDs] = createSignal<DeviceTypeAndInfo<string>>({
+    [DeviceType.audioOutput]: sdkSelectedDevices().audioOutputDeviceId,
+  });
+  const [allDevices, setAllDevices] = createSignal({
+    [DeviceType.audioOutput]: sdkAllDevices().audioOutput,
+  });
 
-  if (isAllowedToPublish.video) {
-    allDevices[DeviceType.videoInput] = sdkAllDevices.videoInput;
-    selectedDeviceIDs[DeviceType.videoInput] = sdkSelectedDevices.videoInputDeviceId;
-  }
-  if (isAllowedToPublish.audio) {
-    allDevices[DeviceType.audioInput] = sdkAllDevices.audioInput;
-    selectedDeviceIDs[DeviceType.audioInput] = sdkSelectedDevices.audioInputDeviceId;
-  }
+  createEffect(() => {
+    if (isAllowedToPublish().video) {
+      setAllDevices(prev => ({ ...prev, [DeviceType.videoInput]: sdkAllDevices().videoInput }));
+      setSelectedDeviceIDs(prev => ({ ...prev, [DeviceType.videoInput]: sdkSelectedDevices().videoInputDeviceId }));
+    }
+    if (isAllowedToPublish().audio) {
+      setAllDevices(prev => ({ ...prev, [DeviceType.audioInput]: sdkAllDevices().audioInput }));
+      setSelectedDeviceIDs(prev => ({ ...prev, [DeviceType.audioInput]: sdkSelectedDevices().audioInputDeviceId }));
+    }
+  });
 
   const updateDevice: useDevicesResult['updateDevice'] = async ({ deviceType, deviceId }) => {
     try {

@@ -1,3 +1,4 @@
+import { Accessor } from 'solid-js';
 import {
   selectIsAllowedToPublish,
   selectIsLocalAudioEnabled,
@@ -11,18 +12,18 @@ export interface useAVToggleResult {
   /**
    * true if unmuted and vice versa
    */
-  isLocalAudioEnabled: boolean;
-  isLocalVideoEnabled: boolean;
+  isLocalAudioEnabled: Accessor<boolean>;
+  isLocalVideoEnabled: Accessor<boolean>;
   /**
    * use this function to toggle audio state, the function will only be present if the user
    * has permission to unmute audio
    */
-  toggleAudio?: () => void;
+  toggleAudio?: Accessor<(() => void) | undefined>;
   /**
    * use this function to toggle video state, the function will only be present if the user
    * has permission to unmute video
    */
-  toggleVideo?: () => void;
+  toggleVideo?: Accessor<(() => void) | undefined>;
 }
 
 /**
@@ -38,7 +39,7 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
 
   const toggleAudio = async () => {
     try {
-      await actions.setLocalAudioEnabled(!isLocalAudioEnabled);
+      await actions.setLocalAudioEnabled(!isLocalAudioEnabled());
     } catch (err) {
       handleError(err as Error, 'toggleAudio');
     }
@@ -46,7 +47,7 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
 
   const toggleVideo = async () => {
     try {
-      await actions.setLocalVideoEnabled(!isLocalVideoEnabled);
+      await actions.setLocalVideoEnabled(!isLocalVideoEnabled());
     } catch (err) {
       handleError(err as Error, 'toggleVideo');
     }
@@ -55,7 +56,7 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
   return {
     isLocalAudioEnabled,
     isLocalVideoEnabled,
-    toggleAudio: isAllowedToPublish?.audio ? toggleAudio : undefined,
-    toggleVideo: isAllowedToPublish?.video ? toggleVideo : undefined,
+    toggleAudio: () => (isAllowedToPublish()?.audio ? toggleAudio : undefined),
+    toggleVideo: () => (isAllowedToPublish()?.video ? toggleVideo : undefined),
   };
 };

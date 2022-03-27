@@ -4,7 +4,7 @@ import {
   selectRoomState,
   HMSConfigInitialSettings,
 } from '@100mslive/hms-video-store';
-import { createMemo, mergeProps } from 'solid-js';
+import { Accessor, createMemo, mergeProps } from 'solid-js';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
@@ -38,7 +38,7 @@ export interface usePreviewResult {
   /**
    * enable the join button for the user only when this is true
    */
-  enableJoin: boolean;
+  enableJoin: Accessor<boolean>;
   /**
    * call this function to join the room
    */
@@ -47,7 +47,7 @@ export interface usePreviewResult {
    * once the user has joined the room, till leave happens this flag will be true. It can be used
    * to decide to show between preview form and conferencing component/video tiles.
    */
-  isConnected: boolean;
+  isConnected: Accessor<boolean | undefined>;
   /**
    * call this function to join the room
    */
@@ -65,7 +65,7 @@ export const usePreviewJoin = (props: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
-  const enableJoin = roomState === HMSRoomState.Preview;
+  const enableJoin = () => roomState() === HMSRoomState.Preview;
 
   const config = createMemo<HMSConfig>(() => {
     return {
@@ -82,7 +82,7 @@ export const usePreviewJoin = (props: usePreviewInput): usePreviewResult => {
     if (!props.token) {
       return;
     }
-    if (roomState !== HMSRoomState.Disconnected) {
+    if (roomState() !== HMSRoomState.Disconnected) {
       await actions.leave();
     }
     try {
