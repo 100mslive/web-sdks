@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   StyledVideoTile,
@@ -24,7 +24,7 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 
-const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
+const Tile = ({ peerId, showStatsOnTiles, isAudioOnly, width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -37,7 +37,10 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
   const isBRB = metaData?.isBRBOn || false;
   const label = getVideoTileLabel(peer, track);
   return (
-    <StyledVideoTile.Root css={{ width, height }}>
+    <StyledVideoTile.Root
+      css={{ width, height }}
+      data-testid="participant_tile"
+    >
       {peer ? (
         <StyledVideoTile.Container
           onMouseEnter={() => setIsMouseHovered(true)}
@@ -61,14 +64,18 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
               attach={!isAudioOnly}
               mirror={peer?.isLocal && track?.source === "regular"}
               degraded={isVideoDegraded}
+              data-testid="participant_video_tile"
             />
           ) : null}
           {isVideoMuted || isVideoDegraded || isAudioOnly ? (
-            <Avatar name={peer?.name || ""} />
+            <Avatar
+              name={peer?.name || ""}
+              data-testid="participant_avatar_icon"
+            />
           ) : null}
           <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
           {isAudioMuted ? (
-            <StyledVideoTile.AudioIndicator>
+            <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
@@ -80,12 +87,18 @@ const Tile = ({ peerId, showStatsOnTiles, isAudioOnly,  width, height }) => {
             />
           ) : null}
           {isHandRaised ? (
-            <StyledVideoTile.AttributeBox css={metaStyles}>
+            <StyledVideoTile.AttributeBox
+              css={metaStyles}
+              data-testid="raiseHand_icon_onTile"
+            >
               <HandRaiseFilledIcon width={40} height={40} />
             </StyledVideoTile.AttributeBox>
           ) : null}
           {isBRB ? (
-            <StyledVideoTile.AttributeBox css={metaStyles}>
+            <StyledVideoTile.AttributeBox
+              css={metaStyles}
+              data-testid="brb_icon_onTile"
+            >
               <BrbIcon width={40} height={40} />
             </StyledVideoTile.AttributeBox>
           ) : null}

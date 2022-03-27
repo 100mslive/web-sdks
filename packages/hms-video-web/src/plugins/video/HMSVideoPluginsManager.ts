@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
@@ -322,13 +323,13 @@ export class HMSVideoPluginsManager {
             }
           };
           if (!skipProcessing) {
-            if (i == this.plugins.length - 1) {
+            if (i === this.plugins.length - 1) {
               await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
             } else {
               await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
             }
           } else {
-            if (i == this.plugins.length - 1) {
+            if (i === this.plugins.length - 1) {
               await process(this.canvases[i]!, this.outputCanvas!);
             } else {
               await process(this.canvases[i]!, this.canvases[i + 1]!);

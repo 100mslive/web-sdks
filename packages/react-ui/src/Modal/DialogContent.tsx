@@ -40,9 +40,9 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
 
 export const DialogTitle = styled(DialogPrimitive.Title, {});
 
-export const DialogDefaultCloseIcon = () => (
+export const DialogDefaultCloseIcon = ({ ...props }: any) => (
   <DialogClose asChild>
-    <IconButton>
+    <IconButton {...props}>
       <CrossIcon />
     </IconButton>
   </DialogClose>

@@ -163,6 +163,14 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static previewNetworkQuality(properties: { downLink?: string; score?: number; error?: string }) {
+    return new AnalyticsEvent({
+      name: 'perf.networkquality.preview',
+      level: properties.error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
