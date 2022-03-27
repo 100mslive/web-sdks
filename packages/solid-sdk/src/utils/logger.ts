@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 export enum HMSLogLevel {
   VERBOSE,
   DEBUG,
