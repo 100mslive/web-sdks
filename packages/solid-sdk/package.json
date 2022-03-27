@@ -33,7 +33,6 @@
   "dependencies": {
     "@100mslive/hms-video-store": "0.2.94-alpha.0",
     "react-intersection-observer": "^8.33.1",
-    "solid-zustand": "^1.2.2",
     "zustand": "^3.6.2"
   }
 }

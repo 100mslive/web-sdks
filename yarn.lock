@@ -14238,14 +14238,6 @@ solid-refresh@^0.4.0:
     "@babel/helper-module-imports" "^7.16.0"
     "@babel/types" "^7.16.0"
 
-solid-zustand@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/solid-zustand/-/solid-zustand-1.2.2.tgz#0b479a6a12df05b41905352d77fe91d0b0970e4f"
-  integrity sha512-bcxy390p1yDs1IOqwvQtsR32aoRWlfMIdj2Gq0738OSheuLoD2pllnEO1CNOJ1tnAvQzn87ORCkrdtA/oQSmrg==
-  dependencies:
-    solid-js "^1.3.10"
-    zustand "^3.7.1"
-
 sort-keys@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/sort-keys/-/sort-keys-2.0.0.tgz#658535584861ec97d730d6cf41822e1f56684128"
@@ -16376,7 +16368,7 @@ zustand@3.5.7:
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.5.7.tgz#add5e8d0ba031ce6e0ddf9cb76ef15306efb665f"
   integrity sha512-DlVFXJavIHyXTOGz6dB+8QHZsPyJcGJSEBtlp2Ivmd5SwtlCnhPo3L8LB6YRfAOJC2PbqzgoD8NMjk+y+vIF0g==
 
-zustand@^3.6.2, zustand@^3.6.9, zustand@^3.7.1:
+zustand@^3.6.2, zustand@^3.6.9:
   version "3.7.1"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.7.1.tgz#7388f0a7175a6c2fd9a2880b383a4bf6cdf6b7c6"
   integrity sha512-wHBCZlKj+bg03/hP+Tzv24YhnqqP8MCeN9ECPDXoF01062SIbnfl3j9O0znkDw1lNTY0a8WN3F///a0UhhaEqg==
