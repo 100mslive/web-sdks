@@ -1,4 +1,7 @@
-import { selectIsLocalAudioEnabled } from "@100mslive/react-sdk";
+import {
+  selectIsLocalAudioEnabled,
+  selectIsLocalVideoEnabled,
+} from "@100mslive/react-sdk";
 
 let isEvenListenersAttached = false;
 
@@ -6,6 +9,7 @@ export function KeyboardInputManager(hmsReactiveStore) {
   let isShortcutExecuted = false;
   const hmsActions = hmsReactiveStore.getActions();
   const hmsVanillaStore = hmsReactiveStore.getStore();
+
   const toggleAudio = async () => {
     if (!isShortcutExecuted) {
       const enabled = hmsVanillaStore.getState(selectIsLocalAudioEnabled);
@@ -14,9 +18,29 @@ export function KeyboardInputManager(hmsReactiveStore) {
     }
   };
 
+  const toggleVideo = async () => {
+    if (!isShortcutExecuted) {
+      const enabled = hmsVanillaStore.getState(selectIsLocalVideoEnabled);
+      await hmsActions.setLocalVideoEnabled(!enabled);
+      isShortcutExecuted = true;
+    }
+  };
+
   const keyDownHandler = async e => {
-    if (e.ctrlKey && (e.key === "m" || e.key === "M")) {
+    const CONTROL_KEY = e.ctrlKey;
+    const SHIFT_KEY = e.shiftKey;
+    const M_KEY = e.key === "m" || e.key === "M";
+    const K_KEY = e.key === "k" || e.key === "K";
+
+    const SHORTCUT_TOGGLE_AUDIO = CONTROL_KEY && M_KEY;
+    const SHORTCUT_TOGGLE_VIDEO = CONTROL_KEY && SHIFT_KEY && K_KEY;
+
+    if (SHORTCUT_TOGGLE_AUDIO) {
       await toggleAudio();
+    }
+
+    if (SHORTCUT_TOGGLE_VIDEO) {
+      await toggleVideo();
     }
   };
 
@@ -31,7 +55,7 @@ export function KeyboardInputManager(hmsReactiveStore) {
 
   const unbind = () => {
     document.removeEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
+    document.removeEventListener("keyup", keyUpHandler, false);
   };
 
   return {

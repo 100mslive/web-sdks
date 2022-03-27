@@ -28,7 +28,11 @@ export const AudioVideoToggle = ({ compact = false }) => {
         </Tooltip>
       ) : null}
       {toggleVideo ? (
-        <Tooltip title={`Turn ${isLocalVideoEnabled ? "off" : "on"} video`}>
+        <Tooltip
+          title={`Turn ${
+            isLocalVideoEnabled ? "off" : "on"
+          } video (ctrl + shift + k)`}
+        >
           <IconButton
             css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
