@@ -4,6 +4,7 @@ const dependencyMapping = {
   'react-sdk': ['react-sdk', 'react-ui'],
   'react-icons': ['react-icons', 'react-ui'],
   'react-ui': ['react-ui'],
+  'solid-sdk': ['solid-sdk'],
 };
 
 module.exports = { dependencyMapping };

@@ -1,6 +1,8 @@
+/* eslint-disable complexity */
 const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
+const { solidPlugin } = require('esbuild-plugin-solid');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -13,12 +15,15 @@ async function main() {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
   const isReact = pkg.name.includes('react');
+  const isSolid = pkg.name.includes('solid');
   const external = Object.keys(pkg.dependencies || {});
   if (isReact) {
     external.push('react');
+  } else if (isSolid) {
+    external.push('solid-js');
   }
   try {
-    esbuild.buildSync({
+    await esbuild.build({
       entryPoints: [source],
       outfile: 'dist/index.cjs.js',
       minify: true,
@@ -28,9 +33,10 @@ async function main() {
       tsconfig: 'tsconfig.json',
       external,
       metafile: true,
+      plugins: isSolid ? [solidPlugin()] : [],
     });
 
-    const esmResult = esbuild.buildSync({
+    const esmResult = await esbuild.build({
       entryPoints: [source],
       outfile: 'dist/index.js',
       minify: true,
@@ -40,6 +46,7 @@ async function main() {
       tsconfig: 'tsconfig.build.json',
       external,
       metafile: true,
+      plugins: isSolid ? [solidPlugin()] : [],
     });
 
     let esmSize = 0;
