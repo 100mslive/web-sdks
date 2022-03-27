@@ -41,10 +41,32 @@
     reselect "4.0.0"
     zustand "3.5.7"
 
+"@100mslive/hms-video-store@0.2.94-alpha.0":
+  version "0.2.94-alpha.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.94-alpha.0.tgz#e0b1bcbc5dee894b0d70627d8fef3646b23076f5"
+  integrity sha512-UZqUNCTorrStcnqt2zfQbu1iBNHSBXifPsnbopvsTfAxD9ym/g9FJ/2O00kdOBY7kr6p7KKHT4Qo4KBVDHUqSQ==
+  dependencies:
+    "@100mslive/hms-video" "0.1.48-alpha.0"
+    eventemitter2 "^6.4.5"
+    immer "^9.0.6"
+    reselect "4.0.0"
+    zustand "3.5.7"
+
 "@100mslive/hms-video@0.1.47":
   version "0.1.47"
   resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.47.tgz#32d2db450a42e5096796cfbd1784adb88343767a"
   integrity sha512-FH532OzIkDZXYr4Enh+wB5MRtG98hP+Q/ey+0bqs5lWjlB67ViYysKGA4M+skJ0cOOEMwRQBe6X51m41b5wM2g==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-video@0.1.48-alpha.0":
+  version "0.1.48-alpha.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.48-alpha.0.tgz#ad344eb64c112b78d00553cdbfaa0c6f08d3d518"
+  integrity sha512-auwuiTi205raH4+qZ2yFzCD9/PxuxZFNIYi4WAdMyKcOBZOFNxquxhronY0y2L1Ye0ya5ibuzzDxEVi9Qphj1g==
   dependencies:
     eventemitter2 "^6.4.5"
     sdp-transform "^2.14.1"

@@ -1,11 +1,11 @@
-import Solid, { useContext } from 'solid-js';
+import Solid, { Accessor, useContext } from 'solid-js';
 import { EqualityChecker, StateSelector } from 'zustand';
 import shallow from 'zustand/shallow';
 import { HMSActions, HMSStore, HMSNotifications, HMSStatsStore, IStoreReadOnly } from '@100mslive/hms-video-store';
 import HMSLogger from '../utils/logger';
 
 export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
-  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
+  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): Accessor<U>;
 }
 
 export const hooksErrorMessage =

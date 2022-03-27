@@ -1,17 +1,23 @@
-import Solid, { createContext, createEffect, createSignal, useContext } from 'solid-js';
+import Solid, { createContext, createEffect, createSignal, onCleanup, useContext } from 'solid-js';
+import { StateSelector } from 'zustand';
 import {
   HMSReactiveStore,
-  HMSStore,
   HMSActions,
   HMSNotification,
   HMSNotifications,
-  HMSStatsStore,
   HMSStats,
   HMSStoreWrapper,
   HMSNotificationTypes,
+  IStoreReadOnly,
+  HMSStore,
 } from '@100mslive/hms-video-store';
-import create from 'solid-zustand';
-import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
+import {
+  HMSContextProviderProps,
+  makeHMSStoreHook,
+  hooksErrorMessage,
+  makeHMSStatsStoreHook,
+  IHMSReactStore,
+} from './store';
 import { isBrowser } from '../utils/isBrowser';
 
 export interface HMSRoomProviderProps {
@@ -24,6 +30,20 @@ export interface HMSRoomProviderProps {
    */
   isHMSStatsOn?: boolean;
 }
+
+const createZustandStore = <T extends HMSStore>(store: IStoreReadOnly<T>): IHMSReactStore<T> => {
+  function useStore<U>(selector: StateSelector<T, U>) {
+    const [state, setState] = createSignal<U>(store.getState(selector));
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const unsubscribe = store.subscribe(newState => setState(newState as U extends Function ? never : U), selector);
+    onCleanup(() => unsubscribe());
+    return state;
+  }
+
+  useStore.getState = store.getState;
+  useStore.subscribe = store.subscribe;
+  return useStore;
+};
 
 /**
  * only one context is being created currently. This would need to be changed if multiple
@@ -39,55 +59,68 @@ let providerProps: HMSContextProviderProps;
  * @constructor
  */
 export const HMSRoomProvider: Solid.Component<HMSRoomProviderProps> = props => {
-  if (!providerProps) {
-    // adding a dummy function for setstate and destroy because zustan'd create expects them
-    // to be present but we don't expose them from the store.
-    const errFn = () => {
-      throw new Error('modifying store is not allowed');
-    };
-    if (props.actions && props.store) {
-      providerProps = {
-        actions: props.actions,
-        store: create<HMSStore>({
-          ...props.store,
-          setState: errFn,
-          destroy: errFn,
-        }),
-      };
-      if (props.notifications) {
-        providerProps.notifications = props.notifications;
-      }
-      if (props.stats) {
-        providerProps.statsStore = create<HMSStatsStore>({
-          getState: props.stats.getState,
-          subscribe: props.stats.subscribe,
-          setState: errFn,
-          destroy: errFn,
-        });
-      }
-    } else {
-      const hmsReactiveStore = new HMSReactiveStore();
-      providerProps = {
-        actions: hmsReactiveStore.getActions(),
-        store: create<HMSStore>({
-          ...hmsReactiveStore.getStore(),
-          setState: errFn,
-          destroy: errFn,
-        }), // convert vanilla store in react hook
-        notifications: hmsReactiveStore.getNotifications(),
-      };
+  // if (!providerProps) {
+  //   // adding a dummy function for setstate and destroy because zustan'd create expects them
+  //   // to be present but we don't expose them from the store.
+  //   const errFn = () => {
+  //     throw new Error('modifying store is not allowed');
+  //   };
+  //   if (props.actions && props.store) {
+  //     providerProps = {
+  //       actions: props.actions,
+  //       store: create<HMSStore>({
+  //         ...props.store,
+  //         setState: errFn,
+  //         destroy: errFn,
+  //       }),
+  //     };
+  //     if (props.notifications) {
+  //       providerProps.notifications = props.notifications;
+  //     }
+  //     if (props.stats) {
+  //       providerProps.statsStore = create<HMSStatsStore>({
+  //         getState: props.stats.getState,
+  //         subscribe: props.stats.subscribe,
+  //         setState: errFn,
+  //         destroy: errFn,
+  //       });
+  //     }
+  //   } else {
+  //     const hmsReactiveStore = new HMSReactiveStore();
+  //     providerProps = {
+  //       actions: hmsReactiveStore.getActions(),
+  //       store: create<HMSStore>({
+  //         ...hmsReactiveStore.getStore(),
+  //         setState: errFn,
+  //         destroy: errFn,
+  //       }), // convert vanilla store in react hook
+  //       notifications: hmsReactiveStore.getNotifications(),
+  //     };
 
-      if (props.isHMSStatsOn) {
-        const stats = hmsReactiveStore.getStats();
-        providerProps.statsStore = create<HMSStatsStore>({
-          getState: stats.getState,
-          subscribe: stats.subscribe,
-          setState: errFn,
-          destroy: errFn,
-        });
-      }
-    }
-  }
+  //     if (props.isHMSStatsOn) {
+  //       const stats = hmsReactiveStore.getStats();
+  //       providerProps.statsStore = create<HMSStatsStore>({
+  //         getState: stats.getState,
+  //         subscribe: stats.subscribe,
+  //         setState: errFn,
+  //         destroy: errFn,
+  //       });
+  //     }
+  //   }
+  // }
+
+  // const errFn = () => {
+  //   throw new Error('modifying store is not allowed');
+  // };
+  // const [state, setState] = createStore(createDefaultStoreState());
+  // const hmsStore: IHMSStore = {};
+
+  const hmsReactiveStore = new HMSReactiveStore();
+  providerProps = {
+    actions: hmsReactiveStore.getActions(),
+    store: createZustandStore(hmsReactiveStore.getStore()), // convert vanilla store in react hook
+    notifications: hmsReactiveStore.getNotifications(),
+  };
 
   if (isBrowser) {
     window.addEventListener('beforeunload', () => providerProps.actions.leave());
