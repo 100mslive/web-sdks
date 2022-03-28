@@ -25,12 +25,16 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
-const MessageType = ({ hasPeer, roles }) => {
+const MessageType = ({ hasPeer, roles, hasCurrentUserSent }) => {
   if (hasPeer) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
-        to me
-        <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
+        {hasCurrentUserSent ? "" : "to me"}
+        <Text
+          as="span"
+          variant="sm"
+          css={{ color: "$error", mx: hasCurrentUserSent ? 0 : "$4" }}
+        >
           (Privately)
         </Text>
       </Text>
@@ -108,12 +112,11 @@ const ChatMessage = React.memo(({ message }) => {
       <Text variant="sm" css={{ color: "$textSecondary" }}>
         {message.senderName}
       </Text>
-      {message.sender !== localPeerId && (
-        <MessageType
-          hasPeer={message.recipientPeer}
-          roles={message.recipientRoles}
-        />
-      )}
+      <MessageType
+        hasCurrentUserSent={message.sender === localPeerId}
+        hasPeer={message.recipientPeer}
+        roles={message.recipientRoles}
+      />
       <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
         {formatTime(message.time)}
       </Text>
