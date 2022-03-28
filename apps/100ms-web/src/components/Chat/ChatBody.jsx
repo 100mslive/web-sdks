@@ -5,7 +5,7 @@ import {
   selectLocalPeerID,
   selectMessagesByPeerID,
   selectMessagesByRole,
-  selectPeerByID,
+  selectPeerNameByID,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -27,11 +27,11 @@ const formatTime = date => {
 };
 
 const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
-  const peer = useHMSStore(selectPeerByID(receiver));
+  const peerName = useHMSStore(selectPeerNameByID(receiver));
   if (receiver) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
-        {hasCurrentUserSent ? `to ${peer?.name}` : "to me"}
+        {hasCurrentUserSent ? `to ${peerName}` : "to me"}
         <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
           (Privately)
         </Text>
