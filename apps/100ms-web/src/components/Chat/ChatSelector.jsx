@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import {
   selectAvailableRoleNames,
   selectRemotePeers,
@@ -24,6 +24,7 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
       css={{
         cursor: "pointer",
         p: "$4 $8",
+        flexShrink: 0,
         "&:hover": { bg: "$menuBg" },
       }}
       align="center"
@@ -45,12 +46,12 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
 
 const SelectorHeader = ({ children }) => {
   return (
-    <Fragment>
+    <Box css={{ flexShrink: 0 }}>
       <HorizontalDivider space={4} />
       <Text variant="md" css={{ p: "$4 $8", fontWeight: "$semiBold" }}>
         {children}
       </Text>
-    </Fragment>
+    </Box>
   );
 };
 
@@ -109,6 +110,7 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         left: 0,
         bg: "$bgSecondary",
         py: "$4",
+        overflowY: "auto",
       }}
     >
       <Everyone onSelect={onSelect} active={!role && !peerId} />

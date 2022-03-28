@@ -41,7 +41,7 @@ export const Chat = ({ onClose }) => {
       <Box
         css={{
           flex: "1 1 0",
-          overflowY: "auto",
+          overflowY: isSelectorOpen ? "hidden" : "auto",
           bg: "$bgSecondary",
           pt: "$4",
           position: "relative",
