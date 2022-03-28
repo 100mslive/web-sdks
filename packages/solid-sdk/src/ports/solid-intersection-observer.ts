@@ -72,9 +72,8 @@ export function useInView(props: IntersectionOptions): Accessor<CustomInViewHook
           rootMargin: props.rootMargin,
           threshold: props.threshold,
           // @ts-ignore
-          trackVisibility,
-          // @ts-ignore
-          delay,
+          trackVisibility: props.trackVisibility,
+          delay: props.delay,
         },
         props.fallbackInView,
       );

@@ -1,5 +1,5 @@
 import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
-import { createEffect, onCleanup } from 'solid-js';
+import { Accessor, createEffect, onCleanup } from 'solid-js';
 import { useInView } from '../ports/solid-intersection-observer';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
@@ -17,7 +17,7 @@ export interface useVideoInput {
 }
 
 export interface useVideoOutput {
-  videoRef: (node: HTMLVideoElement) => void;
+  videoRef: Accessor<(node: HTMLVideoElement) => void>;
 }
 /**
  * This hooks can be used to implement a video tile component. Given a track id it will return a ref.
@@ -31,7 +31,7 @@ export const useVideo = (props: useVideoInput): useVideoOutput => {
   const track = useHMSStore(selectTrackByID(props.trackId));
   const inViewResponse = useInView({ threshold: 0.5 });
 
-  const setRefs = (node: HTMLVideoElement) => {
+  const setRefs = () => (node: HTMLVideoElement) => {
     videoRef = node;
     inViewResponse().ref(node);
   };
