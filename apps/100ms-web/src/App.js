@@ -5,11 +5,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import {
-  HMSRoomProvider,
-  useHMSActions,
-  useHMSVanillaStore,
-} from "@100mslive/react-sdk";
+import { HMSRoomProvider } from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
 import PreviewScreen from "./components/PreviewScreen";
 import { Conference } from "./components/conference";
@@ -28,7 +24,7 @@ import "./index.css";
 import { PostLeave } from "./components/PostLeave";
 import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
-import { KeyboardInputManager } from "./components/Input/KeyboardInputManager";
+import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -47,18 +43,6 @@ if (window.location.host.includes("localhost")) {
 }
 
 document.title = `${appName}'s ${document.title}`;
-
-const KeyboardHandler = () => {
-  const store = useHMSVanillaStore();
-  const actions = useHMSActions();
-
-  useEffect(() => {
-    const keyboardManager = new KeyboardInputManager(store, actions);
-    keyboardManager.bindAllShortcuts();
-    return keyboardManager.unbindAllShortcuts;
-  }, [actions, store]);
-  return null;
-};
 
 export function EdtechComponent({
   roomId = "",
