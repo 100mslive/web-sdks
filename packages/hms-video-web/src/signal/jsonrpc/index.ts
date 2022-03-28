@@ -161,17 +161,11 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async close(): Promise<void> {
-    const p = new Promise<void>(resolve => {
-      this.socket!.addEventListener('close', () => resolve());
-    });
-    // @TODO: Clean up: Remove event listeners.
-
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     this.socket!.close(1000, 'Normal Close');
     this.setIsConnected(false, 'code: 1000, normal websocket close');
     this.socket!.removeEventListener('close', this.onCloseHandler);
     this.socket!.removeEventListener('message', this.onMessageHandler);
-    return p;
   }
 
   async join(
@@ -291,7 +285,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private onCloseHandler(event: CloseEvent) {
     HMSLogger.d(`Websocket closed code=${event.code}`);
-    this.setIsConnected(false, `code: ${event.code},  unexpected websocket close`);
+    this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
     // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
 
     // @DISCUSS: onOffline would have thrown error already.

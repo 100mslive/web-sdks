@@ -109,6 +109,10 @@ export class HMSSDKActions implements IHMSActions {
     // this.actionBatcher = new ActionBatcher(store);
   }
 
+  refreshDevices(): void {
+    this.sdk.refreshDevices();
+  }
+
   async unblockAudio() {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
@@ -217,10 +221,15 @@ export class HMSSDKActions implements IHMSActions {
       // for backward compatibility
       sdkConfig.audioOnly = config;
     }
-    if (enabled) {
-      await this.startScreenShare(sdkConfig);
-    } else {
-      await this.stopScreenShare();
+    try {
+      if (enabled) {
+        await this.startScreenShare(sdkConfig);
+      } else {
+        await this.stopScreenShare();
+      }
+    } catch (error) {
+      this.hmsNotifications.sendError(SDKToHMS.convertException(error as SDKHMSException));
+      throw error;
     }
   }
 
@@ -385,8 +394,8 @@ export class HMSSDKActions implements IHMSActions {
   validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult {
     let result = {} as HMSPluginSupportResult;
     if (!plugin) {
-      HMSLogger.w('Invalid plugin received in store');
-      result.errMsg = 'trying to add invalid plugin, see docs for details';
+      HMSLogger.w('no plugin passed in for checking support"');
+      result.errMsg = 'no plugin passed in for checking support"';
       return result;
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
@@ -394,10 +403,8 @@ export class HMSSDKActions implements IHMSActions {
       const sdkTrack = this.hmsSDKTracks[trackID];
       if (sdkTrack) {
         result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
-        //TODO: check if it is required
-        // this.syncRoomState(`${action}AudioPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to validate plugin`);
+        HMSLogger.w(`local audio track ${trackID} not found to apply plugin`);
       }
     }
 

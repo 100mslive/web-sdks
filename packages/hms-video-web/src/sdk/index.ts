@@ -138,6 +138,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  refreshDevices(): void {
+    this.validateJoined('refreshDevices');
+    this.deviceManager.init(true);
+  }
+
   getWebrtcInternals() {
     return this.transport?.getWebrtcInternals();
   }
@@ -249,6 +254,14 @@ export class HMSSdk implements HMSInterface {
       });
     }
 
+    let initSuccessful = false;
+    let networkTestFinished = false;
+    const timerId = setTimeout(() => {
+      // If init or network is not done by 3s send -1
+      if (!initSuccessful || !networkTestFinished) {
+        this.listener?.onNetworkQuality?.(-1);
+      }
+    }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
@@ -265,8 +278,12 @@ export class HMSSdk implements HMSInterface {
       this.transport
         .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
-          if (initConfig) {
-            this.networkTestManager.start(initConfig.config?.networkHealth);
+          initSuccessful = true;
+          clearTimeout(timerId);
+          if (initConfig && this.listener?.onNetworkQuality) {
+            this.networkTestManager.start(initConfig.config?.networkHealth).then(() => {
+              networkTestFinished = true;
+            });
           }
         })
         .catch(ex => {
@@ -298,7 +315,7 @@ export class HMSSdk implements HMSInterface {
   };
 
   private handleAudioPluginError = (error: HMSException) => {
-    HMSLogger.d(this.TAG, 'Audio Plugin Error event', error);
+    HMSLogger.e(this.TAG, 'Audio Plugin Error event', error);
     this.errorListener?.onError(error);
   };
 
@@ -310,6 +327,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
     const { roomId, userId, role } = decodeJWT(config.authToken);
+    this.networkTestManager?.stop();
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.commonSetup(config, roomId, listener);
@@ -398,6 +416,7 @@ export class HMSSdk implements HMSInterface {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
+      this.networkTestManager?.stop();
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
