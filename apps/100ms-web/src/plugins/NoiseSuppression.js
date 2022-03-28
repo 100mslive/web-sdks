@@ -15,7 +15,7 @@ export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const [disable, setDisabled] = useState(false);
-  const [pluginSupport, setPluginSupport] = useState(false);
+  const [isNSSupported, setIsNSSupported] = useState(false);
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
   );
@@ -37,7 +37,7 @@ export const NoiseSuppression = () => {
     }
   }, [hmsActions]);
 
-  const cleanup = useCallback(
+  const handleFailure = useCallback(
     async err => {
       let message = "adding Noise Suppression plugin failed, see docs";
       if (err.message) {
@@ -67,12 +67,12 @@ export const NoiseSuppression = () => {
         await hmsActions.addPluginToAudioTrack(pluginRef.current);
       } else {
         const err = pluginSupport.errMsg;
-        await cleanup(err);
+        await handleFailure(err);
       }
     } catch (err) {
-      await cleanup(err);
+      await handleFailure(err);
     }
-  }, [hmsActions, cleanup]);
+  }, [hmsActions, handleFailure]);
 
   useEffect(() => {
     if (!pluginRef.current) {
@@ -82,16 +82,11 @@ export const NoiseSuppression = () => {
     const pluginSupport = hmsActions.validateAudioPluginSupport(
       pluginRef.current
     );
-    if (pluginSupport.isSupported) {
-      setDisabled(false);
-      setPluginSupport(true);
-    } else {
-      setDisabled(true);
-      setPluginSupport(false);
-    }
+    setIsNSSupported(pluginSupport.isSupported);
+    setDisabled(!pluginSupport.isSupported);
   }, [selectedDeviceIDs.audioInput, hmsActions]);
 
-  if (pluginSupport) {
+  if (isNSSupported) {
     return (
       <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
         <IconButton

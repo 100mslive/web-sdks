@@ -8,6 +8,7 @@ import {
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { useCallback } from 'react';
+import { logErrorHandler } from '../utils/commons';
 
 export interface useScreenShareResult {
   /**
@@ -33,8 +34,6 @@ export interface useScreenShareResult {
   screenShareAudioTrackId?: HMSTrackID;
 }
 
-const logErrorHandler = (e: Error) => console.log('Error: ', e);
-
 /**
  * This hook can be used to implement a screenshare toggle button as well as know about the screenshare in the room.
  * This works best if your application only needs to show one screenshare in large view at a time with other screenshares
@@ -54,8 +53,8 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
     async (audioOnly = false) => {
       try {
         await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
-      } catch (error) {
-        handleError(error as Error);
+      } catch (err) {
+        handleError(err as Error, 'toggleScreenShare');
       }
     },
     [actions, amIScreenSharing, handleError],

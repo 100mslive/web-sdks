@@ -23,7 +23,7 @@ jobs:
         if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true'
         with:
           browser: chrome
-          build: yarn build
+          build: yarn build --no-private
         env:
           CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}
           CYPRESS_ROOM_ID: ${{ secrets.ROOM_ID }}
