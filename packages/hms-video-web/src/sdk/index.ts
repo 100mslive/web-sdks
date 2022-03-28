@@ -481,8 +481,9 @@ export class HMSSdk implements HMSInterface {
       recipientRoles,
       time: new Date(),
     });
-    HMSLogger.d(this.TAG, 'Sending Message:: ', hmsMessage);
-    await this.transport.sendMessage(hmsMessage);
+    HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
+    const response = await this.transport.sendMessage(hmsMessage);
+    hmsMessage.time = new Date(response.timestamp);
     return hmsMessage;
   }
 

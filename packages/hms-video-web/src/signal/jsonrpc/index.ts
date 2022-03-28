@@ -11,6 +11,7 @@ import {
   StartRTMPOrRecordingRequestParams,
   UpdatePeerRequestParams,
   HLSRequestParams,
+  BroadcastResponse,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -211,7 +212,10 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async broadcast(message: Message) {
-    await this.call(HMSSignalMethod.BROADCAST, { version: '1.0', ...message.toSignalParams() });
+    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
+      version: '1.0',
+      ...message.toSignalParams(),
+    });
   }
 
   leave() {
