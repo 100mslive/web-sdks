@@ -95,7 +95,7 @@ const NewMessageIndicator = ({ role, peerId, onClick }) => {
       justify="center"
       css={{
         width: "100%",
-        transform: "translatey(-100%)",
+        transform: "translatey(-150%)",
         position: "absolute",
       }}
     >

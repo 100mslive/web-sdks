@@ -7,10 +7,9 @@ import { SendIcon } from "@100mslive/react-icons";
 const TextArea = styled("textarea", {
   width: "100%",
   bg: "transparent",
-  p: "$2 $3",
-  pl: "$8",
   color: "$textPrimary",
   resize: "none",
+  lineHeight: "1rem",
   "&:focus": {
     boxShadow: "none",
     outline: "none",
@@ -48,6 +47,8 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         minHeight: "$16",
         maxHeight: "$24",
         position: "relative",
+        py: "$4",
+        pl: "$8",
       }}
     >
       {children}
