@@ -34,7 +34,8 @@ form {
   padding: 20px;
 }
 
-input {
+input,
+select {
   display: block;
   width: 100%;
   border-radius: 8px;
