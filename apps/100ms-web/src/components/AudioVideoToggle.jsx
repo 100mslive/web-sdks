@@ -8,6 +8,18 @@ import {
 import { Tooltip, IconButton } from "@100mslive/react-ui";
 import { useAVToggle } from "@100mslive/react-sdk";
 
+/**
+ * 'navigator.useAgentData.platform' is the recommended way to
+ * 'platform sniff'. Although, it's still not implemented in
+ * Firefox and Safari. So when not available, the deprecated
+ * 'navigator.platform' is used for backward compatibility.
+ */
+let isMacOS = /mac/i.test(
+  navigator.userAgentData
+    ? navigator.userAgentData.platform
+    : navigator.platform
+);
+
 export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
@@ -15,7 +27,9 @@ export const AudioVideoToggle = ({ compact = false }) => {
     <Fragment>
       {toggleAudio ? (
         <Tooltip
-          title={`Turn ${isLocalAudioEnabled ? "off" : "on"} audio (ctrl + m)`}
+          title={`Turn ${isLocalAudioEnabled ? "off" : "on"} audio (${
+            isMacOS ? "⌘" : "ctrl"
+          } + d)`}
         >
           <IconButton
             css={{ mr: compact ? "$2" : "$4" }}
@@ -29,9 +43,9 @@ export const AudioVideoToggle = ({ compact = false }) => {
       ) : null}
       {toggleVideo ? (
         <Tooltip
-          title={`Turn ${
-            isLocalVideoEnabled ? "off" : "on"
-          } video (ctrl + shift + k)`}
+          title={`Turn ${isLocalVideoEnabled ? "off" : "on"} video (${
+            isMacOS ? "⌘" : "ctrl"
+          } + e)`}
         >
           <IconButton
             css={compact ? { ml: "$2" } : { mx: "$4" }}

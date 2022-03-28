@@ -50,7 +50,7 @@ if (window.location.host.includes("localhost")) {
 document.title = `${appName}'s ${document.title}`;
 
 const hmsReactiveStore = new HMSReactiveStore();
-const keyboardInputManager = KeyboardInputManager(hmsReactiveStore);
+const keyboardInputManager = new KeyboardInputManager(hmsReactiveStore);
 
 export function EdtechComponent({
   roomId = "",

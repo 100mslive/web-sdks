@@ -4,72 +4,71 @@ import {
 } from "@100mslive/react-sdk";
 
 let isEvenListenersAttached = false;
+/**
+ * 'navigator.useAgentData.platform' is the recommended way to
+ * 'platform sniff'. Although, it's still not implemented in
+ * Firefox and Safari. So when not available, the deprecated
+ * 'navigator.platform' is used for backward compatibility.
+ */
+let isMacOS = /mac/i.test(
+  navigator.userAgentData
+    ? navigator.userAgentData.platform
+    : navigator.platform
+);
 
-export function KeyboardInputManager(hmsReactiveStore) {
-  let isShortcutExecuted = false;
-  const hmsActions = hmsReactiveStore.getActions();
-  const hmsVanillaStore = hmsReactiveStore.getStore();
+export class KeyboardInputManager {
+  #actions;
+  #store;
+  constructor(hmsReactiveStore) {
+    this.#actions = hmsReactiveStore.getActions();
+    this.#store = hmsReactiveStore.getStore();
+  }
+  async #toggleAudio() {
+    const enabled = this.#store.getState(selectIsLocalAudioEnabled);
+    await this.#actions.setLocalAudioEnabled(!enabled);
+  }
 
-  const toggleAudio = async () => {
-    if (!isShortcutExecuted) {
-      const enabled = hmsVanillaStore.getState(selectIsLocalAudioEnabled);
-      await hmsActions.setLocalAudioEnabled(!enabled);
-      isShortcutExecuted = true;
-    }
-  };
+  async #toggleVideo() {
+    const enabled = this.#store.getState(selectIsLocalVideoEnabled);
+    await this.#actions.setLocalVideoEnabled(!enabled);
+  }
 
-  const toggleVideo = async () => {
-    if (!isShortcutExecuted) {
-      const enabled = hmsVanillaStore.getState(selectIsLocalVideoEnabled);
-      await hmsActions.setLocalVideoEnabled(!enabled);
-      isShortcutExecuted = true;
-    }
-  };
+  #keyDownHandler = async e => {
+    const CONTROL_KEY = isMacOS ? e.metaKey : e.ctrlKey;
+    const D_KEY = e.key === "d" || e.key === "D";
+    const E_KEY = e.key === "e" || e.key === "E";
 
-  const keyDownHandler = async e => {
-    const CONTROL_KEY = e.ctrlKey;
-    const SHIFT_KEY = e.shiftKey;
-    const M_KEY = e.key === "m" || e.key === "M";
-    const K_KEY = e.key === "k" || e.key === "K";
-
-    const SHORTCUT_TOGGLE_AUDIO = CONTROL_KEY && M_KEY;
-    const SHORTCUT_TOGGLE_VIDEO = CONTROL_KEY && SHIFT_KEY && K_KEY;
+    const SHORTCUT_TOGGLE_AUDIO = CONTROL_KEY && D_KEY;
+    const SHORTCUT_TOGGLE_VIDEO = CONTROL_KEY && E_KEY;
 
     if (SHORTCUT_TOGGLE_AUDIO) {
-      await toggleAudio();
+      e.preventDefault();
+      await this.#toggleAudio();
+    } else if (SHORTCUT_TOGGLE_VIDEO) {
+      e.preventDefault();
+      await this.#toggleVideo();
     }
+  };
 
-    if (SHORTCUT_TOGGLE_VIDEO) {
-      await toggleVideo();
+  #bind() {
+    document.addEventListener("keydown", this.#keyDownHandler, false);
+  }
+
+  #unbind() {
+    document.removeEventListener("keydown", this.#keyDownHandler, false);
+  }
+
+  bindAllShortcuts() {
+    if (!isEvenListenersAttached) {
+      this.#bind();
+      isEvenListenersAttached = true;
     }
-  };
+  }
 
-  const keyUpHandler = e => {
-    isShortcutExecuted = false;
-  };
-
-  const bind = () => {
-    document.addEventListener("keydown", keyDownHandler, false);
-    document.addEventListener("keyup", keyUpHandler, false);
-  };
-
-  const unbind = () => {
-    document.removeEventListener("keydown", keyDownHandler, false);
-    document.removeEventListener("keyup", keyUpHandler, false);
-  };
-
-  return {
-    bindAllShortcuts: () => {
-      if (!isEvenListenersAttached) {
-        bind();
-        isEvenListenersAttached = true;
-      }
-    },
-    unbindAllShortcuts: () => {
-      if (isEvenListenersAttached) {
-        unbind();
-        isEvenListenersAttached = false;
-      }
-    },
-  };
+  unbindAllShortcuts() {
+    if (isEvenListenersAttached) {
+      this.#unbind();
+      isEvenListenersAttached = false;
+    }
+  }
 }
