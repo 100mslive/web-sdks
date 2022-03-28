@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import {
   selectHMSMessages,
+  selectLocalPeerID,
   selectMessagesByPeerID,
   selectMessagesByRole,
   useHMSActions,
@@ -24,7 +25,7 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
-const MessageType = ({ hasPeer, hasRoles }) => {
+const MessageType = ({ hasPeer, roles }) => {
   if (hasPeer) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
@@ -36,12 +37,12 @@ const MessageType = ({ hasPeer, hasRoles }) => {
     );
   }
 
-  if (hasRoles) {
+  if (roles && roles.length) {
     return (
       <Text variant="sm" css={{ mx: "$4" }}>
         to
         <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
-          (Role)
+          ({roles.join(",")})
         </Text>
       </Text>
     );
@@ -78,33 +79,37 @@ const AnnotisedChat = ({ message }) => {
   );
 };
 
-const ChatMessage = React.memo(
-  ({ id, sender, message, time, read, hasPeer, hasRoles }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-    const hmsActions = useHMSActions();
+const ChatMessage = React.memo(({ message }) => {
+  const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+  const hmsActions = useHMSActions();
+  const localPeerId = useHMSStore(selectLocalPeerID);
 
-    useEffect(() => {
-      if (id && !read && inView) {
-        hmsActions.setMessageRead(true, id);
-      }
-    }, [read, hmsActions, inView, id]);
+  useEffect(() => {
+    if (message.id && !message.read && inView) {
+      hmsActions.setMessageRead(true, message.id);
+    }
+  }, [message.read, hmsActions, inView, message.id]);
 
-    return (
-      <Flex ref={ref} css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
-        <Text variant="sm" css={{ color: "$textSecondary" }}>
-          {sender}
-        </Text>
-        <MessageType hasPeer={hasPeer} hasRoles={hasRoles} />
-        <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
-          {formatTime(time)}
-        </Text>
-        <Text css={{ w: "100%", my: "$2" }}>
-          <AnnotisedChat message={message} />
-        </Text>
-      </Flex>
-    );
-  }
-);
+  return (
+    <Flex ref={ref} css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
+      <Text variant="sm" css={{ color: "$textSecondary" }}>
+        {message.senderName}
+      </Text>
+      {message.sender !== localPeerId && (
+        <MessageType
+          hasPeer={message.recipientPeer}
+          roles={message.recipientRoles}
+        />
+      )}
+      <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
+        {formatTime(message.time)}
+      </Text>
+      <Text css={{ w: "100%", my: "$2" }}>
+        <AnnotisedChat message={message.message} />
+      </Text>
+    </Flex>
+  );
+});
 
 export const ChatBody = ({ role, peerId }) => {
   const storeMessageSelector = role
@@ -125,18 +130,7 @@ export const ChatBody = ({ role, peerId }) => {
   return (
     <Fragment>
       {messages.map(message => {
-        return (
-          <ChatMessage
-            key={message.id}
-            id={message.id}
-            sender={message.senderName}
-            time={message.time}
-            message={message.message}
-            read={message.read}
-            hasPeer={message.recipientPeer}
-            hasRoles={message.recipientRoles?.length}
-          />
-        );
+        return <ChatMessage key={message.id} message={message} />;
       })}
     </Fragment>
   );
