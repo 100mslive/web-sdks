@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
-import { HMSRoomProvider } from "@100mslive/react-sdk";
+import {
+  HMSRoomProvider,
+  useHMSActions,
+  useHMSVanillaStore,
+} from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
 import PreviewScreen from "./components/PreviewScreen";
 import { Conference } from "./components/conference";
@@ -24,6 +28,7 @@ import "./index.css";
 import { PostLeave } from "./components/PostLeave";
 import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
+import { KeyboardInputManager } from "./components/Input/KeyboardInputManager";
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -42,6 +47,19 @@ if (window.location.host.includes("localhost")) {
 }
 
 document.title = `${appName}'s ${document.title}`;
+
+const KeyboardHandler = () => {
+  const store = useHMSVanillaStore();
+  const actions = useHMSActions();
+
+  useEffect(() => {
+    console.error("effect triggered");
+    const keyboardManager = new KeyboardInputManager(store, actions);
+    keyboardManager.bindAllShortcuts();
+    return keyboardManager.unbindAllShortcuts;
+  }, [actions, store]);
+  return <Fragment />;
+};
 
 export function EdtechComponent({
   roomId = "",
@@ -70,6 +88,7 @@ export function EdtechComponent({
   useEffect(() => {
     setThemeType(theme);
   }, [theme]);
+
   return (
     <HMSThemeProvider
       themeType={themeType}
@@ -115,6 +134,7 @@ function AppRoutes({ getUserToken }) {
       <ToastContainer />
       <Notifications />
       <Confetti />
+      <KeyboardHandler />
       <Switch>
         <Route
           path="/preview/:roomId/:role?"
