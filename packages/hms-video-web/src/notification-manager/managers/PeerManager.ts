@@ -124,7 +124,7 @@ export class PeerManager {
       customerUserId: peer.info.user_id,
       metadata: peer.info.data,
       role: this.store.getPolicyForRole(peer.role),
-      joinedAt: convertDateNumToDate(peer.joined_at) || new Date(),
+      joinedAt: convertDateNumToDate(peer.joined_at),
     });
 
     this.store.addPeer(hmsPeer);
