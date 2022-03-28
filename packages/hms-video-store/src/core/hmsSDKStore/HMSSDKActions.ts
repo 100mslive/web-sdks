@@ -109,8 +109,8 @@ export class HMSSDKActions implements IHMSActions {
     // this.actionBatcher = new ActionBatcher(store);
   }
 
-  refreshDevices(): void {
-    this.sdk.refreshDevices();
+  async refreshDevices() {
+    await this.sdk.refreshDevices();
   }
 
   async unblockAudio() {
