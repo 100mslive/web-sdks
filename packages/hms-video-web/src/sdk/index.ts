@@ -314,6 +314,11 @@ export class HMSSdk implements HMSInterface {
     }
   };
 
+  private handleAudioPluginError = (error: HMSException) => {
+    HMSLogger.e(this.TAG, 'Audio Plugin Error event', error);
+    this.errorListener?.onError(error);
+  };
+
   join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -770,6 +775,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
     await this.deviceManager.init();
     this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
@@ -777,6 +783,7 @@ export class HMSSdk implements HMSInterface {
 
   private cleanDeviceManagers() {
     this.eventBus.deviceChange.unsubscribe(this.handleDeviceChange);
+    this.eventBus.audioPluginFailed.unsubscribe(this.handleAudioPluginError);
     this.eventBus.autoplayError.unsubscribe(this.handleAutoplayError);
     this.deviceManager.cleanUp();
     this.audioSinkManager.cleanUp();

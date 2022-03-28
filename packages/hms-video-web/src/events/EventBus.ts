@@ -38,6 +38,8 @@ export class EventBus {
     this.eventEmitter,
   );
 
+  readonly audioPluginFailed = new HMSInternalEvent<HMSException>(HMSEvents.AUDIO_PLUGIN_FAILED, this.eventEmitter);
+
   readonly localAudioSilence = new HMSInternalEvent<{ track: HMSLocalAudioTrack }>(
     HMSEvents.LOCAL_AUDIO_SILENCE,
     this.eventEmitter,

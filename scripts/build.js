@@ -2,6 +2,7 @@ const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
 
+// eslint-disable-next-line complexity
 async function main() {
   if (fs.existsSync('./dist')) {
     fs.rmSync('./dist', { recursive: true }, e => {
@@ -16,6 +17,12 @@ async function main() {
   const external = Object.keys(pkg.dependencies || {});
   if (isReact) {
     external.push('react');
+  }
+  if (pkg.name === '@100mslive/hms-noise-suppression') {
+    external.push('fs', 'path', './src/models/Noise.js');
+  }
+  if (['@100mslive/hms-noise-suppression', '@100mslive/hms-virtual-background'].includes(pkg.name)) {
+    external.push('@100mslive/hms-video');
   }
   try {
     esbuild.buildSync({

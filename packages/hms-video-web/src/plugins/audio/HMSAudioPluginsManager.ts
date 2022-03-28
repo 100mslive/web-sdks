@@ -1,4 +1,4 @@
-import { HMSAudioPlugin } from './HMSAudioPlugin'; //HMSAudioPluginType
+import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -6,6 +6,12 @@ import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { EventBus } from '../../events/EventBus';
 
 const TAG = 'AudioPluginsManager';
+const DEFAULT_SAMPLE_RATE = 48000;
+
+//Handling sample rate error in case of firefox
+const checkBrowserSupport = () => {
+  return navigator.userAgent.indexOf('Firefox') !== -1;
+};
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -38,6 +44,7 @@ export class HMSAudioPluginsManager {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
+    this.createAudioContext();
   }
 
   getPlugins(): string[] {
@@ -55,6 +62,7 @@ export class HMSAudioPluginsManager {
         HMSAction.AUDIO_PLUGINS,
         'Add Plugin is already in Progress',
       );
+      this.analytics.added(name, this.audioContext!.sampleRate);
       this.analytics.failure(name, err);
       HMSLogger.w("can't add another plugin when previous add is in progress");
       throw err;
@@ -69,6 +77,7 @@ export class HMSAudioPluginsManager {
     }
   }
 
+  // eslint-disable-next-line complexity
   private async addPluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
     if (this.pluginsMap.get(name)) {
@@ -76,23 +85,16 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    if (!plugin.isSupported()) {
-      const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
-        HMSAction.AUDIO_PLUGINS,
-        'platform not supported ',
-      );
-      this.analytics.failure(name, err);
-      HMSLogger.i(TAG, `Platform is not supported for plugin - ${plugin.getName()}`);
-      return;
-    }
+    await this.validateAndThrow(name, plugin);
+
     try {
       if (this.pluginsMap.size === 0) {
-        await this.initContextAndAudioNodes();
+        await this.initAudioNodes();
       } else if (this.prevAudioNode) {
         // Previous node will be connected to destination. Disconnect that
         this.prevAudioNode.disconnect();
       }
-      this.analytics.added(name);
+      this.analytics.added(name, this.audioContext!.sampleRate);
       await this.analytics.initWithTime(name, async () => plugin.init());
       this.pluginsMap.set(name, plugin);
       await this.processPlugin(plugin);
@@ -100,6 +102,37 @@ export class HMSAudioPluginsManager {
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
       throw err;
+    }
+  }
+
+  validatePlugin(plugin: HMSAudioPlugin) {
+    return plugin.checkSupport(this.audioContext);
+  }
+
+  async validateAndThrow(name: string, plugin: HMSAudioPlugin) {
+    const result = this.validatePlugin(plugin);
+    if (result.isSupported) {
+      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+    } else {
+      //Needed to re-add in the reprocess case, to send error message in case of failure
+      this.analytics.added(name, this.audioContext!.sampleRate);
+      if (result.errType === HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'platform not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+        await this.cleanup();
+        throw err;
+      } else if (result.errType === HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED) {
+        const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+          HMSAction.AUDIO_PLUGINS,
+          'audio device not supported, see docs',
+        );
+        this.analytics.failure(name, err);
+        await this.cleanup();
+        throw err;
+      }
     }
   }
 
@@ -122,8 +155,7 @@ export class HMSAudioPluginsManager {
       await this.removePluginInternal(plugin);
     }
     await this.hmsTrack.setProcessedTrack(undefined);
-    // close context, disconnect nodes, stop track
-    this.audioContext?.close();
+    //disconnect nodes, stop track
     this.sourceNode?.disconnect();
     this.prevAudioNode?.disconnect();
     this.outputTrack?.stop();
@@ -131,9 +163,14 @@ export class HMSAudioPluginsManager {
     // reset all variables
     this.sourceNode = undefined;
     this.destinationNode = undefined;
-    this.audioContext = undefined;
     this.prevAudioNode = undefined;
     this.outputTrack = undefined;
+  }
+
+  //Keeping it separate since we are initializing context only once
+  async closeContext() {
+    this.audioContext?.close();
+    this.audioContext = undefined;
   }
 
   async reprocessPlugins() {
@@ -142,29 +179,27 @@ export class HMSAudioPluginsManager {
     }
     const plugins = Array.from(this.pluginsMap.values()); // make a copy of plugins
     await this.cleanup();
-    await this.initContextAndAudioNodes();
+    await this.initAudioNodes();
     for (const plugin of plugins) {
       await this.addPlugin(plugin);
     }
   }
 
-  private async initContextAndAudioNodes() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
-
-    if (!this.sourceNode) {
-      const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-      this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
-    }
-    if (!this.destinationNode) {
-      this.destinationNode = this.audioContext.createMediaStreamDestination();
-      this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
-      try {
-        await this.hmsTrack.setProcessedTrack(this.outputTrack);
-      } catch (err) {
-        HMSLogger.e(TAG, 'error in setting processed track', err);
-        throw err;
+  private async initAudioNodes() {
+    if (this.audioContext) {
+      if (!this.sourceNode) {
+        const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
+        this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
+      }
+      if (!this.destinationNode) {
+        this.destinationNode = this.audioContext.createMediaStreamDestination();
+        this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
+        try {
+          await this.hmsTrack.setProcessedTrack(this.outputTrack);
+        } catch (err) {
+          HMSLogger.e(TAG, 'error in setting processed track', err);
+          throw err;
+        }
       }
     }
   }
@@ -211,5 +246,20 @@ export class HMSAudioPluginsManager {
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
+  }
+
+  private createAudioContext() {
+    if (!this.audioContext) {
+      if (checkBrowserSupport()) {
+        /**
+        Not setting default sample rate for firefox since connecting
+        audio nodes from context with different sample rate is not
+        supported in firefox
+ */
+        this.audioContext = new AudioContext();
+      } else {
+        this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
+      }
+    }
   }
 }
