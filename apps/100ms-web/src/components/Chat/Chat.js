@@ -12,41 +12,13 @@ import {
 } from "@100mslive/react-sdk";
 import { ChevronDownIcon } from "@100mslive/react-icons";
 
-const NewMessageIndicator = ({ role, peerId, onClick }) => {
-  const unreadCountSelector = role
-    ? selectMessagesUnreadCountByRole(role)
-    : peerId
-    ? selectMessagesUnreadCountByPeerID(peerId)
-    : selectUnreadHMSMessagesCount;
-
-  const unreadCount = useHMSStore(unreadCountSelector);
-  if (!unreadCount) {
-    return null;
-  }
-  return (
-    <Flex
-      justify="center"
-      css={{
-        width: "100%",
-        transform: "translatey(-100%)",
-        position: "absolute",
-      }}
-    >
-      <Button onClick={onClick} css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}>
-        New Messages
-        <ChevronDownIcon width={16} height={16} />
-      </Button>
-    </Flex>
-  );
-};
-
 export const Chat = ({ onClose }) => {
   const [chatOptions, setChatOptions] = useState({
     role: "",
     peerId: "",
     selection: "Everyone",
   });
-  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [isSelectorOpen, setSelectorOpen] = useState(false);
   const bodyRef = useRef(null);
   const scrollToBottom = useCallback(() => {
     if (!bodyRef.current) {
@@ -59,7 +31,7 @@ export const Chat = ({ onClose }) => {
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
-        open={selectorOpen}
+        open={isSelectorOpen}
         selection={chatOptions.selection}
         onToggle={() => {
           setSelectorOpen(value => !value);
@@ -77,7 +49,7 @@ export const Chat = ({ onClose }) => {
         ref={bodyRef}
       >
         <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-        {selectorOpen && (
+        {isSelectorOpen && (
           <ChatSelector
             role={chatOptions.role}
             peerId={chatOptions.peerId}
@@ -103,6 +75,34 @@ export const Chat = ({ onClose }) => {
           onClick={scrollToBottom}
         />
       </ChatFooter>
+    </Flex>
+  );
+};
+
+const NewMessageIndicator = ({ role, peerId, onClick }) => {
+  const unreadCountSelector = role
+    ? selectMessagesUnreadCountByRole(role)
+    : peerId
+    ? selectMessagesUnreadCountByPeerID(peerId)
+    : selectUnreadHMSMessagesCount;
+
+  const unreadCount = useHMSStore(unreadCountSelector);
+  if (!unreadCount) {
+    return null;
+  }
+  return (
+    <Flex
+      justify="center"
+      css={{
+        width: "100%",
+        transform: "translatey(-100%)",
+        position: "absolute",
+      }}
+    >
+      <Button onClick={onClick} css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}>
+        New Messages
+        <ChevronDownIcon width={16} height={16} />
+      </Button>
     </Flex>
   );
 };

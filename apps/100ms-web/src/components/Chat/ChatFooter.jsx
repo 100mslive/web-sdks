@@ -13,6 +13,7 @@ const TextArea = styled("textarea", {
   resize: "none",
   "&:focus": {
     boxShadow: "none",
+    outline: "none",
   },
 });
 

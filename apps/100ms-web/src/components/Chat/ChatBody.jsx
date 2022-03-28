@@ -59,7 +59,7 @@ const MessageType = ({ hasPeer, hasRoles }) => {
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
-const ChatLink = ({ message }) => {
+const AnnotisedChat = ({ message }) => {
   return (
     <Fragment>
       {message
@@ -95,11 +95,11 @@ const ChatMessage = React.memo(
           {sender}
         </Text>
         <MessageType hasPeer={hasPeer} hasRoles={hasRoles} />
-        <Text variant="sm" css={{ ml: "auto", color: "$textMedEmp" }}>
+        <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
           {formatTime(time)}
         </Text>
         <Text css={{ w: "100%", my: "$2" }}>
-          <ChatLink message={message} />
+          <AnnotisedChat message={message} />
         </Text>
       </Flex>
     );
