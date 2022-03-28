@@ -85,7 +85,32 @@ export class HMSAudioPluginsManager {
       return;
     }
 
-    const result = plugin.checkSupport(this.audioContext);
+    await this.validateAndThrow(name, plugin);
+
+    try {
+      if (this.pluginsMap.size === 0) {
+        await this.initAudioNodes();
+      } else if (this.prevAudioNode) {
+        // Previous node will be connected to destination. Disconnect that
+        this.prevAudioNode.disconnect();
+      }
+      this.analytics.added(name, this.audioContext!.sampleRate);
+      await this.analytics.initWithTime(name, async () => plugin.init());
+      this.pluginsMap.set(name, plugin);
+      await this.processPlugin(plugin);
+      await this.connectToDestination();
+    } catch (err) {
+      HMSLogger.e(TAG, 'failed to add plugin', err);
+      throw err;
+    }
+  }
+
+  validatePlugin(plugin: HMSAudioPlugin) {
+    return plugin.checkSupport(this.audioContext);
+  }
+
+  async validateAndThrow(name: string, plugin: HMSAudioPlugin) {
+    const result = this.validatePlugin(plugin);
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
@@ -109,26 +134,6 @@ export class HMSAudioPluginsManager {
         throw err;
       }
     }
-    try {
-      if (this.pluginsMap.size === 0) {
-        await this.initAudioNodes();
-      } else if (this.prevAudioNode) {
-        // Previous node will be connected to destination. Disconnect that
-        this.prevAudioNode.disconnect();
-      }
-      this.analytics.added(name, this.audioContext!.sampleRate);
-      await this.analytics.initWithTime(name, async () => plugin.init());
-      this.pluginsMap.set(name, plugin);
-      await this.processPlugin(plugin);
-      await this.connectToDestination();
-    } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin', err);
-      throw err;
-    }
-  }
-
-  validatePlugin(plugin: HMSAudioPlugin) {
-    return plugin.checkSupport(this.audioContext);
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
