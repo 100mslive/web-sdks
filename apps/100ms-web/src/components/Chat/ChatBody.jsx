@@ -8,7 +8,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Flex, Text } from "@100mslive/react-ui";
+import { Flex, styled, Text } from "@100mslive/react-ui";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -60,6 +60,13 @@ const MessageType = ({ hasPeer, roles }) => {
 const URL_REGEX =
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
+const Link = styled("a", {
+  color: "$brandDefault",
+  "&:hover": {
+    textDecoration: "underline",
+  },
+});
+
 const AnnotisedChat = ({ message }) => {
   return (
     <Fragment>
@@ -68,9 +75,14 @@ const AnnotisedChat = ({ message }) => {
         .split(" ")
         .map(part =>
           URL_REGEX.test(part) ? (
-            <a href={part} key={part} target="_blank" rel="noopener noreferrer">
+            <Link
+              href={part}
+              key={part}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {part}{" "}
-            </a>
+            </Link>
           ) : (
             `${part} `
           )
