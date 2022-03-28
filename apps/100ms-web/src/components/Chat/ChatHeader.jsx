@@ -7,43 +7,39 @@ import {
   PeopleIcon,
 } from "@100mslive/react-icons";
 
-export const ChatHeader = ({
-  selection,
-  unreadCount,
-  open,
-  onToggle,
-  onClose,
-}) => {
-  return (
-    <Flex
-      onClick={onToggle}
-      align="center"
-      css={{
-        bg: "$menuBg",
-        color: "$textPrimary",
-        h: "$16",
-        borderTopLeftRadius: "$2",
-        borderTopRightRadius: "$2",
-        pl: "$8",
-        pr: "$4",
-      }}
-    >
-      <PeopleIcon />
-      <Text css={{ mx: "$2" }}>{selection}</Text>
-      {open ? (
-        <ChevronUpIcon width={18} height={18} />
-      ) : (
-        <ChevronDownIcon width={18} height={18} />
-      )}
-      <IconButton
-        css={{ ml: "auto" }}
-        onClick={e => {
-          e.stopPropagation();
-          open ? onToggle() : onClose();
+export const ChatHeader = React.memo(
+  ({ selection, open, onToggle, onClose }) => {
+    return (
+      <Flex
+        onClick={onToggle}
+        align="center"
+        css={{
+          bg: "$menuBg",
+          color: "$textPrimary",
+          h: "$16",
+          borderTopLeftRadius: "$2",
+          borderTopRightRadius: "$2",
+          pl: "$8",
+          pr: "$4",
         }}
       >
-        <CrossIcon />
-      </IconButton>
-    </Flex>
-  );
-};
+        <PeopleIcon />
+        <Text css={{ mx: "$2" }}>{selection}</Text>
+        {open ? (
+          <ChevronUpIcon width={18} height={18} />
+        ) : (
+          <ChevronDownIcon width={18} height={18} />
+        )}
+        <IconButton
+          css={{ ml: "auto" }}
+          onClick={e => {
+            e.stopPropagation();
+            open ? onToggle() : onClose();
+          }}
+        >
+          <CrossIcon />
+        </IconButton>
+      </Flex>
+    );
+  }
+);

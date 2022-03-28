@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   selectAvailableRoleNames,
   selectRemotePeers,
@@ -11,11 +11,13 @@ import {
   Box,
   Flex,
   HorizontalDivider,
+  IconButton,
+  Input,
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
 import { ChatDotIcon } from "./ChatDotIcon";
-import { CheckIcon } from "@100mslive/react-icons";
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
@@ -44,7 +46,7 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   );
 };
 
-const SelectorHeader = ({ children }) => {
+const SelectorHeader = React.memo(({ children }) => {
   return (
     <Box css={{ flexShrink: 0 }}>
       <HorizontalDivider space={4} />
@@ -53,9 +55,9 @@ const SelectorHeader = ({ children }) => {
       </Text>
     </Box>
   );
-};
+});
 
-const Everyone = ({ onSelect, active }) => {
+const Everyone = React.memo(({ onSelect, active }) => {
   const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
   return (
     <SelectorItem
@@ -67,9 +69,9 @@ const Everyone = ({ onSelect, active }) => {
       }}
     />
   );
-};
+});
 
-const RoleItem = ({ onSelect, role, active }) => {
+const RoleItem = React.memo(({ onSelect, role, active }) => {
   const unreadCount = useHMSStore(selectMessagesUnreadCountByRole(role));
   return (
     <SelectorItem
@@ -81,7 +83,7 @@ const RoleItem = ({ onSelect, role, active }) => {
       }}
     />
   );
-};
+});
 
 const PeerItem = ({ onSelect, peerId, name, active }) => {
   const unreadCount = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
@@ -100,6 +102,7 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
 export const ChatSelector = ({ role, peerId, onSelect }) => {
   const roles = useHMSStore(selectAvailableRoleNames);
   const peers = useHMSStore(selectRemotePeers);
+  const [search, setSearch] = useState("");
   return (
     <Flex
       direction="column"
@@ -113,6 +116,38 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         overflowY: "auto",
       }}
     >
+      <Box css={{ p: "$4", flexShrink: 0, position: "relative" }}>
+        <Input
+          type="text"
+          autoCorrect="off"
+          autoComplete="name"
+          value={search}
+          placeholder="Search Participants"
+          css={{
+            bg: "$menuBg",
+            w: "100%",
+            pr: "$12",
+            "$:focus": { boxShadow: "none", outline: "none" },
+          }}
+          onChange={e => {
+            setSearch(e.target.value);
+          }}
+        />
+        <Flex
+          align="center"
+          css={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            mr: "$6",
+            height: "100%",
+          }}
+        >
+          <IconButton onClick={() => setSearch("")}>
+            <CrossIcon width={18} height={18} />
+          </IconButton>
+        </Flex>
+      </Box>
       <Everyone onSelect={onSelect} active={!role && !peerId} />
       {roles.length > 0 && <SelectorHeader>Roles</SelectorHeader>}
       {roles.map(userRole => {
@@ -126,17 +161,19 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         );
       })}
       {peers.length > 0 && <SelectorHeader>Participants</SelectorHeader>}
-      {peers.map(peer => {
-        return (
-          <PeerItem
-            key={peer.id}
-            name={peer.name}
-            peerId={peer.id}
-            active={peer.id === peerId}
-            onSelect={onSelect}
-          />
-        );
-      })}
+      {peers
+        .filter(peer => !search || peer.name.toLowerCase().includes(search))
+        .map(peer => {
+          return (
+            <PeerItem
+              key={peer.id}
+              name={peer.name}
+              peerId={peer.id}
+              active={peer.id === peerId}
+              onSelect={onSelect}
+            />
+          );
+        })}
     </Flex>
   );
 };
