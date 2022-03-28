@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -53,12 +53,11 @@ const KeyboardHandler = () => {
   const actions = useHMSActions();
 
   useEffect(() => {
-    console.error("effect triggered");
     const keyboardManager = new KeyboardInputManager(store, actions);
     keyboardManager.bindAllShortcuts();
     return keyboardManager.unbindAllShortcuts;
   }, [actions, store]);
-  return <Fragment />;
+  return null;
 };
 
 export function EdtechComponent({
