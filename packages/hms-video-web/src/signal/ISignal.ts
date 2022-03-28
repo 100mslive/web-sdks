@@ -11,6 +11,7 @@ import {
   StartRTMPOrRecordingRequestParams,
   UpdatePeerRequestParams,
   HLSRequestParams,
+  BroadcastResponse,
 } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
@@ -36,7 +37,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   trackUpdate(tracks: Map<string, Track>): void;
 
-  broadcast(message: HMSMessage): Promise<void>;
+  broadcast(message: HMSMessage): Promise<BroadcastResponse>;
 
   leave(): void;
 

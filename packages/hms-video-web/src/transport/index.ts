@@ -426,7 +426,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async sendMessage(message: Message) {
-    await this.signal.broadcast(message);
+    return await this.signal.broadcast(message);
   }
 
   /**
