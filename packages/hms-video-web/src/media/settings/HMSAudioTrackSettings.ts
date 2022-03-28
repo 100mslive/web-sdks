@@ -63,7 +63,6 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
   readonly codec?: HMSAudioCodec;
   readonly maxBitrate?: number;
   readonly deviceId?: string;
-  readonly sampleRate?: number;
   readonly advanced?: Array<MediaTrackConstraintSet>;
 
   constructor(

@@ -181,18 +181,20 @@ export class HMSAudioPluginsManager {
   }
 
   private async initAudioNodes() {
-    if (!this.sourceNode) {
-      const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
-      this.sourceNode = this.audioContext!.createMediaStreamSource(audioStream);
-    }
-    if (!this.destinationNode) {
-      this.destinationNode = this.audioContext!.createMediaStreamDestination();
-      this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
-      try {
-        await this.hmsTrack.setProcessedTrack(this.outputTrack);
-      } catch (err) {
-        HMSLogger.e(TAG, 'error in setting processed track', err);
-        throw err;
+    if (this.audioContext) {
+      if (!this.sourceNode) {
+        const audioStream = new MediaStream([this.hmsTrack.nativeTrack]);
+        this.sourceNode = this.audioContext.createMediaStreamSource(audioStream);
+      }
+      if (!this.destinationNode) {
+        this.destinationNode = this.audioContext.createMediaStreamDestination();
+        this.outputTrack = this.destinationNode.stream.getAudioTracks()[0];
+        try {
+          await this.hmsTrack.setProcessedTrack(this.outputTrack);
+        } catch (err) {
+          HMSLogger.e(TAG, 'error in setting processed track', err);
+          throw err;
+        }
       }
     }
   }
