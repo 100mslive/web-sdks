@@ -183,7 +183,7 @@ export interface IHMSActions {
    */
   setAudioOutputDevice(deviceId: string): void;
 
-  refreshDevices(): void;
+  refreshDevices(): Promise<void>;
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
