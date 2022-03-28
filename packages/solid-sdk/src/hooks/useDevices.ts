@@ -49,7 +49,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
-  const [selectedDeviceIDs, setSelectedDeviceIDs] = createSignal<DeviceTypeAndInfo<string>>({
+  const [selectedDeviceIDs, setSelectedDeviceIDs] = createSignal({
     [DeviceType.audioOutput]: sdkSelectedDevices().audioOutputDeviceId,
   });
   const [allDevices, setAllDevices] = createSignal({
@@ -57,14 +57,23 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   });
 
   createEffect(() => {
+    const newSelectedDeviceIDs = {
+      [DeviceType.audioOutput]: sdkSelectedDevices().audioOutputDeviceId,
+    };
+    const newAllDevices = {
+      [DeviceType.audioOutput]: sdkAllDevices().audioOutput,
+    };
     if (isAllowedToPublish().video) {
-      setAllDevices(prev => ({ ...prev, [DeviceType.videoInput]: sdkAllDevices().videoInput }));
-      setSelectedDeviceIDs(prev => ({ ...prev, [DeviceType.videoInput]: sdkSelectedDevices().videoInputDeviceId }));
+      Object.assign(newAllDevices, { [DeviceType.videoInput]: sdkAllDevices().videoInput });
+      Object.assign(newSelectedDeviceIDs, { [DeviceType.videoInput]: sdkSelectedDevices().videoInputDeviceId });
     }
     if (isAllowedToPublish().audio) {
-      setAllDevices(prev => ({ ...prev, [DeviceType.audioInput]: sdkAllDevices().audioInput }));
-      setSelectedDeviceIDs(prev => ({ ...prev, [DeviceType.audioInput]: sdkSelectedDevices().audioInputDeviceId }));
+      Object.assign(newAllDevices, { [DeviceType.audioInput]: sdkAllDevices().audioInput });
+      Object.assign(newSelectedDeviceIDs, { [DeviceType.audioInput]: sdkSelectedDevices().audioInputDeviceId });
     }
+
+    setAllDevices(newAllDevices);
+    setSelectedDeviceIDs(newSelectedDeviceIDs);
   });
 
   const updateDevice: useDevicesResult['updateDevice'] = async ({ deviceType, deviceId }) => {
