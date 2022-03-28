@@ -23,13 +23,15 @@ export const ChatHeader = React.memo(
           pr: "$4",
         }}
       >
-        <PeopleIcon />
-        <Text css={{ mx: "$2" }}>{selection}</Text>
-        {open ? (
-          <ChevronUpIcon width={18} height={18} />
-        ) : (
-          <ChevronDownIcon width={18} height={18} />
-        )}
+        <Flex align="center" css={{ cursor: "pointer" }}>
+          <PeopleIcon />
+          <Text css={{ mx: "$2" }}>{selection}</Text>
+          {open ? (
+            <ChevronUpIcon width={18} height={18} />
+          ) : (
+            <ChevronDownIcon width={18} height={18} />
+          )}
+        </Flex>
         <IconButton
           css={{ ml: "auto" }}
           onClick={e => {
