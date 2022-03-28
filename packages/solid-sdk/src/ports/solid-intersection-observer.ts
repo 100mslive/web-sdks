@@ -1,8 +1,14 @@
 import { observe } from 'react-intersection-observer';
-import type { InViewHookResponse, IntersectionOptions } from 'react-intersection-observer';
-import { createEffect, createSignal } from 'solid-js';
+import type { IntersectionOptions } from 'react-intersection-observer';
+import { Accessor, createEffect, createSignal } from 'solid-js';
 
 type State = {
+  inView: boolean;
+  entry?: IntersectionObserverEntry;
+};
+
+type CustomInViewHookRespone = {
+  ref: (node?: Element | null) => void;
   inView: boolean;
   entry?: IntersectionObserverEntry;
 };
@@ -33,29 +39,19 @@ type State = {
  * };
  * ```
  */
-export function useInView({
-  threshold,
-  delay,
-  trackVisibility,
-  rootMargin,
-  root,
-  triggerOnce,
-  skip,
-  initialInView,
-  fallbackInView,
-}: IntersectionOptions = {}): InViewHookResponse {
+export function useInView(props: IntersectionOptions): Accessor<CustomInViewHookRespone> {
   let unobserve: (() => void) | undefined;
   const [state, setState] = createSignal<State>({
-    inView: !!initialInView,
+    inView: !!props.initialInView,
   });
-  const setRef = (node: Element) => {
+  const setRef = (node?: Element | null) => {
     if (unobserve !== undefined) {
       unobserve();
       unobserve = undefined;
     }
 
     // Skip creating the observer
-    if (skip) {
+    if (props.skip) {
       return;
     }
 
@@ -65,42 +61,42 @@ export function useInView({
         (inView, entry) => {
           setState({ inView, entry });
 
-          if (entry.isIntersecting && triggerOnce && unobserve) {
+          if (entry.isIntersecting && props.triggerOnce && unobserve) {
             // If it should only trigger once, unobserve the element after it's inView
             unobserve();
             unobserve = undefined;
           }
         },
         {
-          root,
-          rootMargin,
-          threshold,
+          root: props.root,
+          rootMargin: props.rootMargin,
+          threshold: props.threshold,
           // @ts-ignore
           trackVisibility,
           // @ts-ignore
           delay,
         },
-        fallbackInView,
+        props.fallbackInView,
       );
     }
   };
 
   createEffect(() => {
-    if (!unobserve && state().entry && !triggerOnce && !skip) {
+    if (!unobserve && state().entry && !props.triggerOnce && !props.skip) {
       // If we don't have a ref, then reset the state (unless the hook is set to only `triggerOnce` or `skip`)
       // This ensures we correctly reflect the current state - If you aren't observing anything, then nothing is inView
       setState({
-        inView: !!initialInView,
+        inView: !!props.initialInView,
       });
     }
   });
 
-  const result = [setRef, state().inView, state().entry] as InViewHookResponse;
+  // const result = [setRef, state().inView, state().entry] as InViewHookResponse;
 
-  // Support object destructuring, by adding the specific values.
-  result.ref = result[0];
-  result.inView = result[1];
-  result.entry = result[2];
-
+  const result: Accessor<CustomInViewHookRespone> = () => ({
+    ref: setRef,
+    inView: state().inView,
+    entry: state().entry,
+  });
   return result;
 }

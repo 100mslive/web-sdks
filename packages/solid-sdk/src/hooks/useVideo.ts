@@ -29,17 +29,17 @@ export const useVideo = (props: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   let videoRef: HTMLVideoElement;
   const track = useHMSStore(selectTrackByID(props.trackId));
-  const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
+  const inViewResponse = useInView({ threshold: 0.5 });
 
   const setRefs = (node: HTMLVideoElement) => {
     videoRef = node;
-    inViewRef(node);
+    inViewResponse().ref(node);
   };
 
   createEffect(() => {
     (async () => {
       if (videoRef && track()?.id) {
-        if (inView && track()!.enabled && props.attach !== false) {
+        if (inViewResponse().inView && track()!.enabled && props.attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track()!.id, videoRef);
         } else {
