@@ -15,8 +15,16 @@ import {
   ChevronDownIcon,
   AudioPlayerIcon,
   PencilDrawIcon,
+  ShareScreenIcon,
 } from "@100mslive/react-icons";
-import { useRecordingStreaming } from "@100mslive/react-sdk";
+import {
+  useHMSStore,
+  useRecordingStreaming,
+  selectPeerScreenSharing,
+  selectPeerSharingAudio,
+  selectPeerSharingVideoPlaylist,
+  selectLocalPeer,
+} from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
 import { useWhiteboardMetadata } from "../../plugins/whiteboard/useWhiteboardMetadata";
@@ -60,6 +68,10 @@ export const AdditionalRoomState = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
+  const localPeer = useHMSStore(selectLocalPeer);
+  const peerSharing = useHMSStore(selectPeerScreenSharing);
+  const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
+  const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
   const isPlaylistInactive = [
@@ -67,16 +79,20 @@ export const AdditionalRoomState = () => {
     !playlist.peer?.isLocal && !playlist.track?.enabled,
     playlist.peer?.isLocal && !playlist.selection,
   ].some(Boolean);
-  const isScreenshareInactive = [
+  const isAudioshareInactive = [
     !screenshareAudio.peer || !screenshareAudio.track,
     !screenshareAudio.peer?.isLocal && !screenshareAudio.track?.enabled,
   ].some(Boolean);
+
+  const isScreenSharingOn =
+    (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
+    peerSharingPlaylist;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
-
   if (
     isPlaylistInactive &&
-    isScreenshareInactive &&
+    isAudioshareInactive &&
+    !isScreenSharingOn &&
     !isRecordingOn &&
     !isStreamingOn &&
     !whiteboardOwner
@@ -97,10 +113,17 @@ export const AdditionalRoomState = () => {
           }}
           data-testid="record_status_dropdown"
         >
-          {!isScreenshareInactive && (
+          {!isAudioshareInactive && (
             <Tooltip title="Screenshare Audio">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <MusicIcon width={24} height={24} />
+              </Flex>
+            </Tooltip>
+          )}
+          {isScreenSharingOn && (
+            <Tooltip title="Screenshare">
+              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+                <ShareScreenIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
@@ -186,9 +209,9 @@ export const AdditionalRoomState = () => {
           </Dropdown.Item>
         )}
         {(isRecordingOn || isStreamingOn) &&
-          (!isPlaylistInactive ||
-            !isScreenshareInactive ||
-            whiteboardOwner) && <Dropdown.ItemSeparator />}
+          (!isPlaylistInactive || !isAudioshareInactive || whiteboardOwner) && (
+            <Dropdown.ItemSeparator />
+          )}
         {!isPlaylistInactive && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <AudioPlayerIcon width={24} height={24} />
@@ -222,7 +245,7 @@ export const AdditionalRoomState = () => {
             )}
           </Dropdown.Item>
         )}
-        {!isScreenshareInactive && (
+        {!isAudioshareInactive && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <MusicIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
@@ -237,6 +260,16 @@ export const AdditionalRoomState = () => {
               }}
             >
               {screenshareAudio.muted ? "Unmute" : "Mute"}
+            </Text>
+          </Dropdown.Item>
+        )}
+        {isScreenSharingOn && (
+          <Dropdown.Item css={{ color: "$textPrimary" }}>
+            <MusicIcon width={24} height={24} />
+            <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
+              {peerSharing.id === localPeer.id
+                ? "You are sharing your screen"
+                : `${peerSharing.name} is sharing their screen`}
             </Text>
           </Dropdown.Item>
         )}
