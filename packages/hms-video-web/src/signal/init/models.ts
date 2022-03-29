@@ -27,7 +27,12 @@ export interface InitConfig {
   readonly rtcConfiguration: RTCConfiguration;
   readonly pingTimeout?: number;
   readonly config: {
-    readonly enabledFlags?: Array<'subscribeDegradation' | 'simulcast'>;
+    readonly enabledFlags?: Array<`${InitFlags}`>;
     readonly networkHealth: NetworkHealth;
   };
+}
+
+export enum InitFlags {
+  FLAG_SERVER_SUB_DEGRADATION = 'subscribeDegradation',
+  FLAG_SERVER_SIMULCAST = 'simulcast',
 }

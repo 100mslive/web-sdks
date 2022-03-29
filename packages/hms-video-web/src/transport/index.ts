@@ -25,7 +25,7 @@ import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
@@ -291,12 +291,12 @@ export default class HMSTransport implements ITransport {
     return this.webrtcInternals;
   }
 
-  getEnabledFlags() {
+  isFlagEnabled(flag: InitFlags) {
     const config = this.initConfig?.config;
-    return config?.enabledFlags || [];
+    const flags = config?.enabledFlags || [];
+    return flags.includes(flag);
   }
 
-  // eslint-disable-next-line complexity
   async join(
     authToken: string,
     peerId: string,
@@ -304,7 +304,7 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
-    const isServerSubDegrade = this.getEnabledFlags().includes('subscribeDegradation');
+    const isServerSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
@@ -329,7 +329,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
-          isServerSubDegrade || false,
+          isServerSubDegrade,
         );
       }
     } catch (error) {
