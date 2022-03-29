@@ -48,5 +48,5 @@
       }
     }
   ],
-  "ignorePatterns": ["**/dist/**"]
+  "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js"]
 }

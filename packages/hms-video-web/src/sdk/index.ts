@@ -138,9 +138,9 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  refreshDevices(): void {
+  async refreshDevices() {
     this.validateJoined('refreshDevices');
-    this.deviceManager.init(true);
+    await this.deviceManager.init(true);
   }
 
   getWebrtcInternals() {
@@ -280,7 +280,7 @@ export class HMSSdk implements HMSInterface {
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
           clearTimeout(timerId);
-          if (initConfig && this.listener?.onNetworkQuality) {
+          if (initConfig && config.captureNetworkQualityInPreview) {
             this.networkTestManager.start(initConfig.config?.networkHealth).then(() => {
               networkTestFinished = true;
             });
@@ -312,6 +312,11 @@ export class HMSSdk implements HMSInterface {
         this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, this.localPeer!);
       }
     }
+  };
+
+  private handleAudioPluginError = (error: HMSException) => {
+    HMSLogger.e(this.TAG, 'Audio Plugin Error event', error);
+    this.errorListener?.onError(error);
   };
 
   join(config: HMSConfig, listener: HMSUpdateListener) {
@@ -358,7 +363,6 @@ export class HMSSdk implements HMSInterface {
         { name: config.userName, metaData: config.metaData || '' },
         config.initEndpoint,
         config.autoVideoSubscribe,
-        window.HMS?.SERVER_SUB_DEGRADE || false,
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
@@ -481,8 +485,9 @@ export class HMSSdk implements HMSInterface {
       recipientRoles,
       time: new Date(),
     });
-    HMSLogger.d(this.TAG, 'Sending Message:: ', hmsMessage);
-    await this.transport.sendMessage(hmsMessage);
+    HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
+    const response = await this.transport.sendMessage(hmsMessage);
+    hmsMessage.time = new Date(response.timestamp);
     return hmsMessage;
   }
 
@@ -769,6 +774,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
     await this.deviceManager.init();
     this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
@@ -776,6 +782,7 @@ export class HMSSdk implements HMSInterface {
 
   private cleanDeviceManagers() {
     this.eventBus.deviceChange.unsubscribe(this.handleDeviceChange);
+    this.eventBus.audioPluginFailed.unsubscribe(this.handleAudioPluginError);
     this.eventBus.autoplayError.unsubscribe(this.handleAutoplayError);
     this.deviceManager.cleanUp();
     this.audioSinkManager.cleanUp();

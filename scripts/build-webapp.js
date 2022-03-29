@@ -1,6 +1,5 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
-const { gzip } = require('zlib');
 const PostCssPlugin = require('esbuild-plugin-postcss2');
 const autoprefixer = require('autoprefixer');
 
@@ -35,11 +34,11 @@ async function main() {
       external,
       metafile: false,
       loader,
-      plugins,
       define,
+      plugins,
     });
 
-    const esmResult = esbuild.build({
+    esbuild.build({
       entryPoints: [source],
       outfile: 'dist/index.js',
       assetNames: '[name]',
@@ -50,23 +49,8 @@ async function main() {
       external,
       metafile: true,
       loader,
-      plugins,
       define,
-    });
-
-    let esmSize = 0;
-    Object.values(esmResult.metafile?.outputs || {}).forEach(output => {
-      esmSize += output.bytes;
-    });
-
-    fs.readFile('./dist/index.js', (_err, data) => {
-      gzip(data, (_err, result) => {
-        console.log(
-          `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(
-            2,
-          )}kb minified)`,
-        );
-      });
+      plugins,
     });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);

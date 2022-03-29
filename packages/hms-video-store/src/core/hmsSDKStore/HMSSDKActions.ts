@@ -1,5 +1,6 @@
 import {
   createDefaultStoreState,
+  HMSChangeMultiTrackStateParams,
   HMSMediaSettings,
   HMSMessage,
   HMSMessageInput,
@@ -11,7 +12,6 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
-  HMSChangeMultiTrackStateParams,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -24,6 +24,7 @@ import {
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
   selectLocalAudioTrackID,
+  selectLocalMediaSettings,
   selectLocalPeer,
   selectLocalTrackIDs,
   selectLocalVideoTrackID,
@@ -32,7 +33,6 @@ import {
   selectRolesMap,
   selectRoomStarted,
   selectRoomState,
-  selectLocalMediaSettings,
   selectTrackByID,
   selectTracksMap,
 } from '../selectors';
@@ -40,18 +40,19 @@ import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
+  HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
+  HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
+  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSException as SDKHMSException,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalTrack as SDKHMSLocalTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLogLevel,
+  HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
-  HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
-  HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
-  HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
@@ -108,8 +109,8 @@ export class HMSSDKActions implements IHMSActions {
     // this.actionBatcher = new ActionBatcher(store);
   }
 
-  refreshDevices(): void {
-    this.sdk.refreshDevices();
+  async refreshDevices() {
+    await this.sdk.refreshDevices();
   }
 
   async unblockAudio() {
@@ -388,6 +389,50 @@ export class HMSSDKActions implements IHMSActions {
   }
   async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
     return this.addRemoveAudioPlugin(plugin, 'add');
+  }
+
+  validateVideoPluginSupport(plugin: HMSVideoPlugin): HMSPluginSupportResult {
+    let result = {} as HMSPluginSupportResult;
+    result.isSupported = false; //Setting default to false
+    if (!plugin) {
+      HMSLogger.w('no plugin passed in for checking support');
+      result.errMsg = 'no plugin passed in for checking support';
+      return result;
+    }
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
+      } else {
+        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
+      }
+    }
+
+    return result;
+  }
+
+  validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult {
+    let result = {} as HMSPluginSupportResult;
+    result.isSupported = false; //Setting default to false
+    if (!plugin) {
+      HMSLogger.w('no plugin passed in for checking support"');
+      result.errMsg = 'no plugin passed in for checking support"';
+      return result;
+    }
+    const trackID = this.store.getState(selectLocalAudioTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
+      } else {
+        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
+      }
+    }
+
+    return result;
   }
 
   async removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void> {
@@ -977,6 +1022,7 @@ export class HMSSDKActions implements IHMSActions {
         }, 'error');
       }
     }
+    this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error);
