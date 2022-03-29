@@ -11,7 +11,7 @@ export class NetworkTestManager {
   constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
 
   start = async (networkHealth: NetworkHealth) => {
-    if (!window.HMS?.NETWORK_TEST || !networkHealth) {
+    if (!networkHealth) {
       return;
     }
     const { url, timeout, scoreMap } = networkHealth;
