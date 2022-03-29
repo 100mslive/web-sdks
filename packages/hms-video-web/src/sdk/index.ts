@@ -204,7 +204,7 @@ export class HMSSdk implements HMSInterface {
 
     onStateChange: async (state: TransportState, error?: HMSException) => {
       switch (state) {
-        case TransportState.Joined:
+        case TransportState.Connected:
           if (this.transportState === TransportState.Reconnecting) {
             this.listener?.onReconnected();
           }
@@ -276,7 +276,14 @@ export class HMSSdk implements HMSInterface {
       this.eventBus.policyChange.subscribeOnce(policyHandler);
 
       this.transport
-        .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
+        .connect(
+          config.authToken,
+          config.initEndpoint || 'https://prod-init.100ms.live/init',
+          this.localPeer!.peerId,
+          { name: config.userName, metaData: config.metaData || '' },
+          config.autoVideoSubscribe,
+          window.HMS?.SERVER_SUB_DEGRADE || false,
+        )
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
           clearTimeout(timerId);

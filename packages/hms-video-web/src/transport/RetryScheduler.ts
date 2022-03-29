@@ -155,7 +155,7 @@ export class RetryScheduler {
       taskPromise?.resolve(failedRetryCount);
 
       if (changeState && this.inProgress.size === 0) {
-        this.onStateChange(TransportState.Joined);
+        this.onStateChange(TransportState.Connected);
       }
       HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
