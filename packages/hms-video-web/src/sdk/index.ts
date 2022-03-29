@@ -280,7 +280,7 @@ export class HMSSdk implements HMSInterface {
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
           clearTimeout(timerId);
-          if (initConfig && this.listener?.onNetworkQuality) {
+          if (initConfig && config.captureNetworkQualityInPreview) {
             this.networkTestManager.start(initConfig.config?.networkHealth).then(() => {
               networkTestFinished = true;
             });
