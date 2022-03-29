@@ -291,16 +291,20 @@ export default class HMSTransport implements ITransport {
     return this.webrtcInternals;
   }
 
+  getEnabledFlags() {
+    const config = this.initConfig?.config;
+    return config?.enabledFlags || [];
+  }
+
+  // eslint-disable-next-line complexity
   async join(
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
-
-    // TODO: set default to true on final release
-    serverSubDegrade = false,
   ): Promise<void> {
+    const isServerSubDegrade = this.getEnabledFlags().includes('subscribeDegradation');
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
@@ -309,7 +313,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       initEndpoint,
       autoSubscribeVideo,
-      serverSubDegrade,
+      isServerSubDegrade,
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -325,7 +329,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
-          serverSubDegrade,
+          isServerSubDegrade || false,
         );
       }
     } catch (error) {
