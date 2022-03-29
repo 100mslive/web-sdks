@@ -2,7 +2,7 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSLocalStream from '../streams/HMSLocalStream';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { getVideoTrack } from '../../utils/track';
-import { HMSVideoPlugin } from '../../plugins';
+import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
@@ -132,6 +132,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async removePlugin(plugin: HMSVideoPlugin): Promise<void> {
     return this.pluginsManager.removePlugin(plugin);
+  }
+
+  /**
+   * @see HMSVideoPlugin
+   */
+  validatePlugin(plugin: HMSVideoPlugin): HMSPluginSupportResult {
+    return this.pluginsManager.validatePlugin(plugin);
   }
 
   /**
