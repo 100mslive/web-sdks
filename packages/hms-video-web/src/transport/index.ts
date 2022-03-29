@@ -304,7 +304,7 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
-    const isServerSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
+    const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
       authToken,
@@ -313,7 +313,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       initEndpoint,
       autoSubscribeVideo,
-      isServerSubDegrade,
+      isServerHandlingDegradation,
     );
 
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -329,7 +329,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
-          isServerSubDegrade,
+          isServerHandlingDegradation,
         );
       }
     } catch (error) {
