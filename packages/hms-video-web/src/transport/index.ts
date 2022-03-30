@@ -297,6 +297,7 @@ export default class HMSTransport implements ITransport {
     return flags.includes(flag);
   }
 
+  // eslint-disable-next-line complexity
   async join(
     authToken: string,
     peerId: string,
@@ -304,6 +305,10 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
+    if (!this.initConfig) {
+      const initConfig = await this.connect(authToken, initEndpoint, peerId);
+      this.initConfig = initConfig as InitConfig;
+    }
     const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     this.setTransportStateForJoin();
     this.joinParameters = new JoinParameters(
