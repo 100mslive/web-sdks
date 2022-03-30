@@ -20,6 +20,7 @@ import {
 import {
   useHMSStore,
   useRecordingStreaming,
+  useScreenShare,
   selectPeerScreenSharing,
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
@@ -84,9 +85,25 @@ export const AdditionalRoomState = () => {
     !screenshareAudio.peer?.isLocal && !screenshareAudio.track?.enabled,
   ].some(Boolean);
 
-  const isScreenSharingOn =
-    (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
-    peerSharingPlaylist;
+  const {
+    screenSharingPeerId,
+    screenSharingPeerName,
+    amIScreenSharing,
+    screenShareAudioTrackId,
+    screenShareVideoTrackId,
+  } = useScreenShare();
+  console.log(
+    "useScreenshare",
+    screenSharingPeerId,
+    screenSharingPeerName,
+    amIScreenSharing,
+    screenShareAudioTrackId,
+    screenShareVideoTrackId
+  );
+  // const isScreenSharingOn =
+  //   (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
+  //   peerSharingPlaylist;
+  const isScreenSharingOn = !!screenSharingPeerId && !!screenShareVideoTrackId;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
   if (
@@ -267,9 +284,9 @@ export const AdditionalRoomState = () => {
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <MusicIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
-              {peerSharing.id === localPeer.id
+              {amIScreenSharing
                 ? "You are sharing your screen"
-                : `${peerSharing.name} is sharing their screen`}
+                : `${screenSharingPeerName} is sharing their screen`}
             </Text>
           </Dropdown.Item>
         )}
