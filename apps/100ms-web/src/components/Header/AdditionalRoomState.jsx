@@ -16,15 +16,14 @@ import {
   AudioPlayerIcon,
   PencilDrawIcon,
   ShareScreenIcon,
+  VideoPlayerIcon,
 } from "@100mslive/react-icons";
 import {
-  useHMSStore,
   useRecordingStreaming,
   useScreenShare,
-  selectPeerScreenSharing,
-  selectPeerSharingAudio,
-  selectPeerSharingVideoPlaylist,
   selectLocalPeer,
+  selectPeerSharingVideoPlaylist,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
@@ -59,7 +58,7 @@ const getStreamingText = ({ isStreamingOn, isHLSRunning }) => {
 /**
  * Display state of recording, streaming, playlist, whiteboard
  */
-export const AdditionalRoomState = () => {
+export const AdditionalRoomState = ({ isAudioOnly }) => {
   const playlist = usePlaylistMusic();
   const {
     isServerRecordingOn,
@@ -69,10 +68,6 @@ export const AdditionalRoomState = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
-  const localPeer = useHMSStore(selectLocalPeer);
-  const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
-  const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
   const isPlaylistInactive = [
@@ -85,31 +80,26 @@ export const AdditionalRoomState = () => {
     !screenshareAudio.peer?.isLocal && !screenshareAudio.track?.enabled,
   ].some(Boolean);
 
+  const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
+  const localPeer = useHMSStore(selectLocalPeer);
+  const isVideoPlayListPlaying = !!peerSharingPlaylist?.id;
   const {
     screenSharingPeerId,
     screenSharingPeerName,
     amIScreenSharing,
-    screenShareAudioTrackId,
     screenShareVideoTrackId,
   } = useScreenShare();
-  console.log(
-    "useScreenshare",
-    screenSharingPeerId,
-    screenSharingPeerName,
-    amIScreenSharing,
-    screenShareAudioTrackId,
-    screenShareVideoTrackId
-  );
-  // const isScreenSharingOn =
-  //   (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
-  //   peerSharingPlaylist;
+
   const isScreenSharingOn = !!screenSharingPeerId && !!screenShareVideoTrackId;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
+  const shouldShowScreenShareState = isAudioOnly && isScreenSharingOn;
+  const shouldShowVideoState = isAudioOnly && isVideoPlayListPlaying;
   if (
     isPlaylistInactive &&
     isAudioshareInactive &&
-    !isScreenSharingOn &&
+    !shouldShowScreenShareState &&
+    !shouldShowVideoState &&
     !isRecordingOn &&
     !isStreamingOn &&
     !whiteboardOwner
@@ -137,10 +127,17 @@ export const AdditionalRoomState = () => {
               </Flex>
             </Tooltip>
           )}
-          {isScreenSharingOn && (
+          {shouldShowScreenShareState && (
             <Tooltip title="Screenshare">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <ShareScreenIcon width={24} height={24} />
+              </Flex>
+            </Tooltip>
+          )}
+          {shouldShowVideoState && (
+            <Tooltip title="video playlist">
+              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+                <VideoPlayerIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
@@ -280,13 +277,23 @@ export const AdditionalRoomState = () => {
             </Text>
           </Dropdown.Item>
         )}
-        {isScreenSharingOn && (
+        {isScreenSharingOn && isAudioOnly && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
-            <MusicIcon width={24} height={24} />
+            <ShareScreenIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
-              {amIScreenSharing
-                ? "You are sharing your screen"
-                : `${screenSharingPeerName} is sharing their screen`}
+              {`Shared by: ${amIScreenSharing ? "You" : screenSharingPeerName}`}
+            </Text>
+          </Dropdown.Item>
+        )}
+        {isVideoPlayListPlaying && isAudioOnly && (
+          <Dropdown.Item css={{ color: "$textPrimary" }}>
+            <VideoPlayerIcon width={24} height={24} />
+            <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
+              {`Shared by: ${
+                peerSharingPlaylist.id === localPeer.id
+                  ? "You"
+                  : peerSharingPlaylist.name
+              }`}
             </Text>
           </Dropdown.Item>
         )}
