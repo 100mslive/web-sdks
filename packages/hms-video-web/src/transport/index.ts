@@ -305,20 +305,13 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
-    const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const joinRequestedAt = new Date();
     try {
       if (!this.signal.isConnected || !this.initConfig) {
-        await this.connect(
-          authToken,
-          initEndpoint,
-          peerId,
-          customData,
-          autoSubscribeVideo,
-          isServerHandlingDegradation,
-        );
+        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
       }
 
+      const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         await this.connectionJoin(
           customData.name,
@@ -349,7 +342,6 @@ export default class HMSTransport implements ITransport {
     peerId: string,
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
-    serverSubDegrade = false,
   ): Promise<InitConfig | void> {
     this.setTransportStateForConnect();
     this.joinParameters = new JoinParameters(
@@ -359,7 +351,6 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       endpoint,
       autoSubscribeVideo,
-      serverSubDegrade,
     );
     try {
       const response = await this.internalConnect(token, endpoint, peerId);
@@ -761,7 +752,7 @@ export default class HMSTransport implements ITransport {
     // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
     //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
-      if (!this.joinParameters?.serverSubDegrade) {
+      if (!this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION)) {
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
