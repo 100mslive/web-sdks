@@ -85,14 +85,14 @@ export const AdditionalRoomState = ({ isAudioOnly }) => {
   const isVideoPlayListPlaying = !!peerSharingPlaylist?.id;
   const {
     screenSharingPeerName,
-    amIScreenSharing,
+    screenSharingPeerId,
     screenShareVideoTrackId,
   } = useScreenShare();
 
-  const isScreenSharingOn = !!screenShareVideoTrackId;
+  const isVideoScreenSharingOn = !!screenShareVideoTrackId;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
-  const shouldShowScreenShareState = isAudioOnly && isScreenSharingOn;
+  const shouldShowScreenShareState = isAudioOnly && isVideoScreenSharingOn;
   const shouldShowVideoState = isAudioOnly && isVideoPlayListPlaying;
   if (
     isPlaylistInactive &&
@@ -276,15 +276,19 @@ export const AdditionalRoomState = ({ isAudioOnly }) => {
             </Text>
           </Dropdown.Item>
         )}
-        {isScreenSharingOn && isAudioOnly && (
+        {shouldShowScreenShareState && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <ShareScreenIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
-              {`Shared by: ${amIScreenSharing ? "You" : screenSharingPeerName}`}
+              {`Shared by: ${
+                screenSharingPeerId === localPeer.id
+                  ? "You"
+                  : screenSharingPeerName
+              }`}
             </Text>
           </Dropdown.Item>
         )}
-        {isVideoPlayListPlaying && isAudioOnly && (
+        {shouldShowVideoState && (
           <Dropdown.Item css={{ color: "$textPrimary" }}>
             <VideoPlayerIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
