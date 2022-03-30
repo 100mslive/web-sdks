@@ -48,7 +48,7 @@ export const Conference = () => {
   }
 
   return (
-    <Flex css={{ size: "100%", overflow: "hidden" }} direction="column">
+    <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$18", "@md": { h: "$17" } }}>
           <Header />
