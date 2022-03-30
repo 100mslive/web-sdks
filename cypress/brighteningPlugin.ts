@@ -12,6 +12,10 @@ export class brighteningPlugin {
     return this.name;
   }
 
+  checkSupport() {
+    return { isSupported: true };
+  }
+
   isSupported() {
     return true;
   }

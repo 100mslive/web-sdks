@@ -15,7 +15,12 @@ export interface HMSAudioPlugin {
 
   /**
    * This function will be called before the call to init, it is used to check whether the plugin supports current
-   * OS and device or not. An error will be thrown back to the user if they try to use an unsupported plugin.
+   * OS, browser and audio device or not. An error object will be thrown back to the user if they try to use an unsupported plugin.
+   */
+  checkSupport(ctx?: AudioContext): HMSPluginSupportResult;
+
+  /**
+   * @deprecated. Will be deleted in future updates. Use checkSupport instead.
    */
   isSupported(): boolean;
 
@@ -52,4 +57,15 @@ export interface HMSAudioPlugin {
 export enum HMSAudioPluginType {
   TRANSFORM = 'TRANSFORM',
   ANALYZE = 'ANALYZE',
+}
+
+export interface HMSPluginSupportResult {
+  isSupported: boolean;
+  errType?: HMSPluginUnsupportedTypes;
+  errMsg?: string;
+}
+
+export enum HMSPluginUnsupportedTypes {
+  PLATFORM_NOT_SUPPORTED = 'PLATFORM_NOT_SUPPORTED',
+  DEVICE_NOT_SUPPORTED = 'DEVICE_NOT_SUPPORTED',
 }
