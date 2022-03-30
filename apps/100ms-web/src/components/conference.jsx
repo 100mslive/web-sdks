@@ -48,7 +48,7 @@ export const Conference = () => {
   }
 
   return (
-    <Flex css={{ size: "100%" }} direction="column">
+    <Flex css={{ size: "100%", overflow: "hidden" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$18", "@md": { h: "$17" } }}>
           <Header />
@@ -57,9 +57,7 @@ export const Conference = () => {
       <Box
         css={{
           w: "100%",
-          ...(isHeadless
-            ? { height: "100%", overflow: "hidden" }
-            : { flex: "1 1 0" }),
+          flex: "1 1 0",
         }}
       >
         <ConferenceMainView isChatOpen={isChatOpen} toggleChat={toggleChat} />
