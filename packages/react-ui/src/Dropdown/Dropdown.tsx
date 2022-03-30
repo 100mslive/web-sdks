@@ -30,6 +30,7 @@ const DropdownItem = styled(Item, {
   p: '$4 $8',
   display: 'flex',
   alignItems: 'center',
+  outline: 'none',
 });
 
 const DropdownItemSeparator = styled(Separator, {

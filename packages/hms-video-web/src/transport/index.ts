@@ -25,7 +25,7 @@ import { TransportState } from './models/TransportState';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
@@ -291,21 +291,32 @@ export default class HMSTransport implements ITransport {
     return this.webrtcInternals;
   }
 
+  isFlagEnabled(flag: InitFlags) {
+    const config = this.initConfig?.config;
+    const flags = config?.enabledFlags || [];
+    return flags.includes(flag);
+  }
+
   async join(
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
-
-    // TODO: set default to true on final release
-    serverSubDegrade = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
+    const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const joinRequestedAt = new Date();
     try {
       if (!this.signal.isConnected || !this.initConfig) {
-        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo, serverSubDegrade);
+        await this.connect(
+          authToken,
+          initEndpoint,
+          peerId,
+          customData,
+          autoSubscribeVideo,
+          isServerHandlingDegradation,
+        );
       }
 
       if (this.initConfig) {
@@ -314,7 +325,7 @@ export default class HMSTransport implements ITransport {
           customData.metaData,
           this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
-          serverSubDegrade,
+          isServerHandlingDegradation,
         );
       }
     } catch (error) {
