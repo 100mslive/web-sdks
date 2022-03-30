@@ -84,13 +84,12 @@ export const AdditionalRoomState = ({ isAudioOnly }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const isVideoPlayListPlaying = !!peerSharingPlaylist?.id;
   const {
-    screenSharingPeerId,
     screenSharingPeerName,
     amIScreenSharing,
     screenShareVideoTrackId,
   } = useScreenShare();
 
-  const isScreenSharingOn = !!screenSharingPeerId && !!screenShareVideoTrackId;
+  const isScreenSharingOn = !!screenShareVideoTrackId;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
   const shouldShowScreenShareState = isAudioOnly && isScreenSharingOn;
