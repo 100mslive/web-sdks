@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Divider from './Divider';
 import DownloadCodeModal from './DownloadCodeModal';
+import { Button, Flex, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../helpers/analytics_helpers';
 
 // images
@@ -130,11 +131,7 @@ export default function Header({
 
   return (
     <>
-      <div
-        className={`${
-          theme === 'dark' ? 'text-white bg-black' : 'text-black bg-white'
-        } w-100 p-3 bg-transparent flex justify-between items-center border-b border-gray-cool4`}
-      >
+      <Flex align="center" justify="between" css={{ p: '$6', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}>
         <img
           onClick={() => {
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
@@ -143,11 +140,11 @@ export default function Header({
           src={theme === 'dark' ? logo : darkLogo}
           alt="100ms logo"
         />
-        <div className="flex items-center">
+        <Flex align="center">
           {onlyEmail && (
             <>
               {roomLinks && Object.keys(roomLinks).length > 0 && (
-                <button
+                <Button
                   onClick={() => {
                     togModal(!modal);
                     AppAnalytics.track('invite.clicked');
@@ -167,39 +164,35 @@ export default function Header({
                     />
                   </svg>
                   <span className="ml-2">Invite</span>
-                </button>
+                </Button>
               )}
-              <a
-                target="_blank"
-                href="https://100ms.live/contact"
-                rel="noreferrer"
-                className=" rounded-lg relative px-3 py-2 bg-gray-cool2 text-white hover:bg-opacity-80 mr-4 text-sm focus:outline-none flex items-center"
+              <Button
+                variant="standard"
+                onClick={() => {
+                  window.open('https://100ms.live/contact');
+                }}
               >
                 Schedule a demo
-              </a>
-              <button
+              </Button>
+              <Button
+                variant="standard"
+                css={{ mx: '$4' }}
+                disabled={savingData}
                 onClick={() => {
                   setCodeModal(true);
                 }}
                 className=" rounded-lg relative px-3 py-1.5 bg-gray-cool2 text-white hover:bg-opacity-80 mr-4 text-sm focus:outline-none flex items-center"
               >
                 <img alt="code" src={iconCode} />
-                {savingData && <div className="w-full h-full z-50 absolute top-0 left-0 bg-black opacity-40"></div>}
-              </button>
-              <button
-                onClick={toggleModal}
-                className="rounded-lg px-3 py-1.5 bg-gray-cool2 text-white hover:bg-opacity-80 text-sm focus:outline-none"
-              >
+              </Button>
+              <Button variant="standard" css={{ mr: '$4' }} onClick={toggleModal}>
                 <img alt="edit" src={iconEdit} />
-              </button>
+              </Button>
             </>
           )}
-          <div
-            className="ml-4 flex items-center justify-center rounded-full h-8 w-8"
-            style={{ backgroundColor: `${randomColor}` }}
-          >
+          <Flex align="center" justify="center" css={{ backgroundColor: randomColor, w: '$14', h: '$14', r: '$round' }}>
             {getEmailInitials()}
-          </div>
+          </Flex>
         </div>
       </div>
       {codeModal && (
