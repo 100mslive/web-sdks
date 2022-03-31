@@ -149,11 +149,6 @@ export default function Header({
                     togModal(!modal);
                     AppAnalytics.track('invite.clicked');
                   }}
-                  className={`rounded-lg px-3 py-1.5 hover:bg-opacity-80 text-sm focus:outline-none mr-4 sm:flex sm:items-center ${
-                    theme === 'dark'
-                      ? 'bg-blue-standard text-white'
-                      : ' bg-white border hover:bg-gray-3 hover:bg-opacity-10 shadow-sm text-black'
-                  }`}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -171,21 +166,21 @@ export default function Header({
                 onClick={() => {
                   window.open('https://100ms.live/contact');
                 }}
+                css={{ py: '$3' }}
               >
                 Schedule a demo
               </Button>
               <Button
                 variant="standard"
-                css={{ mx: '$4' }}
+                css={{ p: '$3 $6', mx: '$4' }}
                 disabled={savingData}
                 onClick={() => {
                   setCodeModal(true);
                 }}
-                className=" rounded-lg relative px-3 py-1.5 bg-gray-cool2 text-white hover:bg-opacity-80 mr-4 text-sm focus:outline-none flex items-center"
               >
                 <img alt="code" src={iconCode} />
               </Button>
-              <Button variant="standard" css={{ mr: '$4' }} onClick={toggleModal}>
+              <Button variant="standard" css={{ mr: '$4', p: '$3 $6' }} onClick={toggleModal}>
                 <img alt="edit" src={iconEdit} />
               </Button>
             </>
