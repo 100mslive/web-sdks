@@ -18,7 +18,7 @@ const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const Roles = React.lazy(() => import('./components/Roles'));
 const Plugins = React.lazy(() => import('./components/Plugins'));
 
-const hostname = 'ravi.qa-app.100ms.live' || process.env.REACT_APP_HOST_NAME || window.location.hostname;
+const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
 console.log(hostname, process.env.REACT_APP_HOST_NAME);
 
