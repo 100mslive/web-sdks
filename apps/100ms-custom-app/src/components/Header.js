@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Modal from './Modal';
-import Divider from './Divider';
+import React, { useState, useEffect, Suspense } from 'react';
 import DownloadCodeModal from './DownloadCodeModal';
 import { Button, Flex, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../helpers/analytics_helpers';
@@ -10,10 +8,10 @@ import logo from '../assets/images/100ms_logo.svg';
 import darkLogo from '../assets/images/100ms_dark.svg';
 
 // icons
-import copy from '../assets/images/icons/copy.svg';
-import copyWhite from '../assets/images/icons/copy-white.svg';
 import iconEdit from '../assets/images/icons/icon-edit.svg';
 import iconCode from '../assets/images/icons/icon-code.svg';
+
+const InviteLinksModal = React.lazy(() => import('./InviteLinksModal'));
 
 const getRandomColor = () => {
   const h = Math.floor(Math.random() * 360),
@@ -149,6 +147,7 @@ export default function Header({
                     togModal(!modal);
                     AppAnalytics.track('invite.clicked');
                   }}
+                  css={{ p: '$3 $8', mr: '$4' }}
                 >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -194,78 +193,9 @@ export default function Header({
         <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
       )}
       {modal && (
-        <Modal>
-          <div
-            className={`max-w-screen-md min-h-[530px] flex flex-col w-3/4 py-4 px-5 rounded-xl ${
-              theme === 'dark' ? 'bg-gray-cool1 text-white' : 'bg-white shadow-lg text-black'
-            }`}
-          >
-            <div className="flex justify-between mb-4">
-              <h5 className="h5 text-xl font-semibold">Roles Urls</h5>
-              <button
-                onClick={() => togModal(false)}
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span
-                  className={`focus:outline-none font-semibold text-xl ${
-                    theme === 'dark' ? 'text-white' : ' text-black'
-                  }`}
-                  aria-hidden="true"
-                >
-                  &times;
-                </span>
-              </button>
-            </div>
-            <Divider />
-            <div className="mt-4 px-2">
-              <ul>
-                {Object.keys(roomLinks).map((role, index) => {
-                  const roomRole = roomLinks[role];
-                  if (roomRole.is_active) {
-                    let role_url = `https://${window.location.hostname}/preview/${roomRole.identifier}`;
-                    return (
-                      <React.Fragment key={index}>
-                        <li className="my-4 flex items-center">
-                          <div className="font-medium mr-2 capitalize min-w-[160px] overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[200px]">
-                            {role}
-                          </div>
-                          <div
-                            className={`overflow-hidden flex flex-grow justify-between text-sm font-medium py-1.5 px-2 border rounded-md border-gray-cool3 ${
-                              theme === 'dark' ? 'bg-gray-cool1 text-gray-cool5' : ' bg-white'
-                            }`}
-                          >
-                            <div
-                              id={`role-url-${index}`}
-                              className="overflow-hidden overflow-ellipsis whitespace-nowrap"
-                              key={index}
-                            >{`${role_url}`}</div>
-                            <button
-                              className="focus:outline-none flex-shrink-0 ml-2"
-                              onClick={() => {
-                                copyToClipboard(`role-url-${index}`);
-                              }}
-                            >
-                              <img
-                                src={theme === 'dark' ? copyWhite : copy}
-                                className="w-4 cursor-pointer"
-                                alt="copy icon"
-                              />
-                            </button>
-                          </div>
-                        </li>
-                        <Divider />
-                      </React.Fragment>
-                    );
-                  }
-                  return null;
-                })}
-              </ul>
-            </div>
-          </div>
-        </Modal>
+        <Suspense fallback={<div>Loading...</div>}>
+          <InviteLinksModal onClose={() => togModal(false)} roomLinks={roomLinks} />
+        </Suspense>
       )}
     </>
   );
