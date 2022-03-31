@@ -112,21 +112,6 @@ export default function Header({
     });
   };
 
-  const copyToClipboard = containerid => {
-    const cont = document.getElementById(containerid);
-    let str = cont.innerHTML;
-    cont.style.color = '#2A70DE';
-    const el = document.createElement('textarea');
-    el.value = str;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    setTimeout(() => {
-      cont.style.color = '#B0C3DB';
-    }, 2000);
-  };
-
   return (
     <>
       <Flex align="center" justify="between" css={{ p: '$6', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}>
