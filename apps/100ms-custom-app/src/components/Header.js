@@ -191,10 +191,10 @@ export default function Header({
             </>
           )}
           <Flex align="center" justify="center" css={{ backgroundColor: randomColor, w: '$14', h: '$14', r: '$round' }}>
-            {getEmailInitials()}
+            <Text>{getEmailInitials()}</Text>
           </Flex>
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       {codeModal && (
         <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
       )}
