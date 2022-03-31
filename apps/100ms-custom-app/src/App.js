@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import cookies from 'js-cookies';
 import axios from 'axios';
+import { Box } from '@100mslive/react-ui';
 import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 
 // components
 import Modal from './components/Modal';
-import Header from './components/Header';
 import Divider from './components/Divider';
 import ErrorModal from './components/ErrorModal';
 
@@ -13,6 +13,7 @@ import ErrorModal from './components/ErrorModal';
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 
+const Header = React.lazy(() => import('./components/Header'));
 const Layout = React.lazy(() => import('./components/Layout'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const Roles = React.lazy(() => import('./components/Roles'));
@@ -456,16 +457,18 @@ class App extends Component {
         ) : (
           <>
             {this.state.onlyEmail && (
-              <Header
-                savingData={this.state.savingData}
-                refreshData={this.fetchData}
-                settings={this.state.temporary_state}
-                roleNames={this.state.roleNames}
-                roomLinks={this.state.roomLinks}
-                onlyEmail={this.state.onlyEmail}
-                email={this.state.userEmail}
-                toggleModal={this.toggleModal}
-              />
+              <Suspense fallback={<Box css={{ bg: '$mainBg' }} />}>
+                <Header
+                  savingData={this.state.savingData}
+                  refreshData={this.fetchData}
+                  settings={this.state.temporary_state}
+                  roleNames={this.state.roleNames}
+                  roomLinks={this.state.roomLinks}
+                  onlyEmail={this.state.onlyEmail}
+                  email={this.state.userEmail}
+                  toggleModal={this.toggleModal}
+                />
+              </Suspense>
             )}
             <HMSEdtechTemplate
               tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
