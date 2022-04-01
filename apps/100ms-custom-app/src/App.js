@@ -4,15 +4,13 @@ import axios from 'axios';
 import { Box, Flex, Loading } from '@100mslive/react-ui';
 import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 
-// components
-import ErrorModal from './components/ErrorModal';
-
 // icons
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
+const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
 class App extends Component {
@@ -385,7 +383,11 @@ class App extends Component {
     }
     return (
       <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
-        {this.state.error && <ErrorModal title={this.state.error.title} body={this.state.error.body} />}
+        {this.state.error && (
+          <Suspense fallback={<Box />}>
+            <ErrorModal title={this.state.error.title} body={this.state.error.body} />
+          </Suspense>
+        )}
         {this.state.onlyEmail && (
           <Suspense fallback={<Box />}>
             <Header
