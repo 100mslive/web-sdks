@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import DownloadCodeModal from './DownloadCodeModal';
 import { Button, Flex, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../helpers/analytics_helpers';
 
@@ -11,6 +10,7 @@ import darkLogo from '../assets/images/100ms_dark.svg';
 import iconEdit from '../assets/images/icons/icon-edit.svg';
 import iconCode from '../assets/images/icons/icon-code.svg';
 
+const DownloadCodeModal = React.lazy(() => import('./DownloadCodeModal'));
 const InviteLinksModal = React.lazy(() => import('./InviteLinksModal'));
 
 const getRandomColor = () => {
@@ -65,13 +65,13 @@ export default function Header({
 
   const getEmailInitials = () => {
     let initials = '';
-    email = email.toLowerCase();
-    for (let i = 0; i < email.length; i++) {
-      if (email[i] === '@') {
+    const userEmail = email.toLowerCase();
+    for (let i = 0; i < userEmail.length; i++) {
+      if (userEmail[i] === '@') {
         break;
       }
-      if (email[i] >= 'a' && email[i] <= 'z') {
-        initials += email[i];
+      if (userEmail[i] >= 'a' && userEmail[i] <= 'z') {
+        initials += userEmail[i];
       }
       if (initials.length === 2) {
         break;
@@ -83,11 +83,7 @@ export default function Header({
   const generateEnvData = logo => {
     return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
       settings.brand_color
-    }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_SHOW_CHAT=${
-      settings.plugins.chat
-    }\nREACT_APP_SHOW_SCREENSHARE=${
-      settings.plugins['screen-share']
-    }\nREACT_APP_VIDEO_AVATAR=true\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
+    }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
       process.env.REACT_APP_BACKEND_API + window.location.hostname
     }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
   };
@@ -95,19 +91,12 @@ export default function Header({
   const downloadCode = async () => {
     await refreshData().then(logo => {
       var envFile = document.createElement('a');
-
       const data = generateEnvData(logo);
-
       envFile.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
-
       envFile.download = 'example.env';
-
       envFile.style.display = 'none';
-
       document.body.appendChild(envFile);
-
       envFile.click();
-
       document.body.removeChild(envFile);
     });
   };
@@ -175,7 +164,9 @@ export default function Header({
         </Flex>
       </Flex>
       {codeModal && (
-        <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
+        </Suspense>
       )}
       {modal && (
         <Suspense fallback={<div>Loading...</div>}>
