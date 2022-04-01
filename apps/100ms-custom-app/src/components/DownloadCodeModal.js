@@ -24,10 +24,10 @@ const Item = ({ title, description, step, selected, children, onClick }) => {
   );
 };
 
-const DownloadCodeModal = ({ downloadEnv }) => {
+const DownloadCodeModal = ({ downloadEnv, onClose }) => {
   const [selection, setSelection] = useState(0);
   return (
-    <Dialog.Root defaultOpen>
+    <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="Download Code">
         <Fragment>
           <Item

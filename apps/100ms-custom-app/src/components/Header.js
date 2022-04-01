@@ -165,7 +165,7 @@ export default function Header({
       </Flex>
       {codeModal && (
         <Suspense fallback={<div>Loading...</div>}>
-          <DownloadCodeModal downloadEnv={downloadCode} theme={theme} closeModal={() => setCodeModal(false)} />
+          <DownloadCodeModal downloadEnv={downloadCode} theme={theme} onClose={() => setCodeModal(false)} />
         </Suspense>
       )}
       {modal && (
