@@ -12,14 +12,8 @@ import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 
 const Header = React.lazy(() => import('./components/Header'));
-const Layout = React.lazy(() => import('./components/Layout'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
-const Roles = React.lazy(() => import('./components/Roles'));
-const Plugins = React.lazy(() => import('./components/Plugins'));
-
 const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
-
-console.log(hostname, process.env.REACT_APP_HOST_NAME);
 
 class App extends Component {
   constructor() {
@@ -48,16 +42,6 @@ class App extends Component {
         logo_obj: null,
         logo_url: null,
         logo_name: null,
-        plugins: {
-          chat: true,
-          'screen-share': true,
-          'universal-annotation': true,
-          'virtual-bg': true,
-          spotlight: true,
-          'raise-hand': true,
-          'google-drive': true,
-          youtube: true,
-        },
       },
       temporary_state: {
         theme: 'dark',
@@ -72,27 +56,6 @@ class App extends Component {
           clicks: 0,
           metadata: '',
         },
-        plugins: {
-          chat: true,
-          'screen-share': true,
-          'universal-annotation': true,
-          'virtual-bg': true,
-          spotlight: true,
-          'raise-hand': true,
-          'google-drive': true,
-          youtube: true,
-        },
-      },
-      teacher_layout: null,
-      sidebarContent: null,
-      student_layout: null,
-      allowedOnStage: null,
-      roleOnNew: null,
-      hostRole: null,
-      participantsLive: {
-        'ajay.trivedi@company.com': null,
-        'samir.bharadwaj@company.com': null,
-        'surabhi.kumar@company.com': null,
       },
     };
   }
@@ -310,23 +273,8 @@ class App extends Component {
   };
 
   storeSettings = async jwt => {
-    const getBoolean = value => {
-      return value ? '1' : '0';
-    };
-
     const mapTileShape = value => {
       return value === '1-1' ? 'SQUARE' : value === '16-9' ? 'WIDE' : 'LANDSCAPE';
-    };
-
-    const mapAvatars = value => {
-      switch (value) {
-        case 'initial':
-          return 'initials';
-        case 'pebble':
-          return 'pebble people';
-        default:
-          return 'none';
-      }
     };
 
     const currentSettings = this.state.temporary_state;
@@ -340,15 +288,6 @@ class App extends Component {
     formData.append('font', currentSettings.font.toUpperCase());
     formData.append('tile_shape', mapTileShape(currentSettings.tile_shape));
     formData.append('theme', currentSettings.theme.toUpperCase());
-    formData.append('video_off_avatars', mapAvatars(currentSettings.avatars));
-    formData.append('chat', getBoolean(currentSettings.plugins.chat));
-    formData.append('screenshare', getBoolean(currentSettings.plugins['screen-share']));
-    formData.append('annotation', getBoolean(currentSettings.plugins['universal-annotation']));
-    formData.append('background', getBoolean(currentSettings.plugins['virtual-bg']));
-    formData.append('spotlight', getBoolean(currentSettings.plugins.spotlight));
-    formData.append('raise_hand', getBoolean(currentSettings.plugins['raise-hand']));
-    formData.append('google_drive', getBoolean(currentSettings.plugins['google-drive']));
-    formData.append('youtube', getBoolean(currentSettings.plugins.youtube));
     formData.append('app_type', this.state.app_type);
     formData.append('app_name', this.state.app_name);
     formData.append('subdomain', hostname);
@@ -406,12 +345,8 @@ class App extends Component {
             change={this.changeSettings}
           />
         );
-      case 'plugins':
-        return <Plugins settings={this.state.temporary_state} change={this.changeSettings} />;
-      case 'participants-roles':
-        return <Roles settings={this.state.temporary_state} change={this.changeSettings} />;
       default:
-        return <Layout settings={this.state.temporary_state} change={this.changeSettings} />;
+        return null;
     }
   };
 
