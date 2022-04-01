@@ -1,7 +1,7 @@
 import React, { Component, Suspense } from 'react';
 import cookies from 'js-cookies';
 import axios from 'axios';
-import { Box } from '@100mslive/react-ui';
+import { Box, Flex, Loading } from '@100mslive/react-ui';
 import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 
 // components
@@ -376,73 +376,68 @@ class App extends Component {
   };
 
   render() {
-    const { error } = this.state;
+    if (this.state.loading) {
+      return (
+        <Flex justify="center" align="center" css={{ size: '100%' }}>
+          <Loading size={100} />
+        </Flex>
+      );
+    }
     return (
-      <div className="flex flex-col h-full overflow-hidden">
-        {error ? (
-          <div className="bg-black h-full">
-            <ErrorModal title={error.title} body={error.body} />
-          </div>
-        ) : this.state.loading ? (
-          <div className="flex items-center h-full justify-center">
-            <div className="custom-loader"></div>
-          </div>
-        ) : (
-          <>
-            {this.state.onlyEmail && (
-              <Suspense fallback={<Box css={{ bg: '$mainBg' }} />}>
-                <Header
-                  savingData={this.state.savingData}
-                  refreshData={this.fetchData}
-                  settings={this.state.temporary_state}
-                  roleNames={this.state.roleNames}
-                  roomLinks={this.state.roomLinks}
-                  onlyEmail={this.state.onlyEmail}
-                  email={this.state.userEmail}
-                  toggleModal={this.toggleModal}
-                />
-              </Suspense>
-            )}
-            <HMSEdtechTemplate
-              tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
-              themeConfig={{
-                aspectRatio: this.state.temporary_state.tile_shape,
-                font: this.state.temporary_state.font,
-                color: this.state.temporary_state.brand_color,
-                theme: this.state.temporary_state.theme,
-                showChat: this.state.temporary_state.plugins.chat.toString(),
-                showScreenshare: this.state.temporary_state.plugins['screen-share'].toString(),
-                logo:
-                  this.state.temporary_state.logo_url ||
-                  (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
-                showAvatar: 'true',
-                avatarType: this.state.temporary_state.avatars,
-                logoClass: 'h-12',
-                headerPresent: this.state.showHeader.toString(),
-                metadata: this.state.temporary_state.metadataFields.metadata,
-              }}
-              getUserToken={this.fetchUserToken}
+      <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
+        {this.state.error && <ErrorModal title={this.state.error.title} body={this.state.error.body} />}
+        {this.state.onlyEmail && (
+          <Suspense fallback={<Box />}>
+            <Header
+              savingData={this.state.savingData}
+              refreshData={this.fetchData}
+              settings={this.state.temporary_state}
+              roleNames={this.state.roleNames}
+              roomLinks={this.state.roomLinks}
+              onlyEmail={this.state.onlyEmail}
+              email={this.state.userEmail}
+              toggleModal={this.toggleModal}
             />
-            {this.state.modal && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <RoomSettings
-                  onClose={this.toggleModal}
-                  handleLogoChange={this.handleLogoChange}
-                  settings={this.state.temporary_state}
-                  change={this.changeSettings}
-                  onSave={this.saveDetails}
-                  onCancel={() => {
-                    this.setState({
-                      temporary_state: this.state.final_state,
-                      modal: false,
-                    });
-                  }}
-                />
-              </Suspense>
-            )}
-          </>
+          </Suspense>
         )}
-      </div>
+        <HMSEdtechTemplate
+          tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+          themeConfig={{
+            aspectRatio: this.state.temporary_state.tile_shape,
+            font: this.state.temporary_state.font,
+            color: this.state.temporary_state.brand_color,
+            theme: this.state.temporary_state.theme,
+            showChat: this.state.temporary_state.plugins.chat.toString(),
+            showScreenshare: this.state.temporary_state.plugins['screen-share'].toString(),
+            logo:
+              this.state.temporary_state.logo_url ||
+              (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
+            showAvatar: 'true',
+            avatarType: this.state.temporary_state.avatars,
+            logoClass: 'h-12',
+            headerPresent: this.state.showHeader.toString(),
+            metadata: this.state.temporary_state.metadataFields.metadata,
+          }}
+          getUserToken={this.fetchUserToken}
+        />
+        {this.state.modal && (
+          <Suspense fallback={<div>Loading...</div>}>
+            <RoomSettings
+              onClose={this.toggleModal}
+              handleLogoChange={this.handleLogoChange}
+              settings={this.state.temporary_state}
+              change={this.changeSettings}
+              onSave={this.saveDetails}
+              onCancel={() => {
+                this.setState({
+                  temporary_state: this.state.final_state,
+                  modal: false,
+                });
+              }}
+            />
+          </Suspense>
+        )}
+      </Flex>
     );
   }
 }
