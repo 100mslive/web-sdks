@@ -5,8 +5,6 @@ import { Box } from '@100mslive/react-ui';
 import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 
 // components
-import Modal from './components/Modal';
-import Divider from './components/Divider';
 import ErrorModal from './components/ErrorModal';
 
 // icons
@@ -491,75 +489,21 @@ class App extends Component {
               getUserToken={this.fetchUserToken}
             />
             {this.state.modal && (
-              <Modal>
-                <div className="max-w-screen-md min-h-[530px] flex flex-col justify-between w-3/4 py-5 px-2.5 text-white rounded-xl bg-gray-cool6">
-                  <div>
-                    <div className="flex items-center px-2.5 mb-4">
-                      <h2 className="font-semibold text-2xl">Customise your app</h2>
-                      <button
-                        onClick={() => this.toggleModal()}
-                        type="button"
-                        className="close ml-auto"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        <span className={`focus:outline-none  text-2xl text-white`} aria-hidden="true">
-                          &times;
-                        </span>
-                      </button>
-                    </div>
-                    <Divider />
-                    <div className="mt-4 mb-10 flex">
-                      <div className="w-60">
-                        {/* <div onClick={() => {
-                    this.setState({ activeTab: "layout" });
-                  }} className={`w-full p-5 rounded-lg mb-2.5 cursor-pointer hover:bg-gray-cool2 hover:bg-opacity-40 ${this.state.activeTab === "layout" ? "bg-gray-cool2 text-white" : " text-gray-cool5"}`}>
-                    Layout
-                            </div> */}
-                        <div
-                          onClick={() => {
-                            this.setState({ activeTab: 'theme' });
-                            this.changeSettings('metadataFields', {
-                              ...this.state.temporary_state.metadataFields,
-                              clicks: this.state.temporary_state.metadataFields.clicks + 1,
-                            });
-                          }}
-                          className={`w-full p-5 rounded-lg mb-2.5 cursor-pointer hover:bg-gray-cool2 hover:bg-opacity-40 ${
-                            this.state.activeTab === 'theme' ? 'bg-gray-cool2 text-white' : ' text-gray-cool5'
-                          }`}
-                        >
-                          Theme
-                        </div>
-                      </div>
-                      <div className="w-full flex-grow py-2.5 px-5 h-full overflow-y-auto custom-scroll-bar">
-                        <React.Suspense fallback={<div>Loading...</div>}>{this.content()}</React.Suspense>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <Divider />
-                    <div className="mt-5 justify-end items-end flex">
-                      <button
-                        onClick={() => {
-                          this.setState({
-                            temporary_state: this.state.final_state,
-                            modal: false,
-                          });
-                        }}
-                        className=" rounded-lg px-9 py-2.5 bg-gray-cool2 text-white hover:bg-opacity-70 text-sm focus:outline-none mr-4 sm:block hidden"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={this.saveDetails}
-                        className=" rounded-lg px-9 py-2.5 bg-blue-standard text-white hover:bg-opacity-70 text-sm focus:outline-none"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Modal>
+              <Suspense fallback={<div>Loading...</div>}>
+                <RoomSettings
+                  onClose={this.toggleModal}
+                  handleLogoChange={this.handleLogoChange}
+                  settings={this.state.temporary_state}
+                  change={this.changeSettings}
+                  onSave={this.saveDetails}
+                  onCancel={() => {
+                    this.setState({
+                      temporary_state: this.state.final_state,
+                      modal: false,
+                    });
+                  }}
+                />
+              </Suspense>
             )}
           </>
         )}
