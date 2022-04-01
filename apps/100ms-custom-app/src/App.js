@@ -222,16 +222,6 @@ class App extends Component {
               clicks: 0,
               metadata: prevSettings.metadata,
             },
-            plugins: {
-              chat: prevSettings.chat,
-              'screen-share': prevSettings.screenshare,
-              'universal-annotation': prevSettings.annotation,
-              'virtual-bg': prevSettings.background,
-              spotlight: prevSettings.spotlight,
-              'raise-hand': prevSettings.raise_hand,
-              'google-drive': prevSettings.google_drive,
-              youtube: prevSettings.youtube,
-            },
           };
           this.setState({
             loading: false,
@@ -409,14 +399,9 @@ class App extends Component {
             font: this.state.temporary_state.font,
             color: this.state.temporary_state.brand_color,
             theme: this.state.temporary_state.theme,
-            showChat: this.state.temporary_state.plugins.chat.toString(),
-            showScreenshare: this.state.temporary_state.plugins['screen-share'].toString(),
             logo:
               this.state.temporary_state.logo_url ||
               (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
-            showAvatar: 'true',
-            avatarType: this.state.temporary_state.avatars,
-            logoClass: 'h-12',
             headerPresent: this.state.showHeader.toString(),
             metadata: this.state.temporary_state.metadataFields.metadata,
           }}
