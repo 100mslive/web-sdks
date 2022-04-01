@@ -2,13 +2,13 @@ import React, { Fragment } from 'react';
 import { Box, Button, Dialog, Flex, HorizontalDivider, Select, styled, Text } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
 
-const ItemRoot = React.memo(({ title, children, divider = true }) => (
+const ItemRoot = React.memo(({ title, children }) => (
   <Fragment>
     <Flex justify="between" align="center" css={{ p: '$8 $4' }}>
       <Text>{title}</Text>
       {children}
     </Flex>
-    {divider && <HorizontalDivider />}
+    <HorizontalDivider />
   </Fragment>
 ));
 
@@ -39,8 +39,19 @@ const TileType = ({ type, active, value, change }) => {
         change('tile_shape', value);
       }}
     >
-      {type}
+      <Text>{type}</Text>
     </Flex>
+  );
+};
+
+const ThemeType = ({ title, active, onClick }) => {
+  return (
+    <Box
+      css={{ w: '$20', m: '$2', p: '$2 $8', r: '$1', bg: active ? '$menuBg' : '', cursor: 'pointer' }}
+      onClick={onClick}
+    >
+      <Text>{title}</Text>
+    </Box>
   );
 };
 
@@ -51,12 +62,14 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)' }}>
         <Flex css={{ size: '100%', overflow: 'hidden' }}>
-          <Box css={{ flex: '1 1 0' }}>
-            <Text css={{ p: '$8 $4' }}>Theme</Text>
+          <Box css={{ flex: '1 1 0', pt: '$6' }}>
+            <Text css={{ p: '$8', bg: '$bgSecondary', r: '$1' }}>Theme</Text>
           </Box>
-          <Box css={{ flex: '3 1 0' }}>
+          <Box css={{ flex: '3 1 0', ml: '$8' }}>
             <ItemRoot title="Logo">
-              <Button variant="standard">Upload</Button>
+              <Button as="label" htmlFor="logoInput" variant="standard" css={{ bg: '$bgSecondary', cursor: 'pointer' }}>
+                Upload
+              </Button>
               <input
                 onChange={handleLogoChange}
                 type="file"
@@ -67,24 +80,21 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
               />
             </ItemRoot>
             <ItemRoot title="Appearance">
-              <Flex align="center">
-                <Button
-                  variant="standard"
-                  css={{ mx: '$4' }}
+              <Flex align="center" css={{ bg: '$bgSecondary', r: '$1' }}>
+                <ThemeType
+                  title="Dark"
+                  active={settings.theme === 'dark'}
                   onClick={() => {
                     change('theme', 'dark');
                   }}
-                >
-                  Dark
-                </Button>
-                <Button
-                  variant="standard"
+                />
+                <ThemeType
+                  title="Light"
+                  active={settings.theme === 'light'}
                   onClick={() => {
                     change('theme', 'light');
                   }}
-                >
-                  Light
-                </Button>
+                />
               </Flex>
             </ItemRoot>
             <ItemRoot title="Brand Color">
@@ -144,8 +154,8 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
             )}
           </Box>
         </Flex>
-        <Flex justify="end" align="center">
-          <Button variant="standard" onClick={onCancel}>
+        <Flex justify="end" align="center" css={{ mt: '$8' }}>
+          <Button variant="standard" css={{ mr: '$8' }} onClick={onCancel}>
             Cancel
           </Button>
           <Button onClick={onSave}>Save</Button>
