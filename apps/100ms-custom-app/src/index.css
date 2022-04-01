@@ -22,7 +22,7 @@ body,
   left: 0;
   width: 100%;
   margin: 0;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 html {
