@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
+import { CopyIcon } from '@100mslive/react-icons';
 import { Dialog, Flex, HorizontalDivider, textEllipsis, Text, IconButton, Box } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
-import copy from '../assets/images/icons/copy.svg';
 
 const InviteLinksModal = ({ onClose, roomLinks }) => {
   return (
@@ -28,7 +28,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                             navigator.clipboard.writeText(roleUrl);
                           }}
                         >
-                          <img src={copy} alt="copy icon" width={18} height={18} />
+                          <CopyIcon />
                         </IconButton>
                       </Flex>
                     </Flex>
