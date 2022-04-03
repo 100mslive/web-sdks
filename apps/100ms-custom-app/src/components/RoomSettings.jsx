@@ -30,7 +30,6 @@ const TileType = ({ type, active, value, change }) => {
         h: '$20',
         border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
         ml: '$4',
-        p: '$8',
         width,
         flexShrink: 0,
         cursor: 'pointer',
@@ -67,7 +66,12 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
           </Box>
           <Box css={{ flex: '3 1 0', ml: '$8' }}>
             <ItemRoot title="Logo">
-              <Button as="label" htmlFor="logoInput" variant="standard" css={{ bg: '$bgSecondary', cursor: 'pointer' }}>
+              <Button
+                as="label"
+                htmlFor="logoInput"
+                variant="standard"
+                css={{ bg: '$bgSecondary', cursor: 'pointer', color: '$textPrimary' }}
+              >
                 Upload
               </Button>
               <input
