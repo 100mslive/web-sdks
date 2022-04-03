@@ -204,7 +204,8 @@ export class HMSSdk implements HMSInterface {
 
     onStateChange: async (state: TransportState, error?: HMSException) => {
       switch (state) {
-        case TransportState.Connected:
+        case TransportState.Preview:
+        case TransportState.Joined:
           if (this.transportState === TransportState.Reconnecting) {
             this.listener?.onReconnected();
           }
@@ -222,6 +223,7 @@ export class HMSSdk implements HMSInterface {
       }
 
       this.transportState = state;
+      HMSLogger.d(this.TAG, 'Transport State Change', this.transportState);
     },
   };
 
@@ -276,7 +278,7 @@ export class HMSSdk implements HMSInterface {
       this.eventBus.policyChange.subscribeOnce(policyHandler);
 
       this.transport
-        .connect(
+        .preview(
           config.authToken,
           config.initEndpoint || 'https://prod-init.100ms.live/init',
           this.localPeer!.peerId,

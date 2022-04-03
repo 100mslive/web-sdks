@@ -33,10 +33,11 @@ export class RetryScheduler {
     category: TFC,
     error: HMSException,
     task: RetryTask,
+    originalState: TransportState,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     changeState = true,
   ) {
-    await this.scheduleTask(category, error, changeState, task, maxFailedRetries);
+    await this.scheduleTask(category, error, changeState, task, originalState, maxFailedRetries);
   }
 
   reset() {
@@ -51,6 +52,7 @@ export class RetryScheduler {
     error: HMSException,
     changeState: boolean,
     task: RetryTask,
+    originalState: TransportState,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
   ): Promise<void> {
@@ -155,11 +157,19 @@ export class RetryScheduler {
       taskPromise?.resolve(failedRetryCount);
 
       if (changeState && this.inProgress.size === 0) {
-        this.onStateChange(TransportState.Connected);
+        this.onStateChange(originalState);
       }
       HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
-      await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
+      await this.scheduleTask(
+        category,
+        error,
+        changeState,
+        task,
+        originalState,
+        maxFailedRetries,
+        failedRetryCount + 1,
+      );
     }
   }
 

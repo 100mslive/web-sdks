@@ -166,6 +166,7 @@ export default class HMSTransport implements ITransport {
           TransportFailureCategory.SignalDisconnect,
           exception,
           this.retrySignalDisconnectTask,
+          this.state,
         );
       }
     },
@@ -178,6 +179,7 @@ export default class HMSTransport implements ITransport {
             TransportFailureCategory.SignalDisconnect,
             ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
             this.retrySignalDisconnectTask,
+            this.state,
           );
         }
       } catch (e) {
@@ -297,6 +299,19 @@ export default class HMSTransport implements ITransport {
     return flags.includes(flag);
   }
 
+  async preview(
+    token: string,
+    endpoint: string,
+    peerId: string,
+    customData: { name: string; metaData: string },
+    autoSubscribeVideo = false,
+  ): Promise<InitConfig | void> {
+    const initConfig = await this.connect(token, endpoint, peerId, customData, autoSubscribeVideo);
+    this.state = TransportState.Preview;
+    this.observer.onStateChange(this.state);
+    return initConfig;
+  }
+
   async join(
     authToken: string,
     peerId: string,
@@ -334,6 +349,8 @@ export default class HMSTransport implements ITransport {
     }
 
     HMSLogger.d(TAG, '✅ join: successful');
+    this.state = TransportState.Joined;
+    this.observer.onStateChange(this.state);
   }
 
   async connect(
@@ -354,8 +371,6 @@ export default class HMSTransport implements ITransport {
     );
     try {
       const response = await this.internalConnect(token, endpoint, peerId);
-      this.state = TransportState.Connected;
-      this.observer.onStateChange(this.state);
       return response;
     } catch (error) {
       const shouldRetry =
@@ -377,6 +392,7 @@ export default class HMSTransport implements ITransport {
           TransportFailureCategory.ConnectFailed,
           error as HMSException,
           task,
+          this.state,
           MAX_TRANSPORT_RETRIES,
           false,
         );
@@ -690,12 +706,14 @@ export default class HMSTransport implements ITransport {
         TransportFailureCategory.PublishIceConnectionFailed,
         ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
         this.retryPublishIceFailedTask,
+        this.state,
       );
     } else {
       this.retryScheduler.schedule(
         TransportFailureCategory.SubscribeIceConnectionFailed,
         ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
         this.retrySubscribeIceFailedTask,
+        this.state,
         1,
       );
     }
