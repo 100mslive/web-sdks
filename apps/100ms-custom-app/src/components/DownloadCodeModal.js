@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { Box, Button, Dialog, Flex, Text, flexCenter } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
+import { DownloadIcon } from '@100mslive/react-icons';
 
 const Step = ({ value, opacity }) => (
   <Text css={{ bg: '$mainBg', size: '$12', r: '$round', mr: '$8', ...flexCenter, opacity }}>{value}</Text>
@@ -45,7 +46,8 @@ const DownloadCodeModal = ({ downloadEnv, onClose }) => {
                 setSelection(value => value + 1);
               }}
             >
-              Download
+              <DownloadIcon />
+              &nbsp;Download
             </Button>
           </Item>
           <Item
