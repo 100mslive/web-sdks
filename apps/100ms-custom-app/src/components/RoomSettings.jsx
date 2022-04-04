@@ -43,7 +43,6 @@ const TileType = ({ type, active, value, change }) => {
         border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
         ml: '$4',
         width,
-        flexShrink: 0,
         cursor: 'pointer',
       }}
       onClick={() => {

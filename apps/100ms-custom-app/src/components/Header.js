@@ -119,7 +119,7 @@ export default function Header({
                     togModal(!modal);
                     AppAnalytics.track('invite.clicked');
                   }}
-                  css={{ p: '$3 $8', mr: '$4', color: '$white' }}
+                  css={{ px: '$8', mr: '$4', color: '$white' }}
                 >
                   <InviteIcon />
                   <Text as="span" css={{ ml: '$2', color: '$white' }}>
@@ -129,16 +129,16 @@ export default function Header({
               )}
               <Button
                 variant="standard"
+                css={{ lineHeight: '1.5rem' }}
                 onClick={() => {
                   window.open('https://100ms.live/contact');
                 }}
-                css={{ py: '$3' }}
               >
                 Schedule a demo
               </Button>
               <Button
                 variant="standard"
-                css={{ p: '$3 $6', mx: '$4' }}
+                css={{ px: '$6', mx: '$4' }}
                 disabled={savingData}
                 onClick={() => {
                   setCodeModal(true);
@@ -146,7 +146,7 @@ export default function Header({
               >
                 <CodeIcon />
               </Button>
-              <Button variant="standard" css={{ mr: '$4', p: '$3 $6' }} onClick={toggleModal}>
+              <Button variant="standard" css={{ mr: '$4', px: '$6' }} onClick={toggleModal}>
                 <EditIcon />
               </Button>
             </>
