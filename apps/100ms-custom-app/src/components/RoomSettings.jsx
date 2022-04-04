@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { UploadIcon } from '@100mslive/react-icons';
 import { Box, Button, Dialog, Flex, HorizontalDivider, Select, styled, Text } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
 
@@ -70,9 +71,10 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
                 as="label"
                 htmlFor="logoInput"
                 variant="standard"
-                css={{ bg: '$bgSecondary', cursor: 'pointer', color: '$textPrimary' }}
+                css={{ bg: '$bgSecondary', cursor: 'pointer', color: '$textPrimary', display: 'flex' }}
               >
-                Upload
+                <UploadIcon />
+                &nbsp; Upload
               </Button>
               <input
                 onChange={handleLogoChange}
