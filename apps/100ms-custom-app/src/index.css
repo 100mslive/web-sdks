@@ -54,25 +54,6 @@ button:focus {
   border-radius: 5px;
 }
 
-#customise-color-picker {
-  width: 12px;
-  height: 12px;
-  padding: 0;
-  margin: 0;
-  border: 0px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-#customise-color-picker::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-#customise-color-picker::-webkit-color-swatch {
-  border: none;
-}
-
 /* custom color toggle button */
 input.custom-toggle[type='checkbox'] {
   height: 0;

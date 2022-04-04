@@ -20,6 +20,14 @@ const TextArea = styled('textarea', {
   resize: 'none',
 });
 
+const ColorPicker = styled('input', {
+  w: '$6',
+  h: '$6',
+  r: '$3',
+  mr: '$4',
+  cursor: 'pointer',
+});
+
 const TileType = ({ type, active, value, change }) => {
   const [multiplier, divider] = value.split('-').map(Number);
   const width = (80 * multiplier) / divider;
@@ -110,17 +118,16 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
                 align="center"
                 css={{ bg: '$bgSecondary', p: '$4', r: '$1', cursor: 'pointer', overflow: 'hidden' }}
               >
-                <Box css={{ w: '$6', h: '$6', r: '$round', bg: settings.brand_color, mr: '$4' }}>
-                  <input
-                    id="brandColorPicker"
-                    type="color"
-                    onChange={e => {
-                      change('brand_color', e.target.value);
-                    }}
-                    value={settings.brand_color}
-                    style={{ display: 'none' }}
-                  />
-                </Box>
+                <ColorPicker
+                  type="color"
+                  id="brandColorPicker"
+                  name="brandColorPicker"
+                  css={{ bg: settings.brand_color }}
+                  onChange={e => {
+                    change('brand_color', e.target.value);
+                  }}
+                  value={settings.brand_color}
+                />
                 <Text>{settings.brand_color}</Text>
               </Flex>
             </ItemRoot>
