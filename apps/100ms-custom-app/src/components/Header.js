@@ -1,90 +1,37 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { Button, Flex, Text } from '@100mslive/react-ui';
-import { AppAnalytics } from '../helpers/analytics_helpers';
-
-// images
+import React, { useState, Suspense, useCallback } from 'react';
+import { InviteIcon, CodeIcon, EditIcon } from '@100mslive/react-icons';
+import { Button, Flex, styled, Text } from '@100mslive/react-ui';
+import { AppAnalytics } from '../utils/analytics';
+import { getInitialsFromEmail, getRandomColor } from '../utils/utils';
 import logo from '../assets/images/100ms_logo.svg';
 import darkLogo from '../assets/images/100ms_dark.svg';
 
-// icons
-import { InviteIcon, CodeIcon, EditIcon } from '@100mslive/react-icons';
-
 const DownloadCodeModal = React.lazy(() => import('./DownloadCodeModal'));
 const InviteLinksModal = React.lazy(() => import('./InviteLinksModal'));
-
-const getRandomColor = () => {
-  const h = Math.floor(Math.random() * 360),
-    s = `${Math.floor(Math.random() * 100)}%`,
-    l = `${Math.floor(Math.random() * 60)}%`;
-  return `hsl(${h},${s},${l})`;
-};
-
+const LogoImg = styled('img', {
+  maxHeight: '$14',
+  p: '$2',
+  cursor: 'pointer',
+  '@md': {
+    maxHeight: '$12',
+  },
+});
 const randomColor = getRandomColor();
 
-export default function Header({
-  savingData,
-  refreshData,
-  settings,
-  roleNames,
-  roomLinks,
-  onlyEmail,
-  email,
-  toggleModal,
-}) {
+export default function Header({ savingData, refreshData, settings, roomLinks, onlyEmail, toggleModal }) {
   const [modal, togModal] = useState(false);
   const [codeModal, setCodeModal] = useState(false);
-  const [role_data, setRoleData] = useState({
-    role_names: [],
-    roomId: null,
-  });
 
-  useEffect(() => {
-    const pathName = window.location.pathname;
-    let roomId = '';
-    if (pathName.startsWith('/preview') || pathName.startsWith('/meeting') || pathName.startsWith('/leave')) {
-      let index = 9;
-      if (pathName.startsWith('/leave')) {
-        index = 7;
-      }
-      for (let i = index; i < pathName.length; i++) {
-        if (pathName[i] === '/') {
-          break;
-        }
-        roomId += pathName[i];
-      }
-    }
-    setRoleData({
-      ...role_data,
-      role_names: roleNames,
-      roomId: roomId,
-    });
-    // eslint-disable-next-line
-  }, []);
-
-  const getEmailInitials = () => {
-    let initials = '';
-    const userEmail = email.toLowerCase();
-    for (let i = 0; i < userEmail.length; i++) {
-      if (userEmail[i] === '@') {
-        break;
-      }
-      if (userEmail[i] >= 'a' && userEmail[i] <= 'z') {
-        initials += userEmail[i];
-      }
-      if (initials.length === 2) {
-        break;
-      }
-    }
-    return initials;
-  };
-
-  const generateEnvData = logo => {
-    return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
-      settings.brand_color
-    }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
-      process.env.REACT_APP_BACKEND_API + window.location.hostname
-    }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
-  };
+  const generateEnvData = useCallback(
+    logo => {
+      return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
+        settings.brand_color
+      }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
+        process.env.REACT_APP_BACKEND_API + window.location.hostname
+      }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
+    },
+    [settings.tile_shape, settings.brand_color, settings.theme, settings.font],
+  );
 
   const downloadCode = async () => {
     await refreshData().then(logo => {
@@ -102,13 +49,14 @@ export default function Header({
   return (
     <>
       <Flex align="center" justify="between" css={{ p: '$6', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}>
-        <img
+        <LogoImg
           onClick={() => {
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
           }}
-          className="h-6 hover:cursor-pointer"
           src={settings.theme === 'dark' ? logo : darkLogo}
           alt="100ms logo"
+          width={132}
+          height={40}
         />
         <Flex align="center">
           {onlyEmail && (
@@ -151,8 +99,8 @@ export default function Header({
               </Button>
             </>
           )}
-          <Flex align="center" justify="center" css={{ backgroundColor: randomColor, w: '$14', h: '$14', r: '$round' }}>
-            <Text>{getEmailInitials()}</Text>
+          <Flex align="center" justify="center" css={{ bg: randomColor, w: '$14', h: '$14', r: '$round' }}>
+            <Text>{getInitialsFromEmail()}</Text>
           </Flex>
         </Flex>
       </Flex>

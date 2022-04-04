@@ -1,10 +1,9 @@
-import React, { Component, Suspense } from 'react';
-import cookies from 'js-cookies';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { Box, Flex, Loading } from '@100mslive/react-ui';
+import { Flex, Loading } from '@100mslive/react-ui';
 import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
+import { getAuthInfo, getRoomCodeFromUrl, storeRoomSettings } from './utils/utils';
 
-// icons
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 
@@ -13,62 +12,37 @@ const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      activeTab: 'theme',
-      modal: false,
-      loading: true,
-      showHeader: true,
-      userEmail: null,
-      onlyEmail: false,
-      roleNames: null,
-      roomJoinToken: null,
-      roomLinks: null,
-      roomCode: null,
-      savingData: false,
-      error: null,
+const App = () => {
+  const prevSavedSettings = useRef({});
+  const appInfo = useRef({ app_type: '', app_name: '' });
+  const [loading, setLoading] = useState(true);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [onlyEmail, setOnlyEmail] = useState(false);
+  const [error, setError] = useState('');
+  const [roomLinks, setRoomLinks] = useState({});
+  const [settings, setSettings] = useState({
+    theme: 'dark',
+    tile_shape: '1-1',
+    font: 'Inter',
+    avatars: 'initial',
+    brand_color: '#2F80FF',
+    logo_obj: null,
+    logo_url: null,
+    logo_name: null,
+    metadataFields: {
+      clicks: 0,
+      metadata: '',
+    },
+  });
 
-      // user's settings
-      final_state: {
-        theme: 'dark',
-        tile_shape: '1-1',
-        font: 'Inter',
-        avatars: 'initial',
-        brand_color: '#2F80FF',
-        logo_obj: null,
-        logo_url: null,
-        logo_name: null,
-      },
-      temporary_state: {
-        theme: 'dark',
-        tile_shape: '1-1',
-        font: 'Inter',
-        avatars: 'initial',
-        brand_color: '#2F80FF',
-        logo_obj: null,
-        logo_url: null,
-        logo_name: null,
-        metadataFields: {
-          clicks: 0,
-          metadata: '',
-        },
-      },
-    };
-  }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  componentDidMount() {
-    this.extractUrlCode();
-    this.fetchData();
-  }
-
-  fetchUserToken = async name => {
-    return await this.getRoomDetails(this.getToken(), name);
-  };
-
-  getRoomDetails = async (jwt, name) => {
-    const code = this.extractUrlCode();
+  const getRoomDetails = async name => {
+    const code = getRoomCodeFromUrl();
+    const jwt = getAuthInfo().token;
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
     const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
     var headers = {};
@@ -103,60 +77,19 @@ class App extends Component {
       });
   };
 
-  extractUrlCode = () => {
-    const path = window.location.pathname;
-    let roomCode = null;
-    if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
-      roomCode = '';
-      for (let i = 9; i < path.length; i++) {
-        if (path[i] === '/') {
-          break;
-        }
-        roomCode += path[i];
-      }
-      if (roomCode.trim() === '') {
-        roomCode = null;
-      }
-    }
-    this.setState({ roomCode });
-    return roomCode;
-  };
-
-  getToken = () => {
-    try {
-      const cookieName = process.env.REACT_APP_ENV === 'qa' ? 'authUser-qa' : 'authUser';
-      const authUser = JSON.parse(cookies.getItem(cookieName));
-      const token = authUser?.token;
-      this.setState({ userEmail: authUser?.email });
-      return token;
-    } catch (e) {
-      // user not logged in
-      this.setState({ showHeader: false });
-      console.log(e);
-    }
-  };
-
-  fetchData = async () => {
-    const jwt = this.getToken();
+  const fetchData = async () => {
+    const jwt = getAuthInfo().token;
     axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    var url = `${
+    const url = `${
       process.env.REACT_APP_BACKEND_API
-    }apps/get-details?domain=${hostname}&room_id=${this.extractUrlCode()}`;
-
-    console.log('url', url);
-    let headers = {};
+    }apps/get-details?domain=${hostname}&room_id=${getRoomCodeFromUrl()}`;
+    const headers = {};
     if (jwt) {
-      headers = {
-        Authorization: `Bearer ${jwt}`,
-        'Content-Type': 'application/json',
-      };
-    } else {
-      headers = {
-        'Content-Type': 'application/json',
-      };
+      headers['Authorization'] = `Bearer ${jwt}`;
     }
+    headers['Content-Type'] = 'application/json';
 
-    let mapTileShape = shape => {
+    const mapTileShape = shape => {
       if (shape === 'SQUARE') {
         return '1-1';
       } else if (shape === 'WIDE') {
@@ -167,7 +100,7 @@ class App extends Component {
       return shape;
     };
 
-    let mapFromBackend = data => {
+    const mapFromBackend = data => {
       const avatars = {
           PEBBLE: 'pebble',
           INITIALS: 'initial',
@@ -223,20 +156,12 @@ class App extends Component {
               metadata: prevSettings.metadata,
             },
           };
-          this.setState({
-            loading: false,
-            onlyEmail: res.data.same_user,
-            final_state: prevSettings,
-            temporary_state: prevSettings,
-            roleNames: res.data.role,
-            roomLinks: res.data.room_links,
-            app_name,
-            app_type,
-            error: null,
-          });
-        } else {
-          console.error('get-details failure', res.data);
-          throw Error('something went wrong, success is not true!');
+          setLoading(false);
+          setOnlyEmail(res.data.same_user);
+          prevSavedSettings.current = Object.assign({}, prevSettings);
+          appInfo.current = { app_name, app_type };
+          setRoomLinks(res.data.room_links);
+          setSettings(prevSettings);
         }
       })
       .catch(err => {
@@ -251,182 +176,112 @@ class App extends Component {
             body: 'Please make sure the domain name is right',
           };
         }
-        this.setState({
-          loading: false,
-          error,
-        });
+        setLoading(false);
+        setError(error);
         console.error(errorMessage);
       });
-    return this.state.temporary_state.logo_url;
   };
 
-  storeSettings = async jwt => {
-    const mapTileShape = value => {
-      return value === '1-1' ? 'SQUARE' : value === '16-9' ? 'WIDE' : 'LANDSCAPE';
-    };
-
-    const currentSettings = this.state.temporary_state;
-    const logoFile = currentSettings.logo_obj;
-    let formData = new FormData();
-    if (logoFile) {
-      formData.append('logo', logoFile);
-    }
-
-    formData.append('color', currentSettings.brand_color);
-    formData.append('font', currentSettings.font.toUpperCase());
-    formData.append('tile_shape', mapTileShape(currentSettings.tile_shape));
-    formData.append('theme', currentSettings.theme.toUpperCase());
-    formData.append('app_type', this.state.app_type);
-    formData.append('app_name', this.state.app_name);
-    formData.append('subdomain', hostname);
-    formData.append('metadata', currentSettings.metadataFields.metadata);
-
-    this.setState({ savingData: true });
-
-    axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}apps/details`;
-
-    const headers = {
-      Authorization: `Bearer ${jwt}`,
-      'Content-Type': 'multipart/form-data',
-    };
-
-    await axios
-      .post(url, formData, { headers: headers })
-      .then(res => {
-        if (res.data.success) {
-          console.log('Details saves successfully!');
-        } else {
-          throw Error('Error while storing the data!');
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-    this.setState({ savingData: false });
-  };
-
-  changeSettings = (key, value) => {
-    this.setState({
-      temporary_state: {
-        ...this.state.temporary_state,
-        [key]: value,
-      },
+  const storeSettings = async () => {
+    setSavingSettings(true);
+    await storeRoomSettings({
+      hostname,
+      appInfo: appInfo.current,
+      settings,
     });
+    setSavingSettings(false);
   };
 
-  toggleModal = () => {
-    this.setState({ modal: !this.state.modal });
-    this.changeSettings('metadataFields', {
-      ...this.state.temporary_state.metadataFields,
+  const changeSettings = (key, value) => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      [key]: value,
+    }));
+  };
+
+  const toggleModal = () => {
+    setShowSettingsModal(value => !value);
+    changeSettings('metadataFields', {
+      ...settings.metadataFields,
       clicks: 0,
     });
   };
 
-  content = () => {
-    switch (this.state.activeTab) {
-      case 'theme':
-        return (
-          <RoomSettings
-            handleLogoChange={this.handleLogoChange}
-            settings={this.state.temporary_state}
-            change={this.changeSettings}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  handleLogoChange = e => {
+  const handleLogoChange = e => {
     if (e.target.files && e.target.files[0]) {
       const logo_name = e.target.files[0].name;
       const logo_url = URL.createObjectURL(e.target.files[0]);
       const logo_obj = e.target.files[0];
-      this.setState({
-        temporary_state: {
-          ...this.state.temporary_state,
-          logo_obj,
-          logo_url,
-          logo_name,
-        },
-      });
+      setSettings(value => ({
+        ...value,
+        logo_obj,
+        logo_url,
+        logo_name,
+      }));
     }
   };
 
-  saveDetails = () => {
-    const token = this.getToken();
-    this.setState({
-      final_state: this.state.temporary_state,
-      modal: false,
-    });
-    this.storeSettings(token);
+  const saveDetails = () => {
+    prevSavedSettings.current = settings;
+    setShowSettingsModal(false);
+    storeSettings();
   };
 
-  render() {
-    if (this.state.loading) {
-      return (
-        <Flex justify="center" align="center" css={{ size: '100%' }}>
-          <Loading size={100} />
-        </Flex>
-      );
-    }
+  if (loading) {
     return (
-      <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
-        {this.state.error && (
-          <Suspense fallback={<Box />}>
-            <ErrorModal title={this.state.error.title} body={this.state.error.body} />
-          </Suspense>
-        )}
-        {this.state.onlyEmail && (
-          <Suspense fallback={<Box />}>
-            <Header
-              savingData={this.state.savingData}
-              refreshData={this.fetchData}
-              settings={this.state.temporary_state}
-              roleNames={this.state.roleNames}
-              roomLinks={this.state.roomLinks}
-              onlyEmail={this.state.onlyEmail}
-              email={this.state.userEmail}
-              toggleModal={this.toggleModal}
-            />
-          </Suspense>
-        )}
-        <HMSEdtechTemplate
-          tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
-          themeConfig={{
-            aspectRatio: this.state.temporary_state.tile_shape,
-            font: this.state.temporary_state.font,
-            color: this.state.temporary_state.brand_color,
-            theme: this.state.temporary_state.theme,
-            logo:
-              this.state.temporary_state.logo_url ||
-              (this.state.temporary_state.theme === 'dark' ? logoDark : logoLight),
-            headerPresent: this.state.showHeader.toString(),
-            metadata: this.state.temporary_state.metadataFields.metadata,
-          }}
-          getUserToken={this.fetchUserToken}
-        />
-        {this.state.modal && (
-          <Suspense fallback={<div>Loading...</div>}>
-            <RoomSettings
-              onClose={this.toggleModal}
-              handleLogoChange={this.handleLogoChange}
-              settings={this.state.temporary_state}
-              change={this.changeSettings}
-              onSave={this.saveDetails}
-              onCancel={() => {
-                this.setState({
-                  temporary_state: this.state.final_state,
-                  modal: false,
-                });
-              }}
-            />
-          </Suspense>
-        )}
+      <Flex justify="center" align="center" css={{ size: '100%' }}>
+        <Loading size={100} />
       </Flex>
     );
   }
-}
+  return (
+    <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
+      {error && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <ErrorModal title={error.title} body={error.body} />
+        </Suspense>
+      )}
+      {onlyEmail && (
+        <Header
+          savingData={savingSettings}
+          refreshData={fetchData}
+          settings={settings}
+          roomLinks={roomLinks}
+          onlyEmail={onlyEmail}
+          toggleModal={toggleModal}
+        />
+      )}
+
+      <HMSEdtechTemplate
+        tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+        themeConfig={{
+          aspectRatio: settings.tile_shape,
+          font: settings.font,
+          color: settings.brand_color,
+          theme: settings.theme,
+          logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
+          headerPresent: String(!!getAuthInfo().userEmail),
+          metadata: settings.metadataFields.metadata,
+        }}
+        getUserToken={getRoomDetails}
+      />
+      {showSettingsModal && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <RoomSettings
+            onClose={toggleModal}
+            handleLogoChange={handleLogoChange}
+            settings={settings}
+            change={changeSettings}
+            onSave={saveDetails}
+            onCancel={() => {
+              setSettings(Object.assign({}, prevSavedSettings.current));
+              setShowSettingsModal(false);
+            }}
+          />
+        </Suspense>
+      )}
+    </Flex>
+  );
+};
 
 export default App;
