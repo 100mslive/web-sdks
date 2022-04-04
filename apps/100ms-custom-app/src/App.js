@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Flex, Loading } from '@100mslive/react-ui';
-import { EdtechComponent as HMSEdtechTemplate } from '100ms_edtech_template';
 import { getAuthInfo, getRoomCodeFromUrl, storeRoomSettings } from './utils/utils';
 
 import logoLight from './assets/images/logo-on-white.png';
@@ -10,6 +9,9 @@ import logoDark from './assets/images/logo-on-black.png';
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
+const HMSEdtechTemplate = React.lazy(() =>
+  import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
+);
 const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 
 const App = () => {
@@ -252,19 +254,23 @@ const App = () => {
         />
       )}
 
-      <HMSEdtechTemplate
-        tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
-        themeConfig={{
-          aspectRatio: settings.tile_shape,
-          font: settings.font,
-          color: settings.brand_color,
-          theme: settings.theme,
-          logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
-          headerPresent: String(!!getAuthInfo().userEmail),
-          metadata: settings.metadataFields.metadata,
-        }}
-        getUserToken={getRoomDetails}
-      />
+      {!error && !loading && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <HMSEdtechTemplate
+            tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+            themeConfig={{
+              aspectRatio: settings.tile_shape,
+              font: settings.font,
+              color: settings.brand_color,
+              theme: settings.theme,
+              logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
+              headerPresent: String(!!getAuthInfo().userEmail),
+              metadata: settings.metadataFields.metadata,
+            }}
+            getUserToken={getRoomDetails}
+          />
+        </Suspense>
+      )}
       {showSettingsModal && (
         <Suspense fallback={<div>Loading...</div>}>
           <RoomSettings

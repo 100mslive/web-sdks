@@ -12,7 +12,7 @@ const ErrorModal = ({ title, body }) => {
         onEscapeKeyDown={e => e.preventDefault()}
         onPointerDownOutside={e => e.preventDefault()}
       >
-        <Text css={{ p: '$8 0' }}>{body}</Text>
+        <Text css={{ p: '$8 0', wordBreak: 'break-word' }}>{body}</Text>
       </DialogContent>
     </Dialog.Root>
   );
