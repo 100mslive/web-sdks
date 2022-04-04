@@ -29,7 +29,6 @@ export default function Header({
   roomLinks,
   onlyEmail,
   email,
-  theme = 'dark',
   toggleModal,
 }) {
   const [modal, togModal] = useState(false);
@@ -108,7 +107,7 @@ export default function Header({
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
           }}
           className="h-6 hover:cursor-pointer"
-          src={theme === 'dark' ? logo : darkLogo}
+          src={settings.theme === 'dark' ? logo : darkLogo}
           alt="100ms logo"
         />
         <Flex align="center">
@@ -159,7 +158,7 @@ export default function Header({
       </Flex>
       {codeModal && (
         <Suspense fallback={<div>Loading...</div>}>
-          <DownloadCodeModal downloadEnv={downloadCode} theme={theme} onClose={() => setCodeModal(false)} />
+          <DownloadCodeModal downloadEnv={downloadCode} onClose={() => setCodeModal(false)} />
         </Suspense>
       )}
       {modal && (
