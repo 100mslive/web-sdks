@@ -26,6 +26,9 @@ const ColorPicker = styled('input', {
   r: '$3',
   mr: '$4',
   cursor: 'pointer',
+  '&::-webkit-color-swatch': {
+    border: 'none',
+  },
 });
 
 const TileType = ({ type, active, value, change }) => {
