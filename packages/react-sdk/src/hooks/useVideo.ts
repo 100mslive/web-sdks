@@ -33,8 +33,10 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
 
   const setRefs = useCallback(
     node => {
-      videoRef.current = node;
-      inViewRef(node);
+      if (node) {
+        videoRef.current = node;
+        inViewRef(node);
+      }
     },
     [inViewRef],
   );
