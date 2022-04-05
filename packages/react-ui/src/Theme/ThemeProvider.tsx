@@ -3,15 +3,21 @@ import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 import useSSR from './useSSR';
 
+const defaultTheme = 'dark';
+const defaultAspectRatio = {
+  width: 1,
+  height: 1,
+};
+
 export type ThemeContextValue = {
   themeType: 'dark' | 'light';
   theme: Theme;
   aspectRatio: { width: number; height: number };
 };
 export type ThemeProviderProps = {
-  themeType: 'dark' | 'light';
+  themeType?: 'dark' | 'light';
   theme?: Theme;
-  aspectRatio: { width: number; height: number };
+  aspectRatio?: { width: number; height: number };
 };
 
 const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 } };
@@ -25,9 +31,9 @@ export const ThemeContext = React.createContext(defaultContext);
  * </ThemeProvider>
  */
 export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>> = ({
-  themeType,
+  themeType = defaultTheme,
   theme: userTheme,
-  aspectRatio,
+  aspectRatio = defaultAspectRatio,
   children,
 }) => {
   const previousClassName = useRef('');
