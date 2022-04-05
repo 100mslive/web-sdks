@@ -68,7 +68,7 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      /* chunks: 'all',
       cacheGroups: {
         react: {
           name: 'react',
@@ -92,7 +92,7 @@ module.exports = {
         default: {
           reuseExistingChunk: true,
         },
-      },
+      }, */
     },
     runtimeChunk: false,
     minimize: isProduction,
