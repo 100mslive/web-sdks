@@ -68,25 +68,34 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
         react: {
           name: 'react',
           enforce: true,
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
-          chunks: 'all',
+        },
+        hms: {
+          name: 'hms',
+          enforce: true,
+          test: /[\\/]packages[\\/](hms-.+)/,
+          reuseExistingChunk: true,
         },
         vendor: {
-          name: 'vendor',
+          name(module) {
+            // get the name. E.g. node_modules/packageName/not/this/part.js
+            // or node_modules/packageName
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            // npm package names are URL-safe, but some servers don't like @ symbols
+            return `vendor-${packageName.replace('@', '')}`;
+          },
           enforce: true,
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/](?!react|react-dom)/,
           reuseExistingChunk: true,
-          chunks: 'all',
-          maxSize: 204800,
         },
         default: {
           reuseExistingChunk: true,
-          chunks: 'all',
         },
       },
     },
