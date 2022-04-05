@@ -268,8 +268,8 @@ export class HMSSdk implements HMSInterface {
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
-        listener.onPreview(this.store.getRoom(), tracks);
         this.sdkState.isPreviewInProgress = false;
+        listener.onPreview(this.store.getRoom(), tracks);
         resolve();
       };
 
