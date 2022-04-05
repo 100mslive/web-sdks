@@ -76,12 +76,6 @@ module.exports = {
           test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
         },
-        hms: {
-          name: 'hms',
-          enforce: true,
-          test: /[\\/]packages[\\/](hms-.+)/,
-          reuseExistingChunk: true,
-        },
         vendor: {
           name(module) {
             // get the name. E.g. node_modules/packageName/not/this/part.js
