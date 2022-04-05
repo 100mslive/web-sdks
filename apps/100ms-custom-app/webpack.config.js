@@ -93,6 +93,7 @@ module.exports = {
           enforce: true,
           test: /[\\/]node_modules[\\/](?!react|react-dom)/,
           reuseExistingChunk: true,
+          maxSize: 204800,
         },
         default: {
           reuseExistingChunk: true,
