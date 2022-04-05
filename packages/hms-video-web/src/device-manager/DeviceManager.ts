@@ -17,10 +17,7 @@ export type SelectedDevices = {
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
 
-interface HMSDeviceManager {
-  audioInput: MediaDeviceInfo[];
-  audioOutput: MediaDeviceInfo[];
-  videoInput: MediaDeviceInfo[];
+interface HMSDeviceManager extends DeviceMap {
   outputDevice?: MediaDeviceInfo;
   hasWebcamPermission: boolean;
   hasMicrophonePermission: boolean;
