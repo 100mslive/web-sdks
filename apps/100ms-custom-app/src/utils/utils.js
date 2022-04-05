@@ -101,3 +101,49 @@ export const getInitialsFromEmail = () => {
   }
   return initials;
 };
+
+export const mapTileShape = shape => {
+  if (shape === 'SQUARE') {
+    return '1-1';
+  } else if (shape === 'WIDE') {
+    return '16-9';
+  } else if (shape === 'LANDSCAPE') {
+    return '4-3';
+  }
+  return shape;
+};
+
+export const mapFromBackend = data => {
+  const avatars = {
+      PEBBLE: 'pebble',
+      INITIALS: 'initial',
+    },
+    fonts = {
+      LATO: 'Lato',
+      ROBOTO: 'Roboto',
+      MONTSERRAT: 'Montserrat',
+      INTER: 'Inter',
+      'OPEN SANS': 'Open Sans',
+      'IBM PLEX SANS': 'IBM Plex Sans',
+    };
+
+  return {
+    ...data,
+    video_off_avatars: avatars[data.video_off_avatars],
+    font: fonts[data.font],
+  };
+};
+
+export const getWithRetry = async (url, headers) => {
+  const MAX_RETRIES = 4;
+  let error = Error('something went wrong');
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      return await axios.get(url, { headers: headers });
+    } catch (err) {
+      error = err;
+    }
+  }
+  console.error('max retry done for get-details', error);
+  throw error;
+};
