@@ -159,15 +159,15 @@ export default class HMSTransport implements ITransport {
       await this.observer.onStateChange(TransportState.Failed, error);
     },
 
-    onFailure: (exception: HMSException) => {
+    onFailure: (error: HMSException) => {
       // @DISCUSS: Should we remove this? Pong failure would have already scheduled signal retry.
       if (this.joinParameters) {
-        this.retryScheduler.schedule(
-          TransportFailureCategory.SignalDisconnect,
-          exception,
-          this.retrySignalDisconnectTask,
-          this.state,
-        );
+        this.retryScheduler.schedule({
+          category: TransportFailureCategory.SignalDisconnect,
+          error,
+          task: this.retrySignalDisconnectTask,
+          originalState: this.state,
+        });
       }
     },
 
@@ -175,12 +175,12 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
       try {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
-          this.retryScheduler.schedule(
-            TransportFailureCategory.SignalDisconnect,
-            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
-            this.retrySignalDisconnectTask,
-            this.state,
-          );
+          this.retryScheduler.schedule({
+            category: TransportFailureCategory.SignalDisconnect,
+            error: ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+            task: this.retrySignalDisconnectTask,
+            originalState: this.state,
+          });
         }
       } catch (e) {
         console.error(e);
@@ -388,14 +388,14 @@ export default class HMSTransport implements ITransport {
           return Boolean(this.initConfig && this.initConfig.endpoint);
         };
 
-        await this.retryScheduler.schedule(
-          TransportFailureCategory.ConnectFailed,
-          error as HMSException,
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.ConnectFailed,
+          error,
           task,
-          this.state,
-          MAX_TRANSPORT_RETRIES,
-          false,
-        );
+          originalState: this.state,
+          maxFailedRetries: MAX_TRANSPORT_RETRIES,
+          changeState: false,
+        });
       } else {
         throw error;
       }
@@ -702,20 +702,20 @@ export default class HMSTransport implements ITransport {
 
   private async handleIceConnectionFailure(role: HMSConnectionRole) {
     if (role === HMSConnectionRole.Publish) {
-      this.retryScheduler.schedule(
-        TransportFailureCategory.PublishIceConnectionFailed,
-        ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
-        this.retryPublishIceFailedTask,
-        this.state,
-      );
+      this.retryScheduler.schedule({
+        category: TransportFailureCategory.PublishIceConnectionFailed,
+        error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
+        task: this.retryPublishIceFailedTask,
+        originalState: this.state,
+      });
     } else {
-      this.retryScheduler.schedule(
-        TransportFailureCategory.SubscribeIceConnectionFailed,
-        ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
-        this.retrySubscribeIceFailedTask,
-        this.state,
-        1,
-      );
+      this.retryScheduler.schedule({
+        category: TransportFailureCategory.SubscribeIceConnectionFailed,
+        error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
+        task: this.retrySubscribeIceFailedTask,
+        originalState: this.state,
+        maxFailedRetries: 1,
+      });
     }
   }
 
