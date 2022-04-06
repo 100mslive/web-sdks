@@ -100,7 +100,7 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
             </>
           )}
           <Flex align="center" justify="center" css={{ bg: randomColor, w: '$14', h: '$14', r: '$round' }}>
-            <Text>{getInitialsFromEmail()}</Text>
+            <Text css={{ color: '$white' }}>{getInitialsFromEmail()}</Text>
           </Flex>
         </Flex>
       </Flex>
