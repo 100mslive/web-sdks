@@ -33,25 +33,33 @@ async function main() {
       target: 'es6',
       external,
       metafile: false,
+      treeShaking: true,
       loader,
       define,
       plugins,
     });
 
-    esbuild.build({
-      entryPoints: [source],
-      outfile: 'dist/index.js',
-      assetNames: '[name]',
-      minify: false,
-      bundle: true,
-      format: 'esm',
-      target: 'es6',
-      external,
-      metafile: true,
-      loader,
-      define,
-      plugins,
-    });
+    esbuild
+      .build({
+        entryPoints: [source],
+        outdir: 'dist/',
+        assetNames: '[name]',
+        minify: false,
+        bundle: true,
+        format: 'esm',
+        target: 'es6',
+        external,
+        metafile: true,
+        splitting: true,
+        treeShaking: true,
+        loader,
+        define,
+        plugins,
+      })
+      .then(() => {
+        fs.renameSync('./dist/App.js', './dist/index.js');
+        fs.renameSync('./dist/App.css', './dist/index.css');
+      });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);
