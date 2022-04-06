@@ -15,6 +15,7 @@ import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 import WhiteboardView from "./WhiteboardView";
+import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 
 const HLSView = React.lazy(() => import("./HLSView"));
 const ScreenShareView = React.lazy(() => import("./screenShareView"));
@@ -66,7 +67,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     !isAudioOnly
   ) {
     ViewComponent = ScreenShareView;
-  } else if (uiViewMode === "activeSpeaker") {
+  } else if (uiViewMode === UI_MODE_ACTIVE_SPEAKER) {
     ViewComponent = ActiveSpeakerView;
   } else {
     ViewComponent = MainGridView;
