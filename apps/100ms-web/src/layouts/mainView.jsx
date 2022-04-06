@@ -14,8 +14,8 @@ import { AppContext } from "../components/context/AppContext";
 import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
+import WhiteboardView from "./WhiteboardView";
 
-const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
 const ScreenShareView = React.lazy(() => import("./screenShareView"));
 const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
