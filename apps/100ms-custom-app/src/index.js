@@ -4,7 +4,6 @@ import LogRocket from 'logrocket';
 import setupLogRocketReact from 'logrocket-react';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import '100ms_edtech_template/dist/index.css';
 import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
