@@ -204,14 +204,16 @@ const App = () => {
         </Suspense>
       )}
       {onlyEmail && (
-        <Header
-          savingData={savingSettings}
-          refreshData={fetchData}
-          settings={settings}
-          roomLinks={roomLinks}
-          onlyEmail={onlyEmail}
-          toggleModal={toggleModal}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Header
+            savingData={savingSettings}
+            refreshData={fetchData}
+            settings={settings}
+            roomLinks={roomLinks}
+            onlyEmail={onlyEmail}
+            toggleModal={toggleModal}
+          />
+        </Suspense>
       )}
 
       {!error && !loading && (
