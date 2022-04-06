@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
@@ -68,23 +68,39 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
+      /* chunks: 'all',
       cacheGroups: {
-        vendor: {
-          name: 'vendor',
+        react: {
+          name: 'react',
           enforce: true,
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
-          chunks: 'all',
+        },
+        vendor: {
+          name(module) {
+            // get the name. E.g. node_modules/packageName/not/this/part.js
+            // or node_modules/packageName
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            // npm package names are URL-safe, but some servers don't like @ symbols
+            return `vendor-${packageName.replace('@', '')}`;
+          },
+          enforce: true,
+          test: /[\\/]node_modules[\\/](?!react|react-dom)/,
+          reuseExistingChunk: true,
+          maxSize: 204800,
         },
         default: {
           reuseExistingChunk: true,
-          chunks: 'all',
         },
-      },
+      }, */
     },
     runtimeChunk: false,
     minimize: isProduction,
-    minimizer: [new ESBuildMinifyPlugin()],
+    minimizer: [
+      new TerserPlugin({
+        minify: TerserPlugin.uglifyJsMinify,
+      }),
+    ],
   },
   plugins: [
     new webpack.ProgressPlugin(),
