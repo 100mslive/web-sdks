@@ -659,6 +659,8 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.preview(config, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
+      onReconnected: this.onReconnected.bind(this),
+      onReconnecting: this.onReconnecting.bind(this),
       onDeviceChange: this.onDeviceChange.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
@@ -990,7 +992,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('reconnectedSync');
     this.hmsNotifications.sendReconnected();
     this.setState(store => {
-      store.room.roomState = HMSRoomState.Connected;
+      store.room.roomState = store.room.isConnected ? HMSRoomState.Connected : HMSRoomState.Preview;
     }, 'reconnected');
   }
 
