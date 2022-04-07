@@ -10,6 +10,11 @@
   "engines": {
     "node": ">=10"
   },
+  "browser": {
+    "path": false,
+    "fs": false,
+    "stream": false
+  },
   "scripts": {
     "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ../../scripts/dev",
