@@ -38,12 +38,15 @@
     "@radix-ui/react-checkbox": "^0.1.4",
     "@radix-ui/react-dialog": "^0.1.1",
     "@radix-ui/react-dropdown-menu": "^0.1.4",
+    "@radix-ui/react-label": "^0.1.5",
     "@radix-ui/react-popover": "^0.1.4",
+    "@radix-ui/react-radio-group": "^0.1.5",
     "@radix-ui/react-slider": "^0.1.1",
     "@radix-ui/react-switch": "^0.1.1",
     "@radix-ui/react-toast": "^0.1.1",
     "@radix-ui/react-tooltip": "^0.1.1",
     "@stitches/react": "^1.2.5",
-    "lodash.merge": "^4.6.2"
+    "lodash.merge": "^4.6.2",
+    "react-use": "^17.3.2"
   }
 }
