@@ -15,7 +15,7 @@
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ../../scripts/dev",
-    "build:only": "rollup -c",
+    "build:only": "NODE_ENV=production rollup -c",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
     "types:build": "tsc -p tsconfig.build.json",
