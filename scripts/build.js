@@ -13,16 +13,10 @@ async function main() {
   }
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
-  const isReact = pkg.name.includes('react');
   const external = Object.keys(pkg.dependencies || {});
-  if (isReact) {
-    external.push('react');
-  }
+  external.push(...Object.keys(pkg.peerDependencies || {}));
   if (pkg.name === '@100mslive/hms-noise-suppression') {
     external.push('fs', 'path', './src/models/Noise.js');
-  }
-  if (['@100mslive/hms-noise-suppression', '@100mslive/hms-virtual-background'].includes(pkg.name)) {
-    external.push('@100mslive/hms-video');
   }
   try {
     esbuild.buildSync({

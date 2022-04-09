@@ -29,7 +29,7 @@
     "react": "^17.0.2"
   },
   "peerDependencies": {
-    "react": "^17.0.1"
+    "react": "^17.0.2"
   },
   "dependencies": {
     "@100mslive/hms-video-store": "0.2.94",
