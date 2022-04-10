@@ -47,6 +47,7 @@ async function main() {
         entryPoints: [source],
         outdir: 'dist/',
         format: 'esm',
+        splitting: true,
         ...commonOptions,
       })
       .then(() => {
