@@ -24,9 +24,7 @@ async function main() {
     target: 'es6',
     external,
     tsconfig: 'tsconfig.json',
-    minifySyntax: true,
-    minifyIdentifiers: true,
-    minifyWhitespace: false, // to keep pure annotations intact
+    minify: true,
   };
   try {
     await esbuild.build({
