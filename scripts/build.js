@@ -20,11 +20,13 @@ async function main() {
   }
   const commonOptions = {
     entryPoints: [source],
-    minify: true,
     bundle: true,
     target: 'es6',
     external,
     tsconfig: 'tsconfig.json',
+    minifySyntax: true,
+    minifyIdentifiers: true,
+    minifyWhitespace: false, // to keep pure annotations intact
   };
   try {
     await esbuild.build({
