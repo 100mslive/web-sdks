@@ -40,7 +40,7 @@ async function main() {
     bundle: true,
     format: 'esm',
     target: 'es6',
-    tsconfig: './tsconfig.json',
+    tsconfig: 'tsconfig.json',
     external,
     sourcemap: true,
     incremental: true,
