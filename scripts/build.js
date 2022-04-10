@@ -38,7 +38,7 @@ async function main() {
       bundle: true,
       format: 'esm',
       target: 'es6',
-      tsconfig: 'tsconfig.build.json',
+      tsconfig: 'tsconfig.json',
       external,
       metafile: true,
     });
