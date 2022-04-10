@@ -18,28 +18,25 @@ async function main() {
   if (pkg.name === '@100mslive/hms-noise-suppression') {
     external.push('fs', 'path', './src/models/Noise.js');
   }
+  const commonOptions = {
+    entryPoints: [source],
+    minify: true,
+    bundle: true,
+    target: 'es6',
+    external,
+    tsconfig: 'tsconfig.json',
+  };
   try {
-    esbuild.buildSync({
-      entryPoints: [source],
+    await esbuild.build({
+      ...commonOptions,
       outfile: 'dist/index.cjs.js',
-      minify: true,
-      bundle: true,
       format: 'cjs',
-      target: 'es6',
-      tsconfig: 'tsconfig.json',
-      external,
-      metafile: true,
     });
 
-    const esmResult = esbuild.buildSync({
-      entryPoints: [source],
+    const esmResult = await esbuild.build({
+      ...commonOptions,
       outfile: 'dist/index.js',
-      minify: true,
-      bundle: true,
       format: 'esm',
-      target: 'es6',
-      tsconfig: 'tsconfig.json',
-      external,
       metafile: true,
     });
 
