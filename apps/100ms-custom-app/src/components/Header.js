@@ -10,7 +10,7 @@ const DownloadCodeModal = React.lazy(() => import('./DownloadCodeModal'));
 const InviteLinksModal = React.lazy(() => import('./InviteLinksModal'));
 const LogoImg = styled('img', {
   maxHeight: '$14',
-  p: '$2',
+  width: 'auto',
   cursor: 'pointer',
   '@md': {
     maxHeight: '$12',
@@ -48,7 +48,11 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
 
   return (
     <>
-      <Flex align="center" justify="between" css={{ p: '$6', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}>
+      <Flex
+        align="center"
+        justify="between"
+        css={{ p: '$6 $4', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}
+      >
         <LogoImg
           onClick={() => {
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
