@@ -2,61 +2,6 @@
 # yarn lockfile v1
 
 
-"@100mslive/hms-video-store@0.2.94":
-  version "0.2.94"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.94.tgz#8e6cb9c7fa7d29070c191d8e5304b3411cb21cec"
-  integrity sha512-esquCvqEsM0LTBv4SIG5ZpLM30pAmu8/Vj6D/UDkQ/4ripF8wswbwVwDPgQcn9ZGB85bHi7icxZDbXCl3WtFrg==
-  dependencies:
-    "@100mslive/hms-video" "0.1.48"
-    eventemitter2 "^6.4.5"
-    immer "^9.0.6"
-    reselect "4.0.0"
-    zustand "3.5.7"
-
-"@100mslive/hms-video@0.1.48":
-  version "0.1.48"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.48.tgz#71aab9ce4d0d31693f4d7a90da75f06eaa6111b7"
-  integrity sha512-7XQFQ+KNSU7fkk50Vx7TR1RsC/O2kHCl2Ce+kEEck9kjrz3ZjCLQ6Bd9i0w/ziaFCK4HrjmqHX2NicXQc3K11w==
-  dependencies:
-    eventemitter2 "^6.4.5"
-    sdp-transform "^2.14.1"
-    ua-parser-js "^1.0.1"
-    uuid "^8.3.2"
-    webrtc-adapter "^8.0.0"
-
-"@100mslive/react-icons@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.0.11.tgz#0c8bc9d5edf522d86ca384303a3688aba8c86a23"
-  integrity sha512-9S0BNtWDt2MVYrNniuqzhKssxzRdv2JonozxmbWrVjvdVrNR2bhzv1hrkgnda6jG15hF2QHgwX+Z0NDifZy9qQ==
-
-"@100mslive/react-sdk@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.0.11.tgz#f9b4c5ca3d8780d8e0d3bde01d2a25d56855b45e"
-  integrity sha512-UGL1liUcmDExsR86BUb00YwZML/OtSHLXG8U4Dn0+CAUUpy6olwwECTZOyqpeIT5BMY66pA3USEUO7Xk052Bqg==
-  dependencies:
-    "@100mslive/hms-video-store" "0.2.94"
-    react-intersection-observer "^8.33.1"
-    react-resize-detector "^7.0.0"
-    zustand "^3.6.2"
-
-"@100mslive/react-ui@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-ui/-/react-ui-0.0.11.tgz#3a86f1ccd726b3b3b6b8e9ac6e60172eadda2f07"
-  integrity sha512-VsGX7MMj0bUvhkYrI2jA2hnUWW2VTK/zKcygIwFhsNqKD+Sm5KMyp+d4BhijDkNcaouYZuFXzZ2vfWVHsoKZ5g==
-  dependencies:
-    "@100mslive/react-icons" "0.0.11"
-    "@100mslive/react-sdk" "0.0.11"
-    "@radix-ui/react-checkbox" "^0.1.4"
-    "@radix-ui/react-dialog" "^0.1.1"
-    "@radix-ui/react-dropdown-menu" "^0.1.4"
-    "@radix-ui/react-popover" "^0.1.4"
-    "@radix-ui/react-slider" "^0.1.1"
-    "@radix-ui/react-switch" "^0.1.1"
-    "@radix-ui/react-toast" "^0.1.1"
-    "@radix-ui/react-tooltip" "^0.1.1"
-    "@stitches/react" "^1.2.5"
-    lodash.merge "^4.6.2"
-
 "@ampproject/remapping@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.1.2.tgz#4edca94973ded9630d20101cd8559cedb8d8bd34"
