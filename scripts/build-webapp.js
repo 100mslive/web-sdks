@@ -23,38 +23,32 @@ async function main() {
     }),
   ];
   try {
-    esbuild.build({
+    const commonOptions = {
       entryPoints: [source],
-      outfile: 'dist/index.cjs.js',
       assetNames: '[name]',
       minify: false,
       bundle: true,
-      format: 'cjs',
       target: 'es6',
       external,
-      metafile: false,
       treeShaking: true,
       loader,
       define,
       plugins,
+    };
+
+    esbuild.build({
+      outfile: 'dist/index.cjs.js',
+      format: 'cjs',
+      ...commonOptions,
     });
 
     esbuild
       .build({
         entryPoints: [source],
         outdir: 'dist/',
-        assetNames: '[name]',
-        minify: false,
-        bundle: true,
         format: 'esm',
-        target: 'es6',
-        external,
-        metafile: true,
         splitting: true,
-        treeShaking: true,
-        loader,
-        define,
-        plugins,
+        ...commonOptions,
       })
       .then(() => {
         fs.renameSync('./dist/App.js', './dist/index.js');

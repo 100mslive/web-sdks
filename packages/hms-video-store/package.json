@@ -1,5 +1,5 @@
 {
-  "version": "0.2.94",
+  "version": "0.2.95-alpha.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -17,7 +17,7 @@
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.build.json",
+    "types:build": "tsc -p tsconfig.json",
     "format": "prettier --write src/**/*.ts",
     "test": "jest --maxWorkers=1",
     "test:watch": "jest --watch",
@@ -33,7 +33,7 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.48",
+    "@100mslive/hms-video": "0.1.49-alpha.0",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
