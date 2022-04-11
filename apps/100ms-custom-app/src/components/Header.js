@@ -109,12 +109,12 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
         </Flex>
       </Flex>
       {codeModal && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
           <DownloadCodeModal downloadEnv={downloadCode} onClose={() => setCodeModal(false)} />
         </Suspense>
       )}
       {modal && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
           <InviteLinksModal onClose={() => togModal(false)} roomLinks={roomLinks} />
         </Suspense>
       )}
