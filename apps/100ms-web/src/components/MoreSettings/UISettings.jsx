@@ -72,15 +72,15 @@ export const UISettings = ({ open, onOpenChange }) => {
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
   const audioOnlyToggleHandler = useCallback(
-    async value => {
-      if (value && isLocalVideoEnabled) {
+    async isAudioOnlyModeOn => {
+      if (isAudioOnlyModeOn && isLocalVideoEnabled) {
         await hmsActions.setLocalVideoEnabled(false);
       }
 
-      if (value && isLocalScreenShared) {
+      if (isAudioOnlyModeOn && isLocalScreenShared) {
         await hmsActions.setScreenShareEnabled(false);
       }
-      setIsAudioOnly(value);
+      setIsAudioOnly(isAudioOnlyModeOn);
     },
     [isAudioOnly]
   );
