@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, Suspense } from "react";
+import React, { useEffect, useContext, Suspense, useCallback } from "react";
 import {
   useHMSStore,
   useHMSActions,
@@ -8,6 +8,7 @@ import {
   selectPeerSharingVideoPlaylist,
   selectRoomState,
   selectLocalPeer,
+  selectIsLocalVideoEnabled,
 } from "@100mslive/react-sdk";
 import { MainGridView } from "./mainGridView";
 import { AppContext } from "../components/context/AppContext";
@@ -38,6 +39,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     showStatsOnTiles,
     isAudioOnly,
   } = useContext(AppContext);
+
   useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {
