@@ -61,7 +61,8 @@ export const mobileChatStyle = {
   right: 8,
   width: "100%",
   maxWidth: 300,
-  minHeight: 440,
+  height: "70vh",
+  maxHeight: 440,
 };
 
 export const isScreenshareSupported = () => {
