@@ -1,10 +1,5 @@
-export interface HMSDeviceManager {
+export interface DeviceMap {
   audioInput: MediaDeviceInfo[];
   audioOutput: MediaDeviceInfo[];
   videoInput: MediaDeviceInfo[];
-  outputDevice?: MediaDeviceInfo;
-  hasWebcamPermission: boolean;
-  hasMicrophonePermission: boolean;
 }
-
-export type DeviceMap = Omit<HMSDeviceManager, 'outputDevice' | 'hasWebcamPermission' | 'hasMicrophonePermission'>;
