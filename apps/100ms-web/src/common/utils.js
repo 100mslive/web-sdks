@@ -68,3 +68,20 @@ export const mobileChatStyle = {
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
 };
+
+export function lazyWithRetry(fn, retriesLeft = 2, interval = 1000) {
+  return new Promise((resolve, reject) => {
+    fn()
+      .then(resolve)
+      .catch(error => {
+        setTimeout(() => {
+          if (retriesLeft === 1) {
+            reject(error);
+            return;
+          }
+
+          lazyWithRetry(fn, retriesLeft - 1, interval).then(resolve, reject);
+        }, interval);
+      });
+  });
+}

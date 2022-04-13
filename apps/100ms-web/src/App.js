@@ -12,7 +12,7 @@ import { Notifications } from "./components/Notifications";
 import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { FeatureFlags } from "./services/FeatureFlags";
-import { shadeColor } from "./common/utils";
+import { lazyWithRetry, shadeColor } from "./common/utils";
 import {
   getUserToken as defaultGetUserToken,
   getBackendEndpoint,
@@ -24,10 +24,18 @@ import LogoForDark from "./images/logo-light.svg";
 import FullPageProgress from "./components/FullPageProgress";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 
-const Conference = React.lazy(() => import("./components/conference"));
-const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
-const ErrorPage = React.lazy(() => import("./components/ErrorPage"));
-const PostLeave = React.lazy(() => import("./components/PostLeave"));
+const Conference = React.lazy(() =>
+  lazyWithRetry(() => import("./components/conference"))
+);
+const PreviewScreen = React.lazy(() =>
+  lazyWithRetry(() => import("./components/PreviewScreen"))
+);
+const ErrorPage = React.lazy(() =>
+  lazyWithRetry(() => import("./components/ErrorPage"))
+);
+const PostLeave = React.lazy(() =>
+  lazyWithRetry(() => import("./components/PostLeave"))
+);
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
