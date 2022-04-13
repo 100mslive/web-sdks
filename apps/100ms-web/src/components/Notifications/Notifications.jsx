@@ -19,6 +19,7 @@ import { TextWithIcon } from "./TextWithIcon";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { getMetadata } from "../../common/utils";
+import { ToastBatcher } from "../Toast/ToastBatcher";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -38,6 +39,11 @@ export function Notifications() {
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
+        ToastBatcher.addToastType({
+          title: notification.data?.name,
+          duration: 2000,
+          type: "METADATA_UPDATED",
+        });
         ToastManager.addToast({
           title: (
             <TextWithIcon Icon={HandIcon}>
