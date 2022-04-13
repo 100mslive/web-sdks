@@ -44,14 +44,6 @@ export function Notifications() {
           duration: 2000,
           type: "METADATA_UPDATED",
         });
-        ToastManager.addToast({
-          title: (
-            <TextWithIcon Icon={HandIcon}>
-              {notification.data?.name} raised their hand.
-            </TextWithIcon>
-          ),
-          duration: 2000,
-        });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(
@@ -63,8 +55,10 @@ export function Notifications() {
       case HMSNotificationTypes.NEW_MESSAGE:
         if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
           return;
-        ToastManager.addToast({
-          title: `New message from ${notification.data?.senderName}`,
+        ToastBatcher.addToastType({
+          title: notification.data?.senderName,
+          duration: 2000,
+          type: "NEW_MESSAGE",
         });
         break;
       case HMSNotificationTypes.ERROR:

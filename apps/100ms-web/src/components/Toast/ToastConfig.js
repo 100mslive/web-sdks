@@ -11,7 +11,35 @@ export const ToastConfig = {
     multiple: toast => {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${toast.name} and ${toast.count} others joined`};
+          {`${toast.name} and ${toast.count} others joined`}
+        </TextWithIcon>
+      );
+    },
+  },
+  PEER_LIST: {
+    single: toast => {
+      return (
+        <TextWithIcon Icon={PersonIcon}>{`${toast.name} joined`}</TextWithIcon>
+      );
+    },
+    multiple: toast => {
+      return (
+        <TextWithIcon Icon={PersonIcon}>
+          {`${toast.name} and ${toast.count} others joined`}
+        </TextWithIcon>
+      );
+    },
+  },
+  PEER_LEFT: {
+    single: toast => {
+      return (
+        <TextWithIcon Icon={PersonIcon}>{`${toast.name} left`}</TextWithIcon>
+      );
+    },
+    multiple: toast => {
+      return (
+        <TextWithIcon Icon={PersonIcon}>
+          {`${toast.name} and ${toast.count} others left`}
         </TextWithIcon>
       );
     },
@@ -19,13 +47,15 @@ export const ToastConfig = {
   METADATA_UPDATED: {
     single: toast => {
       return (
-        <TextWithIcon Icon={HandIcon}>{`${toast.name} joined`}</TextWithIcon>
+        <TextWithIcon
+          Icon={HandIcon}
+        >{`${toast.name} raised hand`}</TextWithIcon>
       );
     },
     multiple: toast => {
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`${toast.name} and ${toast.count} others joined`};
+          {`${toast.name} and ${toast.count} others raised hand`}
         </TextWithIcon>
       );
     },
@@ -33,13 +63,15 @@ export const ToastConfig = {
   NEW_MESSAGE: {
     single: toast => {
       return (
-        <TextWithIcon Icon={HandIcon}>{`${toast.name} joined`}</TextWithIcon>
+        <TextWithIcon
+          Icon={HandIcon}
+        >{`New message from ${toast.name}`}</TextWithIcon>
       );
     },
     multiple: toast => {
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`${toast.name} and ${toast.count} others joined`};
+          {`New messages from ${toast.name} and ${toast.count} others`}
         </TextWithIcon>
       );
     },
