@@ -38,5 +38,15 @@ export const ToastBatcher = {
         duration: duration,
       });
     }
+    this.syncUItoast();
+  },
+  syncUItoast(toastsDisplaying) {
+    for (const [toastType, toastInfo] of this.toastsType.entries()) {
+      if (!toastsDisplaying.find(toast => toast.id === toastInfo.id)) {
+        this.toastsType.delete(toastType);
+      }
+    }
   },
 };
+
+ToastManager.addListener(ToastBatcher.syncUItoast);

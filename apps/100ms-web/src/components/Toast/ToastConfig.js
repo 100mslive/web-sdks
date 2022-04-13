@@ -71,7 +71,7 @@ export const ToastConfig = {
     multiple: toast => {
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`New messages from ${toast.name} and ${toast.count} others`}
+          {`${toast.count} new messages`}
         </TextWithIcon>
       );
     },
