@@ -37,7 +37,6 @@ const SpeakerTag = () => {
 const LogoImg = styled("img", {
   maxHeight: "$14",
   p: "$2",
-  w: "auto",
   "@md": {
     maxHeight: "$12",
   },
@@ -45,11 +44,10 @@ const LogoImg = styled("img", {
 
 const Logo = () => {
   const { logo } = useContext(AppContext);
-  return <LogoImg src={logo} alt="Brand Logo" width={132} height={40} />;
+  return <LogoImg src={logo} alt="Brand Logo" />;
 };
 
 export const Header = ({ isPreview }) => {
-  const { isAudioOnly } = useContext(AppContext);
   const localPeer = useHMSStore(selectLocalPeer);
   const showPip = localPeer?.roleName !== DEFAULT_HLS_VIEWER_ROLE && !isPreview;
   return (
@@ -65,7 +63,7 @@ export const Header = ({ isPreview }) => {
       <Flex align="center" css={{ position: "absolute", right: "$4" }}>
         {showPip && <PIPComponent />}
         <Flex align="center" css={{ mx: "$2" }}>
-          <AdditionalRoomState isAudioOnly={isAudioOnly} />
+          <AdditionalRoomState />
         </Flex>
         <Box css={{ mx: "$2" }}>
           <ParticipantList />

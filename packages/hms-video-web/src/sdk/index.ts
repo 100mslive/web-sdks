@@ -204,7 +204,6 @@ export class HMSSdk implements HMSInterface {
 
     onStateChange: async (state: TransportState, error?: HMSException) => {
       switch (state) {
-        case TransportState.Preview:
         case TransportState.Joined:
           if (this.transportState === TransportState.Reconnecting) {
             this.listener?.onReconnected();
@@ -223,7 +222,6 @@ export class HMSSdk implements HMSInterface {
       }
 
       this.transportState = state;
-      HMSLogger.d(this.TAG, 'Transport State Change', this.transportState);
     },
   };
 
@@ -270,21 +268,15 @@ export class HMSSdk implements HMSInterface {
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
-        this.sdkState.isPreviewInProgress = false;
         listener.onPreview(this.store.getRoom(), tracks);
+        this.sdkState.isPreviewInProgress = false;
         resolve();
       };
 
       this.eventBus.policyChange.subscribeOnce(policyHandler);
 
       this.transport
-        .preview(
-          config.authToken,
-          config.initEndpoint || 'https://prod-init.100ms.live/init',
-          this.localPeer!.peerId,
-          { name: config.userName, metaData: config.metaData || '' },
-          config.autoVideoSubscribe,
-        )
+        .connect(config.authToken, config.initEndpoint || 'https://prod-init.100ms.live/init', this.localPeer!.peerId)
         .then((initConfig: InitConfig | void) => {
           initSuccessful = true;
           clearTimeout(timerId);

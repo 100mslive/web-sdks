@@ -2,12 +2,6 @@ import React, { useMemo, useRef } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 import useSSR from './useSSR';
-import { useMedia } from 'react-use';
-
-const defaultAspectRatio = {
-  width: 1,
-  height: 1,
-};
 
 export type ThemeContextValue = {
   themeType: 'dark' | 'light';
@@ -15,9 +9,9 @@ export type ThemeContextValue = {
   aspectRatio: { width: number; height: number };
 };
 export type ThemeProviderProps = {
-  themeType?: 'dark' | 'light';
+  themeType: 'dark' | 'light';
   theme?: Theme;
-  aspectRatio?: { width: number; height: number };
+  aspectRatio: { width: number; height: number };
 };
 
 const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 } };
@@ -33,15 +27,14 @@ export const ThemeContext = React.createContext(defaultContext);
 export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>> = ({
   themeType,
   theme: userTheme,
-  aspectRatio = defaultAspectRatio,
+  aspectRatio,
   children,
 }) => {
-  const systemTheme = useMedia('prefers-color-scheme: dark') ? 'dark' : 'light';
-  const resolvedTheme = themeType || systemTheme;
   const previousClassName = useRef('');
   const { isBrowser } = useSSR();
+
   const updatedTheme = useMemo(() => {
-    const updatedTheme = createTheme({ themeType: resolvedTheme, theme: userTheme || {} });
+    const updatedTheme = createTheme({ themeType, theme: userTheme || {} });
     if (!isBrowser) {
       return updatedTheme;
     }
@@ -51,10 +44,10 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
     return updatedTheme;
-  }, [userTheme, resolvedTheme, isBrowser]);
+  }, [userTheme, themeType, isBrowser]);
 
   return (
-    <ThemeContext.Provider value={{ themeType: resolvedTheme, theme: updatedTheme as unknown as Theme, aspectRatio }}>
+    <ThemeContext.Provider value={{ themeType, theme: updatedTheme as unknown as Theme, aspectRatio }}>
       {children}
     </ThemeContext.Provider>
   );

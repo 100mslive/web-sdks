@@ -17,7 +17,7 @@ const analyticsTrack = (title, options) => {
     timestamp: new Date().toString(),
     subdomain: window.location.hostname,
   };
-  if (email && window.analytics) {
+  if (email) {
     window.analytics.track(title, {
       ...options,
       ...commonOptions,

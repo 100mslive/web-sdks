@@ -12,16 +12,12 @@ import { getBackendEndpoint } from "../../services/tokenService";
 import {
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
-  QUERY_PARAM_VIEW_MODE,
-  UI_MODE_ACTIVE_SPEAKER,
-  UI_MODE_GRID,
 } from "../../common/constants";
 import { getMetadata } from "../../common/utils";
 import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
-import { useSearchParam } from "react-use";
 
 const AppContext = React.createContext(null);
 
@@ -49,7 +45,7 @@ const defaultUiSettings = {
     ERROR: true,
     METADATA_UPDATED: true,
   },
-  uiViewMode: UI_MODE_GRID,
+  uiViewMode: "grid",
   showStatsOnTiles: false,
   enableAmbientMusic: false,
 };
@@ -67,8 +63,6 @@ const AppContextProvider = ({
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const sessionId = useHMSStore(selectSessionId);
-  const isDefaultModeActiveSpeaker =
-    useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
   const appPolicyConfig = useMemo(
     () => normalizeAppPolicyConfig(roleNames, rolesMap, policyConfig),
     [roleNames, policyConfig, rolesMap]
@@ -84,9 +78,7 @@ const AppContextProvider = ({
     maxTileCount: uiSettings.maxTileCount,
     localAppPolicyConfig: {},
     subscribedNotifications: uiSettings.subscribedNotifications || {},
-    uiViewMode: isDefaultModeActiveSpeaker
-      ? UI_MODE_ACTIVE_SPEAKER
-      : uiSettings.uiViewMode || UI_MODE_GRID,
+    uiViewMode: uiSettings.uiViewMode || "grid",
     showStatsOnTiles: uiSettings.showStatsOnTiles || false,
     enableAmbientMusic: uiSettings.enableAmbientMusic || false,
   });

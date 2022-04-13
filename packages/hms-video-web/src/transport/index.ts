@@ -159,15 +159,14 @@ export default class HMSTransport implements ITransport {
       await this.observer.onStateChange(TransportState.Failed, error);
     },
 
-    onFailure: (error: HMSException) => {
+    onFailure: (exception: HMSException) => {
       // @DISCUSS: Should we remove this? Pong failure would have already scheduled signal retry.
       if (this.joinParameters) {
-        this.retryScheduler.schedule({
-          category: TransportFailureCategory.SignalDisconnect,
-          error,
-          task: this.retrySignalDisconnectTask,
-          originalState: this.state,
-        });
+        this.retryScheduler.schedule(
+          TransportFailureCategory.SignalDisconnect,
+          exception,
+          this.retrySignalDisconnectTask,
+        );
       }
     },
 
@@ -175,12 +174,11 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
       try {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
-          this.retryScheduler.schedule({
-            category: TransportFailureCategory.SignalDisconnect,
-            error: ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
-            task: this.retrySignalDisconnectTask,
-            originalState: this.state,
-          });
+          this.retryScheduler.schedule(
+            TransportFailureCategory.SignalDisconnect,
+            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+            this.retrySignalDisconnectTask,
+          );
         }
       } catch (e) {
         console.error(e);
@@ -299,19 +297,6 @@ export default class HMSTransport implements ITransport {
     return flags.includes(flag);
   }
 
-  async preview(
-    token: string,
-    endpoint: string,
-    peerId: string,
-    customData: { name: string; metaData: string },
-    autoSubscribeVideo = false,
-  ): Promise<InitConfig | void> {
-    const initConfig = await this.connect(token, endpoint, peerId, customData, autoSubscribeVideo);
-    this.state = TransportState.Preview;
-    this.observer.onStateChange(this.state);
-    return initConfig;
-  }
-
   async join(
     authToken: string,
     peerId: string,
@@ -319,14 +304,25 @@ export default class HMSTransport implements ITransport {
     initEndpoint = 'https://prod-init.100ms.live/init',
     autoSubscribeVideo = false,
   ): Promise<void> {
+    const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
+    this.setTransportStateForJoin();
+    this.joinParameters = new JoinParameters(
+      authToken,
+      peerId,
+      customData.name,
+      customData.metaData,
+      initEndpoint,
+      autoSubscribeVideo,
+      isServerHandlingDegradation,
+    );
+
     HMSLogger.d(TAG, 'join: started ⏰');
     const joinRequestedAt = new Date();
     try {
       if (!this.signal.isConnected || !this.initConfig) {
-        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
+        await this.connect(authToken, initEndpoint, peerId);
       }
 
-      const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         await this.connectionJoin(
           customData.name,
@@ -353,25 +349,9 @@ export default class HMSTransport implements ITransport {
     this.observer.onStateChange(this.state);
   }
 
-  async connect(
-    token: string,
-    endpoint: string,
-    peerId: string,
-    customData: { name: string; metaData: string },
-    autoSubscribeVideo = false,
-  ): Promise<InitConfig | void> {
-    this.setTransportStateForConnect();
-    this.joinParameters = new JoinParameters(
-      token,
-      peerId,
-      customData.name,
-      customData.metaData,
-      endpoint,
-      autoSubscribeVideo,
-    );
+  async connect(token: string, endpoint: string, peerId: string): Promise<InitConfig | void> {
     try {
-      const response = await this.internalConnect(token, endpoint, peerId);
-      return response;
+      return await this.internalConnect(token, endpoint, peerId);
     } catch (error) {
       const shouldRetry =
         error instanceof HMSException &&
@@ -388,14 +368,13 @@ export default class HMSTransport implements ITransport {
           return Boolean(this.initConfig && this.initConfig.endpoint);
         };
 
-        await this.retryScheduler.schedule({
-          category: TransportFailureCategory.ConnectFailed,
-          error,
+        await this.retryScheduler.schedule(
+          TransportFailureCategory.ConnectFailed,
+          error as HMSException,
           task,
-          originalState: this.state,
-          maxFailedRetries: MAX_TRANSPORT_RETRIES,
-          changeState: false,
-        });
+          MAX_TRANSPORT_RETRIES,
+          false,
+        );
       } else {
         throw error;
       }
@@ -702,20 +681,18 @@ export default class HMSTransport implements ITransport {
 
   private async handleIceConnectionFailure(role: HMSConnectionRole) {
     if (role === HMSConnectionRole.Publish) {
-      this.retryScheduler.schedule({
-        category: TransportFailureCategory.PublishIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
-        task: this.retryPublishIceFailedTask,
-        originalState: this.state,
-      });
+      this.retryScheduler.schedule(
+        TransportFailureCategory.PublishIceConnectionFailed,
+        ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
+        this.retryPublishIceFailedTask,
+      );
     } else {
-      this.retryScheduler.schedule({
-        category: TransportFailureCategory.SubscribeIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
-        task: this.retrySubscribeIceFailedTask,
-        originalState: this.state,
-        maxFailedRetries: 1,
-      });
+      this.retryScheduler.schedule(
+        TransportFailureCategory.SubscribeIceConnectionFailed,
+        ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
+        this.retrySubscribeIceFailedTask,
+        1,
+      );
     }
   }
 
@@ -770,7 +747,7 @@ export default class HMSTransport implements ITransport {
     // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
     //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
-      if (!this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION)) {
+      if (!this.joinParameters?.serverSubDegrade) {
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
@@ -791,9 +768,8 @@ export default class HMSTransport implements ITransport {
 
   private retryPublishIceFailedTask = async () => {
     if (
-      this.publishConnection &&
-      (this.publishConnection.iceConnectionState !== 'connected' ||
-        this.publishConnection.connectionState !== 'connected')
+      this.publishConnection!.iceConnectionState !== 'connected' ||
+      this.publishConnection!.connectionState !== 'connected'
     ) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -811,9 +787,8 @@ export default class HMSTransport implements ITransport {
 
   private retrySubscribeIceFailedTask = async () => {
     if (
-      this.subscribeConnection &&
-      (this.subscribeConnection.iceConnectionState !== 'connected' ||
-        this.subscribeConnection.connectionState !== 'connected')
+      this.subscribeConnection!.iceConnectionState !== 'connected' ||
+      this.subscribeConnection!.connectionState !== 'connected'
     ) {
       const p = new Promise<boolean>((resolve, reject) => {
         // Use subscribe constant string
@@ -860,16 +835,13 @@ export default class HMSTransport implements ITransport {
     return ok;
   };
 
-  private setTransportStateForConnect() {
+  private setTransportStateForJoin() {
     if (this.state === TransportState.Failed) {
       this.state = TransportState.Disconnected;
     }
 
     if (this.state !== TransportState.Disconnected && this.state !== TransportState.Reconnecting) {
-      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(
-        HMSAction.JOIN,
-        `Cannot join a meeting in ${this.state} state`,
-      );
+      throw ErrorFactory.WebsocketMethodErrors.AlreadyJoined(HMSAction.JOIN, `Cannot join a meeting in ${this.state}`);
     }
 
     if (this.state === TransportState.Disconnected) {

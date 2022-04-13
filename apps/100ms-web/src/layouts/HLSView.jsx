@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, Fragment } from "react";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import { Box, Flex, styled, Text } from "@100mslive/react-ui";
+import Hls from "hls.js";
 import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 
@@ -9,22 +10,20 @@ const HLSVideo = styled("video", {
   margin: "0 auto",
 });
 
-const HLSView = ({ isChatOpen, toggleChat }) => {
+export const HLSView = ({ isChatOpen, toggleChat }) => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   useEffect(() => {
     if (videoRef.current) {
-      import("hls.js").then(({ default: Hls }) => {
-        if (Hls.isSupported() && hlsState.variants[0]?.url) {
-          let hls = new Hls(getHLSConfig());
-          hls.loadSource(hlsState.variants[0].url);
-          hls.attachMedia(videoRef.current);
-        } else if (
-          videoRef.current.canPlayType("application/vnd.apple.mpegurl")
-        ) {
-          videoRef.current.src = hlsState.variants[0].url;
-        }
-      });
+      if (Hls.isSupported() && hlsState.variants[0]?.url) {
+        let hls = new Hls(getHLSConfig());
+        hls.loadSource(hlsState.variants[0].url);
+        hls.attachMedia(videoRef.current);
+      } else if (
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
+      ) {
+        videoRef.current.src = hlsState.variants[0].url;
+      }
     }
   }, [hlsState]);
 
@@ -73,5 +72,3 @@ function getHLSConfig() {
   }
   return {};
 }
-
-export default HLSView;

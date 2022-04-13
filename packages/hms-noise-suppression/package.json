@@ -1,5 +1,5 @@
 {
-  "version": "0.1.10-alpha.0",
+  "version": "0.1.9",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -10,18 +10,13 @@
   "engines": {
     "node": ">=10"
   },
-  "browser": {
-    "path": false,
-    "fs": false,
-    "stream": false
-  },
   "scripts": {
     "start": "concurrently \"yarn dev\" \"yarn types\"",
     "dev": "node ../../scripts/dev",
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.json",
+    "types:build": "tsc -p tsconfig.build.json",
     "test": "jest --maxWorkers=1 --passWithNoTests",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
@@ -37,6 +32,6 @@
   "author": "vishaldhull09",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.1.49-alpha.0"
+    "@100mslive/hms-video": "0.1.48"
   }
 }

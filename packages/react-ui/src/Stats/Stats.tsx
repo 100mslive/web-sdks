@@ -9,7 +9,7 @@ import {
 } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
-import { selectConnectionQualityByPeerID } from '@100mslive/react-sdk';
+import { selectConnectionQualityByPeerID } from '@100mslive/hms-video-store';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;

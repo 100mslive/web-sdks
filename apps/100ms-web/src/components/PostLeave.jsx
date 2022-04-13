@@ -1,5 +1,4 @@
 import React from "react";
-import { useHistory, useParams } from "react-router-dom";
 import { SunWithFace } from "@100mslive/react-icons";
 import {
   Box,
@@ -10,9 +9,7 @@ import {
 } from "@100mslive/react-ui";
 import PlaceholderBg from "../images/post_leave.png";
 
-const PostLeave = () => {
-  const history = useHistory();
-  const { roomId, role } = useParams();
+export const PostLeave = ({ history, match }) => {
   return (
     <Flex justify="center" align="center" css={{ size: "100%", bg: "$mainBg" }}>
       <Box
@@ -74,8 +71,8 @@ const PostLeave = () => {
           <Flex justify="center">
             <Button
               onClick={() => {
-                let previewUrl = "/preview/" + roomId;
-                if (role) previewUrl += "/" + role;
+                let previewUrl = "/preview/" + match.params.roomId;
+                if (match.params.role) previewUrl += "/" + match.params.role;
                 history.push(previewUrl);
               }}
               css={{ mx: "$4" }}
@@ -99,5 +96,3 @@ const PostLeave = () => {
     </Flex>
   );
 };
-
-export default PostLeave;

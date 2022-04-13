@@ -6,11 +6,21 @@ import {
   MicOnIcon,
 } from "@100mslive/react-icons";
 import { Tooltip, IconButton } from "@100mslive/react-ui";
-import { useAVToggle, parsedUserAgent } from "@100mslive/react-sdk";
+import { useAVToggle } from "@100mslive/react-sdk";
 
-const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
+/**
+ * 'navigator.useAgentData.platform' is the recommended way to
+ * 'platform sniff'. Although, it's still not implemented in
+ * Firefox and Safari. So when not available, the deprecated
+ * 'navigator.platform' is used for backward compatibility.
+ */
+let isMacOS = /mac/i.test(
+  navigator.userAgentData
+    ? navigator.userAgentData.platform
+    : navigator.platform
+);
 
-export const AudioVideoToggle = ({ compact = false, isAudioOnly }) => {
+export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
   return (
@@ -46,7 +56,6 @@ export const AudioVideoToggle = ({ compact = false, isAudioOnly }) => {
             css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
             active={isLocalVideoEnabled}
-            disabled={isAudioOnly}
             onClick={toggleVideo}
             data-testid="video_btn"
           >

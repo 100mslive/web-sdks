@@ -11,6 +11,7 @@ html,
 body,
 #root {
   height: 100%;
+  overflow: hidden;
 }
 
 code,
@@ -23,4 +24,9 @@ pre {
 
 :focus {
   outline: none;
+}
+
+* {
+  min-height: 0;
+  min-width: 0;
 }

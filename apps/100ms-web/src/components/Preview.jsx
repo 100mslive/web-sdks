@@ -142,7 +142,6 @@ const PreviewTile = ({ name }) => {
         "@sm": {
           height: "unset",
           width: "min(360px, 90%)",
-          maxWidth: "90%",
         },
       }}
       ref={borderAudioRef}

@@ -8,8 +8,6 @@ import { HMSRoomUpdate, HMSPeerUpdate } from './update-listener';
 export interface HMSPreviewListener extends DeviceChangeListener {
   onPreview(room: HMSRoom, localTracks: HMSTrack[]): void;
   onError(exception: HMSException): void;
-  onReconnecting(error: HMSException): void;
-  onReconnected(): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
   onNetworkQuality?(score: number): void;

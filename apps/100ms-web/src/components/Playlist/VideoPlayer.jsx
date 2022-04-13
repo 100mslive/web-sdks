@@ -11,7 +11,7 @@ import { ShrinkIcon, ExpandIcon, CrossIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text, Video } from "@100mslive/react-ui";
 import { VideoPlaylistControls } from "./PlaylistControls";
 
-export const VideoPlayer = React.memo(({ peerId, isAudioOnly }) => {
+export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));
   const active = useHMSStore(selectVideoPlaylist.selectedItem);
   const hmsActions = useHMSActions();
@@ -54,7 +54,6 @@ export const VideoPlayer = React.memo(({ peerId, isAudioOnly }) => {
       )}
       <Video
         trackId={videoTrack?.id}
-        attach={!isAudioOnly}
         css={{
           "@lg": { objectFit: "contain", h: "auto" },
           r: "$1",

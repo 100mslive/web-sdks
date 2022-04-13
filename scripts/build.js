@@ -13,30 +13,39 @@ async function main() {
   }
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
+  const isReact = pkg.name.includes('react');
   const external = Object.keys(pkg.dependencies || {});
-  external.push(...Object.keys(pkg.peerDependencies || {}));
+  if (isReact) {
+    external.push('react');
+  }
   if (pkg.name === '@100mslive/hms-noise-suppression') {
     external.push('fs', 'path', './src/models/Noise.js');
   }
-  const commonOptions = {
-    entryPoints: [source],
-    bundle: true,
-    target: 'es6',
-    external,
-    tsconfig: 'tsconfig.json',
-    minify: true,
-  };
+  if (['@100mslive/hms-noise-suppression', '@100mslive/hms-virtual-background'].includes(pkg.name)) {
+    external.push('@100mslive/hms-video');
+  }
   try {
-    await esbuild.build({
-      ...commonOptions,
+    esbuild.buildSync({
+      entryPoints: [source],
       outfile: 'dist/index.cjs.js',
+      minify: true,
+      bundle: true,
       format: 'cjs',
+      target: 'es6',
+      tsconfig: 'tsconfig.json',
+      external,
+      metafile: true,
     });
 
-    const esmResult = await esbuild.build({
-      ...commonOptions,
+    const esmResult = esbuild.buildSync({
+      entryPoints: [source],
       outfile: 'dist/index.js',
+      minify: true,
+      bundle: true,
       format: 'esm',
+      target: 'es6',
+      tsconfig: 'tsconfig.build.json',
+      external,
       metafile: true,
     });
 

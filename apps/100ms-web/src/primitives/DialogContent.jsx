@@ -143,10 +143,7 @@ export const DialogSelect = ({
   return (
     <DialogRow breakSm>
       <Label>{title}:</Label>
-      <Select.Root
-        data-testid={`dialog_select_${title}`}
-        css={{ width: "70%", "@sm": { width: "100%" } }}
-      >
+      <Select.Root css={{ width: "70%", "@sm": { width: "100%" } }}>
         <Select.DefaultDownIcon />
         <Select.Select
           onChange={e => onChange(e.target.value)}

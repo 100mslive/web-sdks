@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, Suspense } from "react";
+import React, { useEffect, useContext } from "react";
 import {
   useHMSStore,
   useHMSActions,
@@ -9,17 +9,14 @@ import {
   selectRoomState,
   selectLocalPeer,
 } from "@100mslive/react-sdk";
+import { ScreenShareView } from "./screenShareView";
 import { MainGridView } from "./mainGridView";
+import { ActiveSpeakerView } from "./ActiveSpeakerView";
+import { HLSView } from "./HLSView";
+import { WhiteboardView } from "./WhiteboardView";
 import { AppContext } from "../components/context/AppContext";
-import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
-import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
-
-const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
-const HLSView = React.lazy(() => import("./HLSView"));
-const ScreenShareView = React.lazy(() => import("./screenShareView"));
-const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
 
 export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const localPeer = useHMSStore(selectLocalPeer);
@@ -38,7 +35,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     showStatsOnTiles,
     isAudioOnly,
   } = useContext(AppContext);
-
   useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {
@@ -63,12 +59,11 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
   } else if (
-    ((peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
-      peerSharingPlaylist) &&
-    !isAudioOnly
+    (peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
+    peerSharingPlaylist
   ) {
     ViewComponent = ScreenShareView;
-  } else if (uiViewMode === UI_MODE_ACTIVE_SPEAKER) {
+  } else if (uiViewMode === "activeSpeaker") {
     ViewComponent = ActiveSpeakerView;
   } else {
     ViewComponent = MainGridView;
@@ -76,15 +71,13 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
 
   return (
     ViewComponent && (
-      <Suspense fallback={<FullPageProgress />}>
-        <ViewComponent
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
-          role={localPeer.roleName}
-          showStats={showStatsOnTiles}
-          isAudioOnly={isAudioOnly}
-        />
-      </Suspense>
+      <ViewComponent
+        isChatOpen={isChatOpen}
+        toggleChat={toggleChat}
+        role={localPeer.roleName}
+        showStats={showStatsOnTiles}
+        isAudioOnly={isAudioOnly}
+      />
     )
   );
 };

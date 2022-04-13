@@ -10,15 +10,15 @@ import {
 import { Box, Flex } from "@100mslive/react-ui";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import FullPageProgress from "./FullPageProgress";
+import FullPageProgress from "./FullPageSpinner";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
 import { AppContext } from "./context/AppContext";
 
-const Conference = () => {
+export const Conference = () => {
   const history = useHistory();
   const { roomId, role } = useParams();
-  const { isHeadless, isAudioOnly } = useContext(AppContext);
+  const { isHeadless } = useContext(AppContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const toggleChat = useCallback(() => {
     setIsChatOpen(open => !open);
@@ -58,23 +58,16 @@ const Conference = () => {
         css={{
           w: "100%",
           flex: "1 1 0",
-          minHeight: 0,
         }}
       >
         <ConferenceMainView isChatOpen={isChatOpen} toggleChat={toggleChat} />
       </Box>
       {!isHeadless && (
         <Box css={{ flexShrink: 0, minHeight: "$24" }}>
-          <Footer
-            isChatOpen={isChatOpen}
-            toggleChat={toggleChat}
-            isAudioOnly={isAudioOnly}
-          />
+          <Footer isChatOpen={isChatOpen} toggleChat={toggleChat} />
         </Box>
       )}
       <RoleChangeRequestModal />
     </Flex>
   );
 };
-
-export default Conference;

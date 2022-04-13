@@ -8,8 +8,10 @@ async function main() {
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
   require('dotenv').config();
   const define = { 'process.env': JSON.stringify(process.env) };
-  const commonOptions = {
+
+  esbuild.build({
     entryPoints: [source],
+    outfile: 'dist/index.cjs.js',
     assetNames: '[name]',
     minify: true,
     bundle: true,
@@ -20,15 +22,10 @@ async function main() {
     sourcemap: true,
     loader,
     define,
-  };
-
-  esbuild.build({
-    outfile: 'dist/index.cjs.js',
-    ...commonOptions,
     watch: {
       onRebuild(error) {
         if (error) {
-          console.log(`× ${pkg.name}: An error in prevented the cjs rebuild.`);
+          console.log(`× ${pkg.name}: An error in prevented the rebuild.`);
           return;
         }
         console.log(`✔ ${pkg.name}: Rebuilt.`);
@@ -37,13 +34,23 @@ async function main() {
   });
 
   esbuild.build({
+    entryPoints: [source],
     outfile: 'dist/index.js',
+    assetNames: '[name]',
+    minify: false,
+    bundle: true,
     format: 'esm',
-    ...commonOptions,
+    target: 'es6',
+    external,
+    loader,
+    define,
+    sourcemap: true,
+    incremental: true,
+    treeShaking: true,
     watch: {
       onRebuild(error) {
         if (error) {
-          console.log(`× ${pkg.name}: An error in prevented the esm rebuild.`);
+          console.log(`× ${pkg.name}: An error in prevented the rebuild.`);
           return;
         }
         console.log(`✔ ${pkg.name}: Rebuilt.`);

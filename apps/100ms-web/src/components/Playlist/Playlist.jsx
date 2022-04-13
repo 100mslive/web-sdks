@@ -20,6 +20,7 @@ import {
 import { PlaylistItem } from "./PlaylistItem";
 import { AudioPlaylistControls } from "./PlaylistControls";
 import { usePlaylist } from "../hooks/usePlaylist";
+import { isScreenshareSupported } from "../../common/utils";
 
 const BrowseAndPlayFromLocal = ({ type, actions }) => {
   return (
@@ -61,7 +62,11 @@ export const Playlist = ({ type }) => {
   const [open, setOpen] = useState(false);
   const [collapse, setCollapse] = useState(false);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  if (!isAllowedToPublish.screen || playlist.length === 0) {
+  if (
+    !isAllowedToPublish.screen ||
+    !isScreenshareSupported() ||
+    playlist.length === 0
+  ) {
     return null;
   }
 

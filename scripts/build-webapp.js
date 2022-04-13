@@ -23,37 +23,35 @@ async function main() {
     }),
   ];
   try {
-    const commonOptions = {
+    esbuild.build({
       entryPoints: [source],
+      outfile: 'dist/index.cjs.js',
       assetNames: '[name]',
       minify: false,
       bundle: true,
+      format: 'cjs',
       target: 'es6',
       external,
-      treeShaking: true,
+      metafile: false,
       loader,
       define,
       plugins,
-    };
-
-    esbuild.build({
-      outfile: 'dist/index.cjs.js',
-      format: 'cjs',
-      ...commonOptions,
     });
 
-    esbuild
-      .build({
-        entryPoints: [source],
-        outdir: 'dist/',
-        format: 'esm',
-        splitting: true,
-        ...commonOptions,
-      })
-      .then(() => {
-        fs.renameSync('./dist/App.js', './dist/index.js');
-        fs.renameSync('./dist/App.css', './dist/index.css');
-      });
+    esbuild.build({
+      entryPoints: [source],
+      outfile: 'dist/index.js',
+      assetNames: '[name]',
+      minify: false,
+      bundle: true,
+      format: 'esm',
+      target: 'es6',
+      external,
+      metafile: true,
+      loader,
+      define,
+      plugins,
+    });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);

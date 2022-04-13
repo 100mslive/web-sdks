@@ -9,6 +9,7 @@ import {
 } from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { HMSNoiseSuppressionPlugin } from "@100mslive/hms-noise-suppression";
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
@@ -21,16 +22,13 @@ export const NoiseSuppression = () => {
   const { selectedDeviceIDs } = useDevices();
   const pluginActive = isPluginPresent && !disable;
 
-  const createPlugin = useCallback(async () => {
+  const createPlugin = () => {
     if (!pluginRef.current) {
-      const { HMSNoiseSuppressionPlugin } = await import(
-        "@100mslive/hms-noise-suppression"
-      );
       pluginRef.current = new HMSNoiseSuppressionPlugin(
         process.env.NS_DURATION_TIME_IN_MS
       );
     }
-  }, []);
+  };
 
   const removePlugin = useCallback(async () => {
     if (pluginRef.current) {
@@ -60,7 +58,7 @@ export const NoiseSuppression = () => {
   const addPlugin = useCallback(async () => {
     try {
       setDisabled(false);
-      await createPlugin();
+      createPlugin();
       //check support its recommended
       const pluginSupport = hmsActions.validateAudioPluginSupport(
         pluginRef.current
@@ -74,21 +72,19 @@ export const NoiseSuppression = () => {
     } catch (err) {
       await handleFailure(err);
     }
-  }, [hmsActions, handleFailure, createPlugin]);
+  }, [hmsActions, handleFailure]);
 
   useEffect(() => {
-    (async () => {
-      if (!pluginRef.current) {
-        await createPlugin();
-      }
+    if (!pluginRef.current) {
+      createPlugin();
+    }
 
-      const pluginSupport = hmsActions.validateAudioPluginSupport(
-        pluginRef.current
-      );
-      setIsNSSupported(pluginSupport.isSupported);
-      setDisabled(!pluginSupport.isSupported);
-    })();
-  }, [selectedDeviceIDs.audioInput, hmsActions, createPlugin]);
+    const pluginSupport = hmsActions.validateAudioPluginSupport(
+      pluginRef.current
+    );
+    setIsNSSupported(pluginSupport.isSupported);
+    setDisabled(!pluginSupport.isSupported);
+  }, [selectedDeviceIDs.audioInput, hmsActions]);
 
   if (isNSSupported) {
     return (

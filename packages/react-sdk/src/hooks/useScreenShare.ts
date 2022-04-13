@@ -25,11 +25,6 @@ export interface useScreenShareResult {
    */
   screenSharingPeerId?: HMSPeerID;
   /**
-   * the name of the peer who is currently screensharing. Will be undefined if no one is sharing the screen.
-   * In case of multiple screenshares, the behavior of which one is picked is not defined.
-   */
-  screenSharingPeerName?: string;
-  /**
    * screenShare audio track id, will only be present if there is a screenshare with video track
    */
   screenShareVideoTrackId?: HMSTrackID;
@@ -68,7 +63,6 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   return {
     amIScreenSharing,
     screenSharingPeerId: screenSharePeer?.id,
-    screenSharingPeerName: screenSharePeer?.name,
     screenShareVideoTrackId: screenShare?.video?.id,
     screenShareAudioTrackId: screenShare?.audio?.id,
     toggleScreenShare,

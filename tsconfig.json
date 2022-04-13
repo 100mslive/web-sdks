@@ -2,5 +2,15 @@
   // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
   "composite": true,
   "extends": "./tsconfig.base.json",
-  "compilerOptions": {}
+  "references": [
+    { "path": "./packages/hms-video-web" },
+    { "path": "./packages/hms-video-store" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@100mslive/hms-video": ["./packages/hms-video-web"],
+      "@100mslive/hms-video-store": ["./packages/hms-video-store"] //
+    }
+  }
 }

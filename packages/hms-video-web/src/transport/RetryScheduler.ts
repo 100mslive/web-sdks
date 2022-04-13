@@ -20,15 +20,6 @@ type RetryTask = () => Promise<boolean>;
 
 const TAG = '[RetryScheduler]';
 
-interface ScheduleTaskParams {
-  category: TFC;
-  error: HMSException;
-  task: RetryTask;
-  originalState: TransportState;
-  maxFailedRetries?: number;
-  changeState?: boolean;
-}
-
 export class RetryScheduler {
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
@@ -38,15 +29,14 @@ export class RetryScheduler {
     private sendEvent: (error: HMSException, category: TFC) => void,
   ) {}
 
-  async schedule({
-    category,
-    error,
-    task,
-    originalState,
+  async schedule(
+    category: TFC,
+    error: HMSException,
+    task: RetryTask,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     changeState = true,
-  }: ScheduleTaskParams) {
-    await this.scheduleTask({ category, error, changeState, task, originalState, maxFailedRetries });
+  ) {
+    await this.scheduleTask(category, error, changeState, task, maxFailedRetries);
   }
 
   reset() {
@@ -56,15 +46,14 @@ export class RetryScheduler {
   }
 
   // eslint-disable-next-line complexity
-  private async scheduleTask({
-    category,
-    error,
-    changeState,
-    task,
-    originalState,
+  private async scheduleTask(
+    category: TFC,
+    error: HMSException,
+    changeState: boolean,
+    task: RetryTask,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
-  }: ScheduleTaskParams & { failedRetryCount?: number }): Promise<void> {
+  ): Promise<void> {
     HMSLogger.d(TAG, 'schedule: ', { category: TFC[category], error });
 
     // First schedule call
@@ -166,19 +155,11 @@ export class RetryScheduler {
       taskPromise?.resolve(failedRetryCount);
 
       if (changeState && this.inProgress.size === 0) {
-        this.onStateChange(originalState);
+        this.onStateChange(TransportState.Joined);
       }
       HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
-      await this.scheduleTask({
-        category,
-        error,
-        changeState,
-        task,
-        originalState,
-        maxFailedRetries,
-        failedRetryCount: failedRetryCount + 1,
-      });
+      await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
     }
   }
 

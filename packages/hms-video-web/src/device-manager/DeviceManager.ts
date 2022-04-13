@@ -1,3 +1,4 @@
+import { HMSDeviceManager } from '../interfaces/HMSDeviceManager';
 import type { DeviceMap } from '../interfaces/HMSDeviceManager';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
@@ -16,13 +17,6 @@ export type SelectedDevices = {
 };
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
-
-interface HMSDeviceManager extends DeviceMap {
-  outputDevice?: MediaDeviceInfo;
-  hasWebcamPermission: boolean;
-  hasMicrophonePermission: boolean;
-}
-
 export class DeviceManager implements HMSDeviceManager {
   audioInput: MediaDeviceInfo[] = [];
   audioOutput: MediaDeviceInfo[] = [];

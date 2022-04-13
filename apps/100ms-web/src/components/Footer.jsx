@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import {
   BrbIcon,
   ChatIcon,
@@ -26,15 +26,12 @@ import { Screenshare } from "./ScreenShare";
 import { ScreenShareHintModal } from "./ScreenshareHintModal";
 import { NoiseSuppression } from "../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../plugins/whiteboard";
-import { VirtualBackground } from "../plugins/VirtualBackground/VirtualBackground";
+import { VirtualBackground } from "../plugins/VirtualBackground";
 import { useMyMetadata } from "./hooks/useMetadata";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { isScreenshareSupported } from "../common/utils";
 import { Playlist } from "../components/Playlist/Playlist";
-
-const TranscriptionButton = React.lazy(() =>
-  import("../plugins/transcription")
-);
+import { TranscriptionButton } from "../plugins/transcription";
 
 const ScreenshareAudio = () => {
   const {
@@ -77,7 +74,7 @@ const ScreenshareAudio = () => {
   );
 };
 
-export const MetaActions = ({ isMobile = false }) => {
+export const MetaActions = () => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
   return (
@@ -89,9 +86,7 @@ export const MetaActions = ({ isMobile = false }) => {
         <IconButton
           onClick={toggleHandRaise}
           active={!isHandRaised}
-          data-testid={`${
-            isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
-          }`}
+          data-testid="raise_hand_btn"
         >
           <HandIcon />
         </IconButton>
@@ -131,7 +126,7 @@ const Chat = ({ isChatOpen, toggleChat }) => {
   );
 };
 
-export const Footer = ({ isChatOpen, toggleChat, isAudioOnly }) => {
+export const Footer = ({ isChatOpen, toggleChat }) => {
   return (
     <Flex
       justify="between"
@@ -174,12 +169,12 @@ export const Footer = ({ isChatOpen, toggleChat, isAudioOnly }) => {
           }}
         >
           <VerticalDivider space={4} />
-          <MetaActions isMobile />
+          <MetaActions />
         </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
-        <AudioVideoToggle isAudioOnly={isAudioOnly} />
-        <Screenshare isAudioOnly={isAudioOnly} css={{ mx: "$4" }} />
+        <AudioVideoToggle />
+        <Screenshare css={{ mx: "$4" }} />
         <MoreSettings />
         <VerticalDivider space={4} />
         <LeaveRoom />

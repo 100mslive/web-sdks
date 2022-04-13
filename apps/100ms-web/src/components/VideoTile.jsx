@@ -23,14 +23,7 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 
-const Tile = ({
-  peerId,
-  showStatsOnTiles,
-  isAudioOnly,
-  width,
-  height,
-  index,
-}) => {
+const Tile = ({ peerId, showStatsOnTiles, isAudioOnly, width, height }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -45,7 +38,7 @@ const Tile = ({
   return (
     <StyledVideoTile.Root
       css={{ width, height }}
-      data-testid={`participant_tile_${index}`}
+      data-testid="participant_tile"
     >
       {peer ? (
         <StyledVideoTile.Container
@@ -79,9 +72,7 @@ const Tile = ({
               data-testid="participant_avatar_icon"
             />
           ) : null}
-          <StyledVideoTile.Info data-testid="participant_name_onTile">
-            {label}
-          </StyledVideoTile.Info>
+          <StyledVideoTile.Info>{label}</StyledVideoTile.Info>
           {isAudioMuted ? (
             <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
               <MicOffIcon />

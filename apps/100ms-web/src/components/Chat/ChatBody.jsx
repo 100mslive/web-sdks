@@ -118,7 +118,7 @@ const ChatMessage = React.memo(({ message }) => {
       <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
         {formatTime(message.time)}
       </Text>
-      <Text css={{ w: "100%", my: "$2", wordBreak: "break-word" }}>
+      <Text css={{ w: "100%", my: "$2" }}>
         <AnnotisedChat message={message.message} />
       </Text>
     </Flex>
