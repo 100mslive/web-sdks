@@ -48,8 +48,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
+    this._degraded = false;
     this.updateLayer();
-    this.setDegraded(false);
   }
 
   /**
