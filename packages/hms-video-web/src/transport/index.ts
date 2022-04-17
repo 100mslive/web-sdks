@@ -326,6 +326,8 @@ export default class HMSTransport implements ITransport {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
       }
 
+      this.validateNotDisconnected('connect');
+
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         await this.connectionJoin(
@@ -729,10 +731,7 @@ export default class HMSTransport implements ITransport {
     try {
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
       // if leave was called while init was going on, don't open websocket
-      if (this.state === TransportState.Disconnected) {
-        HMSLogger.d(TAG, 'not opening websocket as transport state id disconnected');
-        throw ErrorFactory.GenericErrors.ValidationFailed('leave called before connect could complete');
-      }
+      this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
@@ -752,6 +751,15 @@ export default class HMSTransport implements ITransport {
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;
+    }
+  }
+
+  // leave could be called between any two async tasks, which would make
+  // the state disconnected instead of connecting, throw error for those cases.
+  private validateNotDisconnected(stage: string) {
+    if (this.state === TransportState.Disconnected) {
+      HMSLogger.w(TAG, 'aborting join as transport state is disconnected');
+      throw ErrorFactory.GenericErrors.ValidationFailed(`leave called before join could complete - stage=${stage}`);
     }
   }
 
