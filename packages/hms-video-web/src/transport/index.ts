@@ -728,6 +728,10 @@ export default class HMSTransport implements ITransport {
     const connectRequestedAt = new Date();
     try {
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      // if leave was called while init was going on, don't open websocket
+      if (this.state === TransportState.Disconnected) {
+        return;
+      }
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
