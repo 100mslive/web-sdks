@@ -730,7 +730,8 @@ export default class HMSTransport implements ITransport {
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
       // if leave was called while init was going on, don't open websocket
       if (this.state === TransportState.Disconnected) {
-        return;
+        HMSLogger.d(TAG, 'not opening websocket as transport state id disconnected');
+        throw ErrorFactory.GenericErrors.ValidationFailed('leave called before connect could complete');
       }
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
