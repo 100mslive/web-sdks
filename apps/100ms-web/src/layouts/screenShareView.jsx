@@ -157,7 +157,10 @@ const ScreenShareComponent = ({
           },
         }}
       >
-        <VideoPlayer peerId={peerSharingPlaylist.id} />
+        <VideoPlayer
+          isAudioOnly={isAudioOnly}
+          peerId={peerSharingPlaylist.id}
+        />
       </Box>
     );
   }
@@ -177,12 +180,7 @@ const ScreenShareComponent = ({
           screenshareTrack?.displaySurface
         ) ? (
           <Box css={{ objectFit: "contain", h: "100%" }}>
-            <ScreenshareDisplay
-              stopScreenShare={async () => {
-                await hmsActions.setScreenShareEnabled(false);
-              }}
-              classes={{ rootBg: "h-full" }}
-            />
+            <ScreenshareDisplay />
           </Box>
         ) : (
           <ScreenshareTile

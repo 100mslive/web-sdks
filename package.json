@@ -84,7 +84,15 @@
     },
     {
       "path": "packages/hms-video-store/dist/index.js",
-      "limit": "100 KB"
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/react-ui/dist/index.cjs.js",
+      "limit": "20 KB"
+    },
+    {
+      "path": "packages/react-ui/dist/index.js",
+      "limit": "20 KB"
     },
     {
       "path": "packages/hms-virtual-background/dist/index.cjs.js",

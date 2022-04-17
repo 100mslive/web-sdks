@@ -77,7 +77,7 @@ const ScreenshareAudio = () => {
   );
 };
 
-export const MetaActions = () => {
+export const MetaActions = ({ isMobile = false }) => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
 
   return (
@@ -89,7 +89,9 @@ export const MetaActions = () => {
         <IconButton
           onClick={toggleHandRaise}
           active={!isHandRaised}
-          data-testid="raise_hand_btn"
+          data-testid={`${
+            isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
+          }`}
         >
           <HandIcon />
         </IconButton>
@@ -129,7 +131,7 @@ const Chat = ({ isChatOpen, toggleChat }) => {
   );
 };
 
-export const Footer = ({ isChatOpen, toggleChat }) => {
+export const Footer = ({ isChatOpen, toggleChat, isAudioOnly }) => {
   return (
     <Flex
       justify="between"
@@ -172,12 +174,12 @@ export const Footer = ({ isChatOpen, toggleChat }) => {
           }}
         >
           <VerticalDivider space={4} />
-          <MetaActions />
+          <MetaActions isMobile />
         </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
-        <AudioVideoToggle />
-        <Screenshare css={{ mx: "$4" }} />
+        <AudioVideoToggle isAudioOnly={isAudioOnly} />
+        <Screenshare isAudioOnly={isAudioOnly} css={{ mx: "$4" }} />
         <MoreSettings />
         <VerticalDivider space={4} />
         <LeaveRoom />
