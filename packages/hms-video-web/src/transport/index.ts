@@ -414,7 +414,11 @@ export default class HMSTransport implements ITransport {
       this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
-      this.signal.leave();
+      try {
+        this.signal.leave();
+      } catch (err) {
+        HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
+      }
       await this.signal.close();
     } catch (err) {
       if (err instanceof HMSException) {
@@ -835,8 +839,6 @@ export default class HMSTransport implements ITransport {
   };
 
   private retrySignalDisconnectTask = async () => {
-    let ok = this.signal.isConnected;
-
     HMSLogger.d(TAG, 'retrySignalDisconnectTask', { signalConnected: this.signal.isConnected });
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
@@ -847,13 +849,10 @@ export default class HMSTransport implements ITransport {
           this.joinParameters!.endpoint,
           this.joinParameters!.peerId,
         );
-        ok = true;
-      } catch (ex) {
-        ok = false;
-      }
+      } catch (ex) {}
     }
 
-    ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
+    const ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 
