@@ -19,7 +19,6 @@ import * as sdkTypes from './sdkTypes';
 import { SDKToHMS } from './adapter';
 import {
   HMSRoleChangeRequest,
-  selectCustomUISettings,
   selectHMSMessagesCount,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
