@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "100ms_edtech_template": "0.1.4",
-    "@100mslive/react-icons": "0.0.12-alpha.0",
-    "@100mslive/react-ui": "0.0.12-alpha.0",
+    "@100mslive/react-icons": "0.0.12-alpha.3",
+    "@100mslive/react-ui": "0.0.12-alpha.3",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "logrocket": "^2.2.0",
@@ -41,7 +41,6 @@
     ]
   },
   "devDependencies": {
-    "@100mslive/react-icons": "0.0.12-alpha.0",
     "autoprefixer": "^10.4.2",
     "copy-webpack-plugin": "^10.2.1",
     "css-loader": "^6.5.1",
