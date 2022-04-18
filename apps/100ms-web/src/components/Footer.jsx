@@ -12,6 +12,7 @@ import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
+  selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
 import {
   Flex,
@@ -131,7 +132,7 @@ const Chat = ({ isChatOpen, toggleChat }) => {
   );
 };
 
-export const Footer = ({ isChatOpen, toggleChat, isAudioOnly }) => {
+export const Footer = ({ isChatOpen, toggleChat }) => {
   return (
     <Flex
       justify="between"
@@ -178,8 +179,8 @@ export const Footer = ({ isChatOpen, toggleChat, isAudioOnly }) => {
         </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
-        <AudioVideoToggle isAudioOnly={isAudioOnly} />
-        <Screenshare isAudioOnly={isAudioOnly} css={{ mx: "$4" }} />
+        <AudioVideoToggle />
+        <Screenshare css={{ mx: "$4" }} />
         <MoreSettings />
         <VerticalDivider space={4} />
         <LeaveRoom />

@@ -19,6 +19,7 @@ import * as sdkTypes from './sdkTypes';
 import { SDKToHMS } from './adapter';
 import {
   HMSRoleChangeRequest,
+  selectCustomUISettings,
   selectHMSMessagesCount,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
@@ -468,6 +469,34 @@ export class HMSSDKActions implements IHMSActions {
     // TODO: hotfix for HMS-3639. Needs a better solution
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
+  }
+  /**
+   *
+   * @param settings full setting object. use it for replacing the entire settings
+   * or for initialization
+   */
+  setCustomUISettings(settings: Record<string, any>): void;
+  /**
+   * use it for updating a particular property in the setting
+   * @param key a string. Does not check for existence. If the key is already not
+   * a property of the customUISettings, it is added.
+   * @param value value to set for the key.
+   */
+  setCustomUISettings(key: string, value: any): void;
+  setCustomUISettings(settingsOrKey: Record<string, any> | string, value?: any) {
+    if (typeof settingsOrKey === 'string' || settingsOrKey instanceof String) {
+      this.setState(store => {
+        /**
+         * toString() is needed because computed properties only work
+         * on primitive strings and not on string Objects.
+         */
+        store.customUISettings[settingsOrKey.toString()] = value;
+      });
+    } else {
+      this.setState(store => {
+        store.customUISettings = settingsOrKey;
+      });
+    }
   }
 
   /**

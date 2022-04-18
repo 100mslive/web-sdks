@@ -1,5 +1,12 @@
 import { createSelector } from 'reselect';
-import { selectHMSMessages, selectLocalPeerID, selectPeers, selectPeersMap, selectTracksMap } from './selectors';
+import {
+  selectCustomUISettings,
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectPeers,
+  selectPeersMap,
+  selectTracksMap,
+} from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import {
   getPeerTracksByCondition,
@@ -9,12 +16,13 @@ import {
   isVideo,
   isAudioPlaylist,
 } from './selectorUtils';
-import { byIDCurry } from './common';
+import { byIDCurry, byKeyCurry } from './common';
 import { HMSLogger } from '../../common/ui-logger';
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
+const selectCustomUISettingsKey = (_store: HMSStore, key: string | undefined) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -28,6 +36,17 @@ const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (st
  * Select the {@link HMSPeer} object given a peer ID.
  */
 export const selectPeerByID = byIDCurry(selectPeerByIDBare);
+
+/**
+ * Select a particular setting from customUISetting by ID.
+ */
+export const selectCustomUISettingsByKey = byKeyCurry(
+  createSelector([selectCustomUISettings, selectCustomUISettingsKey], (settings, key) => {
+    if (key) {
+      return settings[key];
+    }
+  }),
+);
 
 /**
  * Select the name of a {@link HMSPeer} given a peer ID.

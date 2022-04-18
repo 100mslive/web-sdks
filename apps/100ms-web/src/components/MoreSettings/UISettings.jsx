@@ -18,6 +18,7 @@ import {
 import { AppContext } from "../context/AppContext";
 import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID } from "../../common/constants";
 import {
+  selectCustomUISettingsByKey,
   selectIsLocalScreenShared,
   selectIsLocalVideoEnabled,
   useHMSActions,
@@ -64,13 +65,12 @@ export const UISettings = ({ open, onOpenChange }) => {
     setSubscribedNotifications,
     uiViewMode,
     setuiViewMode,
-    isAudioOnly,
-    setIsAudioOnly,
   } = useContext(AppContext);
 
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
+  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
   const audioOnlyToggleHandler = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn && isLocalVideoEnabled) {
@@ -80,9 +80,10 @@ export const UISettings = ({ open, onOpenChange }) => {
       if (isAudioOnlyModeOn && isLocalScreenShared) {
         await hmsActions.setScreenShareEnabled(false);
       }
-      setIsAudioOnly(isAudioOnlyModeOn);
+
+      hmsActions.setCustomUISettings("isAudioOnly", isAudioOnlyModeOn);
     },
-    [isAudioOnly]
+    [hmsActions, isLocalVideoEnabled, isLocalScreenShared]
   );
 
   return (

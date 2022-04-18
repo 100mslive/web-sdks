@@ -84,6 +84,7 @@ export const makeFakeStore = (): HMSStore => {
       },
       sessionId: '',
     },
+    customUISettings: {},
     peers: {
       '1': {
         id: '1',

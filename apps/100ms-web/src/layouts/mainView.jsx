@@ -7,7 +7,9 @@ import {
   selectPeerScreenSharing,
   selectPeerSharingVideoPlaylist,
   selectRoomState,
+  selectCustomUISettingsByKey,
   selectLocalPeer,
+  selectCustomUISettings,
 } from "@100mslive/react-sdk";
 import { MainGridView } from "./mainGridView";
 import { AppContext } from "../components/context/AppContext";
@@ -26,6 +28,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
+  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
@@ -36,7 +39,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     uiViewMode,
     HLS_VIEWER_ROLE,
     showStatsOnTiles,
-    isAudioOnly,
   } = useContext(AppContext);
 
   useEffect(() => {
@@ -82,7 +84,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
           toggleChat={toggleChat}
           role={localPeer.roleName}
           showStats={showStatsOnTiles}
-          isAudioOnly={isAudioOnly}
         />
       </Suspense>
     )

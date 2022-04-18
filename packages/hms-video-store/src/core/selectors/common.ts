@@ -21,3 +21,16 @@ export function byIDCurry<S extends StoreTypes, T>(selector: byIDSelector<S, T>)
     return (store: S) => selector(store, id);
   };
 }
+
+/**
+ * takes in a normal selector which has store and key as input and curries it to make it easier to use.
+ * Before: store.getState((store) => selectObjectByKey(store, key))
+ * After: store.getState(selectObjectByKey(key))
+ */
+export function byKeyCurry<S extends StoreTypes, T>(
+  selector: byIDSelector<S, T>,
+): (key?: string) => StoreSelector<S, T> {
+  return (key?: string) => {
+    return (store: S) => selector(store, key);
+  };
+}

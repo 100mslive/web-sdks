@@ -14,6 +14,7 @@ import {
   selectPeerByID,
   selectPeerMetadata,
   selectVideoTrackByPeerID,
+  selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -24,16 +25,10 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 
-const Tile = ({
-  peerId,
-  showStatsOnTiles,
-  isAudioOnly,
-  width,
-  height,
-  index,
-}) => {
+const Tile = ({ peerId, showStatsOnTiles, width, height, index }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
+  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
   const [isMouseHovered, setIsMouseHovered] = useState(false);

@@ -6,13 +6,19 @@ import {
   MicOnIcon,
 } from "@100mslive/react-icons";
 import { Tooltip, IconButton } from "@100mslive/react-ui";
-import { useAVToggle, parsedUserAgent } from "@100mslive/react-sdk";
+import {
+  useAVToggle,
+  parsedUserAgent,
+  useHMSStore,
+  selectCustomUISettingsByKey,
+} from "@100mslive/react-sdk";
 
 const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
 
-export const AudioVideoToggle = ({ compact = false, isAudioOnly }) => {
+export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
+  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
   return (
     <Fragment>
       {toggleAudio ? (

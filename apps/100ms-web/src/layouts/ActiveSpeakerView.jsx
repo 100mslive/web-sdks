@@ -4,6 +4,7 @@ import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
+  selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
@@ -12,7 +13,6 @@ const ActiveSpeakerView = ({
   isChatOpen,
   toggleChat,
   isParticipantListOpen,
-  isAudioOnly,
 }) => {
   const peers = useHMSStore(selectPeers);
   const localPeer = useHMSStore(selectLocalPeer);
@@ -43,7 +43,6 @@ const ActiveSpeakerView = ({
         toggleChat={toggleChat}
         allowRemoteMute={false}
         hideSidePane={!showSidePane}
-        isAudioOnly={isAudioOnly}
         isParticipantListOpen={isParticipantListOpen}
         totalPeers={1}
       />
@@ -52,7 +51,6 @@ const ActiveSpeakerView = ({
           peers={peers.filter(peer => peer.id !== activeSpeaker.id)}
           isChatOpen={isChatOpen}
           toggleChat={toggleChat}
-          isAudioOnly={isAudioOnly}
           isParticipantListOpen={isParticipantListOpen}
           totalPeers={peers.length - 1}
         />
