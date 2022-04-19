@@ -3,42 +3,41 @@ import { ToastManager } from "./ToastManager";
 
 export const ToastBatcher = {
   toastsType: new Map(),
-  addToastType(toast) {
-    const { type, duration } = toast;
-    const toastType = this.toastsType.has(type);
+  addToastType(notification, duration = 2000, type) {
+    let notificationType = type;
+    if (!type) {
+      notificationType = notification.type;
+    }
+    const toastType = this.toastsType.has(notificationType);
     if (toastType) {
-      const toastDetail = this.toastsType.get(type);
-      const { id } = toastDetail;
-      let count = toastDetail.count;
-      count = parseInt(count) + 1;
-      const toastText = ToastConfig[type].multiple({
-        name: toast.title,
-        count: count,
-      });
+      let { notifications } = this.toastsType.get(notificationType);
+      const { id } = notifications[0];
+      notifications = [...notifications, notification];
+      const toastText = ToastConfig[notificationType].multiple(notifications);
       const toastId = ToastManager.replaceToast(id, {
         title: toastText,
         duration: duration,
       });
       this.toastsType.set(type, {
         id: toastId,
-        count: count,
-        title: toastText,
+        notifications: notifications,
         duration: duration,
       });
     } else {
-      const toastText = ToastConfig[type].single({ name: toast.title });
+      const toastText = ToastConfig[notificationType].single(notification);
       const toastId = ToastManager.addToast({
         title: toastText,
         duration: duration,
       });
-      this.toastsType.set(type, {
+      let notifications = [];
+      notifications.push(notification);
+      this.toastsType.set(notificationType, {
         id: toastId,
-        count: 0,
-        title: toastText,
+        notifications: [...notifications],
         duration: duration,
       });
     }
-    this.syncUItoast(ToastManager.getToasts());
+    console.log(this.toastsType, "map");
   },
   syncUItoast(toastsDisplaying) {
     for (const [toastType, toastInfo] of this.toastsType.entries()) {

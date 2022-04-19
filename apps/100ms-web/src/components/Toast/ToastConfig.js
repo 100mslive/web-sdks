@@ -2,60 +2,88 @@ import { HandIcon, PersonIcon } from "@100mslive/react-icons";
 import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ToastConfig = {
-  PEER_JOINED: {
-    single: toast => {
-      return (
-        <TextWithIcon Icon={PersonIcon}>{`${toast.name} joined`}</TextWithIcon>
-      );
+  PEER_LIST: {
+    single: function ({ notification }) {
+      if (notification.data.length === 1) {
+        return (
+          <TextWithIcon
+            Icon={PersonIcon}
+          >{`${notification.data[0]?.name} joined`}</TextWithIcon>
+        );
+      } else {
+        return (
+          <TextWithIcon Icon={PersonIcon}>
+            {`${notification.data[0]?.name} and ${
+              notification.data.length - 1
+            } others joined`}
+          </TextWithIcon>
+        );
+      }
     },
-    multiple: toast => {
+    multiple: notifications => {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${toast.name} and ${toast.count} others joined`}
+          {`${notifications[0].data.name} and ${
+            notifications.length - 1
+          } others joined`}
         </TextWithIcon>
       );
     },
   },
-  PEER_LIST: {
-    single: toast => {
+  PEER_JOINED: {
+    single: function ({ notification }) {
+      console.log("single", notification);
       return (
-        <TextWithIcon Icon={PersonIcon}>{`${toast.name} joined`}</TextWithIcon>
+        <TextWithIcon
+          Icon={PersonIcon}
+        >{`${notification.data?.name} joined`}</TextWithIcon>
       );
     },
-    multiple: toast => {
+    multiple: function ({ notifications }) {
+      console.log("multiple", notifications);
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${toast.name} and ${toast.count} others joined`}
+          {`${notifications[0].notification.data.name} and ${
+            notifications.length - 1
+          } others joined`}
         </TextWithIcon>
       );
     },
   },
   PEER_LEFT: {
-    single: toast => {
+    single: function ({ notification }) {
       return (
-        <TextWithIcon Icon={PersonIcon}>{`${toast.name} left`}</TextWithIcon>
+        <TextWithIcon
+          Icon={PersonIcon}
+        >{`${notification.data?.name} left`}</TextWithIcon>
       );
     },
-    multiple: toast => {
+    multiple: function ({ notifications }) {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${toast.name} and ${toast.count} others left`}
+          {`${notifications[0].data.name} and ${
+            notifications.length - 1
+          } others left`}
         </TextWithIcon>
       );
     },
   },
   METADATA_UPDATED: {
-    single: toast => {
+    single: notification => {
+      console.log(notification);
       return (
         <TextWithIcon
           Icon={HandIcon}
-        >{`${toast.name} raised hand`}</TextWithIcon>
+        >{`${notification.data?.name} raised hand`}</TextWithIcon>
       );
     },
-    multiple: toast => {
+    multiple: notifications => {
+      console.log(notifications);
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`${toast.name} and ${toast.count} others raised hand`}
+          {`${notifications[0].data?.name} and ${
+            notifications.length - 1
+          } others raised hand`}
         </TextWithIcon>
       );
     },

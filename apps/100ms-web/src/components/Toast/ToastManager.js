@@ -35,6 +35,5 @@ export const ToastManager = {
   onChange() {
     const toasts = Array.from(this.toasts.values());
     this.listeners.forEach(listener => listener(toasts));
-    console.log("toasts", toasts);
   },
 };

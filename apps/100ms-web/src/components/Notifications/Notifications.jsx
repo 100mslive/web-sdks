@@ -39,11 +39,7 @@ export function Notifications() {
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.addToastType({
-          title: notification.data?.name,
-          duration: 2000,
-          type: "METADATA_UPDATED",
-        });
+        ToastBatcher.addToastType(notification);
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(
