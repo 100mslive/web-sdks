@@ -33,7 +33,7 @@ export const PeerNotifications = () => {
       case HMSNotificationTypes.PEER_LIST:
         if (subscribedNotifications.PEER_JOINED) {
           toastText = notification.data?.name;
-          toastType = "PEER_LIST";
+          toastType = "PEER_JOINED";
         }
         break;
       case HMSNotificationTypes.PEER_JOINED:

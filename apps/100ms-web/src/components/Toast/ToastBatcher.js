@@ -38,7 +38,7 @@ export const ToastBatcher = {
         duration: duration,
       });
     }
-    this.syncUItoast();
+    this.syncUItoast(ToastManager.getToasts());
   },
   syncUItoast(toastsDisplaying) {
     for (const [toastType, toastInfo] of this.toastsType.entries()) {
@@ -49,4 +49,4 @@ export const ToastBatcher = {
   },
 };
 
-ToastManager.addListener(ToastBatcher.syncUItoast);
+ToastManager.addListener(ToastBatcher.syncUItoast.bind(ToastBatcher));
