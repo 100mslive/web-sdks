@@ -30,11 +30,6 @@ describe('HMSRemoteStream', () => {
     expect(args['framerate']).toBe(HMSSimulcastLayer.HIGH);
   });
 
-  it('does not send a message when layer stays same', () => {
-    stream.setVideo(HMSSimulcastLayer.NONE);
-    expect(sendOverApiDataChannel.mock.calls.length).toBe(0);
-  });
-
   it('sends message when audio is disabled', () => {
     stream.setAudio(true);
     expect(sendOverApiDataChannel.mock.calls.length).toBe(0);
