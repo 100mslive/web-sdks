@@ -92,3 +92,5 @@ export const QUERY_PARAM_VIEW_MODE = "ui_mode";
 export const UI_MODE_ACTIVE_SPEAKER = "activespeaker";
 export const UI_MODE_GRID = "grid";
 export const MAX_TOASTS = 5;
+
+export const CUSTOM_UI_SETTING_IS_AUDIO_ONLY = "isAudioOnly";

@@ -11,11 +11,14 @@ import {
 import { ShrinkIcon, ExpandIcon, CrossIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text, Video } from "@100mslive/react-ui";
 import { VideoPlaylistControls } from "./PlaylistControls";
+import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../../common/constants";
 
 export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));
   const active = useHMSStore(selectVideoPlaylist.selectedItem);
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   const hmsActions = useHMSActions();
   const ref = useRef(null);
   const [show, toggle] = useToggle(false);

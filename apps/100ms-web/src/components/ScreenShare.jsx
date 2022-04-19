@@ -6,11 +6,14 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../common/constants";
 import { isScreenshareSupported } from "../common/utils";
 
 export const Screenshare = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   const {
     amIScreenSharing,
     screenShareVideoTrackId: video,

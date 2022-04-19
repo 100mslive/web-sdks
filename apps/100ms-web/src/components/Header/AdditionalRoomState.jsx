@@ -29,6 +29,7 @@ import {
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
 import { useWhiteboardMetadata } from "../../plugins/whiteboard/useWhiteboardMetadata";
+import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../../common/constants";
 
 const getRecordingText = (
   { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
@@ -69,7 +70,9 @@ export const AdditionalRoomState = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
   const isPlaylistInactive = [

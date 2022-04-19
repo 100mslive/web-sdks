@@ -12,13 +12,16 @@ import {
   useHMSStore,
   selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
+import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../common/constants";
 
 const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
 
 export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   return (
     <Fragment>
       {toggleAudio ? (

@@ -13,6 +13,7 @@ import { useFullscreen } from "react-use";
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import screenfull from "screenfull";
+import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../common/constants";
 
 const Tile = ({
   peerId,
@@ -22,7 +23,9 @@ const Tile = ({
 }) => {
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const label = getVideoTileLabel(peer, track);
   const fullscreenRef = useRef(null);

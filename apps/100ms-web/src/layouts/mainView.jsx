@@ -16,7 +16,10 @@ import { AppContext } from "../components/context/AppContext";
 import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
-import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
+import {
+  CUSTOM_UI_SETTING_IS_AUDIO_ONLY,
+  UI_MODE_ACTIVE_SPEAKER,
+} from "../common/constants";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
@@ -28,7 +31,9 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const isAudioOnly = useHMSStore(selectCustomUISettingsByKey("isAudioOnly"));
+  const isAudioOnly = useHMSStore(
+    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+  );
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
