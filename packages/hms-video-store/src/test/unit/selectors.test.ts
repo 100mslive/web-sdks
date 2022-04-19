@@ -71,6 +71,8 @@ import {
   selectPeers,
   selectPeerMetadata,
   selectConnectionQualities,
+  selectCustomUISettings,
+  selectCustomUISettingsByKey,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -317,5 +319,14 @@ describe('derived selectors', () => {
       { peer: peerScreenSharing, isAudioEnabled: false },
       { peer: remotePeerTwo, isAudioEnabled: false },
     ]);
+  });
+});
+
+describe('customUISettings', () => {
+  test('select CustomUISettings', () => {
+    expect(selectCustomUISettings(fakeStore)).toEqual(fakeStore.customUISettings);
+  });
+  test('select CustomUISettingsByKey', () => {
+    expect(selectCustomUISettingsByKey('isAudioOnly')(fakeStore)).toEqual(true);
   });
 });
