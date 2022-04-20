@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { IStore } from '../sdk/store';
 import { userAgent } from '../utils/support';
+import AnalyticsEvent from './AnalyticsEvent';
 
 interface ClientEventBody {
   event: string;
@@ -22,10 +23,10 @@ export class ClientEventsManager {
     };
   }
 
-  sendEvent({ eventName, payload }: { eventName: string; payload: Record<string, any> }) {
-    const { token, peer_id, session_id, ...rest } = payload;
+  sendEvent(event: AnalyticsEvent) {
+    const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
-      event: eventName,
+      event: event.name,
       payload: rest,
       event_id: uuid(),
       peer_id,
