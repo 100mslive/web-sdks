@@ -3,7 +3,7 @@ import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ToastConfig = {
   PEER_LIST: {
-    single: function ({ notification }) {
+    single: function (notification) {
       if (notification.data.length === 1) {
         return (
           <TextWithIcon
@@ -13,7 +13,7 @@ export const ToastConfig = {
       }
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${notification.data[0]?.name} and ${
+          {`${notification.data[notification.data.length - 1]?.name} and ${
             notification.data.length - 1
           } others joined`}
         </TextWithIcon>
@@ -30,7 +30,7 @@ export const ToastConfig = {
     },
   },
   PEER_JOINED: {
-    single: function ({ notification }) {
+    single: function (notification) {
       return (
         <TextWithIcon
           Icon={PersonIcon}
@@ -40,7 +40,7 @@ export const ToastConfig = {
     multiple: function (notifications) {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${notifications[0].notification.data.name} and ${
+          {`${notifications[notifications.length].data.name} and ${
             notifications.length - 1
           } others joined`}
         </TextWithIcon>
@@ -48,17 +48,17 @@ export const ToastConfig = {
     },
   },
   PEER_LEFT: {
-    single: function ({ notification }) {
+    single: function (notification) {
       return (
         <TextWithIcon
           Icon={PersonIcon}
         >{`${notification.data?.name} left`}</TextWithIcon>
       );
     },
-    multiple: function ({ notifications }) {
+    multiple: function (notifications) {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${notifications[0].data.name} and ${
+          {`${notifications[notifications.length - 1].data.name} and ${
             notifications.length - 1
           } others left`}
         </TextWithIcon>
@@ -76,7 +76,7 @@ export const ToastConfig = {
     multiple: notifications => {
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`${notifications[0].data?.name} and ${
+          {`${notifications[notifications.length - 1].data?.name} and ${
             notifications.length - 1
           } others raised hand`}
         </TextWithIcon>

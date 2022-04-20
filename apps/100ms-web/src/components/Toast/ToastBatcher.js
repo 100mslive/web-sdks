@@ -3,7 +3,7 @@ import { ToastManager } from "./ToastManager";
 
 export const ToastBatcher = {
   toastsType: new Map(),
-  showToast(notification, duration = 2000, type) {
+  showToastInternal({ notification, duration, type }) {
     let notificationType = type;
     if (!type) {
       notificationType = notification.type;
@@ -36,6 +36,13 @@ export const ToastBatcher = {
         notifications: [...notifications],
         duration: duration,
       });
+    }
+  },
+  showToast({ notification, duration = 3000, type }) {
+    try {
+      this.showToastInternal({ notification, duration, type });
+    } catch (err) {
+      console.debug("Notifications", err);
     }
   },
   syncUItoast(toastsDisplaying) {

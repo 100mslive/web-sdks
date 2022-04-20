@@ -3,9 +3,8 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { PersonIcon } from "@100mslive/react-icons";
 import { ToastBatcher } from "../Toast/ToastBatcher";
-import { TextWithIcon } from "./TextWithIcon";
+
 import {
   UserPreferencesKeys,
   useUserPreferences,
@@ -27,33 +26,23 @@ export const PeerNotifications = () => {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
-    let toast;
 
     switch (notification.type) {
       case HMSNotificationTypes.PEER_LIST:
-        if (subscribedNotifications.PEER_JOINED) {
-          toast = notification;
-        }
-        break;
       case HMSNotificationTypes.PEER_JOINED:
-        if (subscribedNotifications.PEER_JOINED) {
-          toast = notification;
+        if (!subscribedNotifications.PEER_JOINED) {
+          return;
         }
         break;
       case HMSNotificationTypes.PEER_LEFT:
-        if (subscribedNotifications.PEER_LEFT) {
-          toast = notification;
+        if (!subscribedNotifications.PEER_LEFT) {
+          return;
         }
         break;
       default:
-        break;
+        return;
     }
-    if (toast) {
-      ToastBatcher.showToast({
-        notification: toast,
-        type: toast.type,
-      });
-    }
+    ToastBatcher.showToast({ notification });
   }, [
     notification,
     subscribedNotifications.PEER_JOINED,
