@@ -1,3 +1,5 @@
+import { TransportState } from '../transport/models/TransportState';
+
 export interface AdditionalAnalyticsProperties {
   bitrate?: {
     publish?: number;
@@ -11,4 +13,5 @@ export interface AdditionalAnalyticsProperties {
   peer_id?: string;
   token?: string;
   session_id?: string;
+  transport_state?: TransportState;
 }

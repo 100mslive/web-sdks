@@ -918,6 +918,7 @@ export default class HMSTransport implements ITransport {
       peer_id: this.store.getLocalPeer()?.peerId,
       token: this.store.getConfig()?.authToken,
       session_id: this.store.getRoom().sessionId,
+      transport_state: this.state,
     };
   }
 }
