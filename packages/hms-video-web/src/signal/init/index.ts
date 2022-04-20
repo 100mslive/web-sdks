@@ -6,7 +6,7 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 const TAG = 'InitService';
 
 export default class InitService {
-  private static async handleError(response: Response, body: { code: number; message: string }) {
+  private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {
       case 404:
         throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
@@ -36,7 +36,7 @@ export default class InitService {
         },
       });
       const config = await response.json();
-      await this.handleError(response, config);
+      this.handleError(response, config);
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
       return transformInitConfig(config);
     } catch (err) {
