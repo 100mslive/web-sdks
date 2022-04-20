@@ -31,7 +31,6 @@ export const ToastConfig = {
   },
   PEER_JOINED: {
     single: function ({ notification }) {
-      console.log("single", notification);
       return (
         <TextWithIcon
           Icon={PersonIcon}
@@ -39,7 +38,6 @@ export const ToastConfig = {
       );
     },
     multiple: function (notifications) {
-      console.log("multiple", notifications);
       return (
         <TextWithIcon Icon={PersonIcon}>
           {`${notifications[0].notification.data.name} and ${
@@ -69,7 +67,6 @@ export const ToastConfig = {
   },
   METADATA_UPDATED: {
     single: notification => {
-      console.log(notification);
       return (
         <TextWithIcon
           Icon={HandIcon}
@@ -77,7 +74,6 @@ export const ToastConfig = {
       );
     },
     multiple: notifications => {
-      console.log(notifications);
       return (
         <TextWithIcon Icon={HandIcon}>
           {`${notifications[0].data?.name} and ${
@@ -89,7 +85,6 @@ export const ToastConfig = {
   },
   NEW_MESSAGE: {
     single: notification => {
-      console.log(notification);
       return (
         <TextWithIcon
           Icon={ChatIcon}

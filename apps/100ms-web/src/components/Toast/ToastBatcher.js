@@ -13,7 +13,6 @@ export const ToastBatcher = {
       let { notifications } = this.toastsType.get(notificationType);
       const { id } = notifications[0];
       notifications.push(notification);
-      console.log("showToast", notifications);
       const toastText = ToastConfig[notificationType].multiple(notifications);
       const toastId = ToastManager.replaceToast(id, {
         title: toastText,
@@ -38,7 +37,6 @@ export const ToastBatcher = {
         duration: duration,
       });
     }
-    console.log(this.toastsType, "map");
   },
   syncUItoast(toastsDisplaying) {
     for (const [toastType, toastInfo] of this.toastsType.entries()) {

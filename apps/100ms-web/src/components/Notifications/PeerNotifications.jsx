@@ -38,7 +38,6 @@ export const PeerNotifications = () => {
       case HMSNotificationTypes.PEER_JOINED:
         if (subscribedNotifications.PEER_JOINED) {
           toast = notification;
-          console.log("j", notification);
         }
         break;
       case HMSNotificationTypes.PEER_LEFT:
@@ -50,10 +49,8 @@ export const PeerNotifications = () => {
         break;
     }
     if (toast) {
-      console.log(toast);
       ToastBatcher.showToast({
         notification: toast,
-        duration: 20000,
         type: toast.type,
       });
     }
