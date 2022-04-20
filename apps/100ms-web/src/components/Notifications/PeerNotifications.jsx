@@ -10,7 +10,6 @@ import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
-import { ConcatenationScope } from "webpack";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
@@ -51,10 +50,10 @@ export const PeerNotifications = () => {
         break;
     }
     if (toast) {
-      const duration = 10000;
-      ToastBatcher.addToastType({
+      console.log(toast);
+      ToastBatcher.showToast({
         notification: toast,
-        duration: duration,
+        duration: 20000,
         type: toast.type,
       });
     }

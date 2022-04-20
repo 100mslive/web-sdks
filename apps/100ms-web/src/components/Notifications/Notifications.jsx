@@ -39,7 +39,7 @@ export function Notifications() {
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.addToastType(notification);
+        ToastBatcher.showToast(notification);
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(
@@ -51,11 +51,7 @@ export function Notifications() {
       case HMSNotificationTypes.NEW_MESSAGE:
         if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
           return;
-        ToastBatcher.addToastType({
-          title: notification.data?.senderName,
-          duration: 2000,
-          type: "NEW_MESSAGE",
-        });
+        ToastBatcher.showToast(notification);
         break;
       case HMSNotificationTypes.ERROR:
         if (notification.data?.isTerminal) {

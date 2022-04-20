@@ -3,7 +3,7 @@ import { ToastManager } from "./ToastManager";
 
 export const ToastBatcher = {
   toastsType: new Map(),
-  addToastType(notification, duration = 2000, type) {
+  showToast(notification, duration = 2000, type) {
     let notificationType = type;
     if (!type) {
       notificationType = notification.type;
@@ -12,7 +12,8 @@ export const ToastBatcher = {
     if (toastType) {
       let { notifications } = this.toastsType.get(notificationType);
       const { id } = notifications[0];
-      notifications = [...notifications, notification];
+      notifications.push(notification);
+      console.log("showToast", notifications);
       const toastText = ToastConfig[notificationType].multiple(notifications);
       const toastId = ToastManager.replaceToast(id, {
         title: toastText,

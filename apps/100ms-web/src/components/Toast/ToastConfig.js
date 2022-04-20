@@ -39,7 +39,7 @@ export const ToastConfig = {
         >{`${notification.data?.name} joined`}</TextWithIcon>
       );
     },
-    multiple: function ({ notifications }) {
+    multiple: function (notifications) {
       console.log("multiple", notifications);
       return (
         <TextWithIcon Icon={PersonIcon}>
@@ -89,17 +89,17 @@ export const ToastConfig = {
     },
   },
   NEW_MESSAGE: {
-    single: toast => {
+    single: notification => {
       return (
         <TextWithIcon
           Icon={HandIcon}
-        >{`New message from ${toast.name}`}</TextWithIcon>
+        >{`New message from ${notification.data?.name}`}</TextWithIcon>
       );
     },
-    multiple: toast => {
+    multiple: notifications => {
       return (
         <TextWithIcon Icon={HandIcon}>
-          {`${toast.count} new messages`}
+          {`${notifications.length} new messages`}
         </TextWithIcon>
       );
     },
