@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
 import AnalyticsEvent from './AnalyticsEvent';
 
@@ -13,7 +14,7 @@ interface ClientEventBody {
 }
 
 export class ClientEventsManager {
-  public TAG = 'ClientEventsManager';
+  private TAG = 'ClientEventsManager';
   sendEvent(event: AnalyticsEvent) {
     const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
@@ -30,10 +31,14 @@ export class ClientEventsManager {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(requestBody),
     })
-      .then(response => response.json())
-      .then(res => {
-        console.log(res);
+      .then(response => {
+        if (response.status !== 200) {
+          throw Error(response.statusText);
+        }
+        return response.json();
       })
-      .catch(console.error);
+      .catch(error => {
+        HMSLogger.e(this.TAG, 'Failed to send event', error, event);
+      });
   }
 }
