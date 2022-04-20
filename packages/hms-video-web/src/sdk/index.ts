@@ -120,7 +120,7 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
-    this.analyticsEventsService = new AnalyticsEventsService();
+    this.analyticsEventsService = new AnalyticsEventsService(this.store);
     this.transport = new HMSTransport(
       this.observer,
       this.deviceManager,
