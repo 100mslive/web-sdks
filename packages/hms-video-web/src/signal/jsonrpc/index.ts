@@ -82,6 +82,7 @@ export default class JsonRpcSignal implements ISignal {
 
     window.addEventListener('online', () => {
       HMSLogger.d(this.TAG, 'Window network online');
+      this.observer.onNetworkOnline();
     });
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
