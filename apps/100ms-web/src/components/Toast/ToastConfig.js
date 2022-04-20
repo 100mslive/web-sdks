@@ -1,4 +1,4 @@
-import { HandIcon, PersonIcon } from "@100mslive/react-icons";
+import { HandIcon, PersonIcon, ChatIcon } from "@100mslive/react-icons";
 import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ToastConfig = {
@@ -10,15 +10,14 @@ export const ToastConfig = {
             Icon={PersonIcon}
           >{`${notification.data[0]?.name} joined`}</TextWithIcon>
         );
-      } else {
-        return (
-          <TextWithIcon Icon={PersonIcon}>
-            {`${notification.data[0]?.name} and ${
-              notification.data.length - 1
-            } others joined`}
-          </TextWithIcon>
-        );
       }
+      return (
+        <TextWithIcon Icon={PersonIcon}>
+          {`${notification.data[0]?.name} and ${
+            notification.data.length - 1
+          } others joined`}
+        </TextWithIcon>
+      );
     },
     multiple: notifications => {
       return (
@@ -90,15 +89,16 @@ export const ToastConfig = {
   },
   NEW_MESSAGE: {
     single: notification => {
+      console.log(notification);
       return (
         <TextWithIcon
-          Icon={HandIcon}
-        >{`New message from ${notification.data?.name}`}</TextWithIcon>
+          Icon={ChatIcon}
+        >{`New message from ${notification.data?.senderName}`}</TextWithIcon>
       );
     },
     multiple: notifications => {
       return (
-        <TextWithIcon Icon={HandIcon}>
+        <TextWithIcon Icon={ChatIcon}>
           {`${notifications.length} new messages`}
         </TextWithIcon>
       );

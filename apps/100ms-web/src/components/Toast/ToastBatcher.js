@@ -19,7 +19,7 @@ export const ToastBatcher = {
         title: toastText,
         duration: duration,
       });
-      this.toastsType.set(type, {
+      this.toastsType.set(notificationType, {
         id: toastId,
         notifications: notifications,
         duration: duration,
