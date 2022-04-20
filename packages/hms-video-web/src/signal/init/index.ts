@@ -36,7 +36,7 @@ export default class InitService {
         },
       });
       const config = await response.json();
-      this.handleError(response, config);
+      await this.handleError(response, config);
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
       return transformInitConfig(config);
     } catch (err) {
@@ -69,6 +69,6 @@ export function getUrl(endpoint: string, peerId: string, region?: string) {
 export function transformInitConfig(config: any): InitConfig {
   return {
     ...config,
-    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration.ice_servers },
+    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration?.ice_servers },
   };
 }
