@@ -917,6 +917,7 @@ export default class HMSTransport implements ITransport {
       recent_pong_response_times: this.signal.getPongResponseTimes(),
       peer_id: this.store.getLocalPeer()?.peerId,
       token: this.store.getConfig()?.authToken,
+      session_id: this.store.getRoom().sessionId,
     };
   }
 }

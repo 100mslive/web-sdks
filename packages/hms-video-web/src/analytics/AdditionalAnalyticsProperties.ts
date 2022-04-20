@@ -10,4 +10,5 @@ export interface AdditionalAnalyticsProperties {
   recent_pong_response_times: number[];
   peer_id?: string;
   token?: string;
+  session_id?: string;
 }
