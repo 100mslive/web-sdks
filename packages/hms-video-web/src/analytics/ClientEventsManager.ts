@@ -23,17 +23,17 @@ export class ClientEventsManager {
   }
 
   sendEvent({ eventName, payload }: { eventName: string; payload: Record<string, any> }) {
-    const config = this.store.getConfig();
+    const { token, peer_id, ...rest } = payload;
     const requestBody: ClientEventBody = {
       event: eventName,
-      payload,
+      payload: rest,
       event_id: uuid(),
-      peer_id: payload.peer_id,
+      peer_id,
       timestamp: Date.now(),
     };
     fetch('https://event-nonprod.100ms.live/v2/client', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config?.authToken}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(requestBody),
     })
       .then(response => response.json())

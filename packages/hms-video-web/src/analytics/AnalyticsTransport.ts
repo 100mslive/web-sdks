@@ -17,13 +17,14 @@ export abstract class AnalyticsTransport {
     }
   }
 
-  flushFailedEvents() {
+  flushFailedEvents(currentPeerId?: string) {
     try {
       HMSLogger.d(this.TAG, 'Flushing failed events', this.failedEvents);
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
         if (event) {
-          this.sendSingleEvent(event);
+          const isEventFromCurrentPeer = event.properties.peer_id === currentPeerId;
+          (isEventFromCurrentPeer || !event.properties.peer_id) && this.sendSingleEvent(event);
         }
       }
     } catch (error) {

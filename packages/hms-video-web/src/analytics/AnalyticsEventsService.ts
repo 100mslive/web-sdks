@@ -9,19 +9,18 @@ const TAG = 'AnalyticsEventsService';
 export class AnalyticsEventsService {
   private bufferSize = ANALYTICS_BUFFER_SIZE;
 
-  private transports: AnalyticsTransport[] = [];
+  private transport: AnalyticsTransport | null = null;
   private pendingEvents: AnalyticsEvent[] = [];
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
-  addTransport(transport: AnalyticsTransport) {
-    if (!this.transports.includes(transport)) {
-      this.transports.push(transport);
-    }
+  setTransport(transport: AnalyticsTransport) {
+    this.transport = transport;
   }
 
-  removeTransport(transport: AnalyticsTransport) {
-    this.transports.splice(this.transports.indexOf(transport), 1);
+  reset() {
+    this.transport = null;
+    this.pendingEvents = [];
   }
 
   queue(event: AnalyticsEvent) {
@@ -37,7 +36,7 @@ export class AnalyticsEventsService {
   }
 
   flush() {
-    if (this.transports.length === 0) {
+    if (!this.transport) {
       HMSLogger.w(TAG, 'No valid signalling API found to flush analytics');
       return;
     }
@@ -46,7 +45,7 @@ export class AnalyticsEventsService {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
-          this.transports.forEach(transport => transport.sendEvent(event));
+          this.transport.sendEvent(event);
         }
       }
     } catch (error) {

@@ -8,4 +8,6 @@ export interface AdditionalAnalyticsProperties {
   num_degraded_tracks?: number;
   max_sub_bitrate?: number;
   recent_pong_response_times: number[];
+  peer_id?: string;
+  token?: string;
 }
