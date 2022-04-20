@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid';
-import { IStore } from '../sdk/store';
 import { userAgent } from '../utils/support';
 import AnalyticsEvent from './AnalyticsEvent';
 
@@ -10,19 +9,11 @@ interface ClientEventBody {
   session_id?: string;
   timestamp: number;
   payload: Record<string, any>;
+  agent: string;
 }
 
 export class ClientEventsManager {
-  constructor(private store: IStore) {}
-
-  getBaseData() {
-    return {
-      peer_id: this.store.getLocalPeer()?.peerId,
-      session_id: this.store.getRoom()?.id,
-      agent: userAgent,
-    };
-  }
-
+  public TAG = 'ClientEventsManager';
   sendEvent(event: AnalyticsEvent) {
     const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
@@ -32,6 +23,7 @@ export class ClientEventsManager {
       peer_id,
       session_id,
       timestamp: Date.now(),
+      agent: userAgent,
     };
     fetch('https://event-nonprod.100ms.live/v2/client', {
       method: 'POST',
