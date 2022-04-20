@@ -23,12 +23,13 @@ export class ClientEventsManager {
   }
 
   sendEvent({ eventName, payload }: { eventName: string; payload: Record<string, any> }) {
-    const { token, peer_id, ...rest } = payload;
+    const { token, peer_id, session_id, ...rest } = payload;
     const requestBody: ClientEventBody = {
       event: eventName,
       payload: rest,
       event_id: uuid(),
       peer_id,
+      session_id,
       timestamp: Date.now(),
     };
     fetch('https://event-nonprod.100ms.live/v2/client', {
