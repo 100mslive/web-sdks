@@ -14,8 +14,7 @@ const slideUp = keyframes({
 });
 
 const StyledAccordion = styled(BaseAccordion.Root, {
-  borderRadius: 6,
-  width: 300,
+  borderRadius: '$1',
   backgroundColor: 'transparent',
 });
 
@@ -23,11 +22,12 @@ const StyledItem = styled(BaseAccordion.Item, {
   overflow: 'hidden',
   marginTop: 1,
   padding: '2rem 0',
-  borderBottom: '1px solid #3C3F44',
+  borderBottom: '1px solid',
+  borderColor: '$borderLight',
   '&:first-child': {
     marginTop: 0,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
+    borderTopLeftRadius: '$0',
+    borderTopRightRadius: '$0',
   },
 
   '&:last-child': {
@@ -37,7 +37,7 @@ const StyledItem = styled(BaseAccordion.Item, {
   '&:focus-within': {
     position: 'relative',
     zIndex: 1,
-    boxShadow: `0 0 0 2px transparent`,
+    boxShadow: `0 0 0 0.125rem transparent`,
   },
 });
 
@@ -55,8 +55,8 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  color: '#ffffff',
-  boxShadow: `0 0px 0 #ffffff`,
+  color: '$white',
+  boxShadow: `0 0px 0 $white`,
   '&[data-state="closed"]': { backgroundColor: 'transparent' },
   '&[data-state="open"]': { backgroundColor: 'transparent' },
   '&:hover': { backgroundColor: 'transparent' },
@@ -74,7 +74,7 @@ const StyledContent = styled(BaseAccordion.Content, {
 });
 
 const StyledChevron = styled('div', {
-  color: '#464E59',
+  color: '$secondaryLight',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=open] &': { transform: 'rotate(180deg)' },
 });

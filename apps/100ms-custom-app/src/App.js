@@ -199,12 +199,12 @@ const App = () => {
   return (
     <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
       {error && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
           <ErrorModal title={error.title} body={error.body} />
         </Suspense>
       )}
       {onlyEmail && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
           <Header
             savingData={savingSettings}
             refreshData={fetchData}
@@ -217,7 +217,13 @@ const App = () => {
       )}
 
       {!error && !loading && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <Flex justify="center" align="center" css={{ size: '100%' }}>
+              <Loading size={100} />
+            </Flex>
+          }
+        >
           <HMSEdtechTemplate
             tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
             themeConfig={{
@@ -234,7 +240,7 @@ const App = () => {
         </Suspense>
       )}
       {showSettingsModal && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={null}>
           <RoomSettings
             onClose={toggleModal}
             handleLogoChange={handleLogoChange}
