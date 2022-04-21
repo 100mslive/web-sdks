@@ -11,7 +11,7 @@ export const ToastBatcher = {
     const toastType = this.toastsType.has(notificationType);
     if (toastType) {
       let { notifications } = this.toastsType.get(notificationType);
-      const { id } = notifications[0];
+      const { id } = this.toastsType.get(notificationType);
       notifications.push(notification);
       const toastText = ToastConfig[notificationType].multiple(notifications);
       const toastId = ToastManager.replaceToast(id, {
