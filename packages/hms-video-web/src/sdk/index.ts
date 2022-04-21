@@ -988,7 +988,7 @@ export class HMSSdk implements HMSInterface {
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
     // This needs to be figure out. All events get called from here.
-    if (this.transportState === TransportState.Failed) {
+    if (this.transportState === TransportState.Failed || event.properties.is_terminal) {
       this.clientEventsManager.sendEvent(event);
       return;
     }
