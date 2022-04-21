@@ -8,6 +8,6 @@
     "sourceMap": false,
     "emitDeclarationOnly": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "build"]
+  "include": ["src/**/*", "types"],
+  "exclude": ["node_modules", "dist", "docs", "**/*.test.ts", "**/*.spec.ts"]
 }
