@@ -478,7 +478,7 @@ export class HMSSDKActions implements IHMSActions {
   /**
    * use it for updating a particular property in the setting
    * @param key a string. Does not check for existence. If the key is already not
-   * a property of the customUISettings, it is added.
+   * a property of the appData, it is added.
    * @param value value to set for the key.
    */
   setCustomUISettings(key: string, value: any): void;
@@ -489,11 +489,11 @@ export class HMSSDKActions implements IHMSActions {
          * toString() is needed because computed properties only work
          * on primitive strings and not on string Objects.
          */
-        store.customUISettings[settingsOrKey.toString()] = value;
+        store.appData[settingsOrKey.toString()] = value;
       });
     } else {
       this.setState(store => {
-        store.customUISettings = settingsOrKey;
+        store.appData = settingsOrKey;
       });
     }
   }

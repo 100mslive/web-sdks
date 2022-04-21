@@ -24,7 +24,7 @@ import {
   selectLocalPeer,
   selectPeerSharingVideoPlaylist,
   useHMSStore,
-  selectCustomUISettingsByKey,
+  selectAppDataByKey,
 } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
@@ -71,7 +71,7 @@ export const AdditionalRoomState = () => {
     isRecordingOn,
   } = useRecordingStreaming();
   const isAudioOnly = useHMSStore(
-    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+    selectAppDataByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
   );
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);

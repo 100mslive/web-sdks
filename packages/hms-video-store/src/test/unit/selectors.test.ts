@@ -322,9 +322,9 @@ describe('derived selectors', () => {
   });
 });
 
-describe('customUISettings', () => {
+describe('appData', () => {
   test('select CustomUISettings', () => {
-    expect(selectCustomUISettings(fakeStore)).toEqual(fakeStore.customUISettings);
+    expect(selectCustomUISettings(fakeStore)).toEqual(fakeStore.appData);
   });
   test('select CustomUISettingsByKey', () => {
     expect(selectCustomUISettingsByKey('isAudioOnly')(fakeStore)).toEqual(true);

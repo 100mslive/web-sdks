@@ -6,7 +6,7 @@ import {
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
-  selectCustomUISettingsByKey,
+  selectAppDataByKey,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
 import { Header } from "./Header";

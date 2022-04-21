@@ -12,7 +12,7 @@ import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
-  selectCustomUISettingsByKey,
+  selectAppDataByKey,
 } from "@100mslive/react-sdk";
 import {
   Flex,

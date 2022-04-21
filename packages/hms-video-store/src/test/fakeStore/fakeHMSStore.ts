@@ -84,7 +84,7 @@ export const makeFakeStore = (): HMSStore => {
       },
       sessionId: '',
     },
-    customUISettings: {
+    appData: {
       isAudioOnly: true,
     },
     peers: {

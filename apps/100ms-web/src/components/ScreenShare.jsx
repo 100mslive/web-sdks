@@ -1,6 +1,6 @@
 import { ShareScreenIcon } from "@100mslive/react-icons";
 import {
-  selectCustomUISettingsByKey,
+  selectAppDataByKey,
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
@@ -12,7 +12,7 @@ import { isScreenshareSupported } from "../common/utils";
 export const Screenshare = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioOnly = useHMSStore(
-    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+    selectAppDataByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
   );
   const {
     amIScreenSharing,

@@ -1,14 +1,14 @@
 import { useHMSActions } from "@100mslive/react-sdk";
 import { useEffect } from "react";
 
-export function AppData() {
+export function customAppData() {
   const hmsActions = useHMSActions();
   useEffect(() => {
-    const initialAppData = {
+    const initialcustomAppData = {
       isAudioOnly: false,
     };
-    hmsActions.setAppData(initialAppData);
+    hmsActions.setCustomAppData(initialcustomAppData);
   }, [hmsActions]);
-  
+
   return null;
 }
