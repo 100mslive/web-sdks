@@ -36,7 +36,12 @@ export class ClientEventsManager {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
-        return response.json();
+        const events = this.failedEvents.get() || [];
+        const index = events.findIndex(storageEvent => storageEvent.timestamp === event.timestamp);
+        if (index > -1) {
+          events.splice(index, 1);
+          this.failedEvents.set(events);
+        }
       })
       .catch(error => {
         const existingEvents = this.failedEvents.get() || [];
