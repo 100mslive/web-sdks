@@ -101,7 +101,7 @@ export const MetaActions = ({ isMobile = false }) => {
           css={{ mx: "$4" }}
           onClick={toggleBRB}
           active={!isBRBOn}
-          data-testid="brb_btn"
+          data-testid={`${isMobile ? "brb_btn_mobile" : "brb_btn"}`}
         >
           <BrbIcon />
         </IconButton>
