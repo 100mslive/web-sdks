@@ -177,11 +177,11 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore
     }
     try {
-      this.sdkJoinWithListeners(config);
       this.isRoomJoinCalled = true;
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
+      this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
