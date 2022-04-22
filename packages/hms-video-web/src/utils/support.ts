@@ -1,4 +1,5 @@
 import { UAParser } from 'ua-parser-js';
+import { v4 as uuid } from 'uuid';
 import { version } from './package.alias.json';
 
 export const parsedUserAgent = new UAParser();
@@ -38,3 +39,5 @@ export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 export const userAgent = createUserAgent();
 
 export const isPageHidden = () => typeof document !== undefined && document.hidden;
+
+export const deviceId = uuid();

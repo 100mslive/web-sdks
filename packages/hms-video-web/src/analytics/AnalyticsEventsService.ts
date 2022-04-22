@@ -3,7 +3,6 @@ import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsTransport } from './AnalyticsTransport';
-import { IStore } from '../sdk/store';
 
 const TAG = 'AnalyticsEventsService';
 
@@ -14,8 +13,6 @@ export class AnalyticsEventsService {
   private pendingEvents: AnalyticsEvent[] = [];
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
-
-  constructor(private store: IStore) {}
 
   setTransport(transport: AnalyticsTransport) {
     this.transport = transport;
@@ -28,9 +25,6 @@ export class AnalyticsEventsService {
 
   queue(event: AnalyticsEvent) {
     if (event.level >= this.level) {
-      event.properties.peer_id = this.store.getLocalPeer()?.peerId;
-      event.properties.session_id = this.store.getRoom().sessionId;
-      event.properties.token = this.store.getConfig()?.authToken;
       this.pendingEvents.push(event);
 
       if (this.pendingEvents.length > this.bufferSize) {

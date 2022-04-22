@@ -122,7 +122,7 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
-    this.analyticsEventsService = new AnalyticsEventsService(this.store);
+    this.analyticsEventsService = new AnalyticsEventsService();
     this.clientEventsManager = new ClientEventsManager();
     this.transport = new HMSTransport(
       this.observer,
@@ -987,6 +987,9 @@ export class HMSSdk implements HMSInterface {
   };
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
+    event.properties.peer_id = this.store.getLocalPeer()?.peerId;
+    event.properties.session_id = this.store.getRoom().sessionId;
+    event.properties.token = this.store.getConfig()?.authToken;
     // This needs to be figure out. All events get called from here.
     if (this.transportState === TransportState.Failed || event.properties.is_terminal) {
       this.clientEventsManager.sendEvent(event);
