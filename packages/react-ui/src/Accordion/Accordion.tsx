@@ -20,16 +20,14 @@ const StyledAccordion = styled(BaseAccordion.Root, {
 
 const StyledItem = styled(BaseAccordion.Item, {
   overflow: 'hidden',
-  marginTop: 1,
   padding: '2rem 0',
-  borderBottom: '1px solid',
+  borderBottom: '$px solid',
   borderColor: '$borderLight',
   '&:first-child': {
     marginTop: 0,
     borderTopLeftRadius: '$0',
     borderTopRightRadius: '$0',
   },
-
   '&:last-child': {
     borderBottom: '0',
   },
