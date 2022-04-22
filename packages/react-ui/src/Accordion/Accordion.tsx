@@ -23,8 +23,7 @@ const StyledAccordion = styled(BaseAccordion.Root, {
 const StyledItem = styled(BaseAccordion.Item, {
   overflow: 'hidden',
   padding: '0.75rem 0',
-  borderBottom: '$px solid',
-  borderColor: '$borderLight',
+  borderBottom: '$space$px solid $borderLight',
   cursor: 'pointer',
   '&:first-child': {
     marginTop: 0,
@@ -34,7 +33,6 @@ const StyledItem = styled(BaseAccordion.Item, {
   '&:last-child': {
     borderBottom: '0',
   },
-
   '&:focus-within': {
     position: 'relative',
     zIndex: 1,
@@ -51,7 +49,6 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   all: 'unset',
   fontFamily: 'inherit',
   backgroundColor: 'transparent',
-  height: '2rem',
   flex: 1,
   display: 'flex',
   alignItems: 'center',
