@@ -2,6 +2,43 @@
 # yarn lockfile v1
 
 
+"@100mslive/hms-video-store@0.2.96":
+  version "0.2.96"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.2.96.tgz#43a7991ce9a96cef78507ee1cfd80384414c001a"
+  integrity sha512-/gf8a62Qxt4hxXp856iUpJhaOKaX7muAVSTdBmysuPmmqMMM5uro1YaGccT7GQ0jED1FfIN96+OZBGYr9wD1bA==
+  dependencies:
+    "@100mslive/hms-video" "0.1.50"
+    eventemitter2 "^6.4.5"
+    immer "^9.0.6"
+    reselect "4.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-video@0.1.50":
+  version "0.1.50"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.1.50.tgz#8f62b12597578221b1ad600fc721c4c845cf6bfc"
+  integrity sha512-3U3Az66lwFuosbth8hez02jArQqAJfVuRsvc3Xsm20vGvNIUyU3B/qq+hQNctsHaVlE73C54Nvka+pXpyRbI3g==
+  dependencies:
+    eventemitter2 "^6.4.5"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/react-icons@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.0.13.tgz#154286df60dc66bd7e94bc2d2fe8f7d7e030d138"
+  integrity sha512-800viKUUJP4vRxANzo0qBVQCvl787xKtJuIg3LSSP/gjMDhO6WtE7zWlqVdK4w83HSSbJ0CYKuhNPtAkrnmfdQ==
+
+"@100mslive/react-sdk@0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.0.13.tgz#5455d9ceff4ad1375d7bc3f08224feb02dba188e"
+  integrity sha512-kDlORQCYqda/jAPYqcphFRgyU3rb9s78Hkxapz1JekrEjh0rp2Ge13H55bYNgwyQuw0EFUfehseOeTNt/swtCg==
+  dependencies:
+    "@100mslive/hms-video-store" "0.2.96"
+    react-intersection-observer "^8.33.1"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
+
 "@ampproject/remapping@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.1.2.tgz#4edca94973ded9630d20101cd8559cedb8d8bd34"
