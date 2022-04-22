@@ -6,7 +6,7 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 const TAG = 'InitService';
 
 export default class InitService {
-  private static async handleError(response: Response, body: { code: number; message: string }) {
+  private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {
       case 404:
         throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
@@ -69,6 +69,6 @@ export function getUrl(endpoint: string, peerId: string, region?: string) {
 export function transformInitConfig(config: any): InitConfig {
   return {
     ...config,
-    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration.ice_servers },
+    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration?.ice_servers },
   };
 }

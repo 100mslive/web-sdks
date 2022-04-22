@@ -40,11 +40,6 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    */
   setVideo(layer: HMSSimulcastLayer) {
-    if (this.video === layer) {
-      HMSLogger.d(`[Remote stream] ${this.id}`, `Already on ${layer} layer`);
-      return;
-    }
-
     this.setVideoLayer(layer);
     this.syncWithApiChannel();
   }
