@@ -40,7 +40,7 @@ export const ToastConfig = {
     multiple: function (notifications) {
       return (
         <TextWithIcon Icon={PersonIcon}>
-          {`${notifications[notifications.length].data.name} and ${
+          {`${notifications[notifications.length - 1].data.name} and ${
             notifications.length - 1
           } others joined`}
         </TextWithIcon>
