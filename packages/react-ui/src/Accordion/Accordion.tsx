@@ -16,13 +16,16 @@ const slideUp = keyframes({
 const StyledAccordion = styled(BaseAccordion.Root, {
   borderRadius: '$1',
   backgroundColor: 'transparent',
+  width: '100%',
+  padding: '1rem',
 });
 
 const StyledItem = styled(BaseAccordion.Item, {
   overflow: 'hidden',
-  padding: '2rem 0',
+  padding: '0.75rem 0',
   borderBottom: '$px solid',
   borderColor: '$borderLight',
+  cursor: 'pointer',
   '&:first-child': {
     marginTop: 0,
     borderTopLeftRadius: '$0',
