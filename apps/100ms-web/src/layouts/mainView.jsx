@@ -7,9 +7,8 @@ import {
   selectPeerScreenSharing,
   selectPeerSharingVideoPlaylist,
   selectRoomState,
-  selectCustomUISettingsByKey,
   selectLocalPeer,
-  selectCustomUISettings,
+  selectAppData,
 } from "@100mslive/react-sdk";
 import { MainGridView } from "./mainGridView";
 import { AppContext } from "../components/context/AppContext";
@@ -17,7 +16,7 @@ import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 import {
-  CUSTOM_UI_SETTING_IS_AUDIO_ONLY,
+  APP_DATA_IS_AUDIO_ONLY,
   UI_MODE_ACTIVE_SPEAKER,
 } from "../common/constants";
 
@@ -31,9 +30,8 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const isAudioOnly = useHMSStore(
-    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
-  );
+  const isAudioOnly = useHMSStore(selectAppData(APP_DATA_IS_AUDIO_ONLY));
+  const fullstate = useHMSStore(selectAppData());
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
@@ -46,6 +44,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     showStatsOnTiles,
   } = useContext(AppContext);
 
+  console.log("FULL STATE", fullstate, isAudioOnly);
   useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {

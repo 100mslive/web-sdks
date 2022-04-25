@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import {
-  selectCustomUISettings,
+  selectFullAppData,
   selectHMSMessages,
   selectLocalPeerID,
   selectPeers,
@@ -22,7 +22,7 @@ import { HMSLogger } from '../../common/ui-logger';
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
-const selectCustomUISettingsKey = (_store: HMSStore, key: string | undefined) => key;
+const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -40,11 +40,12 @@ export const selectPeerByID = byIDCurry(selectPeerByIDBare);
 /**
  * Select a particular setting from customUISetting by ID.
  */
-export const selectCustomUISettingsByKey = byKeyCurry(
-  createSelector([selectCustomUISettings, selectCustomUISettingsKey], (settings, key) => {
+export const selectAppData = byKeyCurry(
+  createSelector([selectFullAppData, selectAppDataKey], (settings, key) => {
     if (key) {
       return settings[key];
     }
+    return settings;
   }),
 );
 

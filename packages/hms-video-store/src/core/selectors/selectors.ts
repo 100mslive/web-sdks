@@ -52,8 +52,9 @@ export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
 
 /**
  * select appData.
+ * @internal
  */
-export const selectCustomUISettings = (store: HMSStore) => store.appData;
+export const selectFullAppData = (store: HMSStore) => store.appData;
 
 /**
  * Select the available audio input, audio output and video input devices on your machine.

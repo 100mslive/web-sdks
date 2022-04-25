@@ -12,7 +12,6 @@ import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
-  selectAppDataByKey,
 } from "@100mslive/react-sdk";
 import {
   Flex,

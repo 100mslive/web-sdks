@@ -5,7 +5,6 @@ import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
-  selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
 import { ParticipantList } from "./ParticipantList";
 import { AdditionalRoomState } from "./AdditionalRoomState";

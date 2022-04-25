@@ -4,7 +4,6 @@ import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeer,
-  selectCustomUISettingsByKey,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";

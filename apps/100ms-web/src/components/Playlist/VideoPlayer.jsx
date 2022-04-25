@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useFullscreen, useToggle } from "react-use";
 import screenfull from "screenfull";
 import {
-  selectCustomUISettingsByKey,
+  selectAppData,
   selectVideoPlaylist,
   selectVideoPlaylistVideoTrackByPeerID,
   useHMSActions,
@@ -11,13 +11,13 @@ import {
 import { ShrinkIcon, ExpandIcon, CrossIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text, Video } from "@100mslive/react-ui";
 import { VideoPlaylistControls } from "./PlaylistControls";
-import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../../common/constants";
+import { APP_DATA_IS_AUDIO_ONLY } from "../../common/constants";
 
 export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));
   const active = useHMSStore(selectVideoPlaylist.selectedItem);
   const isAudioOnly = useHMSStore(
-    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+    selectAppData(APP_DATA_IS_AUDIO_ONLY)
   );
   const hmsActions = useHMSActions();
   const ref = useRef(null);

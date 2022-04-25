@@ -6,7 +6,6 @@ import { ChatView } from "./chatView";
 import VideoList from "./VideoList";
 import { mobileChatStyle } from "../common/utils";
 import { Image } from "./Image";
-import { selectAppDataByKey, useHMSStore } from "@100mslive/react-sdk";
 
 const MAX_TILES_FOR_MOBILE = 4;
 

@@ -71,8 +71,8 @@ import {
   selectPeers,
   selectPeerMetadata,
   selectConnectionQualities,
-  selectCustomUISettings,
-  selectCustomUISettingsByKey,
+  selectAppData,
+  selectFullAppData,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -323,10 +323,10 @@ describe('derived selectors', () => {
 });
 
 describe('appData', () => {
-  test('select CustomUISettings', () => {
-    expect(selectCustomUISettings(fakeStore)).toEqual(fakeStore.appData);
+  test('select AppData', () => {
+    expect(selectFullAppData(fakeStore)).toEqual(fakeStore.appData);
   });
-  test('select CustomUISettingsByKey', () => {
-    expect(selectCustomUISettingsByKey('isAudioOnly')(fakeStore)).toEqual(true);
+  test('select AppDataByKey', () => {
+    expect(selectAppData('isAudioOnly')(fakeStore)).toEqual(true);
   });
 });

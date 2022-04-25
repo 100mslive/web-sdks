@@ -14,7 +14,7 @@ import {
   selectPeerByID,
   selectPeerMetadata,
   selectVideoTrackByPeerID,
-  selectAppDataByKey,
+  selectAppData,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -24,13 +24,13 @@ import {
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
-import { CUSTOM_UI_SETTING_IS_AUDIO_ONLY } from "../common/constants";
+import { APP_DATA_IS_AUDIO_ONLY } from "../common/constants";
 
 const Tile = ({ peerId, showStatsOnTiles, width, height, index }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useHMSStore(
-    selectAppDataByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
+    selectAppData(APP_DATA_IS_AUDIO_ONLY)
   );
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));

@@ -6,9 +6,13 @@ export function AppData() {
   useEffect(() => {
     const initialAppData = {
       isAudioOnly: false,
+      testObject: {
+        a: 1,
+        b: 2,
+      },
     };
     hmsActions.setAppData(initialAppData);
   }, [hmsActions]);
-  
+
   return null;
 }

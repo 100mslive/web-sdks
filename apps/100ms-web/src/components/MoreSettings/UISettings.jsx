@@ -17,12 +17,12 @@ import {
 } from "../../primitives/DialogContent";
 import { AppContext } from "../context/AppContext";
 import {
-  CUSTOM_UI_SETTING_IS_AUDIO_ONLY,
+  APP_DATA_IS_AUDIO_ONLY,
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
 } from "../../common/constants";
 import {
-  selectCustomUISettingsByKey,
+  selectAppData,
   selectIsLocalScreenShared,
   selectIsLocalVideoEnabled,
   useHMSActions,
@@ -74,9 +74,7 @@ export const UISettings = ({ open, onOpenChange }) => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const isAudioOnly = useHMSStore(
-    selectCustomUISettingsByKey(CUSTOM_UI_SETTING_IS_AUDIO_ONLY)
-  );
+  const isAudioOnly = useHMSStore(selectAppData(APP_DATA_IS_AUDIO_ONLY));
   const audioOnlyToggleHandler = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn && isLocalVideoEnabled) {
@@ -87,7 +85,15 @@ export const UISettings = ({ open, onOpenChange }) => {
         await hmsActions.setScreenShareEnabled(false);
       }
 
-      hmsActions.setCustomUISettings("isAudioOnly", isAudioOnlyModeOn);
+      hmsActions.setAppData("isAudioOnly", isAudioOnlyModeOn);
+      hmsActions.setAppData(
+        "testObject",
+        {
+          b: 1,
+          c: 30,
+        },
+        true
+      );
     },
     [hmsActions, isLocalVideoEnabled, isLocalScreenShared]
   );
