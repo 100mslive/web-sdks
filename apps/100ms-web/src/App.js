@@ -23,7 +23,7 @@ import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
 import FullPageProgress from "./components/FullPageProgress";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
-import { AppData } from "./components/AppData/index.jsx";
+import { AppData } from "./components/AppData/AppData.jsx";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));

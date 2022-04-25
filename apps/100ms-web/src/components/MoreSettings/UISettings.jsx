@@ -22,12 +22,12 @@ import {
   UI_SETTINGS,
 } from "../../common/constants";
 import {
-  selectAppData,
   selectIsLocalScreenShared,
   selectIsLocalVideoEnabled,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
+import { useSetUiSettings } from "../AppData/useUISettings";
 
 const cssStyle = {
   flexDirection: "column",
@@ -74,28 +74,19 @@ export const UISettings = ({ open, onOpenChange }) => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
-  const audioOnlyToggleHandler = useCallback(
+  const [isAudioOnly, setIsAudioOnly] = useSetUiSettings(
+    UI_SETTINGS.isAudioOnly
+  );
+  const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
-      if (isAudioOnlyModeOn && isLocalVideoEnabled) {
-        await hmsActions.setLocalVideoEnabled(false);
+      if (isAudioOnlyModeOn) {
+        // turn off video and screen share if user switches to audio only mode
+        isLocalVideoEnabled && (await hmsActions.setLocalVideoEnabled(false));
+        isLocalScreenShared && (await hmsActions.setScreenShareEnabled(false));
       }
-
-      if (isAudioOnlyModeOn && isLocalScreenShared) {
-        await hmsActions.setScreenShareEnabled(false);
-      }
-
-      hmsActions.setAppData("isAudioOnly", isAudioOnlyModeOn);
-      hmsActions.setAppData(
-        "testObject",
-        {
-          b: 1,
-          c: 30,
-        },
-        true
-      );
+      setIsAudioOnly(isAudioOnlyModeOn);
     },
-    [hmsActions, isLocalVideoEnabled, isLocalScreenShared]
+    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setIsAudioOnly]
   );
 
   return (
@@ -160,7 +151,7 @@ export const UISettings = ({ open, onOpenChange }) => {
             title="Audio Only Mode"
             id="audioOnlyMode"
             value={isAudioOnly}
-            onChange={audioOnlyToggleHandler}
+            onChange={toggleIsAudioOnly}
             css={{ margin: "$4 0" }}
           />
           <Flex css={{ w: "100%", "@md": { display: "none" } }}>

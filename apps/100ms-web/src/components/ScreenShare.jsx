@@ -1,6 +1,5 @@
 import { ShareScreenIcon } from "@100mslive/react-icons";
 import {
-  selectAppData,
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
@@ -8,10 +7,11 @@ import {
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { UI_SETTINGS } from "../common/constants";
 import { isScreenshareSupported } from "../common/utils";
+import { useUISettings } from "./AppData/useUISettings";
 
 export const ScreenshareToggle = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
+  const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const {
     amIScreenSharing,
     screenShareVideoTrackId: video,

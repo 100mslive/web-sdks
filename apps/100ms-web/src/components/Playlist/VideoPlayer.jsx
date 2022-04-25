@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import { useFullscreen, useToggle } from "react-use";
 import screenfull from "screenfull";
 import {
-  selectAppData,
   selectVideoPlaylist,
   selectVideoPlaylistVideoTrackByPeerID,
   useHMSActions,
@@ -12,11 +11,12 @@ import { ShrinkIcon, ExpandIcon, CrossIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text, Video } from "@100mslive/react-ui";
 import { VideoPlaylistControls } from "./PlaylistControls";
 import { UI_SETTINGS } from "../../common/constants";
+import { useUISettings } from "../AppData/useUISettings";
 
 export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));
   const active = useHMSStore(selectVideoPlaylist.selectedItem);
-  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
+  const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const hmsActions = useHMSActions();
   const ref = useRef(null);
   const [show, toggle] = useToggle(false);

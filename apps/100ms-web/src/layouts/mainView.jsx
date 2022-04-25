@@ -8,7 +8,6 @@ import {
   selectPeerSharingVideoPlaylist,
   selectRoomState,
   selectLocalPeer,
-  selectAppData,
 } from "@100mslive/react-sdk";
 import { MainGridView } from "./mainGridView";
 import { AppContext } from "../components/context/AppContext";
@@ -16,6 +15,7 @@ import FullPageProgress from "../components/FullPageProgress";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 import { UI_MODE_ACTIVE_SPEAKER, UI_SETTINGS } from "../common/constants";
+import { useUISettings } from "../components/AppData/useUISettings";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
@@ -27,7 +27,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
+  const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();

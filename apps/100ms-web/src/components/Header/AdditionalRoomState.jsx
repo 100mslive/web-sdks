@@ -24,12 +24,12 @@ import {
   selectLocalPeer,
   selectPeerSharingVideoPlaylist,
   useHMSStore,
-  selectAppData,
 } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
 import { useWhiteboardMetadata } from "../../plugins/whiteboard/useWhiteboardMetadata";
 import { UI_SETTINGS } from "../../common/constants";
+import { useUISettings } from "../AppData/useUISettings";
 
 const getRecordingText = (
   { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
@@ -70,7 +70,7 @@ export const AdditionalRoomState = () => {
     isHLSRunning,
     isRecordingOn,
   } = useRecordingStreaming();
-  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
+  const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const screenshareAudio = useScreenshareAudio();
   const [open, setOpen] = useState(false);
   const isPlaylistInactive = [

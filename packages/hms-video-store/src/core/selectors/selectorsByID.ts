@@ -16,7 +16,7 @@ import {
   isVideo,
   isAudioPlaylist,
 } from './selectorUtils';
-import { byIDCurry, byKeyCurry } from './common';
+import { byIDCurry } from './common';
 import { HMSLogger } from '../../common/ui-logger';
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
@@ -38,9 +38,10 @@ const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (st
 export const selectPeerByID = byIDCurry(selectPeerByIDBare);
 
 /**
- * Select a particular setting from customUISetting by ID.
+ * Select a particular key from ui app data by passed in key.
+ * if key is not passed, full data is returned.
  */
-export const selectAppData = byKeyCurry(
+export const selectAppData = byIDCurry(
   createSelector([selectFullAppData, selectAppDataKey], (settings, key) => {
     if (key) {
       return settings[key];
