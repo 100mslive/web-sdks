@@ -28,7 +28,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
-  const fullstate = useHMSStore(selectAppData());
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const roomState = useHMSStore(selectRoomState);
   useBeamAutoLeave();
@@ -41,7 +40,6 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
     showStatsOnTiles,
   } = useContext(AppContext);
 
-  console.log("FULL STATE", fullstate, isAudioOnly);
   useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {

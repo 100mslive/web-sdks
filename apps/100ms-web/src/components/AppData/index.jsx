@@ -11,7 +11,7 @@ export function AppData() {
         b: 2,
       },
     };
-    hmsActions.setAppData(initialAppData);
+    hmsActions.initAppData(initialAppData);
   }, [hmsActions]);
 
   return null;

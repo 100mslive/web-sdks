@@ -469,93 +469,22 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
   }
-  /**
-   *
-   * @param data full app data object. use it for replacing the entire appdata
-   * or for initialization
-   */
-  setAppData(data: Record<string, any>): void;
-  /**
-   * use it for updating a particular property in the appdata
-   * @param key
-   *          a string. Does not check for existence. If the key is already not
-   *          a property of the appData, it is added.
-   * @param value
-   *          value to set for the key.
-   * @param merge
-   *          set it to true if you want to merge the appdata.
-   *          - Always replaces the value for a given key if this parameter is
-   *            not explicitly set to true.
-   *          - Always replaces if the value is anything other
-   *            than a plain object (i.e) JSON.parse()able.
-   *          - If set to true on non-plain objects, this is ignored.
-   * @example
-   * assume appdata is initially
-   *  {
-   *     mySettings: {
-   *       setting1: 'val1',
-   *       setting2: 'val2',
-   *     },
-   *     mySettings2: 43,
-   *     mySettings3: false,
-   *   };
-   *
-   * after calling,
-   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
-   * it becomes
-   *  {
-   *     mySettings: {
-   *       setting1: 'val1-edit',
-   *       setting2: 'val2',
-   *       setting3: 'val3',
-   *     },
-   *     mySettings2: 43,
-   *     mySettings3: false,
-   *   };
-   **/
-  setAppData(key: string, value: any, merge?: boolean): void;
-  setAppData(dataOrKey: Record<string, any> | string, value?: any, merge?: boolean) {
-    function isPlainObject(obj: any) {
-      const c =
-        Object.prototype.toString.call(obj) === '[object Object]' &&
-        obj.constructor &&
-        obj.constructor.name === 'Object';
-      return c === true;
-    }
 
-    console.log('SET APP DATA', dataOrKey, value, merge, isPlainObject(dataOrKey));
-    if (typeof dataOrKey === 'string' || dataOrKey instanceof String) {
-      if (merge && isPlainObject(value)) {
-        this.setState(store => {
-          /**
-           * toString() is needed because computed properties only work
-           * on primitive strings and not on string Objects.
-           */
-          const appData = store.appData;
-          const key = dataOrKey.toString();
-          const oldValue = { ...appData[key] };
-          console.log(store.appData, oldValue, value);
-          //   store.appData[dataOrKey.toString()] = {
-          //     ...oldValue,
-          //     ...value,
-          //   };
+  initAppData(appData: Record<string, any>) {
+    this.setState(store => {
+      store.appData = appData;
+    }, 'initAppData');
+  }
 
-          store.appData[key] = Object.assign(oldValue, value);
-          console.log('UPDATE', oldValue);
-        });
+  setAppData(key: string, value: any, merge?: boolean) {
+    const isValueObject = value?.constructor.name === 'Object';
+    this.setState(store => {
+      if (merge && isValueObject) {
+        Object.assign(store.appData[key], value);
+      } else {
+        store.appData[key] = value;
       }
-      this.setState(store => {
-        /**
-         * toString() is needed because computed properties only work
-         * on primitive strings and not on string Objects.
-         */
-        store.appData[dataOrKey.toString()] = value;
-      });
-    } else {
-      this.setState(store => {
-        store.appData = dataOrKey;
-      });
-    }
+    }, `setAppData-${key}`);
   }
 
   /**
