@@ -51,6 +51,12 @@ export const selectTracksMap = (store: HMSStore) => store.tracks;
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
 
 /**
+ * select appData.
+ * @internal
+ */
+export const selectFullAppData = (store: HMSStore) => store.appData;
+
+/**
  * Select the available audio input, audio output and video input devices on your machine.
  * @param store
  * @returns An object of array of available audio input, audio output and video input devices.
