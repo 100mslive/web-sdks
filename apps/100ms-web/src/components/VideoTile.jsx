@@ -24,14 +24,12 @@ import {
 import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
-import { APP_DATA_IS_AUDIO_ONLY } from "../common/constants";
+import { UI_SETTINGS } from "../common/constants";
 
 const Tile = ({ peerId, showStatsOnTiles, width, height, index }) => {
   const track = useHMSStore(selectVideoTrackByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
-  const isAudioOnly = useHMSStore(
-    selectAppData(APP_DATA_IS_AUDIO_ONLY)
-  );
+  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !useHMSStore(selectIsPeerVideoEnabled(peerId));
   const [isMouseHovered, setIsMouseHovered] = useState(false);

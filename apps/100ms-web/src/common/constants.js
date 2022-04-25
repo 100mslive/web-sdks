@@ -93,4 +93,6 @@ export const UI_MODE_ACTIVE_SPEAKER = "activespeaker";
 export const UI_MODE_GRID = "grid";
 export const MAX_TOASTS = 5;
 
-export const APP_DATA_IS_AUDIO_ONLY = "isAudioOnly";
+export const UI_SETTINGS = {
+  isAudioOnly: "isAudioOnly",
+};

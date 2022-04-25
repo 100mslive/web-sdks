@@ -17,9 +17,9 @@ import {
 } from "../../primitives/DialogContent";
 import { AppContext } from "../context/AppContext";
 import {
-  APP_DATA_IS_AUDIO_ONLY,
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
+  UI_SETTINGS,
 } from "../../common/constants";
 import {
   selectAppData,
@@ -74,7 +74,7 @@ export const UISettings = ({ open, onOpenChange }) => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const isAudioOnly = useHMSStore(selectAppData(APP_DATA_IS_AUDIO_ONLY));
+  const isAudioOnly = useHMSStore(selectAppData(UI_SETTINGS.isAudioOnly));
   const audioOnlyToggleHandler = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn && isLocalVideoEnabled) {
