@@ -1,5 +1,9 @@
 import { APP_DATA } from "../../common/constants";
-import { selectAppData, useHMSActions } from "@100mslive/react-sdk";
+import {
+  selectAppData,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { useCallback } from "react";
 
 /**
@@ -13,7 +17,7 @@ import { useCallback } from "react";
  * @param {string | undefined} uiSettingKey
  */
 export const useUISettings = uiSettingKey => {
-  let value = selectAppData(APP_DATA.uiSettings);
+  let value = useHMSStore(selectAppData(APP_DATA.uiSettings));
   return uiSettingKey ? value[uiSettingKey] : value;
 };
 
