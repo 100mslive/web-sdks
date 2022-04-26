@@ -23,6 +23,8 @@ import LogoForLight from "./images/logo-dark.svg";
 import LogoForDark from "./images/logo-light.svg";
 import FullPageProgress from "./components/FullPageProgress";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
+import PostLeave from "./components/PostLeave";
+import { AppData } from "./components/AppData/AppData.jsx";
 
 const Conference = React.lazy(() =>
   lazyWithRetry(() => import("./components/conference"))
@@ -32,9 +34,6 @@ const PreviewScreen = React.lazy(() =>
 );
 const ErrorPage = React.lazy(() =>
   lazyWithRetry(() => import("./components/ErrorPage"))
-);
-const PostLeave = React.lazy(() =>
-  lazyWithRetry(() => import("./components/PostLeave"))
 );
 
 const defaultTokenEndpoint = process.env
@@ -130,6 +129,7 @@ function AppRoutes({ getUserToken }) {
       <ToastContainer />
       <Notifications />
       <Confetti />
+      <AppData />
       <KeyboardHandler />
       <Switch>
         <Route
@@ -158,9 +158,7 @@ function AppRoutes({ getUserToken }) {
           </Suspense>
         </Route>
         <Route path="/leave/:roomId/:role?">
-          <Suspense fallback={<FullPageProgress />}>
-            <PostLeave />
-          </Suspense>
+           <PostLeave />
         </Route>
         <Route
           path="/:roomId/:role?"

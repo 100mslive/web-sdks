@@ -71,6 +71,8 @@ import {
   selectPeers,
   selectPeerMetadata,
   selectConnectionQualities,
+  selectAppData,
+  selectFullAppData,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -317,5 +319,14 @@ describe('derived selectors', () => {
       { peer: peerScreenSharing, isAudioEnabled: false },
       { peer: remotePeerTwo, isAudioEnabled: false },
     ]);
+  });
+});
+
+describe('appData', () => {
+  test('select AppData', () => {
+    expect(selectFullAppData(fakeStore)).toEqual(fakeStore.appData);
+  });
+  test('select AppDataByKey', () => {
+    expect(selectAppData('isAudioOnly')(fakeStore)).toEqual(true);
   });
 });

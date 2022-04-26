@@ -363,4 +363,58 @@ export interface IHMSActions {
    * This will be available after joining the room
    */
   videoPlaylist: IHMSPlaylistActions;
+
+  /**
+   * @param data full app data object. use this to initialise app data in store.
+   * App Data is a small space in the store for UI to keep a few non updating
+   * global state fields for easy reference across UI.
+   * Note that if the fields are updating at high frequency or there
+   * are too many of them, it's recommended to have another UI side store
+   * to avoid performance issues.
+   */
+  initAppData(data: Record<string, any>): void;
+  /**
+   * use it for updating a particular property in the appdata
+   * @param key
+   *          a string. Does not check for existence. If the key is already not
+   *          a property of the appData, it is added.
+   * @param value
+   *          value to set for the key.
+   * @param merge
+   *          set it to true if you want to merge the appdata.
+   *          - Always replaces the value for a given key if this parameter is
+   *            not explicitly set to true.
+   *          - Always replaces if the value is anything other
+   *            than a plain object (i.e) JSON.parse()able.
+   *          - If set to true on non-plain objects, this is ignored.
+   * @example
+   * assume appdata is initially
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1',
+   *       setting2: 'val2',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * after calling,
+   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * it becomes
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1-edit',
+   *       setting2: 'val2',
+   *       setting3: 'val3',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * Note: This is not suitable for keeping large data or data which updates
+   * at a high frequency, it is recommended to use app side store for those
+   * cases.
+   **/
+  setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
+  setAppData(key: string, value: any): void;
 }
