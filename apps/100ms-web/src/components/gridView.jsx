@@ -65,7 +65,7 @@ export const GridCenterView = ({
           <FirstPersonDisplay />
         )}
       </Box>
-      {isChatOpen && hideSidePane && (
+      {!!isChatOpen && hideSidePane && (
         <Flex
           css={{
             height: "75%",
@@ -113,7 +113,7 @@ export const GridSidePaneView = ({ peers, showStatsOnTiles }) => {
           />
         )}
       </Flex>
-      {isChatOpen && (
+      {!!isChatOpen && (
         <Flex
           align="end"
           css={{
