@@ -39,7 +39,7 @@ export const Chat = () => {
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
-        open={isSelectorOpen}
+        selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
         onToggle={() => {
           setSelectorOpen(value => !value);
