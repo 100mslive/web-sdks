@@ -7,7 +7,7 @@ import {
 } from "@100mslive/react-sdk";
 import { APP_DATA } from "../../common/constants";
 
-export const useChatOpen = () => {
+export const useIsChatOpen = () => {
   const isChatOpen = useHMSStore(selectAppData(APP_DATA.chatOpen));
   return !!isChatOpen;
 };

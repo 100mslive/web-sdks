@@ -16,7 +16,7 @@ import VideoList from "../components/VideoList";
 import VideoTile from "../components/VideoTile";
 import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 import { mobileChatStyle } from "../common/utils";
-import { useChatOpen } from "../components/AppData/useChatState";
+import { useIsChatOpen } from "../components/AppData/useChatState";
 
 const ScreenShareView = ({ showStats }) => {
   // for smaller screen we will show sidebar in bottom
@@ -168,7 +168,7 @@ const ScreenShareComponent = ({
 };
 
 const CustomChatView = () => {
-  const isChatOpen = useChatOpen();
+  const isChatOpen = useIsChatOpen();
   return isChatOpen ? (
     <Box
       css={{
