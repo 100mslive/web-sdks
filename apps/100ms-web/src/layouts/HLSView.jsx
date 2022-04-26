@@ -41,7 +41,7 @@ const HLSView = () => {
           </Text>
         </Flex>
       )}
-      {!!isChatOpen && (
+      {isChatOpen && (
         <Box
           css={{
             height: "50%",

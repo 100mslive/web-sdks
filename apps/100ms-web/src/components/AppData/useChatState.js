@@ -9,7 +9,7 @@ import { APP_DATA } from "../../common/constants";
 
 export const useChatOpen = () => {
   const isChatOpen = useHMSStore(selectAppData(APP_DATA.chatOpen));
-  return isChatOpen;
+  return !!isChatOpen;
 };
 
 export const useToggleChat = () => {
