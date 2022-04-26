@@ -43,11 +43,17 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
 
   useEffect(() => {
     const messageElement = inputRef.current;
-    messageElement.value = draftMessage;
+    if (messageElement) {
+      messageElement.value = draftMessage;
+    }
+  }, [draftMessage]);
+
+  useEffect(() => {
+    const messageElement = inputRef.current;
     return () => {
       setDraftMessage(messageElement?.value || "");
     };
-  }, [draftMessage]); //eslint-disable-line
+  }, [setDraftMessage]);
 
   return (
     <Flex
