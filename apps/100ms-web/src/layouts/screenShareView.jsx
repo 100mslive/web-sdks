@@ -169,26 +169,24 @@ const ScreenShareComponent = ({
 
 const CustomChatView = () => {
   const isChatOpen = useChatOpen();
-  return (
-    isChatOpen && (
-      <Box
-        css={{
-          h: "45%",
-          flexShrink: 0,
-          "@lg": mobileChatStyle,
-          "@ls": {
-            position: "absolute",
-            top: 0,
-            h: "100%",
-            minHeight: 300,
-            zIndex: 40,
-          },
-        }}
-      >
-        <ChatView />
-      </Box>
-    )
-  );
+  return isChatOpen ? (
+    <Box
+      css={{
+        h: "45%",
+        flexShrink: 0,
+        "@lg": mobileChatStyle,
+        "@ls": {
+          position: "absolute",
+          top: 0,
+          h: "100%",
+          minHeight: 300,
+          zIndex: 40,
+        },
+      }}
+    >
+      <ChatView />
+    </Box>
+  ) : null;
 };
 
 const SmallTilePeersView = ({
