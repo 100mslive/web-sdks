@@ -1056,6 +1056,7 @@ export class HMSSDKActions implements IHMSActions {
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       this.setState(draft => {
         draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
+        draft.tracks[trackID].degraded = sdkTrack.degraded;
       }, action);
     }
   }
