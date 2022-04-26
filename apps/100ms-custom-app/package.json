@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "100ms_edtech_template": "0.1.4",
-    "@100mslive/react-icons": "0.0.12-alpha.3",
-    "@100mslive/react-ui": "0.0.12-alpha.3",
+    "@100mslive/react-icons": "0.0.14",
+    "@100mslive/react-ui": "0.0.14",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "logrocket": "^2.2.0",
