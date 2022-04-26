@@ -8,6 +8,7 @@ export function AppData() {
     const initialAppData = {
       [APP_DATA.uiSettings]: {
         [UI_SETTINGS.isAudioOnly]: false,
+        [APP_DATA.chatOpen]: false,
       },
     };
     hmsActions.initAppData(initialAppData);

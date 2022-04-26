@@ -8,11 +8,7 @@ import {
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
 
-const ActiveSpeakerView = ({
-  isChatOpen,
-  toggleChat,
-  isParticipantListOpen,
-}) => {
+const ActiveSpeakerView = ({ isParticipantListOpen }) => {
   const peers = useHMSStore(selectPeers);
   const localPeer = useHMSStore(selectLocalPeer);
   const [activeSpeaker, setActiveSpeaker] = useState(localPeer);
@@ -38,8 +34,6 @@ const ActiveSpeakerView = ({
       <GridCenterView
         peers={[activeSpeaker]}
         maxTileCount={1}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
         allowRemoteMute={false}
         hideSidePane={!showSidePane}
         isParticipantListOpen={isParticipantListOpen}
@@ -48,8 +42,6 @@ const ActiveSpeakerView = ({
       {showSidePane && (
         <GridSidePaneView
           peers={peers.filter(peer => peer.id !== activeSpeaker.id)}
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
           isParticipantListOpen={isParticipantListOpen}
           totalPeers={peers.length - 1}
         />

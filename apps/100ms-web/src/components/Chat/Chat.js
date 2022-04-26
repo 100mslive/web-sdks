@@ -13,7 +13,7 @@ import {
 } from "@100mslive/react-sdk";
 import { ChevronDownIcon } from "@100mslive/react-icons";
 
-export const Chat = ({ onClose }) => {
+export const Chat = () => {
   const [chatOptions, setChatOptions] = useState({
     role: "",
     peerId: "",
@@ -44,7 +44,6 @@ export const Chat = ({ onClose }) => {
         onToggle={() => {
           setSelectorOpen(value => !value);
         }}
-        onClose={onClose}
       />
       <Box
         css={{

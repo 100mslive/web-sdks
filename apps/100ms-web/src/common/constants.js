@@ -95,6 +95,7 @@ export const MAX_TOASTS = 5;
 
 export const APP_DATA = {
   uiSettings: "uiSettings",
+  chatOpen: "chatOpen",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
