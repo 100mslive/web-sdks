@@ -27,7 +27,8 @@ export class ClientEventsManager {
       timestamp: Date.now(),
       agent: userAgent,
     };
-    fetch('https://event-nonprod.100ms.live/v2/client', {
+    // 'https://event-nonprod.100ms.live/v2/client/report',
+    fetch('https://qa-in2.100ms.live/reporter/v2/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(requestBody),
@@ -45,8 +46,10 @@ export class ClientEventsManager {
       })
       .catch(error => {
         const existingEvents = this.failedEvents.get() || [];
-        existingEvents.push(event);
-        this.failedEvents.set(existingEvents);
+        if (!existingEvents.find(existingEvent => existingEvent.timestamp === event.timestamp)) {
+          existingEvents.push(event);
+          this.failedEvents.set(existingEvents);
+        }
         HMSLogger.e(this.TAG, 'Failed to send event', error, event);
       });
   }
