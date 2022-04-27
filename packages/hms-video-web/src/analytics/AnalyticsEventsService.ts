@@ -51,6 +51,7 @@ export class AnalyticsEventsService {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
+          event.properties.peer_id = this.store.getLocalPeer()?.peerId;
           if (this.transport && this.transport.transportProvider.isConnected) {
             this.transport.sendEvent(event);
           } else {
@@ -64,7 +65,6 @@ export class AnalyticsEventsService {
   }
 
   private sendClientEvent(event: AnalyticsEvent) {
-    event.properties.peer_id = this.store.getLocalPeer()?.peerId;
     event.properties.session_id = this.store.getRoom().sessionId;
     event.properties.token = this.store.getConfig()?.authToken;
     this.clientEventsManager.sendEvent(event);
