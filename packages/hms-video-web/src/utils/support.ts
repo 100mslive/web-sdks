@@ -38,6 +38,6 @@ export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
 export const userAgent = createUserAgent();
 
-export const isPageHidden = () => typeof document !== undefined && document.hidden;
-
 export const deviceId = uuid();
+
+export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;
