@@ -51,7 +51,6 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
-import { ClientEventsManager } from '../analytics/ClientEventsManager';
 
 const TAG = '[HMSTransport]:';
 
@@ -82,7 +81,6 @@ export default class HMSTransport implements ITransport {
     private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
-    private clientEventsManager: ClientEventsManager,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -196,7 +194,7 @@ export default class HMSTransport implements ITransport {
     },
     // this is called when window.online event is triggered
     onNetworkOnline: () => {
-      this.clientEventsManager.flushFailedEvents();
+      this.analyticsEventsService.flushFailedClientEvents();
     },
   };
 

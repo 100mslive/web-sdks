@@ -59,7 +59,6 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
 import { HMSAudioContextHandler } from '../utils/media';
-import { ClientEventsManager } from '../analytics/ClientEventsManager';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -97,7 +96,6 @@ export class HMSSdk implements HMSInterface {
   private analyticsEventsService!: AnalyticsEventsService;
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
-  private clientEventsManager!: ClientEventsManager;
   private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
@@ -122,8 +120,7 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
-    this.analyticsEventsService = new AnalyticsEventsService();
-    this.clientEventsManager = new ClientEventsManager();
+    this.analyticsEventsService = new AnalyticsEventsService(this.store);
     this.transport = new HMSTransport(
       this.observer,
       this.deviceManager,
@@ -131,7 +128,6 @@ export class HMSSdk implements HMSInterface {
       this.localTrackManager,
       this.eventBus,
       this.analyticsEventsService,
-      this.clientEventsManager,
     );
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
   }
@@ -987,14 +983,6 @@ export class HMSSdk implements HMSInterface {
   };
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
-    event.properties.peer_id = this.store.getLocalPeer()?.peerId;
-    event.properties.session_id = this.store.getRoom().sessionId;
-    event.properties.token = this.store.getConfig()?.authToken;
-    // This needs to be figure out. All events get called from here.
-    if (this.transportState === TransportState.Failed || event.properties.is_terminal) {
-      this.clientEventsManager.sendEvent(event);
-      return;
-    }
     this.analyticsEventsService.queue(event).flush();
   };
 }
