@@ -11,6 +11,7 @@ interface ClientEventBody {
   timestamp: number;
   payload: Record<string, any>;
   agent: string;
+  device_id: string;
 }
 
 export class ClientEventsManager {
@@ -26,6 +27,7 @@ export class ClientEventsManager {
       session_id,
       timestamp: Date.now(),
       agent: userAgent,
+      device_id: event.device_id,
     };
     // 'https://event-nonprod.100ms.live/v2/client/report',
     fetch('https://qa-in2.100ms.live/reporter/v2/report', {

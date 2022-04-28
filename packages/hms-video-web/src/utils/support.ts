@@ -38,6 +38,19 @@ export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
 export const userAgent = createUserAgent();
 
-export const deviceId = uuid();
+export const getAnalyticsDeviceId = () => {
+  let id = '';
+  if (isBrowser) {
+    const storageId = window.localStorage.getItem('analyticsDeviceId');
+    console.error({ storageId });
+    if (storageId) {
+      id = storageId;
+    } else {
+      id = uuid();
+      window.localStorage.setItem('analyticsDeviceId', id);
+    }
+  }
+  return id;
+};
 
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;

@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
 import { domainCategory } from './domain-analytics';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
-import { deviceId } from '../utils/support';
+import { getAnalyticsDeviceId } from '../utils/support';
 
 interface AnalyticsEventInit {
   name: string;
@@ -34,7 +34,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     this.properties = properties || {};
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
     this.event_id = uuid();
-    this.device_id = deviceId;
+    this.device_id = getAnalyticsDeviceId();
   }
 
   toSignalParams() {
