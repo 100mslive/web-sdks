@@ -21,11 +21,11 @@ export class FeatureFlags {
     // ask permissions in preview even if role doesn't have it
     window.HMS.ALWAYS_REQUEST_PERMISSIONS = false;
     // add support for server degradation
-    window.HMS.USE_FREEZE = true;
+    window.HMS.FREEZE_VIDEO_LIST = true;
   }
 
-  static useFreeze() {
-    return window.HMS.USE_FREEZE;
+  static freezeVideoList() {
+    return window.HMS.FREEZE_VIDEO_LIST;
   }
 
   static optimiseHLSLatency() {

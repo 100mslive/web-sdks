@@ -36,7 +36,7 @@ const List = ({
       setPage(0);
     }
   }, [pagesWithTiles.length, page]);
-  const useFreeze = FeatureFlags.useFreeze();
+  const useFreeze = FeatureFlags.freezeVideoList();
   return (
     <StyledVideoList.Root ref={ref}>
       <StyledVideoList.Container>
