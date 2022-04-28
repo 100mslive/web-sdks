@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Freeze } from "react-freeze";
 import {
   StyledVideoList,
   getLeft,
@@ -39,34 +40,36 @@ const List = ({
       <StyledVideoList.Container>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tiles, pageNo) => (
-              <StyledVideoList.View
-                css={{
-                  left: getLeft(pageNo, page),
-                  transition: "left 0.3s ease-in-out",
-                }}
-                key={pageNo}
-              >
-                {tiles.map((tile, i) =>
-                  tile.track?.source === "screen" ? (
-                    <ScreenshareTile
-                      showStatsOnTiles={showStatsOnTiles}
-                      key={tile.track.id}
-                      width={tile.width}
-                      height={tile.height}
-                      peerId={tile.peer.id}
-                    />
-                  ) : (
-                    <VideoTile
-                      showStatsOnTiles={showStatsOnTiles}
-                      key={tile.track?.id || tile.peer.id}
-                      width={tile.width}
-                      height={tile.height}
-                      peerId={tile.peer?.id}
-                      index={i}
-                    />
-                  )
-                )}
-              </StyledVideoList.View>
+              <Freeze freeze={window.HMS.USE_FREEZE && page !== pageNo}>
+                <StyledVideoList.View
+                  css={{
+                    left: getLeft(pageNo, page),
+                    transition: "left 0.3s ease-in-out",
+                  }}
+                  key={pageNo}
+                >
+                  {tiles.map((tile, i) =>
+                    tile.track?.source === "screen" ? (
+                      <ScreenshareTile
+                        showStatsOnTiles={showStatsOnTiles}
+                        key={tile.track.id}
+                        width={tile.width}
+                        height={tile.height}
+                        peerId={tile.peer.id}
+                      />
+                    ) : (
+                      <VideoTile
+                        showStatsOnTiles={showStatsOnTiles}
+                        key={tile.track?.id || tile.peer.id}
+                        width={tile.width}
+                        height={tile.height}
+                        peerId={tile.peer?.id}
+                        index={i}
+                      />
+                    )
+                  )}
+                </StyledVideoList.View>
+              </Freeze>
             ))
           : null}
       </StyledVideoList.Container>

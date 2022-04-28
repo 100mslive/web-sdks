@@ -21,6 +21,7 @@ export class FeatureFlags {
     // ask permissions in preview even if role doesn't have it
     window.HMS.ALWAYS_REQUEST_PERMISSIONS = false;
     // add support for server degradation
+    window.HMS.USE_FREEZE = true;
   }
 
   static optimiseHLSLatency() {
