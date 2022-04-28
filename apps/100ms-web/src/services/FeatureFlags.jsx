@@ -24,6 +24,10 @@ export class FeatureFlags {
     window.HMS.USE_FREEZE = true;
   }
 
+  static useFreeze() {
+    return window.HMS.USE_FREEZE;
+  }
+
   static optimiseHLSLatency() {
     return window.HMS.OPTIMISE_HLS_LATENCY;
   }

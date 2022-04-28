@@ -9,6 +9,7 @@ import {
 import { useVideoList } from "@100mslive/react-sdk";
 import VideoTile from "./VideoTile";
 import ScreenshareTile from "./ScreenshareTile";
+import { FeatureFlags } from "../services/FeatureFlags";
 
 const List = ({
   maxTileCount,
@@ -35,12 +36,13 @@ const List = ({
       setPage(0);
     }
   }, [pagesWithTiles.length, page]);
+  const useFreeze = FeatureFlags.useFreeze();
   return (
     <StyledVideoList.Root ref={ref}>
       <StyledVideoList.Container>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tiles, pageNo) => (
-              <Freeze freeze={window.HMS.USE_FREEZE && page !== pageNo}>
+              <Freeze freeze={useFreeze && page !== pageNo}>
                 <StyledVideoList.View
                   css={{
                     left: getLeft(pageNo, page),
