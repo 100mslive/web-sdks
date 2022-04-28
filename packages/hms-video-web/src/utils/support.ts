@@ -42,7 +42,6 @@ export const getAnalyticsDeviceId = () => {
   let id = '';
   if (isBrowser) {
     const storageId = window.localStorage.getItem('analyticsDeviceId');
-    console.error({ storageId });
     if (storageId) {
       id = storageId;
     } else {
