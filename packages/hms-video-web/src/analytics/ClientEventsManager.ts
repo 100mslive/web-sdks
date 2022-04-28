@@ -15,7 +15,7 @@ interface ClientEventBody {
 }
 
 export class ClientEventsManager {
-  private TAG = 'ClientEventsManager';
+  private TAG = '[ClientEventsManager]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   sendEvent(event: AnalyticsEvent) {
     const { token, peer_id, session_id, ...rest } = event.properties;
@@ -52,7 +52,7 @@ export class ClientEventsManager {
           existingEvents.push(event);
           this.failedEvents.set(existingEvents);
         }
-        HMSLogger.e(this.TAG, 'Failed to send event', error, event);
+        HMSLogger.v(this.TAG, 'Failed to send event', error, event);
       });
   }
   flushFailedEvents() {
