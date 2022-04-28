@@ -1,4 +1,5 @@
 import React from 'react';
+import { Freeze } from 'react-freeze';
 import { useVideoList, HMSPeer } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
 import { VideoTile } from '../VideoTile/VideoTile';
@@ -26,14 +27,16 @@ export const VideoList: React.FC<Props> = ({ peers, maxTileCount = 4 }) => {
       <StyledVideoList.Container ref={ref}>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tile, pageNo) => (
-              <StyledVideoList.View
-                css={{ left: getLeft(pageNo, page), transition: 'left 0.3s ease-in-out' }}
-                key={pageNo}
-              >
-                {tile.map(tile => (
-                  <VideoTile key={tile.peer.id} width={tile.width} height={tile.height} peerId={tile.peer.id} />
-                ))}
-              </StyledVideoList.View>
+              <Freeze freeze={pageNo !== page}>
+                <StyledVideoList.View
+                  css={{ left: getLeft(pageNo, page), transition: 'left 0.3s ease-in-out' }}
+                  key={pageNo}
+                >
+                  {tile.map(tile => (
+                    <VideoTile key={tile.peer.id} width={tile.width} height={tile.height} peerId={tile.peer.id} />
+                  ))}
+                </StyledVideoList.View>
+              </Freeze>
             ))
           : null}
       </StyledVideoList.Container>
