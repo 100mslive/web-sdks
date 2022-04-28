@@ -158,7 +158,7 @@ function AppRoutes({ getUserToken }) {
           </Suspense>
         </Route>
         <Route path="/leave/:roomId/:role?">
-           <PostLeave />
+          <PostLeave />
         </Route>
         <Route
           path="/:roomId/:role?"
