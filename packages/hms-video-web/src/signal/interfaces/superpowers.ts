@@ -1,4 +1,5 @@
 import { HMSTrackSource } from '../..';
+import { RTMPRecordingResolution } from '../../interfaces';
 
 /**
  * Parameteres for the role change request sent to the server.
@@ -36,10 +37,12 @@ export interface MultiTrackUpdateRequestParams {
   source?: HMSTrackSource;
   value: boolean;
 }
+
 export interface StartRTMPOrRecordingRequestParams {
   meeting_url: string;
   rtmp_urls?: Array<string>;
   record: boolean;
+  resolution?: RTMPRecordingResolution;
 }
 
 export interface UpdatePeerRequestParams {
