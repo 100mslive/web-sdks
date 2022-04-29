@@ -50,7 +50,7 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { isNode } from '../utils/support';
+import { isNode, isProd } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
@@ -900,7 +900,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
-
+    this.analyticsEventsService.setEnv(isProd(config.initEndpoint));
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId, this.store));

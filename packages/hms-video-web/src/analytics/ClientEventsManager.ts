@@ -14,9 +14,18 @@ interface ClientEventBody {
   device_id: string;
 }
 
+export enum ENV {
+  PROD = 'prod',
+  QA = 'qa',
+}
+
 export class ClientEventsManager {
   private TAG = '[ClientEventsManager]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
+  private env: ENV = ENV.PROD;
+  setEnv(env: ENV) {
+    this.env = env;
+  }
   sendEvent(event: AnalyticsEvent) {
     const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
@@ -29,7 +38,11 @@ export class ClientEventsManager {
       agent: userAgent,
       device_id: event.device_id,
     };
-    // 'https://event-nonprod.100ms.live/v2/client/report',
+    const url =
+      this.env === ENV.PROD
+        ? 'https://event.100ms.live/v2/client/report'
+        : 'https://event-nonprod.100ms.live/v2/client/report';
+    console.log(url);
     fetch('https://qa-in2.100ms.live/reporter/v2/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
