@@ -17,12 +17,12 @@ const StyledAccordion = styled(BaseAccordion.Root, {
   borderRadius: '$1',
   backgroundColor: 'transparent',
   width: '100%',
-  padding: '1rem',
+  padding: '$8',
 });
 
 const StyledItem = styled(BaseAccordion.Item, {
   overflow: 'hidden',
-  padding: '0.75rem 0',
+  padding: '$6 0',
   borderBottom: '$space$px solid $borderLight',
   cursor: 'pointer',
   '&:first-child': {
@@ -54,7 +54,7 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   alignItems: 'center',
   justifyContent: 'space-between',
   color: '$white',
-  boxShadow: `0 0px 0 $white`,
+  boxShadow: `0 0 0 $white`,
   '&[data-state="closed"]': { backgroundColor: 'transparent' },
   '&[data-state="open"]': { backgroundColor: 'transparent' },
   '&:hover': { backgroundColor: 'transparent' },
@@ -94,6 +94,7 @@ export const AccordionHeader: React.FC<PropsWithChildren<{ toggleIcon: React.Rea
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AccordionContent: React.FC = ({ children, ...props }) => (
-  <StyledContent {...props}>{children}</StyledContent>
-);
+export const AccordionContent: React.FC<PropsWithChildren<{ children: React.ReactNode }>> = ({
+  children,
+  ...props
+}) => <StyledContent {...props}>{children}</StyledContent>;
