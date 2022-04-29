@@ -133,6 +133,11 @@ export const selectLocalPeerID = createSelector(selectRoom, room => {
 });
 
 /**
+ * Select the peer name of your local peer.
+ */
+export const selectLocalPeerName = createSelector(selectLocalPeer, peer => peer?.name);
+
+/**
  * Select the track ID of your local peer's primary audio track
  */
 export const selectLocalAudioTrackID = createSelector(selectLocalPeer, peer => peer?.audioTrack);
