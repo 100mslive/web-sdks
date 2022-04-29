@@ -49,7 +49,7 @@ export const getAnalyticsDeviceId = () => {
       window.localStorage.setItem('analyticsDeviceId', id);
     }
   }
-  return id;
+  return id || uuid();
 };
 
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;

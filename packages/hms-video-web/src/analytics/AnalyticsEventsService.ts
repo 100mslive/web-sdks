@@ -59,7 +59,7 @@ export class AnalyticsEventsService {
           if (this.transport && this.transport.transportProvider.isConnected) {
             this.transport.sendEvent(event);
           } else {
-            this.sendClientEvent(event);
+            this.sendClientEventOnHTTP(event);
           }
         }
       }
@@ -68,7 +68,7 @@ export class AnalyticsEventsService {
     }
   }
 
-  private sendClientEvent(event: AnalyticsEvent) {
+  private sendClientEventOnHTTP(event: AnalyticsEvent) {
     event.properties.session_id = this.store.getRoom().sessionId;
     event.properties.token = this.store.getConfig()?.authToken;
     this.clientEventsManager.sendEvent(event);

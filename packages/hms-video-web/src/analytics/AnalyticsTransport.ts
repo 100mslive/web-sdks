@@ -24,7 +24,9 @@ export abstract class AnalyticsTransport {
         const event = this.failedEvents.dequeue();
         if (event) {
           const isEventFromCurrentPeer = event.properties.peer_id === currentPeerId;
-          (isEventFromCurrentPeer || !event.properties.peer_id) && this.sendSingleEvent(event);
+          if (isEventFromCurrentPeer || !event.properties.peer_id) {
+            this.sendSingleEvent(event);
+          }
         }
       }
     } catch (error) {
