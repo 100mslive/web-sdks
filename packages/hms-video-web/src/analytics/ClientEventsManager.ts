@@ -42,8 +42,7 @@ export class ClientEventsManager {
       this.env === ENV.PROD
         ? 'https://event.100ms.live/v2/client/report'
         : 'https://event-nonprod.100ms.live/v2/client/report';
-    console.log(url);
-    fetch('https://qa-in2.100ms.live/reporter/v2/report', {
+    fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(requestBody),
