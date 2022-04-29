@@ -15,6 +15,7 @@ import {
 } from "../../primitives/DialogContent";
 import { QUERY_PARAM_SKIP_PREVIEW } from "../../common/constants";
 import { ToastManager } from "../Toast/ToastManager";
+import { ResolutionInput } from "./ResolutionInput";
 
 const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") +
@@ -104,6 +105,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               data-testid="rtmp_url_field"
             />
           )}
+          {permissions.streaming && <ResolutionInput />}
           {permissions.streaming && (
             <DialogCheckbox
               title="HLS"
