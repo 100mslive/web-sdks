@@ -470,6 +470,23 @@ export class HMSSDKActions implements IHMSActions {
     this.removeRoleChangeRequest(request);
   }
 
+  initAppData(appData: Record<string, any>) {
+    this.setState(store => {
+      store.appData = appData;
+    }, 'initAppData');
+  }
+
+  setAppData(key: string, value: any, merge?: boolean) {
+    const isValueObject = value?.constructor.name === 'Object';
+    this.setState(store => {
+      if (merge && isValueObject) {
+        Object.assign(store.appData[key], value);
+      } else {
+        store.appData[key] = value;
+      }
+    }, `setAppData-${key}`);
+  }
+
   /**
    * @privateRemarks
    * there is no corresponding sdk method for rejecting change role but as the store also maintains the full

@@ -1,5 +1,12 @@
 import { createSelector } from 'reselect';
-import { selectHMSMessages, selectLocalPeerID, selectPeers, selectPeersMap, selectTracksMap } from './selectors';
+import {
+  selectFullAppData,
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectPeers,
+  selectPeersMap,
+  selectTracksMap,
+} from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import {
   getPeerTracksByCondition,
@@ -15,6 +22,7 @@ import { HMSLogger } from '../../common/ui-logger';
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
+const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -28,6 +36,19 @@ const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (st
  * Select the {@link HMSPeer} object given a peer ID.
  */
 export const selectPeerByID = byIDCurry(selectPeerByIDBare);
+
+/**
+ * Select a particular key from ui app data by passed in key.
+ * if key is not passed, full data is returned.
+ */
+export const selectAppData = byIDCurry(
+  createSelector([selectFullAppData, selectAppDataKey], (settings, key) => {
+    if (key) {
+      return settings[key];
+    }
+    return settings;
+  }),
+);
 
 /**
  * Select the name of a {@link HMSPeer} given a peer ID.
