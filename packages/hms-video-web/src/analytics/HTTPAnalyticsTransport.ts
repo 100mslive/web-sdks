@@ -2,6 +2,7 @@ import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
 import AnalyticsEvent from './AnalyticsEvent';
+import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 interface ClientEventBody {
   event: string;
@@ -19,10 +20,11 @@ export enum ENV {
   QA = 'qa',
 }
 
-export class ClientEventsManager {
-  private TAG = '[ClientEventsManager]';
+export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
+  TAG = '[HTTPAnalyticsTransport]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   private env: ENV = ENV.PROD;
+  isConnected = true;
   setEnv(env: ENV) {
     this.env = env;
   }

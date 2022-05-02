@@ -4,7 +4,7 @@ import HMSLogger from '../utils/logger';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsTransport } from './AnalyticsTransport';
 import { IStore } from '../sdk/store';
-import { ClientEventsManager, ENV } from './ClientEventsManager';
+import { HTTPAnalyticsTransport, ENV } from './HTTPAnalyticsTransport';
 
 const TAG = 'AnalyticsEventsService';
 
@@ -13,16 +13,16 @@ export class AnalyticsEventsService {
 
   private transport: AnalyticsTransport | null = null;
   private pendingEvents: AnalyticsEvent[] = [];
-  private clientEventsManager: ClientEventsManager;
+  private httpAnalyticsTransport: HTTPAnalyticsTransport;
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
   constructor(private store: IStore) {
-    this.clientEventsManager = new ClientEventsManager();
+    this.httpAnalyticsTransport = new HTTPAnalyticsTransport();
   }
 
   setEnv(isProd: boolean) {
-    this.clientEventsManager.setEnv(isProd ? ENV.PROD : ENV.QA);
+    this.httpAnalyticsTransport.setEnv(isProd ? ENV.PROD : ENV.QA);
   }
 
   setTransport(transport: AnalyticsTransport) {
@@ -47,7 +47,7 @@ export class AnalyticsEventsService {
   }
 
   flushFailedClientEvents() {
-    this.clientEventsManager.flushFailedEvents();
+    this.httpAnalyticsTransport.flushFailedEvents();
   }
 
   flush() {
@@ -71,6 +71,6 @@ export class AnalyticsEventsService {
   private sendClientEventOnHTTP(event: AnalyticsEvent) {
     event.properties.session_id = this.store.getRoom().sessionId;
     event.properties.token = this.store.getConfig()?.authToken;
-    this.clientEventsManager.sendEvent(event);
+    this.httpAnalyticsTransport.sendEvent(event);
   }
 }
