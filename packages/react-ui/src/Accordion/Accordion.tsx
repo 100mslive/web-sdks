@@ -93,8 +93,7 @@ export const AccordionHeader: React.FC<PropsWithChildren<{ toggleIcon: React.Rea
   </StyledHeader>
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AccordionContent: React.FC<PropsWithChildren<{ children: React.ReactNode }>> = ({
+export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.AccordionContentProps>> = ({
   children,
   ...props
 }) => <StyledContent {...props}>{children}</StyledContent>;
