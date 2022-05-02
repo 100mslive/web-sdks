@@ -1,6 +1,7 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
+import HMSLogger from '../../utils/logger';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
@@ -29,6 +30,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   preferLayer(layer: HMSSimulcastLayer) {
+    if (this.getSimulcastLayer() === layer) {
+      HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${layer} layer`);
+      return;
+    }
     (this.stream as HMSRemoteStream).setVideo(layer);
   }
 
@@ -43,6 +48,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
+    this._degraded = false;
     this.updateLayer();
   }
 
@@ -81,6 +87,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     if (this.degraded) {
       newLayer = HMSSimulcastLayer.NONE;
+    }
+    if (this.getSimulcastLayer() === newLayer) {
+      HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${newLayer} layer`);
+      return;
     }
     (this.stream as HMSRemoteStream).setVideo(newLayer);
   }

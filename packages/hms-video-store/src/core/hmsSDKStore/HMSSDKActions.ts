@@ -177,11 +177,11 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore
     }
     try {
-      this.sdkJoinWithListeners(config);
       this.isRoomJoinCalled = true;
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
+      this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -468,6 +468,23 @@ export class HMSSDKActions implements IHMSActions {
     // TODO: hotfix for HMS-3639. Needs a better solution
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
+  }
+
+  initAppData(appData: Record<string, any>) {
+    this.setState(store => {
+      store.appData = appData;
+    }, 'initAppData');
+  }
+
+  setAppData(key: string, value: any, merge?: boolean) {
+    const isValueObject = value?.constructor.name === 'Object';
+    this.setState(store => {
+      if (merge && isValueObject) {
+        Object.assign(store.appData[key], value);
+      } else {
+        store.appData[key] = value;
+      }
+    }, `setAppData-${key}`);
   }
 
   /**
@@ -1039,6 +1056,7 @@ export class HMSSDKActions implements IHMSActions {
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       this.setState(draft => {
         draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
+        draft.tracks[trackID].degraded = sdkTrack.degraded;
       }, action);
     }
   }

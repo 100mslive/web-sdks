@@ -39,6 +39,7 @@ import {
   HLSRequestParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
@@ -326,6 +327,8 @@ export default class HMSTransport implements ITransport {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
       }
 
+      this.validateNotDisconnected('connect');
+
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         await this.connectionJoin(
@@ -414,7 +417,11 @@ export default class HMSTransport implements ITransport {
       this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
-      this.signal.leave();
+      try {
+        this.signal.leave();
+      } catch (err) {
+        HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
+      }
       await this.signal.close();
     } catch (err) {
       if (err instanceof HMSException) {
@@ -495,18 +502,20 @@ export default class HMSTransport implements ITransport {
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
+    const signalParams: StartRTMPOrRecordingRequestParams = {
+      meeting_url: params.meetingURL,
+      record: params.record,
+    };
+
     if (params.rtmpURLs?.length) {
-      await this.signal.startRTMPOrRecording({
-        meeting_url: params.meetingURL,
-        record: params.record,
-        rtmp_urls: params.rtmpURLs,
-      });
-    } else {
-      await this.signal.startRTMPOrRecording({
-        meeting_url: params.meetingURL,
-        record: params.record,
-      });
+      signalParams.rtmp_urls = params.rtmpURLs;
     }
+
+    if (params.resolution) {
+      signalParams.resolution = params.resolution;
+    }
+
+    await this.signal.startRTMPOrRecording(signalParams);
   }
 
   async stopRTMPOrRecording() {
@@ -724,6 +733,8 @@ export default class HMSTransport implements ITransport {
     const connectRequestedAt = new Date();
     try {
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      // if leave was called while init was going on, don't open websocket
+      this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
@@ -743,6 +754,15 @@ export default class HMSTransport implements ITransport {
       }
       HMSLogger.d(TAG, '❌ internal connect: failed', error);
       throw error;
+    }
+  }
+
+  // leave could be called between any two async tasks, which would make
+  // the state disconnected instead of connecting, throw error for those cases.
+  private validateNotDisconnected(stage: string) {
+    if (this.state === TransportState.Disconnected) {
+      HMSLogger.w(TAG, 'aborting join as transport state is disconnected');
+      throw ErrorFactory.GenericErrors.ValidationFailed(`leave called before join could complete - stage=${stage}`);
     }
   }
 
@@ -835,8 +855,6 @@ export default class HMSTransport implements ITransport {
   };
 
   private retrySignalDisconnectTask = async () => {
-    let ok = this.signal.isConnected;
-
     HMSLogger.d(TAG, 'retrySignalDisconnectTask', { signalConnected: this.signal.isConnected });
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
@@ -847,13 +865,10 @@ export default class HMSTransport implements ITransport {
           this.joinParameters!.endpoint,
           this.joinParameters!.peerId,
         );
-        ok = true;
-      } catch (ex) {
-        ok = false;
-      }
+      } catch (ex) {}
     }
 
-    ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
+    const ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 
@@ -900,7 +915,7 @@ export default class HMSTransport implements ITransport {
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
     const network_info = getNetworkInfo();
-    const document_hidden = typeof document !== undefined && document.hidden;
+    const document_hidden = typeof document !== 'undefined' && document.hidden;
     const num_degraded_tracks = this.store.getRemoteVideoTracks().filter(track => track.degraded).length;
     const publishBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.publish?.bitrate;
     const subscribeBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.subscribe?.bitrate;
