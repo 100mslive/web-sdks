@@ -16,8 +16,9 @@ import VideoList from "../components/VideoList";
 import VideoTile from "../components/VideoTile";
 import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 import { mobileChatStyle } from "../common/utils";
+import { useIsChatOpen } from "../components/AppData/useChatState";
 
-const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
+const ScreenShareView = ({ showStats }) => {
   // for smaller screen we will show sidebar in bottom
   const mediaQueryLg = cssConfig.media.lg;
   const showSidebarInBottom = useMedia(mediaQueryLg);
@@ -67,8 +68,6 @@ const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
         <SidePane
           showSidebarInBottom={showSidebarInBottom}
           showStats={showStats}
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
           peerScreenSharing={peerPresenting}
           isPresenterInSmallTiles={showPresenterInSmallTile}
           smallTilePeers={smallTilePeers}
@@ -83,8 +82,6 @@ const ScreenShareView = ({ showStats, isChatOpen, toggleChat }) => {
 // and both camera + screen(if applicable) of others
 export const SidePane = ({
   showStats,
-  isChatOpen,
-  toggleChat,
   isPresenterInSmallTiles,
   peerScreenSharing, // the peer who is screensharing
   smallTilePeers,
@@ -101,22 +98,16 @@ export const SidePane = ({
       {!isPresenterInSmallTiles && (
         <LargeTilePeerView
           peerScreenSharing={peerScreenSharing}
-          isChatOpen={isChatOpen}
           showStatsOnTiles={showStats}
         />
       )}
       <SmallTilePeersView
         showSidebarInBottom={showSidebarInBottom}
-        isChatOpen={isChatOpen}
         smallTilePeers={smallTilePeers}
         shouldShowScreenFn={shouldShowScreenFn}
         showStatsOnTiles={showStats}
       />
-      <CustomChatView
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
-        totalPeers={totalPeers}
-      />
+      <CustomChatView totalPeers={totalPeers} />
     </Fragment>
   );
 };
@@ -176,27 +167,26 @@ const ScreenShareComponent = ({
   );
 };
 
-const CustomChatView = ({ isChatOpen, toggleChat }) => {
-  return (
-    isChatOpen && (
-      <Box
-        css={{
-          h: "45%",
-          flexShrink: 0,
-          "@lg": mobileChatStyle,
-          "@ls": {
-            position: "absolute",
-            top: 0,
-            h: "100%",
-            minHeight: 300,
-            zIndex: 40,
-          },
-        }}
-      >
-        <ChatView toggleChat={toggleChat} />
-      </Box>
-    )
-  );
+const CustomChatView = () => {
+  const isChatOpen = useIsChatOpen();
+  return isChatOpen ? (
+    <Box
+      css={{
+        h: "45%",
+        flexShrink: 0,
+        "@lg": mobileChatStyle,
+        "@ls": {
+          position: "absolute",
+          top: 0,
+          h: "100%",
+          minHeight: 300,
+          zIndex: 40,
+        },
+      }}
+    >
+      <ChatView />
+    </Box>
+  ) : null;
 };
 
 const SmallTilePeersView = ({

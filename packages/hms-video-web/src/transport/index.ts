@@ -915,7 +915,7 @@ export default class HMSTransport implements ITransport {
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
     const network_info = getNetworkInfo();
-    const document_hidden = typeof document !== undefined && document.hidden;
+    const document_hidden = typeof document !== 'undefined' && document.hidden;
     const num_degraded_tracks = this.store.getRemoteVideoTracks().filter(track => track.degraded).length;
     const publishBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.publish?.bitrate;
     const subscribeBitrate = this.getWebrtcInternals()?.getCurrentStats()?.getLocalPeerStats()?.subscribe?.bitrate;

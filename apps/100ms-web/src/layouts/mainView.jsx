@@ -12,6 +12,7 @@ import {
 import { MainGridView } from "./mainGridView";
 import { AppContext } from "../components/context/AppContext";
 import FullPageProgress from "../components/FullPageProgress";
+import ScreenShareView from "./screenShareView";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 import { UI_MODE_ACTIVE_SPEAKER, UI_SETTINGS } from "../common/constants";
@@ -19,10 +20,9 @@ import { useUISettings } from "../components/AppData/useUISettings";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
-const ScreenShareView = React.lazy(() => import("./screenShareView"));
 const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
 
-export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
+export const ConferenceMainView = () => {
   const localPeer = useHMSStore(selectLocalPeer);
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
@@ -78,12 +78,7 @@ export const ConferenceMainView = ({ isChatOpen, toggleChat }) => {
   return (
     ViewComponent && (
       <Suspense fallback={<FullPageProgress />}>
-        <ViewComponent
-          isChatOpen={isChatOpen}
-          toggleChat={toggleChat}
-          role={localPeer.roleName}
-          showStats={showStatsOnTiles}
-        />
+        <ViewComponent role={localPeer.roleName} showStats={showStatsOnTiles} />
       </Suspense>
     )
   );
