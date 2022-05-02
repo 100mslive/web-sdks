@@ -370,7 +370,7 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
     try {
       return peer?.metadata && peer.metadata !== '' ? JSON.parse(peer.metadata) : {};
     } catch (error) {
-      console.error('cannot parse peer metadata', error);
+      // console.error('cannot parse peer metadata', error);
       return {};
     }
   });
