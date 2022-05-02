@@ -3,10 +3,24 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import HMSLogger from '../../utils/logger';
 
+interface TrackAction {
+  action: 'addSink' | 'removeSink' | 'preferLayer' | 'setDegraded';
+  data?: any;
+}
+
+class TrackHistory {
+  history: TrackAction[] = [];
+
+  push(action: TrackAction) {
+    this.history.push(action);
+  }
+}
+
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
+  history = new TrackHistory();
 
   public get degraded() {
     return this._degraded;
@@ -34,6 +48,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${layer} layer`);
       return;
     }
+    this.history.push({ action: 'preferLayer', data: { layer } });
     (this.stream as HMSRemoteStream).setVideo(layer);
   }
 
@@ -44,12 +59,14 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
     this.updateLayer();
+    this.history.push({ action: 'addSink', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
   }
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
     this._degraded = false;
     this.updateLayer();
+    this.history.push({ action: 'removeSink', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
   }
 
   /**
@@ -77,10 +94,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       // No need to sent preferLayer update, as server has done it already
       const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
       (this.stream as HMSRemoteStream).setVideoLayer(layer);
+      this.history.push({ action: 'setDegraded', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
       return;
     }
 
     this.updateLayer();
+    this.history.push({ action: 'setDegraded', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
   }
 
   private updateLayer() {
