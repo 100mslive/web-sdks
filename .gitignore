@@ -13,3 +13,4 @@ cy-coverage
 tsconfig.tsbuildinfo
 docs
 .cache
+.dccache*

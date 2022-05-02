@@ -39,6 +39,7 @@ import {
   HLSRequestParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
 import Message from '../sdk/models/HMSMessage';
@@ -506,18 +507,20 @@ export default class HMSTransport implements ITransport {
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
+    const signalParams: StartRTMPOrRecordingRequestParams = {
+      meeting_url: params.meetingURL,
+      record: params.record,
+    };
+
     if (params.rtmpURLs?.length) {
-      await this.signal.startRTMPOrRecording({
-        meeting_url: params.meetingURL,
-        record: params.record,
-        rtmp_urls: params.rtmpURLs,
-      });
-    } else {
-      await this.signal.startRTMPOrRecording({
-        meeting_url: params.meetingURL,
-        record: params.record,
-      });
+      signalParams.rtmp_urls = params.rtmpURLs;
     }
+
+    if (params.resolution) {
+      signalParams.resolution = params.resolution;
+    }
+
+    await this.signal.startRTMPOrRecording(signalParams);
   }
 
   async stopRTMPOrRecording() {
