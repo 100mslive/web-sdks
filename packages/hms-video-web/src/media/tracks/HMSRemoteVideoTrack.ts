@@ -3,15 +3,11 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import HMSLogger from '../../utils/logger';
 
-interface TrackAction {
-  action: 'addSink' | 'removeSink' | 'preferLayer' | 'setDegraded';
-  data?: any;
-}
-
 class TrackHistory {
-  history: TrackAction[] = [];
+  history: Record<string, any>[] = [];
 
-  push(action: TrackAction) {
+  push(action: Record<string, any>) {
+    action.time = new Date().toISOString().split('T')[1];
     this.history.push(action);
   }
 }
@@ -48,8 +44,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${layer} layer`);
       return;
     }
-    this.history.push({ action: 'preferLayer', data: { layer } });
     (this.stream as HMSRemoteStream).setVideo(layer);
+    this.history.push({ action: `uiPreferLayer-${layer}`, layer: this.getSimulcastLayer() });
   }
 
   getSimulcastLayer() {
@@ -59,14 +55,22 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
     this.updateLayer();
-    this.history.push({ action: 'addSink', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
+    this.history.push({
+      action: 'uiSetLayer-high',
+      layer: this.getSimulcastLayer(),
+      degraded: this.degraded,
+    });
   }
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
     this._degraded = false;
     this.updateLayer();
-    this.history.push({ action: 'removeSink', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
+    this.history.push({
+      action: 'uiSetLayer-none',
+      layer: this.getSimulcastLayer(),
+      degraded: this.degraded,
+    });
   }
 
   /**
@@ -84,6 +88,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   /** @internal */
+  // eslint-disable-next-line complexity
   setDegraded(value: boolean) {
     this._degraded = value;
     if (value) {
@@ -94,12 +99,20 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       // No need to sent preferLayer update, as server has done it already
       const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
       (this.stream as HMSRemoteStream).setVideoLayer(layer);
-      this.history.push({ action: 'setDegraded', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
+      this.history.push({
+        action: value ? 'sfuDegraded-none' : 'sfuRecovered-high',
+        layer: this.getSimulcastLayer(),
+        degraded: this.degraded,
+      });
       return;
     }
 
     this.updateLayer();
-    this.history.push({ action: 'setDegraded', data: { layer: this.getSimulcastLayer(), degraded: this.degraded } });
+    this.history.push({
+      action: value ? 'sdkDegraded-none' : 'sdkRecovered-high',
+      layer: this.getSimulcastLayer(),
+      degraded: this.degraded,
+    });
   }
 
   private updateLayer() {
