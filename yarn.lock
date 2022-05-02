@@ -12254,6 +12254,11 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
+react-freeze@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-freeze/-/react-freeze-1.0.0.tgz#b21c65fe1783743007c8c9a2952b1c8879a77354"
+  integrity sha512-yQaiOqDmoKqks56LN9MTgY06O0qQHgV4FUrikH357DydArSZHQhl0BJFqGKIZoTqi8JizF9Dxhuk1FIZD6qCaw==
+
 react-hotkey-hook@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-hotkey-hook/-/react-hotkey-hook-1.0.2.tgz#ca17a3f806092027eaaf41fd2f111afd9926e3ab"
