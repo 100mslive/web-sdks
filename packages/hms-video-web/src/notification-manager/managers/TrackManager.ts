@@ -107,7 +107,7 @@ export class TrackManager {
 
       if (track instanceof HMSRemoteVideoTrack) {
         const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
-        track.setDegraded(isDegraded);
+        track.setDegradedFromServer(isDegraded);
         if (isDegraded) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
         } else {

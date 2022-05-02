@@ -29,9 +29,9 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * degradation is ON.
    * @param layer is simulcast layer to be set
    */
-  setVideoLayer(layer: HMSSimulcastLayer) {
+  setVideoLayer(layer: HMSSimulcastLayer, peerName: string) {
     this.video = layer;
-    HMSLogger.d(`[Remote stream] ${this.id}`, `Switching to ${layer} layer`);
+    HMSLogger.d(`[Remote stream] ${peerName} - ${this.id}`, `Switching to ${layer} layer`);
   }
 
   /**
@@ -39,8 +39,8 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * side subscribe degradation is ON or client unsubscribes the current track.
    * @param layer is simulcast layer to be set
    */
-  setVideo(layer: HMSSimulcastLayer) {
-    this.setVideoLayer(layer);
+  setVideo(layer: HMSSimulcastLayer, peerName: string) {
+    this.setVideoLayer(layer, peerName);
     this.syncWithApiChannel();
   }
 

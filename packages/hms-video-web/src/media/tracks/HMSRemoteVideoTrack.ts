@@ -44,7 +44,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${layer} layer`);
       return;
     }
-    (this.stream as HMSRemoteStream).setVideo(layer);
+    (this.stream as HMSRemoteStream).setVideo(layer, this.getName());
     this.history.push({ action: `uiPreferLayer-${layer}`, layer: this.getSimulcastLayer() });
   }
 
@@ -54,7 +54,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.updateLayer();
+    this.updateLayer(HMSSimulcastLayer.HIGH);
     this.history.push({
       action: 'uiSetLayer-high',
       layer: this.getSimulcastLayer(),
@@ -65,7 +65,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
     this._degraded = false;
-    this.updateLayer();
+    this.updateLayer(HMSSimulcastLayer.NONE);
     this.history.push({
       action: 'uiSetLayer-none',
       layer: this.getSimulcastLayer(),
@@ -88,26 +88,25 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   /** @internal */
-  // eslint-disable-next-line complexity
-  setDegraded(value: boolean) {
+  setDegradedFromServer(value: boolean) {
     this._degraded = value;
-    if (value) {
-      this._degradedAt = new Date();
-    }
+    this._degradedAt = value ? new Date() : this._degradedAt;
+    // No need to send preferLayer update, as server has done it already
+    const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
+    (this.stream as HMSRemoteStream).setVideoLayer(layer, this.getName());
+    this.history.push({
+      action: value ? 'sfuDegraded-none' : 'sfuRecovered-high',
+      layer: this.getSimulcastLayer(),
+      degraded: this.degraded,
+    });
+  }
 
-    if (this.stream instanceof HMSRemoteStream && this.stream.isServerHandlingDegradation()) {
-      // No need to sent preferLayer update, as server has done it already
-      const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
-      (this.stream as HMSRemoteStream).setVideoLayer(layer);
-      this.history.push({
-        action: value ? 'sfuDegraded-none' : 'sfuRecovered-high',
-        layer: this.getSimulcastLayer(),
-        degraded: this.degraded,
-      });
-      return;
-    }
-
-    this.updateLayer();
+  /** @internal */
+  setDegradedFromSdk(value: boolean) {
+    this._degraded = value;
+    this._degradedAt = value ? new Date() : this._degradedAt;
+    const layer = value ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
+    this.updateLayer(layer);
     this.history.push({
       action: value ? 'sdkDegraded-none' : 'sdkRecovered-high',
       layer: this.getSimulcastLayer(),
@@ -115,15 +114,26 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     });
   }
 
-  private updateLayer() {
+  private updateLayer(expectation: HMSSimulcastLayer) {
     let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
     if (this.degraded) {
       newLayer = HMSSimulcastLayer.NONE;
     }
+    if (expectation !== newLayer) {
+      HMSLogger.w(
+        `[Remote track] ${this.getName()} discrepancy`,
+        `updatelayer, expected-${expectation}, actual newLayer-${newLayer}`,
+      );
+    }
     if (this.getSimulcastLayer() === newLayer) {
-      HMSLogger.d(`[Remote stream] ${this.stream.id}`, `Already on ${newLayer} layer`);
+      HMSLogger.d(`[Remote stream] ${this.getName()}`, `Already on ${newLayer} layer`);
       return;
     }
-    (this.stream as HMSRemoteStream).setVideo(newLayer);
+    (this.stream as HMSRemoteStream).setVideo(newLayer, this.getName());
+  }
+
+  private getName() {
+    // @ts-ignore
+    return window.__hms.store.getState().peers[this.peerId].name;
   }
 }
