@@ -10,25 +10,25 @@ export const dialogClose = keyframes({
   '100%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
 });
 
-const slideUpAndFade = (start = '2px') =>
+export const slideUpAndFade = (start = '2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateY(${start})` },
     '100%': { opacity: 1, transform: 'translateY(0)' },
   });
 
-const slideRightAndFade = (start = '-2px') =>
+export const slideRightAndFade = (start = '-2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateX(${start})` },
     '100%': { opacity: 1, transform: 'translateX(0)' },
   });
 
-const slideDownAndFade = (start = '-2px') =>
+export const slideDownAndFade = (start = '-2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateY(${start})` },
     '100%': { opacity: 1, transform: 'translateY(0)' },
   });
 
-const slideLeftAndFade = (start = '2px') =>
+export const slideLeftAndFade = (start = '2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateX(${start})` },
     '100%': { opacity: 1, transform: 'translateX(0)' },
