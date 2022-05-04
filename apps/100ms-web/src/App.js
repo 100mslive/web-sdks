@@ -1,9 +1,9 @@
 import React, { Suspense, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
-  Redirect,
+  Navigate,
 } from "react-router-dom";
 import { HMSRoomProvider } from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
@@ -125,19 +125,19 @@ function AppRoutes({ getUserToken }) {
       <Confetti />
       <AppData />
       <KeyboardHandler />
-      <Switch>
+      <Routes>
         <Route
           path="/preview/:roomId/:role?"
           render={({ match }) => {
             const { params } = match;
             if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
+              return <Navigate to="/" />;
             }
             if (
               !params.roomId ||
               ["preview", "meeting", "leave"].includes(params.roomId)
             ) {
-              return <Redirect to="/" />;
+              return <Navigate to="/" />;
             }
             return (
               <Suspense fallback={<FullPageProgress />}>
@@ -161,13 +161,13 @@ function AppRoutes({ getUserToken }) {
           render={({ match }) => {
             const { params } = match;
             if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
+              return <Navigate to="/" />;
             }
             if (!params.roomId) {
-              return <Redirect to="/" />;
+              return <Navigate to="/" />;
             }
             return (
-              <Redirect to={`/preview/${params.roomId}/${params.role || ""}`} />
+              <Navigate to={`/preview/${params.roomId}/${params.role || ""}`} />
             );
           }}
         />
@@ -176,7 +176,7 @@ function AppRoutes({ getUserToken }) {
             <ErrorPage error="Invalid URL!" />
           </Suspense>
         </Route>
-      </Switch>
+      </Routes>
     </Router>
   );
 }
