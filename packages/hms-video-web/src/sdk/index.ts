@@ -129,7 +129,13 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
     );
+
+    /**
+     * Note: Subscribe to events here right after creating stores and managers to not miss events published earlier
+     */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
+    this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
+    this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
 
   private validateJoined(name: string) {
@@ -781,8 +787,6 @@ export class HMSSdk implements HMSInterface {
       return;
     }
     this.sdkState.deviceManagersInitialised = true;
-    this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
-    this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
     await this.deviceManager.init();
     this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
