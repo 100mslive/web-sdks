@@ -32,12 +32,16 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ""}/${role}`);
       else navigate(`/preview/${roomId || ""}`);
     }
+  }, [isConnectedToRoom, isConnectingToRoom, navigate, role, roomId]);
+
+  useEffect(() => {
     return () => {
       // This is needed to handle mac touchpad swipe gesture
-      hmsActions.leave();
+      if (isConnectedToRoom) {
+        hmsActions.leave();
+      }
     };
-    // eslint-disable-next-line
-  }, []);
+  }, [hmsActions, isConnectedToRoom]);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;
