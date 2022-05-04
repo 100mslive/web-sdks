@@ -1,37 +1,67 @@
 import { Flex, Input, Label } from "@100mslive/react-ui";
-import React from "react";
+import React, { useCallback, useState } from "react";
+import {
+  RTMP_RECORD_DEFAULT_RESOLUTION,
+  RTMP_RECORD_RESOLUTION_MAX,
+  RTMP_RECORD_RESOLUTION_MIN,
+} from "../../common/constants";
+import { DialogRow } from "../../primitives/DialogContent";
 
-export const ResolutionInput = () => {
+export const ResolutionInput = ({ onResolutionChange }) => {
+  const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
+
+  const resolutionChangeHandler = useCallback(
+    event => {
+      const { name, value } = event.target;
+      const width = name === "resWidth" ? Number(value) : resolution.width;
+      const height = name === "resHeight" ? Number(value) : resolution.height;
+
+      const newResolution = {
+        width: !isNaN(width) ? width : RTMP_RECORD_DEFAULT_RESOLUTION.width,
+        height: !isNaN(height) ? height : RTMP_RECORD_DEFAULT_RESOLUTION.height,
+      };
+      setResolution(newResolution);
+    },
+    [resolution]
+  );
+
   return (
-    <Flex justify="start" align="center">
-      <Label
-        htmlFor="resolution"
-        css={{ ml: "$4", fontSize: "$sm", cursor: "pointer", width: "40%" }}
+    <DialogRow breakSm>
+      <Label css={{ "@sm": { marginBottom: "1rem" } }}>Resolution</Label>
+      <Flex
+        justify="between"
+        css={{ width: "70%", "@sm": { width: "100%" } }}
+        gap={2}
       >
-        resolution
-      </Label>
-      <Input
-        css={{ mb: "1rem", marginLeft: "1rem", width: "30%" }}
-        autoComplete="name"
-        type="text"
-        required
-        autoFocus
-        maxLength={20}
-        value="1280"
-        onChange={e => {}}
-        data-testid="preview_name_field"
-      />
-      <Input
-        css={{ mb: "1rem", marginLeft: "1rem", width: "30%" }}
-        autoComplete="name"
-        type="text"
-        required
-        autoFocus
-        maxLength={20}
-        value="720"
-        onChange={e => {}}
-        data-testid="preview_name_field"
-      />
-    </Flex>
+        <Flex direction="column" css={{ width: "50%" }}>
+          <span>Width</span>
+          <Input
+            css={{ width: "100%", "@sm": { width: "100%" } }}
+            name="resWidth"
+            value={resolution.width}
+            onChange={resolutionChangeHandler}
+            disabled={false}
+            min={RTMP_RECORD_RESOLUTION_MIN}
+            max={RTMP_RECORD_RESOLUTION_MAX}
+            onBlur={() => onResolutionChange(resolution)}
+            type="number"
+          />
+        </Flex>
+        <Flex direction="column" css={{ width: "50%" }}>
+          <span>Height</span>
+          <Input
+            css={{ width: "100%", "@sm": { width: "100%" } }}
+            name="resHeight"
+            value={resolution.height}
+            onChange={resolutionChangeHandler}
+            onBlur={() => onResolutionChange(resolution)}
+            disabled={false}
+            min={RTMP_RECORD_RESOLUTION_MIN}
+            max={RTMP_RECORD_RESOLUTION_MAX}
+            type="number"
+          />
+        </Flex>
+      </Flex>
+    </DialogRow>
   );
 };
