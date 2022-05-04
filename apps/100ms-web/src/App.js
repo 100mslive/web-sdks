@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useParams,
 } from "react-router-dom";
 import { HMSRoomProvider } from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
@@ -117,6 +118,17 @@ export function EdtechComponent({
   );
 }
 
+const RedirectToPreview = () => {
+  const { roomId, role } = useParams();
+  if (!roomId && !role) {
+    return <Navigate to="/" />;
+  }
+  if (!roomId) {
+    return <Navigate to="/" />;
+  }
+  return <Navigate to={`/preview/${roomId}/${role || ""}`} />;
+};
+
 function AppRoutes({ getUserToken }) {
   return (
     <Router>
@@ -127,55 +139,63 @@ function AppRoutes({ getUserToken }) {
       <KeyboardHandler />
       <Routes>
         <Route
-          path="/preview/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Navigate to="/" />;
-            }
-            if (
-              !params.roomId ||
-              ["preview", "meeting", "leave"].includes(params.roomId)
-            ) {
-              return <Navigate to="/" />;
-            }
-            return (
-              <Suspense fallback={<FullPageProgress />}>
-                <PreviewScreen getUserToken={getUserToken} />
-              </Suspense>
-            );
-          }}
+          path="/preview/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
         />
-        <Route path="/meeting/:roomId/:role?">
-          <Suspense fallback={<FullPageProgress />}>
-            <Conference />
-          </Suspense>
-        </Route>
-        <Route path="/leave/:roomId/:role?">
-          <Suspense fallback={<FullPageProgress />}>
-            <PostLeave />
-          </Suspense>
-        </Route>
         <Route
-          path="/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Navigate to="/" />;
-            }
-            if (!params.roomId) {
-              return <Navigate to="/" />;
-            }
-            return (
-              <Navigate to={`/preview/${params.roomId}/${params.role || ""}`} />
-            );
-          }}
+          path="/preview/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
         />
-        <Route path="*">
-          <Suspense fallback={<FullPageProgress />}>
-            <ErrorPage error="Invalid URL!" />
-          </Suspense>
-        </Route>
+        <Route
+          path="/meeting/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/meeting/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/leave/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PostLeave />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/leave/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PostLeave />
+            </Suspense>
+          }
+        />
+        <Route path="/:roomId/:role" element={<RedirectToPreview />} />
+        <Route path="/:roomId/" element={<RedirectToPreview />} />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <ErrorPage error="Invalid URL!" />
+            </Suspense>
+          }
+        />
       </Routes>
     </Router>
   );
