@@ -131,7 +131,8 @@ export class HMSSdk implements HMSInterface {
     );
 
     /**
-     * Note: Subscribe to events here right after creating stores and managers to not miss events published earlier
+     * Note: Subscribe to events here right after creating stores and managers
+     * to not miss events that are published before the handlers are subscribed.
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
