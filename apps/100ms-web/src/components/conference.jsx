@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   selectRoomState,
   HMSRoomState,
@@ -16,7 +16,7 @@ import { ConferenceMainView } from "../layouts/mainView";
 import { AppContext } from "./context/AppContext";
 
 const Conference = () => {
-  const history = useHistory();
+  const history = useNavigate();
   const { roomId, role } = useParams();
   const { isHeadless } = useContext(AppContext);
   const isConnectingToRoom =

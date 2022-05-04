@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import React, { useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LogRocket from "logrocket";
 import {
   useHMSNotifications,
@@ -21,7 +21,7 @@ import { ToastBatcher } from "../Toast/ToastBatcher";
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const history = useHistory();
+  const history = useNavigate();
   const { subscribedNotifications, isHeadless, HLS_VIEWER_ROLE } =
     useContext(AppContext);
   useEffect(() => {

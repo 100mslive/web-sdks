@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SunWithFace } from "@100mslive/react-icons";
 import {
   Box,
@@ -11,7 +11,7 @@ import {
 import PlaceholderBg from "../images/post_leave.png";
 
 const PostLeave = () => {
-  const history = useHistory();
+  const history = useNavigate();
   const { roomId, role } = useParams();
   return (
     <Flex justify="center" align="center" css={{ size: "100%", bg: "$mainBg" }}>
