@@ -16,7 +16,7 @@ import { ConferenceMainView } from "../layouts/mainView";
 import { AppContext } from "./context/AppContext";
 
 const Conference = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { roomId, role } = useParams();
   const { isHeadless } = useContext(AppContext);
   const isConnectingToRoom =
@@ -26,11 +26,11 @@ const Conference = () => {
 
   useEffect(() => {
     if (!roomId) {
-      history.push(`/`);
+      navigate.push(`/`);
     }
     if (!(isConnectingToRoom || isConnectedToRoom)) {
-      if (role) history.push(`/preview/${roomId || ""}/${role}`);
-      else history.push(`/preview/${roomId || ""}`);
+      if (role) navigate.push(`/preview/${roomId || ""}/${role}`);
+      else navigate.push(`/preview/${roomId || ""}`);
     }
     return () => {
       // This is needed to handle mac touchpad swipe gesture

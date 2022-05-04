@@ -14,7 +14,7 @@ const env = process.env.REACT_APP_ENV;
 // use this field to join directly for quick testing while in local
 const directJoinNoHeadless = process.env.REACT_APP_HEADLESS_JOIN === "true";
 const PreviewScreen = ({ getUserToken }) => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { tokenEndpoint, setIsHeadless } = useContext(AppContext);
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const [token, setToken] = useState(null);
@@ -48,7 +48,7 @@ const PreviewScreen = ({ getUserToken }) => {
     if (userRole) {
       meetingURL += `/${userRole}`;
     }
-    history.push(meetingURL);
+    navigate.push(meetingURL);
   };
 
   if (error.title) {

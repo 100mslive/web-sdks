@@ -21,7 +21,7 @@ import { ToastBatcher } from "../Toast/ToastBatcher";
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { subscribedNotifications, isHeadless, HLS_VIEWER_ROLE } =
     useContext(AppContext);
   useEffect(() => {
@@ -87,11 +87,11 @@ export function Notifications() {
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
-            const previewLocation = history.location.pathname.replace(
+            const previewLocation = navigate.location.pathname.replace(
               "meeting",
               "leave"
             );
-            history.push(previewLocation);
+            navigate.push(previewLocation);
           }, 2000);
           return;
         }
@@ -135,11 +135,11 @@ export function Notifications() {
               }`,
         });
         setTimeout(() => {
-          const leaveLocation = history.location.pathname.replace(
+          const leaveLocation = navigate.location.pathname.replace(
             "meeting",
             "leave"
           );
-          history.push(leaveLocation);
+          navigate.push(leaveLocation);
         }, 2000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
@@ -152,7 +152,7 @@ export function Notifications() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    history,
+    navigate,
     notification,
     subscribedNotifications.ERROR,
     subscribedNotifications.NEW_MESSAGE,

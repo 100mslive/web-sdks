@@ -22,7 +22,7 @@ import {
 } from "../primitives/DialogContent";
 
 export const LeaveRoom = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const params = useParams();
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
@@ -31,9 +31,9 @@ export const LeaveRoom = () => {
 
   const redirectToLeavePage = () => {
     if (params.role) {
-      history.push("/leave/" + params.roomId + "/" + params.role);
+      navigate.push("/leave/" + params.roomId + "/" + params.role);
     } else {
-      history.push("/leave/" + params.roomId);
+      navigate.push("/leave/" + params.roomId);
     }
   };
 

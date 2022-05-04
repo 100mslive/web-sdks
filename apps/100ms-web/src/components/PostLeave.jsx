@@ -11,7 +11,7 @@ import {
 import PlaceholderBg from "../images/post_leave.png";
 
 const PostLeave = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const { roomId, role } = useParams();
   return (
     <Flex justify="center" align="center" css={{ size: "100%", bg: "$mainBg" }}>
@@ -76,7 +76,7 @@ const PostLeave = () => {
               onClick={() => {
                 let previewUrl = "/preview/" + roomId;
                 if (role) previewUrl += "/" + role;
-                history.push(previewUrl);
+                navigate.push(previewUrl);
               }}
               css={{ mx: "$4" }}
               data-testid="join_again_btn"
