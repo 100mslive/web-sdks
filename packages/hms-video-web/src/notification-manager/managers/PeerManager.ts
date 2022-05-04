@@ -52,6 +52,10 @@ export class PeerManager {
     const hmsPeers: HMSRemotePeer[] = [];
     const newPeers = new Set(peers.map(peer => peer.peer_id));
     this.store.getRemotePeers().forEach(({ peerId, fromRoomState }) => {
+      /**
+       * Remove only if the peer join happened from preview roomstate update. This will prevent the peer joined
+       * from peer-join event post join from being removed from the store.
+       */
       if (!newPeers.has(peerId) && fromRoomState) {
         this.store.removePeer(peerId);
       }
