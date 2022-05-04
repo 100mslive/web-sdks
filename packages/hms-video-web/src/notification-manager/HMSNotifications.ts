@@ -85,6 +85,7 @@ export interface PeerNotification {
   tracks: {
     [track_id: string]: TrackState;
   };
+  is_from_room_state?: boolean;
 }
 
 export interface RoomState {
