@@ -51,8 +51,7 @@ export class PeerManager {
     }
     const hmsPeers: HMSRemotePeer[] = [];
     const newPeers = new Set(peers.map(peer => peer.peer_id));
-    const storePeers = new Set(this.store.getRemotePeers().map(peer => peer.peerId));
-    storePeers.forEach(peerId => {
+    this.store.getRemotePeers().forEach(({ peerId }) => {
       if (!newPeers.has(peerId)) {
         this.store.removePeer(peerId);
       }
