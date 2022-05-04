@@ -31,9 +31,9 @@ export const LeaveRoom = () => {
 
   const redirectToLeavePage = () => {
     if (params.role) {
-      navigate.push("/leave/" + params.roomId + "/" + params.role);
+      navigate("/leave/" + params.roomId + "/" + params.role);
     } else {
-      navigate.push("/leave/" + params.roomId);
+      navigate("/leave/" + params.roomId);
     }
   };
 

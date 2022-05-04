@@ -48,7 +48,7 @@ const PreviewScreen = ({ getUserToken }) => {
     if (userRole) {
       meetingURL += `/${userRole}`;
     }
-    navigate.push(meetingURL);
+    navigate(meetingURL);
   };
 
   if (error.title) {

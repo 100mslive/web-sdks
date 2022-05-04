@@ -76,7 +76,7 @@ const PostLeave = () => {
               onClick={() => {
                 let previewUrl = "/preview/" + roomId;
                 if (role) previewUrl += "/" + role;
-                navigate.push(previewUrl);
+                navigate(previewUrl);
               }}
               css={{ mx: "$4" }}
               data-testid="join_again_btn"

@@ -91,7 +91,7 @@ export function Notifications() {
               "meeting",
               "leave"
             );
-            navigate.push(previewLocation);
+            navigate(previewLocation);
           }, 2000);
           return;
         }
@@ -139,7 +139,7 @@ export function Notifications() {
             "meeting",
             "leave"
           );
-          navigate.push(leaveLocation);
+          navigate(leaveLocation);
         }, 2000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:

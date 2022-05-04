@@ -26,11 +26,11 @@ const Conference = () => {
 
   useEffect(() => {
     if (!roomId) {
-      navigate.push(`/`);
+      navigate(`/`);
     }
     if (!(isConnectingToRoom || isConnectedToRoom)) {
-      if (role) navigate.push(`/preview/${roomId || ""}/${role}`);
-      else navigate.push(`/preview/${roomId || ""}`);
+      if (role) navigate(`/preview/${roomId || ""}/${role}`);
+      else navigate(`/preview/${roomId || ""}`);
     }
     return () => {
       // This is needed to handle mac touchpad swipe gesture
