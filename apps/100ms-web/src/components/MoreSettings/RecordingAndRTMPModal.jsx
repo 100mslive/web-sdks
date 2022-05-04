@@ -13,12 +13,12 @@ import {
   DialogInput,
   DialogRow,
 } from "../../primitives/DialogContent";
+import { ToastManager } from "../Toast/ToastManager";
+import { ResolutionInput } from "./ResolutionInput";
 import {
   QUERY_PARAM_SKIP_PREVIEW,
   RTMP_RECORD_DEFAULT_RESOLUTION,
 } from "../../common/constants";
-import { ToastManager } from "../Toast/ToastManager";
-import { ResolutionInput } from "./ResolutionInput";
 
 const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") +
@@ -75,7 +75,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               meetingURL,
               rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
               record: recordingSelected,
-              resolution: recordingResolution ,
+              resolution: recordingResolution,
             });
       } else {
         isHLSRunning

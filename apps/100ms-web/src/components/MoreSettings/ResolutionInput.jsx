@@ -36,7 +36,7 @@ export const ResolutionInput = ({ onResolutionChange }) => {
         <Flex direction="column" css={{ width: "50%" }}>
           <span>Width</span>
           <Input
-            css={{ width: "100%", "@sm": { width: "100%" } }}
+            css={{ width: "100%" }}
             name="resWidth"
             value={resolution.width}
             onChange={resolutionChangeHandler}
@@ -50,7 +50,7 @@ export const ResolutionInput = ({ onResolutionChange }) => {
         <Flex direction="column" css={{ width: "50%" }}>
           <span>Height</span>
           <Input
-            css={{ width: "100%", "@sm": { width: "100%" } }}
+            css={{ width: "100%" }}
             name="resHeight"
             value={resolution.height}
             onChange={resolutionChangeHandler}
