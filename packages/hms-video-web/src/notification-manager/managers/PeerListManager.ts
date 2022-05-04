@@ -69,7 +69,8 @@ export class PeerListManager {
     // an empty value here so rest of the code flow can ignore this change, the below
     // can be changed when tracks will be sent as a separate object in future
     Object.keys(roomPeers).forEach(peer => {
-      roomPeers[peer]['tracks'] = {};
+      roomPeers[peer].tracks = {};
+      roomPeers[peer].is_from_room_state = true;
     });
     this.handleRepeatedPeerList(roomPeers);
   };

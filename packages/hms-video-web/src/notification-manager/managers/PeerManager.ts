@@ -51,8 +51,8 @@ export class PeerManager {
     }
     const hmsPeers: HMSRemotePeer[] = [];
     const newPeers = new Set(peers.map(peer => peer.peer_id));
-    this.store.getRemotePeers().forEach(({ peerId }) => {
-      if (!newPeers.has(peerId)) {
+    this.store.getRemotePeers().forEach(({ peerId, fromRoomState }) => {
+      if (!newPeers.has(peerId) && fromRoomState) {
         this.store.removePeer(peerId);
       }
     });
@@ -131,6 +131,7 @@ export class PeerManager {
       metadata: peer.info.data,
       role: this.store.getPolicyForRole(peer.role),
       joinedAt: convertDateNumToDate(peer.joined_at),
+      fromRoomState: !!peer.is_from_room_state,
     });
 
     this.store.addPeer(hmsPeer);
