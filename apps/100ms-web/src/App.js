@@ -120,10 +120,14 @@ export function EdtechComponent({
 
 const RedirectToPreview = () => {
   const { roomId, role } = useParams();
+
   if (!roomId && !role) {
     return <Navigate to="/" />;
   }
   if (!roomId) {
+    return <Navigate to="/" />;
+  }
+  if (["preview", "meeting", "leave"].includes(roomId) && !role) {
     return <Navigate to="/" />;
   }
   return <Navigate to={`/preview/${roomId}/${role || ""}`} />;
