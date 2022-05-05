@@ -27,7 +27,7 @@ export const ResolutionInput = ({ onResolutionChange }) => {
 
   return (
     <DialogRow breakSm>
-      <Label css={{ "@sm": { marginBottom: "1rem" } }}>Resolution</Label>
+      <Label css={{ "@sm": { mb: "$8" } }}>Resolution</Label>
       <Flex
         justify="between"
         css={{ width: "70%", "@sm": { width: "100%" } }}
