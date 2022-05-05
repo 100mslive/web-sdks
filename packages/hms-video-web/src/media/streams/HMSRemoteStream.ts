@@ -55,10 +55,6 @@ export default class HMSRemoteStream extends HMSMediaStream {
     return this.audio;
   }
 
-  isServerHandlingDegradation() {
-    return this.connection.isServerHandlingDegradation;
-  }
-
   /**
    * send the expected state of the stream to SFU over data channel
    * @private
