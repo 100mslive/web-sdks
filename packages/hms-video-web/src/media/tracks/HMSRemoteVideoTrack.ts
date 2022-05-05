@@ -32,8 +32,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   preferLayer(layer: HMSSimulcastLayer) {
-    if (this.getSimulcastLayer() === layer) {
-      HMSLogger.d(`[Remote stream Prefer Layer] ${this.stream.id}`, `Already on ${layer} layer`);
+    if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
       return;
     }
     (this.stream as HMSRemoteStream).setVideoLayer(layer, this.logIdentifier);
@@ -46,14 +45,14 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.updateLayer();
+    this.updateLayer('addSink');
     this.pushInHistory('uiSetLayer-high');
   }
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
+    this.updateLayer('removeSink');
     this._degraded = false;
-    this.updateLayer();
     this.pushInHistory('uiSetLayer-none');
   }
 
@@ -90,13 +89,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   setDegradedFromSdk(value: boolean) {
     this._degraded = value;
     this._degradedAt = value ? new Date() : this._degradedAt;
-    this.updateLayer();
+    this.updateLayer('sdkDegradation');
     this.pushInHistory(value ? 'sdkDegraded-none' : 'sdkRecovered-high');
   }
 
-  private updateLayer() {
+  private updateLayer(source: string) {
     const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
-    if (!this.shouldSendVideoLayer(newLayer)) {
+    if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
     (this.stream as HMSRemoteStream).setVideoLayer(newLayer, this.logIdentifier);
@@ -120,13 +119,16 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * TODO: if track is degraded, send the update if target layer is lower than current layer
    * @private
    */
-  private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer) {
+  private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer, source: string) {
     const currLayer = this.getSimulcastLayer();
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
     if (currLayer === targetLayer) {
-      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Not sending update, already on layer ${targetLayer}`);
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier}`,
+        `Not sending update, already on layer ${targetLayer}, source=${source}`,
+      );
       return false;
     }
     return true;
