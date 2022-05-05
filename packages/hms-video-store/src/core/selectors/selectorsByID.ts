@@ -374,3 +374,5 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
       return {};
     }
   });
+
+export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);

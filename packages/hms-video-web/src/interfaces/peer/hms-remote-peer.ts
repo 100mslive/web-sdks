@@ -5,4 +5,5 @@ export interface HMSRemotePeer extends HMSPeer {
   audioTrack?: HMSRemoteAudioTrack;
   videoTrack?: HMSRemoteVideoTrack;
   auxiliaryTracks: HMSRemoteTrack[];
+  fromRoomState: boolean;
 }
