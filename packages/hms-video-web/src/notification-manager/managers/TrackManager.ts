@@ -107,7 +107,7 @@ export class TrackManager {
 
       if (track instanceof HMSRemoteVideoTrack) {
         const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
-        track.setDegradedFromServer(isDegraded);
+        track.setLayerFromServer(trackEntry.current_layer, isDegraded);
         if (isDegraded) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
         } else {
@@ -165,6 +165,8 @@ export class TrackManager {
 
       track.source = state.trackInfo.source;
       track.peerId = hmsPeer.peerId;
+      // set log identifier to initial name of the peer
+      track.logIdentifier = hmsPeer.name;
       track.setEnabled(!state.trackInfo.mute);
       this.addAudioTrack(hmsPeer, track);
       this.addVideoTrack(hmsPeer, track);

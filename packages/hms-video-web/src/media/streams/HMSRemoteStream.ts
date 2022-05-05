@@ -28,19 +28,22 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * Sets the video layer after receiving new state from SFU. This is used when server side subscribe
    * degradation is ON.
    * @param layer is simulcast layer to be set
+   * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayer(layer: HMSSimulcastLayer, peerName: string) {
+  setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string) {
     this.video = layer;
-    HMSLogger.d(`[Remote stream] ${peerName} - ${this.id}`, `Switching to ${layer} layer`);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Setting layer field to - ${layer}`);
   }
 
   /**
    * Sets the video layer and updates the track state to SFU via api datachannel. This is used when client
    * side subscribe degradation is ON or client unsubscribes the current track.
    * @param layer is simulcast layer to be set
+   * @param identifier is stream identifier to be printed in logs
    */
-  setVideo(layer: HMSSimulcastLayer, peerName: string) {
-    this.setVideoLayer(layer, peerName);
+  setVideoLayer(layer: HMSSimulcastLayer, identifier: string) {
+    this.setVideoLayerLocally(layer, identifier);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Switching to ${layer} layer`);
     this.syncWithApiChannel();
   }
 
@@ -56,6 +59,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
     return this.connection.isServerHandlingDegradation;
   }
 
+  /**
+   * send the expected state of the stream to SFU over data channel
+   * @private
+   */
   private syncWithApiChannel() {
     const data = {
       streamId: this.id,
