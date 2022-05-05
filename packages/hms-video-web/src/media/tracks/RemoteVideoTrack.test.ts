@@ -165,11 +165,13 @@ describe('remoteVideoTrack', () => {
     expect(track.enabled).toBe(true);
     track.addSink(videoElement);
     expectNonDegradedVisible();
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
     sfuDegrades();
     expectDegradedVisible();
     track.setEnabled(false);
     expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
-    // video goes out of view
+    expectLayersSent([HMSSimulcastLayer.HIGH]);
+    // video goes out of view or UI detaches
     track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
