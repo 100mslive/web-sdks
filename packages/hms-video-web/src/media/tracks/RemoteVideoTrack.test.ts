@@ -142,7 +142,7 @@ describe('remoteVideoTrack', () => {
    */
   test('sfu degradation with pagination', () => {
     track.addSink(videoElement);
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.HIGH, true);
+    expectNonDegradedVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
     sfuDegrades();
