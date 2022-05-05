@@ -6,17 +6,18 @@ import { HMSSimulcastLayer } from '../../interfaces';
 const streamId = '123';
 const trackId = '456';
 const nativeStream = { id: streamId } as MediaStream;
-const nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
 const videoElement = { srcObject: null } as HTMLVideoElement;
 
 describe('remoteVideoTrack', () => {
   let stream: HMSRemoteStream;
   let sendOverApiDataChannel: jest.Mock;
   let track: HMSRemoteVideoTrack;
+  let nativeTrack: MediaStreamTrack;
   beforeEach(() => {
     sendOverApiDataChannel = jest.fn();
     const connection = { sendOverApiDataChannel } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
+    nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
     track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular');
     window.MediaStream = jest.fn().mockImplementation(() => ({
       addTrack: jest.fn(),
@@ -118,6 +119,20 @@ describe('remoteVideoTrack', () => {
       HMSSimulcastLayer.NONE,
       HMSSimulcastLayer.NONE,
     ]);
+  });
+
+  test('sdk degradation + track mute', () => {
+    expect(track.enabled).toBe(true);
+    track.addSink(videoElement);
+    expectNonDegradedVisible();
+    track.setDegradedFromSdk(true);
+    expectDegradedVisible();
+    track.setEnabled(false);
+    expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
+    // video goes out of view
+    track.removeSink(videoElement);
+    expectNonDegradedNotVisible();
+    expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE, HMSSimulcastLayer.NONE]);
   });
 
   /**
