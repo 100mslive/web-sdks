@@ -33,7 +33,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
   const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
 
   const setRefs = useCallback(
-    node => {
+    (node: HTMLVideoElement) => {
       if (node) {
         videoRef.current = node;
         inViewRef(node);
