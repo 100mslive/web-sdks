@@ -11,6 +11,11 @@ export abstract class HMSTrack {
   source?: HMSTrackSource;
   peerId?: string;
 
+  /**
+   * @internal to print as a helpful identifier alongside logs
+   */
+  logIdentifier = '';
+
   /** The native mediastream track, for local, this changes on mute/unmute(for video),
    * and on device change.
    * @internal */

@@ -21,7 +21,7 @@ describe('HMSRemoteStream', () => {
   });
 
   it('sends data channel message when layer is switched', () => {
-    stream.setVideo(HMSSimulcastLayer.HIGH);
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, 'test');
     expect(sendOverApiDataChannel.mock.calls.length).toBe(1);
     const args = JSON.parse(sendOverApiDataChannel.mock.calls[0][0]);
     expect(args['streamId']).toBe(streamId);
