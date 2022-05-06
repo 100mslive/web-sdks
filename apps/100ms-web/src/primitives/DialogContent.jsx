@@ -179,7 +179,7 @@ export const DialogInput = ({
 }) => {
   return (
     <DialogRow breakSm>
-      <Label>{title}:</Label>
+      <Label>{title}</Label>
       <Input
         css={{ width: "70%", "@sm": { width: "100%" } }}
         value={value}

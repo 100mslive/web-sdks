@@ -18,6 +18,7 @@ import { ResolutionInput } from "./ResolutionInput";
 import {
   QUERY_PARAM_SKIP_PREVIEW,
   RTMP_RECORD_DEFAULT_RESOLUTION,
+  RTMP_RESOLUTION_IGNORED_WARNING_TEXT,
 } from "../../common/constants";
 
 const defaultMeetingUrl =
@@ -116,8 +117,12 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               data-testid="rtmp_url_field"
             />
           )}
-          {permissions.streaming && (
-            <ResolutionInput onResolutionChange={resolutionChangeHandler} />
+          {(permissions.streaming || permissions.recording) && (
+            <ResolutionInput
+              onResolutionChange={resolutionChangeHandler}
+              disabled={hlsSelected || isHLSRunning}
+              disabledText={RTMP_RESOLUTION_IGNORED_WARNING_TEXT}
+            />
           )}
           {permissions.streaming && (
             <DialogCheckbox
