@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import {
   HMSReactiveStore,
   HMSStore,
@@ -39,7 +39,7 @@ let providerProps: HMSContextProviderProps;
  * @constructor
  */
 // eslint-disable-next-line complexity
-export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
+export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> = ({
   children,
   actions,
   store,
