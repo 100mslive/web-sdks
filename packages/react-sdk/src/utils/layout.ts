@@ -446,7 +446,7 @@ export const getVideoTracksFromPeers = (
     if (peer.auxiliaryTracks.length > 0) {
       peer.auxiliaryTracks.forEach(trackId => {
         const track = tracks[trackId];
-        if (track?.type === 'video' && track?.source !== 'screen') {
+        if (track?.type === 'video' && track?.source === 'regular') {
           peerTiles.push({ track, peer });
         }
       });
