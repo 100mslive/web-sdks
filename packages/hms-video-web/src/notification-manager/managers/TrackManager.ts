@@ -186,7 +186,7 @@ export class TrackManager {
     if (auxiliaryTrackIndex > -1) {
       hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
     } else {
-      if (track.type === 'audio') {
+      if (track.type === HMSTrackType.AUDIO) {
         hmsPeer.audioTrack = undefined;
       } else {
         hmsPeer.videoTrack = undefined;
