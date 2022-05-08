@@ -53,7 +53,7 @@ describe('add/remove track api', () => {
         });
 
       actions1.join({ userName: 'test', authToken: token, initEndpoint });
-      cy.get('@onJoin')
+      cy.get('@onJoin1')
         .should('be.calledOnce')
         .then(() => {
           expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
