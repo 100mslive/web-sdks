@@ -64,6 +64,17 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const startStopRTMPRecordingHLS = async action => {
     try {
       if (action === "start") {
+        const rtmpRecordParams = {
+          meetingURL,
+          rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
+          record: recordingSelected,
+        };
+        const resolution = getResolution();
+
+        if (resolution) {
+          rtmpRecordParams.resolution = resolution;
+        }
+
         hlsSelected
           ? await hmsActions.startHLSStreaming({
               variants: [{ meetingURL: meetingURL }],
@@ -71,12 +82,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
                 ? { hlsVod: true, singleFilePerLayer: true }
                 : undefined,
             })
-          : await hmsActions.startRTMPOrRecording({
-              meetingURL,
-              rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
-              record: recordingSelected,
-              resolution: recordingResolution,
-            });
+          : await hmsActions.startRTMPOrRecording(rtmpRecordParams);
       } else {
         isHLSRunning
           ? await hmsActions.stopHLSStreaming()
@@ -91,6 +97,19 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
         error
       );
       ToastManager.addToast({ title: error.message });
+    }
+
+    function getResolution() {
+      const resolution = {};
+      if (recordingResolution.width) {
+        resolution.width = recordingResolution.width;
+      }
+      if (recordingResolution.height) {
+        resolution.height = recordingResolution.height;
+      }
+      if (Object.keys(resolution).length > 0) {
+        return resolution;
+      }
     }
   };
 
