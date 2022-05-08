@@ -58,5 +58,8 @@ Cypress.Commands.add('localTracksAdded', (localPeer: HMSLocalPeer) => {
         }
       });
       expect(count).to.equal(2);
+    })
+    .then(() => {
+      return Promise.resolve();
     });
 });
