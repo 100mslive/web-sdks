@@ -1,10 +1,17 @@
-import { HMSReactiveStore, selectLocalPeer } from '../../packages/hms-video-store/src';
+import {
+  HMSReactiveStore,
+  selectIsConnectedToRoom,
+  selectLocalPeer,
+  selectRemotePeers,
+} from '../../packages/hms-video-store/src';
 import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 
-let HMSStore;
+let HMSStore, HMSStore1;
 let actions: HMSSDKActions;
+let actions1: HMSSDKActions;
 let store: IHMSStoreReadOnly;
+let store1: IHMSStoreReadOnly;
 let initEndpoint;
 
 let token;
@@ -17,42 +24,75 @@ describe('add/remove track api', () => {
   });
   beforeEach(() => {
     HMSStore = new HMSReactiveStore();
-    actions = HMSStore.getHMSActions();
+    actions = HMSStore.getActions();
     store = HMSStore.getStore();
+    HMSStore1 = new HMSReactiveStore();
+    store1 = HMSStore1.getStore();
+    actions1 = HMSStore1.getActions();
     initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
     //@ts-ignore
     cy.spy(actions, 'onJoin').as('onJoin');
     //@ts-ignore
     cy.spy(actions, 'onTrackUpdate').as('onTrackUpdate');
+
+    //@ts-ignore
+    cy.spy(actions1, 'onJoin').as('onJoin1');
+    //@ts-ignore
+    cy.spy(actions1, 'onTrackUpdate').as('onTrackUpdate1');
   });
 
   describe('Add/Remove Track', () => {
-    afterEach(() => {
-      if (actions) {
-        return actions.leave();
-      }
+    it('both peers should join', () => {
+      const start = Date.now();
+      actions.join({ userName: 'test', authToken: token, initEndpoint });
+      cy.get('@onJoin')
+        .should('be.calledOnce')
+        .then(() => {
+          expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
+          cy.log(String(Date.now() - start));
+        });
+
+      actions1.join({ userName: 'test', authToken: token, initEndpoint });
+      cy.get('@onJoin')
+        .should('be.calledOnce')
+        .then(() => {
+          expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
+          cy.log(String(Date.now() - start));
+        });
     });
 
-    it('should add/remove a track to aux track on addTrack', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer())
-        .then(() => {
-          return navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        })
-        .then(stream => {
-          const videoTrack = stream.getVideoTracks()[0];
-          actions.addTrack(videoTrack).then(() => {
+    it('should add/remove a track to aux track on addTrack for localPeer', () => {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+        const videoTrack = stream.getVideoTracks()[0];
+        actions.addTrack(videoTrack).then(() => {
+          const localPeer = store.getState(selectLocalPeer);
+          expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+          expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
+          actions.removeTrack(videoTrack.id).then(() => {
             const localPeer = store.getState(selectLocalPeer);
-            expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-            expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
-            actions.removeTrack(videoTrack.id).then(() => {
-              const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks.length).to.equal(0);
-              expect(localPeer.videoTrack).to.not.equal(undefined);
-            });
+            expect(localPeer.auxiliaryTracks.length).to.equal(0);
+            expect(localPeer.videoTrack).to.not.equal(undefined);
           });
         });
+      });
+    });
+
+    it('should add/remove aux track for remotePeer on add/removeTrack', () => {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+        const videoTrack = stream.getVideoTracks()[0];
+        actions.addTrack(videoTrack).then(() => {
+          const remotePeer = store1.getState(selectRemotePeers)[0];
+          expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+          expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
+          actions.removeTrack(videoTrack.id).then(() => {
+            const remotePeer = store1.getState(selectRemotePeers)[0];
+            expect(remotePeer.auxiliaryTracks.length).to.equal(0);
+            expect(remotePeer.videoTrack).to.not.equal(undefined);
+            actions.leave();
+            actions1.leave();
+          });
+        });
+      });
     });
   });
 });
