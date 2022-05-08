@@ -21,6 +21,8 @@ describe('add/remove track api', () => {
     store = HMSStore.getStore();
     initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
     //@ts-ignore
+    cy.spy(actions, 'onJoin').as('onJoin');
+    //@ts-ignore
     cy.spy(actions, 'onTrackUpdate').as('onTrackUpdate');
   });
 
