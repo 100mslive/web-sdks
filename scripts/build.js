@@ -26,7 +26,6 @@ async function main() {
     tsconfig: 'tsconfig.json',
     minify: true,
     sourcemap: true,
-    sourcesContent: false,
   };
   try {
     await esbuild.build({
