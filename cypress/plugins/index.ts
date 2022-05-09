@@ -25,6 +25,5 @@ module.exports = (on, config) => {
     config.env[key] = process.env[key];
   });
   console.log('config', config.env);
-  require('@cypress/code-coverage/task')(on, config);
   return config;
 };
