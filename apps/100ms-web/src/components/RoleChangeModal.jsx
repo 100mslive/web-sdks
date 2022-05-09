@@ -20,9 +20,6 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const [selectedRole, setRole] = useState(peer?.roleName);
   const [requestPermission, setRequestPermission] = useState(true);
   const hmsActions = useHMSActions();
-  if (!peer) {
-    return null;
-  }
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent
@@ -35,7 +32,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
           selected={selectedRole}
           onChange={setRole}
         />
-        {!peer?.isLocal && (
+        {!peer.isLocal && (
           <DialogCheckbox
             title="Request Permission"
             value={requestPermission}

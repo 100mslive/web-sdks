@@ -442,15 +442,6 @@ export const getVideoTracksFromPeers = (
     } else if (!filterNonPublishingPeers) {
       peerTiles.push({ peer: peer });
     }
-    // Handle video tracks in auxiliary tracks as well.
-    if (peer.auxiliaryTracks.length > 0) {
-      peer.auxiliaryTracks.forEach(trackId => {
-        const track = tracks[trackId];
-        if (track?.type === 'video' && track?.source === 'regular') {
-          peerTiles.push({ track, peer });
-        }
-      });
-    }
     if (includeScreenShareForPeer(peer) && peer.auxiliaryTracks.length > 0) {
       const screenShareTrackID = peer.auxiliaryTracks.find(trackID => {
         const track = tracks[trackID];

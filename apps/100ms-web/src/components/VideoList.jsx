@@ -61,7 +61,6 @@ const List = ({
                         width={tile.width}
                         height={tile.height}
                         peerId={tile.peer?.id}
-                        trackId={tile.track?.id}
                         index={i}
                       />
                     )
