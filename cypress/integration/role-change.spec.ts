@@ -133,7 +133,7 @@ describe('role change api', () => {
             .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
             .then(() => {
               //@ts-ignore
-              const sdkPeer = actions.sdk.getPeers()[1];
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
               const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.videoTrack).to.equal(undefined);
               expect(sdkPeer.videoTrack).to.equal(undefined);
@@ -142,7 +142,7 @@ describe('role change api', () => {
             .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
             .then(() => {
               //@ts-ignore
-              const sdkPeer = actions.sdk.getPeers()[1];
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
               const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.audioTrack).to.equal(undefined);
               expect(sdkPeer.audioTrack).to.equal(undefined);
@@ -159,13 +159,20 @@ describe('role change api', () => {
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
           actions.changeRole(localPeer.id, 'audio-only', true);
-          cy.get('@onTrackUpdate')
-            .should('have.callCount', 3)
+          cy.get('@onPeerUpdate')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.roleName).to.equal('audio-only');
+            });
+          cy.get('@onTrackUpdate')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions.sdk.getLocalPeer();
+              const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.videoTrack).to.equal(undefined);
-              expect(localPeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
             });
         });
     });
@@ -181,12 +188,21 @@ describe('role change api', () => {
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
           actions.changeRole(localPeer.id, 'audio-only', true);
-          cy.get('@onTrackUpdate1')
-            .should('have.callCount', 5)
+          cy.get('@onPeerUpdate1')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const remotePeer = store1.getState(selectRemotePeers)[0];
+              expect(remotePeer.roleName).to.equal('audio-only');
+            });
+
+          cy.get('@onTrackUpdate1')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
+              const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.videoTrack).to.equal(undefined);
-              expect(remotePeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
             });
         });
     });
@@ -204,13 +220,29 @@ describe('role change api', () => {
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
           actions1.changeRole(localPeer.id, 'hls-viewer', true);
-          cy.get('@onTrackUpdate')
-            .should('have.callCount', 6)
+          cy.get('@onPeerUpdate')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.roleName).to.equal('hls-viewer');
+            });
+          cy.get('@onTrackUpdate')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions.sdk.getLocalPeer();
+              const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.videoTrack).to.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
+            });
+          cy.get('@onTrackUpdate')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions.sdk.getLocalPeer();
+              const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.audioTrack).to.equal(undefined);
+              expect(sdkPeer.audioTrack).to.equal(undefined);
             });
         });
     });
@@ -227,13 +259,29 @@ describe('role change api', () => {
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
           actions1.changeRole(localPeer.id, 'hls-viewer', true);
-          cy.get('@onTrackUpdate1')
-            .should('have.callCount', 6)
+          cy.get('@onPeerUpdate1')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.roleName).to.equal('hls-viewer');
+            });
+          cy.get('@onTrackUpdate1')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
+              const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.videoTrack).to.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
+            });
+          cy.get('@onTrackUpdate1')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
+              const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.audioTrack).to.equal(undefined);
+              expect(sdkPeer.audioTrack).to.equal(undefined);
             });
         });
     });
@@ -242,18 +290,29 @@ describe('role change api', () => {
   describe('role change to audio only role', () => {
     it('should remove video track on localPeer', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
+      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
       cy.get('@onTrackUpdate')
-        .should('be.calledTwice')
+        .should('have.callCount', 4)
+        .then(() => {
+          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
+        })
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
-          actions.changeRole(localPeer.id, 'audio-only', true);
-          cy.get('@onTrackUpdate')
-            .should('have.callCount', 3)
+          actions1.changeRole(localPeer.id, 'audio-only', true);
+          cy.get('@onPeerUpdate')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.roleName).to.equal('audio-only');
+            });
+          cy.get('@onTrackUpdate')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions.sdk.getLocalPeer();
+              const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.videoTrack).to.equal(undefined);
-              expect(localPeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
             });
         });
     });
@@ -269,12 +328,20 @@ describe('role change api', () => {
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
           actions1.changeRole(localPeer.id, 'audio-only', true);
-          cy.get('@onTrackUpdate1')
-            .should('have.callCount', 5)
+          cy.get('@onPeerUpdate1')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
             .then(() => {
               const remotePeer = store1.getState(selectRemotePeers)[0];
+              expect(remotePeer.roleName).to.equal('audio-only');
+            });
+          cy.get('@onTrackUpdate1')
+            .should('be.calledWithMatch', HMSTrackUpdate.TRACK_REMOVED)
+            .then(() => {
+              //@ts-ignore
+              const sdkPeer = actions1.sdk.getPeers().find(peer => !peer.isLocal);
+              const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.videoTrack).to.equal(undefined);
-              expect(remotePeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.videoTrack).to.equal(undefined);
             });
         });
     });
