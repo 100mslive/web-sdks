@@ -104,14 +104,18 @@ describe('add/remove track api', () => {
           navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
             const videoTrack = stream.getVideoTracks()[0];
             actions.addTrack(videoTrack).then(() => {
-              const remotePeer = store1.getState(selectRemotePeers)[0];
-              expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-              expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
-              actions.removeTrack(videoTrack.id).then(() => {
-                const remotePeer = store1.getState(selectRemotePeers)[0];
-                expect(remotePeer.auxiliaryTracks.length).to.equal(0);
-                expect(remotePeer.videoTrack).to.not.equal(undefined);
-              });
+              cy.get('@onTrackUpdate1')
+                .should('be.calledOnce')
+                .then(() => {
+                  const remotePeer = store1.getState(selectRemotePeers)[0];
+                  expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+                  expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
+                  actions.removeTrack(videoTrack.id).then(() => {
+                    const remotePeer = store1.getState(selectRemotePeers)[0];
+                    expect(remotePeer.auxiliaryTracks.length).to.equal(0);
+                    expect(remotePeer.videoTrack).to.not.equal(undefined);
+                  });
+                });
             });
           });
         });
