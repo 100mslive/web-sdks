@@ -16,6 +16,12 @@ let initEndpoint;
 
 let token;
 
+const getTrack = () => {
+  return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+    return stream.getVideoTracks()[0];
+  });
+};
+
 describe('add/remove track api', () => {
   before(() => {
     cy.getToken().then(authToken => {
@@ -51,74 +57,76 @@ describe('add/remove track api', () => {
     }
   });
 
-  describe('Add/Remove Track', () => {
-    it('both peers should join', () => {
-      const start = Date.now();
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      cy.get('@onJoin')
-        .should('be.calledOnce')
-        .then(() => {
-          expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
-          cy.log(String(Date.now() - start));
-        });
+  it('both peers should join', () => {
+    const start = Date.now();
+    actions.join({ userName: 'test', authToken: token, initEndpoint });
+    cy.get('@onJoin')
+      .should('be.calledOnce')
+      .then(() => {
+        expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
+        cy.log(String(Date.now() - start));
+      });
 
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onJoin1')
-        .should('be.calledOnce')
-        .then(() => {
-          expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
-          cy.log(String(Date.now() - start));
-        });
-    });
+    actions1.join({ userName: 'test1', authToken: token, initEndpoint });
+    cy.get('@onJoin1')
+      .should('be.calledOnce')
+      .then(() => {
+        expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
+        cy.log(String(Date.now() - start));
+      });
+  });
 
-    it('should add/remove a track to aux track on addTrack for localPeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
-          const videoTrack = stream.getVideoTracks()[0];
-          actions.addTrack(videoTrack).then(() => {
+  it('should add/remove a track to aux track on addTrack for localPeer', () => {
+    actions.join({ userName: 'test', authToken: token, initEndpoint });
+
+    cy.get('@onTrackUpdate')
+      .should('be.calledTwice')
+      .then(() => getTrack())
+      .then((videoTrack: MediaStreamTrack) => {
+        actions.addTrack(videoTrack);
+        cy.get('@onTrackUpdate')
+          .should('be.calledThrice')
+          .then(() => {
             const localPeer = store.getState(selectLocalPeer);
             expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
             expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
-            actions.removeTrack(videoTrack.id).then(() => {
-              const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks.length).to.equal(0);
-              expect(localPeer.videoTrack).to.not.equal(undefined);
-            });
+            return actions.removeTrack(videoTrack.id);
+          })
+          .then(() => {
+            const localPeer = store.getState(selectLocalPeer);
+            expect(localPeer.auxiliaryTracks.length).to.equal(0);
+            expect(localPeer.videoTrack).to.not.equal(undefined);
           });
-        });
       });
-    });
+  });
 
-    it('should add/remove aux track for remotePeer on add/removeTrack', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer());
-
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      //@ts-ignore
-      cy.localTracksAdded(actions1.sdk.getLocalPeer(), { join: '@onJoin1', trackUpdate: '@onTrackUpdate1' }).then(
-        () => {
-          navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
-            const videoTrack = stream.getVideoTracks()[0];
-            actions.addTrack(videoTrack).then(() => {
-              cy.get('@onTrackUpdate1')
-                .should('be.calledOnce')
-                .then(() => {
-                  const remotePeer = store1.getState(selectRemotePeers)[0];
-                  expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-                  expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
-                  actions.removeTrack(videoTrack.id).then(() => {
-                    const remotePeer = store1.getState(selectRemotePeers)[0];
-                    expect(remotePeer.auxiliaryTracks.length).to.equal(0);
-                    expect(remotePeer.videoTrack).to.not.equal(undefined);
-                  });
-                });
-            });
+  it('should add/remove aux track for remotePeer on add/removeTrack', () => {
+    actions.join({ userName: 'test', authToken: token, initEndpoint });
+    actions1.join({ userName: 'test1', authToken: token, initEndpoint });
+    cy.get('@onTrackUpdate')
+      .should('have.callCount', 4)
+      .then(() => {
+        return cy.get('@onTrackUpdate1').should('have.callCount', 4);
+      })
+      // By this time both peers would have joined and got each others tracks
+      .then(() => getTrack())
+      .then((videoTrack: MediaStreamTrack) => {
+        actions.addTrack(videoTrack);
+        cy.get('@onTrackUpdate1')
+          .should('have.callCount', 5)
+          .then(() => {
+            const remotePeer = store1.getState(selectRemotePeers)[0];
+            expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+            expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
+            actions.removeTrack(videoTrack.id);
+            cy.get('@onTrackUpdate1')
+              .should('have.callCount', 6)
+              .then(() => {
+                const remotePeer = store1.getState(selectRemotePeers)[0];
+                expect(remotePeer.auxiliaryTracks.length).to.equal(0);
+                expect(remotePeer.videoTrack).to.not.equal(undefined);
+              });
           });
-        },
-      );
-    });
+      });
   });
 });
