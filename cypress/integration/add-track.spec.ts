@@ -21,8 +21,6 @@ describe('add/remove track api', () => {
     cy.getToken().then(authToken => {
       token = authToken;
     });
-  });
-  beforeEach(() => {
     HMSStore = new HMSReactiveStore();
     actions = HMSStore.getActions();
     store = HMSStore.getStore();
@@ -39,6 +37,15 @@ describe('add/remove track api', () => {
     cy.spy(actions1, 'onJoin').as('onJoin1');
     //@ts-ignore
     cy.spy(actions1, 'onTrackUpdate').as('onTrackUpdate1');
+  });
+
+  after(() => {
+    if (actions) {
+      actions.leave().catch(console.error);
+    }
+    if (actions1) {
+      actions1.leave().catch(console.error);
+    }
   });
 
   describe('Add/Remove Track', () => {
@@ -88,8 +95,6 @@ describe('add/remove track api', () => {
             const remotePeer = store1.getState(selectRemotePeers)[0];
             expect(remotePeer.auxiliaryTracks.length).to.equal(0);
             expect(remotePeer.videoTrack).to.not.equal(undefined);
-            actions.leave();
-            actions1.leave();
           });
         });
       });
