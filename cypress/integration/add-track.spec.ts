@@ -21,6 +21,9 @@ describe('add/remove track api', () => {
     cy.getToken().then(authToken => {
       token = authToken;
     });
+  });
+
+  beforeEach(() => {
     HMSStore = new HMSReactiveStore();
     actions = HMSStore.getActions();
     store = HMSStore.getStore();
@@ -39,12 +42,12 @@ describe('add/remove track api', () => {
     cy.spy(actions1, 'onTrackUpdate').as('onTrackUpdate1');
   });
 
-  after(() => {
+  afterEach(() => {
     if (actions) {
-      actions.leave().catch(console.error);
+      actions.leave();
     }
     if (actions1) {
-      actions1.leave().catch(console.error);
+      actions1.leave();
     }
   });
 
@@ -69,35 +72,48 @@ describe('add/remove track api', () => {
     });
 
     it('should add/remove a track to aux track on addTrack for localPeer', () => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
-        const videoTrack = stream.getVideoTracks()[0];
-        actions.addTrack(videoTrack).then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-          expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
-          actions.removeTrack(videoTrack.id).then(() => {
+      actions.join({ userName: 'test', authToken: token, initEndpoint });
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+          const videoTrack = stream.getVideoTracks()[0];
+          actions.addTrack(videoTrack).then(() => {
             const localPeer = store.getState(selectLocalPeer);
-            expect(localPeer.auxiliaryTracks.length).to.equal(0);
-            expect(localPeer.videoTrack).to.not.equal(undefined);
+            expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+            expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
+            actions.removeTrack(videoTrack.id).then(() => {
+              const localPeer = store.getState(selectLocalPeer);
+              expect(localPeer.auxiliaryTracks.length).to.equal(0);
+              expect(localPeer.videoTrack).to.not.equal(undefined);
+            });
           });
         });
       });
     });
 
     it('should add/remove aux track for remotePeer on add/removeTrack', () => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
-        const videoTrack = stream.getVideoTracks()[0];
-        actions.addTrack(videoTrack).then(() => {
-          const remotePeer = store1.getState(selectRemotePeers)[0];
-          expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-          expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
-          actions.removeTrack(videoTrack.id).then(() => {
-            const remotePeer = store1.getState(selectRemotePeers)[0];
-            expect(remotePeer.auxiliaryTracks.length).to.equal(0);
-            expect(remotePeer.videoTrack).to.not.equal(undefined);
+      actions.join({ userName: 'test', authToken: token, initEndpoint });
+      actions1.join({ userName: 'test', authToken: token, initEndpoint });
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer())
+        .then(() => {
+          return cy.get('@onTrackUpdate1').should('be.calledTwice');
+        })
+        .then(() => {
+          navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+            const videoTrack = stream.getVideoTracks()[0];
+            actions.addTrack(videoTrack).then(() => {
+              const remotePeer = store1.getState(selectRemotePeers)[0];
+              expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+              expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
+              actions.removeTrack(videoTrack.id).then(() => {
+                const remotePeer = store1.getState(selectRemotePeers)[0];
+                expect(remotePeer.auxiliaryTracks.length).to.equal(0);
+                expect(remotePeer.videoTrack).to.not.equal(undefined);
+              });
+            });
           });
         });
-      });
     });
   });
 });
