@@ -49,7 +49,6 @@ export const AudioVideoToggle = ({ compact = false }) => {
             css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
             active={isLocalVideoEnabled}
-            disabled={isAudioOnly}
             onClick={toggleVideo}
             data-testid="video_btn"
           >
