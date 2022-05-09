@@ -45,21 +45,24 @@ Cypress.Commands.add('getToken', () => {
     .should('exist');
 });
 
-Cypress.Commands.add('localTracksAdded', (localPeer: HMSLocalPeer) => {
-  return cy
-    .get('@onJoin')
-    .then(() => cy.get('@onTrackUpdate'))
-    .should(value => {
-      const spy = value as unknown as SinonSpy;
-      let count = 0;
-      spy.getCalls().forEach((call: SinonSpyCall) => {
-        if (expect(call.lastArg).to.equal(localPeer)) {
-          count++;
-        }
+Cypress.Commands.add(
+  'localTracksAdded',
+  (localPeer: HMSLocalPeer, { join = '@onJoin', trackUpdate = '@onTrackUpdate' } = {}) => {
+    return cy
+      .get(join)
+      .then(() => cy.get(trackUpdate))
+      .should(value => {
+        const spy = value as unknown as SinonSpy;
+        let count = 0;
+        spy.getCalls().forEach((call: SinonSpyCall) => {
+          if (expect(call.lastArg).to.equal(localPeer)) {
+            count++;
+          }
+        });
+        expect(count).to.equal(2);
+      })
+      .then(() => {
+        return Promise.resolve();
       });
-      expect(count).to.equal(2);
-    })
-    .then(() => {
-      return Promise.resolve();
-    });
-});
+  },
+);
