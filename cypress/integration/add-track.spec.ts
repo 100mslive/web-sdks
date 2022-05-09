@@ -62,7 +62,7 @@ describe('add/remove track api', () => {
           cy.log(String(Date.now() - start));
         });
 
-      actions1.join({ userName: 'test', authToken: token, initEndpoint });
+      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
       cy.get('@onJoin1')
         .should('be.calledOnce')
         .then(() => {
@@ -93,27 +93,27 @@ describe('add/remove track api', () => {
 
     it('should add/remove aux track for remotePeer on add/removeTrack', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test', authToken: token, initEndpoint });
+      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
       //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer())
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('be.calledTwice');
-        })
-        .then(() => {
-          navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
-            const videoTrack = stream.getVideoTracks()[0];
-            actions.addTrack(videoTrack).then(() => {
-              const remotePeer = store1.getState(selectRemotePeers)[0];
-              expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-              expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
-              actions.removeTrack(videoTrack.id).then(() => {
+      cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
+        cy.get('@onTrackUpdate1')
+          .should('be.calledTwice')
+          .then(() => {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+              const videoTrack = stream.getVideoTracks()[0];
+              actions.addTrack(videoTrack).then(() => {
                 const remotePeer = store1.getState(selectRemotePeers)[0];
-                expect(remotePeer.auxiliaryTracks.length).to.equal(0);
-                expect(remotePeer.videoTrack).to.not.equal(undefined);
+                expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+                expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
+                actions.removeTrack(videoTrack.id).then(() => {
+                  const remotePeer = store1.getState(selectRemotePeers)[0];
+                  expect(remotePeer.auxiliaryTracks.length).to.equal(0);
+                  expect(remotePeer.videoTrack).to.not.equal(undefined);
+                });
               });
             });
           });
-        });
+      });
     });
   });
 });
