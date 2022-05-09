@@ -54,6 +54,7 @@ Cypress.Commands.add(
       .should(value => {
         const spy = value as unknown as SinonSpy;
         let count = 0;
+        console.log(spy);
         spy.getCalls().forEach((call: SinonSpyCall) => {
           if (expect(call.lastArg).to.equal(localPeer)) {
             count++;
