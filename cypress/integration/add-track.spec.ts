@@ -93,14 +93,13 @@ describe('add/remove track api', () => {
 
     it('should add/remove aux track for remotePeer on add/removeTrack', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer());
+
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
       //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer())
-        .then(() => {
-          //@ts-ignore
-          return cy.localTracksAdded(actions1.sdk.getLocalPeer(), { join: '@onJoin1', trackUpdate: '@onTrackUpdate1' });
-        })
-        .then(() => {
+      cy.localTracksAdded(actions1.sdk.getLocalPeer(), { join: '@onJoin1', trackUpdate: '@onTrackUpdate1' }).then(
+        () => {
           navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
             const videoTrack = stream.getVideoTracks()[0];
             actions.addTrack(videoTrack).then(() => {
@@ -118,7 +117,8 @@ describe('add/remove track api', () => {
                 });
             });
           });
-        });
+        },
+      );
     });
   });
 });
