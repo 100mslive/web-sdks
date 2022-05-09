@@ -24,6 +24,8 @@ jobs:
         with:
           browser: chrome
           build: yarn build --no-private
+          headless: false
+          parallel: true
         env:
           CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}
           CYPRESS_ROOM_ID: ${{ secrets.ROOM_ID }}
