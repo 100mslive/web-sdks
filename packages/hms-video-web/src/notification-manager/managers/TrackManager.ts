@@ -188,7 +188,7 @@ export class TrackManager {
     } else {
       if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack?.trackId === track.trackId) {
         hmsPeer.audioTrack = undefined;
-      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.audioTrack?.trackId === track.trackId) {
+      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack?.trackId === track.trackId) {
         hmsPeer.videoTrack = undefined;
       }
     }
