@@ -39,6 +39,15 @@ const checkRole = ({ actions, store, isLocal = true, role }) => {
     });
 };
 
+const onBothPeersTracksAdded = () => {
+  return cy
+    .get('@onTrackUpdate')
+    .should('have.callCount', 4)
+    .then(() => {
+      return cy.get('@onTrackUpdate1').should('have.callCount', 4);
+    });
+};
+
 describe('role change api', () => {
   before(() => {
     cy.getToken().then(authToken => {
@@ -114,11 +123,7 @@ describe('role change api', () => {
     it('should remove tracks on remote end', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
+      onBothPeersTracksAdded()
         // By this time both peers would have joined and got each others tracks
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
@@ -145,11 +150,7 @@ describe('role change api', () => {
     it('should remove videoTrack on remote end', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
+      onBothPeersTracksAdded()
         // By this time both peers would have joined and got each others tracks
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
@@ -164,28 +165,19 @@ describe('role change api', () => {
     it('should remove tracks on localPeer', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
-        .then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          actions1.changeRole(localPeer.id, 'hls-viewer', true);
-          checkRole({ actions, store, role: 'hls-viewer' });
-          checkTrack({ actions, store, testKey: 'videoTrack' });
-          checkTrack({ actions, store, testKey: 'audioTrack' });
-        });
+      onBothPeersTracksAdded().then(() => {
+        const localPeer = store.getState(selectLocalPeer);
+        actions1.changeRole(localPeer.id, 'hls-viewer', true);
+        checkRole({ actions, store, role: 'hls-viewer' });
+        checkTrack({ actions, store, testKey: 'videoTrack' });
+        checkTrack({ actions, store, testKey: 'audioTrack' });
+      });
     });
 
     it('should remove tracks on remote end', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
+      onBothPeersTracksAdded()
         // By this time both peers would have joined and got each others tracks
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
@@ -201,26 +193,17 @@ describe('role change api', () => {
     it('should remove video track on localPeer', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
-        .then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          actions1.changeRole(localPeer.id, 'audio-only', true);
-          checkRole({ actions, store, role: 'audio-only' });
-          checkTrack({ actions, store, testKey: 'videoTrack' });
-        });
+      onBothPeersTracksAdded().then(() => {
+        const localPeer = store.getState(selectLocalPeer);
+        actions1.changeRole(localPeer.id, 'audio-only', true);
+        checkRole({ actions, store, role: 'audio-only' });
+        checkTrack({ actions, store, testKey: 'videoTrack' });
+      });
     });
     it('should remove videoTrack on remote end', () => {
       actions.join({ userName: 'test', authToken: token, initEndpoint });
       actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      cy.get('@onTrackUpdate')
-        .should('have.callCount', 4)
-        .then(() => {
-          return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-        })
+      onBothPeersTracksAdded()
         // By this time both peers would have joined and got each others tracks
         .then(() => {
           const localPeer = store.getState(selectLocalPeer);
