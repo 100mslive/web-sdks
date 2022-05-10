@@ -18,10 +18,7 @@ import { ResolutionInput } from "./ResolutionInput";
 import {
   QUERY_PARAM_SKIP_PREVIEW,
   RTMP_RECORD_DEFAULT_RESOLUTION,
-<<<<<<< HEAD
   RTMP_RESOLUTION_IGNORED_WARNING_TEXT,
-=======
->>>>>>> origin/main
 } from "../../common/constants";
 
 const defaultMeetingUrl =
