@@ -1,5 +1,5 @@
 {
-  "version": "0.2.98",
+  "version": "0.2.100-alpha.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -40,7 +40,7 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.52",
+    "@100mslive/hms-video": "0.1.54-alpha.0",
     "eventemitter2": "^6.4.5",
     "immer": "^9.0.6",
     "reselect": "4.0.0",

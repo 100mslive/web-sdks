@@ -20,6 +20,8 @@ export const SUBSCRIBE_TIMEOUT = 60000;
 
 export const RTC_STATS_MONITOR_INTERVAL = 1000;
 
+export const MAINTAIN_TRACK_HISTORY = false;
+
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',

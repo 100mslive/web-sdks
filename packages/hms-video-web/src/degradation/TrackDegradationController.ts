@@ -72,7 +72,7 @@ export class TrackDegradationController {
     }
 
     HMSLogger.d(this.TAG, 'Packet lost stable, recovering track', this.recoveringTrack);
-    this.recoveringTrack.setDegraded(false);
+    this.recoveringTrack.setDegradedFromSdk(false);
     this.eventBus.trackRestored.publish(this.recoveringTrack);
     this.recoverGracePeriod = this.MIN_RECOVER_GRACE_PERIOD;
   }
@@ -92,7 +92,7 @@ export class TrackDegradationController {
     let halfCount = Math.ceil(activeTracks.length / 2);
     while (halfCount--) {
       const track = activeTracks.pop();
-      track!.setDegraded(true);
+      track!.setDegradedFromSdk(true);
       this.eventBus.trackDegraded.publish(track!);
     }
   }
@@ -120,7 +120,7 @@ export class TrackDegradationController {
 
   private cancelRecovery() {
     if (this.recoveringTrack) {
-      this.recoveringTrack.setDegraded(true);
+      this.recoveringTrack.setDegradedFromSdk(true);
       this.eventBus.trackDegraded.publish(this.recoveringTrack);
     }
     this.recoveringTrack = undefined;
