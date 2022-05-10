@@ -239,7 +239,7 @@ export class HMSSdk implements HMSInterface {
     const request: HMSLeaveRoomRequest = {
       roomEnded: message.room_end,
       reason: message.reason,
-      requestedBy: peer!,
+      requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
     this.leave();
