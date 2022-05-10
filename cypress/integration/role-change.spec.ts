@@ -317,6 +317,8 @@ describe('role change api', () => {
               const localPeer = store.getState(selectLocalPeer);
               expect(localPeer.videoTrack).to.equal(undefined);
               expect(sdkPeer.videoTrack).to.equal(undefined);
+              expect(localPeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.audioTrack).to.not.equal(undefined);
             });
         });
     });
@@ -346,6 +348,8 @@ describe('role change api', () => {
               const remotePeer = store1.getState(selectRemotePeers)[0];
               expect(remotePeer.videoTrack).to.equal(undefined);
               expect(sdkPeer.videoTrack).to.equal(undefined);
+              expect(remotePeer.audioTrack).to.not.equal(undefined);
+              expect(sdkPeer.audioTrack).to.not.equal(undefined);
             });
         });
     });
