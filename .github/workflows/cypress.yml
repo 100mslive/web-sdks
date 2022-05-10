@@ -17,10 +17,12 @@ jobs:
               - 'packages/hms-video-web/**/*.(ts|js)'
             store:
               - 'packages/hms-video-store/**/*.(ts|js)'
+            cypress:
+              - 'cypress/**/*.(ts|js)'
 
       - name: Cypress
         uses: cypress-io/github-action@v2
-        if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true'
+        if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true' || steps.filter.outputs.cypress == 'true'
         with:
           browser: chrome
           build: yarn build --no-private
