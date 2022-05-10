@@ -489,7 +489,7 @@ export class HMSSDKActions implements IHMSActions {
         const newAppData = {
           [key]: value,
         };
-        this.initAppData(newAppData);
+        store.appData = newAppData;
       }
     }, `setAppData-${key}`);
   }
