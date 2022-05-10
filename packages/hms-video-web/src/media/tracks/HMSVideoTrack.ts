@@ -6,6 +6,9 @@ export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
 
+  /**
+   * sink=video element rendering the video
+   */
   hasSinks() {
     return this.sinkCount > 0;
   }

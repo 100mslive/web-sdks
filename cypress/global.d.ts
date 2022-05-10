@@ -10,7 +10,7 @@ declare global {
        * @param title
        */
       getToken(): Chainable<string>;
-      localTracksAdded(localPeer: HMSLocalPeer): Chainable<void>;
+      localTracksAdded(localPeer: HMSLocalPeer, options: { join: string; trackUpdate: string }): Chainable<void>;
     }
   }
 }

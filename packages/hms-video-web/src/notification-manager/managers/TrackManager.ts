@@ -107,7 +107,7 @@ export class TrackManager {
 
       if (track instanceof HMSRemoteVideoTrack) {
         const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
-        track.setDegraded(isDegraded);
+        track.setLayerFromServer(trackEntry.current_layer, isDegraded);
         if (isDegraded) {
           this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
         } else {
@@ -165,6 +165,8 @@ export class TrackManager {
 
       track.source = state.trackInfo.source;
       track.peerId = hmsPeer.peerId;
+      // set log identifier to initial name of the peer
+      track.logIdentifier = hmsPeer.name;
       track.setEnabled(!state.trackInfo.mute);
       this.addAudioTrack(hmsPeer, track);
       this.addVideoTrack(hmsPeer, track);
@@ -180,27 +182,14 @@ export class TrackManager {
   }
 
   private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    const removeAuxiliaryTrack = () => {
-      const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
-      if (auxiliaryTrackIndex > -1) {
-        hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
-      }
-    };
-
-    switch (track.type) {
-      case HMSTrackType.AUDIO:
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.audioTrack = undefined;
-        }
-        break;
-      case HMSTrackType.VIDEO: {
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.videoTrack = undefined;
-        }
+    const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+    if (auxiliaryTrackIndex > -1) {
+      hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
+    } else {
+      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack?.trackId === track.trackId) {
+        hmsPeer.audioTrack = undefined;
+      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack?.trackId === track.trackId) {
+        hmsPeer.videoTrack = undefined;
       }
     }
   }

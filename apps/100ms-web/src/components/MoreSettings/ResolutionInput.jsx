@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import { HangUpIcon, InfoIcon } from "@100mslive/react-icons";
 import { Flex, Input, Label, Text, Tooltip } from "@100mslive/react-ui";
+=======
+import { Flex, Input, Label } from "@100mslive/react-ui";
+>>>>>>> origin/main
 import React, { useCallback, useState } from "react";
 import {
   RTMP_RECORD_DEFAULT_RESOLUTION,
@@ -7,6 +11,7 @@ import {
   RTMP_RECORD_RESOLUTION_MIN,
 } from "../../common/constants";
 import { DialogRow } from "../../primitives/DialogContent";
+<<<<<<< HEAD
 import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ResolutionInput = ({
@@ -14,6 +19,10 @@ export const ResolutionInput = ({
   disabled,
   disabledText,
 }) => {
+=======
+
+export const ResolutionInput = ({ onResolutionChange }) => {
+>>>>>>> origin/main
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
   const resolutionChangeHandler = useCallback(
@@ -34,15 +43,19 @@ export const ResolutionInput = ({
   return (
     <DialogRow breakSm>
       <Label css={{ "@sm": { mb: "$8" } }}>Resolution</Label>
+<<<<<<< HEAD
       <Tooltip title={disabledText}>
         <div>
           <InfoIcon color="#B0C3DB" />
         </div>
       </Tooltip>
+=======
+>>>>>>> origin/main
       <Flex
         justify="between"
         css={{ width: "70%", "@sm": { width: "100%" } }}
         gap={2}
+<<<<<<< HEAD
         direction="column"
       >
         <Flex justify="between" gap={2}>
@@ -74,6 +87,36 @@ export const ResolutionInput = ({
               type="number"
             />
           </Flex>
+=======
+      >
+        <Flex direction="column" css={{ width: "50%" }}>
+          <span>Width</span>
+          <Input
+            css={{ width: "100%" }}
+            name="resWidth"
+            value={resolution.width}
+            onChange={resolutionChangeHandler}
+            disabled={false}
+            min={RTMP_RECORD_RESOLUTION_MIN}
+            max={RTMP_RECORD_RESOLUTION_MAX}
+            onBlur={() => onResolutionChange(resolution)}
+            type="number"
+          />
+        </Flex>
+        <Flex direction="column" css={{ width: "50%" }}>
+          <span>Height</span>
+          <Input
+            css={{ width: "100%" }}
+            name="resHeight"
+            value={resolution.height}
+            onChange={resolutionChangeHandler}
+            onBlur={() => onResolutionChange(resolution)}
+            disabled={false}
+            min={RTMP_RECORD_RESOLUTION_MIN}
+            max={RTMP_RECORD_RESOLUTION_MAX}
+            type="number"
+          />
+>>>>>>> origin/main
         </Flex>
       </Flex>
     </DialogRow>

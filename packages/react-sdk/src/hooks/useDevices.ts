@@ -65,7 +65,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   }
 
   const updateDevice = useCallback(
-    async ({ deviceType, deviceId }) => {
+    async ({ deviceType, deviceId }: { deviceType: DeviceType; deviceId: string }) => {
       try {
         switch (deviceType) {
           case DeviceType.audioInput:

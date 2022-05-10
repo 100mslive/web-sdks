@@ -137,6 +137,10 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  /**
+   * TODO: remove once everything is switched to server side degradation, this
+   * event can be handled on server side as well.
+   */
   static degradationStats(track: HMSRemoteVideoTrack, isDegraded: boolean) {
     const name = 'video.degradation.stats';
     const level = AnalyticsEventLevel.INFO;

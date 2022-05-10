@@ -479,10 +479,17 @@ export class HMSSDKActions implements IHMSActions {
   setAppData(key: string, value: any, merge?: boolean) {
     const isValueObject = value?.constructor.name === 'Object';
     this.setState(store => {
-      if (merge && isValueObject) {
-        Object.assign(store.appData[key], value);
+      if (store.appData) {
+        if (merge && isValueObject) {
+          Object.assign(store.appData[key], value);
+        } else {
+          store.appData[key] = value;
+        }
       } else {
-        store.appData[key] = value;
+        const newAppData = {
+          [key]: value,
+        };
+        store.appData = newAppData;
       }
     }, `setAppData-${key}`);
   }
