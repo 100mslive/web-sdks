@@ -44,7 +44,7 @@ export const selectPeerByID = byIDCurry(selectPeerByIDBare);
 export const selectAppData = byIDCurry(
   createSelector([selectFullAppData, selectAppDataKey], (appData, key) => {
     if (!appData) {
-      throw new Error('appData was never initialized');
+      return {};
     }
     if (key) {
       return appData[key];
