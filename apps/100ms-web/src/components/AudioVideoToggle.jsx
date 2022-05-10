@@ -16,6 +16,7 @@ export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  throw new Error("HELLO");
   return (
     <Fragment>
       {toggleAudio ? (
