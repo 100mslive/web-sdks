@@ -155,20 +155,20 @@ export interface ConnectionQualityList {
  * Represents the role change request received from the server
  */
 export interface RoleChangeRequestParams {
-  requested_by: string;
+  requested_by?: string;
   role: string;
   token: string;
 }
 
 export interface TrackUpdateRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   track_id: string;
   stream_id: string;
   mute: boolean;
 }
 
 export interface ChangeTrackMuteStateNotification {
-  requested_by: string;
+  requested_by?: string;
   roles?: string[];
   type?: 'audio' | 'video';
   source?: HMSTrackSource;
@@ -176,7 +176,7 @@ export interface ChangeTrackMuteStateNotification {
 }
 
 export interface PeerLeaveRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   reason: string;
   room_end: boolean;
 }
