@@ -7,12 +7,11 @@ import {
   RTMP_RECORD_RESOLUTION_MIN,
 } from "../../common/constants";
 import { DialogRow } from "../../primitives/DialogContent";
-import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ResolutionInput = ({
   onResolutionChange,
   disabled,
-  disabledText,
+  tooltipText,
 }) => {
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
@@ -34,7 +33,7 @@ export const ResolutionInput = ({
   return (
     <DialogRow breakSm>
       <Label css={{ "@sm": { mb: "$8" } }}>Resolution</Label>
-      <Tooltip title={disabledText}>
+      <Tooltip title={tooltipText}>
         <div>
           <InfoIcon color="#B0C3DB" />
         </div>

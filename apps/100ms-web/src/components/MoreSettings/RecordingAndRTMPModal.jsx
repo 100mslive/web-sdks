@@ -121,11 +121,8 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
             <ResolutionInput
               onResolutionChange={resolutionChangeHandler}
               disabled={hlsSelected || isHLSRunning}
-              disabledText={RTMP_RESOLUTION_IGNORED_WARNING_TEXT}
+              tooltipText={RTMP_RESOLUTION_IGNORED_WARNING_TEXT}
             />
-          )}
-          {permissions.streaming && (
-            <ResolutionInput onResolutionChange={resolutionChangeHandler} />
           )}
           {permissions.streaming && (
             <DialogCheckbox
