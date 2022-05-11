@@ -283,7 +283,6 @@ export class HMSSdk implements HMSInterface {
       };
 
       this.eventBus.policyChange.subscribeOnce(policyHandler);
-
       this.transport
         .preview(
           config.authToken,

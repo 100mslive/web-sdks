@@ -43,20 +43,14 @@ class Store implements IStore {
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
+  private env: ENV = ENV.PROD;
 
   getConfig() {
     return this.config;
   }
 
-  getEnv(): ENV {
-    const endPoint = this.config?.initEndpoint!;
-    const url = endPoint.split('https://')[1];
-    if (url.startsWith(ENV.PROD)) {
-      return ENV.PROD;
-    } else if (url.startsWith(ENV.QA)) {
-      return ENV.QA;
-    }
-    return ENV.DEV;
+  getEnv() {
+    return this.env;
   }
 
   getPublishParams() {
@@ -205,6 +199,7 @@ class Store implements IStore {
       }
     }
     this.config = config;
+    this.setEnv();
   }
 
   setPublishParams(params: PublishParams) {
@@ -363,6 +358,20 @@ class Store implements IStore {
       }
       peer.role = this.getPolicyForRole(peer.role.name);
     });
+  }
+
+  private setEnv() {
+    const endPoint = this.config?.initEndpoint!;
+    const url = endPoint.split('https://')[1];
+    let env: ENV = ENV.PROD;
+    if (url.startsWith(ENV.PROD)) {
+      env = ENV.PROD;
+    } else if (url.startsWith(ENV.QA)) {
+      env = ENV.QA;
+    } else if (url.startsWith(ENV.DEV)) {
+      env = ENV.DEV;
+    }
+    this.env = env;
   }
 }
 
