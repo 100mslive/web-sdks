@@ -1,4 +1,4 @@
-import { ENV } from '../sdk/store/IStore';
+import { ENV, IStore } from '../sdk/store/IStore';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
@@ -19,11 +19,9 @@ interface ClientEventBody {
 export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
   TAG = '[HTTPAnalyticsTransport]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
-  private env: ENV = ENV.PROD;
   isConnected = true;
-  setEnv(env: ENV) {
-    this.env = env;
-  }
+  constructor(private store: IStore) {}
+
   sendEvent(event: AnalyticsEvent) {
     const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
@@ -37,7 +35,7 @@ export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
       device_id: event.device_id,
     };
     const url =
-      this.env === ENV.PROD
+      this.store.getEnv() === ENV.PROD
         ? 'https://event.100ms.live/v2/client/report'
         : 'https://event-nonprod.100ms.live/v2/client/report';
     fetch(url, {

@@ -18,8 +18,7 @@ export class AnalyticsEventsService {
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
   constructor(private store: IStore) {
-    this.httpAnalyticsTransport = new HTTPAnalyticsTransport();
-    this.httpAnalyticsTransport.setEnv(store.getEnv());
+    this.httpAnalyticsTransport = new HTTPAnalyticsTransport(store);
   }
 
   setTransport(transport: AnalyticsTransport) {
