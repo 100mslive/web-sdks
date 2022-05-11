@@ -10,6 +10,7 @@ export type HMSPeerInit = {
   metadata?: string;
   role?: HMSRole;
   joinedAt?: Date;
+  fromRoomState?: boolean;
 };
 
 export class HMSPeer implements IHMSPeer {

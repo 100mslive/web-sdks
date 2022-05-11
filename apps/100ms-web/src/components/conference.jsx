@@ -1,5 +1,6 @@
 import React, { useEffect, useContext } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { usePrevious } from "react-use";
 import {
   selectRoomState,
   HMSRoomState,
@@ -16,28 +17,36 @@ import { ConferenceMainView } from "../layouts/mainView";
 import { AppContext } from "./context/AppContext";
 
 const Conference = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { roomId, role } = useParams();
   const { isHeadless } = useContext(AppContext);
-  const isConnectingToRoom =
-    useHMSStore(selectRoomState) === HMSRoomState.Connecting;
+  const roomState = useHMSStore(selectRoomState);
+  const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
 
   useEffect(() => {
     if (!roomId) {
-      history.push(`/`);
+      navigate(`/`);
+      return;
     }
-    if (!(isConnectingToRoom || isConnectedToRoom)) {
-      if (role) history.push(`/preview/${roomId || ""}/${role}`);
-      else history.push(`/preview/${roomId || ""}`);
+    if (
+      !prevState &&
+      !(roomState === HMSRoomState.Connecting || isConnectedToRoom)
+    ) {
+      if (role) navigate(`/preview/${roomId || ""}/${role}`);
+      else navigate(`/preview/${roomId || ""}`);
     }
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
+
+  useEffect(() => {
     return () => {
       // This is needed to handle mac touchpad swipe gesture
-      hmsActions.leave();
+      if (isConnectedToRoom) {
+        hmsActions.leave();
+      }
     };
-    // eslint-disable-next-line
-  }, []);
+  }, [hmsActions, isConnectedToRoom]);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;

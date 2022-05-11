@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import LogRocket from 'logrocket';
 import setupLogRocketReact from 'logrocket-react';
 import App from './App';
@@ -12,11 +12,11 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID)
   setupLogRocketReact(LogRocket);
 }
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function

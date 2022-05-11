@@ -42,11 +42,14 @@ export const selectPeerByID = byIDCurry(selectPeerByIDBare);
  * if key is not passed, full data is returned.
  */
 export const selectAppData = byIDCurry(
-  createSelector([selectFullAppData, selectAppDataKey], (settings, key) => {
-    if (key) {
-      return settings[key];
+  createSelector([selectFullAppData, selectAppDataKey], (appData, key) => {
+    if (!appData) {
+      return {};
     }
-    return settings;
+    if (key) {
+      return appData[key];
+    }
+    return appData;
   }),
 );
 
@@ -374,3 +377,5 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
       return {};
     }
   });
+
+export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);

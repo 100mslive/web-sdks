@@ -658,12 +658,7 @@ export default class HMSTransport implements ITransport {
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ) {
     this.publishConnection = new HMSPublishConnection(this.signal, config, this.publishConnectionObserver, this);
-    this.subscribeConnection = new HMSSubscribeConnection(
-      this.signal,
-      config,
-      this.subscribeConnectionObserver,
-      serverSubDegrade,
-    );
+    this.subscribeConnection = new HMSSubscribeConnection(this.signal, config, this.subscribeConnectionObserver);
 
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');

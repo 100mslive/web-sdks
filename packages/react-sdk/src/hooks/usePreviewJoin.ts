@@ -99,6 +99,9 @@ export const usePreviewJoin = ({
         return;
       }
       if (roomState !== HMSRoomState.Disconnected) {
+        return;
+      }
+      if (isConnected) {
         await actions.leave();
       }
       try {
@@ -107,7 +110,7 @@ export const usePreviewJoin = ({
         handleError(err as Error, 'preview');
       }
     })();
-  }, [actions, handleError, token, roomState, config]);
+  }, [actions, handleError, token, roomState, config, isConnected]);
 
   const join = useCallback(() => {
     if (!token) {
