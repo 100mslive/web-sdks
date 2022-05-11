@@ -17,6 +17,7 @@ export class ErrorBoundary extends Component {
       () => {
         console.log("calling log rocket with error", this.state.errorInfo);
         LogRocket.track("uiError", this.state);
+        LogRocket.error(this.state);
       }
     );
   }
