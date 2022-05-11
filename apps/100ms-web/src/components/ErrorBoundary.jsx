@@ -11,7 +11,7 @@ export class ErrorBoundary extends Component {
     // Catch errors in any components below and re-render with error message
     this.setState(
       {
-        error: error,
+        error: error?.message,
         errorInfo: errorInfo,
       },
       () => {
