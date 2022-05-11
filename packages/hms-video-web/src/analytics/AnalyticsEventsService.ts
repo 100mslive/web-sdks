@@ -13,13 +13,10 @@ export class AnalyticsEventsService {
 
   private transport: AnalyticsTransport | null = null;
   private pendingEvents: AnalyticsEvent[] = [];
-  private httpAnalyticsTransport: HTTPAnalyticsTransport;
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
-  constructor(private store: IStore) {
-    this.httpAnalyticsTransport = new HTTPAnalyticsTransport(store);
-  }
+  constructor(private store: IStore) {}
 
   setTransport(transport: AnalyticsTransport) {
     this.transport = transport;
@@ -43,7 +40,7 @@ export class AnalyticsEventsService {
   }
 
   flushFailedClientEvents() {
-    this.httpAnalyticsTransport.flushFailedEvents();
+    HTTPAnalyticsTransport.flushFailedEvents();
   }
 
   flush() {
@@ -67,6 +64,6 @@ export class AnalyticsEventsService {
   private sendClientEventOnHTTP(event: AnalyticsEvent) {
     event.properties.session_id = this.store.getRoom().sessionId;
     event.properties.token = this.store.getConfig()?.authToken;
-    this.httpAnalyticsTransport.sendEvent(event);
+    HTTPAnalyticsTransport.sendEvent(event);
   }
 }

@@ -1,4 +1,5 @@
-import { ENV, IStore } from '../sdk/store/IStore';
+import { ENV } from '../sdk/store/IStore';
+import { CLIENT_ANAYLTICS_PROD_ENDPOINT, CLIENT_ANAYLTICS_QA_ENDPOINT } from '../utils/constants';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
@@ -16,13 +17,22 @@ interface ClientEventBody {
   device_id: string;
 }
 
-export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
+class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   TAG = '[HTTPAnalyticsTransport]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   isConnected = true;
-  constructor(private store: IStore) {}
+  private env: null | ENV = null;
+
+  setEnv(env: ENV) {
+    this.env = env;
+    this.flushFailedEvents();
+  }
 
   sendEvent(event: AnalyticsEvent) {
+    if (!this.env) {
+      this.addEventToStorage(event);
+      return;
+    }
     const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
       event: event.name,
@@ -34,10 +44,7 @@ export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
       agent: userAgent,
       device_id: event.device_id,
     };
-    const url =
-      this.store.getEnv() === ENV.PROD
-        ? 'https://event.100ms.live/v2/client/report'
-        : 'https://event-nonprod.100ms.live/v2/client/report';
+    const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -55,11 +62,6 @@ export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
         }
       })
       .catch(error => {
-        const existingEvents = this.failedEvents.get() || [];
-        if (!existingEvents.find(existingEvent => existingEvent.timestamp === event.timestamp)) {
-          existingEvents.push(event);
-          this.failedEvents.set(existingEvents);
-        }
         HMSLogger.v(this.TAG, 'Failed to send event', error, event);
       });
   }
@@ -67,4 +69,14 @@ export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
     const events = this.failedEvents.get();
     events?.forEach(event => this.sendEvent(event));
   }
+
+  private addEventToStorage(event: AnalyticsEvent): void {
+    const existingEvents = this.failedEvents.get() || [];
+    if (!existingEvents.find(existingEvent => existingEvent.timestamp === event.timestamp)) {
+      existingEvents.push(event);
+      this.failedEvents.set(existingEvents);
+    }
+  }
 }
+
+export const HTTPAnalyticsTransport = new ClientAnalyticsTransport();

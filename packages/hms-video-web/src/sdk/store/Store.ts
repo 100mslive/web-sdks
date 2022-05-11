@@ -25,6 +25,7 @@ import { HMSConfig, PublishParams } from '../../interfaces';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -371,7 +372,7 @@ class Store implements IStore {
     } else if (url.startsWith(ENV.DEV)) {
       env = ENV.DEV;
     }
-    this.env = env;
+    HTTPAnalyticsTransport.setEnv(env);
   }
 }
 
