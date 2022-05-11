@@ -1,4 +1,4 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { ENV, IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces';
@@ -46,6 +46,17 @@ class Store implements IStore {
 
   getConfig() {
     return this.config;
+  }
+
+  getEnv(): ENV {
+    const endPoint = this.config?.initEndpoint!;
+    const url = endPoint.split('https://')[1];
+    if (url.startsWith(ENV.PROD)) {
+      return ENV.PROD;
+    } else if (url.startsWith(ENV.QA)) {
+      return ENV.QA;
+    }
+    return ENV.DEV;
   }
 
   getPublishParams() {

@@ -322,7 +322,7 @@ export default class HMSTransport implements ITransport {
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
-    initEndpoint = 'https://prod-init.100ms.live/init',
+    initEndpoint: string,
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');

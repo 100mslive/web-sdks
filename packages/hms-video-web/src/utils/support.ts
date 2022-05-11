@@ -53,10 +53,3 @@ export const getAnalyticsDeviceId = () => {
 };
 
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;
-
-export const isProd = (endPoint?: string) => {
-  if (!endPoint) {
-    return true;
-  }
-  return endPoint.split('https://')[1].startsWith('prod');
-};

@@ -4,7 +4,7 @@ import HMSLogger from '../utils/logger';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsTransport } from './AnalyticsTransport';
 import { IStore } from '../sdk/store';
-import { HTTPAnalyticsTransport, ENV } from './HTTPAnalyticsTransport';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 
 const TAG = 'AnalyticsEventsService';
 
@@ -19,10 +19,7 @@ export class AnalyticsEventsService {
 
   constructor(private store: IStore) {
     this.httpAnalyticsTransport = new HTTPAnalyticsTransport();
-  }
-
-  setEnv(isProd: boolean) {
-    this.httpAnalyticsTransport.setEnv(isProd ? ENV.PROD : ENV.QA);
+    this.httpAnalyticsTransport.setEnv(store.getEnv());
   }
 
   setTransport(transport: AnalyticsTransport) {

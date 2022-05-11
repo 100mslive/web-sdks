@@ -1,3 +1,4 @@
+import { ENV } from '../sdk/store/IStore';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
@@ -13,11 +14,6 @@ interface ClientEventBody {
   payload: Record<string, any>;
   agent: string;
   device_id: string;
-}
-
-export enum ENV {
-  PROD = 'prod',
-  QA = 'qa',
 }
 
 export class HTTPAnalyticsTransport implements IAnalyticsTransportProvider {
