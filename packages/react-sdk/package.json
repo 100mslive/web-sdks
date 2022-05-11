@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.17-alpha.0",
+  "version": "0.0.17",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -31,10 +31,10 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "peerDependencies": {
-    "react": "^18.1.0"
+    "react": ">=17.0.2 < 19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.2.100-alpha.0",
+    "@100mslive/hms-video-store": "0.2.100",
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
