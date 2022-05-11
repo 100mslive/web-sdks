@@ -17,22 +17,19 @@ jobs:
               - 'packages/hms-video-web/**/*.(ts|js)'
             store:
               - 'packages/hms-video-store/**/*.(ts|js)'
+            cypress:
+              - 'cypress/**/*.(ts|js)'
 
       - name: Cypress
         uses: cypress-io/github-action@v2
-        if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true'
+        if: steps.filter.outputs.sdk == 'true' || steps.filter.outputs.store == 'true' || steps.filter.outputs.cypress == 'true'
         with:
           browser: chrome
           build: yarn build --no-private
+          headless: false
         env:
           CYPRESS_TOKEN_ENDPOINT: ${{ secrets.TOKEN_ENDPOINT }}
           CYPRESS_ROOM_ID: ${{ secrets.ROOM_ID }}
           CYPRESS_ROLE: ${{ secrets.ROLE }}
           CYPRESS_API_ENV: ${{ secrets.API_ENV }}
           CYPRESS_INIT_ENDPOINT: ${{ secrets.INIT_ENDPOINT }}
-
-      - name: Cypress Coverage
-        uses: romeovs/lcov-reporter-action@v0.2.11
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./cy-coverage/lcov.info

@@ -72,6 +72,7 @@ export const ErrorFactory = {
         action,
         `Token is not in proper JWT format - ${description}`,
         description,
+        true,
       );
     },
 

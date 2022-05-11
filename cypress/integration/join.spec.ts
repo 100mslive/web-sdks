@@ -47,7 +47,7 @@ describe('join api', () => {
       cy.get('@onJoin')
         .should('be.calledOnce')
         .then(() => {
-          expect(store.getState(selectIsConnectedToRoom)).to.be.true;
+          expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
           cy.log(String(Date.now() - start));
         });
     });

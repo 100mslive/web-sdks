@@ -182,27 +182,14 @@ export class TrackManager {
   }
 
   private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    const removeAuxiliaryTrack = () => {
-      const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
-      if (auxiliaryTrackIndex > -1) {
-        hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
-      }
-    };
-
-    switch (track.type) {
-      case HMSTrackType.AUDIO:
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.audioTrack = undefined;
-        }
-        break;
-      case HMSTrackType.VIDEO: {
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.videoTrack = undefined;
-        }
+    const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+    if (auxiliaryTrackIndex > -1) {
+      hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
+    } else {
+      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack?.trackId === track.trackId) {
+        hmsPeer.audioTrack = undefined;
+      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack?.trackId === track.trackId) {
+        hmsPeer.videoTrack = undefined;
       }
     }
   }

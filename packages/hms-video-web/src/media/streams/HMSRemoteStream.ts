@@ -8,7 +8,6 @@ export default class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;
-  private frameRate = HMSSimulcastLayer.HIGH;
 
   constructor(nativeStream: MediaStream, connection: HMSSubscribeConnection) {
     super(nativeStream);
@@ -21,7 +20,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
     }
 
     this.audio = enabled;
-    this.syncWithApiChannel();
+    this.syncWithApiChannel(false);
   }
 
   /**
@@ -56,16 +55,31 @@ export default class HMSRemoteStream extends HMSMediaStream {
   }
 
   /**
-   * send the expected state of the stream to SFU over data channel
+   * send the expected state of the stream to SFU over data channel.
+   * the video field is optional from SFU's perspective but audio should be
+   * passed everytime.
+   * We don't pass in the video field, if only audio needs to subscribed/unsubscribed,
+   * else there is a chance of mismatch between states in case of degradation. If
+   * a degraded track is (audio) muted, a video layer false will be sent which to
+   * SFU will appear as if remove sink was called and the track will never be recovered.
    * @private
    */
-  private syncWithApiChannel() {
-    const data = {
+  private syncWithApiChannel(sendVideoLayer = true) {
+    const data: SubscriptionMessage = {
       streamId: this.id,
-      video: this.video,
       audio: this.audio,
-      framerate: this.frameRate,
     };
+    if (sendVideoLayer) {
+      data.video = this.video;
+      data.framerate = this.video;
+    }
     this.connection.sendOverApiDataChannel(JSON.stringify(data));
   }
+}
+
+interface SubscriptionMessage {
+  streamId: string;
+  audio: boolean;
+  framerate?: HMSSimulcastLayer;
+  video?: HMSSimulcastLayer;
 }
