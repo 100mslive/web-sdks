@@ -372,6 +372,7 @@ class Store implements IStore {
     } else if (url.startsWith(ENV.DEV)) {
       env = ENV.DEV;
     }
+    this.env = env;
     HTTPAnalyticsTransport.setEnv(env);
   }
 }
