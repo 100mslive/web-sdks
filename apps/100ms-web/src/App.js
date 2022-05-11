@@ -26,6 +26,7 @@ import FullPageProgress from "./components/FullPageProgress";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import PostLeave from "./components/PostLeave";
 import { AppData } from "./components/AppData/AppData.jsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.jsx";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
@@ -110,7 +111,9 @@ export function EdtechComponent({
                 : { h: "100%" }),
             }}
           >
-            <AppRoutes getUserToken={getUserToken} />
+            <ErrorBoundary>
+              <AppRoutes getUserToken={getUserToken} />
+            </ErrorBoundary>
           </Box>
         </AppContextProvider>
       </HMSRoomProvider>

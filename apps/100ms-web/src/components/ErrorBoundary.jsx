@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import LogRocket from "logrocket";
+import { ErrorWithSupportLink } from "./PreviewScreen";
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,12 +13,11 @@ export class ErrorBoundary extends Component {
     this.setState(
       {
         error: error?.message,
-        errorInfo: JSON.stringify(errorInfo),
+        errorInfo: errorInfo,
       },
       () => {
-        console.log("calling log rocket with error", this.state.errorInfo);
-        LogRocket.track("uiError", this.state);
-        LogRocket.error(this.state);
+        console.error("uiError", this.state.error, this.state.errorInfo);
+        LogRocket.track("uiError", { error: this.state.error });
       }
     );
   }
@@ -26,15 +26,13 @@ export class ErrorBoundary extends Component {
     if (this.state.errorInfo) {
       return (
         <div>
-          {this.props.childName ? (
-            <h2>Error rendering: {this.props.childName}.</h2>
-          ) : (
-            <h2>Something went wrong.</h2>
+          {ErrorWithSupportLink(
+            "Something went wrong. Please reload to see if it works."
           )}
           <details style={{ whiteSpace: "pre-wrap" }}>
             {this.state.error && this.state.error.toString()}
             <br />
-            {this.state.errorInfo.componentStack}
+            {JSON.stringify(this.state.errorInfo)}
           </details>
         </div>
       );
