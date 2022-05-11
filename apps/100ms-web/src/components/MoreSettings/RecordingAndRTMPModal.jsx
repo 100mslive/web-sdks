@@ -64,25 +64,26 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const startStopRTMPRecordingHLS = async action => {
     try {
       if (action === "start") {
-        const rtmpRecordParams = {
-          meetingURL,
-          rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
-          record: recordingSelected,
-        };
-        const resolution = getResolution();
+        if (hlsSelected) {
+          await hmsActions.startHLSStreaming({
+            variants: [{ meetingURL: meetingURL }],
+            recording: recordingSelected
+              ? { hlsVod: true, singleFilePerLayer: true }
+              : undefined,
+          });
+        } else {
+          const rtmpRecordParams = {
+            meetingURL,
+            rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
+            record: recordingSelected,
+          };
+          const resolution = getResolution();
 
-        if (resolution) {
-          rtmpRecordParams.resolution = resolution;
+          if (resolution) {
+            rtmpRecordParams.resolution = resolution;
+          }
+          await hmsActions.startRTMPOrRecording(rtmpRecordParams);
         }
-
-        hlsSelected
-          ? await hmsActions.startHLSStreaming({
-              variants: [{ meetingURL: meetingURL }],
-              recording: recordingSelected
-                ? { hlsVod: true, singleFilePerLayer: true }
-                : undefined,
-            })
-          : await hmsActions.startRTMPOrRecording(rtmpRecordParams);
       } else {
         isHLSRunning
           ? await hmsActions.stopHLSStreaming()
