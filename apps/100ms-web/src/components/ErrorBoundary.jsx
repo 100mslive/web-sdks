@@ -12,10 +12,10 @@ export class ErrorBoundary extends Component {
     this.setState(
       {
         error: error?.message,
-        errorInfo: errorInfo,
+        errorInfo: JSON.stringify(errorInfo),
       },
       () => {
-        console.log("calling log rocket with error", this.state);
+        console.log("calling log rocket with error", this.state.errorInfo);
         LogRocket.track("uiError", this.state);
       }
     );
