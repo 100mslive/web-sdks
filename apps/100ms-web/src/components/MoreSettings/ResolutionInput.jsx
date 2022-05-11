@@ -32,12 +32,14 @@ export const ResolutionInput = ({
 
   return (
     <DialogRow breakSm>
-      <Label css={{ "@sm": { mb: "$8" } }}>Resolution</Label>
-      <Tooltip title={tooltipText}>
-        <div>
-          <InfoIcon color="#B0C3DB" />
-        </div>
-      </Tooltip>
+      <Flex gap={1}>
+        <Label css={{ "@sm": { mb: "$8" } }}>Resolution</Label>
+        <Tooltip title={tooltipText}>
+          <div>
+            <InfoIcon color="#B0C3DB" />
+          </div>
+        </Tooltip>
+      </Flex>
       <Flex
         justify="between"
         css={{ width: "70%", "@sm": { width: "100%" } }}
