@@ -17,7 +17,10 @@ export class ErrorBoundary extends Component {
       },
       () => {
         LogRocket.track("uiError", { error: this.state.error });
-        console.error("uiError", this.state.error, this.state.errorInfo);
+        LogRocket.captureMessage("uiError", {
+          tags: this.state.error,
+          extra: this.state.errorInfo,
+        });
       }
     );
   }
