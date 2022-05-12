@@ -219,7 +219,7 @@ export const DialogCheckbox = ({
   return (
     <DialogRow css={css}>
       <Label htmlFor={id} css={{ cursor: "pointer" }}>
-        {title}:
+        {title}
       </Label>
       <Checkbox.Root
         checked={value}
