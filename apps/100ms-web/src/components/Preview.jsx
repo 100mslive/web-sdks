@@ -28,7 +28,6 @@ import {
   useUserPreferences,
 } from "./hooks/useUserPreferences";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
-import { ErrorBoundary } from "./ErrorBoundary";
 
 const defaultPreviewPreference = {
   name: "",
@@ -155,9 +154,7 @@ const PreviewTile = ({ name }) => {
             <Avatar name={name} data-testid="preview_avatar_tile" />
           ) : null}
           <StyledVideoTile.AttributeBox css={controlStyles}>
-            <ErrorBoundary childName="AudioVideoToggle">
-              <AudioVideoToggle compact />
-            </ErrorBoundary>
+            <AudioVideoToggle compact />
           </StyledVideoTile.AttributeBox>
           <Settings>
             <StyledVideoTile.AttributeBox css={settingStyles}>
