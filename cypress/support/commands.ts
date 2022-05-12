@@ -29,11 +29,11 @@ import type { HMSLocalPeer } from '../../packages/hms-video-store/src/core/hmsSD
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('getToken', () => {
+Cypress.Commands.add('getToken', (role?: string) => {
   const tokenEndpoint = Cypress.env('CYPRESS_TOKEN_ENDPOINT');
   const data = {
     room_id: Cypress.env('CYPRESS_ROOM_ID'),
-    role: Cypress.env('CYPRESS_ROLE'),
+    role: role || Cypress.env('CYPRESS_ROLE'),
     env: Cypress.env('CYPRESS_API_ENV'),
     user_id: 'test',
   };
