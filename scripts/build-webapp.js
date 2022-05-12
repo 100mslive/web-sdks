@@ -31,6 +31,7 @@ async function main() {
       target: 'es6',
       external,
       treeShaking: true,
+      sourcemap: true,
       loader,
       define,
       plugins,
