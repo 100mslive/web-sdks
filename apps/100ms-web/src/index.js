@@ -4,7 +4,6 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 
 if (
   process.env.NODE_ENV === "production" &&
@@ -17,9 +16,7 @@ if (
 const root = createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
+    <App />
   </React.StrictMode>
 );
 
