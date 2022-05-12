@@ -56,7 +56,7 @@ describe('Http Analytics tests', () => {
     cy.get('@addEventToStorage').should('not.be.called');
   });
 
-  it('should store in storage if analytics fails', () => {
+  it('should store in storage if analytics fails and send again on preview', () => {
     cy.intercept(
       { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
       { statusCode: 401, statusText: 'Something went wrong' },
