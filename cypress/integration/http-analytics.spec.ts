@@ -86,17 +86,19 @@ describe('Http Analytics tests', () => {
     cy.get('@onError').should('be.calledOnce');
     cy.get('@setEnv').should('be.calledOnce');
     cy.get('@sendEvent').should('be.calledOnce');
-    cy.get('@addEventToStorage').then(() => {
-      expect(localStorage.getItem('client-events')).to.not.equal(null);
-      const newSdk = new HMSSdk();
-      cy.intercept(
-        { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
-        { statusCode: 200, statusText: 'Event recorded' },
-      );
-      //@ts-ignore
-      newSdk.preview({ userName: 'test', authToken: token, initEndpoint }, previewListener).catch(console.error);
-      cy.get('@sendEvent').should('be.calledTwice');
-    });
+    cy.get('@addEventToStorage')
+      .should('be.calledOnce')
+      .then(() => {
+        expect(localStorage.getItem('client-events')).to.not.equal(null);
+        const newSdk = new HMSSdk();
+        cy.intercept(
+          { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
+          { statusCode: 200, statusText: 'Event recorded' },
+        );
+        //@ts-ignore
+        newSdk.preview({ userName: 'test', authToken: token, initEndpoint }, previewListener).catch(console.error);
+        cy.get('@sendEvent').should('be.calledTwice');
+      });
   });
 
   it('should send previous local storage events on join', () => {
