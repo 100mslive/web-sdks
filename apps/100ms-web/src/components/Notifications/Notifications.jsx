@@ -87,7 +87,7 @@ export function Notifications() {
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
-            const previewLocation = navigate.location.pathname.replace(
+            const previewLocation = window.location.pathname.replace(
               "meeting",
               "leave"
             );
@@ -135,7 +135,7 @@ export function Notifications() {
               }`,
         });
         setTimeout(() => {
-          const leaveLocation = navigate.location.pathname.replace(
+          const leaveLocation = window.location.pathname.replace(
             "meeting",
             "leave"
           );
@@ -152,7 +152,6 @@ export function Notifications() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    navigate,
     notification,
     subscribedNotifications.ERROR,
     subscribedNotifications.NEW_MESSAGE,
