@@ -51,6 +51,7 @@ export class BroadcastManager {
     // If sender peerId is available in store, use that peer.
     let sender = notifPeer ? this.store.getPeerById(notifPeer.peer_id) : undefined;
     // If not available in store, use peer data from received broadcast message from Biz
+    // notifPeer can be undefined when message is sent via api
     if (!sender && notifPeer) {
       sender = new HMSPeer({
         peerId: notifPeer.peer_id,
