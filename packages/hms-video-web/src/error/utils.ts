@@ -35,11 +35,12 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSExc
    */
   const deniedBySystem =
     deviceInfo === 'screen' &&
-    adapter.browserDetails.browser === 'chrome' &&
-    err.name === 'NotAllowedError' &&
-    err.message.includes('denied by system');
+    ((adapter.browserDetails.browser === 'chrome' &&
+      err.name === 'NotAllowedError' &&
+      err.message.includes('denied by system')) ||
+      err.name === 'NotFoundError');
   if (deniedBySystem) {
-    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
+    return ErrorFactory.TracksErrors.SystemDeniedPermission(HMSAction.TRACK, deviceInfo, err.message);
   }
 
   switch (err.name) {
