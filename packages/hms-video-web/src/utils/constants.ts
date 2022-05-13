@@ -24,6 +24,7 @@ export const MAINTAIN_TRACK_HISTORY = false;
 
 export const CLIENT_ANAYLTICS_PROD_ENDPOINT = 'https://event.100ms.live/v2/client/report';
 export const CLIENT_ANAYLTICS_QA_ENDPOINT = 'https://event-nonprod.100ms.live/v2/client/report';
+export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',

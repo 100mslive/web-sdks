@@ -1,5 +1,9 @@
 import { ENV } from '../sdk/store/IStore';
-import { CLIENT_ANAYLTICS_PROD_ENDPOINT, CLIENT_ANAYLTICS_QA_ENDPOINT } from '../utils/constants';
+import {
+  CLIENT_ANAYLTICS_PROD_ENDPOINT,
+  CLIENT_ANAYLTICS_QA_ENDPOINT,
+  CLIENT_ANAYLTICS_STORAGE_LIMIT,
+} from '../utils/constants';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { userAgent } from '../utils/support';
@@ -74,6 +78,9 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   private addEventToStorage(event: AnalyticsEvent): void {
     const existingEvents = this.failedEvents.get() || [];
     if (!existingEvents.find(existingEvent => existingEvent.timestamp === event.timestamp)) {
+      if (existingEvents.length === CLIENT_ANAYLTICS_STORAGE_LIMIT) {
+        existingEvents.shift();
+      }
       existingEvents.push(event);
       this.failedEvents.set(existingEvents);
     }
