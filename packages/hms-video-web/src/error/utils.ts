@@ -23,7 +23,7 @@ function getDefaultError(error: string, deviceInfo: string) {
 /**
  * # Edge Cases:
  * - Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
- * we will handle this internally and throw error as User block - 3001 and OS block - 3002 for all browsers.
+ * we will handle this internally and throw error as User block - 3001 and OS block - 3011 for all browsers.
  * Chrome -
  * User blocked - NotAllowedError - Permission denied
  * System blocked - NotAllowedError - Permission denied by system
