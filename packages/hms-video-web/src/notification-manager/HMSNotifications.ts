@@ -206,7 +206,6 @@ export interface MessageNotificationInfo {
   sender?: string;
   message: any;
   type: string;
-  time?: string;
 }
 
 export interface RecordingNotification {
