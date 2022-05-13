@@ -103,7 +103,7 @@ export const ErrorFactory = {
         ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
         'CantAccessCaptureDevice',
         action,
-        `[TRACK]: No permission to access capture device - ${deviceInfo}`,
+        `User denied permission to access capture device - ${deviceInfo}`,
         description,
       );
     },
@@ -194,6 +194,16 @@ export const ErrorFactory = {
         'NoAudioDetected',
         action,
         'No audio input detected from microphone',
+        description,
+      );
+    },
+
+    SystemDeniedPermission(action: HMSAction, deviceInfo: string, description = '') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+        'SystemDeniedPermission',
+        action,
+        `Operating System denied permission to access capture device - ${deviceInfo}`,
         description,
       );
     },

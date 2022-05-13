@@ -60,6 +60,9 @@ export const ErrorCodes = {
 
     // No audio detected from track, indicates problem with device hardware
     NO_AUDIO_DETECTED: 3010,
+
+    // Operating System denied permission
+    SYSTEM_DENIED_PERMISSION: 3011,
   },
 
   WebrtcErrors: {
