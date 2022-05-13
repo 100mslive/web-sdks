@@ -182,7 +182,7 @@ export interface PeerLeaveRequestNotification {
 }
 
 export interface MessageNotification {
-  peer: {
+  peer?: {
     peer_id: string;
     info: {
       name: string;
@@ -203,7 +203,7 @@ export interface SendMessage {
 }
 
 export interface MessageNotificationInfo {
-  sender: string;
+  sender?: string;
   message: any;
   type: string;
   time?: string;

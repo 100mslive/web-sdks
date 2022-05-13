@@ -128,10 +128,10 @@ export class SDKToHMS {
 
   static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender.peerId,
-      senderName: sdkMessage.sender.name,
-      senderRole: sdkMessage.sender.role?.name,
-      senderUserId: sdkMessage.sender.customerUserId,
+      sender: sdkMessage.sender?.peerId,
+      senderName: sdkMessage.sender?.name,
+      senderRole: sdkMessage.sender?.role?.name,
+      senderUserId: sdkMessage.sender?.customerUserId,
       recipientPeer: sdkMessage.recipientPeer?.peerId,
       recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,
