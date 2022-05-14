@@ -1,6 +1,7 @@
 import HMSLogger from '../utils/logger';
 import { Queue } from '../utils/queue';
 import AnalyticsEvent from './AnalyticsEvent';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 export abstract class AnalyticsTransport {
@@ -26,6 +27,8 @@ export abstract class AnalyticsTransport {
           const isEventFromCurrentPeer = event.properties.peer_id === currentPeerId;
           if (isEventFromCurrentPeer || !event.properties.peer_id) {
             this.sendSingleEvent(event);
+          } else {
+            HTTPAnalyticsTransport.sendEvent(event);
           }
         }
       }
