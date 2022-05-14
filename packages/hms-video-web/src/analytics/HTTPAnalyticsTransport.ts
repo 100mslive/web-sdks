@@ -55,6 +55,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       body: JSON.stringify(requestBody),
     })
       .then(response => {
+        this.flushFailedEvents();
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
@@ -68,9 +69,6 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       .catch(error => {
         HMSLogger.v(this.TAG, 'Failed to send event', error, event);
         this.addEventToStorage(event);
-      })
-      .finally(() => {
-        this.flushFailedEvents();
       });
   }
   flushFailedEvents() {
