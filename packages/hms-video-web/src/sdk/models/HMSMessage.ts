@@ -26,7 +26,6 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
     const peer = this.recipientPeer?.peerId;
     const sendParams: SendMessage = {
       info: {
-        sender: this.sender?.peerId,
         message: this.message,
         type: this.type,
       },

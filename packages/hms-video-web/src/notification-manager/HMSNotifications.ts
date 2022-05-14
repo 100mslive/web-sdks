@@ -203,7 +203,6 @@ export interface SendMessage {
 }
 
 export interface MessageNotificationInfo {
-  sender?: string;
   message: any;
   type: string;
 }
