@@ -124,20 +124,36 @@ export const normalizeAppPolicyConfig = (
     if (!newConfig[roleName]) {
       newConfig[roleName] = {};
     }
+    const subscribedRoles =
+      rolesMap[roleName].subscribeParams?.subscribeToRoles || [];
     if (!newConfig[roleName].center) {
       const publishingRoleNames = roleNames.filter(roleName =>
         canPublishAV(rolesMap[roleName])
       );
-      // all other publishing roles apart from local role in center by default
-      newConfig[roleName].center = publishingRoleNames.filter(
-        rName => rName !== roleName
-      );
+      if (
+        subscribedRoles.length === 0 ||
+        (subscribedRoles.length === 1 && subscribedRoles[0] === roleName)
+      ) {
+        newConfig[roleName].center = [roleName];
+      } else {
+        // all other publishing roles apart from local role in center by default
+        newConfig[roleName].center = publishingRoleNames.filter(
+          rName => rName !== roleName
+        );
+      }
     }
     // everyone from my role is in sidepane by default if they can publish
     if (!newConfig[roleName].sidepane) {
-      newConfig[roleName].sidepane = canPublishAV(rolesMap[roleName])
-        ? [roleName]
-        : [];
+      if (
+        subscribedRoles.length === 0 ||
+        (subscribedRoles.length === 1 && subscribedRoles[0] === roleName)
+      ) {
+        newConfig[roleName].sidepane = [];
+      } else {
+        newConfig[roleName].sidepane = canPublishAV(rolesMap[roleName])
+          ? [roleName]
+          : [];
+      }
     }
     if (!newConfig[roleName].selfRoleChangeTo) {
       newConfig[roleName].selfRoleChangeTo = roleNames;
