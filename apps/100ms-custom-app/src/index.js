@@ -9,7 +9,8 @@ import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
   const shouldInitLogRocket = () => {
-    console.log("BlackListed Domains",process.env.REACT_APP_LOGROCKET_BLACKLIST);
+    console.log('BlackListed Domains', process.env.REACT_APP_LOGROCKET_BLACKLIST);
+    console.log('ENV', process.env);
     return true;
   };
 
