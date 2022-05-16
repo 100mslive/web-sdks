@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID)
     LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
     setupLogRocketReact(LogRocket);
   } else {
-    console.log('Domain has been blacklisted from registering to logrocket');
+    console.log('Domain has been blacklisted from registering to logrocket.');
   }
 }
 
