@@ -8,8 +8,19 @@ import '100ms_edtech_template/dist/index.css';
 import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
-  LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
-  setupLogRocketReact(LogRocket);
+  const shouldBlacklistDomainForLogRocket = () => {
+    if (process.env.REACT_APP_LOGROCKET_BLACKLIST) {
+      const domains = process.env.REACT_APP_LOGROCKET_BLACKLIST.split(',');
+      return domains.includes(window.location.hostname);
+    }
+  };
+
+  if (shouldBlacklistDomainForLogRocket()) {
+    console.debug(`Not initializing logrocket for ${window.location.hostname}`);
+  } else {
+    LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
+    setupLogRocketReact(LogRocket);
+  }
 }
 
 const root = createRoot(document.getElementById('root'));
