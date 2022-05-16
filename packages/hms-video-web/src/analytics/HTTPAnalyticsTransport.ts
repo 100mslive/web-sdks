@@ -64,7 +64,6 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
           events.splice(index, 1);
           this.failedEvents.set(events);
         }
-        this.flushFailedEvents();
       })
       .catch(error => {
         HMSLogger.v(this.TAG, 'Failed to send event', error, event);
