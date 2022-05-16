@@ -127,7 +127,6 @@ const App = () => {
         }
       })
       .catch(err => {
-        console.log(err);
         const errorMessage = `[FetchData - get-details] ${err.message} ${err.toJSON && JSON.stringify(err.toJSON())}`;
         let error = {
           title: 'Something went wrong',

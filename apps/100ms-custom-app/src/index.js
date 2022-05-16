@@ -9,28 +9,22 @@ import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
   const shouldBlacklistDomainForLogRocket = () => {
-    console.log('BlackListed Domains', process.env.REACT_APP_LOGROCKET_BLACKLIST);
-    console.log('ENV', process.env);
     if (process.env.REACT_APP_LOGROCKET_BLACKLIST) {
       const domains = process.env.REACT_APP_LOGROCKET_BLACKLIST.split(',');
       if (domains.length !== 0) {
         const myDomain = window.location.hostname;
-        console.log(`checking if ${myDomain} is in blacklisted domain list: ${domains}`);
         if (domains.includes(myDomain)) {
-          console.log('Returning true');
           return true;
         }
       }
     }
 
-    console.log('Returning false');
     return false;
   };
 
   if (shouldBlacklistDomainForLogRocket()) {
-    console.log(`the domain ${window.location.hostname} has been blacklisted from registering to logrocket.`);
+    console.warn(`the domain ${window.location.hostname} has been blacklisted from registering to logrocket.`);
   } else {
-    console.log('Domain not blacklisted, initializing logrocket');
     LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
     setupLogRocketReact(LogRocket);
   }
