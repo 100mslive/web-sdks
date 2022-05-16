@@ -23,7 +23,7 @@ function getDefaultError(error: string, deviceInfo: string) {
 /**
  * # Edge Cases:
  * - Screenshare error: The problem is when block at OS level, chrome throws NotAllowedError(HMS code - 3001) while firefox throws NotFoundError(HMS code - 3002),
- * we will handle this internally and throw error as User block - 3001 and OS block - 3002 for all browsers.
+ * we will handle this internally and throw error as User block - 3001 and OS block - 3011 for all browsers.
  * Chrome -
  * User blocked - NotAllowedError - Permission denied
  * System blocked - NotAllowedError - Permission denied by system
@@ -35,11 +35,12 @@ function convertMediaErrorToHMSException(err: Error, deviceInfo: string): HMSExc
    */
   const deniedBySystem =
     deviceInfo === 'screen' &&
-    adapter.browserDetails.browser === 'chrome' &&
-    err.name === 'NotAllowedError' &&
-    err.message.includes('denied by system');
+    ((adapter.browserDetails.browser === 'chrome' &&
+      err.name === 'NotAllowedError' &&
+      err.message.includes('denied by system')) ||
+      err.name === 'NotFoundError');
   if (deniedBySystem) {
-    return ErrorFactory.TracksErrors.DeviceNotAvailable(HMSAction.TRACK, deviceInfo, err.message);
+    return ErrorFactory.TracksErrors.SystemDeniedPermission(HMSAction.TRACK, deviceInfo, err.message);
   }
 
   switch (err.name) {
