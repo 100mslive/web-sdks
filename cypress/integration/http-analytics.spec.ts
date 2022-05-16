@@ -79,7 +79,7 @@ describe('Http Analytics tests', () => {
   it('should store in storage if analytics fails and send again on preview', () => {
     cy.intercept(
       { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
-      { statusCode: 401, statusText: 'Something went wrong' },
+      { statusCode: 500, statusText: 'Something went wrong' },
     );
     //@ts-ignore
     sdk.preview({ userName: 'test', authToken: invalidRoleToken, initEndpoint }, previewListener).catch(console.error);
