@@ -42,6 +42,7 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsSto
 const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
   const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 
+  sdk.getWebrtcInternals()?.start();
   const unsubSdkStats = sdk
     .getWebrtcInternals()
     ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));

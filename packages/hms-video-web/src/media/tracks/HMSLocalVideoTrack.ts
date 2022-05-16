@@ -192,11 +192,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * The one whose data is currently being sent, which will be used when removing from connection senders.
    */
   getTrackIDBeingSent() {
-    return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
+    return this.getTrackBeingSent().id;
   }
 
   getTrackBeingSent() {
-    return this.processedTrack || this.nativeTrack;
+    return this.enabled ? this.processedTrack || this.nativeTrack : this.nativeTrack;
   }
 
   /**
