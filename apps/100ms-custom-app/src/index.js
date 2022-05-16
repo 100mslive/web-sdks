@@ -8,8 +8,15 @@ import '100ms_edtech_template/dist/index.css';
 import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID) {
-  LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
-  setupLogRocketReact(LogRocket);
+  const shouldInitLogRocket = () => {
+    console.log("BlackListed Domains",process.env.REACT_APP_LOGROCKET_BLACKLIST);
+    return true;
+  };
+
+  if (shouldInitLogRocket()) {
+    LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
+    setupLogRocketReact(LogRocket);
+  }
 }
 
 const root = createRoot(document.getElementById('root'));
