@@ -63,6 +63,10 @@ export class HMSWebrtcInternals {
    * @internal
    */
   async start() {
+    if (this.isMonitored) {
+      HMSLogger.d(this.TAG, 'Already started');
+      return;
+    }
     this.stop();
     this.isMonitored = true;
     HMSLogger.d(this.TAG, 'Starting Webrtc Stats Monitor');

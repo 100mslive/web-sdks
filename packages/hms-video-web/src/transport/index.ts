@@ -786,6 +786,7 @@ export default class HMSTransport implements ITransport {
     //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
       if (!this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION)) {
+        await this.webrtcInternals?.start();
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
@@ -801,7 +802,6 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
-    await this.webrtcInternals?.start();
   }
 
   private retryPublishIceFailedTask = async () => {
