@@ -55,6 +55,10 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       body: JSON.stringify(requestBody),
     })
       .then(response => {
+        // Ignore invalid token or expired token messages
+        if (response.status === 401) {
+          return;
+        }
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
