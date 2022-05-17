@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useInView } from "react-intersection-observer";
 import { ChevronDownIcon } from "@100mslive/react-icons";
 import { useHMSActions } from "@100mslive/react-sdk";
@@ -55,13 +61,7 @@ export const Chat = () => {
         }}
         ref={bodyRef}
       >
-        <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-        <ScrollHandler
-          scrollToBottom={scrollToBottom}
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-        />
-        {isSelectorOpen && (
+        {isSelectorOpen ? (
           <ChatSelector
             role={chatOptions.role}
             peerId={chatOptions.peerId}
@@ -73,6 +73,15 @@ export const Chat = () => {
               setSelectorOpen(false);
             }}
           />
+        ) : (
+          <Fragment>
+            <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
+            <ScrollHandler
+              scrollToBottom={scrollToBottom}
+              role={chatOptions.role}
+              peerId={chatOptions.peerId}
+            />
+          </Fragment>
         )}
       </Box>
 
@@ -81,11 +90,13 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         onSend={scrollToBottom}
       >
-        <NewMessageIndicator
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-          scrollToBottom={scrollToBottom}
-        />
+        {!isSelectorOpen && (
+          <NewMessageIndicator
+            role={chatOptions.role}
+            peerId={chatOptions.peerId}
+            scrollToBottom={scrollToBottom}
+          />
+        )}
       </ChatFooter>
     </Flex>
   );
@@ -107,7 +118,9 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
       }}
     >
       <Button
-        onClick={() => scrollToBottom()}
+        onClick={() => {
+          scrollToBottom();
+        }}
         css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}
       >
         New Messages
