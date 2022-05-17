@@ -137,6 +137,6 @@ const ScrollHandler = ({ scrollToBottom, role, peerId }) => {
     if (inView && unreadCount) {
       scrollToBottom();
     }
-  }, [inView, unreadCount]); //eslint-disable-line
+  }, [inView, unreadCount, scrollToBottom]);
   return <div ref={ref} style={{ height: 1 }}></div>;
 };
