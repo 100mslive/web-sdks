@@ -39,10 +39,9 @@ export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
 export const userAgent = createUserAgent();
 
-const storage = new LocalStorage<string>('hms-analytics-deviceId');
-
 export const getAnalyticsDeviceId = () => {
   let id = '';
+  const storage = new LocalStorage<string>('hms-analytics-deviceId');
   const storageId = storage.get();
   if (storageId) {
     id = storageId;
