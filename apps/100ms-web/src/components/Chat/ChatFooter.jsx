@@ -74,6 +74,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
       <TextArea
         placeholder="Write something here"
         ref={inputRef}
+        autoFocus
         onKeyPress={async event => {
           if (event.key === "Enter") {
             if (!event.shiftKey) {
