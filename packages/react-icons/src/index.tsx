@@ -1,3 +1,4 @@
+export { default as AddIcon } from './AddIcon';
 export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
@@ -19,6 +20,8 @@ export { default as DownloadIcon } from './DownloadIcon';
 export { default as EditIcon } from './EditIcon';
 export { default as ExitIcon } from './ExitIcon';
 export { default as ExpandIcon } from './ExpandIcon';
+export { default as EyeCloseIcon } from './EyeCloseIcon';
+export { default as EyeOpenIcon } from './EyeOpenIcon';
 export { default as GlobeIcon } from './GlobeIcon';
 export { default as GridIcon } from './GridIcon';
 export { default as HamburgerMenuIcon } from './HamburgerMenuIcon';
