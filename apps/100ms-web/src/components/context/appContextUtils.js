@@ -126,14 +126,15 @@ export const normalizeAppPolicyConfig = (
     }
     const subscribedRoles =
       rolesMap[roleName].subscribeParams?.subscribeToRoles || [];
+
+    const isNotSubscringOrSubscringToSelf =
+      subscribedRoles.length === 0 ||
+      (subscribedRoles.length === 1 && subscribedRoles[0] === roleName);
     if (!newConfig[roleName].center) {
       const publishingRoleNames = roleNames.filter(roleName =>
         canPublishAV(rolesMap[roleName])
       );
-      if (
-        subscribedRoles.length === 0 ||
-        (subscribedRoles.length === 1 && subscribedRoles[0] === roleName)
-      ) {
+      if (isNotSubscringOrSubscringToSelf) {
         newConfig[roleName].center = [roleName];
       } else {
         // all other publishing roles apart from local role in center by default
@@ -144,10 +145,7 @@ export const normalizeAppPolicyConfig = (
     }
     // everyone from my role is in sidepane by default if they can publish
     if (!newConfig[roleName].sidepane) {
-      if (
-        subscribedRoles.length === 0 ||
-        (subscribedRoles.length === 1 && subscribedRoles[0] === roleName)
-      ) {
+      if (isNotSubscringOrSubscringToSelf) {
         newConfig[roleName].sidepane = [];
       } else {
         newConfig[roleName].sidepane = canPublishAV(rolesMap[roleName])
