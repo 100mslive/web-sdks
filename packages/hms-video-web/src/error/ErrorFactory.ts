@@ -29,10 +29,10 @@ export enum HMSAction {
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
-    GenericConnect(action: HMSAction, description = '') {
+    FailedToConnect(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.WebSocketConnectionErrors.GENERIC_CONNECT,
-        'WebsocketConnection',
+        ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
+        'WebsocketFailedToConnect',
         action,
         `[WS]: ${description}`,
         `[WS]: ${description}`,

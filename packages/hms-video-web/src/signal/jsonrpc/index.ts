@@ -138,9 +138,9 @@ export default class JsonRpcSignal implements ISignal {
          */
         HMSLogger.e(this.TAG, 'Error from websocket', error);
         reject(
-          ErrorFactory.WebSocketConnectionErrors.GenericConnect(
+          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(
             HMSAction.JOIN,
-            `Error opening socket connection - ${error}`,
+            `Error opening websocket connection - ${error}`,
           ),
         );
       };
