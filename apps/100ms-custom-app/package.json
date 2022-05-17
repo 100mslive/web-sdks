@@ -51,6 +51,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.5.2",
     "postcss": "^8.4.5",
+    "source-map-loader": "^3.0.1",
     "terser-webpack-plugin": "^5.3.1"
   }
 }
