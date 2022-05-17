@@ -35,7 +35,9 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = "";
-      onSend();
+      setTimeout(() => {
+        onSend();
+      }, 0);
     } catch (error) {
       ToastManager.addToast({ title: error.message });
     }
