@@ -210,12 +210,12 @@ export interface MessageNotificationInfo {
 export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   error?: ServerError;
 }
 
 export interface RTMPNotification {
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   started_at?: number;
   error?: ServerError;
 }
