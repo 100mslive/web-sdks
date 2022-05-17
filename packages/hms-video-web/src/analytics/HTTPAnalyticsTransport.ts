@@ -57,17 +57,13 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       .then(response => {
         // Ignore invalid token or expired token messages
         if (response.status === 401) {
+          this.removeFromStorage(event);
           return;
         }
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
-        const events = this.failedEvents.get() || [];
-        const index = events.findIndex(storageEvent => storageEvent.timestamp === event.timestamp);
-        if (index > -1) {
-          events.splice(index, 1);
-          this.failedEvents.set(events);
-        }
+        this.removeFromStorage(event);
       })
       .catch(error => {
         HMSLogger.v(this.TAG, 'Failed to send event', error, event);
@@ -87,6 +83,15 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       }
       existingEvents.push(event);
       this.failedEvents.set(existingEvents);
+    }
+  }
+
+  private removeFromStorage(event: AnalyticsEvent): void {
+    const events = this.failedEvents.get() || [];
+    const index = events.findIndex(storageEvent => storageEvent.timestamp === event.timestamp);
+    if (index > -1) {
+      events.splice(index, 1);
+      this.failedEvents.set(events);
     }
   }
 }
