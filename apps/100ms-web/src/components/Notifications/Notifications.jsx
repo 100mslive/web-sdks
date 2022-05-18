@@ -92,6 +92,7 @@ export function Notifications() {
               "meeting",
               "leave"
             );
+            ToastManager.clearAllToast();
             navigate(previewLocation);
           }, 2000);
           return;
