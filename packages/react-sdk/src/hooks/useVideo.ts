@@ -30,7 +30,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectTrackByID(trackId));
 
-  const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
+  const { ref: inViewRef, inView } = useInView({ threshold: 0.4 });
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
