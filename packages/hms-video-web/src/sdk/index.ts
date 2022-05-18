@@ -235,11 +235,11 @@ export class HMSSdk implements HMSInterface {
   };
 
   private handlePeerLeaveRequest = (message: PeerLeaveRequestNotification) => {
-    const peer = this.store.getPeerById(message.requested_by);
+    const peer = message.requested_by ? this.store.getPeerById(message.requested_by) : undefined;
     const request: HMSLeaveRoomRequest = {
       roomEnded: message.room_end,
       reason: message.reason,
-      requestedBy: peer!,
+      requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
     this.leave();
