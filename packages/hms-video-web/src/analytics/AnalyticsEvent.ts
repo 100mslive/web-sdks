@@ -23,6 +23,11 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   level: AnalyticsEventLevel;
   includesPII: boolean;
   properties: Record<string, any>;
+  metadata: {
+    token?: string;
+    peerId?: string;
+    sessionId?: string;
+  } = {};
   timestamp: number;
   event_id: string;
   device_id: string;

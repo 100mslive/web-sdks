@@ -37,13 +37,12 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       this.addEventToStorage(event);
       return;
     }
-    const { token, peer_id, session_id, ...rest } = event.properties;
     const requestBody: ClientEventBody = {
       event: event.name,
-      payload: rest,
+      payload: event.properties,
       event_id: String(event.timestamp),
-      peer_id,
-      session_id,
+      peer_id: event.metadata.peerId,
+      session_id: event.metadata.sessionId,
       timestamp: Date.now(),
       agent: userAgent,
       device_id: event.device_id,
@@ -51,7 +50,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
     fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.metadata.token}` },
       body: JSON.stringify(requestBody),
     })
       .then(response => {
