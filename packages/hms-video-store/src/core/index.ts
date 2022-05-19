@@ -30,4 +30,5 @@ export type {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HLSConfig,
+  HLSMeetingURLVariant,
 } from './hmsSDKStore/sdkTypes';

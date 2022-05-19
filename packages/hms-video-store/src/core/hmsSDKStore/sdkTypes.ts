@@ -39,6 +39,7 @@ import {
   HMSRemoteTrackStats,
   parsedUserAgent,
   HMSConnectionQuality,
+  HLSMeetingURLVariant,
 } from '@100mslive/hms-video';
 
 export {
@@ -79,6 +80,7 @@ export type {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
+  HLSMeetingURLVariant,
   HMSHLS,
   HMSPeerStats,
   HMSTrackStats,
