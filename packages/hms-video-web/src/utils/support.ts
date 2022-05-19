@@ -1,4 +1,6 @@
 import { UAParser } from 'ua-parser-js';
+import { v4 as uuid } from 'uuid';
+import { LocalStorage } from './local-storage';
 import { version } from './package.alias.json';
 
 export const parsedUserAgent = new UAParser();
@@ -36,5 +38,18 @@ function createUserAgent(): string {
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
 export const userAgent = createUserAgent();
+
+export const getAnalyticsDeviceId = () => {
+  let id = '';
+  const storage = new LocalStorage<string>('hms-analytics-deviceId');
+  const storageId = storage.get();
+  if (storageId) {
+    id = storageId;
+  } else {
+    id = uuid();
+    storage.set(id);
+  }
+  return id;
+};
 
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;

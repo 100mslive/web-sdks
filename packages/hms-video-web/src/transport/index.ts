@@ -188,9 +188,14 @@ export default class HMSTransport implements ITransport {
       }
     },
 
+    // this is called when socket connection is successful
     onOnline: () => {
       HMSLogger.d(TAG, 'socket online', TransportState[this.state]);
-      this.analyticsSignalTransport.flushFailedEvents();
+      this.analyticsSignalTransport.flushFailedEvents(this.store.getLocalPeer()?.peerId);
+    },
+    // this is called when window.online event is triggered
+    onNetworkOnline: () => {
+      this.analyticsEventsService.flushFailedClientEvents();
     },
   };
 
@@ -317,7 +322,7 @@ export default class HMSTransport implements ITransport {
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
-    initEndpoint = 'https://prod-init.100ms.live/init',
+    initEndpoint: string,
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -407,7 +412,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    this.analyticsEventsService.removeTransport(this.analyticsSignalTransport);
+    this.analyticsEventsService.reset();
 
     this.retryScheduler.reset();
     this.joinParameters = undefined;
@@ -733,7 +738,7 @@ export default class HMSTransport implements ITransport {
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
-      this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
+      this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();
       return this.initConfig;
     } catch (error) {
@@ -926,6 +931,7 @@ export default class HMSTransport implements ITransport {
       },
       max_sub_bitrate: this.maxSubscribeBitrate,
       recent_pong_response_times: this.signal.getPongResponseTimes(),
+      transport_state: this.state,
     };
   }
 }

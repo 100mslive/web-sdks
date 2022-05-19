@@ -82,6 +82,7 @@ export default class JsonRpcSignal implements ISignal {
 
     window.addEventListener('online', () => {
       HMSLogger.d(this.TAG, 'Window network online');
+      this.observer.onNetworkOnline();
     });
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
@@ -96,7 +97,7 @@ export default class JsonRpcSignal implements ISignal {
     const id = uuid();
     const message = { method, params, id, jsonrpc: '2.0' } as JsonRpcRequest;
 
-    this.socket!.send(JSON.stringify(message));
+    this.socket?.send(JSON.stringify(message));
 
     try {
       const response = await new Promise<any>((resolve, reject) => {
@@ -117,7 +118,7 @@ export default class JsonRpcSignal implements ISignal {
   private notify(method: string, params: any) {
     const message = { method, params };
 
-    this.socket!.send(JSON.stringify(message));
+    this.socket?.send(JSON.stringify(message));
   }
 
   open(uri: string): Promise<void> {
@@ -150,8 +151,8 @@ export default class JsonRpcSignal implements ISignal {
         resolve();
         this.setIsConnected(true);
         this.id++;
-        this.socket!.removeEventListener('open', openHandler);
-        this.socket!.removeEventListener('error', errorListener);
+        this.socket?.removeEventListener('open', openHandler);
+        this.socket?.removeEventListener('error', errorListener);
         this.pingPongLoop(this.id);
       };
 
