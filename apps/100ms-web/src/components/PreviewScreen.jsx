@@ -27,8 +27,7 @@ import getToken from "../services/tokenService";
 
 const env = process.env.REACT_APP_ENV;
 // use this field to join directly for quick testing while in local
-const directJoinNoHeadlessFromEnv =
-  process.env.REACT_APP_HEADLESS_JOIN === "true";
+const directJoinHeadfulFromEnv = process.env.REACT_APP_HEADLESS_JOIN === "true";
 const PreviewScreen = ({ getUserToken }) => {
   const navigate = useNavigate();
   const { tokenEndpoint, setIsHeadless } = useContext(AppContext);
@@ -38,10 +37,10 @@ const PreviewScreen = ({ getUserToken }) => {
   // way to skip preview for automated tests, beam recording and streaming
   const beamInToken = useSearchParam("token") === "beam_recording"; // old format to remove
   let skipPreview = useSearchParam(QUERY_PARAM_SKIP_PREVIEW) === "true";
-  const directJoinNoHeadless =
+  const directJoinHeadful =
     useSearchParam(QUERY_PARAM_SKIP_PREVIEW_HEADFUL) === "true" ||
-    directJoinNoHeadlessFromEnv;
-  skipPreview = skipPreview || beamInToken || directJoinNoHeadless;
+    directJoinHeadfulFromEnv;
+  skipPreview = skipPreview || beamInToken || directJoinHeadful;
   const initialName =
     useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? "Beam" : "");
   let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
@@ -64,7 +63,7 @@ const PreviewScreen = ({ getUserToken }) => {
   }, [tokenEndpoint, urlRoomId, getUserToken, userRole, authToken]);
 
   const onJoin = () => {
-    !directJoinNoHeadless && setIsHeadless(skipPreview);
+    !directJoinHeadful && setIsHeadless(skipPreview);
     let meetingURL = `/meeting/${urlRoomId}`;
     if (userRole) {
       meetingURL += `/${userRole}`;
