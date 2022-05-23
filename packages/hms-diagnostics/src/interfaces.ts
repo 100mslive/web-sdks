@@ -1,5 +1,5 @@
 export interface HMSDiagnosticsOutputValue {
-  success: boolean;
+  success: boolean | null;
   errorMessage: string;
   info?: Record<string, any>;
 }
@@ -13,7 +13,7 @@ export interface HMSDiagnosticsOutput {
     websocket: HMSDiagnosticsOutputValue;
   };
   devices: {
-    success: boolean;
+    success: boolean | null;
     errorMessage: string;
     camera: HMSDiagnosticsOutputValue;
     microphone: HMSDiagnosticsOutputValue;

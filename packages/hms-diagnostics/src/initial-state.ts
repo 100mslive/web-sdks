@@ -2,17 +2,17 @@ import { HMSDiagnosticsOutput } from './interfaces';
 
 export const initialState: HMSDiagnosticsOutput = {
   connectivity: {
-    stun: { success: false, errorMessage: '' },
-    turnUDP: { success: false, errorMessage: '' },
-    turnTCP: { success: false, errorMessage: '' },
-    init: { success: false, errorMessage: '' },
-    websocket: { success: false, errorMessage: '' },
+    stun: { success: null, errorMessage: '' },
+    turnUDP: { success: null, errorMessage: '' },
+    turnTCP: { success: null, errorMessage: '' },
+    init: { success: null, errorMessage: '' },
+    websocket: { success: null, errorMessage: '' },
   },
   devices: {
-    success: false,
+    success: null,
     errorMessage: '',
-    camera: { success: false, errorMessage: '' },
-    microphone: { success: false, errorMessage: '' },
+    camera: { success: null, errorMessage: '' },
+    microphone: { success: null, errorMessage: '' },
   },
-  webRTC: { success: false, errorMessage: '' },
+  webRTC: { success: null, errorMessage: '' },
 };
