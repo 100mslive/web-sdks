@@ -22,6 +22,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     try {
       validateMediaDevicesExistence();
       this.result.devices.success = true;
+      this.result.devices.errorMessage = '';
     } catch (error) {
       this.result.devices.success = false;
       this.result.devices.errorMessage = (error as HMSException).message;
@@ -33,6 +34,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     try {
       validateRTCPeerConnection();
       this.result.webRTC.success = true;
+      this.result.webRTC.errorMessage = '';
     } catch (error) {
       this.result.webRTC.success = false;
       this.result.webRTC.errorMessage = (error as HMSException).message;
