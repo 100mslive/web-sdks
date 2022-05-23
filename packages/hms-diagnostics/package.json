@@ -1,0 +1,39 @@
+{
+  "name": "@100mslive/hms-diagnostics",
+  "version": "0.0.1",
+  "description": "Package to verify if the device is able to connect to 100ms and notify the problem preventing from doing so.",
+  "main": "dist/index.cjs.js",
+  "typings": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "prestart": "rm -rf dist && yarn types:build",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "build": "yarn build:only && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.json",
+    "lint": "eslint -c ../../.eslintrc .",
+    "lint:fix": "yarn lint --fix",
+    "prepare": "yarn build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "author": "100ms <tech-common@100ms.live>"
+}
