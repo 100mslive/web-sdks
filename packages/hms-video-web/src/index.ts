@@ -13,3 +13,4 @@ export * from './interfaces';
 export * from './rtc-stats';
 export * from './plugins';
 export * from './utils/logger';
+export { validateMediaDevicesExistence, validateRTCPeerConnection } from './utils/validations';

@@ -13,6 +13,8 @@ export interface HMSDiagnosticsOutput {
     websocket: HMSDiagnosticsOutputValue;
   };
   devices: {
+    success: boolean;
+    errorMessage: string;
     camera: HMSDiagnosticsOutputValue;
     microphone: HMSDiagnosticsOutputValue;
   };

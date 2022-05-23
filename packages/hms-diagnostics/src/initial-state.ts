@@ -9,6 +9,8 @@ export const initialState: HMSDiagnosticsOutput = {
     websocket: { success: false, errorMessage: '' },
   },
   devices: {
+    success: false,
+    errorMessage: '',
     camera: { success: false, errorMessage: '' },
     microphone: { success: false, errorMessage: '' },
   },
