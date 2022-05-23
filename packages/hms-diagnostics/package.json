@@ -35,5 +35,11 @@
     "analyze": "size-limit --why",
     "format": "prettier --write src/**/*.ts"
   },
-  "author": "100ms <tech-common@100ms.live>"
+  "author": "100ms <tech-common@100ms.live>",
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.7"
+  }
 }
