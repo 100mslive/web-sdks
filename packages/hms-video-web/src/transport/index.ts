@@ -188,9 +188,14 @@ export default class HMSTransport implements ITransport {
       }
     },
 
+    // this is called when socket connection is successful
     onOnline: () => {
       HMSLogger.d(TAG, 'socket online', TransportState[this.state]);
-      this.analyticsSignalTransport.flushFailedEvents();
+      this.analyticsSignalTransport.flushFailedEvents(this.store.getLocalPeer()?.peerId);
+    },
+    // this is called when window.online event is triggered
+    onNetworkOnline: () => {
+      this.analyticsEventsService.flushFailedClientEvents();
     },
   };
 
@@ -317,7 +322,7 @@ export default class HMSTransport implements ITransport {
     authToken: string,
     peerId: string,
     customData: { name: string; metaData: string },
-    initEndpoint = 'https://prod-init.100ms.live/init',
+    initEndpoint: string,
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
@@ -380,6 +385,7 @@ export default class HMSTransport implements ITransport {
         error instanceof HMSException &&
         ([
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
+          ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
           ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
         ].includes(error.code) ||
           error.code.toString().startsWith('5') ||
@@ -406,7 +412,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    this.analyticsEventsService.removeTransport(this.analyticsSignalTransport);
+    this.analyticsEventsService.reset();
 
     this.retryScheduler.reset();
     this.joinParameters = undefined;
@@ -732,7 +738,7 @@ export default class HMSTransport implements ITransport {
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
-      this.analyticsEventsService.addTransport(this.analyticsSignalTransport);
+      this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();
       return this.initConfig;
     } catch (error) {
@@ -763,7 +769,7 @@ export default class HMSTransport implements ITransport {
 
   private async openSignal(token: string, peerId: string) {
     if (!this.initConfig) {
-      throw ErrorFactory.WebSocketConnectionErrors.GenericConnect(HMSAction.INIT, 'Init Config not found');
+      throw ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
 
     HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);
@@ -786,6 +792,7 @@ export default class HMSTransport implements ITransport {
     //  as server will check in policy if subscribe degradation enabled from dashboard
     if (this.store.getSubscribeDegradationParams()) {
       if (!this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION)) {
+        await this.webrtcInternals?.start();
         this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
         this.eventBus.statsUpdate.subscribe(stats => {
           this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
@@ -801,7 +808,6 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
-    await this.webrtcInternals?.start();
   }
 
   private retryPublishIceFailedTask = async () => {
@@ -925,6 +931,7 @@ export default class HMSTransport implements ITransport {
       },
       max_sub_bitrate: this.maxSubscribeBitrate,
       recent_pong_response_times: this.signal.getPongResponseTimes(),
+      transport_state: this.state,
     };
   }
 }

@@ -15,4 +15,6 @@ export interface ISignalEventsObserver {
   onOffline(reason: string): void;
 
   onOnline(): void;
+
+  onNetworkOnline(): void;
 }

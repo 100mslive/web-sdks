@@ -169,7 +169,6 @@ export const fakeMessage: MessageNotification = {
   roles: [], // empty for broadcast
   timestamp: 0,
   info: {
-    sender: FAKE_PEER_ID,
     message: 'Test',
     type: 'chat',
   },

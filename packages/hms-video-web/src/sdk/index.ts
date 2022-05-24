@@ -120,7 +120,7 @@ export class HMSSdk implements HMSInterface {
     this.audioSinkManager.setListener(this.listener);
     this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
     this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
-    this.analyticsEventsService = new AnalyticsEventsService();
+    this.analyticsEventsService = new AnalyticsEventsService(this.store);
     this.transport = new HMSTransport(
       this.observer,
       this.deviceManager,
@@ -235,11 +235,11 @@ export class HMSSdk implements HMSInterface {
   };
 
   private handlePeerLeaveRequest = (message: PeerLeaveRequestNotification) => {
-    const peer = this.store.getPeerById(message.requested_by);
+    const peer = message.requested_by ? this.store.getPeerById(message.requested_by) : undefined;
     const request: HMSLeaveRoomRequest = {
       roomEnded: message.room_end,
       reason: message.reason,
-      requestedBy: peer!,
+      requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
     this.leave();
@@ -283,11 +283,10 @@ export class HMSSdk implements HMSInterface {
       };
 
       this.eventBus.policyChange.subscribeOnce(policyHandler);
-
       this.transport
         .preview(
           config.authToken,
-          config.initEndpoint || 'https://prod-init.100ms.live/init',
+          config.initEndpoint!,
           this.localPeer!.peerId,
           { name: config.userName, metaData: config.metaData || '' },
           config.autoVideoSubscribe,
@@ -376,7 +375,7 @@ export class HMSSdk implements HMSInterface {
         config.authToken,
         this.localPeer!.peerId,
         { name: config.userName, metaData: config.metaData || '' },
-        config.initEndpoint,
+        config.initEndpoint!,
         config.autoVideoSubscribe,
       )
       .then(async () => {
@@ -902,6 +901,9 @@ export class HMSSdk implements HMSInterface {
    */
   private commonSetup(config: HMSConfig, roomId: string, listener: HMSPreviewListener | HMSUpdateListener) {
     this.stringifyMetadata(config);
+    if (!config.initEndpoint) {
+      config.initEndpoint = 'https://prod-init.100ms.live';
+    }
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();

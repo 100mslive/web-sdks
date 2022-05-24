@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "100ms_edtech_template": "0.1.4",
-    "@100mslive/react-icons": "0.0.17",
-    "@100mslive/react-ui": "0.0.17",
+    "@100mslive/react-icons": "0.0.18-alpha.0",
+    "@100mslive/react-ui": "0.0.18-alpha.0",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "logrocket": "^2.2.0",
@@ -51,6 +51,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.5.2",
     "postcss": "^8.4.5",
+    "source-map-loader": "^3.0.1",
     "terser-webpack-plugin": "^5.3.1"
   }
 }

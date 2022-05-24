@@ -300,7 +300,7 @@ const selectMessagesByPeerIDInternal = createSelector(
         return false;
       }
       // if localPeer or peerID is not a sender remove this
-      if (![localPeerID, peerID].includes(message.sender)) {
+      if (message.sender && ![localPeerID, peerID].includes(message.sender)) {
         return false;
       }
       // at this point we know the sender is one of local or passed in peer, check the recipient side
