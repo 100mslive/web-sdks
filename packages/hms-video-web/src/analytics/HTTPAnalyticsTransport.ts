@@ -15,6 +15,7 @@ interface ClientEventBody {
   event_id: string;
   peer_id?: string;
   session_id?: string;
+  room_id?: string;
   timestamp: number;
   payload: Record<string, any>;
   agent: string;
@@ -43,6 +44,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       event_id: String(event.timestamp),
       peer_id: event.metadata.peerId,
       session_id: event.metadata.sessionId,
+      room_id: event.metadata.roomId,
       timestamp: Date.now(),
       agent: userAgent,
       device_id: event.device_id,
