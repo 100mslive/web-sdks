@@ -64,6 +64,7 @@ export class AnalyticsEventsService {
   private sendClientEventOnHTTP(event: AnalyticsEvent) {
     event.metadata.sessionId = this.store.getRoom().sessionId;
     event.metadata.token = this.store.getConfig()?.authToken;
+    event.metadata.roomId = this.store.getRoom().id;
     HTTPAnalyticsTransport.sendEvent(event);
   }
 }
