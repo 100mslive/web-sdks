@@ -19,7 +19,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   async start() {
     await this.checkConnectivity();
     await this.checkDevices();
-    console.table(this.result);
     return this.result;
   }
 
