@@ -6,7 +6,8 @@ export interface HMSDiagnosticsOutputValue {
 
 export interface HMSDiagnosticsOutput {
   connectivity: {
-    stun: HMSDiagnosticsOutputValue;
+    stunUDP: HMSDiagnosticsOutputValue;
+    stunTCP: HMSDiagnosticsOutputValue;
     turnUDP: HMSDiagnosticsOutputValue;
     turnTCP: HMSDiagnosticsOutputValue;
     init: HMSDiagnosticsOutputValue;

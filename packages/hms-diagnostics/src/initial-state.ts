@@ -2,7 +2,8 @@ import { HMSDiagnosticsOutput } from './interfaces';
 
 export const initialState: HMSDiagnosticsOutput = {
   connectivity: {
-    stun: { success: null, errorMessage: '' },
+    stunUDP: { success: null, errorMessage: '' },
+    stunTCP: { success: null, errorMessage: '' },
     turnUDP: { success: null, errorMessage: '' },
     turnTCP: { success: null, errorMessage: '' },
     init: { success: null, errorMessage: '' },
