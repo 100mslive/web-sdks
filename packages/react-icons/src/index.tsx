@@ -20,6 +20,7 @@ export { default as DownloadIcon } from './DownloadIcon';
 export { default as EditIcon } from './EditIcon';
 export { default as ExitIcon } from './ExitIcon';
 export { default as ExpandIcon } from './ExpandIcon';
+export { default as ExternalLinkIcon } from './ExternalLinkIcon';
 export { default as EyeCloseIcon } from './EyeCloseIcon';
 export { default as EyeOpenIcon } from './EyeOpenIcon';
 export { default as GlobeIcon } from './GlobeIcon';
