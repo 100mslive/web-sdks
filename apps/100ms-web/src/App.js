@@ -55,6 +55,7 @@ const getAspectRatio = ({ width, height }) => {
   const portraitDomains = (
     process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
   ).split(",");
+  console.log({ width, height, portraitDomains, host });
   if (portraitDomains.includes(host) && width > height) {
     return { width: height, height: width };
   }
