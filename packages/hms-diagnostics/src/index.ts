@@ -17,6 +17,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   }
 
   async start() {
+    this.checkwebRTC();
     await this.checkConnectivity();
     await this.checkDevices();
     return this.result;
