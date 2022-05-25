@@ -65,7 +65,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const startStopRTMPRecordingHLS = async action => {
     try {
       if (action === "start") {
-        // the skip_preview param only works on preview link, replace meeting with preview if needed
+        // the skip_preview param only works for preview link, replace meeting with preview if needed
         const urlToStreamRecord = meetingURL.replace(
           "app.100ms.live/meeting",
           "app.100ms.live/preview"
