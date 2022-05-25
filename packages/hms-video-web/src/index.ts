@@ -14,4 +14,5 @@ export * from './interfaces';
 export * from './rtc-stats';
 export * from './plugins';
 export * from './utils/logger';
+export type { InitConfig } from './signal/init/models';
 export { validateMediaDevicesExistence, validateRTCPeerConnection } from './utils/validations';

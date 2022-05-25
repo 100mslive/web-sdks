@@ -4,10 +4,13 @@ import {
   validateRTCPeerConnection,
   HMSGetMediaActions,
   BuildGetMediaError,
+  HMSSdk,
 } from '@100mslive/hms-video';
+import type { InitConfig } from '@100mslive/hms-video';
 import { initialState } from './initial-state';
 import cloneDeep from 'lodash.clonedeep';
 import { HMSDiagnosticsInterface, HMSDiagnosticsOutput } from './interfaces';
+import { getToken } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
@@ -20,11 +23,21 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     this.checkwebRTC();
     await this.checkConnectivity();
     await this.checkDevices();
+    console.log(this.result);
     return this.result;
   }
 
   async checkConnectivity() {
-    await this.checkSTUNAndTURNConnectivity();
+    try {
+      const initConfig = await this.checkInit();
+      this.result.connectivity.init.success = true;
+      this.result.connectivity.init.errorMessage = '';
+      this.result.connectivity.init.info = initConfig;
+      await this.checkSTUNAndTURNConnectivity(initConfig);
+    } catch (error) {
+      this.result.connectivity.init.success = false;
+      this.result.connectivity.init.errorMessage = (error as Error).message;
+    }
     return this.result.connectivity;
   }
 
@@ -54,9 +67,9 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     return this.result.webRTC;
   }
 
-  private async checkSTUNAndTURNConnectivity() {
+  private async checkSTUNAndTURNConnectivity(initConfig: InitConfig) {
     return new Promise<void>(resolve => {
-      const pc = new RTCPeerConnection();
+      const pc = new RTCPeerConnection(initConfig.rtcConfiguration);
       const iceCandidates: RTCIceCandidate[] = [];
       pc.createDataChannel('');
       pc.onicecandidateerror = e => console.error(e);
@@ -144,5 +157,29 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       this.result.devices.microphone.errorMessage = exception.message;
       this.result.devices.microphone.info = exception;
     }
+  }
+
+  private async checkInit() {
+    const sdk = new HMSSdk();
+    // @ts-ignore
+    sdk.initStoreAndManagers();
+    const token = await getToken();
+    if (!token) {
+      this.result.connectivity.init.success = false;
+      this.result.connectivity.init.errorMessage = 'Failed to create token';
+      return;
+    }
+    //@ts-ignore
+    const initConfig = await sdk.transport.connect(
+      token,
+      'https://qa-init.100ms.live/',
+      Date.now(),
+      { name: 'diagnostics' },
+      false,
+    );
+
+    //@ts-ignore
+    this.result.connectivity.websocket.success = sdk.transport.signal.isConnected;
+    return initConfig;
   }
 }
