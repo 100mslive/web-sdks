@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           fetch-depth: 0
           ref: main
       - run: |
