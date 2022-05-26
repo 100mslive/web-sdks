@@ -412,8 +412,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    this.analyticsEventsService.reset();
-
     this.retryScheduler.reset();
     this.joinParameters = undefined;
 
@@ -428,6 +426,8 @@ export default class HMSTransport implements ITransport {
       } catch (err) {
         HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
       }
+      this.analyticsEventsService.flushFailedClientEvents();
+      this.analyticsEventsService.reset();
       await this.signal.close();
     } catch (err) {
       if (err instanceof HMSException) {
