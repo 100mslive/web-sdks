@@ -17,6 +17,7 @@ import { useWhiteboardMetadata } from "../plugins/whiteboard";
 import { useBeamAutoLeave } from "../common/hooks";
 import { UI_MODE_ACTIVE_SPEAKER, UI_SETTINGS } from "../common/constants";
 import { useUISettings } from "../components/AppData/useUISettings";
+import { VJSHLSView } from "./VJSHLSView";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
@@ -60,7 +61,7 @@ export const ConferenceMainView = () => {
 
   let ViewComponent;
   if (localPeerRole === HLS_VIEWER_ROLE) {
-    ViewComponent = HLSView;
+    ViewComponent = VJSHLSView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
   } else if (
