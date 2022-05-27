@@ -1,4 +1,5 @@
 {
+  "version": "0.1.16-alpha.2",
   "version": "0.1.16-alpha.1",
   "license": "MIT",
   "main": "dist/index.cjs.js",
@@ -37,6 +38,6 @@
   "author": "vishaldhull09",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.1.55-alpha.1"
+    "@100mslive/hms-video": "0.1.55-alpha.2"
   }
 }
