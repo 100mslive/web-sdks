@@ -12,6 +12,7 @@ import {
 
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
+import LogRocket from 'logrocket';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
@@ -132,7 +133,7 @@ const App = () => {
           title: 'Something went wrong',
           body: errorMessage,
         };
-        LogRocket.track("getDetailsError", error);
+        LogRocket.track('getDetailsError', error);
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
