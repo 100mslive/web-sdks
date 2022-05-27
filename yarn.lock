@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@100mslive/hms-noise-suppression@0.1.16-alpha.2":
+  version "0.1.16-alpha.2"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-suppression/-/hms-noise-suppression-0.1.16-alpha.2.tgz#1de823d8349844548b85dafa7de15094c1b0ec5e"
+  integrity sha512-BSXI6/peHEmt7K1CR+EeQDDFNukC28k8uFOdqObtfElFSOYp0rHJX7vwmOmWQHKIwTm+I1MrM3TJdQ0L/6KQVg==
+
 "@ampproject/remapping@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.1.2.tgz#4edca94973ded9630d20101cd8559cedb8d8bd34"
