@@ -132,6 +132,7 @@ const App = () => {
           title: 'Something went wrong',
           body: errorMessage,
         };
+        LogRocket.track("getDetailsError", error);
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
