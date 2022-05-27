@@ -9,7 +9,7 @@ declare global {
        * Get token required for preview/join
        * @param title
        */
-      getToken(): Chainable<string>;
+      getToken(role?: string): Chainable<string>;
       localTracksAdded(localPeer: HMSLocalPeer, options: { join: string; trackUpdate: string }): Chainable<void>;
     }
   }

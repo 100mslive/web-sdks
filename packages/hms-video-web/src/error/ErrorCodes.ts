@@ -8,7 +8,7 @@
 export const ErrorCodes = {
   WebSocketConnectionErrors: {
     // Error connecting to ws or init config not available
-    GENERIC_CONNECT: 1000,
+    FAILED_TO_CONNECT: 1000,
 
     // Network connection lost
     WEBSOCKET_CONNECTION_LOST: 1003,

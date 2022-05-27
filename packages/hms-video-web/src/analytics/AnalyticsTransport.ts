@@ -1,6 +1,7 @@
 import HMSLogger from '../utils/logger';
 import { Queue } from '../utils/queue';
 import AnalyticsEvent from './AnalyticsEvent';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 export abstract class AnalyticsTransport {
@@ -17,13 +18,18 @@ export abstract class AnalyticsTransport {
     }
   }
 
-  flushFailedEvents() {
+  flushFailedEvents(currentPeerId?: string) {
     try {
       HMSLogger.d(this.TAG, 'Flushing failed events', this.failedEvents);
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
         if (event) {
-          this.sendSingleEvent(event);
+          const isEventFromCurrentPeer = event.metadata?.peerId === currentPeerId;
+          if (isEventFromCurrentPeer || !event.metadata.peerId) {
+            this.sendSingleEvent(event);
+          } else {
+            HTTPAnalyticsTransport.sendEvent(event);
+          }
         }
       }
     } catch (error) {

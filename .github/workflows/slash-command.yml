@@ -9,7 +9,7 @@ jobs:
       - name: Slash Command Dispatch
         uses: peter-evans/slash-command-dispatch@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           commands: |
             version
             publish

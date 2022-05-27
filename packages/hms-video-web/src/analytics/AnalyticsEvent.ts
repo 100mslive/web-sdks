@@ -1,6 +1,8 @@
+import { v4 as uuid } from 'uuid';
 import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
 import { domainCategory } from './domain-analytics';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
+import { getAnalyticsDeviceId } from '../utils/support';
 
 interface AnalyticsEventInit {
   name: string;
@@ -21,7 +23,15 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   level: AnalyticsEventLevel;
   includesPII: boolean;
   properties: Record<string, any>;
+  metadata: {
+    token?: string;
+    peerId?: string;
+    sessionId?: string;
+    roomId?: string;
+  } = {};
   timestamp: number;
+  event_id: string;
+  device_id: string;
 
   constructor({ name, level, properties, includesPII, timestamp }: AnalyticsEventInit) {
     this.name = name;
@@ -29,6 +39,8 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     this.includesPII = includesPII || false;
     this.properties = properties || {};
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
+    this.event_id = uuid();
+    this.device_id = getAnalyticsDeviceId();
   }
 
   toSignalParams() {

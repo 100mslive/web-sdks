@@ -1,7 +1,7 @@
 ## Web sdks
 
-
 This monorepo will contain all packages related to core sdk and store.
+
 
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
@@ -31,7 +31,27 @@ yarn test
 yarn lint
 ```
 
-For starting sdk and store locally, run `yarn start` in both folders.
+### Running dev server
+
+Run whatever things you're changing in below in different terminal instances. For other packages you can navigate to 
+the folder directly and run `yarn start`.
+
+```
+# for webapp
+> yarn app
+
+# for hms-video-web
+> yarn sdk
+
+# for hms-video-store
+> yarn store
+
+# for react-sdk
+> yarn reactsdk
+
+# for react-ui
+> yarn reactui
+```
 
 > Note: run yarn start in sdk first and then in store
 
