@@ -41,6 +41,6 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         if: github.ref == 'main' || github.ref == 'production'
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           event-type: automation
           repository: 100mslive/playwright-automation

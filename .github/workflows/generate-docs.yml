@@ -26,24 +26,24 @@ jobs:
 
       - name: Install packages
         run: yarn install --frozen-lockfile
-        
+
       - name: Build
         run: yarn build
 
       - name: Generate API Reference
         working-directory: ./packages/hms-video-store
         run: yarn docs
-        
+
       - name: checkout 100ms-docs
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           repository: 100mslive/100ms-docs
           path: 100ms-docs
-        
+
       - name: copy over api reference
         run: cp -R ./packages/hms-video-store/docs ./100ms-docs/docs/api-reference/javascript
-        
+
       - name: replace old api-reference
         working-directory: ./100ms-docs/docs/api-reference/javascript
         run: |
@@ -54,7 +54,7 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           path: 100ms-docs
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           commit-message: 'docs(web): update api reference'
           title: 'docs(web): update api reference'
           labels: automated pr

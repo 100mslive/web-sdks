@@ -1,4 +1,4 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { ENV, IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 import { HMSSpeaker } from '../../interfaces';
@@ -25,6 +25,7 @@ import { HMSConfig, PublishParams } from '../../interfaces';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -43,9 +44,14 @@ class Store implements IStore {
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
+  private env: ENV = ENV.PROD;
 
   getConfig() {
     return this.config;
+  }
+
+  getEnv() {
+    return this.env;
   }
 
   getPublishParams() {
@@ -194,6 +200,7 @@ class Store implements IStore {
       }
     }
     this.config = config;
+    this.setEnv();
   }
 
   setPublishParams(params: PublishParams) {
@@ -352,6 +359,21 @@ class Store implements IStore {
       }
       peer.role = this.getPolicyForRole(peer.role.name);
     });
+  }
+
+  private setEnv() {
+    const endPoint = this.config?.initEndpoint!;
+    const url = endPoint.split('https://')[1];
+    let env: ENV = ENV.PROD;
+    if (url.startsWith(ENV.PROD)) {
+      env = ENV.PROD;
+    } else if (url.startsWith(ENV.QA)) {
+      env = ENV.QA;
+    } else if (url.startsWith(ENV.DEV)) {
+      env = ENV.DEV;
+    }
+    this.env = env;
+    HTTPAnalyticsTransport.setEnv(env);
   }
 }
 

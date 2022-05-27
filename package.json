@@ -50,7 +50,12 @@
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "app": "cd apps/100ms-web && yarn start",
+    "sdk": "cd packages/hms-video-web && yarn start",
+    "store": "cd packages/hms-video-store && yarn start",
+    "reactsdk": "cd packages/react-sdk && yarn start",
+    "reactui": "cd packages/react-ui && yarn start"
   },
   "workspaces": [
     "packages/*",

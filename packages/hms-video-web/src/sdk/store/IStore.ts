@@ -25,8 +25,15 @@ export interface TrackStateEntry {
   trackInfo: TrackState;
 }
 
+export enum ENV {
+  PROD = 'prod',
+  QA = 'qa',
+  DEV = 'dev',
+}
+
 export interface IStore {
   getConfig(): HMSConfig | undefined;
+  getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
 
   getComparator(): Comparator;
