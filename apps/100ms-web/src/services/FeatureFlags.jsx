@@ -23,7 +23,7 @@ export class FeatureFlags {
     // add support for server degradation
     window.HMS.FREEZE_VIDEO_LIST = false; // process.env.REACT_APP_ENV === "qa";
     // to send http events
-    window.HMS.CLIENT_EVENTS = process.env.REACT_APP_ENV === "qa";
+    window.HMS.CLIENT_EVENTS = process.env.SEND_CLIENT_EVENTS === "true";
   }
 
   static freezeVideoList() {
