@@ -61,6 +61,7 @@ export { default as SpotlightIcon } from './SpotlightIcon';
 export { default as SquareMenuIcon } from './SquareMenuIcon';
 export { default as SunWithFace } from './SunWithFace';
 export { default as TextboxIcon } from './TextboxIcon';
+export { default as TrashIcon } from './TrashIcon';
 export { default as UploadIcon } from './UploadIcon';
 export { default as VideoConferencing } from './VideoConferencing';
 export { default as VideoOffIcon } from './VideoOffIcon';
