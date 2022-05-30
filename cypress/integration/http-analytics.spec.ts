@@ -69,6 +69,8 @@ describe('Http Analytics tests', () => {
       { statusCode: 200, statusText: 'Event recorded' },
     );
     //@ts-ignore
+    window.HMS = { CLIENT_EVENTS: true };
+    //@ts-ignore
     sdk.preview({ userName: 'test', authToken: invalidRoleToken, initEndpoint }, previewListener).catch(console.error);
     cy.get('@onError').should('be.calledOnce');
     cy.get('@setEnv').should('be.calledOnce');
