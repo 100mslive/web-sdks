@@ -1,6 +1,5 @@
 {
   "version": "0.1.16-alpha.2",
-  "version": "0.1.16-alpha.1",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
