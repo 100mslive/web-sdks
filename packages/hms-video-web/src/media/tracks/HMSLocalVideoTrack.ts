@@ -73,6 +73,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
+        this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
     }
     await super.setEnabled(value);
