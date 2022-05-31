@@ -66,13 +66,13 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
           <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
 
           <StatsRow
-            show={isNotNullish(videoTrackStats?.mimeType)}
+            show={isNotNullish(videoTrackStats?.codec)}
             label={"Codec(V)"}
             value={videoTrackStats?.codec}
           />
 
           <StatsRow
-            show={isNotNullish(audioTrackStats?.mimeType)}
+            show={isNotNullish(audioTrackStats?.codec)}
             label={"Codec(A)"}
             value={audioTrackStats?.codec}
           />
