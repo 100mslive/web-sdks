@@ -64,7 +64,7 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
   let remoteStreamStats: RTCRemoteInboundRtpStreamStats | undefined;
 
-  const mimeTypes = new Map<string, string>(); // codecId -> mimeType
+  const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
   trackReport?.forEach(stat => {
     switch (stat.type) {
       case 'inbound-rtp':
@@ -77,14 +77,14 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
         remoteStreamStats = stat;
         break;
       case 'codec':
-        mimeTypes.set(stat.id, stat.mimeType);
+        mimeTypes[stat.id] = stat.mimeType;
         break;
       default:
         break;
     }
   });
 
-  const mimeType = streamStats?.codecId ? mimeTypes.get(streamStats.codecId) : undefined;
+  const mimeType = streamStats?.codecId ? mimeTypes[streamStats.codecId] : undefined;
   let codec: string | undefined;
   if (mimeType) {
     codec = mimeType.substring(mimeType.indexOf('/') + 1);
