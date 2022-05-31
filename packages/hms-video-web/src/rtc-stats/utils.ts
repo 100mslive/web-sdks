@@ -84,8 +84,8 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
     }
   });
 
-  const mimeType = mimeTypes.get(streamStats?.codecId || '');
-  let codec = '';
+  const mimeType = streamStats?.codecId ? mimeTypes.get(streamStats.codecId) : undefined;
+  let codec: string | undefined;
   if (mimeType) {
     codec = mimeType.substring(mimeType.indexOf('/') + 1);
   }
