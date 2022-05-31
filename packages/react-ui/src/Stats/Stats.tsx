@@ -65,6 +65,18 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
 
           <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
 
+          <StatsRow
+            show={isNotNullish(videoTrackStats?.mimeType)}
+            label={"MimeType(V)"}
+            value={videoTrackStats?.mimeType}
+          />
+
+          <StatsRow
+            show={isNotNullish(audioTrackStats?.mimeType)}
+            label={"MimeType(A)"}
+            value={audioTrackStats?.mimeType}
+          />
+
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
       </table>

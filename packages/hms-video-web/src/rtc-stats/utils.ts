@@ -53,6 +53,7 @@ export const getTrackStats = async (
       packetsLostRate,
       peerId: track.peerId,
       peerName,
+      mimeType: trackStats.mimeType,
     })
   );
 };
@@ -62,6 +63,8 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   // Valid by Webrtc spec, not in TS
   // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
   let remoteStreamStats: RTCRemoteInboundRtpStreamStats | undefined;
+
+  const mimeTypes = new Map<string, string>(); // codecId -> mimeType
   trackReport?.forEach(stat => {
     switch (stat.type) {
       case 'inbound-rtp':
@@ -73,12 +76,21 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
       case 'remote-inbound-rtp':
         remoteStreamStats = stat;
         break;
+      case 'codec':
+        mimeTypes.set(stat.id, stat.mimeType);
+        break;
       default:
         break;
     }
   });
 
-  return streamStats && Object.assign(streamStats, { remote: remoteStreamStats });
+  return (
+    streamStats &&
+    Object.assign(streamStats, {
+      remote: remoteStreamStats,
+      mimeType: mimeTypes.get(streamStats.codecId!),
+    })
+  );
 };
 
 export const getLocalPeerStatsFromReport = (
