@@ -1,4 +1,5 @@
 export { default as AddIcon } from './AddIcon';
+export { default as AlertIcon } from './AlertIcon';
 export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
