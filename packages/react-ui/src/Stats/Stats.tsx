@@ -67,14 +67,14 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
 
           <StatsRow
             show={isNotNullish(videoTrackStats?.mimeType)}
-            label={"MimeType(V)"}
-            value={videoTrackStats?.mimeType}
+            label={"Codec(V)"}
+            value={videoTrackStats?.codec}
           />
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.mimeType)}
-            label={"MimeType(A)"}
-            value={audioTrackStats?.mimeType}
+            label={"Codec(A)"}
+            value={audioTrackStats?.codec}
           />
 
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />

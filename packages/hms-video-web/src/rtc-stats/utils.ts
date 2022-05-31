@@ -53,7 +53,7 @@ export const getTrackStats = async (
       packetsLostRate,
       peerId: track.peerId,
       peerName,
-      mimeType: trackStats.mimeType,
+      codec: trackStats.codec,
     })
   );
 };
@@ -84,11 +84,17 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
     }
   });
 
+  const mimeType = mimeTypes.get(streamStats?.codecId || '');
+  let codec = '';
+  if (mimeType) {
+    codec = mimeType.substring(mimeType.indexOf('/') + 1);
+  }
+
   return (
     streamStats &&
     Object.assign(streamStats, {
       remote: remoteStreamStats,
-      mimeType: mimeTypes.get(streamStats.codecId!),
+      codec: codec,
     })
   );
 };
