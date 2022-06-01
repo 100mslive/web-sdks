@@ -336,19 +336,33 @@ export default class HMSTransport implements ITransport {
 
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
-        await this.connectionJoin(
+        this.publishConnection = new HMSPublishConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.publishConnectionObserver,
+          this,
+        );
+
+        this.subscribeConnection = new HMSSubscribeConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.subscribeConnectionObserver,
+        );
+
+        await this.joinPublishNegotiation(
           customData.name,
           customData.metaData,
-          this.initConfig.rtcConfiguration,
           autoSubscribeVideo,
           isServerHandlingDegradation,
         );
+        await this.initRtcStatsMonitor();
+        HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
     } catch (error) {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.join(joinRequestedAt, new Date(), error));
+        this.eventBus.analytics.publish(AnalyticsEventFactory.join(error, joinRequestedAt, new Date()));
       }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
@@ -650,17 +664,13 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
-  private async connectionJoin(
+  private async joinPublishNegotiation(
     name: string,
     data: string,
-    config: RTCConfiguration,
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ) {
-    this.publishConnection = new HMSPublishConnection(this.signal, config, this.publishConnectionObserver, this);
-    this.subscribeConnection = new HMSSubscribeConnection(this.signal, config, this.subscribeConnectionObserver);
-
     try {
       HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
       const offer = await this.publishConnection!.createOffer(constraints, new Map());
@@ -672,11 +682,23 @@ export default class HMSTransport implements ITransport {
       }
 
       this.publishConnection!.initAfterJoin();
-      await this.initRtcStatsMonitor();
-      HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
     } catch (error) {
-      this.state = TransportState.Failed;
-      throw error;
+      HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
+      const task = async () => {
+        await this.joinPublishNegotiation(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
+        // used to check success of publish negotiation as remoteDescription is set once we receive answer from biz
+        return Boolean(this.publishConnection?.remoteDescription);
+      };
+
+      await this.retryScheduler.schedule({
+        category: TransportFailureCategory.PublishNegotiationFailed,
+        error: ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(
+          HMSAction.JOIN,
+          'Failed to send join over WS connection',
+        ),
+        task,
+        originalState: TransportState.Joined,
+      });
     }
   }
 
@@ -869,7 +891,10 @@ export default class HMSTransport implements ITransport {
       } catch (ex) {}
     }
 
-    const ok = this.signal.isConnected && (await this.retryPublishIceFailedTask());
+    // Only retry publish failed task after joining the call - not needed in preview signal reconnect
+    const ok = this.store.getRoom().joinedAt
+      ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
+      : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
     this.signal.trackUpdate(this.trackStates);
 
@@ -903,6 +928,9 @@ export default class HMSTransport implements ITransport {
         break;
       case TransportFailureCategory.SignalDisconnect:
         event = AnalyticsEventFactory.disconnect(error, additionalProps);
+        break;
+      case TransportFailureCategory.PublishNegotiationFailed:
+        event = AnalyticsEventFactory.join(error);
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
         event = AnalyticsEventFactory.publish({ error });
