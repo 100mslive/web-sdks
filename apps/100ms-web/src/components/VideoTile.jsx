@@ -27,6 +27,14 @@ import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 import { UI_SETTINGS } from "../common/constants";
 import { useUISettings } from "./AppData/useUISettings";
 
+const shouldShowAudioLevel = () => {
+  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+  const noAudioLevelDomains = (
+    process.env.REACT_APP_NO_AUDIO_LEVEL_DOMAINS || ""
+  ).split(",");
+  return !noAudioLevelDomains.includes(host);
+};
+
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
     ? selectTrackByID(trackId)
@@ -59,7 +67,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={borderAudioRef}
+          ref={shouldShowAudioLevel() ? borderAudioRef : undefined}
         >
           <ConnectionIndicator isTile peerId={peerId} />
           {showStatsOnTiles ? (
