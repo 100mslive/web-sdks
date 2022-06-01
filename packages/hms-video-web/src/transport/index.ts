@@ -412,8 +412,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async leave(): Promise<void> {
-    this.analyticsEventsService.reset();
-
     this.retryScheduler.reset();
     this.joinParameters = undefined;
 
@@ -428,6 +426,8 @@ export default class HMSTransport implements ITransport {
       } catch (err) {
         HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
       }
+      this.analyticsEventsService.flushFailedClientEvents();
+      this.analyticsEventsService.reset();
       await this.signal.close();
     } catch (err) {
       if (err instanceof HMSException) {
@@ -716,14 +716,14 @@ export default class HMSTransport implements ITransport {
         category: TransportFailureCategory.PublishIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
         task: this.retryPublishIceFailedTask,
-        originalState: this.state,
+        originalState: TransportState.Joined,
       });
     } else {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.SubscribeIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
         task: this.retrySubscribeIceFailedTask,
-        originalState: this.state,
+        originalState: TransportState.Joined,
         maxFailedRetries: 1,
       });
     }

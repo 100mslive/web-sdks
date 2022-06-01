@@ -33,9 +33,11 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   removeSink(videoElement: HTMLVideoElement) {
-    videoElement.srcObject = null;
-    if (this.sinkCount > 0) {
-      this.sinkCount--;
+    if (videoElement.srcObject !== null) {
+      videoElement.srcObject = null;
+      if (this.sinkCount > 0) {
+        this.sinkCount--;
+      }
     }
   }
 
