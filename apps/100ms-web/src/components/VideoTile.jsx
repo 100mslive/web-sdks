@@ -26,14 +26,7 @@ import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 import { UI_SETTINGS } from "../common/constants";
 import { useUISettings } from "./AppData/useUISettings";
-
-const shouldShowAudioLevel = () => {
-  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
-  const noAudioLevelDomains = (
-    process.env.REACT_APP_NO_AUDIO_LEVEL_DOMAINS || ""
-  ).split(",");
-  return !noAudioLevelDomains.includes(host);
-};
+import { useAppConfig } from "./AppData/useAppConfig";
 
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
@@ -58,6 +51,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === "mouseenter");
   }, []);
+  const appConfig = useAppConfig();
   return (
     <StyledVideoTile.Root
       css={{ width, height }}
@@ -67,7 +61,11 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={shouldShowAudioLevel() ? borderAudioRef : undefined}
+          ref={
+            appConfig?.headlessConfig?.hideAudioLevel
+              ? undefined
+              : borderAudioRef
+          }
         >
           <ConnectionIndicator isTile peerId={peerId} />
           {showStatsOnTiles ? (
