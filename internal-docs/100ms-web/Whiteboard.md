@@ -1,6 +1,6 @@
 # Multiplayer Whiteboard using Tldraw
 
-## Internal Hooks
+## Internal APIs
 
 ### `useMultiplayerState`
 
@@ -8,17 +8,17 @@
   and updates changes from remote peers in local whiteboard.
 - Returns event handlers which as passed to `<Tldraw />`.
 
-### `useCommunication`
+### `PusherCommunicationProvider`
 
-- Initializes the right whiteboard communication provider(HMS or pusher). Communication Provider is a class to subscribe to, broadcast and store events.
+- Provides methods to communicate - broadcast and receive whiteboard related messages between 2 peers.
 
-- A custom communication provider using any service could be implemented by extending `BaseCommunicationProvider` and implementing `init`, `broadcastEvent` and `subscribe` methods(Refer PusherCommunicationProvider).
+- A custom communication provider using any service could be implemented by referring `PusherCommunicationProvider` and implementing `init`, `broadcastEvent` and `subscribe` methods.
 
 ### `useRoom`
 
 - Simple abstraction over provider and metadata as room object for useMultiplayerState
 
-useMultiplayerState, useCommunication and useRoom are internal hooks for Whiteboard functionalites
+useMultiplayerState and useRoom are internal hooks for Whiteboard functionalites
 
 ## Public Hooks
 
