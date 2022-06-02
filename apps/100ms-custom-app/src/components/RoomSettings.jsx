@@ -11,6 +11,7 @@ import {
   Text,
   Checkbox,
   Label,
+  RadioGroup,
 } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
 
@@ -136,6 +137,7 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
       }),
     };
   };
+  console.log({ settings });
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)' }}>
@@ -274,6 +276,28 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
                     change('metadataFields', handleSettingsMetaData('hideTileName', !headlessConfig.hideTileName));
                   }}
                 />
+              </HeadlessItem>
+              <HeadlessItem title="UI Layout">
+                <RadioGroup.Root
+                  css={{ flexDirection: 'column', alignItems: 'flex-start' }}
+                  value={headlessConfig.uiMode}
+                  onValueChange={value => {
+                    change('metadataFields', handleSettingsMetaData('uiMode', value));
+                  }}
+                >
+                  <Flex align="center" css={{ my: '$4' }}>
+                    <RadioGroup.Item value="grid" id="gridView" css={{ mr: '$4' }}>
+                      <RadioGroup.Indicator />
+                    </RadioGroup.Item>
+                    <Label htmlFor="gridView">Grid View</Label>
+                  </Flex>
+                  <Flex align="center" css={{ cursor: 'pointer' }}>
+                    <RadioGroup.Item value="active" id="activeSpeaker" css={{ mr: '$4' }}>
+                      <RadioGroup.Indicator />
+                    </RadioGroup.Item>
+                    <Label htmlFor="activeSpeaker">Active Speaker</Label>
+                  </Flex>
+                </RadioGroup.Root>
               </HeadlessItem>
             </Box>
           )}
