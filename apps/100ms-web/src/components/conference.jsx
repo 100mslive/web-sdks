@@ -14,13 +14,12 @@ import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
-import { useUISettings } from "./AppData/useUISettings";
-import { UI_SETTINGS } from "../common/constants";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const Conference = () => {
   const navigate = useNavigate();
   const { roomId, role } = useParams();
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);

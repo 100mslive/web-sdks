@@ -25,7 +25,7 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 import { UI_SETTINGS } from "../common/constants";
-import { useUISettings } from "./AppData/useUISettings";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { useAppConfig } from "./AppData/useAppConfig";
 
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
@@ -37,7 +37,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);

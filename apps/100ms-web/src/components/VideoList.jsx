@@ -7,8 +7,7 @@ import ScreenshareTile from "./ScreenshareTile";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { Pagination } from "./Pagination";
 import { useAppConfig } from "./AppData/useAppConfig";
-import { useUISettings } from "./AppData/useUISettings";
-import { UI_SETTINGS } from "../common/constants";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const getOffset = ({ appConfig, isHeadless }) => {
   if (!isHeadless) {
@@ -31,7 +30,7 @@ const List = ({
 }) => {
   const { aspectRatio } = useTheme();
   const appConfig = useAppConfig();
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const { ref, pagesWithTiles } = useVideoList({
     peers,
     maxTileCount,

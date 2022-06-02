@@ -13,7 +13,7 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import screenfull from "screenfull";
 import { UI_SETTINGS } from "../common/constants";
-import { useUISettings } from "./AppData/useUISettings";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 
 const labelStyles = {
   position: "unset",
@@ -33,7 +33,7 @@ const Tile = ({
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const label = getVideoTileLabel({
     peerName: peer.name,

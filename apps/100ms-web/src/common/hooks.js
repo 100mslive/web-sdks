@@ -10,8 +10,7 @@ import {
   selectIsConnectedToRoom,
 } from "@100mslive/react-sdk";
 import { useEffect, useRef, useState } from "react";
-import { useUISettings } from "../components/AppData/useUISettings";
-import { UI_SETTINGS } from "./constants";
+import { useIsHeadless } from "../components/AppData/useUISettings";
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -50,7 +49,7 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 export const useBeamAutoLeave = () => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const { aloneForLong } = useWhenAloneInRoom();
   const hls = useHMSStore(selectHLSState);
   const rtmp = useHMSStore(selectRTMPState);
