@@ -44,10 +44,10 @@ const getPadding = ({ isHeadless, appConfig }) => {
   if (!isHeadless) {
     return undefined;
   }
-  if (typeof offset !== "boolean") {
+  if (typeof offset !== "number") {
     return undefined;
   }
-  return 0;
+  return offset === 0 ? 0 : undefined;
 };
 
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {

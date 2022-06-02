@@ -15,10 +15,10 @@ const getOffset = ({ appConfig, isHeadless }) => {
     return 32;
   }
   const offset = appConfig?.headlessConfig?.tileOffset;
-  if (typeof offset !== "boolean") {
+  if (typeof offset !== "number") {
     return 32;
   }
-  return 0;
+  return offset;
 };
 
 const List = ({
