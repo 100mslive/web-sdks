@@ -68,7 +68,7 @@ const App = () => {
             ...settings,
             metadataFields: {
               ...settings.metadataFields,
-              metadata: JSON.stringify(metadata),
+              metadata: JSON.stringify({ ...settings.metadata, ...metadata }),
             },
           },
         });
