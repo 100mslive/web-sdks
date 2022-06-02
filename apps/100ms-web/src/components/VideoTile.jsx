@@ -28,6 +28,17 @@ import { UI_SETTINGS } from "../common/constants";
 import { useUISettings } from "./AppData/useUISettings";
 import { useAppConfig } from "./AppData/useAppConfig";
 
+const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
+  if (!isAudioMuted) {
+    return false;
+  }
+  if (!isHeadless) {
+    return true;
+  }
+  const hide = appConfig?.headlessConfig?.hideTileAudioMute;
+  return hide !== true;
+};
+
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
     ? selectTrackByID(trackId)
@@ -95,7 +106,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
           <StyledVideoTile.Info data-testid="participant_name_onTile">
             {label}
           </StyledVideoTile.Info>
-          {isAudioMuted ? (
+          {showAudioMuted({ appConfig, isHeadless, isAudioMuted }) ? (
             <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
