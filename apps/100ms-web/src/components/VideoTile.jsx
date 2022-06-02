@@ -39,6 +39,17 @@ const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
   return hide !== true;
 };
 
+const getPadding = ({ isHeadless, appConfig }) => {
+  const offset = appConfig?.headlessConfig?.tileOffset;
+  if (!isHeadless) {
+    return undefined;
+  }
+  if (typeof offset !== "boolean") {
+    return undefined;
+  }
+  return 0;
+};
+
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
     ? selectTrackByID(trackId)
@@ -66,7 +77,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const appConfig = useAppConfig();
   return (
     <StyledVideoTile.Root
-      css={{ width, height }}
+      css={{ width, height, padding: getPadding({ isHeadless, appConfig }) }}
       data-testid={`participant_tile_${peerName}`}
     >
       {peerName !== undefined ? (

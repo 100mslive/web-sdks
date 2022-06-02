@@ -6,6 +6,20 @@ import VideoTile from "./VideoTile";
 import ScreenshareTile from "./ScreenshareTile";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { Pagination } from "./Pagination";
+import { useAppConfig } from "./AppData/useAppConfig";
+import { useUISettings } from "./AppData/useUISettings";
+import { UI_SETTINGS } from "../common/constants";
+
+const getOffset = ({ appConfig, isHeadless }) => {
+  if (!isHeadless) {
+    return 32;
+  }
+  const offset = appConfig?.headlessConfig?.tileOffset;
+  if (typeof offset !== "boolean") {
+    return 32;
+  }
+  return 0;
+};
 
 const List = ({
   maxTileCount,
@@ -16,6 +30,8 @@ const List = ({
   includeScreenShareForPeer,
 }) => {
   const { aspectRatio } = useTheme();
+  const appConfig = useAppConfig();
+  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
   const { ref, pagesWithTiles } = useVideoList({
     peers,
     maxTileCount,
@@ -23,7 +39,7 @@ const List = ({
     maxRowCount,
     includeScreenShareForPeer,
     aspectRatio,
-    offsetY: 32,
+    offsetY: getOffset({ isHeadless, appConfig }),
   });
   const [page, setPage] = useState(0);
   useEffect(() => {
