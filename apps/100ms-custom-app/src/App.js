@@ -48,7 +48,35 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    setUpdateMetadataOnWindow();
+  }, []); //eslint-disable-line
+
+  const setUpdateMetadataOnWindow = () => {
+    if (!window.__hmsApp) {
+      window.__hmsApp = {};
+    }
+    window.__hmsApp.updateMetadata = async metadata => {
+      try {
+        changeSettings('metadataFields', {
+          ...settings.metadataFields,
+          metadata: JSON.stringify(metadata),
+        });
+        await storeRoomSettings({
+          hostname,
+          appInfo: appInfo.current,
+          settings: {
+            ...settings,
+            metadataFields: {
+              ...settings.metadataFields,
+              metadata: JSON.stringify(metadata),
+            },
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  };
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
