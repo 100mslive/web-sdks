@@ -9,17 +9,6 @@ import { Pagination } from "./Pagination";
 import { useAppConfig } from "./AppData/useAppConfig";
 import { useIsHeadless } from "./AppData/useUISettings";
 
-const getOffset = ({ appConfig, isHeadless }) => {
-  if (!isHeadless) {
-    return 32;
-  }
-  const offset = appConfig?.headlessConfig?.tileOffset;
-  if (typeof offset !== "number") {
-    return 32;
-  }
-  return offset;
-};
-
 const List = ({
   maxTileCount,
   peers,
@@ -97,5 +86,16 @@ const List = ({
 };
 
 const VideoList = React.memo(List);
+
+const getOffset = ({ appConfig, isHeadless }) => {
+  if (!isHeadless) {
+    return 32;
+  }
+  const offset = appConfig?.headlessConfig?.tileOffset;
+  if (typeof offset !== "number") {
+    return 32;
+  }
+  return offset;
+};
 
 export default VideoList;

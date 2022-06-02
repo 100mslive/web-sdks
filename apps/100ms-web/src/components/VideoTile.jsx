@@ -150,7 +150,7 @@ const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
     return isAudioMuted;
   }
   const hide = appConfig?.headlessConfig?.hideTileAudioMute;
-  return !hide;
+  return isAudioMuted && !hide;
 };
 
 const getPadding = ({ isHeadless, appConfig }) => {
