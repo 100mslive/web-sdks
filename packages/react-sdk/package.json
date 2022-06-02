@@ -35,11 +35,7 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@100mslive/hms-video-store": "0.3.1-alpha.1",
-=======
-    "@100mslive/hms-video-store": "0.3.1-alpha.0",
->>>>>>> main
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
