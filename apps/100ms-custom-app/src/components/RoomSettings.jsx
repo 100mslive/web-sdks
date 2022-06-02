@@ -12,6 +12,7 @@ import {
   Checkbox,
   Label,
   RadioGroup,
+  Input,
 } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
 
@@ -137,7 +138,6 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
       }),
     };
   };
-  console.log({ settings });
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)' }}>
@@ -276,6 +276,19 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
                     change('metadataFields', handleSettingsMetaData('hideTileName', !headlessConfig.hideTileName));
                   }}
                 />
+                <Flex align="center" justify="between">
+                  <Label htmlFor="tileOffset">Tile Offset</Label>
+                  <Input
+                    id="tileOffset"
+                    css={{ width: '70%', '@sm': { width: '100%' }, ml: '$4', my: '$4' }}
+                    min={0}
+                    type="number"
+                    value={headlessConfig.tileOffset}
+                    onChange={e => {
+                      change('metadataFields', handleSettingsMetaData('tileOffset', e.target.value));
+                    }}
+                  />
+                </Flex>
               </HeadlessItem>
               <HeadlessItem title="UI Layout">
                 <RadioGroup.Root
