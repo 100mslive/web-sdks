@@ -16,6 +16,7 @@ export function AppData({ appDetails }) {
     const initialAppData = {
       [APP_DATA.uiSettings]: {
         [UI_SETTINGS.isAudioOnly]: false,
+        [UI_SETTINGS.isHeadless]: false,
       },
       [APP_DATA.chatOpen]: false,
       [APP_DATA.chatDraft]: "",

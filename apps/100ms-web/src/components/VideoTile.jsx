@@ -37,6 +37,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);
@@ -99,7 +100,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {isMouseHovered && !isLocal ? (
+          {isMouseHovered && !isHeadless && !isLocal ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}

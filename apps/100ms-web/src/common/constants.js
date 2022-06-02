@@ -112,4 +112,5 @@ export const APP_DATA = {
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
+  isHeadless: "isHeadless",
 };

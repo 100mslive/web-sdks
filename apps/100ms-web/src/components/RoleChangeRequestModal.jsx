@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   useHMSActions,
   selectRoleChangeRequest,
@@ -6,11 +6,12 @@ import {
 } from "@100mslive/react-sdk";
 import { PersonIcon } from "@100mslive/react-icons";
 import { RequestDialog } from "../primitives/DialogContent";
-import { AppContext } from "./context/AppContext";
+import { useUISettings } from "./AppData/useUISettings";
+import { UI_SETTINGS } from "../common/constants";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
-  const { isHeadless } = useContext(AppContext);
+  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
 
   if (!roleChangeRequest?.role || isHeadless) {
