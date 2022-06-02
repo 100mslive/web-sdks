@@ -28,28 +28,6 @@ import { UI_SETTINGS } from "../common/constants";
 import { useUISettings } from "./AppData/useUISettings";
 import { useAppConfig } from "./AppData/useAppConfig";
 
-const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
-  if (!isAudioMuted) {
-    return false;
-  }
-  if (!isHeadless) {
-    return true;
-  }
-  const hide = appConfig?.headlessConfig?.hideTileAudioMute;
-  return hide !== true;
-};
-
-const getPadding = ({ isHeadless, appConfig }) => {
-  const offset = appConfig?.headlessConfig?.tileOffset;
-  if (!isHeadless) {
-    return undefined;
-  }
-  if (typeof offset !== "number") {
-    return undefined;
-  }
-  return offset === 0 ? 0 : undefined;
-};
-
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
     ? selectTrackByID(trackId)
@@ -166,5 +144,21 @@ const PeerMetadata = ({ peerId }) => {
 };
 
 const VideoTile = React.memo(Tile);
+
+const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
+  if (!isHeadless) {
+    return isAudioMuted;
+  }
+  const hide = appConfig?.headlessConfig?.hideTileAudioMute;
+  return !hide;
+};
+
+const getPadding = ({ isHeadless, appConfig }) => {
+  const offset = appConfig?.headlessConfig?.tileOffset;
+  if (!isHeadless || typeof offset !== "number") {
+    return undefined;
+  }
+  return offset === 0 ? 0 : undefined;
+};
 
 export default VideoTile;
