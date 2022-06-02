@@ -35,8 +35,13 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@100mslive/react-icons": "0.1.1-alpha.1",
     "@100mslive/react-sdk": "0.1.1-alpha.1",
+=======
+    "@100mslive/react-icons": "0.1.1-alpha.0",
+    "@100mslive/react-sdk": "0.1.1-alpha.0",
+>>>>>>> main
     "@radix-ui/react-accordion": "^0.1.6",
     "@radix-ui/react-checkbox": "^0.1.4",
     "@radix-ui/react-dialog": "^0.1.1",
