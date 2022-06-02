@@ -92,9 +92,12 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               data-testid="participant_avatar_icon"
             />
           ) : null}
-          <StyledVideoTile.Info data-testid="participant_name_onTile">
-            {label}
-          </StyledVideoTile.Info>
+          {(!isHeadless ||
+            (isHeadless && !appConfig?.headlessConfig?.hideTileName)) && (
+            <StyledVideoTile.Info data-testid="participant_name_onTile">
+              {label}
+            </StyledVideoTile.Info>
+          )}
           {showAudioMuted({ appConfig, isHeadless, isAudioMuted }) ? (
             <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
               <MicOffIcon />
