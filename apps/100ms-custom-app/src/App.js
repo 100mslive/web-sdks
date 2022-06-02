@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
   getAuthInfo,
@@ -49,6 +50,40 @@ const App = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setUpdateMetadataOnWindow();
+  }, [settings]); //eslint-disable-line
+
+  const setUpdateMetadataOnWindow = () => {
+    if (!window.__hmsApp) {
+      window.__hmsApp = {};
+    }
+    window.__hmsApp.updateMetadata = async metadata => {
+      try {
+        const currentMetadata = !settings.metadataFields.metadata ? {} : JSON.parse(settings.metadataFields.metadata);
+        const metaUpdate = JSON.stringify(merge(currentMetadata, metadata));
+        console.log(metaUpdate);
+        await storeRoomSettings({
+          hostname,
+          appInfo: appInfo.current,
+          settings: {
+            ...settings,
+            metadataFields: {
+              ...settings.metadataFields,
+              metadata: metaUpdate,
+            },
+          },
+        });
+        changeSettings('metadataFields', {
+          ...settings.metadataFields,
+          metadata: metaUpdate,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  };
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
