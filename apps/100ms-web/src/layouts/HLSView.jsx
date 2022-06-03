@@ -34,7 +34,8 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  const hlsUrl = hlsState.variants[0]?.url;
+  const hlsUrl =
+    "https://multiplatform-f.akamaihd.net/i/multi/april11/sintel/sintel-hd_,512x288_450_b,640x360_700_b,768x432_1000_b,1024x576_1400_m,.mp4.csmil/master.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -48,6 +49,7 @@ const HLSView = () => {
 
       hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
         setAvailableLevels(data.levels);
+        console.log("LEVELS", data.levels[0]);
         setCurrentSelectedQualityText("Auto");
       });
     } else if (
@@ -61,6 +63,7 @@ const HLSView = () => {
     qualityLevel => {
       if (hls) {
         hls.currentLevel = getCurrentLevel(qualityLevel);
+        console.log("CURRENT LEVEL", hls.currentLevel);
         const levelText =
           qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
         setCurrentSelectedQualityText(levelText);
@@ -85,6 +88,7 @@ const HLSView = () => {
    * because availableLevels.getIndexOf(1080p) will give 0 but level 0 is 360p.
    */
   const getCurrentLevel = qualityLevel => {
+    console.log("Choosen quality level", qualityLevel);
     if (qualityLevel.height === "auto") {
       return -1;
     }
