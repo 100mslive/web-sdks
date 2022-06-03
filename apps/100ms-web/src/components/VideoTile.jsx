@@ -25,30 +25,8 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { ConnectionIndicator } from "./Connection/ConnectionIndicator";
 import { UI_SETTINGS } from "../common/constants";
-import { useUISettings } from "./AppData/useUISettings";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { useAppConfig } from "./AppData/useAppConfig";
-
-const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
-  if (!isAudioMuted) {
-    return false;
-  }
-  if (!isHeadless) {
-    return true;
-  }
-  const hide = appConfig?.headlessConfig?.hideTileAudioMute;
-  return hide !== true;
-};
-
-const getPadding = ({ isHeadless, appConfig }) => {
-  const offset = appConfig?.headlessConfig?.tileOffset;
-  if (!isHeadless) {
-    return undefined;
-  }
-  if (typeof offset !== "number") {
-    return undefined;
-  }
-  return offset === 0 ? 0 : undefined;
-};
 
 const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const trackSelector = trackId
@@ -59,7 +37,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);
@@ -114,9 +92,12 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               data-testid="participant_avatar_icon"
             />
           ) : null}
-          <StyledVideoTile.Info data-testid="participant_name_onTile">
-            {label}
-          </StyledVideoTile.Info>
+          {(!isHeadless ||
+            (isHeadless && !appConfig?.headlessConfig?.hideTileName)) && (
+            <StyledVideoTile.Info data-testid="participant_name_onTile">
+              {label}
+            </StyledVideoTile.Info>
+          )}
           {showAudioMuted({ appConfig, isHeadless, isAudioMuted }) ? (
             <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
               <MicOffIcon />
@@ -166,5 +147,21 @@ const PeerMetadata = ({ peerId }) => {
 };
 
 const VideoTile = React.memo(Tile);
+
+const showAudioMuted = ({ appConfig, isHeadless, isAudioMuted }) => {
+  if (!isHeadless) {
+    return isAudioMuted;
+  }
+  const hide = appConfig?.headlessConfig?.hideTileAudioMute;
+  return isAudioMuted && !hide;
+};
+
+const getPadding = ({ isHeadless, appConfig }) => {
+  const offset = appConfig?.headlessConfig?.tileOffset;
+  if (!isHeadless || typeof offset !== "number") {
+    return undefined;
+  }
+  return offset === 0 ? 0 : undefined;
+};
 
 export default VideoTile;

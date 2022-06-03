@@ -6,12 +6,11 @@ import {
 } from "@100mslive/react-sdk";
 import { PersonIcon } from "@100mslive/react-icons";
 import { RequestDialog } from "../primitives/DialogContent";
-import { useUISettings } from "./AppData/useUISettings";
-import { UI_SETTINGS } from "../common/constants";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
+  const isHeadless = useIsHeadless();
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
 
   if (!roleChangeRequest?.role || isHeadless) {
