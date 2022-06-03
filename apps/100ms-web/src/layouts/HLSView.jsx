@@ -5,7 +5,15 @@ import React, {
   useState,
   useCallback,
 } from "react";
+
+import Hls from "hls.js";
+
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  SettingIcon,
+} from "@100mslive/react-icons";
 import {
   Box,
   Dropdown,
@@ -14,15 +22,10 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import Hls from "hls.js";
+
 import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { useIsChatOpen } from "../components/AppData/useChatState";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  SettingIcon,
-} from "@100mslive/react-icons";
 
 const HLSVideo = styled("video", {
   h: "100%",
@@ -66,7 +69,7 @@ const HLSView = () => {
         setCurrentSelectedQualityText(levelText);
       }
     },
-    [hls, availableLevels]
+    [availableLevels]
   );
 
   /**
