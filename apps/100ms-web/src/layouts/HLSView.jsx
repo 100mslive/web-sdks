@@ -34,8 +34,7 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  const hlsUrl =
-    "https://multiplatform-f.akamaihd.net/i/multi/april11/sintel/sintel-hd_,512x288_450_b,640x360_700_b,768x432_1000_b,1024x576_1400_m,.mp4.csmil/master.m3u8";
+  const hlsUrl = "https://qa-cdn.100ms.live/beam/vod/stream_0/stream.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -43,22 +42,39 @@ const HLSView = () => {
 
   useEffect(() => {
     if (videoRef.current && hlsUrl && !hls) {
-      hls = new Hls(getHLSConfig());
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(videoRef.current);
+      if (Hls.isSupported()) {
+        hls = new Hls(getHLSConfig());
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(videoRef.current);
 
-      hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
-        setAvailableLevels(data.levels);
-        console.log("LEVELS", data.levels[0]);
-        setCurrentSelectedQualityText("Auto");
-      });
-    } else if (
-      videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
-    ) {
-      videoRef.current.src = hlsUrl;
+        hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
+          setAvailableLevels(data.levels);
+          console.log("LEVELS", data.levels);
+          getTags(data.levels[0]);
+          setCurrentSelectedQualityText("Auto");
+        });
+      } else if (
+        videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
+      ) {
+        videoRef.current.src = hlsUrl;
+      }
     }
   }, [hlsUrl]);
 
+  const getTags = level => {
+    const fragments = level.details.fragments;
+    console.log("TOTAL FRAGMENT LENGTH", fragments.length);
+    const fragmentsWithTime = fragments.filter(fragment => {
+      // console.log(fragment.tagList);
+      const tagsWeNeed = fragment.tagList.filter(tag => {
+        return tag.indexOf("EXT-X-DATERANGE") !== -1;
+      });
+      // console.log("TAGLIST", tagsWeNeed.length);
+      return tagsWeNeed.length > 0;
+    });
+
+    console.log("WHAT WE NEED", fragmentsWithTime);
+  };
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hls) {
