@@ -181,6 +181,12 @@ export default class JsonRpcSignal implements ISignal {
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
   ): Promise<RTCSessionDescriptionInit> {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.JOIN,
+        'Failed to send join over WS connection',
+      );
+    }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
     const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
 
