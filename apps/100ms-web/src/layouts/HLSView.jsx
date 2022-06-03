@@ -45,18 +45,20 @@ const HLSView = () => {
 
   useEffect(() => {
     if (videoRef.current && hlsUrl && !hls) {
-      hls = new Hls(getHLSConfig());
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(videoRef.current);
+      if (Hls.isSupported()) {
+        hls = new Hls(getHLSConfig());
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(videoRef.current);
 
-      hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
-        setAvailableLevels(data.levels);
-        setCurrentSelectedQualityText("Auto");
-      });
-    } else if (
-      videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
-    ) {
-      videoRef.current.src = hlsUrl;
+        hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
+          setAvailableLevels(data.levels);
+          setCurrentSelectedQualityText("Auto");
+        });
+      } else if (
+        videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
+      ) {
+        videoRef.current.src = hlsUrl;
+      }
     }
   }, [hlsUrl]);
 
