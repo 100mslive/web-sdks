@@ -65,6 +65,11 @@ export class AnalyticsEventsService {
     event.metadata.sessionId = this.store.getRoom().sessionId;
     event.metadata.token = this.store.getConfig()?.authToken;
     event.metadata.roomId = this.store.getRoom().id;
+    event.metadata.roomName = this.store.getRoom().name;
+    event.metadata.role = this.store.getLocalPeer()?.role?.name;
+    event.metadata.joinedAt = this.store.getRoom().joinedAt?.getTime();
+    event.metadata.sessionStartTime = this.store.getRoom().startedAt?.getTime();
+    event.metadata.userName = this.store.getLocalPeer()?.name;
     HTTPAnalyticsTransport.sendEvent(event);
   }
 }

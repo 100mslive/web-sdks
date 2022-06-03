@@ -28,6 +28,12 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     peerId?: string;
     sessionId?: string;
     roomId?: string;
+    role?: string;
+    roomName?: string;
+    joinedAt?: number;
+    templateId?: string;
+    sessionStartTime?: number;
+    userName?: string;
   } = {};
   timestamp: number;
   event_id: string;

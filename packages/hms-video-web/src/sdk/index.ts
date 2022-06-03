@@ -17,7 +17,12 @@ import ITransportObserver from '../transport/ITransportObserver';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import decodeJWT from '../utils/jwt';
-import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
+import {
+  HMSNotificationMethod,
+  NotificationManager,
+  PeerLeaveRequestNotification,
+  PolicyParams,
+} from '../notification-manager';
 import {
   HMSLocalAudioTrack,
   HMSLocalTrack,
@@ -272,12 +277,13 @@ export class HMSSdk implements HMSInterface {
       }
     }, 3000);
     return new Promise<void>((resolve, reject) => {
-      const policyHandler = async () => {
+      const policyHandler = async (event: PolicyParams) => {
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
+        this.store.getRoom().templateId = event.template_id;
         listener.onPreview(this.store.getRoom(), tracks);
         resolve();
       };
@@ -825,7 +831,8 @@ export class HMSSdk implements HMSInterface {
     if (localPeer?.role) {
       this.listener?.onJoin(room);
     } else {
-      this.eventBus.policyChange.subscribeOnce(() => {
+      this.eventBus.policyChange.subscribeOnce((event: PolicyParams) => {
+        room.templateId = event.template_id;
         this.listener?.onJoin(room);
       });
     }
