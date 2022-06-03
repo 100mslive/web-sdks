@@ -29,33 +29,27 @@ const HLSVideo = styled("video", {
   margin: "0 auto",
 });
 
-let hls;
+let hls = null;
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
-  const [isManifestLoaded, setIsManifestLoaded] = useState(false);
   const [availableLevels, setAvailableLevels] = useState([]);
-  const [isHLSInitialized, setIsHLSInitialized] = useState(false);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
 
   useEffect(() => {
-    if (videoRef.current && hlsUrl) {
+    if (videoRef.current && hlsUrl && !hls) {
       hls = new Hls(getHLSConfig());
-      setIsHLSInitialized(true);
       hls.loadSource(hlsUrl);
       hls.attachMedia(videoRef.current);
 
-      if (!isManifestLoaded) {
-        hls.on(Hls.Events.MANIFEST_LOADED, (event, data) => {
-          setIsManifestLoaded(true);
-          setAvailableLevels(data.levels);
-          setCurrentSelectedQualityText("Auto");
-        });
-      }
+      hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
+        setAvailableLevels(data.levels);
+        setCurrentSelectedQualityText("Auto");
+      });
     } else if (
       videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
     ) {
@@ -64,15 +58,15 @@ const HLSView = () => {
   }, [hlsUrl]);
 
   const qualitySelectorHandler = useCallback(
-    (event, qualityLevel) => {
-      if (isHLSInitialized) {
+    qualityLevel => {
+      if (hls) {
         hls.currentLevel = getCurrentLevel(qualityLevel);
         const levelText =
           qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
         setCurrentSelectedQualityText(levelText);
       }
     },
-    [isHLSInitialized, availableLevels]
+    [hls, availableLevels]
   );
 
   /**
@@ -94,10 +88,9 @@ const HLSView = () => {
     if (qualityLevel.height === "auto") {
       return -1;
     }
-    const urls = availableLevels.map(level => level.url);
-    const index = urls.findIndex(url => {
-      return url === qualityLevel.url;
-    });
+    const index = availableLevels.findIndex(
+      ({ url }) => url === qualityLevel.url
+    );
 
     return availableLevels.length - 1 - index;
   };
@@ -111,7 +104,7 @@ const HLSView = () => {
               open={qualityDropDownOpen}
               onOpenChange={value => setQualityDropDownOpen(value)}
             >
-              <Dropdown.Trigger asChild data-testid="participant_list">
+              <Dropdown.Trigger asChild data-testid="quality_selector">
                 <Flex
                   css={{
                     color: "$textPrimary",
@@ -147,7 +140,7 @@ const HLSView = () => {
                 >
                   <Dropdown.Item
                     onClick={event =>
-                      qualitySelectorHandler(event, { height: "auto" })
+                      qualitySelectorHandler({ height: "auto" })
                     }
                     css={{
                       h: "auto",
@@ -163,7 +156,7 @@ const HLSView = () => {
                   {availableLevels.map(level => {
                     return (
                       <Dropdown.Item
-                        onClick={event => qualitySelectorHandler(event, level)}
+                        onClick={() => qualitySelectorHandler(level)}
                         css={{
                           h: "auto",
                           flexDirection: "column",
@@ -184,7 +177,7 @@ const HLSView = () => {
             </Dropdown.Root>
           </Flex>
 
-          <HLSVideo ref={videoRef} autoPlay controls />
+          <HLSVideo ref={videoRef} autoPlay controls playsInline />
         </>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%" }}>
