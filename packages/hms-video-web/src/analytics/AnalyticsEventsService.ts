@@ -62,14 +62,17 @@ export class AnalyticsEventsService {
   }
 
   private sendClientEventOnHTTP(event: AnalyticsEvent) {
-    event.metadata.sessionId = this.store.getRoom().sessionId;
+    const room = this.store.getRoom();
+    const localPeer = this.store.getLocalPeer();
     event.metadata.token = this.store.getConfig()?.authToken;
-    event.metadata.roomId = this.store.getRoom().id;
-    event.metadata.roomName = this.store.getRoom().name;
-    event.metadata.role = this.store.getLocalPeer()?.role?.name;
-    event.metadata.joinedAt = this.store.getRoom().joinedAt?.getTime();
-    event.metadata.sessionStartTime = this.store.getRoom().startedAt?.getTime();
-    event.metadata.userName = this.store.getLocalPeer()?.name;
+    event.metadata.sessionId = room.sessionId;
+    event.metadata.roomId = room.id;
+    event.metadata.roomName = room.name;
+    event.metadata.joinedAt = room.joinedAt?.getTime();
+    event.metadata.sessionStartTime = room.startedAt?.getTime();
+    event.metadata.role = localPeer?.role?.name;
+    event.metadata.userName = localPeer?.name;
+    event.metadata.userData = localPeer?.metadata;
     HTTPAnalyticsTransport.sendEvent(event);
   }
 }

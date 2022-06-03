@@ -34,6 +34,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     templateId?: string;
     sessionStartTime?: number;
     userName?: string;
+    userData?: string;
   } = {};
   timestamp: number;
   event_id: string;
