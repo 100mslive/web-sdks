@@ -3,7 +3,7 @@ import { ErrorFactory, HMSAction } from './ErrorFactory';
 import { HMSException } from './HMSException';
 
 export enum HMSGetMediaActions {
-  UNKNOWN = 'unknown(video or audio or screen)',
+  UNKNOWN = 'unknown(video or audio)',
   AUDIO = 'audio',
   VIDEO = 'video',
   AV = 'audio, video',
