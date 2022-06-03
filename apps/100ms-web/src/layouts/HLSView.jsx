@@ -55,7 +55,7 @@ const HLSView = () => {
           setCurrentSelectedQualityText("Auto");
         });
       } else if (
-        videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
       ) {
         videoRef.current.src = hlsUrl;
       }
