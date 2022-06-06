@@ -60,6 +60,7 @@ export { default as ShrinkIcon } from './ShrinkIcon';
 export { default as SpeakerIcon } from './SpeakerIcon';
 export { default as SpotlightIcon } from './SpotlightIcon';
 export { default as SquareMenuIcon } from './SquareMenuIcon';
+export { default as StarIcon } from './StarIcon';
 export { default as SunWithFace } from './SunWithFace';
 export { default as TextboxIcon } from './TextboxIcon';
 export { default as TrashIcon } from './TrashIcon';
