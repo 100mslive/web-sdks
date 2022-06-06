@@ -53,6 +53,7 @@ export class LocalTrackManager {
     const canPublishVideo = !!trackSettings.video;
     let tracksToPublish: Array<HMSLocalTrack> = [];
     const { videoTrack, audioTrack } = await this.updateCurrentLocalTrackSettings(trackSettings);
+    const localStream = (videoTrack?.stream || audioTrack?.stream) as HMSLocalStream | undefined;
     // The track gets added to the store only after it is published.
     const isVideoTrackPublished = Boolean(videoTrack && this.store.getTrackById(videoTrack.trackId));
     const isAudioTrackPublished = Boolean(audioTrack && this.store.getTrackById(audioTrack.trackId));
@@ -68,9 +69,14 @@ export class LocalTrackManager {
     };
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
-      tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings);
+      tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
     } catch (error) {
-      tracksToPublish = await this.retryGetLocalTracks(error as HMSException, trackSettings, fetchTrackOptions);
+      tracksToPublish = await this.retryGetLocalTracks(
+        error as HMSException,
+        trackSettings,
+        fetchTrackOptions,
+        localStream,
+      );
     }
 
     /**
@@ -97,10 +103,11 @@ export class LocalTrackManager {
   async getLocalTracks(
     fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
     settings: HMSTrackSettings,
+    localStream?: HMSLocalStream,
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
-      return this.createHMSLocalTracks(nativeTracks, settings);
+      return this.createHMSLocalTracks(nativeTracks, settings, localStream);
     } catch (error) {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
@@ -272,6 +279,7 @@ export class LocalTrackManager {
     error: HMSException,
     trackSettings: HMSTrackSettings,
     fetchTrackOptions: IFetchAVTrackOptions,
+    localStream?: HMSLocalStream,
   ): Promise<Array<HMSLocalTrack>> {
     if (error instanceof HMSException && error.action === HMSAction.TRACK) {
       this.observer.onFailure(error);
@@ -294,7 +302,7 @@ export class LocalTrackManager {
 
         try {
           // Try get local tracks with no constraints
-          return await this.getLocalTracks(fetchTrackOptions, newTrackSettings);
+          return await this.getLocalTracks(fetchTrackOptions, newTrackSettings, localStream);
         } catch (error) {
           /**
            * This error shouldn't be overconstrained error(as we've dropped all constraints).
@@ -312,7 +320,7 @@ export class LocalTrackManager {
             ex = newError;
           }
 
-          return await this.retryGetLocalTracks(ex as HMSException, trackSettings, fetchTrackOptions);
+          return await this.retryGetLocalTracks(ex as HMSException, trackSettings, fetchTrackOptions, localStream);
         }
       }
 
@@ -320,13 +328,13 @@ export class LocalTrackManager {
       fetchTrackOptions.video = videoFailure ? 'empty' : fetchTrackOptions.video;
       HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
       try {
-        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
       } catch (error) {
         HMSLogger.w(this.TAG, 'Fetch empty tacks failed', error);
         fetchTrackOptions.audio = fetchTrackOptions.audio && 'empty';
         fetchTrackOptions.video = fetchTrackOptions.video && 'empty';
         this.observer.onFailure(error as HMSException);
-        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
       }
     } else {
       HMSLogger.w(this.TAG, 'Fetch AV Tracks failed - unknown exception', error);
@@ -445,19 +453,39 @@ export class LocalTrackManager {
     );
   }
 
-  private createHMSLocalTracks(nativeTracks: MediaStreamTrack[], settings: HMSTrackSettings) {
+  private createHMSLocalTracks(
+    nativeTracks: MediaStreamTrack[],
+    settings: HMSTrackSettings,
+    localStream?: HMSLocalStream,
+  ) {
     const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
     const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
-    const local = new HMSLocalStream(new MediaStream(nativeTracks));
+    if (localStream) {
+      nativeTracks.forEach(track => localStream?.nativeStream.addTrack(track));
+    } else {
+      localStream = new HMSLocalStream(new MediaStream(nativeTracks));
+    }
 
     const tracks: Array<HMSLocalTrack> = [];
     if (nativeAudioTrack && settings?.audio) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
+      const audioTrack = new HMSLocalAudioTrack(
+        localStream,
+        nativeAudioTrack,
+        'regular',
+        this.eventBus,
+        settings.audio,
+      );
       tracks.push(audioTrack);
     }
 
     if (nativeVideoTrack && settings?.video) {
-      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
+      const videoTrack = new HMSLocalVideoTrack(
+        localStream,
+        nativeVideoTrack,
+        'regular',
+        this.eventBus,
+        settings.video,
+      );
       tracks.push(videoTrack);
     }
     return tracks;
