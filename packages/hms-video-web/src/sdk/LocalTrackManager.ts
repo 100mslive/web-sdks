@@ -460,22 +460,32 @@ export class LocalTrackManager {
   ) {
     const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
     const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
-    let local: HMSLocalStream;
     if (localStream) {
       nativeTracks.forEach(track => localStream?.nativeStream.addTrack(track));
-      local = localStream;
     } else {
-      local = new HMSLocalStream(new MediaStream(nativeTracks));
+      localStream = new HMSLocalStream(new MediaStream(nativeTracks));
     }
 
     const tracks: Array<HMSLocalTrack> = [];
     if (nativeAudioTrack && settings?.audio) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
+      const audioTrack = new HMSLocalAudioTrack(
+        localStream,
+        nativeAudioTrack,
+        'regular',
+        this.eventBus,
+        settings.audio,
+      );
       tracks.push(audioTrack);
     }
 
     if (nativeVideoTrack && settings?.video) {
-      const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
+      const videoTrack = new HMSLocalVideoTrack(
+        localStream,
+        nativeVideoTrack,
+        'regular',
+        this.eventBus,
+        settings.video,
+      );
       tracks.push(videoTrack);
     }
     return tracks;
