@@ -213,4 +213,21 @@ describe('role change api', () => {
         });
     });
   });
+
+  describe('role change to audio only role and back to audio video publishing role', () => {
+    it('tracks should be in the same stream', () => {
+      actions.join({ userName: 'test', authToken: token, initEndpoint });
+      cy.get('@onTrackUpdate')
+        .should('be.calledTwice')
+        .then(() => {
+          // @ts-ignore
+          const localPeer = actions.sdk.getLocalPeer();
+          actions.changeRole(localPeer.peerId, 'audio-only', true);
+          const localStreamID = localPeer.audioTrack.stream.id;
+
+          actions.changeRole(localPeer.peerId, 'student', true);
+          expect(localPeer.videoTrack.stream.id).to.equal(localStreamID);
+        });
+    });
+  });
 });
