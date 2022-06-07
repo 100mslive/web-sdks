@@ -70,7 +70,7 @@ export class LocalTrackManager {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings);
     } catch (error) {
-      tracksToPublish = await this.retryGetLocalTracks(error, trackSettings, fetchTrackOptions);
+      tracksToPublish = await this.retryGetLocalTracks(error as HMSException, trackSettings, fetchTrackOptions);
     }
 
     /**
@@ -91,6 +91,9 @@ export class LocalTrackManager {
     return tracksToPublish;
   }
 
+  /**
+   * @throws {HMSException}
+   */
   async getLocalTracks(
     fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
     settings: HMSTrackSettings,
@@ -114,6 +117,9 @@ export class LocalTrackManager {
     }
   }
 
+  /**
+   * @throws {HMSException}
+   */
   private async getNativeLocalTracks(
     fetchTrackOptions: IFetchAVTrackOptions = { audio: false, video: false },
     settings: HMSTrackSettings,
@@ -226,6 +232,9 @@ export class LocalTrackManager {
     return emptyTrack;
   }
 
+  /**
+   * @throws {HMSException}
+   */
   private async getAVTracks(settings: HMSTrackSettings): Promise<Array<MediaStreamTrack>> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -260,7 +269,7 @@ export class LocalTrackManager {
 
   // eslint-disable-next-line complexity
   private async retryGetLocalTracks(
-    error: unknown,
+    error: HMSException,
     trackSettings: HMSTrackSettings,
     fetchTrackOptions: IFetchAVTrackOptions,
   ): Promise<Array<HMSLocalTrack>> {
@@ -303,7 +312,7 @@ export class LocalTrackManager {
             ex = newError;
           }
 
-          return await this.retryGetLocalTracks(ex, trackSettings, fetchTrackOptions);
+          return await this.retryGetLocalTracks(ex as HMSException, trackSettings, fetchTrackOptions);
         }
       }
 
@@ -316,12 +325,12 @@ export class LocalTrackManager {
         HMSLogger.w(this.TAG, 'Fetch empty tacks failed', error);
         fetchTrackOptions.audio = fetchTrackOptions.audio && 'empty';
         fetchTrackOptions.video = fetchTrackOptions.video && 'empty';
-        this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
+        this.observer.onFailure(error as HMSException);
         return await this.getLocalTracks(fetchTrackOptions, trackSettings);
       }
     } else {
       HMSLogger.w(this.TAG, 'Fetch AV Tracks failed - unknown exception', error);
-      this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
+      this.observer.onFailure(error);
       return [];
     }
   }
@@ -333,7 +342,10 @@ export class LocalTrackManager {
     if (videoError) {
       return HMSGetMediaActions.VIDEO;
     }
-    return HMSGetMediaActions.AUDIO;
+    if (audioError) {
+      return HMSGetMediaActions.AUDIO;
+    }
+    return HMSGetMediaActions.UNKNOWN;
   }
 
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {

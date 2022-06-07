@@ -14,7 +14,24 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+
 import Hls from "hls.js";
+
+import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  SettingIcon,
+} from "@100mslive/react-icons";
+import {
+  Box,
+  Dropdown,
+  Flex,
+  styled,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
+
 import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { useIsChatOpen } from "../components/AppData/useChatState";
@@ -82,13 +99,12 @@ const HLSView = () => {
     qualityLevel => {
       if (hls) {
         hls.currentLevel = getCurrentLevel(qualityLevel);
-        console.log("CURRENT LEVEL", hls.currentLevel);
         const levelText =
           qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
         setCurrentSelectedQualityText(levelText);
       }
     },
-    [hls, availableLevels]
+    [availableLevels]
   );
 
   /**
@@ -107,7 +123,6 @@ const HLSView = () => {
    * because availableLevels.getIndexOf(1080p) will give 0 but level 0 is 360p.
    */
   const getCurrentLevel = qualityLevel => {
-    console.log("Choosen quality level", qualityLevel);
     if (qualityLevel.height === "auto") {
       return -1;
     }
