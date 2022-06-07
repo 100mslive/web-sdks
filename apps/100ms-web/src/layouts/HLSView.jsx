@@ -35,6 +35,9 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const hlsUrl = "https://qa-cdn.100ms.live/beam/vod/stream_0/stream.m3u8";
+  // const hlsUrl =
+  // "https://cdn-in.100ms.live/beam/621b70b47a9d04e28c60cdf9/621b73757a9d04e28c60ce03/20220606/1654490342400/stream_3/stream.m3u8";
+  // const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -53,8 +56,18 @@ const HLSView = () => {
           getTags(data.levels[0]);
           setCurrentSelectedQualityText("Auto");
         });
+        hls.on(Hls.Events.FRAG_CHANGED, (event, listener, context) => {
+          // console.log("FRAG CHANGED", listener);
+          const tagsWeNeed = listener.frag.tagList.filter(tag => {
+            return tag.indexOf("EXT-X-DATERANGE") !== -1;
+          });
+          if (tagsWeNeed.length > 0) {
+            console.log("GOT TIMED METADATA. CELEBRATING.....", tagsWeNeed[0]);
+            window.sendConfetti();
+          }
+        });
       } else if (
-        videoRef?.current?.canPlayType("application/vnd.apple.mpegurl")
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
       ) {
         videoRef.current.src = hlsUrl;
       }
@@ -63,7 +76,10 @@ const HLSView = () => {
 
   const getTags = level => {
     const fragments = level.details.fragments;
+    // setInterval(() => {
     console.log("TOTAL FRAGMENT LENGTH", fragments.length);
+    // }, 1000);
+
     const fragmentsWithTime = fragments.filter(fragment => {
       // console.log(fragment.tagList);
       const tagsWeNeed = fragment.tagList.filter(tag => {
