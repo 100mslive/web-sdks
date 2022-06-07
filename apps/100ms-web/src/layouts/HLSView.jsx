@@ -23,6 +23,7 @@ import {
   ChevronUpIcon,
   SettingIcon,
 } from "@100mslive/react-icons";
+import { ToastManager } from "../components/Toast/ToastManager";
 
 const HLSVideo = styled("video", {
   h: "100%",
@@ -52,17 +53,20 @@ const HLSView = () => {
 
         hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
           setAvailableLevels(data.levels);
-          console.log("LEVELS", data.levels);
-          getTags(data.levels[0]);
           setCurrentSelectedQualityText("Auto");
         });
-        hls.on(Hls.Events.FRAG_CHANGED, (event, listener, context) => {
-          // console.log("FRAG CHANGED", listener);
-          const tagsWeNeed = listener.frag.tagList.filter(tag => {
-            return tag.indexOf("EXT-X-DATERANGE") !== -1;
-          });
-          if (tagsWeNeed.length > 0) {
-            console.log("GOT TIMED METADATA. CELEBRATING.....", tagsWeNeed[0]);
+        hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+          const tagList = data?.frag?.tagList;
+          const tagIfMD = tagList.filter(
+            tag => tag.indexOf("EXT-X-DATERANGE") !== -1
+          );
+
+          if (tagIfMD.length > 0) {
+            const message = tagIfMD[0][1].split("STR=")[1];
+            console.log("Got Timed Metadata.Celebrating....", message);
+            ToastManager.addToast({
+              title: `Got Message from Backend: ${message}`,
+            });
             window.sendConfetti();
           }
         });
@@ -74,23 +78,6 @@ const HLSView = () => {
     }
   }, [hlsUrl]);
 
-  const getTags = level => {
-    const fragments = level.details.fragments;
-    // setInterval(() => {
-    console.log("TOTAL FRAGMENT LENGTH", fragments.length);
-    // }, 1000);
-
-    const fragmentsWithTime = fragments.filter(fragment => {
-      // console.log(fragment.tagList);
-      const tagsWeNeed = fragment.tagList.filter(tag => {
-        return tag.indexOf("EXT-X-DATERANGE") !== -1;
-      });
-      // console.log("TAGLIST", tagsWeNeed.length);
-      return tagsWeNeed.length > 0;
-    });
-
-    console.log("WHAT WE NEED", fragmentsWithTime);
-  };
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hls) {
