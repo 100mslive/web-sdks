@@ -68,7 +68,7 @@ const HeadlessSettings = ({ change, settings }) => {
           }}
         />
         <Flex align="center" justify="between">
-          <Label htmlFor="tileOffset">Tile Offset</Label>
+          <Label htmlFor="tileOffset">Tile Margin(space around Video Tile in px - 0-10)</Label>
           <Input
             id="tileOffset"
             css={{ width: '25%', '@sm': { width: '100%' }, ml: '$4', my: '$4' }}

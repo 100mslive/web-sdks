@@ -32,7 +32,7 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
                 Theme
               </TabButton>
               <TabButton active={tab === 1} onClick={() => setTab(1)}>
-                Headless
+                Streaming/Recording
               </TabButton>
             </Flex>
           </Box>
