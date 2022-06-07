@@ -9,6 +9,8 @@ export class FeatureFlags {
     process.env.REACT_APP_ENABLE_WHITEBOARD &&
     process.env.REACT_APP_PUSHER_APP_KEY &&
     process.env.REACT_APP_PUSHER_AUTHENDPOINT;
+  static enableHLSQualityLevels =
+    process.env.REACT_APP_ENABLE_HLS_QUALITY_LVL === "true";
 
   static init() {
     if (!window.HMS) {

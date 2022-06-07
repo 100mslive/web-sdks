@@ -104,83 +104,88 @@ const HLSView = () => {
     <Fragment>
       {hlsUrl ? (
         <>
-          <Flex align="center" css={{ position: "absolute", right: "$4" }}>
-            <Dropdown.Root
-              open={qualityDropDownOpen}
-              onOpenChange={value => setQualityDropDownOpen(value)}
-            >
-              <Dropdown.Trigger asChild data-testid="quality_selector">
-                <Flex
-                  css={{
-                    color: "$textPrimary",
-                    borderRadius: "$1",
-                    cursor: "pointer",
-                    border: "1px solid $textDisabled",
-                    padding: "$2 $4",
-                  }}
-                >
-                  <Tooltip title="Select Quality">
-                    <Flex>
-                      <SettingIcon />
-                      <Text variant="md">{currentSelectedQualityText}</Text>
-                    </Flex>
-                  </Tooltip>
-
-                  <Box
-                    css={{ "@lg": { display: "none" }, color: "$textDisabled" }}
-                  >
-                    {qualityDropDownOpen ? (
-                      <ChevronUpIcon />
-                    ) : (
-                      <ChevronDownIcon />
-                    )}
-                  </Box>
-                </Flex>
-              </Dropdown.Trigger>
-              {availableLevels.length > 0 && (
-                <Dropdown.Content
-                  sideOffset={5}
-                  align="end"
-                  css={{ height: "auto", maxHeight: "$96" }}
-                >
-                  <Dropdown.Item
-                    onClick={event =>
-                      qualitySelectorHandler({ height: "auto" })
-                    }
+          {FeatureFlags.enableHLSQualityLevels ? (
+            <Flex align="center" css={{ position: "absolute", right: "$4" }}>
+              <Dropdown.Root
+                open={qualityDropDownOpen}
+                onOpenChange={value => setQualityDropDownOpen(value)}
+              >
+                <Dropdown.Trigger asChild data-testid="quality_selector">
+                  <Flex
                     css={{
-                      h: "auto",
-                      flexDirection: "column",
-                      flexWrap: "wrap",
+                      color: "$textPrimary",
+                      borderRadius: "$1",
                       cursor: "pointer",
-                      alignItems: "flex-start",
+                      border: "1px solid $textDisabled",
+                      padding: "$2 $4",
                     }}
-                    key="auto"
                   >
-                    <Text>Automatic</Text>
-                  </Dropdown.Item>
-                  {availableLevels.map(level => {
-                    return (
-                      <Dropdown.Item
-                        onClick={() => qualitySelectorHandler(level)}
-                        css={{
-                          h: "auto",
-                          flexDirection: "column",
-                          flexWrap: "wrap",
-                          cursor: "pointer",
-                          alignItems: "flex-start",
-                        }}
-                        key={level.url}
-                      >
-                        <Text>{`${level.height}p (${(
-                          Number(level.bitrate / 1024) / 1024
-                        ).toFixed(2)} Mbps)`}</Text>
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Content>
-              )}
-            </Dropdown.Root>
-          </Flex>
+                    <Tooltip title="Select Quality">
+                      <Flex>
+                        <SettingIcon />
+                        <Text variant="md">{currentSelectedQualityText}</Text>
+                      </Flex>
+                    </Tooltip>
+
+                    <Box
+                      css={{
+                        "@lg": { display: "none" },
+                        color: "$textDisabled",
+                      }}
+                    >
+                      {qualityDropDownOpen ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </Box>
+                  </Flex>
+                </Dropdown.Trigger>
+                {availableLevels.length > 0 && (
+                  <Dropdown.Content
+                    sideOffset={5}
+                    align="end"
+                    css={{ height: "auto", maxHeight: "$96" }}
+                  >
+                    <Dropdown.Item
+                      onClick={event =>
+                        qualitySelectorHandler({ height: "auto" })
+                      }
+                      css={{
+                        h: "auto",
+                        flexDirection: "column",
+                        flexWrap: "wrap",
+                        cursor: "pointer",
+                        alignItems: "flex-start",
+                      }}
+                      key="auto"
+                    >
+                      <Text>Automatic</Text>
+                    </Dropdown.Item>
+                    {availableLevels.map(level => {
+                      return (
+                        <Dropdown.Item
+                          onClick={() => qualitySelectorHandler(level)}
+                          css={{
+                            h: "auto",
+                            flexDirection: "column",
+                            flexWrap: "wrap",
+                            cursor: "pointer",
+                            alignItems: "flex-start",
+                          }}
+                          key={level.url}
+                        >
+                          <Text>{`${level.height}p (${(
+                            Number(level.bitrate / 1024) / 1024
+                          ).toFixed(2)} Mbps)`}</Text>
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </Dropdown.Content>
+                )}
+              </Dropdown.Root>
+            </Flex>
+          ) : null}
 
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
         </>
