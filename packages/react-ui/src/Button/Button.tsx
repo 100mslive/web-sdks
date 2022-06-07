@@ -1,5 +1,6 @@
 import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
+import React from 'react';
 
 /**
  * @param base bg color
