@@ -222,11 +222,22 @@ describe('role change api', () => {
         .then(() => {
           // @ts-ignore
           const localPeer = actions.sdk.getLocalPeer();
-          actions.changeRole(localPeer.peerId, 'audio-only', true);
           const localStreamID = localPeer.audioTrack.stream.id;
+          actions.changeRole(localPeer.peerId, 'audio-only', true);
 
-          actions.changeRole(localPeer.peerId, 'student', true);
-          expect(localPeer.videoTrack.stream.id).to.equal(localStreamID);
+          cy.get('@onPeerUpdate')
+            .should('be.calledWithMatch', HMSPeerUpdate.ROLE_UPDATED)
+            .then(() => {
+              actions.changeRole(localPeer.peerId, 'student', true);
+
+              cy.get('@onTrackUpdate')
+                .should('have.callCount', 4)
+                .should('be.calledWithMatch', HMSTrackUpdate.TRACK_ADDED)
+                .then(() => {
+                  // @ts-ignore
+                  expect(actions.sdk.getLocalPeer().videoTrack.stream.id).to.equal(localStreamID);
+                });
+            });
         });
     });
   });
