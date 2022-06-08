@@ -62,6 +62,14 @@ const HLSView = () => {
     }
   }, [hlsUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (hls && hls.media) {
+        hls.detachMedia();
+      }
+    };
+  }, []);
+
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hls) {
@@ -115,6 +123,7 @@ const HLSView = () => {
                     color: "$textPrimary",
                     borderRadius: "$1",
                     cursor: "pointer",
+                    zIndex: 40,
                     border: "1px solid $textDisabled",
                     padding: "$2 $4",
                   }}
