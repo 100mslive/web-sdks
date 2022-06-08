@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Dialog, Flex, styled } from '@100mslive/react-ui';
 import { DialogContent } from './DialogContent';
-import HeadlessSettings from './HeadlessSettings';
+import StreamingRecordingSettings from './StreamingRecordingSettings';
 import ThemeSettings from './ThemeSettings';
 
 const TabButton = styled('button', {
@@ -21,7 +21,7 @@ const TabButton = styled('button', {
 });
 
 export default function RoomSettings({ onClose, settings, change, handleLogoChange, onSave, onCancel }) {
-  const [tab, setTab] = useState(1);
+  const [tab, setTab] = useState(0);
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)' }}>
@@ -39,7 +39,7 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
 
           {tab === 0 && <ThemeSettings change={change} settings={settings} handleLogoChange={handleLogoChange} />}
 
-          {tab === 1 && <HeadlessSettings change={change} settings={settings} />}
+          {tab === 1 && <StreamingRecordingSettings change={change} settings={settings} />}
         </Flex>
         <Flex justify="end" align="center" css={{ mt: '$8' }}>
           <Button variant="standard" css={{ mr: '$8' }} onClick={onCancel}>

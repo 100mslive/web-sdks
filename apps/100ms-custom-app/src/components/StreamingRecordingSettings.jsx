@@ -29,7 +29,7 @@ const HeadlessItem = React.memo(({ title, children }) => (
   </Fragment>
 ));
 
-const HeadlessSettings = ({ change, settings }) => {
+const StreamingRecordingSettings = ({ change, settings }) => {
   const metaData = JSON.parse(settings.metadataFields.metadata || '{}');
   const { headlessConfig } = metaData;
   const handleSettingsMetaData = (key, value) => {
@@ -108,4 +108,4 @@ const HeadlessSettings = ({ change, settings }) => {
   );
 };
 
-export default HeadlessSettings;
+export default StreamingRecordingSettings;
