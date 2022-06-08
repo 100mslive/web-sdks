@@ -716,14 +716,14 @@ export default class HMSTransport implements ITransport {
         category: TransportFailureCategory.PublishIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH),
         task: this.retryPublishIceFailedTask,
-        originalState: this.state,
+        originalState: TransportState.Joined,
       });
     } else {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.SubscribeIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.SUBSCRIBE),
         task: this.retrySubscribeIceFailedTask,
-        originalState: this.state,
+        originalState: TransportState.Joined,
         maxFailedRetries: 1,
       });
     }
