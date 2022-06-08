@@ -16,7 +16,7 @@
     "prestart": "rm -rf dist",
     "start": "rollup -c -w",
     "build": "rm -rf dist && NODE_ENV=production rollup -c",
-    "lint": "eslint src/**",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
     "storybook": "start-storybook -p 6006",
