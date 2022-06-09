@@ -62,9 +62,7 @@ export class ErrorBoundary extends Component {
                 );
               }}
             </ThemeContext.Consumer>
-            {/* <img src={errorBgDark} alt="error background" /> */}
             <Flex
-              // align="center"
               direction="column"
               css={{
                 position: "absolute",
@@ -93,7 +91,9 @@ export class ErrorBoundary extends Component {
                   <Button
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        JSON.stringify(this.state.errorInfo)
+                        `${this.state.error.toString()}\n${JSON.stringify(
+                          this.state.errorInfo
+                        )}}`
                       );
                       this.setState({ isErrorCopied: true });
                     }}
