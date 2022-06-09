@@ -356,6 +356,7 @@ export default class HMSTransport implements ITransport {
           isServerHandlingDegradation,
         );
         await this.initRtcStatsMonitor();
+        this.eventBus.analytics.publish(AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date()));
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
     } catch (error) {
