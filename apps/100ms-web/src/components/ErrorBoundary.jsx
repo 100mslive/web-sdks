@@ -90,10 +90,12 @@ export class ErrorBoundary extends Component {
                 <Tooltip title="Copy error details to clipboard">
                   <Button
                     onClick={() => {
+                      const { error, errorInfo } = this.state;
                       navigator.clipboard.writeText(
-                        `${this.state.error.toString()}\n${JSON.stringify(
-                          this.state.errorInfo
-                        )}}`
+                        JSON.stringify({
+                          error,
+                          errorInfo,
+                        })
                       );
                       this.setState({ isErrorCopied: true });
                     }}
