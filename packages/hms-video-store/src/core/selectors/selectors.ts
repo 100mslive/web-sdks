@@ -95,7 +95,9 @@ export const selectIsConnectedToRoom = createSelector([selectRoom], room => room
 export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
   if (isConnected) {
     // if we have peer count from server return that else return number of peers in the store.
-    // show 1 when room.peerCount is 0 as there might be a delay in getting it.
+    // In case the strongly consistent peer list is disabled and only eventual consistent count and peer
+    // details is sent, room.peerCount may be 0 for a few second even though local peer is connected, send 1 in that case.
+    // TODO: Fix this at populating room.peerCount level than in selector.
     return room.peerCount !== undefined ? room.peerCount || 1 : room.peers.length;
   } else {
     // if we have peer count from server return that, else return number of peers except the local one because local is
