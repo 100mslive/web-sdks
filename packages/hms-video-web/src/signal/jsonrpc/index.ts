@@ -407,6 +407,7 @@ export default class JsonRpcSignal implements ISignal {
         return await this.call(HMSSignalMethod.JOIN, params);
       } catch (err) {
         error = err as HMSException;
+        HMSLogger.e(this.TAG, 'Failed sending join', { try: i + 1, params, error });
         const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
         if (!shouldRetry) {
           break;
