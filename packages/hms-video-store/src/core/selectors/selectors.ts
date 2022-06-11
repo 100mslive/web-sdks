@@ -95,12 +95,12 @@ export const selectIsConnectedToRoom = createSelector([selectRoom], room => room
 export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
   if (isConnected) {
     // if we have peer count from server return that else return number of peers in the store.
-    return room.peerCount || room.peers.length;
+    return room.peerCount !== undefined ? room.peerCount : room.peers.length;
   } else {
     // if we have peer count from server return that, else return number of peers except the local one because local is
     // not joined yet.
     // Math.max to ensure we're not returning -1, if the selector is called before local peer is put in the store
-    return Math.max(room.peerCount || room.peers.length - 1, 0);
+    return Math.max(room.peerCount !== undefined ? room.peerCount : room.peers.length - 1, 0);
   }
 });
 

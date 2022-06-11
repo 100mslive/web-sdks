@@ -68,6 +68,7 @@ export class PeerListManager {
     if (roomPeers === null || roomPeers === undefined) {
       // room state doesn't say anything about the peers, if there are no peers,
       // empty object would come instead
+      this.handleRepeatedPeerList({});
       return;
     }
     // we don't get tracks inside the peer object in room state, we're adding
