@@ -34,23 +34,22 @@ const ColorPicker = styled('input', {
 
 const TileType = ({ type, active, value, change }) => {
   const [multiplier, divider] = value.split('-').map(Number);
-  const width = (80 * multiplier) / divider;
   return (
     <Flex
       align="center"
       justify="center"
       css={{
-        h: '$20',
+        height: '$24',
+        aspectRatio: `${multiplier}/${divider}`,
         border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
-        ml: '$4',
-        width,
+        m: '$2',
         cursor: 'pointer',
       }}
       onClick={() => {
         change('tile_shape', value);
       }}
     >
-      <Text>{type}</Text>
+      <Text variant='sm'>{type}</Text>
     </Flex>
   );
 };
@@ -127,8 +126,10 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
         </Flex>
       </ItemRoot>
       <ItemRoot title="Tile Shape">
-        <Flex>
+        <Flex justify='end' css={{ flexWrap: 'wrap', ml: '$8'}}>
           <TileType type="Square" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
+          <TileType type="3-4" value="3-4" active={settings.tile_shape === '3-4'} change={change} />
+          <TileType type="9-16" value="9-16" active={settings.tile_shape === '9-16'} change={change} />
           <TileType type="Landscape" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
           <TileType type="Wide" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
         </Flex>
