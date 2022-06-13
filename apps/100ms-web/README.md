@@ -70,7 +70,7 @@ In Windows, you might encounter
 This happens because our build script has 
 
 ```json
-"scripts: {
+"scripts": {
   "build": "NODE_ENV=production webpack",
 }
 ```
