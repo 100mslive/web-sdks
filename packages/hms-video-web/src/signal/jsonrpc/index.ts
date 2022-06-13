@@ -28,6 +28,7 @@ import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 import { Queue } from '../../utils/queue';
 import { isPageHidden } from '../../utils/support';
+import { sleep } from '../../utils/timer-utils';
 
 export default class JsonRpcSignal implements ISignal {
   readonly TAG = '[ SIGNAL ]: ';
@@ -412,6 +413,9 @@ export default class JsonRpcSignal implements ISignal {
         if (!shouldRetry) {
           break;
         }
+
+        const delay = (2 + Math.random() * 2) * 1000;
+        await sleep(delay);
       }
     }
     HMSLogger.e(`Sending join over WS failed after ${MAX_RETRIES} retries`, params);
