@@ -81,6 +81,7 @@ and this doesn't work in windows. To fix this, there are two solution. you can u
 
 we prefer using `win-node-env` because with it, only windows users can install it locally while not changing their npm scripts thus adding the dependency to non-windows users too.
 
+
 | :bulb:        |  404 Error              |
 |---------------|:------------------------|
 Please ignore the 404 message, you need to join the right URL of the room. Next sections describe how to create a room and form the correct URL
