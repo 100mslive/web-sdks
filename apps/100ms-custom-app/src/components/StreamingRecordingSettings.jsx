@@ -37,7 +37,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
       ...settings.metadataFields,
       metadata: JSON.stringify({
         headlessConfig: {
-          ...metaData.headlessConfig,
+          ...(metaData.headlessConfig || {}),
           [key]: value,
         },
       }),
