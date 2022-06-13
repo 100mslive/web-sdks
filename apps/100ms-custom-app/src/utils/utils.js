@@ -33,12 +33,16 @@ export const getAuthInfo = () => {
   return info;
 };
 
+const tileShapeMapping = {
+  '1-1': 'SQUARE',
+  '4-3': 'LANDSCAPE',
+  '16-9': 'WIDE',
+  '3-4': '3-4',
+  '9-16': '9-16',
+};
+
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
-  const mapTileShape = value => {
-    return value === '1-1' ? 'SQUARE' : value === '16-9' ? 'WIDE' : 'LANDSCAPE';
-  };
-
   const formData = new FormData();
   const logoFile = settings.logo_obj;
   if (logoFile) {
@@ -47,7 +51,7 @@ export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
 
   formData.append('color', settings.brand_color);
   formData.append('font', settings.font.toUpperCase());
-  formData.append('tile_shape', mapTileShape(settings.tile_shape));
+  formData.append('tile_shape', tileShapeMapping[settings.tile_shape]);
   formData.append('theme', settings.theme.toUpperCase());
   formData.append('app_type', appInfo.app_type);
   formData.append('app_name', appInfo.app_name);
