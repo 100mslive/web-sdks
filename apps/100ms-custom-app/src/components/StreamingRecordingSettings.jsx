@@ -46,13 +46,14 @@ const StreamingRecordingSettings = ({ change, settings }) => {
   return (
     <Box css={{ flex: '3 1 0', ml: '$8' }}>
       <HeadlessItem title="Visible UI Elements">
-        {headlessConfig.hideAudioLevel ?   <CheckboxItem
+        {headlessConfig.hideAudioLevel !== null ? <CheckboxItem
           checked={headlessConfig.hideAudioLevel}
           label="Audio Level Border"
           onClick={() => {
             change('metadataFields', handleSettingsMetaData('hideAudioLevel', !headlessConfig.hideAudioLevel));
           }}
-        /> : null}
+        />: null}
+        
         <CheckboxItem
           checked={headlessConfig.hideTileAudioMute}
           label="Audio Mute on Tile"

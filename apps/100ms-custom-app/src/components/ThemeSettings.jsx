@@ -125,13 +125,13 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           <Text>{settings.brand_color}</Text>
         </Flex>
       </ItemRoot>
-      <ItemRoot title="Tile Shape">
+      <ItemRoot title="Tile Aspect Ratio">
         <Flex justify='end' css={{ flexWrap: 'wrap', ml: '$8'}}>
-          <TileType type="Square" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
-          <TileType type="3-4" value="3-4" active={settings.tile_shape === '3-4'} change={change} />
-          <TileType type="9-16" value="9-16" active={settings.tile_shape === '9-16'} change={change} />
-          <TileType type="Landscape" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
-          <TileType type="Wide" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
+          <TileType type="1:1" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
+          <TileType type="3:4" value="3-4" active={settings.tile_shape === '3-4'} change={change} />
+          <TileType type="9:16" value="9-16" active={settings.tile_shape === '9-16'} change={change} />
+          <TileType type="4:3" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
+          <TileType type="16:9" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
         </Flex>
       </ItemRoot>
       <ItemRoot title="Font Family">
