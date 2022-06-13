@@ -27,9 +27,9 @@ const App = () => {
   const prevSavedSettings = useRef({});
   const appInfo = useRef({ app_type: '', app_name: '' });
   const [loading, setLoading] = useState(true);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [onlyEmail, setOnlyEmail] = useState(false);
+  const [onlyEmail, setOnlyEmail] = useState(true);
   const [error, setError] = useState('');
   const [roomLinks, setRoomLinks] = useState({});
   const [settings, setSettings] = useState({

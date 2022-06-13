@@ -5,6 +5,7 @@ import StreamingRecordingSettings from './StreamingRecordingSettings';
 import ThemeSettings from './ThemeSettings';
 
 const TabButton = styled('button', {
+  color: '$textPrimary',
   p: '$8',
   bg: 'transparent',
   r: '$1',
@@ -24,7 +25,10 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
   const [tab, setTab] = useState(0);
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
-      <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)', height:  'min(800px, 90%)', overflowY: 'auto' }}>
+      <DialogContent
+        title="Customise your app"
+        css={{ width: 'min(700px, 100%)', height: 'min(800px, 90%)', overflowY: 'auto' }}
+      >
         <Flex css={{ size: '100%', overflow: 'hidden' }}>
           <Box css={{ flex: '1 1 0', pt: '$6' }}>
             <Flex direction="column">
