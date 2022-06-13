@@ -34,3 +34,5 @@ export interface HMSDiagnosticsInterface {
   checkDevices(): Promise<HMSDiagnosticsOutput['devices']>;
   checkwebRTC(): HMSDiagnosticsOutput['webRTC'];
 }
+
+export type ConnectivityKeys = keyof HMSDiagnosticsOutput['connectivity'];

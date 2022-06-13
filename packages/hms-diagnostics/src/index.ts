@@ -7,9 +7,11 @@ import {
   HMSSdk,
 } from '@100mslive/hms-video';
 import type { InitConfig } from '@100mslive/hms-video';
-import { initialState } from './initial-state';
 import cloneDeep from 'lodash.clonedeep';
+import setInObject from 'lodash.set';
+import { initialState } from './initial-state';
 import { HMSDiagnosticsInterface, HMSDiagnosticsOutput } from './interfaces';
+import type { ConnectivityKeys } from './interfaces';
 import { getToken } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
@@ -30,27 +32,32 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   async checkConnectivity() {
     try {
       const initConfig = await this.checkInit();
-      this.result.connectivity.init.success = true;
-      this.result.connectivity.init.errorMessage = '';
-      this.result.connectivity.init.info = initConfig;
+      this.updateStatus({ path: 'connectivity.init', info: initConfig });
       await this.checkSTUNAndTURNConnectivity(initConfig);
     } catch (error) {
-      this.result.connectivity.init.success = false;
-      this.result.connectivity.init.errorMessage = (error as Error).message;
+      this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: (error as Error).message });
     }
+    (Object.keys(this.result.connectivity) as ConnectivityKeys[]).forEach((connectionType: ConnectivityKeys) => {
+      const status = this.result.connectivity[connectionType].success;
+      if (status === null) {
+        this.updateStatus({ path: `connectivity.${connectionType}`, success: false });
+      }
+    });
     return this.result.connectivity;
   }
 
   async checkDevices() {
     try {
       validateMediaDevicesExistence();
-      this.result.devices.success = true;
-      this.result.devices.errorMessage = '';
+      this.updateStatus({ path: 'devices' });
       await this.checkCamera();
       await this.checkMicrophone();
     } catch (error) {
-      this.result.devices.success = false;
-      this.result.devices.errorMessage = (error as HMSException).message;
+      this.updateStatus({
+        path: 'devices',
+        errorMessage: (error as HMSException).message,
+        info: error as HMSException,
+      });
     }
     return this.result.devices;
   }
@@ -58,11 +65,14 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   checkwebRTC() {
     try {
       validateRTCPeerConnection();
-      this.result.webRTC.success = true;
-      this.result.webRTC.errorMessage = '';
+      this.updateStatus({ path: 'webRTC' });
     } catch (error) {
-      this.result.webRTC.success = false;
-      this.result.webRTC.errorMessage = (error as HMSException).message;
+      this.updateStatus({
+        path: 'webRTC',
+        success: false,
+        errorMessage: (error as HMSException).message,
+        info: error as HMSException,
+      });
     }
     return this.result.webRTC;
   }
@@ -94,26 +104,22 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       // If a srflx candidate was found, the STUN server works!
       if (candidate.type === 'srflx') {
         if (candidate.protocol === 'udp') {
-          this.result.connectivity.stunUDP.success = true;
-          this.result.connectivity.stunUDP.info = { address: candidate.address };
+          this.updateStatus({ path: 'connectivity.stunUDP', info: candidate });
         }
 
         if (candidate.protocol === 'tcp') {
-          this.result.connectivity.stunTCP.success = true;
-          this.result.connectivity.stunTCP.info = { address: candidate.address };
+          this.updateStatus({ path: 'connectivity.stunTCP', info: candidate });
         }
       }
 
       // If a relay candidate was found, the TURN server works!
       if (candidate.type === 'relay') {
         if (candidate.protocol === 'udp') {
-          this.result.connectivity.turnUDP.success = true;
-          this.result.connectivity.turnUDP.info = { address: candidate.address };
+          this.updateStatus({ path: 'connectivity.turnUDP', info: candidate });
         }
 
         if (candidate.protocol === 'tcp') {
-          this.result.connectivity.turnTCP.success = true;
-          this.result.connectivity.turnTCP.info = { address: candidate.address };
+          this.updateStatus({ path: 'connectivity.turnTCP', info: candidate });
         }
       }
     });
@@ -124,18 +130,23 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const videoTrack = stream.getVideoTracks()[0];
       const settings = videoTrack.getSettings();
-      this.result.devices.camera.success = true;
-      this.result.devices.camera.info = {
-        deviceId: settings.deviceId,
-        groupId: settings.groupId,
-        label: videoTrack.label,
-      };
+      this.updateStatus({
+        path: 'devices.camera',
+        info: {
+          deviceId: settings.deviceId,
+          groupId: settings.groupId,
+          label: videoTrack.label,
+        },
+      });
       videoTrack.stop();
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
-      this.result.devices.camera.success = false;
-      this.result.devices.camera.errorMessage = exception.message;
-      this.result.devices.camera.info = exception;
+      this.updateStatus({
+        path: 'devices.camera',
+        info: exception,
+        errorMessage: exception.message,
+        success: false,
+      });
     }
   }
 
@@ -144,18 +155,23 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const audioTrack = stream.getAudioTracks()[0];
       const settings = audioTrack.getSettings();
-      this.result.devices.microphone.success = true;
-      this.result.devices.microphone.info = {
-        deviceId: settings.deviceId,
-        groupId: settings.groupId,
-        label: audioTrack.label,
-      };
+      this.updateStatus({
+        path: 'devices.microphone',
+        info: {
+          deviceId: settings.deviceId,
+          groupId: settings.groupId,
+          label: audioTrack.label,
+        },
+      });
       audioTrack.stop();
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
-      this.result.devices.microphone.success = false;
-      this.result.devices.microphone.errorMessage = exception.message;
-      this.result.devices.microphone.info = exception;
+      this.updateStatus({
+        path: 'devices.microphone',
+        success: false,
+        errorMessage: exception.message,
+        info: exception,
+      });
     }
   }
 
@@ -165,8 +181,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     sdk.initStoreAndManagers();
     const token = await getToken();
     if (!token) {
-      this.result.connectivity.init.success = false;
-      this.result.connectivity.init.errorMessage = 'Failed to create token';
+      this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: 'Failed to create token' });
       return;
     }
     //@ts-ignore
@@ -179,7 +194,21 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     );
 
     //@ts-ignore
-    this.result.connectivity.websocket.success = sdk.transport.signal.isConnected;
+    this.updateStatus({ path: 'connectivity.websocket', success: sdk.transport.signal.isConnected });
     return initConfig;
+  }
+
+  private updateStatus({
+    path,
+    success = true,
+    errorMessage = '',
+    info,
+  }: {
+    path: string;
+    success?: boolean;
+    errorMessage?: string;
+    info?: Record<string, any>;
+  }) {
+    setInObject(this.result, path, { success, errorMessage, info });
   }
 }
