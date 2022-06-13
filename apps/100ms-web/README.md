@@ -54,8 +54,38 @@ Then start the app with:
 ```bash
 yarn start
 ```
+The app now should be running at https://localhost:3000/. 
 
-The app now should be running at https://localhost:3000/. (Please ignore the 404 message, you need to join the right URL of the room. Next sections describe how to create a room and form the correct URL)
+---
+
+#### Troubleshooting
+| :bulb:        |  Windows  Users         |
+|---------------|:------------------------|
+
+In Windows, you might encounter
+
+```bash
+'NODE_ENV' is not recognized as an internal or external command, operable program or batch file.
+```
+This happens because our build script has 
+
+```json
+"scripts: {
+  "build": "NODE_ENV=production webpack",
+}
+```
+and this doesn't work in windows. To fix this, there are two solution. you can use
+
+* [cross-env](https://www.npmjs.com/package/cross-env)
+* [win-node-env](https://github.com/laggingreflex/win-node-env)
+
+we prefer using `win-node-env` because with it, only windows users can install it locally while not changing their npm scripts thus adding the dependency to non-windows users too.
+
+| :bulb:        |  404 Error              |
+|---------------|:------------------------|
+Please ignore the 404 message, you need to join the right URL of the room. Next sections describe how to create a room and form the correct URL
+
+---
 
 ### Create a room
 
