@@ -46,26 +46,25 @@ const StreamingRecordingSettings = ({ change, settings }) => {
   return (
     <Box css={{ flex: '3 1 0', ml: '$8' }}>
       <HeadlessItem title="Visible UI Elements">
-        {headlessConfig.hideAudioLevel !== null ? <CheckboxItem
-          checked={headlessConfig.hideAudioLevel}
+        <CheckboxItem
+          checked={headlessConfig?.hideAudioLevel}
           label="Audio Level Border"
           onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideAudioLevel', !headlessConfig.hideAudioLevel));
-          }}
-        />: null}
-        
-        <CheckboxItem
-          checked={headlessConfig.hideTileAudioMute}
-          label="Audio Mute on Tile"
-          onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideTileAudioMute', !headlessConfig.hideTileAudioMute));
+            change('metadataFields', handleSettingsMetaData('hideAudioLevel', !headlessConfig?.hideAudioLevel));
           }}
         />
         <CheckboxItem
-          checked={headlessConfig.hideTileName}
+          checked={headlessConfig?.hideTileAudioMute}
+          label="Audio Mute on Tile"
+          onClick={() => {
+            change('metadataFields', handleSettingsMetaData('hideTileAudioMute', !headlessConfig?.hideTileAudioMute));
+          }}
+        />
+        <CheckboxItem
+          checked={headlessConfig?.hideTileName}
           label="Name on Tile"
           onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideTileName', !headlessConfig.hideTileName));
+            change('metadataFields', handleSettingsMetaData('hideTileName', !headlessConfig?.hideTileName));
           }}
         />
         <Flex align="center" justify="between">
@@ -76,7 +75,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             min={0}
             max={40}
             type="number"
-            value={headlessConfig.tileOffset}
+            value={headlessConfig?.tileOffset}
             onChange={e => {
               change('metadataFields', handleSettingsMetaData('tileOffset', e.target.value));
             }}
@@ -86,7 +85,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
       <HeadlessItem title="UI Layout">
         <RadioGroup.Root
           css={{ flexDirection: 'column', alignItems: 'flex-start' }}
-          value={headlessConfig.uiMode}
+          value={headlessConfig?.uiMode}
           onValueChange={value => {
             change('metadataFields', handleSettingsMetaData('uiMode', value));
           }}
