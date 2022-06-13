@@ -1,0 +1,11 @@
+node_modules/
+ConfigurationsTest/allure-report
+ConfigurationsTest/playwright-report
+build
+test-results/
+playwright-report/
+.idea
+slackMessage.json
+package-lock.json
+slackMessage.txt
+.DS_Store
