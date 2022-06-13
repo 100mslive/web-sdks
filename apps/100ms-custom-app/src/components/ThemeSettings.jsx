@@ -38,7 +38,7 @@ const TileType = ({ type, active, value, change }) => {
     <Flex
       align="center"
       justify="center"
-      css={{ 
+      css={{
         height: '$20',
         aspectRatio: `${multiplier}/${divider}`,
         border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
@@ -49,7 +49,7 @@ const TileType = ({ type, active, value, change }) => {
         change('tile_shape', value);
       }}
     >
-      <Text variant='sm'>{type}</Text>
+      <Text variant="sm">{type}</Text>
     </Flex>
   );
 };
@@ -67,7 +67,7 @@ const ThemeType = ({ title, active, onClick }) => {
 
 const ThemeSettings = ({ handleLogoChange, change, settings }) => {
   return (
-    <Box css={{ flex: '3 1 0', ml: '$8' }}>
+    <Fragment>
       <ItemRoot title="Logo">
         <Button
           as="label"
@@ -126,7 +126,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
         </Flex>
       </ItemRoot>
       <ItemRoot title="Tile Aspect Ratio">
-        <Flex justify='end' css={{ flexWrap: 'wrap', ml: '$8'}}>
+        <Flex justify="end" css={{ flexWrap: 'wrap', ml: '$8' }}>
           <TileType type="4:3" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
           <TileType type="16:9" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
           <TileType type="1:1" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
@@ -161,7 +161,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           ></TextArea>
         </ItemRoot>
       )}
-    </Box>
+    </Fragment>
   );
 };
 

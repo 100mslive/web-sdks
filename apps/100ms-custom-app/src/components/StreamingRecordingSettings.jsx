@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Box, Label, RadioGroup, Input, Flex, Checkbox, HorizontalDivider, Text } from '@100mslive/react-ui';
+import { Label, RadioGroup, Input, Flex, Checkbox, HorizontalDivider, Text } from '@100mslive/react-ui';
 
 const CheckboxItem = ({ onClick, type, label, checked }) => {
   return (
@@ -44,7 +44,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
     };
   };
   return (
-    <Box css={{ flex: '3 1 0', ml: '$8' }}>
+    <Fragment>
       <HeadlessItem title="Visible UI Elements">
         <CheckboxItem
           checked={headlessConfig?.hideAudioLevel}
@@ -104,7 +104,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
           </Flex>
         </RadioGroup.Root>
       </HeadlessItem>
-    </Box>
+    </Fragment>
   );
 };
 
