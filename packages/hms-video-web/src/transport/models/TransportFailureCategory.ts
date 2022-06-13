@@ -1,6 +1,7 @@
 export enum TransportFailureCategory {
   ConnectFailed,
   SignalDisconnect,
+  PublishNegotiationFailed,
   PublishIceConnectionFailed,
   SubscribeIceConnectionFailed,
 }
@@ -8,6 +9,7 @@ export enum TransportFailureCategory {
 export const Dependencies = {
   [TransportFailureCategory.ConnectFailed]: [],
   [TransportFailureCategory.SignalDisconnect]: [],
+  [TransportFailureCategory.PublishNegotiationFailed]: [TransportFailureCategory.SignalDisconnect],
   [TransportFailureCategory.PublishIceConnectionFailed]: [TransportFailureCategory.SignalDisconnect],
   [TransportFailureCategory.SubscribeIceConnectionFailed]: [TransportFailureCategory.SignalDisconnect],
 };

@@ -402,7 +402,6 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    this.store.cleanUp();
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     DeviceStorageManager.cleanup();
@@ -419,6 +418,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.videoTrack?.cleanup();
       this.localPeer.videoTrack = undefined;
     }
+    this.store.cleanUp();
     this.listener = undefined;
     if (this.roleChangeManager) {
       this.eventBus.localRoleUpdate.unsubscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
