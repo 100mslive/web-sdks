@@ -44,7 +44,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   }
 
   sendEvent(event: AnalyticsEvent) {
-    if (!this.env || !window.HMS?.CLIENT_EVENTS) {
+    if (!this.env) {
       this.addEventToStorage(event);
       return;
     }
