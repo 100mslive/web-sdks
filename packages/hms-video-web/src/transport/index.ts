@@ -327,6 +327,7 @@ export default class HMSTransport implements ITransport {
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
     const joinRequestedAt = new Date();
+    const isPreviewCalled = this.state === TransportState.Preview;
     try {
       if (!this.signal.isConnected || !this.initConfig) {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
@@ -356,13 +357,18 @@ export default class HMSTransport implements ITransport {
           isServerHandlingDegradation,
         );
         await this.initRtcStatsMonitor();
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
+        );
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
     } catch (error) {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.join(error, joinRequestedAt, new Date()));
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.join(error, joinRequestedAt, new Date(), isPreviewCalled),
+        );
       }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
