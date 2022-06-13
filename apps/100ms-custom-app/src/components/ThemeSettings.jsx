@@ -38,8 +38,8 @@ const TileType = ({ type, active, value, change }) => {
     <Flex
       align="center"
       justify="center"
-      css={{
-        height: '$24',
+      css={{ 
+        height: '$20',
         aspectRatio: `${multiplier}/${divider}`,
         border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
         m: '$2',
@@ -127,11 +127,11 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
       </ItemRoot>
       <ItemRoot title="Tile Aspect Ratio">
         <Flex justify='end' css={{ flexWrap: 'wrap', ml: '$8'}}>
+          <TileType type="4:3" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
+          <TileType type="16:9" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
           <TileType type="1:1" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
           <TileType type="3:4" value="3-4" active={settings.tile_shape === '3-4'} change={change} />
           <TileType type="9:16" value="9-16" active={settings.tile_shape === '9-16'} change={change} />
-          <TileType type="4:3" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
-          <TileType type="16:9" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
         </Flex>
       </ItemRoot>
       <ItemRoot title="Font Family">
