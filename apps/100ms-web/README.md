@@ -84,6 +84,7 @@ we prefer using `win-node-env` because with it, only windows users can install i
 
 | :bulb:        |  404 Error              |
 |---------------|:------------------------|
+
 Please ignore the 404 message, you need to join the right URL of the room. Next sections describe how to create a room and form the correct URL
 
 ---
