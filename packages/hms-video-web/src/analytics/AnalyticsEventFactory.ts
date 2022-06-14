@@ -48,11 +48,11 @@ export default class AnalyticsEventFactory {
     ...props
   }: {
     error?: HMSException;
-    time: number;
-    init_response_time: number;
-    ws_connect_time: number;
-    on_policy_change_time: number;
-    local_tracks_time: number;
+    time?: number;
+    init_response_time?: number;
+    ws_connect_time?: number;
+    on_policy_change_time?: number;
+    local_tracks_time?: number;
   }) {
     const name = this.eventNameFor('preview', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
@@ -63,8 +63,6 @@ export default class AnalyticsEventFactory {
 
   static join({
     error,
-    start,
-    end,
     ...props
   }: {
     error?: HMSException;
@@ -80,15 +78,7 @@ export default class AnalyticsEventFactory {
     const name = this.eventNameFor('join', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
 
-    const properties = this.getPropertiesWithError(
-      {
-        ...props,
-        is_preview_called: !!props.is_preview_called,
-        [this.KEY_REQUESTED_AT]: start?.getTime(),
-        [this.KEY_RESPONDED_AT]: end?.getTime(),
-      },
-      error,
-    );
+    const properties = this.getPropertiesWithError({ ...props, is_preview_called: !!props.is_preview_called }, error);
 
     return new AnalyticsEvent({ name, level, properties });
   }

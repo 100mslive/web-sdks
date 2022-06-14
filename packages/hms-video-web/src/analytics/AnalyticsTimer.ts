@@ -1,27 +1,20 @@
+import HMSLogger from '../utils/logger';
+
 export type TimedEventName = 'init' | 'websocket-open' | 'on-policy-change' | 'local-tracks' | 'preview' | 'join';
 
 export class AnalyticsTimer {
-  private eventTimestamps: Partial<Record<TimedEventName, { start?: Date; end?: Date }>> = {};
+  private eventPerformanceMeasures: Partial<Record<TimedEventName, PerformanceMeasure>> = {};
 
   start(eventName: TimedEventName) {
-    if (this.eventTimestamps[eventName]) {
-      this.eventTimestamps[eventName]!.start = new Date();
-    } else {
-      this.eventTimestamps[eventName] = { start: new Date() };
-    }
+    performance.mark(eventName);
   }
 
   end(eventName: TimedEventName) {
-    if (this.eventTimestamps[eventName]) {
-      this.eventTimestamps[eventName]!.end = new Date();
-    } else {
-      this.eventTimestamps[eventName] = { end: new Date() };
-    }
+    this.eventPerformanceMeasures[eventName] = performance.measure(eventName, eventName);
+    HMSLogger.d('[HMSPerformanceTiming]', eventName, this.eventPerformanceMeasures[eventName]?.duration);
   }
 
   getTimeTaken(eventName: TimedEventName) {
-    return (
-      (this.eventTimestamps[eventName]?.end?.getTime() || 0) - (this.eventTimestamps[eventName]?.start?.getTime() || 0)
-    );
+    return this.eventPerformanceMeasures[eventName]?.duration;
   }
 }
