@@ -53,7 +53,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       payload: event.properties,
       event_id: String(event.timestamp),
       peer: event.metadata.peer,
-      timestamp: Date.now(),
+      timestamp: event.timestamp,
       agent: userAgent,
       device_id: event.device_id,
     };
