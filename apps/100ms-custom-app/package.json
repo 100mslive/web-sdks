@@ -18,7 +18,7 @@
   "scripts": {
     "start": "webpack serve",
     "prebuild": "cd ../100ms-web && yarn esbuild",
-    "build": "NODE_ENV=production webpack",
+    "build": "webpack --node-env production",
     "lint": "eslint src/**/*.js",
     "lint:fix": "yarn lint --fix",
     "format": "prettier --write src/**/*.js"
