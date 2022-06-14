@@ -43,13 +43,14 @@ export class AnalyticsEventsService {
     HTTPAnalyticsTransport.flushFailedEvents();
   }
 
+  // eslint-disable-next-line complexity
   flush() {
     try {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
           event.metadata.peerId = this.store.getLocalPeer()?.peerId;
-          if (this.transport && this.transport.transportProvider.isConnected) {
+          if (this.transport && (this.transport.transportProvider.isConnected || !window.HMS?.CLIENT_EVENTS)) {
             this.transport.sendEvent(event);
           } else {
             this.sendClientEventOnHTTP(event);
