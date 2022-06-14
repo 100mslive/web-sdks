@@ -321,7 +321,9 @@ export class HMSSdk implements HMSInterface {
         .catch(ex => {
           this.analyticsTimer.end('preview');
           this.errorListener?.onError(ex as HMSException);
-          this.sendPreviewAnalyticsEvent(ex);
+          if (ex instanceof HMSException) {
+            this.sendPreviewAnalyticsEvent(ex);
+          }
           this.sdkState.isPreviewInProgress = false;
           reject(ex as HMSException);
         });
@@ -414,7 +416,9 @@ export class HMSSdk implements HMSInterface {
       .catch(error => {
         this.analyticsTimer.end('join');
         this.listener?.onError(error as HMSException);
-        this.sendJoinAnalyticsEvent(isPreviewCalled, error);
+        if (error instanceof HMSException) {
+          this.sendJoinAnalyticsEvent(isPreviewCalled, error);
+        }
         HMSLogger.e(this.TAG, 'Unable to join room', error);
       })
       .then(() => {
