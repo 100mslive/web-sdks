@@ -43,16 +43,49 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static join(error?: HMSException, requestedAt?: Date, respondedAt?: Date, is_preview_called = false) {
+  static preview({
+    error,
+    ...props
+  }: {
+    error?: HMSException;
+    time: number;
+    init_response_time: number;
+    ws_connect_time: number;
+    on_policy_change_time: number;
+    local_tracks_time: number;
+  }) {
+    const name = this.eventNameFor('preview', error === undefined);
+    const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
+    const properties = this.getPropertiesWithError(props, error);
+
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
+  static join({
+    error,
+    start,
+    end,
+    ...props
+  }: {
+    error?: HMSException;
+    is_preview_called?: boolean;
+    start?: Date;
+    end?: Date;
+    time?: number;
+    init_response_time?: number;
+    ws_connect_time?: number;
+    on_policy_change_time?: number;
+    local_tracks_time?: number;
+  }) {
     const name = this.eventNameFor('join', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
 
     const properties = this.getPropertiesWithError(
       {
-        [this.KEY_REQUESTED_AT]: requestedAt?.getTime(),
-        [this.KEY_RESPONDED_AT]: respondedAt?.getTime(),
-        time: (respondedAt?.getTime() || 0) - (requestedAt?.getTime() || 0),
-        is_preview_called,
+        ...props,
+        is_preview_called: !!props.is_preview_called,
+        [this.KEY_REQUESTED_AT]: start?.getTime(),
+        [this.KEY_RESPONDED_AT]: end?.getTime(),
       },
       error,
     );

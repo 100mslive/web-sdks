@@ -59,6 +59,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
 import { HMSAudioContextHandler } from '../utils/media';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -94,6 +95,7 @@ export class HMSSdk implements HMSInterface {
   private roleChangeManager?: RoleChangeManager;
   private localTrackManager!: LocalTrackManager;
   private analyticsEventsService!: AnalyticsEventsService;
+  private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
@@ -119,7 +121,13 @@ export class HMSSdk implements HMSInterface {
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
     this.audioSinkManager.setListener(this.listener);
     this.eventBus.autoplayError.subscribe(this.handleAutoplayError);
-    this.localTrackManager = new LocalTrackManager(this.store, this.observer, this.deviceManager, this.eventBus);
+    this.localTrackManager = new LocalTrackManager(
+      this.store,
+      this.observer,
+      this.deviceManager,
+      this.eventBus,
+      this.analyticsTimer,
+    );
     this.analyticsEventsService = new AnalyticsEventsService(this.store);
     this.transport = new HMSTransport(
       this.observer,
@@ -128,6 +136,7 @@ export class HMSSdk implements HMSInterface {
       this.localTrackManager,
       this.eventBus,
       this.analyticsEventsService,
+      this.analyticsTimer,
     );
 
     /**
@@ -184,6 +193,11 @@ export class HMSSdk implements HMSInterface {
         this.handlePeerLeaveRequest(message.params as PeerLeaveRequestNotification);
         return;
       }
+
+      if (message.method === HMSNotificationMethod.POLICY_CHANGE) {
+        this.analyticsTimer.end('on-policy-change');
+      }
+
       this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
     },
 
@@ -254,6 +268,8 @@ export class HMSSdk implements HMSInterface {
         ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
       );
     }
+
+    this.analyticsTimer.start('preview');
     this.setUpPreview(config, listener);
 
     // Request permissions and populate devices before waiting for policy
@@ -278,7 +294,9 @@ export class HMSSdk implements HMSInterface {
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
+        this.analyticsTimer.end('preview');
         listener.onPreview(this.store.getRoom(), tracks);
+        this.sendPreviewAnalyticsEvent();
         resolve();
       };
 
@@ -301,7 +319,9 @@ export class HMSSdk implements HMSInterface {
           }
         })
         .catch(ex => {
+          this.analyticsTimer.end('preview');
           this.errorListener?.onError(ex as HMSException);
+          this.sendPreviewAnalyticsEvent(ex);
           this.sdkState.isPreviewInProgress = false;
           reject(ex as HMSException);
         });
@@ -340,6 +360,10 @@ export class HMSSdk implements HMSInterface {
     if (this.sdkState.isPreviewInProgress) {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
+
+    this.analyticsTimer.start('join');
+
+    const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.networkTestManager?.stop();
     this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
@@ -382,12 +406,15 @@ export class HMSSdk implements HMSInterface {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
         HMSAudioContextHandler.resumeContext();
         this.notifyJoin();
+        this.sendJoinAnalyticsEvent(isPreviewCalled);
         if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);
         }
       })
       .catch(error => {
+        this.analyticsTimer.end('join');
         this.listener?.onError(error as HMSException);
+        this.sendJoinAnalyticsEvent(isPreviewCalled, error);
         HMSLogger.e(this.TAG, 'Unable to join room', error);
       })
       .then(() => {
@@ -823,9 +850,11 @@ export class HMSSdk implements HMSInterface {
     }
 
     if (localPeer?.role) {
+      this.analyticsTimer.end('join');
       this.listener?.onJoin(room);
     } else {
       this.eventBus.policyChange.subscribeOnce(() => {
+        this.analyticsTimer.end('join');
         this.listener?.onJoin(room);
       });
     }
@@ -987,6 +1016,33 @@ export class HMSSdk implements HMSInterface {
     );
     // @TODO: start sending if error is less frequent
     // this.listener?.onError(error);
+  };
+
+  private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.join({
+        error,
+        time: this.analyticsTimer.getTimeTaken('join'),
+        init_response_time: this.analyticsTimer.getTimeTaken('init'),
+        ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
+        on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
+        local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+        is_preview_called,
+      }),
+    );
+  };
+
+  private sendPreviewAnalyticsEvent = (error?: HMSException) => {
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.preview({
+        error,
+        time: this.analyticsTimer.getTimeTaken('preview'),
+        init_response_time: this.analyticsTimer.getTimeTaken('init'),
+        ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
+        on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
+        local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+      }),
+    );
   };
 
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {

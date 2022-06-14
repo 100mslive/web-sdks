@@ -52,6 +52,7 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 
 const TAG = '[HMSTransport]:';
 
@@ -82,6 +83,7 @@ export default class HMSTransport implements ITransport {
     private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
+    private analyticsTimer: AnalyticsTimer,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -326,8 +328,6 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
-    const joinRequestedAt = new Date();
-    const isPreviewCalled = this.state === TransportState.Preview;
     try {
       if (!this.signal.isConnected || !this.initConfig) {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
@@ -357,19 +357,12 @@ export default class HMSTransport implements ITransport {
           isServerHandlingDegradation,
         );
         await this.initRtcStatsMonitor();
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
-        );
+
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
     } catch (error) {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.join(error, joinRequestedAt, new Date(), isPreviewCalled),
-        );
-      }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
       await this.observer.onStateChange(this.state, ex);
@@ -761,7 +754,9 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
+      this.analyticsTimer.start('init');
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      this.analyticsTimer.end('init');
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
@@ -806,7 +801,10 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent', userAgent);
     this.endpoint = url.toString();
+    this.analyticsTimer.start('websocket-open');
     await this.signal.open(this.endpoint);
+    this.analyticsTimer.end('websocket-open');
+    this.analyticsTimer.start('on-policy-change');
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
@@ -936,7 +934,14 @@ export default class HMSTransport implements ITransport {
         event = AnalyticsEventFactory.disconnect(error, additionalProps);
         break;
       case TransportFailureCategory.PublishNegotiationFailed:
-        event = AnalyticsEventFactory.join(error);
+        event = AnalyticsEventFactory.join({
+          error,
+          time: this.analyticsTimer.getTimeTaken('join'),
+          init_response_time: this.analyticsTimer.getTimeTaken('init'),
+          ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
+          on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
+          local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+        });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
         event = AnalyticsEventFactory.publish({ error });
