@@ -43,6 +43,7 @@ export class AnalyticsEventsService {
     HTTPAnalyticsTransport.flushFailedEvents();
   }
 
+  // eslint-disable-next-line complexity
   flush() {
     try {
       while (this.pendingEvents.length > 0) {

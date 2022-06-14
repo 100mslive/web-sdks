@@ -54,6 +54,10 @@ the folder directly and run `yarn start`.
 
 > Note: run yarn start in sdk first and then in store
 
+### Custom App in Dev
+
+This is useful when you want to see changes from `100ms-web` app being reflected in custom app in dev. Run `yarn dev` in `100ms-web` & `yarn start` in `custom-app`
+
 ### Update a packages version
 
 Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to
