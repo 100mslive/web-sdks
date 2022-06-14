@@ -25,17 +25,21 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   properties: Record<string, any>;
   metadata: {
     token?: string;
-    peerId?: string;
-    sessionId?: string;
-    roomId?: string;
-    role?: string;
-    roomName?: string;
-    joinedAt?: number;
-    templateId?: string;
-    sessionStartTime?: number;
-    userName?: string;
-    userData?: string;
-  } = {};
+    peer: {
+      peer_id?: string;
+      session_id?: string;
+      room_id?: string;
+      role?: string;
+      room_name?: string;
+      joined_at?: number;
+      template_id?: string;
+      session_started_at?: number;
+      user_name?: string;
+      user_data?: string;
+    };
+  } = {
+    peer: {},
+  };
   timestamp: number;
   event_id: string;
   device_id: string;
