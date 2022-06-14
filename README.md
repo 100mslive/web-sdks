@@ -2,7 +2,6 @@
 
 This monorepo will contain all packages related to core sdk and store.
 
-
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
 ### Local Setup
@@ -33,7 +32,7 @@ yarn lint
 
 ### Running dev server
 
-Run whatever things you're changing in below in different terminal instances. For other packages you can navigate to 
+Run whatever things you're changing in below in different terminal instances. For other packages you can navigate to
 the folder directly and run `yarn start`.
 
 ```
@@ -54,6 +53,10 @@ the folder directly and run `yarn start`.
 ```
 
 > Note: run yarn start in sdk first and then in store
+
+### Custom App in Dev
+
+This is useful when you want to see changes from `100ms-web` app being reflected in custom app in dev. Run `yarn dev` in `100ms-web` & `yarn start` in `custom-app`
 
 ### Update a packages version
 
@@ -108,6 +111,20 @@ if there is only one remote, add webapp as a new remote.
 Follow the documentation [here](https://github.com/lerna/lerna/tree/main/commands/create#readme)
 
 > Note: Don't forget to update mapping in `scripts/constants.js`. Also update`lernaCommands` in `versioning.js` depending on the new repo's dependencies and dependents
+
+## Setup Cypress
+
+- Create a .env file to the root folder and add the following variables.
+
+```
+CYPRESS_TOKEN_ENDPOINT=https://qa-in2.100ms.live/hmsapi/ravi.qa-app.100ms.live/api/token
+CYPRESS_ROOM_ID=60f26ab342a997a1ff49c5c2
+CYPRESS_ROLE=student
+CYPRESS_API_ENV=qa
+CYPRESS_INIT_ENDPOINT=https://qa-init.100ms.live/init
+```
+
+- Run `yarn cypress:open` at the root level to open the cypress app.
 
 ## Tips and Tricks
 

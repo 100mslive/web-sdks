@@ -43,14 +43,16 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static join(requestedAt: Date, respondedAt: Date, error?: HMSException) {
+  static join(error?: HMSException, requestedAt?: Date, respondedAt?: Date, is_preview_called = false) {
     const name = this.eventNameFor('join', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
 
     const properties = this.getPropertiesWithError(
       {
-        [this.KEY_REQUESTED_AT]: requestedAt.getTime(),
-        [this.KEY_RESPONDED_AT]: respondedAt.getTime(),
+        [this.KEY_REQUESTED_AT]: requestedAt?.getTime(),
+        [this.KEY_RESPONDED_AT]: respondedAt?.getTime(),
+        time: (respondedAt?.getTime() || 0) - (requestedAt?.getTime() || 0),
+        is_preview_called,
       },
       error,
     );

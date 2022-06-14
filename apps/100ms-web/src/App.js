@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, useCallback } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -89,6 +89,8 @@ export function EdtechComponent({
     setThemeType(theme);
   }, [theme]);
 
+  const getUserTokenCallback = useCallback(getUserToken, []);
+
   return (
     <ErrorBoundary>
       <HMSThemeProvider
@@ -123,7 +125,10 @@ export function EdtechComponent({
                   : { h: "100%" }),
               }}
             >
-              <AppRoutes getUserToken={getUserToken} />
+              <AppRoutes
+                getUserToken={getUserTokenCallback}
+                appDetails={metadata}
+              />
             </Box>
           </AppContextProvider>
         </HMSRoomProvider>
@@ -147,13 +152,13 @@ const RedirectToPreview = () => {
   return <Navigate to={`/preview/${roomId}/${role || ""}`} />;
 };
 
-function AppRoutes({ getUserToken }) {
+function AppRoutes({ getUserToken, appDetails }) {
   return (
     <Router>
       <ToastContainer />
       <Notifications />
       <Confetti />
-      <AppData />
+      <AppData appDetails={appDetails} />
       <KeyboardHandler />
       <Routes>
         <Route

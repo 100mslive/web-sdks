@@ -12,8 +12,10 @@ import {
   QUERY_PARAM_NAME,
   QUERY_PARAM_SKIP_PREVIEW,
   QUERY_PARAM_AUTH_TOKEN,
+  UI_SETTINGS,
 } from "../common/constants";
 import getToken from "../services/tokenService";
+import { useSetUiSettings } from "./AppData/useUISettings";
 
 /**
  * query params exposed -
@@ -26,9 +28,10 @@ import getToken from "../services/tokenService";
  */
 
 const env = process.env.REACT_APP_ENV;
-const PreviewScreen = ({ getUserToken }) => {
+const PreviewScreen = React.memo(({ getUserToken }) => {
   const navigate = useNavigate();
-  const { tokenEndpoint, setIsHeadless } = useContext(AppContext);
+  const { tokenEndpoint } = useContext(AppContext);
+  const [, setIsHeadless] = useSetUiSettings(UI_SETTINGS.isHeadless);
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const [token, setToken] = useState(null);
   const [error, setError] = useState({ title: "", body: "" });
@@ -97,7 +100,7 @@ const PreviewScreen = ({ getUserToken }) => {
       </Flex>
     </Flex>
   );
-};
+});
 
 const convertPreviewError = error => {
   console.error("[error]", { error });
