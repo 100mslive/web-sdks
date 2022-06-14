@@ -1,11 +1,17 @@
 import * as workerTimers from "worker-timers";
-import { drawVideoElementsOnCanvas } from "./pipUtils";
-
+import { drawVideoElementsOnCanvas, dummyChangeInCanvas } from "./pipUtils";
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const DEFAULT_CANVAS_WIDTH = 900;
 const DEFAULT_CANVAS_HEIGHT = 600;
 const LEAVE_EVENT_NAME = "leavepictureinpicture";
+
+const PIPStates = {
+  starting: "starting",
+  started: "started",
+  stopping: "stopping",
+  stopped: "stopped",
+};
 
 /**
  * video elements are stitched together as a canvas which is converted to
@@ -19,6 +25,7 @@ const LEAVE_EVENT_NAME = "leavepictureinpicture";
 class PipManager {
   constructor() {
     this.reset();
+    this.state = PIPStates.stopped;
   }
 
   /**
@@ -72,19 +79,32 @@ class PipManager {
     if (!this.isSupported()) {
       throw new Error("pip is not supported on this browser");
     }
-    await this.stop(); // if anything is already running
+    console.log("starting PIP, current state", this.state);
+    if (this.state === PIPStates.started) {
+      await this.stop(); // if anything is already running
+    }
+    this.state = PIPStates.starting;
     this.init(hmsActions, onStateChangeFn);
     this.hmsActions = hmsActions;
     this.pipVideo.addEventListener(LEAVE_EVENT_NAME, this.stop);
     this.renderLoop();
-    await this.pipVideo.play();
-    if (!this.isOn()) {
-      this.requestPIP();
+    try {
+      const videoPlayPromise = this.pipVideo.play();
+      dummyChangeInCanvas(this.canvas);
+      await videoPlayPromise;
+      if (!this.isOn()) {
+        await this.requestPIP();
+      }
+      this.state = PIPStates.started;
+      this.onStateChange(true);
+    } catch (err) {
+      console.error("error in request pip", err);
+      this.state = PIPStates.stopped;
     }
-    this.onStateChange(true);
   }
 
   stop = async () => {
+    this.state = PIPStates.stopping;
     this.pipVideo?.removeEventListener(LEAVE_EVENT_NAME, this.stop);
     if (this.timeoutRef) {
       workerTimers.clearTimeout(this.timeoutRef);
@@ -96,6 +116,7 @@ class PipManager {
     await this.detachOldAttachNewTracks(this.tracksToShow, []);
     this.onStateChange(false); // notify parent about this
     this.reset(); // cleanup
+    this.state = PIPStates.stopped;
   };
 
   /**
@@ -152,19 +173,28 @@ class PipManager {
   renderLoop() {
     const delay = 1000 / DEFAULT_FPS;
     this.timeoutRef = workerTimers.setTimeout(() => {
-      drawVideoElementsOnCanvas(this.videoElements, this.canvas);
+      if (
+        this.state === PIPStates.stopping ||
+        this.state === PIPStates.stopped
+      ) {
+        return;
+      }
+      if (this.state === PIPStates.started) {
+        drawVideoElementsOnCanvas(this.videoElements, this.canvas);
+      }
       this.renderLoop();
     }, delay);
   }
 
-  requestPIP() {
+  async requestPIP() {
     try {
       if (this.isOn()) {
         this.exitPIP(); // is this really needed?
       }
-      this.pipVideo.requestPictureInPicture();
+      await this.pipVideo.requestPictureInPicture();
     } catch (error) {
-      console.error("error in requestpip", error);
+      console.error("error in requestpip", error, "state", this.state);
+      throw error;
     }
   }
 
