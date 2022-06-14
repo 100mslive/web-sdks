@@ -63,16 +63,32 @@ export class PlaylistManager
       return;
     }
     list.forEach((item: HMSPlaylistItem<T>) => {
-      this.state[item.type].list.push(item);
+      if (!this.state[item.type].list.includes(item)) {
+        this.state[item.type].list.push(item);
+      }
     });
   }
 
-  removeItem<T>(item: HMSPlaylistItem<T>): void {
-    const list = this.state[item.type].list;
-    const index = list.findIndex(playItem => item.id === playItem.id);
-    if (index > -1) {
-      list.splice(index, 1);
+  async clearList(type: HMSPlaylistType): Promise<void> {
+    if (this.isPlaying(type)) {
+      await this.stop(type);
     }
+    this.state[type].list = [];
+  }
+
+  async removeItem(id: string, type: HMSPlaylistType): Promise<boolean> {
+    const { list, currentIndex } = this.state[type];
+    const index = list.findIndex(playItem => id === playItem.id);
+    if (index > -1) {
+      // stop if the item is playing
+      if (currentIndex === index && this.isPlaying(type)) {
+        await this.stop(type);
+      }
+      list.splice(index, 1);
+      console.error({ list });
+      return true;
+    }
+    return false;
   }
 
   seek(value: number, type: HMSPlaylistType = HMSPlaylistType.audio): void {

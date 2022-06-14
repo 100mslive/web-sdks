@@ -74,4 +74,17 @@ export class HMSPlaylist implements IHMSPlaylistActions {
     this.playlistManager.setPlaybackRate(this.type, playbackRate);
     this.syncPlaylistState(`set${this.type}PlaybackRate`);
   }
+
+  async removeItem(id: string) {
+    const removed = await this.playlistManager.removeItem(id, this.type);
+    if (removed) {
+      this.syncPlaylistState(`remove${this.type}PlaylistItem`);
+    }
+    return removed;
+  }
+
+  async clearList() {
+    await this.playlistManager.clearList(this.type);
+    this.syncPlaylistState(`clear${this.type}Playlist`);
+  }
 }
