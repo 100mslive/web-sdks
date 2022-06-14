@@ -85,7 +85,6 @@ export class PlaylistManager
         await this.stop(type);
       }
       list.splice(index, 1);
-      console.error({ list });
       return true;
     }
     return false;
