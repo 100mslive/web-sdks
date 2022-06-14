@@ -1,5 +1,4 @@
-import { useVideo } from '@100mslive/react-sdk';
-import { Video, StyledVideo } from './Video';
+import { Video } from './Video';
 import VideoDocs from './Video.mdx';
 import React from 'react';
 
@@ -7,15 +6,12 @@ const VideoComponent = () => {
   return <Video trackId="2" />;
 };
 
-const VideoHook = () => {
-  const { videoRef } = useVideo({
-    trackId: '1',
-  });
-  return <StyledVideo ref={videoRef} autoPlay playsInline muted />;
+const StyledVideoComponent = () => {
+  return <Video css={{ width: 500, height: 300 }} trackId="2" />;
 };
 
-export default {
-  title: 'Example/Video',
+const VideoStories = {
+  title: 'Rendering Video/Video Component',
   component: VideoComponent,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   parameters: {
@@ -25,5 +21,7 @@ export default {
   },
 };
 
+export default VideoStories;
+
 export const VideoExample = VideoComponent.bind({});
-export const UseVideoHook = VideoHook.bind({});
+export const StyledVideoExample = StyledVideoComponent.bind({});
