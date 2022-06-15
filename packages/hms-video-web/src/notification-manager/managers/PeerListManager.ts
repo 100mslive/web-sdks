@@ -1,13 +1,12 @@
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener } from '../..';
-import { HMSPeerUpdate, HMSTrackUpdate } from '../../interfaces';
-import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
+import { HMSPeerUpdate } from '../../interfaces';
+import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
 import { PeerManager } from './PeerManager';
 import { TrackManager } from './TrackManager';
-import { convertDateNumToDate } from '../../utils/date';
 
 /**
  * Handles:
@@ -39,7 +38,7 @@ export class PeerListManager {
       const peerList = notification as PeerListNotification;
       if (isReconnecting) {
         HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
-        this.handleReconnectPeerList(peerList.peers);
+        this.handleRepeatedPeerList(peerList.peers);
       } else {
         // TODO: Don't call initial peerlist if atleast 1room state had happen
         HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
@@ -68,7 +67,7 @@ export class PeerListManager {
       // If there are no peers either roomState.peers will be empty object
       // or peer_count will be 0(handled below)
       if (roomState.peer_count === 0) {
-        this.handleRoomStatePeerList({});
+        this.handleRepeatedPeerList({});
       }
       return;
     }
@@ -79,56 +78,35 @@ export class PeerListManager {
       roomPeers[peer].tracks = {};
       roomPeers[peer].is_from_room_state = true;
     });
-    this.handleRoomStatePeerList(roomPeers);
+    this.handleRepeatedPeerList(roomPeers);
   };
 
-  private handleRoomStatePeerList = (peersMap: Record<string, PeerNotification>) => {
+  private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, { peersToRemove });
     let peerListChanged = peersToRemove.length > 0;
+    if (peerListChanged) {
+      HMSLogger.d(this.TAG, { peersToRemove });
+    }
 
+    // Send peer-leave updates to all the missing peers
     peersToRemove.forEach(peer => {
       this.store.removePeer(peer.peerId);
     });
 
-    // eslint-disable-next-line complexity
-    const updatePeerRoleAndInfo = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
-      if (oldPeer.role && oldPeer.role.name !== newPeerNotification.role) {
-        const newRole = this.store.getPolicyForRole(newPeerNotification.role);
-        oldPeer.updateRole(newRole);
-        peerListChanged = true;
-      }
-      if (newPeerNotification.info.name && oldPeer.name !== newPeerNotification.info.name) {
-        oldPeer.updateName(newPeerNotification.info.name);
-        peerListChanged = true;
-      }
-      if (newPeerNotification.info.data && oldPeer.metadata !== newPeerNotification.info.data) {
-        oldPeer.updateMetadata(newPeerNotification.info.data);
-        peerListChanged = true;
-      }
-    };
-
+    // Check for any tracks which are added/removed
     peers.forEach(newPeerNotification => {
       const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
 
       if (oldPeer) {
-        // Update peer's role and info(name, data) locally, new role and info is received from the room-state
-        updatePeerRoleAndInfo(oldPeer, newPeerNotification);
+        peerListChanged ||= this.updatePeerTracks(oldPeer, newPeerNotification);
+        // Update peer's role locally, new role is received from room-state or reconnect peer-list
+        peerListChanged ||= this.updatePeerRoleAndInfo(oldPeer, newPeerNotification);
       } else {
         // New peer joined while in preview(from room state)
-        const hmsPeer = new HMSRemotePeer({
-          peerId: newPeerNotification.peer_id,
-          name: newPeerNotification.info.name,
-          customerUserId: newPeerNotification.info.user_id,
-          metadata: newPeerNotification.info.data,
-          role: this.store.getPolicyForRole(newPeerNotification.role),
-          joinedAt: convertDateNumToDate(newPeerNotification.joined_at),
-          fromRoomState: !!newPeerNotification.is_from_room_state,
-        });
-
-        this.store.addPeer(hmsPeer);
+        this.peerManager.makePeer(newPeerNotification);
+        this.trackManager.processPendingTracks();
         peerListChanged = true;
       }
     });
@@ -138,70 +116,66 @@ export class PeerListManager {
     }
   };
 
-  private handleReconnectPeerList = (peersMap: Record<string, PeerNotification>) => {
-    const currentPeerList = this.store.getRemotePeers();
-    const peers = Object.values(peersMap);
-    const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, { peersToRemove });
+  // eslint-disable-next-line complexity
+  private updatePeerRoleAndInfo = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
+    let peerChanged = false;
+    if (oldPeer.role && oldPeer.role.name !== newPeerNotification.role) {
+      const newRole = this.store.getPolicyForRole(newPeerNotification.role);
+      oldPeer.updateRole(newRole);
+      peerChanged = true;
+    }
+    if (newPeerNotification.info.name && oldPeer.name !== newPeerNotification.info.name) {
+      oldPeer.updateName(newPeerNotification.info.name);
+      peerChanged = true;
+    }
+    if (newPeerNotification.info.data && oldPeer.metadata !== newPeerNotification.info.data) {
+      oldPeer.updateMetadata(newPeerNotification.info.data);
+      peerChanged = true;
+    }
 
-    // Send peer-leave updates to all the missing peers
-    peersToRemove.forEach(peer => {
-      const peerNotification: PeerNotification = {
-        peer_id: peer.peerId,
-        role: peer.role?.name || '',
-        info: {
-          name: peer.name,
-          data: peer.metadata || '',
-          user_id: peer.customerUserId || '',
-        },
-        tracks: {},
-      };
+    return peerChanged;
+  };
 
-      this.peerManager.handlePeerLeave(peerNotification);
-    });
+  private updatePeerTracks = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
+    let tracksChanged = false;
+    const newPeerTrackStates = Object.values(newPeerNotification.tracks);
 
-    // Check for any tracks which are added/removed
-    peers.forEach(newPeerNotification => {
-      const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
-      const newPeerTrackStates = Object.values(newPeerNotification.tracks);
+    // Peer already present in room, we take diff between the tracks
+    const tracks = this.store.getPeerTracks(oldPeer.peerId);
 
-      if (oldPeer) {
-        // Peer already present in room, we take diff between the tracks
-        const tracks = this.store.getPeerTracks(oldPeer.peerId);
-
-        // Remove all the tracks which are not present in the peer.tracks
-        tracks.forEach(track => {
-          if (!newPeerNotification.tracks[track.trackId]) {
-            this.removePeerTrack(oldPeer, track.trackId);
-            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, oldPeer);
-          }
-        });
-
-        // Add track-metadata for all the new tracks
-        newPeerTrackStates.forEach(trackData => {
-          if (!this.store.getTrackById(trackData.track_id)) {
-            // NOTE: We assume that, once the connection is re-established,
-            //  transport layer will send a native onTrackAdd
-            this.store.setTrackState({
-              peerId: oldPeer.peerId,
-              trackInfo: trackData,
-            });
-          }
-        });
-
-        // Handle RTC track add and track state change.
-        this.trackManager.handleTrackUpdate({
-          peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peer_id },
-          tracks: newPeerNotification.tracks,
-        });
-
-        // Update peer's role locally, new role is received from the reconnect peer-list
-        this.peerManager.handlePeerUpdate(newPeerNotification);
-      } else {
-        // New peer joined while reconnecting
-        this.peerManager.handlePeerJoin(newPeerNotification);
+    // Remove all the tracks which are not present in the peer.tracks
+    tracks.forEach(track => {
+      if (!newPeerNotification.tracks[track.trackId]) {
+        tracksChanged = true;
+        this.removePeerTrack(oldPeer, track.trackId);
       }
     });
+
+    // Add track-metadata for all the new tracks
+    newPeerTrackStates.forEach(trackData => {
+      const oldTrack = this.store.getTrackById(trackData.track_id);
+      if (!oldTrack) {
+        // NOTE: We assume that, once the connection is re-established,
+        //  transport layer will send a native onTrackAdd
+        this.store.setTrackState({
+          peerId: oldPeer.peerId,
+          trackInfo: trackData,
+        });
+        tracksChanged = true;
+      } else {
+        if (oldTrack.enabled !== !trackData.mute) {
+          tracksChanged = true;
+        }
+      }
+    });
+
+    // Handle RTC track add and track state change.
+    this.trackManager.handleTrackUpdate({
+      peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peer_id },
+      tracks: newPeerNotification.tracks,
+    });
+
+    return tracksChanged;
   };
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {

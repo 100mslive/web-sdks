@@ -127,7 +127,7 @@ export class PeerManager {
     }
   }
 
-  private makePeer(peer: PeerNotification) {
+  makePeer(peer: PeerNotification) {
     const hmsPeer = new HMSRemotePeer({
       peerId: peer.peer_id,
       name: peer.info.name,
@@ -139,7 +139,6 @@ export class PeerManager {
     });
 
     this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({
