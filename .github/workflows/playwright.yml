@@ -30,10 +30,6 @@ on:
   repository_dispatch:
     types: [automation]
 
-defaults:
-  run:
-    working-directory: playwright
-
 jobs:
   test:
     timeout-minutes: 10
@@ -79,11 +75,19 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "17.x"
-      - run: yarn install
-      - run: npx playwright install
+      - run: |
+          pwd 
+          ls 
+          cd playwright
+          yarn install
+          npx playwright install
 
       - name: Test in Region - "${{ env.REGION }}"
-        run: yarn "${{ env.REGION }}"
+        run: |
+          pwd 
+          ls
+          cd playwright
+          yarn "${{ env.REGION }}"
 
       - name: Push test result
         if: always()
