@@ -1,4 +1,5 @@
 import HMSLogger from '../utils/logger';
+import { isSafari } from '../utils/support';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
 import { RTCLoopback } from './loopback';
@@ -67,7 +68,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
             await this.videoElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
             stream.addTrack(audioTrack);
-            const videoTrack = await RTCLoopback.processVideoFromTrack(stream.getVideoTracks()[0]);
+            const videoTrack = await this.getVideoTrack(stream);
             this.tracks.push(videoTrack);
             resolve(this.tracks);
           } else {
@@ -145,6 +146,14 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       this.canvas = document.createElement('canvas');
       this.canvasContext = this.canvas.getContext('2d');
     }
+  }
+
+  private async getVideoTrack(stream: MediaStream) {
+    let videoTrack = stream.getVideoTracks()[0];
+    if (isSafari()) {
+      videoTrack = await RTCLoopback.processVideoFromTrack(stream.getVideoTracks()[0]);
+    }
+    return videoTrack;
   }
 
   private get TAG() {

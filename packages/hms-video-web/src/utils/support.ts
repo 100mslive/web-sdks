@@ -37,6 +37,8 @@ function createUserAgent(): string {
 
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
+export const isSafari = () => parsedUserAgent.getBrowser().name?.toLowerCase().includes('safari');
+
 export const userAgent = createUserAgent();
 
 export const getAnalyticsDeviceId = () => {
