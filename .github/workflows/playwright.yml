@@ -82,7 +82,6 @@ jobs:
 
       - name: Test in Region - "${{ env.REGION }}"
         run: |
-          ls
           cd playwright
           yarn "${{ env.REGION }}"
 
@@ -92,7 +91,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: "playwright-report"
+          source-directory: "playwright/playwright-report"
           destination-github-username: "100mslive"
           destination-repository-name: "automation-reports"
           target-branch: "${{ env.REGION }}"
@@ -105,7 +104,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.19.0
         with:
-          payload-file-path: "./slackMessage.json"
+          payload-file-path: "./playwright/slackMessage.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
