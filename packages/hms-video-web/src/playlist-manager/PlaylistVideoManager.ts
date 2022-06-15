@@ -1,7 +1,7 @@
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
-import { drawOnCanvas } from './utils';
+import { drawOnCanvas } from './canvas-utils';
 
 /**
  * This class handles video playlist management

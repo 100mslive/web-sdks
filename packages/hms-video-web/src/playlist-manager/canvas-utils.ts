@@ -12,7 +12,6 @@ export function drawOnCanvas(canvas: HTMLCanvasElement, video: HTMLVideoElement,
   }
 
   // Vertex shader program
-
   const vsSource = `
       attribute mediump vec2 aVertexPosition;
       varying mediump vec2 vDirection;
@@ -25,7 +24,6 @@ export function drawOnCanvas(canvas: HTMLCanvasElement, video: HTMLVideoElement,
     `;
 
   // Fragment shader program
-
   const fsSource = `
     //<!-- //## code for pixel effects goes here if needed -->
   
@@ -48,13 +46,10 @@ export function drawOnCanvas(canvas: HTMLCanvasElement, video: HTMLVideoElement,
     `;
 
   const program: WebGLProgram | null = gl.createProgram();
-  if (!program) {
-    return;
-  }
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
-  if (!vertexShader || !fragmentShader) {
+  if (!program || !vertexShader || !fragmentShader) {
     return;
   }
   gl.attachShader(program, vertexShader);
