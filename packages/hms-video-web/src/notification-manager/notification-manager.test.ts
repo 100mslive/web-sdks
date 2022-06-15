@@ -4,7 +4,16 @@ import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
 import HMSRoom from '../sdk/models/HMSRoom';
 import { NotificationManager } from './NotificationManager';
 import { Store } from '../sdk/store';
-import { fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList, FAKE_PEER_ID } from './fixtures';
+import {
+  fakeMessage,
+  fakePeer,
+  fakePeerList,
+  fakePolicy,
+  fakeReconnectPeerList,
+  fakeRoomState,
+  fakeSpeakerList,
+  FAKE_PEER_ID,
+} from './fixtures';
 import { EventBus } from '../events/EventBus';
 
 let joinHandler: jest.Mock<any, any>;
@@ -68,6 +77,49 @@ beforeEach(() => {
 });
 
 describe('Notification Manager', () => {
+  describe('room-state', () => {
+    it('should call onPeerUpdate with correct peer list', () => {
+      notificationManager.handleNotification({ method: HMSNotificationMethod.POLICY_CHANGE, params: fakePolicy });
+      notificationManager.handleNotification({ method: HMSNotificationMethod.ROOM_STATE, params: fakeRoomState });
+
+      expect(peerUpdateHandler).toHaveBeenCalled();
+      peerUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
+        expect(call[1].length).toEqual(Object.keys(fakeRoomState.peers!).length);
+        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      });
+      expect(roomUpdateHandler).toHaveBeenCalled();
+      expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
+    });
+
+    it('should call onPeerUpdate with updated peer list on subsequent room states', () => {
+      const newFakeRoomState = { room: fakeRoomState.room, peers: { ...fakeRoomState.peers }, peerCount: 1 };
+      delete newFakeRoomState.peers?.['peer_id_2'];
+      notificationManager.handleNotification({ method: HMSNotificationMethod.ROOM_STATE, params: newFakeRoomState });
+
+      expect(peerUpdateHandler).toHaveBeenCalled();
+      peerUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
+        expect(call[1].length).toEqual(Object.keys(newFakeRoomState.peers!).length);
+        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      });
+    });
+  });
+
+  describe('initial peer-list', () => {
+    it('should call onPeerUpdate with correct parameters', () => {
+      notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_LIST, params: fakePeerList });
+
+      expect(peerUpdateHandler).toHaveBeenCalled();
+      peerUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
+        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      });
+      expect(roomUpdateHandler).toHaveBeenCalled();
+      expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
+    });
+  });
+
   describe('on-peer-join', () => {
     it('should call onPeerUpdate with correct parameters', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_JOIN, params: fakePeer });
@@ -80,7 +132,6 @@ describe('Notification Manager', () => {
     });
 
     it('should add peer in store', () => {
-      notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_JOIN, params: fakePeer });
       const peer = store.getPeerById(fakePeer.peer_id);
       expect(peer).toBeInstanceOf(HMSRemotePeer);
       expect(peer?.peerId).toBe(fakePeer.peer_id);
@@ -100,20 +151,6 @@ describe('Notification Manager', () => {
     it('should remove peer from store', () => {
       const peer = store.getPeerById(fakePeer.peer_id);
       expect(peer).toBeUndefined();
-    });
-  });
-
-  describe('initial peer-list', () => {
-    it('should call onPeerUpdate with correct parameters', () => {
-      notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_LIST, params: fakePeerList });
-
-      expect(peerUpdateHandler).toHaveBeenCalled();
-      peerUpdateHandler.mock.calls.forEach(call => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
-        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
-      });
-      expect(roomUpdateHandler).toHaveBeenCalled();
-      expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
     });
   });
 

@@ -1,4 +1,11 @@
-import { PeerNotification, PeerListNotification, SpeakerList, MessageNotification } from './HMSNotifications';
+import {
+  PeerNotification,
+  PeerListNotification,
+  SpeakerList,
+  MessageNotification,
+  PeriodicRoomState,
+  PolicyParams,
+} from './HMSNotifications';
 
 export const FAKE_PEER_ID = 'peer_id_1';
 
@@ -7,6 +14,148 @@ export const fakePeer: PeerNotification = {
   info: { data: 'data', name: 'Sarvesh0', user_id: 'customer_user_id' },
   role: 'host',
   tracks: {},
+};
+
+export const fakePolicy: PolicyParams = {
+  name: 'student',
+  known_roles: {
+    host: {
+      name: 'host',
+      publishParams: {
+        allowed: ['audio', 'video', 'screen'],
+        audio: {
+          bitRate: 32,
+          codec: 'opus',
+        },
+        video: {
+          bitRate: 400,
+          codec: 'vp8',
+          frameRate: 30,
+          width: 640,
+          height: 480,
+        },
+        screen: {
+          codec: 'vp8',
+          frameRate: 10,
+          width: 1920,
+          height: 1080,
+          bitRate: 320,
+        },
+        videoSimulcastLayers: { layers: [] },
+        screenSimulcastLayers: { layers: [] },
+      },
+      subscribeParams: {
+        subscribeToRoles: ['student', 'teacher', 'host', 'audio-only', '720p'],
+        maxSubsBitRate: 5200,
+        subscribeDegradation: {
+          packetLossThreshold: 25,
+          degradeGracePeriodSeconds: 1,
+          recoverGracePeriodSeconds: 4,
+        },
+      },
+      permissions: {
+        endRoom: true,
+        removeOthers: true,
+        mute: true,
+        unmute: true,
+        changeRole: true,
+        recording: true,
+        streaming: true,
+      },
+      priority: 1,
+    },
+    viewer: {
+      name: 'viewer',
+      publishParams: {
+        allowed: [],
+        audio: {
+          bitRate: 32,
+          codec: 'opus',
+        },
+        video: {
+          bitRate: 300,
+          codec: 'vp8',
+          frameRate: 30,
+          width: 480,
+          height: 360,
+        },
+        screen: {
+          codec: 'vp8',
+          frameRate: 10,
+          width: 1920,
+          height: 1080,
+          bitRate: 320,
+        },
+        videoSimulcastLayers: { layers: [] },
+        screenSimulcastLayers: { layers: [] },
+      },
+      subscribeParams: {
+        subscribeToRoles: ['host', 'student', 'teacher'],
+        maxSubsBitRate: 3200,
+        subscribeDegradation: {
+          packetLossThreshold: 25,
+          degradeGracePeriodSeconds: 1,
+          recoverGracePeriodSeconds: 4,
+        },
+      },
+      permissions: {
+        endRoom: true,
+        removeOthers: true,
+        mute: true,
+        unmute: true,
+        changeRole: true,
+        recording: true,
+        streaming: true,
+      },
+      priority: 1,
+    },
+  },
+};
+
+export const fakeRoomState: PeriodicRoomState = {
+  peer_count: 2,
+  room: {
+    name: 'test',
+    session_id: 'session_id',
+    started_at: 100,
+    recording: {
+      sfu: { enabled: false },
+      browser: { enabled: false },
+      hls: { enabled: false },
+    },
+    streaming: {
+      enabled: false,
+      rtmp: { enabled: false },
+      hls: { enabled: false, variants: [] },
+    },
+  },
+  peers: {
+    // optional
+    [FAKE_PEER_ID]: {
+      info: {
+        name: 'Sarvesh1',
+        data: 'data',
+        user_id: 'customer_user_id',
+      },
+      role: 'host',
+      peer_id: FAKE_PEER_ID,
+      joined_at: 1639133920000,
+      tracks: {},
+      is_from_room_state: true,
+    },
+    peer_id_2: {
+      info: {
+        name: 'Sarvesh2',
+        data: 'data',
+        user_id: 'customer_user_id',
+      },
+      role: 'host',
+      peer_id: 'peer_id_2',
+      joined_at: 1639133730000,
+      tracks: {},
+      is_from_room_state: true,
+    },
+  },
 };
 
 export const fakePeerList: PeerListNotification = {
