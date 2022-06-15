@@ -12,7 +12,6 @@
     "prod-eu": "APP_ENV=prod ENV_PATH=env/.env.prod-eu playwright test --grep-invert @qaonly",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "prepare": "husky install",
     "format": "prettier --write src/**/*.ts"
   },
   "keywords": [],
