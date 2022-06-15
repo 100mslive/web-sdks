@@ -149,6 +149,7 @@ const App = () => {
             brand_color: prevSettings.color,
             logo_obj: null,
             logo_url: prevSettings.logo,
+            recording_url: prevSettings.recording_url,
             logo_name: null,
             metadataFields: {
               clicks: 0,
