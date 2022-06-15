@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     defaults:
-      runs:
+      run:
         working-directory: playwright
 
     steps:
