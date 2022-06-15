@@ -21,6 +21,7 @@ export class PolicyChangeManager {
     }
 
     this.store.setKnownRoles(params.known_roles);
+    this.store.getRoom().templateId = params.template_id;
     // handle when role is not present in known_roles
     const publishParams = params.known_roles[params.name]?.publishParams;
     this.store.setPublishParams(publishParams);

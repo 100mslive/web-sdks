@@ -49,8 +49,8 @@ export class AnalyticsEventsService {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
-          event.metadata.peerId = this.store.getLocalPeer()?.peerId;
-          if (this.transport && (this.transport.transportProvider.isConnected || !window.HMS?.CLIENT_EVENTS)) {
+          event.metadata.peer.peer_id = this.store.getLocalPeer()?.peerId;
+          if (this.transport && this.transport.transportProvider.isConnected) {
             this.transport.sendEvent(event);
           } else {
             this.sendClientEventOnHTTP(event);
@@ -63,9 +63,20 @@ export class AnalyticsEventsService {
   }
 
   private sendClientEventOnHTTP(event: AnalyticsEvent) {
-    event.metadata.sessionId = this.store.getRoom().sessionId;
+    const room = this.store.getRoom();
+    const localPeer = this.store.getLocalPeer();
     event.metadata.token = this.store.getConfig()?.authToken;
-    event.metadata.roomId = this.store.getRoom().id;
+    event.metadata.peer = {
+      session_id: room.sessionId,
+      room_id: room.id,
+      room_name: room.name,
+      template_id: room.templateId,
+      joined_at: room.joinedAt?.getTime(),
+      session_started_at: room.startedAt?.getTime(),
+      role: localPeer?.role?.name,
+      user_name: localPeer?.name,
+      user_data: localPeer?.metadata,
+    };
     HTTPAnalyticsTransport.sendEvent(event);
   }
 }
