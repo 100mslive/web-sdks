@@ -41,6 +41,7 @@ const App = () => {
     logo_obj: null,
     logo_url: null,
     logo_name: null,
+    recording_url: '',
     metadataFields: {
       clicks: 0,
       metadata: '',
@@ -271,6 +272,7 @@ const App = () => {
               logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
               headerPresent: String(!!getAuthInfo().userEmail),
               metadata: settings.metadataFields.metadata,
+              recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
           />
