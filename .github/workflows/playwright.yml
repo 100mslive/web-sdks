@@ -89,7 +89,7 @@ jobs:
         if: always()
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          API_TOKEN_GITHUB: ${{ secrets.PAT_TOKEN }}
         with:
           source-directory: "playwright/playwright-report"
           destination-github-username: "100mslive"
