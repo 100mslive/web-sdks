@@ -76,15 +76,12 @@ jobs:
         with:
           node-version: "17.x"
       - run: |
-          pwd 
-          ls 
           cd playwright
           yarn install
           npx playwright install
 
       - name: Test in Region - "${{ env.REGION }}"
         run: |
-          pwd 
           ls
           cd playwright
           yarn "${{ env.REGION }}"
