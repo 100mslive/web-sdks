@@ -1,7 +1,7 @@
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
-import { drawOnCanvas } from './canvas-utils';
+import { RTCLoopback } from './loopback';
 
 /**
  * This class handles video playlist management
@@ -21,6 +21,7 @@ import { drawOnCanvas } from './canvas-utils';
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
   private videoElement: HTMLVideoElement | null = null;
+  private canvasContext: CanvasRenderingContext2D | null = null;
   private canvas!: HTMLCanvasElement;
   private timer: any;
   private tracks: MediaStreamTrack[] = [];
@@ -66,9 +67,8 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
             await this.videoElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
             stream.addTrack(audioTrack);
-            stream.getTracks().forEach((track: MediaStreamTrack) => {
-              this.tracks.push(track);
-            });
+            const videoTrack = await RTCLoopback.processVideoFromTrack(stream.getVideoTracks()[0]);
+            this.tracks.push(videoTrack);
             resolve(this.tracks);
           } else {
             // No need to capture canvas stream/get audio track. They wull be auto updated
@@ -80,6 +80,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
               // if seek happened, there is no play call/promise to be resolved, just reset seeked
               this.seeked = false;
               // This event will be called on seekTo when paused. Just draw the one frame on canvas.
+              this.canvasContext?.drawImage(this.videoElement, 0, 0, this.canvas?.width, this.canvas?.height);
             }
           }
         } catch (err) {
@@ -112,13 +113,16 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private clearCanvasAndTracks() {
     this.tracks = [];
     // clear canvas before playing new video
-    // this.canvasContext?.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvasContext?.clearRect(0, 0, this.canvas.width, this.canvas.height);
     clearTimeout(this.timer);
   }
 
   private drawImage = () => {
     if (this.videoElement && !this.videoElement.paused && !this.videoElement.ended) {
-      this.timer = drawOnCanvas(this.canvas, this.videoElement, this.DEFAUL_FPS);
+      this.canvasContext?.drawImage(this.videoElement, 0, 0, this.canvas?.width, this.canvas?.height);
+      this.timer = setTimeout(() => {
+        this.drawImage();
+      }, 1000 / this.DEFAUL_FPS);
     }
   };
 
@@ -139,6 +143,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private createCanvas() {
     if (!this.canvas) {
       this.canvas = document.createElement('canvas');
+      this.canvasContext = this.canvas.getContext('2d');
     }
   }
 
