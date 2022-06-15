@@ -34,9 +34,6 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: playwright
 
     steps:
       # Figure out the region where test needs to be run
@@ -78,6 +75,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "17.x"
+      - run: cd playwright
       - run: yarn install
       - run: npx playwright install
 
