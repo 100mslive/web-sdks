@@ -75,13 +75,14 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "17.x"
-      - working-directory: playwright
-      - run: yarn install
+      - run: cd playwright && yarn install
       - run: npx playwright install
+        working-directory: playwright
 
       - name: Test in Region - "${{ env.REGION }}"
       - working-directory: playwright
         run: yarn "${{ env.REGION }}"
+        working-directory: playwright
 
       - name: Push test result
         if: always()
