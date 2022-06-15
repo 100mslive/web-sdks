@@ -30,6 +30,10 @@ on:
   repository_dispatch:
     types: [automation]
 
+defaults:
+  run:
+    working-directory: playwright
+
 jobs:
   test:
     timeout-minutes: 10
@@ -75,14 +79,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "17.x"
-      - run: cd playwright && yarn install
+      - run: yarn install
       - run: npx playwright install
-        working-directory: playwright
 
       - name: Test in Region - "${{ env.REGION }}"
-      - working-directory: playwright
         run: yarn "${{ env.REGION }}"
-        working-directory: playwright
 
       - name: Push test result
         if: always()
@@ -90,7 +91,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: "playwright/playwright-report"
+          source-directory: "playwright-report"
           destination-github-username: "100mslive"
           destination-repository-name: "automation-reports"
           target-branch: "${{ env.REGION }}"
@@ -103,7 +104,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.19.0
         with:
-          payload-file-path: "./playwright/slackMessage.json"
+          payload-file-path: "./slackMessage.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
