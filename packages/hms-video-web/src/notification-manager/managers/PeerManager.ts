@@ -21,7 +21,7 @@ export class PeerManager {
   constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
 
   private get TAG() {
-    return `[${this.constructor.name}]`;
+    return `[HMSPeerManager]`;
   }
 
   handleNotification(method: string, notification: any) {

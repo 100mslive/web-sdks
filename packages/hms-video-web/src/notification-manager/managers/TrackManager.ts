@@ -25,7 +25,7 @@ export class TrackManager {
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
   private get TAG() {
-    return `[${this.constructor.name}]`;
+    return `[HMSTrackManager]`;
   }
 
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
@@ -128,7 +128,6 @@ export class TrackManager {
 
       const trackEntry = params.tracks[trackId];
       const track = this.store.getTrackById(trackId);
-      HMSLogger.d(this.TAG, `TRACK_UPDATE`, trackEntry);
 
       this.store.setTrackState({
         peerId: params.peer.peer_id,
@@ -142,6 +141,7 @@ export class TrackManager {
         track.setEnabled(!trackEntry.mute);
         const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
         if (eventType) {
+          HMSLogger.d(this.TAG, HMSTrackUpdate[eventType], track);
           this.listener?.onTrackUpdate(eventType, track, hmsPeer);
         }
       }
@@ -169,6 +169,7 @@ export class TrackManager {
       track.setEnabled(!state.trackInfo.mute);
       this.addAudioTrack(hmsPeer, track);
       this.addVideoTrack(hmsPeer, track);
+      HMSLogger.d(this.TAG, 'TRACK_ADDED', track);
       /**
        * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
        * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created

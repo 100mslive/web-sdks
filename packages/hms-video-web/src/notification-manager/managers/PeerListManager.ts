@@ -30,7 +30,7 @@ export class PeerListManager {
   ) {}
 
   private get TAG() {
-    return `[${this.constructor.name}]`;
+    return `[HMSPeerListManager]`;
   }
 
   handleNotification(method: string, notification: any, isReconnecting: boolean) {
