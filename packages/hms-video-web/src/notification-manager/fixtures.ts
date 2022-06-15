@@ -17,6 +17,7 @@ export const fakePeer: PeerNotification = {
 };
 
 export const fakePolicy: PolicyParams = {
+  template_id: 'template_id_1',
   name: 'student',
   known_roles: {
     host: {
