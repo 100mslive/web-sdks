@@ -162,15 +162,13 @@ describe('Notification Manager', () => {
       );
 
       // console.log({ reconnectPeerListMock: peerUpdateHandler.mock.calls });
-      expect(peerUpdateHandler).toHaveBeenCalledTimes(2);
+      expect(peerUpdateHandler).toHaveBeenCalledTimes(1);
 
-      expect(peerUpdateHandler.mock.calls[0][0]).toBe(HMSPeerUpdate.PEER_LEFT);
-      expect(peerUpdateHandler.mock.calls[0][1]).toBeInstanceOf(HMSRemotePeer);
-      expect(peerUpdateHandler.mock.calls[0][1].peerId).toBe('peer_id_3');
-
-      expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_JOINED);
-      expect(peerUpdateHandler.mock.calls[1][1]).toBeInstanceOf(HMSRemotePeer);
-      expect(peerUpdateHandler.mock.calls[1][1].peerId).toBe('peer_id_2');
+      peerUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
+        expect(call[1].length).toEqual(Object.keys(fakeReconnectPeerList.peers).length);
+        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      });
 
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
