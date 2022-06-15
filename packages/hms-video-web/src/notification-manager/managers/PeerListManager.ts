@@ -1,12 +1,13 @@
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener } from '../..';
-import { HMSTrackUpdate } from '../../interfaces';
-import { HMSPeer } from '../../sdk/models/peer';
+import { HMSPeerUpdate, HMSTrackUpdate } from '../../interfaces';
+import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
 import { PeerManager } from './PeerManager';
 import { TrackManager } from './TrackManager';
+import { convertDateNumToDate } from '../../utils/date';
 
 /**
  * Handles:
@@ -38,7 +39,7 @@ export class PeerListManager {
       const peerList = notification as PeerListNotification;
       if (isReconnecting) {
         HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList);
-        this.handleReconnectPeerList(peerList);
+        this.handleReconnectPeerList(peerList.peers);
       } else {
         // TODO: Don't call initial peerlist if atleast 1room state had happen
         HMSLogger.d(this.TAG, `PEER_LIST event`, peerList);
@@ -55,10 +56,6 @@ export class PeerListManager {
     this.peerManager.handlePeerList(peers);
   };
 
-  private handleReconnectPeerList = (peerList: PeerListNotification) => {
-    this.handleRepeatedPeerList(peerList.peers);
-  };
-
   private handlePreviewRoomState = (roomState: PeriodicRoomState) => {
     if (!this.store.hasRoleDetailsArrived()) {
       // we can't process the peers yet we don't know enough about them(role info)
@@ -71,7 +68,7 @@ export class PeerListManager {
       // If there are no peers either roomState.peers will be empty object
       // or peer_count will be 0(handled below)
       if (roomState.peer_count === 0) {
-        this.handleRepeatedPeerList({});
+        this.handleRoomStatePeerList({});
       }
       return;
     }
@@ -82,10 +79,66 @@ export class PeerListManager {
       roomPeers[peer].tracks = {};
       roomPeers[peer].is_from_room_state = true;
     });
-    this.handleRepeatedPeerList(roomPeers);
+    this.handleRoomStatePeerList(roomPeers);
   };
 
-  private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {
+  private handleRoomStatePeerList = (peersMap: Record<string, PeerNotification>) => {
+    const currentPeerList = this.store.getRemotePeers();
+    const peers = Object.values(peersMap);
+    const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
+    HMSLogger.d(this.TAG, { peersToRemove });
+    let peerListChanged = peersToRemove.length > 0;
+
+    peersToRemove.forEach(peer => {
+      this.store.removePeer(peer.peerId);
+    });
+
+    // eslint-disable-next-line complexity
+    const updatePeerRoleAndInfo = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
+      if (oldPeer.role && oldPeer.role.name !== newPeerNotification.role) {
+        const newRole = this.store.getPolicyForRole(newPeerNotification.role);
+        oldPeer.updateRole(newRole);
+        peerListChanged = true;
+      }
+      if (newPeerNotification.info.name && oldPeer.name !== newPeerNotification.info.name) {
+        oldPeer.updateName(newPeerNotification.info.name);
+        peerListChanged = true;
+      }
+      if (newPeerNotification.info.data && oldPeer.metadata !== newPeerNotification.info.data) {
+        oldPeer.updateMetadata(newPeerNotification.info.data);
+        peerListChanged = true;
+      }
+    };
+
+    peers.forEach(newPeerNotification => {
+      const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
+
+      if (oldPeer) {
+        // Update peer's role and info(name, data) locally, new role and info is received from the room-state
+        updatePeerRoleAndInfo(oldPeer, newPeerNotification);
+      } else {
+        // New peer joined while in preview(from room state)
+        const hmsPeer = new HMSRemotePeer({
+          peerId: newPeerNotification.peer_id,
+          name: newPeerNotification.info.name,
+          customerUserId: newPeerNotification.info.user_id,
+          metadata: newPeerNotification.info.data,
+          role: this.store.getPolicyForRole(newPeerNotification.role),
+          joinedAt: convertDateNumToDate(newPeerNotification.joined_at),
+          fromRoomState: !!newPeerNotification.is_from_room_state,
+        });
+
+        this.store.addPeer(hmsPeer);
+        peerListChanged = true;
+      }
+    });
+
+    if (peerListChanged) {
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, this.store.getRemotePeers());
+    }
+  };
+
+  private handleReconnectPeerList = (peersMap: Record<string, PeerNotification>) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
