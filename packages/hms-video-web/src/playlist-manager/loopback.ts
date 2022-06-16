@@ -1,3 +1,14 @@
+/**
+ * This class is used to create two peer connections which are connected to each other. This can be useful in two cases:
+ * 1. To get a playlist audio track whose audio is not considered as audio of the peer.audiotrack
+ * 2. To get a CanvasCaptureMediaStreamTrack as a MediaStreamTrack as the former does not work in safari
+ *
+ * Working:
+ * Two Peer connections are created.
+ * Whenever a track is to be processed, it is added to the first connection and offer/answer is updated on both peer connections.
+ * On the second peer connection on track, the processed track is received, which is then returned. This track is then published to
+ * 100ms SFU.
+ */
 export class Loopback {
   private rtcConnection: RTCPeerConnection;
   private rtcLoopbackConnection: RTCPeerConnection;
