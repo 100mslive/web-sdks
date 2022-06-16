@@ -7,6 +7,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { EventBus } from '../events/EventBus';
 import { HMSLocalTrack } from '../media/tracks';
+import { Loopback } from './loopback';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -46,10 +47,10 @@ export class PlaylistManager
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
 
-  constructor(private sdk: HMSSdk, private eventBus: EventBus) {
+  constructor(private sdk: HMSSdk, private eventBus: EventBus, private rtcLoopback: Loopback) {
     super();
     this.audioManager = new PlaylistAudioManager();
-    this.videoManager = new PlaylistVideoManager();
+    this.videoManager = new PlaylistVideoManager(this.rtcLoopback);
     this.addListeners();
   }
 

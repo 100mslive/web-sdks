@@ -2,7 +2,7 @@ import HMSLogger from '../utils/logger';
 import { isSafari } from '../utils/support';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { AudioContextManager } from './AudioContextManager';
-import { RTCLoopback } from './loopback';
+import { Loopback } from './loopback';
 
 /**
  * This class handles video playlist management
@@ -30,6 +30,10 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private DEFAUL_FPS = 24;
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
+
+  constructor(private rtcLoopback: Loopback) {
+    super();
+  }
 
   play(url: string) {
     this.videoElement = this.getVideoElement();
@@ -150,7 +154,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private async getVideoTrack(stream: MediaStream) {
     let videoTrack = stream.getVideoTracks()[0];
     if (isSafari()) {
-      videoTrack = await RTCLoopback.processVideoFromTrack(stream.getVideoTracks()[0]);
+      videoTrack = await this.rtcLoopback.processVideoFromTrack(stream.getVideoTracks()[0]);
     }
     return videoTrack;
   }

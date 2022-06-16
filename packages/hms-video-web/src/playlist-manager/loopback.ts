@@ -1,7 +1,7 @@
-class Loopback {
-  rtcConnection = new RTCPeerConnection();
-  rtcLoopbackConnection = new RTCPeerConnection();
-  audioContext = new AudioContext();
+export class Loopback {
+  private rtcConnection: RTCPeerConnection;
+  private rtcLoopbackConnection: RTCPeerConnection;
+  private audioContext: AudioContext;
   offerOptions = {
     offerVideo: true,
     offerAudio: true,
@@ -9,12 +9,21 @@ class Loopback {
     offerToReceiveVideo: false,
   };
   constructor() {
+    this.rtcConnection = new RTCPeerConnection();
+    this.rtcLoopbackConnection = new RTCPeerConnection();
+    this.audioContext = new AudioContext();
     this.rtcConnection.onicecandidate = e => {
       e.candidate && this.rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
     };
     this.rtcLoopbackConnection.onicecandidate = e => {
       e.candidate && this.rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate));
     };
+  }
+
+  cleanup() {
+    this.rtcConnection.close();
+    this.rtcLoopbackConnection.close();
+    this.audioContext.close();
   }
 
   async processAudioFromUrl(url: string) {
@@ -73,5 +82,3 @@ class Loopback {
     await this.rtcConnection.setRemoteDescription(answer);
   }
 }
-
-export const RTCLoopback = new Loopback();

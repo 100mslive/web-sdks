@@ -59,6 +59,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
 import { HMSAudioContextHandler } from '../utils/media';
+import { Loopback } from '../playlist-manager/loopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -96,6 +97,7 @@ export class HMSSdk implements HMSInterface {
   private analyticsEventsService!: AnalyticsEventsService;
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
+  private rtcLoopback!: Loopback;
   private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
@@ -112,7 +114,8 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.eventBus = new EventBus();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
-    this.playlistManager = new PlaylistManager(this, this.eventBus);
+    this.rtcLoopback = new Loopback();
+    this.playlistManager = new PlaylistManager(this, this.eventBus, this.rtcLoopback);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
@@ -406,6 +409,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
+    this.rtcLoopback?.cleanup();
     HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**
