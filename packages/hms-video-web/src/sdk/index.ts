@@ -50,7 +50,7 @@ import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { LocalTrackManager } from './LocalTrackManager';
 import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { isNode } from '../utils/support';
+import { isNode, isSafari } from '../utils/support';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
@@ -174,7 +174,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   async getCrossBrowserCanvasTrack(track: MediaStreamTrack) {
-    return await this.rtcLoopback?.processVideoFromTrack(track);
+    let processedTrack = track;
+    if (isSafari()) {
+      processedTrack = await this.rtcLoopback?.processVideoFromTrack(track);
+    }
+    return processedTrack;
   }
 
   private handleAutoplayError = (error: HMSException) => {
