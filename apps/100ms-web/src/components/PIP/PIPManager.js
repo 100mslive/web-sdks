@@ -140,14 +140,14 @@ class PipManager {
    * @private
    */
   async init(hmsActions, onStateChangeFn) {
-    await this.initMediaElements();
     this.hmsActions = hmsActions;
     this.onStateChange = onStateChangeFn;
+    await this.initMediaElements();
   }
 
   async initMediaElements() {
     if (!this.canvas) {
-      const { canvas, pipVideo } = this.initializeCanvasAndVideoElement();
+      const { canvas, pipVideo } = await this.initializeCanvasAndVideoElement();
       this.canvas = canvas; // where stitching will take place
       this.pipVideo = pipVideo; // the element which will be sent in PIP
       this.videoElements = this.initializeVideoElements(); // for attaching tracks
@@ -157,13 +157,19 @@ class PipManager {
     }
   }
 
-  initializeCanvasAndVideoElement() {
+  async initializeCanvasAndVideoElement() {
     const canvas = document.createElement("canvas");
     canvas.width = DEFAULT_CANVAS_WIDTH;
     canvas.height = DEFAULT_CANVAS_HEIGHT;
     const pipVideo = document.createElement("video");
     pipVideo.muted = true;
-    pipVideo.srcObject = canvas.captureStream();
+    const stream = new MediaStream();
+    const canvasStream = canvas.captureStream();
+    const videoTrack = await this.hmsActions.getCrossBrowserCanvasTrack(
+      canvasStream.getVideoTracks()[0]
+    );
+    stream.addTrack(videoTrack);
+    pipVideo.srcObject = stream;
     return { canvas, pipVideo };
   }
 
@@ -173,6 +179,7 @@ class PipManager {
       const videoElement = document.createElement("video");
       videoElement.autoplay = true;
       videoElement.playsinline = true;
+      videoElement.muted = true;
       videoElements.push(videoElement);
     }
     return videoElements;
@@ -300,4 +307,4 @@ class PipManager {
 }
 
 export const PictureInPicture = new PipManager();
-// PictureInPicture.initMediaElements().catch(console.error);  // for safari, init early
+PictureInPicture.initMediaElements().catch(console.error); // for safari, init early
