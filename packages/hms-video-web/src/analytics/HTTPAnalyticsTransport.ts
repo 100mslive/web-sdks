@@ -13,9 +13,19 @@ import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 interface ClientEventBody {
   event: string;
   event_id: string;
-  peer_id?: string;
-  session_id?: string;
-  room_id?: string;
+  peer: {
+    peer_id?: string;
+    role?: string;
+    joined_at?: number;
+    left_at?: number;
+    room_id?: string;
+    room_name?: string;
+    session_started_at?: number;
+    user_data?: string;
+    user_name?: string;
+    template_id?: string;
+    session_id?: string;
+  };
   timestamp: number;
   payload: Record<string, any>;
   agent: string;
@@ -34,7 +44,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   }
 
   sendEvent(event: AnalyticsEvent) {
-    if (!this.env || !window.HMS?.CLIENT_EVENTS) {
+    if (!this.env) {
       this.addEventToStorage(event);
       return;
     }
@@ -42,10 +52,8 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       event: event.name,
       payload: event.properties,
       event_id: String(event.timestamp),
-      peer_id: event.metadata.peerId,
-      session_id: event.metadata.sessionId,
-      room_id: event.metadata.roomId,
-      timestamp: Date.now(),
+      peer: event.metadata.peer,
+      timestamp: event.timestamp,
       agent: userAgent,
       device_id: event.device_id,
     };

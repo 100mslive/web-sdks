@@ -21,7 +21,23 @@ yarn install
 ### Test
 
 ```
-yarn test
+yarn test 
+
+```
+### Running playwright tests
+
+Navigate to playwright directory before running below commands.
+
+## Install packages
+
+```
+yarn install
+```
+
+## Run for say qa-in
+
+```
+ yarn qa-in
 ```
 
 ### Lint
@@ -53,6 +69,10 @@ the folder directly and run `yarn start`.
 ```
 
 > Note: run yarn start in sdk first and then in store
+
+### Custom App in Dev
+
+This is useful when you want to see changes from `100ms-web` app being reflected in custom app in dev. Run `yarn dev` in `100ms-web` & `yarn start` in `custom-app`
 
 ### Update a packages version
 
