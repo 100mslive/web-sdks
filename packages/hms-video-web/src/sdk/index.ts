@@ -173,6 +173,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.hls;
   }
 
+  async getCrossBrowserCanvasTrack(track: MediaStreamTrack) {
+    return await this.rtcLoopback?.processVideoFromTrack(track);
+  }
+
   private handleAutoplayError = (error: HMSException) => {
     this.errorListener?.onError?.(error);
   };

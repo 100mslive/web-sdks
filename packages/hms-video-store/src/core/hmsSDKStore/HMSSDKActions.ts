@@ -117,6 +117,10 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
+  async getCrossBrowserCanvasTrack(track: MediaStreamTrack) {
+    return await this.sdk.getCrossBrowserCanvasTrack(track);
+  }
+
   setVolume(value: number, trackId?: HMSTrackID): void {
     if (trackId) {
       this.setTrackVolume(value, trackId);
