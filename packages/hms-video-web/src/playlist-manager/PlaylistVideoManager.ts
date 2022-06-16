@@ -67,9 +67,8 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
             this.audioContextManager.resumeContext();
             await this.videoElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
-            stream.addTrack(audioTrack);
             const videoTrack = await this.getVideoTrack(stream);
-            this.tracks.push(videoTrack);
+            this.tracks.push(videoTrack, audioTrack);
             resolve(this.tracks);
           } else {
             // No need to capture canvas stream/get audio track. They wull be auto updated
