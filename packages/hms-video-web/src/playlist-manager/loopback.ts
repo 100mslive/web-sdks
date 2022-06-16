@@ -37,7 +37,7 @@ export class Loopback {
     this.audioContext.close();
   }
 
-  async processAudioFromUrl(url: string) {
+  async processAudioFromUrl(url: string): Promise<MediaStreamTrack> {
     const track = await this.createAudioTrackFromUrl(url);
     return new Promise<MediaStreamTrack>(resolve => {
       this.rtcConnection.addTrack(track);
@@ -48,7 +48,7 @@ export class Loopback {
     });
   }
 
-  async processAudioFromTrack(track: MediaStreamTrack) {
+  async processAudioFromTrack(track: MediaStreamTrack): Promise<MediaStreamTrack> {
     return new Promise<MediaStreamTrack>(resolve => {
       this.rtcConnection.addTrack(track);
       this.rtcLoopbackConnection.ontrack = e => {
@@ -58,7 +58,7 @@ export class Loopback {
     });
   }
 
-  async processVideoFromTrack(track: MediaStreamTrack) {
+  async processVideoFromTrack(track: MediaStreamTrack): Promise<MediaStreamTrack> {
     return new Promise<MediaStreamTrack>(resolve => {
       this.rtcConnection.addTrack(track);
       this.rtcLoopbackConnection.ontrack = e => {
