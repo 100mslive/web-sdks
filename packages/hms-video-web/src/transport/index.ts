@@ -337,43 +337,38 @@ export default class HMSTransport implements ITransport {
 
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
-        this.publishConnection = new HMSPublishConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.publishConnectionObserver,
-          this,
-        );
+        const createConnectionsAndNegotiateJoin = async () => {
+          const isNonWebRTC = this.store.isLocalPeerNonWebRTC();
+          if (!isNonWebRTC) {
+            this.createHMSConnections();
+          }
 
-        this.subscribeConnection = new HMSSubscribeConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.subscribeConnectionObserver,
-        );
+          await this.negotiateJoin(
+            customData.name,
+            customData.metaData,
+            autoSubscribeVideo,
+            isServerHandlingDegradation,
+            isNonWebRTC,
+          );
+        };
 
-        const negotiateJoinWhenPolicyIsAvailable = async () => {
+        /**
+         * Create HMSConnections and negotiate join when policy is available based on role
+         */
+        const createConnectionsAndNegotiateJoinWhenPolicyIsAvailable = async () => {
           if (this.store.hasRoleDetailsArrived()) {
-            await this.negotiateJoin(
-              customData.name,
-              customData.metaData,
-              autoSubscribeVideo,
-              isServerHandlingDegradation,
-            );
+            await createConnectionsAndNegotiateJoin();
           } else {
             await new Promise<void>(resolve => {
               this.eventBus.policyChange.subscribeOnce(async () => {
-                await this.negotiateJoin(
-                  customData.name,
-                  customData.metaData,
-                  autoSubscribeVideo,
-                  isServerHandlingDegradation,
-                );
+                await createConnectionsAndNegotiateJoin();
                 resolve();
               });
             });
           }
         };
 
-        await negotiateJoinWhenPolicyIsAvailable();
+        await createConnectionsAndNegotiateJoinWhenPolicyIsAvailable();
         await this.initRtcStatsMonitor();
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
@@ -688,30 +683,41 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
+  private createHMSConnections() {
+    if (this.initConfig) {
+      this.publishConnection = new HMSPublishConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.publishConnectionObserver,
+        this,
+      );
+
+      this.subscribeConnection = new HMSSubscribeConnection(
+        this.signal,
+        this.initConfig.rtcConfiguration,
+        this.subscribeConnectionObserver,
+      );
+    }
+  }
+
   private async negotiateJoin(
     name: string,
     data: string,
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
+    isNonWebRTC = false,
     constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
-  ) {
+  ): Promise<boolean> {
     try {
-      HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-      const offer = await this.publishConnection!.createOffer(constraints, new Map());
-      await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo, serverSubDegrade);
-      await this.publishConnection!.setRemoteDescription(answer);
-      for (const candidate of this.publishConnection!.candidates || []) {
-        await this.publishConnection!.addIceCandidate(candidate);
+      if (isNonWebRTC) {
+        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
+      } else {
+        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
       }
-
-      this.publishConnection!.initAfterJoin();
     } catch (error) {
       HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
       const task = async () => {
-        await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
-        // used to check success of publish negotiation as remoteDescription is set once we receive answer from biz
-        return Boolean(this.publishConnection?.remoteDescription);
+        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isNonWebRTC, constraints);
       };
 
       await this.retryScheduler.schedule({
@@ -723,7 +729,40 @@ export default class HMSTransport implements ITransport {
         task,
         originalState: TransportState.Joined,
       });
+
+      return false;
     }
+  }
+
+  private async negotiateJoinWebRTC(
+    name: string,
+    data: string,
+    autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
+    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
+  ): Promise<boolean> {
+    HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
+    const offer = await this.publishConnection!.createOffer(constraints, new Map());
+    await this.publishConnection?.setLocalDescription(offer);
+    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, offer);
+    await this.publishConnection?.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection?.candidates || []) {
+      await this.publishConnection?.addIceCandidate(candidate);
+    }
+
+    this.publishConnection?.initAfterJoin();
+    return !!answer;
+  }
+
+  private async negotiateJoinNonWebRTC(
+    name: string,
+    data: string,
+    autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
+  ): Promise<boolean> {
+    HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
+    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade);
+    return !!response;
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
