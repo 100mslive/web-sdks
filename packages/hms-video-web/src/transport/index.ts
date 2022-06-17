@@ -114,18 +114,21 @@ export default class HMSTransport implements ITransport {
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
       try {
-        await this.subscribeConnection!.setRemoteDescription(jsep);
+        if (!this.subscribeConnection) {
+          return;
+        }
+        await this.subscribeConnection.setRemoteDescription(jsep);
         HMSLogger.d(
           TAG,
-          `[SUBSCRIBE] Adding ${this.subscribeConnection!.candidates.length} ice-candidates`,
-          this.subscribeConnection!.candidates,
+          `[SUBSCRIBE] Adding ${this.subscribeConnection.candidates.length} ice-candidates`,
+          this.subscribeConnection.candidates,
         );
-        for (const candidate of this.subscribeConnection!.candidates) {
-          await this.subscribeConnection!.addIceCandidate(candidate);
+        for (const candidate of this.subscribeConnection.candidates) {
+          await this.subscribeConnection.addIceCandidate(candidate);
         }
-        this.subscribeConnection!.candidates.length = 0;
-        const answer = await this.subscribeConnection!.createAnswer();
-        await this.subscribeConnection!.setLocalDescription(answer);
+        this.subscribeConnection.candidates.length = 0;
+        const answer = await this.subscribeConnection.createAnswer();
+        await this.subscribeConnection.setLocalDescription(answer);
         this.signal.answer(answer);
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
@@ -145,10 +148,10 @@ export default class HMSTransport implements ITransport {
 
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
-        trickle.target === HMSConnectionRole.Publish ? this.publishConnection! : this.subscribeConnection!;
-      if (connection.remoteDescription === null) {
+        trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
+      if (!connection?.remoteDescription) {
         // ICE candidates can't be added without any remote session description
-        connection.candidates.push(trickle.candidate);
+        connection?.candidates.push(trickle.candidate);
       } else {
         await connection.addIceCandidate(trickle.candidate);
       }
@@ -370,6 +373,9 @@ export default class HMSTransport implements ITransport {
 
         await createConnectionsAndNegotiateJoinWhenPolicyIsAvailable();
         await this.initRtcStatsMonitor();
+
+        this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
+
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
         );
@@ -685,18 +691,22 @@ export default class HMSTransport implements ITransport {
 
   private createHMSConnections() {
     if (this.initConfig) {
-      this.publishConnection = new HMSPublishConnection(
-        this.signal,
-        this.initConfig.rtcConfiguration,
-        this.publishConnectionObserver,
-        this,
-      );
+      if (!this.publishConnection) {
+        this.publishConnection = new HMSPublishConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.publishConnectionObserver,
+          this,
+        );
+      }
 
-      this.subscribeConnection = new HMSSubscribeConnection(
-        this.signal,
-        this.initConfig.rtcConfiguration,
-        this.subscribeConnectionObserver,
-      );
+      if (!this.subscribeConnection) {
+        this.subscribeConnection = new HMSSubscribeConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.subscribeConnectionObserver,
+        );
+      }
     }
   }
 
@@ -764,6 +774,39 @@ export default class HMSTransport implements ITransport {
     const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade);
     return !!response;
   }
+
+  /**
+   * Negotiate initial publish after changing role from non-webrtc peer to webrtc peer by sending offer
+   */
+  private async negotiateInitialPublish(
+    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
+  ) {
+    HMSLogger.d(TAG, '⏳ Negotiating offer over PUBLISH connection');
+    const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
+    await this.publishConnection?.setLocalDescription(offer);
+    const answer = await this.signal.offer(offer, this.trackStates);
+    await this.publishConnection?.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection?.candidates || []) {
+      await this.publishConnection?.addIceCandidate(candidate);
+    }
+
+    this.publishConnection?.initAfterJoin();
+    return !!answer;
+  }
+
+  private handleLocalRoleUpdate = async () => {
+    const isWebRTC = !this.store.isLocalPeerNonWebRTC();
+    if (!isWebRTC) {
+      return;
+    }
+
+    HMSLogger.d(
+      TAG,
+      'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
+    );
+    this.createHMSConnections();
+    await this.negotiateInitialPublish();
+  };
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);
