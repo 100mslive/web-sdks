@@ -178,9 +178,9 @@ export default class JsonRpcSignal implements ISignal {
   async join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
@@ -392,8 +392,8 @@ export default class JsonRpcSignal implements ISignal {
     name: string;
     disableVidAutoSub: boolean;
     data: string;
-    offer: RTCSessionDescriptionInit;
     server_sub_degrade: boolean;
+    offer?: RTCSessionDescriptionInit;
   }): Promise<RTCSessionDescriptionInit> {
     const MAX_RETRIES = 3;
     let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(
