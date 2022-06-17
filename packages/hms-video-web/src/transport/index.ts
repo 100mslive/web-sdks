@@ -31,7 +31,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -477,9 +477,10 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  handleLocalRoleUpdate = async () => {
-    const isWebRTC = !this.store.isLocalPeerNonWebRTC();
-    if (!isWebRTC) {
+  handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
+    const changedFromNonWebRTCToWebRTC =
+      this.store.isRoleNonWebRTC(oldRole.name) && !this.store.isRoleNonWebRTC(newRole.name);
+    if (!changedFromNonWebRTCToWebRTC) {
       return;
     }
 
