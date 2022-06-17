@@ -374,8 +374,6 @@ export default class HMSTransport implements ITransport {
         await createConnectionsAndNegotiateJoinWhenPolicyIsAvailable();
         await this.initRtcStatsMonitor();
 
-        this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
-
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
         );
@@ -478,6 +476,20 @@ export default class HMSTransport implements ITransport {
       this.observer.onStateChange(this.state);
     }
   }
+
+  handleLocalRoleUpdate = async () => {
+    const isWebRTC = !this.store.isLocalPeerNonWebRTC();
+    if (!isWebRTC) {
+      return;
+    }
+
+    HMSLogger.d(
+      TAG,
+      'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
+    );
+    this.createHMSConnections();
+    await this.negotiateInitialPublish();
+  };
 
   async publish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
@@ -793,20 +805,6 @@ export default class HMSTransport implements ITransport {
     this.publishConnection?.initAfterJoin();
     return !!answer;
   }
-
-  private handleLocalRoleUpdate = async () => {
-    const isWebRTC = !this.store.isLocalPeerNonWebRTC();
-    if (!isWebRTC) {
-      return;
-    }
-
-    HMSLogger.d(
-      TAG,
-      'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
-    );
-    this.createHMSConnections();
-    await this.negotiateInitialPublish();
-  };
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
     HMSLogger.d(TAG, `⏳ [role=PUBLISH] onRenegotiationNeeded START`, this.trackStates);

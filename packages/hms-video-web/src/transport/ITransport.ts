@@ -50,4 +50,6 @@ export default interface ITransport {
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 
   changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams): Promise<void>;
+
+  handleLocalRoleUpdate(): Promise<void>;
 }
