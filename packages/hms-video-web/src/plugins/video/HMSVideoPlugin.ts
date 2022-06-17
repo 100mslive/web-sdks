@@ -36,7 +36,7 @@ export interface HMSVideoPlugin {
    */
   getPluginType(): HMSVideoPluginType;
 
-  getContextType?: () => HMSVideoPluginCanvasContextType;
+  getContextType?(): HMSVideoPluginCanvasContextType;
 
   /**
    * This function will be called by the SDK for every video frame which the plugin needs to process.
