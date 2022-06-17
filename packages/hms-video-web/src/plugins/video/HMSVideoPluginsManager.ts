@@ -161,21 +161,22 @@ export class HMSVideoPluginsManager {
     if (result.isSupported) {
       HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
+      let error;
       switch (result.errType) {
         case HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED:
-          const error = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+          error = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
             HMSAction.VIDEO_PLUGINS,
             'platform not supported, see docs',
           );
           this.analytics.failure(name, error);
           throw error;
         case HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED:
-          const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+          error = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
             HMSAction.VIDEO_PLUGINS,
             'video device not supported, see docs',
           );
-          this.analytics.failure(name, err);
-          throw err;
+          this.analytics.failure(name, error);
+          throw error;
       }
     }
   }
