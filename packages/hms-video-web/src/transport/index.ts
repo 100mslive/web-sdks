@@ -350,12 +350,30 @@ export default class HMSTransport implements ITransport {
           this.subscribeConnectionObserver,
         );
 
-        await this.joinPublishNegotiation(
-          customData.name,
-          customData.metaData,
-          autoSubscribeVideo,
-          isServerHandlingDegradation,
-        );
+        const negotiateJoinWhenPolicyIsAvailable = async () => {
+          if (this.store.hasRoleDetailsArrived()) {
+            await this.negotiateJoin(
+              customData.name,
+              customData.metaData,
+              autoSubscribeVideo,
+              isServerHandlingDegradation,
+            );
+          } else {
+            await new Promise<void>(resolve => {
+              this.eventBus.policyChange.subscribeOnce(async () => {
+                await this.negotiateJoin(
+                  customData.name,
+                  customData.metaData,
+                  autoSubscribeVideo,
+                  isServerHandlingDegradation,
+                );
+                resolve();
+              });
+            });
+          }
+        };
+
+        await negotiateJoinWhenPolicyIsAvailable();
         await this.initRtcStatsMonitor();
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
@@ -670,7 +688,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
-  private async joinPublishNegotiation(
+  private async negotiateJoin(
     name: string,
     data: string,
     autoSubscribeVideo: boolean,
@@ -691,7 +709,7 @@ export default class HMSTransport implements ITransport {
     } catch (error) {
       HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
       const task = async () => {
-        await this.joinPublishNegotiation(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
+        await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
         // used to check success of publish negotiation as remoteDescription is set once we receive answer from biz
         return Boolean(this.publishConnection?.remoteDescription);
       };
