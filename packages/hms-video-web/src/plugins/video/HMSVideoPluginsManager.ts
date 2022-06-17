@@ -1,5 +1,5 @@
 /* eslint-disable complexity */
-import { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
+import { HMSVideoPlugin, HMSVideoPluginCanvasContextType, HMSVideoPluginType } from './HMSVideoPlugin';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
@@ -45,8 +45,7 @@ export class HMSVideoPluginsManager {
   private pluginsLoopRunning = false;
   private pluginsLoopState: 'paused' | 'running' = 'paused';
   private readonly hmsTrack: HMSLocalVideoTrack;
-  private readonly plugins: string[]; // plugin names in order they were added
-  private readonly pluginsMap: Record<string, HMSVideoPlugin>; // plugin names to their instance mapping
+  private readonly pluginsMap: Map<string, HMSVideoPlugin>; // plugin names to their instance mapping
   private inputVideo?: HTMLVideoElement;
   private inputCanvas?: CanvasElement;
   private outputCanvas?: CanvasElement;
@@ -59,8 +58,7 @@ export class HMSVideoPluginsManager {
 
   constructor(track: HMSLocalVideoTrack, eventBus: EventBus) {
     this.hmsTrack = track;
-    this.plugins = [];
-    this.pluginsMap = {};
+    this.pluginsMap = new Map();
     this.pluginNumFramesToSkip = {};
     this.pluginNumFramesSkipped = {};
     this.analytics = new VideoPluginsAnalytics(eventBus);
@@ -68,7 +66,7 @@ export class HMSVideoPluginsManager {
   }
 
   getPlugins(): string[] {
-    return [...this.plugins];
+    return Array.from(this.pluginsMap.keys());
   }
 
   /**
@@ -108,7 +106,7 @@ export class HMSVideoPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
-    if (this.pluginsMap[name]) {
+    if (this.pluginsMap.has(name)) {
       HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
       return;
     }
@@ -136,15 +134,14 @@ export class HMSVideoPluginsManager {
 
     try {
       await this.analytics.initWithTime(name, async () => await plugin.init());
-      this.plugins.push(name);
-      this.pluginsMap[name] = plugin;
+      this.pluginsMap.set(name, plugin);
       // add new canvases according to new added plugins
-      if (this.plugins.length + 1 > this.canvases.length) {
-        for (let i = this.canvases.length; i <= this.plugins.length; i++) {
+      if (this.pluginsMap.size + 1 > this.canvases.length) {
+        for (let i = this.canvases.length; i <= this.pluginsMap.size; i++) {
           this.canvases[i] = document.createElement('canvas') as CanvasElement;
         }
       }
-      await this.startPluginsLoop();
+      await this.startPluginsLoop(plugin.getContextType?.());
     } catch (err) {
       HMSLogger.e(TAG, 'failed to add plugin', err);
       await this.removePlugin(plugin);
@@ -183,13 +180,13 @@ export class HMSVideoPluginsManager {
 
   async removePlugin(plugin: HMSVideoPlugin) {
     const name = plugin.getName();
-    if (!this.pluginsMap[name]) {
+    if (!this.pluginsMap.get(name)) {
       HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
       return;
     }
     HMSLogger.i(TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.plugins.length === 0) {
+    if (this.pluginsMap.size === 0) {
       HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsLoop();
     }
@@ -198,13 +195,7 @@ export class HMSVideoPluginsManager {
   }
 
   removePluginEntry(name: string) {
-    const index = this.plugins.indexOf(name);
-    if (index !== -1) {
-      this.plugins.splice(index, 1);
-    }
-    if (this.pluginsMap[name]) {
-      delete this.pluginsMap[name];
-    }
+    this.pluginsMap.delete(name);
     if (this.pluginNumFramesToSkip[name]) {
       delete this.pluginNumFramesToSkip[name];
     }
@@ -231,14 +222,14 @@ export class HMSVideoPluginsManager {
    * remove every plugin one by one
    */
   async cleanup() {
-    for (const name of this.plugins) {
-      await this.removePlugin(this.pluginsMap[name]);
+    for (const plugin of this.pluginsMap.values()) {
+      await this.removePlugin(plugin);
     }
     // memory cleanup
     this.outputTrack?.stop();
   }
 
-  private initElementsAndStream() {
+  private initElementsAndStream(contextType?: HMSVideoPluginCanvasContextType) {
     if (!this.inputCanvas) {
       this.inputCanvas = document.createElement('canvas') as CanvasElement;
     }
@@ -248,17 +239,17 @@ export class HMSVideoPluginsManager {
     }
     // FF issue https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
     this.inputCanvas.getContext('2d');
-    this.outputCanvas.getContext('2d');
+    this.outputCanvas.getContext(contextType || HMSVideoPluginCanvasContextType['2D']);
     // capture stream automatically uses the framerate at which the output canvas is changing
     const outputStream = this.outputCanvas.captureStream();
     this.outputTrack = outputStream.getVideoTracks()[0];
   }
 
-  private async startPluginsLoop() {
+  private async startPluginsLoop(contextType?: HMSVideoPluginCanvasContextType) {
     if (this.pluginsLoopRunning) {
       return;
     }
-    this.initElementsAndStream();
+    this.initElementsAndStream(contextType);
     this.pluginsLoopRunning = true;
     try {
       await this.hmsTrack.setProcessedTrack(this.outputTrack);
@@ -328,9 +319,9 @@ export class HMSVideoPluginsManager {
    */
   private async processFramesThroughPlugins() {
     this.canvases[0] = this.inputCanvas!;
-    for (let i = 0; i < this.plugins.length; i++) {
-      const name = this.plugins[i];
-      const plugin = this.pluginsMap[name];
+    let i = 0;
+    for (const plugin of this.pluginsMap.values()) {
+      const name = plugin.getName();
       if (!plugin) {
         continue;
       }
@@ -346,16 +337,18 @@ export class HMSVideoPluginsManager {
             }
           };
           if (!skipProcessing) {
-            if (i === this.plugins.length - 1) {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
+            const currentCanvas = this.canvases[i];
+            const nextCanvas = this.canvases[i + 1];
+            if (i === this.pluginsMap.size - 1) {
+              await this.analytics.processWithTime(name, async () => process(currentCanvas, this.outputCanvas!));
             } else {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
+              await this.analytics.processWithTime(name, async () => process(currentCanvas, nextCanvas));
             }
           } else {
-            if (i === this.plugins.length - 1) {
-              await process(this.canvases[i]!, this.outputCanvas!);
+            if (i === this.pluginsMap.size - 1) {
+              await process(this.canvases[i], this.outputCanvas!);
             } else {
-              await process(this.canvases[i]!, this.canvases[i + 1]!);
+              await process(this.canvases[i], this.canvases[i + 1]);
             }
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
@@ -368,6 +361,7 @@ export class HMSVideoPluginsManager {
         //remove plugin from loop and stop analytics for it
         await this.removePlugin(plugin);
       }
+      i++;
     }
   }
 
@@ -421,11 +415,6 @@ export class HMSVideoPluginsManager {
   private resetCanvases() {
     if (!this.outputCanvas || !this.inputCanvas) {
       return;
-    }
-    const outputCtx = this.outputCanvas.getContext('2d');
-    if (outputCtx) {
-      outputCtx.fillStyle = `rgb(0, 0, 0)`;
-      outputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
     const inputCtx = this.inputCanvas.getContext('2d');
     if (inputCtx) {
