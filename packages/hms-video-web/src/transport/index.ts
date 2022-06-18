@@ -453,12 +453,12 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
-    HMSLogger.d(
+    HMSLogger.i(
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
     this.createPeerConnections();
-    await this.negotiateInitialPublish();
+    await this.negotiateOnFirstPublish();
   };
 
   async publish(tracks: Array<HMSLocalTrack>): Promise<void> {
@@ -727,18 +727,17 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
     isNonWebRTC = false,
-    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ): Promise<boolean> {
     try {
       if (isNonWebRTC) {
         return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
       } else {
-        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
+        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
       }
     } catch (error) {
       HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
       const task = async () => {
-        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isNonWebRTC, constraints);
+        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isNonWebRTC);
       };
 
       await this.retryScheduler.schedule({
@@ -760,10 +759,9 @@ export default class HMSTransport implements ITransport {
     data: string,
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
-    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
   ): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-    const offer = await this.publishConnection!.createOffer(constraints, new Map());
+    const offer = await this.publishConnection!.createOffer();
     await this.publishConnection?.setLocalDescription(offer);
     const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, offer);
     await this.publishConnection?.setRemoteDescription(answer);
@@ -787,13 +785,11 @@ export default class HMSTransport implements ITransport {
   }
 
   /**
-   * Negotiate initial publish after changing role from non-webrtc peer to webrtc peer by sending offer
+   * Negotiate on first publish after changing role from non-webrtc peer to webrtc peer by sending offer
    */
-  private async negotiateInitialPublish(
-    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
-  ) {
+  private async negotiateOnFirstPublish() {
     HMSLogger.d(TAG, '⏳ Negotiating offer over PUBLISH connection');
-    const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
+    const offer = await this.publishConnection!.createOffer(this.trackStates);
     await this.publishConnection?.setLocalDescription(offer);
     const answer = await this.signal.offer(offer, this.trackStates);
     await this.publishConnection?.setRemoteDescription(answer);
@@ -813,7 +809,7 @@ export default class HMSTransport implements ITransport {
     }
 
     try {
-      const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
+      const offer = await this.publishConnection!.createOffer(this.trackStates, constraints);
       await this.publishConnection!.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
