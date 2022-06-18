@@ -1,6 +1,6 @@
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSUpdateListener } from '../..';
-import { HMSPeerUpdate } from '../../interfaces';
+import { HMSUpdateListener, HMSPeerListUpdate } from '../..';
+import { HMSPreviewListener } from '../../interfaces/preview-listener';
 import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
@@ -26,7 +26,7 @@ export class PeerListManager {
     private store: IStore,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
-    public listener?: HMSUpdateListener,
+    public listener?: HMSUpdateListener | HMSPreviewListener,
   ) {}
 
   private get TAG() {
@@ -84,14 +84,32 @@ export class PeerListManager {
   private handleRepeatedPeerList = (peersMap: Record<string, PeerNotification>) => {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
-    const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    let peerListChanged = peersToRemove.length > 0;
-    if (peerListChanged) {
-      HMSLogger.d(this.TAG, { peersToRemove });
-    }
+    const peersRemoved = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
+    const peersAdded: HMSPeer[] = [];
+    const peersWithRoleChanged: HMSPeer[] = [];
+    const peersWithNameChanged: HMSPeer[] = [];
+    const peersWithMetadataChanged: HMSPeer[] = [];
+    let peerTracksChanged = false;
+
+    // eslint-disable-next-line complexity
+    const updatePeerRoleAndInfo = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
+      if (oldPeer.role && oldPeer.role.name !== newPeerNotification.role) {
+        const newRole = this.store.getPolicyForRole(newPeerNotification.role);
+        oldPeer.updateRole(newRole);
+        peersWithRoleChanged.push(oldPeer);
+      }
+      if (newPeerNotification.info.name && oldPeer.name !== newPeerNotification.info.name) {
+        oldPeer.updateName(newPeerNotification.info.name);
+        peersWithNameChanged.push(oldPeer);
+      }
+      if (newPeerNotification.info.data && oldPeer.metadata !== newPeerNotification.info.data) {
+        oldPeer.updateMetadata(newPeerNotification.info.data);
+        peersWithMetadataChanged.push(oldPeer);
+      }
+    };
 
     // Send peer-leave updates to all the missing peers
-    peersToRemove.forEach(peer => {
+    peersRemoved.forEach(peer => {
       this.store.removePeer(peer.peerId);
     });
 
@@ -100,40 +118,39 @@ export class PeerListManager {
       const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
 
       if (oldPeer) {
-        peerListChanged ||= this.updatePeerTracks(oldPeer, newPeerNotification);
+        peerTracksChanged ||= this.updatePeerTracks(oldPeer, newPeerNotification);
         // Update peer's role locally, new role is received from room-state or reconnect peer-list
-        peerListChanged ||= this.updatePeerRoleAndInfo(oldPeer, newPeerNotification);
+        updatePeerRoleAndInfo(oldPeer, newPeerNotification);
       } else {
         // New peer joined while in preview(from room state)
-        this.peerManager.makePeer(newPeerNotification);
+        const newPeer = this.peerManager.makePeer(newPeerNotification);
         this.trackManager.processPendingTracks();
-        peerListChanged = true;
+        peersAdded.push(newPeer);
       }
     });
 
+    const peersChanged = [
+      peersRemoved,
+      peersAdded,
+      peersWithMetadataChanged,
+      peersWithNameChanged,
+      peersWithRoleChanged,
+    ].some(peersChanged => peersChanged.length > 0);
+
+    const peerListChanged = peersChanged || peerTracksChanged;
+
     if (peerListChanged) {
-      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, this.store.getRemotePeers());
+      const peerListUpdate: HMSPeerListUpdate = {
+        peers: this.store.getRemotePeers(),
+        peersAdded,
+        peersRemoved,
+        peersWithMetadataChanged,
+        peersWithNameChanged,
+        peersWithRoleChanged,
+      };
+      HMSLogger.d(this.TAG, 'Peer list updated', peerListUpdate, { peersChanged, peerTracksChanged });
+      this.listener?.onPeerListUpdate(peerListUpdate);
     }
-  };
-
-  // eslint-disable-next-line complexity
-  private updatePeerRoleAndInfo = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
-    let peerChanged = false;
-    if (oldPeer.role && oldPeer.role.name !== newPeerNotification.role) {
-      const newRole = this.store.getPolicyForRole(newPeerNotification.role);
-      oldPeer.updateRole(newRole);
-      peerChanged = true;
-    }
-    if (newPeerNotification.info.name && oldPeer.name !== newPeerNotification.info.name) {
-      oldPeer.updateName(newPeerNotification.info.name);
-      peerChanged = true;
-    }
-    if (newPeerNotification.info.data && oldPeer.metadata !== newPeerNotification.info.data) {
-      oldPeer.updateMetadata(newPeerNotification.info.data);
-      peerChanged = true;
-    }
-
-    return peerChanged;
   };
 
   private updatePeerTracks = (oldPeer: HMSPeer, newPeerNotification: PeerNotification) => {
