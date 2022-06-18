@@ -341,8 +341,8 @@ export default class HMSTransport implements ITransport {
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         const createConnectionsAndNegotiateJoin = async () => {
-          const isNonWebRTC = this.store.isLocalPeerNonWebRTC();
-          if (!isNonWebRTC) {
+          const isWebrtc = !this.isLocalPeerNonWebRTC();
+          if (isWebrtc) {
             this.createHMSConnections();
           }
 
@@ -351,7 +351,7 @@ export default class HMSTransport implements ITransport {
             customData.metaData,
             autoSubscribeVideo,
             isServerHandlingDegradation,
-            isNonWebRTC,
+            !isWebrtc,
           );
         };
 
@@ -478,8 +478,7 @@ export default class HMSTransport implements ITransport {
   }
 
   handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
-    const changedFromNonWebRTCToWebRTC =
-      this.store.isRoleNonWebRTC(oldRole.name) && !this.store.isRoleNonWebRTC(newRole.name);
+    const changedFromNonWebRTCToWebRTC = this.isRoleNonWebRTC(oldRole) && !this.isRoleNonWebRTC(newRole);
     if (!changedFromNonWebRTCToWebRTC) {
       return;
     }
@@ -935,6 +934,27 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
+  }
+
+  /**
+   *
+   * @returns boolean denoting if a peer cannot publish(video, audio or screen) and cannot subscribe to any role
+   */
+  private isRoleNonWebRTC(role: HMSRole) {
+    const isNotPublishing = !role.publishParams.allowed || role.publishParams.allowed?.length === 0;
+    const isNotSubscribing =
+      !role.subscribeParams.subscribeToRoles || role.subscribeParams.subscribeToRoles?.length === 0;
+
+    return isNotPublishing && isNotSubscribing;
+  }
+
+  private isLocalPeerNonWebRTC() {
+    const localRole = this.store.getLocalPeer()?.role;
+    if (!localRole) {
+      return false;
+    }
+
+    return this.isRoleNonWebRTC(localRole);
   }
 
   private retryPublishIceFailedTask = async () => {

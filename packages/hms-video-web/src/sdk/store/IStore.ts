@@ -87,8 +87,6 @@ export interface IStore {
   updateAudioOutputDevice(device: MediaDeviceInfo): void;
 
   hasRoleDetailsArrived(): boolean;
-  isRoleNonWebRTC(role: string): boolean;
-  isLocalPeerNonWebRTC(): boolean;
 
   cleanUp(): void;
 }

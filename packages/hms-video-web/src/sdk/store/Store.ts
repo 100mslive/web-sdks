@@ -336,29 +336,6 @@ class Store implements IStore {
     );
   }
 
-  isRoleNonWebRTC(role: string) {
-    const policy = this.getPolicyForRole(role);
-
-    if (!policy) {
-      return false;
-    }
-
-    const isNotPublishing = !policy.publishParams.allowed || policy.publishParams.allowed?.length === 0;
-    const isNotSubscribing =
-      !policy.subscribeParams.subscribeToRoles || policy.subscribeParams.subscribeToRoles?.length === 0;
-
-    return isNotPublishing && isNotSubscribing;
-  }
-
-  isLocalPeerNonWebRTC() {
-    const localRole = this.getLocalPeer()?.role;
-    if (!localRole) {
-      return false;
-    }
-
-    return this.isRoleNonWebRTC(localRole.name);
-  }
-
   cleanUp() {
     const tracks = this.getTracks();
     for (const track of tracks) {
