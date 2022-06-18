@@ -6,6 +6,7 @@ import {
   HMSMessageInput,
   HMSPeer,
   HMSPeerID,
+  HMSPeerListUpdate,
   HMSPlaylistType,
   HMSRoomState,
   HMSStore,
@@ -618,6 +619,7 @@ export class HMSSDKActions implements IHMSActions {
       onJoin: this.onJoin.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
+      onPeerListUpdate: this.onPeerListUpdate.bind(this),
       onTrackUpdate: this.onTrackUpdate.bind(this),
       onMessageReceived: this.onMessageReceived.bind(this),
       onError: this.onError.bind(this),
@@ -688,6 +690,7 @@ export class HMSSDKActions implements IHMSActions {
       onDeviceChange: this.onDeviceChange.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
+      onPeerListUpdate: this.onPeerListUpdate.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
     });
     this.sdk.addAudioListener({
@@ -853,25 +856,33 @@ export class HMSSDKActions implements IHMSActions {
     }, 'RoomUpdate');
   }
 
-  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
+  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
     if (
       [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
     ) {
       return; // ignore, high frequency update so no point of syncing peers
     }
-    if (Array.isArray(sdkPeer)) {
-      this.syncRoomState('peersJoined');
-      const hmsPeers = [];
-      for (const peer of sdkPeer) {
-        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        if (hmsPeer) {
-          hmsPeers.push(hmsPeer);
-        }
-      }
-      this.hmsNotifications.sendPeerList(hmsPeers);
-      return;
-    }
     this.sendPeerUpdateNotification(type, sdkPeer);
+  }
+
+  protected onPeerListUpdate(sdkPeerListUpdate: sdkTypes.HMSPeerListUpdate) {
+    const convertSdkPeerList = (sdkPeers: sdkTypes.HMSPeer[] | undefined) =>
+      sdkPeers && sdkPeers.map(({ peerId }) => this.store.getState(selectPeerByID(peerId))!);
+
+    const peersRemoved = convertSdkPeerList(sdkPeerListUpdate.peersRemoved);
+    this.syncRoomState('peerListUpdate');
+
+    const peerListUpdate: HMSPeerListUpdate = {
+      peers: convertSdkPeerList(sdkPeerListUpdate.peers)!,
+      peersAdded: convertSdkPeerList(sdkPeerListUpdate.peersAdded),
+      peersWithMetadataChanged: convertSdkPeerList(sdkPeerListUpdate.peersWithMetadataChanged),
+      peersWithNameChanged: convertSdkPeerList(sdkPeerListUpdate.peersWithNameChanged),
+      peersWithRoleChanged: convertSdkPeerList(sdkPeerListUpdate.peersWithRoleChanged),
+      peersRemoved,
+    };
+
+    this.hmsNotifications.sendRoomState(peerListUpdate);
+    return;
   }
 
   protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {

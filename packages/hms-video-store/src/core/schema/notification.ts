@@ -3,7 +3,7 @@ export interface HMSNotification {
   type: string;
   message: string;
   /**
-   * HMSPeer | HMSTrack | HMSMessage | HMSException
+   * HMSPeer | HMSTrack | HMSMessage | HMSException | HMSPeerListUpdate
    */
   data?: any;
   severity?: HMSNotificationSeverity;
@@ -17,7 +17,7 @@ export enum HMSNotificationSeverity {
 export enum HMSNotificationTypes {
   PEER_JOINED = 'PEER_JOINED',
   PEER_LEFT = 'PEER_LEFT',
-  PEER_LIST = 'PEER_LIST',
+  ROOM_STATE = 'ROOM_STATE',
   NEW_MESSAGE = 'NEW_MESSAGE',
   ERROR = 'ERROR',
   RECONNECTING = 'RECONNECTING',

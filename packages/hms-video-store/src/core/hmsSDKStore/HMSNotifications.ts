@@ -18,6 +18,7 @@ import {
   HMSLeaveRoomRequest,
   HMSDeviceChangeEvent,
   HMSPlaylistItem,
+  HMSPeerListUpdate,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -83,8 +84,12 @@ export class HMSNotifications implements IHMSNotifications {
     this.emitEvent(notification);
   }
 
-  sendPeerList(peers: HMSPeer[]) {
-    const notification = this.createNotification(HMSNotificationTypes.PEER_LIST, peers, HMSNotificationSeverity.INFO);
+  sendRoomState(peerListUpdate: HMSPeerListUpdate) {
+    const notification = this.createNotification(
+      HMSNotificationTypes.ROOM_STATE,
+      peerListUpdate,
+      HMSNotificationSeverity.INFO,
+    );
     this.emitEvent(notification);
   }
 
@@ -169,6 +174,7 @@ export class HMSNotifications implements IHMSNotifications {
       | HMSLeaveRoomRequest
       | HMSDeviceChangeEvent
       | HMSPlaylistItem<T>
+      | HMSPeerListUpdate
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

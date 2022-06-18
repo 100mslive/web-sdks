@@ -71,3 +71,12 @@ export interface HMSSpeaker {
   trackID: HMSTrackID;
   audioLevel: number;
 }
+
+export interface HMSPeerListUpdate {
+  peers: HMSPeer[];
+  peersAdded?: HMSPeer[];
+  peersRemoved?: HMSPeer[];
+  peersWithNameChanged?: HMSPeer[];
+  peersWithMetadataChanged?: HMSPeer[];
+  peersWithRoleChanged?: HMSPeer[];
+}
