@@ -761,15 +761,19 @@ export default class HMSTransport implements ITransport {
     serverSubDegrade: boolean,
   ): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-    const offer = await this.publishConnection!.createOffer();
-    await this.publishConnection?.setLocalDescription(offer);
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
+      return false;
+    }
+    const offer = await this.publishConnection.createOffer();
+    await this.publishConnection.setLocalDescription(offer);
     const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, offer);
-    await this.publishConnection?.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection?.candidates || []) {
-      await this.publishConnection?.addIceCandidate(candidate);
+    await this.publishConnection.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection.candidates) {
+      await this.publishConnection.addIceCandidate(candidate);
     }
 
-    this.publishConnection?.initAfterJoin();
+    this.publishConnection.initAfterJoin();
     return !!answer;
   }
 
@@ -789,15 +793,19 @@ export default class HMSTransport implements ITransport {
    */
   private async negotiateOnFirstPublish() {
     HMSLogger.d(TAG, '⏳ Negotiating offer over PUBLISH connection');
-    const offer = await this.publishConnection!.createOffer(this.trackStates);
-    await this.publishConnection?.setLocalDescription(offer);
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
+      return false;
+    }
+    const offer = await this.publishConnection.createOffer(this.trackStates);
+    await this.publishConnection.setLocalDescription(offer);
     const answer = await this.signal.offer(offer, this.trackStates);
-    await this.publishConnection?.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection?.candidates || []) {
-      await this.publishConnection?.addIceCandidate(candidate);
+    await this.publishConnection.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection.candidates) {
+      await this.publishConnection.addIceCandidate(candidate);
     }
 
-    this.publishConnection?.initAfterJoin();
+    this.publishConnection.initAfterJoin();
     return !!answer;
   }
 
@@ -808,15 +816,20 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot renegotiate');
+      return;
+    }
+
     try {
-      const offer = await this.publishConnection!.createOffer(this.trackStates, constraints);
-      await this.publishConnection!.setLocalDescription(offer);
+      const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
+      await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
-      await this.publishConnection!.setRemoteDescription(answer);
-      callback!.promise.resolve(true);
+      await this.publishConnection.setRemoteDescription(answer);
+      callback.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
       let ex: HMSException;
