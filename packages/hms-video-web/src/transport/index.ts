@@ -340,38 +340,8 @@ export default class HMSTransport implements ITransport {
 
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
-        const createConnectionsAndNegotiateJoin = async () => {
-          const isWebrtc = !this.isLocalPeerNonWebRTC();
-          if (isWebrtc) {
-            this.createHMSConnections();
-          }
-
-          await this.negotiateJoin(
-            customData.name,
-            customData.metaData,
-            autoSubscribeVideo,
-            isServerHandlingDegradation,
-            !isWebrtc,
-          );
-        };
-
-        /**
-         * Create HMSConnections and negotiate join when policy is available based on role
-         */
-        const createConnectionsAndNegotiateJoinWhenPolicyIsAvailable = async () => {
-          if (this.store.hasRoleDetailsArrived()) {
-            await createConnectionsAndNegotiateJoin();
-          } else {
-            await new Promise<void>(resolve => {
-              this.eventBus.policyChange.subscribeOnce(async () => {
-                await createConnectionsAndNegotiateJoin();
-                resolve();
-              });
-            });
-          }
-        };
-
-        await createConnectionsAndNegotiateJoinWhenPolicyIsAvailable();
+        await this.waitForLocalRoleAvailability();
+        await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo, isServerHandlingDegradation);
         await this.initRtcStatsMonitor();
 
         this.eventBus.analytics.publish(
@@ -487,7 +457,7 @@ export default class HMSTransport implements ITransport {
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
-    this.createHMSConnections();
+    this.createPeerConnections();
     await this.negotiateInitialPublish();
   };
 
@@ -701,7 +671,36 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
-  private createHMSConnections() {
+  private waitForLocalRoleAvailability() {
+    if (this.store.hasRoleDetailsArrived()) {
+      return;
+    } else {
+      return new Promise<void>(resolve => {
+        this.eventBus.policyChange.subscribeOnce(() => resolve());
+      });
+    }
+  }
+
+  private async createConnectionsAndNegotiateJoin(
+    customData: { name: string; metaData: string },
+    autoSubscribeVideo = false,
+    isServerHandlingDegradation = true,
+  ) {
+    const isWebrtc = !this.isLocalPeerNonWebRTC();
+    if (isWebrtc) {
+      this.createPeerConnections();
+    }
+
+    await this.negotiateJoin(
+      customData.name,
+      customData.metaData,
+      autoSubscribeVideo,
+      isServerHandlingDegradation,
+      !isWebrtc,
+    );
+  }
+
+  private createPeerConnections() {
     if (this.initConfig) {
       if (!this.publishConnection) {
         this.publishConnection = new HMSPublishConnection(
