@@ -9,6 +9,7 @@ import { DeviceChangeListener } from './device-change-listener';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
 import { HMSLeaveRoomRequest } from './leave-room-request';
 import { HMSConnectionQuality } from './peer';
+import { HMSPeerListUpdate } from './peer-list-update';
 
 export enum HMSRoomUpdate {
   PEER_ADDED,
@@ -63,7 +64,8 @@ export interface HMSConnectionQualityListener {
 export interface HMSUpdateListener extends DeviceChangeListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
-  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
+  onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | null): void;
+  onPeerListUpdate(peerListUpdate: HMSPeerListUpdate): void;
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
   onMessageReceived(message: HMSMessage): void;
   onError(error: HMSException): void;
