@@ -61,9 +61,9 @@ export default class HMSPublishConnection extends HMSConnection {
 
   private setEncodingParams = async (encodingParams: RTCRtpEncodingParameters, track: HMSLocalTrack) => {
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
-    console.log('current parameters', sender?.getParameters());
     if (sender) {
       const params = sender.getParameters();
+      HMSLogger.d('current parameters', sender.getParameters());
       if (params.encodings.length > 0) {
         params.encodings[0] = {
           ...params.encodings[0],
@@ -71,6 +71,7 @@ export default class HMSPublishConnection extends HMSConnection {
         };
       }
       await sender.setParameters(params);
+      HMSLogger.d('applied parameters', sender.getParameters());
     }
   };
 }
