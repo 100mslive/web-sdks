@@ -24,8 +24,8 @@ export abstract class AnalyticsTransport {
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
         if (event) {
-          const isEventFromCurrentPeer = event.metadata?.peerId === currentPeerId;
-          if ([isEventFromCurrentPeer, !event.metadata.peerId, !window.HMS?.CLIENT_EVENTS].some(value => !!value)) {
+          const isEventFromCurrentPeer = event.metadata?.peer.peer_id === currentPeerId;
+          if (isEventFromCurrentPeer || !event.metadata.peer.peer_id) {
             this.sendSingleEvent(event);
           } else {
             HTTPAnalyticsTransport.sendEvent(event);

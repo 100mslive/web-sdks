@@ -93,6 +93,8 @@ export interface IHMSPlaylistActions {
    * @param playbackRate - value from 0.25 and 2.0
    */
   setPlaybackRate(playbackRate: number): void;
+  removeItem(id: string): Promise<boolean>;
+  clearList(): Promise<void>;
 }
 
 /**

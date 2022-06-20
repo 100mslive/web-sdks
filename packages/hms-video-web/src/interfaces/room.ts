@@ -20,6 +20,7 @@ export interface HMSRoom {
   rtmp: HMSRTMP;
   hls: HMSHLS;
   peerCount?: number;
+  templateId?: string;
 }
 
 export interface HMSRecording {

@@ -364,7 +364,7 @@ export class HMSSdk implements HMSInterface {
       this.removeTrack.bind(this),
       this.listener,
     );
-    this.eventBus.localRoleUpdate.subscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
+    this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
 
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
@@ -758,6 +758,11 @@ export class HMSSdk implements HMSInterface {
     await this.setAndPublishTracks(tracks);
     this.sdkState.published = true;
   }
+
+  private handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
+    await this.transport.handleLocalRoleUpdate({ oldRole, newRole });
+    await this.roleChangeManager?.handleLocalPeerRoleUpdate({ oldRole, newRole });
+  };
 
   private async setAndPublishTracks(tracks: HMSLocalTrack[]) {
     for (const track of tracks) {

@@ -3,6 +3,7 @@
 
 This monorepo will contain all packages related to core sdk and store.
 
+
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
 ### Local Setup
@@ -22,7 +23,23 @@ yarn install
 ### Test
 
 ```
-yarn test
+yarn test 
+
+```
+### Running playwright tests
+
+Navigate to playwright directory before running below commands.
+
+## Install packages
+
+```
+yarn install
+```
+
+## Run for say qa-in
+
+```
+ yarn qa-in
 ```
 
 ### Lint
