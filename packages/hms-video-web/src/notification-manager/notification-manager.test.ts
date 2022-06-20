@@ -19,6 +19,7 @@ import { EventBus } from '../events/EventBus';
 let joinHandler: jest.Mock<any, any>;
 let roomUpdateHandler: jest.Mock<any, any>;
 let peerUpdateHandler: jest.Mock<any, any>;
+let peerListUpdateHandler: jest.Mock<any, any>;
 let trackUpdateHandler: jest.Mock<any, any>;
 let messageReceivedHandler: jest.Mock<any, any>;
 let errorHandler: jest.Mock<any, any>;
@@ -41,6 +42,7 @@ beforeEach(() => {
   joinHandler = jest.fn();
   roomUpdateHandler = jest.fn();
   peerUpdateHandler = jest.fn();
+  peerListUpdateHandler = jest.fn();
   trackUpdateHandler = jest.fn();
   messageReceivedHandler = jest.fn();
   errorHandler = jest.fn();
@@ -59,6 +61,7 @@ beforeEach(() => {
     onJoin: joinHandler,
     onRoomUpdate: roomUpdateHandler,
     onPeerUpdate: peerUpdateHandler,
+    onPeerListUpdate: peerListUpdateHandler,
     onTrackUpdate: trackUpdateHandler,
     onMessageReceived: messageReceivedHandler,
     onError: errorHandler,
@@ -82,11 +85,10 @@ describe('Notification Manager', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.POLICY_CHANGE, params: fakePolicy });
       notificationManager.handleNotification({ method: HMSNotificationMethod.ROOM_STATE, params: fakeRoomState });
 
-      expect(peerUpdateHandler).toHaveBeenCalled();
-      peerUpdateHandler.mock.calls.forEach(call => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
-        expect(call[1].length).toEqual(Object.keys(fakeRoomState.peers!).length);
-        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      expect(peerListUpdateHandler).toHaveBeenCalled();
+      peerListUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0].peers.length).toEqual(Object.keys(fakeRoomState.peers!).length);
+        expect(call[0].peers[0]).toBeInstanceOf(HMSRemotePeer);
       });
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
@@ -97,11 +99,11 @@ describe('Notification Manager', () => {
       delete newFakeRoomState.peers?.['peer_id_2'];
       notificationManager.handleNotification({ method: HMSNotificationMethod.ROOM_STATE, params: newFakeRoomState });
 
-      expect(peerUpdateHandler).toHaveBeenCalled();
-      peerUpdateHandler.mock.calls.forEach(call => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
-        expect(call[1].length).toEqual(Object.keys(newFakeRoomState.peers!).length);
-        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      expect(peerListUpdateHandler).toHaveBeenCalled();
+      peerListUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0].peers.length).toEqual(Object.keys(newFakeRoomState.peers!).length);
+        expect(call[0].peersRemoved.length).toEqual(1);
+        expect(call[0].peers[0]).toBeInstanceOf(HMSRemotePeer);
       });
     });
   });
@@ -110,10 +112,9 @@ describe('Notification Manager', () => {
     it('should call onPeerUpdate with correct parameters', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.PEER_LIST, params: fakePeerList });
 
-      expect(peerUpdateHandler).toHaveBeenCalled();
-      peerUpdateHandler.mock.calls.forEach(call => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
-        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      expect(peerListUpdateHandler).toHaveBeenCalled();
+      peerListUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0].peers[0]).toBeInstanceOf(HMSRemotePeer);
       });
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
@@ -162,12 +163,13 @@ describe('Notification Manager', () => {
       );
 
       // console.log({ reconnectPeerListMock: peerUpdateHandler.mock.calls });
-      expect(peerUpdateHandler).toHaveBeenCalledTimes(1);
+      expect(peerListUpdateHandler).toHaveBeenCalledTimes(1);
 
-      peerUpdateHandler.mock.calls.forEach(call => {
-        expect(call[0]).toBe(HMSPeerUpdate.PEER_LIST);
-        expect(call[1].length).toEqual(Object.keys(fakeReconnectPeerList.peers).length);
-        expect(call[1][0]).toBeInstanceOf(HMSRemotePeer);
+      peerListUpdateHandler.mock.calls.forEach(call => {
+        expect(call[0].peers.length).toEqual(Object.keys(fakeReconnectPeerList.peers).length);
+        expect(call[0].peers[0]).toBeInstanceOf(HMSRemotePeer);
+        expect(call[0].peersAdded.length).toEqual(1);
+        expect(call[0].peersRemoved.length).toEqual(1);
       });
 
       expect(roomUpdateHandler).toHaveBeenCalled();
