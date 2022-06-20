@@ -43,6 +43,9 @@ export default class HMSPublishConnection extends HMSConnection {
     this.nativeConnection.onconnectionstatechange = () => {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
     };
+
+    // @ts-ignore
+    window.setEncodingParams = this.setEncodingParams;
   }
 
   initAfterJoin() {
@@ -55,4 +58,19 @@ export default class HMSPublishConnection extends HMSConnection {
   trackUpdate(track: HMSLocalTrack) {
     this.transport.trackUpdate(track);
   }
+
+  private setEncodingParams = async (encodingParams: RTCRtpEncodingParameters, track: HMSLocalTrack) => {
+    const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
+    console.log('current parameters', sender?.getParameters());
+    if (sender) {
+      const params = sender.getParameters();
+      if (params.encodings.length > 0) {
+        params.encodings[0] = {
+          ...params.encodings[0],
+          ...encodingParams,
+        };
+      }
+      await sender.setParameters(params);
+    }
+  };
 }
