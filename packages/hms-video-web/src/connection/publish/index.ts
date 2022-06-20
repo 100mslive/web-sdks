@@ -70,12 +70,12 @@ export default class HMSPublishConnection extends HMSConnection {
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
     if (sender) {
       const params = sender.getParameters();
-      HMSLogger.d('current parameters', sender.getParameters());
+      HMSLogger.d('current parameters', params);
       if (params.encodings.length > 0) {
-        params.encodings[0] = {
-          ...params.encodings[0],
-          ...encodingParams,
-        };
+        for (const key in encodingParams) {
+          //@ts-ignore
+          params.encodings[0][key] = encodingParams[key];
+        }
       }
       await sender.setParameters(params);
       HMSLogger.d('applied parameters', sender.getParameters());
