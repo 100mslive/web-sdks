@@ -949,6 +949,10 @@ export default class HMSTransport implements ITransport {
    * @returns boolean denoting if a peer cannot publish(video, audio or screen) and cannot subscribe to any role
    */
   private isRoleNonWebRTC(role: HMSRole) {
+    if (!this.isFlagEnabled(InitFlags.FLAG_NON_WEBRTC_DISABLE_OFFER)) {
+      return false;
+    }
+
     const isNotPublishing = !role.publishParams.allowed || role.publishParams.allowed?.length === 0;
     const isNotSubscribing =
       !role.subscribeParams.subscribeToRoles || role.subscribeParams.subscribeToRoles?.length === 0;
