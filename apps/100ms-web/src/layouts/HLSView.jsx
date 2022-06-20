@@ -23,6 +23,7 @@ import {
 import { ChatView } from "../components/chatView";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { useIsChatOpen } from "../components/AppData/useChatState";
+import { ToastManager } from "../components/Toast/ToastManager";
 
 const HLSVideo = styled("video", {
   h: "100%",
@@ -34,7 +35,9 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  const hlsUrl = hlsState.variants[0]?.url;
+  // const hlsUrl = hlsState.variants[0]?.url;
+  const hlsUrl =
+    "https://dev-cdn.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220617/1655459468919/master.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -51,6 +54,31 @@ const HLSView = () => {
           setAvailableLevels(data.levels);
           setCurrentSelectedQualityText("Auto");
         });
+
+        hls.on(Hls.Events.BUFFER_APPENDED, (event, data) => {
+          console.log("BUFFER APPEND", data.frag.relurl);
+          // console.log("===================");
+        });
+        hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+          console.log("FRAG LOAD", data.frag.relurl);
+          // console.log("===================");
+        });
+        // hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+        //   console.log("FRAG", data);
+        //   const tagList = data?.frag?.tagList;
+        //   const tagIfMD = tagList.filter(
+        //     tag => tag.indexOf("EXT-X-DATERANGE") !== -1
+        //   );
+
+        //   if (tagIfMD.length > 0) {
+        //     const message = tagIfMD[0][1].split("STR=")[1];
+        //     console.log("Got Timed Metadata.Celebrating....", message);
+        //     ToastManager.addToast({
+        //       title: `Got Message from Backend: ${message}`,
+        //     });
+        //     window.sendConfetti();
+        //   }
+        // });
       } else if (
         videoRef.current.canPlayType("application/vnd.apple.mpegurl")
       ) {
