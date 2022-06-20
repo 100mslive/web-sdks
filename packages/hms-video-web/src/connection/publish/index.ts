@@ -61,11 +61,11 @@ export default class HMSPublishConnection extends HMSConnection {
 
   private setEncodingParams = async (encodingParams: RTCRtpEncodingParameters, type: 'video' | 'screen') => {
     //@ts-ignore
-    const videoTrack = window.__hms.sdk.localPeer.videoTrack.nativeTrack;
+    const videoTrack = window.__hms.sdk.localPeer.videoTrack;
     //@ts-ignore
     const screenTrack = window.__hms.sdk.localPeer.auxiliaryTracks.find(
       (track: HMSLocalTrack) => track.source === 'screen' && track.type === 'video',
-    ).nativeTrack;
+    );
     const track = type === 'video' ? videoTrack : screenTrack;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
     if (sender) {
