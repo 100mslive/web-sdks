@@ -950,7 +950,7 @@ export default class HMSTransport implements ITransport {
    */
   private doesRoleNeedWebRTC(role: HMSRole) {
     if (!this.isFlagEnabled(InitFlags.FLAG_NON_WEBRTC_DISABLE_OFFER)) {
-      return false;
+      return true;
     }
 
     const isPublishing = role.publishParams.allowed && role.publishParams.allowed?.length > 0;
