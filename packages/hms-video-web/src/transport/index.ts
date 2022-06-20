@@ -953,8 +953,10 @@ export default class HMSTransport implements ITransport {
       return true;
     }
 
-    const isPublishing = role.publishParams.allowed && role.publishParams.allowed?.length > 0;
-    const isSubscribing = role.subscribeParams.subscribeToRoles && role.subscribeParams.subscribeToRoles?.length > 0;
+    const isPublishing = Boolean(role.publishParams.allowed && role.publishParams.allowed?.length > 0);
+    const isSubscribing = Boolean(
+      role.subscribeParams.subscribeToRoles && role.subscribeParams.subscribeToRoles?.length > 0,
+    );
 
     return isPublishing || isSubscribing;
   }
@@ -962,7 +964,7 @@ export default class HMSTransport implements ITransport {
   private doesLocalPeerNeedWebRTC() {
     const localRole = this.store.getLocalPeer()?.role;
     if (!localRole) {
-      return false;
+      return true;
     }
 
     return this.doesRoleNeedWebRTC(localRole);
