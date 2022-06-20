@@ -390,11 +390,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private async callWithRetry<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
-    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(
-      500,
-      HMSAction.JOIN,
-      `Default ${method} error`,
-    );
+    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
 
     for (let i = 0; i < MAX_RETRIES; i++) {
       try {
