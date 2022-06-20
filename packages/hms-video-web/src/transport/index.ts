@@ -448,7 +448,7 @@ export default class HMSTransport implements ITransport {
   }
 
   handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
-    const changedFromNonWebRTCToWebRTC = this.isRoleNonWebRTC(oldRole) && !this.isRoleNonWebRTC(newRole);
+    const changedFromNonWebRTCToWebRTC = !this.doesRoleNeedWebRTC(oldRole) && this.doesRoleNeedWebRTC(newRole);
     if (!changedFromNonWebRTCToWebRTC) {
       return;
     }
@@ -686,7 +686,7 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo = false,
     isServerHandlingDegradation = true,
   ) {
-    const isWebrtc = !this.isLocalPeerNonWebRTC();
+    const isWebrtc = this.doesLocalPeerNeedWebRTC();
     if (isWebrtc) {
       this.createPeerConnections();
     }
@@ -726,18 +726,18 @@ export default class HMSTransport implements ITransport {
     data: string,
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
-    isNonWebRTC = false,
+    isWebRTC = true,
   ): Promise<boolean> {
     try {
-      if (isNonWebRTC) {
-        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
-      } else {
+      if (isWebRTC) {
         return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
+      } else {
+        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
       }
     } catch (error) {
       HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
       const task = async () => {
-        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isNonWebRTC);
+        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
       };
 
       await this.retryScheduler.schedule({
@@ -945,28 +945,27 @@ export default class HMSTransport implements ITransport {
   }
 
   /**
-   *
+   * Role does not need WebRTC(peer connections to communicate to SFU) if it cannot publish or subscribe to anything
    * @returns boolean denoting if a peer cannot publish(video, audio or screen) and cannot subscribe to any role
    */
-  private isRoleNonWebRTC(role: HMSRole) {
+  private doesRoleNeedWebRTC(role: HMSRole) {
     if (!this.isFlagEnabled(InitFlags.FLAG_NON_WEBRTC_DISABLE_OFFER)) {
       return false;
     }
 
-    const isNotPublishing = !role.publishParams.allowed || role.publishParams.allowed?.length === 0;
-    const isNotSubscribing =
-      !role.subscribeParams.subscribeToRoles || role.subscribeParams.subscribeToRoles?.length === 0;
+    const isPublishing = role.publishParams.allowed && role.publishParams.allowed?.length > 0;
+    const isSubscribing = role.subscribeParams.subscribeToRoles && role.subscribeParams.subscribeToRoles?.length > 0;
 
-    return isNotPublishing && isNotSubscribing;
+    return isPublishing || isSubscribing;
   }
 
-  private isLocalPeerNonWebRTC() {
+  private doesLocalPeerNeedWebRTC() {
     const localRole = this.store.getLocalPeer()?.role;
     if (!localRole) {
       return false;
     }
 
-    return this.isRoleNonWebRTC(localRole);
+    return this.doesRoleNeedWebRTC(localRole);
   }
 
   private retryPublishIceFailedTask = async () => {
