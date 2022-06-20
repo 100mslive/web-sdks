@@ -696,7 +696,7 @@ export default class HMSTransport implements ITransport {
       customData.metaData,
       autoSubscribeVideo,
       isServerHandlingDegradation,
-      !isWebrtc,
+      isWebrtc,
     );
   }
 
