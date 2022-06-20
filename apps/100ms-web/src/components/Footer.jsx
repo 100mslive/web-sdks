@@ -32,6 +32,7 @@ import { FeatureFlags } from "../services/FeatureFlags";
 import { isScreenshareSupported } from "../common/utils";
 import { Playlist } from "../components/Playlist/Playlist";
 import { useIsChatOpen, useToggleChat } from "./AppData/useChatState";
+import { KrispPlugin } from "../plugins/krisp/KrispPlugin";
 
 const TranscriptionButton = React.lazy(() =>
   import("../plugins/transcription")
@@ -166,6 +167,7 @@ export const Footer = () => {
         <LeftDivider />
         <VirtualBackground />
         <NoiseSuppression />
+        <KrispPlugin />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
         <Flex
           align="center"
