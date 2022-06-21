@@ -178,9 +178,9 @@ export default class JsonRpcSignal implements ISignal {
   async join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
@@ -189,7 +189,7 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
-    const response: RTCSessionDescriptionInit = await this.joinWithRetry(params);
+    const response: RTCSessionDescriptionInit = await this.callWithRetry(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -208,7 +208,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
-    const response = await this.call(HMSSignalMethod.OFFER, {
+    const response = await this.callWithRetry(HMSSignalMethod.OFFER, {
       desc,
       tracks: Object.fromEntries(tracks),
     });
@@ -388,27 +388,17 @@ export default class JsonRpcSignal implements ISignal {
     }
   }
 
-  private async joinWithRetry(params: {
-    name: string;
-    disableVidAutoSub: boolean;
-    data: string;
-    offer: RTCSessionDescriptionInit;
-    server_sub_degrade: boolean;
-  }): Promise<RTCSessionDescriptionInit> {
+  private async callWithRetry<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
-    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(
-      500,
-      HMSAction.JOIN,
-      'Default join error',
-    );
+    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
 
     for (let i = 0; i < MAX_RETRIES; i++) {
       try {
-        HMSLogger.d(this.TAG, `Try number ${i + 1} sending join`, params);
-        return await this.call(HMSSignalMethod.JOIN, params);
+        HMSLogger.d(this.TAG, `Try number ${i + 1} sending ${method}`, params);
+        return await this.call(method, params);
       } catch (err) {
         error = err as HMSException;
-        HMSLogger.e(this.TAG, 'Failed sending join', { try: i + 1, params, error });
+        HMSLogger.e(this.TAG, `Failed sending ${method}`, { method, try: i + 1, params, error });
         const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
         if (!shouldRetry) {
           break;
@@ -418,7 +408,7 @@ export default class JsonRpcSignal implements ISignal {
         await sleep(delay);
       }
     }
-    HMSLogger.e(`Sending join over WS failed after ${MAX_RETRIES} retries`, params);
+    HMSLogger.e(`Sending ${method} over WS failed after ${MAX_RETRIES} retries`, { method, params, error });
     throw error;
   }
 }
