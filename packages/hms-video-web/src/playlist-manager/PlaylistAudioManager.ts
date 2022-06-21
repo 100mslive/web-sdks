@@ -41,7 +41,7 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
           if (!this.audioElement) {
             return;
           }
-          this.audioContextManager.resumeContext();
+          await this.audioContextManager.resumeContext();
           // Create audio track only once and reuse, it will be updated with current content
           if (!this.track) {
             await this.audioElement.play();

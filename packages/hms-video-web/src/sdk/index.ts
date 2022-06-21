@@ -380,7 +380,7 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        HMSAudioContextHandler.resumeContext();
+        await HMSAudioContextHandler.resumeContext();
         this.notifyJoin();
         if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
           await this.publish(config.settings || defaultSettings);

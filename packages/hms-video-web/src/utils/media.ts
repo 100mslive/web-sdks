@@ -44,7 +44,7 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
 export interface HMSAudioContext {
   audioContext: AudioContext | null;
   getAudioContext: () => AudioContext;
-  resumeContext: () => void;
+  resumeContext: () => Promise<void>;
 }
 
 export const HMSAudioContextHandler: HMSAudioContext = {
@@ -55,8 +55,8 @@ export const HMSAudioContextHandler: HMSAudioContext = {
     }
     return this.audioContext;
   },
-  resumeContext() {
-    this.getAudioContext()
+  async resumeContext() {
+    await this.getAudioContext()
       .resume()
       .catch(error => {
         HMSLogger.e('AudioContext', error);

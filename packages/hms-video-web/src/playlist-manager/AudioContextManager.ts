@@ -16,10 +16,14 @@ export class AudioContextManager {
    * Note: when the browser tab is muted by default, AudioContext will be in suspended state
    * It has to be resumed for the video/audio to be played.
    */
-  resumeContext() {
+  async resumeContext() {
     if (this.audioContext.state === 'suspended') {
-      HMSLogger.d(this.TAG, 'AudioContext is resumed');
-      this.audioContext.resume();
+      try {
+        await this.audioContext.resume();
+        HMSLogger.d(this.TAG, 'AudioContext is resumed');
+      } catch (error) {
+        HMSLogger.d(this.TAG, 'AudioContext failed to resume', error);
+      }
     }
   }
 
