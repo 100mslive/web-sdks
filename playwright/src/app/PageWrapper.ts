@@ -167,6 +167,16 @@ export class PageWrapper {
     console.log("Hovered: ", elementId);
   }
 
+  async setInternetEnabled(enabled: boolean) {
+    const isOffline = !enabled;
+    if(enabled) {
+      this.emulateNetwork(isOffline, 0, 500, 500);
+    } else {
+      this.emulateNetwork(isOffline, -1, -1, -1);
+    }
+    console.log("Internet enabled: ", enabled);
+  }
+
   /**
    * function to emulate network traffic 
    * pass offline : true for making page offline
@@ -177,6 +187,10 @@ export class PageWrapper {
     await client.send('Network.emulateNetworkConditions', 
     { 'offline': offline, 'latency':latency, 'downloadThroughput': downloadThroughput, 'uploadThroughput': uploadThroughput});
   }
+
+  async delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 }
 
 export interface JoinConfig {
