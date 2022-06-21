@@ -19,5 +19,4 @@ test(`Verify network connection/disconnection notification on preview page`, asy
   await page.delay(5000);
   await page.setInternetEnabled(true);
   await page.assertVisible(page.center.network_connected_notification);
-  await page.delay(5000);
 });
