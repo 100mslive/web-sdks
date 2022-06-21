@@ -1,5 +1,5 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
@@ -7,7 +7,7 @@ test.beforeEach(async () => {});
 
 test.afterEach(async () => {});
 
-const tests = [5000, 35000];
+const networkDisconnectedDurations = [5000, 35000];
 
 test(`Verify network disconnection/reconnection notifications`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
@@ -20,7 +20,7 @@ test(`Verify network disconnection/reconnection notifications`, async ({ page: n
   await page.close();
 });
 
-tests.forEach( (waitTime) => {
+networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
   test(`Verify local peer room state is updated for remote peer after network is restored after ${waitTime} ms`, async ({
     context,
   }) => {
@@ -31,10 +31,9 @@ tests.forEach( (waitTime) => {
     await pages[0].setInternetEnabled(false);
     await pages[0].assertVisible(pages[0].center.network_offline_notification);
     await pages[0].click(pages[0].footer.meeting_audio_btn);
-    await pages[0].delay(waitTime);
+    await pages[0].delay(networkDisconnectedDuration);
     await pages[0].setInternetEnabled(true);
     await pages[1].assertVisible(pages[1].center.audio_mute_icon_onTile);
     await context.close();
   });
-} );
-
+});

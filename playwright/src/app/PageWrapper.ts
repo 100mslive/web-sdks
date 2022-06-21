@@ -1,8 +1,8 @@
-import { BrowserContext, ChromiumBrowserContext, Dialog, expect, Page as PlaywrightPage} from "@playwright/test";
-import { PreviewPage } from "./selectors/PreviewPage";
-import { Header } from "./selectors/Header";
-import { Center } from "./selectors/Center";
-import { Footer } from "./selectors/Footer";
+import { BrowserContext, ChromiumBrowserContext, Dialog, expect, Page as PlaywrightPage } from '@playwright/test';
+import { PreviewPage } from './selectors/PreviewPage';
+import { Header } from './selectors/Header';
+import { Center } from './selectors/Center';
+import { Footer } from './selectors/Footer';
 
 export class PageWrapper {
   private page: PlaywrightPage;
@@ -14,7 +14,7 @@ export class PageWrapper {
 
   constructor(page: PlaywrightPage) {
     this.page = page;
-    this.localName = "";
+    this.localName = '';
     this.preview = new PreviewPage(this);
     this.header = new Header(this);
     this.footer = new Footer(this);
@@ -44,8 +44,8 @@ export class PageWrapper {
   }
 
   acceptDialogWhenPrompted() {
-    this.page.on("dialog", async (dialog: Dialog) => {
-      console.log("Dialog opened", dialog.message());
+    this.page.on('dialog', async (dialog: Dialog) => {
+      console.log('Dialog opened', dialog.message());
       await dialog.accept();
     });
   }
@@ -76,9 +76,9 @@ export class PageWrapper {
   }
 
   async assertVisible(elementId: string) {
-    console.log("going to assert visibility", elementId);
-    await this.page.waitForSelector(elementId, { state: "visible" });
-    console.log("asserted visibility for", elementId);
+    console.log('going to assert visibility', elementId);
+    await this.page.waitForSelector(elementId, { state: 'visible' });
+    console.log('asserted visibility for', elementId);
   }
 
   locator(elementSelector: string) {
@@ -86,14 +86,14 @@ export class PageWrapper {
   }
 
   async assertNotVisible(elementId: string) {
-    console.log("going to assert non visibility", elementId);
+    console.log('going to assert non visibility', elementId);
     await expect(this.page.locator(elementId)).not.toBeVisible();
-    console.log("asserted non visibility for", elementId);
+    console.log('asserted non visibility for', elementId);
   }
 
   async sendText(elementId: string, text: string) {
     await this.page.locator(elementId).fill(text);
-    console.log("Text sent: ", text, "to element", elementId);
+    console.log('Text sent: ', text, 'to element', elementId);
   }
 
   async hasText(elementId: string, text: string) {
@@ -105,7 +105,7 @@ export class PageWrapper {
    */
   async getText(elementId: string) {
     const text = await this.page.locator(elementId).textContent();
-    console.log("Text Found- ", text);
+    console.log('Text Found- ', text);
     return text;
   }
 
@@ -130,18 +130,18 @@ export class PageWrapper {
     try {
       await this.footer.endRoom();
     } catch (e) {
-      console.log("No room to end", e);
+      console.log('No room to end', e);
     }
   }
 
   async getUrl() {
     const currentUrl = this.page.url();
-    console.log("currentURL: ", currentUrl);
+    console.log('currentURL: ', currentUrl);
     return currentUrl;
   }
 
   async selectPopupOption(elementId: string) {
-    await this.page.locator("select").selectOption(elementId);
+    await this.page.locator('select').selectOption(elementId);
   }
 
   async assertLocalAudioState(enabled?: boolean) {
@@ -159,38 +159,42 @@ export class PageWrapper {
   async clickOnce(elementId: string) {
     // await expect(this.page.locator(elementId)).toBeEnabled();
     await this.page.locator(elementId).click();
-    console.log("Clicked: ", elementId);
+    console.log('Clicked: ', elementId);
   }
 
   async hover(elementId: string) {
     await this.page.hover(elementId);
-    console.log("Hovered: ", elementId);
+    console.log('Hovered: ', elementId);
   }
 
   async setInternetEnabled(enabled: boolean) {
     const isOffline = !enabled;
-    if(enabled) {
+    if (enabled) {
       this.emulateNetwork(isOffline, 0, 500, 500);
     } else {
       this.emulateNetwork(isOffline, -1, -1, -1);
     }
-    console.log("Internet enabled: ", enabled);
+    console.log('Internet enabled: ', enabled);
   }
 
   /**
-   * function to emulate network traffic 
+   * function to emulate network traffic
    * pass offline : true for making page offline
    */
-   async emulateNetwork(offline: boolean, latency: number, downloadThroughput: number, uploadThroughput: number){
-    const context = await this.page.context() as ChromiumBrowserContext;
+  async emulateNetwork(offline: boolean, latency: number, downloadThroughput: number, uploadThroughput: number) {
+    const context = this.page.context() as ChromiumBrowserContext;
     const client = await context.newCDPSession(this.page);
-    await client.send('Network.emulateNetworkConditions', 
-    { 'offline': offline, 'latency':latency, 'downloadThroughput': downloadThroughput, 'uploadThroughput': uploadThroughput});
+    await client.send('Network.emulateNetworkConditions', {
+      offline: offline,
+      latency: latency,
+      downloadThroughput: downloadThroughput,
+      uploadThroughput: uploadThroughput,
+    });
   }
 
   async delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-}
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 }
 
 export interface JoinConfig {
