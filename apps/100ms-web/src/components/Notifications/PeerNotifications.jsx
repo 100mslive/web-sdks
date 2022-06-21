@@ -11,7 +11,7 @@ import {
 } from "../hooks/useUserPreferences";
 
 const notificationTypes = [
-  HMSNotificationTypes.PEER_LIST,
+  HMSNotificationTypes.ROOM_STATE,
   HMSNotificationTypes.PEER_JOINED,
   HMSNotificationTypes.PEER_LEFT,
 ];
@@ -28,7 +28,14 @@ export const PeerNotifications = () => {
     console.debug(`[${notification.type}]`, notification);
 
     switch (notification.type) {
-      case HMSNotificationTypes.PEER_LIST:
+      case HMSNotificationTypes.ROOM_STATE:
+        if (
+          !subscribedNotifications.PEER_JOINED &&
+          !subscribedNotifications.PEER_LEFT
+        ) {
+          return;
+        }
+        break;
       case HMSNotificationTypes.PEER_JOINED:
         if (!subscribedNotifications.PEER_JOINED) {
           return;

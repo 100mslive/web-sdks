@@ -2,22 +2,31 @@ import { HandIcon, PersonIcon, ChatIcon } from "@100mslive/react-icons";
 import { TextWithIcon } from "../Notifications/TextWithIcon";
 
 export const ToastConfig = {
-  PEER_LIST: {
+  ROOM_STATE: {
     single: function (notification) {
-      if (notification.data.length === 1) {
+      let notificationText = "";
+      const { peersAdded, peersRemoved } = notification.data;
+      if (peersAdded?.length === 1) {
+        notificationText = `${peersAdded[0].name} joined`;
+      } else if (peersAdded?.length > 1) {
+        notificationText = `${peersAdded[0].name} and ${
+          peersAdded.length - 1
+        } others joined`;
+      }
+
+      if (peersRemoved?.length === 1) {
+        notificationText += ` ${peersRemoved[0].name} left`;
+      } else if (peersRemoved?.length > 1) {
+        notificationText += ` ${peersRemoved[0].name} and ${
+          peersRemoved.length - 1
+        } others left`;
+      }
+
+      if (notificationText) {
         return (
-          <TextWithIcon
-            Icon={PersonIcon}
-          >{`${notification.data[0]?.name} joined`}</TextWithIcon>
+          <TextWithIcon Icon={PersonIcon}>{notificationText}</TextWithIcon>
         );
       }
-      return (
-        <TextWithIcon Icon={PersonIcon}>
-          {`${notification.data[notification.data.length - 1]?.name} and ${
-            notification.data.length - 1
-          } others joined`}
-        </TextWithIcon>
-      );
     },
     multiple: notifications => {
       return (

@@ -883,7 +883,6 @@ export class HMSSDKActions implements IHMSActions {
     };
 
     this.hmsNotifications.sendRoomState(peerListUpdate);
-    return;
   }
 
   protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {
