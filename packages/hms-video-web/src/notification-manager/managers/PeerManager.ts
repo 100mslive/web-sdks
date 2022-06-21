@@ -63,7 +63,14 @@ export class PeerManager {
     for (const peer of peers) {
       hmsPeers.push(this.makePeer(peer));
     }
-    this.listener?.onPeerListUpdate({ peers: hmsPeers, peersAdded: hmsPeers });
+    this.listener?.onPeerListUpdate({
+      peers: hmsPeers,
+      peersAdded: hmsPeers,
+      peersRemoved: [],
+      peersWithMetadataChanged: [],
+      peersWithNameChanged: [],
+      peersWithRoleChanged: [],
+    });
     this.trackManager.processPendingTracks();
   };
 
