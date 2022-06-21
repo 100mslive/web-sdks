@@ -15,11 +15,11 @@ export const makeFakeMessage = (msg: string, sender: string): HMSMessage => {
 };
 
 export const fakeMessages = [
-  makeFakeMessage('Hi guys', 'Yash'),
-  makeFakeMessage('Ivy L left meeting', 'admin'),
-  makeFakeMessage('Ping me at nikhil@100ms.live', 'Yash'),
+  makeFakeMessage('Hello from 100m', 'Yash'),
+  makeFakeMessage('This is a chat example', 'admin'),
+  makeFakeMessage('via the sendBroadcast action', 'Yash'),
   makeFakeMessage('Our twitter handle @100mslive', '100ms'),
-  makeFakeMessage('Nikhil left meeting', 'admin'),
+  makeFakeMessage('Type and send chat!', 'admin'),
 ];
 
 export const fakeMessage = makeFakeMessage('where is everyone?', 'tushar');

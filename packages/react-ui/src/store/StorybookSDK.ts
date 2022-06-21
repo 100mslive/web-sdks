@@ -129,7 +129,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.log('video removed');
   }
 
-  sendMessage(message: string | HMSMessageInput): void {
+  async sendBroadcastMessage(message: string | HMSMessageInput): Promise<void> {
     this.store.setState(store => {
       const user = 'You';
       const newMsg = makeFakeMessage(typeof message === 'string' ? message : message.message, user);
