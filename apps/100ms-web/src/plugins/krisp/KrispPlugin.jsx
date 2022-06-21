@@ -29,6 +29,7 @@ class Plugin {
     }
     const ncFilter = await FilterFactory.create(ctx, ncOptions);
     source.connect(ncFilter);
+    console.error("KrispPlugin", ctx.sampleRate, ncFilter, ctx);
     this.ncFilter = ncFilter;
     return ncFilter;
   }
