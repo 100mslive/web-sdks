@@ -207,7 +207,7 @@ export class HMSAudioPluginsManager {
   private async processPlugin(plugin: HMSAudioPlugin) {
     try {
       if (this.audioContext?.state === 'suspended') {
-        this.audioContext?.resume();
+        await this.audioContext?.resume().catch(error => HMSLogger.e(TAG, error));
       }
       const currentNode = await plugin.processAudioTrack(
         this.audioContext!, // it is always present at this point
