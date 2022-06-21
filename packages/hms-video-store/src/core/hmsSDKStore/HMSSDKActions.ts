@@ -866,12 +866,12 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   protected onPeerListUpdate(sdkPeerListUpdate: sdkTypes.HMSPeerListUpdate) {
-    const storePeers = this.store.getState().peers;
-    const convertSdkPeerList = (sdkPeers: sdkTypes.HMSPeer[] | undefined) =>
-      sdkPeers && sdkPeers.map(({ peerId }) => storePeers[peerId]);
-
-    const peersRemoved = convertSdkPeerList(sdkPeerListUpdate.peersRemoved);
+    let storePeers = this.store.getState().peers;
+    const convertSdkPeerList = (sdkPeers: sdkTypes.HMSPeer[]) => sdkPeers.map(({ peerId }) => storePeers[peerId]);
+    const peersRemoved = sdkPeerListUpdate.peersRemoved.map(({ peerId }) => storePeers[peerId]);
     this.syncRoomState('peerListUpdate');
+    // store would have changed in the syncRoomState operation
+    storePeers = this.store.getState().peers;
 
     const peerListUpdate: HMSPeerListUpdate = {
       peers: convertSdkPeerList(sdkPeerListUpdate.peers)!,

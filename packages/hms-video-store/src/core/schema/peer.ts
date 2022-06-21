@@ -74,9 +74,9 @@ export interface HMSSpeaker {
 
 export interface HMSPeerListUpdate {
   peers: HMSPeer[];
-  peersAdded?: HMSPeer[];
-  peersRemoved?: HMSPeer[];
-  peersWithNameChanged?: HMSPeer[];
-  peersWithMetadataChanged?: HMSPeer[];
-  peersWithRoleChanged?: HMSPeer[];
+  peersAdded: HMSPeer[];
+  peersRemoved: HMSPeer[];
+  peersWithNameChanged: HMSPeer[];
+  peersWithMetadataChanged: HMSPeer[];
+  peersWithRoleChanged: HMSPeer[];
 }
