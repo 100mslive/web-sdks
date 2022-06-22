@@ -59,7 +59,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
 import { HMSAudioContextHandler } from '../utils/media';
-import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -195,7 +195,7 @@ export class HMSSdk implements HMSInterface {
       }
 
       if (message.method === HMSNotificationMethod.POLICY_CHANGE) {
-        this.analyticsTimer.end('on-policy-change');
+        this.analyticsTimer.end(TimedEvent.ON_POLICY_CHANGE);
       }
 
       this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
@@ -269,7 +269,7 @@ export class HMSSdk implements HMSInterface {
       );
     }
 
-    this.analyticsTimer.start('preview');
+    this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
     // Request permissions and populate devices before waiting for policy
@@ -294,7 +294,7 @@ export class HMSSdk implements HMSInterface {
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
-        this.analyticsTimer.end('preview');
+        this.analyticsTimer.end(TimedEvent.PREVIEW);
         listener.onPreview(this.store.getRoom(), tracks);
         this.sendPreviewAnalyticsEvent();
         resolve();
@@ -319,7 +319,7 @@ export class HMSSdk implements HMSInterface {
           }
         })
         .catch(ex => {
-          this.analyticsTimer.end('preview');
+          this.analyticsTimer.end(TimedEvent.PREVIEW);
           this.errorListener?.onError(ex as HMSException);
           if (ex instanceof HMSException) {
             this.sendPreviewAnalyticsEvent(ex);
@@ -363,7 +363,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotReady(HMSAction.JOIN, "Preview is in progress, can't join");
     }
 
-    this.analyticsTimer.start('join');
+    this.analyticsTimer.start(TimedEvent.JOIN);
 
     const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
@@ -414,7 +414,7 @@ export class HMSSdk implements HMSInterface {
         }
       })
       .catch(error => {
-        this.analyticsTimer.end('join');
+        this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onError(error as HMSException);
         if (error instanceof HMSException) {
           this.sendJoinAnalyticsEvent(isPreviewCalled, error);
@@ -435,6 +435,7 @@ export class HMSSdk implements HMSInterface {
   private cleanUp() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
+    this.analyticsTimer.cleanUp();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     HMSLogger.cleanUp();
@@ -859,11 +860,11 @@ export class HMSSdk implements HMSInterface {
     }
 
     if (localPeer?.role) {
-      this.analyticsTimer.end('join');
+      this.analyticsTimer.end(TimedEvent.JOIN);
       this.listener?.onJoin(room);
     } else {
       this.eventBus.policyChange.subscribeOnce(() => {
-        this.analyticsTimer.end('join');
+        this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
       });
     }
@@ -1031,11 +1032,13 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.join({
         error,
-        time: this.analyticsTimer.getTimeTaken('join'),
-        init_response_time: this.analyticsTimer.getTimeTaken('init'),
-        ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
-        on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
-        local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+        ...this.analyticsTimer.getTimes(
+          TimedEvent.INIT,
+          TimedEvent.WEBSOCKET_CONNECT,
+          TimedEvent.ON_POLICY_CHANGE,
+          TimedEvent.LOCAL_TRACKS,
+        ),
+        time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
       }),
     );
@@ -1045,11 +1048,13 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.preview({
         error,
-        time: this.analyticsTimer.getTimeTaken('preview'),
-        init_response_time: this.analyticsTimer.getTimeTaken('init'),
-        ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
-        on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
-        local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+        ...this.analyticsTimer.getTimes(
+          TimedEvent.INIT,
+          TimedEvent.WEBSOCKET_CONNECT,
+          TimedEvent.ON_POLICY_CHANGE,
+          TimedEvent.LOCAL_TRACKS,
+        ),
+        time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),
     );
   };

@@ -52,7 +52,7 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
-import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 const TAG = '[HMSTransport]:';
 
@@ -859,9 +859,9 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
-      this.analyticsTimer.start('init');
+      this.analyticsTimer.start(TimedEvent.INIT);
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
-      this.analyticsTimer.end('init');
+      this.analyticsTimer.end(TimedEvent.INIT);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
@@ -906,10 +906,10 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent', userAgent);
     this.endpoint = url.toString();
-    this.analyticsTimer.start('websocket-open');
+    this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);
-    this.analyticsTimer.end('websocket-open');
-    this.analyticsTimer.start('on-policy-change');
+    this.analyticsTimer.end(TimedEvent.WEBSOCKET_CONNECT);
+    this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
@@ -1067,11 +1067,11 @@ export default class HMSTransport implements ITransport {
       case TransportFailureCategory.PublishNegotiationFailed:
         event = AnalyticsEventFactory.join({
           error,
-          time: this.analyticsTimer.getTimeTaken('join'),
-          init_response_time: this.analyticsTimer.getTimeTaken('init'),
-          ws_connect_time: this.analyticsTimer.getTimeTaken('websocket-open'),
-          on_policy_change_time: this.analyticsTimer.getTimeTaken('on-policy-change'),
-          local_tracks_time: this.analyticsTimer.getTimeTaken('local-tracks'),
+          time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
+          init_response_time: this.analyticsTimer.getTimeTaken(TimedEvent.INIT),
+          ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
+          on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
+          local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:

@@ -22,7 +22,7 @@ import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioContextHandler } from '../utils/media';
-import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -70,7 +70,7 @@ export class LocalTrackManager {
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
 
-    this.analyticsTimer.start('local-tracks');
+    this.analyticsTimer.start(TimedEvent.LOCAL_TRACKS);
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
@@ -82,7 +82,7 @@ export class LocalTrackManager {
         localStream,
       );
     }
-    this.analyticsTimer.end('local-tracks');
+    this.analyticsTimer.end(TimedEvent.LOCAL_TRACKS);
 
     /**
      * concat local tracks only if both are true which means it is either join or switched from a role
