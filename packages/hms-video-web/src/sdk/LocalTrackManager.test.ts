@@ -11,9 +11,6 @@ import { HMSLocalPeer } from './models/peer';
 import { EventBus } from '../events/EventBus';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 
-global.performance.mark = require('perf_hooks').performance.mark;
-global.performance.measure = require('perf_hooks').performance.measure;
-
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
 
@@ -144,6 +141,8 @@ const mockMediaDevices = {
 // @ts-ignore
 global.navigator.mediaDevices = mockMediaDevices;
 global.MediaStream = jest.fn().mockImplementation(() => mockMediaStream);
+global.performance.mark = require('perf_hooks').performance.mark;
+global.performance.measure = require('perf_hooks').performance.measure;
 
 const mockAudioContext = {
   createOscillator() {
