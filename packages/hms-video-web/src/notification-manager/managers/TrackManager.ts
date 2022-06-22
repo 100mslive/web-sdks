@@ -118,8 +118,6 @@ export class TrackManager {
   };
 
   handleTrackUpdate = (params: TrackStateNotification) => {
-    HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
-
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
       return;
