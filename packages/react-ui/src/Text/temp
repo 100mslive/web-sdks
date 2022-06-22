@@ -1,0 +1,14 @@
+import React from 'react';
+import { ComponentMeta } from '@storybook/react';
+import { Text } from './Text';
+
+export default {
+  /* 👇 The title prop is optional.
+   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
+   * to learn how to generate automatic titles
+   */
+  title: 'UI Components/Text',
+  component: Text,
+} as ComponentMeta<typeof Text>;
+
+const TextStory = <Text>The Evil Rabbit jumps.</Text>;
