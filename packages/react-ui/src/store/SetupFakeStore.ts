@@ -1,8 +1,8 @@
+import { HMSReactiveStore, HMSStore, createDefaultStoreState } from '@100mslive/react-sdk';
+import create from 'zustand';
 import { fakeMessages } from '../fixtures/chats';
 import { fakeParticipants } from '../fixtures/peers';
 import { StoryBookSDK } from './StorybookSDK';
-import { HMSReactiveStore, HMSStore, createDefaultStoreState } from '@100mslive/hms-video-store';
-import create from 'zustand';
 
 const store = HMSReactiveStore.createNewHMSStore('HMSStore', createDefaultStoreState);
 
@@ -23,10 +23,10 @@ export function setUpFakeStore() {
     peers: [],
   });
   storyBookSDK.addTestVideoURLs(videoURLS);
-  fakeParticipants.map(peerWithMute => {
+  fakeParticipants.forEach(peerWithMute => {
     storyBookSDK.addTestPeerAndSpeaker(peerWithMute.peer);
   });
-  fakeMessages.map(msg => {
-    storyBookSDK.sendMessage(msg.message);
+  fakeMessages.forEach(msg => {
+    storyBookSDK.sendBroadcastMessage(msg.message);
   });
 }

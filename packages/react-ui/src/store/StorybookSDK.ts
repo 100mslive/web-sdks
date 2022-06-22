@@ -1,4 +1,3 @@
-import { makeFakeMessage } from '../fixtures/chats';
 import {
   HMSActions,
   IHMSStore,
@@ -7,8 +6,12 @@ import {
   HMSTrackSource,
   HMSRoomState,
   HMSMessageInput,
-} from '@100mslive/hms-video-store';
-import { HMSAudioTrackSettings, HMSVideoTrackSettings, HMSConfig, HMSSimulcastLayer } from '@100mslive/hms-video';
+  HMSAudioTrackSettings,
+  HMSVideoTrackSettings,
+  HMSConfig,
+  HMSSimulcastLayer,
+} from '@100mslive/react-sdk';
+import { makeFakeMessage } from '../fixtures/chats';
 
 /*
 This is a dummy bridge with no connected backend. It can be used for
