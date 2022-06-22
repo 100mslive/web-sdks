@@ -30,6 +30,7 @@ import {
   HMSWebrtcStats,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  HMSVideoPluginCanvasContextType,
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
@@ -52,6 +53,7 @@ export {
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  HMSVideoPluginCanvasContextType,
   parsedUserAgent,
 };
 
