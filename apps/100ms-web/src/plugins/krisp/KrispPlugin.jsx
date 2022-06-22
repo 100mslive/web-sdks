@@ -9,9 +9,11 @@ import { useCallback, useRef } from "react";
 import FilterFactory from "./krispsdk.mjs";
 
 const ncOptions = {
-  modelOption: FilterFactory.ModelOptions.model_32,
+  modelOption: FilterFactory.ModelOptions.model_nc_auto,
   processor: "./krisp.processor.js",
-  model_32: "./weights/model_32.kw",
+  model_8: "weights/model_8.kw", // Narrow band model path
+  model_16: "weights/model_16.kw", // Wide band model path
+  model_32: "weights/model_32.kw",
 };
 
 class Plugin {
