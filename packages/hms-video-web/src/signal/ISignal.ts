@@ -24,9 +24,9 @@ export interface ISignal extends IAnalyticsTransportProvider {
   join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;

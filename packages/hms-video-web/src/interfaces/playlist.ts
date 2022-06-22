@@ -32,9 +32,10 @@ export interface HMSPlaylistProgressEvent {
 export interface HMSPlaylistManager {
   getList<T>(type: HMSPlaylistType): HMSPlaylistItem<T>[];
   setList<T>(list: HMSPlaylistItem<T>[]): void;
+  clearList(type: HMSPlaylistType): Promise<void>;
   playNext(type: HMSPlaylistType): Promise<void>;
   playPrevious(type: HMSPlaylistType): Promise<void>;
-  removeItem<T>(item: HMSPlaylistItem<T>): void;
+  removeItem(id: string, type: HMSPlaylistType): Promise<boolean>;
   /**
    * Seek forward/backward on selected type relative to currentTime
    * @param value - number in seconds to go forward(if negative, it goes backwards)

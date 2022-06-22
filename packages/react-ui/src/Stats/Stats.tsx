@@ -65,17 +65,9 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
 
           <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
 
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.codec)}
-            label={"Codec(V)"}
-            value={videoTrackStats?.codec}
-          />
+          <StatsRow show={isNotNullish(videoTrackStats?.codec)} label={'Codec(V)'} value={videoTrackStats?.codec} />
 
-          <StatsRow
-            show={isNotNullish(audioTrackStats?.codec)}
-            label={"Codec(A)"}
-            value={audioTrackStats?.codec}
-          />
+          <StatsRow show={isNotNullish(audioTrackStats?.codec)} label={'Codec(A)'} value={audioTrackStats?.codec} />
 
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
@@ -149,6 +141,6 @@ export function isNotNullishAndNot0(value: number | undefined | null) {
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNotNullish(value: number | undefined | null) {
+export function isNotNullish(value: number | string | undefined | null) {
   return value !== undefined && value !== null;
 }

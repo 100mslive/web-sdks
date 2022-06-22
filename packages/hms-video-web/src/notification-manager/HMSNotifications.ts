@@ -48,6 +48,7 @@ export interface PolicyParams {
   known_roles: {
     [role: string]: HMSRole;
   };
+  template_id: string;
 }
 
 /**
