@@ -475,7 +475,9 @@ export class HMSSdk implements HMSInterface {
 
   getPeers() {
     const peers = this.store.getPeers();
-    HMSLogger.d(this.TAG, `Got peers`, peers);
+    if (peers.length < 50) {
+      HMSLogger.d(this.TAG, `Got peers`, peers);
+    }
     return peers;
   }
 
