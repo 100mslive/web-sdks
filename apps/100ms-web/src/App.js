@@ -27,6 +27,7 @@ import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import PostLeave from "./components/PostLeave";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import Diagnostics from "./components/Diagnostics.js";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
@@ -221,6 +222,7 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl }) {
             </Suspense>
           }
         />
+        <Route path="/diagnostics" element={<Diagnostics />} />
         <Route
           path="*"
           element={
