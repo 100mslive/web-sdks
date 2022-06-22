@@ -31,7 +31,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -52,6 +52,7 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 const TAG = '[HMSTransport]:';
 
@@ -82,6 +83,7 @@ export default class HMSTransport implements ITransport {
     private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
+    private analyticsTimer: AnalyticsTimer,
   ) {
     this.webrtcInternals = new HMSWebrtcInternals(
       this.store,
@@ -114,18 +116,21 @@ export default class HMSTransport implements ITransport {
   private signalObserver: ISignalEventsObserver = {
     onOffer: async (jsep: RTCSessionDescriptionInit) => {
       try {
-        await this.subscribeConnection!.setRemoteDescription(jsep);
+        if (!this.subscribeConnection) {
+          return;
+        }
+        await this.subscribeConnection.setRemoteDescription(jsep);
         HMSLogger.d(
           TAG,
-          `[SUBSCRIBE] Adding ${this.subscribeConnection!.candidates.length} ice-candidates`,
-          this.subscribeConnection!.candidates,
+          `[SUBSCRIBE] Adding ${this.subscribeConnection.candidates.length} ice-candidates`,
+          this.subscribeConnection.candidates,
         );
-        for (const candidate of this.subscribeConnection!.candidates) {
-          await this.subscribeConnection!.addIceCandidate(candidate);
+        for (const candidate of this.subscribeConnection.candidates) {
+          await this.subscribeConnection.addIceCandidate(candidate);
         }
-        this.subscribeConnection!.candidates.length = 0;
-        const answer = await this.subscribeConnection!.createAnswer();
-        await this.subscribeConnection!.setLocalDescription(answer);
+        this.subscribeConnection.candidates.length = 0;
+        const answer = await this.subscribeConnection.createAnswer();
+        await this.subscribeConnection.setLocalDescription(answer);
         this.signal.answer(answer);
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
@@ -145,10 +150,10 @@ export default class HMSTransport implements ITransport {
 
     onTrickle: async (trickle: HMSTrickle) => {
       const connection =
-        trickle.target === HMSConnectionRole.Publish ? this.publishConnection! : this.subscribeConnection!;
-      if (connection.remoteDescription === null) {
+        trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
+      if (!connection?.remoteDescription) {
         // ICE candidates can't be added without any remote session description
-        connection.candidates.push(trickle.candidate);
+        connection?.candidates.push(trickle.candidate);
       } else {
         await connection.addIceCandidate(trickle.candidate);
       }
@@ -326,8 +331,6 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo = false,
   ): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
-    const joinRequestedAt = new Date();
-    const isPreviewCalled = this.state === TransportState.Preview;
     try {
       if (!this.signal.isConnected || !this.initConfig) {
         await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
@@ -337,39 +340,15 @@ export default class HMSTransport implements ITransport {
 
       const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
-        this.publishConnection = new HMSPublishConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.publishConnectionObserver,
-          this,
-        );
-
-        this.subscribeConnection = new HMSSubscribeConnection(
-          this.signal,
-          this.initConfig.rtcConfiguration,
-          this.subscribeConnectionObserver,
-        );
-
-        await this.joinPublishNegotiation(
-          customData.name,
-          customData.metaData,
-          autoSubscribeVideo,
-          isServerHandlingDegradation,
-        );
+        await this.waitForLocalRoleAvailability();
+        await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo, isServerHandlingDegradation);
         await this.initRtcStatsMonitor();
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.join(undefined, joinRequestedAt, new Date(), isPreviewCalled),
-        );
+
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
       }
     } catch (error) {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.join(error, joinRequestedAt, new Date(), isPreviewCalled),
-        );
-      }
       const ex = error as HMSException;
       ex.isTerminal = ex.code === 500;
       await this.observer.onStateChange(this.state, ex);
@@ -459,6 +438,20 @@ export default class HMSTransport implements ITransport {
       this.observer.onStateChange(this.state);
     }
   }
+
+  handleLocalRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
+    const changedFromNonWebRTCToWebRTC = !this.doesRoleNeedWebRTC(oldRole) && this.doesRoleNeedWebRTC(newRole);
+    if (!changedFromNonWebRTCToWebRTC) {
+      return;
+    }
+
+    HMSLogger.i(
+      TAG,
+      'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
+    );
+    this.createPeerConnections();
+    await this.negotiateOnFirstPublish();
+  };
 
   async publish(tracks: Array<HMSLocalTrack>): Promise<void> {
     for (const track of tracks) {
@@ -670,30 +663,73 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
-  private async joinPublishNegotiation(
+  private waitForLocalRoleAvailability() {
+    if (this.store.hasRoleDetailsArrived()) {
+      return;
+    } else {
+      return new Promise<void>(resolve => {
+        this.eventBus.policyChange.subscribeOnce(() => resolve());
+      });
+    }
+  }
+
+  private async createConnectionsAndNegotiateJoin(
+    customData: { name: string; metaData: string },
+    autoSubscribeVideo = false,
+    isServerHandlingDegradation = true,
+  ) {
+    const isWebrtc = this.doesLocalPeerNeedWebRTC();
+    if (isWebrtc) {
+      this.createPeerConnections();
+    }
+
+    await this.negotiateJoin(
+      customData.name,
+      customData.metaData,
+      autoSubscribeVideo,
+      isServerHandlingDegradation,
+      isWebrtc,
+    );
+  }
+
+  private createPeerConnections() {
+    if (this.initConfig) {
+      if (!this.publishConnection) {
+        this.publishConnection = new HMSPublishConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.publishConnectionObserver,
+          this,
+        );
+      }
+
+      if (!this.subscribeConnection) {
+        this.subscribeConnection = new HMSSubscribeConnection(
+          this.signal,
+          this.initConfig.rtcConfiguration,
+          this.subscribeConnectionObserver,
+        );
+      }
+    }
+  }
+
+  private async negotiateJoin(
     name: string,
     data: string,
     autoSubscribeVideo: boolean,
     serverSubDegrade: boolean,
-    constraints: RTCOfferOptions = { offerToReceiveAudio: false, offerToReceiveVideo: false },
-  ) {
+    isWebRTC = true,
+  ): Promise<boolean> {
     try {
-      HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
-      const offer = await this.publishConnection!.createOffer(constraints, new Map());
-      await this.publishConnection!.setLocalDescription(offer);
-      const answer = await this.signal.join(name, data, offer, !autoSubscribeVideo, serverSubDegrade);
-      await this.publishConnection!.setRemoteDescription(answer);
-      for (const candidate of this.publishConnection!.candidates || []) {
-        await this.publishConnection!.addIceCandidate(candidate);
+      if (isWebRTC) {
+        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
+      } else {
+        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
       }
-
-      this.publishConnection!.initAfterJoin();
     } catch (error) {
       HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
       const task = async () => {
-        await this.joinPublishNegotiation(name, data, autoSubscribeVideo, serverSubDegrade, constraints);
-        // used to check success of publish negotiation as remoteDescription is set once we receive answer from biz
-        return Boolean(this.publishConnection?.remoteDescription);
+        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
       };
 
       await this.retryScheduler.schedule({
@@ -705,7 +741,64 @@ export default class HMSTransport implements ITransport {
         task,
         originalState: TransportState.Joined,
       });
+
+      return false;
     }
+  }
+
+  private async negotiateJoinWebRTC(
+    name: string,
+    data: string,
+    autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
+  ): Promise<boolean> {
+    HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
+      return false;
+    }
+    const offer = await this.publishConnection.createOffer();
+    await this.publishConnection.setLocalDescription(offer);
+    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, offer);
+    await this.publishConnection.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection.candidates) {
+      await this.publishConnection.addIceCandidate(candidate);
+    }
+
+    this.publishConnection.initAfterJoin();
+    return !!answer;
+  }
+
+  private async negotiateJoinNonWebRTC(
+    name: string,
+    data: string,
+    autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
+  ): Promise<boolean> {
+    HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
+    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade);
+    return !!response;
+  }
+
+  /**
+   * Negotiate on first publish after changing role from non-webrtc peer to webrtc peer by sending offer
+   */
+  private async negotiateOnFirstPublish() {
+    HMSLogger.d(TAG, '⏳ Negotiating offer over PUBLISH connection');
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
+      return false;
+    }
+    const offer = await this.publishConnection.createOffer(this.trackStates);
+    await this.publishConnection.setLocalDescription(offer);
+    const answer = await this.signal.offer(offer, this.trackStates);
+    await this.publishConnection.setRemoteDescription(answer);
+    for (const candidate of this.publishConnection.candidates) {
+      await this.publishConnection.addIceCandidate(candidate);
+    }
+
+    this.publishConnection.initAfterJoin();
+    return !!answer;
   }
 
   private async performPublishRenegotiation(constraints?: RTCOfferOptions) {
@@ -715,15 +808,20 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
+    if (!this.publishConnection) {
+      HMSLogger.e(TAG, 'Publish peer connection not found, cannot renegotiate');
+      return;
+    }
+
     try {
-      const offer = await this.publishConnection!.createOffer(constraints, this.trackStates);
-      await this.publishConnection!.setLocalDescription(offer);
+      const offer = await this.publishConnection.createOffer(this.trackStates, constraints);
+      await this.publishConnection.setLocalDescription(offer);
       HMSLogger.time(`renegotiation-offer-exchange`);
       const answer = await this.signal.offer(offer, this.trackStates);
       this.callbacks.delete(RENEGOTIATION_CALLBACK_ID);
       HMSLogger.timeEnd(`renegotiation-offer-exchange`);
-      await this.publishConnection!.setRemoteDescription(answer);
-      callback!.promise.resolve(true);
+      await this.publishConnection.setRemoteDescription(answer);
+      callback.promise.resolve(true);
       HMSLogger.d(TAG, `[role=PUBLISH] onRenegotiationNeeded DONE ✅`);
     } catch (err) {
       let ex: HMSException;
@@ -761,7 +859,9 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
+      this.analyticsTimer.start(TimedEvent.INIT);
       this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      this.analyticsTimer.end(TimedEvent.INIT);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
@@ -806,7 +906,10 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent', userAgent);
     this.endpoint = url.toString();
+    this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);
+    this.analyticsTimer.end(TimedEvent.WEBSOCKET_CONNECT);
+    this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
@@ -836,6 +939,32 @@ export default class HMSTransport implements ITransport {
         this.observer.onTrackRestore(track);
       });
     }
+  }
+
+  /**
+   * Role does not need WebRTC(peer connections to communicate to SFU) if it cannot publish or subscribe to anything
+   * @returns boolean denoting if a peer cannot publish(video, audio or screen) and cannot subscribe to any role
+   */
+  private doesRoleNeedWebRTC(role: HMSRole) {
+    if (!this.isFlagEnabled(InitFlags.FLAG_NON_WEBRTC_DISABLE_OFFER)) {
+      return true;
+    }
+
+    const isPublishing = Boolean(role.publishParams.allowed && role.publishParams.allowed?.length > 0);
+    const isSubscribing = Boolean(
+      role.subscribeParams.subscribeToRoles && role.subscribeParams.subscribeToRoles?.length > 0,
+    );
+
+    return isPublishing || isSubscribing;
+  }
+
+  private doesLocalPeerNeedWebRTC() {
+    const localRole = this.store.getLocalPeer()?.role;
+    if (!localRole) {
+      return true;
+    }
+
+    return this.doesRoleNeedWebRTC(localRole);
   }
 
   private retryPublishIceFailedTask = async () => {
@@ -936,7 +1065,14 @@ export default class HMSTransport implements ITransport {
         event = AnalyticsEventFactory.disconnect(error, additionalProps);
         break;
       case TransportFailureCategory.PublishNegotiationFailed:
-        event = AnalyticsEventFactory.join(error);
+        event = AnalyticsEventFactory.join({
+          error,
+          time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
+          init_response_time: this.analyticsTimer.getTimeTaken(TimedEvent.INIT),
+          ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
+          on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
+          local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
+        });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
         event = AnalyticsEventFactory.publish({ error });
