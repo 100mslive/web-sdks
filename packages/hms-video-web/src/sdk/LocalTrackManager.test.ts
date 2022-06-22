@@ -67,6 +67,7 @@ const mockMediaStream = {
   getAudioTracks: jest.fn(() => [
     { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
   ]),
+  addTrack: jest.fn(() => {}),
 };
 
 const gumSuccess = (constraints: any) => {

@@ -66,8 +66,13 @@ export class PeerListManager {
     }
     const roomPeers = roomState.peers;
     if (roomPeers === null || roomPeers === undefined) {
-      // room state doesn't say anything about the peers, if there are no peers,
-      // empty object would come instead
+      // in this case, room state doesn't say anything about the peers,
+      // there can be optimisations in place to not send this field when it's unchanged from previously sent value.
+      // If there are no peers either roomState.peers will be empty object
+      // or peer_count will be 0(handled below)
+      if (roomState.peer_count === 0) {
+        this.handleRepeatedPeerList({});
+      }
       return;
     }
     // we don't get tracks inside the peer object in room state, we're adding

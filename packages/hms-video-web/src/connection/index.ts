@@ -45,10 +45,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  async createOffer(
-    options: RTCOfferOptions | undefined = undefined,
-    tracks: Map<string, TrackState>,
-  ): Promise<RTCSessionDescriptionInit> {
+  async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);

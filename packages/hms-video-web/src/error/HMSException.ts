@@ -1,4 +1,5 @@
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { HMSAction } from './ErrorFactory';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
@@ -8,7 +9,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
   constructor(
     public readonly code: number,
     public name: string,
-    action: HMSAction,
+    action: HMSAction | HMSSignalMethod,
     public message: string,
     public description: string,
     public isTerminal: boolean = false,

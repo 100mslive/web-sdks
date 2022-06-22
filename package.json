@@ -62,7 +62,8 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "playwright/*"
   ],
   "engines": {
     "node": ">=16"

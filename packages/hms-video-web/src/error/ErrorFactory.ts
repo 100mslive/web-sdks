@@ -5,6 +5,7 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
 
@@ -262,7 +263,7 @@ export const ErrorFactory = {
   },
 
   WebsocketMethodErrors: {
-    ServerErrors(code: number, action: HMSAction, description: string) {
+    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
       return new HMSException(code, 'ServerErrors', action, description, description, true);
     },
 
