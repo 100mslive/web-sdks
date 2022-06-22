@@ -9,6 +9,7 @@ import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalPeer } from './models/peer';
 import { EventBus } from '../events/EventBus';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -140,6 +141,8 @@ const mockMediaDevices = {
 // @ts-ignore
 global.navigator.mediaDevices = mockMediaDevices;
 global.MediaStream = jest.fn().mockImplementation(() => mockMediaStream);
+global.performance.mark = require('perf_hooks').performance.mark;
+global.performance.measure = require('perf_hooks').performance.measure;
 
 const mockAudioContext = {
   createOscillator() {
@@ -184,6 +187,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
     expect(manager).toBeDefined();
   });
@@ -194,6 +198,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
     testStore.setPublishParams(hostPublishParams);
     await manager.getTracksToPublish({});
@@ -215,6 +220,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setPublishParams(hostPublishParams);
@@ -370,6 +376,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
@@ -403,6 +410,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
