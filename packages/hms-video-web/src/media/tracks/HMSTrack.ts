@@ -66,6 +66,7 @@ export abstract class HMSTrack {
     this.stream = stream;
     this.nativeTrack = track;
     this.source = source;
+    this.logIdentifier = track.id; // initial value
   }
 
   /**

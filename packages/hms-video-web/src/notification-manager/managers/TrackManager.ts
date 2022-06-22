@@ -30,29 +30,18 @@ export class TrackManager {
 
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
 
-  isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
-    const toInt = (layer: HMSSimulcastLayer): number => {
-      switch (layer) {
-        case HMSSimulcastLayer.HIGH:
-          return 3;
-        case HMSSimulcastLayer.MEDIUM:
-          return 2;
-        case HMSSimulcastLayer.LOW:
-          return 1;
-        case HMSSimulcastLayer.NONE:
-          return 0;
-      }
-    };
-
-    return toInt(newLayer) < toInt(prevLayer);
-  }
-
+  /**
+   * handle track info(track id, corresponding peer, current state etc.) coming
+   * in from signalling server
+   */
   handleTrackMetadataAdd(params: TrackStateNotification) {
-    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
+    const peerId = params.peer.peer_id;
+    const peerName = params.peer.info?.name;
+    HMSLogger.d(this.TAG, `track metadata arrived from signalling - ${peerId}, name- ${peerName}`, params);
 
     for (const trackId in params.tracks) {
       this.store.setTrackState({
-        peerId: params.peer.peer_id,
+        peerId,
         trackInfo: params.tracks[trackId],
       });
     }
@@ -61,20 +50,20 @@ export class TrackManager {
   }
 
   /**
-   * Sets the tracks to peer and returns the peer
+   * handle track add coming over WebRTC
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `track add from WebRTC - ${track.logIdentifier}`, track, track.nativeTrack);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
   };
 
   /**
-   * Sets the track of corresponding peer to null and returns the peer
+   * handle track remove coming over WebRTC
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE - ${track.logIdentifier}`, track, track.nativeTrack);
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
@@ -92,6 +81,10 @@ export class TrackManager {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 
+  /**
+   * handle track layer changes coming in over WebRTC Data Channel
+   * layer can be changed by SFU in case of network degradation.
+   */
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
     for (const trackId in params.tracks) {
       const trackEntry = params.tracks[trackId];
@@ -117,6 +110,9 @@ export class TrackManager {
     }
   };
 
+  /**
+   * handle track metadata update(mute status for e.g.) coming in from signalling srver
+   */
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
@@ -141,13 +137,19 @@ export class TrackManager {
         track.setEnabled(!trackEntry.mute);
         const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
         if (eventType) {
-          HMSLogger.d(this.TAG, HMSTrackUpdate[eventType], track);
+          HMSLogger.d(this.TAG, `event - ${HMSTrackUpdate[eventType]}, track-${track.logIdentifier}`, track);
           this.listener?.onTrackUpdate(eventType, track, hmsPeer);
         }
       }
     }
   };
 
+  /**
+   * track is in pending state when one of webrtc add track, signalling track add or peer add hasn't
+   * arrived yet. this method is called when any of the above things changes.
+   * TODO: currently every time we create a copy of all pending tracks to process and loop
+   * TODO: over them. It can be optimised to do it only for information which could have changed.
+   */
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
 
@@ -169,10 +171,10 @@ export class TrackManager {
       track.setEnabled(!state.trackInfo.mute);
       this.addAudioTrack(hmsPeer, track);
       this.addVideoTrack(hmsPeer, track);
-      HMSLogger.d(this.TAG, 'TRACK_ADDED', track);
+      HMSLogger.d(this.TAG, `TRACK_ADDED - ${track.logIdentifier}`, track);
       /**
        * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
-       * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
+       * on onTrackUpdate can be override in AudioSinkManager when audio element is created
        **/
       track.type === HMSTrackType.AUDIO
         ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
@@ -230,5 +232,25 @@ export class TrackManager {
       eventType = HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED;
     }
     return eventType;
+  }
+
+  /**
+   * track is degraded if newLayer is worse than prev layer
+   */
+  private isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
+    const toInt = (layer: HMSSimulcastLayer): number => {
+      switch (layer) {
+        case HMSSimulcastLayer.HIGH:
+          return 3;
+        case HMSSimulcastLayer.MEDIUM:
+          return 2;
+        case HMSSimulcastLayer.LOW:
+          return 1;
+        case HMSSimulcastLayer.NONE:
+          return 0;
+      }
+    };
+
+    return toInt(newLayer) < toInt(prevLayer);
   }
 }
