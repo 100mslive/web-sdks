@@ -35,9 +35,10 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
+  const frags = {};
   // const hlsUrl = hlsState.variants[0]?.url;
   const hlsUrl =
-    "https://dev-cdn.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220617/1655459468919/master.m3u8";
+    "https://dev-cdn.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220620/1655716484659/master.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -56,12 +57,48 @@ const HLSView = () => {
         });
 
         hls.on(Hls.Events.BUFFER_APPENDED, (event, data) => {
-          console.log("BUFFER APPEND", data.frag.relurl);
+          // console.log("BUFFER APPEND");
+          // console.log("FRAG", data);
+          const frag = data?.frag;
+          const tagList = frag?.tagList;
+          const tagIfMD = tagList.filter(
+            tag => tag.indexOf("EXT-X-DATERANGE") !== -1
+          );
+
+          console.log(
+            `%c fragment ${data.frag.relurl} added to buffer`,
+            "background: #d9ed92; color: #184e77"
+          );
+          const timedMT = tagIfMD[0][1];
+
+          const containedTimedMt = timedMT ? "Contains Metadata" : "";
+          console.log(
+            `%c ${containedTimedMt}`,
+            "background: #d9ed92; color: #184e77"
+          );
+          if (tagIfMD.length > 0) {
+            frags[frag?.relurl] = { tagMetadata: tagIfMD[0][1] };
+          }
+          // console.log("frags", frags);
           // console.log("===================");
         });
         hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-          console.log("FRAG LOAD", data.frag.relurl);
-          // console.log("===================");
+          const fragData = frags[data.frag.relurl];
+          if (fragData) {
+            console.log(
+              `%c fragment ${data.frag.relurl} loaded. Contains metadata`,
+              "background: #ffba08; color: #370617"
+            );
+            console.log(
+              "%c looking for payload in" + fragData.tagMetadata,
+              "background: #583101; color:#ffedd8"
+            );
+            const payload = fragData.tagMetadata.split("PAYLOAD=")[1];
+            console.log(
+              `%c Payload: ${payload}`,
+              "color:#2b2d42; background:#d80032"
+            );
+          }
         });
         // hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
         //   console.log("FRAG", data);
