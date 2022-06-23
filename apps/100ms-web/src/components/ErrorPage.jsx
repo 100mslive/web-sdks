@@ -29,7 +29,7 @@ function ErrorPage({ error }) {
             direction="column"
             css={{ position: "absolute", size: "100%", top: "33.33%", left: 0 }}
           >
-            <Text variant="h2">Almost There!</Text>
+            <Text variant="h3">Almost There!</Text>
             <Text
               variant="body1"
               css={{ margin: "1.75rem", textAlign: "center" }}
