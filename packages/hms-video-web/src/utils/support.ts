@@ -10,6 +10,8 @@ export const isNode =
 
 export const isBrowser = typeof window !== 'undefined';
 
+export const isFirefox = parsedUserAgent.getBrowser().name?.toLowerCase().includes('firefox');
+
 const checkIsSupported = () => {
   if (isNode) {
     return false;

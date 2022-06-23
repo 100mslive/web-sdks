@@ -1,11 +1,11 @@
-import { AudioLevelIcon } from "@100mslive/react-icons";
+import { useCallback } from "react";
 import {
   selectIsLocalAudioPluginPresent,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
+import { AudioLevelIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
-import { useCallback } from "react";
 import FilterFactory from "./krispsdk.mjs";
 
 const ncOptions = {
@@ -32,10 +32,7 @@ class Plugin {
     if (!this.ncFilter) {
       this.ncFilter = await FilterFactory.create(ctx, ncOptions);
     }
-    if (ctx.state === "suspended") {
-      console.error("audio context suspended, resuming");
-      await ctx.resume();
-    }
+    console.error(ctx.state);
     this.ncFilter.enable();
     window.ncFilter = this.ncFilter;
     source.connect(this.ncFilter);
@@ -54,6 +51,7 @@ class Plugin {
 
   stop() {
     this.ncFilter?.disconnect();
+    this.ncFilter?.kill();
     this.ncFilter = null;
   }
 }

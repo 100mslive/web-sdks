@@ -4,14 +4,10 @@ import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { EventBus } from '../../events/EventBus';
+import { isFirefox } from '../../utils/support';
 
 const TAG = 'AudioPluginsManager';
 const DEFAULT_SAMPLE_RATE = 48000;
-
-//Handling sample rate error in case of firefox
-const checkBrowserSupport = () => {
-  return navigator.userAgent.indexOf('Firefox') !== -1;
-};
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -253,12 +249,12 @@ export class HMSAudioPluginsManager {
 
   private createAudioContext() {
     if (!this.audioContext) {
-      if (checkBrowserSupport()) {
+      if (isFirefox) {
         /**
-        Not setting default sample rate for firefox since connecting
-        audio nodes from context with different sample rate is not
-        supported in firefox
- */
+         * Not setting default sample rate for firefox since connecting
+         * audio nodes from context with different sample rate is not
+         * supported in firefox
+         */
         this.audioContext = new AudioContext();
       } else {
         this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
