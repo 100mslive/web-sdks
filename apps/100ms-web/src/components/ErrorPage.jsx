@@ -1,6 +1,4 @@
 import React from "react";
-import errorBgDark from "../images/error-bg-dark.svg";
-import errorBgLight from "../images/error-bg-light.svg";
 import { Flex, Box, Text, useTheme } from "@100mslive/react-ui";
 import { CREATE_ROOM_DOC_URL } from "../common/constants";
 
@@ -18,8 +16,12 @@ function ErrorPage({ error }) {
     >
       <Box css={{ position: "relative", overflow: "hidden", r: "$3" }}>
         <img
-          src={themeType === "dark" ? errorBgDark : errorBgLight}
-          alt="error background"
+          src={
+            themeType === "dark"
+              ? require("../images/error-bg-dark.svg")
+              : require("../images/error-bg-light.svg")
+          }
+          alt="Error Background"
         />
         {window.location.hostname === "localhost" && error === "isRoot" ? (
           <Flex
