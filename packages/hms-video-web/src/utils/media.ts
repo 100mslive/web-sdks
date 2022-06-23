@@ -56,10 +56,13 @@ export const HMSAudioContextHandler: HMSAudioContext = {
     return this.audioContext;
   },
   async resumeContext() {
-    await this.getAudioContext()
-      .resume()
-      .catch(error => {
-        HMSLogger.e('AudioContext', error);
-      });
+    try {
+      const context = this.getAudioContext();
+      if (context.state === 'suspended') {
+        await this.getAudioContext().resume();
+      }
+    } catch (error) {
+      HMSLogger.e('HMSAudioContext', 'failed to resume', error);
+    }
   },
 };
