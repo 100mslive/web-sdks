@@ -21,7 +21,7 @@ function ErrorPage({ error }) {
           src={themeType === "dark" ? errorBgDark : errorBgLight}
           alt="error background"
         />
-        {window.location.hostname === "localhost" && error === "isRoot" ? (
+        {window.location.hostname === "localhost" ? (
           <Flex
             align="center"
             direction="column"
