@@ -607,10 +607,10 @@ export class HMSSDKActions implements IHMSActions {
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
+    HMSLogger.cleanUp();
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
     }, reason);
-    HMSLogger.cleanUp();
   }
 
   private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
