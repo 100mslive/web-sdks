@@ -58,7 +58,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
-    HMSLogger.d(this.TAG, 'isConnected set', { id: this.id, old: this._isConnected, new: newValue });
+    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue} }`);
     if (this._isConnected === newValue) {
       return;
     }
