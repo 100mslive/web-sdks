@@ -59,7 +59,9 @@ export const HMSAudioContextHandler: HMSAudioContext = {
     try {
       const context = this.getAudioContext();
       if (context.state === 'suspended') {
-        await this.getAudioContext().resume();
+        HMSLogger.d('HMSAudioContext', 'context suspended, resuming');
+        await context.resume();
+        HMSLogger.d('HMSAudioContext', 'context suspended, resumed');
       }
     } catch (error) {
       HMSLogger.e('HMSAudioContext', 'failed to resume', error);
