@@ -213,14 +213,7 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl }) {
         />
         <Route path="/:roomId/:role" element={<RedirectToPreview />} />
         <Route path="/:roomId/" element={<RedirectToPreview />} />
-        <Route
-          path="*"
-          element={
-            <Suspense fallback={<FullPageProgress />}>
-              <ErrorPage error="Invalid URL!" />
-            </Suspense>
-          }
-        />
+        <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
       </Routes>
     </Router>
   );
