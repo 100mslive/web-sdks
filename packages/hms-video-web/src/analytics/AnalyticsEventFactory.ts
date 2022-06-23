@@ -210,6 +210,7 @@ export default class AnalyticsEventFactory {
         : {
             error_name: error.name,
             error_message: error.message,
+            error_description: error.cause,
           };
     } else {
       return {};

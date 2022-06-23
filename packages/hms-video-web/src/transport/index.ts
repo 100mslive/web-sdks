@@ -287,15 +287,13 @@ export default class HMSTransport implements ITransport {
     try {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.publish({
-            error,
-            devices: this.deviceManager.getDevices(),
-            settings: new HMSTrackSettings(videoSettings, audioSettings, false),
-          }),
-        );
-      }
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          error: error as Error,
+          devices: this.deviceManager.getDevices(),
+          settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+        }),
+      );
       throw error;
     }
   }
@@ -413,7 +411,7 @@ export default class HMSTransport implements ITransport {
   async leave(): Promise<void> {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
-
+    HMSLogger.d(TAG, 'leaving in transport');
     try {
       this.state = TransportState.Leaving;
       this.webrtcInternals?.cleanUp();
@@ -422,6 +420,7 @@ export default class HMSTransport implements ITransport {
       await this.subscribeConnection?.close();
       try {
         this.signal.leave();
+        HMSLogger.d(TAG, 'signal leave done');
       } catch (err) {
         HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
       }
@@ -429,9 +428,7 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.reset();
       await this.signal.close();
     } catch (err) {
-      if (err instanceof HMSException) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
-      }
+      this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err as Error));
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
     } finally {
       this.state = TransportState.Disconnected;
@@ -458,14 +455,12 @@ export default class HMSTransport implements ITransport {
       try {
         await this.publishTrack(track);
       } catch (error) {
-        if (error instanceof HMSException) {
-          this.eventBus.analytics.publish(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-            }),
-          );
-        }
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error: error as Error,
+          }),
+        );
       }
     }
   }
@@ -870,10 +865,10 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.flush();
       return this.initConfig;
     } catch (error) {
-      if (error instanceof HMSException && this.state !== TransportState.Reconnecting) {
+      if (this.state !== TransportState.Reconnecting) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.connect(
-            error,
+            error as Error,
             this.getAdditionalAnalyticsProperties(),
             connectRequestedAt,
             new Date(),
