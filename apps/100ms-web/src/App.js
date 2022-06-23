@@ -27,10 +27,10 @@ import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import PostLeave from "./components/PostLeave";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import ErrorPage from "./components/ErrorPage";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
-const ErrorPage = React.lazy(() => import("./components/ErrorPage"));
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
