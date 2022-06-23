@@ -1,5 +1,4 @@
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
-import HMSLogger from './logger';
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {
@@ -46,25 +45,3 @@ export interface HMSAudioContext {
   getAudioContext: () => AudioContext;
   resumeContext: () => Promise<void>;
 }
-
-export const HMSAudioContextHandler: HMSAudioContext = {
-  audioContext: null,
-  getAudioContext() {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
-    return this.audioContext;
-  },
-  async resumeContext() {
-    try {
-      const context = this.getAudioContext();
-      if (context.state === 'suspended') {
-        HMSLogger.d('HMSAudioContext', 'context suspended, resuming');
-        await context.resume();
-        HMSLogger.d('HMSAudioContext', 'context suspended, resumed');
-      }
-    } catch (error) {
-      HMSLogger.e('HMSAudioContext', 'failed to resume', error);
-    }
-  },
-};

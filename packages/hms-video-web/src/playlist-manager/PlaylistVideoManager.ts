@@ -24,10 +24,14 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private canvas!: HTMLCanvasElement;
   private timer: any;
   private tracks: MediaStreamTrack[] = [];
-  private audioContextManager!: AudioContextManager;
   private DEFAUL_FPS = 24;
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
+  private TAG = '[PlaylistVideoManager]';
+
+  constructor(private audioContextManager: AudioContextManager) {
+    super();
+  }
 
   play(url: string) {
     this.videoElement = this.getVideoElement();
@@ -64,7 +68,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
             this.videoElement.onplay = this.drawImage;
             await this.audioContextManager.resumeContext();
             await this.videoElement.play();
-            const audioTrack = this.audioContextManager.getAudioTrack();
+            const audioTrack = this.audioContextManager.getAudioTrackFromElement(this.videoElement);
             stream.addTrack(audioTrack);
             stream.getTracks().forEach((track: MediaStreamTrack) => {
               this.tracks.push(track);
@@ -106,7 +110,6 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     this.videoElement?.pause();
     this.videoElement?.removeAttribute('src');
     this.videoElement = null;
-    this.audioContextManager?.cleanup();
     this.clearCanvasAndTracks();
   }
 
@@ -136,7 +139,6 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     videoElement.addEventListener('ended', () => {
       this.emit('ended', null);
     });
-    this.audioContextManager = new AudioContextManager(videoElement);
     return videoElement;
   }
 
@@ -145,9 +147,5 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       this.canvas = document.createElement('canvas');
       this.canvasContext = this.canvas.getContext('2d');
     }
-  }
-
-  private get TAG() {
-    return 'PlaylistVideoManager';
   }
 }

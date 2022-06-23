@@ -58,8 +58,8 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
-import { HMSAudioContextHandler } from '../utils/media';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { AudioContextManager } from '../playlist-manager/AudioContextManager';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -98,6 +98,7 @@ export class HMSSdk implements HMSInterface {
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
+  private audioContextManager!: AudioContextManager;
   private sdkState = { ...INITIAL_STATE };
 
   private initStoreAndManagers() {
@@ -114,7 +115,8 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.eventBus = new EventBus();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
-    this.playlistManager = new PlaylistManager(this, this.eventBus);
+    this.audioContextManager = new AudioContextManager();
+    this.playlistManager = new PlaylistManager(this, this.eventBus, this.audioContextManager);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
@@ -127,6 +129,7 @@ export class HMSSdk implements HMSInterface {
       this.deviceManager,
       this.eventBus,
       this.analyticsTimer,
+      this.audioContextManager,
     );
     this.analyticsEventsService = new AnalyticsEventsService(this.store);
     this.transport = new HMSTransport(
@@ -371,6 +374,7 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    this.audioContextManager?.resumeContext();
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -404,7 +408,6 @@ export class HMSSdk implements HMSInterface {
       )
       .then(async () => {
         HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        await HMSAudioContextHandler.resumeContext();
         this.notifyJoin();
         this.sendJoinAnalyticsEvent(isPreviewCalled);
         if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
@@ -432,6 +435,7 @@ export class HMSSdk implements HMSInterface {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanUp();
+    this.audioContextManager.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     HMSLogger.cleanUp();

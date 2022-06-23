@@ -23,6 +23,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   settings: HMSAudioTrackSettings;
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private context?: AudioContext;
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
@@ -50,6 +51,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
+  }
+
+  setContext(context: AudioContext) {
+    this.context = context;
+    this.pluginsManager.setContext(context);
   }
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
@@ -170,11 +176,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (this.audioLevelMonitor) {
       this.destroyAudioLevelMonitor();
     }
+    if (!this.context) {
+      throw Error('call set context on audio track');
+    }
     HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
     this.audioLevelMonitor = new TrackAudioLevelMonitor(
       this,
       this.eventBus.trackAudioLevelUpdate,
       this.eventBus.localAudioSilence,
+      this.context,
     );
     this.audioLevelMonitor.start();
     this.audioLevelMonitor.detectSilence();
@@ -188,7 +198,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async cleanup() {
     super.cleanup();
     await this.pluginsManager.cleanup();
-    await this.pluginsManager.closeContext();
     this.processedTrack?.stop();
     this.destroyAudioLevelMonitor();
   }

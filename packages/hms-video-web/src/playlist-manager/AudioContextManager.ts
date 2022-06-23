@@ -2,13 +2,10 @@ import HMSLogger from '../utils/logger';
 
 export class AudioContextManager {
   private audioContext: AudioContext;
-  private destinationNode?: MediaStreamAudioDestinationNode;
-  private source: MediaElementAudioSourceNode;
+  private TAG = '[AudioContextManager]';
 
-  constructor(element: HTMLMediaElement) {
+  constructor() {
     this.audioContext = new AudioContext();
-    this.source = this.audioContext.createMediaElementSource(element);
-    this.source.connect(this.audioContext.destination);
   }
 
   /**
@@ -27,23 +24,21 @@ export class AudioContextManager {
     }
   }
 
-  getAudioTrack() {
-    // Always create a destinationNode to get new audio track id
-    if (this.destinationNode) {
-      this.source.disconnect(this.destinationNode);
-    }
-    this.destinationNode = this.audioContext.createMediaStreamDestination();
-    this.source.connect(this.destinationNode);
-    return this.destinationNode.stream.getAudioTracks()[0];
+  getContext() {
+    return this.audioContext;
+  }
+
+  getAudioTrackFromElement(element: HTMLMediaElement) {
+    const source = this.audioContext.createMediaElementSource(element);
+    const destination = this.audioContext.createMediaStreamDestination();
+    source.connect(this.audioContext.destination);
+    source.connect(destination);
+    return destination.stream.getAudioTracks()[0];
   }
 
   cleanup() {
     if (this.audioContext.state !== 'closed') {
       this.audioContext.close();
     }
-  }
-
-  private get TAG() {
-    return 'AudioContextManager';
   }
 }

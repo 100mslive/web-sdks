@@ -17,9 +17,12 @@ import { AudioContextManager } from './AudioContextManager';
 export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
   private audioElement: HTMLAudioElement | null = null;
   private track?: MediaStreamTrack;
-  private audioContextManager!: AudioContextManager;
   // This is to handle audio playing when seekTo is called when audio is paused
   private seeked = false;
+
+  constructor(private audioContextManager: AudioContextManager) {
+    super();
+  }
 
   async play(url: string) {
     this.audioElement = this.getAudioElement();
@@ -45,7 +48,7 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
           // Create audio track only once and reuse, it will be updated with current content
           if (!this.track) {
             await this.audioElement.play();
-            const audioTrack = this.audioContextManager.getAudioTrack();
+            const audioTrack = this.audioContextManager.getAudioTrackFromElement(this.audioElement);
             this.track = audioTrack;
             resolve([audioTrack]);
           } else {
@@ -81,7 +84,6 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     this.audioElement?.pause();
     this.audioElement?.removeAttribute('src');
     this.audioElement = null;
-    this.audioContextManager?.cleanup();
     this.track = undefined;
   }
 
@@ -95,7 +97,6 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     audioElement.addEventListener('ended', () => {
       this.emit('ended', null);
     });
-    this.audioContextManager = new AudioContextManager(audioElement);
     return audioElement;
   }
 

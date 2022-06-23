@@ -4,10 +4,8 @@ import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { EventBus } from '../../events/EventBus';
-import { isFirefox } from '../../utils/support';
 
 const TAG = 'AudioPluginsManager';
-const DEFAULT_SAMPLE_RATE = 48000;
 
 /**
  * This class manages applying different plugins on a local audio track. Plugins which need to modify the audio
@@ -26,7 +24,6 @@ export class HMSAudioPluginsManager {
   private readonly hmsTrack: HMSLocalAudioTrack;
   // Map maintains the insertion order
   private readonly pluginsMap: Map<string, HMSAudioPlugin>;
-  private audioContext?: AudioContext;
 
   private sourceNode?: MediaStreamAudioSourceNode;
   private destinationNode?: MediaStreamAudioDestinationNode;
@@ -35,12 +32,16 @@ export class HMSAudioPluginsManager {
   // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
+  private audioContext?: AudioContext;
 
   constructor(track: HMSLocalAudioTrack, eventBus: EventBus) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.createAudioContext();
+  }
+
+  setContext(context: AudioContext) {
+    this.audioContext = context;
   }
 
   getPlugins(): string[] {
@@ -163,12 +164,6 @@ export class HMSAudioPluginsManager {
     this.outputTrack = undefined;
   }
 
-  //Keeping it separate since we are initializing context only once
-  async closeContext() {
-    this.audioContext?.close();
-    this.audioContext = undefined;
-  }
-
   async reprocessPlugins() {
     if (this.pluginsMap.size === 0 || !this.sourceNode) {
       return;
@@ -245,20 +240,5 @@ export class HMSAudioPluginsManager {
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);
-  }
-
-  private createAudioContext() {
-    if (!this.audioContext) {
-      if (isFirefox) {
-        /**
-         * Not setting default sample rate for firefox since connecting
-         * audio nodes from context with different sample rate is not
-         * supported in firefox
-         */
-        this.audioContext = new AudioContext();
-      } else {
-        this.audioContext = new AudioContext({ sampleRate: DEFAULT_SAMPLE_RATE });
-      }
-    }
   }
 }

@@ -30,6 +30,7 @@ export class TrackAudioLevelMonitor {
     private track: HMSLocalAudioTrack,
     private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>,
     private silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
+    private context: AudioContext,
   ) {
     try {
       const stream = new MediaStream([this.track.nativeTrack]);
@@ -143,7 +144,7 @@ export class TrackAudioLevelMonitor {
   }
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
-    const audioContext = new AudioContext();
+    const audioContext = this.context;
     const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);

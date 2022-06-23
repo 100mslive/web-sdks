@@ -21,8 +21,8 @@ import { DeviceManager } from '../device-manager';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioContextHandler } from '../utils/media';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { AudioContextManager } from '../playlist-manager/AudioContextManager';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -43,6 +43,7 @@ export class LocalTrackManager {
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
     private analyticsTimer: AnalyticsTimer,
+    private audioContextManager: AudioContextManager,
   ) {}
 
   // eslint-disable-next-line complexity
@@ -233,8 +234,7 @@ export class LocalTrackManager {
     return emptyTrack;
   }
 
-  static getEmptyAudioTrack(): MediaStreamTrack {
-    const ctx = HMSAudioContextHandler.getAudioContext();
+  static getEmptyAudioTrack(ctx: AudioContext): MediaStreamTrack {
     const oscillator = ctx.createOscillator();
     const dst = ctx.createMediaStreamDestination();
     oscillator.connect(dst);
@@ -364,7 +364,7 @@ export class LocalTrackManager {
   private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
     const nativeTracks: MediaStreamTrack[] = [];
     if (fetchTrackOptions.audio === 'empty') {
-      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
+      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack(this.audioContextManager.getContext()));
     }
 
     if (fetchTrackOptions.video === 'empty') {
@@ -480,6 +480,7 @@ export class LocalTrackManager {
         this.eventBus,
         settings.audio,
       );
+      audioTrack.setContext(this.audioContextManager.getContext());
       tracks.push(audioTrack);
     }
 
