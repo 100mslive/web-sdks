@@ -29,7 +29,6 @@ class slackReporter implements Reporter {
   onTestEnd(test: TestCase, result: TestResult): void {
     // test is flaky when it had some failures but passed in retries
     if (test.outcome() === "flaky") {
-      this.counters.failed--;
       this.failures = this.failures.filter((title) => title !== test.title);
       this.counters.flaky++;
       this.flaky.push(test.title);

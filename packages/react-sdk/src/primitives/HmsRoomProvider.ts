@@ -23,6 +23,7 @@ export interface HMSRoomProviderProps {
    * if true this will enable webrtc stats collection
    */
   isHMSStatsOn?: boolean;
+  leaveOnUnload?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   notifications,
   stats,
   isHMSStatsOn = false,
+  leaveOnUnload = true,
 }) => {
   if (!providerProps) {
     // adding a dummy function for setstate and destroy because zustan'd create expects them
@@ -98,11 +100,11 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   }
 
   useEffect(() => {
-    if (isBrowser) {
+    if (isBrowser && leaveOnUnload) {
       window.addEventListener('beforeunload', () => providerProps.actions.leave());
       window.addEventListener('onunload', () => providerProps.actions.leave());
     }
-  }, []);
+  }, [leaveOnUnload]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
 };
