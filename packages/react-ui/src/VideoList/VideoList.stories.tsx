@@ -5,6 +5,7 @@ import { StyledVideoList } from './StyledVideoList';
 import { StyledVideoTile } from '../VideoTile';
 import Video from '../Video/Video';
 import { getLeft } from './videoListUtils';
+import { ComponentStory } from '@storybook/react';
 
 const VideoListMeta = {
   title: 'Video/VideoList',
@@ -12,7 +13,12 @@ const VideoListMeta = {
 
 export default VideoListMeta;
 
-const VideoTile = ({ width, height, trackId, name }) => {
+const VideoTile: React.FC<{ width: number; height: number; trackId: string; name: string }> = ({
+  width,
+  height,
+  trackId,
+  name,
+}) => {
   return (
     <StyledVideoTile.Root css={{ width, height }}>
       <StyledVideoTile.Container>
@@ -60,7 +66,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
                       key={tile.track?.id || tile.peer.id + i}
                       width={tile.width}
                       height={tile.height}
-                      trackId={tile.track?.id}
+                      trackId={tile.track?.id || ''}
                       name={tile.peer.name}
                     />
                   ),
@@ -73,7 +79,9 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
   );
 };
 
-export const Example = VideoListStory.bind({});
+const Template: ComponentStory<typeof VideoListStory> = args => <VideoListStory {...args} />;
+
+export const Example = Template.bind({});
 
 Example.args = {
   maxTileCount: 2,
