@@ -39,9 +39,3 @@ export async function getLocalDevices(): Promise<MediaDeviceGroups> {
     throw BuildGetMediaError(err as Error, HMSGetMediaActions.AV);
   }
 }
-
-export interface HMSAudioContext {
-  audioContext: AudioContext | null;
-  getAudioContext: () => AudioContext;
-  resumeContext: () => Promise<void>;
-}
