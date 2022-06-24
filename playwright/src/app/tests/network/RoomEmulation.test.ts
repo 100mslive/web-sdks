@@ -21,7 +21,7 @@ test(`Verify network disconnection/reconnection notifications`, async ({ page: n
 });
 
 networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
-  test(`Verify local peer room state is updated for remote peer after network is restored after ${waitTime} ms`, async ({
+  test(`Verify local peer room state is updated for remote peer after network is restored after ${networkDisconnectedDuration} ms`, async ({
     context,
   }) => {
     const pages = await PageWrapper.openPages(context, 2, {
