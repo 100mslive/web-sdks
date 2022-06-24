@@ -1,39 +1,34 @@
-import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import React, { useState } from 'react';
 import { Toast } from './Toast';
 
-export default {
-  title: 'UI Components/Toast',
-  component: Toast,
-} as ComponentMeta<typeof Toast>;
-
-interface ToastProps {
-  title: string;
-  description: string;
-  close: boolean;
-  open: boolean;
-  duration: number;
-  onOpenChange: () => void;
-}
-
-const ToastStory: React.FC<ToastProps> = ({ title, description, close = true, open, duration, onOpenChange }) => {
+const ToastStory = () => {
   return (
     <Toast.Provider>
-      <Toast.Root open={open} onOpenChange={onOpenChange} duration={!close ? 600000 : duration}>
-        <Toast.Title css={{ mr: close ? '$12' : 0 }}>{title}</Toast.Title>
-        {description && <Toast.Description css={{ mr: close ? '$12' : 0 }}>{description}</Toast.Description>}
-        {close && <Toast.Close />}
+      <ToastComponent />
+    </Toast.Provider>
+  );
+};
+
+const ToastComponent = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</button>
+      <Toast.Root open={isOpen} duration={60000}>
+        <Toast.Title css={{ mr: '$12' }}>Hello from Toast Component</Toast.Title>
+        <Toast.Description css={{ mr: '$12' }}>Toast component Description</Toast.Description>
+        <Toast.Close />
       </Toast.Root>
       <Toast.Viewport css={{ bottom: '$24' }} />
-    </Toast.Provider>
+    </>
   );
 };
 
 export const Example = ToastStory.bind({});
 
-Example.args = {
-  title: 'Hello from Toast Component',
-  description: 'Toast component Description',
-  open: true,
-  close: true,
+const ToastMeta = {
+  title: 'UI Components/Toast',
+  component: ToastStory,
 };
+
+export default ToastMeta;
