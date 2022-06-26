@@ -51,6 +51,7 @@ import {
   HMSLogLevel,
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
+  HMSRemoteVideoTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSSdk,
@@ -66,7 +67,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
-import { ACTION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -376,8 +377,14 @@ export class HMSSDKActions implements IHMSActions {
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+    if (sdkTrack?.type === 'video') {
+      const isUnsubscribed =
+        sdkTrack instanceof HMSRemoteVideoTrack && sdkTrack.getSimulcastLayer() === HMSSimulcastLayer.NONE;
+      if (videoElement.srcObject === null && isUnsubscribed) {
+        // video is already detached
+        return;
+      }
+      (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
       this.updateVideoLayer(trackID, 'detachVideo');
     } else {
       if (videoElement) {
@@ -732,7 +739,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
       this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
@@ -752,7 +759,7 @@ export class HMSSDKActions implements IHMSActions {
    * @protected
    */
   protected syncRoomState(action: string) {
-    action = `${action}_roomState`;
+    action = `${action}_fullSync`;
     HMSLogger.time(`store-sync-${action}`);
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
@@ -848,11 +855,10 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  //@ts-ignore
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room));
-    }, 'RoomUpdate');
+    }, `${type}`);
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
@@ -883,7 +889,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
     } else {
-      const actionName = type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
+      const actionName = TRACK_NOTIFICATION_TYPES[type] || 'trackUpdate';
       this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
@@ -1265,7 +1271,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    const actionName = ACTION_TYPES[type];
+    const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {
