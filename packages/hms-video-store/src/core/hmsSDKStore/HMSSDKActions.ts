@@ -380,6 +380,9 @@ export class HMSSDKActions implements IHMSActions {
       await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
       this.updateVideoLayer(trackID, 'detachVideo');
     } else {
+      if (videoElement) {
+        videoElement.srcObject = null; // so chrome can clean up
+      }
       this.logPossibleInconsistency('no video track found to remove sink');
     }
   }
