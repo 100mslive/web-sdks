@@ -51,7 +51,6 @@ import {
   HMSLogLevel,
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
-  HMSRemoteVideoTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSSdk,
@@ -378,12 +377,6 @@ export class HMSSDKActions implements IHMSActions {
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      const isUnsubscribed =
-        sdkTrack instanceof HMSRemoteVideoTrack && sdkTrack.getSimulcastLayer() === HMSSimulcastLayer.NONE;
-      if (videoElement.srcObject === null && isUnsubscribed) {
-        // video is already detached
-        return;
-      }
       (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
       this.updateVideoLayer(trackID, 'detachVideo');
     } else {
@@ -1069,10 +1062,15 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      this.setState(draft => {
-        draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-        draft.tracks[trackID].degraded = sdkTrack.degraded;
-      }, action);
+      const storeTrack = this.store.getState(selectTrackByID(trackID));
+      const hasFieldChanged =
+        storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
+      if (hasFieldChanged) {
+        this.setState(draft => {
+          draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
+          draft.tracks[trackID].degraded = sdkTrack.degraded;
+        }, action);
+      }
     }
   }
 
