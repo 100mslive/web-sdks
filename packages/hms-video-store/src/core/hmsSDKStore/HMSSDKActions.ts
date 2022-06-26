@@ -673,8 +673,6 @@ export class HMSSDKActions implements IHMSActions {
         Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
       }
     }, 'deviceChange');
-    // sync is needed to update the current selected device
-    // this.syncRoomState('deviceChangeSync');
     // send notification only on device change - selection is present
     if (event.selection) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
@@ -753,7 +751,8 @@ export class HMSSDKActions implements IHMSActions {
    * interested in with a new reference.
    * @protected
    */
-  protected syncRoomState(action?: string) {
+  protected syncRoomState(action: string) {
+    action = `${action}_roomState`;
     HMSLogger.time(`store-sync-${action}`);
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
