@@ -2,6 +2,7 @@ import { UAParser } from 'ua-parser-js';
 import { v4 as uuid } from 'uuid';
 import { LocalStorage } from './local-storage';
 import { version } from './package.alias.json';
+import HMSLogger from './logger';
 
 export const parsedUserAgent = new UAParser();
 
@@ -22,22 +23,32 @@ export const isSupported = checkIsSupported();
 
 function createUserAgent(): string {
   if (isNode) {
-    return `hmsclient/${version}`;
+    return `web_hmsclient/${version} nodejs`;
   }
-  const device = parsedUserAgent.getDevice();
-  const browser = parsedUserAgent.getBrowser();
-  const os = parsedUserAgent.getOS();
+  const parsedOs = parsedUserAgent.getOS();
+  const parsedDevice = parsedUserAgent.getDevice();
+  const parsedBrowser = parsedUserAgent.getBrowser();
 
-  if (device.type) {
-    return `hmsclient/${version} ${os.name}/${os.version} (${device.vendor}_${device.type}_/_${browser.name}_${browser.version})`;
-  } else {
-    return `hmsclient/${version} ${os.name}/${os.version} (${browser.name}_${browser.version})`;
+  const sdk = `web_hmsclient/${version}`;
+  const os = replaceSpaces(`${parsedOs.name}/${parsedOs.version}`);
+  const browser = replaceSpaces(`${parsedBrowser.name}_${parsedBrowser.version}`);
+  let device = browser;
+  if (parsedDevice.type) {
+    const deviceVendor = replaceSpaces(`${parsedDevice.vendor}_${parsedDevice.type}`);
+    device = `${deviceVendor}/${browser}`;
   }
+
+  return `${sdk} ${os} ${device}`;
+}
+
+function replaceSpaces(s: string) {
+  return s.replaceAll(' ', '_');
 }
 
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
 export const userAgent = createUserAgent();
+HMSLogger.d('[Util]', 'userAgent', userAgent);
 
 export const getAnalyticsDeviceId = () => {
   let id = '';
