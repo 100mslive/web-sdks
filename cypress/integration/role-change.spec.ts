@@ -7,7 +7,7 @@ let room: CypressRoom;
 
 let token;
 
-describe.only('role change api', () => {
+describe('role change api', () => {
   before(() => {
     cy.getToken().then(authToken => {
       token = authToken;

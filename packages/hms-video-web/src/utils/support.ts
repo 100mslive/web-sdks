@@ -23,14 +23,15 @@ export const isSupported = checkIsSupported();
 
 function createUserAgent(): string {
   if (isNode) {
-    return `web_hmsclient/${version} nodejs`;
+    return `hmsclient/${version} web_nodejs`;
   }
   const parsedOs = parsedUserAgent.getOS();
   const parsedDevice = parsedUserAgent.getDevice();
   const parsedBrowser = parsedUserAgent.getBrowser();
 
-  const sdk = `web_hmsclient/${version}`;
-  const os = replaceSpaces(`${parsedOs.name}/${parsedOs.version}`);
+  const sdk = `hmsclient/${version}`;
+  const osNameVersion = replaceSpaces(`${parsedOs.name}/${parsedOs.version}`);
+  const os = `web_${osNameVersion}`;
   const browser = replaceSpaces(`${parsedBrowser.name}_${parsedBrowser.version}`);
   let device = browser;
   if (parsedDevice.type) {
@@ -51,7 +52,7 @@ export const userAgent = createUserAgent();
 HMSLogger.d('[Util]', 'userAgent', userAgent);
 
 export const getAnalyticsDeviceId = () => {
-  let id = '';
+  let id;
   const storage = new LocalStorage<string>('hms-analytics-deviceId');
   const storageId = storage.get();
   if (storageId) {
