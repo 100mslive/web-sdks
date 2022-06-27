@@ -18,7 +18,7 @@ test(`Send msg to everyone`, async ({ context }) => {
   await context.close();
 });
 
-test(`Send msg to particular peer`, async ({ context }) => {
+test(`Send msg to particular peer @chat`, async ({ context }) => {
   const msg = 'Hello, how are you ?';
   const pages = await PageWrapper.openPages(context, peersCount);
   const peerName = pages[1].localName;
@@ -26,7 +26,6 @@ test(`Send msg to particular peer`, async ({ context }) => {
   for (let i = 1; i < peersCount; i++) {
   await pages[i].click(pages[i].footer.chat_btn);
   }
-  await pages[0].hasText(pages[0].footer.first_chat_msg, msg);
   await pages[1].hasText(pages[1].footer.first_chat_msg, msg);
   await pages[2].assertNotVisible(pages[2].footer.first_chat_msg);
   await context.close();
