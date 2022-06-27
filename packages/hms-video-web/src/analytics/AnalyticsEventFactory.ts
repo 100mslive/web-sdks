@@ -194,7 +194,7 @@ export default class AnalyticsEventFactory {
 
   static HLSError(error: Error, start = true) {
     return new AnalyticsEvent({
-      name: `hls-${start ? 'start' : 'stop'}.failed`,
+      name: `hls.${start ? 'start' : 'stop'}.failed`,
       level: AnalyticsEventLevel.ERROR,
       properties: this.getPropertiesWithError(error),
     });
@@ -202,7 +202,7 @@ export default class AnalyticsEventFactory {
 
   static RTMPError(error: Error, start = true) {
     return new AnalyticsEvent({
-      name: `rtmp-${start ? 'start' : 'stop'}.failed`,
+      name: `rtmp.${start ? 'start' : 'stop'}.failed`,
       level: AnalyticsEventLevel.ERROR,
       properties: this.getPropertiesWithError(error),
     });
