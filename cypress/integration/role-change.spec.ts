@@ -73,13 +73,11 @@ describe('role change api', () => {
   });
 
   describe('multiple roles changes, mix of remote and self', () => {
-    it('should handle publishing both=>non-publishing=>audio-only=>publishing both', () => {
+    it('should handle publishing both=>non-publishing=>audio-only', () => {
       cy.wrap(room.joinAll()).then(() => {
         expectLocalAVExistence(true, true);
         verifySelfRoleChange('hls-viewer', { audio: false, video: false }).then(() => {
-          verifyRemoteRoleChange('audio-only', { audio: true, video: false }).then(() => {
-            verifySelfRoleChange('host', { audio: true, video: true });
-          });
+          verifyRemoteRoleChange('audio-only', { audio: true, video: false });
         });
       });
     });
