@@ -30,7 +30,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_NOTIF_CHANNEL_ID }}
           status: Start
           color: warning
 
@@ -52,7 +52,7 @@ jobs:
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
           message_id: ${{ steps.slack.outputs.message_id }}
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_NOTIF_CHANNEL_ID }}
           status: Publish
           color: "#bada55"
 
@@ -72,7 +72,7 @@ jobs:
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
           message_id: ${{ steps.slack.outputs.message_id }}
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_NOTIF_CHANNEL_ID }}
           status: Success
           color: good
 
@@ -83,6 +83,6 @@ jobs:
         uses: voxmedia/github-action-slack-notify-build@v1
         with:
           message_id: ${{ steps.slack.outputs.message_id }}
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_NOTIF_CHANNEL_ID }}
           status: Failed
           color: danger
