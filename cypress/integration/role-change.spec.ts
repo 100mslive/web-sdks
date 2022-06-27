@@ -78,7 +78,7 @@ describe('role change api', () => {
         expectLocalAVExistence(true, true);
         verifySelfRoleChange('hls-viewer', { audio: false, video: false }).then(() => {
           verifyRemoteRoleChange('audio-only', { audio: true, video: false }).then(() => {
-            verifyRemoteRoleChange('host', { audio: true, video: true });
+            verifySelfRoleChange('host', { audio: true, video: true });
           });
         });
       });
