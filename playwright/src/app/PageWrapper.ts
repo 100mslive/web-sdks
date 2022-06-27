@@ -94,6 +94,7 @@ export class PageWrapper {
   async sendText(elementId: string, text: string) {
     await this.page.locator(elementId).fill(text);
     console.log('Text sent: ', text, 'to element', elementId);
+    await this.pressKey('Enter');
   }
 
   async hasText(elementId: string, text: string) {
@@ -195,6 +196,39 @@ export class PageWrapper {
   async delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+   /**
+   * accepts string values like F1 - F12, Digit0- Digit9, KeyA- KeyZ, Backquote, Minus, Equal,
+   *  Backslash, Backspace, Tab, Delete, Escape, ArrowDown, End, Enter, Home, Insert, PageDown, PageUp, ArrowRight, ArrowUp
+   */
+    async pressKey(key: string) {
+      await this.page.keyboard.press(key);
+    }
+
+    /**
+   * function to send message in chat to all, any peer or 
+   * peers with specific role. Pass msg and "all", or "peername" or "roleName" for sending
+   * message to all or particular peer or peers with specific role.
+   */
+    async sendMessage(msg: string, to: string) {
+      await this.page.click(this.footer.chat_btn);
+      if(to == 'all') {
+      await this.sendText(this.footer.chat_placeholder,msg);
+      } else {
+      await this.selectPeerOrRole(to);
+      await this.sendText(this.footer.chat_placeholder,msg);
+      }
+    }
+
+   /**
+   * function to select peer or role in chat
+   * pass peer name or role name to chat with
+   */
+    async selectPeerOrRole(name: string){
+    await this.page.click(this.footer.chat_peer_selector);
+    await this.page.click(`text=${name}`);
+    }
+
 }
 
 export interface JoinConfig {
