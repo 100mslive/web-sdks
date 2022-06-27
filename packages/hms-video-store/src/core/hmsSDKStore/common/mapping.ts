@@ -7,8 +7,6 @@ export const PEER_NOTIFICATION_TYPES: PeerNotificationMap = {
   [sdkTypes.HMSPeerUpdate.PEER_JOINED]: HMSNotificationTypes.PEER_JOINED,
   [sdkTypes.HMSPeerUpdate.PEER_LEFT]: HMSNotificationTypes.PEER_LEFT,
   [sdkTypes.HMSPeerUpdate.ROLE_UPDATED]: HMSNotificationTypes.ROLE_UPDATED,
-  [sdkTypes.HMSPeerUpdate.AUDIO_TOGGLED]: HMSNotificationTypes.PEER_AUDIO_UPDATED,
-  [sdkTypes.HMSPeerUpdate.VIDEO_TOGGLED]: HMSNotificationTypes.PEER_VIDEO_UPDATED,
   [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: HMSNotificationTypes.NAME_UPDATED,
   [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: HMSNotificationTypes.METADATA_UPDATED,
 };
