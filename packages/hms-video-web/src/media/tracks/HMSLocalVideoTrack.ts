@@ -197,7 +197,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   getTrackBeingSent() {
-    return this.enabled ? this.processedTrack || this.nativeTrack : this.nativeTrack;
+    return this.processedTrack || this.nativeTrack;
   }
 
   /**
