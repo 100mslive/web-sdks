@@ -592,7 +592,7 @@ export default class HMSTransport implements ITransport {
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
-    track.publishedTrackId = track.nativeTrack.id;
+    track.publishedTrackId = track.getTrackIDBeingSent();
     HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
