@@ -1,6 +1,7 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
 import { Text } from './Text';
+import { textVariants } from './Text';
 
 export default {
   title: 'UI Components/Text',
@@ -9,25 +10,7 @@ export default {
     variant: {
       control: {
         type: 'select',
-        options: [
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'sub1',
-          'sub2',
-          'body1',
-          'body2',
-          'button',
-          'caption',
-          'overline',
-          'tiny',
-          'xs',
-          'sm',
-          'md',
-        ],
+        options: Object.keys(textVariants),
       },
     },
   },
