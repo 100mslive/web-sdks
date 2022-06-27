@@ -14,7 +14,7 @@ const ToastComponent = () => {
   return (
     <>
       <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</button>
-      <Toast.Root open={isOpen} duration={60000}>
+      <Toast.Root open={isOpen} onOpenChange={o => setIsOpen(o)}>
         <Toast.Title css={{ mr: '$12' }}>Hello from Toast Component</Toast.Title>
         <Toast.Description css={{ mr: '$12' }}>Toast component Description</Toast.Description>
         <Toast.Close />

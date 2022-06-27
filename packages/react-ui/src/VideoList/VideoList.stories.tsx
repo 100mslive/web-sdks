@@ -50,7 +50,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
     aspectRatio,
   });
   return (
-    <StyledVideoList.Root css={{ height: '100vh', width: '100%', bg: 'red' }} ref={ref}>
+    <StyledVideoList.Root css={{ height: '100vh', width: '100%' }} ref={ref}>
       <StyledVideoList.Container>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tiles, pageNo) => (
