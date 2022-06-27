@@ -3,10 +3,9 @@ import {
   selectIsConnectedToRoom,
   selectLocalAudioTrackID,
   selectLocalPeer,
-  selectLocalPeerRole,
-  selectLocalPeerRoleName,
   selectLocalVideoTrackID,
-  selectRemotePeers,
+  selectPeerByID,
+  selectRoleByRoleName,
 } from '@100mslive/hms-video-store';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
@@ -50,35 +49,52 @@ export class CypressPeer {
     return this.sdk.getLocalPeer();
   }
 
-  getVideoTrackId() {
+  get videoTrack() {
     return this.store.getState(selectLocalVideoTrackID);
   }
 
-  getAudioTrackId() {
+  get audioTrack() {
     return this.store.getState(selectLocalAudioTrackID);
   }
 
   join = async () => {
     this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
     await this.waitTillConnected();
-    await this.waitForTracks();
+    await this.waitForTracks(this.id);
     return `peer ${this.name} joined`;
   };
 
-  changeRole = async (toRole: string, force = true) => {
-    await this.actions.changeRole(this.id, toRole, force);
-    // promise till role actually changes
+  waitForTracks = async (peerId: string) => {
     return new Promise(resolve => {
-      this.store.subscribe(role => {
-        if (role === toRole) {
-          resolve(role);
+      this.store.subscribe(peer => {
+        if (!peer) {
+          return;
         }
-      }, selectLocalPeerRoleName);
+        const allowed = this.store.getState(selectRoleByRoleName(peer.roleName))?.publishParams?.allowed || [];
+        const isAudioAlright = allowed.includes('audio') ? peer.audioTrack : !peer.audioTrack;
+        const isVideoAlright = allowed.includes('video') ? peer.videoTrack : !peer.videoTrack;
+        if (isAudioAlright && isVideoAlright) {
+          resolve(true);
+        }
+      }, selectPeerByID(peerId));
     });
   };
 
-  getRemotePeer = () => {
-    return this.store.getState(selectRemotePeers)[0];
+  /**
+   * changeRole("newrole") // changes self role
+   * changeRole("newRole", peerid) // changes role of passed in peer
+   * waits till the role changes is actually reflected in store
+   */
+  changeRole = async (toRole: string, peerId?: string, force = true) => {
+    if (!peerId) {
+      peerId = this.id;
+    }
+    await this.actions.changeRole(peerId, toRole, force);
+    return this.waitTillRoleChange(toRole, peerId);
+  };
+
+  getPeerById = (peerId: string) => {
+    return this.store.getState(selectPeerByID(peerId));
   };
 
   leave = async () => {
@@ -89,6 +105,23 @@ export class CypressPeer {
     return this.store.getState(selectIsConnectedToRoom);
   };
 
+  /**
+   * waits till the role for the passed in peer is changed to passed in toRole.
+   * If peer is not passed wait till self role changes.
+   */
+  waitTillRoleChange = async (toRole: string, forPeerId?: string) => {
+    if (!forPeerId) {
+      forPeerId = this.id;
+    }
+    return new Promise(resolve => {
+      this.store.subscribe(peer => {
+        if (peer?.roleName === toRole) {
+          resolve(true);
+        }
+      }, selectPeerByID(forPeerId));
+    });
+  };
+
   private waitTillConnected = async () => {
     return new Promise(resolve => {
       this.store.subscribe(isConnected => {
@@ -96,19 +129,6 @@ export class CypressPeer {
           resolve(true);
         }
       }, selectIsConnectedToRoom);
-    });
-  };
-
-  private waitForTracks = async () => {
-    return new Promise(resolve => {
-      this.store.subscribe(peer => {
-        const allowed = this.store.getState(selectLocalPeerRole)?.publishParams?.allowed || [];
-        const isAudioAlright = !allowed.includes('audio') || peer.audioTrack;
-        const isVideoAlright = !allowed.includes('video') || peer.videoTrack;
-        if (isAudioAlright && isVideoAlright) {
-          resolve(true);
-        }
-      }, selectLocalPeer);
     });
   };
 }

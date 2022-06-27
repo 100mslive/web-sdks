@@ -8,10 +8,19 @@ export class CypressRoom {
   }
 
   joinAll = async () => {
-    const promises = [];
+    let promises = [];
     this.peers.forEach(peer => {
       promises.push(peer.join());
     });
+    await Promise.all(promises);
+    promises = [];
+    for (const peer1 of this.peers) {
+      for (const peer2 of this.peers) {
+        if (peer1 !== peer2) {
+          promises.push(peer1.waitForTracks(peer2.id));
+        }
+      }
+    }
     await Promise.all(promises);
   };
 

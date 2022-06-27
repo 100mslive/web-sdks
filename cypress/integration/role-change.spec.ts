@@ -1,68 +1,13 @@
-import {
-  HMSReactiveStore,
-  selectIsConnectedToRoom,
-  selectLocalPeer,
-  selectRemotePeers,
-} from '../../packages/hms-video-store/src';
-import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { CypressPeer } from '../support/peer';
 import { CypressRoom } from '../support/room';
 
-let HMSStore, HMSStore1;
-let actions: HMSSDKActions;
-let actions1: HMSSDKActions;
-let store: IHMSStoreReadOnly;
-let store1: IHMSStoreReadOnly;
-let room: CypressRoom;
 let localPeer: CypressPeer;
 let remotePeer: CypressPeer;
-let initEndpoint;
+let room: CypressRoom;
 
 let token;
 
-const onceCyJoined = store => {
-  return cy.wrap(null).should(() => {
-    expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
-  });
-};
-
-const verifyTrackUndefined = ({ actions, store, isLocal = true, trackType }) => {
-  const getTrackId = () => {
-    const storePeer = isLocal ? store.getState(selectLocalPeer) : store.getState(selectRemotePeers)[0];
-    return storePeer[trackType];
-  };
-  return cy
-    .wrap(null)
-    .should(() => {
-      expect(getTrackId()).to.equal(undefined);
-    })
-    .then(() => {
-      const sdkPeer = isLocal ? actions.sdk.getLocalPeer() : actions.sdk.getPeers().find(peer => !peer.isLocal);
-      expect(sdkPeer[trackType]).to.equal(undefined);
-    });
-};
-
-const verifyRoleChange = ({ actions, store, isLocal = true, role }) => {
-  return cy
-    .wrap(null)
-    .should(() => {
-      const storePeer = isLocal ? store.getState(selectLocalPeer) : store.getState(selectRemotePeers)[0];
-      expect(storePeer?.roleName).to.equal(role);
-    })
-    .then(() => {
-      const sdkPeer = isLocal ? actions.sdk.getLocalPeer() : actions.sdk.getPeers().find(peer => !peer.isLocal);
-      expect(sdkPeer.role.name).to.equal(role);
-    });
-};
-
-const onBothPeerJoined = (store, store1) => {
-  return onceCyJoined(store).should(() => {
-    expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
-  });
-};
-
-describe('role change api', () => {
+describe.only('role change api', () => {
   before(() => {
     cy.getToken().then(authToken => {
       token = authToken;
@@ -70,25 +15,12 @@ describe('role change api', () => {
   });
 
   beforeEach(() => {
-    HMSStore = new HMSReactiveStore();
-    actions = HMSStore.getActions();
-    store = HMSStore.getStore();
-    HMSStore1 = new HMSReactiveStore();
-    store1 = HMSStore1.getStore();
-    actions1 = HMSStore1.getActions();
     localPeer = new CypressPeer(token);
     remotePeer = new CypressPeer(token);
     room = new CypressRoom(localPeer, remotePeer);
-    initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
   });
 
   afterEach(() => {
-    if (actions) {
-      actions.leave();
-    }
-    if (actions1) {
-      actions1.leave();
-    }
     if (room) {
       room.leaveAll();
     }
@@ -97,113 +29,61 @@ describe('role change api', () => {
   it('should join both peers', () => {
     const start = Date.now();
     cy.wrap(room.joinAll()).then(() => {
-      expect(localPeer.isConnected()).to.equal(true);
-      expect(remotePeer.isConnected()).to.equal(true);
+      expect(localPeer.isConnected()).to.be.true;
+      expect(remotePeer.isConnected()).to.be.true;
+      expectLocalAVExistence(true, true);
       cy.log('time for both peer join', String(Date.now() - start));
     });
   });
 
   describe('self role change to non publishing role', () => {
-    it('should remove tracks on localPeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      onceCyJoined(store).then(() => {
-        const localPeer = store.getState(selectLocalPeer);
-        actions.changeRole(localPeer.id, 'hls-viewer', true);
-        verifyRoleChange({ actions, store, role: 'hls-viewer' }).then(() => {
-          verifyTrackUndefined({ actions, store, trackType: 'videoTrack' });
-          verifyTrackUndefined({ actions, store, trackType: 'audioTrack' });
-        });
-      });
-    });
-
-    it('should remove tracks on remote end', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onceCyJoined(store).then(() => {
-        const localPeer = store.getState(selectLocalPeer);
-        actions.changeRole(localPeer.id, 'hls-viewer', true);
-        verifyRoleChange({ actions: actions1, store: store1, role: 'hls-viewer', isLocal: false }).then(() => {
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'videoTrack', isLocal: false });
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'audioTrack', isLocal: false });
-        });
+    it('should remove tracks on localPeer and for remote', () => {
+      cy.wrap(room.joinAll()).then(() => {
+        expectLocalAVExistence(true, true);
+        verifySelfRoleChange('hls-viewer', { audio: false, video: false });
       });
     });
   });
 
   describe('self role change to audio only role', () => {
-    it('should remove video track on localPeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      onceCyJoined(store).then(() => {
-        const localPeer = store.getState(selectLocalPeer);
-        actions.changeRole(localPeer.id, 'audio-only', true);
-        verifyRoleChange({ actions, store, role: 'audio-only' });
-        verifyTrackUndefined({ actions, store, trackType: 'videoTrack' });
+    it('should remove only the video track', () => {
+      cy.wrap(room.joinAll()).then(() => {
+        expectLocalAVExistence(true, true);
+        verifySelfRoleChange('audio-only', { audio: true, video: false });
       });
-    });
-    it('should remove videoTrack on remote end', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onBothPeerJoined(store, store1)
-        // By this time both peers would have joined and got each others tracks
-        .then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          actions.changeRole(localPeer.id, 'audio-only', true);
-          verifyRoleChange({ actions: actions1, store: store1, role: 'audio-only', isLocal: false });
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'videoTrack', isLocal: false });
-        });
     });
   });
 
-  describe('role change to non publishing role', () => {
-    it('should remove tracks on localPeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onBothPeerJoined(store, store1).then(() => {
-        const localPeer = store.getState(selectLocalPeer);
-        actions1.changeRole(localPeer.id, 'hls-viewer', true);
-        verifyRoleChange({ actions, store, role: 'hls-viewer' });
-        verifyTrackUndefined({ actions, store, trackType: 'videoTrack' });
-        verifyTrackUndefined({ actions, store, trackType: 'audioTrack' });
+  describe('remote role change to non publishing role', () => {
+    it('should remove tracks for localPeer and remotePeer', () => {
+      cy.wrap(room.joinAll()).then(() => {
+        expectLocalAVExistence(true, true);
+        verifyRemoteRoleChange('hls-viewer', { audio: false, video: false });
       });
-    });
-
-    it('should remove tracks on remote end', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onBothPeerJoined(store, store1)
-        // By this time both peers would have joined and got each others tracks
-        .then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          actions1.changeRole(localPeer.id, 'hls-viewer', true);
-          verifyRoleChange({ actions: actions1, store: store1, role: 'hls-viewer', isLocal: false });
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'videoTrack', isLocal: false });
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'audioTrack', isLocal: false });
-        });
     });
   });
 
-  describe('role change to audio only role', () => {
-    it('should remove video track on localPeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onBothPeerJoined(store, store1).then(() => {
-        const localPeer = store.getState(selectLocalPeer);
-        actions1.changeRole(localPeer.id, 'audio-only', true);
-        verifyRoleChange({ actions, store, role: 'audio-only' });
-        verifyTrackUndefined({ actions, store, trackType: 'videoTrack' });
+  describe('remote role change to audio only role', () => {
+    it('should remove video track on localPeer and on remote end', () => {
+      cy.wrap(room.joinAll()).then(() => {
+        expectLocalAVExistence(true, true);
+        verifyRemoteRoleChange('audio-only', { audio: true, video: false });
       });
     });
-    it('should remove videoTrack on remote end', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      onBothPeerJoined(store, store1)
-        // By this time both peers would have joined and got each others tracks
-        .then(() => {
-          const localPeer = store.getState(selectLocalPeer);
-          actions1.changeRole(localPeer.id, 'audio-only', true);
-          verifyRoleChange({ actions: actions1, store: store1, role: 'audio-only', isLocal: false });
-          verifyTrackUndefined({ actions: actions1, store: store1, trackType: 'videoTrack', isLocal: false });
+  });
+
+  describe('multiple roles changes, mix of remote and self', () => {
+    it('should handle publishing both=>non-publishing=>audio-only=>publishing both=>audio-only', () => {
+      cy.wrap(room.joinAll()).then(() => {
+        expectLocalAVExistence(true, true);
+        verifySelfRoleChange('hls-viewer', { audio: false, video: false }).then(() => {
+          verifyRemoteRoleChange('audio-only', { audio: true, video: false }).then(() => {
+            verifyRemoteRoleChange('host', { audio: true, video: true }).then(() => {
+              verifySelfRoleChange('audio-only', { audio: true, video: false });
+            });
+          });
         });
+      });
     });
   });
 
@@ -214,10 +94,10 @@ describe('role change api', () => {
         const streamId = sdkPeer.audioTrack.stream.id;
         expect(sdkPeer.videoTrack.stream.id).to.equal(streamId);
         cy.wrap(localPeer.changeRole('audio-only')).then(() => {
-          expect(localPeer.getVideoTrackId()).to.equal(undefined);
-          expect(sdkPeer.videoTrack).to.equal(undefined);
+          expect(localPeer.videoTrack).to.be.undefined;
+          expect(sdkPeer.videoTrack).to.be.undefined;
           cy.wrap(localPeer.changeRole('student')).then(() => {
-            expect(localPeer.getVideoTrackId()).to.not.equal(undefined);
+            expect(localPeer.videoTrack).to.exist;
             expect(sdkPeer.videoTrack.stream.id).to.equal(streamId);
           });
         });
@@ -225,3 +105,43 @@ describe('role change api', () => {
     });
   });
 });
+
+function verifySelfRoleChange(toRole: string, roleAv: { audio: boolean; video: boolean }) {
+  return cy.wrap(localPeer.changeRole(toRole)).then(() => {
+    cy.log('selfRoleChange - ', toRole);
+    cy.wrap(remotePeer.waitTillRoleChange(toRole, localPeer.id)).then(() => {
+      cy.wrap(remotePeer.waitForTracks(localPeer.id)).then(() => {
+        expectLocalAVExistence(roleAv.audio, roleAv.video);
+      });
+    });
+  });
+}
+
+function verifyRemoteRoleChange(toRole: string, roleAv: { audio: boolean; video: boolean }) {
+  return cy.wrap(remotePeer.changeRole(toRole, localPeer.id)).then(() => {
+    cy.log('remoteRoleChange - ', toRole);
+    cy.wrap(localPeer.waitTillRoleChange(toRole)).then(() => {
+      cy.wrap(remotePeer.waitForTracks(localPeer.id)).then(() => {
+        expectLocalAVExistence(roleAv.audio, roleAv.video);
+      });
+    });
+  });
+}
+
+function expectLocalAVExistence(audio: boolean, video: boolean) {
+  const localPeerInRemote = remotePeer.getPeerById(localPeer.id);
+  if (audio) {
+    expect(localPeer.audioTrack).to.exist;
+    expect(localPeerInRemote.audioTrack).to.exist;
+  } else {
+    expect(localPeer.audioTrack).to.be.undefined;
+    expect(localPeerInRemote.audioTrack).to.be.undefined;
+  }
+  if (video) {
+    expect(localPeer.videoTrack).to.exist;
+    expect(localPeerInRemote.videoTrack).to.exist;
+  } else {
+    expect(localPeer.videoTrack).to.be.undefined;
+    expect(localPeerInRemote.videoTrack).to.be.undefined;
+  }
+}
