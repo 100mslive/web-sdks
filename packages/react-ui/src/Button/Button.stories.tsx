@@ -28,22 +28,26 @@ export const Primary = Template.bind({});
 
 Primary.args = {
   variant: 'primary',
+  outlined: false,
 };
 
 export const Standard = Template.bind({});
 
 Standard.args = {
   variant: 'standard',
+  outlined: false,
 };
 
 export const Danger = Template.bind({});
 
 Danger.args = {
   variant: 'danger',
+  outlined: false,
 };
 
 export const Icon = WithIcon.bind({});
 Icon.args = {
   variant: 'danger',
   icon: true,
+  outlined: false,
 };
