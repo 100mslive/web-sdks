@@ -1088,7 +1088,7 @@ export default class HMSTransport implements ITransport {
           ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
           on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
           local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
-          retry_count: this.joinRetryCount,
+          retries_join: this.joinRetryCount,
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
