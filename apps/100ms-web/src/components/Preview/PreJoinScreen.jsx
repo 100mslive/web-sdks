@@ -38,12 +38,13 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
       </Text>
       <Form onSubmit={formSubmit}>
         <InputField>
-          <Label>
+          <Label for="name">
             <Text css={{ c: "$textHighEmp" }} variant="body2">
               Name
             </Text>
           </Label>
           <Input
+            id="name"
             css={{ w: "100%", "@sm": "400px" }}
             value={name}
             onChange={e => setName(e.target.value)}
