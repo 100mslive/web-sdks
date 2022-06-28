@@ -9,6 +9,7 @@ import {
   TextboxIcon,
 } from "@100mslive/react-icons";
 import {
+  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectPermissions,
   useHMSStore,
@@ -37,6 +38,7 @@ const hoverStyles = {
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
@@ -82,18 +84,19 @@ export const MoreSettings = () => {
             css={hoverStyles}
             onClick={() => setShowSelfRoleChange(true)}
           />
-          {(permissions.streaming || permissions.recording) && (
-            <Dropdown.Item
-              onClick={() => setShowRecordingModal(true)}
-              css={hoverStyles}
-              data-testid="streaming_recording_btn"
-            >
-              <RecordIcon />
-              <Text variant="sm" css={{ ml: "$4" }}>
-                Streaming/Recording
-              </Text>
-            </Dropdown.Item>
-          )}
+          {(permissions.streaming || permissions.recording) &&
+            (isAllowedToPublish.audio || isAllowedToPublish.video) && ( // TODO: remove this check when permissions are added
+              <Dropdown.Item
+                onClick={() => setShowRecordingModal(true)}
+                css={hoverStyles}
+                data-testid="streaming_recording_btn"
+              >
+                <RecordIcon />
+                <Text variant="sm" css={{ ml: "$4" }}>
+                  Streaming/Recording
+                </Text>
+              </Dropdown.Item>
+            )}
           <FullScreenItem hoverStyles={hoverStyles} />
           {permissions.mute && (
             <Dropdown.Item
