@@ -44,7 +44,7 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
             </Text>
           </Label>
           <Input
-            css={{ w: "400px" }}
+            css={{ w: "100%", "@sm": "400px" }}
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Enter your name"
@@ -60,6 +60,7 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
 };
 
 const InputField = styled("fieldset", {
+  width: "100%",
   display: "flex",
   flexDirection: "column",
   margin: "$12 0",
@@ -70,9 +71,12 @@ const InputField = styled("fieldset", {
 });
 
 const Form = styled("form", {
+  maxWidth: "400px",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  padding: "0 $8",
 });
 
 export default PreJoinScreen;
