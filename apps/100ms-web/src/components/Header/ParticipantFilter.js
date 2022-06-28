@@ -91,7 +91,7 @@ const Item = ({ selected, title, onSelection, value, icon, isRole = true }) => {
       <Text css={{ flex: "1 1 0" }}>{title}</Text>
       {selected && (
         <Text>
-          <CheckIcon />
+          <CheckIcon widht={16} height={16} />
         </Text>
       )}
     </Flex>
