@@ -12,6 +12,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   display: 'flex',
   flexDirection: 'column',
   position: 'relative',
+  fontFamily: '$sans',
   ...toastAnimation,
 });
 const ToastTitle = styled(ToastPrimitives.Title, {

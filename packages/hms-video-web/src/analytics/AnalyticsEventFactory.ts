@@ -192,6 +192,22 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static HLSError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `hls.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
+  static RTMPError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `rtmp.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
