@@ -1,3 +1,6 @@
+import React, { ComponentProps, PropsWithChildren } from 'react';
+import { Box, Flex } from '../Layout';
+import { Loading } from '../Loading';
 import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
 
@@ -48,9 +51,10 @@ const getButtonVariants = (base: string, hover: string, active: string, disabled
   };
 };
 
-export const Button = styled('button', {
+const StyledButton = styled('button', {
   ...flexCenter,
   fontFamily: '$sans',
+  position: 'relative',
   outline: 'none',
   border: 'none',
   fs: '$md',
@@ -102,3 +106,22 @@ export const Button = styled('button', {
     variant: 'primary',
   },
 });
+
+export const Button: React.FC<PropsWithChildren<{ loading: boolean } & ComponentProps<typeof StyledButton>>> = ({
+  children,
+  loading,
+  ...props
+}) => {
+  return (
+    <StyledButton {...props}>
+      <>
+        {loading && (
+          <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute' }}>
+            <Loading size={'1.5rem'} />
+          </Flex>
+        )}
+        <Box css={{ visibility: loading ? 'hidden' : 'visible' }}>{children}</Box>
+      </>
+    </StyledButton>
+  );
+};
