@@ -12,10 +12,12 @@ import {
 import {
   ChevronDownIcon,
   ChevronUpIcon,
+  HandRaiseIcon,
   PeopleIcon,
   SettingIcon,
 } from "@100mslive/react-icons";
 import {
+  selectPeerMetadata,
   selectPermissions,
   useHMSStore,
   useParticipantList,
@@ -176,16 +178,20 @@ const ParticipantListInARole = ({
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(({ canChangeRole, onSettings }) => {
-  return (
-    <Fragment>
-      <Flex align="center">
-        {canChangeRole && (
-          <IconButton onClick={onSettings}>
-            <SettingIcon />
-          </IconButton>
-        )}
-      </Flex>
-    </Fragment>
-  );
-});
+const ParticipantActions = React.memo(
+  ({ canChangeRole, onSettings, peerId }) => {
+    const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+    return (
+      <Fragment>
+        <Flex align="center">
+          {isHandRaised && <HandRaiseIcon />}
+          {canChangeRole && (
+            <IconButton onClick={onSettings}>
+              <SettingIcon />
+            </IconButton>
+          )}
+        </Flex>
+      </Fragment>
+    );
+  }
+);
