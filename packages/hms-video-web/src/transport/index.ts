@@ -75,6 +75,7 @@ export default class HMSTransport implements ITransport {
   private trackDegradationController?: TrackDegradationController;
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
+  private joinRetryCount = 0;
 
   constructor(
     private observer: ITransportObserver,
@@ -678,7 +679,7 @@ export default class HMSTransport implements ITransport {
       this.createPeerConnections();
     }
 
-    await this.negotiateJoin(
+    await this.negotiateJoinWithRetry(
       customData.name,
       customData.metaData,
       autoSubscribeVideo,
@@ -708,6 +709,45 @@ export default class HMSTransport implements ITransport {
     }
   }
 
+  private async negotiateJoinWithRetry(
+    name: string,
+    data: string,
+    autoSubscribeVideo: boolean,
+    serverSubDegrade: boolean,
+    isWebRTC = true,
+  ) {
+    try {
+      await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
+    } catch (error) {
+      HMSLogger.e(TAG, 'Join negotiation failed ❌', error);
+      const hmsError =
+        error instanceof HMSException
+          ? error
+          : ErrorFactory.WebsocketMethodErrors.ServerErrors(500, HMSAction.JOIN, `Default join WS error`);
+      hmsError.isTerminal = false;
+      const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
+
+      this.joinRetryCount = 0;
+      if (shouldRetry) {
+        const task = async () => {
+          this.joinRetryCount++;
+          return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
+        };
+
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.JoinWSMessageFailed,
+          error: hmsError,
+          task,
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
+      } else {
+        throw error;
+      }
+    }
+  }
+
   private async negotiateJoin(
     name: string,
     data: string,
@@ -715,29 +755,10 @@ export default class HMSTransport implements ITransport {
     serverSubDegrade: boolean,
     isWebRTC = true,
   ): Promise<boolean> {
-    try {
-      if (isWebRTC) {
-        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
-      } else {
-        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
-      }
-    } catch (error) {
-      HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
-      const task = async () => {
-        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
-      };
-
-      await this.retryScheduler.schedule({
-        category: TransportFailureCategory.PublishNegotiationFailed,
-        error: ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(
-          HMSAction.JOIN,
-          'Failed to send join over WS connection',
-        ),
-        task,
-        originalState: TransportState.Joined,
-      });
-
-      return false;
+    if (isWebRTC) {
+      return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
+    } else {
+      return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
     }
   }
 
@@ -1059,7 +1080,7 @@ export default class HMSTransport implements ITransport {
       case TransportFailureCategory.SignalDisconnect:
         event = AnalyticsEventFactory.disconnect(error, additionalProps);
         break;
-      case TransportFailureCategory.PublishNegotiationFailed:
+      case TransportFailureCategory.JoinWSMessageFailed:
         event = AnalyticsEventFactory.join({
           error,
           time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
@@ -1067,6 +1088,7 @@ export default class HMSTransport implements ITransport {
           ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
           on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
           local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
+          retry_count: this.joinRetryCount,
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
