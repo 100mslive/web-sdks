@@ -24,9 +24,11 @@ import {
 } from "@100mslive/react-sdk";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
+import { ParticipantFilter } from "./ParticipantFilter";
 
 export const ParticipantList = () => {
-  const { participants, isConnected, peerCount } = useParticipants();
+  const [filter, setFilter] = useState();
+  const { participants, isConnected, peerCount } = useParticipants(filter);
   const [open, setOpen] = useState(false);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
@@ -64,25 +66,48 @@ export const ParticipantList = () => {
             </Tooltip>
           </Flex>
         </Dropdown.Trigger>
-        {participants.length && (
-          <Dropdown.Content
-            sideOffset={5}
-            align="end"
-            css={{ w: "$72", height: "auto", maxHeight: "$96" }}
+        <Dropdown.Content
+          sideOffset={5}
+          align="end"
+          css={{ w: "$72", height: "auto", maxHeight: "$96" }}
+        >
+          <Flex
+            align="center"
+            justify="between"
+            css={{ w: "100%", p: "$4 $8" }}
           >
-            {participants.map(peer => {
-              return (
-                <Participant
-                  peer={peer}
-                  key={peer.id}
-                  canChangeRole={canChangeRole}
-                  showActions={isConnected}
-                  onParticipantAction={setSelectedPeerId}
-                />
-              );
-            })}
-          </Dropdown.Content>
-        )}
+            <Text variant="h6" css={{ flex: "1 1 0" }}>
+              Participants
+            </Text>
+            <ParticipantFilter
+              selection={filter}
+              onSelection={setFilter}
+              isConnected={isConnected}
+            />
+          </Flex>
+          {participants.length === 0 && (
+            <Flex
+              align="center"
+              justify="center"
+              css={{ w: "100%", p: "$8 0" }}
+            >
+              <Text variant="sm">
+                {!filter ? "No participants" : "No matching participants"}
+              </Text>
+            </Flex>
+          )}
+          {participants.map(peer => {
+            return (
+              <Participant
+                peer={peer}
+                key={peer.id}
+                canChangeRole={canChangeRole}
+                showActions={isConnected}
+                onParticipantAction={setSelectedPeerId}
+              />
+            );
+          })}
+        </Dropdown.Content>
       </Dropdown.Root>
       {selectedPeerId && (
         <RoleChangeModal
