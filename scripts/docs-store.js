@@ -8,7 +8,7 @@ const fs = require('fs');
  */
 const getFiles = (path, arrayOfFiles = []) => {
   fs.readdirSync(path).forEach(file => {
-    const filePath = path + '/' + file;
+    const filePath = `${path}/${file}`;
     if (fs.statSync(filePath).isDirectory()) {
       arrayOfFiles = getFiles(filePath, arrayOfFiles);
     } else {
