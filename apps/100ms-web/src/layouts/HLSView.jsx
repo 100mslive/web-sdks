@@ -85,8 +85,8 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const fragsTimeTable = {};
-  const hlsUrl = hlsState.variants[0]?.url;
-  // const hlsUrl = localStorage.getItem("hlsUrl");
+  // const hlsUrl = hlsState.variants[0]?.url;
+  const hlsUrl = localStorage.getItem("hlsUrl");
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
