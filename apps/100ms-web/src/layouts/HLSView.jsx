@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import Hls from "hls.js";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -30,15 +29,62 @@ const HLSVideo = styled("video", {
   margin: "0 auto",
 });
 
+export function removeQuotes(str) {
+  return str.replace(/^"(.*)"$/, "$1");
+}
+
+export function parseTagsList(tagList) {
+  const tagMap = {};
+  for (const tags of tagList) {
+    tagMap[tags[0]] = removeQuotes(tags[1]);
+  }
+
+  return {
+    rawTags: {
+      ...tagMap,
+    },
+    duration: Number(tagMap["INF"]),
+    fragmentStartAt: parseISOString(tagMap["PROGRAM-DATE-TIME"]),
+  };
+}
+
+export function parseMetadataString(mtStr) {
+  const splitAtComma = mtStr.split(",");
+
+  const tagMap = {};
+  for (const tags of splitAtComma) {
+    const splitAtEquals = tags.split("=");
+
+    tagMap[splitAtEquals[0]] = removeQuotes(splitAtEquals[1]);
+  }
+
+  return {
+    duration: tagMap["DURATION"],
+    id: tagMap["ID"],
+    starTime: parseISOString(tagMap["START-DATE"]),
+    payload: tagMap["X-100MSLIVE-PAYLOAD"],
+  };
+}
+
+function getSecondsFromTime(time) {
+  return time.getHours() * 60 * 60 + time.getMinutes() * 60 + time.getSeconds();
+}
+
+/** doesn't account for timezones.
+ * Do not use for dates. Only accurate for time */
+export function parseISOString(s) {
+  var b = s.split(/\D+/);
+  return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+}
+
 let hls = null;
+
 const HLSView = () => {
   const videoRef = useRef(null);
-  const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  const frags = {};
+  const fragsTimeTable = {};
   // const hlsUrl = hlsState.variants[0]?.url;
-  const hlsUrl =
-    "https://dev-cdn.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220620/1655716484659/master.m3u8";
+  const hlsUrl = localStorage.getItem("hlsUrl");
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -56,66 +102,180 @@ const HLSView = () => {
           setCurrentSelectedQualityText("Auto");
         });
 
+        /**
+         * Everytime a fragment is appended to the buffer,
+         * we parse the tags and see if the metadata is
+         * in the tags. If it does, we parse the metadatastring
+         * and create a timetable. This timetable is an array of key value
+         * pairs with timeinSeconds as key and the value is an object
+         * of the parsed metadata.
+         * (e.g)
+         *  {
+         *   36206: {
+         *     duration: "20",
+         *     id: "c382fce1-d551-4862-bdb3-c255ca668154",
+         *     payload: "hello2572",
+         *     starTime: Tue Jun 28 2022 10:03:26 GMT+0530 (India Standard Time)
+         *   }
+         * }
+         */
         hls.on(Hls.Events.BUFFER_APPENDED, (event, data) => {
-          // console.log("BUFFER APPEND");
-          // console.log("FRAG", data);
           const frag = data?.frag;
           const tagList = frag?.tagList;
-          const tagIfMD = tagList.filter(
-            tag => tag.indexOf("EXT-X-DATERANGE") !== -1
-          );
 
-          console.log(
-            `%c fragment ${data.frag.relurl} added to buffer`,
-            "background: #d9ed92; color: #184e77"
-          );
-          const timedMT = tagIfMD[0][1];
-
-          const containedTimedMt = timedMT ? "Contains Metadata" : "";
-          console.log(
-            `%c ${containedTimedMt}`,
-            "background: #d9ed92; color: #184e77"
-          );
-          if (tagIfMD.length > 0) {
-            frags[frag?.relurl] = { tagMetadata: tagIfMD[0][1] };
-          }
-          // console.log("frags", frags);
-          // console.log("===================");
-        });
-        hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-          const fragData = frags[data.frag.relurl];
-          if (fragData) {
+          const tagsMap = parseTagsList(tagList);
+          const metadataString = tagsMap.rawTags["EXT-X-DATERANGE"];
+          if (metadataString) {
             console.log(
-              `%c fragment ${data.frag.relurl} loaded. Contains metadata`,
+              `%c fragment ${data.frag.relurl} containing Metadata added to buffer`,
+              "background: #d9ed92; color: #184e77"
+            );
+
+            const tagMetadata = parseMetadataString(metadataString);
+            const timeSegment = getSecondsFromTime(tagMetadata.starTime);
+            fragsTimeTable[timeSegment.toString()] = {
+              ...tagMetadata,
+            };
+            console.log(
+              "%c TIMETABLE",
+              "background: #d9ed92; color: #184e77",
+              fragsTimeTable
+            );
+          }
+        });
+
+        /**
+         * on Every Fragment change, we check if the fragment's
+         * PROGRAM_TIME is nearby a possible metadata's START_TIME
+         * If it does, we start a setTimeout and try to show it
+         * on the right time.
+         * NOTE: Javascript cannot gaurantee exact time, it
+         * only gaurantees minimum time before trying to show.
+         */
+        hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+          const tagsList = parseTagsList(data?.frag.tagList);
+          console.log(
+            `%c Fragment Loaded. Program Time: ${tagsList.fragmentStartAt}`,
+            "background: #264653; color: #Fafafa"
+          );
+
+          const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
+          const timeStampStrings = Object.keys(fragsTimeTable);
+          const timeStamps = timeStampStrings.map(timeStamp =>
+            Number(timeStamp)
+          );
+          let nearestTimeStamp = timeSegment;
+          /**
+           * There are two scenarios here.
+           * 1) the program time is exactly same as a startime,
+           * which means the below 'if' will fail.
+           * 2) the program time is less than the startime,
+           * which means it is not in the timeStamps array
+           * which goes into the below if condition
+           *
+           * NOTE: PROGRAM_TIME canot be greated than START_TIME,
+           * because the backend gaurantee that every time it sends
+           * a metadata, its always for an event in the future.
+           */
+          if (timeStamps.indexOf(timeSegment) === -1) {
+            /**
+             * since we don't have the exact time in timeStamps, we push
+             * our fragment's timeSegment(programtime) to the timestamp
+             * and sort it. Once it's sorted, the next element to our
+             * timeSegement is the nearest happening of a metadata startTime.
+             * (e.g)
+             * timestamp  = [5,10,12,15,16]
+             * timeSegment = 13
+             * we push timeSegment to timestamp => [5,10,12,15,16,13]
+             * we sort it => [5,10,12,13,15,16]
+             * now next element of timeSegment 13 is 15 which is always the nearest future
+             * occurence of a metadata.
+             */
+            timeStamps.push(timeSegment);
+            timeStamps.sort();
+            console.log(
+              `%c current segment starting at ${timeSegment} secs since stream started`,
+              "background: #E76F51; color: #264653"
+            );
+            const whereAmI = timeStamps.indexOf(timeSegment);
+            nearestTimeStamp = timeStamps[whereAmI + 1];
+          } else {
+            /**
+             * If the timeSegment matches one of the startime,
+             * then we dont need to push it, we can just sort it
+             * and by the same logic above, the next element of
+             * our timesegment is the nearest future occurence of
+             * metadata.
+             */
+            timeStamps.sort();
+            const whereAmI = timeStamps.indexOf(timeSegment);
+            nearestTimeStamp = timeStamps[whereAmI];
+          }
+
+          /**
+           * This check is if timestamp ends up on the
+           * end of the array after sorting meaning
+           * there is no possible future events.
+           * Hence NearestTimeStamp will be undefined.
+           */
+          if (isNaN(nearestTimeStamp)) {
+            return;
+          }
+
+          /**
+           * at this point its gauranteed that we have a timesegment and a possible
+           * future event very close. We now take the difference between them.
+           * The difference must always be from 0(start of the fragment) to INF duration(end of the fragment)
+           * if it is not, then the metadata doesn't belong to this fragment and we leavae it
+           * 'as-is' so future fragments can try to parse it.
+           *
+           * (e.g) timestamp => [5,11,12,15,20,22], duration = 2.
+           *
+           * Fragment1_timesegment = 11 => nearestTimeStamp=>11 => 11 - 11 = 0 (play at start of the fragment)
+           *
+           * Fragment2_timesegment = 13 => nearestTimeStamp=>15 => 15 - 13 = 2 (still inside duration.
+           * so play after 2 sec of the start of the fragment)
+           *
+           * Fragment3_timesegment = 15 => nearestTimeStamp=>20 => 20 - 15 = 5 (5 is greated than duration 2. so
+           * this does not belong to this fragment. ignore and move on to next fragment)
+           *
+           * Fragment4_timesegment = 18 => nearestTimeStamp=>20 => 20 - 18 = 2 (valid)
+           *
+           */
+          const timeDifference = nearestTimeStamp - timeSegment;
+          if (timeDifference >= 0 && timeDifference < tagsList.duration) {
+            console.log(
+              `%c found metadata with start time ${nearestTimeStamp}. playing in current segment ${timeDifference} sec later. Fetching payload...`,
               "background: #ffba08; color: #370617"
             );
-            console.log(
-              "%c looking for payload in" + fragData.tagMetadata,
-              "background: #583101; color:#ffedd8"
-            );
-            const payload = fragData.tagMetadata.split("PAYLOAD=")[1];
+
+            const payload = fragsTimeTable[nearestTimeStamp].payload;
             console.log(
               `%c Payload: ${payload}`,
               "color:#2b2d42; background:#d80032"
             );
+            /**
+             * we start a timeout for difference seconds.
+             * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
+             * time JS will wait before calling Toast and confetti. It's not guaranteed even
+             * for timeDifference = 0.
+             */
+            setTimeout(() => {
+              ToastManager.addToast({
+                title: `Payload shown at ${fragsTimeTable[nearestTimeStamp].starTime}: ${payload}`,
+              });
+              window.sendConfetti();
+              console.log(
+                `Finished delivering payload.Deleting ${nearestTimeStamp} from timetable`
+              );
+              /** we delete the occured events from the timetable. This is not
+               * needed for the operation. Just a bit of optimisation as a really
+               * long stream with many metadata can quickly make the timetable really big.
+               */
+              delete fragsTimeTable[nearestTimeStamp];
+            }, timeDifference * 1000);
           }
         });
-        // hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-        //   console.log("FRAG", data);
-        //   const tagList = data?.frag?.tagList;
-        //   const tagIfMD = tagList.filter(
-        //     tag => tag.indexOf("EXT-X-DATERANGE") !== -1
-        //   );
-
-        //   if (tagIfMD.length > 0) {
-        //     const message = tagIfMD[0][1].split("STR=")[1];
-        //     console.log("Got Timed Metadata.Celebrating....", message);
-        //     ToastManager.addToast({
-        //       title: `Got Message from Backend: ${message}`,
-        //     });
-        //     window.sendConfetti();
-        //   }
-        // });
       } else if (
         videoRef.current.canPlayType("application/vnd.apple.mpegurl")
       ) {
