@@ -36,6 +36,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected }) => {
           border: "1px solid $textDisabled",
           borderRadius: "$1",
           h: "auto",
+          cursor: "pointer",
         }}
       >
         <Flex align="center">
