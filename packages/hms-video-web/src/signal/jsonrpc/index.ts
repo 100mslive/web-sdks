@@ -189,7 +189,7 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
-    const response: RTCSessionDescriptionInit = await this.callWithRetry(HMSSignalMethod.JOIN, params);
+    const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
