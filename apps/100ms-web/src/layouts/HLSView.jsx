@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import Hls from "hls.js";
+import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -81,10 +82,11 @@ let hls = null;
 
 const HLSView = () => {
   const videoRef = useRef(null);
+  const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const fragsTimeTable = {};
-  // const hlsUrl = hlsState.variants[0]?.url;
-  const hlsUrl = localStorage.getItem("hlsUrl");
+  const hlsUrl = hlsState.variants[0]?.url;
+  // const hlsUrl = localStorage.getItem("hlsUrl");
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -239,9 +241,10 @@ const HLSView = () => {
            * Fragment3_timesegment = 15 => nearestTimeStamp=>20 => 20 - 15 = 5 (5 is greated than duration 2. so
            * this does not belong to this fragment. ignore and move on to next fragment)
            *
-           * Fragment4_timesegment = 18 => nearestTimeStamp=>20 => 20 - 18 = 2 (valid)
+           * Fragment4_timesegment = 19 => nearestTimeStamp=>20 => 20 - 19 = 1 (valid)
            *
            */
+
           const timeDifference = nearestTimeStamp - timeSegment;
           if (timeDifference >= 0 && timeDifference < tagsList.duration) {
             console.log(
