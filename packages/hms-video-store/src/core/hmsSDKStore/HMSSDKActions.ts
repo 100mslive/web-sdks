@@ -851,7 +851,7 @@ export class HMSSDKActions implements IHMSActions {
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room));
-    }, `${type}`);
+    }, type);
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
