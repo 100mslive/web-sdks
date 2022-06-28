@@ -1,6 +1,7 @@
 import { styled } from '../Theme';
 
 export const Input = styled('input', {
+  fontFamily: '$sans',
   backgroundColor: '$surfaceLight',
   borderRadius: '8px',
   outline: 'none',
