@@ -119,6 +119,7 @@ export const baseConfig = {
       16: '3rem',
       17: '3.5rem',
       18: '4rem',
+      19: '4.25rem',
       20: '5rem',
       24: '6rem',
       28: '7rem',
