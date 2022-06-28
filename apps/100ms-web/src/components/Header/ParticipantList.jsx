@@ -76,7 +76,7 @@ export const ParticipantList = () => {
             justify="between"
             css={{ w: "100%", p: "$4 $8" }}
           >
-            <Text variant="h6" css={{ flex: "1 1 0" }}>
+            <Text css={{ flex: "1 1 0", fontWeight: "$semiBold" }}>
               Participants
             </Text>
             <ParticipantFilter
