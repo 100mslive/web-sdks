@@ -5,7 +5,7 @@ import {
   useUserPreferences,
   UserPreferencesKeys,
 } from "../hooks/useUserPreferences";
-import UserMusicIcon from "../../images/user-music-icon.svg";
+import UserMusicIcon from "../../images/UserMusicIcon";
 
 const defaultPreviewPreference = {
   name: "",
@@ -29,7 +29,7 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
   const [name, setName] = useState(initialName || previewPreference.name);
   return (
     <>
-      <img src={UserMusicIcon} alt="Welcome User Icon" />
+      <UserMusicIcon />
       <Text css={{ mt: "$8", mb: "$4" }} variant="h4">
         Go live in five!
       </Text>
