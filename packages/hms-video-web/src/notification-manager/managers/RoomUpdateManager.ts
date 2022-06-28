@@ -134,7 +134,7 @@ export class RoomUpdateManager {
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
     const room = this.store.getRoom();
-    let action: number;
+    let action: HMSRoomUpdate;
     if (notification.type === 'sfu') {
       room.recording.server = {
         running,

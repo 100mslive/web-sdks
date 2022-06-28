@@ -44,6 +44,7 @@ const Info = styled('div', {
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
+  fontFamily: '$sans',
 });
 
 const AvatarContainer = styled('div', {

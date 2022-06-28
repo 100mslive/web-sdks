@@ -46,6 +46,13 @@
           }
         ]
       }
+    },
+    {
+      // https://stackoverflow.com/questions/37558795/nice-way-to-get-rid-of-no-unused-expressions-linter-error-with-chai
+      "files": ["*.spec.ts"],
+      "rules": {
+        "no-unused-expressions": "off"
+      }
     }
   ],
   "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js"]

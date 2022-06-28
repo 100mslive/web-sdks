@@ -21,6 +21,7 @@ class slackReporter implements Reporter {
   };
   private flaky: string[] = [];
   private failures: string[] = [];
+  private timedOut: string[] = [];
 
   onBegin(config: FullConfig, suite: Suite): void {
     this.addCountToMessage("Total", suite.allTests().length);
@@ -29,13 +30,15 @@ class slackReporter implements Reporter {
   onTestEnd(test: TestCase, result: TestResult): void {
     // test is flaky when it had some failures but passed in retries
     if (test.outcome() === "flaky") {
-      this.counters.failed--;
       this.failures = this.failures.filter((title) => title !== test.title);
       this.counters.flaky++;
       this.flaky.push(test.title);
     } else if (result.status === "failed" && !this.failures.includes(test.title)) {
       this.counters.failed++;
       this.failures.push(test.title);
+    } else if (result.status === "timedOut" && !this.failures.includes(test.title)) {
+      this.counters.timedOut++;
+      this.timedOut.push(test.title);
     } else if (result.status !== "failed") {
       this.counters[result.status]++;
     }
@@ -55,6 +58,11 @@ class slackReporter implements Reporter {
     if (this.counters["flaky"] > 0) {
       this.message += "\n*Flaky Tests - *\n";
       this.message += `${this.flaky.join("\n")}\n`;
+    }
+    if (this.counters["timedOut"] > 0) {
+      slackPayload.attachments[0].color = "#af0e20";
+      this.message += "\n*TimedOut Tests - *\n";
+      this.message += `${this.timedOut.join("\n")}\n`;
     }
 
     console.log(`Finished the run: ${result.status}`);
