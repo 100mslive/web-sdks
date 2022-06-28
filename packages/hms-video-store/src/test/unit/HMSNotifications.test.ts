@@ -58,11 +58,6 @@ describe('hms notifications tests', () => {
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
-  test('when unhandled track event on Notification not to be called', () => {
-    notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track.id);
-    expect(cb.mock.calls.length).toBe(0);
-  });
-
   test('when track added on Notification to be called', () => {
     notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_ADDED, track.id);
     expect(cb.mock.calls.length).toBe(1);
