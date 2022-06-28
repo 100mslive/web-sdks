@@ -20,14 +20,13 @@ import {
   selectPeerMetadata,
   selectPermissions,
   useHMSStore,
-  useParticipantList,
+  useParticipants,
 } from "@100mslive/react-sdk";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 
 export const ParticipantList = () => {
-  const { roles, participantsByRoles, peerCount, isConnected } =
-    useParticipantList();
+  const { participants, isConnected, peerCount } = useParticipants();
   const [open, setOpen] = useState(false);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
@@ -50,7 +49,7 @@ export const ParticipantList = () => {
             <Tooltip title="Participant List">
               <Flex>
                 <ParticipantCount peerCount={peerCount} />
-                {roles.length > 0 && (
+                {participants.length > 0 && (
                   <Box
                     css={{
                       ml: "$2",
@@ -65,32 +64,21 @@ export const ParticipantList = () => {
             </Tooltip>
           </Flex>
         </Dropdown.Trigger>
-        {roles.length > 0 && (
+        {participants.length && (
           <Dropdown.Content
             sideOffset={5}
             align="end"
-            css={{ height: "auto", maxHeight: "$96" }}
+            css={{ w: "$72", height: "auto", maxHeight: "$96" }}
           >
-            {roles.map(role => {
-              const participants = participantsByRoles[role];
+            {participants.map(peer => {
               return (
-                <Dropdown.Group
-                  css={{
-                    h: "auto",
-                    flexDirection: "column",
-                    flexWrap: "wrap",
-                    alignItems: "flex-start",
-                  }}
-                  key={role}
-                >
-                  <ParticipantListInARole
-                    roleName={role}
-                    participants={participants}
-                    canChangeRole={canChangeRole}
-                    showActions={isConnected}
-                    onParticipantAction={setSelectedPeerId}
-                  />
-                </Dropdown.Group>
+                <Participant
+                  peer={peer}
+                  key={peer.id}
+                  canChangeRole={canChangeRole}
+                  showActions={isConnected}
+                  onParticipantAction={setSelectedPeerId}
+                />
               );
             })}
           </Dropdown.Content>
@@ -119,59 +107,50 @@ const ParticipantCount = React.memo(({ peerCount }) => {
   );
 });
 
-/**
- * list of all peers for the role
- */
-const ParticipantListInARole = ({
-  roleName,
-  participants,
+const Participant = ({
+  peer,
+  canChangeRole,
   showActions,
   onParticipantAction,
-  canChangeRole,
 }) => {
   return (
-    <>
-      <Dropdown.Label css={{ h: "$14" }}>
-        <Text variant="md" data-testid={`role_${roleName}`} css={{ pl: "$8" }}>
-          {roleName}({participants.length})
+    <Dropdown.Item
+      key={peer.id}
+      css={{ w: "100%", h: "$19" }}
+      data-testid={"participant_" + peer.name}
+    >
+      <Box css={{ width: "$16", flexShrink: 0 }}>
+        <Avatar
+          name={peer.name}
+          css={{
+            position: "unset",
+            transform: "unset",
+            mr: "$4",
+            fontSize: "$sm",
+          }}
+        />
+      </Box>
+      <Flex direction="column" css={{ flex: "1 1 0" }}>
+        <Text
+          variant="md"
+          css={{ ...textEllipsis(150), fontWeight: "$semiBold" }}
+        >
+          {peer.name}
         </Text>
-      </Dropdown.Label>
-      {participants.map((peer, i) => {
-        return (
-          <Dropdown.Item
-            key={peer.id}
-            css={{ w: "100%", h: "$14" }}
-            data-testid={"participant_" + peer.name}
-          >
-            <Box css={{ width: "$13" }}>
-              <Avatar
-                shape="square"
-                name={peer.name}
-                css={{
-                  position: "unset",
-                  transform: "unset",
-                  mr: "$4",
-                  fontSize: "$sm",
-                }}
-              />
-            </Box>
-            <Text variant="md" css={{ ...textEllipsis(150), flex: "1 1 0" }}>
-              {peer.name}
-            </Text>
-            <ConnectionIndicator peerId={peer.id} />
-            {showActions && (
-              <ParticipantActions
-                peerId={peer.id}
-                onSettings={() => {
-                  onParticipantAction(peer.id);
-                }}
-                canChangeRole={canChangeRole}
-              />
-            )}
-          </Dropdown.Item>
-        );
-      })}
-    </>
+        <Text variant="sub2" css={{ color: "$textMedEmp" }}>
+          {peer.roleName}
+        </Text>
+      </Flex>
+      {showActions && (
+        <ParticipantActions
+          peerId={peer.id}
+          onSettings={() => {
+            onParticipantAction(peer.id);
+          }}
+          canChangeRole={canChangeRole}
+        />
+      )}
+    </Dropdown.Item>
   );
 };
 
@@ -182,16 +161,15 @@ const ParticipantActions = React.memo(
   ({ canChangeRole, onSettings, peerId }) => {
     const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
     return (
-      <Fragment>
-        <Flex align="center">
-          {isHandRaised && <HandRaiseIcon />}
-          {canChangeRole && (
-            <IconButton onClick={onSettings}>
-              <SettingIcon />
-            </IconButton>
-          )}
-        </Flex>
-      </Fragment>
+      <Flex align="center" css={{ flexShrink: 0 }}>
+        <ConnectionIndicator peerId={peerId} />
+        {isHandRaised && <HandRaiseIcon />}
+        {canChangeRole && (
+          <IconButton onClick={onSettings}>
+            <SettingIcon />
+          </IconButton>
+        )}
+      </Flex>
     );
   }
 );
