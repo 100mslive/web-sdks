@@ -13,7 +13,7 @@ export const Input = styled('input', {
     boxShadow: '0 0 0 1px $colors$borderAccent',
   },
   '&::placeholder': {
-    color: '$textDisabled';
+    color: '$textDisabled',
   },
   variants: {
     error: {
