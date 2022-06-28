@@ -39,7 +39,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected }) => {
         }}
       >
         <Flex align="center">
-          <Text variant="sm" css={{ ...textEllipsis(100) }}>
+          <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || "Everyone"}
           </Text>
           <Box css={{ ml: "$2", color: "$textDisabled" }}>
