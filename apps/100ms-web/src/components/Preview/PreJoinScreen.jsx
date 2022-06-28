@@ -31,10 +31,10 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
     <>
       <UserMusicIcon />
       <Text css={{ mt: "$8", mb: "$4" }} variant="h4">
-        Go live in five!
+        Jump right in!
       </Text>
       <Text css={{ c: "$textMedEmp", textAlign: "center" }} variant="body1">
-        Let’s get your studio setup ready in less <br /> than 5 minutes!
+        Enter your name to join
       </Text>
       <Form onSubmit={formSubmit}>
         <InputField>
@@ -49,6 +49,7 @@ const PreJoinScreen = ({ initialName, setIsNameScreen }) => {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Enter your name"
+            autoFocus
           />
         </InputField>
 
