@@ -17,7 +17,7 @@ export interface useParticipantsResult {
   rolesWithParticipants: HMSRoleName[];
 }
 
-export type useParticipantsParams = { role: HMSRoleName; metadata: { isHandRaised: boolean } };
+export type useParticipantsParams = { role: HMSRoleName; metadata: Record<string, any> };
 export const useParticipants = (params?: useParticipantsParams) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
