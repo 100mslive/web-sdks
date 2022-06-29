@@ -28,7 +28,8 @@ const Template: ComponentStory<typeof Button> = args => <Button {...args}>Hello 
 
 const WithIcon: ComponentStory<typeof Button> = args => (
   <Button {...args}>
-    <HangUpIcon /> Leave Room
+    <HangUpIcon />
+    Leave Room
   </Button>
 );
 
@@ -62,4 +63,5 @@ Icon.args = {
   icon: true,
   outlined: false,
   loading: false,
+  css: { alignItems: 'center', display: 'block', flexDirection: 'row' },
 };

@@ -1,4 +1,4 @@
-import React, { ComponentProps, PropsWithChildren } from 'react';
+import React, { ComponentPropsWithRef, ForwardedRef, PropsWithChildren } from 'react';
 import { Box, Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { styled } from '../Theme';
@@ -17,18 +17,18 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
     border: `solid $space$px ${base}`,
     c: '$textHighEmp',
     '&[disabled]': {
-      c: '$colors$textDisabledWhite',
-      bg: '$colors$transparent',
+      c: '$textDisabledWhite',
+      bg: '$transparent',
       border: `solid $space$px ${disabled}`,
       cursor: 'not-allowed',
     },
     '&:not([disabled]):hover': {
       border: `solid $space$px ${hover}`,
-      bg: '$colors$transparent',
+      bg: '$transparent',
     },
     '&:not([disabled]):active': {
       border: `solid $space$px ${active}`,
-      bg: '$colors$transparent',
+      bg: '$transparent',
     },
   };
 };
@@ -36,9 +36,9 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
 const getButtonVariants = (base: string, hover: string, active: string, disabled: string) => {
   return {
     bg: base,
-    c: '$colors$textHighEmp',
+    c: '$textHighEmp',
     '&[disabled]': {
-      c: '$colors$textDisabledWhite',
+      c: '$textDisabledWhite',
       cursor: 'not-allowed',
       bg: disabled,
     },
@@ -107,21 +107,29 @@ const StyledButton = styled('button', {
   },
 });
 
-export const Button: React.FC<PropsWithChildren<{ loading: boolean } & ComponentProps<typeof StyledButton>>> = ({
-  children,
-  loading,
-  ...props
-}) => {
+export interface ButtonLoadingProps {
+  children?: React.ReactNode;
+  loading: boolean;
+}
+
+export type Ref = HTMLButtonElement;
+
+export const Button = React.forwardRef<
+  Ref,
+  PropsWithChildren<{ loading: boolean } & ComponentPropsWithRef<typeof StyledButton>>
+>(({ children, loading, ...buttonProps }, ref) => {
   return (
-    <StyledButton {...props}>
+    <StyledButton {...buttonProps} ref={ref}>
       <>
         {loading && (
           <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute' }}>
-            <Loading size={'1.5rem'} />
+            <Loading />
           </Flex>
         )}
-        <Box css={{ visibility: loading ? 'hidden' : 'visible' }}>{children}</Box>
+        <Flex align="center" justify="center" css={{ visibility: loading ? 'hidden' : 'visible' }}>
+          {children}
+        </Flex>
       </>
     </StyledButton>
   );
-};
+});
