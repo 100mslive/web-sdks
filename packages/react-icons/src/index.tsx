@@ -3,6 +3,7 @@ export { default as ArrowRightIcon } from './ArrowRightIcon';
 export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
 export { default as BrbIcon } from './BrbIcon';
+export { default as ChangeRoleIcon } from './ChangeRoleIcon';
 export { default as ChatIcon } from './ChatIcon';
 export { default as ChatUnreadIcon } from './ChatUnreadIcon';
 export { default as CheckIcon } from './CheckIcon';
