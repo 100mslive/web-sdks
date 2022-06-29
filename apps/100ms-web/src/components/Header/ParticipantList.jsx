@@ -1,5 +1,19 @@
 import React, { Fragment, useState } from "react";
 import {
+  selectPeerCount,
+  selectPeerMetadata,
+  selectPermissions,
+  useHMSStore,
+  useParticipants,
+} from "@100mslive/react-sdk";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  HandRaiseIcon,
+  PeopleIcon,
+  SettingIcon,
+} from "@100mslive/react-icons";
+import {
   Dropdown,
   Flex,
   Box,
@@ -9,22 +23,11 @@ import {
   IconButton,
   Tooltip,
 } from "@100mslive/react-ui";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  HandRaiseIcon,
-  PeopleIcon,
-  SettingIcon,
-} from "@100mslive/react-icons";
-import {
-  selectPeerMetadata,
-  selectPermissions,
-  useHMSStore,
-  useParticipants,
-} from "@100mslive/react-sdk";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -123,16 +126,36 @@ export const ParticipantList = () => {
   );
 };
 
-const ParticipantCount = React.memo(({ peerCount }) => {
+export const ParticipantCount = () => {
+  const peerCount = useHMSStore(selectPeerCount);
+  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   return (
-    <>
-      <Box css={{ display: "block", mr: "$2" }}>
-        <PeopleIcon />
-      </Box>
-      <Text variant="md">{peerCount}</Text>
-    </>
+    <IconButton onClick={toggleSidepane}>
+      <PeopleIcon />
+      {peerCount > 0 && (
+        <Flex
+          align="center"
+          justify="center"
+          css={{
+            position: "absolute",
+            top: 0,
+            right: -8,
+            zIndex: 2,
+            transform: "translateY(-50%)",
+            height: "$10",
+            minWidth: "$10",
+            bg: "$surfaceLight",
+            borderRadius: "$4",
+            color: "$textPrimary",
+            fontSize: "$tiny",
+          }}
+        >
+          {peerCount}
+        </Flex>
+      )}
+    </IconButton>
   );
-});
+};
 
 const Participant = ({
   peer,
