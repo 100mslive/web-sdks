@@ -573,7 +573,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async sendHLSTimedMetadata(params?: SendHLSTimedMetadata) {
-    console.log("PARAMS IN TRANSPORT", params);
     if (params) {
       const { metadata, metadataId } = params;
       const hlsMtParams: HLSTimedMetadataParams = {
