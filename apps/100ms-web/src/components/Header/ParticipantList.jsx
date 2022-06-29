@@ -28,7 +28,8 @@ import { ParticipantFilter } from "./ParticipantFilter";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
-  const { participants, isConnected, peerCount } = useParticipants(filter);
+  const { participants, isConnected, peerCount, rolesWithParticipants } =
+    useParticipants(filter);
   const [open, setOpen] = useState(false);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
@@ -83,6 +84,7 @@ export const ParticipantList = () => {
               selection={filter}
               onSelection={setFilter}
               isConnected={isConnected}
+              roles={rolesWithParticipants}
             />
           </Flex>
           {participants.length === 0 && (

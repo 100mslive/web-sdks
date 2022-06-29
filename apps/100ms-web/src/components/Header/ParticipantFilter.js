@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { selectAvailableRoleNames, useHMSStore } from "@100mslive/react-sdk";
 import { Box, Dropdown, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import {
   CheckIcon,
@@ -9,9 +8,13 @@ import {
   PeopleIcon,
 } from "@100mslive/react-icons";
 
-export const ParticipantFilter = ({ selection, onSelection, isConnected }) => {
+export const ParticipantFilter = ({
+  selection,
+  onSelection,
+  isConnected,
+  roles,
+}) => {
   const [open, setOpen] = useState(false);
-  const availableRoles = useHMSStore(selectAvailableRoleNames);
   const selectionValue =
     typeof selection === "object"
       ? selection.role
@@ -67,7 +70,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected }) => {
           isRole={false}
         />
         <Dropdown.ItemSeparator />
-        {availableRoles.map(role => (
+        {roles.map(role => (
           <Item
             key={role}
             selected={selectionValue === role}
