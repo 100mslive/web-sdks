@@ -53,6 +53,7 @@ export const baseConfig = {
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',
+      md: '0 0 8px 0 rgba(0,0,0,0.3)',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
@@ -119,6 +120,7 @@ export const baseConfig = {
       16: '3rem',
       17: '3.5rem',
       18: '4rem',
+      19: '4.25rem',
       20: '5rem',
       24: '6rem',
       28: '7rem',
