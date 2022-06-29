@@ -63,6 +63,7 @@ export { default as SquareMenuIcon } from './SquareMenuIcon';
 export { default as SunWithFace } from './SunWithFace';
 export { default as TextboxIcon } from './TextboxIcon';
 export { default as UploadIcon } from './UploadIcon';
+export { default as VerticalMenuIcon } from './VerticalMenuIcon';
 export { default as VideoConferencing } from './VideoConferencing';
 export { default as VideoOffIcon } from './VideoOffIcon';
 export { default as VideoOnIcon } from './VideoOnIcon';
