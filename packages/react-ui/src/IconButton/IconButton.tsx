@@ -3,12 +3,10 @@ import { flexCenter } from '../utils/styles';
 
 export const IconButton = styled('button', {
   ...flexCenter,
-  width: '$13',
-  height: '$13',
   outline: 'none',
-  border: '1px solid $borderLight',
+  border: 'none',
   padding: '$2',
-  r: '$1',
+  r: '$0',
   cursor: 'pointer',
   backgroundColor: 'transparent',
   color: '$textPrimary',
@@ -36,7 +34,6 @@ export const IconButton = styled('button', {
         '&:not([disabled]):hover': {
           backgroundColor: '$iconBtn',
         },
-        border: 'none',
       },
       true: {
         '&:not([disabled]):hover': {
