@@ -1,17 +1,22 @@
 import React, { Fragment, useCallback, useState } from "react";
 import {
+  selectAudioTrackByPeerID,
+  selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
   selectPermissions,
+  useHMSActions,
   useHMSStore,
   useParticipants,
 } from "@100mslive/react-sdk";
 import {
   CrossIcon,
+  ChangeRoleIcon,
   HandRaiseIcon,
   PeopleIcon,
   SearchIcon,
-  SettingIcon,
+  VerticalMenuIcon,
+  SpeakerIcon,
 } from "@100mslive/react-icons";
 import {
   Flex,
@@ -21,6 +26,8 @@ import {
   textEllipsis,
   IconButton,
   Input,
+  Dropdown,
+  Slider,
 } from "@100mslive/react-ui";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
@@ -34,7 +41,6 @@ export const ParticipantList = () => {
   const { participants, isConnected, peerCount, rolesWithParticipants } =
     useParticipants(filter);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
-  const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
@@ -81,7 +87,6 @@ export const ParticipantList = () => {
               <Participant
                 peer={peer}
                 key={peer.id}
-                canChangeRole={canChangeRole}
                 showActions={isConnected}
                 onParticipantAction={setSelectedPeerId}
               />
@@ -183,22 +188,69 @@ const Participant = ({
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(
-  ({ canChangeRole, onSettings, peerId }) => {
-    const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
-    return (
-      <Flex align="center" css={{ flexShrink: 0 }}>
-        <ConnectionIndicator peerId={peerId} />
-        {isHandRaised && <HandRaiseIcon />}
+const ParticipantActions = React.memo(({ onSettings, peerId }) => {
+  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+  return (
+    <Flex align="center" css={{ flexShrink: 0 }}>
+      <ConnectionIndicator peerId={peerId} />
+      {isHandRaised && <HandRaiseIcon />}
+      <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} />
+    </Flex>
+  );
+});
+
+const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
+  const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
+  const [open, setOpen] = useState(false);
+  return (
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+      <Dropdown.Trigger asChild data-testid="participant_more_actions">
+        <Text>
+          <VerticalMenuIcon />
+        </Text>
+      </Dropdown.Trigger>
+      <Dropdown.Content align="start" sideOffset={8}>
         {canChangeRole && (
-          <IconButton onClick={onSettings}>
-            <SettingIcon />
-          </IconButton>
+          <Dropdown.Item onClick={() => onRoleChange(peerId)}>
+            <ChangeRoleIcon />
+            <Text css={{ ml: "$4" }}>Change Role</Text>
+          </Dropdown.Item>
         )}
-      </Flex>
-    );
+        <ParticipantVolume peerId={peerId} />
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+};
+
+const ParticipantVolume = ({ peerId }) => {
+  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const hmsActions = useHMSActions();
+  if (peerId === localPeerId) {
+    return null;
   }
-);
+
+  return (
+    <Dropdown.Item css={{ h: "auto" }}>
+      <Flex direction="column" css={{ w: "100%" }}>
+        <Flex align="center">
+          <SpeakerIcon />
+          <Text css={{ ml: "$4" }}>
+            Volume{audioTrack.volume ? `(${audioTrack.volume})` : ""}
+          </Text>
+        </Flex>
+        <Slider
+          css={{ my: "0.5rem" }}
+          step={5}
+          value={[audioTrack.volume]}
+          onValueChange={e => {
+            hmsActions.setVolume(e[0], audioTrack?.id);
+          }}
+        />
+      </Flex>
+    </Dropdown.Item>
+  );
+};
 
 const ParticipantSearch = ({ onSearch }) => {
   const [value, setValue] = React.useState("");

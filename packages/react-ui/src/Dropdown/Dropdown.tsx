@@ -31,6 +31,7 @@ const DropdownItem = styled(Item, {
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
+  cursor: 'pointer',
 });
 
 const DropdownItemSeparator = styled(Separator, {
