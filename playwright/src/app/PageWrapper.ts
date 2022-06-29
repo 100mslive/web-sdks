@@ -94,7 +94,6 @@ export class PageWrapper {
   async sendText(elementId: string, text: string) {
     await this.page.locator(elementId).fill(text);
     console.log('Text sent: ', text, 'to element', elementId);
-    await this.pressKey('Enter');
   }
 
   async hasText(elementId: string, text: string) {
@@ -218,6 +217,7 @@ export class PageWrapper {
       await this.selectPeerOrRole(to);
       await this.sendText(this.footer.chat_placeholder,msg);
       }
+      await this.pressKey('Enter');
     }
 
    /**

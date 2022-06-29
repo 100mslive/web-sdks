@@ -8,6 +8,7 @@ import { sleep } from '../utils/timer-utils';
 export class NetworkTestManager {
   private TAG = 'NetworkTestManager';
   private controller = new AbortController();
+  private score?: number;
   constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
 
   start = async (networkHealth: NetworkHealth) => {
@@ -53,7 +54,7 @@ export class NetworkTestManager {
         })
         .catch(error => {
           HMSLogger.e(this.TAG, error);
-          this.listener?.onNetworkQuality?.(0);
+          this.updateScoreToListener(0);
           this.eventBus.analytics.publish(
             AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
           );
@@ -61,7 +62,7 @@ export class NetworkTestManager {
     } catch (error) {
       HMSLogger.e(this.TAG, error);
       if ((error as Error).name !== 'AbortError') {
-        this.listener?.onNetworkQuality?.(0);
+        this.updateScoreToListener(0);
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
         );
@@ -96,11 +97,19 @@ export class NetworkTestManager {
         calculatedScore = Number(score);
       }
     }
-    this.listener?.onNetworkQuality?.(calculatedScore);
+    this.updateScoreToListener(calculatedScore);
     if (finished) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.previewNetworkQuality({ score: calculatedScore, downLink: bitrate.toFixed(2) }),
       );
     }
   };
+
+  private updateScoreToListener(newQualityScore: number) {
+    if (newQualityScore === this.score) {
+      return;
+    }
+    this.score = newQualityScore;
+    this.listener?.onNetworkQuality?.(newQualityScore);
+  }
 }

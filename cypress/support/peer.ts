@@ -2,7 +2,7 @@ import {
   HMSReactiveStore,
   selectIsConnectedToRoom,
   selectLocalAudioTrackID,
-  selectLocalPeer,
+  selectLocalPeerID,
   selectLocalVideoTrackID,
   selectPeerByID,
   selectRoleByRoleName,
@@ -42,7 +42,7 @@ export class CypressPeer {
   }
 
   get id() {
-    return this.store.getState(selectLocalPeer)?.id;
+    return this.store.getState(selectLocalPeerID);
   }
 
   get sdkPeer() {
