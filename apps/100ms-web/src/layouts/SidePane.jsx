@@ -17,12 +17,10 @@ const SidePane = () => {
     return null;
   }
   return (
-
     <Box
       css={{ flex: "0 0 $space$100", p: "$10", bg: "$surfaceDefault", r: "$1" }}
     >
       <ViewComponent />
-
     </Box>
   );
 };
