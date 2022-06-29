@@ -24,6 +24,7 @@ export { default as ExternalLinkIcon } from './ExternalLinkIcon';
 export { default as EyeCloseIcon } from './EyeCloseIcon';
 export { default as EyeOpenIcon } from './EyeOpenIcon';
 export { default as GlobeIcon } from './GlobeIcon';
+export { default as GoLiveIcon } from './GoLiveIcon';
 export { default as GridIcon } from './GridIcon';
 export { default as HamburgerMenuIcon } from './HamburgerMenuIcon';
 export { default as HandIcon } from './HandIcon';
