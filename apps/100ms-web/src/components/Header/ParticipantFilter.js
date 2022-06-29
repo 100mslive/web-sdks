@@ -16,11 +16,7 @@ export const ParticipantFilter = ({
 }) => {
   const [open, setOpen] = useState(false);
   const selectionValue =
-    typeof selection === "object"
-      ? selection.role
-      : selection === "isHandRaise"
-      ? "Raised Hand"
-      : selection;
+    selection?.role || (selection?.metadata?.isHandRaised ? "Raised Hand" : "");
   const onItemClick = useCallback(value => {
     onSelection(value);
     setOpen(false);
@@ -59,15 +55,13 @@ export const ParticipantFilter = ({
           title="Everyone"
           onSelection={onItemClick}
           icon={<PeopleIcon />}
-          isRole={false}
         />
         <Item
           selected={selection === "isHandRaise"}
           title="Raised Hand"
-          value="isHandRaise"
           onSelection={onItemClick}
           icon={<HandRaiseIcon />}
-          isRole={false}
+          value={{ metadata: { isHandRaised: true }, role: "" }}
         />
         <Dropdown.ItemSeparator />
         {roles.map(role => (
@@ -75,7 +69,7 @@ export const ParticipantFilter = ({
             key={role}
             selected={selectionValue === role}
             title={role}
-            value={role}
+            value={{ metadata: { isHandRaised: false }, role }}
             onSelection={onItemClick}
           />
         ))}
@@ -84,12 +78,12 @@ export const ParticipantFilter = ({
   );
 };
 
-const Item = ({ selected, title, onSelection, value, icon, isRole = true }) => {
+const Item = ({ selected, title, onSelection, value, icon }) => {
   return (
     <Flex
       align="center"
       css={{ w: "100%", p: "$4 $8", cursor: "pointer" }}
-      onClick={() => onSelection(isRole ? { role: value } : value)}
+      onClick={() => onSelection(value)}
     >
       {icon && <Text css={{ mr: "$2" }}>{icon}</Text>}
       <Text css={{ flex: "1 1 0" }}>{title}</Text>

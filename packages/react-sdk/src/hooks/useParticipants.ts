@@ -17,7 +17,7 @@ export interface useParticipantsResult {
   rolesWithParticipants: HMSRoleName[];
 }
 
-export type useParticipantsParams = 'isHandRaise' | { role: HMSRoleName };
+export type useParticipantsParams = { role: HMSRoleName; metadata: { isHandRaised: boolean } };
 export const useParticipants = (params?: useParticipantsParams) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
@@ -25,12 +25,12 @@ export const useParticipants = (params?: useParticipantsParams) => {
   let participantList = useHMSStore(isConnected ? selectPeers : selectRemotePeers);
   const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName)));
   const vanillaStore = useHMSVanillaStore();
-  if (params === 'isHandRaise') {
+  if (params?.metadata?.isHandRaised) {
     participantList = participantList.filter(peer => {
       return vanillaStore.getState(selectPeerMetadata(peer.id)).isHandRaised;
     });
   }
-  if (typeof params === 'object' && availableRoles.includes(params.role)) {
+  if (params?.role && availableRoles.includes(params.role)) {
     participantList = participantList.filter(peer => peer.roleName === params.role);
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
