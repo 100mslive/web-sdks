@@ -20,7 +20,7 @@ const SidePane = () => {
   if (!sidepane) {
     return null;
   }
-  return <Box css={{ flex: "0 0 33.3%" }}>{renderComponent()}</Box>;
+  return <Box css={{ flexBasis: "$100" }}>{renderComponent()}</Box>;
 };
 
 export default SidePane;
