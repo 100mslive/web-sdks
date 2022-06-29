@@ -62,7 +62,7 @@ export const ParticipantFilter = ({
           icon={<PeopleIcon />}
         />
         <Item
-          selected={selection === "isHandRaise"}
+          selected={selection?.metadata?.isHandRaised}
           title="Raised Hand"
           onSelection={onItemClick}
           icon={<HandRaiseIcon />}

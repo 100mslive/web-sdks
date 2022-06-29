@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useCallback, useState } from "react";
 import {
   selectPeerCount,
   selectPeerMetadata,
@@ -10,6 +10,7 @@ import {
   CrossIcon,
   HandRaiseIcon,
   PeopleIcon,
+  SearchIcon,
   SettingIcon,
 } from "@100mslive/react-icons";
 import {
@@ -19,12 +20,14 @@ import {
   Avatar,
   textEllipsis,
   IconButton,
+  Input,
 } from "@100mslive/react-ui";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import { useDebounce } from "react-use";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -33,6 +36,16 @@ export const ParticipantList = () => {
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const onSearch = useCallback(value => {
+    console.error("search", value);
+    setFilter(filterValue => {
+      if (!filterValue) {
+        filterValue = {};
+      }
+      filterValue.search = value;
+      return { ...filterValue };
+    });
+  }, []);
   if (peerCount === 0) {
     return null;
   }
@@ -55,6 +68,7 @@ export const ParticipantList = () => {
             <CrossIcon />
           </IconButton>
         </Flex>
+        <ParticipantSearch onSearch={onSearch} />
         {participants.length === 0 && (
           <Flex align="center" justify="center" css={{ w: "100%", p: "$8 0" }}>
             <Text variant="sm">
@@ -186,3 +200,36 @@ const ParticipantActions = React.memo(
     );
   }
 );
+
+const ParticipantSearch = ({ onSearch }) => {
+  const [value, setValue] = React.useState("");
+  useDebounce(
+    () => {
+      onSearch(value);
+    },
+    300,
+    [value, onSearch]
+  );
+  return (
+    <Box css={{ p: "$4 0", my: "$8", position: "relative" }}>
+      <Box
+        css={{
+          position: "absolute",
+          left: "$4",
+          top: "$2",
+          transform: "translateY(50%)",
+          color: "$textMedEmp",
+        }}
+      >
+        <SearchIcon />
+      </Box>
+      <Input
+        type="text"
+        placeholder="Find what you are looking for"
+        css={{ w: "100%", pl: "$14" }}
+        value={value}
+        onChange={event => setValue(event.currentTarget.value)}
+      />
+    </Box>
+  );
+};
