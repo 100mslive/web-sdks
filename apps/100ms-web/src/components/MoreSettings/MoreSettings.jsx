@@ -85,7 +85,7 @@ export const MoreSettings = () => {
             onClick={() => setShowSelfRoleChange(true)}
           />
           {(permissions.streaming || permissions.recording) &&
-            (isAllowedToPublish.audio || isAllowedToPublish.video) && ( // TODO: remove this check when permissions are added
+            Object.values(isAllowedToPublish).some(value => !!value) && ( // TODO: remove this check when permissions are added
               <Dropdown.Item
                 onClick={() => setShowRecordingModal(true)}
                 css={hoverStyles}
