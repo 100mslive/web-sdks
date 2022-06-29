@@ -7,21 +7,18 @@ import {
   useParticipants,
 } from "@100mslive/react-sdk";
 import {
-  ChevronDownIcon,
-  ChevronUpIcon,
+  CrossIcon,
   HandRaiseIcon,
   PeopleIcon,
   SettingIcon,
 } from "@100mslive/react-icons";
 import {
-  Dropdown,
   Flex,
   Box,
   Text,
   Avatar,
   textEllipsis,
   IconButton,
-  Tooltip,
 } from "@100mslive/react-ui";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
@@ -33,87 +30,48 @@ export const ParticipantList = () => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount, rolesWithParticipants } =
     useParticipants(filter);
-  const [open, setOpen] = useState(false);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
+  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   if (peerCount === 0) {
     return null;
   }
 
   return (
     <Fragment>
-      <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-        <Dropdown.Trigger asChild data-testid="participant_list">
-          <Flex
-            css={{
-              color: "$textPrimary",
-              borderRadius: "$1",
-              border: "1px solid $textDisabled",
-              padding: "$2 $4",
-            }}
-          >
-            <Tooltip title="Participant List">
-              <Flex>
-                <ParticipantCount peerCount={peerCount} />
-                {participants.length > 0 && (
-                  <Box
-                    css={{
-                      ml: "$2",
-                      "@lg": { display: "none" },
-                      color: "$textDisabled",
-                    }}
-                  >
-                    {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                  </Box>
-                )}
-              </Flex>
-            </Tooltip>
-          </Flex>
-        </Dropdown.Trigger>
-        <Dropdown.Content
-          sideOffset={5}
-          align="end"
-          css={{ w: "$72", height: "auto", maxHeight: "$96" }}
+      <Flex align="center" css={{ w: "100%", py: "$4", mb: "$10" }}>
+        <Text css={{ fontWeight: "$semiBold", mr: "$4" }}>Participants</Text>
+        <ParticipantFilter
+          selection={filter}
+          onSelection={setFilter}
+          isConnected={isConnected}
+          roles={rolesWithParticipants}
+        />
+        <IconButton
+          onClick={toggleSidepane}
+          css={{ w: "$11", h: "$11", ml: "auto" }}
         >
-          <Flex
-            align="center"
-            justify="between"
-            css={{ w: "100%", p: "$4 $8" }}
-          >
-            <Text css={{ flex: "1 1 0", fontWeight: "$semiBold" }}>
-              Participants
-            </Text>
-            <ParticipantFilter
-              selection={filter}
-              onSelection={setFilter}
-              isConnected={isConnected}
-              roles={rolesWithParticipants}
-            />
-          </Flex>
-          {participants.length === 0 && (
-            <Flex
-              align="center"
-              justify="center"
-              css={{ w: "100%", p: "$8 0" }}
-            >
-              <Text variant="sm">
-                {!filter ? "No participants" : "No matching participants"}
-              </Text>
-            </Flex>
-          )}
-          {participants.map(peer => {
-            return (
-              <Participant
-                peer={peer}
-                key={peer.id}
-                canChangeRole={canChangeRole}
-                showActions={isConnected}
-                onParticipantAction={setSelectedPeerId}
-              />
-            );
-          })}
-        </Dropdown.Content>
-      </Dropdown.Root>
+          <CrossIcon />
+        </IconButton>
+      </Flex>
+      {participants.length === 0 && (
+        <Flex align="center" justify="center" css={{ w: "100%", p: "$8 0" }}>
+          <Text variant="sm">
+            {!filter ? "No participants" : "No matching participants"}
+          </Text>
+        </Flex>
+      )}
+      {participants.map(peer => {
+        return (
+          <Participant
+            peer={peer}
+            key={peer.id}
+            canChangeRole={canChangeRole}
+            showActions={isConnected}
+            onParticipantAction={setSelectedPeerId}
+          />
+        );
+      })}
       {selectedPeerId && (
         <RoleChangeModal
           peerId={selectedPeerId}
@@ -130,7 +88,7 @@ export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   return (
-    <IconButton onClick={toggleSidepane}>
+    <IconButton onClick={toggleSidepane} data-testid="participant_list">
       <PeopleIcon />
       {peerCount > 0 && (
         <Flex
@@ -164,7 +122,7 @@ const Participant = ({
   onParticipantAction,
 }) => {
   return (
-    <Dropdown.Item
+    <Flex
       key={peer.id}
       css={{ w: "100%", h: "$19" }}
       data-testid={"participant_" + peer.name}
@@ -200,7 +158,7 @@ const Participant = ({
           canChangeRole={canChangeRole}
         />
       )}
-    </Dropdown.Item>
+    </Flex>
   );
 };
 
