@@ -41,6 +41,18 @@ export const ConferenceMainView = () => {
   } = useContext(AppContext);
 
   useEffect(() => {
+    const params = {
+      metadata: [
+        {
+          payload: "hello",
+          duration: 2,
+        },
+      ],
+      metadataId: new Date().getMilliseconds().toString(),
+    };
+    hmsActions.sendHLSTimedMetadata(params);
+  }, []);
+  useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {
       return;

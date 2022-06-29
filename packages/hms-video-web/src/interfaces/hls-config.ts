@@ -31,3 +31,13 @@ export interface HLSMeetingURLVariant {
    */
   metadata?: string;
 }
+
+export interface SendHLSTimedMetadata {
+  metadata: SendHLSTimedMetadataObject[];
+  metadataId: string;
+}
+
+export interface SendHLSTimedMetadataObject {
+  payload: string; // payload string. Max length: 100
+  duration: number; // Duration in seconds
+}

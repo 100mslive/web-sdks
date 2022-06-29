@@ -12,6 +12,7 @@ import {
   UpdatePeerRequestParams,
   HLSRequestParams,
   BroadcastResponse,
+  HLSTimedMetadataParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -293,6 +294,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+  }
+
+  async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
+    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
