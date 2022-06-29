@@ -4,13 +4,14 @@ import { styled } from '../Theme';
 
 const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
-  width: 34,
-  height: 14,
-  backgroundColor: '$bgSecondary',
-  borderRadius: '9999px',
+  width: '30px',
+  height: '14px',
+  border: 'solid $space$px $secondaryDefault',
+  borderRadius: '$3',
+  p: '$2',
   position: 'relative',
   cursor: 'pointer',
-  '&[data-state="checked"]': { backgroundColor: '$bgPrimary' },
+  '&[data-state="checked"]': { backgroundColor: '$primaryDefault', border: 'solid $space$px $primaryDefault' },
   '&:focus': {
     outline: 'none',
   },
@@ -22,17 +23,17 @@ const SwitchRoot = styled(BaseSwitch.Root, {
 
 const SwitchThumb = styled(BaseSwitch.Thumb, {
   display: 'block',
+  top: '3px',
+
   position: 'absolute',
-  top: -3,
-  left: -3,
-  width: 20,
-  height: 20,
-  backgroundColor: '$grayDefault',
+  width: '$md',
+  height: '$md',
+  backgroundColor: '$secondaryDefault',
   borderRadius: '$round',
   transition: 'transform 100ms',
-  transform: 'translateX(2px)',
+  transform: 'translateX(0.5px)',
   willChange: 'transform',
-  '&[data-state="checked"]': { transform: 'translateX(18px)', backgroundColor: '$brandDefault' },
+  '&[data-state="checked"]': { transform: 'translateX(14px)', backgroundColor: '$textHighEmp' },
 });
 
 type SwitchProps = React.ComponentProps<typeof SwitchRoot>;

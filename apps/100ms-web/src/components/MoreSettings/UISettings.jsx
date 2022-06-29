@@ -7,6 +7,7 @@ import {
   Label,
   Slider,
   Text,
+  Switch,
   Box,
   HorizontalDivider,
 } from "@100mslive/react-ui";
@@ -167,6 +168,7 @@ export const UISettings = ({ open, onOpenChange }) => {
                 }}
                 css={{ w: "70%" }}
               />
+              <Switch />
             </Flex>
           </Flex>
         </DialogRow>
