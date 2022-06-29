@@ -39,6 +39,9 @@ const hoverStyles = {
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const isPublishingAnything = Object.values(isAllowedToPublish).some(
+    value => !!value
+  );
   const localPeerId = useHMSStore(selectLocalPeerID);
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
@@ -85,7 +88,7 @@ export const MoreSettings = () => {
             onClick={() => setShowSelfRoleChange(true)}
           />
           {(permissions.streaming || permissions.recording) &&
-            Object.values(isAllowedToPublish).some(value => !!value) && ( // TODO: remove this check when permissions are added
+            isPublishingAnything && ( // TODO: remove this check when permissions are added
               <Dropdown.Item
                 onClick={() => setShowRecordingModal(true)}
                 css={hoverStyles}
