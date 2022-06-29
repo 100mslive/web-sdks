@@ -52,6 +52,7 @@ export { default as PoorConnectivityIcon } from './PoorConnectivityIcon';
 export { default as PrevIcon } from './PrevIcon';
 export { default as RecordIcon } from './RecordIcon';
 export { default as RemoveUserIcon } from './RemoveUserIcon';
+export { default as SearchIcon } from './SearchIcon';
 export { default as SendIcon } from './SendIcon';
 export { default as SettingIcon } from './SettingIcon';
 export { default as ShareScreenIcon } from './ShareScreenIcon';
