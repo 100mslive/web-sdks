@@ -7,18 +7,18 @@ import {
 import { useCallback } from "react";
 import { APP_DATA } from "../../common/constants";
 
-export const useSidepaneState = () => {
+export const useSidepaneState = sidepaneType => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
-  return sidepane;
+  return sidepaneType && sidepane === sidepaneType;
 };
 
-export const useSidepaneToggle = option => {
+export const useSidepaneToggle = sidepaneType => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const toggleSidepane = useCallback(() => {
     const isOpen =
-      vanillaStore.getState(selectAppData(APP_DATA.sidePane)) === option;
-    hmsActions.setAppData(APP_DATA.sidePane, !isOpen ? option : "", true);
-  }, [vanillaStore, hmsActions, option]);
+      vanillaStore.getState(selectAppData(APP_DATA.sidePane)) === sidepaneType;
+    hmsActions.setAppData(APP_DATA.sidePane, !isOpen ? sidepaneType : "");
+  }, [vanillaStore, hmsActions, sidepaneType]);
   return toggleSidepane;
 };
