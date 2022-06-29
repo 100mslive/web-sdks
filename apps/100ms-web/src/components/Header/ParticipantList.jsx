@@ -37,7 +37,6 @@ export const ParticipantList = () => {
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
-    console.error("search", value);
     setFilter(filterValue => {
       if (!filterValue) {
         filterValue = {};
