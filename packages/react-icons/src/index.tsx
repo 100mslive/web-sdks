@@ -12,6 +12,7 @@ export { default as ChevronRightIcon } from './ChevronRightIcon';
 export { default as ChevronUpIcon } from './ChevronUpIcon';
 export { default as ClosedCaptionIcon } from './ClosedCaptionIcon';
 export { default as CodeIcon } from './CodeIcon';
+export { default as ColoredHandIcon } from './ColoredHandIcon';
 export { default as ComputerIcon } from './ComputerIcon';
 export { default as ConnectivityIcon } from './ConnectivityIcon';
 export { default as CopyIcon } from './CopyIcon';
