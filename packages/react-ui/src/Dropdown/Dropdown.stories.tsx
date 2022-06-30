@@ -61,10 +61,10 @@ const Template = () => {
             </Dropdown.Label>
             {participants.map((peer, i) => (
               <Dropdown.Item
-                css={{ display: 'flex', justifyContent: 'space-between' }}
+                css={{ justifyContent: 'space-between' }}
                 data-testid={'participant_' + i}
               >
-                <Box css={{ display: 'flex' }}>
+                <Flex>
                   <Box css={{ width: '$16' }}>
                     <Avatar
                       name={peer.name}
@@ -84,7 +84,7 @@ const Template = () => {
                       {peer.roleName}
                     </Text>
                   </Flex>
-                </Box>
+                </Flex>
               </Dropdown.Item>
             ))}
           </Dropdown.Group>
