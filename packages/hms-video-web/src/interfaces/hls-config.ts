@@ -1,4 +1,4 @@
-import { HLSTimedMetadata } from "../signal/interfaces";
+import { HLSTimedMetadata } from '../signal/interfaces';
 
 export interface HLSConfig {
   /**
