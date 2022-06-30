@@ -88,6 +88,10 @@ const App = () => {
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
+    if (!code) {
+      LogRocket.track('roomIdNull', window.location.pathname);
+      return;
+    }
     const jwt = getAuthInfo().token;
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
     const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
