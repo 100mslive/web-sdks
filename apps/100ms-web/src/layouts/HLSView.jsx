@@ -21,8 +21,8 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import { ChatView } from "../components/chatView";
-import { FeatureFlags } from "../services/FeatureFlags";
 import { useIsChatOpen } from "../components/AppData/useChatState";
+import { HLSController } from "../controllers/hls/HLSController";
 
 const HLSVideo = styled("video", {
   h: "100%",
@@ -43,11 +43,10 @@ const HLSView = () => {
   useEffect(() => {
     if (videoRef.current && hlsUrl && !hls) {
       if (Hls.isSupported()) {
-        hls = new Hls(getHLSConfig());
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(videoRef.current);
-
+        const hlsController = new HLSController(hlsUrl, videoRef);
+        hls = hlsController.getHlsInstance();
         hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
+          console.log("MANIFEST LOADED ONCE 1");
           setAvailableLevels(data.levels);
           setCurrentSelectedQualityText("Auto");
         });
@@ -218,19 +217,5 @@ const HLSView = () => {
     </Fragment>
   );
 };
-
-function getHLSConfig() {
-  if (FeatureFlags.optimiseHLSLatency()) {
-    // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
-    return {
-      enableWorker: true,
-      liveSyncDuration: 1,
-      liveMaxLatencyDuration: 5,
-      liveDurationInfinity: true,
-      highBufferWatchdogPeriod: 1,
-    };
-  }
-  return {};
-}
 
 export default HLSView;
