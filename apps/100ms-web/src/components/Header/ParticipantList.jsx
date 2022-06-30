@@ -73,7 +73,9 @@ export const ParticipantList = () => {
             <CrossIcon />
           </IconButton>
         </Flex>
-        <ParticipantSearch onSearch={onSearch} />
+        {!filter?.search && participants.length === 0 ? null : (
+          <ParticipantSearch onSearch={onSearch} />
+        )}
         {participants.length === 0 && (
           <Flex align="center" justify="center" css={{ w: "100%", p: "$8 0" }}>
             <Text variant="sm">
