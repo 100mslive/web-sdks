@@ -20,6 +20,7 @@ export class HLSController {
     return this.hls;
   }
   registerEvents() {
+    console.log("registering events in HLS controller");
     /**
      * Everytime a fragment is appended to the buffer,
      * we parse the tags and see if the metadata is
@@ -42,8 +43,8 @@ export class HLSController {
       const tagList = frag?.tagList;
 
       const tagsMap = parseTagsList(tagList);
-      const metadataString = tagsMap.rawTags["EXT-X-DATERANGE"];
-      if (metadataString) {
+      const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
+      if (metadataStrings.length > 0) {
         console.log(
           `%c fragment ${data.frag.relurl} containing Metadata added to buffer`,
           "background: #d9ed92; color: #184e77"
