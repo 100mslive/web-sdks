@@ -11,14 +11,14 @@ export function parseTagsList(tagList) {
       tagMap[tags[0]] = [removeQuotes(tags[1])];
     }
   }
-
-  return {
+  const result = {
     rawTags: {
       ...tagMap,
     },
-    duration: Number(tagMap["INF"]),
-    fragmentStartAt: parseISOString(tagMap["PROGRAM-DATE-TIME"]),
+    duration: Number(tagMap["INF"][0]),
+    fragmentStartAt: parseISOString(tagMap["PROGRAM-DATE-TIME"][0]),
   };
+  return result;
 }
 
 export function parseMetadataString(mtStr) {
@@ -48,4 +48,12 @@ export function getSecondsFromTime(time) {
 export function parseISOString(s) {
   var b = s.split(/\D+/);
   return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+}
+
+export function isMetadataAlreadyInTimeTable(fragsTimeStamps, tagMetadata) {
+  const alreadyExistingmetadata = fragsTimeStamps.filter(
+    fragsTimeStamp => fragsTimeStamp.id === tagMetadata.id
+  );
+
+  return !!alreadyExistingmetadata.length;
 }

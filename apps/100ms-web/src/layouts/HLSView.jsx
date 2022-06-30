@@ -23,6 +23,8 @@ import {
 import { ChatView } from "../components/chatView";
 import { useIsChatOpen } from "../components/AppData/useChatState";
 import { HLSController } from "../controllers/hls/HLSController";
+import { HLSEvent } from "../controllers/hls/HLSEvent";
+import { ToastManager } from "../components/Toast/ToastManager";
 
 const HLSVideo = styled("video", {
   h: "100%",
@@ -44,9 +46,16 @@ const HLSView = () => {
     if (videoRef.current && hlsUrl && !hls) {
       if (Hls.isSupported()) {
         const hlsController = new HLSController(hlsUrl, videoRef);
+
+        hlsController.on(HLSEvent.HLS_TIMED_METADATA_LOADED, payload => {
+          ToastManager.addToast({
+            title: `Payload shown ${payload}`,
+          });
+          window.sendConfetti();
+        });
+
         hls = hlsController.getHlsInstance();
         hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
-          console.log("MANIFEST LOADED ONCE 1");
           setAvailableLevels(data.levels);
           setCurrentSelectedQualityText("Auto");
         });
