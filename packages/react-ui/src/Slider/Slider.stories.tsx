@@ -1,8 +1,10 @@
-import { ComponentMeta } from '@storybook/react';
-import { Slider } from './Slider';
 import React from 'react';
 
+import { ComponentMeta } from '@storybook/react';
+
 import { Box } from '@100mslive/react-ui';
+
+import { Slider } from './Slider';
 
 export default {
   title: 'UI Components/Slider',
@@ -12,13 +14,8 @@ export default {
 const Template = () => {
   const [volume, setVolume] = React.useState<number>(25);
   return (
-    <Box css={{width: "$80"}}>
-    <Slider
-      defaultValue={[25]} 
-      step={1} 
-      value={[volume]}
-      onValueChange={e => setVolume(e[0])}
-    />
+    <Box css={{ width: '$80' }}>
+      <Slider defaultValue={[25]} step={1} value={[volume]} onValueChange={e => setVolume(e[0])} />
     </Box>
   );
 };
