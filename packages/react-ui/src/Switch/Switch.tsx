@@ -24,7 +24,6 @@ const SwitchRoot = styled(BaseSwitch.Root, {
 const SwitchThumb = styled(BaseSwitch.Thumb, {
   display: 'block',
   top: '3px',
-
   position: 'absolute',
   width: '$md',
   height: '$md',
