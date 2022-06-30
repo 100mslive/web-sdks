@@ -5,10 +5,11 @@ export function removeQuotes(str) {
 export function parseTagsList(tagList) {
   const tagMap = {};
   for (const tags of tagList) {
-    if(tagMap[tags[0]]) {
-      tagMap[tags[0]].push(removeQoutes)
+    if (tagMap[tags[0]]) {
+      tagMap[tags[0]].push(removeQuotes(tags[1]));
+    } else {
+      tagMap[tags[0]] = [removeQuotes(tags[1])];
     }
-    tagMap[tags[0]] = removeQuotes(tags[1]);
   }
 
   return {
