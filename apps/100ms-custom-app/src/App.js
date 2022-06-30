@@ -26,7 +26,7 @@ const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 const App = () => {
   const prevSavedSettings = useRef({});
   const appInfo = useRef({ app_type: '', app_name: '' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -49,9 +49,11 @@ const App = () => {
   });
 
   useEffect(() => {
-    fetchData();
+    const code = getRoomCodeFromUrl();
+    if (code) {
+      fetchData();
+    }
   }, []);
-
   useEffect(() => {
     setUpdateMetadataOnWindow();
   }, [settings]); //eslint-disable-line
@@ -88,10 +90,6 @@ const App = () => {
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
-    if (!code) {
-      LogRocket.track('roomIdNull', window.location.pathname);
-      return;
-    }
     const jwt = getAuthInfo().token;
     axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
     const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
@@ -127,12 +125,11 @@ const App = () => {
       });
   };
 
-  const fetchData = async () => {
+  const fetchData = async roomId => {
     const jwt = getAuthInfo().token;
+    const code = getRoomCodeFromUrl();
     axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    const url = `${
-      process.env.REACT_APP_BACKEND_API
-    }apps/get-details?domain=${hostname}&room_id=${getRoomCodeFromUrl()}`;
+    const url = `${process.env.REACT_APP_BACKEND_API}apps/get-details?domain=${hostname}&room_id=${roomId || code}`;
     const headers = {};
     if (jwt) {
       headers['Authorization'] = `Bearer ${jwt}`;
@@ -280,6 +277,7 @@ const App = () => {
               recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
+            getDetails={fetchData}
           />
         </Suspense>
       )}
