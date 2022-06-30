@@ -1,4 +1,6 @@
+import { Box } from '../Layout';
 import { styled } from '../Theme';
+import { flexCenter } from '../utils';
 
 export const Root = styled('div', {
   padding: '0.75rem',
@@ -47,13 +49,6 @@ const Info = styled('div', {
   fontFamily: '$sans',
 });
 
-const AvatarContainer = styled('div', {
-  position: 'absolute',
-  left: '50%',
-  top: '50%',
-  transform: 'translateX(-50%) translateY(-50%)',
-});
-
 const AttributeBox = styled('div', {
   position: 'absolute',
   color: '$textPrimary',
@@ -91,6 +86,21 @@ const FullScreenButton = styled('button', {
   '&:not([disabled]):focus': {
     outline: 'none',
     boxShadow: '0 0 0 3px $colors$brandLight',
+  },
+});
+
+const AvatarContainer = styled(Box, {
+  ...flexCenter,
+  flexDirection: 'column',
+  position: 'absolute',
+  left: '50%',
+  top: '50%',
+  transform: 'translateX(-50%) translateY(-50%)',
+  width: '100%',
+  height: '100%',
+  '& > * + *': {
+    marginBottom: '0',
+    marginTop: '$4',
   },
 });
 
