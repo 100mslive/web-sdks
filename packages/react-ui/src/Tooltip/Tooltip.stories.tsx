@@ -22,16 +22,16 @@ ExampleWithString.args = {
   title: 'hi',
 };
 
-const TooltipStorywithReactNode = (args: any, title: ReactNode) => {
+const Example = () => {
+  return <h1>Hi</h1>;
+};
+
+const TooltipStorywithReactNode = () => {
   return (
-    <Tooltip title={<div dangerouslySetInnerHTML={{ _html: title }} />} {...args}>
+    <Tooltip title={<Example />}>
       <span>Hover to see Tooltip</span>
     </Tooltip>
   );
 };
 
 export const ExampleWithReactNode = TooltipStorywithReactNode.bind({});
-
-ExampleWithReactNode.args = {
-  title: 'Hello',
-};
