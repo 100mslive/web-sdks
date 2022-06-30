@@ -28,6 +28,7 @@ export const baseConfig = {
       grayLight: '#B0C3DB',
       grayDefault: '#657080',
       grayDark: '#303740',
+      secondaryGray: '#242A33',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
       textHighEmp: 'rgba(245, 249, 255, 0.95)',
