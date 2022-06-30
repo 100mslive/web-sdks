@@ -1,12 +1,19 @@
-import React, { useContext } from "react";
+import React, { Fragment, useContext } from "react";
 import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeerRoleName,
   selectIsConnectedToRoom,
   selectIsAllowedToPublish,
+  useRecordingStreaming,
+  useHMSActions,
 } from "@100mslive/react-sdk";
-import { SpeakerIcon, GoLiveIcon } from "@100mslive/react-icons";
+import {
+  SpeakerIcon,
+  GoLiveIcon,
+  EndStreamIcon,
+  RecordIcon,
+} from "@100mslive/react-icons";
 import {
   Flex,
   Text,
@@ -14,9 +21,9 @@ import {
   Box,
   styled,
   Button,
+  Tooltip,
 } from "@100mslive/react-ui";
 import { ParticipantList } from "./ParticipantList";
-import { AdditionalRoomState } from "./AdditionalRoomState";
 import PIPComponent from "../PIP/PIPComponent";
 import { AppContext } from "../context/AppContext";
 import { useSidepaneToggle } from "../AppData/useSidepane";
@@ -61,6 +68,39 @@ const Logo = () => {
   return <LogoImg src={logo} alt="Brand Logo" width={132} height={40} />;
 };
 
+const EndStream = () => {
+  const { isHLSRecordingOn, isHLSRunning } = useRecordingStreaming();
+  const hmsActions = useHMSActions();
+  if (!isHLSRunning) {
+    return null;
+  }
+  return (
+    <Flex align="center">
+      <Flex align="center">
+        {isHLSRecordingOn && (
+          <Tooltip title="HLS Recording on">
+            <Text css={{ color: "$error" }}>
+              <RecordIcon width={16} height={16} />
+            </Text>
+          </Tooltip>
+        )}
+        <Text css={{ ml: "$2" }}>Live with HLS</Text>
+      </Flex>
+      <Button
+        variant="standard"
+        icon
+        css={{ mx: "$8" }}
+        onClick={async () => {
+          await hmsActions.stopHLSStreaming();
+        }}
+      >
+        <EndStreamIcon />
+        End Stream
+      </Button>
+    </Flex>
+  );
+};
+
 const GoLive = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -68,7 +108,9 @@ const GoLive = () => {
   const isPublishingAnything = Object.values(isAllowedToPublish).some(
     value => !!value
   );
-  if (!isConnected || !isPublishingAnything) {
+  const { isHLSRunning } = useRecordingStreaming();
+
+  if (!isConnected || !isPublishingAnything || isHLSRunning) {
     return null;
   }
   return (
@@ -76,6 +118,19 @@ const GoLive = () => {
       <GoLiveIcon />
       <Text css={{ mx: "$2" }}>Go Live</Text>
     </Button>
+  );
+};
+
+const StreamActions = () => {
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  if (!isConnected) {
+    return null;
+  }
+  return (
+    <Fragment>
+      <GoLive />
+      <EndStream />
+    </Fragment>
   );
 };
 
@@ -94,8 +149,7 @@ export const Header = ({ isPreview }) => {
       <SpeakerTag />
       <Flex align="center" css={{ position: "absolute", right: "$4" }}>
         {showPip && <PIPComponent />}
-        <AdditionalRoomState />
-        <GoLive />
+        <StreamActions />
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
         </Box>
