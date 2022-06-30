@@ -144,7 +144,7 @@ export function EdtechComponent({
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
   useEffect(() => {
-    getDetails(roomId);
+    getDetails();
   }, [roomId]); //eslint-disable-line
 
   if (!roomId && !role) {

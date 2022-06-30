@@ -124,11 +124,11 @@ const App = () => {
       });
   };
 
-  const fetchData = async roomId => {
+  const fetchData = async () => {
     const jwt = getAuthInfo().token;
     const code = getRoomCodeFromUrl();
     axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}apps/get-details?domain=${hostname}&room_id=${roomId || code}`;
+    const url = `${process.env.REACT_APP_BACKEND_API}apps/get-details?domain=${hostname}&room_id=${code}`;
     const headers = {};
     if (jwt) {
       headers['Authorization'] = `Bearer ${jwt}`;
