@@ -753,12 +753,7 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot send HLS Metadata',
       );
     }
-    try {
-      await this.transport?.sendHLSTimedMetadata(params);
-    } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error, false));
-      throw error;
-    }
+    await this.transport?.sendHLSTimedMetadata(params);
   }
 
   async changeName(name: string) {

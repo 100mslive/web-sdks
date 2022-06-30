@@ -1,3 +1,5 @@
+import { HLSTimedMetadata } from "../signal/interfaces";
+
 export interface HLSConfig {
   /**
    * A list of meeting url which needs to be streamed as HLS feed, only one url is currently supported, all entries
@@ -33,11 +35,6 @@ export interface HLSMeetingURLVariant {
 }
 
 export interface SendHLSTimedMetadata {
-  metadata: SendHLSTimedMetadataObject[];
+  metadata: HLSTimedMetadata[];
   metadataId: string;
-}
-
-export interface SendHLSTimedMetadataObject {
-  payload: string; // payload string. Max length: 100
-  duration: number; // Duration in seconds
 }
