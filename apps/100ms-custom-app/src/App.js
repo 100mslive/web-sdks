@@ -26,7 +26,6 @@ const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
 const App = () => {
   const prevSavedSettings = useRef({});
   const appInfo = useRef({ app_type: '', app_name: '' });
-  const [loading, setLoading] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -157,7 +156,6 @@ const App = () => {
               metadata: prevSettings.metadata,
             },
           };
-          setLoading(false);
           setOnlyEmail(res.data.same_user);
           prevSavedSettings.current = Object.assign({}, prevSettings);
           appInfo.current = { app_name, app_type };
@@ -178,7 +176,6 @@ const App = () => {
             body: 'Please make sure the domain name is right',
           };
         }
-        setLoading(false);
         setError(error);
         console.error(errorMessage);
       });
@@ -229,13 +226,6 @@ const App = () => {
     storeSettings();
   };
 
-  if (loading) {
-    return (
-      <Flex justify="center" align="center" css={{ size: '100%' }}>
-        <Loading size={100} />
-      </Flex>
-    );
-  }
   return (
     <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
       {error && (
@@ -256,7 +246,7 @@ const App = () => {
         </Suspense>
       )}
 
-      {!error && !loading && (
+      {!error && (
         <Suspense
           fallback={
             <Flex justify="center" align="center" css={{ size: '100%' }}>
