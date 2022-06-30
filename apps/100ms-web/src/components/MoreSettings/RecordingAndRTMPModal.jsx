@@ -184,7 +184,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               type="reset"
               css={{ mx: "$4" }}
               onClick={() => startStopRTMPRecordingHLS("stop")}
-              disabled={!isAnythingRunning}
+              // disabled={!isAnythingRunning}
               data-testid="rtmp_recording_stop"
             >
               Stop

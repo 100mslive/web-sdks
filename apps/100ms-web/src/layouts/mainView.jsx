@@ -40,8 +40,11 @@ export const ConferenceMainView = () => {
     showStatsOnTiles,
   } = useContext(AppContext);
 
-  useEffect(() => {
-    const params = {
+  /**
+     * ADDED FOR TESTING PURPROSES FOR QA TEAM.
+     * TODO REMOVE THIS BEFORE MOVING TO PRODUCTION.
+     * param eg:
+     *     const params = {
       metadata: [
         {
           payload: "hello",
@@ -50,8 +53,15 @@ export const ConferenceMainView = () => {
       ],
       metadataId: new Date().getMilliseconds().toString(),
     };
-    hmsActions.sendHLSTimedMetadata(params);
-  }, []);
+     */
+  window.hlsTimedMetadata = params => {
+    if (params) {
+      console.log("SENDING HLS METADATA", params);
+      hmsActions.sendHLSTimedMetadata(params);
+    } else {
+      console.log("NO params given");
+    }
+  };
   useEffect(() => {
     // set list only when room state is connected
     if (roomState !== HMSRoomState.Connected) {
