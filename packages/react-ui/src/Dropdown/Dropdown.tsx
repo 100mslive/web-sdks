@@ -7,7 +7,7 @@ const DropdownTrigger = styled(Trigger, {
   cursor: 'pointer',
   appearance: 'none !important',
   '&[data-state="open"]': {
-    backgroundColor: '$menuBg',
+    backgroundColor: '$surfaceLight',
   },
   '&:focus': {
     outline: 'none',
@@ -24,13 +24,13 @@ const DropdownTriggerItem = styled(TriggerItem, {
 });
 
 const DropdownItem = styled(Item, {
-  h: '$14',
-  w: '100%',
+  h: '$12',
   color: '$textPrimary',
-  p: '$4 $8',
+  p: '$8 $4',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
+  cursor: 'pointer',
 });
 
 const DropdownItemSeparator = styled(Separator, {
@@ -40,17 +40,20 @@ const DropdownItemSeparator = styled(Separator, {
 });
 
 const DropdownContent = styled(Content, {
-  w: '$56',
-  maxHeight: '$56',
-  r: '$2',
-  p: '$4 0',
-  backgroundColor: '$menuBg',
+  w: '$80',
+  maxHeight: '$64',
+  r: '$1',
+  p: '$4',
+  backgroundColor: '$surfaceLight',
   overflowY: 'auto',
 });
 
 const DropdownLabel = styled(Label, {
   display: 'flex',
   alignItems: 'center',
+  h: '$12',
+  w: '100%',
+  p: '$8 $4',
 });
 
 const DropdownGroup = styled(Group, {});
