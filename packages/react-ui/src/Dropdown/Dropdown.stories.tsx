@@ -1,9 +1,8 @@
-import { ComponentMeta } from '@storybook/react';
-import { Dropdown } from './Dropdown';
 import React from 'react';
-
-import { Box, Text, Avatar, textEllipsis, Flex } from '@100mslive/react-ui';
+import { ComponentMeta } from '@storybook/react';
 import { PeopleIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
+import { Box, Text, Avatar, textEllipsis, Flex } from '@100mslive/react-ui';
+import { Dropdown } from './Dropdown';
 
 export default {
   title: 'UI Components/Dropdown',
@@ -60,10 +59,7 @@ const Template = () => {
               </Text>
             </Dropdown.Label>
             {participants.map((peer, i) => (
-              <Dropdown.Item
-                css={{ justifyContent: 'space-between' }}
-                data-testid={'participant_' + i}
-              >
+              <Dropdown.Item css={{ justifyContent: 'space-between' }} data-testid={'participant_' + i}>
                 <Flex>
                   <Box css={{ width: '$16' }}>
                     <Avatar
