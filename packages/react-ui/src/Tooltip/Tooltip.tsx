@@ -29,7 +29,7 @@ const TooltipTrigger = styled(BaseTooltip.Trigger, {
 
 // TODO: refactor this to adjust more props and composing
 // TODO: also handle <kbd></kbd> inputs
-export const Tooltip: React.FC<PropsWithChildren<{ title: string }>> = ({ children, title }) => (
+export const Tooltip: React.FC<PropsWithChildren<{ title: React.ReactNode | string }>> = ({ children, title }) => (
   <BaseTooltip.Root delayDuration={200}>
     <TooltipTrigger asChild>{children}</TooltipTrigger>
     <TooltipBox sideOffset={10} side="top">
