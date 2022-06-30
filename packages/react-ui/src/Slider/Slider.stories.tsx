@@ -1,9 +1,7 @@
 import React from 'react';
 
 import { ComponentMeta } from '@storybook/react';
-
 import { Box } from '@100mslive/react-ui';
-
 import { Slider } from './Slider';
 
 export default {
