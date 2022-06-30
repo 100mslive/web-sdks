@@ -93,6 +93,7 @@ export const baseConfig = {
       '1': '0.5rem',
       '2': '0.75rem',
       '3': '1rem',
+      '4': '1.5rem',
       round: '100rem',
     },
     space: {
@@ -137,6 +138,7 @@ export const baseConfig = {
       72: '18rem',
       80: '20rem',
       96: '24rem',
+      100: '27rem',
     },
     borderWidths: {
       light: '1px',
