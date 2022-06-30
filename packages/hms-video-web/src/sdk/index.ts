@@ -52,7 +52,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig } from '../interfaces/hls-config';
+import { HLSConfig, SendHLSTimedMetadata } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -744,6 +744,16 @@ export class HMSSdk implements HMSInterface {
       this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error, false));
       throw error;
     }
+  }
+
+  async sendHLSTimedMetadata(params?: SendHLSTimedMetadata) {
+    if (!this.localPeer) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        'No local peer present, cannot send HLS Metadata',
+      );
+    }
+    await this.transport?.sendHLSTimedMetadata(params);
   }
 
   async changeName(name: string) {

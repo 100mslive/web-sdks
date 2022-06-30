@@ -58,6 +58,16 @@ export interface HLSRequestParams {
   };
 }
 
+export interface HLSTimedMetadataParams {
+  metadata_objs: HLSTimedMetadata[]; // Currently only 3 objects can be sent
+  metadata_id: string; // Used for dedup checks etc by beam. Currently no-op.
+}
+
+export interface HLSTimedMetadata {
+  payload: string; // payload string. Max length: 100
+  duration: number; // Duration in seconds
+}
+
 export interface HLSVariant {
   meeting_url: string;
   metadata?: string;
