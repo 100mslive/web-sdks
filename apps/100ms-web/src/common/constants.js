@@ -120,7 +120,7 @@ export const UI_SETTINGS = {
 export const SIDE_PANE_OPTIONS = {
   PARTICIPANTS: "Participants",
   CHAT: "Chat",
-  HLS: "STREAMING",
+  STREAMING: "STREAMING",
   TILES: "TILES",
   SCREEN_TILES: "SCREEN_TILES",
 };

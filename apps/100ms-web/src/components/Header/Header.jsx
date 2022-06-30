@@ -1,16 +1,29 @@
 import React, { useContext } from "react";
-import { Flex, Text, textEllipsis, Box, styled } from "@100mslive/react-ui";
-import { SpeakerIcon } from "@100mslive/react-icons";
 import {
   useHMSStore,
   selectDominantSpeaker,
   selectLocalPeerRoleName,
+  selectIsConnectedToRoom,
+  selectIsAllowedToPublish,
 } from "@100mslive/react-sdk";
+import { SpeakerIcon, GoLiveIcon } from "@100mslive/react-icons";
+import {
+  Flex,
+  Text,
+  textEllipsis,
+  Box,
+  styled,
+  Button,
+} from "@100mslive/react-ui";
 import { ParticipantList } from "./ParticipantList";
 import { AdditionalRoomState } from "./AdditionalRoomState";
 import PIPComponent from "../PIP/PIPComponent";
 import { AppContext } from "../context/AppContext";
-import { DEFAULT_HLS_VIEWER_ROLE } from "../../common/constants";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import {
+  DEFAULT_HLS_VIEWER_ROLE,
+  SIDE_PANE_OPTIONS,
+} from "../../common/constants";
 
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -48,6 +61,24 @@ const Logo = () => {
   return <LogoImg src={logo} alt="Brand Logo" width={132} height={40} />;
 };
 
+const GoLive = () => {
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const isPublishingAnything = Object.values(isAllowedToPublish).some(
+    value => !!value
+  );
+  if (!isConnected || !isPublishingAnything) {
+    return null;
+  }
+  return (
+    <Button variant="standard" onClick={toggleStreaming} css={{ mx: "$2" }}>
+      <GoLiveIcon />
+      <Text css={{ mx: "$2" }}>Go Live</Text>
+    </Button>
+  );
+};
+
 export const Header = ({ isPreview }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const showPip = localPeerRole !== DEFAULT_HLS_VIEWER_ROLE && !isPreview;
@@ -64,6 +95,7 @@ export const Header = ({ isPreview }) => {
       <Flex align="center" css={{ position: "absolute", right: "$4" }}>
         {showPip && <PIPComponent />}
         <AdditionalRoomState />
+        <GoLive />
         <Box css={{ mx: "$2" }}>
           <ParticipantList />
         </Box>
