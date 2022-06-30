@@ -19,6 +19,7 @@ export { default as CopyIcon } from './CopyIcon';
 export { default as CrossIcon } from './CrossIcon';
 export { default as DownloadIcon } from './DownloadIcon';
 export { default as EditIcon } from './EditIcon';
+export { default as EndStreamIcon } from './EndStreamIcon';
 export { default as ExitIcon } from './ExitIcon';
 export { default as ExpandIcon } from './ExpandIcon';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon';
