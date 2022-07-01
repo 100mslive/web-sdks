@@ -11,7 +11,7 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger, {
   justifyContent: 'center',
   borderRadius: '$2',
   padding: '$8',
-  lineHeight: 1,
+  lineHeight: '$px',
   gap: '$8',
   backgroundColor: '$secondaryDefault',
   color: '$white',
@@ -50,7 +50,7 @@ const StyledLabel = styled(SelectPrimitive.Label, {
 });
 
 const StyledSeparator = styled(SelectPrimitive.Separator, {
-  height: '1px',
+  height: '$px',
   backgroundColor: '$white',
   margin: '$4',
   opacity: 0.4
