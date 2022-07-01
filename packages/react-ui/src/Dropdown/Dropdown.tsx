@@ -18,10 +18,9 @@ const DropdownTrigger = styled(Trigger, {
 });
 
 const DropdownTriggerItem = styled(TriggerItem, {
-  h: '$14',
   w: '100%',
   color: '$textPrimary',
-  p: '$4 $8',
+  p: '$8',
   display: 'flex',
   alignItems: 'center',
 });
