@@ -12,25 +12,32 @@ const DropdownTrigger = styled(Trigger, {
   '&:focus': {
     outline: 'none',
   },
+  '&:focus-visible': {
+    boxShadow: '0 0 0 3px $colors$primaryDefault',
+  },
 });
 
 const DropdownTriggerItem = styled(TriggerItem, {
-  h: '$14',
   w: '100%',
   color: '$textPrimary',
-  p: '$4 $8',
+  p: '$8',
   display: 'flex',
   alignItems: 'center',
 });
 
 const DropdownItem = styled(Item, {
-  h: '$12',
   color: '$textPrimary',
-  p: '$8 $4',
+  p: '$8',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
-  cursor: 'pointer',
+  '&:hover': {
+    cursor: 'pointer',
+    bg: '$surfaceLighter',
+  },
+  '&:focus-visible': {
+    bg: '$surfaceLighter',
+  },
 });
 
 const DropdownItemSeparator = styled(Separator, {
@@ -43,7 +50,7 @@ const DropdownContent = styled(Content, {
   w: '$80',
   maxHeight: '$64',
   r: '$1',
-  p: '$4',
+  py: '$4',
   backgroundColor: '$surfaceLight',
   overflowY: 'auto',
 });
