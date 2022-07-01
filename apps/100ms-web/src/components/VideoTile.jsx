@@ -6,6 +6,7 @@ import {
   VideoTileStats,
   useBorderAudioLevel,
   Text,
+  textEllipsis,
 } from "@100mslive/react-ui";
 import {
   useHMSStore,
@@ -95,16 +96,21 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               />
             ) : null}
             {(!isHeadless ||
-              (isHeadless && !appConfig?.headlessConfig?.hideTileName)) && (
-              <Text variant="body2" data-testid="participant_name_onTile">
-                {label}
-              </Text>
-            )}
+              (isHeadless && !appConfig?.headlessConfig?.hideTileName)) &&
+              isVideoMuted && (
+                <Text
+                  variant="body2"
+                  css={{ ...textEllipsis("75%") }}
+                  data-testid="participant_name_onTile"
+                >
+                  {label}
+                </Text>
+              )}
           </StyledVideoTile.AvatarContainer>
 
           {showAudioMuted({ appConfig, isHeadless, isAudioMuted }) ? (
             <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
-              <MicOffIcon />
+              <MicOffIcon height={20} />
             </StyledVideoTile.AudioIndicator>
           ) : null}
           {isMouseHovered && !isHeadless && !isLocal ? (
@@ -121,7 +127,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
   );
 };
 
-const metaStyles = { left: "20px", bottom: "20px" };
+const metaStyles = { top: "$4", left: "$4" };
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));

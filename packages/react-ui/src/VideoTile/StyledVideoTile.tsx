@@ -18,7 +18,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$tileBg',
+  background: '$surfaceDefault',
   variants: {
     transparentBg: {
       true: {
@@ -56,14 +56,13 @@ const AttributeBox = styled('div', {
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  bottom: '20px',
+  top: '$2',
+  right: '$2',
   color: '$white',
-  bg: '$error',
+  bg: '$black',
   borderRadius: '$round',
-  width: '28px',
-  height: '28px',
+  width: '30px',
+  height: '30px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
