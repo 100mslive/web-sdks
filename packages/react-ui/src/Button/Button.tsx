@@ -1,5 +1,5 @@
-import React, { ComponentPropsWithRef, ForwardedRef, PropsWithChildren } from 'react';
-import { Box, Flex } from '../Layout';
+import React, { ComponentPropsWithRef, PropsWithChildren } from 'react';
+import { Flex } from '../Layout';
 import { Loading } from '../Loading';
 import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
@@ -104,13 +104,6 @@ const StyledButton = styled('button', {
     variant: 'primary',
   },
 });
-
-export interface ButtonLoadingProps {
-  children?: React.ReactNode;
-  loading: boolean;
-}
-
-export type Ref = HTMLButtonElement;
 
 export const Button = React.forwardRef<
   Ref,
