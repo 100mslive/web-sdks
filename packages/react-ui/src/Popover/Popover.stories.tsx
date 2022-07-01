@@ -27,10 +27,10 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Popover.Root> = args => (
-  <Flex>
+  <Flex css={{ w: '$80' }} justify="center">
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button variant="primary" css={{ aspectRatio: 1, r: '$round' }}>
+        <Button variant="standard" css={{ aspectRatio: 1, r: '$round', p: '$2 $2' }}>
           <Tooltip title="Leave Room">
             <Box css={{ w: '$10', h: '$10' }}>
               <ExpandIcon></ExpandIcon>
@@ -38,7 +38,7 @@ const Template: ComponentStory<typeof Popover.Root> = args => (
           </Tooltip>
         </Button>
       </Popover.Trigger>
-      <Popover.Content sideOffset={5}>
+      <Popover.Content align="center" side="bottom">
         <Flex css={{ flexDirection: 'column', gap: 10 }} justify="center" align="center">
           <Flex direction="row" justify="between" css={{ width: '100%' }}>
             <Text as="div" variant="overline" css={{ color: '$textMedEmp' }}>
@@ -73,6 +73,7 @@ const Template: ComponentStory<typeof Popover.Root> = args => (
             <Input />
           </Inputfield>
         </Flex>
+        <Popover.Arrow css={{ width: '$4' }} />
       </Popover.Content>
     </Popover.Root>
   </Flex>
