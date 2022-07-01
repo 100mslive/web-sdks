@@ -101,6 +101,11 @@ const StyledButton = styled('button', {
         gap: '$4',
       },
     },
+    loading: {
+      true: {
+        width: '120px',
+      },
+    },
   },
   defaultVariants: {
     variant: 'primary',
@@ -119,17 +124,8 @@ export const Button = React.forwardRef<
   PropsWithChildren<{ loading: boolean } & ComponentPropsWithRef<typeof StyledButton>>
 >(({ children, loading, ...buttonProps }, ref) => {
   return (
-    <StyledButton {...buttonProps} ref={ref}>
-      <>
-        {loading && (
-          <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute' }}>
-            <Loading />
-          </Flex>
-        )}
-        <Flex align="center" justify="center" css={{ visibility: loading ? 'hidden' : 'visible' }}>
-          {children}
-        </Flex>
-      </>
+    <StyledButton {...buttonProps} loading={loading} ref={ref}>
+      {loading ? <Loading /> : <>{children}</>}
     </StyledButton>
   );
 });
