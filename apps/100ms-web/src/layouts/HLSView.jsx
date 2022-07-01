@@ -37,9 +37,7 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  // const hlsUrl = hlsState.variants[0]?.url;
-  const hlsUrl =
-    "https://cdn-dev.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220701/1656668819769/stream_0/stream.m3u8";
+  const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -49,6 +47,7 @@ const HLSView = () => {
     if (videoRef.current && hlsUrl && !hls) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
+        hls = hlsController.getHlsInstance();
 
         hlsController.on(HLSEvent.HLS_TIMED_METADATA_LOADED, payload => {
           console.log(
@@ -73,13 +72,7 @@ const HLSView = () => {
   }, [hlsUrl]);
 
   useEffect(() => {
-    return () => {
-      if (hls && hls.media) {
-        hls.detachMedia();
-        hls = null;
-        hlsController.reset();
-      }
-    };
+    return () => hlsController.reset();
   }, []);
 
   const qualitySelectorHandler = useCallback(

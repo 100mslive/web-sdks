@@ -50,23 +50,23 @@ export function parseTagsList(tagList) {
 
 /**
  *
- * @param {string} mtStr the raw EXT-X-DATERANGE value
+ * @param {string} metadatastring the raw EXT-X-DATERANGE value
  * @returns an object of parsed data.
  */
-export function parseMetadataString(mtStr) {
-  const splitAtComma = mtStr.split(",");
+export function parseAttributesFromMetadata(metadatastring) {
+  const metadataAttributes = metadatastring.split(",");
 
-  const tagMap = {};
-  for (const tags of splitAtComma) {
-    const [splitLHS, splitRHS] = tags.split("=");
-    tagMap[splitLHS] = removeQuotes(splitRHS);
+  const attributesByKey = {};
+  for (const attribute of metadataAttributes) {
+    const [attribKey, attribValue] = attribute.split("=");
+    attributesByKey[attribKey] = removeQuotes(attribValue);
   }
 
   return {
-    duration: tagMap["DURATION"],
-    id: tagMap["ID"],
-    starTime: new Date(tagMap["START-DATE"]),
-    payload: tagMap["X-100MSLIVE-PAYLOAD"],
+    duration: attributesByKey["DURATION"],
+    id: attributesByKey["ID"],
+    starTime: new Date(attributesByKey["START-DATE"]),
+    payload: attributesByKey["X-100MSLIVE-PAYLOAD"],
   };
 }
 

@@ -4,7 +4,7 @@ import { HLSEvent, HLSEventReactor } from "./HLSEvent";
 import {
   getSecondsFromTime,
   isMetadataAlreadyInTimeTable,
-  parseMetadataString,
+  parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
 
@@ -21,9 +21,12 @@ export class HLSController {
   }
 
   reset() {
+    if (this.hls && this.hls.media) {
+      this.hls.detachMedia();
+      this.hls = null;
+    }
     this.fragsTimeTable = null;
     this.reactor = null;
-    this.hls = null;
   }
 
   getHlsInstance() {
@@ -75,7 +78,7 @@ export class HLSController {
       const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
       if (metadataStrings.length > 0) {
         for (let metadataString of metadataStrings) {
-          const tagMetadata = parseMetadataString(metadataString);
+          const tagMetadata = parseAttributesFromMetadata(metadataString);
           const timeSegment = getSecondsFromTime(tagMetadata.starTime);
           /**
            * a single timestamp can have upto 3 DATERANGE tags.
