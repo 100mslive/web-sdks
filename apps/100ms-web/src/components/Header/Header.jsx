@@ -23,7 +23,7 @@ import {
   Button,
   Tooltip,
 } from "@100mslive/react-ui";
-import { ParticipantList } from "./ParticipantList";
+import { ParticipantCount } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
 import { AppContext } from "../context/AppContext";
 import { useSidepaneToggle } from "../AppData/useSidepane";
@@ -143,15 +143,15 @@ export const Header = ({ isPreview }) => {
       align="center"
       css={{ position: "relative", height: "100%" }}
     >
-      <Flex align="center" css={{ position: "absolute", left: "$4" }}>
+      <Flex align="center" css={{ position: "absolute", left: "$10" }}>
         <Logo />
       </Flex>
-      <SpeakerTag />
-      <Flex align="center" css={{ position: "absolute", right: "$4" }}>
+      {!isPreview ? <SpeakerTag /> : null}
+      <Flex align="center" css={{ position: "absolute", right: "$10" }}>
         {showPip && <PIPComponent />}
         <StreamActions />
         <Box css={{ mx: "$2" }}>
-          <ParticipantList />
+          <ParticipantCount />
         </Box>
       </Flex>
     </Flex>

@@ -63,7 +63,7 @@
     "@radix-ui/react-switch": "^0.1.1",
     "@radix-ui/react-toast": "^0.1.1",
     "@radix-ui/react-tooltip": "^0.1.1",
-    "@stitches/react": "^1.2.5",
+    "@stitches/react": "^1.2.8",
     "lodash.merge": "^4.6.2",
     "react-use": "^17.3.2"
   }

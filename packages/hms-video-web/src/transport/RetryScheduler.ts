@@ -141,7 +141,7 @@ export class RetryScheduler {
       this.onStateChange(TransportState.Reconnecting, error);
     }
 
-    const delay = this.getDelayForRetryCount(failedRetryCount);
+    const delay = this.getDelayForRetryCount(category, failedRetryCount);
 
     HMSLogger.i(
       TAG,
@@ -182,9 +182,18 @@ export class RetryScheduler {
     }
   }
 
-  private getDelayForRetryCount(n: number) {
-    const delay = Math.pow(2, n);
-    const jitter = Math.random();
+  private getBaseDelayForTask(category: TFC, n: number) {
+    if (category === TFC.JoinWSMessageFailed) {
+      // linear backoff(2 + jitter for every retry)
+      return 2;
+    }
+    // exponential backoff
+    return Math.pow(2, n);
+  }
+
+  private getDelayForRetryCount(category: TFC, n: number) {
+    const delay = this.getBaseDelayForTask(category, n);
+    const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
     return Math.round(Math.min(delay + jitter, MAX_TRANSPORT_RETRY_DELAY) * 1000);
   }
 
