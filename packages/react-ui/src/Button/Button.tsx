@@ -102,9 +102,7 @@ const StyledButton = styled('button', {
       },
     },
     loading: {
-      true: {
-        width: '120px',
-      },
+      true: {},
     },
   },
   defaultVariants: {
