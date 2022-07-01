@@ -8,6 +8,8 @@ import {
   ChevronLeftIcon,
   RecordIcon,
   InfoIcon,
+  EndStreamIcon,
+  PeopleIcon,
 } from "@100mslive/react-icons";
 import {
   Flex,
@@ -25,6 +27,7 @@ import {
   selectAppData,
   useHMSActions,
   useHMSStore,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 
 export const StreamingLanding = () => {
@@ -122,19 +125,7 @@ const ContentHeader = ({ onBack, title, content }) => {
 };
 
 const HLSStreaming = ({ onBack }) => {
-  const [record, setRecord] = useState(false);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
-  const hmsActions = useHMSActions();
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const startHLS = useCallback(async () => {
-    await hmsActions.startHLSStreaming({
-      variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
-      recording: record
-        ? { hlsVod: true, singleFilePerLayer: true }
-        : undefined,
-    });
-    toggleStreaming();
-  }, [recordingUrl, hmsActions, record, toggleStreaming]);
+  const { isHLSRunning } = useRecordingStreaming();
   return (
     <Box
       css={{
@@ -161,9 +152,31 @@ const HLSStreaming = ({ onBack }) => {
           and real-time messaging, all within this platform.
         </Text>
       </Box>
+      {isHLSRunning ? <EndHLS /> : <StartHLS />}
+    </Box>
+  );
+};
+
+const StartHLS = () => {
+  const [record, setRecord] = useState(false);
+  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
+  const hmsActions = useHMSActions();
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  const startHLS = useCallback(async () => {
+    await hmsActions.startHLSStreaming({
+      variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
+      recording: record
+        ? { hlsVod: true, singleFilePerLayer: true }
+        : undefined,
+    });
+    toggleStreaming();
+  }, [recordingUrl, hmsActions, record, toggleStreaming]);
+
+  return (
+    <Fragment>
       <Flex
         align="center"
-        css={{ bg: "$surfaceLight", m: "$8", p: "$8", r: "$0" }}
+        css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
       >
         <Text>
           <RecordIcon />
@@ -173,13 +186,13 @@ const HLSStreaming = ({ onBack }) => {
         </Text>
         <Switch checked={record} onCheckedChange={setRecord} />
       </Flex>
-      <Box css={{ p: "$4 $8" }}>
-        <Button css={{ w: "100%", r: "$0" }} onClick={startHLS}>
+      <Box css={{ p: "$4 $10" }}>
+        <Button css={{ w: "100%", r: "$0" }} icon onClick={startHLS}>
           <GoLiveIcon />
-          <Text css={{ mx: "$2" }}>Go Live</Text>
+          Go Live
         </Button>
       </Box>
-      <Flex align="center" css={{ p: "$4 $8" }}>
+      <Flex align="center" css={{ p: "$4 $10" }}>
         <Text>
           <InfoIcon width={16} height={16} />
         </Text>
@@ -188,6 +201,29 @@ const HLSStreaming = ({ onBack }) => {
           stop the stream to enable recording.
         </Text>
       </Flex>
+    </Fragment>
+  );
+};
+
+const EndHLS = () => {
+  const hmsActions = useHMSActions();
+  return (
+    <Box css={{ p: "$4 $10" }}>
+      <Button css={{ w: "100%", r: "$0" }} icon>
+        <PeopleIcon />
+        Invite People
+      </Button>
+      <Button
+        variant="danger"
+        css={{ w: "100%", r: "$0", my: "$8" }}
+        icon
+        onClick={async () => {
+          await hmsActions.stopHLSStreaming();
+        }}
+      >
+        <EndStreamIcon />
+        End Stream
+      </Button>
     </Box>
   );
 };
