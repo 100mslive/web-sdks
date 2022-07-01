@@ -97,9 +97,7 @@ const StyledButton = styled('button', {
       true: {},
     },
     icon: {
-      true: {
-        gap: '$4',
-      },
+      true: {},
     },
   },
   defaultVariants: {
