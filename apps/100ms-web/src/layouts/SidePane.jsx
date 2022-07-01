@@ -19,17 +19,17 @@ const SidePane = () => {
   return (
     <Box
       css={{
-        flex: "0 0 $space$100",
+        position: "absolute",
+        w: "$100",
+        h: "100%",
         p: "$10",
         bg: "$surfaceDefault",
         r: "$1",
-        "@md": {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 10,
+        top: 0,
+        right: 0,
+        zIndex: 10,
+        "@lg": {
+          w: "100%",
         },
       }}
     >

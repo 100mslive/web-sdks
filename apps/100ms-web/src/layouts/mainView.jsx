@@ -79,7 +79,7 @@ export const ConferenceMainView = () => {
 
   return (
     <Suspense fallback={<FullPageProgress />}>
-      <Flex css={{ size: "100%", px: "$10", position: "relative" }}>
+      <Flex css={{ size: "100%", position: "relative" }}>
         <ViewComponent showStats={showStatsOnTiles} />
         <SidePane />
       </Flex>
