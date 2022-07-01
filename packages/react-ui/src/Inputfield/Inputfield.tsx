@@ -1,9 +1,12 @@
 import { styled } from '../Theme';
 
 const Fieldset = styled('fieldset', {
-  width: '100%',
   display: 'flex',
-  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  border: 'none',
+  backgroundColor: '$transparent',
+  width: '100%',
 });
 
-export const InputField = Fieldset;
+export const Inputfield = Fieldset;
