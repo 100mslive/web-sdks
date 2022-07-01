@@ -125,6 +125,7 @@ const HLSStreaming = ({ onBack }) => {
   const [record, setRecord] = useState(false);
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
   const startHLS = useCallback(async () => {
     await hmsActions.startHLSStreaming({
       variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
@@ -132,7 +133,8 @@ const HLSStreaming = ({ onBack }) => {
         ? { hlsVod: true, singleFilePerLayer: true }
         : undefined,
     });
-  }, [recordingUrl, hmsActions, record]);
+    toggleStreaming();
+  }, [recordingUrl, hmsActions, record, toggleStreaming]);
   return (
     <Box
       css={{
