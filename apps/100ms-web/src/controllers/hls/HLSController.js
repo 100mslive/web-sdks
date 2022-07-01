@@ -10,21 +10,40 @@ import {
 
 export class HLSController {
   hls;
-  fragsTimeTable = {};
+  fragsTimeTable = new Map();
   reactor = new HLSEventReactor();
   constructor(hlsUrl, videoRef) {
     this.hls = new Hls(this.getHLSConfig());
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
     this.handleHLSTimedMetadataParsing();
+    this.ControllerEvents = [HLSEvent.HLS_TIMED_METADATA_LOADED];
   }
+
+  reset() {
+    this.fragsTimeTable = null;
+    this.reactor = null;
+    this.hls = null;
+  }
+
   getHlsInstance() {
     return this.hls;
   }
 
+  /**
+   * Event listener. Also takes HLS JS events. If its
+   * not a Controller's event, it just forwards the
+   * request to hlsjs
+   * @param {string | Hls.Events} eventName
+   * @param {Function} eventCallback
+   */
   on(eventName, eventCallback) {
-    this.reactor.registerEvent(eventName);
-    this.reactor.addEventListener(eventName, eventCallback);
+    if (this.ControllerEvents.indexOf(eventName) === -1) {
+      this.hls.on(eventName, eventCallback);
+    } else {
+      this.reactor.registerEvent(eventName);
+      this.reactor.addEventListener(eventName, eventCallback);
+    }
   }
 
   handleHLSTimedMetadataParsing() {
@@ -63,10 +82,9 @@ export class HLSController {
            * so we accumulate everything into a single key such that
            * <timesegment>: [mt1, mt2, mt3]
            */
-          if (this.fragsTimeTable[timeSegment.toString()]) {
+          if (this.fragsTimeTable.has(timeSegment)) {
             // timetable already exist
-            const fragsTimeTableEntries =
-              this.fragsTimeTable[timeSegment.toString()];
+            const fragsTimeTableEntries = this.fragsTimeTable.get(timeSegment);
 
             /**
              * Backend will keep sending the same metadata tags in each fragments
@@ -77,17 +95,17 @@ export class HLSController {
               !isMetadataAlreadyInTimeTable(fragsTimeTableEntries, tagMetadata)
             ) {
               // append current metadata to existing timestamp
-              this.fragsTimeTable[timeSegment.toString()].push({
+              this.fragsTimeTable.get(timeSegment).push({
                 ...tagMetadata,
               });
             }
           } else {
             // no entry in timetable exist. So add a new entry
-            this.fragsTimeTable[timeSegment.toString()] = [
+            this.fragsTimeTable.set(timeSegment, [
               {
                 ...tagMetadata,
               },
-            ];
+            ]);
           }
         }
       }
@@ -104,8 +122,10 @@ export class HLSController {
     this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
       const tagsList = parseTagsList(data?.frag.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
-      const timeStampStrings = Object.keys(this.fragsTimeTable);
-      const timeStamps = timeStampStrings.map(timeStamp => Number(timeStamp));
+      const timeStamps = [];
+      this.fragsTimeTable.forEach((value, key) => {
+        timeStamps.push(key);
+      });
       let nearestTimeStamp = timeSegment;
       /**
        * There are two scenarios here.
@@ -173,7 +193,7 @@ export class HLSController {
        * Fragment1_timesegment = 11 => nearestTimeStamp=>11 => 11 - 11 = 0 (play at start of the fragment)
        *
        * Fragment2_timesegment = 14 => nearestTimeStamp=>15 => 15 - 14 = 1 (still inside duration.
-       * so play after 2 sec of the start of the fragment)
+       * so play after 1 sec of the start of the fragment)
        *
        * Fragment3_timesegment = 15 => nearestTimeStamp=>20 => 20 - 15 = 5 (5 is greated than duration 2. so
        * this does not belong to this fragment. ignore and move on to next fragment)
@@ -184,13 +204,9 @@ export class HLSController {
 
       const timeDifference = nearestTimeStamp - timeSegment;
       if (timeDifference >= 0 && timeDifference < tagsList.duration) {
-        const payload = this.fragsTimeTable[nearestTimeStamp].map(
-          metadata => metadata.payload
-        );
-        console.log(
-          `%c Payload: ${payload}`,
-          "color:#2b2d42; background:#d80032"
-        );
+        const payload = this.fragsTimeTable
+          .get(nearestTimeStamp)
+          .map(metadata => metadata.payload);
         /**
          * we start a timeout for difference seconds.
          * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
@@ -210,7 +226,7 @@ export class HLSController {
            * needed for the operation. Just a bit of optimisation as a really
            * long stream with many metadata can quickly make the timetable really big.
            */
-          delete this.fragsTimeTable[nearestTimeStamp];
+          this.fragsTimeTable.delete(nearestTimeStamp);
         }, timeDifference * 1000);
       }
     });

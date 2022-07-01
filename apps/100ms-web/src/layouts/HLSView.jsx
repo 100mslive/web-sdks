@@ -32,11 +32,14 @@ const HLSVideo = styled("video", {
 });
 
 let hls = null;
+let hlsController;
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
-  const hlsUrl = hlsState.variants[0]?.url;
+  // const hlsUrl = hlsState.variants[0]?.url;
+  const hlsUrl =
+    "https://cdn-dev.100ms.live/beam/628222c405c6487f9e55644a/629a045d05c6487f9e55655b/20220701/1656668819769/stream_0/stream.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -45,17 +48,19 @@ const HLSView = () => {
   useEffect(() => {
     if (videoRef.current && hlsUrl && !hls) {
       if (Hls.isSupported()) {
-        const hlsController = new HLSController(hlsUrl, videoRef);
+        hlsController = new HLSController(hlsUrl, videoRef);
 
         hlsController.on(HLSEvent.HLS_TIMED_METADATA_LOADED, payload => {
+          console.log(
+            `%c Payload: ${payload}`,
+            "color:#2b2d42; background:#d80032"
+          );
           ToastManager.addToast({
-            title: `Payload shown ${payload}`,
+            title: `Payload from timed Metadata ${payload}`,
           });
-          window.sendConfetti();
         });
 
-        hls = hlsController.getHlsInstance();
-        hls.once(Hls.Events.MANIFEST_LOADED, (event, data) => {
+        hlsController.on(Hls.Events.MANIFEST_LOADED, (event, data) => {
           setAvailableLevels(data.levels);
           setCurrentSelectedQualityText("Auto");
         });
@@ -72,6 +77,7 @@ const HLSView = () => {
       if (hls && hls.media) {
         hls.detachMedia();
         hls = null;
+        hlsController.reset();
       }
     };
   }, []);

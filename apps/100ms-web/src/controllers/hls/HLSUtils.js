@@ -1,7 +1,34 @@
+/**
+ * Removes qoutes in string.
+ * (e.g) removeQoutes('Hello "Ram"!') // returns 'hello Ram!'
+ * @param {string} str - string to remove the qoutes from.
+ * @returns
+ */
 export function removeQuotes(str) {
   return str.replace(/^"(.*)"$/, "$1");
 }
 
+/**
+ *
+ * @param {Array[][]} tagList are the fragment tags sent
+ * from backend. Their follow the following structure
+ * [
+ *  [
+ *    "INF",
+ *    "2"
+ *  ],
+ *  [
+ *    "EXT-PROGRAM-TIME",
+ *    "2022-07-01T08:41:46+0000"
+ *  ],
+ *  [
+ *    "EXT-DATE-RANGE",
+ *    "somethignsomething;duration='2';payload='Hello'"
+ *  ]
+ * ]
+ * @returns an object with parsed tags. Original
+ * tags are available in rawTags property as Key/Value pairs.
+ */
 export function parseTagsList(tagList) {
   const tagMap = {};
   for (const tags of tagList) {
@@ -16,38 +43,40 @@ export function parseTagsList(tagList) {
       ...tagMap,
     },
     duration: Number(tagMap["INF"][0]),
-    fragmentStartAt: parseISOString(tagMap["PROGRAM-DATE-TIME"][0]),
+    fragmentStartAt: new Date(tagMap["PROGRAM-DATE-TIME"][0]),
   };
   return result;
 }
 
+/**
+ *
+ * @param {string} mtStr the raw EXT-X-DATERANGE value
+ * @returns an object of parsed data.
+ */
 export function parseMetadataString(mtStr) {
   const splitAtComma = mtStr.split(",");
 
   const tagMap = {};
   for (const tags of splitAtComma) {
-    const splitAtEquals = tags.split("=");
-
-    tagMap[splitAtEquals[0]] = removeQuotes(splitAtEquals[1]);
+    const [splitLHS, splitRHS] = tags.split("=");
+    tagMap[splitLHS] = removeQuotes(splitRHS);
   }
 
   return {
     duration: tagMap["DURATION"],
     id: tagMap["ID"],
-    starTime: parseISOString(tagMap["START-DATE"]),
+    starTime: new Date(tagMap["START-DATE"]),
     payload: tagMap["X-100MSLIVE-PAYLOAD"],
   };
 }
 
+/**
+ *
+ * @param {Date} time
+ * @returns total seconds from 00:00:00 to 'time'
+ */
 export function getSecondsFromTime(time) {
   return time.getHours() * 60 * 60 + time.getMinutes() * 60 + time.getSeconds();
-}
-
-/** doesn't account for timezones.
- * Do not use for dates. Only accurate for time */
-export function parseISOString(s) {
-  var b = s.split(/\D+/);
-  return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
 }
 
 export function isMetadataAlreadyInTimeTable(fragsTimeStamps, tagMetadata) {
