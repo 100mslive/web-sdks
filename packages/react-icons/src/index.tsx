@@ -217,7 +217,6 @@ export { default as VirtualBackgroundIcon } from './VirtualBackgroundIcon';
 export { default as VolumeOneIcon } from './VolumeOneIcon';
 export { default as WalletIcon } from './WalletIcon';
 export { default as WiredMic } from './WiredMic';
-export { default as Wrench } from './Wrench';
 export { default as WrenchIcon } from './WrenchIcon';
 export { default as YogaIcon } from './YogaIcon';
 export { default as YoutubeIcon } from './YoutubeIcon';
