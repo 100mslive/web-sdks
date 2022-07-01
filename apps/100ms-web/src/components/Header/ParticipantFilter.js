@@ -36,6 +36,7 @@ export const ParticipantFilter = ({
           borderRadius: "$0",
           cursor: "pointer",
         }}
+        tabIndex={0}
       >
         <Flex align="center">
           <Text variant="tiny" css={{ ...textEllipsis(80) }}>

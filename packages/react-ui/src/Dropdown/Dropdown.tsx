@@ -12,6 +12,9 @@ const DropdownTrigger = styled(Trigger, {
   '&:focus': {
     outline: 'none',
   },
+  '&:focus-visible': {
+    boxShadow: '0 0 0 3px $colors$primaryDefault',
+  },
 });
 
 const DropdownTriggerItem = styled(TriggerItem, {

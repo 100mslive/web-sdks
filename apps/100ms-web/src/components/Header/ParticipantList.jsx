@@ -204,7 +204,12 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const [open, setOpen] = useState(false);
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-      <Dropdown.Trigger asChild data-testid="participant_more_actions">
+      <Dropdown.Trigger
+        asChild
+        data-testid="participant_more_actions"
+        css={{ p: "$2", r: "$0" }}
+        tabIndex={0}
+      >
         <Text>
           <VerticalMenuIcon />
         </Text>
