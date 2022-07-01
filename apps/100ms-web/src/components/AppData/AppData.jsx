@@ -1,6 +1,11 @@
-import { useHMSActions } from "@100mslive/react-sdk";
+import {
+  selectIsConnectedToRoom,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { useEffect } from "react";
 import { APP_DATA, UI_SETTINGS } from "../../common/constants";
+import { useSidepaneReset } from "./useSidepane";
 
 export const getAppDetails = appDetails => {
   try {
@@ -12,6 +17,15 @@ export const getAppDetails = appDetails => {
 
 export function AppData({ appDetails, recordingUrl }) {
   const hmsActions = useHMSActions();
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const resetSidePane = useSidepaneReset();
+
+  useEffect(() => {
+    if (!isConnected) {
+      resetSidePane();
+    }
+  }, [isConnected, resetSidePane]);
+
   useEffect(() => {
     const initialAppData = {
       [APP_DATA.uiSettings]: {

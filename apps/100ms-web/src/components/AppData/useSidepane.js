@@ -22,3 +22,11 @@ export const useSidepaneToggle = sidepaneType => {
   }, [vanillaStore, hmsActions, sidepaneType]);
   return toggleSidepane;
 };
+
+export const useSidepaneReset = () => {
+  const hmsActions = useHMSActions();
+  const resetSidepane = useCallback(() => {
+    hmsActions.setAppData(APP_DATA.sidePane, "");
+  }, [hmsActions]);
+  return resetSidepane;
+};
