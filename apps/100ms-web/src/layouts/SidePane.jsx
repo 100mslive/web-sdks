@@ -5,7 +5,7 @@ import { Chat } from "../components/Chat/Chat";
 import { ParticipantList } from "../components/Header/ParticipantList";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
 
-const SidePane = () => {
+const SidePane = ({ css }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
@@ -28,8 +28,10 @@ const SidePane = () => {
         top: 0,
         right: 0,
         zIndex: 10,
+        ...css,
         "@lg": {
           w: "100%",
+          ...css["@lg"],
         },
       }}
     >

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useDebounce } from "react-use";
 import {
   selectAudioTrackByPeerID,
@@ -33,7 +33,7 @@ import {
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
-import { useSidepaneToggle } from "../AppData/useSidepane";
+import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
@@ -111,8 +111,21 @@ export const ParticipantList = () => {
 export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const isParticipantsOpen = useSidepaneState(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  useEffect(() => {
+    if (isParticipantsOpen && peerCount === 0) {
+      toggleSidepane();
+    }
+  }, [isParticipantsOpen, peerCount, toggleSidepane]);
   return (
-    <IconButton onClick={toggleSidepane} data-testid="participant_list">
+    <IconButton
+      onClick={() => {
+        if (peerCount > 0) {
+          toggleSidepane();
+        }
+      }}
+      data-testid="participant_list"
+    >
       <PeopleIcon />
       {peerCount > 0 && (
         <Flex
