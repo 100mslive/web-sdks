@@ -317,7 +317,7 @@ export interface IHMSActions {
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
   /**
-   * TODO: write meaningful comment here
+   * @alpha
    */
   sendHLSTimedMetadata(params?: SendHLSTimedMetadata): Promise<void>;
 
