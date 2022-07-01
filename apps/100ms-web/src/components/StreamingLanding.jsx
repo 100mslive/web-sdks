@@ -55,61 +55,49 @@ export const StreamingLanding = () => {
       <Text variant="tiny" color="$textMedEmp">
         Add Other Speakers
       </Text>
-      <Flex
-        css={{
-          w: "100%",
-          p: "$10",
-          r: "$1",
-          cursor: "pointer",
-          bg: "$surfaceLight",
-          mb: "$10",
-          mt: "$8",
-        }}
-      >
-        <Text css={{ alignSelf: "center", p: "$4" }}>
-          <WiredMic width={40} height={40} />
-        </Text>
-        <Box css={{ flex: "1 1 0", mx: "$8" }}>
-          <Text variant="h6" css={{ mb: "$4" }}>
-            Invite others to join
-          </Text>
-          <Text variant="sm">Add more people</Text>
-        </Box>
-        <Text css={{ alignSelf: "center" }}>
-          <ChevronRightIcon />
-        </Text>
-      </Flex>
+      <StreamCard title="Invite others to join" subtitle="Add more people" />
       <Text variant="tiny" color="$textMedEmp">
         Start Streaming
       </Text>
-      <Flex
-        css={{
-          w: "100%",
-          p: "$10",
-          r: "$1",
-          cursor: "pointer",
-          bg: "$surfaceLight",
-          my: "$8",
-        }}
+      <StreamCard
+        title="Live Stream with HLS"
+        subtitle="Stream to millions, edit and control what the viewer sees and more!"
+        css={{ my: "$8" }}
         onClick={() => setShowHLS(true)}
-      >
-        <Text css={{ alignSelf: "center", p: "$4" }}>
-          <GoLiveIcon width={40} height={40} />
-        </Text>
-        <Box css={{ flex: "1 1 0", mx: "$8" }}>
-          <Text variant="h6" css={{ mb: "$4" }}>
-            Live Stream with HLS
-          </Text>
-          <Text variant="sm">
-            Stream to millions, edit and control what the viewer sees and more!
-          </Text>
-        </Box>
-        <Text css={{ alignSelf: "center" }}>
-          <ChevronRightIcon />
-        </Text>
-      </Flex>
+      />
       {showHLS && <HLSStreaming onBack={() => setShowHLS(false)} />}
     </Fragment>
+  );
+};
+
+const StreamCard = ({ title, subtitle, css = {}, onClick }) => {
+  return (
+    <Flex
+      css={{
+        w: "100%",
+        p: "$10",
+        r: "$1",
+        cursor: "pointer",
+        bg: "$surfaceLight",
+        mb: "$10",
+        mt: "$8",
+        ...css,
+      }}
+      onClick={onClick}
+    >
+      <Text css={{ alignSelf: "center", p: "$4" }}>
+        <WiredMic width={40} height={40} />
+      </Text>
+      <Box css={{ flex: "1 1 0", mx: "$8" }}>
+        <Text variant="h6" css={{ mb: "$4" }}>
+          {title}
+        </Text>
+        <Text variant="sm">{subtitle}</Text>
+      </Box>
+      <Text css={{ alignSelf: "center" }}>
+        <ChevronRightIcon />
+      </Text>
+    </Flex>
   );
 };
 
