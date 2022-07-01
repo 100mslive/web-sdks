@@ -52,34 +52,59 @@ export const StreamingLanding = () => {
           <CrossIcon />
         </IconButton>
       </Flex>
-      <Text variant="sub1">Add Other Speakers</Text>
-      <Flex css={{ w: "100%", h: "$24", py: "$8" }}>
+      <Text variant="tiny" color="$textMedEmp">
+        Add Other Speakers
+      </Text>
+      <Flex
+        css={{
+          w: "100%",
+          p: "$10",
+          r: "$1",
+          cursor: "pointer",
+          bg: "$surfaceLight",
+          mb: "$10",
+          mt: "$8",
+        }}
+      >
         <Text css={{ alignSelf: "center", p: "$4" }}>
           <WiredMic width={40} height={40} />
         </Text>
         <Box css={{ flex: "1 1 0", mx: "$8" }}>
-          <Text variant="h6">Invite others to join</Text>
-          <Text variant="sub1">Add more people</Text>
+          <Text variant="h6" css={{ mb: "$4" }}>
+            Invite others to join
+          </Text>
+          <Text variant="sm">Add more people</Text>
         </Box>
-        <Text>
+        <Text css={{ alignSelf: "center" }}>
           <ChevronRightIcon />
         </Text>
       </Flex>
-      <Text variant="sub1">Start Streaming</Text>
+      <Text variant="tiny" color="$textMedEmp">
+        Start Streaming
+      </Text>
       <Flex
-        css={{ w: "100%", h: "$24", py: "$8", cursor: "pointer" }}
+        css={{
+          w: "100%",
+          p: "$10",
+          r: "$1",
+          cursor: "pointer",
+          bg: "$surfaceLight",
+          my: "$8",
+        }}
         onClick={() => setShowHLS(true)}
       >
         <Text css={{ alignSelf: "center", p: "$4" }}>
           <GoLiveIcon width={40} height={40} />
         </Text>
         <Box css={{ flex: "1 1 0", mx: "$8" }}>
-          <Text variant="h6">Live Stream with HLS</Text>
-          <Text variant="sub1">
+          <Text variant="h6" css={{ mb: "$4" }}>
+            Live Stream with HLS
+          </Text>
+          <Text variant="sm">
             Stream to millions, edit and control what the viewer sees and more!
           </Text>
         </Box>
-        <Text>
+        <Text css={{ alignSelf: "center" }}>
           <ChevronRightIcon />
         </Text>
       </Flex>
@@ -141,7 +166,7 @@ const HLSStreaming = ({ onBack }) => {
         <Text css={{ fontWeight: "$semiBold", mt: "$8", mb: "$4" }}>
           HLS Streaming
         </Text>
-        <Text variant="sub1">
+        <Text variant="sm" color="$textMedEmp">
           Stream directly from the browser using any device with multiple hosts
           and real-time messaging, all within this platform.
         </Text>
@@ -168,7 +193,7 @@ const HLSStreaming = ({ onBack }) => {
         <Text>
           <InfoIcon width={16} height={16} />
         </Text>
-        <Text css={{ mx: "$8" }}>
+        <Text variant="tiny" color="$textMedEmp" css={{ mx: "$8" }}>
           You cannot start recording once the stream starts, you will have to
           stop the stream to enable recording.
         </Text>
