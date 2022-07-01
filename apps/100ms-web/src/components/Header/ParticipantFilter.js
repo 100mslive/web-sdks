@@ -30,16 +30,14 @@ export const ParticipantFilter = ({
         asChild
         data-testid="participant_list_filter"
         css={{
-          pl: "$4",
-          pr: "$2",
           border: "1px solid $textDisabled",
-          borderRadius: "$0",
-          cursor: "pointer",
+          r: "$0",
+          p: "$2 $4",
         }}
         tabIndex={0}
       >
         <Flex align="center">
-          <Text variant="tiny" css={{ ...textEllipsis(80) }}>
+          <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || "Everyone"}
           </Text>
           <Box css={{ ml: "$2", color: "$textDisabled" }}>
@@ -54,7 +52,12 @@ export const ParticipantFilter = ({
       <Dropdown.Content
         align="start"
         sideOffset={8}
-        css={{ height: "auto", maxHeight: "$96", boxShadow: "$md" }}
+        css={{
+          height: "auto",
+          maxHeight: "$96",
+          boxShadow: "$md",
+          w: "$48",
+        }}
       >
         <Item
           selected={!selection}
@@ -103,7 +106,7 @@ const Item = ({ selected, title, onSelection, value, icon }) => {
     >
       <Flex align="center" css={{ flex: "1 1 0" }}>
         {icon && <Text>{icon}</Text>}
-        <Text css={{ ml: "$2" }}>{title}</Text>
+        <Text css={{ ml: "$4" }}>{title}</Text>
       </Flex>
       {selected && (
         <Text>
