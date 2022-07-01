@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useState } from "react";
+import { useDebounce } from "react-use";
 import {
   selectAudioTrackByPeerID,
   selectLocalPeerID,
@@ -34,7 +35,6 @@ import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
-import { useDebounce } from "react-use";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
