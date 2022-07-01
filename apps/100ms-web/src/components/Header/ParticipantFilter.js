@@ -90,15 +90,6 @@ export const ParticipantFilter = ({
 const Item = ({ selected, title, onSelection, value, icon }) => {
   return (
     <Dropdown.Item
-      css={{
-        "&:hover": {
-          cursor: "pointer",
-          bg: "$iconHoverBg",
-        },
-        "&:focus-visible": {
-          bg: "$iconHoverBg",
-        },
-      }}
       onClick={e => {
         e.preventDefault();
         onSelection(value);
