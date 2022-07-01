@@ -106,7 +106,7 @@ const StyledButton = styled('button', {
 });
 
 export const Button = React.forwardRef<
-  Ref,
+  HTMLButtonElement,
   PropsWithChildren<{ loading: boolean } & ComponentPropsWithRef<typeof StyledButton>>
 >(({ children, loading, ...buttonProps }, ref) => {
   return (
@@ -120,7 +120,7 @@ export const Button = React.forwardRef<
         <Flex
           align="center"
           justify="center"
-          css={{ visibility: loading ? 'hidden' : 'visible', gap: children.length > 1 ? '$4' : '0' }}
+          css={{ visibility: loading ? 'hidden' : 'visible', gap: buttonProps.icon ? '$4' : '0' }}
         >
           {children}
         </Flex>
