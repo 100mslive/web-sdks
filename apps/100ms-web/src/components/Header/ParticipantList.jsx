@@ -124,6 +124,7 @@ export const ParticipantCount = () => {
           toggleSidepane();
         }
       }}
+      active={!isParticipantsOpen}
       data-testid="participant_list"
     >
       <PeopleIcon />
