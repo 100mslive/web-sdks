@@ -15,6 +15,9 @@ export default {
         options: ['primary', 'standard', 'danger'],
       },
     },
+    outlined: { control: 'boolean' },
+    icon: { control: 'boolean' },
+    loading: { control: 'boolean' },
   },
   parameters: {
     docs: {
@@ -63,5 +66,4 @@ Icon.args = {
   icon: true,
   outlined: false,
   loading: false,
-  css: { alignItems: 'center', display: 'block', flexDirection: 'row' },
 };
