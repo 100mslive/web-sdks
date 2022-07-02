@@ -54,7 +54,15 @@ export const ChatHeader = React.memo(
               </Box>
             </Flex>
           </Dropdown.Trigger>
-          <Dropdown.Content>
+          <Dropdown.Content
+            css={{
+              w: "$64",
+              overflow: "hidden",
+              maxHeight: "unset",
+            }}
+            align="start"
+            sideOffset={8}
+          >
             <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
           </Dropdown.Content>
         </Dropdown.Root>
