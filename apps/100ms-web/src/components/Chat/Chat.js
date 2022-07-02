@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { ChevronDownIcon } from "@100mslive/react-icons";
 import { useHMSActions } from "@100mslive/react-sdk";
@@ -12,7 +6,6 @@ import { Box, Button, Flex } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { ChatBody } from "./ChatBody";
-import { ChatSelector } from "./ChatSelector";
 import { useUnreadCount } from "./useUnreadCount";
 
 export const Chat = () => {
@@ -47,6 +40,9 @@ export const Chat = () => {
       <ChatHeader
         selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
+        onSelect={setChatOptions}
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
         onToggle={() => {
           setSelectorOpen(value => !value);
         }}
@@ -55,34 +51,17 @@ export const Chat = () => {
         css={{
           flex: "1 1 0",
           overflowY: isSelectorOpen ? "hidden" : "auto",
-          bg: "$bgSecondary",
           pt: "$4",
           position: "relative",
         }}
         ref={bodyRef}
       >
-        {isSelectorOpen ? (
-          <ChatSelector
-            role={chatOptions.role}
-            peerId={chatOptions.peerId}
-            onSelect={data => {
-              setChatOptions(state => ({
-                ...state,
-                ...data,
-              }));
-              setSelectorOpen(false);
-            }}
-          />
-        ) : (
-          <Fragment>
-            <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-            <ScrollHandler
-              scrollToBottom={scrollToBottom}
-              role={chatOptions.role}
-              peerId={chatOptions.peerId}
-            />
-          </Fragment>
-        )}
+        <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
+        <ScrollHandler
+          scrollToBottom={scrollToBottom}
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+        />
       </Box>
 
       <ChatFooter

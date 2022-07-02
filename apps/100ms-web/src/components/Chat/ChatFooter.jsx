@@ -61,13 +61,13 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        borderTop: "1px solid $borderDefault",
-        bg: "$menuBg",
+        bg: "$surfaceLight",
         minHeight: "$16",
         maxHeight: "$24",
         position: "relative",
-        py: "$4",
+        py: "$6",
         pl: "$8",
+        r: "$1",
       }}
     >
       {children}
