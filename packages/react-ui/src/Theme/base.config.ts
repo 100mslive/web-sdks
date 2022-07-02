@@ -51,6 +51,10 @@ export const baseConfig = {
       secondaryDefault: '#475366',
       secondaryDark: '#2D3440',
       secondaryDisabled: '#242A33',
+      errorDefault: '#CC525F',
+      errorLight: '#D87983',
+      errorDark: '#9D2F3B',
+      errorDisabled: '#621D24',
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',

@@ -7,7 +7,18 @@ import React from 'react';
 export default {
   title: 'UI Components/Button',
   component: Button,
-  argTypes: { onClick: { action: 'clicked' } },
+  argTypes: {
+    onClick: { action: 'clicked' },
+    variant: {
+      control: {
+        type: 'select',
+        options: ['primary', 'standard', 'danger'],
+      },
+    },
+    outlined: { control: 'boolean' },
+    icon: { control: 'boolean' },
+    loading: { control: 'boolean' },
+  },
   parameters: {
     docs: {
       page: ButtonDocs,
@@ -20,7 +31,8 @@ const Template: ComponentStory<typeof Button> = args => <Button {...args}>Hello 
 
 const WithIcon: ComponentStory<typeof Button> = args => (
   <Button {...args}>
-    <HangUpIcon /> Leave Room
+    <HangUpIcon />
+    Leave Room
   </Button>
 );
 
@@ -28,22 +40,30 @@ export const Primary = Template.bind({});
 
 Primary.args = {
   variant: 'primary',
+  outlined: false,
+  loading: false,
 };
 
 export const Standard = Template.bind({});
 
 Standard.args = {
   variant: 'standard',
+  outlined: false,
+  loading: false,
 };
 
 export const Danger = Template.bind({});
 
 Danger.args = {
   variant: 'danger',
+  outlined: false,
+  loading: false,
 };
 
 export const Icon = WithIcon.bind({});
 Icon.args = {
   variant: 'danger',
   icon: true,
+  outlined: false,
+  loading: false,
 };
