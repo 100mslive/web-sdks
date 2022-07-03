@@ -3,6 +3,7 @@ import axios from 'axios';
 import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
+  apiBasePath,
   getAuthInfo,
   getRoomCodeFromUrl,
   getWithRetry,
@@ -27,10 +28,8 @@ if (!hostname.endsWith('app.100ms.live')) {
 } else if (hostname.endsWith('dev-app.100ms.live')) {
   // route dev-app appropriately to qa or prod
   const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
-  hostname.replace('dev-app.100ms.live', envSuffix);
+  hostname = hostname.replace('dev-app.100ms.live', envSuffix);
 }
-
-const apiBasePath = `${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
 
 const App = () => {
   const prevSavedSettings = useRef({});
@@ -103,7 +102,6 @@ const App = () => {
       return;
     }
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: apiBasePath, timeout: 2000 });
     const url = `${apiBasePath}get-token`;
     let headers;
     if (jwt) {
@@ -140,7 +138,6 @@ const App = () => {
   const fetchData = async () => {
     const jwt = getAuthInfo().token;
     const code = getRoomCodeFromUrl();
-    axios.create({ baseURL: apiBasePath, timeout: 2000 });
     const url = `${apiBasePath}apps/get-details?domain=${hostname}&room_id=${code}`;
     const headers = {};
     if (jwt) {

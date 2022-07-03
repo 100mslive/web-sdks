@@ -2,7 +2,7 @@ import React, { useState, Suspense, useCallback } from 'react';
 import { InviteIcon, CodeIcon, EditIcon } from '@100mslive/react-icons';
 import { Button, Flex, styled, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../utils/analytics';
-import { getInitialsFromEmail, getRandomColor } from '../utils/utils';
+import { apiBasePath, getInitialsFromEmail, getRandomColor } from '../utils/utils';
 import logo from '../assets/images/100ms_logo.svg';
 import darkLogo from '../assets/images/100ms_dark.svg';
 
@@ -22,7 +22,6 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
   const [modal, togModal] = useState(false);
   const [codeModal, setCodeModal] = useState(false);
 
-  const apiBasePath = `${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
   const generateEnvData = useCallback(
     logo => {
       return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
