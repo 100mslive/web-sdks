@@ -22,12 +22,13 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
   const [modal, togModal] = useState(false);
   const [codeModal, setCodeModal] = useState(false);
 
+  const apiBasePath = `${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
   const generateEnvData = useCallback(
     logo => {
       return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
         settings.brand_color
       }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
-        process.env.REACT_APP_BACKEND_API + window.location.hostname
+        apiBasePath + window.location.hostname
       }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
     },
     [settings.tile_shape, settings.brand_color, settings.theme, settings.font],

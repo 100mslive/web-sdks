@@ -35,6 +35,8 @@ const tileShapeMapping = {
   '9-16': '9-16',
 };
 
+const apiBasePath = `${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
+
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
   const formData = new FormData();
@@ -52,8 +54,8 @@ export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   formData.append('subdomain', hostname);
   formData.append('metadata', settings.metadataFields.metadata);
 
-  axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-  const url = `${process.env.REACT_APP_BACKEND_API}apps/details`;
+  axios.create({ baseURL: apiBasePath, timeout: 2000 });
+  const url = `${apiBasePath}apps/details`;
 
   const headers = {
     Authorization: `Bearer ${jwt}`,
