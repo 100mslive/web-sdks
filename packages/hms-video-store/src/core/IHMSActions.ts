@@ -7,7 +7,6 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
-  SendHLSTimedMetadata,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -315,11 +314,6 @@ export interface IHMSActions {
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
-
-  /**
-   * TODO: write meaningful comment here
-   */
-  sendHLSTimedMetadata(params?: SendHLSTimedMetadata): Promise<void>;
 
   /**
    * If you want to update the name of peer.

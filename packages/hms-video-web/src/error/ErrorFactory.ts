@@ -53,7 +53,7 @@ export const ErrorFactory = {
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description, true);
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -61,7 +61,7 @@ export const ErrorFactory = {
         ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
-        `Endpoint is not reachable - ${description}`,
+        `Endpoint is not reachable.`,
         description,
       );
     },

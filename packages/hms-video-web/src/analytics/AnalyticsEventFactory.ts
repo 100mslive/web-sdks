@@ -74,7 +74,6 @@ export default class AnalyticsEventFactory {
     ws_connect_time?: number;
     on_policy_change_time?: number;
     local_tracks_time?: number;
-    retries_join?: number;
   }) {
     const name = this.eventNameFor('join', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;

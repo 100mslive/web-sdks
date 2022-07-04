@@ -10,6 +10,7 @@ import {
 } from "@100mslive/react-sdk";
 import { FeatureFlagsInit } from "../../services/FeatureFlags";
 import { normalizeAppPolicyConfig, setUpLogRocket } from "./appContextUtils";
+import { getBackendEndpoint } from "../../services/tokenService";
 import {
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
@@ -25,6 +26,13 @@ import {
 import { useSearchParam } from "react-use";
 
 const AppContext = React.createContext(null);
+
+const defaultTokenEndpoint = process.env
+  .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
+  ? `${getBackendEndpoint()}${
+      process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
+    }/`
+  : process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
 
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 const envAudioPlaylist = JSON.parse(
@@ -49,7 +57,7 @@ const defaultUiSettings = {
 };
 
 const AppContextProvider = ({
-  tokenEndpoint,
+  tokenEndpoint = defaultTokenEndpoint,
   policyConfig = envPolicyConfig,
   audioPlaylist = envAudioPlaylist,
   videoPlaylist = envVideoPlaylist,
