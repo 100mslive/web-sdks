@@ -27,6 +27,7 @@ export const ChatHeader = React.memo(
         css={{
           color: "$textPrimary",
           h: "$16",
+          mb: "$2",
         }}
       >
         <Text variant="h6">Chat </Text>

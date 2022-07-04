@@ -45,7 +45,7 @@ const TypeContainer = ({ left, right }) => {
       )}
       {left && right && (
         <Box
-          css={{ borderLeft: "1px solid $textDisabled", mx: "$4", h: "100%" }}
+          css={{ borderLeft: "1px solid $textDisabled", mx: "$4", h: "$8" }}
         />
       )}
       {right && (
@@ -140,12 +140,12 @@ const ChatMessage = React.memo(({ message, index }) => {
   return (
     <Flex
       ref={ref}
+      align="center"
       css={{
         flexWrap: "wrap",
         bg: messageType ? "$surfaceLight" : undefined,
         px: "$2",
-        py: "$4",
-        mb: "$8",
+        mb: "$10",
         mt: index === 0 ? "auto" : undefined,
       }}
       key={message.time}
@@ -164,7 +164,7 @@ const ChatMessage = React.memo(({ message, index }) => {
       />
       <Text
         variant="body2"
-        css={{ w: "100%", my: "$2", wordBreak: "break-word" }}
+        css={{ w: "100%", mt: "$2", wordBreak: "break-word" }}
       >
         <AnnotisedChat message={message.message} />
       </Text>
