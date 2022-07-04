@@ -54,6 +54,9 @@ export const Chat = () => {
           overflowY: "auto",
           pt: "$4",
           position: "relative",
+          // Below two are for pushing scroll to the edge of the box
+          mr: "-$10",
+          pr: "$10",
         }}
         ref={bodyRef}
       >
