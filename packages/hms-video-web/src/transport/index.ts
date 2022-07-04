@@ -741,12 +741,16 @@ export default class HMSTransport implements ITransport {
       const hmsError =
         error instanceof HMSException
           ? error
-          : ErrorFactory.WebsocketMethodErrors.ServerErrors(500, HMSAction.JOIN, `Default join WS error`);
-      hmsError.isTerminal = false;
+          : ErrorFactory.WebsocketMethodErrors.ServerErrors(
+              500,
+              HMSAction.JOIN,
+              `Websocket join error - ${(error as Error).message}`,
+            );
       const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
 
-      this.joinRetryCount = 0;
       if (shouldRetry) {
+        this.joinRetryCount = 0;
+        hmsError.isTerminal = false;
         const task = async () => {
           this.joinRetryCount++;
           return await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });
