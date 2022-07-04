@@ -5,7 +5,7 @@ import {
   InfoIcon,
   MicOffIcon,
   RecordIcon,
-  SettingIcon,
+  SettingsIcon,
   TextboxIcon,
 } from "@100mslive/react-icons";
 import {
@@ -129,7 +129,7 @@ export const MoreSettings = () => {
             css={hoverStyles}
             data-testid="device_settings_btn"
           >
-            <SettingIcon />
+            <SettingsIcon />
             <Text variant="sm" css={{ ml: "$4" }}>
               Device Settings
             </Text>

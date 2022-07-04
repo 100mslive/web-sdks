@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useDevices, DeviceType } from "@100mslive/react-sdk";
 import { Dialog, Button, Text } from "@100mslive/react-ui";
-import { AudioLevelIcon, SettingIcon } from "@100mslive/react-icons";
+import { AudioLevelIcon, SettingsIcon } from "@100mslive/react-icons";
 import {
   DialogContent,
   DialogRow,
@@ -19,7 +19,7 @@ const Settings = ({ open, onOpenChange, children }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
-      <DialogContent Icon={SettingIcon} title="Settings">
+      <DialogContent Icon={SettingsIcon} title="Settings">
         {videoInput?.length ? (
           <DeviceSelector
             title="Video"
