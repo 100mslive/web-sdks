@@ -58,7 +58,7 @@ export const NotificationSettings = () => {
 
   return (
     <Fragment>
-      <Text variant="md" css={{ mb: "$12", fontWeight: "$semiBold" }}>
+      <Text variant="h5" css={{ mb: "$12" }}>
         Notifications
       </Text>
       <Box>

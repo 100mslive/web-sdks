@@ -1,83 +1,150 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, Fragment } from "react";
 import { useDevices, DeviceType } from "@100mslive/react-sdk";
-import { Dialog, Button, Text } from "@100mslive/react-ui";
-import { AudioLevelIcon, SettingsIcon } from "@100mslive/react-icons";
 import {
-  DialogContent,
-  DialogRow,
-  DialogSelect,
-} from "../primitives/DialogContent";
+  ChevronDownIcon,
+  ChevronUpIcon,
+  MicOnIcon,
+  SpeakerIcon,
+  VideoOnIcon,
+} from "@100mslive/react-icons";
+import {
+  Button,
+  Text,
+  Flex,
+  Dropdown,
+  Box,
+  textEllipsis,
+} from "@100mslive/react-ui";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
  * it'll give the user options to change input/output device as well as check speaker.
  * There is also another controlled way of using this by passing in open and onOpenChange.
  */
-const Settings = ({ open, onOpenChange, children }) => {
+const Settings = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
-      <DialogContent Icon={SettingsIcon} title="Settings">
-        {videoInput?.length ? (
-          <DeviceSelector
-            title="Video"
-            devices={videoInput}
-            selection={selectedDeviceIDs.videoInput}
-            onChange={deviceId =>
-              updateDevice({
-                deviceId,
-                deviceType: DeviceType.videoInput,
-              })
-            }
-          />
-        ) : null}
-        {audioInput?.length ? (
-          <DeviceSelector
-            title="Microphone"
-            devices={audioInput}
-            selection={selectedDeviceIDs.audioInput}
-            onChange={deviceId =>
-              updateDevice({
-                deviceId,
-                deviceType: DeviceType.audioInput,
-              })
-            }
-          />
-        ) : null}
-        {audioOutput?.length ? (
-          <DeviceSelector
-            title="Speaker"
-            devices={audioOutput}
-            selection={selectedDeviceIDs.audioOutput}
-            onChange={deviceId =>
-              updateDevice({
-                deviceId,
-                deviceType: DeviceType.audioOutput,
-              })
-            }
-          />
-        ) : null}
-        <DialogRow>
-          <Text>Test Speaker</Text>
+    <Fragment>
+      <Text variant="h5" css={{ mb: "$12" }}>
+        Device Settings
+      </Text>
+      {videoInput?.length ? (
+        <DeviceSelector
+          title="Video"
+          devices={videoInput}
+          icon={<VideoOnIcon />}
+          selection={selectedDeviceIDs.videoInput}
+          onChange={deviceId =>
+            updateDevice({
+              deviceId,
+              deviceType: DeviceType.videoInput,
+            })
+          }
+        />
+      ) : null}
+      {audioInput?.length ? (
+        <DeviceSelector
+          title="Microphone"
+          icon={<MicOnIcon />}
+          devices={audioInput}
+          selection={selectedDeviceIDs.audioInput}
+          onChange={deviceId =>
+            updateDevice({
+              deviceId,
+              deviceType: DeviceType.audioInput,
+            })
+          }
+        />
+      ) : null}
+      {audioOutput?.length ? (
+        <DeviceSelector
+          title="Speaker"
+          icon={<SpeakerIcon />}
+          devices={audioOutput}
+          selection={selectedDeviceIDs.audioOutput}
+          onChange={deviceId =>
+            updateDevice({
+              deviceId,
+              deviceType: DeviceType.audioOutput,
+            })
+          }
+        >
           <TestAudio id={selectedDeviceIDs.audioOutput} />
-        </DialogRow>
-      </DialogContent>
-    </Dialog.Root>
+        </DeviceSelector>
+      ) : null}
+    </Fragment>
   );
 };
 
-const DeviceSelector = ({ title, devices, selection, onChange }) => {
+const DeviceSelector = ({
+  title,
+  devices,
+  selection,
+  onChange,
+  icon,
+  children = null,
+}) => {
+  const [open, setOpen] = useState(false);
   return (
-    <DialogSelect
-      title={title}
-      options={devices}
-      keyField="deviceId"
-      labelField="label"
-      selected={selection}
-      onChange={onChange}
-    />
+    <Box css={{ mb: "$10" }}>
+      <Text css={{ mb: "$4" }}>{title}</Text>
+      <Flex align="center">
+        <Dropdown.Root open={open} onOpenChange={setOpen}>
+          <Dropdown.Trigger
+            asChild
+            data-testid={`${title}_selector`}
+            css={{
+              border: "1px solid $borderLight",
+              bg: "$surfaceLight",
+              r: "$1",
+              p: "$6 $9",
+              ...(children
+                ? {
+                    flex: "1 1 0",
+                    minWidth: 0,
+                  }
+                : {}),
+            }}
+          >
+            <Flex
+              css={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: "$textHighEmp",
+                w: "100%",
+              }}
+            >
+              {icon}
+              <Text
+                css={{
+                  color: "inherit",
+                  ...textEllipsis("90%"),
+                  flex: "1 1 0",
+                  mx: "$6",
+                }}
+              >
+                {devices.find(({ deviceId }) => deviceId === selection)?.label}
+              </Text>
+              {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            </Flex>
+          </Dropdown.Trigger>
+          <Dropdown.Content align="start" sideOffset={8} css={{ w: "100%" }}>
+            {devices.map(device => {
+              return (
+                <Dropdown.Item
+                  key={device.label}
+                  onClick={() => onChange(device.deviceId)}
+                >
+                  {device.label}
+                </Dropdown.Item>
+              );
+            })}
+          </Dropdown.Content>
+        </Dropdown.Root>
+        {children}
+      </Flex>
+    </Box>
   );
 };
 
@@ -101,12 +168,19 @@ const TestAudio = ({ id }) => {
     <>
       <Button
         variant="standard"
-        css={{ backgroundColor: "$bgSecondary", color: "$textPrimary" }}
+        css={{
+          backgroundColor: "$secondaryDefault",
+          color: "$textPrimary",
+          flexShrink: 0,
+          ml: "$4",
+          p: "$6 $9",
+          border: "1px solid $secondaryDefault",
+        }}
         onClick={() => audioRef.current?.play()}
         disabled={playing}
       >
-        <AudioLevelIcon />
-        &nbsp;Play
+        <SpeakerIcon />
+        &nbsp;Test
       </Button>
       <audio
         ref={audioRef}

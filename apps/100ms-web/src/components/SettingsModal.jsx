@@ -9,14 +9,15 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Dialog.Content
-        css={{ w: "min(800px, 100%)", height: "min(656px, 90%)" }}
+        css={{ w: "min(800px, 100%)", height: "min(656px, 90%)", p: 0 }}
       >
         <Tabs.Root defaultValue="devices" css={{ size: "100%" }}>
           <Tabs.List
             css={{
               w: "18.625rem",
               flexDirection: "column",
-              pt: "$8",
+              bg: "$bgPrimary",
+              p: "$14 $10",
             }}
           >
             <Text variant="h5">Settings </Text>
@@ -29,7 +30,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               Notifications
             </Tabs.Trigger>
           </Tabs.List>
-          <Flex direction="column" css={{ flex: "1 1 0" }}>
+          <Flex direction="column" css={{ flex: "1 1 0", minWidth: 0 }}>
             <Tabs.Content value="devices">
               <Settings />
             </Tabs.Content>
