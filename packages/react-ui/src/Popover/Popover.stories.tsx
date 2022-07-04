@@ -1,8 +1,8 @@
+import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { CrossIcon, ExpandIcon } from '@100mslive/react-icons';
 import { Popover } from './index';
 import PopoverDocs from './Popover.mdx';
-import React from 'react';
-import { CrossIcon, ExpandIcon } from '@100mslive/react-icons';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import { Tooltip } from '../Tooltip';
