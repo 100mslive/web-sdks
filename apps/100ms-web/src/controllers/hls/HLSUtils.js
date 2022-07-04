@@ -1,14 +1,4 @@
 /**
- * Removes qoutes in string.
- * (e.g) removeQoutes('Hello "Ram"!') // returns 'hello Ram!'
- * @param {string} str - string to remove the qoutes from.
- * @returns
- */
-export function removeQuotes(str) {
-  return str.replace(/^"(.*)"$/, "$1");
-}
-
-/**
  *
  * @param {Array[][]} tagList are the fragment tags sent
  * from backend. Their follow the following structure
@@ -85,4 +75,14 @@ export function isMetadataAlreadyInTimeTable(fragsTimeStamps, tagMetadata) {
   );
 
   return !!alreadyExistingmetadata.length;
+}
+
+/**
+ * Removes qoutes in string.
+ * (e.g) removeQoutes('Hello "Ram"!') // returns 'hello Ram!'
+ * @param {string} str - string to remove the qoutes from.
+ * @returns
+ */
+function removeQuotes(str) {
+  return str.replace(/^"(.*)"$/, "$1");
 }

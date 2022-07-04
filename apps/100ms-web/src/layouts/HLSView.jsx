@@ -22,8 +22,10 @@ import {
 } from "@100mslive/react-ui";
 import { ChatView } from "../components/chatView";
 import { useIsChatOpen } from "../components/AppData/useChatState";
-import { HLSController } from "../controllers/hls/HLSController";
-import { HLSEvent } from "../controllers/hls/HLSEvent";
+import {
+  HLSController,
+  HLS_TIMED_METADATA_LOADED,
+} from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
 
 const HLSVideo = styled("video", {
@@ -49,7 +51,7 @@ const HLSView = () => {
         hlsController = new HLSController(hlsUrl, videoRef);
         hls = hlsController.getHlsInstance();
 
-        hlsController.on(HLSEvent.HLS_TIMED_METADATA_LOADED, payload => {
+        hlsController.on(HLS_TIMED_METADATA_LOADED, payload => {
           console.log(
             `%c Payload: ${payload}`,
             "color:#2b2d42; background:#d80032"
@@ -72,7 +74,9 @@ const HLSView = () => {
   }, [hlsUrl]);
 
   useEffect(() => {
-    return () => hlsController.reset();
+    if (hlsController) {
+      return () => hlsController.reset();
+    }
   }, []);
 
   const qualitySelectorHandler = useCallback(

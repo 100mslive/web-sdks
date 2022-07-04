@@ -1,6 +1,6 @@
 import Hls from "hls.js";
+import { EventEmitter2 as EventEmitter } from "eventemitter2";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import { HLSEvent, HLSEventReactor } from "./HLSEvent";
 import {
   getSecondsFromTime,
   isMetadataAlreadyInTimeTable,
@@ -8,16 +8,17 @@ import {
   parseTagsList,
 } from "./HLSUtils";
 
+export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export class HLSController {
   hls;
   fragsTimeTable = new Map();
-  reactor = new HLSEventReactor();
+  eventEmitter = new EventEmitter();
   constructor(hlsUrl, videoRef) {
     this.hls = new Hls(this.getHLSConfig());
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
     this.handleHLSTimedMetadataParsing();
-    this.ControllerEvents = [HLSEvent.HLS_TIMED_METADATA_LOADED];
+    this.ControllerEvents = [HLS_TIMED_METADATA_LOADED];
   }
 
   reset() {
@@ -26,7 +27,7 @@ export class HLSController {
       this.hls = null;
     }
     this.fragsTimeTable = null;
-    this.reactor = null;
+    this.eventEmitter = null;
   }
 
   getHlsInstance() {
@@ -44,8 +45,7 @@ export class HLSController {
     if (this.ControllerEvents.indexOf(eventName) === -1) {
       this.hls.on(eventName, eventCallback);
     } else {
-      this.reactor.registerEvent(eventName);
-      this.reactor.addEventListener(eventName, eventCallback);
+      this.eventEmitter.addEventListener(eventName, eventCallback);
     }
   }
 
@@ -117,10 +117,10 @@ export class HLSController {
     /**
      * on Every Fragment change, we check if the fragment's
      * PROGRAM_TIME is nearby a possible metadata's START_TIME
-     * If it does, we start a setTimeout and try to dispatch an event
+     * If it does, we start a setTimeout and try to emit an event
      * on the right time.
      * NOTE: Javascript cannot gaurantee exact time, it
-     * only gaurantees minimum time before trying to dispatch.
+     * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
       const tagsList = parseTagsList(data?.frag.tagList);
@@ -213,18 +213,15 @@ export class HLSController {
         /**
          * we start a timeout for difference seconds.
          * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
-         * time JS will wait before calling dispatch(). It's not guaranteed even
+         * time JS will wait before calling emit(). It's not guaranteed even
          * for timeDifference = 0.
          */
         setTimeout(() => {
           /**
-           * finally dispatch event letting the user know its time to
+           * finally emit event letting the user know its time to
            * do whatever they want with the payload
            */
-          this.reactor.dispatchEvent(
-            HLSEvent.HLS_TIMED_METADATA_LOADED,
-            payload
-          );
+          this.eventEmitter.emit(HLS_TIMED_METADATA_LOADED, payload);
           /** we delete the occured events from the timetable. This is not
            * needed for the operation. Just a bit of optimisation as a really
            * long stream with many metadata can quickly make the timetable really big.
