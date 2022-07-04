@@ -122,7 +122,7 @@ const getMessageType = ({ roles, receiver }) => {
   return receiver ? "private" : "";
 };
 
-const ChatMessage = React.memo(({ message }) => {
+const ChatMessage = React.memo(({ message, index }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -146,6 +146,7 @@ const ChatMessage = React.memo(({ message }) => {
         px: "$2",
         py: "$4",
         mb: "$8",
+        mt: index === 0 ? "auto" : undefined,
       }}
       key={message.time}
       data-testid="chat_msg"
@@ -198,8 +199,8 @@ export const ChatBody = ({ role, peerId }) => {
 
   return (
     <Fragment>
-      {messages.map(message => {
-        return <ChatMessage key={message.id} message={message} />;
+      {messages.map((message, index) => {
+        return <ChatMessage key={message.id} message={message} index={index} />;
       })}
     </Fragment>
   );

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { ChevronDownIcon } from "@100mslive/react-icons";
 import { useHMSActions } from "@100mslive/react-sdk";
-import { Box, Button, Flex } from "@100mslive/react-ui";
+import { Button, Flex } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { ChatBody } from "./ChatBody";
@@ -47,10 +47,11 @@ export const Chat = () => {
           setSelectorOpen(value => !value);
         }}
       />
-      <Box
+      <Flex
+        direction="column"
         css={{
           flex: "1 1 0",
-          overflowY: isSelectorOpen ? "hidden" : "auto",
+          overflowY: "auto",
           pt: "$4",
           position: "relative",
         }}
@@ -62,8 +63,7 @@ export const Chat = () => {
           role={chatOptions.role}
           peerId={chatOptions.peerId}
         />
-      </Box>
-
+      </Flex>
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}
