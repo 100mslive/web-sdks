@@ -136,9 +136,10 @@ const DeviceSelector = ({
                   key={device.label}
                   onSelect={() => onChange(device.deviceId)}
                   css={{
+                    px: "$9",
                     bg:
                       device.deviceId === selection
-                        ? "$surfaceLighter"
+                        ? "$primaryDark"
                         : undefined,
                   }}
                 >
