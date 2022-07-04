@@ -141,7 +141,7 @@ export { default as NextIcon } from './NextIcon';
 export { default as NextJsIcon } from './NextJsIcon';
 export { default as NightIcon } from './NightIcon';
 export { default as NoEntryIcon } from './NoEntryIcon';
-export { default as Notifications } from './Notifications';
+export { default as NotificationsIcon } from './NotificationsIcon';
 export { default as OfferIcon } from './OfferIcon';
 export { default as OpenBook } from './OpenBook';
 export { default as PipIcon } from './PipIcon';
