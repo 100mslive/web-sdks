@@ -129,12 +129,18 @@ const DeviceSelector = ({
               {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
             </Flex>
           </Dropdown.Trigger>
-          <Dropdown.Content align="start" sideOffset={8} css={{ w: "100%" }}>
+          <Dropdown.Content align="start" sideOffset={8} css={{ w: "unset" }}>
             {devices.map(device => {
               return (
                 <Dropdown.Item
                   key={device.label}
-                  onClick={() => onChange(device.deviceId)}
+                  onSelect={() => onChange(device.deviceId)}
+                  css={{
+                    bg:
+                      device.deviceId === selection
+                        ? "$surfaceLighter"
+                        : undefined,
+                  }}
                 >
                   {device.label}
                 </Dropdown.Item>

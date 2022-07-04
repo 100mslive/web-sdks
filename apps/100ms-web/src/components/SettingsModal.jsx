@@ -30,7 +30,10 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               Notifications
             </Tabs.Trigger>
           </Tabs.List>
-          <Flex direction="column" css={{ flex: "1 1 0", minWidth: 0 }}>
+          <Flex
+            direction="column"
+            css={{ flex: "1 1 0", minWidth: 0, mr: "$4" }}
+          >
             <Tabs.Content value="devices">
               <Settings />
             </Tabs.Content>
