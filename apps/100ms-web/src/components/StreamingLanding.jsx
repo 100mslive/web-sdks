@@ -15,7 +15,6 @@ import {
   RecordIcon,
   InfoIcon,
   EndStreamIcon,
-  PeopleIcon,
 } from "@100mslive/react-icons";
 import {
   Flex,
@@ -174,7 +173,7 @@ const StartHLS = () => {
         align="center"
         css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
       >
-        <Text>
+        <Text css={{ color: "$error" }}>
           <RecordIcon />
         </Text>
         <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
