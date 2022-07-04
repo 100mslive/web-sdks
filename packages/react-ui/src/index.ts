@@ -27,4 +27,4 @@ export * from './Label';
 export * from './RadioGroup';
 export * from './Toast';
 export * from './Accordion';
-export * from './Inputfield';
+export * from './Fieldset';

@@ -1,6 +1,6 @@
 import { styled } from '../Theme';
 
-const Fieldset = styled('fieldset', {
+const StyledFieldset = styled('fieldset', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -8,4 +8,4 @@ const Fieldset = styled('fieldset', {
   backgroundColor: '$transparent',
 });
 
-export const Inputfield = Fieldset;
+export const Fieldset = StyledFieldset;
