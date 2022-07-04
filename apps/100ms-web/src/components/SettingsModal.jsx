@@ -1,6 +1,10 @@
 import React from "react";
-import { SettingsIcon, NotificationsIcon } from "@100mslive/react-icons";
-import { Dialog, Flex, Tabs, Text } from "@100mslive/react-ui";
+import {
+  SettingsIcon,
+  NotificationsIcon,
+  CrossIcon,
+} from "@100mslive/react-icons";
+import { Dialog, Flex, IconButton, Tabs, Text } from "@100mslive/react-ui";
 import DeviceSettings from "./DeviceSettings";
 import { NotificationSettings } from "./NotificationSettings";
 
@@ -9,7 +13,11 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Dialog.Content
-        css={{ w: "min(800px, 100%)", height: "min(656px, 90%)", p: 0 }}
+        css={{
+          w: "min(800px, 100%)",
+          height: "min(656px, 90%)",
+          p: 0,
+        }}
       >
         <Tabs.Root defaultValue="devices" css={{ size: "100%" }}>
           <Tabs.List
@@ -42,6 +50,11 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
             </Tabs.Content>
           </Flex>
         </Tabs.Root>
+        <Dialog.Close css={{ position: "absolute", right: "$10", top: "$10" }}>
+          <IconButton>
+            <CrossIcon />
+          </IconButton>
+        </Dialog.Close>
       </Dialog.Content>
     </Dialog.Root>
   );
