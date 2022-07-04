@@ -1,5 +1,11 @@
 import { Fragment, useCallback, useState } from "react";
 import {
+  selectAppData,
+  useHMSActions,
+  useHMSStore,
+  useRecordingStreaming,
+} from "@100mslive/react-sdk";
+import {
   ChevronRightIcon,
   CrossIcon,
   WiredMic,
@@ -21,14 +27,8 @@ import {
   Switch,
 } from "@100mslive/react-ui";
 import { useSidepaneToggle } from "./AppData/useSidepane";
-import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
 import { getDefaultMeetingUrl } from "../common/utils";
-import {
-  selectAppData,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from "@100mslive/react-sdk";
+import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
 
 export const StreamingLanding = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
