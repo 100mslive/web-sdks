@@ -56,10 +56,6 @@ export const StreamingLanding = () => {
         </IconButton>
       </Flex>
       <Text variant="tiny" color="$textMedEmp">
-        Add Other Speakers
-      </Text>
-      <StreamCard title="Invite others to join" subtitle="Add more people" />
-      <Text variant="tiny" color="$textMedEmp">
         Start Streaming
       </Text>
       <StreamCard
@@ -209,10 +205,6 @@ const EndHLS = () => {
   const hmsActions = useHMSActions();
   return (
     <Box css={{ p: "$4 $10" }}>
-      <Button css={{ w: "100%", r: "$0" }} icon>
-        <PeopleIcon />
-        Invite People
-      </Button>
       <Button
         variant="danger"
         css={{ w: "100%", r: "$0", my: "$8" }}
