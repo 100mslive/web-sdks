@@ -29,7 +29,7 @@ const StyledTrigger = styled(TabsPrimitive.Trigger, {
 
 const StyledContent = styled(TabsPrimitive.Content, {
   flexGrow: 1,
-  padding: '$10',
+  padding: '$10 0',
   outline: 'none',
 });
 
