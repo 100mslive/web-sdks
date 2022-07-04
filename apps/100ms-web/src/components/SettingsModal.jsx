@@ -1,7 +1,7 @@
 import React from "react";
 import { SettingsIcon, NotificationsIcon } from "@100mslive/react-icons";
 import { Dialog, Flex, Tabs, Text } from "@100mslive/react-ui";
-import Settings from "./Settings";
+import DeviceSettings from "./DeviceSettings";
 import { NotificationSettings } from "./NotificationSettings";
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
@@ -35,7 +35,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
             css={{ flex: "1 1 0", minWidth: 0, mr: "$4" }}
           >
             <Tabs.Content value="devices">
-              <Settings />
+              <DeviceSettings />
             </Tabs.Content>
             <Tabs.Content value="notifications">
               <NotificationSettings />
