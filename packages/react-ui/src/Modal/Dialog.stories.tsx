@@ -10,6 +10,7 @@ import { Text } from '../Text';
 import { IconButton } from '../IconButton';
 import { Flex } from '../Layout';
 import { CrossIcon, InfoIcon } from '@100mslive/react-icons';
+import { relative } from 'path';
 
 export default {
   title: 'UI Components/Dialog',
@@ -24,20 +25,20 @@ export default {
 
 //👇 We create a “template” of how args map to rendering
 const Template: ComponentStory<typeof Dialog.Root> = args => (
-  <Dialog.Root>
+  <Dialog.Root css={{ position: 'relative' }}>
     <Dialog.Trigger asChild>
       <Button variant="standard">Open Dialog</Button>
     </Dialog.Trigger>
-    <Dialog.Content css={{ pt: '0' }}>
+    <Dialog.Content>
       <Dialog.Title css={{ c: '$textHighEmp', position: 'relative' }}>
-        <Flex justify="start" align="center" gap="3">
-          <InfoIcon></InfoIcon>
-          <Text variant="h5">Dialog Heading</Text>
-          <Dialog.Close asChild>
-            <Button variant="danger" aria-label="close" css={{ position: 'absolute', right: '$2', p: '$2 $4' }}>
-              <CrossIcon></CrossIcon>
-            </Button>
-          </Dialog.Close>
+        <Flex direction="row" justify="between" css={{ w: '100%' }}>
+          <Flex justify="start" align="center" gap="3">
+            <InfoIcon></InfoIcon>
+            <Text variant="h5">Dialog Heading</Text>
+          </Flex>
+          <Dialog.DefaultClose css={{ position: 'absolute', top: '-1rem', right: '-1rem' }}>
+            <CrossIcon></CrossIcon>
+          </Dialog.DefaultClose>
         </Flex>
       </Dialog.Title>
       <Text variant="body1" css={{ c: '$textMedEmp' }}>
@@ -47,11 +48,11 @@ const Template: ComponentStory<typeof Dialog.Root> = args => (
       </Text>
       <Inputfield css={{ mt: '$4' }}>
         <Label htmlFor="name">Name</Label>
-        <Input id="name" defaultValue="Hardik" />
+        <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
       </Inputfield>
       <Inputfield>
         <Label htmlFor="username">Username</Label>
-        <Input id="username" defaultValue="@hdz666" />
+        <Input id="username" defaultValue="@hdz666" css={{ w: '50%' }} />
       </Inputfield>
       <Flex css={{ marginTop: 25, justifyContent: 'flex-end' }}>
         <Dialog.Close asChild>

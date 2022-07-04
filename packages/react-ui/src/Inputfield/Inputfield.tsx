@@ -6,7 +6,6 @@ const Fieldset = styled('fieldset', {
   justifyContent: 'space-between',
   border: 'none',
   backgroundColor: '$transparent',
-  width: '100%',
 });
 
 export const Inputfield = Fieldset;

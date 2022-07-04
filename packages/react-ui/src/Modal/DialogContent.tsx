@@ -26,7 +26,7 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   zIndex: 999,
-  padding: '1.5rem',
+  padding: '$12',
   '@allowMotion': {
     '&[data-state="open"]': {
       animation: `${dialogOpen} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
@@ -38,7 +38,10 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
   '&:focus': { outline: 'none' },
 });
 
-export const DialogTitle = styled(DialogPrimitive.Title, {});
+export const DialogTitle = styled(DialogPrimitive.Title, {
+  margin: '0',
+  padding: '0.5rem',
+});
 
 export const DialogDefaultCloseIcon = ({ ...props }: any) => (
   <DialogClose asChild>
