@@ -43,7 +43,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: "min(400px,100%)", p: "$10" }}>
-        <Dialog.Title>
+        <Dialog.Title css={{ p: "0 $4 0 $4" }}>
           <Text variant="h6"> Change Name</Text>
         </Dialog.Title>
         <form
@@ -66,7 +66,12 @@ export const ChangeNameModal = ({ onOpenChange }) => {
 
           <DialogRow
             justify="between"
-            css={{ width: "100%", flexDirection: "row", gap: "$md" }}
+            css={{
+              width: "100%",
+              flexDirection: "row",
+              gap: "$md",
+              margin: "$10 0 0 0",
+            }}
           >
             <Box css={{ w: "50%" }}>
               <Dialog.Close css={{ w: "100%" }}>
