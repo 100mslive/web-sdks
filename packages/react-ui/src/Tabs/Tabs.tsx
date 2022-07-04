@@ -1,0 +1,41 @@
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { styled } from '../Theme';
+
+const StyledTabsRoot = styled(TabsPrimitive.Root, {
+  display: 'flex',
+});
+
+const StyledList = styled(TabsPrimitive.List, {
+  flexShrink: 0,
+  display: 'flex',
+});
+
+const StyledTrigger = styled(TabsPrimitive.Trigger, {
+  all: 'unset',
+  fontFamily: '$sans',
+  height: '$16',
+  p: '$2 $8',
+  display: 'flex',
+  alignItems: 'center',
+  fontSize: '$sm',
+  lineHeight: '$sm',
+  color: '$textHighEmp',
+  userSelect: 'none',
+  '&[data-state="active"]': {
+    bg: '$surfaceLighter',
+    r: '$1',
+  },
+});
+
+const StyledContent = styled(TabsPrimitive.Content, {
+  flexGrow: 1,
+  padding: '$10',
+  outline: 'none',
+});
+
+export const Tabs = {
+  Root: StyledTabsRoot,
+  List: StyledList,
+  Content: StyledContent,
+  Trigger: StyledTrigger,
+};
