@@ -67,6 +67,7 @@ const StyledContent = styled(BaseAccordion.Content, {
   fontFamily: '$sans',
   color: '$textMedEmp',
   backgroundColor: '$surfaceDefault',
+  padding: '$8 $9',
 
   '&[data-state="open"]': {
     animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
@@ -82,9 +83,7 @@ const StyledChevron = styled(ChevronDownIcon, {
   '[data-state=open] &': { transform: 'rotate(180deg)' },
 });
 
-const StyledContentText = styled('div', {
-  p: '$8 $9',
-});
+const StyledContentText = styled('div', {});
 
 // Exports
 export const AccordionRoot = StyledAccordion;
