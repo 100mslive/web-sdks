@@ -5,7 +5,7 @@ import React from 'react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { Label } from '../Label';
-import { Inputfield } from '../Inputfield';
+import { Fieldset } from '../Fieldset';
 import { Text } from '../Text';
 import { IconButton } from '../IconButton';
 import { Flex } from '../Layout';
@@ -46,14 +46,14 @@ const Template: ComponentStory<typeof Dialog.Root> = args => (
         dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
         labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
       </Text>
-      <Inputfield css={{ mt: '$4' }}>
+      <Fieldset css={{ mt: '$4' }}>
         <Label htmlFor="name">Name</Label>
         <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
-      </Inputfield>
-      <Inputfield>
+      </Fieldset>
+      <Fieldset>
         <Label htmlFor="username">Username</Label>
         <Input id="username" defaultValue="@hdz666" css={{ w: '50%' }} />
-      </Inputfield>
+      </Fieldset>
       <Flex css={{ marginTop: 25, justifyContent: 'flex-end' }}>
         <Dialog.Close asChild>
           <Button variant="primary">Save changes</Button>

@@ -9,7 +9,7 @@ import { Tooltip } from '../Tooltip';
 import { Text } from '../Text';
 import { Label } from '../Label';
 import { Input } from '../Input';
-import { Inputfield } from '../Inputfield';
+import { Fieldset } from '../Fieldset';
 
 export default {
   title: 'UI Components/Popover',
@@ -48,30 +48,30 @@ const Template: ComponentStory<typeof Popover.Root> = args => (
               <CrossIcon width="0.75rem" height="0.75rem"></CrossIcon>
             </Box>
           </Flex>
-          <Inputfield css={{ justifyContent: 'between', width: '100%' }}>
+          <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
             <Label htmlFor="width">
               <Text variant="sub2">Width</Text>
             </Label>
             <Input />
-          </Inputfield>
-          <Inputfield>
+          </Fieldset>
+          <Fieldset>
             <Label htmlFor="maxWidth">
               <Text variant="sub2">Max. width</Text>
             </Label>
             <Input />
-          </Inputfield>
-          <Inputfield>
+          </Fieldset>
+          <Fieldset>
             <Label htmlFor="height">
               <Text variant="sub2">Height</Text>
             </Label>
             <Input />
-          </Inputfield>
-          <Inputfield>
+          </Fieldset>
+          <Fieldset>
             <Label htmlFor="maxHeight">
               <Text variant="sub2">Max. height</Text>
             </Label>
             <Input />
-          </Inputfield>
+          </Fieldset>
         </Flex>
         <Popover.Arrow css={{ width: '$4' }} />
       </Popover.Content>
