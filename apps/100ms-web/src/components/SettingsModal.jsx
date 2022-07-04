@@ -51,7 +51,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
           </Flex>
         </Tabs.Root>
         <Dialog.Close css={{ position: "absolute", right: "$10", top: "$10" }}>
-          <IconButton>
+          <IconButton as="div">
             <CrossIcon />
           </IconButton>
         </Dialog.Close>
