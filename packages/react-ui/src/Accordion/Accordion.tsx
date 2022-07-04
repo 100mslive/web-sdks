@@ -41,11 +41,12 @@ const StyledItem = styled(BaseAccordion.Item, {
 const StyledHeader = styled(BaseAccordion.Header, {
   all: 'unset',
   display: 'flex',
+  fontFamily: '$sans',
 });
 
 const StyledTrigger = styled(BaseAccordion.Trigger, {
   all: 'unset',
-  fontFamily: 'inherit',
+  fontFamily: '$sans',
   backgroundColor: '$surfaceDefault',
   padding: '$8 $9',
   flex: 1,
@@ -63,6 +64,7 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
 const StyledContent = styled(BaseAccordion.Content, {
   overflow: 'hidden',
   fontSize: '$7',
+  fontFamily: '$sans',
   color: '$textMedEmp',
   backgroundColor: '$surfaceDefault',
 
@@ -88,21 +90,23 @@ const StyledContentText = styled('div', {
 export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
-export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps>> = React.forwardRef(
-  ({ children, ...props }) => (
-    <StyledHeader>
-      <StyledTrigger {...props}>
-        {children}
-        <StyledChevron aria-hidden />
-      </StyledTrigger>
-    </StyledHeader>
-  ),
-);
+export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps>> = React.forwardRef<
+  HTMLButtonElement,
+  PropsWithChildren<BaseAccordion.AccordionTriggerProps>
+>(({ children, ...props }, forwardedRef) => (
+  <StyledHeader>
+    <StyledTrigger {...props} ref={forwardedRef}>
+      {children}
+      <StyledChevron aria-hidden />
+    </StyledTrigger>
+  </StyledHeader>
+));
 
-export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.AccordionContentProps>> = React.forwardRef(
-  ({ children, ...props }) => (
-    <StyledContent {...props}>
-      <StyledContentText>{children}</StyledContentText>
-    </StyledContent>
-  ),
-);
+export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.AccordionContentProps>> = React.forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<BaseAccordion.AccordionContentProps>
+>(({ children, ...props }, forwardedRef) => (
+  <StyledContent {...props} ref={forwardedRef}>
+    <StyledContentText>{children}</StyledContentText>
+  </StyledContent>
+));
