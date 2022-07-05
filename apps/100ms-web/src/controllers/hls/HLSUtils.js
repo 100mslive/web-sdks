@@ -69,7 +69,7 @@ export function getSecondsFromTime(time) {
   return time.getHours() * 60 * 60 + time.getMinutes() * 60 + time.getSeconds();
 }
 
-export function isMetadataAlreadyInTimeTable(fragsTimeStamps, tagMetadata) {
+export function isAlreadyInMetadataMap(fragsTimeStamps, tagMetadata) {
   const alreadyExistingmetadata = fragsTimeStamps.filter(
     fragsTimeStamp => fragsTimeStamp.id === tagMetadata.id
   );

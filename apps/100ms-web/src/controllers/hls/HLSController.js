@@ -3,7 +3,7 @@ import { EventEmitter2 as EventEmitter } from "eventemitter2";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   getSecondsFromTime,
-  isMetadataAlreadyInTimeTable,
+  isAlreadyInMetadataMap,
   parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
@@ -54,7 +54,7 @@ export class HLSController {
      * Everytime a fragment is appended to the buffer,
      * we parse the tags and see if the metadata is
      * in the tags. If it does, we parse the metadatastrings
-     * and create a timetable. This timetable is a map of key value
+     * and create a metadataMap. This metadataMap is a map of key value
      * pairs with timeinSeconds as key and the value is an array of objects
      * of the parsed metadata.
      * (e.g)
@@ -83,26 +83,23 @@ export class HLSController {
            * <timesegment>: [mt1, mt2, mt3]
            */
           if (this.metadataByTimeStamp.has(timeSegment)) {
-            // timetable already exist
+            // entry already exist in metadatamap
             const metadataByTimeStampEntries =
               this.metadataByTimeStamp.get(timeSegment);
 
             /**
              * Backend will keep sending the same metadata tags in each fragments
              * until the fragment programtime exceed metadata starttime. so to prevent
-             * same tags getting parsed into timetable, we do a quick check here.
+             * same tags getting parsed into metadataMap, we do a quick check here.
              */
             if (
-              !isMetadataAlreadyInTimeTable(
-                metadataByTimeStampEntries,
-                tagMetadata
-              )
+              !isAlreadyInMetadataMap(metadataByTimeStampEntries, tagMetadata)
             ) {
               // append current metadata to existing timestamp
               this.metadataByTimeStamp.get(timeSegment).push(tagMetadata);
             }
           } else {
-            // no entry in timetable exist. So add a new entry
+            // no entry in metadataMap exist. So add a new entry
             this.metadataByTimeStamp.set(timeSegment, [
               {
                 ...tagMetadata,
@@ -122,10 +119,6 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-      console.log(
-        "Loading fragment with PROGRAM_TIME",
-        new Date().toUTCString()
-      );
       const tagsList = parseTagsList(data?.frag.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];
@@ -225,9 +218,9 @@ export class HLSController {
            * do whatever they want with the payload
            */
           this.eventEmitter.emit(HLS_TIMED_METADATA_LOADED, payload);
-          /** we delete the occured events from the timetable. This is not
+          /** we delete the occured events from the metadataMap. This is not
            * needed for the operation. Just a bit of optimisation as a really
-           * long stream with many metadata can quickly make the timetable really big.
+           * long stream with many metadata can quickly make the metadataMap really big.
            */
           this.metadataByTimeStamp.delete(nearestTimeStamp);
         }, timeDifference * 1000);
