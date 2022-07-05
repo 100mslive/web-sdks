@@ -10,7 +10,7 @@ import {
   UserPreferencesKeys,
 } from "../hooks/useUserPreferences";
 import { ToastManager } from "../Toast/ToastManager";
-
+import { DialogRow } from "../../primitives/DialogContent";
 export const ChangeNameModal = ({ onOpenChange }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW
@@ -41,7 +41,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Overlay />
-      <Dialog.Content css={{ width: "min(400px,100%)", p: "$10" }}>
+      <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
         <Dialog.Title css={{ p: "0 $4" }}>
           <Text variant="h6"> Change Name</Text>
         </Dialog.Title>
@@ -50,7 +50,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
             e.preventDefault();
           }}
         >
-          <Flex justify="center" css={{ my: "$8" }}>
+          <Flex justify="center" align="center" css={{ my: "$8", w: "100%" }}>
             <Input
               css={{ width: "100%" }}
               value={currentName}
@@ -65,6 +65,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
 
           <Flex
             justify="between"
+            align="center"
             css={{
               width: "100%",
               flexDirection: "row",
