@@ -5,15 +5,9 @@ export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
   let roomCode = null;
   if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
-    roomCode = '';
-    for (let i = 9; i < path.length; i++) {
-      if (path[i] === '/') {
-        break;
-      }
-      roomCode += path[i];
-    }
-    if (roomCode.trim() === '') {
-      roomCode = null;
+    const roomPart = path.split('/')[2];
+    if (roomPart?.trim()) {
+      roomCode = roomPart;
     }
   }
   return roomCode;
@@ -41,6 +35,8 @@ const tileShapeMapping = {
   '9-16': '9-16',
 };
 
+export const apiBasePath = `https://${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
+
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
   const formData = new FormData();
@@ -58,8 +54,7 @@ export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   formData.append('subdomain', hostname);
   formData.append('metadata', settings.metadataFields.metadata);
 
-  axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-  const url = `${process.env.REACT_APP_BACKEND_API}apps/details`;
+  const url = `${apiBasePath}apps/details`;
 
   const headers = {
     Authorization: `Bearer ${jwt}`,
