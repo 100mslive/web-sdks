@@ -581,10 +581,11 @@ export default class HMSTransport implements ITransport {
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
-    if (metadataList) {
+    if (metadataList.length > 0) {
       const hlsMtParams: HLSTimedMetadataParams = {
         metadata_objs: metadataList,
       };
+
       await this.signal.sendHLSTimedMetadata(hlsMtParams);
     }
   }
