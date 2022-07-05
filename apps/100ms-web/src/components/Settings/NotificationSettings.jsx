@@ -1,6 +1,4 @@
 import React, { useContext } from "react";
-import { Flex, Label, Box, Switch } from "@100mslive/react-ui";
-import { AppContext } from "../context/AppContext";
 import {
   AlertOctagonIcon,
   ChatIcon,
@@ -8,47 +6,24 @@ import {
   HandIcon,
   PersonIcon,
 } from "@100mslive/react-icons";
+import { Box } from "@100mslive/react-ui";
+import SwitchWithLabel from "./SwitchWithLabel";
+import { AppContext } from "../context/AppContext";
 
 const NotificationItem = ({ onClick, type, label, icon, checked }) => {
   return (
-    <Flex
-      align="center"
-      key={type}
-      css={{
-        my: "$2",
-        py: "$8",
-        w: "100%",
-        borderBottom: "1px solid $borderDefault",
+    <SwitchWithLabel
+      label={label}
+      id={type}
+      icon={icon}
+      checked={checked}
+      onChange={value => {
+        onClick({
+          type,
+          isSubscribed: value,
+        });
       }}
-    >
-      <Label
-        htmlFor={label}
-        css={{
-          ml: "$4",
-          fontSize: "$md",
-          fontWeight: "$semiBold",
-          color: checked ? "$textHighEmp" : "$textDisabled",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "$8",
-        }}
-      >
-        {icon}
-        {label}
-      </Label>
-      <Switch
-        css={{ ml: "auto" }}
-        id={label}
-        checked={checked}
-        onCheckedChange={value => {
-          onClick({
-            type,
-            isSubscribed: value,
-          });
-        }}
-      />
-    </Flex>
+    />
   );
 };
 

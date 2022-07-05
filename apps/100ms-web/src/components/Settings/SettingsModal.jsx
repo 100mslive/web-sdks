@@ -5,6 +5,7 @@ import {
   NotificationsIcon,
   CrossIcon,
   ChevronLeftIcon,
+  GridFourIcon,
 } from "@100mslive/react-icons";
 import {
   Dialog,
@@ -17,6 +18,7 @@ import {
 } from "@100mslive/react-ui";
 import DeviceSettings from "./DeviceSettings";
 import { NotificationSettings } from "./NotificationSettings";
+import { LayoutSettings } from "./LayoutSettings";
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -74,6 +76,10 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 <NotificationsIcon />
                 Notifications
               </Tabs.Trigger>
+              <Tabs.Trigger value="layout" css={{ gap: "$8" }}>
+                <GridFourIcon />
+                Layout
+              </Tabs.Trigger>
             </Flex>
           </Tabs.List>
           {selection && (
@@ -112,6 +118,15 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   Notifications
                 </SettingsContentHeader>
                 <NotificationSettings />
+              </Tabs.Content>
+              <Tabs.Content value="layout">
+                <SettingsContentHeader
+                  onBack={resetSelection}
+                  isMobile={isMobile}
+                >
+                  Layout
+                </SettingsContentHeader>
+                <LayoutSettings />
               </Tabs.Content>
             </Flex>
           )}

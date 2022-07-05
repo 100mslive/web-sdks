@@ -20,6 +20,7 @@ const StyledTrigger = styled(TabsPrimitive.Trigger, {
   lineHeight: '$sm',
   color: '$textHighEmp',
   userSelect: 'none',
+  cursor: 'pointer',
   '&[data-state="active"]': {
     bg: '$surfaceLighter',
     r: '$1',
