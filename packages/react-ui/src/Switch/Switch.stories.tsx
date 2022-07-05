@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Switch } from './Switch';
 import SwitchDocs from './Switch.mdx';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Flex } from '../Layout';
 
 export default {
@@ -12,10 +12,9 @@ export default {
   },
   args: {
     disabled: false,
-    defaultChecked: true,
+    checked: true,
     required: false,
   },
-
   parameters: {
     docs: {
       page: SwitchDocs,
@@ -24,11 +23,14 @@ export default {
 } as ComponentMeta<typeof Switch>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Switch> = args => {
+const Template: ComponentStory<typeof Switch> = ({ checked: initialChecked, ...args }) => {
   const [checked, onCheckedChange] = React.useState(false);
+  useEffect(() => {
+    onCheckedChange(!!initialChecked);
+  }, [initialChecked]);
   return (
     <Flex align="center" justify="center" css={{ w: '$20', h: '$20' }}>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} {...args} />
+      <Switch checked={checked} {...args} onCheckedChange={onCheckedChange} />
     </Flex>
   );
 };

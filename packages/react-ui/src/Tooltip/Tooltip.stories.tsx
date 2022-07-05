@@ -5,6 +5,12 @@ import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Tooltip',
+  argTypes: {
+    icon: { control: 'boolean' },
+  },
+  args: {
+    icon: true,
+  },
   component: Tooltip,
 } as ComponentMeta<typeof Tooltip>;
 
@@ -23,7 +29,7 @@ ExampleWithString.args = {
 };
 
 const Example = () => {
-  return <h1>Hi</h1>;
+  return <h1 style={{ color: '#020202', backgroundColor: '#000f04' }}>Hi</h1>;
 };
 
 const TooltipStorywithReactNode = () => {

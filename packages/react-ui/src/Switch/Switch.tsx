@@ -29,10 +29,9 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   height: '$md',
   backgroundColor: '$secondaryDefault',
   borderRadius: '$round',
-  transition: 'transform 100ms',
-  transform: 'translateX(0.5px)',
-  willChange: 'transform',
-  '&[data-state="checked"]': { transform: 'translateX(14px)', backgroundColor: '$textHighEmp' },
+  transition: 'right 500ms ease-in',
+  left: '$2',
+  '&[data-state="checked"]': { left: 'unset', right: '$2', backgroundColor: '$textHighEmp' },
 });
 
 type SwitchProps = React.ComponentProps<typeof SwitchRoot>;
