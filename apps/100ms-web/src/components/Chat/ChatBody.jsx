@@ -3,6 +3,7 @@ import { useInView } from "react-intersection-observer";
 import {
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
   selectPeerNameByID,
@@ -59,6 +60,7 @@ const TypeContainer = ({ left, right }) => {
 
 const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   const peerName = useHMSStore(selectPeerNameByID(receiver));
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   if (receiver) {
     return (
       <TypeContainer
@@ -71,7 +73,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   }
 
   if (roles && roles.length) {
-    return <TypeContainer left="TO" right={roles.join(",")} />;
+    return <TypeContainer left="TO" right={localPeerRoleName} />;
   }
   return null;
 };
