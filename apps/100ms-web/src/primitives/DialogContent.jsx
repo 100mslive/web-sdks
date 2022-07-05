@@ -87,11 +87,11 @@ export const RequestDialog = ({
 }) => (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
     <Dialog.Overlay />
-    <Dialog.Content css={{ width: "min(600px,80%)", p: "$10" }}>
+    <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
       <Dialog.Title
         css={{ p: 0, display: "flex", flexDirection: "row", gap: "$md" }}
       >
-        {Icon}
+        {Icon ? Icon : null}
         <Text variant="h6">{title}</Text>
       </Dialog.Title>
       <Text
