@@ -4,8 +4,7 @@ import {
   useHMSStore,
   selectLocalPeerName,
 } from "@100mslive/react-sdk";
-import { Dialog, Button, Text, Box, Input } from "@100mslive/react-ui";
-import { DialogRow } from "../../primitives/DialogContent";
+import { Dialog, Flex, Button, Text, Box, Input } from "@100mslive/react-ui";
 import {
   useUserPreferences,
   UserPreferencesKeys,
@@ -43,7 +42,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: "min(400px,100%)", p: "$10" }}>
-        <Dialog.Title css={{ p: "0 $4 0 $4" }}>
+        <Dialog.Title css={{ p: "0 $4" }}>
           <Text variant="h6"> Change Name</Text>
         </Dialog.Title>
         <form
@@ -51,7 +50,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
             e.preventDefault();
           }}
         >
-          <DialogRow justify="center" css={{ my: "$md" }}>
+          <Flex justify="center" css={{ my: "$8" }}>
             <Input
               css={{ width: "100%" }}
               value={currentName}
@@ -62,9 +61,9 @@ export const ChangeNameModal = ({ onOpenChange }) => {
               required
               data-testid="change_name_field"
             />
-          </DialogRow>
+          </Flex>
 
-          <DialogRow
+          <Flex
             justify="between"
             css={{
               width: "100%",
@@ -102,7 +101,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
                 Change
               </Button>
             </Box>
-          </DialogRow>
+          </Flex>
         </form>
       </Dialog.Content>
     </Dialog.Root>
