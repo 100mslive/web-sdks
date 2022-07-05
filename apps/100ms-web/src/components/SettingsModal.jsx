@@ -29,7 +29,10 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
             }}
           >
             <Text variant="h5">Settings </Text>
-            <Tabs.Trigger value="devices" css={{ gap: "$8", mt: "$10" }}>
+            <Tabs.Trigger
+              value="devices"
+              css={{ gap: "$8", mt: "$10", mb: "$4" }}
+            >
               <SettingsIcon />
               Device Settings
             </Tabs.Trigger>

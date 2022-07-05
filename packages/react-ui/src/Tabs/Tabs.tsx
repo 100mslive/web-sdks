@@ -13,8 +13,7 @@ const StyledList = styled(TabsPrimitive.List, {
 const StyledTrigger = styled(TabsPrimitive.Trigger, {
   all: 'unset',
   fontFamily: '$sans',
-  height: '$16',
-  p: '$2 $8',
+  p: '$8',
   display: 'flex',
   alignItems: 'center',
   fontSize: '$sm',
