@@ -23,16 +23,6 @@ import { MuteAllModal } from "./MuteAllModal";
 import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
 
-const hoverStyles = {
-  "&:hover": {
-    cursor: "pointer",
-    bg: "$iconHoverBg",
-  },
-  "&:focus-visible": {
-    bg: "$iconHoverBg",
-  },
-};
-
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -67,7 +57,6 @@ export const MoreSettings = () => {
           css={{ maxHeight: "$96" }}
         >
           <Dropdown.Item
-            css={hoverStyles}
             onClick={() => setShowChangeNameModal(value => !value)}
             data-testid="change_name_btn"
           >
@@ -76,15 +65,11 @@ export const MoreSettings = () => {
               Change Name
             </Text>
           </Dropdown.Item>
-          <ChangeSelfRole
-            css={hoverStyles}
-            onClick={() => setShowSelfRoleChange(true)}
-          />
-          <FullScreenItem hoverStyles={hoverStyles} />
+          <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
+          <FullScreenItem />
           {permissions.mute && (
             <Dropdown.Item
               onClick={() => setShowMuteAll(true)}
-              css={hoverStyles}
               data-testid="mute_all_btn"
             >
               <MicOffIcon />
@@ -96,7 +81,6 @@ export const MoreSettings = () => {
           <Dropdown.ItemSeparator />
           <Dropdown.Item
             onClick={() => setShowDeviceSettings(true)}
-            css={hoverStyles}
             data-testid="device_settings_btn"
           >
             <SettingIcon />
@@ -107,7 +91,6 @@ export const MoreSettings = () => {
           {FeatureFlags.enableStatsForNerds && (
             <Dropdown.Item
               onClick={() => setShowStatsForNerds(true)}
-              css={hoverStyles}
               data-testid="stats_for_nreds_btn"
             >
               <InfoIcon />

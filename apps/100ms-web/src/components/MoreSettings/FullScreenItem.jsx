@@ -3,7 +3,7 @@ import { ExpandIcon } from "@100mslive/react-icons";
 import { Dropdown, Text } from "@100mslive/react-ui";
 import { useFullscreen } from "../hooks/useFullscreen";
 
-export const FullScreenItem = ({ hoverStyles }) => {
+export const FullScreenItem = () => {
   const { allowed, isFullscreen, toggleFullscreen } = useFullscreen();
 
   if (!allowed) {
@@ -15,7 +15,6 @@ export const FullScreenItem = ({ hoverStyles }) => {
       onClick={() => {
         toggleFullscreen();
       }}
-      css={hoverStyles}
       data-testid="full_screen_btn"
     >
       <ExpandIcon />
