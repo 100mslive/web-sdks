@@ -7,7 +7,7 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
-  HLSTimedMetadata
+  HLSTimedMetadata,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,

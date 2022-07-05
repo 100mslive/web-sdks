@@ -168,7 +168,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
             <DialogCheckbox
               title="Recording"
               value={recordingSelected || isRecordingOn}
-              // disabled={isAnythingRunning}
+              disabled={isAnythingRunning}
               id="recordingCheckbox"
               onChange={setRecording}
             />
