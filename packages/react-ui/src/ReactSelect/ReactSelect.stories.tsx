@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Text } from '@100mslive/react-ui';
+import { Text } from '..';
 import { Select } from './ReactSelect';
 
 export default {

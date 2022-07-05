@@ -21,11 +21,11 @@ import {
 import { Slider } from '../Slider';
 import { Flex, StyledMenuTile } from './StyledMenuTile';
 
-interface Props {
+export interface TileMenuProps {
   peerId: HMSPeerID;
 }
 
-export const TileMenu: React.FC<Props> = ({ peerId }) => {
+export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
   const actions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   // TODO: selectTrackByID vs selectVideoTrackByPeerID
