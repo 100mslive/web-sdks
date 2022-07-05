@@ -14,7 +14,6 @@ import {
 import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { FullScreenItem } from "./FullScreenItem";
-import { UISettings } from "./UISettings";
 import SettingsModal from "../Settings/SettingsModal";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ChangeNameModal } from "./ChangeNameModal";
@@ -32,7 +31,6 @@ export const MoreSettings = () => {
   const [showMuteAll, setShowMuteAll] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
-  const [showUISettings, setShowUISettings] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
 
   return (
@@ -116,9 +114,6 @@ export const MoreSettings = () => {
           open={showStatsForNerds}
           onOpenChange={setShowStatsForNerds}
         />
-      )}
-      {showUISettings && (
-        <UISettings open={showUISettings} onOpenChange={setShowUISettings} />
       )}
       {showSelfRoleChange && (
         <RoleChangeModal
