@@ -18,7 +18,7 @@ import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { FullScreenItem } from "./FullScreenItem";
 import { UISettings } from "./UISettings";
-import SettingsModal from "../SettingsModal";
+import SettingsModal from "../Settings/SettingsModal";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ChangeNameModal } from "./ChangeNameModal";
 import { StatsForNerds } from "../StatsForNerds";

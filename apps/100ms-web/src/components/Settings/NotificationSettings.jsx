@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Flex, Label, Box, Switch } from "@100mslive/react-ui";
-import { AppContext } from "./context/AppContext";
+import { AppContext } from "../context/AppContext";
 import {
   AlertOctagonIcon,
   ChatIcon,

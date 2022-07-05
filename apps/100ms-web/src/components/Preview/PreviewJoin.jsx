@@ -22,7 +22,7 @@ import {
 } from "@100mslive/react-ui";
 import { SettingsIcon, ArrowRightIcon } from "@100mslive/react-icons";
 import { AudioVideoToggle } from "../AudioVideoToggle";
-import SettingsModal from "../SettingsModal";
+import SettingsModal from "../Settings/SettingsModal";
 import TileConnection from "../Connection/TileConnection";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import IconButton from "../../IconButton";
