@@ -123,6 +123,10 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
+      console.log(
+        "loading fragment with PROGRAM_TIME",
+        new Date().toUTCString()
+      );
       const tagsList = parseTagsList(data?.frag.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];

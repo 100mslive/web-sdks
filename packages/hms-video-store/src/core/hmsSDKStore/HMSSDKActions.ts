@@ -553,8 +553,8 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopHLSStreaming(params);
   }
 
-  async sendHLSTimedMetadata(params?: sdkTypes.SendHLSTimedMetadata): Promise<void> {
-    await this.sdk.sendHLSTimedMetadata(params);
+  async sendHLSTimedMetadata(metadata: sdkTypes.HLSTimedMetadata[]): Promise<void> {
+    await this.sdk.sendHLSTimedMetadata(metadata);
   }
   async changeName(name: string) {
     await this.sdk.changeName(name);

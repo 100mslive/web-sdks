@@ -7,7 +7,7 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
-  SendHLSTimedMetadata,
+  HLSTimedMetadata
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -319,7 +319,7 @@ export interface IHMSActions {
   /**
    * @alpha
    */
-  sendHLSTimedMetadata(params?: SendHLSTimedMetadata): Promise<void>;
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   /**
    * If you want to update the name of peer.

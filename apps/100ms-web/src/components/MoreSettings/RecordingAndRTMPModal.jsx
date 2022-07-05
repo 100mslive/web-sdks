@@ -168,7 +168,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
             <DialogCheckbox
               title="Recording"
               value={recordingSelected || isRecordingOn}
-              disabled={isAnythingRunning}
+              // disabled={isAnythingRunning}
               id="recordingCheckbox"
               onChange={setRecording}
             />
@@ -184,7 +184,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               type="reset"
               css={{ mx: "$4" }}
               onClick={() => startStopRTMPRecordingHLS("stop")}
-              disabled={!isAnythingRunning}
+              // disabled={!isAnythingRunning}
               data-testid="rtmp_recording_stop"
             >
               Stop
