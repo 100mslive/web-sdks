@@ -8,7 +8,7 @@ const TooltipBox = styled(BaseTooltip.Content, {
   borderRadius: '$0',
   padding: '$3 $4',
   fontSize: '$xs',
-  color: '$white',
+  color: '$textPrimary',
   backgroundColor: '$grayDefault',
   '@media (prefers-reduced-motion: no-preference)': {
     animationDuration: '400ms',

@@ -1,4 +1,11 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
+import { useVirtual } from "@tanstack/react-virtual";
 import { useDebounce } from "react-use";
 import {
   selectAudioTrackByPeerID,
@@ -83,18 +90,11 @@ export const ParticipantList = () => {
             </Text>
           </Flex>
         )}
-        <Box css={{ flex: "1 1 0", overflowY: "auto", mr: "-$10", pr: "$10" }}>
-          {participants.map(peer => {
-            return (
-              <Participant
-                peer={peer}
-                key={peer.id}
-                showActions={isConnected}
-                onParticipantAction={setSelectedPeerId}
-              />
-            );
-          })}
-        </Box>
+        <VirtualizedParticipants
+          participants={participants}
+          isConnected={isConnected}
+          setSelectedPeerId={setSelectedPeerId}
+        />
       </Flex>
       {selectedPeerId && (
         <RoleChangeModal
@@ -153,6 +153,55 @@ export const ParticipantCount = () => {
   );
 };
 
+const VirtualizedParticipants = ({
+  participants,
+  isConnected,
+  setSelectedPeerId,
+}) => {
+  const parentRef = useRef(null);
+  const rowVirtualizer = useVirtual({
+    size: participants.length,
+    parentRef,
+    estimateSize: useCallback(() => 60, []),
+  });
+
+  return (
+    <Box
+      ref={parentRef}
+      css={{ flex: "1 1 0", overflowY: "auto", mr: "-$10", pr: "$10" }}
+    >
+      <div
+        style={{
+          height: `${rowVirtualizer.totalSize}px`,
+          width: "100%",
+          position: "relative",
+        }}
+      >
+        {rowVirtualizer.virtualItems.map(virtualRow => (
+          <div
+            key={virtualRow.index}
+            ref={virtualRow.measureElement}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          >
+            <Participant
+              peer={participants[virtualRow.index]}
+              key={participants[virtualRow.index].id}
+              showActions={isConnected}
+              onParticipantAction={setSelectedPeerId}
+            />
+          </div>
+        ))}
+      </div>
+    </Box>
+  );
+};
+
 const Participant = ({
   peer,
   canChangeRole,
@@ -204,11 +253,19 @@ const Participant = ({
  */
 const ParticipantActions = React.memo(({ onSettings, peerId }) => {
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+  const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
+  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const canChangeVolume = peerId !== localPeerId && audioTrack;
+  const shouldShowMoreActions = canChangeRole || canChangeVolume;
+
   return (
     <Flex align="center" css={{ flexShrink: 0 }}>
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && <HandRaiseIcon />}
-      <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} />
+      {shouldShowMoreActions && (
+        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} />
+      )}
     </Flex>
   );
 });
@@ -245,7 +302,8 @@ const ParticipantVolume = ({ peerId }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerId = useHMSStore(selectLocalPeerID);
   const hmsActions = useHMSActions();
-  if (peerId === localPeerId) {
+  // No volume control for local peer or non audio publishing role
+  if (peerId === localPeerId || !audioTrack) {
     return null;
   }
 
