@@ -31,7 +31,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, SendHLSTimedMetadata } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -580,13 +580,12 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopHLSStreaming();
   }
 
-  async sendHLSTimedMetadata(params?: SendHLSTimedMetadata) {
-    if (params) {
-      const { metadata, metadataId } = params;
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    if (metadataList.length > 0) {
       const hlsMtParams: HLSTimedMetadataParams = {
-        metadata_objs: metadata,
-        metadata_id: metadataId,
+        metadata_objs: metadataList,
       };
+
       await this.signal.sendHLSTimedMetadata(hlsMtParams);
     }
   }
