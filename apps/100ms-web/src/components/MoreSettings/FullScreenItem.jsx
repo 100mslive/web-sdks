@@ -20,7 +20,7 @@ export const FullScreenItem = ({ hoverStyles }) => {
     >
       <ExpandIcon />
       <Text variant="sm" css={{ ml: "$4" }}>
-        {isFullscreen ? "Exit " : ""}Go Fullscreen
+        {isFullscreen ? "Exit " : "Go Fullscreen"}
       </Text>
     </Dropdown.Item>
   );
