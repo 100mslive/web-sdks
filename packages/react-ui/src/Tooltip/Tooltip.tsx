@@ -5,11 +5,11 @@ import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade }
 
 const TooltipBox = styled(BaseTooltip.Content, {
   fontFamily: '$sans',
-  borderRadius: '$0',
-  padding: '$3 $4',
+  borderRadius: '$2',
+  padding: '$2 $4',
   fontSize: '$xs',
   color: '$white',
-  backgroundColor: '$grayDefault',
+  backgroundColor: '$surfaceLight',
   '@media (prefers-reduced-motion: no-preference)': {
     animationDuration: '400ms',
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
