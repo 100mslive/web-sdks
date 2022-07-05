@@ -78,12 +78,10 @@ const StyledContent = styled(BaseAccordion.Content, {
 });
 
 const StyledChevron = styled(ChevronDownIcon, {
-  color: '$white',
+  color: '$textHighEmp',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=open] &': { transform: 'rotate(180deg)' },
 });
-
-const StyledContentText = styled('div', {});
 
 // Exports
 export const AccordionRoot = StyledAccordion;
@@ -106,6 +104,6 @@ export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.Accordio
   PropsWithChildren<BaseAccordion.AccordionContentProps>
 >(({ children, ...props }, forwardedRef) => (
   <StyledContent {...props} ref={forwardedRef}>
-    <StyledContentText>{children}</StyledContentText>
+    {children}
   </StyledContent>
 ));
