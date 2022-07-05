@@ -1,5 +1,5 @@
-import React, { Fragment, useContext } from "react";
-import { Flex, Label, Text, Box, Switch } from "@100mslive/react-ui";
+import React, { useContext } from "react";
+import { Flex, Label, Box, Switch } from "@100mslive/react-ui";
 import { AppContext } from "./context/AppContext";
 import {
   AlertOctagonIcon,
@@ -57,47 +57,42 @@ export const NotificationSettings = () => {
     useContext(AppContext);
 
   return (
-    <Fragment>
-      <Text variant="h5" css={{ mb: "$12" }}>
-        Notifications
-      </Text>
-      <Box>
-        <NotificationItem
-          label="Peer Joined"
-          type="PEER_JOINED"
-          icon={<PersonIcon />}
-          onClick={setSubscribedNotifications}
-          checked={subscribedNotifications.PEER_JOINED}
-        />
-        <NotificationItem
-          label="Peer Leave"
-          type="PEER_LEFT"
-          icon={<ExitIcon />}
-          onClick={setSubscribedNotifications}
-          checked={subscribedNotifications.PEER_LEFT}
-        />
-        <NotificationItem
-          label="New Message"
-          type="NEW_MESSAGE"
-          icon={<ChatIcon />}
-          onClick={setSubscribedNotifications}
-          checked={subscribedNotifications.NEW_MESSAGE}
-        />
-        <NotificationItem
-          label="Hand Raised"
-          type="METADATA_UPDATED"
-          icon={<HandIcon />}
-          onClick={setSubscribedNotifications}
-          checked={subscribedNotifications.METADATA_UPDATED}
-        />
-        <NotificationItem
-          label="Error"
-          type="ERROR"
-          icon={<AlertOctagonIcon />}
-          onClick={setSubscribedNotifications}
-          checked={subscribedNotifications.ERROR}
-        />
-      </Box>
-    </Fragment>
+    <Box>
+      <NotificationItem
+        label="Peer Joined"
+        type="PEER_JOINED"
+        icon={<PersonIcon />}
+        onClick={setSubscribedNotifications}
+        checked={subscribedNotifications.PEER_JOINED}
+      />
+      <NotificationItem
+        label="Peer Leave"
+        type="PEER_LEFT"
+        icon={<ExitIcon />}
+        onClick={setSubscribedNotifications}
+        checked={subscribedNotifications.PEER_LEFT}
+      />
+      <NotificationItem
+        label="New Message"
+        type="NEW_MESSAGE"
+        icon={<ChatIcon />}
+        onClick={setSubscribedNotifications}
+        checked={subscribedNotifications.NEW_MESSAGE}
+      />
+      <NotificationItem
+        label="Hand Raised"
+        type="METADATA_UPDATED"
+        icon={<HandIcon />}
+        onClick={setSubscribedNotifications}
+        checked={subscribedNotifications.METADATA_UPDATED}
+      />
+      <NotificationItem
+        label="Error"
+        type="ERROR"
+        icon={<AlertOctagonIcon />}
+        onClick={setSubscribedNotifications}
+        checked={subscribedNotifications.ERROR}
+      />
+    </Box>
   );
 };

@@ -37,9 +37,6 @@ const Settings = () => {
 
   return (
     <Fragment>
-      <Text variant="h5" css={{ mb: "$12" }}>
-        Device Settings
-      </Text>
       {videoInput?.length ? (
         <Fragment>
           {isVideoOn && (
