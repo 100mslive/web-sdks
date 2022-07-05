@@ -78,7 +78,7 @@ const StyledContent = styled(BaseAccordion.Content, {
 });
 
 const StyledChevron = styled(ChevronDownIcon, {
-  color: '$textHighEmp',
+  color: '$textPrimary',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=open] &': { transform: 'rotate(180deg)' },
 });
