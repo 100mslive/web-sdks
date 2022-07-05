@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState, useRef, useCallback } from "react";
 import { useVirtual } from "@tanstack/react-virtual";
 import {
   Dropdown,
@@ -143,6 +143,7 @@ const VirtualizedParticipants = ({
   const rowVirtualizer = useVirtual({
     size: participants.length,
     parentRef,
+    estimateSize: useCallback(() => 68, []),
   });
 
   return (
