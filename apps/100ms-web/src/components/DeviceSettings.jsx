@@ -1,5 +1,11 @@
 import React, { useRef, useState, useEffect, Fragment } from "react";
-import { useDevices, DeviceType } from "@100mslive/react-sdk";
+import {
+  useDevices,
+  DeviceType,
+  useHMSStore,
+  selectLocalVideoTrackID,
+  selectIsLocalVideoEnabled,
+} from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -14,6 +20,8 @@ import {
   Dropdown,
   Box,
   textEllipsis,
+  StyledVideoTile,
+  Video,
 } from "@100mslive/react-ui";
 
 /**
@@ -24,24 +32,42 @@ import {
 const Settings = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
+  const videoTrackId = useHMSStore(selectLocalVideoTrackID);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+
   return (
     <Fragment>
       <Text variant="h5" css={{ mb: "$12" }}>
         Device Settings
       </Text>
       {videoInput?.length ? (
-        <DeviceSelector
-          title="Video"
-          devices={videoInput}
-          icon={<VideoOnIcon />}
-          selection={selectedDeviceIDs.videoInput}
-          onChange={deviceId =>
-            updateDevice({
-              deviceId,
-              deviceType: DeviceType.videoInput,
-            })
-          }
-        />
+        <Fragment>
+          {isVideoOn && (
+            <StyledVideoTile.Container
+              css={{
+                w: "90%",
+                px: "$10",
+                height: "$48",
+                bg: "transparent",
+                m: "$10 auto",
+              }}
+            >
+              <Video trackId={videoTrackId} />
+            </StyledVideoTile.Container>
+          )}
+          <DeviceSelector
+            title="Video"
+            devices={videoInput}
+            icon={<VideoOnIcon />}
+            selection={selectedDeviceIDs.videoInput}
+            onChange={deviceId =>
+              updateDevice({
+                deviceId,
+                deviceType: DeviceType.videoInput,
+              })
+            }
+          />
+        </Fragment>
       ) : null}
       {audioInput?.length ? (
         <DeviceSelector
