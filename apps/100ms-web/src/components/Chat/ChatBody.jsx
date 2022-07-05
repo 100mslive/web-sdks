@@ -27,7 +27,7 @@ const formatTime = date => {
   return `${hours}:${mins}`;
 };
 
-const TypeContainer = ({ left, right }) => {
+const MessageTypeContainer = ({ left, right }) => {
   return (
     <Flex
       align="center"
@@ -63,7 +63,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   if (receiver) {
     return (
-      <TypeContainer
+      <MessageTypeContainer
         left={
           hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ""}` : "TO YOU"
         }
@@ -73,7 +73,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   }
 
   if (roles && roles.length) {
-    return <TypeContainer left="TO" right={localPeerRoleName} />;
+    return <MessageTypeContainer left="TO" right={localPeerRoleName} />;
   }
   return null;
 };
