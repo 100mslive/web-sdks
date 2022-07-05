@@ -58,7 +58,7 @@ export const LayoutSettings = () => {
         css={{ w: "100%", my: "$2", py: "$8", "@md": { display: "none" } }}
       >
         <Text variant="md" css={{ fontWeight: "$semiBold" }}>
-          Tiles In View
+          Tiles In View({maxTileCount})
         </Text>
         <Flex justify="end" css={{ flex: "1 1 0" }}>
           <Slider
