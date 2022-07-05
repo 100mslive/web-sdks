@@ -124,8 +124,9 @@ const DeviceSelector = ({
             flex: "1 1 0",
             minWidth: 0,
             "[data-radix-popper-content-wrapper]": {
-              width: "100%",
-              transform: "translateY(60px) !important",
+              w: "100%",
+              minWidth: "0 !important",
+              transform: "translateY($space$17) !important",
               zIndex: 11,
             },
           }}
