@@ -55,7 +55,7 @@ export function parseAttributesFromMetadata(metadatastring) {
   return {
     duration: attributesByKey["DURATION"],
     id: attributesByKey["ID"],
-    starTime: new Date(attributesByKey["START-DATE"]),
+    startTime: new Date(attributesByKey["START-DATE"]),
     payload: attributesByKey["X-100MSLIVE-PAYLOAD"],
   };
 }

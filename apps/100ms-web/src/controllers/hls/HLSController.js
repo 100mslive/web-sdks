@@ -11,7 +11,7 @@ import {
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export class HLSController {
   hls;
-  fragsTimeTable = new Map();
+  metadataByTimeStamp = new Map();
   eventEmitter = new EventEmitter();
   constructor(hlsUrl, videoRef) {
     this.hls = new Hls(this.getHLSConfig());
@@ -26,7 +26,7 @@ export class HLSController {
       this.hls.detachMedia();
       this.hls = null;
     }
-    this.fragsTimeTable = null;
+    this.metadataByTimeStamp = null;
     this.eventEmitter = null;
   }
 
@@ -54,7 +54,7 @@ export class HLSController {
      * Everytime a fragment is appended to the buffer,
      * we parse the tags and see if the metadata is
      * in the tags. If it does, we parse the metadatastrings
-     * and create a timetable. This timetable is an array of key value
+     * and create a timetable. This timetable is a map of key value
      * pairs with timeinSeconds as key and the value is an array of objects
      * of the parsed metadata.
      * (e.g)
@@ -63,7 +63,7 @@ export class HLSController {
      *     duration: "20",
      *     id: "c382fce1-d551-4862-bdb3-c255ca668154",
      *     payload: "hello2572",
-     *     starTime: Tue Jun 28 2022 10:03:26 GMT+0530 (India Standard Time)
+     *     startTime: Tue Jun 28 2022 10:03:26 GMT+0530 (India Standard Time)
      *   }]
      * }
      */
@@ -71,23 +71,21 @@ export class HLSController {
       const frag = data?.frag;
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
-      /**
-       * There could be more than one EXT-X-DATERANGE tags in a fragment.
-       * Currently its limited to 3 by backend.
-       */
+      // There could be more than one EXT-X-DATERANGE tags in a fragment.
       const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
       if (metadataStrings.length > 0) {
         for (let metadataString of metadataStrings) {
           const tagMetadata = parseAttributesFromMetadata(metadataString);
-          const timeSegment = getSecondsFromTime(tagMetadata.starTime);
+          const timeSegment = getSecondsFromTime(tagMetadata.startTime);
           /**
            * a single timestamp can have upto 3 DATERANGE tags.
            * so we accumulate everything into a single key such that
            * <timesegment>: [mt1, mt2, mt3]
            */
-          if (this.fragsTimeTable.has(timeSegment)) {
+          if (this.metadataByTimeStamp.has(timeSegment)) {
             // timetable already exist
-            const fragsTimeTableEntries = this.fragsTimeTable.get(timeSegment);
+            const metadataByTimeStampEntries =
+              this.metadataByTimeStamp.get(timeSegment);
 
             /**
              * Backend will keep sending the same metadata tags in each fragments
@@ -95,16 +93,17 @@ export class HLSController {
              * same tags getting parsed into timetable, we do a quick check here.
              */
             if (
-              !isMetadataAlreadyInTimeTable(fragsTimeTableEntries, tagMetadata)
+              !isMetadataAlreadyInTimeTable(
+                metadataByTimeStampEntries,
+                tagMetadata
+              )
             ) {
               // append current metadata to existing timestamp
-              this.fragsTimeTable.get(timeSegment).push({
-                ...tagMetadata,
-              });
+              this.metadataByTimeStamp.get(timeSegment).push(tagMetadata);
             }
           } else {
             // no entry in timetable exist. So add a new entry
-            this.fragsTimeTable.set(timeSegment, [
+            this.metadataByTimeStamp.set(timeSegment, [
               {
                 ...tagMetadata,
               },
@@ -124,21 +123,21 @@ export class HLSController {
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
       console.log(
-        "loading fragment with PROGRAM_TIME",
+        "Loading fragment with PROGRAM_TIME",
         new Date().toUTCString()
       );
       const tagsList = parseTagsList(data?.frag.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];
-      this.fragsTimeTable.forEach((value, key) => {
+      this.metadataByTimeStamp.forEach((value, key) => {
         timeStamps.push(key);
       });
       let nearestTimeStamp = timeSegment;
       /**
        * There are two scenarios here.
-       * 1) the program time is exactly same as a startime,
+       * 1) the program time is exactly same as a startTime,
        * which means the below 'if' will fail.
-       * 2) the program time is behind the startime,
+       * 2) the program time is behind the startTime,
        * which means it is not in the timeStamps array
        * which goes into the below if condition
        *
@@ -167,7 +166,7 @@ export class HLSController {
         nearestTimeStamp = timeStamps[whereAmI + 1];
       } else {
         /**
-         * If the timeSegment matches one of the startime,
+         * If the timeSegment matches one of the startTime,
          * then we dont need to push it, we can just sort it
          * and by the same logic above, the next element of
          * our timesegment is the nearest future occurence of
@@ -211,7 +210,7 @@ export class HLSController {
 
       const timeDifference = nearestTimeStamp - timeSegment;
       if (timeDifference >= 0 && timeDifference < tagsList.duration) {
-        const payload = this.fragsTimeTable
+        const payload = this.metadataByTimeStamp
           .get(nearestTimeStamp)
           .map(metadata => metadata.payload);
         /**
@@ -230,7 +229,7 @@ export class HLSController {
            * needed for the operation. Just a bit of optimisation as a really
            * long stream with many metadata can quickly make the timetable really big.
            */
-          this.fragsTimeTable.delete(nearestTimeStamp);
+          this.metadataByTimeStamp.delete(nearestTimeStamp);
         }, timeDifference * 1000);
       }
     });
