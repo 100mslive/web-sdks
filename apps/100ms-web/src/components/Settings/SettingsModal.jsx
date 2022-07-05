@@ -49,10 +49,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
         <Tabs.Root
           defaultValue=""
           value={selection}
-          onValueChange={value => {
-            console.error(value);
-            setSelection(value);
-          }}
+          onValueChange={setSelection}
           css={{ size: "100%", position: "relative" }}
         >
           <Tabs.List
