@@ -1,15 +1,12 @@
 import React, { Fragment, useState } from "react";
 import {
-  GridIcon,
-  HamburgerMenuIcon,
+  VerticalMenuIcon,
   InfoIcon,
   MicOffIcon,
-  RecordIcon,
   SettingIcon,
-  TextboxIcon,
+  PencilIcon,
 } from "@100mslive/react-icons";
 import {
-  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectPermissions,
   useHMSStore,
@@ -38,10 +35,6 @@ const hoverStyles = {
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isPublishingAnything = Object.values(isAllowedToPublish).some(
-    value => !!value
-  );
   const localPeerId = useHMSStore(selectLocalPeerID);
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
@@ -63,7 +56,7 @@ export const MoreSettings = () => {
           >
             <Tooltip title="More Options">
               <Box>
-                <HamburgerMenuIcon />
+                <VerticalMenuIcon />
               </Box>
             </Tooltip>
           </IconButton>
@@ -78,7 +71,7 @@ export const MoreSettings = () => {
             onClick={() => setShowChangeNameModal(value => !value)}
             data-testid="change_name_btn"
           >
-            <TextboxIcon />
+            <PencilIcon />
             <Text variant="sm" css={{ ml: "$4" }}>
               Change Name
             </Text>
@@ -87,19 +80,6 @@ export const MoreSettings = () => {
             css={hoverStyles}
             onClick={() => setShowSelfRoleChange(true)}
           />
-          {(permissions.streaming || permissions.recording) &&
-            isPublishingAnything && ( // TODO: remove this check when permissions are added
-              <Dropdown.Item
-                onClick={() => setShowRecordingModal(true)}
-                css={hoverStyles}
-                data-testid="streaming_recording_btn"
-              >
-                <RecordIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
-                  Streaming/Recording
-                </Text>
-              </Dropdown.Item>
-            )}
           <FullScreenItem hoverStyles={hoverStyles} />
           {permissions.mute && (
             <Dropdown.Item
@@ -115,23 +95,13 @@ export const MoreSettings = () => {
           )}
           <Dropdown.ItemSeparator />
           <Dropdown.Item
-            onClick={() => setShowUISettings(true)}
-            css={hoverStyles}
-            data-testid="ui_settings_btn"
-          >
-            <GridIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
-              UI Settings
-            </Text>
-          </Dropdown.Item>
-          <Dropdown.Item
             onClick={() => setShowDeviceSettings(true)}
             css={hoverStyles}
             data-testid="device_settings_btn"
           >
             <SettingIcon />
             <Text variant="sm" css={{ ml: "$4" }}>
-              Device Settings
+              Settings
             </Text>
           </Dropdown.Item>
           {FeatureFlags.enableStatsForNerds && (
