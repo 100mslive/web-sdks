@@ -63,7 +63,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
     return (
       <TypeContainer
         left={
-          hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ""}` : "To YOU"
+          hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ""}` : "TO YOU"
         }
         right="PRIVATE"
       />
