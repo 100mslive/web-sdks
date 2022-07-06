@@ -7,18 +7,17 @@ import {
   selectMessagesUnreadCountByRole,
   selectMessagesUnreadCountByPeerID,
 } from "@100mslive/react-sdk";
+import { CheckIcon } from "@100mslive/react-icons";
 import {
   Box,
   Dropdown,
   Flex,
   HorizontalDivider,
-  IconButton,
-  Input,
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
 import { ChatDotIcon } from "./ChatDotIcon";
+import { ParticipantSearch } from "../Header/ParticipantList";
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
@@ -102,36 +101,11 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
   return (
     <Fragment>
       {peers.length > 0 && (
-        <Box css={{ px: "$8", position: "relative" }}>
-          <Input
-            type="text"
-            autoCorrect="off"
-            autoComplete="name"
-            value={search}
-            placeholder="Search Participants"
-            css={{
-              bg: "$menuBg",
-              w: "100%",
-              pr: "$12",
-              "$:focus": { boxShadow: "none", outline: "none" },
-            }}
-            onChange={e => {
-              setSearch(e.target.value);
-            }}
+        <Box css={{ px: "$8" }}>
+          <ParticipantSearch
+            onSearch={setSearch}
+            placeholder="Search participants"
           />
-          <Flex
-            align="center"
-            css={{
-              position: "absolute",
-              right: "$10",
-              top: 0,
-              height: "100%",
-            }}
-          >
-            <IconButton onClick={() => setSearch("")}>
-              <CrossIcon width={18} height={18} />
-            </IconButton>
-          </Flex>
         </Box>
       )}
       <Dropdown.Group css={{ maxHeight: "$64", overflowY: "auto" }}>
@@ -149,7 +123,10 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         })}
         {peers.length > 0 && <SelectorHeader>Participants</SelectorHeader>}
         {peers
-          .filter(peer => !search || peer.name.toLowerCase().includes(search))
+          .filter(
+            peer =>
+              !search || peer.name.toLowerCase().includes(search.toLowerCase())
+          )
           .map(peer => {
             return (
               <PeerItem

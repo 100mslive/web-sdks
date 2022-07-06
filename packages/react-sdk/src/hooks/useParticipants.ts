@@ -64,7 +64,9 @@ export const useParticipants = (params?: useParticipantsParams) => {
   }
   if (params?.search) {
     participantList = participantList.filter(
-      peer => peer.roleName?.includes(params.search) || peer.name.includes(params.search),
+      peer =>
+        peer.roleName?.toLowerCase().includes(params.search.toLowerCase()) ||
+        peer.name.toLowerCase().includes(params.search.toLowerCase()),
     );
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
