@@ -43,6 +43,7 @@ module.exports = {
       events: false,
     },
   },
+  ignoreWarnings: [/Failed to parse source map/],
   module: {
     rules: [
       {
