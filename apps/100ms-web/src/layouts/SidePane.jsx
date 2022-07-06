@@ -34,6 +34,7 @@ const SidePane = ({ css = {} }) => {
         ...css,
         "@lg": {
           w: "100%",
+          right: 0,
           ...(css["@lg"] || {}),
         },
       }}
