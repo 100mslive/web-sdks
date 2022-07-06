@@ -9,7 +9,7 @@ const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
   top: '10px',
   right: '10px',
-  zIndex: '',
+  zIndex: 5,
   width: '$13',
   height: '$13',
   color: 'white',
