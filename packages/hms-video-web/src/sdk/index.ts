@@ -52,7 +52,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig } from '../interfaces/hls-config';
+import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -744,6 +744,11 @@ export class HMSSdk implements HMSInterface {
       this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error, false));
       throw error;
     }
+  }
+
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    this.validateJoined('sendHLSTimedMetadata');
+    await this.transport?.sendHLSTimedMetadata(metadataList);
   }
 
   async changeName(name: string) {

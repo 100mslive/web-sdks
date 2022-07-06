@@ -8,6 +8,7 @@ const TooltipBox = styled(BaseTooltip.Content, {
   borderRadius: '$2',
   padding: '$2 $4',
   fontSize: '$xs',
+
   color: '$textHighEmp',
   backgroundColor: '$surfaceLight',
   '@media (prefers-reduced-motion: no-preference)': {
@@ -39,6 +40,7 @@ const TooltipRoot = BaseTooltip.Root;
 
 // TODO: refactor this to adjust more props and composing
 // TODO: also handle <kbd></kbd> inputs
+
 
 export type alignTooltip = 'end' | 'center' | 'start' | undefined;
 export type sideTooltip = 'bottom' | 'left' | 'right' | 'top' | undefined;

@@ -12,6 +12,7 @@ import {
   UpdatePeerRequestParams,
   HLSRequestParams,
   BroadcastResponse,
+  HLSTimedMetadataParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -189,7 +190,7 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
-    const response: RTCSessionDescriptionInit = await this.callWithRetry(HMSSignalMethod.JOIN, params);
+    const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -293,6 +294,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+  }
+
+  async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
+    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
