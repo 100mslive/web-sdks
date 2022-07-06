@@ -37,11 +37,6 @@ const TooltipTrigger = styled(BaseTooltip.Trigger, {
 });
 
 const TooltipRoot = BaseTooltip.Root;
-
-// TODO: refactor this to adjust more props and composing
-// TODO: also handle <kbd></kbd> inputs
-
-
 export type alignTooltip = 'end' | 'center' | 'start' | undefined;
 export type sideTooltip = 'bottom' | 'left' | 'right' | 'top' | undefined;
 
