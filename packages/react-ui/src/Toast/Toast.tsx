@@ -4,26 +4,52 @@ import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
 import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
+import { Flex, Box } from '../Layout';
+import { Text } from '../Text';
 
 const ToastRoot = styled(ToastPrimitives.Root, {
-  r: '$1',
-  bg: '$toastBg',
+  r: '$3',
+  bg: '$surfaceDefault',
   p: '$8',
   display: 'flex',
   flexDirection: 'column',
   position: 'relative',
   fontFamily: '$sans',
+  borderTop: 'solid $space$px $borderLight',
+  borderBottom: 'solid $space$px $borderLight',
+  borderRight: 'solid $space$px $borderLight',
   ...toastAnimation,
+  variants: {
+    variant: {
+      standard: {
+        borderLeft: 'solid $space$4 $secondaryDefault',
+      },
+      warning: {
+        borderLeft: 'solid $space$4 $warning',
+      },
+      error: {
+        borderLeft: 'solid $space$4 $error',
+      },
+      success: {
+        borderLeft: 'solid $space$4 $success',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'standard',
+  },
 });
+
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
+  lineHeight: '$md',
   color: '$textPrimary',
+  fontWeight: 600,
   mr: '$12',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
-  fontSize: '$sm',
   color: '$textSecondary',
-  mr: '$12',
+  mr: '$17',
   mt: '$2',
 });
 const ToastClose = styled(ToastPrimitives.Close, {
@@ -48,9 +74,9 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = () => {
+const DefaultClose = ({ ...props }) => {
   return (
-    <ToastClose asChild>
+    <ToastClose {...props} asChild>
       <IconButton>
         <CrossIcon />
       </IconButton>
@@ -58,6 +84,43 @@ const DefaultClose = () => {
   );
 };
 
+const ReactToast = ({ title, description, icon, cta, ctaIcon, isClosable, ...props }) => {
+  return (
+    <>
+      <ToastRoot {...props}>
+        {isClosable ? (
+          <DefaultClose
+            css={{
+              w: '$10',
+              h: '$10',
+              right: '$4',
+              top: cta || description ? '$md' : '50%',
+            }}
+          />
+        ) : null}
+        <ToastTitle>
+          <Flex css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: icon ? '$4' : 0 }}>
+            <Box css={{ w: '$10', h: '$10' }}>{icon}</Box>
+            <Box>{title}</Box>
+          </Flex>
+        </ToastTitle>
+        {cta || description ? (
+          <ToastDescription css={{ mr: '$12' }}>
+            <Flex css={{ display: 'flex', flexDirection: 'column', w: '100%' }}>
+              {description ? (
+                <Text variant="body1" css={{ fontWeight: '$regular', mb: cta ? '$10' : 0, c: '$textMedEmp' }}>
+                  {description}
+                </Text>
+              ) : null}
+              {cta ? cta : null}
+            </Flex>
+          </ToastDescription>
+        ) : null}
+      </ToastRoot>
+      <ToastViewport css={{ bottom: '$24' }} />
+    </>
+  );
+};
 export const Toast = {
   Provider: ToastPrimitives.Provider,
   Root: ToastRoot,
@@ -66,4 +129,5 @@ export const Toast = {
   Close: DefaultClose,
   Action: ToastAction,
   Viewport: ToastViewport,
+  ReactToast: ReactToast,
 };
