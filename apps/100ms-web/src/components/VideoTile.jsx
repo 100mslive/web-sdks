@@ -53,6 +53,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
     setIsMouseHovered(event.type === "mouseenter");
   }, []);
   const appConfig = useAppConfig();
+  const hideLabel = isHeadless && appConfig?.headlessConfig?.hideTileName;
   return (
     <StyledVideoTile.Root
       css={{ width, height, padding: getPadding({ isHeadless, appConfig }) }}
@@ -68,7 +69,12 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               : borderAudioRef
           }
         >
-          <TileConnection name={label} isTile peerId={peerId} />
+          <TileConnection
+            hideLabel={hideLabel}
+            name={label}
+            isTile
+            peerId={peerId}
+          />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={audioTrack?.id}
