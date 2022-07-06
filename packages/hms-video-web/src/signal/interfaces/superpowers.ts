@@ -1,5 +1,5 @@
 import { HMSTrackSource } from '../..';
-import { RTMPRecordingResolution } from '../../interfaces';
+import { HLSTimedMetadata, RTMPRecordingResolution } from '../../interfaces';
 
 /**
  * Parameteres for the role change request sent to the server.
@@ -59,13 +59,8 @@ export interface HLSRequestParams {
 }
 
 export interface HLSTimedMetadataParams {
-  metadata_objs: HLSTimedMetadata[]; // Currently only 3 objects can be sent
-  metadata_id: string; // Used for dedup checks etc by beam. Currently no-op.
-}
-
-export interface HLSTimedMetadata {
-  payload: string; // payload string. Max length: 100
-  duration: number; // Duration in seconds
+  metadata_objs: HLSTimedMetadata[];
+  metadata_id?: string;
 }
 
 export interface HLSVariant {
