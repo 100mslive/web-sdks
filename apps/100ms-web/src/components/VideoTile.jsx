@@ -5,8 +5,6 @@ import {
   Video,
   VideoTileStats,
   useBorderAudioLevel,
-  Text,
-  textEllipsis,
 } from "@100mslive/react-ui";
 import {
   useHMSStore,
@@ -70,7 +68,7 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
               : borderAudioRef
           }
         >
-          <TileConnection name={peerName} isTile peerId={peerId} />
+          <TileConnection name={label} isTile peerId={peerId} />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={audioTrack?.id}
@@ -95,17 +93,6 @@ const Tile = ({ peerId, trackId, showStatsOnTiles, width, height }) => {
                 data-testid="participant_avatar_icon"
               />
             ) : null}
-            {(!isHeadless ||
-              (isHeadless && !appConfig?.headlessConfig?.hideTileName)) &&
-              isVideoMuted && (
-                <Text
-                  variant="body2"
-                  css={{ ...textEllipsis("75%") }}
-                  data-testid="participant_name_onTile"
-                >
-                  {label}
-                </Text>
-              )}
           </StyledVideoTile.AvatarContainer>
 
           {showAudioMuted({ appConfig, isHeadless, isAudioMuted }) ? (
