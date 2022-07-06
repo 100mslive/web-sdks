@@ -1,42 +1,60 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { ComponentMeta } from '@storybook/react';
-import { Tooltip } from './Tooltip';
-import { Text } from '../Text';
+import { alignTooltip, sideTooltip, Tooltip } from './Tooltip';
+import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/Tooltip',
   argTypes: {
-    icon: { control: 'boolean' },
+    outlined: { control: 'boolean' },
+    side: { control: 'radio' },
+    align: { control: 'radio' },
   },
   args: {
-    icon: true,
+    outlined: false,
+    side: 'bottom',
+    align: 'center',
   },
   component: Tooltip,
 } as ComponentMeta<typeof Tooltip>;
 
-const TooltipStory = args => {
+const TooltipStoryWithString = (
+  args: JSX.IntrinsicAttributes & {
+    title?: React.ReactNode;
+    outlined?: boolean | undefined;
+    side?: sideTooltip;
+    align?: alignTooltip;
+  } & { children?: React.ReactNode },
+) => {
   return (
-    <Tooltip {...args}>
-      <span>Hover to see Tooltip</span>
-    </Tooltip>
+    <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
+      <Tooltip title="This is title" {...args}>
+        <span>Hover to see Tooltip</span>
+      </Tooltip>
+    </Flex>
   );
 };
 
-export const ExampleWithString = TooltipStory.bind({});
+export const ExampleWithString = TooltipStoryWithString.bind({});
 
-ExampleWithString.args = {
-  title: 'hi',
+const ExampleTitle = () => {
+  return <h3 style={{ color: '$textPrimary' }}>This is title</h3>;
 };
 
-const Example = () => {
-  return <h1 style={{ color: '#020202', backgroundColor: '#000f04' }}>Hi</h1>;
-};
-
-const TooltipStorywithReactNode = () => {
+const TooltipStorywithReactNode = (
+  args: JSX.IntrinsicAttributes & {
+    title?: React.ReactNode;
+    outlined?: boolean | undefined;
+    side?: sideTooltip;
+    align?: alignTooltip;
+  } & { children?: React.ReactNode },
+) => {
   return (
-    <Tooltip title={<Example />}>
-      <span>Hover to see Tooltip</span>
-    </Tooltip>
+    <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
+      <Tooltip title={<ExampleTitle />} {...args}>
+        <span>Hover to see Tooltip</span>
+      </Tooltip>
+    </Flex>
   );
 };
 
