@@ -18,13 +18,14 @@ const formatTime = date => {
   }
   let hours = date.getHours();
   let mins = date.getMinutes();
+  const suffix = hours > 11 ? "PM" : "AM";
   if (hours < 10) {
     hours = "0" + hours;
   }
   if (mins < 10) {
     mins = "0" + mins;
   }
-  return `${hours}:${mins}`;
+  return `${hours}:${mins} ${suffix}`;
 };
 
 const MessageTypeContainer = ({ left, right }) => {
@@ -73,7 +74,12 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   }
 
   if (roles && roles.length) {
-    return <MessageTypeContainer left="TO" right={localPeerRoleName} />;
+    return (
+      <MessageTypeContainer
+        left="TO"
+        right={hasCurrentUserSent ? roles.join(",") : localPeerRoleName}
+      />
+    );
   }
   return null;
 };
@@ -146,7 +152,9 @@ const ChatMessage = React.memo(({ message, index }) => {
       css={{
         flexWrap: "wrap",
         bg: messageType ? "$surfaceLight" : undefined,
-        px: "$2",
+        px: messageType ? "$4" : "$2",
+        py: messageType ? "$4" : 0,
+        r: "$1",
         mb: "$10",
         mt: index === 0 ? "auto" : undefined,
       }}
