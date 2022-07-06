@@ -32,7 +32,6 @@ import {
   Text,
   Avatar,
   textEllipsis,
-  IconButton,
   Input,
   Dropdown,
   Slider,
@@ -45,6 +44,7 @@ import {
   useSidepaneToggle,
 } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import IconButton from "../../IconButton";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();

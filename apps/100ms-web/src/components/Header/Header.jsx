@@ -2,7 +2,6 @@ import React, { Fragment, useContext } from "react";
 import {
   useHMSStore,
   selectDominantSpeaker,
-  selectLocalPeerRoleName,
   selectIsConnectedToRoom,
   selectIsAllowedToPublish,
   useRecordingStreaming,
@@ -25,17 +24,11 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
-import PIPComponent from "../PIP/PIPComponent";
 import { AppContext } from "../context/AppContext";
 import { useSidepaneToggle } from "../AppData/useSidepane";
-import {
-  DEFAULT_HLS_VIEWER_ROLE,
-  SIDE_PANE_OPTIONS,
-} from "../../common/constants";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Header = ({ isPreview }) => {
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const showPip = localPeerRole !== DEFAULT_HLS_VIEWER_ROLE && !isPreview;
   return (
     <Flex
       justify="between"
@@ -47,7 +40,6 @@ export const Header = ({ isPreview }) => {
       </Flex>
       {!isPreview ? <SpeakerTag /> : null}
       <Flex align="center" css={{ position: "absolute", right: "$10" }}>
-        {showPip && <PIPComponent />}
         <StreamActions />
         <Box css={{ mx: "$2" }}>
           <ParticipantCount />

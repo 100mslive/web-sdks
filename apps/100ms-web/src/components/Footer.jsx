@@ -32,6 +32,7 @@ import { FeatureFlags } from "../services/FeatureFlags";
 import { isScreenshareSupported } from "../common/utils";
 import { SIDE_PANE_OPTIONS } from "../common/constants";
 import IconButton from "../IconButton";
+import PIPComponent from "./PIP/PIPComponent";
 
 const TranscriptionButton = React.lazy(() =>
   import("../plugins/transcription")
@@ -181,6 +182,7 @@ export const Footer = () => {
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
         <ScreenshareToggle css={{ mx: "$4" }} />
+        <PIPComponent />
         <MoreSettings />
 
         <LeaveRoom />
