@@ -26,7 +26,6 @@
     "react-freeze": "^1.0.0",
     "react-router-dom": "^6.3.0",
     "react-use": "^17.3.2",
-    "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",
     "recordrtc": "^5.6.2",
     "screenfull": "^5.1.0",
