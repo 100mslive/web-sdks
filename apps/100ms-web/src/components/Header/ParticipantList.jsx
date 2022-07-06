@@ -150,7 +150,7 @@ const VirtualizedParticipants = ({
     <FixedSizeList
       itemSize={68}
       itemCount={participants.length}
-      width="18rem"
+      width="100%"
       height={Math.min(
         PARTICIPANT_LIST_MAX_HEIGHT,
         participants.length * PARTICIPANT_ROW_HEIGHT
