@@ -125,7 +125,6 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
           <EmojiPicker
             onSelect={emoji => {
               inputRef.current.value += ` ${emoji.native} `;
-              setShowEmoji(false);
             }}
           />
         </Dropdown.Content>
