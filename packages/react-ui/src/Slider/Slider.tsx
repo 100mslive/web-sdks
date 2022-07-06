@@ -47,12 +47,12 @@ const Thumb = styled(BaseSlider.Thumb, {
 
 type SliderProps = React.ComponentProps<typeof Root> & { thumbStyles?: CSS };
 
-export const Slider: React.FC<SliderProps> = ({ thumbStyles, ...props }) => (
+export const Slider: React.FC<SliderProps> = ({ showTooltip = true, thumbStyles, ...props }) => (
   <Root {...props}>
     <Track>
       <Range />
     </Track>
-    <Tooltip title={String(props.value?.[0])}>
+    <Tooltip title={showTooltip?String(props.value?.[0]):null}>
       <Thumb css={thumbStyles} />
     </Tooltip>
   </Root>
