@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { Flex, Tooltip } from "@100mslive/react-ui";
+import { Flex, Tooltip, Footer as AppFooter } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "./AudioVideoToggle";
 import { LeaveRoom } from "./LeaveRoom";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
@@ -135,29 +135,8 @@ const Chat = () => {
 
 export const Footer = () => {
   return (
-    <Flex
-      justify="between"
-      align="center"
-      css={{
-        padding: "$2",
-        position: "relative",
-        height: "100%",
-        "@md": { flexWrap: "wrap" },
-      }}
-    >
-      <Flex
-        align="center"
-        css={{
-          position: "absolute",
-          left: "$7",
-          "@md": {
-            position: "unset",
-            justifyContent: "center",
-            w: "100%",
-            p: "$4 0",
-          },
-        }}
-      >
+    <AppFooter.Root>
+      <AppFooter.Left>
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
@@ -176,8 +155,8 @@ export const Footer = () => {
         >
           <MetaActions isMobile />
         </Flex>
-      </Flex>
-      <Flex align="center" justify="center" css={{ w: "100%" }}>
+      </AppFooter.Left>
+      <AppFooter.Center>
         <AudioVideoToggle />
         <ScreenshareToggle css={{ mx: "$4" }} />
         <PIPComponent />
@@ -190,20 +169,11 @@ export const Footer = () => {
         >
           <Chat />
         </Flex>
-      </Flex>
-      <Flex
-        align="center"
-        css={{
-          position: "absolute",
-          right: "$7",
-          "@md": {
-            display: "none",
-          },
-        }}
-      >
+      </AppFooter.Center>
+      <AppFooter.Right>
         <MetaActions />
         <Chat />
-      </Flex>
-    </Flex>
+      </AppFooter.Right>
+    </AppFooter.Root>
   );
 };
