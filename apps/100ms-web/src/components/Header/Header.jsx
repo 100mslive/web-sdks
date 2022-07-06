@@ -32,6 +32,30 @@ import {
   SIDE_PANE_OPTIONS,
 } from "../../common/constants";
 
+export const Header = ({ isPreview }) => {
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const showPip = localPeerRole !== DEFAULT_HLS_VIEWER_ROLE && !isPreview;
+  return (
+    <Flex
+      justify="between"
+      align="center"
+      css={{ position: "relative", height: "100%" }}
+    >
+      <Flex align="center" css={{ position: "absolute", left: "$10" }}>
+        <Logo />
+      </Flex>
+      {!isPreview ? <SpeakerTag /> : null}
+      <Flex align="center" css={{ position: "absolute", right: "$10" }}>
+        {showPip && <PIPComponent />}
+        <StreamActions />
+        <Box css={{ mx: "$2" }}>
+          <ParticipantCount />
+        </Box>
+      </Flex>
+    </Flex>
+  );
+};
+
 const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
@@ -103,14 +127,8 @@ const EndStream = () => {
 
 const GoLive = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isPublishingAnything = Object.values(isAllowedToPublish).some(
-    value => !!value
-  );
   const { isHLSRunning } = useRecordingStreaming();
-
-  if (!isConnected || !isPublishingAnything || isHLSRunning) {
+  if (isHLSRunning) {
     return null;
   }
   return (
@@ -123,7 +141,11 @@ const GoLive = () => {
 
 const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  if (!isConnected) {
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const isPublishingAnything = Object.values(isAllowedToPublish).some(
+    value => !!value
+  );
+  if (!isConnected || !isPublishingAnything) {
     return null;
   }
   return (
@@ -131,29 +153,5 @@ const StreamActions = () => {
       <GoLive />
       <EndStream />
     </Fragment>
-  );
-};
-
-export const Header = ({ isPreview }) => {
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const showPip = localPeerRole !== DEFAULT_HLS_VIEWER_ROLE && !isPreview;
-  return (
-    <Flex
-      justify="between"
-      align="center"
-      css={{ position: "relative", height: "100%" }}
-    >
-      <Flex align="center" css={{ position: "absolute", left: "$10" }}>
-        <Logo />
-      </Flex>
-      {!isPreview ? <SpeakerTag /> : null}
-      <Flex align="center" css={{ position: "absolute", right: "$10" }}>
-        {showPip && <PIPComponent />}
-        <StreamActions />
-        <Box css={{ mx: "$2" }}>
-          <ParticipantCount />
-        </Box>
-      </Flex>
-    </Flex>
   );
 };
