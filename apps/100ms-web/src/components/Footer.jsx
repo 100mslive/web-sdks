@@ -13,12 +13,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import {
-  Flex,
-  IconButton,
-  Tooltip,
-  VerticalDivider,
-} from "@100mslive/react-ui";
+import { Flex, Tooltip } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "./AudioVideoToggle";
 import { LeaveRoom } from "./LeaveRoom";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
@@ -36,6 +31,7 @@ import {
 import { FeatureFlags } from "../services/FeatureFlags";
 import { isScreenshareSupported } from "../common/utils";
 import { SIDE_PANE_OPTIONS } from "../common/constants";
+import IconButton from "../IconButton";
 
 const TranscriptionButton = React.lazy(() =>
   import("../plugins/transcription")
@@ -163,11 +159,11 @@ export const Footer = () => {
           },
         }}
       >
+        <AudioVideoToggle />
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
-        <LeftDivider />
         <VirtualBackground />
         <NoiseSuppression />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
@@ -180,15 +176,13 @@ export const Footer = () => {
             },
           }}
         >
-          <VerticalDivider space={4} />
           <MetaActions isMobile />
         </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
-        <AudioVideoToggle />
         <ScreenshareToggle css={{ mx: "$4" }} />
         <MoreSettings />
-        <VerticalDivider space={4} />
+
         <LeaveRoom />
         <Flex
           align="center"
@@ -208,20 +202,8 @@ export const Footer = () => {
         }}
       >
         <MetaActions />
-        <VerticalDivider space={4} />
         <Chat />
       </Flex>
     </Flex>
-  );
-};
-
-const LeftDivider = () => {
-  const allowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  return (
-    <>
-      {allowedToPublish.screen || FeatureFlags.enableWhiteboard ? (
-        <VerticalDivider space={4} />
-      ) : null}
-    </>
   );
 };

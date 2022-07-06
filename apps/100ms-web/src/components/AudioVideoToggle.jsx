@@ -5,8 +5,9 @@ import {
   MicOffIcon,
   MicOnIcon,
 } from "@100mslive/react-icons";
-import { Tooltip, IconButton } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/react-ui";
 import { useAVToggle, parsedUserAgent } from "@100mslive/react-sdk";
+import IconButton from "../IconButton";
 
 const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
 
@@ -23,7 +24,7 @@ export const AudioVideoToggle = ({ compact = false }) => {
         >
           <IconButton
             css={{ mr: compact ? "$2" : "$4" }}
-            active={isLocalAudioEnabled}
+            active={!isLocalAudioEnabled}
             onClick={toggleAudio}
             key="toggleAudio"
             data-testid="audio_btn"
@@ -45,7 +46,7 @@ export const AudioVideoToggle = ({ compact = false }) => {
           <IconButton
             css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
-            active={isLocalVideoEnabled}
+            active={!isLocalVideoEnabled}
             onClick={toggleVideo}
             data-testid="video_btn"
           >

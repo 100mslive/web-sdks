@@ -11,7 +11,7 @@ import {
   selectPermissions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
+import { Box, Dropdown, Text, Tooltip } from "@100mslive/react-ui";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { FullScreenItem } from "./FullScreenItem";
 import { UISettings } from "./UISettings";
@@ -22,6 +22,7 @@ import { StatsForNerds } from "../StatsForNerds";
 import { MuteAllModal } from "./MuteAllModal";
 import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
+import IconButton from "../../IconButton";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);

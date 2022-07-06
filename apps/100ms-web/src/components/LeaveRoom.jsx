@@ -5,7 +5,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { HangUpIcon } from "@100mslive/react-icons";
+import { HangUpIcon, ExitIcon } from "@100mslive/react-icons";
 import {
   Button,
   Popover,
@@ -14,6 +14,8 @@ import {
   Box,
   IconButton,
   styled,
+  Flex,
+  Text,
 } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
@@ -58,9 +60,10 @@ export const LeaveRoom = () => {
               data-testid="leave_room_btn"
             >
               <Tooltip title="Leave Room">
-                <Box>
-                  <HangUpIcon key="hangUp" />
-                </Box>
+                <Flex align="center" gap={2}>
+                  <ExitIcon key="hangUp" />
+                  <Text variant="button"> Leave Room</Text>
+                </Flex>
               </Tooltip>
             </LeaveIconButton>
           </Popover.Trigger>
@@ -128,7 +131,9 @@ export const LeaveRoom = () => {
 
 const LeaveIconButton = styled(IconButton, {
   color: "$white",
-  width: "$15",
+  height: "$13",
+  px: "$4",
+  r: "$1",
   mx: "$4",
   bg: "$error",
   "&:not([disabled]):hover": {
