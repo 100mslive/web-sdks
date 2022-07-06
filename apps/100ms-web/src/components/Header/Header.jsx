@@ -9,7 +9,7 @@ import {
   selectPermissions,
 } from "@100mslive/react-sdk";
 import {
-  SpeakerIcon,
+  VolumeOneIcon,
   GoLiveIcon,
   EndStreamIcon,
   RecordIcon,
@@ -22,6 +22,7 @@ import {
   styled,
   Button,
   Tooltip,
+  VerticalDivider,
 } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { AppContext } from "../context/AppContext";
@@ -37,8 +38,10 @@ export const Header = ({ isPreview }) => {
     >
       <Flex align="center" css={{ position: "absolute", left: "$10" }}>
         <Logo />
+        <VerticalDivider css={{ ml: "$8" }} />
+        {!isPreview ? <SpeakerTag /> : null}
       </Flex>
-      {!isPreview ? <SpeakerTag /> : null}
+
       <Flex align="center" css={{ position: "absolute", right: "$10" }}>
         <StreamActions />
         <Box css={{ mx: "$2" }}>
@@ -57,7 +60,7 @@ const SpeakerTag = () => {
       justify="center"
       css={{ flex: "1 1 0", color: "$textPrimary", "@md": { display: "none" } }}
     >
-      <SpeakerIcon width={24} height={24} />
+      <VolumeOneIcon />
       <Text
         variant="md"
         css={{ ...textEllipsis(200), ml: "$2" }}
