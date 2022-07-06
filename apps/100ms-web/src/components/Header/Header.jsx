@@ -7,6 +7,7 @@ import {
   selectIsAllowedToPublish,
   useRecordingStreaming,
   useHMSActions,
+  selectPermissions,
 } from "@100mslive/react-sdk";
 import {
   SpeakerIcon,
@@ -142,10 +143,11 @@ const GoLive = () => {
 const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const permissions = useHMSStore(selectPermissions);
   const isPublishingAnything = Object.values(isAllowedToPublish).some(
     value => !!value
   );
-  if (!isConnected || !isPublishingAnything) {
+  if (!isConnected || !isPublishingAnything || !permissions.streaming) {
     return null;
   }
   return (

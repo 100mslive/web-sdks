@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useState } from "react";
 import {
   selectAppData,
+  selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -157,6 +158,7 @@ const StartHLS = () => {
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  const permissions = useHMSStore(selectPermissions);
   const startHLS = useCallback(async () => {
     await hmsActions.startHLSStreaming({
       variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
@@ -169,18 +171,20 @@ const StartHLS = () => {
 
   return (
     <Fragment>
-      <Flex
-        align="center"
-        css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
-      >
-        <Text css={{ color: "$error" }}>
-          <RecordIcon />
-        </Text>
-        <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
-          Record the stream
-        </Text>
-        <Switch checked={record} onCheckedChange={setRecord} />
-      </Flex>
+      {permissions.recording && (
+        <Flex
+          align="center"
+          css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
+        >
+          <Text css={{ color: "$error" }}>
+            <RecordIcon />
+          </Text>
+          <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
+            Record the stream
+          </Text>
+          <Switch checked={record} onCheckedChange={setRecord} />
+        </Flex>
+      )}
       <Box css={{ p: "$4 $10" }}>
         <Button css={{ w: "100%", r: "$0" }} icon onClick={startHLS}>
           <GoLiveIcon />
