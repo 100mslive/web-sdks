@@ -174,7 +174,12 @@ const ChatMessage = React.memo(({ message, index }) => {
       />
       <Text
         variant="body2"
-        css={{ w: "100%", mt: "$2", wordBreak: "break-word" }}
+        css={{
+          w: "100%",
+          mt: "$2",
+          wordBreak: "break-word",
+          whiteSpace: "pre",
+        }}
       >
         <AnnotisedChat message={message.message} />
       </Text>
