@@ -26,6 +26,7 @@ const ToastMeta = {
   argTypes: {
     onClick: { action: 'clicked' },
     open: { control: 'boolean' },
+    variant: { control: 'select', options: ['danger', 'standard', 'warning', 'success', ''] },
   },
   args: {
     variant: 'standard',
