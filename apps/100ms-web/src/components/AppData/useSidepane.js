@@ -10,11 +10,21 @@ import { APP_DATA } from "../../common/constants";
 /**
  * Gives a boolean value if the sidepaneType matches current sidepane value in store
  * @param {string} sidepaneType
- * @returns {boolean | string} - if the sidepaneType is passed returns boolean else the current value
+ * @returns {boolean} - if the sidepaneType is passed returns boolean else the current value
  */
-export const useSidepaneState = sidepaneType => {
-  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
-  return sidepaneType ? sidepane === sidepaneType : sidepane;
+export const useIsSidepaneTypeOpen = sidepaneType => {
+  if (!sidepaneType) {
+    throw Error("Pass one of the side pane options");
+  }
+  return useHMSStore(selectAppData(APP_DATA.sidePane)) === sidepaneType;
+};
+
+/**
+ * Gives the current value of sidepane in store
+ * @returns {string} - if the sidepaneType is passed returns boolean else the current value
+ */
+export const useSidepaneState = () => {
+  return useHMSStore(selectAppData(APP_DATA.sidePane));
 };
 
 /**
