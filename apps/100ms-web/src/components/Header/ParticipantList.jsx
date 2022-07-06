@@ -1,5 +1,5 @@
-import React, { Fragment, useState, useRef, useCallback } from "react";
-import { useVirtual } from "@tanstack/react-virtual";
+import React, { Fragment, useState } from "react";
+import { FixedSizeList } from "react-window";
 import {
   Dropdown,
   Flex,
@@ -28,7 +28,6 @@ import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
 
 export const ParticipantList = () => {
-  const dropdownContentRef = useRef(null);
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount, rolesWithParticipants } =
     useParticipants(filter);
@@ -70,10 +69,14 @@ export const ParticipantList = () => {
           </Flex>
         </Dropdown.Trigger>
         <Dropdown.Content
-          ref={dropdownContentRef}
           sideOffset={5}
           align="end"
-          css={{ w: "$72", height: "auto", maxHeight: "$96" }}
+          css={{
+            w: "$72",
+            height: "auto",
+            maxHeight: "$96",
+            overflowY: "hidden",
+          }}
         >
           <Flex
             align="center"
@@ -102,7 +105,6 @@ export const ParticipantList = () => {
             </Flex>
           )}
           <VirtualizedParticipants
-            parentRef={dropdownContentRef}
             participants={participants}
             canChangeRole={canChangeRole}
             isConnected={isConnected}
@@ -133,49 +135,40 @@ const ParticipantCount = React.memo(({ peerCount }) => {
   );
 });
 
+const PARTICIPANT_ROW_HEIGHT = 68;
+// $96 => 24rem => 384px
+const PARTICIPANT_LIST_MAX_HEIGHT =
+  24 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
 const VirtualizedParticipants = ({
-  parentRef,
   participants,
   canChangeRole,
   isConnected,
   setSelectedPeerId,
 }) => {
-  const rowVirtualizer = useVirtual({
-    size: participants.length,
-    parentRef,
-    estimateSize: useCallback(() => 68, []),
-  });
-
   return (
-    <div
-      style={{
-        height: `${rowVirtualizer.totalSize}px`,
-        width: "100%",
-        position: "relative",
-      }}
+    <FixedSizeList
+      itemSize={68}
+      itemCount={participants.length}
+      width="18rem"
+      height={Math.min(
+        PARTICIPANT_LIST_MAX_HEIGHT,
+        participants.length * PARTICIPANT_ROW_HEIGHT
+      )}
     >
-      {rowVirtualizer.virtualItems.map(virtualRow => (
-        <div
-          key={virtualRow.index}
-          ref={virtualRow.measureElement}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            transform: `translateY(${virtualRow.start}px)`,
-          }}
-        >
-          <Participant
-            peer={participants[virtualRow.index]}
-            key={participants[virtualRow.index].id}
-            canChangeRole={canChangeRole}
-            showActions={isConnected}
-            onParticipantAction={setSelectedPeerId}
-          />
-        </div>
-      ))}
-    </div>
+      {({ index, style }) => {
+        return (
+          <div style={style} key={participants[index].id}>
+            <Participant
+              peer={participants[index]}
+              canChangeRole={canChangeRole}
+              showActions={isConnected}
+              onParticipantAction={setSelectedPeerId}
+            />
+          </div>
+        );
+      }}
+    </FixedSizeList>
   );
 };
 
