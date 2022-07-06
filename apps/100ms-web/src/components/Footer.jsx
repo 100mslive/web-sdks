@@ -84,11 +84,9 @@ export const MetaActions = ({ isMobile = false }) => {
 
   return (
     <Flex align="center">
-      <Tooltip
-        title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}
-        css={{ mx: "$4" }}
-      >
+      <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
         <IconButton
+          css={{ mx: "$4" }}
           onClick={toggleHandRaise}
           active={!isHandRaised}
           data-testid={`${
@@ -160,7 +158,6 @@ export const Footer = () => {
           },
         }}
       >
-        <AudioVideoToggle />
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
@@ -181,6 +178,7 @@ export const Footer = () => {
         </Flex>
       </Flex>
       <Flex align="center" justify="center" css={{ w: "100%" }}>
+        <AudioVideoToggle />
         <ScreenshareToggle css={{ mx: "$4" }} />
         <PIPComponent />
         <MoreSettings />
@@ -188,7 +186,7 @@ export const Footer = () => {
         <LeaveRoom />
         <Flex
           align="center"
-          css={{ display: "none", "@md": { display: "flex", ml: "$4" } }}
+          css={{ display: "none", "@md": { display: "flex" } }}
         >
           <Chat />
         </Flex>

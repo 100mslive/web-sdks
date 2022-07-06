@@ -14,8 +14,6 @@ import {
   Box,
   IconButton,
   styled,
-  Flex,
-  Text,
 } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
@@ -60,10 +58,9 @@ export const LeaveRoom = () => {
               data-testid="leave_room_btn"
             >
               <Tooltip title="Leave Room">
-                <Flex align="center" gap={2}>
+                <Box>
                   <ExitIcon key="hangUp" />
-                  <Text variant="button"> Leave Room</Text>
-                </Flex>
+                </Box>
               </Tooltip>
             </LeaveIconButton>
           </Popover.Trigger>

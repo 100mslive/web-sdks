@@ -58,6 +58,7 @@ const PIPComponent = () => {
         title={`${isPipOn ? "Deactivate" : "Activate"} Person in Person view`}
       >
         <IconButton
+          css={{ mx: "$4" }}
           active={!isPipOn}
           key="pip"
           onClick={() => onPipToggle()}
