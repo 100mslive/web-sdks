@@ -51,15 +51,23 @@ export const Slider: React.FC<SliderProps> = ({
   showTooltip = true,
   thumbStyles,
   ...props
-}) => (
+}) =>  {
+
+  const TooltipWrapper = (props) => {
+    return showTooltip?
+    (<Tooltip title={String(props.value?.[0])}>
+      <Thumb css={thumbStyles} />
+    </Tooltip>)
+     : <Thumb css={thumbStyles} />
+  }
+
+  return (
   <Root {...props}>
     <Track>
       <Range />
     </Track>
-    <Tooltip title={showTooltip ? String(props.value?.[0]) : null}>
-      <Thumb css={thumbStyles} />
-    </Tooltip>
-  </Root>
-);
+    <TooltipWrapper {...props} />
+  </Root>)
+};
 
 Slider.displayName = 'Slider';
