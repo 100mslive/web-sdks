@@ -52,7 +52,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
                 Stats For Nerds
               </Text>
             </Flex>
-            <Dialog.DefaultClose data-testid="dialoge_cross_icon" />
+            <Dialog.DefaultClose data-testid="stats_dialog_close_icon" />
           </Flex>
         </Dialog.Title>
         <HorizontalDivider css={{ mt: "0.8rem" }} />
@@ -120,7 +120,7 @@ const LocalPeerStats = () => {
   }
 
   return (
-    <Flex css={{ flexWrap: "wrap", gap: "$13" }}>
+    <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
       <StatsRow
@@ -176,7 +176,7 @@ const TrackStats = ({ trackID }) => {
 };
 
 const StatsRow = ({ label, value }) => (
-  <Box css={{ bg: "$surfaceLight", w: "$52", p: "$8", borderRadius: "16px" }}>
+  <Box css={{ bg: "$surfaceLight", w: "45%", p: "$8", borderRadius: "16px" }}>
     <Text
       variant="overline"
       css={{
