@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import data from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
-import { Box, Dropdown, Flex, IconButton, styled } from "@100mslive/react-ui";
+import { Box, Popover, Flex, IconButton, styled } from "@100mslive/react-ui";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { ToastManager } from "../Toast/ToastManager";
 import { EmojiIcon, SendIcon } from "@100mslive/react-icons";
@@ -106,16 +106,15 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
           }
         }}
       />
-      <Dropdown.Root open={showEmoji} onOpenChange={setShowEmoji}>
-        <Dropdown.Trigger asChild>
+      <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
+        <Popover.Trigger asChild>
           <IconButton as="div">
             <EmojiIcon />
           </IconButton>
-        </Dropdown.Trigger>
-        <Dropdown.Content
+        </Popover.Trigger>
+        <Popover.Content
           css={{
             p: 0,
-            maxHeight: "unset",
             "em-emoji-picker": {
               width: "100%",
               "--rgb-background": "transparent",
@@ -127,8 +126,8 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
               inputRef.current.value += ` ${emoji.native} `;
             }}
           />
-        </Dropdown.Content>
-      </Dropdown.Root>
+        </Popover.Content>
+      </Popover.Root>
       <IconButton
         onClick={sendMessage}
         css={{ ml: "auto", height: "max-content", mr: "$4" }}
