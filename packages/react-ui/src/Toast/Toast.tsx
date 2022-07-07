@@ -84,7 +84,8 @@ const DefaultClose = ({ ...props }) => {
   );
 };
 
-const ReactToast = ({ title, description, icon, cta, ctaIcon, isClosable, ...props }) => {
+const ReactToast = ({ title, description, icon, cta, isClosable, ...props }) => {
+  const Icon = icon;
   return (
     <>
       <ToastRoot {...props}>
@@ -98,9 +99,9 @@ const ReactToast = ({ title, description, icon, cta, ctaIcon, isClosable, ...pro
             }}
           />
         ) : null}
-        <ToastTitle>
-          <Flex css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: icon ? '$4' : 0 }}>
-            <Box css={{ w: '$10', h: '$10' }}>{icon}</Box>
+        <ToastTitle css={{ mb: description ? (cta ? '$4' : '$24') : 0 }}>
+          <Flex css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: Icon ? '$4' : 0 }}>
+            {Icon ? <Box css={{ w: '$10', h: '$10' }}>{<Icon />}</Box> : null}
             <Box>{title}</Box>
           </Flex>
         </ToastTitle>
@@ -117,7 +118,6 @@ const ReactToast = ({ title, description, icon, cta, ctaIcon, isClosable, ...pro
           </ToastDescription>
         ) : null}
       </ToastRoot>
-      <ToastViewport css={{ bottom: '$24' }} />
     </>
   );
 };
@@ -129,5 +129,5 @@ export const Toast = {
   Close: DefaultClose,
   Action: ToastAction,
   Viewport: ToastViewport,
-  ReactToast: ReactToast,
+  DefaultToast: ReactToast,
 };

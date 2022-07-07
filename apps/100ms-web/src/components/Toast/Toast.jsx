@@ -10,7 +10,15 @@ export const Toast = ({
   onOpenChange,
 }) => {
   return (
-    <ToastPrimitive.Root
+    <ToastPrimitive.DefaultToast
+      title={title}
+      description={description}
+      open={open}
+      isClosable={close}
+      onOpenChange={onOpenChange}
+      duration={!close ? 600000 : duration}
+    >
+      {/* <ToastPrimitive.Root
       open={open}
       onOpenChange={onOpenChange}
       duration={!close ? 600000 : duration}
@@ -24,6 +32,7 @@ export const Toast = ({
         </ToastPrimitive.Description>
       )}
       {close && <ToastPrimitive.Close />}
-    </ToastPrimitive.Root>
+    </ToastPrimitive.Root> */}
+    </ToastPrimitive.DefaultToast>
   );
 };
