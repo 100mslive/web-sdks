@@ -3,6 +3,7 @@ import axios from 'axios';
 import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
+  apiBasePath,
   getAuthInfo,
   getRoomCodeFromUrl,
   getWithRetry,
@@ -21,12 +22,18 @@ const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSEdtechTemplate = React.lazy(() =>
   import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
 );
-const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+let hostname = window.location.hostname;
+if (!hostname.endsWith('app.100ms.live')) {
+  hostname = process.env.REACT_APP_HOST_NAME || hostname;
+} else if (hostname.endsWith('dev-app.100ms.live')) {
+  // route dev-app appropriately to qa or prod
+  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+}
 
 const App = () => {
   const prevSavedSettings = useRef({});
   const appInfo = useRef({ app_type: '', app_name: '' });
-  const [loading, setLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -49,9 +56,11 @@ const App = () => {
   });
 
   useEffect(() => {
-    fetchData();
+    const code = getRoomCodeFromUrl();
+    if (code) {
+      fetchData();
+    }
   }, []);
-
   useEffect(() => {
     setUpdateMetadataOnWindow();
   }, [settings]); //eslint-disable-line
@@ -88,10 +97,13 @@ const App = () => {
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
+    if (!code) {
+      LogRocket.track('roomIdNull', window.location.pathname);
+      return;
+    }
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
-    var headers = {};
+    const url = `${apiBasePath}get-token`;
+    let headers;
     if (jwt) {
       headers = {
         Authorization: `Bearer ${jwt}`,
@@ -125,10 +137,8 @@ const App = () => {
 
   const fetchData = async () => {
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    const url = `${
-      process.env.REACT_APP_BACKEND_API
-    }apps/get-details?domain=${hostname}&room_id=${getRoomCodeFromUrl()}`;
+    const code = getRoomCodeFromUrl();
+    const url = `${apiBasePath}apps/get-details?domain=${hostname}&room_id=${code}`;
     const headers = {};
     if (jwt) {
       headers['Authorization'] = `Bearer ${jwt}`;
@@ -156,7 +166,6 @@ const App = () => {
               metadata: prevSettings.metadata,
             },
           };
-          setLoading(false);
           setOnlyEmail(res.data.same_user);
           prevSavedSettings.current = Object.assign({}, prevSettings);
           appInfo.current = { app_name, app_type };
@@ -177,7 +186,6 @@ const App = () => {
             body: 'Please make sure the domain name is right',
           };
         }
-        setLoading(false);
         setError(error);
         console.error(errorMessage);
       });
@@ -228,13 +236,6 @@ const App = () => {
     storeSettings();
   };
 
-  if (loading) {
-    return (
-      <Flex justify="center" align="center" css={{ size: '100%' }}>
-        <Loading size={100} />
-      </Flex>
-    );
-  }
   return (
     <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
       {error && (
@@ -255,7 +256,7 @@ const App = () => {
         </Suspense>
       )}
 
-      {!error && !loading && (
+      {!error && (
         <Suspense
           fallback={
             <Flex justify="center" align="center" css={{ size: '100%' }}>
@@ -264,7 +265,7 @@ const App = () => {
           }
         >
           <HMSEdtechTemplate
-            tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+            tokenEndpoint={`${apiBasePath + hostname}/`}
             themeConfig={{
               aspectRatio: settings.tile_shape,
               font: settings.font,
@@ -276,6 +277,7 @@ const App = () => {
               recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
+            getDetails={fetchData}
           />
         </Suspense>
       )}

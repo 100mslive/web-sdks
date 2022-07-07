@@ -24,7 +24,6 @@ yarn install
 
 ```
 yarn test 
-
 ```
 ### Running playwright tests
 
