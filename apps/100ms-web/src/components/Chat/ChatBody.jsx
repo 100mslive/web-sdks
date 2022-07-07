@@ -130,7 +130,7 @@ const getMessageType = ({ roles, receiver }) => {
   return receiver ? "private" : "";
 };
 
-const ChatMessage = React.memo(({ message, index }) => {
+const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -156,7 +156,7 @@ const ChatMessage = React.memo(({ message, index }) => {
         py: messageType ? "$4" : 0,
         r: "$1",
         mb: "$10",
-        mt: index === 0 ? "auto" : undefined,
+        mt: autoMarginTop ? "auto" : undefined,
       }}
       key={message.time}
       data-testid="chat_msg"
@@ -214,7 +214,13 @@ export const ChatBody = ({ role, peerId }) => {
   return (
     <Fragment>
       {messages.map((message, index) => {
-        return <ChatMessage key={message.id} message={message} index={index} />;
+        return (
+          <ChatMessage
+            key={message.id}
+            message={message}
+            autoMarginTop={index === 0}
+          />
+        );
       })}
     </Fragment>
   );
