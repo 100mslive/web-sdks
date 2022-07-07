@@ -68,7 +68,6 @@ export const ChangeNameModal = ({ onOpenChange }) => {
             align="center"
             css={{
               width: "100%",
-              flexDirection: "row",
               gap: "$md",
               margin: "$10 0 0 0",
             }}
