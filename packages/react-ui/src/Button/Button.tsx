@@ -107,8 +107,8 @@ const StyledButton = styled('button', {
 
 export const Button = React.forwardRef<
   HTMLButtonElement,
-  PropsWithChildren<{ loading: boolean } & ComponentPropsWithRef<typeof StyledButton>>
->(({ children, loading, icon, ...buttonProps }, ref) => {
+  PropsWithChildren<{ loading?: boolean } & ComponentPropsWithRef<typeof StyledButton>>
+>(({ children, loading = false, icon, ...buttonProps }, ref) => {
   return (
     <StyledButton {...buttonProps} ref={ref}>
       <>

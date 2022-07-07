@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
 import { PeopleIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Box, Text, Avatar, textEllipsis, Flex } from '@100mslive/react-ui';
+import { Box, Text, Avatar, textEllipsis, Flex } from '..';
 import { Dropdown } from './Dropdown';
 
 export default {

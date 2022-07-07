@@ -40,7 +40,10 @@ import {
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
-import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
+import {
+  useIsSidepaneTypeOpen,
+  useSidepaneToggle,
+} from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
@@ -111,7 +114,9 @@ export const ParticipantList = () => {
 export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isParticipantsOpen = useSidepaneState(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const isParticipantsOpen = useIsSidepaneTypeOpen(
+    SIDE_PANE_OPTIONS.PARTICIPANTS
+  );
   useEffect(() => {
     if (isParticipantsOpen && peerCount === 0) {
       toggleSidepane();
@@ -329,7 +334,7 @@ const ParticipantVolume = ({ peerId }) => {
   );
 };
 
-const ParticipantSearch = ({ onSearch }) => {
+export const ParticipantSearch = ({ onSearch, placeholder }) => {
   const [value, setValue] = React.useState("");
   useDebounce(
     () => {
@@ -353,10 +358,15 @@ const ParticipantSearch = ({ onSearch }) => {
       </Box>
       <Input
         type="text"
-        placeholder="Find what you are looking for"
+        placeholder={placeholder || "Find what you are looking for"}
         css={{ w: "100%", pl: "$14" }}
         value={value}
-        onChange={event => setValue(event.currentTarget.value)}
+        onKeyDown={event => {
+          event.stopPropagation();
+        }}
+        onChange={event => {
+          setValue(event.currentTarget.value);
+        }}
       />
     </Box>
   );
