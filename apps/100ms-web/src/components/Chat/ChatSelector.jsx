@@ -122,22 +122,23 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
           );
         })}
         {peers.length > 0 && <SelectorHeader>Participants</SelectorHeader>}
-        {peers
-          .filter(
-            peer =>
-              !search || peer.name.toLowerCase().includes(search.toLowerCase())
-          )
-          .map(peer => {
-            return (
-              <PeerItem
-                key={peer.id}
-                name={peer.name}
-                peerId={peer.id}
-                active={peer.id === peerId}
-                onSelect={onSelect}
-              />
-            );
-          })}
+        {peers.map(peer => {
+          if (
+            search &&
+            !peer.name.toLowerCase().includes(search.toLowerCase())
+          ) {
+            return null;
+          }
+          return (
+            <PeerItem
+              key={peer.id}
+              name={peer.name}
+              peerId={peer.id}
+              active={peer.id === peerId}
+              onSelect={onSelect}
+            />
+          );
+        })}
       </Dropdown.Group>
     </Fragment>
   );
