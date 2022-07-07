@@ -41,6 +41,7 @@ export const ChatHeader = React.memo(
               p: "$2 $4",
               ml: "$8",
             }}
+            tabIndex={0}
           >
             <Flex align="center">
               <Text variant="sm" css={{ ...textEllipsis(80) }}>
