@@ -69,7 +69,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
             css={{
               width: "100%",
               gap: "$md",
-              margin: "$10 0 0 0",
+              mt: "$10",
             }}
           >
             <Box css={{ w: "50%" }}>
