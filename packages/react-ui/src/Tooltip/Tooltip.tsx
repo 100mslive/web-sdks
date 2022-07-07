@@ -5,11 +5,12 @@ import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade }
 
 const TooltipBox = styled(BaseTooltip.Content, {
   fontFamily: '$sans',
-  borderRadius: '$0',
-  padding: '$3 $4',
+  borderRadius: '$2',
+  padding: '$2 $4',
   fontSize: '$xs',
-  color: '$white',
-  backgroundColor: '$grayDefault',
+
+  color: '$textHighEmp',
+  backgroundColor: '$surfaceLight',
   '@media (prefers-reduced-motion: no-preference)': {
     animationDuration: '400ms',
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -21,19 +22,31 @@ const TooltipBox = styled(BaseTooltip.Content, {
       '&[data-side="left"]': { animationName: slideRightAndFade() },
     },
   },
+  variants: {
+    outlined: {
+      true: {
+        backgroundColor: '$blackLight',
+        border: 'solid $space$px $secondaryDark',
+      },
+    },
+  },
 });
 
 const TooltipTrigger = styled(BaseTooltip.Trigger, {
   fontFamily: '$sans',
 });
 
-// TODO: refactor this to adjust more props and composing
-// TODO: also handle <kbd></kbd> inputs
-export const Tooltip: React.FC<PropsWithChildren<{ title: React.ReactNode }>> = ({ children, title }) => (
-  <BaseTooltip.Root delayDuration={200}>
+const TooltipRoot = BaseTooltip.Root;
+export type alignTooltip = 'end' | 'center' | 'start' | undefined;
+export type sideTooltip = 'bottom' | 'left' | 'right' | 'top' | undefined;
+
+export const Tooltip: React.FC<
+  PropsWithChildren<{ title: React.ReactNode | string; outlined?: boolean; side?: sideTooltip; align?: alignTooltip }>
+> = ({ children, title, outlined = true, side = 'bottom', align = 'center' }) => (
+  <TooltipRoot delayDuration={200}>
     <TooltipTrigger asChild>{children}</TooltipTrigger>
-    <TooltipBox sideOffset={10} side="top">
+    <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
       {title}
     </TooltipBox>
-  </BaseTooltip.Root>
+  </TooltipRoot>
 );

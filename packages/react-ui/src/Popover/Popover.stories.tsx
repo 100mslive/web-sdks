@@ -26,7 +26,7 @@ export default {
 } as ComponentMeta<typeof Popover.Root>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Popover.Root> = args => (
+const Template: ComponentStory<typeof Popover.Root> = () => (
   <Flex css={{ w: '$80' }} justify="center">
     <Popover.Root>
       <Popover.Trigger asChild>
