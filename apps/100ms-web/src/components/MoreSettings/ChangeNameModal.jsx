@@ -10,7 +10,7 @@ import {
   UserPreferencesKeys,
 } from "../hooks/useUserPreferences";
 import { ToastManager } from "../Toast/ToastManager";
-import { DialogRow } from "../../primitives/DialogContent";
+
 export const ChangeNameModal = ({ onOpenChange }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW
