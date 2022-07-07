@@ -11,27 +11,10 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <Dialog.Content css={{ w: 'min(684px, 90%)', height: 'min(492px, 100%)' }}>
         <Flex direction="column" css={{ size: '100%' }}>
-          <Box>
-            <SubHeading css={{ mb: '$2' }}>Invite People</SubHeading>
-            <Text variant="h6">Start the conversation</Text>
-          </Box>
+          <SubHeading css={{ mb: '$2' }}>Invite People</SubHeading>
+          <Text variant="h6">Start the conversation</Text>
           <Flex css={{ pt: '$14', flex: '1 1 0', w: '100%' }}>
-            <Flex
-              direction="column"
-              css={{
-                '[data-radix-popper-content-wrapper]': {
-                  width: '100%',
-                  minWidth: '0 !important',
-                  transform: 'translateY($space$20) !important',
-                  zIndex: 11,
-                },
-                position: 'relative',
-                minWidth: 0,
-                flex: '1 1 0',
-                mr: '$14',
-                h: '100%',
-              }}
-            >
+            <LeftContainer>
               <SubHeading>Select Role</SubHeading>
               <Dropdown.Root open={open} onOpenChange={setOpen}>
                 <Dropdown.Trigger
@@ -80,19 +63,8 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
               >
                 <LinkIcon /> Copy Invite Link
               </Button>
-            </Flex>
-            <Flex
-              direction="column"
-              css={{
-                p: '$10 $14',
-                w: '45%',
-                h: '100%',
-                border: '1px solid $borderLight',
-                bg: '$surfaceLight',
-                r: '$1',
-                textAlign: 'center',
-              }}
-            >
+            </LeftContainer>
+            <RightContainer>
               <SubHeading>Scan this QR code on your device to join as this role</SubHeading>
               <Box css={{ flex: '1 1 0', my: '$10', bg: '$white', r: '$1', px: '$8' }}>
                 <QRCodeSVG
@@ -100,7 +72,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                   style={{ width: '100%', height: '100%' }}
                 />
               </Box>
-            </Flex>
+            </RightContainer>
           </Flex>
         </Flex>
         <Dialog.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
@@ -118,6 +90,48 @@ const SubHeading = ({ children, css = {} }) => {
     <Text variant="tiny" css={{ color: '$textMedEmp', textTransform: 'uppercase', ...css }}>
       {children}
     </Text>
+  );
+};
+
+const LeftContainer = ({ children }) => {
+  return (
+    <Flex
+      direction="column"
+      css={{
+        '[data-radix-popper-content-wrapper]': {
+          width: '100%',
+          minWidth: '0 !important',
+          transform: 'translateY($space$20) !important',
+          zIndex: 11,
+        },
+        position: 'relative',
+        minWidth: 0,
+        flex: '1 1 0',
+        mr: '$14',
+        h: '100%',
+      }}
+    >
+      {children}
+    </Flex>
+  );
+};
+
+const RightContainer = ({ children }) => {
+  return (
+    <Flex
+      direction="column"
+      css={{
+        p: '$10 $14',
+        w: '45%',
+        h: '100%',
+        border: '1px solid $borderLight',
+        bg: '$surfaceLight',
+        r: '$1',
+        textAlign: 'center',
+      }}
+    >
+      {children}
+    </Flex>
   );
 };
 
