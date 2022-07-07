@@ -6,16 +6,14 @@ export const ToastConfig = {
       if (notification.data.length === 1) {
         return {
           title: `${notification.data[0]?.name} joined`,
-          icon: PersonIcon,
-          close: true,
+          icon: <PersonIcon />,
         };
       }
       return {
         title: `${notification.data[notification.data.length - 1]?.name} and ${
           notification.data.length - 1
         } others joined`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
     multiple: notifications => {
@@ -23,8 +21,7 @@ export const ToastConfig = {
         title: `${notifications[0].data.name} and ${
           notifications.length - 1
         } others joined`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
   },
@@ -32,8 +29,7 @@ export const ToastConfig = {
     single: function (notification) {
       return {
         title: `${notification.data?.name} joined`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
     multiple: function (notifications) {
@@ -41,8 +37,7 @@ export const ToastConfig = {
         title: `${notifications[notifications.length - 1].data.name} and ${
           notifications.length - 1
         } others joined`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
   },
@@ -50,8 +45,7 @@ export const ToastConfig = {
     single: function (notification) {
       return {
         title: `${notification.data?.name} left`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
     multiple: function (notifications) {
@@ -59,8 +53,7 @@ export const ToastConfig = {
         title: `${notifications[notifications.length - 1].data.name} and ${
           notifications.length - 1
         } others left`,
-        icon: PersonIcon,
-        close: true,
+        icon: <PersonIcon />,
       };
     },
   },
@@ -68,8 +61,7 @@ export const ToastConfig = {
     single: notification => {
       return {
         title: `${notification.data?.name} raised hand`,
-        icon: HandIcon,
-        close: true,
+        icon: <HandIcon />,
       };
     },
     multiple: notifications => {
@@ -77,8 +69,7 @@ export const ToastConfig = {
         title: `${notifications[notifications.length - 1].data?.name} and ${
           notifications.length - 1
         } others raised hand`,
-        icon: HandIcon,
-        close: true,
+        icon: <HandIcon />,
       };
     },
   },
@@ -86,15 +77,13 @@ export const ToastConfig = {
     single: notification => {
       return {
         title: `New message from ${notification.data?.senderName}`,
-        icon: ChatIcon,
-        close: true,
+        icon: <ChatIcon />,
       };
     },
     multiple: notifications => {
       return {
         title: `${notifications.length} new messages`,
-        icon: ChatIcon,
-        close: true,
+        icon: <ChatIcon />,
       };
     },
   },

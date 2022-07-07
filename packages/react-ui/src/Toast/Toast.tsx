@@ -15,9 +15,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   flexDirection: 'column',
   position: 'relative',
   fontFamily: '$sans',
-  borderTop: 'solid $space$px $borderLight',
-  borderBottom: 'solid $space$px $borderLight',
-  borderRight: 'solid $space$px $borderLight',
+  border: 'solid $space$px $borderLight',
   ...toastAnimation,
   variants: {
     variant: {
@@ -42,15 +40,12 @@ const ToastRoot = styled(ToastPrimitives.Root, {
 
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
-  lineHeight: '$md',
   color: '$textPrimary',
   fontWeight: 600,
   mr: '$12',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
   color: '$textSecondary',
-  mr: '$17',
-  mt: '$2',
 });
 const ToastClose = styled(ToastPrimitives.Close, {
   position: 'absolute',
@@ -74,9 +69,9 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = ({ ...props }) => {
+const DefaultClose = css => {
   return (
-    <ToastClose {...props} asChild>
+    <ToastClose css={css} asChild>
       <IconButton>
         <CrossIcon />
       </IconButton>
@@ -84,8 +79,15 @@ const DefaultClose = ({ ...props }) => {
   );
 };
 
-const ReactToast = ({ title, description, icon, cta, isClosable, ...props }) => {
-  const Icon = icon;
+interface ReactToastProps extends ToastPrimitives.ToastProps {
+  title: string;
+  description?: string;
+  isClosable?: boolean;
+  icon?: React.ReactNode;
+  action?: React.ReactNode;
+}
+
+const ReactToast: React.FC<ReactToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -95,25 +97,27 @@ const ReactToast = ({ title, description, icon, cta, isClosable, ...props }) => 
               w: '$10',
               h: '$10',
               right: '$4',
-              top: cta || description ? '$md' : '50%',
+              top: action || description ? '$md' : '50%',
             }}
           />
         ) : null}
-        <ToastTitle css={{ mb: description ? (cta ? '$4' : '$24') : 0 }}>
-          <Flex css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: Icon ? '$4' : 0 }}>
-            {Icon ? <Box css={{ w: '$10', h: '$10' }}>{<Icon />}</Box> : null}
-            <Box>{title}</Box>
+        <ToastTitle css={{ mb: action ? (description ? 0 : '$10') : 0, c: '$textHighEmp' }}>
+          <Flex align="center" css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: icon ? '$4' : 0 }}>
+            {icon ? <Box css={{ w: '$10', h: '$10' }}>{icon}</Box> : null}
+            <Text variant="sub1" css={{ c: '$textHighEmp' }}>
+              {title}
+            </Text>
           </Flex>
         </ToastTitle>
-        {cta || description ? (
+        {action || description ? (
           <ToastDescription css={{ mr: '$12' }}>
             <Flex css={{ display: 'flex', flexDirection: 'column', w: '100%' }}>
               {description ? (
-                <Text variant="body1" css={{ fontWeight: '$regular', mb: cta ? '$10' : 0, c: '$textMedEmp' }}>
+                <Text variant="body1" css={{ fontWeight: '$regular', mb: action ? '$10' : 0, c: '$textMedEmp' }}>
                   {description}
                 </Text>
               ) : null}
-              {cta ? cta : null}
+              {action ? action : null}
             </Flex>
           </ToastDescription>
         ) : null}

@@ -19,12 +19,12 @@ const ToastMeta = {
   argTypes: {
     onClick: { action: 'clicked' },
     open: { control: 'boolean' },
-    variant: { control: 'select', options: ['danger', 'standard', 'warning', 'success', ''] },
+    variant: { control: 'select', options: ['error', 'standard', 'warning', 'success', ''] },
   },
   args: {
     variant: 'standard',
     title: 'Hello from Toast Component',
-    description: 'Write Desc here',
+    description: 'Hello from toast',
     isClosable: true,
   },
   parameters: {
@@ -44,8 +44,8 @@ const ReactToastComponent = ({ ...props }) => {
         description="Toast description goes here"
         open={true}
         isClosable={true}
-        icon={RecordIcon}
-        cta={
+        icon={<RecordIcon />}
+        action={
           <Button variant="standard" outlined css={{ w: 'max-content', p: '$4 $8', gap: '8px' }} icon>
             <Text variant="body2" as="div" css={{ fontWeight: '$regular', lineHeight: '0' }}>
               Hello
@@ -57,12 +57,6 @@ const ReactToastComponent = ({ ...props }) => {
         {...props}
       ></Toast.DefaultToast>
       <Toast.Viewport css={{ bottom: '$24' }} />
-      {/* <Toast.Root open={true} onOpenChange={o => setIsOpen(o)} {...props}>
-        <Toast.Title css={{ mr: '$12' }}>Hello from Toast Component</Toast.Title>
-        <Toast.Description css={{ mr: '$12' }}>Toast component Description</Toast.Description>
-        <Toast.Close />
-      </Toast.Root>
-       */}
     </>
   );
 };
