@@ -30,8 +30,22 @@ export class HLSController {
     this.eventEmitter = null;
   }
 
-  getHlsInstance() {
-    return this.hls;
+  /**
+   *
+   * @returns returns a Number which represents current
+   * quality level. -1 if currentlevel is set to "Auto"
+   */
+  getCurrentLevel() {
+    return this.hls.currentLevel;
+  }
+
+  /**
+   *
+   * @param {currentLevel} Number - currentLevel we want to
+   * set the stream to. -1 for Auto
+   */
+  setCurrentLevel(currentLevel) {
+    this.hls.currentLevel = currentLevel;
   }
 
   /**
@@ -67,8 +81,7 @@ export class HLSController {
      *   }]
      * }
      */
-    this.hls.on(Hls.Events.BUFFER_APPENDED, (event, data) => {
-      const frag = data?.frag;
+    this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
       // There could be more than one EXT-X-DATERANGE tags in a fragment.
@@ -118,8 +131,8 @@ export class HLSController {
      * NOTE: Javascript cannot gaurantee exact time, it
      * only gaurantees minimum time before trying to emit.
      */
-    this.hls.on(Hls.Events.FRAG_CHANGED, (event, data) => {
-      const tagsList = parseTagsList(data?.frag.tagList);
+    this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
+      const tagsList = parseTagsList(frag?.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];
       this.metadataByTimeStamp.forEach((value, key) => {
@@ -129,46 +142,37 @@ export class HLSController {
       /**
        * There are two scenarios here.
        * 1) the program time is exactly same as a startTime,
-       * which means the below 'if' will fail.
        * 2) the program time is behind the startTime,
        * which means it is not in the timeStamps array
-       * which goes into the below if condition
        *
        * NOTE: PROGRAM_TIME canot be ahead than START_TIME,
        * because the backend gaurantee that every time it sends
        * a metadata, its always for an event in the future.
+       *
+       * in both the scenarios, we push
+       * our fragment's timeSegment(programtime) to the timestamp
+       * and sort it. Once it's sorted, the next element to our
+       * timeSegement is the nearest happening of a metadata startTime.
+       * (e.g)
+       * timestamp  = [5,10,12,15,16]
+       * timeSegment = 13
+       * we push timeSegment to timestamp => [5,10,12,15,16,13]
+       * we sort it => [5,10,12,13,15,16]
+       * now next element of timeSegment 13 is 15 which is always the nearest future
+       * occurence of a metadata.
+       *
+       * in case its already there, it will still work
+       * (e.g)
+       * [5,10,12,13,15,16],
+       * after push & sort => [5,10,12,13,13,15,16]
+       * next eement of timesegment 13 is 13(the one we pushed) which still works
+       * the way we want.
        */
-      if (timeStamps.indexOf(timeSegment) === -1) {
-        /**
-         * since we don't have the exact time in timeStamps, we push
-         * our fragment's timeSegment(programtime) to the timestamp
-         * and sort it. Once it's sorted, the next element to our
-         * timeSegement is the nearest happening of a metadata startTime.
-         * (e.g)
-         * timestamp  = [5,10,12,15,16]
-         * timeSegment = 13
-         * we push timeSegment to timestamp => [5,10,12,15,16,13]
-         * we sort it => [5,10,12,13,15,16]
-         * now next element of timeSegment 13 is 15 which is always the nearest future
-         * occurence of a metadata.
-         */
-        timeStamps.push(timeSegment);
-        timeStamps.sort();
+      timeStamps.push(timeSegment);
+      timeStamps.sort();
 
-        const whereAmI = timeStamps.indexOf(timeSegment);
-        nearestTimeStamp = timeStamps[whereAmI + 1];
-      } else {
-        /**
-         * If the timeSegment matches one of the startTime,
-         * then we dont need to push it, we can just sort it
-         * and by the same logic above, the next element of
-         * our timesegment is the nearest future occurence of
-         * metadata.
-         */
-        timeStamps.sort();
-        const whereAmI = timeStamps.indexOf(timeSegment);
-        nearestTimeStamp = timeStamps[whereAmI];
-      }
+      const whereAmI = timeStamps.indexOf(timeSegment);
+      nearestTimeStamp = timeStamps[whereAmI + 1];
 
       /**
        * This check is if timestamp ends up on the
