@@ -50,7 +50,7 @@ export const LayoutSettings = () => {
       <SwitchWithLabel
         label="Audio Only Mode"
         id="audioOnlyMode"
-        value={isAudioOnly}
+        checked={isAudioOnly}
         onChange={toggleIsAudioOnly}
       />
       <Flex
