@@ -138,36 +138,8 @@ export class HLSController {
       this.metadataByTimeStamp.forEach((value, key) => {
         timeStamps.push(key);
       });
+
       let nearestTimeStamp = timeSegment;
-      /**
-       * There are two scenarios here.
-       * 1) the program time is exactly same as a startTime,
-       * 2) the program time is behind the startTime,
-       * which means it is not in the timeStamps array
-       *
-       * NOTE: PROGRAM_TIME canot be ahead than START_TIME,
-       * because the backend gaurantee that every time it sends
-       * a metadata, its always for an event in the future.
-       *
-       * in both the scenarios, we push
-       * our fragment's timeSegment(programtime) to the timestamp
-       * and sort it. Once it's sorted, the next element to our
-       * timeSegement is the nearest happening of a metadata startTime.
-       * (e.g)
-       * timestamp  = [5,10,12,15,16]
-       * timeSegment = 13
-       * we push timeSegment to timestamp => [5,10,12,15,16,13]
-       * we sort it => [5,10,12,13,15,16]
-       * now next element of timeSegment 13 is 15 which is always the nearest future
-       * occurence of a metadata.
-       *
-       * in case its already there, it will still work
-       * (e.g)
-       * [5,10,12,13,15,16],
-       * after push & sort => [5,10,12,13,13,15,16]
-       * next eement of timesegment 13 is 13(the one we pushed) which still works
-       * the way we want.
-       */
       timeStamps.push(timeSegment);
       timeStamps.sort();
 
