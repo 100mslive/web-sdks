@@ -14,6 +14,8 @@ import {
   Box,
   IconButton,
   styled,
+  Text,
+  Flex,
 } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
@@ -47,6 +49,10 @@ export const LeaveRoom = () => {
     redirectToLeavePage();
   };
 
+  if (!permissions) {
+    return;
+  }
+
   return (
     <Fragment>
       {permissions.endRoom ? (
@@ -58,9 +64,12 @@ export const LeaveRoom = () => {
               data-testid="leave_room_btn"
             >
               <Tooltip title="Leave Room">
-                <Box>
+                <Flex gap={2}>
                   <ExitIcon key="hangUp" />
-                </Box>
+                  <Text css={{ "@md": { display: "none" } }} variant="button">
+                    Leave Studio
+                  </Text>
+                </Flex>
               </Tooltip>
             </LeaveIconButton>
           </Popover.Trigger>

@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { Flex, Tooltip, Footer as AppFooter } from "@100mslive/react-ui";
+import { Flex, Tooltip, Footer as AppFooter, Box } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "./AudioVideoToggle";
 import { LeaveRoom } from "./LeaveRoom";
 import { MoreSettings } from "./MoreSettings/MoreSettings";
@@ -161,8 +161,9 @@ export const Footer = () => {
         <ScreenshareToggle css={{ mx: "$4" }} />
         <PIPComponent />
         <MoreSettings />
-
-        <LeaveRoom />
+        <Box css={{ "@md": { display: "none" } }}>
+          <LeaveRoom />
+        </Box>
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}

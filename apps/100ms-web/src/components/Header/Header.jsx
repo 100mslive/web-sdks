@@ -26,6 +26,7 @@ import {
 } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { AppContext } from "../context/AppContext";
+import { LeaveRoom } from "../LeaveRoom";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
@@ -38,6 +39,9 @@ export const Header = ({ isPreview }) => {
     >
       <Flex align="center" css={{ position: "absolute", left: "$10" }}>
         <Logo />
+        <Box css={{ display: "none", "@md": { display: "block" } }}>
+          <LeaveRoom />
+        </Box>
         <VerticalDivider css={{ ml: "$8" }} />
         {!isPreview ? <SpeakerTag /> : null}
       </Flex>
