@@ -3,6 +3,7 @@ import axios from 'axios';
 import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
+  apiBasePath,
   getAuthInfo,
   getRoomCodeFromUrl,
   getWithRetry,
@@ -21,7 +22,14 @@ const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSEdtechTemplate = React.lazy(() =>
   import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
 );
-const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+let hostname = window.location.hostname;
+if (!hostname.endsWith('app.100ms.live')) {
+  hostname = process.env.REACT_APP_HOST_NAME || hostname;
+} else if (hostname.endsWith('dev-app.100ms.live')) {
+  // route dev-app appropriately to qa or prod
+  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+}
 
 const App = () => {
   const prevSavedSettings = useRef({});
@@ -94,9 +102,8 @@ const App = () => {
       return;
     }
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
-    var headers = {};
+    const url = `${apiBasePath}get-token`;
+    let headers;
     if (jwt) {
       headers = {
         Authorization: `Bearer ${jwt}`,
@@ -131,8 +138,7 @@ const App = () => {
   const fetchData = async () => {
     const jwt = getAuthInfo().token;
     const code = getRoomCodeFromUrl();
-    axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}apps/get-details?domain=${hostname}&room_id=${code}`;
+    const url = `${apiBasePath}apps/get-details?domain=${hostname}&room_id=${code}`;
     const headers = {};
     if (jwt) {
       headers['Authorization'] = `Bearer ${jwt}`;
@@ -259,7 +265,7 @@ const App = () => {
           }
         >
           <HMSEdtechTemplate
-            tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+            tokenEndpoint={`${apiBasePath + hostname}/`}
             themeConfig={{
               aspectRatio: settings.tile_shape,
               font: settings.font,

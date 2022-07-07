@@ -7,7 +7,7 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
-  SendHLSTimedMetadata,
+  HLSTimedMetadata,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -317,9 +317,23 @@ export interface IHMSActions {
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
   /**
-   * TODO: write meaningful comment here
+   * @alpha
+   * Used to define date range metadata in a media playlist.
+   * This api adds EXT-X-DATERANGE tags to the media playlist.
+   * It is useful for defining timed metadata for interstitial regions such as advertisements,
+   * but can be used to define any timed metadata needed by your stream.
+   * usage (e.g)
+   * const metadataList = [{
+   *  payload: "some string 1",
+   *  duration: 2
+   * },
+   * {
+   *  payload: "some string 2",
+   *  duration: 3
+   * }]
+   * sendHLSTimedMetadata(metadataList);
    */
-  sendHLSTimedMetadata(params?: SendHLSTimedMetadata): Promise<void>;
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   /**
    * If you want to update the name of peer.

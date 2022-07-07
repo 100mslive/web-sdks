@@ -22,7 +22,7 @@ export class Header {
   participant_list = 'div[data-testid="participant_list"]';
   participant_name = 'div[data-testid="participant_?"]';
   participant_setting = 'div[data-testid="participant_?"] button';
-  participant_role_heading = 'p[data-testid="role_?"]';
+  participant_role_heading = "text=?";
   dialog_select_change_role_to = 'div[data-testid="dialog_select_Change role to"]';
   role_list = [
     "audio",
@@ -33,7 +33,7 @@ export class Header {
     "video",
     "viewer",
   ];
-  setting_role_peer = 'div[role="group"]:nth-child(?) button';
+  setting_role_peer = 'div[role="menuitem"]:nth-child(?) button';
   peerlist_network = 'div[data-testid="participant_?"] span[data-testid="tile_network"]';
 
   constructor(page: PageWrapper) {
