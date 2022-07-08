@@ -120,7 +120,7 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED:
-        if (notification.data.roleName === HLS_VIEWER_ROLE) {
+        if (notification.data?.roleName === HLS_VIEWER_ROLE) {
           return;
         }
         if (notification.data?.isLocal) {
