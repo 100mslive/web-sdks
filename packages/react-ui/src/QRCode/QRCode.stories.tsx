@@ -6,6 +6,7 @@ import QRCodeDocs from './QRCode.mdx';
 
 export default {
   title: 'UI Components/QRCode',
+  id: 'qr-code',
   component: QRCode,
   args: {
     value: 'https://100ms.live',
