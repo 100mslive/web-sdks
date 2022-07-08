@@ -14,7 +14,7 @@ type SetTimeOutId = number;
 export class StoreUpdatesBatcher {
   private queuedUpdates: PartialState<any>[] = [];
   private timer?: SetTimeOutId;
-  private DEFAULT_INTERVAL_MS = 100;
+  private DEFAULT_INTERVAL_MS = 500;
   private store: IHMSStore;
   private actionNames: Set<string> = new Set<string>();
   constructor(store: IHMSStore) {
