@@ -151,7 +151,7 @@ const TrackStats = ({ trackID }) => {
   const inbound = stats.type.includes("inbound");
 
   return (
-    <Flex css={{ flexWrap: "wrap", gap: "$13" }}>
+    <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
       <StatsRow label="Type" value={stats.type + " " + stats.kind} />
       <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, "b/s")} />
       <StatsRow label="Packets Lost" value={stats.packetsLost || "-"} />
@@ -176,7 +176,7 @@ const TrackStats = ({ trackID }) => {
 };
 
 const StatsRow = ({ label, value }) => (
-  <Box css={{ bg: "$surfaceLight", w: "45%", p: "$8", borderRadius: "16px" }}>
+  <Box css={{ bg: "$surfaceLight", w: "47%", p: "$8", r: "$3" }}>
     <Text
       variant="overline"
       css={{
