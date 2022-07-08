@@ -12,7 +12,7 @@ import { PartialState } from 'zustand/vanilla';
 export class StoreUpdatesBatcher {
   private queuedUpdates: PartialState<any>[] = [];
   private timer?: any;
-  private DEFAULT_INTERVAL_MS = 200;
+  private DEFAULT_INTERVAL_MS = 500;
   private store: IHMSStore;
   private actionNames: Set<string> = new Set<string>();
   constructor(store: IHMSStore) {
