@@ -6,9 +6,9 @@ import {
   MicOnIcon,
 } from "@100mslive/react-icons";
 import { Tooltip, IconButton } from "@100mslive/react-ui";
-import { useAVToggle, parsedUserAgent } from "@100mslive/react-sdk";
+import { useAVToggle } from "@100mslive/react-sdk";
 
-const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
+const isMacOS = false;
 
 export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
