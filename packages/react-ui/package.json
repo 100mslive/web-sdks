@@ -33,7 +33,6 @@
     "@storybook/addon-interactions": "^6.5.7",
     "@storybook/addon-links": "^6.5.7",
     "@storybook/builder-webpack4": "^6.5.7",
-    "storybook-dark-mode": "^1.1.0",
     "@storybook/manager-webpack4": "^6.5.7",
     "@storybook/react": "^6.5.7",
     "@storybook/testing-library": "^0.0.11",
@@ -45,7 +44,8 @@
     "react": "^18.1.0",
     "rollup": "^2.70.1",
     "rollup-plugin-esbuild": "^4.9.1",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "storybook-dark-mode": "^1.1.0"
   },
   "peerDependencies": {
     "react": ">=17.0.2 <19.0.0"
@@ -68,6 +68,7 @@
     "@radix-ui/react-tooltip": "^0.1.1",
     "@stitches/react": "^1.2.8",
     "lodash.merge": "^4.6.2",
+    "qrcode.react": "^3.1.0",
     "react-use": "^17.3.2"
   }
 }

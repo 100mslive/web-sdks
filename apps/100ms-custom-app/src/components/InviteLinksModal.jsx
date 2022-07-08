@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, LinkIcon } from '@100mslive/react-icons';
-import { Dialog, Flex, Text, IconButton, Box, Dropdown, Button } from '@100mslive/react-ui';
+import { Dialog, Flex, Text, IconButton, Box, Dropdown, Button, QRCode } from '@100mslive/react-ui';
 
 const InviteLinksModal = ({ onClose, roomLinks }) => {
   const roles = Object.keys(roomLinks);
@@ -65,7 +64,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
             <RightContainer>
               <SubHeading>Scan this QR code on your device to join as this role</SubHeading>
               <Box css={{ flex: '1 1 0', my: '$10', bg: '$white', r: '$1', px: '$8' }}>
-                <QRCodeSVG value={getRoomUrl(roomLinks[selectedRole])} style={{ width: '100%', height: '100%' }} />
+                <QRCode value={getRoomUrl(roomLinks[selectedRole])} />
               </Box>
             </RightContainer>
           </Flex>
