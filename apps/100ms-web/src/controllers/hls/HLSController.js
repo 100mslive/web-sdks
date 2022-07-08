@@ -1,6 +1,6 @@
 import Hls from "hls.js";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
-import { FeatureFlags } from "../../services/FeatureFlags";
+// import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   getSecondsFromTime,
   isAlreadyInMetadataMap,
@@ -10,7 +10,7 @@ import {
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
-export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 10; // seconds
+export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3; // seconds
 export class HLSController {
   hls;
   videoRef;
@@ -59,7 +59,7 @@ export class HLSController {
   jumpToLive() {
     const videoEl = this.videoRef.current;
     videoEl.currentTime = this.hls.liveSyncPosition;
-    console.log(videoEl);
+    // console.log(videoEl);
   }
 
   isVideoLive() {}
@@ -94,6 +94,13 @@ export class HLSController {
         const allowedDelay =
           this.getHLSConfig().liveMaxLatencyDuration ||
           HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
+        console.log(
+          "LIVE",
+          allowedDelay,
+          this.hls.liveSyncPosition,
+          videoEl.currentTime,
+          `Difference = ${this.hls.liveSyncPosition - videoEl.currentTime}`
+        );
         this.isLive =
           this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay;
         if (!this.isLive) {
@@ -121,6 +128,7 @@ export class HLSController {
      * }
      */
     this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
+      console.log(`Segment ${frag.relurl}`);
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
       // There could be more than one EXT-X-DATERANGE tags in a fragment.
@@ -171,6 +179,7 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
+      console.log(`Segment loaded ${frag.relurl}`);
       const tagsList = parseTagsList(frag?.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];
@@ -244,17 +253,17 @@ export class HLSController {
   }
 
   getHLSConfig() {
-    if (FeatureFlags.optimiseHLSLatency()) {
-      // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
-      return {
-        enableWorker: true,
-        liveSyncDuration: 1,
-        liveMaxLatencyDuration: 10,
-        liveDurationInfinity: true,
-        backBufferLength: 2,
-        highBufferWatchdogPeriod: 1,
-      };
-    }
-    return {};
+    // if (FeatureFlags.optimiseHLSLatency()) {
+    // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
+    return {
+      // enableWorker: true,
+      // liveSyncDuration: 3,
+      // liveMaxLatencyDuration: 50,
+      // liveDurationInfinity: true,
+      backBufferLength: 10,
+      // highBufferWatchdogPeriod: 1,
+    };
+    // }
+    // return {};
   }
 }
