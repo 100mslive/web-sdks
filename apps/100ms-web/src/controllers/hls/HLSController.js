@@ -9,16 +9,24 @@ import {
 } from "./HLSUtils";
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
+export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
+export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 10; // seconds
 export class HLSController {
   hls;
+  videoRef;
   metadataByTimeStamp = new Map();
   eventEmitter = new EventEmitter();
+  isLive = true;
   constructor(hlsUrl, videoRef) {
     this.hls = new Hls(this.getHLSConfig());
+    this.videoRef = videoRef;
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
     this.handleHLSTimedMetadataParsing();
-    this.ControllerEvents = [HLS_TIMED_METADATA_LOADED];
+    this.ControllerEvents = [
+      HLS_TIMED_METADATA_LOADED,
+      HLS_STREAM_NO_LONGER_LIVE,
+    ];
   }
 
   reset() {
@@ -48,6 +56,13 @@ export class HLSController {
     this.hls.currentLevel = currentLevel;
   }
 
+  jumpToLive() {
+    const videoEl = this.videoRef.current;
+    videoEl.currentTime = this.hls.liveSyncPosition;
+    console.log(videoEl);
+  }
+
+  isVideoLive() {}
   /**
    * Event listener. Also takes HLS JS events. If its
    * not a Controller's event, it just forwards the
@@ -56,6 +71,15 @@ export class HLSController {
    * @param {Function} eventCallback
    */
   on(eventName, eventCallback) {
+    /**
+     * slight optimization. If the user is not
+     * interested in HLS_STREAM_NO_LONGER_LIVE,
+     * we don't have to register time_update event
+     * as it is a bit costly.
+     */
+    if (eventName === HLS_STREAM_NO_LONGER_LIVE) {
+      this.enableTimeUpdateListener();
+    }
     if (this.ControllerEvents.indexOf(eventName) === -1) {
       this.hls.on(eventName, eventCallback);
     } else {
@@ -63,6 +87,21 @@ export class HLSController {
     }
   }
 
+  enableTimeUpdateListener() {
+    this.videoRef.current.addEventListener("timeupdate", event => {
+      if (this.hls) {
+        const videoEl = this.videoRef.current;
+        const allowedDelay =
+          this.getHLSConfig().liveMaxLatencyDuration ||
+          HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
+        this.isLive =
+          this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay;
+        if (!this.isLive) {
+          this.eventEmitter.emit(HLS_STREAM_NO_LONGER_LIVE);
+        }
+      }
+    });
+  }
   handleHLSTimedMetadataParsing() {
     /**
      * Everytime a fragment is appended to the buffer,
@@ -210,8 +249,9 @@ export class HLSController {
       return {
         enableWorker: true,
         liveSyncDuration: 1,
-        liveMaxLatencyDuration: 5,
+        liveMaxLatencyDuration: 10,
         liveDurationInfinity: true,
+        backBufferLength: 2,
         highBufferWatchdogPeriod: 1,
       };
     }
