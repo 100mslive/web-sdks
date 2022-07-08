@@ -56,9 +56,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                 variant="standard"
                 css={{ mt: 'auto' }}
                 onClick={() => {
-                  navigator.clipboard?.writeText(
-                    `https://${roomLinks[selectedRole].subdomain}/preview/${roomLinks[selectedRole].identifier}`,
-                  );
+                  navigator.clipboard?.writeText(getRoomUrl(roomLinks[selectedRole]));
                 }}
               >
                 <LinkIcon /> Copy Invite Link
@@ -67,10 +65,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
             <RightContainer>
               <SubHeading>Scan this QR code on your device to join as this role</SubHeading>
               <Box css={{ flex: '1 1 0', my: '$10', bg: '$white', r: '$1', px: '$8' }}>
-                <QRCodeSVG
-                  value={`https://${roomLinks[selectedRole].subdomain}/preview/${roomLinks[selectedRole].identifier}`}
-                  style={{ width: '100%', height: '100%' }}
-                />
+                <QRCodeSVG value={getRoomUrl(roomLinks[selectedRole])} style={{ width: '100%', height: '100%' }} />
               </Box>
             </RightContainer>
           </Flex>
@@ -134,5 +129,9 @@ const RightContainer = ({ children }) => {
     </Flex>
   );
 };
+
+function getRoomUrl(roomLink) {
+  return `https://${roomLink.subdomain}/preview/${roomLink.identifier}`;
+}
 
 export default InviteLinksModal;
