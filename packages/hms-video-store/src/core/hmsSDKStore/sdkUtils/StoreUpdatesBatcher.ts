@@ -4,8 +4,6 @@ import { HMSLogger } from '../../../common/ui-logger';
 import { NamedSetState } from '../internalTypes';
 import { PartialState } from 'zustand/vanilla';
 
-type SetTimeOutId = number;
-
 /**
  * pass in an action and an update function, the update functions will be batched and run such that
  * store updates are limited to only one action in a time interval
@@ -13,7 +11,7 @@ type SetTimeOutId = number;
  */
 export class StoreUpdatesBatcher {
   private queuedUpdates: PartialState<any>[] = [];
-  private timer?: SetTimeOutId;
+  private timer?: any;
   private DEFAULT_INTERVAL_MS = 200;
   private store: IHMSStore;
   private actionNames: Set<string> = new Set<string>();
