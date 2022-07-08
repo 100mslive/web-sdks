@@ -67,6 +67,7 @@ import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { StoreUpdatesBatcher } from './sdkUtils/StoreUpdatesBatcher';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -98,7 +99,7 @@ export class HMSSDKActions implements IHMSActions {
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications;
   private ignoredMessageTypes: string[] = [];
-  // private actionBatcher: ActionBatcher;
+  private storeUpdatesBatcher: StoreUpdatesBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
 
@@ -106,7 +107,7 @@ export class HMSSDKActions implements IHMSActions {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
-    // this.actionBatcher = new ActionBatcher(store);
+    this.storeUpdatesBatcher = new StoreUpdatesBatcher(store);
   }
 
   async refreshDevices() {
@@ -1287,6 +1288,6 @@ export class HMSSDKActions implements IHMSActions {
    * @param name
    */
   private setState: NamedSetState<HMSStore> = (fn, name) => {
-    return this.store.namedSetState(fn, name);
+    return this.storeUpdatesBatcher.setState(fn, name);
   };
 }
