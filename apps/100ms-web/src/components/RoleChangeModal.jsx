@@ -5,7 +5,11 @@ import {
   useHMSActions,
   selectAvailableRoleNames,
 } from "@100mslive/react-sdk";
-import { CheckIcon } from "@100mslive/react-icons";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@100mslive/react-icons";
 import {
   Dialog,
   Button,
@@ -14,6 +18,7 @@ import {
   Checkbox,
   Box,
   Flex,
+  Dropdown,
   Select,
 } from "@100mslive/react-ui";
 
@@ -23,6 +28,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const [selectedRole, setRole] = useState(peer?.roleName);
   const [requestPermission, setRequestPermission] = useState(true);
   const hmsActions = useHMSActions();
+  const [open, setOpen] = useState(false);
   if (!peer) {
     return null;
   }
@@ -37,7 +43,71 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
             css={{ fontWeight: 400, mt: "$4", mb: "$8", c: "$textMedEmp" }}
           >{`Change the role of "${peer?.name}" to`}</Text>
         </Dialog.Title>
-        <Select.Root
+        <Flex
+          align="center"
+          css={{
+            w: "100%",
+            mb: "$10",
+          }}
+        >
+          <Box
+            css={{
+              position: "relative",
+              flex: "1 1 0",
+              minWidth: 0,
+              "[data-radix-popper-content-wrapper]": {
+                w: "100%",
+                minWidth: "0 !important",
+                transform: "translateY($space$17) !important",
+                zIndex: 11,
+              },
+            }}
+          >
+            <Dropdown.Root
+              open={open}
+              onOpenChange={setOpen}
+              css={{ width: "100%" }}
+            >
+              <Dropdown.Trigger
+                asChild
+                css={{
+                  border: "1px solid $borderLight",
+                  bg: "$surfaceLight",
+                  r: "$1",
+                  p: "$6 $9",
+                  zIndex: 10,
+                }}
+              >
+                <Flex align="center" justify="between" css={{ width: "100%" }}>
+                  <Text>{selectedRole}</Text>
+                  {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                </Flex>
+              </Dropdown.Trigger>
+              <Dropdown.Content
+                align="start"
+                sideOffset={8}
+                css={{ w: "100%" }}
+                portalled={false}
+              >
+                {roles.map(role => {
+                  return (
+                    <Dropdown.Item
+                      key={role}
+                      onSelect={() => setRole(role)}
+                      css={{
+                        px: "$9",
+                        bg: role === selectedRole ? "$primaryDark" : undefined,
+                      }}
+                    >
+                      {role}
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Content>
+            </Dropdown.Root>
+          </Box>
+        </Flex>
+        {/* <Select.Root
           data-testid="dialog_select_rolechange"
           css={{ width: "100%", mb: "$md" }}
         >
@@ -62,7 +132,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
               );
             })}
           </Select.Select>
-        </Select.Root>
+        </Select.Root>*/}
         {!peer?.isLocal && (
           <Flex justify="between" css={{ w: "100%", mb: "$10" }}>
             <Label
