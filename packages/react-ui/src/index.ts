@@ -29,3 +29,4 @@ export * from './Toast';
 export * from './Accordion';
 export * from './Fieldset';
 export * from './Tabs';
+export * from './QRCode';
