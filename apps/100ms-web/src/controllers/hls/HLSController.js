@@ -256,7 +256,8 @@ export class HLSController {
     // if (FeatureFlags.optimiseHLSLatency()) {
     // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
     return {
-      // enableWorker: true,
+      enableWorker: true,
+      maxBufferLength: 20,
       // liveSyncDuration: 3,
       // liveMaxLatencyDuration: 50,
       // liveDurationInfinity: true,
