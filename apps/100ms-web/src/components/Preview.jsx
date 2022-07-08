@@ -37,6 +37,7 @@ const defaultPreviewPreference = {
 };
 
 const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
+  console.log("from preview");
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
@@ -61,6 +62,7 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
       isVideoMuted: !isLocalVideoEnabled,
     });
     join();
+    console.log("calling onjoin from preview.jsx");
     onJoin && onJoin();
   }, [
     join,

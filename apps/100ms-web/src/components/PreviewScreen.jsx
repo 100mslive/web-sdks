@@ -72,6 +72,7 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     if (userRole) {
       meetingURL += `/${userRole}`;
     }
+    console.log("navigating to meeting url  - ", meetingURL);
     navigate(meetingURL);
   };
 

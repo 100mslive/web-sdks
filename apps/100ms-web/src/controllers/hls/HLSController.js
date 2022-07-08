@@ -11,6 +11,7 @@ import {
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
 export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3; // seconds
+
 export class HLSController {
   hls;
   videoRef;
@@ -59,7 +60,6 @@ export class HLSController {
   jumpToLive() {
     const videoEl = this.videoRef.current;
     videoEl.currentTime = this.hls.liveSyncPosition;
-    // console.log(videoEl);
   }
 
   isVideoLive() {}
@@ -104,6 +104,7 @@ export class HLSController {
             videoEl.currentTime,
             `Difference = ${this.hls.liveSyncPosition - videoEl.currentTime}`
           );
+
           this.eventEmitter.emit(HLS_STREAM_NO_LONGER_LIVE);
         }
       }
@@ -129,6 +130,7 @@ export class HLSController {
      */
     this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
       // console.log(`Segment ${frag.relurl}`);
+
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
       // There could be more than one EXT-X-DATERANGE tags in a fragment.

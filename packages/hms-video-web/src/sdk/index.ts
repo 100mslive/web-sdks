@@ -264,9 +264,10 @@ export class HMSSdk implements HMSInterface {
     validateRTCPeerConnection();
 
     if (this.sdkState.isPreviewInProgress) {
-      return Promise.reject(
-        ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
-      );
+      return;
+      // return Promise.reject(
+      //   ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
+      // );
     }
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
