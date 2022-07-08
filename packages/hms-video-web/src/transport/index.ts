@@ -31,12 +31,13 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
 import {
   HLSRequestParams,
+  HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
@@ -579,6 +580,15 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopHLSStreaming();
   }
 
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    if (metadataList.length > 0) {
+      const hlsMtParams: HLSTimedMetadataParams = {
+        metadata_objs: metadataList,
+      };
+
+      await this.signal.sendHLSTimedMetadata(hlsMtParams);
+    }
+  }
   async changeName(name: string) {
     await this.signal.updatePeer({
       name: name,
@@ -730,12 +740,16 @@ export default class HMSTransport implements ITransport {
       const hmsError =
         error instanceof HMSException
           ? error
-          : ErrorFactory.WebsocketMethodErrors.ServerErrors(500, HMSAction.JOIN, `Default join WS error`);
-      hmsError.isTerminal = false;
+          : ErrorFactory.WebsocketMethodErrors.ServerErrors(
+              500,
+              HMSAction.JOIN,
+              `Websocket join error - ${(error as Error).message}`,
+            );
       const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
 
-      this.joinRetryCount = 0;
       if (shouldRetry) {
+        this.joinRetryCount = 0;
+        hmsError.isTerminal = false;
         const task = async () => {
           this.joinRetryCount++;
           return await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });

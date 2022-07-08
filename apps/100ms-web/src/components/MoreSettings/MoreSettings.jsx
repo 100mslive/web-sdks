@@ -1,15 +1,12 @@
 import React, { Fragment, useState } from "react";
 import {
-  GridIcon,
-  HamburgerMenuIcon,
+  VerticalMenuIcon,
   InfoIcon,
   MicOffIcon,
-  RecordIcon,
-  SettingIcon,
-  TextboxIcon,
+  SettingsIcon,
+  PencilIcon,
 } from "@100mslive/react-icons";
 import {
-  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectPermissions,
   useHMSStore,
@@ -17,8 +14,7 @@ import {
 import { Box, Dropdown, IconButton, Text, Tooltip } from "@100mslive/react-ui";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { FullScreenItem } from "./FullScreenItem";
-import { UISettings } from "./UISettings";
-import Settings from "../Settings";
+import SettingsModal from "../Settings/SettingsModal";
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ChangeNameModal } from "./ChangeNameModal";
 import { StatsForNerds } from "../StatsForNerds";
@@ -26,22 +22,8 @@ import { MuteAllModal } from "./MuteAllModal";
 import { RecordingAndRTMPModal } from "./RecordingAndRTMPModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
 
-const hoverStyles = {
-  "&:hover": {
-    cursor: "pointer",
-    bg: "$iconHoverBg",
-  },
-  "&:focus-visible": {
-    bg: "$iconHoverBg",
-  },
-};
-
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isPublishingAnything = Object.values(isAllowedToPublish).some(
-    value => !!value
-  );
   const localPeerId = useHMSStore(selectLocalPeerID);
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
@@ -49,7 +31,6 @@ export const MoreSettings = () => {
   const [showMuteAll, setShowMuteAll] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
-  const [showUISettings, setShowUISettings] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
 
   return (
@@ -63,7 +44,7 @@ export const MoreSettings = () => {
           >
             <Tooltip title="More Options">
               <Box>
-                <HamburgerMenuIcon />
+                <VerticalMenuIcon />
               </Box>
             </Tooltip>
           </IconButton>
@@ -74,37 +55,19 @@ export const MoreSettings = () => {
           css={{ maxHeight: "$96" }}
         >
           <Dropdown.Item
-            css={hoverStyles}
             onClick={() => setShowChangeNameModal(value => !value)}
             data-testid="change_name_btn"
           >
-            <TextboxIcon />
+            <PencilIcon />
             <Text variant="sm" css={{ ml: "$4" }}>
               Change Name
             </Text>
           </Dropdown.Item>
-          <ChangeSelfRole
-            css={hoverStyles}
-            onClick={() => setShowSelfRoleChange(true)}
-          />
-          {(permissions.streaming || permissions.recording) &&
-            isPublishingAnything && ( // TODO: remove this check when permissions are added
-              <Dropdown.Item
-                onClick={() => setShowRecordingModal(true)}
-                css={hoverStyles}
-                data-testid="streaming_recording_btn"
-              >
-                <RecordIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
-                  Streaming/Recording
-                </Text>
-              </Dropdown.Item>
-            )}
-          <FullScreenItem hoverStyles={hoverStyles} />
+          <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
+          <FullScreenItem />
           {permissions.mute && (
             <Dropdown.Item
               onClick={() => setShowMuteAll(true)}
-              css={hoverStyles}
               data-testid="mute_all_btn"
             >
               <MicOffIcon />
@@ -115,29 +78,17 @@ export const MoreSettings = () => {
           )}
           <Dropdown.ItemSeparator />
           <Dropdown.Item
-            onClick={() => setShowUISettings(true)}
-            css={hoverStyles}
-            data-testid="ui_settings_btn"
-          >
-            <GridIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
-              UI Settings
-            </Text>
-          </Dropdown.Item>
-          <Dropdown.Item
             onClick={() => setShowDeviceSettings(true)}
-            css={hoverStyles}
             data-testid="device_settings_btn"
           >
-            <SettingIcon />
+            <SettingsIcon />
             <Text variant="sm" css={{ ml: "$4" }}>
-              Device Settings
+              Settings
             </Text>
           </Dropdown.Item>
           {FeatureFlags.enableStatsForNerds && (
             <Dropdown.Item
               onClick={() => setShowStatsForNerds(true)}
-              css={hoverStyles}
               data-testid="stats_for_nreds_btn"
             >
               <InfoIcon />
@@ -156,16 +107,13 @@ export const MoreSettings = () => {
         <RecordingAndRTMPModal onOpenChange={setShowRecordingModal} />
       )}
       {showDeviceSettings && (
-        <Settings open onOpenChange={setShowDeviceSettings} />
+        <SettingsModal open onOpenChange={setShowDeviceSettings} />
       )}
       {FeatureFlags.enableStatsForNerds && showStatsForNerds && (
         <StatsForNerds
           open={showStatsForNerds}
           onOpenChange={setShowStatsForNerds}
         />
-      )}
-      {showUISettings && (
-        <UISettings open={showUISettings} onOpenChange={setShowUISettings} />
       )}
       {showSelfRoleChange && (
         <RoleChangeModal

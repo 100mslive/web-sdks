@@ -45,11 +45,16 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
           <Select.Select
             onChange={e => setRole(e.target.value)}
             value={selectedRole}
-            css={{ width: "100%" }}
+            css={{
+              width: "100%",
+              bg: "$surfaceLight",
+              border: "solid $space$px $borderLight",
+              textTransform: "capitalize",
+            }}
           >
-            {roles.map(option => {
-              const id = option;
-              const label = option;
+            {roles.map(role => {
+              const id = role;
+              const label = role;
               return (
                 <option value={id} key={id}>
                   {label}
