@@ -253,7 +253,7 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
           }
         />
         <Route
-          path="/meeting/:roomId/"
+          path="/streaming/meeting/:roomId/"
           element={
             <Suspense fallback={<FullPageProgress />}>
               <Conference />
