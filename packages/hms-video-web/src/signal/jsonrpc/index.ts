@@ -225,7 +225,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async broadcast(message: Message) {
-    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
+    return await this.callWithRetry<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
       version: '1.0',
       ...message.toSignalParams(),
     });
@@ -236,7 +236,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async endRoom(lock: boolean, reason: string) {
-    await this.call(HMSSignalMethod.END_ROOM, { lock, reason });
+    await this.callWithRetry(HMSSignalMethod.END_ROOM, { lock, reason });
   }
 
   sendEvent(event: AnalyticsEvent) {
@@ -261,47 +261,47 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async requestRoleChange(params: RequestForRoleChangeParams) {
-    await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+    await this.callWithRetry(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
   }
 
   async acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
-    await this.call(HMSSignalMethod.ROLE_CHANGE, params);
+    await this.callWithRetry(HMSSignalMethod.ROLE_CHANGE, params);
   }
 
   async requestTrackStateChange(params: TrackUpdateRequestParams) {
-    await this.call(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
+    await this.callWithRetry(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
   }
 
   async requestMultiTrackStateChange(params: MultiTrackUpdateRequestParams) {
-    await this.call(HMSSignalMethod.CHANGE_TRACK_MUTE_STATE_REQUEST, params);
+    await this.callWithRetry(HMSSignalMethod.CHANGE_TRACK_MUTE_STATE_REQUEST, params);
   }
 
   async removePeer(params: RemovePeerRequest) {
-    await this.call(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
+    await this.callWithRetry(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
   }
 
   async startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams) {
-    await this.call(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
+    await this.callWithRetry(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
   }
 
   async stopRTMPAndRecording() {
-    await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
+    await this.callWithRetry(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
   }
 
   async startHLSStreaming(params: HLSRequestParams): Promise<void> {
-    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
+    await this.callWithRetry(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
   }
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
-    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+    await this.callWithRetry(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
   }
 
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
-    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
+    await this.callWithRetry(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
-    await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+    await this.callWithRetry(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
   private onCloseHandler(event: CloseEvent) {
