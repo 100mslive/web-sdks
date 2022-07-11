@@ -31,3 +31,8 @@ export interface HLSMeetingURLVariant {
    */
   metadata?: string;
 }
+
+export interface HLSTimedMetadata {
+  payload: string;
+  duration: number; // Duration in seconds
+}
