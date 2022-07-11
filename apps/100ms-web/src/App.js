@@ -13,7 +13,7 @@ import { Notifications } from "./components/Notifications";
 import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { FeatureFlags } from "./services/FeatureFlags";
-import { shadeColor } from "./common/utils";
+import { getRoutePrefix, shadeColor } from "./common/utils";
 import {
   getUserToken as defaultGetUserToken,
   getBackendEndpoint,
@@ -154,10 +154,13 @@ const RedirectToPreview = ({ getDetails }) => {
   if (!roomId) {
     return <Navigate to="/" />;
   }
-  if (["preview", "meeting", "leave"].includes(roomId) && !role) {
+  if (["streaming", "preview", "meeting", "leave"].includes(roomId) && !role) {
     return <Navigate to="/" />;
   }
-  return <Navigate to={`/preview/${roomId}/${role || ""}`} />;
+
+  return (
+    <Navigate to={`${getRoutePrefix()}/preview/${roomId}/${role || ""}`} />
+  );
 };
 
 function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
@@ -223,6 +226,63 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
         />
         <Route
           path="/:roomId/"
+          element={<RedirectToPreview getDetails={getDetails} />}
+        />
+        <Route
+          path="/streaming/preview/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/streaming/preview/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/streaming/meeting/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/meeting/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/streaming/leave/:roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PostLeave />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/streaming/leave/:roomId/"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PostLeave />
+            </Suspense>
+          }
+        />
+
+        <Route
+          path="/streaming/:roomId/:role"
+          element={<RedirectToPreview getDetails={getDetails} />}
+        />
+        <Route
+          path="/streaming/:roomId/"
           element={<RedirectToPreview getDetails={getDetails} />}
         />
         <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
