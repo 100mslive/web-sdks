@@ -98,7 +98,7 @@ export class RoomUpdateManager {
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
-      error: hlsNotification?.error?.code ? this.toSdkError(hlsNotification.error) : undefined,
+      error: this.toSdkError(hlsNotification?.error),
     };
     hlsNotification?.variants?.forEach(variant => {
       hls.variants.push({
@@ -119,7 +119,7 @@ export class RoomUpdateManager {
         singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification.hls_recording?.hls_vod,
         startedAt: convertDateNumToDate(hlsNotification?.variants?.[0].started_at),
-        error: hlsNotification?.error?.code ? this.toSdkError(hlsNotification.error) : undefined,
+        error: this.toSdkError(hlsNotification.error),
       };
     }
     return hlsRecording;
@@ -142,14 +142,14 @@ export class RoomUpdateManager {
       room.recording.server = {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-        error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
+        error: this.toSdkError(notification.error),
       };
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else {
       room.recording.browser = {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-        error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
+        error: this.toSdkError(notification.error),
       };
       action = HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED;
     }
@@ -161,12 +161,15 @@ export class RoomUpdateManager {
     room.rtmp = {
       running,
       startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-      error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
+      error: this.toSdkError(notification.error),
     };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
   }
 
-  private toSdkError(error: ServerError): HMSException {
+  private toSdkError(error?: ServerError): HMSException | undefined {
+    if (!error?.code) {
+      return undefined;
+    }
     const errMsg = error.message || 'error in streaming/recording';
     return new HMSException(error.code, 'ServerErrors', HMSAction.NONE, errMsg, errMsg);
   }
