@@ -143,7 +143,7 @@ export interface SpeakerList {
   'speaker-list': Speaker[];
 }
 
-interface ConnectionQuality {
+export interface ConnectionQuality {
   peer_id: string;
   downlink_score: number;
 }
