@@ -1,57 +1,136 @@
-import React, { Fragment } from 'react';
-import { CopyIcon } from '@100mslive/react-icons';
-import { Dialog, Flex, HorizontalDivider, textEllipsis, Text, IconButton, Box } from '@100mslive/react-ui';
-import { DialogContent } from './DialogContent';
+import React, { useState } from 'react';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, LinkIcon } from '@100mslive/react-icons';
+import { Dialog, Flex, Text, IconButton, Box, Dropdown, Button, QRCode } from '@100mslive/react-ui';
 
 const InviteLinksModal = ({ onClose, roomLinks }) => {
+  const roles = Object.keys(roomLinks);
+  const [selectedRole, setSelectedRole] = useState(roles[0]);
+  const [open, setOpen] = useState(false);
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
-      <DialogContent title="Role Urls">
-        <Box css={{ mt: '$8', maxHeight: '60vh', overflowY: 'auto', mr: '-$10', pr: '$10' }}>
-          {roomLinks &&
-            Object.keys(roomLinks).map(role => {
-              const roomRole = roomLinks[role];
-              if (roomRole.is_active) {
-                let roleUrl = `https://${window.location.hostname}/preview/${roomRole.identifier}`;
-                return (
-                  <Fragment key={role}>
-                    <Flex
-                      align="center"
-                      css={{ my: '$8', '@sm': { flexDirection: 'column', alignItems: 'flex-start' } }}
-                    >
-                      <Text css={{ width: '$36', flexShrink: 0 }}>{role}</Text>
-                      <Flex
-                        justify="between"
-                        align="center"
+      <Dialog.Content css={{ w: 'min(684px, 90%)', height: 'min(492px, 100%)' }}>
+        <Flex direction="column" css={{ size: '100%' }}>
+          <SubHeading css={{ mb: '$2' }}>Invite People</SubHeading>
+          <Text variant="h6">Start the conversation</Text>
+          <Flex css={{ pt: '$14', flex: '1 1 0', w: '100%' }}>
+            <LeftContainer>
+              <SubHeading>Select Role</SubHeading>
+              <Dropdown.Root open={open} onOpenChange={setOpen}>
+                <Dropdown.Trigger
+                  asChild
+                  css={{
+                    border: '1px solid $borderLight',
+                    bg: '$surfaceLight',
+                    r: '$1',
+                    p: '$6 $9',
+                    mt: '$4',
+                  }}
+                >
+                  <Flex align="center">
+                    <Text css={{ mr: '$4', flex: '1 1 0' }}>{selectedRole}</Text>
+                    {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                  </Flex>
+                </Dropdown.Trigger>
+                <Dropdown.Content align="start" sideOffset={8} css={{ w: '100%' }} portalled={false}>
+                  {roles.map(role => {
+                    return (
+                      <Dropdown.Item
+                        key={role}
                         css={{
-                          border: '1px solid $grayDefault',
-                          r: '$1',
-                          p: '$4',
-                          flex: '1 1 0',
-                          minWidth: 0,
-                          '@sm': { width: '100%', mt: '$4' },
+                          bg: selectedRole === role ? '$primaryDark' : undefined,
                         }}
+                        onClick={() => setSelectedRole(role)}
                       >
-                        <Text css={{ ...textEllipsis('90%'), flex: '1 1 0' }}>{roleUrl}</Text>
-                        <IconButton
-                          onClick={() => {
-                            navigator.clipboard.writeText(roleUrl);
-                          }}
-                        >
-                          <CopyIcon />
-                        </IconButton>
-                      </Flex>
-                    </Flex>
-                    <HorizontalDivider />
-                  </Fragment>
-                );
-              }
-              return null;
-            })}
-        </Box>
-      </DialogContent>
+                        {role}
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Content>
+              </Dropdown.Root>
+              <Text variant="sm" css={{ color: '$textMedEmp', my: '$10' }}>
+                Select a role with relevant permissions that you want to share, to join the room.
+              </Text>
+              <Button
+                icon
+                variant="standard"
+                css={{ mt: 'auto' }}
+                onClick={() => {
+                  navigator.clipboard?.writeText(getRoomUrl(roomLinks[selectedRole]));
+                }}
+              >
+                <LinkIcon /> Copy Invite Link
+              </Button>
+            </LeftContainer>
+            <RightContainer>
+              <SubHeading>Scan this QR code on your device to join as this role</SubHeading>
+              <Box css={{ flex: '1 1 0', my: '$10', bg: '$white', r: '$1', px: '$8' }}>
+                <QRCode value={getRoomUrl(roomLinks[selectedRole])} />
+              </Box>
+            </RightContainer>
+          </Flex>
+        </Flex>
+        <Dialog.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
+          <IconButton as="div">
+            <CrossIcon />
+          </IconButton>
+        </Dialog.Close>
+      </Dialog.Content>
     </Dialog.Root>
   );
 };
+
+const SubHeading = ({ children, css = {} }) => {
+  return (
+    <Text variant="tiny" css={{ color: '$textMedEmp', textTransform: 'uppercase', ...css }}>
+      {children}
+    </Text>
+  );
+};
+
+const LeftContainer = ({ children }) => {
+  return (
+    <Flex
+      direction="column"
+      css={{
+        '[data-radix-popper-content-wrapper]': {
+          width: '100%',
+          minWidth: '0 !important',
+          transform: 'translateY($space$20) !important',
+          zIndex: 11,
+        },
+        position: 'relative',
+        minWidth: 0,
+        flex: '1 1 0',
+        mr: '$14',
+        h: '100%',
+      }}
+    >
+      {children}
+    </Flex>
+  );
+};
+
+const RightContainer = ({ children }) => {
+  return (
+    <Flex
+      direction="column"
+      css={{
+        p: '$10 $14',
+        w: '45%',
+        h: '100%',
+        border: '1px solid $borderLight',
+        bg: '$surfaceLight',
+        r: '$1',
+        textAlign: 'center',
+      }}
+    >
+      {children}
+    </Flex>
+  );
+};
+
+function getRoomUrl(roomLink) {
+  return `https://${roomLink.subdomain}/preview/${roomLink.identifier}`;
+}
 
 export default InviteLinksModal;

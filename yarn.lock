@@ -2065,6 +2065,11 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
+"@emoji-mart/data@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@emoji-mart/data/-/data-1.0.2.tgz#2b94c5b5f2c79611c12238438dad9516576a09ab"
+  integrity sha512-+ZdzBM4llDJJvjuCEsdOYVoSlNA16MMmxKG3oF5LARkwhx6N5clr6phzneWV1qIwJsywqwG7NaBjH8DV6yzjcA==
+
 "@endemolshinegroup/cosmiconfig-typescript-loader@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@endemolshinegroup/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-3.0.2.tgz#eea4635828dde372838b0909693ebd9aafeec22d"
@@ -3711,6 +3716,19 @@
     "@radix-ui/react-use-controllable-state" "0.1.0"
     "@radix-ui/react-use-previous" "0.1.1"
     "@radix-ui/react-use-size" "0.1.1"
+
+"@radix-ui/react-tabs@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-tabs/-/react-tabs-0.1.5.tgz#ddcf860cc32e186d76477ae767dbb216d1944252"
+  integrity sha512-ieVQS1TFr0dX1XA8B+CsSFKOE7kcgEaNWWEfItxj9D1GZjn1o3WqPkW+FhQWDAWZLSKCH2PezYF3MNyO41lgJg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.1.0"
+    "@radix-ui/react-context" "0.1.1"
+    "@radix-ui/react-id" "0.1.5"
+    "@radix-ui/react-primitive" "0.1.4"
+    "@radix-ui/react-roving-focus" "0.1.5"
+    "@radix-ui/react-use-controllable-state" "0.1.0"
 
 "@radix-ui/react-toast@^0.1.1":
   version "0.1.1"
@@ -9157,6 +9175,11 @@ emittery@^0.7.1:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.7.2.tgz#25595908e13af0f5674ab419396e2fb394cdfa82"
   integrity sha512-A8OG5SR/ij3SsJdWDJdkkSYUjQdCUx6APQXem0SaEePBSRg4eymGYwBkKo1Y6DU+af/Jn2dBQqDBvjnr9Vi8nQ==
+
+emoji-mart@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.1.0.tgz#8a36a872e1297747342d1385bd7b7141ac2f4365"
+  integrity sha512-ytXgeemyw4FormPQqWd35Vh06ZSnQFhVUqW51kASZzzjhQOPSGtiN3VCC7vDq94Pkxmsbet+Gps/qj5N90mEnw==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -15900,6 +15923,11 @@ q@^1.1.2, q@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
+
+qrcode.react@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/qrcode.react/-/qrcode.react-3.1.0.tgz#5c91ddc0340f768316fbdb8fff2765134c2aecd8"
+  integrity sha512-oyF+Urr3oAMUG/OiOuONL3HXM+53wvuH3mtIWQrYmsXoAq0DkvZp2RYUWFSMFtbdOpuS++9v+WAkzNVkMlNW6Q==
 
 qs@6.9.7:
   version "6.9.7"

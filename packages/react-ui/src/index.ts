@@ -29,3 +29,5 @@ export * from './Toast';
 export * from './Accordion';
 export * from './Fieldset';
 export * from './Footer';
+export * from './Tabs';
+export * from './QRCode';

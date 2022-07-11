@@ -1,8 +1,8 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Button } from './Button';
-import { HangUpIcon } from '@100mslive/react-icons';
-import ButtonDocs from './Button.mdx';
 import React from 'react';
+import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { HangUpIcon } from '@100mslive/react-icons';
+import { Button } from './Button';
+import ButtonDocs from './Button.mdx';
 
 export default {
   title: 'UI Components/Button',

@@ -22,7 +22,7 @@ export default {
 } as ComponentMeta<typeof Dialog.Root>;
 
 //👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Dialog.Root> = args => (
+const Template: ComponentStory<typeof Dialog.Root> = () => (
   <Dialog.Root css={{ position: 'relative' }}>
     <Dialog.Trigger asChild>
       <Button variant="standard">Open Dialog</Button>
