@@ -27,16 +27,11 @@ import {
 import { ParticipantCount } from "./ParticipantList";
 import { AppContext } from "../context/AppContext";
 import { LeaveRoom } from "../LeaveRoom";
-import { useSidepaneToggle } from "../AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
 import {
-  useIsSidepaneTypeOpen,
   useSidepaneToggle,
+  useIsSidepaneTypeOpen,
 } from "../AppData/useSidepane";
-import {
-  DEFAULT_HLS_VIEWER_ROLE,
-  SIDE_PANE_OPTIONS,
-} from "../../common/constants";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Header = ({ isPreview }) => {
   return (
