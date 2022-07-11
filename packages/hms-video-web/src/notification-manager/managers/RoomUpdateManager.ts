@@ -13,8 +13,11 @@ import { convertDateNumToDate } from '../../utils/date';
 import { ServerError } from '../../interfaces/internal';
 import { HMSException } from '../../error/HMSException';
 import { HMSAction } from '../../error/ErrorFactory';
+import HMSLogger from '../../utils/logger';
 
 export class RoomUpdateManager {
+  private TAG = 'RoomUpdateManager';
+
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
   // eslint-disable-next-line complexity
@@ -171,6 +174,8 @@ export class RoomUpdateManager {
       return undefined;
     }
     const errMsg = error.message || 'error in streaming/recording';
-    return new HMSException(error.code, 'ServerErrors', HMSAction.NONE, errMsg, errMsg);
+    const sdkError = new HMSException(error.code, 'ServerErrors', HMSAction.NONE, errMsg, errMsg);
+    HMSLogger.e(this.TAG, 'error in streaming/recording', sdkError);
+    return sdkError;
   }
 }
