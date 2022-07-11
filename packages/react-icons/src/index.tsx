@@ -23,6 +23,7 @@ export { default as ExpandIcon } from './ExpandIcon';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon';
 export { default as EyeCloseIcon } from './EyeCloseIcon';
 export { default as EyeOpenIcon } from './EyeOpenIcon';
+export { default as GitForkIcon } from './GitForkIcon';
 export { default as GlobeIcon } from './GlobeIcon';
 export { default as GridIcon } from './GridIcon';
 export { default as HamburgerMenuIcon } from './HamburgerMenuIcon';
