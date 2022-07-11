@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  useHMSStore,
+  HMSStoreMock,
   selectAvailableRoleNames,
-  selectRolesMap,
-  selectSessionId,
   selectLocalPeerID,
   selectLocalPeerName,
   selectLocalPeerRoleName,
+  selectRolesMap,
+  selectSessionId,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { FeatureFlagsInit } from "../../services/FeatureFlags";
 import { normalizeAppPolicyConfig, setUpLogRocket } from "./appContextUtils";
@@ -111,6 +112,7 @@ const AppContextProvider = ({
     window.addEventListener("resize", resetHeight);
     // called to initially set the height.
     resetHeight();
+    window.__hmsMock = new HMSStoreMock();
     return () => {
       window.removeEventListener("resize", resetHeight);
     };

@@ -6,6 +6,7 @@ import { NamedSetState } from '../core/hmsSDKStore/internalTypes';
 
 export interface HMSStoreMockPeerConfig {
   roleName?: string;
+  ratePerSecond?: number;
 }
 
 export class HMSStoreMock {
@@ -26,7 +27,7 @@ export class HMSStoreMock {
    */
   addPeersBatched(count: number, config?: HMSStoreMockPeerConfig) {
     const start = performance.now();
-    this.addPeersInternal(count, config);
+    this._addPeersInternal(count, config);
     const timeDiff = performance.now() - start;
     HMSLogger.i(this.TAG, `Time taken in adding ${count} batched mock peers = ${timeDiff}ms`);
   }
@@ -38,7 +39,7 @@ export class HMSStoreMock {
     // add one by one
     const start = performance.now();
     while (count--) {
-      this.addPeersInternal(1, config);
+      this._addPeersInternal(1, config);
     }
     const timeDiff = performance.now() - start;
     HMSLogger.i(
@@ -50,7 +51,7 @@ export class HMSStoreMock {
   /**
    * TODO: simulate with calling onPeerUpdate, should this be on sdk level? would simulate everything even better
    */
-  private addPeersInternal(count: number, config?: HMSStoreMockPeerConfig) {
+  private _addPeersInternal(count: number, config?: HMSStoreMockPeerConfig) {
     const roleName = config?.roleName || 'host';
     const peerBlueprint: HMSPeer = { auxiliaryTracks: [], id: '', isLocal: false, name: '', roleName };
     this.setState(store => {
