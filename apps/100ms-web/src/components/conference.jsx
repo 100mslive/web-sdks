@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import {
+  HMSRoomState,
   selectIsConnectedToRoom,
+  selectRoomState,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -11,34 +13,35 @@ import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
 import { useIsHeadless } from "./AppData/useUISettings";
+import { useNavigate, useParams } from "react-router-dom";
+import { usePrevious } from "react-use";
 
 const Conference = () => {
-  console.log("from inside conference");
-  // const navigate = useNavigate();
-  // const { roomId, role } = useParams();
+  const navigate = useNavigate();
+  const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
-  // const roomState = useHMSStore(selectRoomState);
-  // const prevState = usePrevious(roomState);
+  const roomState = useHMSStore(selectRoomState);
+  const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
 
-  // useEffect(() => {
-  //   if (!roomId) {
-  //     navigate(`/`);
-  //     return;
-  //   }
-  //   if (
-  //     !prevState &&
-  //     !(
-  //       roomState === HMSRoomState.Connecting ||
-  //       roomState === HMSRoomState.Reconnecting ||
-  //       isConnectedToRoom
-  //     )
-  //   ) {
-  //     if (role) navigate(`/preview/${roomId || ""}/${role}`);
-  //     else navigate(`/preview/${roomId || ""}`);
-  //   }
-  // }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
+  useEffect(() => {
+    if (!roomId) {
+      navigate(`/`);
+      return;
+    }
+    if (
+      !prevState &&
+      !(
+        roomState === HMSRoomState.Connecting ||
+        roomState === HMSRoomState.Reconnecting ||
+        isConnectedToRoom
+      )
+    ) {
+      if (role) navigate(`/preview/${roomId || ""}/${role}`);
+      else navigate(`/preview/${roomId || ""}`);
+    }
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls

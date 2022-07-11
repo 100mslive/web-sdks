@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  usePreviewJoin,
-  selectLocalPeer,
-  useHMSStore,
   selectIsLocalVideoEnabled,
+  selectLocalPeer,
   useAVToggle,
+  useHMSStore,
+  usePreviewJoin,
 } from "@100mslive/react-sdk";
 import {
-  Loading,
-  Button,
-  StyledVideoTile,
-  Video,
-  Text,
-  Input,
-  Flex,
   Avatar,
+  Button,
+  Flex,
   IconButton,
-  useTheme,
-  useBorderAudioLevel,
+  Input,
+  Loading,
   styled,
+  StyledVideoTile,
+  Text,
+  useBorderAudioLevel,
+  useTheme,
+  Video,
 } from "@100mslive/react-ui";
 import { SettingIcon } from "@100mslive/react-icons";
 import { AudioVideoToggle } from "./AudioVideoToggle";
@@ -37,7 +37,6 @@ const defaultPreviewPreference = {
 };
 
 const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
-  console.log("from preview");
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
@@ -62,7 +61,6 @@ const Preview = ({ token, onJoin, env, skipPreview, initialName }) => {
       isVideoMuted: !isLocalVideoEnabled,
     });
     join();
-    console.log("calling onjoin from preview.jsx");
     onJoin && onJoin();
   }, [
     join,

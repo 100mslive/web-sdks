@@ -1,14 +1,14 @@
 import React, { Fragment } from "react";
 import {
-  VideoOffIcon,
-  VideoOnIcon,
   MicOffIcon,
   MicOnIcon,
+  VideoOffIcon,
+  VideoOnIcon,
 } from "@100mslive/react-icons";
-import { Tooltip, IconButton } from "@100mslive/react-ui";
-import { useAVToggle } from "@100mslive/react-sdk";
+import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { parsedUserAgent, useAVToggle } from "@100mslive/react-sdk";
 
-const isMacOS = false;
+const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
 
 export const AudioVideoToggle = ({ compact = false }) => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =

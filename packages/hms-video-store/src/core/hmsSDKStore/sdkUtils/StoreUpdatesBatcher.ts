@@ -6,8 +6,8 @@ import { PartialState } from 'zustand/vanilla';
 
 /**
  * pass in an action and an update function, the update functions will be batched and run such that
- * store updates are limited to only one action in a time interval
- *
+ * store updates are limited to only one action in a time interval.
+ * Ensure the order in which updates are applied.
  */
 export class StoreUpdatesBatcher {
   private queuedUpdates: PartialState<any>[] = [];

@@ -264,10 +264,9 @@ export class HMSSdk implements HMSInterface {
     validateRTCPeerConnection();
 
     if (this.sdkState.isPreviewInProgress) {
-      return;
-      // return Promise.reject(
-      //   ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
-      // );
+      return Promise.reject(
+        ErrorFactory.GenericErrors.PreviewAlreadyInProgress(HMSAction.PREVIEW, 'Preview already called'),
+      );
     }
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
@@ -994,7 +993,6 @@ export class HMSSdk implements HMSInterface {
 
   /**
    * Get screenshare based on policy and audioOnly flag
-   * @param {PublishParams} publishParams
    * @param {function} onStop
    * @param config
    * @returns

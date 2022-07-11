@@ -69,8 +69,6 @@ import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { StoreUpdatesBatcher } from './sdkUtils/StoreUpdatesBatcher';
 
-// import { ActionBatcher } from './sdkUtils/ActionBatcher';
-
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
  * and takes control of data management by letting every action pass through it. The
@@ -100,6 +98,7 @@ export class HMSSDKActions implements IHMSActions {
   private hmsNotifications: HMSNotifications;
   private ignoredMessageTypes: string[] = [];
   private storeUpdatesBatcher: StoreUpdatesBatcher;
+  private shouldBatchUpdates: boolean;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
 
@@ -108,6 +107,7 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
     this.storeUpdatesBatcher = new StoreUpdatesBatcher(store);
+    this.shouldBatchUpdates = true;
   }
 
   async refreshDevices() {
@@ -162,9 +162,9 @@ export class HMSSDKActions implements IHMSActions {
     }
 
     try {
-      this.setState(store => {
+      this.setStateImmediately(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      }, 'connecting');
+      }, 'previewConnecting');
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
@@ -179,9 +179,9 @@ export class HMSSDKActions implements IHMSActions {
     }
     try {
       this.isRoomJoinCalled = true;
-      this.setState(store => {
+      this.setStateImmediately(store => {
         store.room.roomState = HMSRoomState.Connecting;
-      }, 'join');
+      }, 'joinConnecting');
       this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
@@ -197,21 +197,20 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
-    this.setState(store => {
+    this.setStateImmediately(store => {
       store.room.roomState = HMSRoomState.Disconnecting;
     }, 'leaving');
-    return this.sdk
-      .leave()
-      .then(() => {
-        this.resetState('leave');
-        HMSLogger.i('left room');
-      })
-      .catch(err => {
-        HMSLogger.e('error in leaving room - ', err);
-        this.setState(store => {
-          store.room.roomState = currentRoomState;
-        }, 'revertLeave');
-      });
+    await this.sdk.leave();
+    try {
+      this.resetState('leave');
+      HMSLogger.i('left room');
+    } catch (err) {
+      HMSLogger.e('error in leaving room - ', err);
+      this.setState(store => {
+        store.room.roomState = currentRoomState;
+      }, 'revertLeave');
+      throw err;
+    }
   }
 
   async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
@@ -1288,6 +1287,23 @@ export class HMSSDKActions implements IHMSActions {
    * @param name
    */
   private setState: NamedSetState<HMSStore> = (fn, name) => {
-    return this.storeUpdatesBatcher.setState(fn, name);
+    if (this.shouldBatchUpdates) {
+      this.storeUpdatesBatcher.setState(fn, name);
+    } else {
+      this.setStateImmediately(fn, name);
+    }
+  };
+
+  /**
+   * set state immediately instead of batching, used to set the very first room state of connecting.
+   * It's fairly risky to use this fn than setState which does batching, as it might lead to race issues, where
+   * the order of updates might get reversed. For e.g. say there are two updates, update1, update2, in that order,
+   * if update1 is batched but update2 gets applied immediately, the order in which they are applied will reverse
+   * leading to a potential inconsistent state of the store. Avoid using this function, the main reason it's there
+   * is to ensure backward compatibility around room state changes. For e.g. room.state in store is changed to connecting
+   * immediately after join or preview are called.
+   */
+  private setStateImmediately: NamedSetState<HMSStore> = (fn, name) => {
+    this.store.namedSetState(fn, name);
   };
 }

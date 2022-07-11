@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
 import { v4 } from "uuid";
@@ -8,10 +8,10 @@ import { Header } from "./Header";
 import { ErrorDialog } from "../primitives/DialogContent";
 import { AppContext } from "./context/AppContext";
 import {
-  QUERY_PARAM_SKIP_PREVIEW_HEADFUL,
+  QUERY_PARAM_AUTH_TOKEN,
   QUERY_PARAM_NAME,
   QUERY_PARAM_SKIP_PREVIEW,
-  QUERY_PARAM_AUTH_TOKEN,
+  QUERY_PARAM_SKIP_PREVIEW_HEADFUL,
   UI_SETTINGS,
 } from "../common/constants";
 import getToken from "../services/tokenService";
@@ -72,7 +72,6 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     if (userRole) {
       meetingURL += `/${userRole}`;
     }
-    console.log("navigating to meeting url  - ", meetingURL);
     navigate(meetingURL);
   };
 
