@@ -63,7 +63,7 @@ import { IHMSStore } from '../IHMSStore';
 
 import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState } from './internalTypes';
+import { NamedSetState, NamedSetStateAsync } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
@@ -1286,9 +1286,9 @@ export class HMSSDKActions implements IHMSActions {
    * @param fn
    * @param name
    */
-  private setState: NamedSetState<HMSStore> = (fn, name) => {
+  private setState: NamedSetStateAsync<HMSStore> = async (fn, name) => {
     if (this.shouldBatchUpdates) {
-      this.storeUpdatesBatcher.setState(fn, name);
+      await this.storeUpdatesBatcher.setState(fn, name);
     } else {
       this.setStateImmediately(fn, name);
     }
@@ -1307,3 +1307,6 @@ export class HMSSDKActions implements IHMSActions {
     this.store.namedSetState(fn, name);
   };
 }
+
+// this list can be used to remove unnecessary logs in console on redux devtools
+export const highFrequencyUpdates = ['audioLevel', 'playlistProgress', 'connectionQuality'];

@@ -1,19 +1,18 @@
 import produce from 'immer';
 import create, {
-  StateSelector,
-  StoreApi,
-  SetState,
-  StateSliceListener,
   EqualityChecker,
   PartialState,
+  SetState,
   State,
+  StateSelector,
+  StateSliceListener,
+  StoreApi,
 } from 'zustand/vanilla';
 import shallow from 'zustand/shallow';
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { IHMSActions } from '../IHMSActions';
-import { HMSSDKActions } from './HMSSDKActions';
-import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
+import { highFrequencyUpdates, HMSSDKActions } from './HMSSDKActions';
+import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
 import { IHMSNotifications } from '../IHMSNotifications';
@@ -255,7 +254,7 @@ export class HMSReactiveStore {
   private static devtoolsOptions(prefix: string) {
     return {
       name: prefix,
-      actionsBlacklist: ['audioLevel', 'playlistProgress', 'connectionQuality'], // very high frequency update, pollutes the action history
+      actionsBlacklist: highFrequencyUpdates, // very high frequency update, pollutes the action history
     };
   }
 

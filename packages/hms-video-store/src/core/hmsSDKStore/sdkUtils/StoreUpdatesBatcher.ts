@@ -1,8 +1,9 @@
 import { HMSStore } from '../../schema';
 import { IHMSStore } from '../../IHMSStore';
 import { HMSLogger } from '../../../common/ui-logger';
-import { NamedSetState } from '../internalTypes';
+import { NamedSetStateAsync } from '../internalTypes';
 import { PartialState } from 'zustand/vanilla';
+import { highFrequencyUpdates } from '../HMSSDKActions';
 
 /**
  * pass in an action and an update function, the update functions will be batched and run such that
@@ -10,51 +11,82 @@ import { PartialState } from 'zustand/vanilla';
  * Ensure the order in which updates are applied.
  */
 export class StoreUpdatesBatcher {
+  private TAG = 'StoreUpdatesBatcher';
+  private queuedActions: Map<string, number> = new Map();
   private queuedUpdates: PartialState<any>[] = [];
-  private timer?: any;
-  private DEFAULT_INTERVAL_MS = 500;
+  private nextUpdatePromise?: Promise<void>;
+  private DEFAULT_INTERVAL_MS = 5;
   private store: IHMSStore;
-  private actionNames: Set<string> = new Set<string>();
+
   constructor(store: IHMSStore) {
     this.store = store;
   }
 
-  setState: NamedSetState<HMSStore> = (fn, action) => {
-    if (action && !['audioLevel', 'playlistProgress', 'connectionQuality'].includes(action)) {
-      HMSLogger.d(`batching ${action} for update`);
+  setState: NamedSetStateAsync<HMSStore> = async (fn, action) => {
+    if (action) {
+      const currCount = this.queuedActions.get(action) || 0;
+      this.queuedActions.set(action, 1 + currCount);
     }
-    this.actionNames.add(action || '');
     this.queuedUpdates.push(fn);
-    if (this.timer) {
-      return;
+    if (!this.nextUpdatePromise) {
+      // there is no schedule update, schedule an update and create a promise
+      this.nextUpdatePromise = new Promise<void>(resolve => {
+        setTimeout(() => {
+          this.setStateBatched();
+          resolve();
+        }, this.DEFAULT_INTERVAL_MS);
+      });
     }
-    // set a future timeout if a timer is not there already
-    this.timer = setTimeout(() => this.setStateBatched(), this.DEFAULT_INTERVAL_MS);
+    return this.nextUpdatePromise;
   };
 
   private setStateBatched() {
     if (this.queuedUpdates?.length > 0) {
+      const action = Array.from(this.queuedActions, ([action, count]) => `${count}-${action}`).join(';');
+      const start = performance.now();
+      let timeDiffFnsRun = 0;
       const batchedFn = (draftStore: HMSStore) => {
         this.queuedUpdates.forEach(fn => {
           try {
             fn(draftStore);
           } catch (err) {
-            HMSLogger.w('failed to update store', err, fn.name);
+            HMSLogger.w(this.TAG, 'failed to update store', err, fn.name);
           }
         });
+        timeDiffFnsRun = performance.now() - start;
       };
-      const start = performance.now();
-      const action = Array.from(this.actionNames).join(';');
       this.store.namedSetState(batchedFn, `batched-${action}`);
-      const timeDiff = performance.now() - start;
-      if (timeDiff > 0) {
-        HMSLogger.d('BatchedSetState', `time taken in setState ${timeDiff}ms`, action);
+      const timeDiffSetState = performance.now() - start;
+      if (this.shouldLog(timeDiffSetState)) {
+        HMSLogger.d(
+          this.TAG,
+          `timeDiffSetState=${timeDiffSetState.toFixed(2)}ms, timeDiffFnsRun=${timeDiffFnsRun.toFixed(
+            2,
+          )}ms, renderTime=${(timeDiffSetState - timeDiffFnsRun).toFixed(2)}ms, actions="${action}"`,
+        );
       }
     }
     // cleanup
     this.queuedUpdates = [];
-    this.actionNames.clear();
-    clearTimeout(this.timer);
-    this.timer = undefined;
+    this.queuedActions.clear();
+    this.nextUpdatePromise = undefined;
+  }
+
+  /**
+   * when timeDiff is small,
+   * don't log if only one action was queued and that was blacklisted
+   */
+  private shouldLog(timeDiffMs: number) {
+    if (timeDiffMs > 100) {
+      return true;
+    }
+    if (this.queuedActions.size === 1) {
+      for (const action of highFrequencyUpdates) {
+        if (this.queuedActions.has(action)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }
