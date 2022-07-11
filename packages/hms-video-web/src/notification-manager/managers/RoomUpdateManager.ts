@@ -1,20 +1,23 @@
-/* eslint-disable complexity */
 import {
-  RecordingNotification,
-  PeerListNotification,
   HLSNotification,
-  RTMPNotification,
+  PeerListNotification,
   PeriodicRoomState,
+  RecordingNotification,
   RoomState,
+  RTMPNotification,
 } from '../HMSNotifications';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSUpdateListener, HMSRoomUpdate, HMSHLS, HMSHLSRecording } from '../../interfaces';
+import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 import { convertDateNumToDate } from '../../utils/date';
+import { ServerError } from '../../interfaces/internal';
+import { HMSException } from '../../error/HMSException';
+import { HMSAction } from '../../error/ErrorFactory';
 
 export class RoomUpdateManager {
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
+  // eslint-disable-next-line complexity
   handleNotification(method: HMSNotificationMethod, notification: any) {
     switch (method) {
       case HMSNotificationMethod.PEER_LIST:
@@ -95,7 +98,7 @@ export class RoomUpdateManager {
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
-      error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
+      error: hlsNotification?.error?.code ? this.toSdkError(hlsNotification.error) : undefined,
     };
     hlsNotification?.variants?.forEach(variant => {
       hls.variants.push({
@@ -116,7 +119,7 @@ export class RoomUpdateManager {
         singleFilePerLayer: !!hlsNotification.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification.hls_recording?.hls_vod,
         startedAt: convertDateNumToDate(hlsNotification?.variants?.[0].started_at),
-        error: hlsNotification?.error?.code ? hlsNotification.error : undefined,
+        error: hlsNotification?.error?.code ? this.toSdkError(hlsNotification.error) : undefined,
       };
     }
     return hlsRecording;
@@ -139,14 +142,14 @@ export class RoomUpdateManager {
       room.recording.server = {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-        error: notification.error?.code ? notification.error : undefined,
+        error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
       };
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else {
       room.recording.browser = {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-        error: notification.error?.code ? notification.error : undefined,
+        error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
       };
       action = HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED;
     }
@@ -158,8 +161,13 @@ export class RoomUpdateManager {
     room.rtmp = {
       running,
       startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
-      error: notification.error?.code ? notification.error : undefined,
+      error: notification.error?.code ? this.toSdkError(notification.error) : undefined,
     };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
+  }
+
+  private toSdkError(error: ServerError): HMSException {
+    const errMsg = error.message || 'error in streaming/recording';
+    return new HMSException(error.code, 'ServerErrors', HMSAction.NONE, errMsg, errMsg);
   }
 }
