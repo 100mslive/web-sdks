@@ -1,6 +1,8 @@
 import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSException } from './error';
 
+export type { DeviceMap };
+
 /**
  * Test fails when adding InputDeviceInfo[error TS2304: Cannot find name 'InputDeviceInfo'.]
  * InputDeviceInfo extends MediaDeviceInfo. See https://w3c.github.io/mediacapture-main/#input-specific-device-info
