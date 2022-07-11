@@ -1,7 +1,7 @@
-import { HMSRecording, HMSRTMP, HMSHLS } from '@100mslive/hms-video';
+import { HMSRecording, HMSRTMP, HMSHLS, HLSVariant } from '@100mslive/hms-video';
 import { HMSPeerID } from './peer';
 
-export type { HMSRecording, HMSRTMP, HMSHLS };
+export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };
 export type HMSRoomID = string;
 
 /**
