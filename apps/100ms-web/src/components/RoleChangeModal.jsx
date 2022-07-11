@@ -19,7 +19,6 @@ import {
   Box,
   Flex,
   Dropdown,
-  Select,
 } from "@100mslive/react-ui";
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
@@ -107,32 +106,6 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
             </Dropdown.Root>
           </Box>
         </Flex>
-        {/* <Select.Root
-          data-testid="dialog_select_rolechange"
-          css={{ width: "100%", mb: "$md" }}
-        >
-          <Select.DefaultDownIcon />
-          <Select.Select
-            onChange={e => setRole(e.target.value)}
-            value={selectedRole}
-            css={{
-              width: "100%",
-              bg: "$surfaceLight",
-              border: "solid $space$px $borderLight",
-              textTransform: "capitalize",
-            }}
-          >
-            {roles.map(role => {
-              const id = role;
-              const label = role;
-              return (
-                <option value={id} key={id}>
-                  {label}
-                </option>
-              );
-            })}
-          </Select.Select>
-        </Select.Root>*/}
         {!peer?.isLocal && (
           <Flex justify="between" css={{ w: "100%", mb: "$10" }}>
             <Label
