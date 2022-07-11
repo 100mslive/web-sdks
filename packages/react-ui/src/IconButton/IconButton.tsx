@@ -30,7 +30,7 @@ export const IconButton = styled('button', {
     active: {
       false: {
         backgroundColor: '$secondaryDark',
-        color: '$white',
+        color: '$textPrimary',
         '&:not([disabled]):hover': {
           backgroundColor: '$secondaryDefault',
         },

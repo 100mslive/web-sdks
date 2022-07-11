@@ -56,7 +56,7 @@ const AttributeBox = styled('div', {
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  top: '$2',
+  bottom: '$2',
   right: '$2',
   color: '$white',
   bg: '$black',
