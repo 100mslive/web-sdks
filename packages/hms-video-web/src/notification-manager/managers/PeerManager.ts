@@ -121,7 +121,7 @@ export class PeerManager {
       peer.updateName(name);
       this.listener?.onPeerUpdate(HMSPeerUpdate.NAME_UPDATED, peer);
     }
-    if (data && peer.metadata !== data) {
+    if (data && JSON.stringify(peer.metadata) !== JSON.stringify(data)) {
       peer.updateMetadata(data);
       this.listener?.onPeerUpdate(HMSPeerUpdate.METADATA_UPDATED, peer);
     }

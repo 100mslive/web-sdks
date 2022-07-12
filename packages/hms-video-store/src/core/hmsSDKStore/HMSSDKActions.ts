@@ -857,27 +857,48 @@ export class HMSSDKActions implements IHMSActions {
     }, type);
   }
 
+  // eslint-disable-next-line complexity
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
     if (
       [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
     ) {
       return; // ignore, high frequency update so no point of syncing peers
+    } else if (Array.isArray(sdkPeer)) {
+      const sdkPeers: sdkTypes.HMSPeer[] = sdkPeer as sdkTypes.HMSPeer[];
+      this.setState(store => {
+        sdkPeers.forEach((sdkPeerObj: sdkTypes.HMSPeer) => {
+          this.onPeerJoined(store, sdkPeerObj);
+        });
+      }, 'peersJoined');
     } else if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
-      if (Array.isArray(sdkPeer)) {
-        this.setState(store => {
-          sdkPeer.forEach(sdkPeerObj => {
-            this.onPeerJoined(store, sdkPeerObj);
-          });
-        }, 'peerJoined');
-      } else {
-        this.setState(store => {
-          this.onPeerJoined(store, sdkPeer);
-        }, 'peerJoined');
-      }
+      this.setState(store => {
+        this.onPeerJoined(store, sdkPeer as sdkTypes.HMSPeer);
+      }, 'peerJoined');
     } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
       this.setState(store => {
         this.onPeerLeft(store, sdkPeer as sdkTypes.HMSPeer);
       }, 'peerLeft');
+    } else if (type === sdkTypes.HMSPeerUpdate.METADATA_UPDATED) {
+      this.setState(store => {
+        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+        if (store.peers[sdkPeer.peerId]) {
+          store.peers[sdkPeer.peerId].metadata = sdkPeer.metadata;
+        }
+      }, 'peerMetadataUpdated');
+    } else if (type === sdkTypes.HMSPeerUpdate.NAME_UPDATED) {
+      this.setState(store => {
+        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+        if (store.peers[sdkPeer.peerId]) {
+          store.peers[sdkPeer.peerId].name = sdkPeer.name;
+        }
+      }, 'peerMetadataUpdated');
+    } else if (type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED) {
+      this.setState(store => {
+        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+        if (store.peers[sdkPeer.peerId]) {
+          store.peers[sdkPeer.peerId].roleName = sdkPeer.role?.name;
+        }
+      }, 'peerRoleUpdated');
     } else {
       this.sendPeerUpdateNotification(type, sdkPeer as sdkTypes.HMSPeer);
     }

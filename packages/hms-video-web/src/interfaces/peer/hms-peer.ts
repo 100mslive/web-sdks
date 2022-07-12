@@ -1,4 +1,4 @@
-import { HMSAudioTrack, HMSVideoTrack, HMSTrack } from '../../media/tracks';
+import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../media/tracks';
 import { HMSRole } from '../role';
 
 export interface HMSPeer {
@@ -7,7 +7,7 @@ export interface HMSPeer {
   isLocal: boolean;
   joinedAt?: Date;
   customerUserId?: string;
-  metadata?: string;
+  metadata?: any;
   audioTrack?: HMSAudioTrack;
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
