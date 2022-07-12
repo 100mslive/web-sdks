@@ -40,7 +40,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
           <Text
             variant="body2"
             css={{ fontWeight: 400, mt: "$4", mb: "$8", c: "$textMedEmp" }}
-          >{`Change the role of "${peer?.name}" to`}</Text>
+          >{`Change the role of "${peer.name}" to`}</Text>
         </Dialog.Title>
         <Flex
           align="center"
