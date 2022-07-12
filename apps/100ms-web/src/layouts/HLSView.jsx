@@ -1,16 +1,15 @@
 import React, {
+  Fragment,
+  useCallback,
   useEffect,
   useRef,
-  Fragment,
   useState,
-  useCallback,
 } from "react";
 import Hls from "hls.js";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import { selectHLSState, useHMSStore } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  HangUpIcon,
   RecordIcon,
   SettingIcon,
 } from "@100mslive/react-icons";
@@ -26,9 +25,9 @@ import {
 import { ChatView } from "../components/chatView";
 import { useIsChatOpen } from "../components/AppData/useChatState";
 import {
-  HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
+  HLSController,
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
 
@@ -100,7 +99,7 @@ const HLSView = () => {
 
   /**
    *
-   * @param {the current quality level clicked by the user. It is the level object } qualityLevel
+   * @param qualityLevel - the current quality level clicked by the user. It is the level object
    * @returns an integer ranging from 0 to (availableLevels.length - 1).
    * (e.g) if 4 levels are available, 0 is the lowest quality and 3 is the highest.
    *
@@ -130,30 +129,26 @@ const HLSView = () => {
         <>
           <Flex
             align="center"
-            justify={"center"}
-            css={{ position: "absolute", right: "$4" }}
+            justify="center"
+            css={{ position: "absolute", right: "$4", zIndex: "100" }}
           >
-            {hlsController ? (
-              <Button
-                variant="standard"
-                css={{ marginRight: "0.3rem" }}
-                onClick={() => {
-                  hlsController.jumpToLive();
-                  setIsVideoLive(true);
-                }}
-                key="LeaveRoom"
-                data-testid="leave_room_btn"
-              >
-                <Tooltip title="Jump to Live">
+            {hlsController && (!isVideoLive || videoRef.current?.paused) ? (
+              <Tooltip title="Jump to Live">
+                <Button
+                  variant="danger"
+                  css={{ marginRight: "0.3rem" }}
+                  onClick={() => {
+                    hlsController.jumpToLive();
+                    setIsVideoLive(true);
+                  }}
+                  data-testid="go_live_btn"
+                >
                   <Flex>
-                    <RecordIcon
-                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
-                      key="jumpToLive"
-                    />
+                    <RecordIcon color="#FAFAFA" />
                     Live
                   </Flex>
-                </Tooltip>
-              </Button>
+                </Button>
+              </Tooltip>
             ) : null}
             <Dropdown.Root
               open={qualityDropDownOpen}
@@ -195,9 +190,7 @@ const HLSView = () => {
                   css={{ height: "auto", maxHeight: "$96" }}
                 >
                   <Dropdown.Item
-                    onClick={event =>
-                      qualitySelectorHandler({ height: "auto" })
-                    }
+                    onClick={_ => qualitySelectorHandler({ height: "auto" })}
                     css={{
                       h: "auto",
                       flexDirection: "column",

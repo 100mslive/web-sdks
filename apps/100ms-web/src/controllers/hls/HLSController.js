@@ -7,10 +7,11 @@ import {
   parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
-export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3; // seconds
+export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 10; // seconds
 
 export class HLSController {
   hls;
@@ -50,7 +51,7 @@ export class HLSController {
 
   /**
    *
-   * @param {currentLevel} Number - currentLevel we want to
+   * @param { Number } currentLevel - currentLevel we want to
    * set the stream to. -1 for Auto
    */
   setCurrentLevel(currentLevel) {
@@ -58,11 +59,18 @@ export class HLSController {
   }
 
   jumpToLive() {
+    console.log("hls, jumping to live");
     const videoEl = this.videoRef.current;
     videoEl.currentTime = this.hls.liveSyncPosition;
+    if (videoEl.paused) {
+      try {
+        videoEl.play();
+      } catch (err) {
+        console.log("failed to play hls element", err);
+      }
+    }
   }
 
-  isVideoLive() {}
   /**
    * Event listener. Also takes HLS JS events. If its
    * not a Controller's event, it just forwards the
@@ -87,8 +95,9 @@ export class HLSController {
     }
   }
 
+  // listen for pause, play as well to show not live if paused
   enableTimeUpdateListener() {
-    this.videoRef.current.addEventListener("timeupdate", event => {
+    this.videoRef.current.addEventListener("timeupdate", _ => {
       if (this.hls) {
         const videoEl = this.videoRef.current;
         const allowedDelay =
@@ -97,13 +106,15 @@ export class HLSController {
         this.isLive =
           this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay;
         if (!this.isLive) {
-          console.log(
-            "LIVE",
-            allowedDelay,
-            this.hls.liveSyncPosition,
-            videoEl.currentTime,
-            `Difference = ${this.hls.liveSyncPosition - videoEl.currentTime}`
-          );
+          // console.log(
+          //   "HLS not live, delay greater than allowed delay",
+          //   {
+          //     allowedDelay,
+          //     currentTime: videoEl.currentTime,
+          //     livePosition: this.hls.liveSyncPosition,
+          //   },
+          //   `Delay = ${this.hls.liveSyncPosition - videoEl.currentTime}`
+          // );
 
           this.eventEmitter.emit(HLS_STREAM_NO_LONGER_LIVE);
         }
@@ -255,18 +266,21 @@ export class HLSController {
   }
 
   getHLSConfig() {
-    // if (FeatureFlags.optimiseHLSLatency()) {
-    // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
+    if (FeatureFlags.optimiseHLSLatency()) {
+      console.log("choosing config for reduced hls latency");
+      // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
+      return {
+        enableWorker: true,
+        liveSyncDuration: 1,
+        liveMaxLatencyDuration: 5,
+        liveDurationInfinity: true,
+        highBufferWatchdogPeriod: 1,
+      };
+    }
     return {
       enableWorker: true,
       maxBufferLength: 20,
-      // liveSyncDuration: 3,
-      // liveMaxLatencyDuration: 50,
-      // liveDurationInfinity: true,
       backBufferLength: 10,
-      // highBufferWatchdogPeriod: 1,
     };
-    // }
-    // return {};
   }
 }
