@@ -39,7 +39,7 @@ const ReactToastComponent = ({ ...props }) => {
   return (
     <>
       <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</Button>
-      <Toast.DefaultToast
+      <Toast.HMSToast
         title={'Toast title goes here'}
         description="Toast description goes here"
         open={true}
@@ -55,7 +55,7 @@ const ReactToastComponent = ({ ...props }) => {
         }
         onOpenChange={o => setIsOpen(o)}
         {...props}
-      ></Toast.DefaultToast>
+      ></Toast.HMSToast>
       <Toast.Viewport css={{ bottom: '$24' }} />
     </>
   );

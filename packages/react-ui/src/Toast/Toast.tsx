@@ -133,5 +133,5 @@ export const Toast = {
   Close: DefaultClose,
   Action: ToastAction,
   Viewport: ToastViewport,
-  DefaultToast: HMSToast,
+  HMSToast: HMSToast,
 };
