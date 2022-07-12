@@ -14,6 +14,7 @@ export class HMSStoreMock {
   private readonly setState: NamedSetState<HMSStore>;
   private peerCounter = 0;
   private sdk: HMSSdk;
+  private mockPeerIds: string[] = [];
 
   constructor(storeSDK?: HMSReactiveStore) {
     if (!storeSDK && isBrowser && window?.__hms) {
@@ -61,6 +62,24 @@ export class HMSStoreMock {
         timeDiff / count
       ).toFixed(2)}ms`,
     );
+  }
+
+  async leavePeers(config?: HMSStoreMockPeerConfig) {
+    // @ts-ignore
+    const notificationManager = this.sdk.notificationManager;
+    const sleepTimeMs = config?.ratePerSecond ? 1000 / config.ratePerSecond : 0;
+    for (const peerId of this.mockPeerIds) {
+      notificationManager.handleNotification({
+        method: 'on-peer-leave',
+        params: {
+          peer_id: peerId,
+        },
+      });
+      if (sleepTimeMs > 0) {
+        await this.sleep(sleepTimeMs);
+      }
+    }
+    this.mockPeerIds = [];
   }
 
   async sleep(timeMs: number) {
@@ -112,5 +131,6 @@ export class HMSStoreMock {
         tracks: {},
       },
     });
+    this.mockPeerIds.push(this.peerCounter.toString());
   };
 }

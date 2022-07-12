@@ -862,20 +862,40 @@ export class HMSSDKActions implements IHMSActions {
       [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
     ) {
       return; // ignore, high frequency update so no point of syncing peers
-    }
-    if (Array.isArray(sdkPeer)) {
-      this.syncRoomState('peersJoined');
-      const hmsPeers = [];
-      for (const peer of sdkPeer) {
-        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        if (hmsPeer) {
-          hmsPeers.push(hmsPeer);
-        }
+    } else if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
+      if (Array.isArray(sdkPeer)) {
+        this.setState(store => {
+          sdkPeer.forEach(sdkPeerObj => {
+            this.onPeerJoined(store, sdkPeerObj);
+          });
+        }, 'peerJoined');
+      } else {
+        this.setState(store => {
+          this.onPeerJoined(store, sdkPeer);
+        }, 'peerJoined');
       }
-      this.hmsNotifications.sendPeerList(hmsPeers);
-      return;
+    } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
+      this.setState(store => {
+        this.onPeerLeft(store, sdkPeer as sdkTypes.HMSPeer);
+      }, 'peerLeft');
+    } else {
+      this.sendPeerUpdateNotification(type, sdkPeer as sdkTypes.HMSPeer);
     }
-    this.sendPeerUpdateNotification(type, sdkPeer);
+  }
+
+  private onPeerJoined(store: HMSStore, sdkPeer: sdkTypes.HMSPeer) {
+    store.room.peers.push(sdkPeer.peerId);
+    store.peers[sdkPeer.peerId] = SDKToHMS.convertPeer(sdkPeer) as HMSPeer;
+    this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
+  }
+
+  private onPeerLeft(store: HMSStore, sdkPeer: sdkTypes.HMSPeer) {
+    delete this.hmsSDKPeers[sdkPeer.peerId];
+    const index = store.room.peers.indexOf(sdkPeer.peerId);
+    if (index > -1) {
+      store.room.peers.splice(index, 1);
+    }
+    delete store.peers[sdkPeer.peerId];
   }
 
   protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {
