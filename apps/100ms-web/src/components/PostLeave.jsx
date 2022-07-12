@@ -3,12 +3,21 @@ import { useParams } from "react-router-dom";
 import { Button, Flex, Box, Text } from "@100mslive/react-ui";
 import { ExitIcon } from "@100mslive/react-icons";
 import { ToastManager } from "./Toast/ToastManager";
-import { useNavigation } from "./hooks/useNavigation";
 import { Header } from "./Header";
+import { useNavigation } from "./hooks/useNavigation";
+import {
+  UserPreferencesKeys,
+  useUserPreferences,
+  defaultPreviewPreference,
+} from "./hooks/useUserPreferences";
 
 const PostLeave = () => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
+  const [previewPreference] = useUserPreferences(
+    UserPreferencesKeys.PREVIEW,
+    defaultPreviewPreference
+  );
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
@@ -33,7 +42,7 @@ const PostLeave = () => {
           variant="body1"
           css={{ color: "$textMedEmp", mt: "$8", fontWeight: "$regular" }}
         >
-          Have a nice day, Iwobi!
+          Have a nice day, {previewPreference?.name}!
         </Text>
         <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
           <Text
@@ -55,19 +64,6 @@ const PostLeave = () => {
             <Text css={{ ml: "$3", fontWeight: "$semiBold" }}>Rejoin</Text>
           </Button>
         </Flex>
-        <Button
-          variant="standard"
-          data-testid="send_feedback_btn"
-          outlined
-          css={{
-            position: "fixed",
-            bottom: "$10",
-            left: "45%",
-            fontWeight: "$semiBold",
-          }}
-        >
-          Send Feedback
-        </Button>
       </Flex>
     </Flex>
   );
