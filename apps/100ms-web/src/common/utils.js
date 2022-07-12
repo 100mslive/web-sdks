@@ -42,16 +42,12 @@ export const arrayIntersection = (a, b) => {
 
 export const getMetadata = metadataString => {
   try {
-    return metadataString === "" ? {} : JSON.parse(metadataString);
+    return metadataString && metadataString !== ""
+      ? JSON.parse(metadataString)
+      : {};
   } catch (error) {
     return {};
   }
-};
-
-export const metadataProps = function (peer) {
-  return {
-    isHandRaised: getMetadata(peer.metadata)?.isHandRaised,
-  };
 };
 
 export const mobileChatStyle = {

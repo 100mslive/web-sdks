@@ -378,7 +378,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
-      this.localPeer.metadata = config.metaData || '';
+      this.localPeer.updateMetadata(config.metaData || '');
     }
 
     this.roleChangeManager = new RoleChangeManager(

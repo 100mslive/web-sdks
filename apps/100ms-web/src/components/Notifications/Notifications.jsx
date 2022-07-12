@@ -3,10 +3,10 @@ import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LogRocket from "logrocket";
 import {
-  useHMSNotifications,
   HMSNotificationTypes,
+  useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { Flex, Text, Button } from "@100mslive/react-ui";
+import { Button, Flex, Text } from "@100mslive/react-ui";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
@@ -16,7 +16,6 @@ import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
-import { getMetadata } from "../../common/utils";
 import { ToastBatcher } from "../Toast/ToastBatcher";
 import { useIsHeadless } from "../AppData/useUISettings";
 
@@ -33,7 +32,7 @@ export function Notifications() {
       case HMSNotificationTypes.METADATA_UPDATED:
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
-        const metadata = getMetadata(notification.data?.metadata);
+        const metadata = notification.data?.metadata;
         if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless)
           return;
 

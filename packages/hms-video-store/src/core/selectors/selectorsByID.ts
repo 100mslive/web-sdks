@@ -11,10 +11,10 @@ import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schem
 import {
   getPeerTracksByCondition,
   isAudio,
-  isVideoPlaylist,
+  isAudioPlaylist,
   isTrackEnabled,
   isVideo,
-  isAudioPlaylist,
+  isVideoPlaylist,
 } from './selectorUtils';
 import { byIDCurry } from './common';
 import { HMSLogger } from '../../common/ui-logger';
@@ -371,7 +371,7 @@ export const selectPeersByRole = (role: HMSRoleName) =>
 export const selectPeerMetadata = (peerId: HMSPeerID) =>
   createSelector(selectPeerByID(peerId), peer => {
     try {
-      return peer?.metadata && peer.metadata !== '' ? JSON.parse(peer.metadata) : {};
+      return peer?.metadata || {};
     } catch (error) {
       console.error('cannot parse peer metadata', error);
       return {};

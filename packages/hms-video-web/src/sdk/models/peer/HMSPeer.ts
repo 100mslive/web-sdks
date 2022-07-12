@@ -18,7 +18,7 @@ export class HMSPeer implements IHMSPeer {
   readonly isLocal: boolean;
   name: string;
   customerUserId?: string = '';
-  metadata?: string = '';
+  metadata?: any = {};
   audioTrack?: HMSAudioTrack;
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[] = [];
@@ -30,7 +30,7 @@ export class HMSPeer implements IHMSPeer {
     this.peerId = peerId;
     this.isLocal = isLocal;
     this.customerUserId = customerUserId;
-    this.metadata = metadata;
+    this.updateMetadata(metadata);
     this.joinedAt = joinedAt;
 
     if (role) {
@@ -50,10 +50,24 @@ export class HMSPeer implements IHMSPeer {
   updateName(newName: string) {
     this.name = newName;
   }
+
   /**
+   * if metadata is string, try to parse it as json, and store as json.
+   * JSON.parse is an expensive operation to do frequently, it's better to do it
+   * once given that json is a common use case.
    * @internal
    */
-  updateMetadata(data: string) {
-    this.metadata = data;
+  updateMetadata(data?: string) {
+    if (!data || data === '') {
+      this.metadata = {};
+    } else if (typeof data === 'string') {
+      try {
+        this.metadata = JSON.parse(data);
+      } catch (err) {
+        this.metadata = data;
+      }
+    } else {
+      this.metadata = data;
+    }
   }
 }
