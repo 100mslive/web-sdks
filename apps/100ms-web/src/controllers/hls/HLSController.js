@@ -1,24 +1,34 @@
 import Hls from "hls.js";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
-import { FeatureFlags } from "../../services/FeatureFlags";
+// import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   getSecondsFromTime,
   isAlreadyInMetadataMap,
   parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
+export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
+export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3; // seconds
+
 export class HLSController {
   hls;
+  videoRef;
   metadataByTimeStamp = new Map();
   eventEmitter = new EventEmitter();
+  isLive = true;
   constructor(hlsUrl, videoRef) {
     this.hls = new Hls(this.getHLSConfig());
+    this.videoRef = videoRef;
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
     this.handleHLSTimedMetadataParsing();
-    this.ControllerEvents = [HLS_TIMED_METADATA_LOADED];
+    this.ControllerEvents = [
+      HLS_TIMED_METADATA_LOADED,
+      HLS_STREAM_NO_LONGER_LIVE,
+    ];
   }
 
   reset() {
@@ -48,6 +58,12 @@ export class HLSController {
     this.hls.currentLevel = currentLevel;
   }
 
+  jumpToLive() {
+    const videoEl = this.videoRef.current;
+    videoEl.currentTime = this.hls.liveSyncPosition;
+  }
+
+  isVideoLive() {}
   /**
    * Event listener. Also takes HLS JS events. If its
    * not a Controller's event, it just forwards the
@@ -56,6 +72,15 @@ export class HLSController {
    * @param {Function} eventCallback
    */
   on(eventName, eventCallback) {
+    /**
+     * slight optimization. If the user is not
+     * interested in HLS_STREAM_NO_LONGER_LIVE,
+     * we don't have to register time_update event
+     * as it is a bit costly.
+     */
+    if (eventName === HLS_STREAM_NO_LONGER_LIVE) {
+      this.enableTimeUpdateListener();
+    }
     if (this.ControllerEvents.indexOf(eventName) === -1) {
       this.hls.on(eventName, eventCallback);
     } else {
@@ -63,6 +88,21 @@ export class HLSController {
     }
   }
 
+  enableTimeUpdateListener() {
+    this.videoRef.current.addEventListener("timeupdate", event => {
+      if (this.hls) {
+        const videoEl = this.videoRef.current;
+        const allowedDelay =
+          this.getHLSConfig().liveMaxLatencyDuration ||
+          HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
+        this.isLive =
+          this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay;
+        if (!this.isLive) {
+          this.eventEmitter.emit(HLS_STREAM_NO_LONGER_LIVE);
+        }
+      }
+    });
+  }
   handleHLSTimedMetadataParsing() {
     /**
      * Everytime a fragment is appended to the buffer,
@@ -82,6 +122,8 @@ export class HLSController {
      * }
      */
     this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
+      // console.log(`Segment ${frag.relurl}`);
+
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
       // There could be more than one EXT-X-DATERANGE tags in a fragment.
@@ -132,6 +174,7 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
+      // console.log(`Segment loaded ${frag.relurl}`);
       const tagsList = parseTagsList(frag?.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];
@@ -208,13 +251,17 @@ export class HLSController {
     if (FeatureFlags.optimiseHLSLatency()) {
       // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
       return {
-        enableWorker: true,
-        liveSyncDuration: 1,
-        liveMaxLatencyDuration: 5,
+        liveSyncDuration: 3,
+        liveMaxLatencyDuration: 50,
         liveDurationInfinity: true,
+
         highBufferWatchdogPeriod: 1,
       };
     }
-    return {};
+    return {
+      enableWorker: true,
+      maxBufferLength: 20,
+      backBufferLength: 10,
+    };
   }
 }

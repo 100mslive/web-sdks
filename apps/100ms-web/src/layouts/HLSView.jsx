@@ -10,12 +10,20 @@ import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
+  HangUpIcon,
+  PauseIcon,
+  PlayIcon,
+  RecordIcon,
   SettingIcon,
+  SpeakerIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
+  Button,
   Dropdown,
   Flex,
+  IconButton,
+  Slider,
   styled,
   Text,
   Tooltip,
@@ -24,6 +32,7 @@ import { ChatView } from "../components/chatView";
 import { useIsChatOpen } from "../components/AppData/useChatState";
 import {
   HLSController,
+  HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
@@ -39,7 +48,10 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
+  // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
+  const [isVideoLive, setIsVideoLive] = useState(true);
+  const [videoProgress, setVideoProgress] = useState(0);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
@@ -49,6 +61,14 @@ const HLSView = () => {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
 
+        videoRef.current.addEventListener("timeupdate", event => {
+          const progress =
+            (videoRef.current.currentTime / videoRef.current.duration) * 100;
+          setVideoProgress(isNaN(progress) ? 0 : progress);
+        });
+        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
+          setIsVideoLive(false);
+        });
         hlsController.on(HLS_TIMED_METADATA_LOADED, payload => {
           console.log(
             `%c Payload: ${payload}`,
@@ -119,7 +139,33 @@ const HLSView = () => {
     <Fragment>
       {hlsUrl ? (
         <>
-          <Flex align="center" css={{ position: "absolute", right: "$4" }}>
+          <Flex
+            align="center"
+            justify={"center"}
+            css={{ position: "absolute", right: "$4" }}
+          >
+            {hlsController ? (
+              <Button
+                variant="standard"
+                css={{ marginRight: "0.3rem" }}
+                onClick={() => {
+                  hlsController.jumpToLive();
+                  setIsVideoLive(true);
+                }}
+                key="LeaveRoom"
+                data-testid="leave_room_btn"
+              >
+                <Tooltip title="Jump to Live">
+                  <Flex>
+                    <RecordIcon
+                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
+                      key="jumpToLive"
+                    />
+                    Live
+                  </Flex>
+                </Tooltip>
+              </Button>
+            ) : null}
             <Dropdown.Root
               open={qualityDropDownOpen}
               onOpenChange={value => setQualityDropDownOpen(value)}
@@ -198,7 +244,19 @@ const HLSView = () => {
             </Dropdown.Root>
           </Flex>
 
-          <HLSVideo ref={videoRef} autoPlay controls playsInline />
+          <Flex>
+            <HLSVideo ref={videoRef} autoPlay controls playsInline />
+          </Flex>
+          <Slider
+            step={1}
+            value={[videoProgress]}
+            onValueChange={progress => {
+              console.log(progress);
+              const currentTime = (progress * videoRef.current.duration) / 100;
+              videoRef.current.currentTime = currentTime;
+            }}
+          />
+          <Controls videoEl={videoRef.current} />
         </>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%" }}>
@@ -228,4 +286,60 @@ const HLSView = () => {
   );
 };
 
+const VolumeControl = ({ videoEl }) => {
+  // console.log("VOLUME", videoEl.volume);
+  return (
+    <Flex align="center" css={{ color: "$white" }}>
+      <SpeakerIcon />
+      <Slider
+        css={{ mx: "$4", w: "$20" }}
+        min={0}
+        max={100}
+        step={1}
+        value={[videoEl.volume * 100]}
+        onValueChange={volume => {
+          videoEl.volume = volume / 100;
+        }}
+        thumbStyles={{ w: "$6", h: "$6" }}
+      />
+    </Flex>
+  );
+};
+
+const Controls = ({ videoEl, css = {} }) => {
+  if (!videoEl) {
+    return;
+  }
+  let time = Math.floor(videoEl.currentTime);
+  const hours = Math.floor(time / 3600);
+  time = time - hours * 3600;
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time - minutes * 60);
+
+  let videoTime = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+  if (hours) {
+    videoTime = `${hours}:${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+  }
+
+  return (
+    <Flex justify="start" align="center" gap={2} css={css}>
+      <Flex align="center">
+        <IconButton
+          onClick={() => {
+            videoEl.paused ? videoEl.play() : videoEl.pause();
+          }}
+          data-testid="playlist_play_pause_btn"
+        >
+          {videoEl.paused ? (
+            <PlayIcon width={32} height={32} />
+          ) : (
+            <PauseIcon width={32} height={32} />
+          )}
+        </IconButton>
+        <Text>{`${videoTime}`}</Text>
+      </Flex>
+      <VolumeControl videoEl={videoEl} />
+    </Flex>
+  );
+};
 export default HLSView;
