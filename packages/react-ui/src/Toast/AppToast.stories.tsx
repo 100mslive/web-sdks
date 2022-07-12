@@ -47,7 +47,7 @@ const ReactToastComponent = ({ ...props }) => {
         icon={<RecordIcon />}
         action={
           <Button variant="standard" outlined css={{ w: 'max-content', p: '$4 $8', gap: '8px' }} icon>
-            <Text variant="body2" as="div" css={{ fontWeight: '$regular', lineHeight: '0' }}>
+            <Text variant="body2" as="div" css={{ fontWeight: '$regular', lineHeight: '0', c: '$textMedEmp' }}>
               Hello
             </Text>
             <RecordIcon></RecordIcon>

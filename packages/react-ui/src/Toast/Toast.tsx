@@ -41,7 +41,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
   color: '$textPrimary',
-  fontWeight: 600,
+  fontWeight: '$semiBold',
   mr: '$12',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -69,7 +69,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = css => {
+const DefaultClose = ({ css }) => {
   return (
     <ToastClose css={css} asChild>
       <IconButton>
@@ -79,7 +79,7 @@ const DefaultClose = css => {
   );
 };
 
-interface ReactToastProps extends ToastPrimitives.ToastProps {
+interface HMSToastProps extends ToastPrimitives.ToastProps {
   title: string;
   description?: string;
   isClosable?: boolean;
@@ -87,7 +87,7 @@ interface ReactToastProps extends ToastPrimitives.ToastProps {
   action?: React.ReactNode;
 }
 
-const ReactToast: React.FC<ReactToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
+const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -133,5 +133,5 @@ export const Toast = {
   Close: DefaultClose,
   Action: ToastAction,
   Viewport: ToastViewport,
-  DefaultToast: ReactToast,
+  DefaultToast: HMSToast,
 };
