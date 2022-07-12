@@ -42,7 +42,8 @@ const PostLeave = () => {
           variant="body1"
           css={{ color: "$textMedEmp", mt: "$8", fontWeight: "$regular" }}
         >
-          Have a nice day, {previewPreference?.name}!
+          Have a nice day
+          {previewPreference.name && `, ${previewPreference.name}`}!
         </Text>
         <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
           <Text
