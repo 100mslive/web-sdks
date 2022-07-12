@@ -14,7 +14,7 @@ export const Input = styled('input', {
     boxShadow: '0 0 0 1px $colors$borderAccent',
   },
   '&::placeholder': {
-    color: '$textMedEmp',
+    color: '$textDisabled',
   },
   variants: {
     error: {

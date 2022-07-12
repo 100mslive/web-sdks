@@ -11,13 +11,17 @@ export const darkTheme = {
     iconBtn: '$white',
     iconHoverBg: 'rgba(255, 255, 255, 0.25)',
     transparentBg: 'rgba(0, 0, 0, 0.22)',
-    mainBg: '$black',
+    mainBg: '$backgroundDefault',
     tileBg: '#212121',
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
     inputBg: '$bgSecondary',
     toastBg: '$menuBg',
+
+    backgroundDefault: '#0B0D0F',
+    backgroundDark: '#090B0D',
+    backgroundDarker: '#040405',
   },
 };
 
@@ -33,7 +37,7 @@ export const lightTheme = {
     iconBtn: '#3b3b3b',
     iconHoverBg: 'rgba(0, 0, 0, 0.22)',
     transparentBg: 'rgba(255, 255, 255, 0.22)',
-    mainBg: '$white',
+    mainBg: '$backgroundDefault',
     tileBg: '#F2F2F2',
     previewBg: '#FAFAFA',
     statsBg: 'rgba(255,255,255,0.75)',
@@ -47,6 +51,10 @@ export const lightTheme = {
     surfaceDefault: '#FFFFFF',
     surfaceLight: '#F9FAFB',
     surfaceLighter: '#F3F5F7',
+
+    backgroundDefault: '#FCFCFD',
+    backgroundDark: '#F0F2F5',
+    backgroundDarker: '#E7EAEF',
   },
 };
 
