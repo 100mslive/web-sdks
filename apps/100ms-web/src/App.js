@@ -148,6 +148,8 @@ const RedirectToPreview = ({ getDetails }) => {
     getDetails();
   }, [roomId]); //eslint-disable-line
 
+  console.error({ roomId, role });
+
   if (!roomId && !role) {
     return <Navigate to="/" />;
   }
@@ -166,7 +168,7 @@ const RedirectToPreview = ({ getDetails }) => {
 const RouteList = ({ getUserToken, getDetails }) => {
   return (
     <Routes>
-      <Route path="preview">
+      <Route path="preview/*">
         <Route
           path=":roomId/:role"
           element={
@@ -184,7 +186,7 @@ const RouteList = ({ getUserToken, getDetails }) => {
           }
         />
       </Route>
-      <Route path="meeting">
+      <Route path="meeting/*">
         <Route
           path=":roomId/:role"
           element={
@@ -206,6 +208,14 @@ const RouteList = ({ getUserToken, getDetails }) => {
         <Route path=":roomId/:role" element={<PostLeave />} />
         <Route path=":roomId" element={<PostLeave />} />
       </Route>
+      <Route
+        path="/:roomId/:role"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
+      <Route
+        path="/:roomId/"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
     </Routes>
   );
 };
@@ -231,14 +241,7 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
             <RouteList getUserToken={getUserToken} getDetails={getDetails} />
           }
         />
-        <Route
-          path="/:roomId/:role"
-          element={<RedirectToPreview getDetails={getDetails} />}
-        />
-        <Route
-          path="/:roomId/"
-          element={<RedirectToPreview getDetails={getDetails} />}
-        />
+
         <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
       </Routes>
     </Router>
