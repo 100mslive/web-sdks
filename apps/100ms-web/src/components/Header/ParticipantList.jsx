@@ -307,6 +307,7 @@ const ParticipantVolume = ({ peerId }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerId = useHMSStore(selectLocalPeerID);
   const hmsActions = useHMSActions();
+  // No volume control for local peer or non audio publishing role
   if (peerId === localPeerId || !audioTrack) {
     return null;
   }

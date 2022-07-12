@@ -106,7 +106,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
             </Dropdown.Root>
           </Box>
         </Flex>
-        {!peer?.isLocal && (
+        {!peer.isLocal && (
           <Flex justify="between" css={{ w: "100%", mb: "$10" }}>
             <Label
               htmlFor="requestRoleChangePermission"
