@@ -43,7 +43,7 @@ function createUserAgent(): string {
 }
 
 function replaceSpaces(s: string) {
-  return s.replaceAll(' ', '_');
+  return s.replace(/ /g, '_');
 }
 
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
