@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 import {
+  selectLocalPeerID,
+  selectPeerMetadata,
   useHMSActions,
   useHMSStore,
-  selectPeerMetadata,
-  selectLocalPeerID,
 } from "@100mslive/react-sdk";
 
 export const useMyMetadata = () => {
@@ -17,10 +17,17 @@ export const useMyMetadata = () => {
 
   const update = async updatedFields => {
     try {
-      await hmsActions.changeMetadata(Object.assign(metaData, updatedFields));
+      await hmsActions.changeMetadata(
+        Object.assign({}, metaData, updatedFields)
+      );
       return true;
     } catch (error) {
-      console.error("failed to update metadata ", metaData, updatedFields);
+      console.error(
+        "failed to update metadata ",
+        metaData,
+        updatedFields,
+        error
+      );
     }
   };
 

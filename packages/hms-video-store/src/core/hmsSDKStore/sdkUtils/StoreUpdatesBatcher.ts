@@ -68,6 +68,7 @@ export class StoreUpdatesBatcher {
         // if updates are taking too much time, have a higher interval for batching
         const deltaTimeMs = 10; // some extra time to have a margin
         this.DEFAULT_INTERVAL_MS = Math.round(timeDiffSetState) + deltaTimeMs;
+        // TODO: have a max limit for batching interval
         HMSLogger.d(this.TAG, `updated batching interval to ${this.DEFAULT_INTERVAL_MS}`);
       }
       this.prevBatchCompletedAt = performance.now();
