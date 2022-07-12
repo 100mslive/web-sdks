@@ -56,7 +56,7 @@ const AttributeBox = styled('div', {
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  top: '$2',
+  bottom: '$2',
   right: '$2',
   color: '$white',
   bg: '$black',
@@ -81,7 +81,7 @@ const FullScreenButton = styled('button', {
   position: 'absolute',
   bottom: '1rem',
   right: '1rem',
-  zIndex: 20,
+  zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
     boxShadow: '0 0 0 3px $colors$brandLight',
