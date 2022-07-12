@@ -17,7 +17,7 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
     border: `solid $space$px ${base}`,
     c: '$textHighEmp',
     '&[disabled]': {
-      c: '$textDisabledWhite',
+      c: '$textAccentDisabled',
       bg: '$transparent',
       border: `solid $space$px ${disabled}`,
       cursor: 'not-allowed',
@@ -38,7 +38,7 @@ const getButtonVariants = (base: string, hover: string, active: string, disabled
     bg: base,
     c: '$textHighEmp',
     '&[disabled]': {
-      c: '$textDisabledWhite',
+      c: '$textAccentDisabled',
       cursor: 'not-allowed',
       bg: disabled,
     },

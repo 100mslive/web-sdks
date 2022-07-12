@@ -24,14 +24,12 @@ export const darkTheme = {
 // TODO: Update light theme colors from design
 export const lightTheme = {
   colors: {
-    bgPrimary: '#FFFFFF',
+    bgPrimary: '$white',
     bgSecondary: '#F5F5F5',
     bgTertiary: 'rgba(255,255,255, 0.38)',
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',
-    textDisabled: 'rgba(0,0,0, 0.38)',
     textInvert: 'rgba(255,255,255, 0.9)',
-    textMedEmp: 'rgba(3, 3, 3, 0.8)',
     iconBtn: '#3b3b3b',
     iconHoverBg: 'rgba(0, 0, 0, 0.22)',
     transparentBg: 'rgba(255, 255, 255, 0.22)',
@@ -43,45 +41,13 @@ export const lightTheme = {
     inputBg: '$tileBg',
     toastBg: '$menuBg',
 
-    orange: '#F69133',
-    cyan: '#8FF5FB',
-    tamarind: '#F79133',
-    yellow: '#FAC919',
-    green: '#00AE63',
-    darkgreen: '37F28D',
-    purple: '#6554C0',
-    success: '#36B37E',
-    error: '#CC525F',
-    errorTint: 'rgba(237,76, 90, 0.9)',
-    warning: '#FFAB00',
-    brandLight: '#74AAFF',
-    brandDefault: '#2F80FF',
-    brandDark: '#0B326F',
-    brandDisabled: '#D8E7FF',
-    grayLight: '#B0C3DB',
-    grayDefault: '#657080',
-    grayDark: '#303740',
-    secondaryGray: '#242A33',
-    grayDisabled: '#DCE4EF',
-    menuBg: '$grayDark',
-
-    textHighEmp: 'rgba(245, 249, 255, 0.95)',
-    textMedEmp: 'rgba(224, 236, 255, 0.8)',
-    textDisabled: 'rgba(195, 208, 229, 0.5)',
-    textMedWhite: 'rgba(255, 255, 255, 0.72)',
-    textDarkWhite: 'rgba(255, 255, 255, 0.48)',
-    textHighWhite: 'rgba(255, 255, 255, 0.98)',
-    textDisabledWhite: 'rgba(255, 255, 255, 0.48)',
-
     borderDefault: '#C2CAD6',
     borderLight: '#B2BCCC',
-    // border accent unchanged
 
     surfaceDefault: '#FFFFFF',
     surfaceLight: '#F9FAFB',
     surfaceLighter: '#F3F5F7',
-    // primary variants are same across both themes
-    // secondary variants are same across both themes
-    // TODO: errors variants?
   },
 };
+
+// Modals -> surface light/er
