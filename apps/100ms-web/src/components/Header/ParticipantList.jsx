@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from "react";
 import { FixedSizeList } from "react-window";
 import {
+  Avatar,
+  Box,
   Dropdown,
   Flex,
-  Box,
-  Text,
-  Avatar,
-  textEllipsis,
   IconButton,
+  Text,
+  textEllipsis,
   Tooltip,
 } from "@100mslive/react-ui";
 import {
@@ -68,49 +68,51 @@ export const ParticipantList = () => {
             </Tooltip>
           </Flex>
         </Dropdown.Trigger>
-        <Dropdown.Content
-          sideOffset={5}
-          align="end"
-          css={{
-            w: "$72",
-            height: "auto",
-            maxHeight: "$96",
-            overflowY: "hidden",
-          }}
-        >
-          <Flex
-            align="center"
-            justify="between"
-            css={{ w: "100%", p: "$4 $8" }}
+        {open && (
+          <Dropdown.Content
+            sideOffset={5}
+            align="end"
+            css={{
+              w: "$72",
+              height: "auto",
+              maxHeight: "$96",
+              overflowY: "hidden",
+            }}
           >
-            <Text css={{ flex: "1 1 0", fontWeight: "$semiBold" }}>
-              Participants
-            </Text>
-            <ParticipantFilter
-              selection={filter}
-              onSelection={setFilter}
-              isConnected={isConnected}
-              roles={rolesWithParticipants}
-            />
-          </Flex>
-          {participants.length === 0 && (
             <Flex
               align="center"
-              justify="center"
-              css={{ w: "100%", p: "$8 0" }}
+              justify="between"
+              css={{ w: "100%", p: "$4 $8" }}
             >
-              <Text variant="sm">
-                {!filter ? "No participants" : "No matching participants"}
+              <Text css={{ flex: "1 1 0", fontWeight: "$semiBold" }}>
+                Participants
               </Text>
+              <ParticipantFilter
+                selection={filter}
+                onSelection={setFilter}
+                isConnected={isConnected}
+                roles={rolesWithParticipants}
+              />
             </Flex>
-          )}
-          <VirtualizedParticipants
-            participants={participants}
-            canChangeRole={canChangeRole}
-            isConnected={isConnected}
-            setSelectedPeerId={setSelectedPeerId}
-          />
-        </Dropdown.Content>
+            {participants.length === 0 && (
+              <Flex
+                align="center"
+                justify="center"
+                css={{ w: "100%", p: "$8 0" }}
+              >
+                <Text variant="sm">
+                  {!filter ? "No participants" : "No matching participants"}
+                </Text>
+              </Flex>
+            )}
+            <VirtualizedParticipants
+              participants={participants}
+              canChangeRole={canChangeRole}
+              isConnected={isConnected}
+              setSelectedPeerId={setSelectedPeerId}
+            />
+          </Dropdown.Content>
+        )}
       </Dropdown.Root>
       {selectedPeerId && (
         <RoleChangeModal
