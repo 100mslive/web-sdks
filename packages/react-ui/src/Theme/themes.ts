@@ -18,10 +18,6 @@ export const darkTheme = {
     menuBg: '$grayDark',
     inputBg: '$bgSecondary',
     toastBg: '$menuBg',
-
-    backgroundDefault: '#0B0D0F',
-    backgroundDark: '#090B0D',
-    backgroundDarker: '#040405',
   },
 };
 
@@ -44,6 +40,11 @@ export const lightTheme = {
     menuBg: '#d9d9d9',
     inputBg: '$tileBg',
     toastBg: '$menuBg',
+
+    // text variants
+    textHighEmp: 'rgba(0, 0, 0, 0.95)',
+    textMedEmp: 'rgba(0, 0, 0, 0.8)',
+    textDisabled: 'rgba(0, 0, 0, 0.4)',
 
     borderDefault: '#C2CAD6',
     borderLight: '#B2BCCC',

@@ -6,7 +6,6 @@ export const baseConfig = {
     colors: {
       white: '#ffffff',
       black: '#000000',
-      blackLight: '#06070D',
       transparent: 'rgba(0, 0, 0, 0)',
       orange: '#F69133',
       cyan: '#8FF5FB',
@@ -45,6 +44,10 @@ export const baseConfig = {
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+
+      backgroundDefault: '#0B0D0F',
+      backgroundDark: '#090B0D',
+      backgroundDarker: '#040405',
 
       primaryLight: '#66A1FF',
       primaryDefault: '#2471ED',

@@ -33,10 +33,10 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
   };
 };
 
-const getButtonVariants = (base: string, hover: string, active: string, disabled: string) => {
+const getButtonVariants = (base: string, hover: string, active: string, disabled: string, isAccent?: boolean) => {
   return {
     bg: base,
-    c: '$textHighEmp',
+    c: `${isAccent ? '$textAccentHigh' : '$textHighEmp'}`,
     '&[disabled]': {
       c: '$textAccentDisabled',
       cursor: 'not-allowed',
@@ -89,9 +89,9 @@ const StyledButton = styled('button', {
   ],
   variants: {
     variant: {
-      standard: getButtonVariants('$secondaryDefault', '$secondaryLight', '$secondaryDark', '$secondaryDisabled'),
+      standard: getButtonVariants('$secondaryDefault', '$secondaryLight', '$secondaryDark', '$secondaryDisabled', true),
       danger: getButtonVariants('$errorDefault', '$errorLight', '$errorDark', '$errorDisabled'),
-      primary: getButtonVariants('$primaryDefault', '$primaryLight', '$primaryDark', '$primaryDisabled'),
+      primary: getButtonVariants('$primaryDefault', '$primaryLight', '$primaryDark', '$primaryDisabled', true),
     },
     outlined: {
       true: {},
