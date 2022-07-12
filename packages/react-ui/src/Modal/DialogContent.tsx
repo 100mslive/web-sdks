@@ -40,7 +40,6 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
 
 export const DialogTitle = styled(DialogPrimitive.Title, {
   margin: 0,
-  padding: '$4',
 });
 
 export const DialogDefaultCloseIcon = ({ ...props }: any) => (
