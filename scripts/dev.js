@@ -11,9 +11,9 @@ async function main() {
   }
   const commonOptions = {
     entryPoints: [source],
-    minify: true,
+    minify: false, // makes things easier for local dev
     bundle: true,
-    target: 'es6',
+    target: 'es2017',
     tsconfig: 'tsconfig.json',
     external,
   };
