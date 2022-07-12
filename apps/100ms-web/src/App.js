@@ -241,7 +241,6 @@ function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
             <RouteList getUserToken={getUserToken} getDetails={getDetails} />
           }
         />
-
         <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
       </Routes>
     </Router>
