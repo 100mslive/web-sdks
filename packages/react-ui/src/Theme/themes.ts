@@ -46,16 +46,16 @@ export const lightTheme = {
     textMedEmp: 'rgba(0, 0, 0, 0.8)',
     textDisabled: 'rgba(0, 0, 0, 0.4)',
 
-    borderDefault: '#C2CAD6',
-    borderLight: '#B2BCCC',
+    borderDefault: '#DDE2E9',
+    borderLight: '#D4D9E2',
 
-    surfaceDefault: '#FFFFFF',
-    surfaceLight: '#F9FAFB',
-    surfaceLighter: '#F3F5F7',
+    surfaceDefault: '#F0F2F5',
+    surfaceLight: '#F6F7F9',
+    surfaceLighter: '#FCFCFD',
 
-    backgroundDefault: '#FCFCFD',
-    backgroundDark: '#F0F2F5',
-    backgroundDarker: '#E7EAEF',
+    backgroundDefault: '#EAECF1',
+    backgroundDark: '#E3E7ED',
+    backgroundDarker: '#DDE2E9',
   },
 };
 
