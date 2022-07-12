@@ -122,6 +122,10 @@ export const ParticipantCount = () => {
       toggleSidepane();
     }
   }, [isParticipantsOpen, peerCount, toggleSidepane]);
+
+  if (peerCount === 0) {
+    return null;
+  }
   return (
     <IconButton
       onClick={() => {
