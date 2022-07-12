@@ -15,7 +15,7 @@ export class StoreUpdatesBatcher {
   private queuedActions: Map<string, number> = new Map();
   private queuedUpdates: PartialState<any>[] = [];
   private nextUpdatePromise?: Promise<void>;
-  private DEFAULT_INTERVAL_MS = 10;
+  private DEFAULT_INTERVAL_MS = 50;
   private store: IHMSStore;
   private prevBatchCompletedAt = 0;
   // to ensure we're giving other things a chance to run as well
@@ -34,9 +34,6 @@ export class StoreUpdatesBatcher {
     if (!this.nextUpdatePromise) {
       const timeSincePrevUpdate = performance.now() - this.prevBatchCompletedAt;
       const extraTime = Math.max(0, this.MINIMUM_GAP_BETWEEN_BATCHES_MS - timeSincePrevUpdate);
-      if (extraTime > 0) {
-        HMSLogger.d(this.TAG, `extraTime=${extraTime}ms, defaultInterval=${this.DEFAULT_INTERVAL_MS}ms`);
-      }
       // there is no schedule update, schedule an update and create a promise
       this.nextUpdatePromise = new Promise<void>(resolve => {
         setTimeout(() => {
