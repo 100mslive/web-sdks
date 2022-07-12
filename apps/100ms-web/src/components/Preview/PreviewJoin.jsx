@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState, Fragment } from "react";
 import {
   usePreviewJoin,
   selectLocalPeer,
@@ -172,11 +172,7 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
         <VirtualBackground />
       </Flex>
       <Flex>
-        <SettingsModal>
-          <IconButton data-testid="preview_setting_btn">
-            <SettingsIcon />
-          </IconButton>
-        </SettingsModal>
+        <PreviewSettings />
         <Button
           onClick={savePreferenceAndJoin}
           disabled={!enableJoin}
@@ -189,5 +185,20 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
     </Flex>
   );
 };
+
+const PreviewSettings = React.memo(() => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Fragment>
+      <IconButton
+        data-testid="preview_setting_btn"
+        onClick={() => setOpen(value => !value)}
+      >
+        <SettingsIcon />
+      </IconButton>
+      {open && <SettingsModal open={open} onOpenChange={setOpen} />}
+    </Fragment>
+  );
+});
 
 export default PreviewJoin;
