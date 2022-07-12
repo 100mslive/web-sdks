@@ -132,10 +132,10 @@ const HLSView = () => {
             justify="center"
             css={{ position: "absolute", right: "$4", zIndex: "100" }}
           >
-            {hlsController && (!isVideoLive || videoRef.current?.paused) ? (
+            {hlsController ? (
               <Tooltip title="Jump to Live">
                 <Button
-                  variant="danger"
+                  variant={isVideoLive ? "standard" : "danger"}
                   css={{ marginRight: "0.3rem" }}
                   onClick={() => {
                     hlsController.jumpToLive();
