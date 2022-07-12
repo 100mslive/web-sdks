@@ -168,7 +168,7 @@ const RedirectToPreview = ({ getDetails }) => {
 const RouteList = ({ getUserToken, getDetails }) => {
   return (
     <Routes>
-      <Route path="preview/*">
+      <Route path="preview">
         <Route
           path=":roomId/:role"
           element={
@@ -186,7 +186,7 @@ const RouteList = ({ getUserToken, getDetails }) => {
           }
         />
       </Route>
-      <Route path="meeting/*">
+      <Route path="meeting">
         <Route
           path=":roomId/:role"
           element={
