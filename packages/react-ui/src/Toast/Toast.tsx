@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
@@ -69,7 +69,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = ({ css }) => {
+const DefaultClose = ({ css }: Pick<ComponentProps<typeof ToastClose>, 'css'>) => {
   return (
     <ToastClose css={css} asChild>
       <IconButton>
