@@ -53,8 +53,8 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  fontSize: '$7',
-  lineHeight: '$px',
+  fontSize: '$md',
+  lineHeight: '$md',
   color: '$textHighEmp',
   '&[data-state="closed"]': { backgroundColor: '$surfaceDefault' },
   '&[data-state="open"]': { backgroundColor: '$surfaceDefault' },
@@ -63,7 +63,7 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
 
 const StyledContent = styled(BaseAccordion.Content, {
   overflow: 'hidden',
-  fontSize: '$7',
+  fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
   backgroundColor: '$surfaceDefault',

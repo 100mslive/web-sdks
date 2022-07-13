@@ -2,12 +2,15 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CrossIcon,
+  RecordIcon,
 } from "@100mslive/react-icons";
+import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
 import {
   Box,
   Flex,
   IconButton,
   slideLeftAndFade,
+  Switch,
   Text,
 } from "@100mslive/react-ui";
 
@@ -76,6 +79,8 @@ export const Container = ({ children }) => {
         bg: "$surfaceDefault",
         transform: "translateX(10%)",
         animation: `${slideLeftAndFade("10%")} 100ms ease-out forwards`,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {children}
@@ -95,4 +100,22 @@ export const ContentBody = ({ Icon, title, children }) => {
       </Text>
     </Box>
   );
+};
+
+export const RecordStream = ({ record, setRecord }) => {
+  const permissions = useHMSStore(selectPermissions);
+  return permissions.recording ? (
+    <Flex
+      align="center"
+      css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
+    >
+      <Text css={{ color: "$error" }}>
+        <RecordIcon />
+      </Text>
+      <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
+        Record the stream
+      </Text>
+      <Switch checked={record} onCheckedChange={setRecord} />
+    </Flex>
+  ) : null;
 };

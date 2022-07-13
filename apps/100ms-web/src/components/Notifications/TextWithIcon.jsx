@@ -1,13 +1,11 @@
 import React from "react";
-import { Box, Flex, Text } from "@100mslive/react-ui";
+import { Box, Text } from "@100mslive/react-ui";
 
 export const TextWithIcon = ({ Icon, children }) => (
-  <Flex>
-    <Box css={{ flexShrink: 0 }}>
+  <Text>
+    <Box as="span" css={{ flexShrink: 0, mr: "$4" }}>
       <Icon />
     </Box>
-    <Text as="div" css={{ ml: "$4" }}>
-      {children}
-    </Text>
-  </Flex>
+    {children}
+  </Text>
 );

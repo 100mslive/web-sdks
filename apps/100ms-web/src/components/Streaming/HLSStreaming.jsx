@@ -1,19 +1,13 @@
 import { Fragment, useCallback, useState } from "react";
-import {
-  EndStreamIcon,
-  GoLiveIcon,
-  InfoIcon,
-  RecordIcon,
-} from "@100mslive/react-icons";
+import { EndStreamIcon, GoLiveIcon, InfoIcon } from "@100mslive/react-icons";
 import {
   selectAppData,
-  selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { Box, Button, Flex, Switch, Text } from "@100mslive/react-ui";
-import { Container, ContentBody, ContentHeader } from "./Common";
+import { Box, Button, Flex, Text } from "@100mslive/react-ui";
+import { Container, ContentBody, ContentHeader, RecordStream } from "./Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { getDefaultMeetingUrl } from "../../common/utils";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
@@ -37,7 +31,6 @@ const StartHLS = () => {
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const permissions = useHMSStore(selectPermissions);
   const startHLS = useCallback(async () => {
     await hmsActions.startHLSStreaming({
       variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
@@ -50,20 +43,7 @@ const StartHLS = () => {
 
   return (
     <Fragment>
-      {permissions.recording && (
-        <Flex
-          align="center"
-          css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
-        >
-          <Text css={{ color: "$error" }}>
-            <RecordIcon />
-          </Text>
-          <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
-            Record the stream
-          </Text>
-          <Switch checked={record} onCheckedChange={setRecord} />
-        </Flex>
-      )}
+      <RecordStream record={record} setRecord={setRecord} />
       <Box css={{ p: "$4 $10" }}>
         <Button css={{ w: "100%", r: "$0" }} icon onClick={startHLS}>
           <GoLiveIcon />
