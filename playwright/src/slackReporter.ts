@@ -66,10 +66,6 @@ class slackReporter implements Reporter {
       this.message += "\n*TimedOut Tests - *\n";
       this.message += `${this.timedOut.join("\n")}\n`;
     }
-     if(this.counters["flaky"] == this.counters["failed"]){
-      slackPayload.attachments[0].color = "#1cba2c";
-      this.counters["failed"] = 0;
-     }
     
     console.log(`Finished the run: ${result.status}`);
     slackText.text = this.message;
