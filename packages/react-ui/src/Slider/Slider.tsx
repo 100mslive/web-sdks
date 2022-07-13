@@ -45,14 +45,14 @@ const Thumb = styled(BaseSlider.Thumb, {
   '&:focus': { boxShadow: 'none' },
 });
 
-type SliderProps = React.ComponentProps<typeof Root> & { thumbStyles?: CSS; hideTooltip?: boolean };
+type SliderProps = React.ComponentProps<typeof Root> & { thumbStyles?: CSS; showTooltip?: boolean };
 
-export const Slider: React.FC<SliderProps> = ({ hideTooltip = false, thumbStyles, ...props }) => (
+export const Slider: React.FC<SliderProps> = ({ showTooltip = true, thumbStyles, ...props }) => (
   <Root {...props}>
     <Track>
       <Range />
     </Track>
-    {!hideTooltip ? (
+    {showTooltip ? (
       <Tooltip title={String(props.value?.[0])}>
         <Thumb css={thumbStyles} />
       </Tooltip>
