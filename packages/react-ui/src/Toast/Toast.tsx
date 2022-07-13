@@ -6,6 +6,7 @@ import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
+import { CSS } from '@stitches/react';
 
 const getToastVariant = (base: string) => {
   return {
@@ -84,7 +85,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = ({ css }) => {
+const DefaultClose = (css?: CSS) => {
   return (
     <ToastClose css={css} asChild>
       <IconButton>
