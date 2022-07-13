@@ -3,7 +3,13 @@ import {
   ChevronRightIcon,
   CrossIcon,
 } from "@100mslive/react-icons";
-import { Box, Flex, IconButton, Text } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  IconButton,
+  slideLeftAndFade,
+  Text,
+} from "@100mslive/react-ui";
 
 export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick }) => {
   return (
@@ -53,5 +59,38 @@ export const ContentHeader = ({ onBack, title, content }) => {
         <CrossIcon width={16} height={16} />
       </IconButton>
     </Flex>
+  );
+};
+
+export const Container = ({ children }) => {
+  return (
+    <Box
+      css={{
+        size: "100%",
+        zIndex: 2,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bg: "$surfaceDefault",
+        transform: "translateX(10%)",
+        animation: `${slideLeftAndFade("10%")} 100ms ease-out forwards`,
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
+export const ContentBody = ({ Icon, title, children }) => {
+  return (
+    <Box css={{ p: "$10" }}>
+      <Text>
+        <Icon width={40} height={40} />
+      </Text>
+      <Text css={{ fontWeight: "$semiBold", mt: "$8", mb: "$4" }}>{title}</Text>
+      <Text variant="sm" color="$textMedEmp">
+        {children}
+      </Text>
+    </Box>
   );
 };

@@ -1,13 +1,12 @@
 import { Fragment, useState } from "react";
-
 import { CrossIcon, ColoredHandIcon, GoLiveIcon } from "@100mslive/react-icons";
 import { Flex, Box, Text, IconButton } from "@100mslive/react-ui";
 import { RTMPIcon } from "./RTMPIcon";
-import { useSidepaneToggle } from "../AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
 import { StreamCard } from "./Common";
 import { HLSStreaming } from "./HLSStreaming";
 import { RTMPStreaming } from "./RTMPStreaming";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const StreamingLanding = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);

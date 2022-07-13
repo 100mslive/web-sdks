@@ -1,3 +1,4 @@
+import { Fragment, useCallback, useState } from "react";
 import {
   EndStreamIcon,
   GoLiveIcon,
@@ -11,50 +12,23 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import {
-  Box,
-  Button,
-  Flex,
-  slideLeftAndFade,
-  Switch,
-  Text,
-} from "@100mslive/react-ui";
-import { Fragment, useCallback, useState } from "react";
-import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
-import { getDefaultMeetingUrl } from "../../common/utils";
+import { Box, Button, Flex, Switch, Text } from "@100mslive/react-ui";
+import { Container, ContentBody, ContentHeader } from "./Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";
-import { ContentHeader } from "./Common";
+import { getDefaultMeetingUrl } from "../../common/utils";
+import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const HLSStreaming = ({ onBack }) => {
   const { isHLSRunning } = useRecordingStreaming();
   return (
-    <Box
-      css={{
-        size: "100%",
-        zIndex: 2,
-        position: "absolute",
-        top: 0,
-        left: 0,
-        bg: "$surfaceDefault",
-        transform: "translateX(10%)",
-        animation: `${slideLeftAndFade("10%")} 100ms ease-out forwards`,
-      }}
-    >
+    <Container>
       <ContentHeader title="Start Streaming" content="HLS" onBack={onBack} />
-      <Box css={{ p: "$10" }}>
-        <Text>
-          <GoLiveIcon width={40} height={40} />
-        </Text>
-        <Text css={{ fontWeight: "$semiBold", mt: "$8", mb: "$4" }}>
-          HLS Streaming
-        </Text>
-        <Text variant="sm" color="$textMedEmp">
-          Stream directly from the browser using any device with multiple hosts
-          and real-time messaging, all within this platform.
-        </Text>
-      </Box>
+      <ContentBody title="HLS Streaming" Icon={GoLiveIcon}>
+        Stream directly from the browser using any device with multiple hosts
+        and real-time messaging, all within this platform.
+      </ContentBody>
       {isHLSRunning ? <EndHLS /> : <StartHLS />}
-    </Box>
+    </Container>
   );
 };
 

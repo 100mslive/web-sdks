@@ -6,6 +6,8 @@ export const TextWithIcon = ({ Icon, children }) => (
     <Box css={{ flexShrink: 0 }}>
       <Icon />
     </Box>
-    <Text css={{ ml: "$4" }}>{children}</Text>
+    <Text as="div" css={{ ml: "$4" }}>
+      {children}
+    </Text>
   </Flex>
 );
