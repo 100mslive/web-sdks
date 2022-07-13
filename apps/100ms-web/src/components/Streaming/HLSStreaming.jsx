@@ -1,4 +1,9 @@
-import { Fragment, useCallback, useState } from "react";
+import {
+  EndStreamIcon,
+  GoLiveIcon,
+  InfoIcon,
+  RecordIcon,
+} from "@100mslive/react-icons";
 import {
   selectAppData,
   selectPermissions,
@@ -7,120 +12,20 @@ import {
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import {
-  ChevronRightIcon,
-  CrossIcon,
-  WiredMic,
-  ColoredHandIcon,
-  GoLiveIcon,
-  ChevronLeftIcon,
-  RecordIcon,
-  InfoIcon,
-  EndStreamIcon,
-} from "@100mslive/react-icons";
-import {
-  Flex,
   Box,
-  Text,
-  IconButton,
-  slideLeftAndFade,
   Button,
+  Flex,
+  slideLeftAndFade,
   Switch,
+  Text,
 } from "@100mslive/react-ui";
-import { useSidepaneToggle } from "./AppData/useSidepane";
-import { getDefaultMeetingUrl } from "../common/utils";
-import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
+import { Fragment, useCallback, useState } from "react";
+import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
+import { getDefaultMeetingUrl } from "../../common/utils";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { ContentHeader } from "./Common";
 
-export const StreamingLanding = () => {
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const [showHLS, setShowHLS] = useState(false);
-
-  return (
-    <Fragment>
-      <Flex css={{ w: "100%", py: "$8" }}>
-        <Box
-          css={{
-            alignSelf: "center",
-            p: "$4",
-            bg: "$surfaceLight",
-            r: "$round",
-          }}
-        >
-          <ColoredHandIcon width={40} height={40} />
-        </Box>
-        <Box css={{ flex: "1 1 0", mx: "$8" }}>
-          <Text variant="sm">Welcome !</Text>
-          <Text variant="h6">Let’s get you started</Text>
-        </Box>
-        <IconButton onClick={toggleStreaming} css={{ alignSelf: "flex-start" }}>
-          <CrossIcon />
-        </IconButton>
-      </Flex>
-      <Text variant="tiny" color="$textMedEmp">
-        Start Streaming
-      </Text>
-      <StreamCard
-        title="Live Stream with HLS"
-        subtitle="Stream to millions, edit and control what the viewer sees and more!"
-        css={{ my: "$8" }}
-        onClick={() => setShowHLS(true)}
-      />
-      {showHLS && <HLSStreaming onBack={() => setShowHLS(false)} />}
-    </Fragment>
-  );
-};
-
-const StreamCard = ({ title, subtitle, css = {}, onClick }) => {
-  return (
-    <Flex
-      css={{
-        w: "100%",
-        p: "$10",
-        r: "$1",
-        cursor: "pointer",
-        bg: "$surfaceLight",
-        mb: "$10",
-        mt: "$8",
-        ...css,
-      }}
-      onClick={onClick}
-    >
-      <Text css={{ alignSelf: "center", p: "$4" }}>
-        <WiredMic width={40} height={40} />
-      </Text>
-      <Box css={{ flex: "1 1 0", mx: "$8" }}>
-        <Text variant="h6" css={{ mb: "$4" }}>
-          {title}
-        </Text>
-        <Text variant="sm">{subtitle}</Text>
-      </Box>
-      <Text css={{ alignSelf: "center" }}>
-        <ChevronRightIcon />
-      </Text>
-    </Flex>
-  );
-};
-
-const ContentHeader = ({ onBack, title, content }) => {
-  return (
-    <Flex css={{ w: "100%", py: "$8", px: "$10", cursor: "pointer" }}>
-      <Text
-        css={{ p: "$2", bg: "$surfaceLight", r: "$round", alignSelf: "center" }}
-        onClick={onBack}
-      >
-        <ChevronLeftIcon width={16} height={16} />
-      </Text>
-      <Box css={{ flex: "1 1 0", mx: "$8" }}>
-        <Text variant="sm">{title}</Text>
-        <Text variant="h6">{content}</Text>
-      </Box>
-      <IconButton onClick={onBack} css={{ alignSelf: "flex-start" }}>
-        <CrossIcon width={16} height={16} />
-      </IconButton>
-    </Flex>
-  );
-};
-
-const HLSStreaming = ({ onBack }) => {
+export const HLSStreaming = ({ onBack }) => {
   const { isHLSRunning } = useRecordingStreaming();
   return (
     <Box
