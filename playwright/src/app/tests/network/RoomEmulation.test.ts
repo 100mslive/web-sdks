@@ -13,7 +13,7 @@ test.afterEach(async () => {
 
 const networkDisconnectedDurations = [5000, 35000];
 
-test(`Verify network disconnection/reconnection notifications @debug`, async ({ context }) => {
+test(`Verify network disconnection/reconnection notifications`, async ({ context }) => {
    pages = await PageWrapper.openPages(context, 2, {
     mic: true,
   });
@@ -26,7 +26,7 @@ test(`Verify network disconnection/reconnection notifications @debug`, async ({ 
 });
 
 networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
-  test(`Verify local peer room state is updated for remote peer after network is restored after @debug ${networkDisconnectedDuration} ms`, async ({
+  test(`Verify local peer room state is updated for remote peer after network is restored after ${networkDisconnectedDuration} ms`, async ({
     context,
   }) => {
      pages = await PageWrapper.openPages(context, 2, {
