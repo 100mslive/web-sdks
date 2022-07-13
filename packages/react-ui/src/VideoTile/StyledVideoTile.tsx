@@ -72,7 +72,7 @@ const AudioIndicator = styled('div', {
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
-  color: '$white',
+  color: '$textHighEmp',
   borderRadius: '$round',
   backgroundColor: '$menuBg',
   display: 'flex',
