@@ -53,6 +53,7 @@ const DropdownContent = styled(Content, {
   py: '$4',
   backgroundColor: '$surfaceLight',
   overflowY: 'auto',
+  boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
 });
 
 const DropdownLabel = styled(Label, {
