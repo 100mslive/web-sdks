@@ -1,11 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import {
   selectAppData,
   useHMSActions,
   useHMSStore,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import {
   AddCircleIcon,
+  EndStreamIcon,
   GoLiveIcon,
   PencilIcon,
   SettingsIcon,
@@ -25,10 +27,7 @@ import { getDefaultMeetingUrl } from "../../common/utils";
 import { APP_DATA } from "../../common/constants";
 
 export const RTMPStreaming = ({ onBack }) => {
-  const [rtmpStreams, setRTMPStreams] = useState([]);
-  const hmsActions = useHMSActions();
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
-  const [record, setRecord] = useState(false);
+  const { isRTMPRunning } = useRecordingStreaming();
 
   return (
     <Container>
@@ -41,6 +40,18 @@ export const RTMPStreaming = ({ onBack }) => {
         Allows you to add a Custom RTMP or more than 1 channel of the same
         platform from our list of supported platforms.
       </ContentBody>
+      {!isRTMPRunning ? <StartRTMP /> : <EndRTMP />}
+    </Container>
+  );
+};
+
+const StartRTMP = () => {
+  const [rtmpStreams, setRTMPStreams] = useState([]);
+  const hmsActions = useHMSActions();
+  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
+  const [record, setRecord] = useState(false);
+  return (
+    <Fragment>
       {rtmpStreams.length > 0 && (
         <Box css={{ px: "$10", overflowY: "auto" }}>
           <Accordion.Root type="single" collapsible>
@@ -110,7 +121,26 @@ export const RTMPStreaming = ({ onBack }) => {
           Go Live
         </Button>
       </Box>
-    </Container>
+    </Fragment>
+  );
+};
+
+const EndRTMP = () => {
+  const hmsActions = useHMSActions();
+  return (
+    <Box css={{ p: "$4 $10" }}>
+      <Button
+        variant="danger"
+        css={{ w: "100%", r: "$0", my: "$8" }}
+        icon
+        onClick={async () => {
+          await hmsActions.stopRTMPAndRecording();
+        }}
+      >
+        <EndStreamIcon />
+        End Stream
+      </Button>
+    </Box>
   );
 };
 
