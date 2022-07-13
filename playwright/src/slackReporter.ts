@@ -31,6 +31,8 @@ class slackReporter implements Reporter {
     // test is flaky when it had some failures but passed in retries
     if (test.outcome() === "flaky") {
       this.failures = this.failures.filter((title) => title !== test.title);
+      if(this.counters.failed > 0)
+      this.counters.failed--;
       this.counters.flaky++;
       this.flaky.push(test.title);
     } else if (result.status === "failed" && !this.failures.includes(test.title)) {
@@ -64,7 +66,11 @@ class slackReporter implements Reporter {
       this.message += "\n*TimedOut Tests - *\n";
       this.message += `${this.timedOut.join("\n")}\n`;
     }
-
+     if(this.counters["flaky"] == this.counters["failed"]){
+      slackPayload.attachments[0].color = "#1cba2c";
+      this.counters["failed"] = 0;
+     }
+    
     console.log(`Finished the run: ${result.status}`);
     slackText.text = this.message;
     let slackJson = JSON.stringify(slackPayload, null, 2);
