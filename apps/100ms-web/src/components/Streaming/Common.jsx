@@ -33,7 +33,9 @@ export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick }) => {
         <Text variant="h6" css={{ mb: "$4" }}>
           {title}
         </Text>
-        <Text variant="sm">{subtitle}</Text>
+        <Text variant="sm" css={{ color: "$textMedEmp" }}>
+          {subtitle}
+        </Text>
       </Box>
       <Text css={{ alignSelf: "center" }}>
         <ChevronRightIcon />
@@ -88,7 +90,7 @@ export const ContentBody = ({ Icon, title, children }) => {
         <Icon width={40} height={40} />
       </Text>
       <Text css={{ fontWeight: "$semiBold", mt: "$8", mb: "$4" }}>{title}</Text>
-      <Text variant="sm" color="$textMedEmp">
+      <Text variant="sm" css={{ color: "$textMedEmp" }}>
         {children}
       </Text>
     </Box>
