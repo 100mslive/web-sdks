@@ -19,22 +19,19 @@ export const ReconnectNotifications = () => {
     if (notification?.type === HMSNotificationTypes.RECONNECTED) {
       LogRocket.track("Reconnected");
       notificationId = ToastManager.replaceToast(notificationId, {
-        title: (
-          <TextWithIcon Icon={ConnectivityIcon}>
-            You are now connected
-          </TextWithIcon>
-        ),
+        title: `You are now connected`,
+        icon: <ConnectivityIcon />,
+        variant: "success",
         duration: 3000,
       });
     } else if (notification?.type === HMSNotificationTypes.RECONNECTING) {
       LogRocket.track("Reconnecting");
       notificationId = ToastManager.replaceToast(notificationId, {
-        title: (
-          <TextWithIcon Icon={PoorConnectivityIcon}>
-            You are offline for now. while we try to reconnect, please check
-            your internet connection.
-          </TextWithIcon>
-        ),
+        title: `You are offline for now. while we try to reconnect, please check
+        your internet connection.
+      `,
+        icon: <PoorConnectivityIcon />,
+        variant: "warning",
         duration: 10000,
       });
     }
