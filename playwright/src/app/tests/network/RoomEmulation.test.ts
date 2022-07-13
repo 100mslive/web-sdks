@@ -1,30 +1,35 @@
 import { PageWrapper } from '../../PageWrapper';
 import { test } from '@playwright/test';
 
-let page: PageWrapper;
+let pages: PageWrapper[];
 
 test.beforeEach(async () => {});
 
-test.afterEach(async () => {});
+test.afterEach(async () => {
+  [0,1].forEach(async i => {
+    await pages[i].close();
+  });
+ });
 
 const networkDisconnectedDurations = [5000, 35000];
 
-test(`Verify network disconnection/reconnection notifications`, async ({ page: nativePage }) => {
-  page = await PageWrapper.openMeetingPage(nativePage);
-  await page.assertVisible(page.center.first_person_img);
-  await page.setInternetEnabled(false);
-  await page.assertVisible(page.center.network_offline_notification);
-  await page.delay(5000);
-  await page.setInternetEnabled(true);
-  await page.assertVisible(page.center.network_connected_notification);
-  await page.close();
+test(`Verify network disconnection/reconnection notifications @debug`, async ({ context }) => {
+   pages = await PageWrapper.openPages(context, 2, {
+    mic: true,
+  });
+  await pages[0].delay(10000);
+  await pages[0].setInternetEnabled(false);
+  await pages[0].assertVisible(pages[0].center.network_offline_notification);
+  await pages[0].delay(5000);
+  await pages[0].setInternetEnabled(true);
+  await pages[0].assertVisible(pages[0].center.network_connected_notification);
 });
 
 networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
-  test(`Verify local peer room state is updated for remote peer after network is restored after ${networkDisconnectedDuration} ms`, async ({
+  test(`Verify local peer room state is updated for remote peer after network is restored after @debug ${networkDisconnectedDuration} ms`, async ({
     context,
   }) => {
-    const pages = await PageWrapper.openPages(context, 2, {
+     pages = await PageWrapper.openPages(context, 2, {
       mic: true,
     });
     await pages[0].timeout(5000);
@@ -34,6 +39,5 @@ networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
     await pages[0].delay(networkDisconnectedDuration);
     await pages[0].setInternetEnabled(true);
     await pages[1].assertVisible(pages[1].center.audio_mute_icon_onTile);
-    await context.close();
   });
 });
