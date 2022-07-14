@@ -91,10 +91,12 @@ export const Container = ({ children }) => {
 export const ContentBody = ({ Icon, title, children }) => {
   return (
     <Box css={{ p: "$10" }}>
-      <Text>
-        <Icon width={40} height={40} />
+      <Text css={{ display: "flex", alignItems: "center", mb: "$4" }}>
+        <Icon />
+        <Text as="span" css={{ fontWeight: "$semiBold", ml: "$4" }}>
+          {title}
+        </Text>
       </Text>
-      <Text css={{ fontWeight: "$semiBold", mt: "$8", mb: "$4" }}>{title}</Text>
       <Text variant="sm" css={{ color: "$textMedEmp" }}>
         {children}
       </Text>

@@ -44,7 +44,7 @@ export const RTMPStreaming = ({ onBack }) => {
         content="Choose a destination"
         onBack={onBack}
       />
-      <ContentBody Icon={SettingsIcon} title="Custom RTMP">
+      <ContentBody Icon={SettingsIcon} title="RTMP">
         Allows you to add a Custom RTMP or more than 1 channel of the same
         platform from our list of supported platforms.
       </ContentBody>
