@@ -23,6 +23,10 @@ import {
   Text,
 } from "@100mslive/react-ui";
 import { Container, ContentBody, ContentHeader, RecordStream } from "./Common";
+import {
+  UserPreferencesKeys,
+  useUserPreferences,
+} from "../hooks/useUserPreferences";
 import { getDefaultMeetingUrl } from "../../common/utils";
 import { APP_DATA } from "../../common/constants";
 
@@ -46,14 +50,19 @@ export const RTMPStreaming = ({ onBack }) => {
 };
 
 const StartRTMP = () => {
-  const [rtmpStreams, setRTMPStreams] = useState([
-    {
-      name: "Stream",
-      id: Date.now(),
-      rtmpURL: "",
-      streamKey: "",
-    },
-  ]);
+  const [rtmpPreference, setRTMPPreference] = useUserPreferences(
+    UserPreferencesKeys.RTMP_URLS
+  );
+  const [rtmpStreams, setRTMPStreams] = useState(
+    rtmpPreference || [
+      {
+        name: "Stream",
+        id: Date.now(),
+        rtmpURL: "",
+        streamKey: "",
+      },
+    ]
+  );
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [record, setRecord] = useState(false);
@@ -121,13 +130,18 @@ const StartRTMP = () => {
             rtmpStreams.length === 0 ||
             rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)
           }
-          onClick={() => {
-            hmsActions.startRTMPOrRecording({
-              rtmpURLs: rtmpStreams.map(
-                value => `${value.rtmpURL}/${value.streamKey}`
-              ),
-              meetingURL: recordingUrl || getDefaultMeetingUrl(),
-            });
+          onClick={async () => {
+            try {
+              hmsActions.startRTMPOrRecording({
+                rtmpURLs: rtmpStreams.map(
+                  value => `${value.rtmpURL}/${value.streamKey}`
+                ),
+                meetingURL: recordingUrl || getDefaultMeetingUrl(),
+              });
+              setRTMPPreference(rtmpStreams);
+            } catch (error) {
+              console.error(error);
+            }
           }}
         >
           <GoLiveIcon />
