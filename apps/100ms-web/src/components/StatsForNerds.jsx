@@ -30,7 +30,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
     [tracksWithLabels]
   );
   const [selectedStat, setSelectedStat] = useState("local-peer");
-  const { showStatsOnTiles, setShowStatsOnTiles } = useSetUiSettings(
+  const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(
     UI_SETTINGS.showStatsOnTiles
   );
   const [open, setOpen] = useState(false);
