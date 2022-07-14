@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext } from "react";
+import React, { Fragment, useCallback } from "react";
 import { Flex, Slider, Text } from "@100mslive/react-ui";
 import {
   selectIsLocalScreenShared,
@@ -7,7 +7,6 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import SwitchWithLabel from "./SwitchWithLabel";
-import { AppContext } from "../context/AppContext";
 import { useSetUiSettings } from "../AppData/useUISettings";
 import {
   UI_MODE_ACTIVE_SPEAKER,
@@ -16,14 +15,17 @@ import {
 } from "../../common/constants";
 
 export const LayoutSettings = () => {
-  const { setMaxTileCount, maxTileCount, uiViewMode, setuiViewMode } =
-    useContext(AppContext);
-
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
   const [isAudioOnly, setIsAudioOnly] = useSetUiSettings(
     UI_SETTINGS.isAudioOnly
+  );
+  const [maxTileCount, setMaxTileCount] = useSetUiSettings(
+    UI_SETTINGS.maxTileCount
+  );
+  const { uiViewMode, setuiViewMode } = useSetUiSettings(
+    UI_SETTINGS.uiViewMode
   );
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {

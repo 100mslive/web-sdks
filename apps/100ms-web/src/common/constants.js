@@ -111,10 +111,13 @@ export const APP_DATA = {
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
   sidePane: "sidePane",
+  subscribedNotifications: "subscribedNotifications",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
   isHeadless: "isHeadless",
+  maxTileCount: "maxTileCount",
+  uiViewMode: "uiViewMode",
 };
 
 export const SIDE_PANE_OPTIONS = {
