@@ -1,36 +1,34 @@
-const valuesMap = new Map();
-
 class LocalStorage {
+  valuesMap = new Map();
   getItem(key: string) {
-    const stringKey = String(key);
-    if (valuesMap.has(key)) {
-      return String(valuesMap.get(stringKey));
+    if (this.valuesMap.has(key)) {
+      return String(this.valuesMap.get(key));
     }
     return null;
   }
 
   setItem(key: string, val: string) {
-    valuesMap.set(String(key), String(val));
+    this.valuesMap.set(key, val);
   }
 
   removeItem(key: string) {
-    valuesMap.delete(key);
+    this.valuesMap.delete(key);
   }
 
   clear() {
-    valuesMap.clear();
+    this.valuesMap.clear();
   }
 
   key(i: number) {
     if (arguments.length === 0) {
       throw new TypeError("Failed to execute 'key' on 'Storage': 1 argument required, but only 0 present."); // this is a TypeError implemented on Chrome, Firefox throws Not enough arguments to Storage.key.
     }
-    const arr = Array.from(valuesMap.keys());
+    const arr = Array.from(this.valuesMap.keys());
     return arr[i];
   }
 
   get length() {
-    return valuesMap.size;
+    return this.valuesMap.size;
   }
 }
 
