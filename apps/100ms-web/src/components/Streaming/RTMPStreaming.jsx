@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   selectAppData,
   useHMSActions,
@@ -74,9 +74,9 @@ const StartRTMP = () => {
   const [record, setRecord] = useState(false);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   return (
-    <Fragment>
+    <Box css={{ overflowY: "auto" }}>
       {rtmpStreams.length > 0 && (
-        <Box css={{ px: "$10", overflowY: "auto" }}>
+        <Box css={{ px: "$10" }}>
           <Accordion.Root
             type="single"
             collapsible
@@ -97,7 +97,7 @@ const StartRTMP = () => {
                     rtmp={rtmp}
                     setRTMPStreams={setRTMPStreams}
                   />
-                  <Accordion.Content css={{ px: "$8", py: 0 }}>
+                  <Accordion.Content css={{ px: "$8", py: 0, mb: "$8" }}>
                     <RTMPForm {...rtmp} setRTMPStreams={setRTMPStreams} />
                   </Accordion.Content>
                 </Accordion.Item>
@@ -116,13 +116,13 @@ const StartRTMP = () => {
         }}
       />
       <RecordStream record={record} setRecord={setRecord} />
-      <Box css={{ p: "$8 $10" }}>
+      <Box css={{ p: "$8 $10", "@lg": { display: "flex", gap: "$4" } }}>
         {rtmpStreams.length < 3 && (
           <Button
             variant="standard"
             outlined
             icon
-            css={{ mb: "$8", w: "100%" }}
+            css={{ my: "$4", w: "100%" }}
             onClick={() => {
               setRTMPStreams(streams => [
                 ...streams,
@@ -141,7 +141,7 @@ const StartRTMP = () => {
         <Button
           variant="primary"
           icon
-          css={{ w: "100%" }}
+          css={{ w: "100%", my: "$4" }}
           disabled={
             rtmpStreams.length === 0 ||
             rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)
@@ -166,7 +166,7 @@ const StartRTMP = () => {
           Go Live
         </Button>
       </Box>
-    </Fragment>
+    </Box>
   );
 };
 
