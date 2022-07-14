@@ -28,7 +28,11 @@ import {
   useUserPreferences,
 } from "../hooks/useUserPreferences";
 import { getDefaultMeetingUrl } from "../../common/utils";
-import { APP_DATA } from "../../common/constants";
+import {
+  APP_DATA,
+  RTMP_RECORD_DEFAULT_RESOLUTION,
+} from "../../common/constants";
+import { ResolutionInput } from "../MoreSettings/ResolutionInput";
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();
@@ -68,6 +72,7 @@ const StartRTMP = () => {
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [record, setRecord] = useState(false);
+  const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   return (
     <Fragment>
       {rtmpStreams.length > 0 && (
@@ -101,6 +106,15 @@ const StartRTMP = () => {
           </Accordion.Root>
         </Box>
       )}
+      <ResolutionInput
+        onResolutionChange={setResolution}
+        css={{
+          flexDirection: "column",
+          alignItems: "start",
+          px: "$10",
+          my: "$8",
+        }}
+      />
       <RecordStream record={record} setRecord={setRecord} />
       <Box css={{ p: "$8 $10" }}>
         {rtmpStreams.length < 3 && (
@@ -139,6 +153,8 @@ const StartRTMP = () => {
                   value => `${value.rtmpURL}/${value.streamKey}`
                 ),
                 meetingURL: recordingUrl || getDefaultMeetingUrl(),
+                resolution: getResolution(resolution),
+                record: record,
               });
               setRTMPPreference(rtmpStreams);
             } catch (error) {
@@ -301,3 +317,16 @@ const updateStream = ({ streams, id, key, value }) =>
     }
     return stream;
   });
+
+function getResolution(recordingResolution) {
+  const resolution = {};
+  if (recordingResolution.width) {
+    resolution.width = recordingResolution.width;
+  }
+  if (recordingResolution.height) {
+    resolution.height = recordingResolution.height;
+  }
+  if (Object.keys(resolution).length > 0) {
+    return resolution;
+  }
+}
