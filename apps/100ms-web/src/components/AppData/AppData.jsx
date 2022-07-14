@@ -81,7 +81,6 @@ export function AppData({
     if (initCalled) {
       return;
     }
-    console.error(isDefaultModeActiveSpeaker);
     const initialAppData = {
       [APP_DATA.uiSettings]: {
         [UI_SETTINGS.isAudioOnly]: false,
