@@ -3,8 +3,13 @@ import {
   selectAppData,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from "@100mslive/react-sdk";
 import { useCallback } from "react";
+import {
+  UserPreferencesKeys,
+  useUserPreferences,
+} from "../hooks/useUserPreferences";
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -68,6 +73,10 @@ export const useSetSubscribedNotifications = notificationKey => {
 
 const useSetAppData = ({ appDataKey, key }) => {
   const actions = useHMSActions();
+  const store = useHMSVanillaStore();
+  const [, setPreferences] = useUserPreferences(
+    UserPreferencesKeys.UI_SETTINGS
+  );
   const setValue = useCallback(
     (value, type) => {
       if (!appDataKey || (!key && !type)) {
@@ -80,8 +89,13 @@ const useSetAppData = ({ appDataKey, key }) => {
         },
         true
       );
+      const appData = store.getState(selectAppData());
+      setPreferences({
+        ...appData.uiSettings,
+        subscribedNotifications: appData.subscribedNotifications,
+      });
     },
-    [actions, appDataKey, key]
+    [actions, appDataKey, key, store, setPreferences]
   );
   return setValue;
 };
