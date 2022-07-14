@@ -85,12 +85,10 @@ export const StreamingFooter = () => {
         <Box css={{ "@md": { display: "none" } }}>
           <PIPComponent />
         </Box>
-        <GoLiveButton
-          css={{ display: "none", height: "$13", "@sm": { display: "block" } }}
-        />
+        <GoLiveButton css={{ display: "none", "@sm": { display: "block" } }} />
         <MoreSettings />
         <Box css={{ "@md": { display: "none" } }}>
-          <LeaveRoom />
+          <LeaveRoom isConference={false} />
         </Box>
         <Flex
           align="center"

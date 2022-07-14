@@ -1,11 +1,5 @@
 import React, { Fragment, useState } from "react";
-import {
-  BrbIcon,
-  ChatIcon,
-  ChatUnreadIcon,
-  HandIcon,
-  MusicIcon,
-} from "@100mslive/react-icons";
+import { ChatIcon, ChatUnreadIcon, MusicIcon } from "@100mslive/react-icons";
 import {
   HMSPlaylistType,
   selectUnreadHMSMessagesCount,
@@ -13,7 +7,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { Flex, Tooltip, Footer as AppFooter, Box } from "@100mslive/react-ui";
+import { Flex, Tooltip, Footer as AppFooter } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { LeaveRoom } from "../LeaveRoom";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
@@ -23,7 +17,6 @@ import { Playlist } from "../../components/Playlist/Playlist";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { useMyMetadata } from "../hooks/useMetadata";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
@@ -33,6 +26,7 @@ import { isScreenshareSupported } from "../../common/utils";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 import IconButton from "../../IconButton";
 import PIPComponent from "../PIP/PIPComponent";
+import MetaActions from "../MetaActions";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
@@ -76,37 +70,6 @@ const ScreenshareAudio = () => {
         <ScreenShareHintModal onClose={() => setShowModal(false)} />
       )}
     </Fragment>
-  );
-};
-
-export const MetaActions = ({ isMobile = false }) => {
-  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
-
-  return (
-    <Flex align="center">
-      <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
-        <IconButton
-          css={{ mx: "$4" }}
-          onClick={toggleHandRaise}
-          active={!isHandRaised}
-          data-testid={`${
-            isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
-          }`}
-        >
-          <HandIcon />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`}>
-        <IconButton
-          css={{ mx: "$4" }}
-          onClick={toggleBRB}
-          active={!isBRBOn}
-          data-testid="brb_btn"
-        >
-          <BrbIcon />
-        </IconButton>
-      </Tooltip>
-    </Flex>
   );
 };
 
@@ -161,9 +124,7 @@ export const ConferencingFooter = () => {
         <ScreenshareToggle css={{ mx: "$4" }} />
         <PIPComponent />
         <MoreSettings />
-        <Box css={{ "@md": { display: "none" } }}>
-          <LeaveRoom />
-        </Box>
+        <LeaveRoom />
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}

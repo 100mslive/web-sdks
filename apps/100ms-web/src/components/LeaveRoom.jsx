@@ -23,7 +23,7 @@ import {
   DialogRow,
 } from "../primitives/DialogContent";
 
-export const LeaveRoom = () => {
+export const LeaveRoom = ({ isConference = true }) => {
   const navigate = useNavigate();
   const params = useParams();
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
@@ -64,12 +64,18 @@ export const LeaveRoom = () => {
               data-testid="leave_room_btn"
             >
               <Tooltip title="Leave Room">
-                <Flex gap={2}>
-                  <ExitIcon key="hangUp" />
-                  <Text css={{ "@md": { display: "none" } }} variant="button">
-                    Leave Studio
-                  </Text>
-                </Flex>
+                {isConference ? (
+                  <Box>
+                    <HangUpIcon key="hangUp" />
+                  </Box>
+                ) : (
+                  <Flex gap={2}>
+                    <ExitIcon key="hangUp" />
+                    <Text css={{ "@md": { display: "none" } }} variant="button">
+                      Leave Studio
+                    </Text>
+                  </Flex>
+                )}
               </Tooltip>
             </LeaveIconButton>
           </Popover.Trigger>
