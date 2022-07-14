@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
   selectRoomState,
@@ -16,9 +16,10 @@ import { ConferenceMainView } from "../layouts/mainView";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { StreamingFooter } from "./Footer/StreamingFooter";
 import { StreamingHeader } from "./Header/StreamingHeader";
+import { useNavigation } from "./hooks/useNavigation";
 
 const Conference = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);

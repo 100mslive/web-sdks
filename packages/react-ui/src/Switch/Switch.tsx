@@ -37,7 +37,7 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   '&[data-state="checked"]': {
     left: 'unset',
     right: '$2',
-    backgroundColor: '$textHighEmp',
+    backgroundColor: '$textAccentHigh',
   },
 });
 

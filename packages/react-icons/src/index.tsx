@@ -89,6 +89,7 @@ export { default as ForwardIcon } from './ForwardIcon';
 export { default as ForwardSolidIcon } from './ForwardSolidIcon';
 export { default as GameIcon } from './GameIcon';
 export { default as GiftIcon } from './GiftIcon';
+export { default as GitForkIcon } from './GitForkIcon';
 export { default as GithubIcon } from './GithubIcon';
 export { default as GlobeIcon } from './GlobeIcon';
 export { default as GlobeTwoIcon } from './GlobeTwoIcon';

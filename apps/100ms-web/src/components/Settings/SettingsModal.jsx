@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useMedia } from "react-use";
 import {
   SettingsIcon,
@@ -23,32 +23,30 @@ import { LayoutSettings } from "./LayoutSettings";
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
-  const [selection, setSelection] = useState(isMobile ? "" : "devices");
-  const resetTriggered = useRef(false);
+  const [selection, setSelection] = useState("");
   const resetSelection = useCallback(() => {
     setSelection("");
   }, []);
 
   useEffect(() => {
-    if (isMobile && selection && !resetTriggered.current) {
-      resetSelection();
-      resetTriggered.current = true;
-    }
-  }, [isMobile, resetSelection, selection]);
+    setSelection(isMobile ? "" : "devices");
+  }, [isMobile]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+      <Dialog.Overlay />
       <Dialog.Content
         css={{
           w: "min(800px, 90%)",
           height: "min(656px, 90%)",
           p: 0,
+          r: "$4",
         }}
       >
         <Tabs.Root
-          defaultValue=""
           value={selection}
+          activationMode={isMobile ? "manual" : "automatic"}
           onValueChange={setSelection}
           css={{ size: "100%", position: "relative" }}
         >
@@ -56,8 +54,10 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
             css={{
               w: isMobile ? "100%" : "18.625rem",
               flexDirection: "column",
-              bg: "$bgPrimary",
+              bg: "$backgroundDefault",
               p: "$14 $10",
+              borderTopLeftRadius: "$4",
+              borderBottomLeftRadius: "$4",
             }}
           >
             <Text variant="h5">Settings </Text>
@@ -129,7 +129,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
           )}
         </Tabs.Root>
         <Dialog.Close css={{ position: "absolute", right: "$10", top: "$10" }}>
-          <IconButton as="div">
+          <IconButton as="div" data-testid="dialog_cross_icon">
             <CrossIcon />
           </IconButton>
         </Dialog.Close>
