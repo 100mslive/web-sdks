@@ -6,7 +6,6 @@ export const baseConfig = {
     colors: {
       white: '#ffffff',
       black: '#000000',
-      blackLight: '#06070D',
       transparent: 'rgba(0, 0, 0, 0)',
       orange: '#F69133',
       cyan: '#8FF5FB',
@@ -35,15 +34,21 @@ export const baseConfig = {
       textHighEmp: 'rgba(245, 249, 255, 0.95)',
       textMedEmp: 'rgba(224, 236, 255, 0.8)',
       textDisabled: 'rgba(195, 208, 229, 0.5)',
-      textMedWhite: 'rgba(255, 255, 255, 0.72)',
-      textDarkWhite: 'rgba(255, 255, 255, 0.48)',
-      textHighWhite: 'rgba(255, 255, 255, 0.98)',
-      textDisabledWhite: 'rgba(255, 255, 255, 0.48)',
-      surfaceDarker: '#06080A',
-      surfaceDark: '#080B0F',
+
+      // text variants when bg is accent (blue)
+      // same for both themes
+      textAccentHigh: 'rgba(255, 255, 255, 0.98)',
+      textAccentMedium: 'rgba(255, 255, 255, 0.72)',
+      textAccentDisabled: 'rgba(255, 255, 255, 0.48)',
+
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+
+      backgroundDefault: '#0B0D0F',
+      backgroundDark: '#090B0D',
+      backgroundDarker: '#040405',
+
       primaryLight: '#66A1FF',
       primaryDefault: '#2471ED',
       primaryDark: '#143466',
