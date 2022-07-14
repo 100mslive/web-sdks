@@ -10,11 +10,12 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
 import { Header } from "./Header";
-import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
 import { useIsHeadless } from "./AppData/useUISettings";
+import { StreamingFooter } from "./Footer/StreamingFooter";
+import { StreamingHeader } from "./Header/StreamingHeader";
 
 const Conference = () => {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ const Conference = () => {
     <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
-          <Header />
+          <StreamingHeader />
         </Box>
       )}
       <Box
@@ -82,7 +83,7 @@ const Conference = () => {
       </Box>
       {!isHeadless && (
         <Box css={{ flexShrink: 0, minHeight: "$24" }} data-testid="footer">
-          <Footer />
+          <StreamingFooter />
         </Box>
       )}
       <RoleChangeRequestModal />

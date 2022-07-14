@@ -24,7 +24,7 @@ export const AudioVideoToggle = ({ compact = false }) => {
         >
           <IconButton
             css={{ mr: compact ? "$2" : "$4" }}
-            active={!isLocalAudioEnabled}
+            active={isLocalAudioEnabled}
             onClick={toggleAudio}
             key="toggleAudio"
             data-testid="audio_btn"
@@ -46,7 +46,7 @@ export const AudioVideoToggle = ({ compact = false }) => {
           <IconButton
             css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
-            active={!isLocalVideoEnabled}
+            active={isLocalVideoEnabled}
             onClick={toggleVideo}
             data-testid="video_btn"
           >
