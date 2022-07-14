@@ -12,7 +12,7 @@ export const darkTheme = {
     iconHoverBg: 'rgba(255, 255, 255, 0.25)',
     transparentBg: 'rgba(0, 0, 0, 0.22)',
     mainBg: '$backgroundDefault',
-    tileBg: '#212121',
+    tileBg: '#0F1115',
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
