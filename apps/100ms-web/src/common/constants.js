@@ -113,6 +113,9 @@ export const APP_DATA = {
   sidePane: "sidePane",
   hlsViewerRole: "hlsViewerRole",
   subscribedNotifications: "subscribedNotifications",
+  logo: "logo",
+  tokenEndpoint: "tokenEndpoint",
+  appPolicyConfig: "appPolicyConfig",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",

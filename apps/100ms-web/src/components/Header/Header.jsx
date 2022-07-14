@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment } from "react";
 import {
   useHMSStore,
   selectDominantSpeaker,
@@ -23,14 +23,15 @@ import {
   styled,
   Button,
   Tooltip,
+  useTheme,
 } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import PIPComponent from "../PIP/PIPComponent";
-import { AppContext } from "../context/AppContext";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
 } from "../AppData/useSidepane";
+import { useLogo } from "../AppData/useUISettings";
 import {
   DEFAULT_HLS_VIEWER_ROLE,
   SIDE_PANE_OPTIONS,
@@ -92,8 +93,21 @@ const LogoImg = styled("img", {
 });
 
 const Logo = () => {
-  const { logo } = useContext(AppContext);
-  return <LogoImg src={logo} alt="Brand Logo" width={132} height={40} />;
+  const { themeType } = useTheme();
+  const logo = useLogo();
+  return (
+    <LogoImg
+      src={
+        logo ||
+        (themeType === "dark"
+          ? require("../../images/logo-light.svg")
+          : require("../../images/logo-dark.svg"))
+      }
+      alt="Brand Logo"
+      width={132}
+      height={40}
+    />
+  );
 };
 
 const EndStream = () => {

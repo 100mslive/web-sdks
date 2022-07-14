@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   selectLocalPeerID,
   selectPeers,
@@ -7,13 +7,12 @@ import {
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
 import { useUISettings } from "../components/AppData/useUISettings";
-import { AppContext } from "../components/context/AppContext";
+import { useAppPolicyConfigByKey } from "../components/AppData/useAppPolicyConfig";
 import { UI_SETTINGS } from "../common/constants";
 
 export const MainGridView = () => {
-  const {
-    appPolicyConfig: { center: centerRoles = [], sidepane: sidepaneRoles = [] },
-  } = useContext(AppContext);
+  const centerRoles = useAppPolicyConfigByKey("center") || [];
+  const sidepaneRoles = useAppPolicyConfigByKey("sidepane") || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const peers = useHMSStore(selectPeers);

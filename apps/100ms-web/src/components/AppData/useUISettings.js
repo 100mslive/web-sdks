@@ -55,6 +55,14 @@ export const useHLSViewerRole = () => {
   return useHMSStore(selectAppData(APP_DATA.hlsViewerRole));
 };
 
+export const useTokenEndpoint = () => {
+  return useHMSStore(selectAppData(APP_DATA.tokenEndpoint));
+};
+
+export const useLogo = () => {
+  return useHMSStore(selectAppData(APP_DATA.logo));
+};
+
 export const useSubscribedNotifications = notificationKey => {
   const value = useHMSStore(selectAppData(APP_DATA.subscribedNotifications));
   if (value) {
