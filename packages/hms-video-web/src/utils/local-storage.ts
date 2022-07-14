@@ -1,4 +1,4 @@
-import { initializePolyfill } from './local-storage-polyfill';
+import { initializeLocalstoragePolyfill } from './local-storage-polyfill';
 import { isBrowser } from './support';
 
 export class LocalStorage<T> {
@@ -10,8 +10,8 @@ export class LocalStorage<T> {
    * localstorage is not available in SSR, so get it only at time of use
    */
   getStorage() {
-    initializePolyfill();
-    if (isBrowser) {
+    if (isBrowser && !this.storage) {
+      initializeLocalstoragePolyfill();
       this.storage = window.localStorage;
     }
     return this.storage;

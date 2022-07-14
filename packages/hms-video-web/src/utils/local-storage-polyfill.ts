@@ -34,7 +34,7 @@ class LocalStorage {
   }
 }
 
-export const initializePolyfill = () => {
+export const initializeLocalstoragePolyfill = () => {
   if (isBrowser && typeof localStorage === undefined) {
     window.localStorage = new LocalStorage();
   }
