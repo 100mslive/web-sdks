@@ -46,7 +46,14 @@ export const RTMPStreaming = ({ onBack }) => {
 };
 
 const StartRTMP = () => {
-  const [rtmpStreams, setRTMPStreams] = useState([]);
+  const [rtmpStreams, setRTMPStreams] = useState([
+    {
+      name: "Stream",
+      id: Date.now(),
+      rtmpURL: "",
+      streamKey: "",
+    },
+  ]);
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [record, setRecord] = useState(false);
@@ -54,7 +61,11 @@ const StartRTMP = () => {
     <Fragment>
       {rtmpStreams.length > 0 && (
         <Box css={{ px: "$10", overflowY: "auto" }}>
-          <Accordion.Root type="single" collapsible>
+          <Accordion.Root
+            type="single"
+            collapsible
+            defaultValue={rtmpStreams[0].id}
+          >
             {rtmpStreams.map(rtmp => {
               return (
                 <Accordion.Item
@@ -81,25 +92,27 @@ const StartRTMP = () => {
       )}
       <RecordStream record={record} setRecord={setRecord} />
       <Box css={{ p: "$8 $10" }}>
-        <Button
-          variant="standard"
-          outlined
-          icon
-          css={{ mb: "$8", w: "100%" }}
-          onClick={() => {
-            setRTMPStreams(streams => [
-              ...streams,
-              {
-                name: "Stream",
-                id: Date.now(),
-                rtmpURL: "",
-                streamKey: "",
-              },
-            ]);
-          }}
-        >
-          <AddCircleIcon /> Add Stream
-        </Button>
+        {rtmpStreams.length < 3 && (
+          <Button
+            variant="standard"
+            outlined
+            icon
+            css={{ mb: "$8", w: "100%" }}
+            onClick={() => {
+              setRTMPStreams(streams => [
+                ...streams,
+                {
+                  name: "Stream",
+                  id: Date.now(),
+                  rtmpURL: "",
+                  streamKey: "",
+                },
+              ]);
+            }}
+          >
+            <AddCircleIcon /> Add Stream
+          </Button>
+        )}
         <Button
           variant="primary"
           icon
@@ -173,19 +186,6 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
       ref={formRef}
       onSubmit={e => {
         e.preventDefault();
-        const data = new FormData(formRef.current);
-        setRTMPStreams(streams =>
-          streams.map(stream => {
-            if (stream.id === id) {
-              return {
-                ...stream,
-                rtmpURL: data.get("rtmpURL"),
-                streamKey: data.get("streamKey"),
-              };
-            }
-            return stream;
-          })
-        );
       }}
     >
       <FormLabel id="rtmpURL">RTMP URL</FormLabel>
@@ -193,7 +193,17 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
         placeholder="Enter RTMP URL"
         id="rtmpURL"
         name="rtmpURL"
-        defaultValue={rtmpURL}
+        value={rtmpURL}
+        onChange={e => {
+          setRTMPStreams(streams =>
+            updateStream({
+              streams,
+              id,
+              value: e.target.value,
+              key: e.target.name,
+            })
+          );
+        }}
         required
       />
       <FormLabel id="streamKey">Stream Key</FormLabel>
@@ -201,12 +211,19 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
         placeholder="Enter Stream Key"
         id="streamKey"
         name="streamKey"
-        defaultValue={streamKey}
+        Value={streamKey}
+        onChange={e => {
+          setRTMPStreams(streams =>
+            updateStream({
+              streams,
+              id,
+              value: e.target.value,
+              key: e.target.name,
+            })
+          );
+        }}
         required
       />
-      <Button variant="standard" css={{ my: "$8" }}>
-        Save Details
-      </Button>
     </Flex>
   );
 };
@@ -257,3 +274,14 @@ const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
     </Accordion.Header>
   );
 };
+
+const updateStream = ({ streams, id, key, value }) =>
+  streams.map(stream => {
+    if (stream.id === id) {
+      return {
+        ...stream,
+        [key]: value,
+      };
+    }
+    return stream;
+  });
