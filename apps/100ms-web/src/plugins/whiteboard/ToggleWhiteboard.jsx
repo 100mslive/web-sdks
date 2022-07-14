@@ -1,6 +1,7 @@
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/react-ui";
 import { PencilDrawIcon } from "@100mslive/react-icons";
 import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
+import IconButton from "../../IconButton";
 
 export const ToggleWhiteboard = () => {
   const {
