@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrbIcon,
-  ChatIcon,
-  ChatUnreadIcon,
-  HandIcon,
-} from "@100mslive/react-icons";
+import { ChatIcon, ChatUnreadIcon } from "@100mslive/react-icons";
 import {
   selectUnreadHMSMessagesCount,
   useHMSStore,
@@ -16,7 +11,6 @@ import { ScreenshareToggle } from "../ScreenShare";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { useMyMetadata } from "../hooks/useMetadata";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
@@ -27,41 +21,11 @@ import IconButton from "../../IconButton";
 import PIPComponent from "../PIP/PIPComponent";
 import { LeaveRoom } from "../LeaveRoom";
 import GoLiveButton from "../GoLiveButton";
+import MetaActions from "../MetaActions";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
 );
-
-export const MetaActions = ({ isMobile = false }) => {
-  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
-
-  return (
-    <Flex align="center">
-      <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
-        <IconButton
-          css={{ mx: "$4" }}
-          onClick={toggleHandRaise}
-          active={!isHandRaised}
-          data-testid={`${
-            isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
-          }`}
-        >
-          <HandIcon />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`}>
-        <IconButton
-          css={{ mx: "$4" }}
-          onClick={toggleBRB}
-          active={!isBRBOn}
-          data-testid="brb_btn"
-        >
-          <BrbIcon />
-        </IconButton>
-      </Tooltip>
-    </Flex>
-  );
-};
 
 const Chat = () => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
@@ -88,17 +52,39 @@ const Chat = () => {
 
 export const StreamingFooter = () => {
   return (
-    <AppFooter.Root css={{ flexWrap: "nowrap" }}>
-      <AppFooter.Left>
+    <AppFooter.Root
+      css={{
+        flexWrap: "nowrap",
+        "@md": {
+          justifyContent: "center",
+        },
+      }}
+    >
+      <AppFooter.Left
+        css={{
+          "@md": {
+            w: "unset",
+            p: "0",
+          },
+        }}
+      >
         <AudioVideoToggle />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
         <NoiseSuppression />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
       </AppFooter.Left>
-      <AppFooter.Center>
+      <AppFooter.Center
+        css={{
+          "@md": {
+            w: "unset",
+          },
+        }}
+      >
         <ScreenshareToggle css={{ mx: "$4", "@sm": { display: "none" } }} />
-        <PIPComponent />
+        <Box css={{ "@md": { display: "none" } }}>
+          <PIPComponent />
+        </Box>
         <GoLiveButton
           css={{ display: "none", height: "$13", "@sm": { display: "block" } }}
         />

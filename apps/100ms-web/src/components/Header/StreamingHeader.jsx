@@ -27,6 +27,7 @@ import { ParticipantCount } from "./ParticipantList";
 import { AppContext } from "../context/AppContext";
 import { LeaveRoom } from "../LeaveRoom";
 import GoLiveButton from "../GoLiveButton";
+import MetaActions from "../MetaActions";
 
 export const StreamingHeader = ({ isPreview }) => {
   return (
@@ -44,6 +45,9 @@ export const StreamingHeader = ({ isPreview }) => {
       </Flex>
 
       <Flex align="center" css={{ position: "absolute", right: "$10" }}>
+        <Box css={{ display: "none", "@md": { display: "block" } }}>
+          <MetaActions compact />
+        </Box>
         <StreamActions />
         <Box css={{ mx: "$2" }}>
           <ParticipantCount />
