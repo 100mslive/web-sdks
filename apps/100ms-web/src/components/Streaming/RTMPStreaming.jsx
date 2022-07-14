@@ -243,7 +243,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
         placeholder="Enter Stream Key"
         id="streamKey"
         name="streamKey"
-        Value={streamKey}
+        value={streamKey}
         onChange={e => {
           setRTMPStreams(streams =>
             updateStream({
