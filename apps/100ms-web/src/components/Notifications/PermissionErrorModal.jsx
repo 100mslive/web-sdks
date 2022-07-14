@@ -55,7 +55,8 @@ export function PermissionErrorModal() {
           <Dialog.DefaultClose data-testid="dialoge_cross_icon" />
         </Dialog.Title>
         <Text variant="md" css={{ py: "$10" }}>
-          Access to {error} is required. Please grant access to {error}
+          Access to {error} is required. If you didn't get a permission dialog,
+          please try refreshing or open in incognito.
         </Text>
       </Dialog.Content>
     </Dialog.Root>
