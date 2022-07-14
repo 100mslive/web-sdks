@@ -50,18 +50,20 @@ export const RTMPStreaming = ({ onBack }) => {
 };
 
 const StartRTMP = () => {
-  const [rtmpPreference, setRTMPPreference] = useUserPreferences(
+  const [rtmpPreference = [], setRTMPPreference] = useUserPreferences(
     UserPreferencesKeys.RTMP_URLS
   );
   const [rtmpStreams, setRTMPStreams] = useState(
-    rtmpPreference || [
-      {
-        name: "Stream",
-        id: Date.now(),
-        rtmpURL: "",
-        streamKey: "",
-      },
-    ]
+    rtmpPreference.length > 0
+      ? rtmpPreference
+      : [
+          {
+            name: "Stream",
+            id: Date.now(),
+            rtmpURL: "",
+            streamKey: "",
+          },
+        ]
   );
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
