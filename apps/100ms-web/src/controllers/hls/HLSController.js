@@ -141,45 +141,48 @@ export class HLSController {
      */
     this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
       // console.log(`Segment ${frag.relurl}`);
-
-      const tagList = frag?.tagList;
-      const tagsMap = parseTagsList(tagList);
-      // There could be more than one EXT-X-DATERANGE tags in a fragment.
-      const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
-      if (metadataStrings.length > 0) {
-        for (let metadataString of metadataStrings) {
-          const tagMetadata = parseAttributesFromMetadata(metadataString);
-          const timeSegment = getSecondsFromTime(tagMetadata.startTime);
-          /**
-           * a single timestamp can have upto 3 DATERANGE tags.
-           * so we accumulate everything into a single key such that
-           * <timesegment>: [mt1, mt2, mt3]
-           */
-          if (this.metadataByTimeStamp.has(timeSegment)) {
-            // entry already exist in metadatamap
-            const metadataByTimeStampEntries =
-              this.metadataByTimeStamp.get(timeSegment);
-
+      try {
+        const tagList = frag?.tagList;
+        const tagsMap = parseTagsList(tagList);
+        // There could be more than one EXT-X-DATERANGE tags in a fragment.
+        const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
+        if (metadataStrings.length > 0) {
+          for (let metadataString of metadataStrings) {
+            const tagMetadata = parseAttributesFromMetadata(metadataString);
+            const timeSegment = getSecondsFromTime(tagMetadata.startTime);
             /**
-             * Backend will keep sending the same metadata tags in each fragments
-             * until the fragment programtime exceed metadata starttime. so to prevent
-             * same tags getting parsed into metadataMap, we do a quick check here.
+             * a single timestamp can have upto 3 DATERANGE tags.
+             * so we accumulate everything into a single key such that
+             * <timesegment>: [mt1, mt2, mt3]
              */
-            if (
-              !isAlreadyInMetadataMap(metadataByTimeStampEntries, tagMetadata)
-            ) {
-              // append current metadata to existing timestamp
-              this.metadataByTimeStamp.get(timeSegment).push(tagMetadata);
+            if (this.metadataByTimeStamp.has(timeSegment)) {
+              // entry already exist in metadatamap
+              const metadataByTimeStampEntries =
+                this.metadataByTimeStamp.get(timeSegment);
+
+              /**
+               * Backend will keep sending the same metadata tags in each fragments
+               * until the fragment programtime exceed metadata starttime. so to prevent
+               * same tags getting parsed into metadataMap, we do a quick check here.
+               */
+              if (
+                !isAlreadyInMetadataMap(metadataByTimeStampEntries, tagMetadata)
+              ) {
+                // append current metadata to existing timestamp
+                this.metadataByTimeStamp.get(timeSegment).push(tagMetadata);
+              }
+            } else {
+              // no entry in metadataMap exist. So add a new entry
+              this.metadataByTimeStamp.set(timeSegment, [
+                {
+                  ...tagMetadata,
+                },
+              ]);
             }
-          } else {
-            // no entry in metadataMap exist. So add a new entry
-            this.metadataByTimeStamp.set(timeSegment, [
-              {
-                ...tagMetadata,
-              },
-            ]);
           }
         }
+      } catch (e) {
+        console.error("Error in extracting timemetadata", e);
       }
     });
 
@@ -281,6 +284,7 @@ export class HLSController {
       enableWorker: true,
       maxBufferLength: 20,
       backBufferLength: 10,
+      debug: true,
     };
   }
 }
