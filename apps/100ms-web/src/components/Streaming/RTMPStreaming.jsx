@@ -97,7 +97,7 @@ const StartRTMP = () => {
                     rtmp={rtmp}
                     setRTMPStreams={setRTMPStreams}
                   />
-                  <Accordion.Content css={{ px: "$8", py: 0, mb: "$8" }}>
+                  <Accordion.Content css={{ px: "$8", py: 0 }}>
                     <RTMPForm {...rtmp} setRTMPStreams={setRTMPStreams} />
                   </Accordion.Content>
                 </Accordion.Item>
@@ -143,8 +143,9 @@ const StartRTMP = () => {
           icon
           css={{ w: "100%", my: "$4" }}
           disabled={
-            rtmpStreams.length === 0 ||
-            rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)
+            (rtmpStreams.length === 0 ||
+              rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
+            !record
           }
           onClick={async () => {
             try {
@@ -215,6 +216,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
       as="form"
       id={id}
       direction="column"
+      css={{ mb: "$8" }}
       ref={formRef}
       onSubmit={e => {
         e.preventDefault();
