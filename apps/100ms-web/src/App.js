@@ -128,7 +128,6 @@ export function EdtechComponent({
                   : { h: "100%" }),
               }}
             >
-              <AppData appDetails={metadata} recordingUrl={recordingUrl} />
               <AppRoutes
                 getUserToken={getUserTokenCallback}
                 getDetails={getDetails}
@@ -225,6 +224,7 @@ const RouteList = ({ getUserToken, getDetails }) => {
 function AppRoutes({ getUserToken, appDetails, recordingUrl, getDetails }) {
   return (
     <Router>
+      <AppData appDetails={appDetails} recordingUrl={recordingUrl} />
       <ToastContainer />
       <Notifications />
       <Confetti />

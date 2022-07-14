@@ -5,6 +5,10 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { useSidepaneReset, useSidepaneState } from "./useSidepane";
+import {
+  UserPreferencesKeys,
+  useUserPreferences,
+} from "../hooks/useUserPreferences";
 import { getMetadata } from "../../common/utils";
 import {
   APP_DATA,
@@ -23,19 +27,29 @@ export const getAppDetails = appDetails => {
   }
 };
 
+let initCalled = false;
 export function AppData({ appDetails, recordingUrl }) {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const sidePane = useSidepaneState();
   const resetSidePane = useSidepaneReset();
+  const [preferences] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
+  const { subscribedNotifications = {}, ...uiSettings } = preferences || {};
 
   useEffect(() => {
-    if (!isConnected && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
+    if (
+      !isConnected &&
+      sidePane &&
+      sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS
+    ) {
       resetSidePane();
     }
   }, [isConnected, sidePane, resetSidePane]);
 
   useEffect(() => {
+    if (initCalled) {
+      return;
+    }
     const initialAppData = {
       [APP_DATA.uiSettings]: {
         [UI_SETTINGS.isAudioOnly]: false,
@@ -44,6 +58,7 @@ export function AppData({ appDetails, recordingUrl }) {
         [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
         [UI_SETTINGS.showStatsOnTiles]: false,
         [UI_SETTINGS.enableAmbientMusic]: false,
+        ...uiSettings,
       },
       [APP_DATA.subscribedNotifications]: {
         PEER_JOINED: false,
@@ -51,6 +66,7 @@ export function AppData({ appDetails, recordingUrl }) {
         NEW_MESSAGE: true,
         ERROR: true,
         METADATA_UPDATED: true,
+        ...subscribedNotifications,
       },
       [APP_DATA.chatOpen]: false,
       [APP_DATA.chatDraft]: "",
@@ -62,7 +78,14 @@ export function AppData({ appDetails, recordingUrl }) {
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     hmsActions.initAppData(initialAppData);
-  }, [hmsActions, appDetails, recordingUrl]);
+    initCalled = true;
+  }, [
+    appDetails,
+    hmsActions,
+    recordingUrl,
+    subscribedNotifications,
+    uiSettings,
+  ]);
 
   return null;
 }
