@@ -5,8 +5,11 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { useSidepaneReset, useSidepaneState } from "./useSidepane";
+import { getMetadata } from "../../common/utils";
 import {
   APP_DATA,
+  DEFAULT_HLS_ROLE_KEY,
+  DEFAULT_HLS_VIEWER_ROLE,
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
@@ -38,10 +41,9 @@ export function AppData({ appDetails, recordingUrl }) {
         [UI_SETTINGS.isAudioOnly]: false,
         [UI_SETTINGS.isHeadless]: false,
         [UI_SETTINGS.maxTileCount]: 9,
-        maxTileCount: 9,
-        uiViewMode: UI_MODE_GRID,
-        showStatsOnTiles: false,
-        enableAmbientMusic: false,
+        [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
+        [UI_SETTINGS.showStatsOnTiles]: false,
+        [UI_SETTINGS.enableAmbientMusic]: false,
       },
       [APP_DATA.subscribedNotifications]: {
         PEER_JOINED: false,
@@ -54,6 +56,9 @@ export function AppData({ appDetails, recordingUrl }) {
       [APP_DATA.chatDraft]: "",
       [APP_DATA.sidePane]: "",
       [APP_DATA.recordingUrl]: recordingUrl,
+      [APP_DATA.hlsViewerRole]:
+        getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
+        DEFAULT_HLS_VIEWER_ROLE,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     hmsActions.initAppData(initialAppData);

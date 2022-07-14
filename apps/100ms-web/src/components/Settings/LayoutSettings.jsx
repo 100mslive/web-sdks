@@ -18,15 +18,7 @@ export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [isAudioOnly, setIsAudioOnly] = useSetUiSettings(
-    UI_SETTINGS.isAudioOnly
-  );
-  const [maxTileCount, setMaxTileCount] = useSetUiSettings(
-    UI_SETTINGS.maxTileCount
-  );
-  const { uiViewMode, setuiViewMode } = useSetUiSettings(
-    UI_SETTINGS.uiViewMode
-  );
+  const [uiSettings, setUISettings] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn) {
@@ -34,17 +26,20 @@ export const LayoutSettings = () => {
         isLocalVideoEnabled && (await hmsActions.setLocalVideoEnabled(false));
         isLocalScreenShared && (await hmsActions.setScreenShareEnabled(false));
       }
-      setIsAudioOnly(isAudioOnlyModeOn);
+      setUISettings(isAudioOnlyModeOn, UI_SETTINGS.isAudioOnly);
     },
-    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setIsAudioOnly]
+    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings]
   );
 
   return (
     <Fragment>
       <SwitchWithLabel
-        checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
+        checked={uiSettings.uiViewMode === UI_MODE_ACTIVE_SPEAKER}
         onChange={value => {
-          setuiViewMode(value ? UI_MODE_ACTIVE_SPEAKER : UI_MODE_GRID);
+          setUISettings(
+            value ? UI_MODE_ACTIVE_SPEAKER : UI_MODE_GRID,
+            UI_SETTINGS.uiViewMode
+          );
         }}
         id="activeSpeakerMode"
         label="Active Speaker Mode"
@@ -52,7 +47,7 @@ export const LayoutSettings = () => {
       <SwitchWithLabel
         label="Audio Only Mode"
         id="audioOnlyMode"
-        checked={isAudioOnly}
+        checked={uiSettings.isAudioOnly}
         onChange={toggleIsAudioOnly}
       />
       <Flex
@@ -60,16 +55,16 @@ export const LayoutSettings = () => {
         css={{ w: "100%", my: "$2", py: "$8", "@md": { display: "none" } }}
       >
         <Text variant="md" css={{ fontWeight: "$semiBold" }}>
-          Tiles In View({maxTileCount})
+          Tiles In View({uiSettings.maxTileCount})
         </Text>
         <Flex justify="end" css={{ flex: "1 1 0" }}>
           <Slider
             step={1}
-            value={[maxTileCount]}
+            value={[uiSettings.maxTileCount]}
             min={1}
             max={49}
             onValueChange={e => {
-              setMaxTileCount(e[0]);
+              setUISettings(e[0], UI_SETTINGS.maxTileCount);
             }}
             css={{ w: "70%" }}
           />

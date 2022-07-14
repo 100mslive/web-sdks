@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import LogRocket from "logrocket";
 import {
   useHMSNotifications,
@@ -11,19 +11,23 @@ import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { ToastManager } from "../Toast/ToastManager";
-import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
-import { getMetadata } from "../../common/utils";
 import { ToastBatcher } from "../Toast/ToastBatcher";
-import { useIsHeadless } from "../AppData/useUISettings";
+import {
+  useHLSViewerRole,
+  useIsHeadless,
+  useSubscribedNotifications,
+} from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
+import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigation();
-  const { subscribedNotifications, HLS_VIEWER_ROLE } = useContext(AppContext);
+  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const subscribedNotifications = useSubscribedNotifications();
   const isHeadless = useIsHeadless();
   useEffect(() => {
     if (!notification) {

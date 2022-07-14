@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   AlertOctagonIcon,
   ChatIcon,
@@ -8,7 +8,7 @@ import {
 } from "@100mslive/react-icons";
 import { Box } from "@100mslive/react-ui";
 import SwitchWithLabel from "./SwitchWithLabel";
-import { AppContext } from "../context/AppContext";
+import { useSetSubscribedNotifications } from "../AppData/useUISettings";
 
 const NotificationItem = ({ onChange, type, label, icon, checked }) => {
   return (
@@ -18,18 +18,15 @@ const NotificationItem = ({ onChange, type, label, icon, checked }) => {
       icon={icon}
       checked={checked}
       onChange={value => {
-        onChange({
-          type,
-          isSubscribed: value,
-        });
+        onChange(value, type);
       }}
     />
   );
 };
 
 export const NotificationSettings = () => {
-  const { subscribedNotifications, setSubscribedNotifications } =
-    useContext(AppContext);
+  const [subscribedNotifications, setSubscribedNotifications] =
+    useSetSubscribedNotifications();
 
   return (
     <Box>

@@ -17,7 +17,7 @@ import { useCallback } from "react";
  * @param {string | undefined} uiSettingKey
  */
 export const useUISettings = uiSettingKey => {
-  let value = useHMSStore(selectAppData(APP_DATA.uiSettings));
+  const value = useHMSStore(selectAppData(APP_DATA.uiSettings));
   if (value) {
     return uiSettingKey ? value[uiSettingKey] : value;
   }
@@ -33,22 +33,55 @@ export const useUISettings = uiSettingKey => {
  * @param {string} uiSettingKey
  */
 export const useSetUiSettings = uiSettingKey => {
-  const actions = useHMSActions();
-  let value = useUISettings(uiSettingKey);
-  const setValue = useCallback(
-    newValue => {
-      actions.setAppData(
-        APP_DATA.uiSettings,
-        { [uiSettingKey]: newValue },
-        true
-      );
-    },
-    [actions, uiSettingKey]
-  );
+  const value = useUISettings(uiSettingKey);
+  const setValue = useSetAppData({
+    appDataKey: APP_DATA.uiSettings,
+    key: uiSettingKey,
+  });
   return [value, setValue];
 };
 
 export const useIsHeadless = () => {
   const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
   return isHeadless;
+};
+
+export const useHLSViewerRole = () => {
+  return useHMSStore(selectAppData(APP_DATA.hlsViewerRole));
+};
+
+export const useSubscribedNotifications = notificationKey => {
+  const value = useHMSStore(selectAppData(APP_DATA.subscribedNotifications));
+  if (value) {
+    return notificationKey ? value[notificationKey] : value;
+  }
+};
+
+export const useSetSubscribedNotifications = notificationKey => {
+  const value = useSubscribedNotifications(notificationKey);
+  const setValue = useSetAppData({
+    appDataKey: APP_DATA.subscribedNotifications,
+    key: notificationKey,
+  });
+  return [value, setValue];
+};
+
+const useSetAppData = ({ appDataKey, key }) => {
+  const actions = useHMSActions();
+  const setValue = useCallback(
+    (value, type) => {
+      if (!appDataKey || (!key && !type)) {
+        return;
+      }
+      actions.setAppData(
+        appDataKey,
+        {
+          [key || type]: value,
+        },
+        true
+      );
+    },
+    [actions, appDataKey, key]
+  );
+  return setValue;
 };

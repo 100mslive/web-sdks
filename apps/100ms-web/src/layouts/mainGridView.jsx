@@ -6,14 +6,16 @@ import {
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
+import { useUISettings } from "../components/AppData/useUISettings";
 import { AppContext } from "../components/context/AppContext";
+import { UI_SETTINGS } from "../common/constants";
 
 export const MainGridView = () => {
   const {
-    maxTileCount,
     appPolicyConfig: { center: centerRoles = [], sidepane: sidepaneRoles = [] },
-    showStatsOnTiles,
   } = useContext(AppContext);
+  const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
+  const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const peers = useHMSStore(selectPeers);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));

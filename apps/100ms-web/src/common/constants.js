@@ -111,6 +111,7 @@ export const APP_DATA = {
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
   sidePane: "sidePane",
+  hlsViewerRole: "hlsViewerRole",
   subscribedNotifications: "subscribedNotifications",
 };
 export const UI_SETTINGS = {
@@ -118,6 +119,8 @@ export const UI_SETTINGS = {
   isHeadless: "isHeadless",
   maxTileCount: "maxTileCount",
   uiViewMode: "uiViewMode",
+  showStatsOnTiles: "showStatsOnTiles",
+  enableAmbientMusic: "enableAmbientMusic",
 };
 
 export const SIDE_PANE_OPTIONS = {
