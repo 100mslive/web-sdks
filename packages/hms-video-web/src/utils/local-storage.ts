@@ -4,14 +4,13 @@ import { isBrowser } from './support';
 export class LocalStorage<T> {
   private storage: Storage | null = null;
 
-  constructor(public readonly key: string) {
-    initializePolyfill();
-  }
+  constructor(public readonly key: string) {}
 
   /**
    * localstorage is not available in SSR, so get it only at time of use
    */
   getStorage() {
+    initializePolyfill();
     if (isBrowser) {
       this.storage = window.localStorage;
     }
