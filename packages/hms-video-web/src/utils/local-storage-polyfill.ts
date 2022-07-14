@@ -1,3 +1,5 @@
+import { isBrowser } from './support';
+
 class LocalStorage {
   valuesMap = new Map();
   getItem(key: string) {
@@ -32,8 +34,8 @@ class LocalStorage {
   }
 }
 
-if (!window.localStorage) {
-  window.localStorage = new LocalStorage();
-}
-
-export {};
+export const initializePolyfill = () => {
+  if (isBrowser && typeof localStorage === undefined) {
+    window.localStorage = new LocalStorage();
+  }
+};

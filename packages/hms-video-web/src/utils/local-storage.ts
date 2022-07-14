@@ -1,9 +1,12 @@
+import { initializePolyfill } from './local-storage-polyfill';
 import { isBrowser } from './support';
 
 export class LocalStorage<T> {
   private storage: Storage | null = null;
 
-  constructor(public readonly key: string) {}
+  constructor(public readonly key: string) {
+    initializePolyfill();
+  }
 
   /**
    * localstorage is not available in SSR, so get it only at time of use
