@@ -14,6 +14,7 @@ import {
   useUserPreferences,
 } from "../hooks/useUserPreferences";
 import { getMetadata } from "../../common/utils";
+import { normalizeAppPolicyConfig } from "../init/initUtils";
 import {
   APP_DATA,
   DEFAULT_HLS_ROLE_KEY,
@@ -24,7 +25,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from "../../common/constants";
-import { normalizeAppPolicyConfig } from "../init/initUtils";
 
 export const getAppDetails = appDetails => {
   try {
