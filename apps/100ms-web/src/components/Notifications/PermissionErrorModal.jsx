@@ -9,11 +9,7 @@ export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [error, setError] = useState("");
   useEffect(() => {
-    if (
-      !notification ||
-      notification.data?.code !== 3001 ||
-      notification.data?.message.includes("screen")
-    ) {
+    if (!notification || notification.data?.code !== 3001) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
