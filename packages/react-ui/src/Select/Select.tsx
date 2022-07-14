@@ -19,7 +19,7 @@ const SelectRoot = styled('select', {
   fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
-  color: '$textPrimary',
+  color: '$textAccentHigh',
   padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
@@ -36,7 +36,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$textPrimary',
+  color: '$textAccentMedium',
   width: '30px',
   height: '100%',
   position: 'absolute',
