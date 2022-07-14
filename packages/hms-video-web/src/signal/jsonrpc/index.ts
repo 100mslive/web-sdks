@@ -95,7 +95,7 @@ export default class JsonRpcSignal implements ISignal {
     return this.pongResponseTimes.toList();
   }
 
-  private async call<T>(method: string, params: any): Promise<T> {
+  private async internalCall<T>(method: string, params: any): Promise<T> {
     const id = uuid();
     const message = { method, params, id, jsonrpc: '2.0' } as JsonRpcRequest;
 
@@ -190,7 +190,7 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
-    const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
+    const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -209,7 +209,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async offer(desc: RTCSessionDescriptionInit, tracks: Map<string, any>): Promise<RTCSessionDescriptionInit> {
-    const response = await this.callWithRetry(HMSSignalMethod.OFFER, {
+    const response = await this.call(HMSSignalMethod.OFFER, {
       desc,
       tracks: Object.fromEntries(tracks),
     });
@@ -225,7 +225,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async broadcast(message: Message) {
-    return await this.callWithRetry<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
+    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
       version: '1.0',
       ...message.toSignalParams(),
     });
@@ -236,7 +236,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async endRoom(lock: boolean, reason: string) {
-    await this.callWithRetry(HMSSignalMethod.END_ROOM, { lock, reason });
+    await this.call(HMSSignalMethod.END_ROOM, { lock, reason });
   }
 
   sendEvent(event: AnalyticsEvent) {
@@ -253,7 +253,7 @@ export default class JsonRpcSignal implements ISignal {
         resolve(Date.now() - pingTime);
       }, timeout + 1);
     });
-    const pongTimeDiff = this.call(HMSSignalMethod.PING, { timestamp: pingTime })
+    const pongTimeDiff = this.internalCall(HMSSignalMethod.PING, { timestamp: pingTime })
       .then(() => Date.now() - pingTime)
       .catch(() => Date.now() - pingTime);
 
@@ -261,47 +261,47 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async requestRoleChange(params: RequestForRoleChangeParams) {
-    await this.callWithRetry(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+    await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
   }
 
   async acceptRoleChangeRequest(params: AcceptRoleChangeParams) {
-    await this.callWithRetry(HMSSignalMethod.ROLE_CHANGE, params);
+    await this.call(HMSSignalMethod.ROLE_CHANGE, params);
   }
 
   async requestTrackStateChange(params: TrackUpdateRequestParams) {
-    await this.callWithRetry(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
+    await this.call(HMSSignalMethod.TRACK_UPDATE_REQUEST, params);
   }
 
   async requestMultiTrackStateChange(params: MultiTrackUpdateRequestParams) {
-    await this.callWithRetry(HMSSignalMethod.CHANGE_TRACK_MUTE_STATE_REQUEST, params);
+    await this.call(HMSSignalMethod.CHANGE_TRACK_MUTE_STATE_REQUEST, params);
   }
 
   async removePeer(params: RemovePeerRequest) {
-    await this.callWithRetry(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
+    await this.call(HMSSignalMethod.PEER_LEAVE_REQUEST, params);
   }
 
   async startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams) {
-    await this.callWithRetry(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
   }
 
   async stopRTMPAndRecording() {
-    await this.callWithRetry(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
+    await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
   }
 
   async startHLSStreaming(params: HLSRequestParams): Promise<void> {
-    await this.callWithRetry(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
   }
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
-    await this.callWithRetry(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
   }
 
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
-    await this.callWithRetry(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
-    await this.callWithRetry(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
   private onCloseHandler(event: CloseEvent) {
@@ -393,14 +393,14 @@ export default class JsonRpcSignal implements ISignal {
     }
   }
 
-  private async callWithRetry<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
+  private async call<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
     let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
 
     for (let i = 0; i < MAX_RETRIES; i++) {
       try {
         HMSLogger.d(this.TAG, `Try number ${i + 1} sending ${method}`, params);
-        return await this.call(method, params);
+        return await this.internalCall(method, params);
       } catch (err) {
         error = err as HMSException;
         HMSLogger.e(this.TAG, `Failed sending ${method}`, { method, try: i + 1, params, error });
