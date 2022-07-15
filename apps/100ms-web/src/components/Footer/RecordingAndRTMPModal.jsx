@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { Fragment, useCallback, useMemo, useState } from "react";
 import {
   selectAppData,
   selectPermissions,
@@ -7,7 +7,7 @@ import {
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { RecordIcon } from "@100mslive/react-icons";
-import { Button, Text, Dialog, Box } from "@100mslive/react-ui";
+import { Button, Text, Dialog, Box, Tooltip } from "@100mslive/react-ui";
 import LogRocket from "logrocket";
 import {
   DialogCheckbox,
@@ -16,7 +16,7 @@ import {
   DialogRow,
 } from "../../primitives/DialogContent";
 import { ToastManager } from "../Toast/ToastManager";
-import { ResolutionInput } from "./ResolutionInput";
+import { ResolutionInput } from "../MoreSettings/ResolutionInput";
 import {
   APP_DATA,
   QUERY_PARAM_SKIP_PREVIEW,
@@ -28,7 +28,7 @@ const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") +
   `?${QUERY_PARAM_SKIP_PREVIEW}=true`;
 
-export const RecordingAndRTMPModal = ({ onOpenChange }) => {
+const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const {
@@ -205,5 +205,28 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
         </Box>
       </DialogContent>
     </Dialog.Root>
+  );
+};
+
+export const RecordingStreaming = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <Fragment>
+      <Tooltip title="Start/Stop streaming/recording">
+        <Button
+          variant="primary"
+          icon
+          onClick={() => {
+            setShowModal(true);
+          }}
+        >
+          <RecordIcon />
+          <Box css={{ "@lg": { display: "none" } }}>Start Streaming</Box>
+        </Button>
+      </Tooltip>
+
+      {showModal && <RecordingAndRTMPModal onOpenChange={setShowModal} />}
+    </Fragment>
   );
 };
