@@ -9,8 +9,8 @@ import {
 } from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
-import { FeatureFlags } from "../services/FeatureFlags";
 import IconButton from "../IconButton";
+import { FeatureFlags } from "../services/FeatureFlags";
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);

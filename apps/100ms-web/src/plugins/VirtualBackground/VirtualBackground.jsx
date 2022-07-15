@@ -7,8 +7,8 @@ import {
 } from "@100mslive/react-sdk";
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
-import { getRandomVirtualBackground } from "./vbutils";
 import IconButton from "../../IconButton";
+import { getRandomVirtualBackground } from "./vbutils";
 
 export const VirtualBackground = () => {
   const pluginRef = useRef(null);

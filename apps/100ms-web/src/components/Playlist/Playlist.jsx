@@ -12,8 +12,8 @@ import {
 import { Dropdown, Text, Flex, Tooltip, Box } from "@100mslive/react-ui";
 import { PlaylistItem } from "./PlaylistItem";
 import { AudioPlaylistControls } from "./PlaylistControls";
-import { usePlaylist } from "../hooks/usePlaylist";
 import IconButton from "../../IconButton";
+import { usePlaylist } from "../hooks/usePlaylist";
 
 const BrowseAndPlayFromLocal = ({ type, actions }) => {
   return (

@@ -5,10 +5,10 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { Tooltip } from "@100mslive/react-ui";
-import { UI_SETTINGS } from "../common/constants";
-import { isScreenshareSupported } from "../common/utils";
-import { useUISettings } from "./AppData/useUISettings";
 import IconButton from "../IconButton";
+import { useUISettings } from "./AppData/useUISettings";
+import { isScreenshareSupported } from "../common/utils";
+import { UI_SETTINGS } from "../common/constants";
 
 export const ScreenshareToggle = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);

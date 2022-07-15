@@ -12,10 +12,10 @@ import { Box, Flex } from "@100mslive/react-ui";
 import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
-import { useIsHeadless } from "./AppData/useUISettings";
 import { ConferencingFooter } from "./Footer/ConferencingFooter";
 import { ConferencingHeader } from "./Header/ConferencingHeader";
 import { useNavigation } from "./hooks/useNavigation";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const Conference = () => {
   const navigate = useNavigation();
