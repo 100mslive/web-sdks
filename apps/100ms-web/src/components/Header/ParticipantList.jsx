@@ -33,12 +33,12 @@ import {
 import { RoleChangeModal } from "../RoleChangeModal";
 import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
 import { ParticipantFilter } from "./ParticipantFilter";
+import IconButton from "../../IconButton";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
 } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
-import IconButton from "../../IconButton";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -122,6 +122,7 @@ export const ParticipantCount = () => {
   }
   return (
     <IconButton
+      css={{ w: "auto", px: "$4" }}
       onClick={() => {
         if (peerCount > 0) {
           toggleSidepane();
