@@ -2,16 +2,14 @@ import React, { ComponentProps } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
-import { styled } from '../Theme';
-import { toastAnimation } from '../utils';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
-
-import { CSS } from '@stitches/react';
+import { styled } from '../Theme';
+import { toastAnimation } from '../utils';
 
 const getToastVariant = (base: string) => {
   return {
-    borderColor: base,
+    borderLeftColor: base,
     borderLeft: 0,
     '&:before': {
       position: 'absolute',
@@ -40,7 +38,6 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   position: 'relative',
   fontFamily: '$sans',
   border: 'solid $space$px $borderLight',
-
   overflow: 'hidden',
   ...toastAnimation,
   variants: {
@@ -49,23 +46,6 @@ const ToastRoot = styled(ToastPrimitives.Root, {
       warning: getToastVariant('$warning'),
       error: getToastVariant('$error'),
       success: getToastVariant('$success'),
-
-  ...toastAnimation,
-  variants: {
-    variant: {
-      standard: {
-        borderLeft: 'solid $space$4 $secondaryDefault',
-      },
-      warning: {
-        borderLeft: 'solid $space$4 $warning',
-      },
-      error: {
-        borderLeft: 'solid $space$4 $error',
-      },
-      success: {
-        borderLeft: 'solid $space$4 $success',
-      },
-
     },
   },
   defaultVariants: {

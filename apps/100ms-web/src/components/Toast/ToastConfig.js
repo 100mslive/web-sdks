@@ -1,4 +1,3 @@
-
 import {
   HandIcon,
   PersonIcon,
@@ -6,7 +5,6 @@ import {
   ConnectivityIcon,
   PoorConnectivityIcon,
 } from "@100mslive/react-icons";
-
 
 export const ToastConfig = {
   PEER_LIST: {
@@ -96,7 +94,7 @@ export const ToastConfig = {
     },
   },
   RECONNECTED: {
-    single: notification => {
+    single: () => {
       return {
         title: `You are now connected`,
         icon: <ConnectivityIcon />,
@@ -106,7 +104,7 @@ export const ToastConfig = {
     },
   },
   RECONNECTING: {
-    single: notification => {
+    single: () => {
       return {
         title: `You are offline for now. while we try to reconnect, please check
         your internet connection.
@@ -115,7 +113,6 @@ export const ToastConfig = {
         variant: "warning",
         duration: 10000,
       };
-
     },
   },
 };
