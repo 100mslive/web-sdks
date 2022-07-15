@@ -12,7 +12,6 @@ import { useIsHeadless } from "./AppData/useUISettings";
 const List = ({
   maxTileCount,
   peers,
-  showStatsOnTiles,
   maxColCount,
   maxRowCount,
   includeScreenShareForPeer,
@@ -52,7 +51,6 @@ const List = ({
                   {tiles.map((tile, i) =>
                     tile.track?.source === "screen" ? (
                       <ScreenshareTile
-                        showStatsOnTiles={showStatsOnTiles}
                         key={tile.track.id}
                         width={tile.width}
                         height={tile.height}
@@ -60,7 +58,6 @@ const List = ({
                       />
                     ) : (
                       <VideoTile
-                        showStatsOnTiles={showStatsOnTiles}
                         key={tile.track?.id || tile.peer.id}
                         width={tile.width}
                         height={tile.height}

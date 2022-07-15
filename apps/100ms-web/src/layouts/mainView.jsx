@@ -31,8 +31,7 @@ export const ConferenceMainView = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   useBeamAutoLeave();
   const hmsActions = useHMSActions();
-  const { uiViewMode, HLS_VIEWER_ROLE, showStatsOnTiles, isAudioOnly } =
-    useUISettings();
+  const { uiViewMode, HLS_VIEWER_ROLE, isAudioOnly } = useUISettings();
 
   useEffect(() => {
     if (!isConnected) {
@@ -77,7 +76,7 @@ export const ConferenceMainView = () => {
   return (
     <Suspense fallback={<FullPageProgress />}>
       <Flex css={{ size: "100%", position: "relative" }}>
-        <ViewComponent showStats={showStatsOnTiles} />
+        <ViewComponent />
         <SidePane />
       </Flex>
     </Suspense>
