@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Box, VerticalDivider } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { Logo, SpeakerTag } from "./HeaderComponents";
-import { StreamActions } from "./StreamActions";
+import { AdditionalRoomState } from "./AdditionalRoomState";
 
 export const ConferencingHeader = ({ isPreview }) => {
   return (
@@ -18,7 +18,7 @@ export const ConferencingHeader = ({ isPreview }) => {
       </Flex>
 
       <Flex align="center" css={{ position: "absolute", right: "$10" }}>
-        <StreamActions />
+        <AdditionalRoomState />
         <Box css={{ mx: "$2" }}>
           <ParticipantCount />
         </Box>
