@@ -7,8 +7,8 @@ import { Dialog, Text } from "@100mslive/react-ui";
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
-  const [error, setError] = useState("");
-  const [systemError, setSystemError] = useState(false);
+  const [deviceType, setDeviceType] = useState("");
+  const [isSystemError, setIsSystemError] = useState(false);
   useEffect(() => {
     if (
       !notification ||
@@ -18,7 +18,7 @@ export function PermissionErrorModal() {
     ) {
       return;
     }
-    console.debug(`[${notification.type}]`, notification);
+    console.error(`[${notification.type}]`, notification);
     const errorMessage = notification.data?.message;
     const hasAudio = errorMessage.includes("audio");
     const hasVideo = errorMessage.includes("video");
@@ -33,15 +33,15 @@ export function PermissionErrorModal() {
     } else if (hasScreen) {
       deviceType = "Screenshare";
     }
-    setError(deviceType);
-    setSystemError(notification.data.code === 3011);
+    setDeviceType(deviceType);
+    setIsSystemError(notification.data.code === 3011);
   }, [notification]);
-  return error ? (
+  return deviceType ? (
     <Dialog.Root
-      open={error}
+      open
       onOpenChange={value => {
         if (!value) {
-          setError("");
+          setDeviceType("");
         }
       }}
     >
@@ -56,7 +56,7 @@ export function PermissionErrorModal() {
           }}
         >
           <Text css={{ fontWeight: "$semiBold" }}>
-            {error} permissions are blocked
+            {deviceType} permissions are blocked
           </Text>
           <Dialog.DefaultClose
             data-testid="dialoge_cross_icon"
@@ -64,9 +64,9 @@ export function PermissionErrorModal() {
           />
         </Dialog.Title>
         <Text variant="md" css={{ py: "$10" }}>
-          Access to {error} is required.
-          {systemError
-            ? `Enable permissions for ${error} from sytem settings`
+          Access to {deviceType} is required.&nbsp;
+          {isSystemError
+            ? `Enable permissions for ${deviceType} from sytem settings`
             : "If you didn't get a permission dialog, please try refreshing or open in incognito window."}
         </Text>
       </Dialog.Content>
