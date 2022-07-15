@@ -23,17 +23,15 @@ export function PermissionErrorModal() {
     const hasAudio = errorMessage.includes("audio");
     const hasVideo = errorMessage.includes("video");
     const hasScreen = errorMessage.includes("screen");
-    let deviceType;
     if (hasAudio && hasVideo) {
-      deviceType = "Camera and Microphone";
+      setDeviceType("Camera and Microphone");
     } else if (hasAudio) {
-      deviceType = "Microphone";
+      setDeviceType("Microphone");
     } else if (hasVideo) {
-      deviceType = "Camera";
+      setDeviceType("Camera");
     } else if (hasScreen) {
-      deviceType = "Screenshare";
+      setDeviceType("Screenshare");
     }
-    setDeviceType(deviceType);
     setIsSystemError(notification.data.code === 3011);
   }, [notification]);
   return deviceType ? (
