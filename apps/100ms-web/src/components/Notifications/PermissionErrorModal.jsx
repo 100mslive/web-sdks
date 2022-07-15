@@ -12,7 +12,9 @@ export function PermissionErrorModal() {
   useEffect(() => {
     if (
       !notification ||
-      (notification.data?.code !== 3001 && notification.data?.code !== 3011)
+      (notification.data?.code !== 3001 && notification.data?.code !== 3011) ||
+      (notification.data?.code === 3001 &&
+        notification.data?.message.includes("screen"))
     ) {
       return;
     }
@@ -20,6 +22,7 @@ export function PermissionErrorModal() {
     const errorMessage = notification.data?.message;
     const hasAudio = errorMessage.includes("audio");
     const hasVideo = errorMessage.includes("video");
+    const hasScreen = errorMessage.includes("screen");
     let deviceType;
     if (hasAudio && hasVideo) {
       deviceType = "Camera and Microphone";
@@ -27,6 +30,8 @@ export function PermissionErrorModal() {
       deviceType = "Microphone";
     } else if (hasVideo) {
       deviceType = "Camera";
+    } else if (hasScreen) {
+      deviceType = "Screenshare";
     }
     setError(deviceType);
     setSystemError(notification.data.code === 3011);
