@@ -107,7 +107,8 @@ export function Notifications() {
         // Autoplay error or user denied screen share(cancelled browser pop-up)
         if (
           notification.data?.code === 3008 ||
-          notification.data?.code === 3001
+          notification.data?.code === 3001 ||
+          notification.data?.code === 3011
         ) {
           return;
         }

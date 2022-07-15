@@ -12,8 +12,7 @@ export function PermissionErrorModal() {
   useEffect(() => {
     if (
       !notification ||
-      notification.data?.code !== 3001 ||
-      notification.data?.code !== 3011
+      (notification.data?.code !== 3001 && notification.data?.code !== 3011)
     ) {
       return;
     }
@@ -54,7 +53,10 @@ export function PermissionErrorModal() {
           <Text css={{ fontWeight: "$semiBold" }}>
             {error} permissions are blocked
           </Text>
-          <Dialog.DefaultClose data-testid="dialoge_cross_icon" />
+          <Dialog.DefaultClose
+            data-testid="dialoge_cross_icon"
+            css={{ alignSelf: "start" }}
+          />
         </Dialog.Title>
         <Text variant="md" css={{ py: "$10" }}>
           Access to {error} is required.
