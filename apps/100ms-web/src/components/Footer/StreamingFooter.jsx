@@ -1,54 +1,21 @@
 import React from "react";
-import { ChatIcon, ChatUnreadIcon } from "@100mslive/react-icons";
-import {
-  selectUnreadHMSMessagesCount,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { Flex, Tooltip, Footer as AppFooter, Box } from "@100mslive/react-ui";
+import { Flex, Footer as AppFooter, Box } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
 import { ScreenshareToggle } from "../ScreenShare";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import {
-  useIsSidepaneTypeOpen,
-  useSidepaneToggle,
-} from "../AppData/useSidepane";
-import { FeatureFlags } from "../../services/FeatureFlags";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
-import IconButton from "../../IconButton";
 import PIPComponent from "../PIP/PIPComponent";
 import { LeaveRoom } from "../LeaveRoom";
 import GoLiveButton from "../GoLiveButton";
 import MetaActions from "../MetaActions";
+import { ChatToggle } from "./ChatToggle";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
 );
-
-const Chat = () => {
-  const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-
-  return (
-    <Tooltip key="chat" title={`${isChatOpen ? "Close" : "Open"} chat`}>
-      <IconButton
-        css={{ mx: "$4" }}
-        onClick={toggleChat}
-        active={!isChatOpen}
-        data-testid="chat_btn"
-      >
-        {countUnreadMessages === 0 ? (
-          <ChatIcon />
-        ) : (
-          <ChatUnreadIcon data-testid="chat_unread_btn" />
-        )}
-      </IconButton>
-    </Tooltip>
-  );
-};
 
 export const StreamingFooter = () => {
   return (
@@ -94,12 +61,12 @@ export const StreamingFooter = () => {
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}
         >
-          <Chat />
+          <ChatToggle />
         </Flex>
       </AppFooter.Center>
       <AppFooter.Right>
         <MetaActions />
-        <Chat />
+        <ChatToggle />
       </AppFooter.Right>
     </AppFooter.Root>
   );
