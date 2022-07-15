@@ -1,21 +1,17 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
+const name = `${process.env.peer_name}1`;
 
 test.beforeEach(async ({ page: nativePage }) => {
   page = new PageWrapper(nativePage);
-  await page.preview.gotoPreviewPage();
+  await page.prepreview.gotoPreviewPage(name);
 });
 
 test.afterEach(async () => {
   await page.close();
 });
-
-// test.afterEach(async ({page}) => {
-//     await pageMethods.clickElement(page, previewPage.preview_video_btn, "preview_video_btn")
-//     await page.close()
-// });
 
 test(`Verify MicBtn on off`, async () => {
   await page.assertVisible(page.preview.preview_audio_on_btn);
