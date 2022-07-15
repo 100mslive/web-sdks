@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
@@ -6,6 +6,7 @@ import { styled } from '../Theme';
 import { toastAnimation } from '../utils';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
+
 import { CSS } from '@stitches/react';
 
 const getToastVariant = (base: string) => {
@@ -39,6 +40,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   position: 'relative',
   fontFamily: '$sans',
   border: 'solid $space$px $borderLight',
+
   overflow: 'hidden',
   ...toastAnimation,
   variants: {
@@ -47,6 +49,23 @@ const ToastRoot = styled(ToastPrimitives.Root, {
       warning: getToastVariant('$warning'),
       error: getToastVariant('$error'),
       success: getToastVariant('$success'),
+
+  ...toastAnimation,
+  variants: {
+    variant: {
+      standard: {
+        borderLeft: 'solid $space$4 $secondaryDefault',
+      },
+      warning: {
+        borderLeft: 'solid $space$4 $warning',
+      },
+      error: {
+        borderLeft: 'solid $space$4 $error',
+      },
+      success: {
+        borderLeft: 'solid $space$4 $success',
+      },
+
     },
   },
   defaultVariants: {
@@ -85,7 +104,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   zIndex: 1000,
 });
 
-const DefaultClose = (css?: CSS) => {
+const DefaultClose = ({ css }: Pick<ComponentProps<typeof ToastClose>, 'css'>) => {
   return (
     <ToastClose css={css} asChild>
       <IconButton>

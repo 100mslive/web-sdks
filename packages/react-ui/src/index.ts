@@ -28,3 +28,6 @@ export * from './RadioGroup';
 export * from './Toast';
 export * from './Accordion';
 export * from './Fieldset';
+export * as HMSSelect from './ReactSelect';
+export * from './Tabs';
+export * from './QRCode';

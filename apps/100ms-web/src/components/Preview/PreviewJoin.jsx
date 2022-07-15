@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState, Fragment } from "react";
 import {
   usePreviewJoin,
   selectLocalPeer,
@@ -20,11 +20,11 @@ import {
   Button,
   textEllipsis,
 } from "@100mslive/react-ui";
-import { SettingIcon, ArrowRightIcon } from "@100mslive/react-icons";
+import { SettingsIcon, ArrowRightIcon } from "@100mslive/react-icons";
 import { AudioVideoToggle } from "../AudioVideoToggle";
-import Settings from "../Settings";
-import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
+import SettingsModal from "../Settings/SettingsModal";
 import TileConnection from "../Connection/TileConnection";
+import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import IconButton from "../../IconButton";
 import {
   useUserPreferences,
@@ -77,10 +77,13 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
   }, [token, skipPreview]);
   return (
     <Container>
-      <Text variant="h4" css={{ wordBreak: "break-all" }}>
+      <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>
         Let's get you started, {name}!
       </Text>
-      <Text css={{ c: "$textMedEmp", my: "$6" }} variant="body1">
+      <Text
+        css={{ c: "$textMedEmp", my: "$6", textAlign: "center" }}
+        variant="body1"
+      >
         Let's get your studio setup ready in less than 5 minutes!
       </Text>
       <Flex
@@ -88,7 +91,6 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
         justify="center"
         css={{
           "@sm": { width: "100%" },
-
           flexDirection: "column",
         }}
       >
@@ -105,8 +107,8 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
 const Container = styled("div", {
   width: "100%",
   ...flexCenter,
-  textAlign: "center",
   flexDirection: "column",
+  px: "$10",
 });
 
 const PreviewTile = ({ name }) => {
@@ -126,8 +128,8 @@ const PreviewTile = ({ name }) => {
         mt: "$12",
         "@sm": {
           height: "unset",
-          width: "min(360px, 90%)",
-          maxWidth: "90%",
+          width: "min(360px, 100%)",
+          maxWidth: "100%",
         },
       }}
       ref={borderAudioRef}
@@ -162,11 +164,7 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
       justify="between"
       css={{
         width: "100%",
-        marginTop: "$8",
-        "@sm": {
-          width: "min(360px, 90%)",
-          maxWidth: "90%",
-        },
+        mt: "$8",
       }}
     >
       <Flex>
@@ -174,11 +172,7 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
         <VirtualBackground />
       </Flex>
       <Flex>
-        <Settings>
-          <IconButton data-testid="preview_setting_btn">
-            <SettingIcon />
-          </IconButton>
-        </Settings>
+        <PreviewSettings />
         <Button
           onClick={savePreferenceAndJoin}
           disabled={!enableJoin}
@@ -191,5 +185,20 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
     </Flex>
   );
 };
+
+const PreviewSettings = React.memo(() => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Fragment>
+      <IconButton
+        data-testid="preview_setting_btn"
+        onClick={() => setOpen(value => !value)}
+      >
+        <SettingsIcon />
+      </IconButton>
+      {open && <SettingsModal open={open} onOpenChange={setOpen} />}
+    </Fragment>
+  );
+});
 
 export default PreviewJoin;

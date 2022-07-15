@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.1.4",
+  "version": "0.2.1-alpha.0",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -13,7 +13,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
+    "svg-build": "rm -rf src/ && svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",
     "build": "yarn svg-build && rm -rf dist && NODE_ENV=production rollup -c",
     "format": "prettier -w src/**",
     "lint": "eslint",

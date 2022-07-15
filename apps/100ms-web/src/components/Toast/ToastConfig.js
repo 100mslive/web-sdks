@@ -1,3 +1,4 @@
+
 import {
   HandIcon,
   PersonIcon,
@@ -5,6 +6,7 @@ import {
   ConnectivityIcon,
   PoorConnectivityIcon,
 } from "@100mslive/react-icons";
+
 
 export const ToastConfig = {
   PEER_LIST: {
@@ -113,6 +115,7 @@ export const ToastConfig = {
         variant: "warning",
         duration: 10000,
       };
+
     },
   },
 };
