@@ -8,8 +8,13 @@ import { Dialog, Text } from "@100mslive/react-ui";
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [error, setError] = useState("");
+  const [systemError, setSystemError] = useState(false);
   useEffect(() => {
-    if (!notification || notification.data?.code !== 3001) {
+    if (
+      !notification ||
+      notification.data?.code !== 3001 ||
+      notification.data?.code !== 3011
+    ) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
@@ -25,6 +30,7 @@ export function PermissionErrorModal() {
       deviceType = "Camera";
     }
     setError(deviceType);
+    setSystemError(notification.data.code === 3011);
   }, [notification]);
   return error ? (
     <Dialog.Root
@@ -51,8 +57,10 @@ export function PermissionErrorModal() {
           <Dialog.DefaultClose data-testid="dialoge_cross_icon" />
         </Dialog.Title>
         <Text variant="md" css={{ py: "$10" }}>
-          Access to {error} is required. If you didn't get a permission dialog,
-          please try refreshing or open in incognito.
+          Access to {error} is required.
+          {systemError
+            ? `Enable permissions for ${error} from sytem settings`
+            : "If you didn't get a permission dialog, please try refreshing or open in incognito window."}
         </Text>
       </Dialog.Content>
     </Dialog.Root>
