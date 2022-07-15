@@ -45,8 +45,8 @@ export const RTMPStreaming = ({ onBack }) => {
         onBack={onBack}
       />
       <ContentBody Icon={SettingsIcon} title="RTMP">
-        Allows you to add a Custom RTMP or more than 1 channel of the same
-        platform from our list of supported platforms.
+        Live Stream your call to Twitch, YouTube, Facebook and any app which
+        supports RTMP, all at the same time
       </ContentBody>
       {!isRTMPRunning ? <StartRTMP /> : <EndRTMP />}
     </Container>
