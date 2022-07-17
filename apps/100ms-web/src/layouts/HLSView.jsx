@@ -1,30 +1,18 @@
-import React, {
-  useEffect,
-  useRef,
-  Fragment,
-  useState,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  HangUpIcon,
-  PauseIcon,
-  PlayIcon,
-  RecordIcon,
+  ExpandIcon,
   SettingIcon,
-  SpeakerIcon,
+  ShrinkIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
-  Button,
   Dropdown,
   Flex,
   IconButton,
-  Slider,
-  styled,
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
@@ -36,11 +24,13 @@ import {
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
-
-const HLSVideo = styled("video", {
-  h: "100%",
-  margin: "0 auto",
-});
+import {
+  HMSVideoPlayer,
+  HMS_VIDEO_PLAYER_CTRL_FULLSCREEN,
+  HMS_VIDEO_PLAYER_CTRL_PLAYBACK,
+  HMS_VIDEO_PLAYER_CTRL_PROGRESS,
+  HMS_VIDEO_PLAYER_CTRL_VOLUME,
+} from "../components/HMSVideo/HMSVideo";
 
 let hlsController;
 const HLSView = () => {
@@ -51,21 +41,20 @@ const HLSView = () => {
   // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
-  const [videoProgress, setVideoProgress] = useState(0);
-  const [currentSelectedQualityText, setCurrentSelectedQualityText] =
-    useState("");
+  // const [videoProgress, setVideoProgress] = useState(0);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     if (videoRef.current && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
 
-        videoRef.current.addEventListener("timeupdate", event => {
-          const progress =
-            (videoRef.current.currentTime / videoRef.current.duration) * 100;
-          setVideoProgress(isNaN(progress) ? 0 : progress);
-        });
+        // videoRef.current.addEventListener("timeupdate", event => {
+        //   const progress =
+        //     (videoRef.current.currentTime / videoRef.current.duration) * 100;
+        //   setVideoProgress(isNaN(progress) ? 0 : progress);
+        // });
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
@@ -81,7 +70,6 @@ const HLSView = () => {
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
           setAvailableLevels(levels);
-          setCurrentSelectedQualityText("Auto");
         });
       } else if (
         videoRef.current.canPlayType("application/vnd.apple.mpegurl")
@@ -101,9 +89,6 @@ const HLSView = () => {
     qualityLevel => {
       if (hlsController) {
         hlsController.setCurrentLevel(getCurrentLevel(qualityLevel));
-        const levelText =
-          qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
-        setCurrentSelectedQualityText(levelText);
       }
     },
     [availableLevels] //eslint-disable-line
@@ -134,131 +119,297 @@ const HLSView = () => {
 
     return availableLevels.length - 1 - index;
   };
+  function toggleFullScreen() {
+    const hlsviewer = document.getElementById("hls-viewer");
+    if (hlsviewer && !isFullScreen) {
+      hlsviewer.requestFullscreen();
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+    }
+  }
 
   return (
-    <Fragment>
+    <div key="hls-viewer" id="hls-viewer" style={{ display: "inline" }}>
       {hlsUrl ? (
-        <>
-          <Flex
-            align="center"
-            justify={"center"}
-            css={{ position: "absolute", right: "$4" }}
-          >
-            {hlsController ? (
-              <Button
-                variant="standard"
-                css={{ marginRight: "0.3rem" }}
-                onClick={() => {
-                  hlsController.jumpToLive();
-                  setIsVideoLive(true);
-                }}
-                key="LeaveRoom"
-                data-testid="leave_room_btn"
-              >
-                <Tooltip title="Jump to Live">
-                  <Flex>
-                    <RecordIcon
-                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
-                      key="jumpToLive"
-                    />
-                    Live
-                  </Flex>
-                </Tooltip>
-              </Button>
-            ) : null}
-            <Dropdown.Root
-              open={qualityDropDownOpen}
-              onOpenChange={value => setQualityDropDownOpen(value)}
-            >
-              <Dropdown.Trigger asChild data-testid="quality_selector">
-                <Flex
-                  css={{
-                    color: "$textPrimary",
-                    borderRadius: "$1",
-                    cursor: "pointer",
-                    zIndex: 40,
-                    border: "1px solid $textDisabled",
-                    padding: "$2 $4",
-                  }}
-                >
-                  <Tooltip title="Select Quality">
-                    <Flex>
-                      <SettingIcon />
-                      <Text variant="md">{currentSelectedQualityText}</Text>
-                    </Flex>
-                  </Tooltip>
-
-                  <Box
-                    css={{ "@lg": { display: "none" }, color: "$textDisabled" }}
+        <Flex css={{ height: "90%" }} justify="center">
+          <HMSVideoPlayer
+            controls={[
+              HMS_VIDEO_PLAYER_CTRL_PROGRESS,
+              HMS_VIDEO_PLAYER_CTRL_VOLUME,
+              HMS_VIDEO_PLAYER_CTRL_PLAYBACK,
+              HMS_VIDEO_PLAYER_CTRL_FULLSCREEN,
+            ]}
+            ref={videoRef}
+            controlsToTheRight={() => {
+              return (
+                <>
+                  {hlsController ? (
+                    <IconButton
+                      variant="standard"
+                      css={{ marginRight: "0.3rem" }}
+                      onClick={() => {
+                        hlsController.jumpToLive();
+                        setIsVideoLive(true);
+                      }}
+                      key="jumpToLive_btn"
+                      data-testid="leave_room_btn"
+                    >
+                      <Tooltip title="Go to Live">
+                        <Flex justify="center" gap={2} align="center">
+                          <Box
+                            css={{
+                              height: "1rem",
+                              width: "1rem",
+                              background: isVideoLive ? "#CC525F" : "#FAFAFA",
+                              borderRadius: "50%",
+                            }}
+                          />
+                          <Text css={{ fontSize: "0.75rem" }}>
+                            {isVideoLive ? "Live" : "Go to Live"}{" "}
+                          </Text>
+                        </Flex>
+                      </Tooltip>
+                    </IconButton>
+                  ) : null}
+                  <Dropdown.Root
+                    open={qualityDropDownOpen}
+                    onOpenChange={value => setQualityDropDownOpen(value)}
                   >
-                    {qualityDropDownOpen ? (
-                      <ChevronUpIcon />
-                    ) : (
-                      <ChevronDownIcon />
-                    )}
-                  </Box>
-                </Flex>
-              </Dropdown.Trigger>
-              {availableLevels.length > 0 && (
-                <Dropdown.Content
-                  sideOffset={5}
-                  align="end"
-                  css={{ height: "auto", maxHeight: "$96" }}
-                >
-                  <Dropdown.Item
-                    onClick={event =>
-                      qualitySelectorHandler({ height: "auto" })
-                    }
-                    css={{
-                      h: "auto",
-                      flexDirection: "column",
-                      flexWrap: "wrap",
-                      cursor: "pointer",
-                      alignItems: "flex-start",
-                    }}
-                    key="auto"
-                  >
-                    <Text>Automatic</Text>
-                  </Dropdown.Item>
-                  {availableLevels.map(level => {
-                    return (
-                      <Dropdown.Item
-                        onClick={() => qualitySelectorHandler(level)}
+                    <Dropdown.Trigger asChild data-testid="quality_selector">
+                      <Flex
                         css={{
-                          h: "auto",
-                          flexDirection: "column",
-                          flexWrap: "wrap",
+                          color: "$textPrimary",
+                          borderRadius: "$1",
                           cursor: "pointer",
-                          alignItems: "flex-start",
+                          zIndex: 40,
+                          border: "1px solid $textDisabled",
+                          padding: "$2 $4",
                         }}
-                        key={level.url}
                       >
-                        <Text>{`${level.height}p (${(
-                          Number(level.bitrate / 1024) / 1024
-                        ).toFixed(2)} Mbps)`}</Text>
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Content>
-              )}
-            </Dropdown.Root>
-          </Flex>
+                        <Tooltip title="Select Quality">
+                          <Flex>
+                            <SettingIcon />
+                          </Flex>
+                        </Tooltip>
 
-          <Flex>
-            <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          </Flex>
-          <Slider
-            step={1}
-            value={[videoProgress]}
-            onValueChange={progress => {
-              console.log(progress);
-              const currentTime = (progress * videoRef.current.duration) / 100;
-              videoRef.current.currentTime = currentTime;
+                        <Box
+                          css={{
+                            "@lg": { display: "none" },
+                            color: "$textDisabled",
+                          }}
+                        >
+                          {qualityDropDownOpen ? (
+                            <ChevronUpIcon />
+                          ) : (
+                            <ChevronDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Dropdown.Trigger>
+                    {availableLevels.length > 0 && (
+                      <Dropdown.Content
+                        sideOffset={5}
+                        align="end"
+                        css={{ height: "auto", maxHeight: "$96" }}
+                      >
+                        <Dropdown.Item
+                          onClick={event =>
+                            qualitySelectorHandler({ height: "auto" })
+                          }
+                          css={{
+                            h: "auto",
+                            flexDirection: "column",
+                            flexWrap: "wrap",
+                            cursor: "pointer",
+                            alignItems: "flex-start",
+                          }}
+                          key="auto"
+                        >
+                          <Text>Automatic</Text>
+                        </Dropdown.Item>
+                        {availableLevels.map(level => {
+                          return (
+                            <Dropdown.Item
+                              onClick={() => qualitySelectorHandler(level)}
+                              css={{
+                                h: "auto",
+                                flexDirection: "column",
+                                flexWrap: "wrap",
+                                cursor: "pointer",
+                                alignItems: "flex-start",
+                              }}
+                              key={level.url}
+                            >
+                              <Text>{`${level.height}p (${(
+                                Number(level.bitrate / 1024) / 1024
+                              ).toFixed(2)} Mbps)`}</Text>
+                            </Dropdown.Item>
+                          );
+                        })}
+                      </Dropdown.Content>
+                    )}
+                  </Dropdown.Root>
+                </>
+              );
+            }}
+            controlsConfig={{
+              progress: {
+                onValueChange: function progress(progress) {
+                  console.log("PROGRESS HAPPENING", progress);
+                },
+              },
+              fullscreen: {
+                onToggle: toggleFullScreen,
+                icon: () => (isFullScreen ? <ShrinkIcon /> : <ExpandIcon />),
+              },
             }}
           />
-          <Controls videoEl={videoRef.current} />
-        </>
+        </Flex>
       ) : (
+        // <>
+        //   <Flex css={{ height: "90%" }}>
+        //     <HLSVideo ref={videoRef} autoPlay playsInline />
+        //   </Flex>
+        //   <Slider
+        //     step={1}
+        //     value={[videoProgress]}
+        //     onValueChange={progress => {
+        //       console.log(progress);
+        //       const currentTime = (progress * videoRef.current.duration) / 100;
+        //       videoRef.current.currentTime = currentTime;
+        //     }}
+        //   />
+        //   <Flex
+        //     justify="between"
+        //     align="center"
+        //     gap={2}
+        //     css={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}
+        //   >
+        //     <Flex justify="start" align="center" gap={2}>
+        //       <PauseButtonAndTime videoEl={videoRef.current} />
+        //       <VolumeControl videoEl={videoRef.current} />
+        //     </Flex>
+        //     <Flex justify="start" align="center" gap={2}>
+        //       {hlsController ? (
+        //         <IconButton
+        //           variant="standard"
+        //           css={{ marginRight: "0.3rem" }}
+        //           onClick={() => {
+        //             hlsController.jumpToLive();
+        //             setIsVideoLive(true);
+        //           }}
+        //           key="jumpToLive_btn"
+        //           data-testid="leave_room_btn"
+        //         >
+        //           <Tooltip title="Jump to Live">
+        //             <Flex>
+        //               <RecordIcon
+        //                 color={isVideoLive ? "#CC525F" : "FAFAFA"}
+        //                 key="jumpToLive"
+        //               />
+        //               <Text>Live</Text>
+        //             </Flex>
+        //           </Tooltip>
+        //         </IconButton>
+        //       ) : null}
+        //       <Dropdown.Root
+        //         open={qualityDropDownOpen}
+        //         onOpenChange={value => setQualityDropDownOpen(value)}
+        //       >
+        //         <Dropdown.Trigger asChild data-testid="quality_selector">
+        //           <Flex
+        //             css={{
+        //               color: "$textPrimary",
+        //               borderRadius: "$1",
+        //               cursor: "pointer",
+        //               zIndex: 40,
+        //               border: "1px solid $textDisabled",
+        //               padding: "$2 $4",
+        //             }}
+        //           >
+        //             <Tooltip title="Select Quality">
+        //               <Flex>
+        //                 <SettingIcon />
+        //               </Flex>
+        //             </Tooltip>
+
+        //             <Box
+        //               css={{
+        //                 "@lg": { display: "none" },
+        //                 color: "$textDisabled",
+        //               }}
+        //             >
+        //               {qualityDropDownOpen ? (
+        //                 <ChevronUpIcon />
+        //               ) : (
+        //                 <ChevronDownIcon />
+        //               )}
+        //             </Box>
+        //           </Flex>
+        //         </Dropdown.Trigger>
+        //         {availableLevels.length > 0 && (
+        //           <Dropdown.Content
+        //             sideOffset={5}
+        //             align="end"
+        //             css={{ height: "auto", maxHeight: "$96" }}
+        //           >
+        //             <Dropdown.Item
+        //               onClick={event =>
+        //                 qualitySelectorHandler({ height: "auto" })
+        //               }
+        //               css={{
+        //                 h: "auto",
+        //                 flexDirection: "column",
+        //                 flexWrap: "wrap",
+        //                 cursor: "pointer",
+        //                 alignItems: "flex-start",
+        //               }}
+        //               key="auto"
+        //             >
+        //               <Text>Automatic</Text>
+        //             </Dropdown.Item>
+        //             {availableLevels.map(level => {
+        //               return (
+        //                 <Dropdown.Item
+        //                   onClick={() => qualitySelectorHandler(level)}
+        //                   css={{
+        //                     h: "auto",
+        //                     flexDirection: "column",
+        //                     flexWrap: "wrap",
+        //                     cursor: "pointer",
+        //                     alignItems: "flex-start",
+        //                   }}
+        //                   key={level.url}
+        //                 >
+        //                   <Text>{`${level.height}p (${(
+        //                     Number(level.bitrate / 1024) / 1024
+        //                   ).toFixed(2)} Mbps)`}</Text>
+        //                 </Dropdown.Item>
+        //               );
+        //             })}
+        //           </Dropdown.Content>
+        //         )}
+        //       </Dropdown.Root>
+        //       <IconButton
+        //         variant="standard"
+        //         css={{ marginRight: "0.3rem" }}
+        //         onClick={() => {
+        //           toggleFullScreen();
+        //         }}
+        //         key="fullscreen"
+        //         data-testid="fullscreen_btn"
+        //       >
+        //         <Tooltip title="Go to fullscreen">
+        //           <Flex>
+        //             <GridIcon />
+        //           </Flex>
+        //         </Tooltip>
+        //       </IconButton>
+        //     </Flex>
+        //   </Flex>
+        // </>
         <Flex align="center" justify="center" css={{ size: "100%" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...
@@ -282,64 +433,8 @@ const HLSView = () => {
           <ChatView />
         </Box>
       )}
-    </Fragment>
+    </div>
   );
 };
 
-const VolumeControl = ({ videoEl }) => {
-  // console.log("VOLUME", videoEl.volume);
-  return (
-    <Flex align="center" css={{ color: "$white" }}>
-      <SpeakerIcon />
-      <Slider
-        css={{ mx: "$4", w: "$20" }}
-        min={0}
-        max={100}
-        step={1}
-        value={[videoEl.volume * 100]}
-        onValueChange={volume => {
-          videoEl.volume = volume / 100;
-        }}
-        thumbStyles={{ w: "$6", h: "$6" }}
-      />
-    </Flex>
-  );
-};
-
-const Controls = ({ videoEl, css = {} }) => {
-  if (!videoEl) {
-    return;
-  }
-  let time = Math.floor(videoEl.currentTime);
-  const hours = Math.floor(time / 3600);
-  time = time - hours * 3600;
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time - minutes * 60);
-
-  let videoTime = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-  if (hours) {
-    videoTime = `${hours}:${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-  }
-
-  return (
-    <Flex justify="start" align="center" gap={2} css={css}>
-      <Flex align="center">
-        <IconButton
-          onClick={() => {
-            videoEl.paused ? videoEl.play() : videoEl.pause();
-          }}
-          data-testid="playlist_play_pause_btn"
-        >
-          {videoEl.paused ? (
-            <PlayIcon width={32} height={32} />
-          ) : (
-            <PauseIcon width={32} height={32} />
-          )}
-        </IconButton>
-        <Text>{`${videoTime}`}</Text>
-      </Flex>
-      <VolumeControl videoEl={videoEl} />
-    </Flex>
-  );
-};
 export default HLSView;
