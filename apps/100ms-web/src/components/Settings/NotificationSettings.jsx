@@ -9,6 +9,7 @@ import {
 import { Box } from "@100mslive/react-ui";
 import SwitchWithLabel from "./SwitchWithLabel";
 import { useSetSubscribedNotifications } from "../AppData/useUISettings";
+import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
 
 const NotificationItem = ({ onChange, type, label, icon, checked }) => {
   return (
@@ -32,35 +33,35 @@ export const NotificationSettings = () => {
     <Box>
       <NotificationItem
         label="Peer Joined"
-        type="PEER_JOINED"
+        type={SUBSCRIBED_NOTIFICATIONS.PEER_JOINED}
         icon={<PersonIcon />}
         onChange={setSubscribedNotifications}
         checked={subscribedNotifications.PEER_JOINED}
       />
       <NotificationItem
         label="Peer Leave"
-        type="PEER_LEFT"
+        type={SUBSCRIBED_NOTIFICATIONS.PEER_LEFT}
         icon={<ExitIcon />}
         onChange={setSubscribedNotifications}
         checked={subscribedNotifications.PEER_LEFT}
       />
       <NotificationItem
         label="New Message"
-        type="NEW_MESSAGE"
+        type={SUBSCRIBED_NOTIFICATIONS.NEW_MESSAGE}
         icon={<ChatIcon />}
         onChange={setSubscribedNotifications}
         checked={subscribedNotifications.NEW_MESSAGE}
       />
       <NotificationItem
         label="Hand Raised"
-        type="METADATA_UPDATED"
+        type={SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED}
         icon={<HandIcon />}
         onChange={setSubscribedNotifications}
         checked={subscribedNotifications.METADATA_UPDATED}
       />
       <NotificationItem
         label="Error"
-        type="ERROR"
+        type={SUBSCRIBED_NOTIFICATIONS.ERROR}
         icon={<AlertOctagonIcon />}
         onChange={setSubscribedNotifications}
         checked={subscribedNotifications.ERROR}

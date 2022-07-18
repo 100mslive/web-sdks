@@ -4,11 +4,8 @@ import {
   useHMSNotifications,
 } from "@100mslive/react-sdk";
 import { ToastBatcher } from "../Toast/ToastBatcher";
-
-import {
-  UserPreferencesKeys,
-  useUserPreferences,
-} from "../hooks/useUserPreferences";
+import { useSubscribedNotifications } from "../AppData/useUISettings";
+import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
@@ -18,24 +15,26 @@ const notificationTypes = [
 
 export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
-  const [{ subscribedNotifications }] = useUserPreferences(
-    UserPreferencesKeys.UI_SETTINGS
+  const PEER_JOINED = useSubscribedNotifications(
+    SUBSCRIBED_NOTIFICATIONS.PEER_JOINED
+  );
+  const PEER_LEFT = useSubscribedNotifications(
+    SUBSCRIBED_NOTIFICATIONS.PEER_LEFT
   );
   useEffect(() => {
     if (!notification) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
-
     switch (notification.type) {
       case HMSNotificationTypes.PEER_LIST:
       case HMSNotificationTypes.PEER_JOINED:
-        if (!subscribedNotifications.PEER_JOINED) {
+        if (!PEER_JOINED) {
           return;
         }
         break;
       case HMSNotificationTypes.PEER_LEFT:
-        if (!subscribedNotifications.PEER_LEFT) {
+        if (!PEER_LEFT) {
           return;
         }
         break;
@@ -43,11 +42,7 @@ export const PeerNotifications = () => {
         return;
     }
     ToastBatcher.showToast({ notification });
-  }, [
-    notification,
-    subscribedNotifications.PEER_JOINED,
-    subscribedNotifications.PEER_LEFT,
-  ]);
+  }, [notification, PEER_JOINED, PEER_LEFT]);
 
   return null;
 };

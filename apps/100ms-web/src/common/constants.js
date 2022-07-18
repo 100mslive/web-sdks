@@ -134,5 +134,13 @@ export const SIDE_PANE_OPTIONS = {
   SCREEN_TILES: "SCREEN_TILES",
 };
 
+export const SUBSCRIBED_NOTIFICATIONS = {
+  PEER_JOINED: "PEER_JOINED",
+  PEER_LEFT: "PEER_LEFT",
+  METADATA_UPDATED: "METADATA_UPDATED",
+  NEW_MESSAGE: "NEW_MESSAGE",
+  ERROR: "ERROR",
+};
+
 export const CREATE_ROOM_DOC_URL =
   "https://github.com/100mslive/100ms-web#create-a-room";
