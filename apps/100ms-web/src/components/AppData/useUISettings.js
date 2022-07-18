@@ -22,10 +22,14 @@ import {
  * @param {string | undefined} uiSettingKey
  */
 export const useUISettings = uiSettingKey => {
-  const value = useHMSStore(selectAppData(APP_DATA.uiSettings));
-  if (value) {
-    return uiSettingKey ? value[uiSettingKey] : value;
-  }
+  const uiSettings = useHMSStore(
+    selectAppData(
+      uiSettingKey
+        ? `${APP_DATA.uiSettings}.${uiSettingKey}`
+        : APP_DATA.uiSettings
+    )
+  );
+  return uiSettings;
 };
 
 /**
@@ -65,13 +69,13 @@ export const useLogo = () => {
 
 export const useSubscribedNotifications = notificationKey => {
   const notificationPreference = useHMSStore(
-    selectAppData(APP_DATA.subscribedNotifications)
+    selectAppData(
+      notificationKey
+        ? `${APP_DATA.subscribedNotifications}.${notificationKey}`
+        : APP_DATA.subscribedNotifications
+    )
   );
-  if (notificationPreference) {
-    return notificationKey
-      ? notificationPreference[notificationKey]
-      : notificationPreference;
-  }
+  return notificationPreference;
 };
 
 export const useSetSubscribedNotifications = notificationKey => {

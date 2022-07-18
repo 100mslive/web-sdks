@@ -25,10 +25,6 @@ export const useIsSidepaneTypeOpen = sidepaneType => {
  */
 export const useSidepaneState = () => {
   const sidePane = useHMSStore(selectAppData(APP_DATA.sidePane));
-  // if this is called before initAppData, it will return {}
-  if (typeof sidepane !== "string") {
-    return "";
-  }
   return sidePane;
 };
 

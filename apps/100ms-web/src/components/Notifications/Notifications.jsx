@@ -28,7 +28,7 @@ export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigation();
   const HLS_VIEWER_ROLE = useHLSViewerRole();
-  const subscribedNotifications = useSubscribedNotifications();
+  const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   useEffect(() => {
     if (!notification) {

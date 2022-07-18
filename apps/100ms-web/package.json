@@ -19,7 +19,6 @@
     "emoji-mart": "^5.1.0",
     "hls.js": "^1.1.1",
     "js-confetti": "^0.10.2",
-    "lodash.get": "^4.4.2",
     "logrocket": "^2.2.0",
     "logrocket-react": "^5.0.1",
     "mobx": "^6.3.12",

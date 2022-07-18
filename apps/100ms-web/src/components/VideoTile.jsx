@@ -25,7 +25,7 @@ import TileMenu from "./TileMenu";
 import { getVideoTileLabel } from "./peerTileUtils";
 import TileConnection from "./Connection/TileConnection";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { useAppConfigByPath } from "./AppData/useAppConfig";
+import { useAppConfig } from "./AppData/useAppConfig";
 import { UI_SETTINGS } from "../common/constants";
 
 const Tile = ({ peerId, trackId, width, height }) => {
@@ -53,7 +53,7 @@ const Tile = ({ peerId, trackId, width, height }) => {
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === "mouseenter");
   }, []);
-  const headlessConfig = useAppConfigByPath("headlessConfig");
+  const headlessConfig = useAppConfig("headlessConfig");
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
   return (
     <StyledVideoTile.Root

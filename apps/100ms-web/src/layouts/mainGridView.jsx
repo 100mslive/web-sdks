@@ -7,12 +7,12 @@ import {
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
 import { useUISettings } from "../components/AppData/useUISettings";
-import { useAppPolicyConfigByKey } from "../components/AppData/useAppPolicyConfig";
+import { useAppPolicyConfig } from "../components/AppData/useAppPolicyConfig";
 import { UI_SETTINGS } from "../common/constants";
 
 export const MainGridView = () => {
-  const centerRoles = useAppPolicyConfigByKey("center") || [];
-  const sidepaneRoles = useAppPolicyConfigByKey("sidepane") || [];
+  const centerRoles = useAppPolicyConfig("center") || [];
+  const sidepaneRoles = useAppPolicyConfig("sidepane") || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const peers = useHMSStore(selectPeers);
   const localPeerId = useHMSStore(selectLocalPeerID);
