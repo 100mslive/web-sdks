@@ -12,8 +12,8 @@ const GoLiveButton = ({ css = {} }) => {
     SIDE_PANE_OPTIONS.STREAMING
   );
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const { isHLSRunning } = useRecordingStreaming();
-  if (isHLSRunning) {
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  if (isHLSRunning && !isRTMPRunning) {
     return null;
   }
   return (

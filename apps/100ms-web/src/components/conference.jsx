@@ -12,8 +12,8 @@ import { Box, Flex } from "@100mslive/react-ui";
 import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
-import { ConferencingFooter } from "./Footer/ConferencingFooter";
-import { ConferencingHeader } from "./Header/ConferencingHeader";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
 import { useNavigation } from "./hooks/useNavigation";
 import { useIsHeadless } from "./AppData/useUISettings";
 
@@ -68,7 +68,7 @@ const Conference = () => {
     <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
         <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
-          <ConferencingHeader />
+          <Header />
         </Box>
       )}
       <Box
@@ -83,7 +83,7 @@ const Conference = () => {
       </Box>
       {!isHeadless && (
         <Box css={{ flexShrink: 0, minHeight: "$24" }} data-testid="footer">
-          <ConferencingFooter />
+          <Footer />
         </Box>
       )}
       <RoleChangeRequestModal />

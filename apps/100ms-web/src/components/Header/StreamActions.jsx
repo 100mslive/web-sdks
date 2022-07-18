@@ -3,18 +3,20 @@ import {
   selectIsAllowedToPublish,
   selectIsConnectedToRoom,
   selectPermissions,
-  useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import GoLiveButton from "../GoLiveButton";
-import { Box, Button, Flex, Text, Tooltip } from "@100mslive/react-ui";
 import { EndStreamIcon, RecordIcon } from "@100mslive/react-icons";
+import { Box, Button, Flex, Text, Tooltip } from "@100mslive/react-ui";
+import GoLiveButton from "../GoLiveButton";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 const EndStream = () => {
-  const { isHLSRecordingOn, isHLSRunning } = useRecordingStreaming();
-  const hmsActions = useHMSActions();
-  if (!isHLSRunning) {
+  const { isHLSRecordingOn, isHLSRunning, isRTMPRunning } =
+    useRecordingStreaming();
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
   return (
@@ -37,8 +39,8 @@ const EndStream = () => {
         outlined
         icon
         css={{ mx: "$8" }}
-        onClick={async () => {
-          await hmsActions.stopHLSStreaming();
+        onClick={() => {
+          toggleStreaming();
         }}
       >
         <EndStreamIcon />
