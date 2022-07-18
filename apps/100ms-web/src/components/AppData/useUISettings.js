@@ -40,8 +40,8 @@ export const useUISettings = uiSettingKey => {
 export const useSetUiSettings = uiSettingKey => {
   const value = useUISettings(uiSettingKey);
   const setValue = useSetAppData({
-    appDataKey: APP_DATA.uiSettings,
-    key: uiSettingKey,
+    key1: APP_DATA.uiSettings,
+    key2: uiSettingKey,
   });
   return [value, setValue];
 };
@@ -64,22 +64,26 @@ export const useLogo = () => {
 };
 
 export const useSubscribedNotifications = notificationKey => {
-  const value = useHMSStore(selectAppData(APP_DATA.subscribedNotifications));
-  if (value) {
-    return notificationKey ? value[notificationKey] : value;
+  const notificationPreference = useHMSStore(
+    selectAppData(APP_DATA.subscribedNotifications)
+  );
+  if (notificationPreference) {
+    return notificationKey
+      ? notificationPreference[notificationKey]
+      : notificationPreference;
   }
 };
 
 export const useSetSubscribedNotifications = notificationKey => {
   const value = useSubscribedNotifications(notificationKey);
   const setValue = useSetAppData({
-    appDataKey: APP_DATA.subscribedNotifications,
-    key: notificationKey,
+    key1: APP_DATA.subscribedNotifications,
+    key2: notificationKey,
   });
   return [value, setValue];
 };
 
-const useSetAppData = ({ appDataKey, key }) => {
+const useSetAppData = ({ key1, key2 }) => {
   const actions = useHMSActions();
   const store = useHMSVanillaStore();
   const [, setPreferences] = useUserPreferences(
@@ -87,13 +91,13 @@ const useSetAppData = ({ appDataKey, key }) => {
   );
   const setValue = useCallback(
     (value, type) => {
-      if (!appDataKey || (!key && !type)) {
+      if (!key1 || (!key2 && !type)) {
         return;
       }
       actions.setAppData(
-        appDataKey,
+        key1,
         {
-          [key || type]: value,
+          [key2 || type]: value,
         },
         true
       );
@@ -103,7 +107,7 @@ const useSetAppData = ({ appDataKey, key }) => {
         subscribedNotifications: appData.subscribedNotifications,
       });
     },
-    [actions, appDataKey, key, store, setPreferences]
+    [actions, key1, key2, store, setPreferences]
   );
   return setValue;
 };
