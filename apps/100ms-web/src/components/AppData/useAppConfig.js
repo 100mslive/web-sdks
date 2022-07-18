@@ -1,9 +1,17 @@
-import { selectAppData, useHMSStore } from "@100mslive/react-sdk";
+import { selectAppDataByPath, useHMSStore } from "@100mslive/react-sdk";
+import { getPath } from "./useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export const useAppConfig = path => {
   const appConfig = useHMSStore(
-    selectAppData(path ? `${APP_DATA.appConfig}.${path}` : APP_DATA.appConfig)
+    selectAppDataByPath(getPath({ base: APP_DATA.appConfig, path }))
   );
   return appConfig;
+};
+
+export const useTileOffset = () => {
+  const offset = useHMSStore(
+    selectAppDataByPath([APP_DATA.appConfig, "headlessConfig", "tileOffset"])
+  );
+  return offset;
 };

@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import get from 'lodash.get';
 import {
   selectFullAppData,
   selectHMSMessages,
@@ -43,16 +42,31 @@ export const selectPeerByID = byIDCurry(selectPeerByIDBare);
  * if key is not passed, full data is returned.
  */
 export const selectAppData = byIDCurry(
-  createSelector([selectFullAppData, selectAppDataKey], (appData, path) => {
+  createSelector([selectFullAppData, selectAppDataKey], (appData, key) => {
     if (!appData) {
       return undefined;
     }
-    if (path) {
-      return get(appData, path);
+    if (key) {
+      return appData[key];
     }
     return appData;
   }),
 );
+
+export const selectAppDataByPath = (keys: string[]) =>
+  createSelector([selectFullAppData], appData => {
+    if (!appData) {
+      return undefined;
+    }
+    if (keys && keys.length > 0) {
+      let value = appData;
+      for (const key of keys) {
+        value = value?.[key];
+      }
+      return value;
+    }
+    return appData;
+  });
 
 /**
  * Select the name of a {@link HMSPeer} given a peer ID.

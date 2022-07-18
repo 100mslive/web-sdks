@@ -1,6 +1,7 @@
 import { APP_DATA, UI_SETTINGS } from "../../common/constants";
 import {
   selectAppData,
+  selectAppDataByPath,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -22,13 +23,11 @@ import {
  * @param {string | undefined} uiSettingKey
  */
 export const useUISettings = uiSettingKey => {
-  const uiSettings = useHMSStore(
-    selectAppData(
-      uiSettingKey
-        ? `${APP_DATA.uiSettings}.${uiSettingKey}`
-        : APP_DATA.uiSettings
-    )
-  );
+  const selectorPath = getPath({
+    base: APP_DATA.uiSettings,
+    path: uiSettingKey,
+  });
+  const uiSettings = useHMSStore(selectAppDataByPath(selectorPath));
   return uiSettings;
 };
 
@@ -68,13 +67,11 @@ export const useLogo = () => {
 };
 
 export const useSubscribedNotifications = notificationKey => {
-  const notificationPreference = useHMSStore(
-    selectAppData(
-      notificationKey
-        ? `${APP_DATA.subscribedNotifications}.${notificationKey}`
-        : APP_DATA.subscribedNotifications
-    )
-  );
+  const selectorPath = getPath({
+    base: APP_DATA.subscribedNotifications,
+    path: notificationKey,
+  });
+  const notificationPreference = useHMSStore(selectAppDataByPath(selectorPath));
   return notificationPreference;
 };
 
@@ -114,4 +111,12 @@ const useSetAppData = ({ key1, key2 }) => {
     [actions, key1, key2, store, setPreferences]
   );
   return setValue;
+};
+
+export const getPath = ({ base, path }) => {
+  let selectorPath = [base];
+  if (path) {
+    selectorPath = selectorPath.concat(path);
+  }
+  return selectorPath;
 };
