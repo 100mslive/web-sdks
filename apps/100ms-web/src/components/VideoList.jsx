@@ -6,7 +6,7 @@ import VideoTile from "./VideoTile";
 import ScreenshareTile from "./ScreenshareTile";
 import { FeatureFlags } from "../services/FeatureFlags";
 import { Pagination } from "./Pagination";
-import { useAppConfig } from "./AppData/useAppConfig";
+import { useAppConfigByPath } from "./AppData/useAppConfig";
 import { useIsHeadless } from "./AppData/useUISettings";
 
 const List = ({
@@ -17,7 +17,7 @@ const List = ({
   includeScreenShareForPeer,
 }) => {
   const { aspectRatio } = useTheme();
-  const appConfig = useAppConfig();
+  const tileOffset = useAppConfigByPath("headlessConfig.tileOffset");
   const isHeadless = useIsHeadless();
   const { ref, pagesWithTiles } = useVideoList({
     peers,
@@ -26,7 +26,7 @@ const List = ({
     maxRowCount,
     includeScreenShareForPeer,
     aspectRatio,
-    offsetY: getOffset({ isHeadless, appConfig }),
+    offsetY: getOffset({ isHeadless, tileOffset }),
   });
   const [page, setPage] = useState(0);
   useEffect(() => {
@@ -84,8 +84,7 @@ const List = ({
 
 const VideoList = React.memo(List);
 
-const getOffset = ({ appConfig, isHeadless }) => {
-  const offset = appConfig?.headlessConfig?.tileOffset;
+const getOffset = ({ offset, isHeadless }) => {
   if (!isHeadless || typeof offset !== "number") {
     return 32;
   }
