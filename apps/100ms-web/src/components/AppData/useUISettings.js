@@ -87,14 +87,14 @@ const useSetAppData = ({ key1, key2 }) => {
     UserPreferencesKeys.UI_SETTINGS
   );
   const setValue = useCallback(
-    (value, type) => {
-      if (!key1 || (!key2 && !type)) {
+    value => {
+      if (!key1 || !key2) {
         return;
       }
       actions.setAppData(
         key1,
         {
-          [key2 || type]: value,
+          [key2]: value,
         },
         true
       );
