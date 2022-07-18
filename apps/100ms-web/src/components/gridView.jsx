@@ -83,7 +83,7 @@ export const GridCenterView = ({ peers, maxTileCount, hideSidePane }) => {
 };
 
 // Side pane shows smaller tiles
-export const GridSidePaneView = ({ peers, showStatsOnTiles }) => {
+export const GridSidePaneView = ({ peers }) => {
   const isChatOpen = useIsChatOpen();
   return (
     <Flex

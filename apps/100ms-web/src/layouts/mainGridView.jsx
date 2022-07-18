@@ -14,7 +14,6 @@ export const MainGridView = () => {
   const centerRoles = useAppPolicyConfigByKey("center") || [];
   const sidepaneRoles = useAppPolicyConfigByKey("sidepane") || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
-  const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const peers = useHMSStore(selectPeers);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
@@ -58,14 +57,9 @@ export const MainGridView = () => {
         allowRemoteMute={false}
         hideSidePane={!showSidePane}
         totalPeers={peers.length}
-        showStatsOnTiles={showStatsOnTiles}
       />
       {showSidePane && (
-        <GridSidePaneView
-          peers={sidebarPeers}
-          totalPeers={peers.length}
-          showStatsOnTiles={showStatsOnTiles}
-        />
+        <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
       )}
     </Flex>
   );
