@@ -15,7 +15,9 @@ export interface HMSRole {
     unmute: boolean;
     mute: boolean;
     changeRole: boolean;
-    streaming: boolean;
+    hlsStreaming: boolean;
+    rtmpStreaming: boolean;
+    browserRecording: boolean;
     recording: boolean;
   };
   priority: number;
