@@ -12,9 +12,10 @@ export const Input = styled('input', {
   fontSize: '$md',
   '&:focus': {
     boxShadow: '0 0 0 1px $colors$borderAccent',
+    border: '1px solid transparent',
   },
   '&::placeholder': {
-    color: '$textMedEmp',
+    color: '$textDisabled',
   },
   variants: {
     error: {

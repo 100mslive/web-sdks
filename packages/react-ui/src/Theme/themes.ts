@@ -24,14 +24,12 @@ export const darkTheme = {
 // TODO: Update light theme colors from design
 export const lightTheme = {
   colors: {
-    bgPrimary: '#FFFFFF',
+    bgPrimary: '$white',
     bgSecondary: '#F5F5F5',
     bgTertiary: 'rgba(255,255,255, 0.38)',
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',
-    textDisabled: 'rgba(0,0,0, 0.38)',
     textInvert: 'rgba(255,255,255, 0.9)',
-    textMedEmp: 'rgba(3, 3, 3, 0.8)',
     iconBtn: '#3b3b3b',
     iconHoverBg: 'rgba(0, 0, 0, 0.22)',
     transparentBg: 'rgba(255, 255, 255, 0.22)',
@@ -42,5 +40,23 @@ export const lightTheme = {
     menuBg: '#d9d9d9',
     inputBg: '$tileBg',
     toastBg: '$menuBg',
+
+    // text variants
+    textHighEmp: 'rgba(0, 0, 0, 0.95)',
+    textMedEmp: 'rgba(0, 0, 0, 0.8)',
+    textDisabled: 'rgba(0, 0, 0, 0.4)',
+
+    borderDefault: '#DDE2E9',
+    borderLight: '#D4D9E2',
+
+    surfaceDefault: '#F0F2F5',
+    surfaceLight: '#F6F7F9',
+    surfaceLighter: '#FCFCFD',
+
+    backgroundDefault: '#EAECF1',
+    backgroundDark: '#E3E7ED',
+    backgroundDarker: '#DDE2E9',
   },
 };
+
+// Modals -> surface light/er

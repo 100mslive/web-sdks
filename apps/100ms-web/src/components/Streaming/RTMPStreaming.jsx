@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   selectAppData,
   useHMSActions,
@@ -28,7 +28,11 @@ import {
   useUserPreferences,
 } from "../hooks/useUserPreferences";
 import { getDefaultMeetingUrl } from "../../common/utils";
-import { APP_DATA } from "../../common/constants";
+import {
+  APP_DATA,
+  RTMP_RECORD_DEFAULT_RESOLUTION,
+} from "../../common/constants";
+import { ResolutionInput } from "../MoreSettings/ResolutionInput";
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();
@@ -40,9 +44,9 @@ export const RTMPStreaming = ({ onBack }) => {
         content="Choose a destination"
         onBack={onBack}
       />
-      <ContentBody Icon={SettingsIcon} title="Custom RTMP">
-        Allows you to add a Custom RTMP or more than 1 channel of the same
-        platform from our list of supported platforms.
+      <ContentBody Icon={SettingsIcon} title="RTMP">
+        Live Stream your call to Twitch, YouTube, Facebook and any app which
+        supports RTMP, all at the same time
       </ContentBody>
       {!isRTMPRunning ? <StartRTMP /> : <EndRTMP />}
     </Container>
@@ -50,26 +54,29 @@ export const RTMPStreaming = ({ onBack }) => {
 };
 
 const StartRTMP = () => {
-  const [rtmpPreference, setRTMPPreference] = useUserPreferences(
+  const [rtmpPreference = [], setRTMPPreference] = useUserPreferences(
     UserPreferencesKeys.RTMP_URLS
   );
   const [rtmpStreams, setRTMPStreams] = useState(
-    rtmpPreference || [
-      {
-        name: "Stream",
-        id: Date.now(),
-        rtmpURL: "",
-        streamKey: "",
-      },
-    ]
+    rtmpPreference.length > 0
+      ? rtmpPreference
+      : [
+          {
+            name: "Stream",
+            id: Date.now(),
+            rtmpURL: "",
+            streamKey: "",
+          },
+        ]
   );
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [record, setRecord] = useState(false);
+  const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   return (
-    <Fragment>
+    <Box css={{ overflowY: "auto" }}>
       {rtmpStreams.length > 0 && (
-        <Box css={{ px: "$10", overflowY: "auto" }}>
+        <Box css={{ px: "$10" }}>
           <Accordion.Root
             type="single"
             collapsible
@@ -99,14 +106,23 @@ const StartRTMP = () => {
           </Accordion.Root>
         </Box>
       )}
+      <ResolutionInput
+        onResolutionChange={setResolution}
+        css={{
+          flexDirection: "column",
+          alignItems: "start",
+          px: "$10",
+          my: "$8",
+        }}
+      />
       <RecordStream record={record} setRecord={setRecord} />
-      <Box css={{ p: "$8 $10" }}>
+      <Box css={{ p: "$8 $10", "@lg": { display: "flex", gap: "$4" } }}>
         {rtmpStreams.length < 3 && (
           <Button
             variant="standard"
             outlined
             icon
-            css={{ mb: "$8", w: "100%" }}
+            css={{ my: "$4", w: "100%" }}
             onClick={() => {
               setRTMPStreams(streams => [
                 ...streams,
@@ -125,10 +141,11 @@ const StartRTMP = () => {
         <Button
           variant="primary"
           icon
-          css={{ w: "100%" }}
+          css={{ w: "100%", my: "$4" }}
           disabled={
-            rtmpStreams.length === 0 ||
-            rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)
+            (rtmpStreams.length === 0 ||
+              rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
+            !record
           }
           onClick={async () => {
             try {
@@ -137,6 +154,8 @@ const StartRTMP = () => {
                   value => `${value.rtmpURL}/${value.streamKey}`
                 ),
                 meetingURL: recordingUrl || getDefaultMeetingUrl(),
+                resolution: getResolution(resolution),
+                record: record,
               });
               setRTMPPreference(rtmpStreams);
             } catch (error) {
@@ -148,7 +167,7 @@ const StartRTMP = () => {
           Go Live
         </Button>
       </Box>
-    </Fragment>
+    </Box>
   );
 };
 
@@ -197,6 +216,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
       as="form"
       id={id}
       direction="column"
+      css={{ mb: "$8" }}
       ref={formRef}
       onSubmit={e => {
         e.preventDefault();
@@ -225,7 +245,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
         placeholder="Enter Stream Key"
         id="streamKey"
         name="streamKey"
-        Value={streamKey}
+        value={streamKey}
         onChange={e => {
           setRTMPStreams(streams =>
             updateStream({
@@ -299,3 +319,16 @@ const updateStream = ({ streams, id, key, value }) =>
     }
     return stream;
   });
+
+function getResolution(recordingResolution) {
+  const resolution = {};
+  if (recordingResolution.width) {
+    resolution.width = recordingResolution.width;
+  }
+  if (recordingResolution.height) {
+    resolution.height = recordingResolution.height;
+  }
+  if (Object.keys(resolution).length > 0) {
+    return resolution;
+  }
+}

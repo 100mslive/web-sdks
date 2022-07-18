@@ -31,10 +31,14 @@ const SidePane = ({ css = {} }) => {
         top: 0,
         right: "$10",
         zIndex: 10,
+        boxShadow: "$md",
         ...css,
         "@lg": {
           w: "100%",
           right: 0,
+          position: "fixed",
+          bottom: 0,
+          height: "unset",
           ...(css["@lg"] || {}),
         },
       }}
