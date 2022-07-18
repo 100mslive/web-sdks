@@ -18,6 +18,7 @@ import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { ToastBatcher } from "../Toast/ToastBatcher";
 import { useIsHeadless } from "../AppData/useUISettings";
+import { PermissionErrorModal } from "./PermissionErrorModal";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -105,8 +106,8 @@ export function Notifications() {
         // Autoplay error or user denied screen share(cancelled browser pop-up)
         if (
           notification.data?.code === 3008 ||
-          (notification.data?.code === 3001 &&
-            notification.data?.message.includes("screen"))
+          notification.data?.code === 3001 ||
+          notification.data?.code === 3011
         ) {
           return;
         }
@@ -179,6 +180,7 @@ export function Notifications() {
       <PeerNotifications />
       <ReconnectNotifications />
       <AutoplayBlockedModal />
+      <PermissionErrorModal />
       <InitErrorModal notification={notification} />
     </>
   );

@@ -1,5 +1,5 @@
-import { PageWrapper } from "../../PageWrapper";
-import { expect, test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { expect, test } from '@playwright/test';
 
 let page: PageWrapper;
 
@@ -12,7 +12,7 @@ test.afterEach(async () => {
   await page.close();
 });
 
-test(`Verify noise supp and virtual background`, async () => {
+test(`Verify noise supp and virtual background @qaonly`, async () => {
   const virtualBg = page.locator(page.footer.virtual_bg_btn);
   const noiseSupp = page.locator(page.footer.noise_supp_btn);
   const btnDisabled = /active-true/;
