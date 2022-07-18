@@ -145,7 +145,7 @@ export class HLSController {
         const tagList = frag?.tagList;
         const tagsMap = parseTagsList(tagList);
         // There could be more than one EXT-X-DATERANGE tags in a fragment.
-        const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"];
+        const metadataStrings = tagsMap.rawTags["EXT-X-DATERANGE"] || [];
         if (metadataStrings.length > 0) {
           for (let metadataString of metadataStrings) {
             const tagMetadata = parseAttributesFromMetadata(metadataString);
@@ -195,76 +195,80 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
-      // console.log(`Segment loaded ${frag.relurl}`);
-      const tagsList = parseTagsList(frag?.tagList);
-      const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
-      const timeStamps = [];
-      this.metadataByTimeStamp.forEach((value, key) => {
-        timeStamps.push(key);
-      });
+      try {
+        const tagsList = parseTagsList(frag?.tagList);
+        const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
+        const timeStamps = [];
+        this.metadataByTimeStamp.forEach((value, key) => {
+          timeStamps.push(key);
+        });
 
-      let nearestTimeStamp = timeSegment;
-      timeStamps.push(timeSegment);
-      timeStamps.sort();
+        let nearestTimeStamp = timeSegment;
+        timeStamps.push(timeSegment);
+        timeStamps.sort();
 
-      const whereAmI = timeStamps.indexOf(timeSegment);
-      nearestTimeStamp = timeStamps[whereAmI + 1];
+        const whereAmI = timeStamps.indexOf(timeSegment);
+        nearestTimeStamp = timeStamps[whereAmI + 1];
 
-      /**
-       * This check is if timestamp ends up on the
-       * end of the array after sorting. Meaning,
-       * there is no possible future events.
-       * Hence NearestTimeStamp will be undefined.
-       */
-      if (isNaN(nearestTimeStamp)) {
-        return;
-      }
-
-      /**
-       * at this point its gauranteed that we have a timesegment and a possible
-       * future event very close. We now take the difference between them.
-       * The difference must always be between 0(start of the fragment) and INF duration(end of the fragment)
-       * if it is not, then the metadata doesn't belong to this fragment and we leave it
-       * 'as-is' so future fragments can try to parse it.
-       *
-       * (e.g) timestamp => [5,11,12,15,20,22], duration = 2.
-       *
-       * Fragment1_timesegment = 11 => nearestTimeStamp=>11 => 11 - 11 = 0 (play at start of the fragment)
-       *
-       * Fragment2_timesegment = 14 => nearestTimeStamp=>15 => 15 - 14 = 1 (still inside duration.
-       * so play after 1 sec of the start of the fragment)
-       *
-       * Fragment3_timesegment = 15 => nearestTimeStamp=>20 => 20 - 15 = 5 (5 is greated than duration 2. so
-       * this does not belong to this fragment. ignore and move on to next fragment)
-       *
-       * Fragment4_timesegment = 19 => nearestTimeStamp=>20 => 20 - 19 = 1 (valid)
-       *
-       */
-
-      const timeDifference = nearestTimeStamp - timeSegment;
-      if (timeDifference >= 0 && timeDifference < tagsList.duration) {
-        const payload = this.metadataByTimeStamp
-          .get(nearestTimeStamp)
-          .map(metadata => metadata.payload);
         /**
-         * we start a timeout for difference seconds.
-         * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
-         * time JS will wait before calling emit(). It's not guaranteed even
-         * for timeDifference = 0.
+         * This check is if timestamp ends up on the
+         * end of the array after sorting. Meaning,
+         * there is no possible future events.
+         * Hence NearestTimeStamp will be undefined.
          */
-        setTimeout(() => {
+        if (isNaN(nearestTimeStamp)) {
+          return;
+        }
+
+        /**
+         * at this point its gauranteed that we have a timesegment and a possible
+         * future event very close. We now take the difference between them.
+         * The difference must always be between 0(start of the fragment) and INF duration(end of the fragment)
+         * if it is not, then the metadata doesn't belong to this fragment and we leave it
+         * 'as-is' so future fragments can try to parse it.
+         *
+         * (e.g) timestamp => [5,11,12,15,20,22], duration = 2.
+         *
+         * Fragment1_timesegment = 11 => nearestTimeStamp=>11 => 11 - 11 = 0 (play at start of the fragment)
+         *
+         * Fragment2_timesegment = 14 => nearestTimeStamp=>15 => 15 - 14 = 1 (still inside duration.
+         * so play after 1 sec of the start of the fragment)
+         *
+         * Fragment3_timesegment = 15 => nearestTimeStamp=>20 => 20 - 15 = 5 (5 is greated than duration 2. so
+         * this does not belong to this fragment. ignore and move on to next fragment)
+         *
+         * Fragment4_timesegment = 19 => nearestTimeStamp=>20 => 20 - 19 = 1 (valid)
+         *
+         */
+
+        const timeDifference = nearestTimeStamp - timeSegment;
+        if (timeDifference >= 0 && timeDifference < tagsList.duration) {
+          const payload = this.metadataByTimeStamp
+            .get(nearestTimeStamp)
+            .map(metadata => metadata.payload);
           /**
-           * finally emit event letting the user know its time to
-           * do whatever they want with the payload
+           * we start a timeout for difference seconds.
+           * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
+           * time JS will wait before calling emit(). It's not guaranteed even
+           * for timeDifference = 0.
            */
-          this.eventEmitter.emit(HLS_TIMED_METADATA_LOADED, payload);
-          /** we delete the occured events from the metadataMap. This is not
-           * needed for the operation. Just a bit of optimisation as a really
-           * long stream with many metadata can quickly make the metadataMap really big.
-           */
-          this.metadataByTimeStamp.delete(nearestTimeStamp);
-        }, timeDifference * 1000);
+          setTimeout(() => {
+            /**
+             * finally emit event letting the user know its time to
+             * do whatever they want with the payload
+             */
+            this.eventEmitter.emit(HLS_TIMED_METADATA_LOADED, payload);
+            /** we delete the occured events from the metadataMap. This is not
+             * needed for the operation. Just a bit of optimisation as a really
+             * long stream with many metadata can quickly make the metadataMap really big.
+             */
+            this.metadataByTimeStamp.delete(nearestTimeStamp);
+          }, timeDifference * 1000);
+        }
+      } catch (e) {
+        console.error("Frag changed event listener error:", e);
       }
+      // console.log(`Segment loaded ${frag.relurl}`);
     });
   }
 

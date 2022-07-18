@@ -83,6 +83,6 @@ export function isAlreadyInMetadataMap(fragsTimeStamps, tagMetadata) {
  * @param {string} str - string to remove the qoutes from.
  * @returns
  */
-function removeQuotes(str) {
+function removeQuotes(str = "") {
   return str.replace(/^"(.*)"$/, "$1");
 }
