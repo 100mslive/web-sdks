@@ -1,6 +1,7 @@
 import React, { Fragment, useCallback, useMemo, useState } from "react";
 import {
   selectAppData,
+  selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -209,20 +210,27 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
 };
 
 export const RecordingStreaming = () => {
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [showModal, setShowModal] = useState(false);
+  const { isStreamingOn } = useRecordingStreaming();
+  const title = isStreamingOn ? "Stop Streaming" : "Start Streaming";
+  if (!isConnected) {
+    return null;
+  }
 
   return (
     <Fragment>
-      <Tooltip title="Start/Stop streaming/recording">
+      <Tooltip title={`${title}/Recording`}>
         <Button
-          variant="primary"
+          variant={isStreamingOn ? "danger" : "standard"}
           icon
+          outlined={isStreamingOn}
           onClick={() => {
             setShowModal(true);
           }}
         >
           <RecordIcon />
-          <Box css={{ "@lg": { display: "none" } }}>Start Streaming</Box>
+          <Box css={{ "@md": { display: "none" } }}>{title}</Box>
         </Button>
       </Tooltip>
 

@@ -22,7 +22,6 @@ import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { isScreenshareSupported } from "../../common/utils";
-import { RecordingStreaming } from "./RecordingAndRTMPModal";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
@@ -106,7 +105,6 @@ export const ConferencingFooter = () => {
         </Flex>
       </AppFooter.Center>
       <AppFooter.Right>
-        <RecordingStreaming />
         <MetaActions />
         <ChatToggle />
       </AppFooter.Right>

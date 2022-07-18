@@ -62,9 +62,9 @@ export const RecordingStatus = () => {
 };
 
 const EndStream = () => {
-  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const { isStreamingOn } = useRecordingStreaming();
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  if (!isHLSRunning && !isRTMPRunning) {
+  if (!isStreamingOn) {
     return null;
   }
   return (
