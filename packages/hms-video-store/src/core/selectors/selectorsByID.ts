@@ -53,7 +53,7 @@ export const selectAppData = byIDCurry(
   }),
 );
 
-export const selectAppDataByPath = (keys: string[]) =>
+export const selectAppDataByPath = (...keys: string[]) =>
   createSelector([selectFullAppData], appData => {
     if (!appData) {
       return undefined;
@@ -61,6 +61,9 @@ export const selectAppDataByPath = (keys: string[]) =>
     if (keys && keys.length > 0) {
       let value = appData;
       for (const key of keys) {
+        if (!key) {
+          return value;
+        }
         value = value?.[key];
       }
       return value;

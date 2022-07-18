@@ -23,11 +23,9 @@ import {
  * @param {string | undefined} uiSettingKey
  */
 export const useUISettings = uiSettingKey => {
-  const selectorPath = getPath({
-    base: APP_DATA.uiSettings,
-    path: uiSettingKey,
-  });
-  const uiSettings = useHMSStore(selectAppDataByPath(selectorPath));
+  const uiSettings = useHMSStore(
+    selectAppDataByPath(APP_DATA.uiSettings, uiSettingKey)
+  );
   return uiSettings;
 };
 
@@ -67,11 +65,9 @@ export const useLogo = () => {
 };
 
 export const useSubscribedNotifications = notificationKey => {
-  const selectorPath = getPath({
-    base: APP_DATA.subscribedNotifications,
-    path: notificationKey,
-  });
-  const notificationPreference = useHMSStore(selectAppDataByPath(selectorPath));
+  const notificationPreference = useHMSStore(
+    selectAppDataByPath(APP_DATA.subscribedNotifications, notificationKey)
+  );
   return notificationPreference;
 };
 
@@ -111,12 +107,4 @@ const useSetAppData = ({ key1, key2 }) => {
     [actions, key1, key2, store, setPreferences]
   );
   return setValue;
-};
-
-export const getPath = ({ base, path }) => {
-  let selectorPath = [base];
-  if (path) {
-    selectorPath = selectorPath.concat(path);
-  }
-  return selectorPath;
 };
