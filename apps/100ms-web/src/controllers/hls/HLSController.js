@@ -1,13 +1,12 @@
 import Hls from "hls.js";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
-// import { FeatureFlags } from "../../services/FeatureFlags";
+import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   getSecondsFromTime,
   isAlreadyInMetadataMap,
   parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
-import { FeatureFlags } from "../../services/FeatureFlags";
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
@@ -63,7 +62,6 @@ export class HLSController {
     videoEl.currentTime = this.hls.liveSyncPosition;
   }
 
-  isVideoLive() {}
   /**
    * Event listener. Also takes HLS JS events. If its
    * not a Controller's event, it just forwards the
@@ -122,8 +120,6 @@ export class HLSController {
      * }
      */
     this.hls.on(Hls.Events.BUFFER_APPENDED, (_, { frag }) => {
-      // console.log(`Segment ${frag.relurl}`);
-
       const tagList = frag?.tagList;
       const tagsMap = parseTagsList(tagList);
       // There could be more than one EXT-X-DATERANGE tags in a fragment.
@@ -174,7 +170,6 @@ export class HLSController {
      * only gaurantees minimum time before trying to emit.
      */
     this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
-      // console.log(`Segment loaded ${frag.relurl}`);
       const tagsList = parseTagsList(frag?.tagList);
       const timeSegment = getSecondsFromTime(tagsList.fragmentStartAt);
       const timeStamps = [];

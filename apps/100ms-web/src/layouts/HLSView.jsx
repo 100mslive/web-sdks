@@ -38,10 +38,10 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
-  // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
+  const [currentSelectedQualityText, setCurrentSelectedQualityText] =
+    useState("");
   const [isVideoLive, setIsVideoLive] = useState(true);
-  // const [videoProgress, setVideoProgress] = useState(0);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -50,11 +50,6 @@ const HLSView = () => {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
 
-        // videoRef.current.addEventListener("timeupdate", event => {
-        //   const progress =
-        //     (videoRef.current.currentTime / videoRef.current.duration) * 100;
-        //   setVideoProgress(isNaN(progress) ? 0 : progress);
-        // });
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
@@ -70,6 +65,7 @@ const HLSView = () => {
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
           setAvailableLevels(levels);
+          setCurrentSelectedQualityText("Auto");
         });
       } else if (
         videoRef.current.canPlayType("application/vnd.apple.mpegurl")
@@ -89,6 +85,9 @@ const HLSView = () => {
     qualityLevel => {
       if (hlsController) {
         hlsController.setCurrentLevel(getCurrentLevel(qualityLevel));
+        const levelText =
+          qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
+        setCurrentSelectedQualityText(levelText);
       }
     },
     [availableLevels] //eslint-disable-line
@@ -119,6 +118,7 @@ const HLSView = () => {
 
     return availableLevels.length - 1 - index;
   };
+
   function toggleFullScreen() {
     const hlsviewer = document.getElementById("hls-viewer");
     if (hlsviewer && !isFullScreen) {
@@ -131,7 +131,7 @@ const HLSView = () => {
   }
 
   return (
-    <div key="hls-viewer" id="hls-viewer" style={{ display: "inline" }}>
+    <div key="hls-viewer" id="hls-viewer" style={{ height: "100%" }}>
       {hlsUrl ? (
         <Flex css={{ height: "90%" }} justify="center">
           <HMSVideoPlayer
@@ -153,8 +153,8 @@ const HLSView = () => {
                         hlsController.jumpToLive();
                         setIsVideoLive(true);
                       }}
-                      key="jumpToLive_btn"
-                      data-testid="leave_room_btn"
+                      key="jump-to-live_btn"
+                      data-testid="jump-to-live_btn"
                     >
                       <Tooltip title="Go to Live">
                         <Flex justify="center" gap={2} align="center">
@@ -191,6 +191,9 @@ const HLSView = () => {
                         <Tooltip title="Select Quality">
                           <Flex>
                             <SettingIcon />
+                            <Text css={{ fontSize: "0.75rem" }} variant="md">
+                              {currentSelectedQualityText}
+                            </Text>
                           </Flex>
                         </Tooltip>
 
@@ -255,11 +258,6 @@ const HLSView = () => {
               );
             }}
             controlsConfig={{
-              progress: {
-                onValueChange: function progress(progress) {
-                  console.log("PROGRESS HAPPENING", progress);
-                },
-              },
               fullscreen: {
                 onToggle: toggleFullScreen,
                 icon: () => (isFullScreen ? <ShrinkIcon /> : <ExpandIcon />),
@@ -268,148 +266,6 @@ const HLSView = () => {
           />
         </Flex>
       ) : (
-        // <>
-        //   <Flex css={{ height: "90%" }}>
-        //     <HLSVideo ref={videoRef} autoPlay playsInline />
-        //   </Flex>
-        //   <Slider
-        //     step={1}
-        //     value={[videoProgress]}
-        //     onValueChange={progress => {
-        //       console.log(progress);
-        //       const currentTime = (progress * videoRef.current.duration) / 100;
-        //       videoRef.current.currentTime = currentTime;
-        //     }}
-        //   />
-        //   <Flex
-        //     justify="between"
-        //     align="center"
-        //     gap={2}
-        //     css={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}
-        //   >
-        //     <Flex justify="start" align="center" gap={2}>
-        //       <PauseButtonAndTime videoEl={videoRef.current} />
-        //       <VolumeControl videoEl={videoRef.current} />
-        //     </Flex>
-        //     <Flex justify="start" align="center" gap={2}>
-        //       {hlsController ? (
-        //         <IconButton
-        //           variant="standard"
-        //           css={{ marginRight: "0.3rem" }}
-        //           onClick={() => {
-        //             hlsController.jumpToLive();
-        //             setIsVideoLive(true);
-        //           }}
-        //           key="jumpToLive_btn"
-        //           data-testid="leave_room_btn"
-        //         >
-        //           <Tooltip title="Jump to Live">
-        //             <Flex>
-        //               <RecordIcon
-        //                 color={isVideoLive ? "#CC525F" : "FAFAFA"}
-        //                 key="jumpToLive"
-        //               />
-        //               <Text>Live</Text>
-        //             </Flex>
-        //           </Tooltip>
-        //         </IconButton>
-        //       ) : null}
-        //       <Dropdown.Root
-        //         open={qualityDropDownOpen}
-        //         onOpenChange={value => setQualityDropDownOpen(value)}
-        //       >
-        //         <Dropdown.Trigger asChild data-testid="quality_selector">
-        //           <Flex
-        //             css={{
-        //               color: "$textPrimary",
-        //               borderRadius: "$1",
-        //               cursor: "pointer",
-        //               zIndex: 40,
-        //               border: "1px solid $textDisabled",
-        //               padding: "$2 $4",
-        //             }}
-        //           >
-        //             <Tooltip title="Select Quality">
-        //               <Flex>
-        //                 <SettingIcon />
-        //               </Flex>
-        //             </Tooltip>
-
-        //             <Box
-        //               css={{
-        //                 "@lg": { display: "none" },
-        //                 color: "$textDisabled",
-        //               }}
-        //             >
-        //               {qualityDropDownOpen ? (
-        //                 <ChevronUpIcon />
-        //               ) : (
-        //                 <ChevronDownIcon />
-        //               )}
-        //             </Box>
-        //           </Flex>
-        //         </Dropdown.Trigger>
-        //         {availableLevels.length > 0 && (
-        //           <Dropdown.Content
-        //             sideOffset={5}
-        //             align="end"
-        //             css={{ height: "auto", maxHeight: "$96" }}
-        //           >
-        //             <Dropdown.Item
-        //               onClick={event =>
-        //                 qualitySelectorHandler({ height: "auto" })
-        //               }
-        //               css={{
-        //                 h: "auto",
-        //                 flexDirection: "column",
-        //                 flexWrap: "wrap",
-        //                 cursor: "pointer",
-        //                 alignItems: "flex-start",
-        //               }}
-        //               key="auto"
-        //             >
-        //               <Text>Automatic</Text>
-        //             </Dropdown.Item>
-        //             {availableLevels.map(level => {
-        //               return (
-        //                 <Dropdown.Item
-        //                   onClick={() => qualitySelectorHandler(level)}
-        //                   css={{
-        //                     h: "auto",
-        //                     flexDirection: "column",
-        //                     flexWrap: "wrap",
-        //                     cursor: "pointer",
-        //                     alignItems: "flex-start",
-        //                   }}
-        //                   key={level.url}
-        //                 >
-        //                   <Text>{`${level.height}p (${(
-        //                     Number(level.bitrate / 1024) / 1024
-        //                   ).toFixed(2)} Mbps)`}</Text>
-        //                 </Dropdown.Item>
-        //               );
-        //             })}
-        //           </Dropdown.Content>
-        //         )}
-        //       </Dropdown.Root>
-        //       <IconButton
-        //         variant="standard"
-        //         css={{ marginRight: "0.3rem" }}
-        //         onClick={() => {
-        //           toggleFullScreen();
-        //         }}
-        //         key="fullscreen"
-        //         data-testid="fullscreen_btn"
-        //       >
-        //         <Tooltip title="Go to fullscreen">
-        //           <Flex>
-        //             <GridIcon />
-        //           </Flex>
-        //         </Tooltip>
-        //       </IconButton>
-        //     </Flex>
-        //   </Flex>
-        // </>
         <Flex align="center" justify="center" css={{ size: "100%" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...

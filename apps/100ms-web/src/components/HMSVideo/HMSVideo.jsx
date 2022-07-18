@@ -12,36 +12,38 @@ export const HMS_VIDEO_PLAYER_CTRL_VOLUME = "volume";
 export const HMSVideoPlayer = forwardRef(
   ({ controls, controlsConfig, controlsToTheRight }, videoRef) => {
     const [videoProgress, setVideoProgress] = useState(0);
-    const sliderConfig = controlsConfig[HMS_VIDEO_PLAYER_CTRL_PROGRESS];
+    const progressBarConfig = controlsConfig[HMS_VIDEO_PLAYER_CTRL_PROGRESS];
     const fullscreenConfig = controlsConfig[HMS_VIDEO_PLAYER_CTRL_FULLSCREEN];
-    console.log(controlsConfig);
+    const checkForControls = controlName =>
+      controls.indexOf(controlName) !== -1;
 
-    const checkForControls = function (controlName) {
-      return controls.indexOf(controlName) !== -1;
-    };
     useEffect(() => {
       videoRef.current.addEventListener("timeupdate", event => {
-        const progress =
-          (videoRef.current.currentTime / videoRef.current.duration) * 100;
+        const progress = Math.floor(
+          (videoRef.current.currentTime / videoRef.current.duration) * 100
+        );
         setVideoProgress(isNaN(progress) ? 0 : progress);
       });
     }, []);
 
     const sliderValueChangeHandler = progress => {
-      console.log(progress);
       const currentTime = (progress * videoRef.current.duration) / 100;
       videoRef.current.currentTime = currentTime;
-      if (sliderConfig.onValueChange) {
-        sliderConfig.onValueChange();
+      if (progressBarConfig.onValueChange) {
+        progressBarConfig.onValueChange();
       }
     };
     return (
-      <div id="hms-video" css={{ height: "100%" }}>
-        <Flex css={{ width: "100%" }}>
-          <video ref={videoRef} controls autoPlay playsInline />
-        </Flex>
+      <div id="hms-video" style={{ height: "100%" }}>
+        <video
+          style={{ height: "100%", margin: "auto" }}
+          ref={videoRef}
+          autoPlay
+          playsInline
+        />
         {checkForControls(HMS_VIDEO_PLAYER_CTRL_PROGRESS) ? (
           <Slider
+            showTooltip={false}
             step={1}
             value={[videoProgress]}
             onValueChange={sliderValueChangeHandler}
@@ -64,7 +66,7 @@ export const HMSVideoPlayer = forwardRef(
               ) : null}
             </Flex>
             <Flex justify="start" align="center" gap={2}>
-              {controlsToTheRight()}
+              {controlsToTheRight ? controlsToTheRight() : null}
               {checkForControls(HMS_VIDEO_PLAYER_CTRL_FULLSCREEN) ? (
                 <IconButton
                   variant="standard"

@@ -3,7 +3,6 @@ import { Flex, Slider } from "@100mslive/react-ui";
 import { useEffect, useState } from "react";
 
 export const VolumeControl = ({ videoEl }) => {
-  // console.log("VOLUME", videoEl);
   const [volume, setVolume] = useState(75);
   useEffect(() => {
     if (volume === 0) {
