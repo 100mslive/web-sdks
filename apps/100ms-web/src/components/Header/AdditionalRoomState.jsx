@@ -31,7 +31,7 @@ import { useWhiteboardMetadata } from "../../plugins/whiteboard/useWhiteboardMet
 import { UI_SETTINGS } from "../../common/constants";
 import { useUISettings } from "../AppData/useUISettings";
 
-const getRecordingText = (
+export const getRecordingText = (
   { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn },
   delimiter = ", "
 ) => {

@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -29,6 +30,7 @@ export const LeaveRoom = ({ isConference = true }) => {
   const params = useParams();
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
 
@@ -50,8 +52,8 @@ export const LeaveRoom = ({ isConference = true }) => {
     redirectToLeavePage();
   };
 
-  if (!permissions) {
-    return;
+  if (!permissions || !isConnected) {
+    return null;
   }
 
   return (

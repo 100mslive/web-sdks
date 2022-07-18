@@ -11,29 +11,68 @@ import { Box, Button, Flex, Text, Tooltip } from "@100mslive/react-ui";
 import GoLiveButton from "../GoLiveButton";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import { getRecordingText } from "./AdditionalRoomState";
 
-const EndStream = () => {
-  const { isHLSRecordingOn, isHLSRunning, isRTMPRunning } =
-    useRecordingStreaming();
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+export const LiveStatus = () => {
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
   return (
     <Flex align="center" css={{ ml: "$4" }}>
       <Box css={{ w: "$4", h: "$4", r: "$round", bg: "$error", mr: "$4" }} />
-      <Text>Live with HLS</Text>
-      {isHLSRecordingOn && (
-        <Tooltip title="HLS Recording on">
-          <Button
-            variant="standard"
-            outlined
-            css={{ color: "$error", ml: "$8", px: "$4" }}
-          >
-            <RecordIcon />
-          </Button>
-        </Tooltip>
-      )}
+      <Text>
+        Live
+        <Text as="span" css={{ "@md": { display: "none" } }}>
+          &nbsp;with {isHLSRunning ? "HLS" : "RTMP"}
+        </Text>
+      </Text>
+    </Flex>
+  );
+};
+
+export const RecordingStatus = () => {
+  const {
+    isBrowserRecordingOn,
+    isServerRecordingOn,
+    isHLSRecordingOn,
+    isRecordingOn,
+  } = useRecordingStreaming();
+
+  if (!isRecordingOn) {
+    return null;
+  }
+  return (
+    <Tooltip
+      title={getRecordingText({
+        isBrowserRecordingOn,
+        isServerRecordingOn,
+        isHLSRecordingOn,
+      })}
+    >
+      <Button
+        variant="standard"
+        outlined
+        css={{ color: "$error", ml: "$8", px: "$4" }}
+      >
+        <RecordIcon width={24} height={24} style={{ marginRight: "0.25rem" }} />
+      </Button>
+    </Tooltip>
+  );
+};
+
+const EndStream = () => {
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  if (!isHLSRunning && !isRTMPRunning) {
+    return null;
+  }
+  return (
+    <Flex align="center">
+      <Flex align="center" css={{ "@md": { display: "none" } }}>
+        <LiveStatus />
+        <RecordingStatus />
+      </Flex>
       <Button
         variant="standard"
         outlined

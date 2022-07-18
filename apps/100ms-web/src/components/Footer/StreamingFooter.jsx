@@ -3,19 +3,11 @@ import { Flex, Footer as AppFooter, Box } from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
 import { ScreenshareToggle } from "../ScreenShare";
-import { NoiseSuppression } from "../../plugins/NoiseSuppression";
-import { ToggleWhiteboard } from "../../plugins/whiteboard";
-import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import PIPComponent from "../PIP/PIPComponent";
 import { LeaveRoom } from "../LeaveRoom";
-import GoLiveButton from "../GoLiveButton";
 import MetaActions from "../MetaActions";
 import { ChatToggle } from "./ChatToggle";
-import { FeatureFlags } from "../../services/FeatureFlags";
-
-const TranscriptionButton = React.lazy(() =>
-  import("../../plugins/transcription")
-);
+import { StreamActions } from "../Header/StreamActions";
 
 export const StreamingFooter = () => {
   return (
@@ -36,10 +28,6 @@ export const StreamingFooter = () => {
         }}
       >
         <AudioVideoToggle />
-        {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
-        <VirtualBackground />
-        <NoiseSuppression />
-        {FeatureFlags.enableTranscription && <TranscriptionButton />}
       </AppFooter.Left>
       <AppFooter.Center
         css={{
@@ -52,7 +40,14 @@ export const StreamingFooter = () => {
         <Box css={{ "@md": { display: "none" } }}>
           <PIPComponent />
         </Box>
-        <GoLiveButton css={{ display: "none", "@sm": { display: "block" } }} />
+        <Box
+          css={{
+            display: "none",
+            "@md": { display: "flex", alignItems: "center" },
+          }}
+        >
+          <StreamActions />
+        </Box>
         <MoreSettings />
         <Box css={{ "@md": { display: "none" } }}>
           <LeaveRoom isConference={false} />
