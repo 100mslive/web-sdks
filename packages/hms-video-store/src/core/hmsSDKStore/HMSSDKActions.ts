@@ -63,7 +63,7 @@ import { IHMSStore } from '../IHMSStore';
 
 import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState, NamedSetStateAsync } from './internalTypes';
+import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
@@ -1327,9 +1327,9 @@ export class HMSSDKActions implements IHMSActions {
    * @param fn
    * @param name
    */
-  private setState: NamedSetStateAsync<HMSStore> = async (fn, name) => {
+  private setState: NamedSetState<HMSStore> = (fn, name) => {
     if (this.shouldBatchUpdates) {
-      await this.storeUpdatesBatcher.setState(fn, name);
+      this.storeUpdatesBatcher.setState(fn, name);
     } else {
       this.setStateImmediately(fn, name);
     }
