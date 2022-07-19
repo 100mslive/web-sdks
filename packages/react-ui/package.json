@@ -65,6 +65,7 @@
     "@radix-ui/react-tooltip": "^0.1.1",
     "@stitches/react": "^1.2.5",
     "lodash.merge": "^4.6.2",
+    "qrcode.react": "^3.1.0",
     "react-use": "^17.3.2"
   }
 }
