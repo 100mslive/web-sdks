@@ -1,23 +1,23 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { IHMSNotifications, HMSNotificationCallback } from '../IHMSNotifications';
+import { HMSNotificationCallback, IHMSNotifications } from '../IHMSNotifications';
 import { IHMSStore } from '../IHMSStore';
-import { selectPeerByID, selectTrackByID } from '../selectors';
+import { selectTrackByID } from '../selectors';
 import * as sdkTypes from './sdkTypes';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import {
-  HMSNotification,
-  HMSNotificationTypes,
-  HMSNotificationSeverity,
-  HMSPeer,
+  HMSChangeMultiTrackStateRequest,
+  HMSChangeTrackStateRequest,
+  HMSDeviceChangeEvent,
   HMSException,
+  HMSLeaveRoomRequest,
   HMSMessage,
+  HMSNotification,
+  HMSNotificationSeverity,
+  HMSNotificationTypes,
+  HMSPeer,
+  HMSPlaylistItem,
   HMSTrack,
   HMSTrackID,
-  HMSChangeTrackStateRequest,
-  HMSChangeMultiTrackStateRequest,
-  HMSLeaveRoomRequest,
-  HMSDeviceChangeEvent,
-  HMSPlaylistItem,
 } from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
@@ -88,11 +88,9 @@ export class HMSNotifications implements IHMSNotifications {
     this.emitEvent(notification);
   }
 
-  sendPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: HMSPeer | null) {
-    const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
-    const notificationType = PEER_NOTIFICATION_TYPES[type];
-    if (notificationType) {
-      const notification = this.createNotification(notificationType, hmsPeer, HMSNotificationSeverity.INFO);
+  sendPeerUpdate(type?: HMSNotificationTypes, peer?: HMSPeer | null) {
+    if (type) {
+      const notification = this.createNotification(type, peer, HMSNotificationSeverity.INFO);
       this.emitEvent(notification);
     }
   }

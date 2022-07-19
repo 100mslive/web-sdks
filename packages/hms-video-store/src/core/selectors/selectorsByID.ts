@@ -25,11 +25,11 @@ const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => 
 const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
-  peerID ? storePeers[peerID] : null,
+  peerID ? storePeers[peerID] : undefined,
 );
 
 const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID ? storeTracks[trackID] : null,
+  trackID ? storeTracks[trackID] : undefined,
 );
 
 /**
@@ -100,7 +100,7 @@ export const selectAuxiliaryTracksByPeerID = byIDCurry((store: HMSStore, peerID?
 });
 
 const selectSpeakerByTrackID = (store: HMSStore, trackID: HMSTrackID | undefined) => {
-  return trackID ? store.speakers[trackID] : null;
+  return trackID ? store.speakers[trackID] : undefined;
 };
 
 /**

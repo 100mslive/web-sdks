@@ -63,11 +63,12 @@ import { IHMSStore } from '../IHMSStore';
 
 import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState } from './internalTypes';
+import { NamedSetState, NamedSetStateAsync } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { StoreUpdatesBatcher } from './sdkUtils/StoreUpdatesBatcher';
+import { original } from 'immer';
 
 /**
  * This class implements the IHMSActions interface for 100ms SDK. It connects with SDK
@@ -857,66 +858,98 @@ export class HMSSDKActions implements IHMSActions {
     }, type);
   }
 
+  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate.PEER_LIST, sdkPeers: sdkTypes.HMSPeer[]): Promise<void>;
+  protected onPeerUpdate(
+    type: Omit<sdkTypes.HMSPeerUpdate, sdkTypes.HMSPeerUpdate.PEER_LIST>,
+    sdkPeer: sdkTypes.HMSPeer,
+  ): Promise<void>;
   // eslint-disable-next-line complexity
-  protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
-    if (
-      [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
-    ) {
-      return; // ignore, high frequency update so no point of syncing peers
-    } else if (Array.isArray(sdkPeer)) {
-      const sdkPeers: sdkTypes.HMSPeer[] = sdkPeer as sdkTypes.HMSPeer[];
-      this.setState(store => {
-        sdkPeers.forEach((sdkPeerObj: sdkTypes.HMSPeer) => {
-          this.onPeerJoined(store, sdkPeerObj);
-        });
-      }, 'peersJoined');
-    } else if (type === sdkTypes.HMSPeerUpdate.PEER_JOINED) {
-      this.setState(store => {
-        this.onPeerJoined(store, sdkPeer as sdkTypes.HMSPeer);
-      }, 'peerJoined');
-    } else if (type === sdkTypes.HMSPeerUpdate.PEER_LEFT) {
-      this.setState(store => {
-        this.onPeerLeft(store, sdkPeer as sdkTypes.HMSPeer);
-      }, 'peerLeft');
-    } else if (type === sdkTypes.HMSPeerUpdate.METADATA_UPDATED) {
-      this.setState(store => {
-        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
-        if (store.peers[sdkPeer.peerId]) {
-          store.peers[sdkPeer.peerId].metadata = sdkPeer.metadata;
-        }
-      }, 'peerMetadataUpdated');
-    } else if (type === sdkTypes.HMSPeerUpdate.NAME_UPDATED) {
-      this.setState(store => {
-        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
-        if (store.peers[sdkPeer.peerId]) {
-          store.peers[sdkPeer.peerId].name = sdkPeer.name;
-        }
-      }, 'peerMetadataUpdated');
-    } else if (type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED) {
-      this.setState(store => {
-        sdkPeer = sdkPeer as sdkTypes.HMSPeer;
-        if (store.peers[sdkPeer.peerId]) {
-          store.peers[sdkPeer.peerId].roleName = sdkPeer.role?.name;
-        }
-      }, 'peerRoleUpdated');
-    } else {
-      this.sendPeerUpdateNotification(type, sdkPeer as sdkTypes.HMSPeer);
+  protected async onPeerUpdate(
+    updateType: sdkTypes.HMSPeerUpdate,
+    sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[],
+  ): Promise<void> {
+    let peer: HMSPeer | undefined;
+    switch (updateType) {
+      case sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER:
+      case sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER:
+        return;
+      case sdkTypes.HMSPeerUpdate.PEER_LIST: {
+        const sdkPeers: sdkTypes.HMSPeer[] = sdkPeer as sdkTypes.HMSPeer[];
+        const hmsPeers: HMSPeer[] = [];
+        await this.setState(store => {
+          sdkPeers.forEach((sdkPeerObj: sdkTypes.HMSPeer) => {
+            hmsPeers.push(this.onPeerJoined(store, sdkPeerObj));
+          });
+        }, 'peersJoined');
+        this.hmsNotifications.sendPeerList(hmsPeers);
+        return;
+      }
+      case sdkTypes.HMSPeerUpdate.PEER_JOINED:
+        await this.setState(store => {
+          this.onPeerJoined(store, sdkPeer as sdkTypes.HMSPeer);
+        }, 'peerJoined');
+        break;
+      case sdkTypes.HMSPeerUpdate.PEER_LEFT:
+        await this.setState(store => {
+          peer = this.onPeerLeft(store, sdkPeer as sdkTypes.HMSPeer);
+        }, 'peerLeft');
+        break;
+      case sdkTypes.HMSPeerUpdate.METADATA_UPDATED:
+        await this.setState(store => {
+          sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+          if (store.peers[sdkPeer.peerId]) {
+            store.peers[sdkPeer.peerId].metadata = sdkPeer.metadata;
+          }
+        }, 'peerMetadataUpdated');
+        break;
+      case sdkTypes.HMSPeerUpdate.NAME_UPDATED:
+        await this.setState(store => {
+          sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+          if (store.peers[sdkPeer.peerId]) {
+            store.peers[sdkPeer.peerId].name = sdkPeer.name;
+          }
+        }, 'peerMetadataUpdated');
+        break;
+      case sdkTypes.HMSPeerUpdate.ROLE_UPDATED:
+        await this.setState(store => {
+          sdkPeer = sdkPeer as sdkTypes.HMSPeer;
+          if (store.peers[sdkPeer.peerId]) {
+            store.peers[sdkPeer.peerId].roleName = sdkPeer.role?.name;
+          }
+        }, 'peerRoleUpdated');
+        break;
+      default:
+        HMSLogger.w('unhandled peer update type', updateType, sdkPeer);
     }
+    if (!peer && !Array.isArray(sdkPeer)) {
+      peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+    }
+    this.sendPeerNotification(updateType, peer);
   }
 
-  private onPeerJoined(store: HMSStore, sdkPeer: sdkTypes.HMSPeer) {
-    store.room.peers.push(sdkPeer.peerId);
-    store.peers[sdkPeer.peerId] = SDKToHMS.convertPeer(sdkPeer) as HMSPeer;
-    this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
+  private onPeerJoined(store: HMSStore, sdkPeer: sdkTypes.HMSPeer): HMSPeer {
+    let hmsPeer = SDKToHMS.convertPeer(sdkPeer) as HMSPeer;
+    // peer could have been added in preview and came later, update the original
+    if (store.peers[sdkPeer.peerId]) {
+      hmsPeer = Object.assign(store.peers[sdkPeer.peerId], hmsPeer);
+    } else {
+      store.room.peers.push(sdkPeer.peerId);
+      store.peers[sdkPeer.peerId] = hmsPeer;
+      this.hmsSDKPeers[sdkPeer.peerId] = sdkPeer;
+    }
+    return hmsPeer;
   }
 
   private onPeerLeft(store: HMSStore, sdkPeer: sdkTypes.HMSPeer) {
     delete this.hmsSDKPeers[sdkPeer.peerId];
-    const index = store.room.peers.indexOf(sdkPeer.peerId);
+    const index = original(store.room.peers)?.indexOf(sdkPeer.peerId) || -1;
     if (index > -1) {
       store.room.peers.splice(index, 1);
     }
+    const hmsPeer = store.peers[sdkPeer.peerId];
     delete store.peers[sdkPeer.peerId];
+    // hmsPeer is a proxy which will be revoked outside setState, get the original object
+    return original(hmsPeer);
   }
 
   protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {
@@ -1311,15 +1344,9 @@ export class HMSSDKActions implements IHMSActions {
     }, action);
   };
 
-  private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
-    let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    this.syncRoomState(actionName);
-    // if peer wasn't available before sync(will happen if event is peer join)
-    if (!peer) {
-      peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    }
-    this.hmsNotifications.sendPeerUpdate(type, peer);
+  private sendPeerNotification = (type: sdkTypes.HMSPeerUpdate, peer?: HMSPeer) => {
+    const notificationType = PEER_NOTIFICATION_TYPES[type];
+    this.hmsNotifications.sendPeerUpdate(notificationType, peer);
   };
 
   /**
@@ -1327,9 +1354,9 @@ export class HMSSDKActions implements IHMSActions {
    * @param fn
    * @param name
    */
-  private setState: NamedSetState<HMSStore> = (fn, name) => {
+  private setState: NamedSetStateAsync<HMSStore> = async (fn, name) => {
     if (this.shouldBatchUpdates) {
-      this.storeUpdatesBatcher.setState(fn, name);
+      return this.storeUpdatesBatcher.setState(fn, name);
     } else {
       this.setStateImmediately(fn, name);
     }

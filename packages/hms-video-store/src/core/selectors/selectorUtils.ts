@@ -4,7 +4,7 @@ type trackCheck = (track: HMSTrack | undefined) => boolean | undefined;
 
 export function getPeerTracksByCondition(
   tracks: Record<HMSTrackID, HMSTrack>,
-  peer: HMSPeer | null,
+  peer?: HMSPeer | null,
   trackCheckFn: trackCheck = isScreenShare,
 ) {
   let videoTrack = undefined;
