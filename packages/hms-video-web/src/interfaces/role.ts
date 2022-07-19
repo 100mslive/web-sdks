@@ -18,7 +18,6 @@ export interface HMSRole {
     hlsStreaming: boolean;
     rtmpStreaming: boolean;
     browserRecording: boolean;
-    recording: boolean;
   };
   priority: number;
 }
