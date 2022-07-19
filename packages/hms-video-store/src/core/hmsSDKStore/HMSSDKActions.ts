@@ -942,7 +942,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private onPeerLeft(store: HMSStore, sdkPeer: sdkTypes.HMSPeer) {
     delete this.hmsSDKPeers[sdkPeer.peerId];
-    const index = original(store.room.peers)?.indexOf(sdkPeer.peerId) || -1;
+    const index = store.room.peers.indexOf(sdkPeer.peerId);
     if (index > -1) {
       store.room.peers.splice(index, 1);
     }

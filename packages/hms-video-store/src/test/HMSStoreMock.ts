@@ -6,7 +6,7 @@ import { NamedSetState } from '../core/hmsSDKStore/internalTypes';
 
 export interface HMSStoreMockPeerConfig {
   ratePerSecond?: number;
-  joinAtSdk?: boolean;
+  joinAtStore?: boolean;
 }
 
 export class HMSStoreMock {
@@ -45,10 +45,10 @@ export class HMSStoreMock {
     const peerAddPromises = [];
     const sleepTimeMs = config?.ratePerSecond ? 1000 / config.ratePerSecond : 0;
     for (let i = 0; i < count; i++) {
-      if (config?.joinAtSdk) {
-        this._addMockPeerInSdk();
-      } else {
+      if (config?.joinAtStore) {
         peerAddPromises.push(this._addPeersInternal(1));
+      } else {
+        this._addMockPeerInSdk();
       }
       if (sleepTimeMs > 0) {
         await this.sleep(sleepTimeMs);
