@@ -20,7 +20,7 @@ const GoLiveButton = ({ css = {} }) => {
     <Button
       variant={isStreamingSidepaneOpen ? "standard" : "primary"}
       onClick={toggleStreaming}
-      css={{ mx: "$2", height: "$13", ...css }}
+      css={{ mx: "$2", ...css }}
     >
       <GoLiveIcon />
       <Text variant="button" css={{ mx: "$2" }}>

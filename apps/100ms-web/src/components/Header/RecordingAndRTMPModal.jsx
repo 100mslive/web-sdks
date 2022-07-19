@@ -140,6 +140,7 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
             data-testid="metting_url_field"
           />
           {permissions.rtmpStreaming && (
+          {permissions.streaming && (
             <DialogInput
               title="RTMP Out"
               value={rtmpURL}
