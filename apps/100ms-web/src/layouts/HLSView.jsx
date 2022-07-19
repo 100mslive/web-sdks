@@ -131,9 +131,28 @@ const HLSView = () => {
   }
 
   return (
-    <div key="hls-viewer" id="hls-viewer" style={{ height: "100%" }}>
+    <div
+      key="hls-viewer"
+      id="hls-viewer"
+      style={{
+        verticalAlign: "middle",
+        display: "inline",
+        height: "100%",
+      }}
+    >
       {hlsUrl ? (
-        <Flex css={{ height: "90%" }} justify="center">
+        <Flex
+          align="center"
+          justify="center"
+          css={{
+            width: "95%",
+            margin: "auto",
+            height: "90%",
+            "@md": { height: "90%" },
+            "@lg": { height: "80%" },
+
+          }}
+        >
           <HMSVideoPlayer
             controls={[
               HMS_VIDEO_PLAYER_CTRL_PROGRESS,
@@ -148,7 +167,6 @@ const HLSView = () => {
                   {hlsController ? (
                     <IconButton
                       variant="standard"
-                      css={{ marginRight: "0.3rem" }}
                       onClick={() => {
                         hlsController.jumpToLive();
                         setIsVideoLive(true);
@@ -160,8 +178,8 @@ const HLSView = () => {
                         <Flex justify="center" gap={2} align="center">
                           <Box
                             css={{
-                              height: "1rem",
-                              width: "1rem",
+                              height: "0.5rem",
+                              width: "0.5rem",
                               background: isVideoLive ? "#CC525F" : "#FAFAFA",
                               borderRadius: "50%",
                             }}
@@ -174,6 +192,7 @@ const HLSView = () => {
                     </IconButton>
                   ) : null}
                   <Dropdown.Root
+                    css={{ margin: "0px" }}
                     open={qualityDropDownOpen}
                     onOpenChange={value => setQualityDropDownOpen(value)}
                   >
@@ -182,6 +201,7 @@ const HLSView = () => {
                         css={{
                           color: "$textPrimary",
                           borderRadius: "$1",
+                          margin: "0px",
                           cursor: "pointer",
                           zIndex: 40,
                           border: "1px solid $textDisabled",

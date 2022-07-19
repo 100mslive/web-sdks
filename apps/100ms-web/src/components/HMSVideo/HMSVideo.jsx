@@ -34,7 +34,7 @@ export const HMSVideoPlayer = forwardRef(
       }
     };
     return (
-      <div id="hms-video" style={{ height: "100%" }}>
+      <div id="hms-video" style={{ height: "100%", width: "100%" }}>
         <video
           style={{ height: "100%", margin: "auto" }}
           ref={videoRef}
@@ -45,6 +45,7 @@ export const HMSVideoPlayer = forwardRef(
           <Slider
             showTooltip={false}
             step={1}
+            css={{ width: "100%" }}
             value={[videoProgress]}
             onValueChange={sliderValueChangeHandler}
           />
@@ -55,9 +56,14 @@ export const HMSVideoPlayer = forwardRef(
             justify="between"
             align="center"
             gap={2}
-            css={{ marginLeft: "0.5rem", marginRight: "0.5rem" }}
+            css={{ width: "100%" }}
           >
-            <Flex justify="start" align="center" gap={2}>
+            <Flex
+              justify="start"
+              align="center"
+              gap={2}
+              css={{ width: "100%" }}
+            >
               {checkForControls(HMS_VIDEO_PLAYER_CTRL_PLAYBACK) ? (
                 <PlaybackAndTimeControls videoEl={videoRef.current} />
               ) : null}
@@ -65,12 +71,17 @@ export const HMSVideoPlayer = forwardRef(
                 <VolumeControl videoEl={videoRef.current} />
               ) : null}
             </Flex>
-            <Flex justify="start" align="center" gap={2}>
+            <Flex
+              justify="end"
+              align="center"
+              css={{ width: "100%", margin: "0px" }}
+              gap={2}
+            >
               {controlsToTheRight ? controlsToTheRight() : null}
               {checkForControls(HMS_VIDEO_PLAYER_CTRL_FULLSCREEN) ? (
                 <IconButton
                   variant="standard"
-                  css={{ marginRight: "0.3rem" }}
+                  css={{ margin: "0px" }}
                   onClick={fullscreenConfig?.onToggle}
                   key={HMS_VIDEO_PLAYER_CTRL_FULLSCREEN}
                   data-testid="fullscreen_btn"
