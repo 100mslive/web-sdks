@@ -1,4 +1,5 @@
 import { HandIcon, PersonIcon, ChatIcon } from "@100mslive/react-icons";
+import { hmsActions } from "../../hms";
 
 export const ToastConfig = {
   PEER_LIST: {
