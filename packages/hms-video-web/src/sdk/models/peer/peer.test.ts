@@ -32,7 +32,6 @@ const getParamsForRole = (roleName: string) => ({
     hlsStreaming: false,
     rtmpStreaming: false,
     browserRecording: false,
-    recording: false,
   },
   priority: 0,
 });
