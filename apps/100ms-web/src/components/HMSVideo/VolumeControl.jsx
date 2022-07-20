@@ -1,6 +1,6 @@
+import { useEffect, useState } from "react";
 import { SpeakerIcon } from "@100mslive/react-icons";
 import { Flex, Slider } from "@100mslive/react-ui";
-import { useEffect, useState } from "react";
 
 export const VolumeControl = ({ videoEl }) => {
   const [volume, setVolume] = useState(75);
@@ -20,7 +20,6 @@ export const VolumeControl = ({ videoEl }) => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          console.log(volume, videoEl.volume);
           videoEl.volume = volume / 100;
           setVolume(volume);
         }}

@@ -14,23 +14,30 @@ export const HMSVideoPlayer = forwardRef(
     const [videoProgress, setVideoProgress] = useState(0);
     const progressBarConfig = controlsConfig[HMS_VIDEO_PLAYER_CTRL_PROGRESS];
     const fullscreenConfig = controlsConfig[HMS_VIDEO_PLAYER_CTRL_FULLSCREEN];
-    const checkForControls = controlName =>
-      controls.indexOf(controlName) !== -1;
+    const checkForControls = controlName => controls.includes(controlName);
 
     useEffect(() => {
-      videoRef.current.addEventListener("timeupdate", event => {
-        const progress = Math.floor(
-          (videoRef.current.currentTime / videoRef.current.duration) * 100
-        );
-        setVideoProgress(isNaN(progress) ? 0 : progress);
-      });
+      const videoEl = videoRef?.current;
+      if (videoEl) {
+        videoEl.addEventListener("timeupdate", event => {
+          const progress = Math.floor(
+            (videoEl.currentTime / videoEl.duration) * 100
+          );
+          setVideoProgress(isNaN(progress) ? 0 : progress);
+        });
+      }
+      return function cleanup() {
+        if (videoEl) {
+          videoEl.removeEventListener("timeupdate");
+        }
+      };
     }, []);
 
     const sliderValueChangeHandler = progress => {
       const currentTime = (progress * videoRef.current.duration) / 100;
       videoRef.current.currentTime = currentTime;
       if (progressBarConfig.onValueChange) {
-        progressBarConfig.onValueChange();
+        progressBarConfig.onValueChange(currentTime);
       }
     };
     return (
@@ -98,3 +105,12 @@ export const HMSVideoPlayer = forwardRef(
     );
   }
 );
+
+const ControlsToTheRight = ({children}) {
+  return <>
+  {children}
+  </>
+}
+const export HMSVideoControls = {
+  Left:ControlsToTheRight
+}
