@@ -111,6 +111,6 @@ const ControlsToTheRight = ({children}) {
   {children}
   </>
 }
-const export HMSVideoControls = {
+export const HMSVideoControls = {
   Left:ControlsToTheRight
 }
