@@ -6,7 +6,11 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { HangUpIcon, ExitIcon } from "@100mslive/react-icons";
+import {
+  HangUpIcon,
+  ExitIcon,
+  AlertTriangleIcon,
+} from "@100mslive/react-icons";
 import {
   Button,
   Popover,
@@ -17,6 +21,7 @@ import {
   styled,
   Text,
   Flex,
+  Dropdown,
 } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
@@ -59,8 +64,8 @@ export const LeaveRoom = ({ isConference = true }) => {
   return (
     <Fragment>
       {permissions.endRoom ? (
-        <Popover.Root>
-          <Popover.Trigger asChild>
+        <Dropdown.Root>
+          <Dropdown.Trigger asChild>
             <LeaveIconButton
               variant="danger"
               key="LeaveRoom"
@@ -81,28 +86,50 @@ export const LeaveRoom = ({ isConference = true }) => {
                 )}
               </Tooltip>
             </LeaveIconButton>
-          </Popover.Trigger>
-          <Popover.Content sideOffset={10}>
-            <Button
-              variant="standard"
-              css={{ w: "100%" }}
+          </Dropdown.Trigger>
+          <Dropdown.Content css={{ p: 0, maxWidth: "470px" }} sideOffset={10}>
+            <Dropdown.Item
+              css={{ w: "100%", bg: "#34191C" }}
               onClick={() => {
                 setShowEndRoomModal(true);
               }}
               data-testid="end_room_btn"
             >
-              End Room
-            </Button>
-            <Button
-              variant="danger"
-              css={{ mt: "$4" }}
+              <Flex gap={4}>
+                <Box>
+                  <AlertTriangleIcon />
+                </Box>
+                <Flex direction="column" align="start">
+                  <Text variant="h6" css={{ c: "$error" }}>
+                    End Session
+                  </Text>
+                  <Text variant="sm" css={{ c: "$textMedEmp" }}>
+                    The session will end for everyone. You can’t undo this
+                    action.
+                  </Text>
+                </Flex>
+              </Flex>
+            </Dropdown.Item>
+            <Dropdown.Item
+              css={{ bg: "$surfaceDefault" }}
               onClick={leaveRoom}
               data-testid="just_leave_btn"
             >
-              Just Leave
-            </Button>
-          </Popover.Content>
-        </Popover.Root>
+              <Flex gap={4}>
+                <Box>
+                  <ExitIcon />
+                </Box>
+                <Flex direction="column" align="start">
+                  <Text variant="h6">Leave Studio</Text>
+                  <Text variant="sm" css={{ c: "$textMedEmp" }}>
+                    Others will continue after you leave. You can join the
+                    studio again.
+                  </Text>
+                </Flex>
+              </Flex>
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom">
           <Tooltip title="Leave Room">
