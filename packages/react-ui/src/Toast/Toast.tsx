@@ -97,7 +97,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
               w: '$10',
               h: '$10',
               right: '$4',
-              top: action || description ? '$md' : '50%',
+              top: action || description ? '$8' : '50%',
             }}
           />
         ) : null}
@@ -117,7 +117,15 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
                   {description}
                 </Text>
               ) : null}
-              {action ? action : null}
+              {action ? (
+                <Box
+                  onClick={() => {
+                    props.onOpenChange?.(false);
+                  }}
+                >
+                  {action}
+                </Box>
+              ) : null}
             </Flex>
           </ToastDescription>
         ) : null}

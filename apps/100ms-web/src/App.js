@@ -6,7 +6,6 @@ import {
   Navigate,
   useParams,
 } from "react-router-dom";
-
 import { HMSRoomProvider } from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
 import { AppContextProvider } from "./components/context/AppContext.js";
@@ -29,7 +28,7 @@ import PostLeave from "./components/PostLeave";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
-import { hmsActions } from "./hms.js";
+import { hmsActions, hmsNotifications, hmsStore } from "./hms.js";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
@@ -116,6 +115,8 @@ export function EdtechComponent({
         <HMSRoomProvider
           isHMSStatsOn={FeatureFlags.enableStatsForNerds}
           actions={hmsActions}
+          store={hmsStore}
+          notifications={hmsNotifications}
         >
           <AppContextProvider
             roomId={roomId}
