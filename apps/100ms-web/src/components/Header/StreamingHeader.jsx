@@ -32,7 +32,7 @@ export const StreamingHeader = ({ isPreview }) => {
         <Box css={{ display: "none", "@md": { display: "block" } }}>
           <MetaActions compact />
         </Box>
-        <Box css={{ display: "block", "@md": { display: "none" } }}>
+        <Box css={{ display: "block", "@md": { display: "none" }, mx: "$2" }}>
           <StreamActions />
         </Box>
         <ParticipantCount />

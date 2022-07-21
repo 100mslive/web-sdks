@@ -74,7 +74,10 @@ export const LeaveRoom = ({ isConference = true }) => {
                 ) : (
                   <Flex gap={2}>
                     <ExitIcon key="hangUp" />
-                    <Text css={{ "@md": { display: "none" } }} variant="button">
+                    <Text
+                      css={{ "@md": { display: "none" }, color: "inherit" }}
+                      variant="button"
+                    >
                       Leave Studio
                     </Text>
                   </Flex>

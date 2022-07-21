@@ -1,5 +1,5 @@
 import { useRecordingStreaming } from "@100mslive/react-sdk";
-import { Button, Text } from "@100mslive/react-ui";
+import { Button } from "@100mslive/react-ui";
 import { GoLiveIcon } from "@100mslive/react-icons";
 import {
   useSidepaneToggle,
@@ -21,11 +21,10 @@ const GoLiveButton = ({ css = {} }) => {
       variant={isStreamingSidepaneOpen ? "standard" : "primary"}
       onClick={toggleStreaming}
       css={{ mx: "$2", ...css }}
+      icon
     >
       <GoLiveIcon />
-      <Text variant="button" css={{ mx: "$2" }}>
-        Go Live
-      </Text>
+      Go Live
     </Button>
   );
 };
