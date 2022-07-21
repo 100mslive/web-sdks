@@ -91,7 +91,6 @@ const EndStream = () => {
         variant="standard"
         outlined
         icon
-        css={{ "@md": { h: "$13" } }}
         onClick={() => {
           toggleStreaming();
         }}

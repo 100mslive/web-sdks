@@ -125,10 +125,6 @@ export const ParticipantCount = () => {
       css={{
         w: "auto",
         p: "$4",
-        h: "auto",
-        "@md": {
-          h: "$13",
-        },
       }}
       onClick={() => {
         if (peerCount > 0) {
