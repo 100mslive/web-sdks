@@ -7,7 +7,7 @@ import {
 } from "./AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "./../common/constants";
 
-const GoLiveButton = ({ css = {} }) => {
+const GoLiveButton = () => {
   const isStreamingSidepaneOpen = useIsSidepaneTypeOpen(
     SIDE_PANE_OPTIONS.STREAMING
   );
@@ -20,7 +20,7 @@ const GoLiveButton = ({ css = {} }) => {
     <Button
       variant={isStreamingSidepaneOpen ? "standard" : "primary"}
       onClick={toggleStreaming}
-      css={{ mx: "$2", ...css }}
+      css={{ "@md": { h: "$13" } }}
       icon
     >
       <GoLiveIcon />
