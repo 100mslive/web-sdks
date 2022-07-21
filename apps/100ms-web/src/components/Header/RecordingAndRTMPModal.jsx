@@ -1,13 +1,14 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { Fragment, useCallback, useMemo, useState } from "react";
 import {
   selectAppData,
+  selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { RecordIcon } from "@100mslive/react-icons";
-import { Button, Text, Dialog, Box } from "@100mslive/react-ui";
+import { Button, Text, Dialog, Box, Tooltip } from "@100mslive/react-ui";
 import LogRocket from "logrocket";
 import {
   DialogCheckbox,
@@ -16,7 +17,7 @@ import {
   DialogRow,
 } from "../../primitives/DialogContent";
 import { ToastManager } from "../Toast/ToastManager";
-import { ResolutionInput } from "./ResolutionInput";
+import { ResolutionInput } from "../MoreSettings/ResolutionInput";
 import {
   APP_DATA,
   QUERY_PARAM_SKIP_PREVIEW,
@@ -28,7 +29,7 @@ const defaultMeetingUrl =
   window.location.href.replace("meeting", "preview") +
   `?${QUERY_PARAM_SKIP_PREVIEW}=true`;
 
-export const RecordingAndRTMPModal = ({ onOpenChange }) => {
+const RecordingAndRTMPModal = ({ onOpenChange }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const {
@@ -138,7 +139,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
             disabled={isAnythingRunning}
             data-testid="metting_url_field"
           />
-          {permissions.streaming && (
+          {permissions.rtmpStreaming && (
             <DialogInput
               title="RTMP Out"
               value={rtmpURL}
@@ -148,14 +149,12 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               data-testid="rtmp_url_field"
             />
           )}
-
           <ResolutionInput
             onResolutionChange={resolutionChangeHandler}
             disabled={hlsSelected || isHLSRunning}
             tooltipText={RTMP_RESOLUTION_IGNORED_WARNING_TEXT}
           />
-
-          {permissions.streaming && (
+          {permissions.hlsStreaming && (
             <DialogCheckbox
               title="HLS"
               id="hlsCheckbox"
@@ -164,7 +163,7 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
               disabled={isAnythingRunning || rtmpURL[0]}
             />
           )}
-          {permissions.recording && (
+          {permissions.browserRecording && (
             <DialogCheckbox
               title="Recording"
               value={recordingSelected || isRecordingOn}
@@ -205,5 +204,35 @@ export const RecordingAndRTMPModal = ({ onOpenChange }) => {
         </Box>
       </DialogContent>
     </Dialog.Root>
+  );
+};
+
+export const RecordingStreaming = () => {
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const [showModal, setShowModal] = useState(false);
+  const { isStreamingOn } = useRecordingStreaming();
+  const title = isStreamingOn ? "Stop Streaming" : "Start Streaming";
+  if (!isConnected) {
+    return null;
+  }
+
+  return (
+    <Fragment>
+      <Tooltip title={`${title}/Recording`}>
+        <Button
+          variant={isStreamingOn ? "danger" : "standard"}
+          icon
+          outlined={isStreamingOn}
+          onClick={() => {
+            setShowModal(true);
+          }}
+        >
+          <RecordIcon />
+          <Box css={{ "@md": { display: "none" } }}>{title}</Box>
+        </Button>
+      </Tooltip>
+
+      {showModal && <RecordingAndRTMPModal onOpenChange={setShowModal} />}
+    </Fragment>
   );
 };
