@@ -1,8 +1,8 @@
 import { selectAppData } from "@100mslive/react-sdk";
 import { HandIcon, PersonIcon, ChatIcon } from "@100mslive/react-icons";
 import { Button } from "@100mslive/react-ui";
-import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
 import { hmsActions, hmsStore } from "../../hms";
+import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
 
 const isChatOpen = () => {
   return (
