@@ -86,7 +86,7 @@ export const LeaveRoom = ({ isConference = true }) => {
               </Tooltip>
             </LeaveIconButton>
           </Dropdown.Trigger>
-          <Dropdown.Content css={{ p: 0, maxWidth: "470px" }} sideOffset={10}>
+          <Dropdown.Content css={{ p: 0 }} sideOffset={10}>
             <Dropdown.Item
               css={{ w: "100%", bg: "#34191C" }}
               onClick={() => {
