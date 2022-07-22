@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.2.1-alpha.0",
+  "version": "0.2.1-alpha.4",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -50,8 +50,8 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.2.1-alpha.0",
-    "@100mslive/react-sdk": "0.2.1-alpha.0",
+    "@100mslive/react-icons": "0.2.1-alpha.4",
+    "@100mslive/react-sdk": "0.2.1-alpha.4",
     "@radix-ui/react-accordion": "^0.1.6",
     "@radix-ui/react-checkbox": "^0.1.4",
     "@radix-ui/react-dialog": "^0.1.1",
@@ -65,6 +65,7 @@
     "@radix-ui/react-tooltip": "^0.1.1",
     "@stitches/react": "^1.2.5",
     "lodash.merge": "^4.6.2",
+    "qrcode.react": "^3.1.0",
     "react-use": "^17.3.2"
   }
 }
