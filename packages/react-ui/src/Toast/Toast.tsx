@@ -32,7 +32,7 @@ const getToastVariant = (base: string) => {
 const ToastRoot = styled(ToastPrimitives.Root, {
   r: '$3',
   bg: '$surfaceDefault',
-  p: '$8',
+  p: '$10',
   display: 'flex',
   flexDirection: 'column',
   position: 'relative',
@@ -55,20 +55,19 @@ const ToastRoot = styled(ToastPrimitives.Root, {
 
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
-  color: '$textPrimary',
+  color: '$textHighEmp',
   fontWeight: '$semiBold',
-  mr: '$12',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
-  color: '$textSecondary',
+  color: '$textMedEmp',
 });
-const ToastClose = styled(ToastPrimitives.Close, {
-  position: 'absolute',
-  right: '$4',
-  top: '50%',
-  transform: 'translateY(-50%)',
+const ToastClose = styled(ToastPrimitives.Close, {});
+const ToastAction = styled(ToastPrimitives.Action, {
+  cursor: 'pointer',
 });
-const ToastAction = styled(ToastPrimitives.Action, {});
 const ToastViewport = styled(ToastPrimitives.Viewport, {
   position: 'fixed',
   bottom: 0,
@@ -106,35 +105,26 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
   return (
     <>
       <ToastRoot {...props}>
-        {isClosable ? (
-          <DefaultClose
-            css={{
-              w: '$10',
-              h: '$10',
-              right: '$4',
-              top: action || description ? '$md' : '50%',
-            }}
-          />
-        ) : null}
-        <ToastTitle css={{ mb: action ? (description ? 0 : '$10') : 0, c: '$textHighEmp' }}>
-          <Flex align="center" css={{ display: 'flex', flexDirection: 'row', w: '100%', gap: icon ? '$4' : 0 }}>
+        <ToastTitle>
+          <Flex align="center" css={{ gap: '$4' }}>
             {icon ? <Box css={{ w: '$10', h: '$10' }}>{icon}</Box> : null}
-            <Text variant="sub1" css={{ c: '$textHighEmp' }}>
+            <Text variant="sub1" css={{ c: 'inherit' }}>
               {title}
             </Text>
           </Flex>
+          {isClosable ? <DefaultClose /> : null}
         </ToastTitle>
-        {action || description ? (
-          <ToastDescription css={{ mr: '$12' }}>
-            <Flex css={{ display: 'flex', flexDirection: 'column', w: '100%' }}>
-              {description ? (
-                <Text variant="body1" css={{ fontWeight: '$regular', mb: action ? '$10' : 0, c: '$textMedEmp' }}>
-                  {description}
-                </Text>
-              ) : null}
-              {action ? action : null}
-            </Flex>
+        {description ? (
+          <ToastDescription>
+            <Text variant="body1" css={{ fontWeight: '$regular', c: '$textMedEmp' }}>
+              {description}
+            </Text>
           </ToastDescription>
+        ) : null}
+        {action ? (
+          <ToastAction altText={`${title}Action`} asChild css={{ mt: '$10' }}>
+            {action}
+          </ToastAction>
         ) : null}
       </ToastRoot>
     </>
