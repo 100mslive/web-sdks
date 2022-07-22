@@ -11,11 +11,6 @@ import { HMSThemeProvider, Box } from "@100mslive/react-ui";
 import { Notifications } from "./components/Notifications";
 import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import { FeatureFlags } from "./services/FeatureFlags";
-import {
-  getUserToken as defaultGetUserToken,
-  getBackendEndpoint,
-} from "./services/tokenService";
 import FullPageProgress from "./components/FullPageProgress";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import PostLeave from "./components/PostLeave";
@@ -24,6 +19,11 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import { Init } from "./components/init/Init";
 import { hmsActions, hmsNotifications, hmsStore } from "./hms.js";
+import { FeatureFlags } from "./services/FeatureFlags";
+import {
+  getUserToken as defaultGetUserToken,
+  getBackendEndpoint,
+} from "./services/tokenService";
 import { getRoutePrefix, shadeColor } from "./common/utils";
 import "./base.css";
 import "./index.css";
