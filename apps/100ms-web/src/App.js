@@ -23,6 +23,7 @@ import { AppData } from "./components/AppData/AppData.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import { Init } from "./components/init/Init";
+import { hmsActions, hmsNotifications, hmsStore } from "./hms.js";
 import { getRoutePrefix, shadeColor } from "./common/utils";
 import "./base.css";
 import "./index.css";
@@ -109,14 +110,18 @@ export function EdtechComponent({
           },
         }}
       >
-        <HMSRoomProvider isHMSStatsOn={FeatureFlags.enableStatsForNerds}>
+        <HMSRoomProvider
+          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+          actions={hmsActions}
+          store={hmsStore}
+          notifications={hmsNotifications}
+        >
           <AppData
             appDetails={metadata}
             recordingUrl={recordingUrl}
             logo={logo}
-            tokenEndpoint={tokenEndpoint}
-            policyConfig={policyConfig}
           />
+
           <Init />
           <Box
             css={{

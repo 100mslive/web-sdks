@@ -21,6 +21,7 @@ import {
   useIsHeadless,
   useSubscribedNotifications,
 } from "../AppData/useUISettings";
+import { MessageNotifications } from "./MessageNotifications";
 import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
 
@@ -52,15 +53,6 @@ export function Notifications() {
             " changed their name to " +
             notification.data.name
         );
-        break;
-      case HMSNotificationTypes.NEW_MESSAGE:
-        if (
-          !subscribedNotifications.NEW_MESSAGE ||
-          notification.data?.ignored ||
-          isHeadless
-        )
-          return;
-        ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.ERROR:
         if (
@@ -172,7 +164,6 @@ export function Notifications() {
   }, [
     notification,
     subscribedNotifications.ERROR,
-    subscribedNotifications.NEW_MESSAGE,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
@@ -186,6 +177,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
+      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );
