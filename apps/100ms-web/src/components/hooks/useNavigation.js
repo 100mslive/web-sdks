@@ -8,7 +8,7 @@ export const useNavigation = () => {
     path => {
       const prefix = getRoutePrefix();
       let route = path;
-      if (!path.startsWith(prefix)) {
+      if (prefix && !path.startsWith(prefix)) {
         route = `${prefix}${path}`;
       }
       navigate(route);
