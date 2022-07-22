@@ -16,6 +16,7 @@ import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { PermissionErrorModal } from "./PermissionErrorModal";
 import { ToastBatcher } from "../Toast/ToastBatcher";
+import { MessageNotifications } from "./MessageNotifications";
 import { AppContext } from "../context/AppContext";
 import { useIsHeadless } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
@@ -172,6 +173,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
+      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );
