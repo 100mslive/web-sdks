@@ -16,12 +16,12 @@ import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { ToastBatcher } from "../Toast/ToastBatcher";
 import { PermissionErrorModal } from "./PermissionErrorModal";
+import { MessageNotifications } from "./MessageNotifications";
 import {
   useHLSViewerRole,
   useIsHeadless,
   useSubscribedNotifications,
 } from "../AppData/useUISettings";
-import { MessageNotifications } from "./MessageNotifications";
 import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
 

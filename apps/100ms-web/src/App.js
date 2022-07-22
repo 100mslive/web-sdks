@@ -120,6 +120,8 @@ export function EdtechComponent({
             appDetails={metadata}
             recordingUrl={recordingUrl}
             logo={logo}
+            tokenEndpoint={tokenEndpoint}
+            policyConfig={policyConfig}
           />
 
           <Init />
