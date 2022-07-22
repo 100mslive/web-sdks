@@ -11,15 +11,15 @@ import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { ToastManager } from "../Toast/ToastManager";
-import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
-import { getMetadata } from "../../common/utils";
+import { PermissionErrorModal } from "./PermissionErrorModal";
 import { ToastBatcher } from "../Toast/ToastBatcher";
+import { AppContext } from "../context/AppContext";
 import { useIsHeadless } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
-import { PermissionErrorModal } from "./PermissionErrorModal";
+import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -48,15 +48,6 @@ export function Notifications() {
             " changed their name to " +
             notification.data.name
         );
-        break;
-      case HMSNotificationTypes.NEW_MESSAGE:
-        if (
-          !subscribedNotifications.NEW_MESSAGE ||
-          notification.data?.ignored ||
-          isHeadless
-        )
-          return;
-        ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.ERROR:
         if (
@@ -168,7 +159,6 @@ export function Notifications() {
   }, [
     notification,
     subscribedNotifications.ERROR,
-    subscribedNotifications.NEW_MESSAGE,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
