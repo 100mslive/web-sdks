@@ -24,13 +24,11 @@ import {
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
-import {
-  HMSVideoPlayer,
-  HMS_VIDEO_PLAYER_CTRL_FULLSCREEN,
-  HMS_VIDEO_PLAYER_CTRL_PLAYBACK,
-  HMS_VIDEO_PLAYER_CTRL_PROGRESS,
-  HMS_VIDEO_PLAYER_CTRL_VOLUME,
-} from "../components/HMSVideo/HMSVideo";
+import { HMSVideoPlayer } from "../components/HMSVideo/HMSVideo";
+import { VideoProgress } from "../components/HMSVideo/VideoProgress";
+import { PlaybackAndTimeControls } from "../components/HMSVideo/PlaybackAndTimeControls";
+import { VolumeControl } from "../components/HMSVideo/VolumeControl";
+import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 
 let hlsController;
 const HLSView = () => {
@@ -150,20 +148,30 @@ const HLSView = () => {
             height: "90%",
             "@md": { height: "90%" },
             "@lg": { height: "80%" },
-
           }}
         >
-          <HMSVideoPlayer
-            controls={[
-              HMS_VIDEO_PLAYER_CTRL_PROGRESS,
-              HMS_VIDEO_PLAYER_CTRL_VOLUME,
-              HMS_VIDEO_PLAYER_CTRL_PLAYBACK,
-              HMS_VIDEO_PLAYER_CTRL_FULLSCREEN,
-            ]}
-            ref={videoRef}
-            controlsToTheRight={() => {
-              return (
-                <>
+          <HMSVideoPlayer ref={videoRef}>
+            <VideoProgress videoRef={videoRef} />
+            <Flex
+              justify="between"
+              align="center"
+              gap={2}
+              css={{ width: "100%" }}
+            >
+              <Flex
+                justify="start"
+                align="center"
+                gap={2}
+                css={{ width: "100%" }}
+              >
+                <PlaybackAndTimeControls videoRef={videoRef} />
+                <VolumeControl videoRef={videoRef} />
+                <Flex
+                  justify="end"
+                  align="center"
+                  css={{ width: "100%", margin: "0px" }}
+                  gap={2}
+                >
                   {hlsController ? (
                     <IconButton
                       variant="standard"
@@ -274,16 +282,14 @@ const HLSView = () => {
                       </Dropdown.Content>
                     )}
                   </Dropdown.Root>
-                </>
-              );
-            }}
-            controlsConfig={{
-              fullscreen: {
-                onToggle: toggleFullScreen,
-                icon: () => (isFullScreen ? <ShrinkIcon /> : <ExpandIcon />),
-              },
-            }}
-          />
+                  <FullScreenButton
+                    onToggle={toggleFullScreen}
+                    icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                  />
+                </Flex>
+              </Flex>
+            </Flex>
+          </HMSVideoPlayer>
         </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%" }}>
