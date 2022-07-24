@@ -47,15 +47,15 @@ export const lightTheme = {
     textDisabled: 'rgba(0, 0, 0, 0.4)',
 
     borderDefault: '#DDE2E9',
-    borderLight: '#D4D9E2',
+    borderLight: '#BCC4D2',
 
-    surfaceDefault: '#F0F2F5',
+    surfaceDefault: '#EDEFF3',
     surfaceLight: '#F6F7F9',
     surfaceLighter: '#FCFCFD',
 
-    backgroundDefault: '#EAECF1',
-    backgroundDark: '#E3E7ED',
-    backgroundDarker: '#DDE2E9',
+    backgroundDefault: '#E0E4EB',
+    backgroundDark: '#DADFE7',
+    backgroundDarker: '#D4DAE2',
   },
 };
 
