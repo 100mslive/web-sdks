@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   selectAppData,
   useHMSActions,
@@ -21,8 +21,15 @@ import {
   Input,
   Label,
   Text,
+  Tooltip,
 } from "@100mslive/react-ui";
-import { Container, ContentBody, ContentHeader, RecordStream } from "./Common";
+import {
+  Container,
+  ContentBody,
+  ContentHeader,
+  ErrorText,
+  RecordStream,
+} from "./Common";
 import {
   UserPreferencesKeys,
   useUserPreferences,
@@ -33,6 +40,7 @@ import {
   RTMP_RECORD_DEFAULT_RESOLUTION,
 } from "../../common/constants";
 import { ResolutionInput } from "../MoreSettings/ResolutionInput";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();
@@ -71,8 +79,13 @@ const StartRTMP = () => {
   );
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
+  const [error, setError] = useState(false);
   const [record, setRecord] = useState(false);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
+  const [rtmpStarted, setRTMPStarted] = useSetAppDataByKey(
+    APP_DATA.rtmpStarted
+  );
+
   return (
     <Box css={{ overflowY: "auto" }}>
       {rtmpStreams.length > 0 && (
@@ -138,49 +151,78 @@ const StartRTMP = () => {
             <AddCircleIcon /> Add Stream
           </Button>
         )}
-        <Button
-          variant="primary"
-          icon
-          css={{ w: "100%", my: "$4" }}
-          disabled={
-            (rtmpStreams.length === 0 ||
-              rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
-            !record
-          }
-          onClick={async () => {
-            try {
-              hmsActions.startRTMPOrRecording({
-                rtmpURLs: rtmpStreams.map(
-                  value => `${value.rtmpURL}/${value.streamKey}`
-                ),
-                meetingURL: recordingUrl || getDefaultMeetingUrl(),
-                resolution: getResolution(resolution),
-                record: record,
-              });
-              setRTMPPreference(rtmpStreams);
-            } catch (error) {
-              console.error(error);
-            }
-          }}
+        <Tooltip
+          title={rtmpStarted ? "RTMP start in progress" : "Start Streaming"}
         >
-          <GoLiveIcon />
-          Go Live
-        </Button>
+          <Button
+            variant="primary"
+            icon
+            css={{ w: "100%", my: "$4" }}
+            disabled={
+              (rtmpStreams.length === 0 ||
+                rtmpStreams.some(
+                  value => !value.rtmpURL || !value.streamKey
+                )) &&
+              !record
+            }
+            loading={rtmpStarted}
+            onClick={async () => {
+              try {
+                setRTMPStarted(true);
+                hmsActions.startRTMPOrRecording({
+                  rtmpURLs: rtmpStreams.map(
+                    value => `${value.rtmpURL}/${value.streamKey}`
+                  ),
+                  meetingURL: recordingUrl || getDefaultMeetingUrl(),
+                  resolution: getResolution(resolution),
+                  record: record,
+                });
+                setRTMPPreference(rtmpStreams);
+              } catch (error) {
+                console.error(error);
+                setError(error.message);
+                setRTMPStarted(false);
+              }
+            }}
+          >
+            <GoLiveIcon />
+            Go Live
+          </Button>
+        </Tooltip>
       </Box>
+      <ErrorText error={error} />
     </Box>
   );
 };
 
 const EndRTMP = () => {
   const hmsActions = useHMSActions();
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState("");
+  const { isRTMPRunning } = useRecordingStreaming();
+
+  useEffect(() => {
+    if (inProgress && !isRTMPRunning) {
+      setInProgress(false);
+    }
+  }, [inProgress, isRTMPRunning]);
+
   return (
     <Box css={{ p: "$4 $10" }}>
+      <ErrorText error={error} />
       <Button
         variant="danger"
         css={{ w: "100%", r: "$0", my: "$8" }}
         icon
+        loading={inProgress}
         onClick={async () => {
-          await hmsActions.stopRTMPAndRecording();
+          try {
+            setInProgress(true);
+            await hmsActions.stopRTMPAndRecording();
+          } catch (error) {
+            setError(error.message);
+            setInProgress(false);
+          }
         }}
       >
         <EndStreamIcon />

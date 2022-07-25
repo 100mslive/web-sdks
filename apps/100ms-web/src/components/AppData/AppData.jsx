@@ -104,6 +104,8 @@ export function AppData({
       [APP_DATA.chatOpen]: false,
       [APP_DATA.chatDraft]: "",
       [APP_DATA.sidePane]: "",
+      [APP_DATA.hlsStarted]: false,
+      [APP_DATA.rtmpStarted]: false,
       [APP_DATA.recordingUrl]: recordingUrl,
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
       [APP_DATA.logo]: logo,

@@ -121,3 +121,14 @@ export const RecordStream = ({ record, setRecord }) => {
     </Flex>
   ) : null;
 };
+
+export const ErrorText = ({ error }) => {
+  if (!error) {
+    return null;
+  }
+  return (
+    <Text variant="sm" css={{ mb: "$4", color: "$error" }}>
+      {error}
+    </Text>
+  );
+};

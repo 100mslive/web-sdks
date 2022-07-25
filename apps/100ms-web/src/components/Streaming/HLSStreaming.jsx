@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useState, useEffect } from "react";
 import { EndStreamIcon, GoLiveIcon, InfoIcon } from "@100mslive/react-icons";
 import {
   selectAppData,
@@ -6,11 +6,17 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { Box, Button, Flex, Text } from "@100mslive/react-ui";
-import { Container, ContentBody, ContentHeader, RecordStream } from "./Common";
-import { useSidepaneToggle } from "../AppData/useSidepane";
+import { Box, Button, Flex, Text, Tooltip } from "@100mslive/react-ui";
+import {
+  Container,
+  ContentBody,
+  ContentHeader,
+  ErrorText,
+  RecordStream,
+} from "./Common";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { getDefaultMeetingUrl } from "../../common/utils";
-import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
+import { APP_DATA } from "../../common/constants";
 
 export const HLSStreaming = ({ onBack }) => {
   const { isHLSRunning } = useRecordingStreaming();
@@ -28,27 +34,47 @@ export const HLSStreaming = ({ onBack }) => {
 
 const StartHLS = () => {
   const [record, setRecord] = useState(false);
+  const [error, setError] = useState(false);
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  const [hlsStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(async () => {
-    await hmsActions.startHLSStreaming({
-      variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
-      recording: record
-        ? { hlsVod: true, singleFilePerLayer: true }
-        : undefined,
-    });
-    toggleStreaming();
-  }, [recordingUrl, hmsActions, record, toggleStreaming]);
+    try {
+      if (hlsStarted) {
+        return;
+      }
+      setHLSStarted(true);
+      setError("");
+      await hmsActions.startHLSStreaming({
+        variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
+        recording: record
+          ? { hlsVod: true, singleFilePerLayer: true }
+          : undefined,
+      });
+    } catch (error) {
+      setHLSStarted(false);
+      setError(error.message);
+    }
+  }, [recordingUrl, hmsActions, record, hlsStarted, setHLSStarted]);
 
   return (
     <Fragment>
       <RecordStream record={record} setRecord={setRecord} />
       <Box css={{ p: "$4 $10" }}>
-        <Button css={{ w: "100%", r: "$0" }} icon onClick={startHLS}>
-          <GoLiveIcon />
-          Go Live
-        </Button>
+        <ErrorText error={error} />
+        <Tooltip
+          title={hlsStarted ? "HLS start in progress" : "Start Streaming"}
+        >
+          <Button
+            css={{ w: "100%", r: "$0" }}
+            icon
+            onClick={startHLS}
+            loading={hlsStarted}
+          >
+            <GoLiveIcon />
+            Go Live
+          </Button>
+        </Tooltip>
       </Box>
       <Flex align="center" css={{ p: "$4 $10" }}>
         <Text>
@@ -65,14 +91,32 @@ const StartHLS = () => {
 
 const EndHLS = () => {
   const hmsActions = useHMSActions();
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState("");
+  const { isHLSRunning } = useRecordingStreaming();
+
+  useEffect(() => {
+    if (inProgress && !isHLSRunning) {
+      setInProgress(false);
+    }
+  }, [inProgress, isHLSRunning]);
+
   return (
     <Box css={{ p: "$4 $10" }}>
+      <ErrorText error={error} />
       <Button
         variant="danger"
         css={{ w: "100%", r: "$0", my: "$8" }}
         icon
+        loading={inProgress}
         onClick={async () => {
-          await hmsActions.stopHLSStreaming();
+          try {
+            setInProgress(true);
+            await hmsActions.stopHLSStreaming();
+          } catch (error) {
+            setError(error.message);
+            setInProgress(false);
+          }
         }}
       >
         <EndStreamIcon />
