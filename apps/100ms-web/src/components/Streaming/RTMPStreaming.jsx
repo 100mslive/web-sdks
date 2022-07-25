@@ -20,8 +20,8 @@ import {
   Flex,
   Input,
   Label,
+  Loading,
   Text,
-  Tooltip,
 } from "@100mslive/react-ui";
 import {
   Container,
@@ -151,44 +151,42 @@ const StartRTMP = () => {
             <AddCircleIcon /> Add Stream
           </Button>
         )}
-        <Tooltip
-          title={rtmpStarted ? "RTMP start in progress" : "Start Streaming"}
-        >
-          <Button
-            variant="primary"
-            icon
-            css={{ w: "100%", my: "$4" }}
-            disabled={
-              (rtmpStreams.length === 0 ||
-                rtmpStreams.some(
-                  value => !value.rtmpURL || !value.streamKey
-                )) &&
-              !record
+
+        <Button
+          variant="primary"
+          icon
+          css={{ w: "100%", my: "$4" }}
+          disabled={
+            (rtmpStreams.length === 0 ||
+              rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
+            !record
+          }
+          onClick={async () => {
+            try {
+              setRTMPStarted(true);
+              hmsActions.startRTMPOrRecording({
+                rtmpURLs: rtmpStreams.map(
+                  value => `${value.rtmpURL}/${value.streamKey}`
+                ),
+                meetingURL: recordingUrl || getDefaultMeetingUrl(),
+                resolution: getResolution(resolution),
+                record: record,
+              });
+              setRTMPPreference(rtmpStreams);
+            } catch (error) {
+              console.error(error);
+              setError(error.message);
+              setRTMPStarted(false);
             }
-            loading={rtmpStarted}
-            onClick={async () => {
-              try {
-                setRTMPStarted(true);
-                hmsActions.startRTMPOrRecording({
-                  rtmpURLs: rtmpStreams.map(
-                    value => `${value.rtmpURL}/${value.streamKey}`
-                  ),
-                  meetingURL: recordingUrl || getDefaultMeetingUrl(),
-                  resolution: getResolution(resolution),
-                  record: record,
-                });
-                setRTMPPreference(rtmpStreams);
-              } catch (error) {
-                console.error(error);
-                setError(error.message);
-                setRTMPStarted(false);
-              }
-            }}
-          >
+          }}
+        >
+          {rtmpStarted ? (
+            <Loading size={24} color="currentColor" />
+          ) : (
             <GoLiveIcon />
-            Go Live
-          </Button>
-        </Tooltip>
+          )}
+          {rtmpStarted ? "Starting stream..." : "Go Live"}
+        </Button>
       </Box>
       <ErrorText error={error} />
     </Box>

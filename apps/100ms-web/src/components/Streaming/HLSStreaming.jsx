@@ -6,7 +6,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { Box, Button, Flex, Text, Tooltip } from "@100mslive/react-ui";
+import { Box, Button, Flex, Text, Loading } from "@100mslive/react-ui";
 import {
   Container,
   ContentBody,
@@ -62,19 +62,19 @@ const StartHLS = () => {
       <RecordStream record={record} setRecord={setRecord} />
       <Box css={{ p: "$4 $10" }}>
         <ErrorText error={error} />
-        <Tooltip
-          title={hlsStarted ? "HLS start in progress" : "Start Streaming"}
+        <Button
+          css={{ w: "100%", r: "$0" }}
+          icon
+          onClick={startHLS}
+          disabled={hlsStarted}
         >
-          <Button
-            css={{ w: "100%", r: "$0" }}
-            icon
-            onClick={startHLS}
-            loading={hlsStarted}
-          >
+          {hlsStarted ? (
+            <Loading size={24} color="currentColor" />
+          ) : (
             <GoLiveIcon />
-            Go Live
-          </Button>
-        </Tooltip>
+          )}
+          {hlsStarted ? "Starting Stream..." : "Go Live"}
+        </Button>
       </Box>
       <Flex align="center" css={{ p: "$4 $10" }}>
         <Text>

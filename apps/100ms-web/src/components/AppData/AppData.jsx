@@ -14,6 +14,7 @@ import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
+import { useSetAppDataByKey } from "./useUISettings";
 import { getMetadata } from "../../common/utils";
 import { normalizeAppPolicyConfig } from "../init/initUtils";
 import {
@@ -26,7 +27,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from "../../common/constants";
-import { useSetAppDataByKey } from "./useUISettings";
 
 export const getAppDetails = appDetails => {
   try {
