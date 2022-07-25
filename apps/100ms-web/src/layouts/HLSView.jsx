@@ -25,7 +25,7 @@ import {
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
-import { HMSVideoPlayer } from "../components/HMSVideo/HMSVideo";
+import { HMSVideoPlayer } from "../components/HMSVideo";
 import { VideoProgress } from "../components/HMSVideo/VideoProgress";
 import { PlayButton } from "../components/HMSVideo/PlayButton";
 import { VolumeControl } from "../components/HMSVideo/VolumeControl";
@@ -45,6 +45,7 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   useFullscreen(hlsViewRef, isFullScreen, {
     onClose: () => setIsFullScreen(false),
   });
@@ -84,6 +85,11 @@ const HLSView = () => {
       return () => hlsController.reset();
     }
   }, []);
+
+  const getQualityText = level =>
+    `${level.height}p (${(Number(level.bitrate / 1024) / 1024).toFixed(
+      2
+    )} Mbps)`;
 
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
@@ -152,149 +158,138 @@ const HLSView = () => {
             "@lg": { height: "80%" },
           }}
         >
-          <HMSVideoPlayer ref={videoRef}>
-            <VideoProgress videoRef={videoRef} />
-            <Flex
-              justify="between"
-              align="center"
-              gap={2}
-              css={{ width: "100%" }}
-            >
-              <Flex
-                justify="start"
-                align="center"
-                gap={2}
-                css={{ width: "100%" }}
-              >
-                <Flex justify="start" align="center" gap={2}>
-                  <PlayButton videoRef={videoRef} />
-                  <VideoTime videoRef={videoRef} />
-                </Flex>
-                <VolumeControl videoRef={videoRef} />
-                <Flex
-                  justify="end"
-                  align="center"
-                  css={{ width: "100%", margin: "0px" }}
-                  gap={2}
+          <HMSVideoPlayer.Root ref={videoRef}>
+            <HMSVideoPlayer.Progress videoRef={videoRef} />
+            <HMSVideoPlayer.Controls.Root>
+              <HMSVideoPlayer.Controls.Left>
+                <HMSVideoPlayer.PlayButton
+                  onClick={() => {
+                    videoRef?.current?.paused
+                      ? videoRef?.current?.play()
+                      : videoRef?.current?.pause();
+                    setIsPaused(Boolean(videoRef?.current?.paused));
+                  }}
+                  isPaused={isPaused}
+                />
+                <HMSVideoPlayer.Duration videoRef={videoRef} />
+                <HMSVideoPlayer.Volume videoRef={videoRef} />
+              </HMSVideoPlayer.Controls.Left>
+              <HMSVideoPlayer.Controls.Right>
+                {hlsController ? (
+                  <IconButton
+                    variant="standard"
+                    onClick={() => {
+                      hlsController.jumpToLive();
+                      setIsVideoLive(true);
+                    }}
+                    key="jump-to-live_btn"
+                    data-testid="jump-to-live_btn"
+                  >
+                    <Tooltip title="Go to Live">
+                      <Flex justify="center" gap={2} align="center">
+                        <Box
+                          css={{
+                            height: "0.5rem",
+                            width: "0.5rem",
+                            background: isVideoLive ? "#CC525F" : "#FAFAFA",
+                            borderRadius: "50%",
+                          }}
+                        />
+                        <Text css={{ fontSize: "0.75rem" }}>
+                          {isVideoLive ? "Live" : "Go to Live"}{" "}
+                        </Text>
+                      </Flex>
+                    </Tooltip>
+                  </IconButton>
+                ) : null}
+                <Dropdown.Root
+                  css={{ margin: "0px" }}
+                  open={qualityDropDownOpen}
+                  onOpenChange={value => setQualityDropDownOpen(value)}
                 >
-                  {hlsController ? (
-                    <IconButton
-                      variant="standard"
-                      onClick={() => {
-                        hlsController.jumpToLive();
-                        setIsVideoLive(true);
+                  <Dropdown.Trigger asChild data-testid="quality_selector">
+                    <Flex
+                      css={{
+                        color: "$textPrimary",
+                        borderRadius: "$1",
+                        margin: "0px",
+                        cursor: "pointer",
+                        zIndex: 40,
+                        border: "1px solid $textDisabled",
+                        padding: "$2 $4",
                       }}
-                      key="jump-to-live_btn"
-                      data-testid="jump-to-live_btn"
                     >
-                      <Tooltip title="Go to Live">
-                        <Flex justify="center" gap={2} align="center">
-                          <Box
-                            css={{
-                              height: "0.5rem",
-                              width: "0.5rem",
-                              background: isVideoLive ? "#CC525F" : "#FAFAFA",
-                              borderRadius: "50%",
-                            }}
-                          />
-                          <Text css={{ fontSize: "0.75rem" }}>
-                            {isVideoLive ? "Live" : "Go to Live"}{" "}
+                      <Tooltip title="Select Quality">
+                        <Flex>
+                          <SettingIcon />
+                          <Text css={{ fontSize: "0.75rem" }} variant="md">
+                            {currentSelectedQualityText}
                           </Text>
                         </Flex>
                       </Tooltip>
-                    </IconButton>
-                  ) : null}
-                  <Dropdown.Root
-                    css={{ margin: "0px" }}
-                    open={qualityDropDownOpen}
-                    onOpenChange={value => setQualityDropDownOpen(value)}
-                  >
-                    <Dropdown.Trigger asChild data-testid="quality_selector">
-                      <Flex
+
+                      <Box
                         css={{
-                          color: "$textPrimary",
-                          borderRadius: "$1",
-                          margin: "0px",
-                          cursor: "pointer",
-                          zIndex: 40,
-                          border: "1px solid $textDisabled",
-                          padding: "$2 $4",
+                          "@lg": { display: "none" },
+                          color: "$textDisabled",
                         }}
                       >
-                        <Tooltip title="Select Quality">
-                          <Flex>
-                            <SettingIcon />
-                            <Text css={{ fontSize: "0.75rem" }} variant="md">
-                              {currentSelectedQualityText}
-                            </Text>
-                          </Flex>
-                        </Tooltip>
-
-                        <Box
-                          css={{
-                            "@lg": { display: "none" },
-                            color: "$textDisabled",
-                          }}
-                        >
-                          {qualityDropDownOpen ? (
-                            <ChevronUpIcon />
-                          ) : (
-                            <ChevronDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Dropdown.Trigger>
-                    {availableLevels.length > 0 && (
-                      <Dropdown.Content
-                        sideOffset={5}
-                        align="end"
-                        css={{ height: "auto", maxHeight: "$96" }}
+                        {qualityDropDownOpen ? (
+                          <ChevronUpIcon />
+                        ) : (
+                          <ChevronDownIcon />
+                        )}
+                      </Box>
+                    </Flex>
+                  </Dropdown.Trigger>
+                  {availableLevels.length > 0 && (
+                    <Dropdown.Content
+                      sideOffset={5}
+                      align="end"
+                      css={{ height: "auto", maxHeight: "$96" }}
+                    >
+                      <Dropdown.Item
+                        onClick={event =>
+                          qualitySelectorHandler({ height: "auto" })
+                        }
+                        css={{
+                          h: "auto",
+                          flexDirection: "column",
+                          flexWrap: "wrap",
+                          cursor: "pointer",
+                          alignItems: "flex-start",
+                        }}
+                        key="auto"
                       >
-                        <Dropdown.Item
-                          onClick={event =>
-                            qualitySelectorHandler({ height: "auto" })
-                          }
-                          css={{
-                            h: "auto",
-                            flexDirection: "column",
-                            flexWrap: "wrap",
-                            cursor: "pointer",
-                            alignItems: "flex-start",
-                          }}
-                          key="auto"
-                        >
-                          <Text>Automatic</Text>
-                        </Dropdown.Item>
-                        {availableLevels.map(level => {
-                          return (
-                            <Dropdown.Item
-                              onClick={() => qualitySelectorHandler(level)}
-                              css={{
-                                h: "auto",
-                                flexDirection: "column",
-                                flexWrap: "wrap",
-                                cursor: "pointer",
-                                alignItems: "flex-start",
-                              }}
-                              key={level.url}
-                            >
-                              <Text>{`${level.height}p (${(
-                                Number(level.bitrate / 1024) / 1024
-                              ).toFixed(2)} Mbps)`}</Text>
-                            </Dropdown.Item>
-                          );
-                        })}
-                      </Dropdown.Content>
-                    )}
-                  </Dropdown.Root>
-                  <FullScreenButton
-                    onToggle={toggleFullScreen}
-                    icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                  />
-                </Flex>
-              </Flex>
-            </Flex>
-          </HMSVideoPlayer>
+                        <Text>Automatic</Text>
+                      </Dropdown.Item>
+                      {availableLevels.map(level => {
+                        return (
+                          <Dropdown.Item
+                            onClick={() => qualitySelectorHandler(level)}
+                            css={{
+                              h: "auto",
+                              flexDirection: "column",
+                              flexWrap: "wrap",
+                              cursor: "pointer",
+                              alignItems: "flex-start",
+                            }}
+                            key={level.url}
+                          >
+                            <Text>{getQualityText(level)}</Text>
+                          </Dropdown.Item>
+                        );
+                      })}
+                    </Dropdown.Content>
+                  )}
+                </Dropdown.Root>
+                <FullScreenButton
+                  onToggle={toggleFullScreen}
+                  icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                />
+              </HMSVideoPlayer.Controls.Right>
+            </HMSVideoPlayer.Controls.Root>
+          </HMSVideoPlayer.Root>
         </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%" }}>

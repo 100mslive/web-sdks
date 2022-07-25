@@ -1,8 +1,9 @@
 import { forwardRef } from "react";
+import { Box } from "@100mslive/react-ui";
 
-export const HMSVideoPlayer = forwardRef(({ children }, videoRef) => {
+export const HMSVideo = forwardRef(({ children }, videoRef) => {
   return (
-    <div id="hms-video" style={{ height: "100%", width: "100%" }}>
+    <Box id="hms-video" style={{ height: "100%", width: "100%" }}>
       <video
         style={{ height: "100%", margin: "auto" }}
         ref={videoRef}
@@ -10,6 +11,6 @@ export const HMSVideoPlayer = forwardRef(({ children }, videoRef) => {
         playsInline
       />
       {children}
-    </div>
+    </Box>
   );
 });

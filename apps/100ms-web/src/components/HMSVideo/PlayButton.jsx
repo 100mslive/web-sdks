@@ -1,19 +1,12 @@
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 import { PauseIcon, PlayIcon } from "@100mslive/react-icons";
 
-export const PlayButton = ({ videoRef }) => {
-  return videoRef.current ? (
+export const PlayButton = ({ onClick, isPaused }) => {
+  return (
     <>
-      <Tooltip title={`${videoRef.current.paused ? "Play" : "Pause"}`}>
-        <IconButton
-          onClick={() => {
-            videoRef.current.paused
-              ? videoRef.current.play()
-              : videoRef.current.pause();
-          }}
-          data-testid="play_pause_btn"
-        >
-          {videoRef.current.paused ? (
+      <Tooltip title={`${isPaused ? "Play" : "Pause"}`}>
+        <IconButton onClick={onClick} data-testid="play_pause_btn">
+          {isPaused ? (
             <PlayIcon width={32} height={32} />
           ) : (
             <PauseIcon width={32} height={32} />
@@ -21,5 +14,5 @@ export const PlayButton = ({ videoRef }) => {
         </IconButton>
       </Tooltip>
     </>
-  ) : null;
+  );
 };
