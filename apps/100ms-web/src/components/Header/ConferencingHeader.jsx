@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, VerticalDivider } from "@100mslive/react-ui";
+import { Flex, VerticalDivider } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { Logo, SpeakerTag } from "./HeaderComponents";
 import { AdditionalRoomState } from "./AdditionalRoomState";
@@ -18,12 +18,18 @@ export const ConferencingHeader = ({ isPreview }) => {
         {!isPreview ? <SpeakerTag /> : null}
       </Flex>
 
-      <Flex align="center" css={{ position: "absolute", right: "$10" }}>
+      <Flex
+        align="center"
+        css={{
+          position: "absolute",
+          right: "$10",
+          gap: "$4",
+          "@md": { gap: "$2" },
+        }}
+      >
         <RecordingStreaming />
         <AdditionalRoomState />
-        <Box css={{ mx: "$2" }}>
-          <ParticipantCount />
-        </Box>
+        <ParticipantCount />
       </Flex>
     </Flex>
   );

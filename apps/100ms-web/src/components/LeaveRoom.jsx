@@ -198,4 +198,7 @@ const LeaveIconButton = styled(IconButton, {
   "&:not([disabled]):active": {
     bg: "$errorTint",
   },
+  "@md": {
+    px: "$4",
+  },
 });

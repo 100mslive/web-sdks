@@ -37,6 +37,7 @@ const LogoImg = styled("img", {
   w: "auto",
   "@md": {
     maxHeight: "$12",
+    display: "none",
   },
 });
 
