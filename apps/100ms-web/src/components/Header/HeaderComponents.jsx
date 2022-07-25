@@ -1,4 +1,8 @@
-import { selectDominantSpeaker, useHMSStore } from "@100mslive/react-sdk";
+import {
+  selectDominantSpeaker,
+  selectIsConnectedToRoom,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { VolumeOneIcon } from "@100mslive/react-icons";
 import {
   Flex,
@@ -37,13 +41,17 @@ const LogoImg = styled("img", {
   w: "auto",
   "@md": {
     maxHeight: "$12",
-    display: "none",
   },
 });
 
 export const Logo = () => {
   const { themeType } = useTheme();
   const logo = useLogo();
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  // Hide logo for now as there is not enough space
+  if (isConnected) {
+    return null;
+  }
   return (
     <LogoImg
       src={
