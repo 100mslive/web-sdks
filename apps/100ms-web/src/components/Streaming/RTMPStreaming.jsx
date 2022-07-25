@@ -30,6 +30,8 @@ import {
   ErrorText,
   RecordStream,
 } from "./Common";
+import { ResolutionInput } from "../MoreSettings/ResolutionInput";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
 import {
   UserPreferencesKeys,
   useUserPreferences,
@@ -39,8 +41,6 @@ import {
   APP_DATA,
   RTMP_RECORD_DEFAULT_RESOLUTION,
 } from "../../common/constants";
-import { ResolutionInput } from "../MoreSettings/ResolutionInput";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();

@@ -1,10 +1,10 @@
+import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CrossIcon,
   RecordIcon,
 } from "@100mslive/react-icons";
-import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
 import {
   Box,
   Flex,
