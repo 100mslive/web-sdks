@@ -1,6 +1,6 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { Flex, Box, config as cssConfig } from "@100mslive/react-ui";
+import { Flex, config as cssConfig } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
@@ -43,9 +43,7 @@ export const StreamingHeader = ({ isPreview }) => {
         }}
       >
         {isMobile ? (
-          <Box>
-            <MetaActions compact />
-          </Box>
+          <MetaActions compact />
         ) : (
           <Flex css={{ gap: "$4" }}>
             <StreamActions />
