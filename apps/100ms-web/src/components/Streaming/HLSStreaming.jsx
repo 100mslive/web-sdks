@@ -109,6 +109,7 @@ const EndHLS = () => {
         css={{ w: "100%", r: "$0", my: "$8" }}
         icon
         loading={inProgress}
+        disabled={inProgress}
         onClick={async () => {
           try {
             setInProgress(true);
