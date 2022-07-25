@@ -37,10 +37,10 @@ const StartHLS = () => {
   const [error, setError] = useState(false);
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
-  const [hlsStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(async () => {
     try {
-      if (hlsStarted) {
+      if (isHLSStarted) {
         return;
       }
       setHLSStarted(true);
@@ -55,7 +55,7 @@ const StartHLS = () => {
       setHLSStarted(false);
       setError(error.message);
     }
-  }, [recordingUrl, hmsActions, record, hlsStarted, setHLSStarted]);
+  }, [recordingUrl, hmsActions, record, isHLSStarted, setHLSStarted]);
 
   return (
     <Fragment>
@@ -66,14 +66,14 @@ const StartHLS = () => {
           css={{ w: "100%", r: "$0" }}
           icon
           onClick={startHLS}
-          disabled={hlsStarted}
+          disabled={isHLSStarted}
         >
-          {hlsStarted ? (
+          {isHLSStarted ? (
             <Loading size={24} color="currentColor" />
           ) : (
             <GoLiveIcon />
           )}
-          {hlsStarted ? "Starting Stream..." : "Go Live"}
+          {isHLSStarted ? "Starting Stream..." : "Go Live"}
         </Button>
       </Box>
       <Flex align="center" css={{ p: "$4 $10" }}>

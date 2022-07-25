@@ -82,7 +82,7 @@ const StartRTMP = () => {
   const [error, setError] = useState(false);
   const [record, setRecord] = useState(false);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
-  const [rtmpStarted, setRTMPStarted] = useSetAppDataByKey(
+  const [isRTMPStarted, setRTMPStarted] = useSetAppDataByKey(
     APP_DATA.rtmpStarted
   );
 
@@ -180,12 +180,12 @@ const StartRTMP = () => {
             }
           }}
         >
-          {rtmpStarted ? (
+          {isRTMPStarted ? (
             <Loading size={24} color="currentColor" />
           ) : (
             <GoLiveIcon />
           )}
-          {rtmpStarted ? "Starting stream..." : "Go Live"}
+          {isRTMPStarted ? "Starting stream..." : "Go Live"}
         </Button>
       </Box>
       <ErrorText error={error} />

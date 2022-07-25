@@ -8,7 +8,14 @@ import {
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { RecordIcon } from "@100mslive/react-icons";
-import { Button, Text, Dialog, Box, Tooltip } from "@100mslive/react-ui";
+import {
+  Button,
+  Text,
+  Dialog,
+  Box,
+  Tooltip,
+  Loading,
+} from "@100mslive/react-ui";
 import LogRocket from "logrocket";
 import {
   DialogCheckbox,
@@ -18,6 +25,11 @@ import {
 } from "../../primitives/DialogContent";
 import { ToastManager } from "../Toast/ToastManager";
 import { ResolutionInput } from "../MoreSettings/ResolutionInput";
+import {
+  useIsHLSStartedFromUI,
+  useIsRTMPStartedFromUI,
+  useSetAppDataByKey,
+} from "../AppData/useUISettings";
 import {
   APP_DATA,
   QUERY_PARAM_SKIP_PREVIEW,
@@ -38,6 +50,10 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
     isStreamingOn,
     isBrowserRecordingOn,
   } = useRecordingStreaming();
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const [isRTMPStarted, setRTMPStarted] = useSetAppDataByKey(
+    APP_DATA.rtmpStarted
+  );
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [meetingURL, setMeetingURL] = useState(
     recordingUrl || defaultMeetingUrl
@@ -76,14 +92,16 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
           "app.100ms.live/meeting",
           "app.100ms.live/preview"
         );
-        if (hlsSelected) {
+        if (hlsSelected && !isHLSStarted) {
+          setHLSStarted(true);
           await hmsActions.startHLSStreaming({
             variants: [{ meetingURL: urlToStreamRecord }],
             recording: recordingSelected
               ? { hlsVod: true, singleFilePerLayer: true }
               : undefined,
           });
-        } else {
+        } else if (!isRTMPStarted) {
+          setRTMPStarted(true);
           const rtmpRecordParams = {
             meetingURL: urlToStreamRecord,
             rtmpURLs: rtmpURL.length > 0 ? [rtmpURL] : undefined,
@@ -104,6 +122,11 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
       onOpenChange(false);
     } catch (error) {
       LogRocket.track(`${hlsSelected ? "hls" : "rtmp/recording"}Error`, error);
+      if (hlsSelected) {
+        setHLSStarted(false);
+      } else {
+        setRTMPStarted(false);
+      }
       console.error(
         `failed to start/stop ${
           hlsSelected ? "hls streaming" : "rtmp/recording"
@@ -192,8 +215,11 @@ const RecordingAndRTMPModal = ({ onOpenChange }) => {
               variant="primary"
               type="submit"
               onClick={() => startStopRTMPRecordingHLS("start")}
+              loading={isHLSStarted || isRTMPStarted}
               disabled={
                 isAnythingRunning ||
+                isHLSStarted ||
+                isRTMPStarted ||
                 (!hlsSelected && !recordingSelected && !rtmpURL)
               }
               data-testid="rtmp_recording_start"
@@ -211,14 +237,19 @@ export const RecordingStreaming = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [showModal, setShowModal] = useState(false);
   const { isStreamingOn } = useRecordingStreaming();
-  const title = isStreamingOn ? "Stop Streaming" : "Start Streaming";
+  const isHLSStartedFromUI = useIsHLSStartedFromUI();
+  const isRTMPStartedFromUI = useIsRTMPStartedFromUI();
+  let tooltipText = isStreamingOn ? "Stop Streaming" : "Start Streaming";
+  if (isHLSStartedFromUI || isRTMPStartedFromUI) {
+    tooltipText = "Starting stream...";
+  }
   if (!isConnected) {
     return null;
   }
 
   return (
     <Fragment>
-      <Tooltip title={`${title}/Recording`}>
+      <Tooltip title={tooltipText}>
         <Button
           variant={isStreamingOn ? "danger" : "standard"}
           icon
@@ -227,8 +258,12 @@ export const RecordingStreaming = () => {
             setShowModal(true);
           }}
         >
-          <RecordIcon />
-          <Box css={{ "@md": { display: "none" } }}>{title}</Box>
+          {isHLSStartedFromUI || isRTMPStartedFromUI ? (
+            <Loading size={24} color="currentColor" />
+          ) : (
+            <RecordIcon />
+          )}
+          <Box css={{ "@md": { display: "none" } }}>{tooltipText}</Box>
         </Button>
       </Tooltip>
 
