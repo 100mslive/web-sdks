@@ -200,5 +200,6 @@ const LeaveIconButton = styled(IconButton, {
   },
   "@md": {
     px: "$4",
+    mx: 0,
   },
 });

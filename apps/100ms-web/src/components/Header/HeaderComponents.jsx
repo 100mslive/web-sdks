@@ -1,3 +1,4 @@
+import { useMedia } from "react-use";
 import {
   selectDominantSpeaker,
   selectIsConnectedToRoom,
@@ -10,8 +11,10 @@ import {
   Text,
   textEllipsis,
   useTheme,
+  config as cssConfig,
 } from "@100mslive/react-ui";
 import { useLogo } from "../AppData/useUISettings";
+import { isStreamingKit } from "../../common/utils";
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -47,9 +50,10 @@ const LogoImg = styled("img", {
 export const Logo = () => {
   const { themeType } = useTheme();
   const logo = useLogo();
+  const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   // Hide logo for now as there is not enough space
-  if (isConnected) {
+  if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
   return (
