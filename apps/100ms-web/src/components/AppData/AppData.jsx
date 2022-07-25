@@ -7,6 +7,7 @@ import {
   selectRolesMap,
   useHMSActions,
   useHMSStore,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { useSidepaneReset, useSidepaneState } from "./useSidepane";
 import {
@@ -25,6 +26,7 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from "../../common/constants";
+import { useSetAppDataByKey } from "./useUISettings";
 
 export const getAppDetails = appDetails => {
   try {
@@ -128,5 +130,28 @@ export function AppData({
     isDefaultModeActiveSpeaker,
   ]);
 
-  return null;
+  return <ResetStreamingStart />;
 }
+
+/**
+ * reset hlsStarted, rtmpStarted values when streaming starts
+ */
+const ResetStreamingStart = () => {
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const [hlsStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const [rtmpStarted, setRTMPStarted] = useSetAppDataByKey(
+    APP_DATA.rtmpStarted
+  );
+
+  useEffect(() => {
+    if (isHLSRunning && hlsStarted) {
+      setHLSStarted(false);
+    }
+  }, [isHLSRunning, hlsStarted, setHLSStarted]);
+  useEffect(() => {
+    if (isRTMPRunning && rtmpStarted) {
+      setRTMPStarted(false);
+    }
+  }, [isRTMPRunning, setRTMPStarted, rtmpStarted]);
+  return null;
+};

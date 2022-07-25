@@ -127,7 +127,7 @@ export const ErrorText = ({ error }) => {
     return null;
   }
   return (
-    <Text variant="sm" css={{ mb: "$4", color: "$error" }}>
+    <Text variant="sm" css={{ mb: "$8", color: "$error" }}>
       {error}
     </Text>
   );
