@@ -1,13 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
 import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExpandIcon,
-  SettingIcon,
-  ShrinkIcon,
-} from "@100mslive/react-icons";
+import { useFullscreen } from "react-use";
 import {
   Box,
   Dropdown,
@@ -16,6 +10,13 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ExpandIcon,
+  SettingIcon,
+  ShrinkIcon,
+} from "@100mslive/react-icons";
 import { ChatView } from "../components/chatView";
 import { useIsChatOpen } from "../components/AppData/useChatState";
 import {
@@ -26,13 +27,15 @@ import {
 import { ToastManager } from "../components/Toast/ToastManager";
 import { HMSVideoPlayer } from "../components/HMSVideo/HMSVideo";
 import { VideoProgress } from "../components/HMSVideo/VideoProgress";
-import { PlaybackAndTimeControls } from "../components/HMSVideo/PlaybackAndTimeControls";
+import { PlayButton } from "../components/HMSVideo/PlayButton";
 import { VolumeControl } from "../components/HMSVideo/VolumeControl";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
+import { VideoTime } from "../components/HMSVideo/VideoTime";
 
 let hlsController;
 const HLSView = () => {
   const videoRef = useRef(null);
+  const hlsViewRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
@@ -42,6 +45,9 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  useFullscreen(hlsViewRef, isFullScreen, {
+    onClose: () => setIsFullScreen(false),
+  });
 
   useEffect(() => {
     if (videoRef.current && hlsUrl) {
@@ -118,21 +124,17 @@ const HLSView = () => {
   };
 
   function toggleFullScreen() {
-    const hlsviewer = document.getElementById("hls-viewer");
-    if (hlsviewer && !isFullScreen) {
-      hlsviewer.requestFullscreen();
-      setIsFullScreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullScreen(false);
+    if (hlsViewRef) {
+      setIsFullScreen(!isFullScreen);
     }
   }
 
   return (
-    <div
+    <Box
       key="hls-viewer"
       id="hls-viewer"
-      style={{
+      ref={hlsViewRef}
+      css={{
         verticalAlign: "middle",
         display: "inline",
         height: "100%",
@@ -164,7 +166,10 @@ const HLSView = () => {
                 gap={2}
                 css={{ width: "100%" }}
               >
-                <PlaybackAndTimeControls videoRef={videoRef} />
+                <Flex justify="start" align="center" gap={2}>
+                  <PlayButton videoRef={videoRef} />
+                  <VideoTime videoRef={videoRef} />
+                </Flex>
                 <VolumeControl videoRef={videoRef} />
                 <Flex
                   justify="end"
@@ -315,7 +320,7 @@ const HLSView = () => {
           <ChatView />
         </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

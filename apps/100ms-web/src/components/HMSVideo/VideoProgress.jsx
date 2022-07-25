@@ -1,5 +1,5 @@
-import { Slider } from "@100mslive/react-ui";
 import { useEffect, useState } from "react";
+import { Slider } from "@100mslive/react-ui";
 
 export const VideoProgress = ({ onValueChange, videoRef }) => {
   const [videoProgress, setVideoProgress] = useState(0);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { SpeakerIcon } from "@100mslive/react-icons";
 import { Flex, Slider } from "@100mslive/react-ui";
+import { SpeakerIcon } from "@100mslive/react-icons";
 
 export const VolumeControl = ({ videoRef }) => {
   const videoEl = videoRef.current;

@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 
 export const HMSVideoPlayer = forwardRef(({ children }, videoRef) => {
   return (
