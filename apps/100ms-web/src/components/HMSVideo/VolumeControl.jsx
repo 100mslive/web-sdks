@@ -4,7 +4,7 @@ import { SpeakerIcon } from "@100mslive/react-icons";
 
 export const VolumeControl = ({ videoRef }) => {
   const videoEl = videoRef.current;
-  const [volume, setVolume] = useState(75);
+  const [volume, setVolume] = useState(videoEl ? videoEl.volume : 100);
   useEffect(() => {
     if (volume === 0) {
       setVolume(videoEl ? videoEl.volume * 10 : 0);
