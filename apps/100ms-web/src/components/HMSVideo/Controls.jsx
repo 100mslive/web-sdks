@@ -1,6 +1,6 @@
-import { Box, Flex } from "@100mslive/react-ui";
+import { Flex } from "@100mslive/react-ui";
 
-export const VideoControls = ({ children }, videoRef) => {
+export const VideoControls = ({ children }) => {
   return (
     <Flex
       id="hms-video-controls"

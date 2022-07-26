@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Slider } from "@100mslive/react-ui";
+import { getPercentage } from "./HMSVIdeoUtils";
 
 export const VideoProgress = ({ onValueChange, videoRef }) => {
   const [videoProgress, setVideoProgress] = useState(0);
@@ -9,7 +10,7 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
     if (videoEl) {
       videoEl.addEventListener("timeupdate", _ => {
         const progress = Math.floor(
-          (videoEl.currentTime / videoEl.duration) * 100
+          getPercentage(videoEl.currentTime, videoEl.duration)
         );
 
         setVideoProgress(isNaN(progress) ? 0 : progress);
