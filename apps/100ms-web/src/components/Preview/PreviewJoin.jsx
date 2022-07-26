@@ -142,7 +142,7 @@ const PreviewTile = ({ name }) => {
     >
       {localPeer ? (
         <>
-          <TileConnection name={name} peerId={localPeer.id} />
+          <TileConnection name={name} peerId={localPeer.id} hideLabel={!name} />
           <Video
             mirror={true}
             trackId={localPeer.videoTrack}
@@ -164,7 +164,7 @@ const PreviewTile = ({ name }) => {
   );
 };
 
-const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
+const PreviewControls = () => {
   return (
     <Flex
       justify="between"
