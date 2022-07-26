@@ -17,15 +17,15 @@ import {
   useTheme,
   Avatar,
   Flex,
-  Button,
   textEllipsis,
 } from "@100mslive/react-ui";
-import { SettingsIcon, ArrowRightIcon } from "@100mslive/react-icons";
+import { SettingsIcon } from "@100mslive/react-icons";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import SettingsModal from "../Settings/SettingsModal";
 import TileConnection from "../Connection/TileConnection";
-import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
+import PreviewName from "./PreviewName";
 import IconButton from "../../IconButton";
+import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import {
   useUserPreferences,
   UserPreferencesKeys,
@@ -37,7 +37,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
   );
-  const name = initialName || previewPreference.name;
+  const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
@@ -78,13 +78,13 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
   return (
     <Container>
       <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>
-        Let's get you started, {name}!
+        Get Started
       </Text>
       <Text
         css={{ c: "$textMedEmp", my: "$6", textAlign: "center" }}
         variant="body1"
       >
-        Let's get your studio setup ready in less than 5 minutes!
+        Setup your audio and video before joining
       </Text>
       <Flex
         align="center"
@@ -98,6 +98,12 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
         <PreviewControls
           enableJoin={enableJoin}
           savePreferenceAndJoin={savePreferenceAndJoin}
+        />
+        <PreviewName
+          name={name}
+          onChange={setName}
+          enableJoin={enableJoin}
+          onJoin={savePreferenceAndJoin}
         />
       </Flex>
     </Container>
@@ -171,17 +177,7 @@ const PreviewControls = ({ enableJoin, savePreferenceAndJoin }) => {
         <AudioVideoToggle compact />
         <VirtualBackground />
       </Flex>
-      <Flex>
-        <PreviewSettings />
-        <Button
-          onClick={savePreferenceAndJoin}
-          disabled={!enableJoin}
-          css={{ ml: "$4" }}
-          icon
-        >
-          Join <ArrowRightIcon />
-        </Button>
-      </Flex>
+      <PreviewSettings />
     </Flex>
   );
 };
