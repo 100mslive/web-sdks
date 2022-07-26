@@ -142,7 +142,7 @@ const PreviewTile = ({ name }) => {
     >
       {localPeer ? (
         <>
-          <TileConnection name={name} peerId={localPeer.id} hideLabel={!name} />
+          <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
             mirror={true}
             trackId={localPeer.videoTrack}
