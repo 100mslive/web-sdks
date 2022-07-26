@@ -1,11 +1,6 @@
 import { Fragment, useCallback, useState, useEffect } from "react";
 import { EndStreamIcon, GoLiveIcon, InfoIcon } from "@100mslive/react-icons";
-import {
-  selectAppData,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from "@100mslive/react-sdk";
+import { useHMSActions, useRecordingStreaming } from "@100mslive/react-sdk";
 import { Box, Button, Flex, Text, Loading } from "@100mslive/react-ui";
 import {
   Container,
@@ -15,7 +10,6 @@ import {
   RecordStream,
 } from "./Common";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { getDefaultMeetingUrl } from "../../common/utils";
 import { APP_DATA } from "../../common/constants";
 
 export const HLSStreaming = ({ onBack }) => {
@@ -35,7 +29,6 @@ export const HLSStreaming = ({ onBack }) => {
 const StartHLS = () => {
   const [record, setRecord] = useState(false);
   const [error, setError] = useState(false);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const hmsActions = useHMSActions();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(async () => {
@@ -46,7 +39,6 @@ const StartHLS = () => {
       setHLSStarted(true);
       setError("");
       await hmsActions.startHLSStreaming({
-        variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
         recording: record
           ? { hlsVod: true, singleFilePerLayer: true }
           : undefined,
@@ -55,7 +47,7 @@ const StartHLS = () => {
       setHLSStarted(false);
       setError(error.message);
     }
-  }, [recordingUrl, hmsActions, record, isHLSStarted, setHLSStarted]);
+  }, [hmsActions, record, isHLSStarted, setHLSStarted]);
 
   return (
     <Fragment>
