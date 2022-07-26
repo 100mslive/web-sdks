@@ -310,6 +310,14 @@ export interface IHMSActions {
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
   startHLSStreaming(params: HLSConfig): Promise<void>;
+  /**
+   * No recording
+   */
+  startHLSStreaming(): Promise<void>;
+  /**
+   * pass recording parameters.
+   */
+  startHLSStreaming(params: Omit<HLSConfig, 'variants'>): Promise<void>;
 
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.

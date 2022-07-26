@@ -31,7 +31,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata, HLSRecordingConfig } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -545,17 +545,18 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: HLSConfig) {
-    const hlsParams: HLSRequestParams = {
-      variants: params.variants.map(variant => {
+  async startHLSStreaming(params?: HLSConfig | HLSRecordingConfig) {
+    const hlsParams: HLSRequestParams = {};
+    if (params && 'variants' in params) {
+      hlsParams.variants = params.variants.map(variant => {
         const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
         if (variant.metadata) {
           hlsVariant.metadata = variant.metadata;
         }
         return hlsVariant;
-      }),
-    };
-    if (params.recording) {
+      });
+    }
+    if (params?.recording) {
       hlsParams.hls_recording = {
         single_file_per_layer: params.recording.singleFilePerLayer,
         hls_vod: params.recording.hlsVod,

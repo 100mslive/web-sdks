@@ -52,7 +52,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
+import { HLSConfig, HLSRecordingConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -716,7 +716,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async startHLSStreaming(params: HLSConfig) {
+  async startHLSStreaming(params?: HLSConfig | HLSRecordingConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,

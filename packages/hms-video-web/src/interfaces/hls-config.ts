@@ -19,6 +19,7 @@ export interface HLSConfig {
   };
 }
 
+export type HLSRecordingConfig = Omit<HLSConfig, 'variants'>;
 export interface HLSMeetingURLVariant {
   /**
    * This meeting url is opened in a headless chrome instance for generating the HLS feed.
