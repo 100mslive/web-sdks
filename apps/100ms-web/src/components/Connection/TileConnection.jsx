@@ -9,7 +9,7 @@ const TileConnection = ({ name, peerId, hideLabel }) => {
         <Text
           css={{
             c: "$textHighEmp",
-            ...textEllipsis("90%"),
+            ...textEllipsis("100%"),
           }}
           variant="xs"
         >
