@@ -2,8 +2,7 @@ import React from "react";
 import { Flex, VerticalDivider } from "@100mslive/react-ui";
 import { ParticipantCount } from "./ParticipantList";
 import { Logo, SpeakerTag } from "./HeaderComponents";
-import { AdditionalRoomState } from "./AdditionalRoomState";
-import { RecordingStreaming } from "./RecordingAndRTMPModal";
+import { StreamActions } from "./StreamActions";
 
 export const ConferencingHeader = ({ isPreview }) => {
   return (
@@ -27,8 +26,7 @@ export const ConferencingHeader = ({ isPreview }) => {
           "@md": { gap: "$2" },
         }}
       >
-        <RecordingStreaming />
-        <AdditionalRoomState />
+        <StreamActions />
         <ParticipantCount />
       </Flex>
     </Flex>
