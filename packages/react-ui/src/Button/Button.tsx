@@ -114,7 +114,7 @@ export const Button = React.forwardRef<
       <>
         {loading && (
           <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute', left: '0' }}>
-            <Loading />
+            <Loading color="currentColor" />
           </Flex>
         )}
         <Flex
