@@ -130,7 +130,8 @@ const RightContainer = ({ children }) => {
 };
 
 function getRoomUrl(roomLink) {
-  return `https://${roomLink.subdomain}/preview/${roomLink.identifier}`;
+  const isStreaming = window.location.pathname.startsWith('/streaming');
+  return `https://${roomLink.subdomain}${isStreaming ? '/streaming' : ''}/preview/${roomLink.identifier}`;
 }
 
 export default InviteLinksModal;
