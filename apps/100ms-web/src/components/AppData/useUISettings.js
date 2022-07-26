@@ -1,4 +1,4 @@
-import { APP_DATA, UI_SETTINGS } from "../../common/constants";
+import { useCallback } from "react";
 import {
   selectAppData,
   selectAppDataByPath,
@@ -6,11 +6,11 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import { useCallback } from "react";
 import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
+import { APP_DATA, UI_SETTINGS } from "../../common/constants";
 
 /**
  * fields saved related to UI settings in store's app data can be
