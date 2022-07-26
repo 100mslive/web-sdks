@@ -55,6 +55,9 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
       setToken(authToken);
       return;
     }
+    if (!tokenEndpoint || !urlRoomId) {
+      return;
+    }
     const getTokenFn = !userRole
       ? () => getUserToken(v4())
       : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
