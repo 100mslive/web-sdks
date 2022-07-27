@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSearchParam, useDeepCompareEffect } from "react-use";
 import {
   selectAvailableRoleNames,
@@ -60,88 +60,86 @@ const initialAppData = {
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
 };
 
-export function AppData({ info, policyConfig }) {
-  const hmsActions = useHMSActions();
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const sidePane = useSidepaneState();
-  const resetSidePane = useSidepaneReset();
-  const [preferences = {}] = useUserPreferences(
-    UserPreferencesKeys.UI_SETTINGS
-  );
-  const roleNames = useHMSStore(selectAvailableRoleNames);
-  const rolesMap = useHMSStore(selectRolesMap);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isDefaultModeActiveSpeaker =
-    useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
-
-  useEffect(() => {
-    if (
-      !isConnected &&
-      sidePane &&
-      sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS
-    ) {
-      resetSidePane();
-    }
-  }, [isConnected, sidePane, resetSidePane]);
-
-  useEffect(() => {
-    hmsActions.initAppData(initialAppData);
-  }, [hmsActions]);
-
-  useDeepCompareEffect(() => {
-    const uiSettings = preferences.uiSettings;
-    if (!uiSettings) {
-      return;
-    }
-    const updatedSettings = {
-      ...uiSettings,
-      [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
-        ? UI_MODE_ACTIVE_SPEAKER
-        : uiSettings.uiViewMode || UI_MODE_GRID,
-    };
-    hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
-
-  useDeepCompareEffect(() => {
-    if (!preferences.subscribedNotifications) {
-      return;
-    }
-    hmsActions.setAppData(
-      APP_DATA.subscribedNotifications,
-      preferences.subscribedNotifications,
-      true
+export const AppData = React.memo(
+  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig }) => {
+    const hmsActions = useHMSActions();
+    const isConnected = useHMSStore(selectIsConnectedToRoom);
+    const sidePane = useSidepaneState();
+    const resetSidePane = useSidepaneReset();
+    const [preferences = {}] = useUserPreferences(
+      UserPreferencesKeys.UI_SETTINGS
     );
-  }, [preferences.subscribedNotifications, hmsActions]);
+    const roleNames = useHMSStore(selectAvailableRoleNames);
+    const rolesMap = useHMSStore(selectRolesMap);
+    const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+    const isDefaultModeActiveSpeaker =
+      useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
 
-  useDeepCompareEffect(() => {
-    if (localPeerRole) {
-      const config = normalizeAppPolicyConfig(
-        roleNames,
-        rolesMap,
-        policyConfig
+    useEffect(() => {
+      if (
+        !isConnected &&
+        sidePane &&
+        sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS
+      ) {
+        resetSidePane();
+      }
+    }, [isConnected, sidePane, resetSidePane]);
+
+    useEffect(() => {
+      hmsActions.initAppData(initialAppData);
+    }, [hmsActions]);
+
+    useEffect(() => {
+      const uiSettings = preferences.uiSettings || {};
+      const updatedSettings = {
+        ...uiSettings,
+        [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
+          ? UI_MODE_ACTIVE_SPEAKER
+          : uiSettings.uiViewMode || UI_MODE_GRID,
+      };
+      hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
+    }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
+
+    useEffect(() => {
+      const appData = {
+        [APP_DATA.recordingUrl]: recordingUrl,
+        [APP_DATA.tokenEndpoint]: tokenEndpoint,
+        [APP_DATA.logo]: logo,
+        [APP_DATA.hlsViewerRole]:
+          getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
+          DEFAULT_HLS_VIEWER_ROLE,
+        [APP_DATA.appConfig]: getAppDetails(appDetails),
+      };
+      for (const key in appData) {
+        hmsActions.setAppData([key], appData[key]);
+      }
+    }, [appDetails, logo, recordingUrl, tokenEndpoint, hmsActions]);
+
+    useDeepCompareEffect(() => {
+      if (!preferences.subscribedNotifications) {
+        return;
+      }
+      hmsActions.setAppData(
+        APP_DATA.subscribedNotifications,
+        preferences.subscribedNotifications,
+        true
       );
-      hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
-    }
-  }, [roleNames, policyConfig, rolesMap, localPeerRole]);
+    }, [preferences.subscribedNotifications, hmsActions]);
 
-  useDeepCompareEffect(() => {
-    const { appDetails, logo, recordingUrl, tokenEndpoint } = info;
-    const appData = {
-      [APP_DATA.recordingUrl]: recordingUrl,
-      [APP_DATA.tokenEndpoint]: tokenEndpoint,
-      [APP_DATA.logo]: logo,
-      [APP_DATA.hlsViewerRole]:
-        getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
-        DEFAULT_HLS_VIEWER_ROLE,
-      [APP_DATA.appConfig]: getAppDetails(appDetails),
-    };
-    for (const key in appData) {
-      hmsActions.setAppData([key], appData[key]);
-    }
-  }, [info]);
+    useDeepCompareEffect(() => {
+      if (localPeerRole) {
+        const config = normalizeAppPolicyConfig(
+          roleNames,
+          rolesMap,
+          policyConfig
+        );
+        hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
+      }
+    }, [roleNames, policyConfig, rolesMap, localPeerRole]);
 
-  return <ResetStreamingStart />;
-}
+    return <ResetStreamingStart />;
+  }
+);
 
 /**
  * reset hlsStarted, rtmpStarted values when streaming starts
