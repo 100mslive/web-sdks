@@ -122,7 +122,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
           </ToastDescription>
         ) : null}
         {action ? (
-          <ToastAction altText={`${title}Action`} asChild css={{ mt: '$10' }}>
+          <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
             {action}
           </ToastAction>
         ) : null}
