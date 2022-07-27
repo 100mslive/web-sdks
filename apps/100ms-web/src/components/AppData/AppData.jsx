@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from "react";
-import { useSearchParam } from "react-use";
+import { useEffect } from "react";
+import { useSearchParam, useEffectOnce, useDeepCompareEffect } from "react-use";
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
@@ -36,6 +36,30 @@ export const getAppDetails = appDetails => {
   }
 };
 
+const initialAppData = {
+  [APP_DATA.uiSettings]: {
+    [UI_SETTINGS.isAudioOnly]: false,
+    [UI_SETTINGS.isHeadless]: false,
+    [UI_SETTINGS.maxTileCount]: 9,
+    [UI_SETTINGS.showStatsOnTiles]: false,
+    [UI_SETTINGS.enableAmbientMusic]: false,
+    [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
+  },
+  [APP_DATA.subscribedNotifications]: {
+    PEER_JOINED: false,
+    PEER_LEFT: false,
+    NEW_MESSAGE: true,
+    ERROR: true,
+    METADATA_UPDATED: true,
+  },
+  [APP_DATA.chatOpen]: false,
+  [APP_DATA.chatDraft]: "",
+  [APP_DATA.sidePane]: "",
+  [APP_DATA.hlsStarted]: false,
+  [APP_DATA.rtmpStarted]: false,
+  [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
+};
+
 export function AppData({
   appDetails,
   recordingUrl,
@@ -47,17 +71,14 @@ export function AppData({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const sidePane = useSidepaneState();
   const resetSidePane = useSidepaneReset();
-  const [preferences] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
-  const { subscribedNotifications = {}, ...uiSettings } = preferences || {};
+  const [preferences = {}] = useUserPreferences(
+    UserPreferencesKeys.UI_SETTINGS
+  );
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isDefaultModeActiveSpeaker =
     useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
-  const appPolicyConfig = useMemo(
-    () => normalizeAppPolicyConfig(roleNames, rolesMap, policyConfig),
-    [roleNames, policyConfig, rolesMap]
-  );
 
   useEffect(() => {
     if (
@@ -69,32 +90,48 @@ export function AppData({
     }
   }, [isConnected, sidePane, resetSidePane]);
 
-  useEffect(() => {
-    const initialAppData = {
-      [APP_DATA.uiSettings]: {
-        [UI_SETTINGS.isAudioOnly]: false,
-        [UI_SETTINGS.isHeadless]: false,
-        [UI_SETTINGS.maxTileCount]: 9,
-        [UI_SETTINGS.showStatsOnTiles]: false,
-        [UI_SETTINGS.enableAmbientMusic]: false,
-        ...uiSettings,
-        [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
-          ? UI_MODE_ACTIVE_SPEAKER
-          : uiSettings.uiViewMode || UI_MODE_GRID,
-      },
-      [APP_DATA.subscribedNotifications]: {
-        PEER_JOINED: false,
-        PEER_LEFT: false,
-        NEW_MESSAGE: true,
-        ERROR: true,
-        METADATA_UPDATED: true,
-        ...subscribedNotifications,
-      },
-      [APP_DATA.chatOpen]: false,
-      [APP_DATA.chatDraft]: "",
-      [APP_DATA.sidePane]: "",
-      [APP_DATA.hlsStarted]: false,
-      [APP_DATA.rtmpStarted]: false,
+  useEffectOnce(() => {
+    hmsActions.initAppData(initialAppData);
+  });
+
+  useDeepCompareEffect(() => {
+    if (localPeerRole) {
+      const config = normalizeAppPolicyConfig(
+        roleNames,
+        rolesMap,
+        policyConfig
+      );
+      hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
+    }
+  }, [roleNames, policyConfig, rolesMap, localPeerRole]);
+
+  useDeepCompareEffect(() => {
+    const uiSettings = preferences.uiSettings;
+    if (!uiSettings) {
+      return;
+    }
+    const updatedSettings = {
+      ...uiSettings,
+      [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
+        ? UI_MODE_ACTIVE_SPEAKER
+        : uiSettings.uiViewMode || UI_MODE_GRID,
+    };
+    hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
+  }, [hmsActions, preferences.uiSettings, isDefaultModeActiveSpeaker]);
+
+  useDeepCompareEffect(() => {
+    if (!preferences.subscribedNotifications) {
+      return;
+    }
+    hmsActions.setAppData(
+      APP_DATA.subscribedNotifications,
+      preferences.subscribedNotifications,
+      true
+    );
+  }, [preferences.subscribedNotifications, hmsActions]);
+
+  useDeepCompareEffect(() => {
+    const appData = {
       [APP_DATA.recordingUrl]: recordingUrl,
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
       [APP_DATA.logo]: logo,
@@ -103,22 +140,10 @@ export function AppData({
         DEFAULT_HLS_VIEWER_ROLE,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
-    if (localPeerRole) {
-      initialAppData[APP_DATA.appLayout] = appPolicyConfig[localPeerRole];
+    for (const key in appData) {
+      hmsActions.setAppData([key], appData[key]);
     }
-    hmsActions.initAppData(initialAppData);
-  }, [
-    appDetails,
-    appPolicyConfig,
-    hmsActions,
-    isDefaultModeActiveSpeaker,
-    localPeerRole,
-    logo,
-    recordingUrl,
-    subscribedNotifications,
-    tokenEndpoint,
-    uiSettings,
-  ]);
+  }, [hmsActions, { appDetails, logo, recordingUrl, tokenEndpoint }]);
 
   return <ResetStreamingStart />;
 }
