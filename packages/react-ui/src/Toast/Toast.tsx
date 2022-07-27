@@ -58,7 +58,7 @@ const ToastTitle = styled(ToastPrimitives.Title, {
   color: '$textHighEmp',
   fontWeight: '$semiBold',
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'start',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -107,12 +107,12 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
       <ToastRoot {...props}>
         <ToastTitle>
           <Flex align="center" css={{ gap: '$4' }}>
-            {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start' }}>{icon}</Box> : null}
+            {icon ? <Box css={{ w: '$10', h: '$10' }}>{icon}</Box> : null}
             <Text variant="sub1" css={{ c: 'inherit' }}>
               {title}
             </Text>
           </Flex>
-          {isClosable ? <DefaultClose css={{ alignSelf: 'start' }} /> : null}
+          {isClosable ? <DefaultClose /> : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
