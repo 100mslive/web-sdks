@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearchParam, useEffectOnce, useDeepCompareEffect } from "react-use";
+import { useSearchParam, useDeepCompareEffect } from "react-use";
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
@@ -60,13 +60,7 @@ const initialAppData = {
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
 };
 
-export function AppData({
-  appDetails,
-  recordingUrl,
-  logo,
-  tokenEndpoint,
-  policyConfig,
-}) {
+export function AppData({ info, policyConfig }) {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const sidePane = useSidepaneState();
@@ -90,20 +84,9 @@ export function AppData({
     }
   }, [isConnected, sidePane, resetSidePane]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     hmsActions.initAppData(initialAppData);
-  });
-
-  useDeepCompareEffect(() => {
-    if (localPeerRole) {
-      const config = normalizeAppPolicyConfig(
-        roleNames,
-        rolesMap,
-        policyConfig
-      );
-      hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
-    }
-  }, [roleNames, policyConfig, rolesMap, localPeerRole]);
+  }, [hmsActions]);
 
   useDeepCompareEffect(() => {
     const uiSettings = preferences.uiSettings;
@@ -117,7 +100,7 @@ export function AppData({
         : uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [hmsActions, preferences.uiSettings, isDefaultModeActiveSpeaker]);
+  }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
 
   useDeepCompareEffect(() => {
     if (!preferences.subscribedNotifications) {
@@ -131,6 +114,18 @@ export function AppData({
   }, [preferences.subscribedNotifications, hmsActions]);
 
   useDeepCompareEffect(() => {
+    if (localPeerRole) {
+      const config = normalizeAppPolicyConfig(
+        roleNames,
+        rolesMap,
+        policyConfig
+      );
+      hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
+    }
+  }, [roleNames, policyConfig, rolesMap, localPeerRole]);
+
+  useDeepCompareEffect(() => {
+    const { appDetails, logo, recordingUrl, tokenEndpoint } = info;
     const appData = {
       [APP_DATA.recordingUrl]: recordingUrl,
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
@@ -143,7 +138,7 @@ export function AppData({
     for (const key in appData) {
       hmsActions.setAppData([key], appData[key]);
     }
-  }, [hmsActions, { appDetails, logo, recordingUrl, tokenEndpoint }]);
+  }, [info]);
 
   return <ResetStreamingStart />;
 }

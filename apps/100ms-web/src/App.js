@@ -117,13 +117,14 @@ export function EdtechComponent({
           notifications={hmsNotifications}
         >
           <AppData
-            appDetails={metadata}
-            recordingUrl={recordingUrl}
-            logo={logo}
-            tokenEndpoint={tokenEndpoint}
             policyConfig={policyConfig}
+            info={{
+              recordingUrl,
+              logo,
+              tokenEndpoint,
+              appDetails: metadata,
+            }}
           />
-
           <Init />
           <Box
             css={{
