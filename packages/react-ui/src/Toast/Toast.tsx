@@ -107,7 +107,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
       <ToastRoot {...props}>
         <ToastTitle>
           <Flex align="center" css={{ gap: '$4' }}>
-            {icon ? <Box css={{ w: '$10', h: '$10' }}>{icon}</Box> : null}
+            {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start', mt: '$2' }}>{icon}</Box> : null}
             <Text variant="sub1" css={{ c: 'inherit' }}>
               {title}
             </Text>
