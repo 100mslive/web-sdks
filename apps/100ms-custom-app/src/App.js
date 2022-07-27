@@ -32,6 +32,7 @@ if (!hostname.endsWith('app.100ms.live')) {
 } else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
   hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
 }
+hostname = 'ravi.qa-app.100ms.live';
 
 const App = () => {
   const prevSavedSettings = useRef({});
