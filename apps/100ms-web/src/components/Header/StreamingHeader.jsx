@@ -39,7 +39,6 @@ export const StreamingHeader = ({ isPreview }) => {
           position: "absolute",
           right: "$10",
           gap: "$4",
-          "@md": { gap: "$2" },
         }}
       >
         {isMobile ? (

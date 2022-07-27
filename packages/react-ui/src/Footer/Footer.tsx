@@ -7,7 +7,7 @@ const Root = styled(Flex, {
   py: '$2',
   position: 'relative',
   height: '100%',
-  '@md': { flexWrap: 'wrap' },
+  '@md': { flexWrap: 'wrap', gap: '$4' },
 });
 
 const Left = styled(Flex, {
