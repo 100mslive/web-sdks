@@ -22,6 +22,7 @@ const ChatAction = React.forwardRef((_, ref) => {
   return (
     <Button
       outlined
+      as="div"
       variant="standard"
       css={{ w: "max-content" }}
       onClick={() => {
