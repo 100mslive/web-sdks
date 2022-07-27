@@ -547,7 +547,7 @@ export default class HMSTransport implements ITransport {
 
   async startHLSStreaming(params?: HLSConfig | HLSRecordingConfig) {
     const hlsParams: HLSRequestParams = {};
-    if (params && 'variants' in params) {
+    if (params && 'variants' in params && params.variants.length > 0) {
       hlsParams.variants = params.variants.map(variant => {
         const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
         if (variant.metadata) {
