@@ -304,7 +304,7 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * Start hls with configured url from dashbiard without any recording
+   * Start hls with configured url from dashboard without any recording
    */
   startHLSStreaming(): Promise<void>;
   /**
@@ -315,7 +315,8 @@ export interface IHMSActions {
    */
   startHLSStreaming(params: HLSConfig): Promise<void>;
   /**
-   * pass recording parameters.
+   * start HLS with configured url from dashboard with the passed in recording parameters.
+   * @param {HLSRecordingConfig} params
    */
   startHLSStreaming(params: HLSRecordingConfig): Promise<void>;
 
