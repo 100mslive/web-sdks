@@ -38,13 +38,13 @@ export const StreamingHeader = ({ isPreview }) => {
         css={{
           position: "absolute",
           right: "$10",
-          gap: "$4",
+          gap: "$6",
         }}
       >
         {isMobile ? (
           <MetaActions compact />
         ) : (
-          <Flex css={{ gap: "$4" }}>
+          <Flex css={{ gap: "$6" }}>
             <StreamActions />
           </Flex>
         )}

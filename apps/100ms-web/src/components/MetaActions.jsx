@@ -13,7 +13,7 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
   }
 
   return (
-    <Flex align="center" css={{ gap: compact ? "$2" : "$4" }}>
+    <Flex align="center" css={{ gap: compact ? "$4" : "$8" }}>
       <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
         <IconButton
           onClick={toggleHandRaise}
