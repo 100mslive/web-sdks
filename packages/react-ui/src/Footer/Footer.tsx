@@ -4,7 +4,7 @@ import { Flex } from '../Layout';
 const Root = styled(Flex, {
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '$2',
+  py: '$2',
   position: 'relative',
   height: '100%',
   '@md': { flexWrap: 'wrap' },
@@ -13,7 +13,8 @@ const Root = styled(Flex, {
 const Left = styled(Flex, {
   alignItems: 'center',
   position: 'absolute',
-  left: '$7',
+  left: '$10',
+  gap: '$4',
   '@md': {
     position: 'unset',
     justifyContent: 'center',
@@ -26,12 +27,14 @@ const Center = styled(Flex, {
   w: '100%',
   justifyContent: 'center',
   alignItems: 'center',
+  gap: '$4',
 });
 
 const Right = styled(Flex, {
   alignItems: 'center',
   position: 'absolute',
-  right: '$7',
+  right: '$10',
+  gap: '$4',
   '@md': {
     display: 'none',
   },

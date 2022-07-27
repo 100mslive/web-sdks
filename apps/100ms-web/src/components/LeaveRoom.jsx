@@ -190,7 +190,6 @@ const LeaveIconButton = styled(IconButton, {
   h: "$14",
   px: "$8",
   r: "$1",
-  mx: "$4",
   bg: "$error",
   "&:not([disabled]):hover": {
     bg: "$errorTint",
