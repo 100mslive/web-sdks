@@ -73,14 +73,14 @@ jobs:
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
-        if: github.ref == 'main' || github.ref_name == 'feat/WEB-1119'
+        if: github.ref_name == 'main'
         with:
           aws-access-key-id: ${{ secrets.S3_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
       - name: Upload to QA S3 Bucket
-        if: github.ref == 'main' || github.ref_name == 'feat/WEB-1119'
+        if: github.ref_name == 'main'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
         run: |
@@ -88,7 +88,7 @@ jobs:
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "static/*"
 
       - name: Build for Production
-        if: github.ref == 'production'
+        if: github.ref_name == 'production'
         run: yarn build
         env:
           REACT_APP_TILE_SHAPE: '1-1'
@@ -114,7 +114,7 @@ jobs:
           REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
 
       - name: Upload to Prod S3 Bucket
-        if: github.ref == 'production'
+        if: github.ref_name == 'production'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
         run: |
