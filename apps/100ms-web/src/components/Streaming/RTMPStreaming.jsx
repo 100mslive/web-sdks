@@ -164,10 +164,11 @@ const StartRTMP = () => {
           onClick={async () => {
             try {
               setRTMPStarted(true);
+              const urls = rtmpStreams
+                .filter(value => value.rtmpURL && value.streamKey)
+                .map(value => `${value.rtmpURL}/${value.streamKey}`);
               hmsActions.startRTMPOrRecording({
-                rtmpURLs: rtmpStreams.map(
-                  value => `${value.rtmpURL}/${value.streamKey}`
-                ),
+                rtmpURLs: urls,
                 meetingURL: recordingUrl || getDefaultMeetingUrl(),
                 resolution: getResolution(resolution),
                 record: record,
