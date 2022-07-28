@@ -81,39 +81,38 @@ const EndStream = () => {
     return null;
   }
   return (
-    <Flex align="center" css={{ gap: "$4" }}>
-      <Flex align="center" css={{ gap: "$4", "@md": { display: "none" } }}>
-        <LiveStatus />
-        <RecordingStatus />
-      </Flex>
-      <Button
-        variant="standard"
-        outlined
-        icon
-        onClick={() => {
-          toggleStreaming();
-        }}
-      >
-        <EndStreamIcon />
-        End Stream
-      </Button>
-    </Flex>
+    <Button
+      variant="standard"
+      outlined
+      icon
+      onClick={() => {
+        toggleStreaming();
+      }}
+    >
+      <EndStreamIcon />
+      End Stream
+    </Button>
   );
 };
 
 export const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
-  if (
-    !isConnected ||
-    (!permissions.hlsStreaming && !permissions.rtmpStreaming)
-  ) {
+  if (!isConnected) {
     return null;
   }
   return (
-    <Fragment>
-      <GoLiveButton />
-      <EndStream />
-    </Fragment>
+    <Flex align="center" css={{ gap: "$4" }}>
+      <Flex align="center" css={{ gap: "$4", "@md": { display: "none" } }}>
+        <LiveStatus />
+        <RecordingStatus />
+      </Flex>
+      {(permissions.hlsStreaming || permissions.rtmpStreaming) && (
+        <Fragment>
+          <GoLiveButton />
+          <EndStream />
+        </Fragment>
+      )}
+    </Flex>
   );
 };
