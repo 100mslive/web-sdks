@@ -87,8 +87,8 @@ const StyledChevron = styled(ChevronDownIcon, {
 export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
-export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles: CSS }>> =
-  React.forwardRef<HTMLButtonElement, PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles: CSS }>>(
+export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS }>> =
+  React.forwardRef<HTMLButtonElement, PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles?: CSS }>>(
     ({ children, iconStyles, ...props }, forwardedRef) => (
       <StyledHeader>
         <StyledTrigger {...props} ref={forwardedRef}>
