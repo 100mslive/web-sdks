@@ -56,12 +56,12 @@ jobs:
           REACT_APP_FONT: 'Roboto'
           REACT_APP_TOKEN_GENERATION_ENDPOINT: 'https://qa-in2.100ms.live/hmsapi/get-token/'
           REACT_APP_ENV: 'qa'
-          REACT_APP_LOGROCKET_ID: plwzmx/edtech-webapp
+          REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
           REACT_APP_POLICY_CONFIG: ''
           REACT_APP_WEBINAR_PROPS: '{}'
           REACT_APP_DEFAULT_APP_DETAILS: '{}'
           ENABLE_ROOT_PATH_BUILD_CACHE: '1'
-          REACT_APP_PUSHER_APP_KEY: '4ae6f78bb2b7f2d9ed11'
+          REACT_APP_PUSHER_APP_KEY: ${{ secrets.PUSHER_KEY }}
           REACT_APP_AMBIENT_MUSIC: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3'
           REACT_APP_PUSHER_AUTHENDPOINT: 'https://whiteboard-server.vercel.app/api/pusher/auth'
           REACT_APP_LOGROCKET_BLACKLIST: 'peakperformerapp.app.100ms.live,callrockethealth.app.100ms.live,buyume1.app.100ms.live,automation.app.100ms.live,juniorkoder.app.100ms.live,qaroy1.qa-app.100ms.live,kluster.app.100ms.live,pankhuriapp.app.100ms.live,qaroy1.qa-app.100ms.live'
@@ -71,21 +71,21 @@ jobs:
           REACT_APP_HEADLESS_JOIN: false
           REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
 
-      - name: Upload static to s3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         if: github.ref == 'main' || github.ref == 'feat/WEB-1119'
-        uses: reggionick/s3-deploy@v3
         with:
-          folder: build/static
-          bucket: ${{ secrets.S3_BUCKET }}
-          bucket-region: ${{ secrets.S3_BUCKET_REGION }}
+          aws-access-key-id: ${{ secrets.S3_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
+          aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
-      - name: Upload to s3
-        if: github.ref == 'main'
-        uses: reggionick/s3-deploy@v3
-        with:
-          folder: build
-          bucket: ${{ secrets.S3_BUCKET }}
-          bucket-region: ${{ secrets.S3_BUCKET_REGION }}
+      - name: Upload to QA S3 Bucket
+        if: github.ref == 'main' || github.ref == 'feat/WEB-1119'
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          aws s3 sync build s3://$BUCKET --include "static/*"
+          aws s3 sync build s3://$BUCKET --exclude "static/*"
 
       - name: Build for Production
         if: github.ref == 'production'
@@ -98,12 +98,12 @@ jobs:
           REACT_APP_FONT: 'Roboto'
           REACT_APP_TOKEN_GENERATION_ENDPOINT: 'https://prod-in2.100ms.live/hmsapi/get-token/'
           REACT_APP_ENV: 'qa'
-          REACT_APP_LOGROCKET_ID: plwzmx/edtech-webapp
+          REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
           REACT_APP_POLICY_CONFIG: ''
           REACT_APP_WEBINAR_PROPS: '{}'
           REACT_APP_DEFAULT_APP_DETAILS: '{}'
           ENABLE_ROOT_PATH_BUILD_CACHE: '1'
-          REACT_APP_PUSHER_APP_KEY: '4ae6f78bb2b7f2d9ed11'
+          REACT_APP_PUSHER_APP_KEY: ${{ secrets.PUSHER_KEY }}
           REACT_APP_AMBIENT_MUSIC: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3'
           REACT_APP_PUSHER_AUTHENDPOINT: 'https://whiteboard-server.vercel.app/api/pusher/auth'
           REACT_APP_LOGROCKET_BLACKLIST: 'peakperformerapp.app.100ms.live,callrockethealth.app.100ms.live,buyume1.app.100ms.live,automation.app.100ms.live,juniorkoder.app.100ms.live,qaroy1.qa-app.100ms.live,kluster.app.100ms.live,pankhuriapp.app.100ms.live,qaroy1.qa-app.100ms.live'
@@ -113,10 +113,10 @@ jobs:
           REACT_APP_HEADLESS_JOIN: false
           REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
 
-      - name: Upload to s3 prod
+      - name: Upload to Prod S3 Bucket
         if: github.ref == 'production'
-        uses: reggionick/s3-deploy@v3
-        with:
-          folder: build/static
-          bucket: ${{ secrets.S3_BUCKET_PROD }}
-          bucket-region: ${{ secrets.S3_BUCKET_REGION }}
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET_PROD }}
+        run: |
+          aws s3 sync build s3://$BUCKET --include "static/*"
+          aws s3 sync build s3://$BUCKET --exclude "static/*"
