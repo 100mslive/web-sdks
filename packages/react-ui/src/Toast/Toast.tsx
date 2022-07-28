@@ -5,7 +5,7 @@ import { IconButton } from '../IconButton';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
 import { styled } from '../Theme';
-import { toastAnimation } from '../utils';
+import { textEllipsis, toastAnimation } from '../utils';
 
 const getToastVariant = (base: string) => {
   return {
@@ -58,7 +58,7 @@ const ToastTitle = styled(ToastPrimitives.Title, {
   color: '$textHighEmp',
   fontWeight: '$semiBold',
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'start',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -106,13 +106,13 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
     <>
       <ToastRoot {...props}>
         <ToastTitle>
-          <Flex align="center" css={{ gap: '$4' }}>
-            {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start' }}>{icon}</Box> : null}
-            <Text variant="sub1" css={{ c: 'inherit' }}>
+          <Flex align="center" css={{ gap: '$4', flex: '1 1 0', minWidth: 0 }}>
+            {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start', mt: '$2' }}>{icon}</Box> : null}
+            <Text variant="sub1" css={{ c: 'inherit', ...textEllipsis('90%') }}>
               {title}
             </Text>
           </Flex>
-          {isClosable ? <DefaultClose css={{ alignSelf: 'start' }} /> : null}
+          {isClosable ? <DefaultClose /> : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
@@ -122,7 +122,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
           </ToastDescription>
         ) : null}
         {action ? (
-          <ToastAction altText={`${title}Action`} asChild css={{ mt: '$10' }}>
+          <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
             {action}
           </ToastAction>
         ) : null}
