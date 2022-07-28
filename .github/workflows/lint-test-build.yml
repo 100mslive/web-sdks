@@ -54,7 +54,7 @@ jobs:
           bucket-region: ap-south-1
 
       - name: Upload to s3 prod
-        if: github.ref == 'main'
+        if: github.ref == 'production'
         uses: reggionick/s3-deploy@v3
         with:
           folder: build
