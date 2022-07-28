@@ -3,7 +3,7 @@ export interface HLSConfig {
    * A list of meeting url which needs to be streamed as HLS feed, only one url is currently supported, all entries
    * except the first one will be ignored.
    */
-  variants: Array<HLSMeetingURLVariant>;
+  variants?: Array<HLSMeetingURLVariant>;
   /**
    * pass in this field if recording needs to be turned on as well
    */
@@ -19,7 +19,6 @@ export interface HLSConfig {
   };
 }
 
-export type HLSRecordingConfig = Omit<HLSConfig, 'variants'>;
 export interface HLSMeetingURLVariant {
   /**
    * This meeting url is opened in a headless chrome instance for generating the HLS feed.

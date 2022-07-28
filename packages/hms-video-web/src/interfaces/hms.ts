@@ -14,7 +14,7 @@ import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
-import { HLSConfig, HLSRecordingConfig } from './hls-config';
+import { HLSConfig } from './hls-config';
 import { ScreenShareConfig } from './track-settings';
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
@@ -41,15 +41,7 @@ export default interface HMS {
   /**
    * @param {HLSConfig} params
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-  /**
-   * @param {HLSRecordingConfig} params
-   */
-  startHLSStreaming(params: HLSRecordingConfig): Promise<void>;
-  /**
-   * @param {Omit<HLSConfig, 'variants'>} params
-   */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;

@@ -19,7 +19,7 @@ import {
   HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig, HLSConfig, HLSRecordingConfig } from './hmsSDKStore/sdkTypes';
+import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -304,22 +304,12 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * Start hls with configured url from dashboard without any recording
-   */
-  startHLSStreaming(): Promise<void>;
-  /**
    * If you want to start HLS streaming.
    * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-  /**
-   * start HLS with configured url from dashboard with the passed in recording parameters.
-   * @param {HLSRecordingConfig} params
-   */
-  startHLSStreaming(params: HLSRecordingConfig): Promise<void>;
-
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
