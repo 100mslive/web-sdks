@@ -157,9 +157,10 @@ const StartRTMP = () => {
           icon
           css={{ w: "100%", my: "$4" }}
           disabled={
-            (rtmpStreams.length === 0 ||
+            isRTMPStarted ||
+            ((rtmpStreams.length === 0 ||
               rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
-            !record
+              !record)
           }
           onClick={async () => {
             try {
