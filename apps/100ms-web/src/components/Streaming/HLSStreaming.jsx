@@ -51,6 +51,7 @@ const StartHLS = () => {
           : undefined,
       });
     } catch (error) {
+      // retry once if urls are missing
       if (error.message.includes("urls missing")) {
         try {
           await hmsActions.startHLSStreaming({
