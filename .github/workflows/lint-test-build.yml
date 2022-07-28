@@ -44,3 +44,19 @@ jobs:
           token: ${{ secrets.DOCKER_GIT_TOKEN }}
           event-type: automation
           repository: 100mslive/playwright-automation
+
+      - name: Upload to s3
+        if: github.ref == 'main'
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: build
+          bucket: ${{ secrets.S3_BUCKET }}
+          bucket-region: ap-south-1
+
+      - name: Upload to s3 prod
+        if: github.ref == 'main'
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: build
+          bucket: ${{ secrets.S3_BUCKET_PROD }}
+          bucket-region: ap-south-1
