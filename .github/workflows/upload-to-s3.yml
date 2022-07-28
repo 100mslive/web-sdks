@@ -59,8 +59,8 @@ jobs:
         if: github.event.inputs.env == 'qa'
         run: yarn build
         env:
-          REACT_APP_TOKEN_GENERATION_ENDPOINT: 'https://qa-in2.100ms.live/hmsapi/get-token/'
           REACT_APP_ENV: 'qa'
+          REACT_APP_ENABLE_WHITEBOARD: 'true'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -82,7 +82,6 @@ jobs:
         if: github.event.inputs.env == 'production'
         run: yarn build
         env:
-          REACT_APP_TOKEN_GENERATION_ENDPOINT: 'https://prod-in2.100ms.live/hmsapi/get-token/'
           REACT_APP_ENV: 'prod'
 
       - name: Upload to Prod S3 Bucket
