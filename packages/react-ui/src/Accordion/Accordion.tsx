@@ -1,4 +1,4 @@
-import React, { ComponentProps, PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from 'react';
 import { keyframes, CSS } from '@stitches/react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
