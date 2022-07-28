@@ -27,37 +27,40 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
     <Dialog.Trigger asChild>
       <Button variant="standard">Open Dialog</Button>
     </Dialog.Trigger>
-    <Dialog.Content>
-      <Dialog.Title css={{ c: '$textHighEmp', position: 'relative' }}>
-        <Flex direction="row" justify="between" css={{ w: '100%' }}>
-          <Flex justify="start" align="center" gap="3">
-            <InfoIcon></InfoIcon>
-            <Text variant="h5">Dialog Heading</Text>
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content>
+        <Dialog.Title css={{ c: '$textHighEmp', position: 'relative' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%' }}>
+            <Flex justify="start" align="center" gap="3">
+              <InfoIcon></InfoIcon>
+              <Text variant="h5">Dialog Heading</Text>
+            </Flex>
+            <Dialog.DefaultClose css={{ position: 'absolute', top: '-1rem', right: '-1rem' }}>
+              <CrossIcon></CrossIcon>
+            </Dialog.DefaultClose>
           </Flex>
-          <Dialog.DefaultClose css={{ position: 'absolute', top: '-1rem', right: '-1rem' }}>
-            <CrossIcon></CrossIcon>
-          </Dialog.DefaultClose>
+        </Dialog.Title>
+        <Text variant="body1" css={{ c: '$textMedEmp' }}>
+          Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
+        </Text>
+        <Fieldset css={{ mt: '$4' }}>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
+        </Fieldset>
+        <Fieldset>
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" defaultValue="@hdz666" css={{ w: '50%' }} />
+        </Fieldset>
+        <Flex css={{ marginTop: 25, justifyContent: 'flex-end' }}>
+          <Dialog.Close asChild>
+            <Button variant="primary">Save changes</Button>
+          </Dialog.Close>
         </Flex>
-      </Dialog.Title>
-      <Text variant="body1" css={{ c: '$textMedEmp' }}>
-        Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-        dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
-        labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
-      </Text>
-      <Fieldset css={{ mt: '$4' }}>
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
-      </Fieldset>
-      <Fieldset>
-        <Label htmlFor="username">Username</Label>
-        <Input id="username" defaultValue="@hdz666" css={{ w: '50%' }} />
-      </Fieldset>
-      <Flex css={{ marginTop: 25, justifyContent: 'flex-end' }}>
-        <Dialog.Close asChild>
-          <Button variant="primary">Save changes</Button>
-        </Dialog.Close>
-      </Flex>
-    </Dialog.Content>
+      </Dialog.Content>
+    </Dialog.Portal>
   </Dialog.Root>
 );
 
