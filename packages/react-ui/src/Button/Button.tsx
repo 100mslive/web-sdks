@@ -36,17 +36,21 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
 const getButtonVariants = (base: string, hover: string, active: string, disabled: string) => {
   return {
     bg: base,
+    border: `1px solid ${base}`,
     c: '$textAccentHigh',
     '&[disabled]': {
       c: '$textAccentDisabled',
       cursor: 'not-allowed',
       bg: disabled,
+      border: `1px solid ${disabled}`,
     },
     '&:not([disabled]):hover': {
       bg: hover,
+      border: `1px solid ${hover}`,
     },
     '&:not([disabled]):active': {
       bg: active,
+      border: `1px solid ${active}`,
     },
   };
 };
