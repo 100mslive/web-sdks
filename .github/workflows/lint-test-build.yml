@@ -97,7 +97,7 @@ jobs:
           REACT_APP_LOGO: ''
           REACT_APP_FONT: 'Roboto'
           REACT_APP_TOKEN_GENERATION_ENDPOINT: 'https://prod-in2.100ms.live/hmsapi/get-token/'
-          REACT_APP_ENV: 'qa'
+          REACT_APP_ENV: 'prod'
           REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
           REACT_APP_POLICY_CONFIG: ''
           REACT_APP_WEBINAR_PROPS: '{}'
