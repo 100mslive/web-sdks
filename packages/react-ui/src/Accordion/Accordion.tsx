@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from 'react';
-import { keyframes } from '@stitches/react';
+import React, { ComponentProps, PropsWithChildren } from 'react';
+import { keyframes, CSS } from '@stitches/react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { styled } from '../Theme';
@@ -87,17 +87,17 @@ const StyledChevron = styled(ChevronDownIcon, {
 export const AccordionRoot = StyledAccordion;
 export const AccordionItem = StyledItem;
 
-export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps>> = React.forwardRef<
-  HTMLButtonElement,
-  PropsWithChildren<BaseAccordion.AccordionTriggerProps>
->(({ children, ...props }, forwardedRef) => (
-  <StyledHeader>
-    <StyledTrigger {...props} ref={forwardedRef}>
-      {children}
-      <StyledChevron aria-hidden />
-    </StyledTrigger>
-  </StyledHeader>
-));
+export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles: CSS }>> =
+  React.forwardRef<HTMLButtonElement, PropsWithChildren<BaseAccordion.AccordionTriggerProps & { iconStyles: CSS }>>(
+    ({ children, iconStyles, ...props }, forwardedRef) => (
+      <StyledHeader>
+        <StyledTrigger {...props} ref={forwardedRef}>
+          {children}
+          <StyledChevron aria-hidden css={iconStyles} />
+        </StyledTrigger>
+      </StyledHeader>
+    ),
+  );
 
 export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.AccordionContentProps>> = React.forwardRef<
   HTMLDivElement,

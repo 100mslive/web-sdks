@@ -30,6 +30,9 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
       border: `solid $space$px ${active}`,
       bg: '$transparent',
     },
+    '&:not([disabled]):focus-visible': {
+      boxShadow: `0 0 0 3px ${base}`,
+    },
   };
 };
 
@@ -51,6 +54,9 @@ const getButtonVariants = (base: string, hover: string, active: string, disabled
     '&:not([disabled]):active': {
       bg: active,
       border: `1px solid ${active}`,
+    },
+    '&:not([disabled]):focus-visible': {
+      boxShadow: `0 0 0 3px ${base}`,
     },
   };
 };
