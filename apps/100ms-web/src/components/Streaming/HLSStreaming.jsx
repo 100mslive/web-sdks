@@ -63,9 +63,10 @@ const StartHLS = () => {
           setHLSStarted(false);
           setError(error.message);
         }
+      } else {
+        setHLSStarted(false);
+        setError(error.message);
       }
-      setHLSStarted(false);
-      setError(error.message);
     }
   }, [hmsActions, record, isHLSStarted, setHLSStarted, recordingUrl]);
 
