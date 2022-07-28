@@ -46,7 +46,7 @@ jobs:
           repository: 100mslive/playwright-automation
 
       - name: Build for QA
-        if: github.ref == 'main' || github.ref_name == 'feat/WEB-1119'
+        if: github.ref == 'main'
         run: yarn build
         env:
           REACT_APP_TILE_SHAPE: '1-1'
