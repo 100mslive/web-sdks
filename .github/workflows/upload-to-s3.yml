@@ -83,8 +83,8 @@ jobs:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "static/*" 
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "static/*"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
 
       - name: Build for Production
         if: github.ref_name == 'production' || github.event.inputs.env == 'production'
@@ -118,5 +118,5 @@ jobs:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "static/*"
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "static/*"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
