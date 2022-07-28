@@ -85,6 +85,9 @@ const StartRTMP = () => {
   const [isRTMPStarted, setRTMPStarted] = useSetAppDataByKey(
     APP_DATA.rtmpStarted
   );
+  const hasRTMPURL = rtmpStreams.some(
+    value => value.rtmpURL && value.streamKey
+  );
 
   return (
     <Box css={{ overflowY: "auto" }}>
@@ -156,18 +159,15 @@ const StartRTMP = () => {
           variant="primary"
           icon
           css={{ w: "100%", my: "$4" }}
-          disabled={
-            isRTMPStarted ||
-            ((rtmpStreams.length === 0 ||
-              rtmpStreams.some(value => !value.rtmpURL || !value.streamKey)) &&
-              !record)
-          }
+          disabled={isRTMPStarted || (!hasRTMPURL && !record)}
           onClick={async () => {
             try {
               setRTMPStarted(true);
-              const urls = rtmpStreams
-                .filter(value => value.rtmpURL && value.streamKey)
-                .map(value => `${value.rtmpURL}/${value.streamKey}`);
+              const urls = hasRTMPURL
+                ? rtmpStreams.map(
+                    value => `${value.rtmpURL}/${value.streamKey}`
+                  )
+                : [];
               hmsActions.startRTMPOrRecording({
                 rtmpURLs: urls,
                 meetingURL: recordingUrl || getDefaultMeetingUrl(),
