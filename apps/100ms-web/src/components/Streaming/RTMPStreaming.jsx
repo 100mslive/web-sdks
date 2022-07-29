@@ -30,7 +30,7 @@ import {
   ErrorText,
   RecordStream,
 } from "./Common";
-import { ResolutionInput } from "../MoreSettings/ResolutionInput";
+import { ResolutionInput } from "./ResolutionInput";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import {
   UserPreferencesKeys,

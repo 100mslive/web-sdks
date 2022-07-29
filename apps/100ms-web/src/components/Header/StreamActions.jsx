@@ -21,7 +21,7 @@ import GoLiveButton from "../GoLiveButton";
 import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
-import { ResolutionInput } from "../MoreSettings/ResolutionInput";
+import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { getDefaultMeetingUrl } from "../../common/utils";
