@@ -143,6 +143,7 @@ const StartRecording = () => {
         <Button
           variant="primary"
           icon
+          css={{ w: "100%" }}
           onClick={async () => {
             try {
               setRecordingState(true);
@@ -169,7 +170,7 @@ const StartRecording = () => {
           }}
         >
           <RecordIcon />
-          Start Recording
+          Start
         </Button>
       </Popover.Content>
     </Popover.Root>
