@@ -108,8 +108,9 @@ const StartRecording = () => {
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(
     APP_DATA.recordingStarted
   );
+  const { isBrowserRecordingOn } = useRecordingStreaming();
   const hmsActions = useHMSActions();
-  if (!permissions?.browserRecording) {
+  if (!permissions?.browserRecording || isBrowserRecordingOn) {
     return null;
   }
   return (
