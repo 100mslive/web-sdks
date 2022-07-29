@@ -174,11 +174,7 @@ const StartRTMP = () => {
                   (value.rtmpURL && !value.streamKey) ||
                   (value.streamKey && !value.rtmpURL)
               );
-              if (hasInvalidData) {
-                setError("Please fill all required(*) fields");
-                return;
-              }
-              if (rtmpStreams.length > 0 && !hasRTMPURL) {
+              if (hasInvalidData || (rtmpStreams.length > 0 && !hasRTMPURL)) {
                 return;
               }
               setRTMPStarted(true);
