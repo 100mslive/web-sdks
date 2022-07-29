@@ -108,7 +108,7 @@ const StartRecording = () => {
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(
     APP_DATA.recordingStarted
   );
-  const { isBrowserRecordingOn } = useRecordingStreaming();
+  const { isBrowserRecordingOn, isStreamingOn } = useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording) {
     return null;
@@ -117,7 +117,13 @@ const StartRecording = () => {
     return (
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button variant="danger" icon outlined onClick={() => setOpen(true)}>
+          <Button
+            variant="danger"
+            icon
+            outlined
+            onClick={() => setOpen(true)}
+            disabled={isStreamingOn}
+          >
             <RecordIcon />
             <Text
               as="span"
@@ -159,7 +165,7 @@ const StartRecording = () => {
         <Button
           variant="standard"
           icon
-          disabled={recordingStarted}
+          disabled={recordingStarted || isStreamingOn}
           onClick={() => setOpen(true)}
         >
           {recordingStarted ? (
