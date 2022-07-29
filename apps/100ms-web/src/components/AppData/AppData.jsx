@@ -11,7 +11,12 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { useSidepaneReset, useSidepaneState } from "./useSidepane";
+import {
+  useIsSidepaneTypeOpen,
+  useSidepaneReset,
+  useSidepaneState,
+  useSidepaneToggle,
+} from "./useSidepane";
 import {
   UserPreferencesKeys,
   useUserPreferences,
@@ -159,6 +164,8 @@ const ResetStreamingStart = () => {
   const [rtmpStarted, setRTMPStarted] = useSetAppDataByKey(
     APP_DATA.rtmpStarted
   );
+  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
+  const isStreamingOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.STREAMING);
 
   useEffect(() => {
     if (isBrowserRecordingOn && recordingStarted) {
@@ -166,13 +173,31 @@ const ResetStreamingStart = () => {
     }
   }, [isBrowserRecordingOn, recordingStarted, setRecordingStarted]);
   useEffect(() => {
-    if ((isHLSRunning || hlsError) && hlsStarted) {
-      setHLSStarted(false);
+    if (isHLSRunning || hlsError) {
+      if (hlsStarted) {
+        setHLSStarted(false);
+      }
+      if (isStreamingOpen) {
+        toggleStreaming();
+      }
     }
-  }, [isHLSRunning, hlsStarted, setHLSStarted, hlsError]);
+  }, [
+    isHLSRunning,
+    hlsStarted,
+    setHLSStarted,
+    hlsError,
+    isStreamingOpen,
+    toggleStreaming,
+  ]);
   useEffect(() => {
-    if ((isRTMPRunning || rtmpError || isBrowserRecordingOn) && rtmpStarted) {
-      setRTMPStarted(false);
+    if (isRTMPRunning || rtmpError || isBrowserRecordingOn) {
+      if (rtmpStarted) {
+        setRTMPStarted(false);
+      }
+
+      if (isStreamingOpen) {
+        toggleStreaming();
+      }
     }
   }, [
     isRTMPRunning,
@@ -180,6 +205,8 @@ const ResetStreamingStart = () => {
     rtmpStarted,
     rtmpError,
     isBrowserRecordingOn,
+    isStreamingOpen,
+    toggleStreaming,
   ]);
   return null;
 };
