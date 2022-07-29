@@ -363,7 +363,7 @@ const updateStream = ({ streams, id, key, value }) =>
     return stream;
   });
 
-function getResolution(recordingResolution) {
+export function getResolution(recordingResolution) {
   const resolution = {};
   if (recordingResolution.width) {
     resolution.width = recordingResolution.width;
