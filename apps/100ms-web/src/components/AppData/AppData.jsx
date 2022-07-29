@@ -176,9 +176,9 @@ const ResetStreamingStart = () => {
     if (isHLSRunning || hlsError) {
       if (hlsStarted) {
         setHLSStarted(false);
-      }
-      if (isStreamingOpen) {
-        toggleStreaming();
+        if (isStreamingOpen) {
+          toggleStreaming();
+        }
       }
     }
   }, [
@@ -193,10 +193,9 @@ const ResetStreamingStart = () => {
     if (isRTMPRunning || rtmpError || isBrowserRecordingOn) {
       if (rtmpStarted) {
         setRTMPStarted(false);
-      }
-
-      if (isStreamingOpen) {
-        toggleStreaming();
+        if (isStreamingOpen) {
+          toggleStreaming();
+        }
       }
     }
   }, [
