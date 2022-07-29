@@ -29,6 +29,7 @@ import {
   SIDE_PANE_OPTIONS,
 } from "../../common/constants";
 import { getDefaultMeetingUrl } from "../../common/utils";
+import { ToastManager } from "../Toast/ToastManager";
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -164,6 +165,17 @@ const StartRecording = () => {
                 record: true,
               });
             } catch (error) {
+              if (error.message.includes("stream alredy running")) {
+                ToastManager.addToast({
+                  title: "Recording already running",
+                  variant: "error",
+                });
+              } else {
+                ToastManager.addToast({
+                  title: error.message,
+                  variant: "error",
+                });
+              }
               setRecordingState(false);
             }
             setOpen(false);
