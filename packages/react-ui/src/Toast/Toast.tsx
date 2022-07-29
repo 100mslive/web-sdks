@@ -5,7 +5,7 @@ import { IconButton } from '../IconButton';
 import { Flex, Box } from '../Layout';
 import { Text } from '../Text';
 import { styled } from '../Theme';
-import { textEllipsis, toastAnimation } from '../utils';
+import { toastAnimation } from '../utils';
 
 const getToastVariant = (base: string) => {
   return {
@@ -108,7 +108,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
         <ToastTitle>
           <Flex align="center" css={{ gap: '$4', flex: '1 1 0', minWidth: 0 }}>
             {icon ? <Box css={{ w: '$10', h: '$10', alignSelf: 'start', mt: '$2' }}>{icon}</Box> : null}
-            <Text variant="sub1" css={{ c: 'inherit', ...textEllipsis('90%') }}>
+            <Text variant="sub1" css={{ c: 'inherit', wordBreak: 'break-all' }}>
               {title}
             </Text>
           </Flex>
