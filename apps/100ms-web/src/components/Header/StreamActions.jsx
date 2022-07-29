@@ -68,26 +68,12 @@ export const RecordingStatus = () => {
         isHLSRecordingOn,
       })}
     >
-      <Box>
-        <Button
-          variant="standard"
-          outlined
-          css={{
-            color: "$error",
-            px: "$4",
-            "@md": { display: "none" },
-          }}
-        >
-          <RecordIcon width={24} height={24} />
-        </Button>
-        <Box
-          css={{
-            display: "none",
-            "@md": { display: "block", color: "$error" },
-          }}
-        >
-          <RecordIcon width={24} height={24} />
-        </Box>
+      <Box
+        css={{
+          color: "$error",
+        }}
+      >
+        <RecordIcon width={24} height={24} />
       </Box>
     </Tooltip>
   );
