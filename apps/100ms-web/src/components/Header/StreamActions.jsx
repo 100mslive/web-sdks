@@ -110,8 +110,54 @@ const StartRecording = () => {
   );
   const { isBrowserRecordingOn } = useRecordingStreaming();
   const hmsActions = useHMSActions();
-  if (!permissions?.browserRecording || isBrowserRecordingOn) {
+  if (!permissions?.browserRecording) {
     return null;
+  }
+  if (isBrowserRecordingOn) {
+    return (
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <Button
+            variant="danger"
+            icon
+            outlined
+            disabled={recordingStarted}
+            onClick={() => setOpen(true)}
+          >
+            <RecordIcon />
+            <Text
+              as="span"
+              css={{ "@md": { display: "none" }, color: "currentColor" }}
+            >
+              Stop Recording
+            </Text>
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content align="end" sideOffset={8} css={{ w: "$64" }}>
+          <Text variant="body" css={{ color: "$textMedEmp" }}>
+            Are you sure you want to end the recording?
+          </Text>
+          <Button
+            variant="danger"
+            icon
+            css={{ ml: "auto" }}
+            onClick={async () => {
+              try {
+                await hmsActions.stopRTMPAndRecording();
+              } catch (error) {
+                ToastManager.addToast({
+                  title: error.message,
+                  variant: "error",
+                });
+              }
+              setOpen(false);
+            }}
+          >
+            Stop
+          </Button>
+        </Popover.Content>
+      </Popover.Root>
+    );
   }
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -135,7 +181,7 @@ const StartRecording = () => {
           </Text>
         </Button>
       </Popover.Trigger>
-      <Popover.Content align="end">
+      <Popover.Content align="end" sideOffset={8} css={{ w: "$64" }}>
         <ResolutionInput
           css={{ flexDirection: "column", alignItems: "start" }}
           onResolutionChange={setResolution}
@@ -143,7 +189,7 @@ const StartRecording = () => {
         <Button
           variant="primary"
           icon
-          css={{ w: "100%" }}
+          css={{ ml: "auto" }}
           onClick={async () => {
             try {
               setRecordingState(true);
@@ -169,7 +215,6 @@ const StartRecording = () => {
             setOpen(false);
           }}
         >
-          <RecordIcon />
           Start
         </Button>
       </Popover.Content>
