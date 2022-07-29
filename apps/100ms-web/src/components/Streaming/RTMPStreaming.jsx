@@ -177,6 +177,7 @@ const StartRTMP = () => {
               if (hasInvalidData || (rtmpStreams.length > 0 && !hasRTMPURL)) {
                 return;
               }
+              setError("");
               setRTMPStarted(true);
               const urls = hasRTMPURL
                 ? rtmpStreams.map(
