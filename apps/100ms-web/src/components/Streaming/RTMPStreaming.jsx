@@ -90,7 +90,13 @@ const StartRTMP = () => {
   );
 
   return (
-    <Box css={{ overflowY: "auto" }}>
+    <Box
+      css={{ overflowY: "auto" }}
+      as="form"
+      onSubmit={e => {
+        e.preventDefault();
+      }}
+    >
       {rtmpStreams.length > 0 && (
         <Box css={{ px: "$10" }}>
           <Accordion.Root
@@ -158,10 +164,23 @@ const StartRTMP = () => {
         <Button
           variant="primary"
           icon
+          type="submit"
           css={{ w: "100%", my: "$4" }}
-          disabled={isRTMPStarted || (!hasRTMPURL && !record)}
+          // disabled={isRTMPStarted || (!hasRTMPURL && !record)}
           onClick={async () => {
             try {
+              const hasInvalidData = rtmpStreams.find(
+                value =>
+                  (value.rtmpURL && !value.streamKey) ||
+                  (value.streamKey && !value.rtmpURL)
+              );
+              if (hasInvalidData) {
+                setError("Please fill all required(*) fields");
+                return;
+              }
+              if (rtmpStreams.length > 0 && !hasRTMPURL) {
+                return;
+              }
               setRTMPStarted(true);
               const urls = hasRTMPURL
                 ? rtmpStreams.map(
@@ -189,8 +208,8 @@ const StartRTMP = () => {
           )}
           {isRTMPStarted ? "Starting stream..." : "Go Live"}
         </Button>
+        <ErrorText error={error} />
       </Box>
-      <ErrorText error={error} />
     </Box>
   );
 };
@@ -255,17 +274,11 @@ const FormLabel = ({ id, children }) => {
 const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
   const formRef = useRef(null);
   return (
-    <Flex
-      as="form"
-      id={id}
-      direction="column"
-      css={{ mb: "$8" }}
-      ref={formRef}
-      onSubmit={e => {
-        e.preventDefault();
-      }}
-    >
-      <FormLabel id="rtmpURL">RTMP URL</FormLabel>
+    <Flex id={id} direction="column" css={{ mb: "$8" }} ref={formRef}>
+      <FormLabel id="rtmpURL">
+        RTMP URL
+        <Asterik />
+      </FormLabel>
       <Input
         placeholder="Enter RTMP URL"
         id="rtmpURL"
@@ -283,7 +296,10 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
         }}
         required
       />
-      <FormLabel id="streamKey">Stream Key</FormLabel>
+      <FormLabel id="streamKey">
+        Stream Key
+        <Asterik />
+      </FormLabel>
       <Input
         placeholder="Enter Stream Key"
         id="streamKey"
@@ -305,6 +321,13 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams }) => {
   );
 };
 
+const Asterik = () => {
+  return (
+    <Text variant="sm" as="span" css={{ color: "$error", mx: "$2" }}>
+      *
+    </Text>
+  );
+};
 const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
   const [edit, setEdit] = useState(false);
   return (
