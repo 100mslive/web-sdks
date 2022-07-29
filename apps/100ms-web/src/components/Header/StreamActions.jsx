@@ -142,6 +142,7 @@ const StartRecording = () => {
             variant="danger"
             icon
             css={{ ml: "auto" }}
+            disabled={isHLSRunning}
             onClick={async () => {
               try {
                 await hmsActions.stopRTMPAndRecording();
@@ -191,6 +192,8 @@ const StartRecording = () => {
           variant="primary"
           icon
           css={{ ml: "auto" }}
+          type="submit"
+          disabled={recordingStarted || isStreamingOn}
           onClick={async () => {
             try {
               setRecordingState(true);
