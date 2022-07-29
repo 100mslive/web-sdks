@@ -171,9 +171,15 @@ const ResetStreamingStart = () => {
     }
   }, [isHLSRunning, hlsStarted, setHLSStarted, hlsError]);
   useEffect(() => {
-    if ((isRTMPRunning || rtmpError) && rtmpStarted) {
+    if ((isRTMPRunning || rtmpError || isBrowserRecordingOn) && rtmpStarted) {
       setRTMPStarted(false);
     }
-  }, [isRTMPRunning, setRTMPStarted, rtmpStarted, rtmpError]);
+  }, [
+    isRTMPRunning,
+    setRTMPStarted,
+    rtmpStarted,
+    rtmpError,
+    isBrowserRecordingOn,
+  ]);
   return null;
 };
