@@ -20,16 +20,16 @@ import {
 import GoLiveButton from "../GoLiveButton";
 import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
 import { getResolution } from "../Streaming/RTMPStreaming";
+import { ToastManager } from "../Toast/ToastManager";
 import { ResolutionInput } from "../MoreSettings/ResolutionInput";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
+import { getDefaultMeetingUrl } from "../../common/utils";
 import {
   APP_DATA,
   RTMP_RECORD_DEFAULT_RESOLUTION,
   SIDE_PANE_OPTIONS,
 } from "../../common/constants";
-import { getDefaultMeetingUrl } from "../../common/utils";
-import { ToastManager } from "../Toast/ToastManager";
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
