@@ -166,7 +166,7 @@ const StartRTMP = () => {
           icon
           type="submit"
           css={{ w: "100%", my: "$4" }}
-          // disabled={isRTMPStarted || (!hasRTMPURL && !record)}
+          disabled={isRTMPStarted || (rtmpStreams.length > 0 && !record)}
           onClick={async () => {
             try {
               const hasInvalidData = rtmpStreams.find(
