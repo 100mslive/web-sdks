@@ -108,7 +108,8 @@ const StartRecording = () => {
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(
     APP_DATA.recordingStarted
   );
-  const { isBrowserRecordingOn, isStreamingOn } = useRecordingStreaming();
+  const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } =
+    useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording) {
     return null;
@@ -122,7 +123,7 @@ const StartRecording = () => {
             icon
             outlined
             onClick={() => setOpen(true)}
-            disabled={isStreamingOn}
+            disabled={isHLSRunning}
           >
             <RecordIcon />
             <Text
