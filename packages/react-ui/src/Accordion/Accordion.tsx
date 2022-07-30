@@ -3,6 +3,7 @@ import { keyframes, CSS } from '@stitches/react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { styled } from '../Theme';
+import { Box } from '../Layout';
 
 const slideDown = keyframes({
   from: { height: 0 },
@@ -67,7 +68,6 @@ const StyledContent = styled(BaseAccordion.Content, {
   fontFamily: '$sans',
   color: '$textMedEmp',
   backgroundColor: '$surfaceDefault',
-  padding: '$8 $9',
 
   '&[data-state="open"]': {
     animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
@@ -104,6 +104,6 @@ export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.Accordio
   PropsWithChildren<BaseAccordion.AccordionContentProps>
 >(({ children, ...props }, forwardedRef) => (
   <StyledContent {...props} ref={forwardedRef}>
-    {children}
+    <Box css={{ padding: '$8 $9' }}>{children}</Box>
   </StyledContent>
 ));
