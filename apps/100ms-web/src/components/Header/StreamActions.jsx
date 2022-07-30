@@ -56,8 +56,19 @@ export const RecordingStatus = () => {
     isHLSRecordingOn,
     isRecordingOn,
   } = useRecordingStreaming();
+  const permissions = useHMSStore(selectPermissions);
 
-  if (!isRecordingOn) {
+  if (
+    !isRecordingOn ||
+    // if only browser recording is enabled, stop recording is shown
+    // so no need to show this as it duplicates
+    [
+      permissions?.browserRecording,
+      !isServerRecordingOn,
+      !isHLSRecordingOn,
+      isBrowserRecordingOn,
+    ].every(value => !!value)
+  ) {
     return null;
   }
   return (
@@ -111,20 +122,14 @@ const StartRecording = () => {
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } =
     useRecordingStreaming();
   const hmsActions = useHMSActions();
-  if (!permissions?.browserRecording) {
+  if (!permissions?.browserRecording || isHLSRunning) {
     return null;
   }
   if (isBrowserRecordingOn) {
     return (
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button
-            variant="danger"
-            icon
-            outlined
-            onClick={() => setOpen(true)}
-            disabled={isHLSRunning}
-          >
+          <Button variant="danger" icon outlined onClick={() => setOpen(true)}>
             <RecordIcon />
             <Text
               as="span"
@@ -142,7 +147,6 @@ const StartRecording = () => {
             variant="danger"
             icon
             css={{ ml: "auto" }}
-            disabled={isHLSRunning}
             onClick={async () => {
               try {
                 await hmsActions.stopRTMPAndRecording();
