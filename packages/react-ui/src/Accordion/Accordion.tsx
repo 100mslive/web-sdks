@@ -49,7 +49,7 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   all: 'unset',
   fontFamily: '$sans',
   backgroundColor: '$surfaceDefault',
-  padding: '$8 $9',
+
   flex: 1,
   display: 'flex',
   alignItems: 'center',
@@ -99,11 +99,12 @@ export const AccordionHeader: React.FC<PropsWithChildren<BaseAccordion.Accordion
     ),
   );
 
-export const AccordionContent: React.FC<PropsWithChildren<BaseAccordion.AccordionContentProps>> = React.forwardRef<
-  HTMLDivElement,
-  PropsWithChildren<BaseAccordion.AccordionContentProps>
->(({ children, ...props }, forwardedRef) => (
-  <StyledContent {...props} ref={forwardedRef}>
-    <Box css={{ padding: '$8 $9' }}>{children}</Box>
-  </StyledContent>
-));
+export const AccordionContent: React.FC<
+  PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>
+> = React.forwardRef<HTMLDivElement, PropsWithChildren<BaseAccordion.AccordionContentProps & { contentStyles?: CSS }>>(
+  ({ children, contentStyles, ...props }, forwardedRef) => (
+    <StyledContent {...props} ref={forwardedRef}>
+      <Box css={contentStyles}>{children}</Box>
+    </StyledContent>
+  ),
+);
