@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: log inputs
         run: |
-          echo "env: ${{ github.event.inputs.env }}, branch: $ {{ github.ref_name }}"
+          echo "env: ${{ inputs.env }}, branch: ${{ github.ref_name }}"
     
       - name: Validate branch
         if: (github.event.inputs.env == 'production' && ${{ !startsWith(github.ref_name, 'production') }})
