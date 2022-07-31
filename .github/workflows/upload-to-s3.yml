@@ -4,12 +4,21 @@ on:
     inputs:
       env:
         description: 'which env to deploy - qa | prod'
+        type: 'choice'
         required: true
-        default: 'qa'
+        default: qa
+        options:
+        - qa
+        - dev
+        - prod
       buildEnvForDev:
         description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+        type: 'choice'
         required: false
-        default: 'prod'
+        default: prod
+        options:
+        - prod
+        - qa
   push:
     branches:
       - main
