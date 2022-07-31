@@ -6,6 +6,10 @@ on:
         description: 'which env to deploy - qa | prod'
         required: true
         default: 'qa'
+      buildEnvForDev:
+        description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+        required: false
+        default: 'prod'
   push:
     branches:
       - main
@@ -88,6 +92,21 @@ jobs:
         if: github.event.inputs.env == 'production'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
+        # upload static folder first and then upload the rest to ensure index.html assets are all present
+        run: |
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+          
+      - name: Build for Dev
+        if: github.event.inputs.env == 'dev'
+        run: yarn build
+        env:
+          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+
+      - name: Upload to Dev S3 Bucket
+        if: github.event.inputs.env == 'dev'
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET_DEV }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
