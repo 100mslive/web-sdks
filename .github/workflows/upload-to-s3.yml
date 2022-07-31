@@ -50,10 +50,11 @@ jobs:
     steps:
       - name: log inputs
         run: |
-          echo "env: ${{ inputs.env }}, branch: ${{ github.ref_name }}"
+          echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
     
+      # prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
-        if: (github.event.inputs.env == 'production' && ${{ !startsWith(github.ref_name, 'production') }})
+        if: ${{ (github.event.inputs.env == 'production' && (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Checkout repo
