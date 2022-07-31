@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: 'which env to deploy - qa | prod'
+        description: 'which env to deploy - qa | dev | prod'
         type: 'choice'
         required: true
         default: qa
@@ -48,8 +48,12 @@ jobs:
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
 
     steps:
+      - name: log inputs
+        run: |
+          echo "env: ${{ github.event.inputs.env }}, branch: $ {{ github.ref_name }}"
+    
       - name: Validate branch
-        if: github.event.inputs.env == 'production' && ${{ !startsWith(github.ref_name, 'production') }}
+        if: (github.event.inputs.env == 'production' && ${{ !startsWith(github.ref_name, 'production') }})
         run: exit 1
 
       - name: Checkout repo
