@@ -54,7 +54,7 @@ jobs:
     
       # prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
-        if: ${{ (github.event.inputs.env == 'production' && (!startsWith(github.ref_name, 'production')) }}
+        if: ${{ (github.event.inputs.env == 'production') && (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Checkout repo
