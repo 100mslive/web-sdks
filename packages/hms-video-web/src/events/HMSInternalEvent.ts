@@ -1,9 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import type { WaitForOptions } from 'eventemitter2';
-
-export interface WaitForFilter {
-  (...values: any[]): boolean;
-}
+import type { WaitForFilter, WaitForOptions } from 'eventemitter2';
 
 export class HMSInternalEvent<T> {
   constructor(private eventName: string, private eventEmitter: EventEmitter) {}
