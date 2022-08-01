@@ -20,8 +20,8 @@ import {
 } from "../components/AppData/useUISettings";
 import { useBeamAutoLeave } from "../common/hooks";
 import { useWhiteboardMetadata } from "../plugins/whiteboard";
-import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 import { useAppConfig } from "../components/AppData/useAppConfig";
+import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
