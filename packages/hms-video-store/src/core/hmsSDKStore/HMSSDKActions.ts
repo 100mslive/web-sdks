@@ -545,7 +545,7 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+  async startHLSStreaming(params?: sdkTypes.HLSConfig) {
     await this.sdk.startHLSStreaming(params);
   }
 
@@ -553,8 +553,8 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopHLSStreaming(params);
   }
 
-  async sendHLSTimedMetadata(params?: sdkTypes.SendHLSTimedMetadata): Promise<void> {
-    await this.sdk.sendHLSTimedMetadata(params);
+  async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
+    await this.sdk.sendHLSTimedMetadata(metadataList);
   }
   async changeName(name: string) {
     await this.sdk.changeName(name);

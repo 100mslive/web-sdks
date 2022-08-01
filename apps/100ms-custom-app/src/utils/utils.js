@@ -3,14 +3,8 @@ import axios from 'axios';
 
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
-  let roomCode = null;
-  if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
-    const roomPart = path.split('/')[2];
-    if (roomPart?.trim()) {
-      roomCode = roomPart;
-    }
-  }
-  return roomCode;
+  const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
+  return path.match(regex)?.groups?.code || null;
 };
 
 export const getAuthInfo = () => {
@@ -35,7 +29,8 @@ const tileShapeMapping = {
   '9-16': '9-16',
 };
 
-export const apiBasePath = `https://${process.env.REACT_APP_ENV}-in2.100ms.live/hmsapi/`;
+const env = process.env.REACT_APP_ENV || 'prod';
+export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
 
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;

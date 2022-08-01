@@ -7,6 +7,7 @@ import {
   StyledDialogContent,
   StyledDialogOverlay,
   StyledDialogTrigger,
+  StyledDialogPortal,
 } from './DialogContent';
 
 const StyledDialog = styled(Root, {});
@@ -19,4 +20,5 @@ export const Dialog = {
   Title: DialogTitle,
   Close: DialogClose,
   DefaultClose: DialogDefaultCloseIcon,
+  Portal: StyledDialogPortal,
 };

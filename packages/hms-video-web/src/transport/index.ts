@@ -31,7 +31,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, SendHLSTimedMetadata } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
@@ -545,17 +545,18 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: HLSConfig) {
-    const hlsParams: HLSRequestParams = {
-      variants: params.variants.map(variant => {
+  async startHLSStreaming(params?: HLSConfig) {
+    const hlsParams: HLSRequestParams = {};
+    if (params && params.variants && params.variants.length > 0) {
+      hlsParams.variants = params.variants.map(variant => {
         const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
         if (variant.metadata) {
           hlsVariant.metadata = variant.metadata;
         }
         return hlsVariant;
-      }),
-    };
-    if (params.recording) {
+      });
+    }
+    if (params?.recording) {
       hlsParams.hls_recording = {
         single_file_per_layer: params.recording.singleFilePerLayer,
         hls_vod: params.recording.hlsVod,
@@ -567,7 +568,7 @@ export default class HMSTransport implements ITransport {
   async stopHLSStreaming(params?: HLSConfig) {
     if (params) {
       const hlsParams: HLSRequestParams = {
-        variants: params?.variants.map(variant => {
+        variants: params?.variants?.map(variant => {
           const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
           if (variant.metadata) {
             hlsVariant.metadata = variant.metadata;
@@ -580,13 +581,12 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopHLSStreaming();
   }
 
-  async sendHLSTimedMetadata(params?: SendHLSTimedMetadata) {
-    if (params) {
-      const { metadata, metadataId } = params;
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    if (metadataList.length > 0) {
       const hlsMtParams: HLSTimedMetadataParams = {
-        metadata_objs: metadata,
-        metadata_id: metadataId,
+        metadata_objs: metadataList,
       };
+
       await this.signal.sendHLSTimedMetadata(hlsMtParams);
     }
   }

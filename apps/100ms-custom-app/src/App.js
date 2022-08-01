@@ -29,6 +29,8 @@ if (!hostname.endsWith('app.100ms.live')) {
   // route dev-app appropriately to qa or prod
   const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
   hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+} else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
+  hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
 }
 
 const App = () => {
@@ -237,7 +239,7 @@ const App = () => {
   };
 
   return (
-    <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
+    <Flex direction="column" css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}>
       {error && (
         <Suspense fallback={null}>
           <ErrorModal title={error.title} body={error.body} />

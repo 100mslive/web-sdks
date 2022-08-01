@@ -52,7 +52,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig, SendHLSTimedMetadata } from '../interfaces/hls-config';
+import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -696,7 +696,7 @@ export class HMSSdk implements HMSInterface {
     try {
       await this.transport?.startRTMPOrRecording(params);
     } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error, false));
+      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error));
       throw error;
     }
   }
@@ -716,7 +716,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async startHLSStreaming(params: HLSConfig) {
+  async startHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
@@ -746,14 +746,9 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async sendHLSTimedMetadata(params?: SendHLSTimedMetadata) {
-    if (!this.localPeer) {
-      throw ErrorFactory.GenericErrors.NotConnected(
-        HMSAction.VALIDATION,
-        'No local peer present, cannot send HLS Metadata',
-      );
-    }
-    await this.transport?.sendHLSTimedMetadata(params);
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    this.validateJoined('sendHLSTimedMetadata');
+    await this.transport?.sendHLSTimedMetadata(metadataList);
   }
 
   async changeName(name: string) {
