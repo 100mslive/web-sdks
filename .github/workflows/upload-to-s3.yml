@@ -74,7 +74,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build for QA
-        if: github.event.inputs.env == 'qa'
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
@@ -88,7 +88,7 @@ jobs:
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
       - name: Upload to QA S3 Bucket
-        if: github.event.inputs.env == 'qa'
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
