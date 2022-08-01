@@ -97,7 +97,7 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             <Label htmlFor="gridView">Grid View</Label>
           </Flex>
           <Flex align="center" css={{ cursor: 'pointer' }}>
-            <RadioGroup.Item value="active" id="activeSpeaker" css={{ mr: '$4' }}>
+            <RadioGroup.Item value="activespeaker" id="activeSpeaker" css={{ mr: '$4' }}>
               <RadioGroup.Indicator />
             </RadioGroup.Item>
             <Label htmlFor="activeSpeaker">Active Speaker</Label>
