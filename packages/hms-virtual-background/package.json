@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1-alpha.6",
+  "version": "1.5.1-alpha.10",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -30,7 +30,7 @@
   "author": "ashish17",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.3.1-alpha.6"
+    "@100mslive/hms-video": "0.3.1-alpha.10"
   },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",

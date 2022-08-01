@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
@@ -20,15 +20,17 @@ export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
 export const StyledDialogPortal = styled(DialogPrimitive.Portal, {});
 
 export const StyledDialogContent = styled(DialogPrimitive.Content, {
-  color: 'white',
-  backgroundColor: '$menuBg',
+  color: '$textMedEmp',
+  backgroundColor: '$surfaceDefault',
   borderRadius: '8px',
   position: 'fixed',
   top: '50%',
   left: '50%',
+  border: '$space$px solid $borderDefault',
+  boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   transform: 'translate(-50%, -50%)',
   zIndex: 999,
-  padding: '1.5rem',
+  padding: '$12',
   '@allowMotion': {
     '&[data-state="open"]': {
       animation: `${dialogOpen} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
@@ -40,9 +42,11 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
   '&:focus': { outline: 'none' },
 });
 
-export const DialogTitle = styled(DialogPrimitive.Title, {});
+export const DialogTitle = styled(DialogPrimitive.Title, {
+  margin: 0,
+});
 
-export const DialogDefaultCloseIcon = ({ ...props }: any) => (
+export const DialogDefaultCloseIcon = (props: ComponentProps<typeof IconButton>) => (
   <DialogClose asChild>
     <IconButton {...props}>
       <CrossIcon />

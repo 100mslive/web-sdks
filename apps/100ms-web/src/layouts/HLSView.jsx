@@ -10,9 +10,8 @@ import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  HangUpIcon,
+  SettingsIcon,
   RecordIcon,
-  SettingIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
@@ -23,25 +22,23 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import { ChatView } from "../components/chatView";
-import { useIsChatOpen } from "../components/AppData/useChatState";
+import { ToastManager } from "../components/Toast/ToastManager";
 import {
   HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
-import { ToastManager } from "../components/Toast/ToastManager";
 
 const HLSVideo = styled("video", {
   h: "100%",
   margin: "0 auto",
+  px: "$10",
 });
 
 let hlsController;
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
-  const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
   // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
@@ -130,8 +127,8 @@ const HLSView = () => {
         <>
           <Flex
             align="center"
-            justify={"center"}
-            css={{ position: "absolute", right: "$4", zIndex: "10" }}
+            justify="center"
+            css={{ position: "absolute", right: "$10", zIndex: "10" }}
           >
             {hlsController ? (
               <Button
@@ -165,14 +162,14 @@ const HLSView = () => {
                     color: "$textPrimary",
                     borderRadius: "$1",
                     cursor: "pointer",
-                    zIndex: 40,
-                    border: "1px solid $textDisabled",
-                    padding: "$2 $4",
+                    zIndex: 4,
+                    border: "$space$px solid $textDisabled",
+                    padding: "$4",
                   }}
                 >
                   <Tooltip title="Select Quality">
                     <Flex>
-                      <SettingIcon />
+                      <SettingsIcon />
                       <Text variant="md">{currentSelectedQualityText}</Text>
                     </Flex>
                   </Tooltip>
@@ -236,28 +233,11 @@ const HLSView = () => {
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
         </>
       ) : (
-        <Flex align="center" justify="center" css={{ size: "100%" }}>
+        <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...
           </Text>
         </Flex>
-      )}
-      {isChatOpen && (
-        <Box
-          css={{
-            height: "50%",
-            position: "absolute",
-            zIndex: 40,
-            bottom: "$20",
-            right: 0,
-            width: "20%",
-            "@sm": {
-              width: "75%",
-            },
-          }}
-        >
-          <ChatView />
-        </Box>
       )}
     </Fragment>
   );
