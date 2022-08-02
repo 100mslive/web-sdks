@@ -15,6 +15,7 @@ import {
   Dropdown,
   Label,
   HorizontalDivider,
+  useTheme,
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../primitives/DropdownTrigger";
 import { useSetUiSettings } from "./AppData/useUISettings";
@@ -34,6 +35,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
     UI_SETTINGS.showStatsOnTiles
   );
   const [open, setOpen] = useState(false);
+  const { themeType } = useTheme();
 
   useEffect(() => {
     if (
@@ -119,7 +121,11 @@ export const StatsForNerds = ({ onOpenChange }) => {
                     }}
                     css={{
                       bg:
-                        option.id === selectedStat ? "$primaryDark" : undefined,
+                        option.id === selectedStat
+                          ? themeType === "dark"
+                            ? "$primaryDark"
+                            : "$grayLight"
+                          : undefined,
                       c: option.id === selectedStat ? "$white" : "$textPrimary",
                     }}
                   >

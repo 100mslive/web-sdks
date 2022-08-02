@@ -19,6 +19,7 @@ import {
   Box,
   Flex,
   Dropdown,
+  useTheme,
 } from "@100mslive/react-ui";
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
@@ -28,6 +29,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const [requestPermission, setRequestPermission] = useState(true);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
+  const { themeType } = useTheme();
   if (!peer) {
     return null;
   }
@@ -101,7 +103,11 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                         css={{
                           px: "$9",
                           bg:
-                            role === selectedRole ? "$primaryDark" : undefined,
+                            role === selectedRole
+                              ? themeType === "dark"
+                                ? "$primaryDark"
+                                : "$grayLight"
+                              : undefined,
                         }}
                       >
                         {role}

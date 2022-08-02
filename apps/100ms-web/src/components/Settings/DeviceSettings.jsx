@@ -15,6 +15,7 @@ import {
   Box,
   StyledVideoTile,
   Video,
+  useTheme,
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 
@@ -103,6 +104,7 @@ const DeviceSelector = ({
   children = null,
 }) => {
   const [open, setOpen] = useState(false);
+  const { themeType } = useTheme();
   return (
     <Box css={{ mb: "$10" }}>
       <Text css={{ mb: "$4" }}>{title}</Text>
@@ -156,7 +158,9 @@ const DeviceSelector = ({
                       px: "$9",
                       bg:
                         device.deviceId === selection
-                          ? "$primaryDark"
+                          ? themeType === "dark"
+                            ? "$primaryDark"
+                            : "$grayLight"
                           : undefined,
                     }}
                   >
