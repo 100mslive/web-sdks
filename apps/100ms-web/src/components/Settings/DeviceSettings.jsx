@@ -15,9 +15,9 @@ import {
   Box,
   StyledVideoTile,
   Video,
-  useTheme,
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
+import { useDropdownSelection } from "../hooks/useDropdownSelection";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
@@ -104,7 +104,7 @@ const DeviceSelector = ({
   children = null,
 }) => {
   const [open, setOpen] = useState(false);
-  const { themeType } = useTheme();
+  const selectionBg = useDropdownSelection();
   return (
     <Box css={{ mb: "$10" }}>
       <Text css={{ mb: "$4" }}>{title}</Text>
@@ -157,11 +157,7 @@ const DeviceSelector = ({
                     css={{
                       px: "$9",
                       bg:
-                        device.deviceId === selection
-                          ? themeType === "dark"
-                            ? "$primaryDark"
-                            : "$grayLight"
-                          : undefined,
+                        device.deviceId === selection ? selectionBg : undefined,
                     }}
                   >
                     {device.label}

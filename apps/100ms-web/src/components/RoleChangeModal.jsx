@@ -19,8 +19,8 @@ import {
   Box,
   Flex,
   Dropdown,
-  useTheme,
 } from "@100mslive/react-ui";
+import { useDropdownSelection } from "./hooks/useDropdownSelection";
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -29,7 +29,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const [requestPermission, setRequestPermission] = useState(true);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
-  const { themeType } = useTheme();
+  const selectionBg = useDropdownSelection();
   if (!peer) {
     return null;
   }
@@ -102,12 +102,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                         onSelect={() => setRole(role)}
                         css={{
                           px: "$9",
-                          bg:
-                            role === selectedRole
-                              ? themeType === "dark"
-                                ? "$primaryDark"
-                                : "$grayLight"
-                              : undefined,
+                          bg: role === selectedRole ? selectionBg : undefined,
                         }}
                       >
                         {role}
