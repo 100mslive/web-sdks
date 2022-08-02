@@ -114,19 +114,27 @@ const DeviceSelector = ({
       <Flex
         align="center"
         css={{
-          w: "100%",
+          gap: "$4",
+          "@md": {
+            flexDirection: children ? "column" : "row",
+            alignItems: children ? "start" : "center",
+          },
         }}
       >
         <Box
           css={{
             position: "relative",
             flex: "1 1 0",
+            w: "100%",
             minWidth: 0,
             "[data-radix-popper-content-wrapper]": {
               w: "100%",
               minWidth: "0 !important",
               transform: "translateY($space$17) !important",
               zIndex: 11,
+            },
+            "@md": {
+              mb: children ? "$8" : 0,
             },
           }}
         >
@@ -198,14 +206,19 @@ const TestAudio = ({ id }) => {
         variant="standard"
         css={{
           flexShrink: 0,
-          ml: "$4",
           p: "$6 $9",
+          "@md": {
+            w: "100%",
+          },
         }}
         onClick={() => audioRef.current?.play()}
         disabled={playing}
       >
         <SpeakerIcon />
-        &nbsp;Test
+        &nbsp;Test{" "}
+        <Text as="span" css={{ display: "none", "@md": { display: "inline" } }}>
+          &nbsp; speaker
+        </Text>
       </Button>
       <audio
         ref={audioRef}
