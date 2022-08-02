@@ -42,6 +42,9 @@ const Settings = () => {
                 height: "$48",
                 bg: "transparent",
                 m: "$10 auto",
+                "@md": {
+                  display: "none",
+                },
               }}
             >
               <Video trackId={videoTrackId} />
