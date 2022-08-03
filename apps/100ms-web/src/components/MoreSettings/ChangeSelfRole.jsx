@@ -38,7 +38,7 @@ export const ChangeSelfRole = ({ onClick }) => {
       </Text>
     </Dropdown.Item>
   ) : (
-    <Dropdown.Root>
+    <Dropdown.Sub>
       <Dropdown.TriggerItem data-testid="change_my_role_btn">
         <PersonIcon />
         <Text variant="sm" css={{ flex: "1 1 0", mx: "$4" }}>
@@ -46,29 +46,31 @@ export const ChangeSelfRole = ({ onClick }) => {
         </Text>
         <ArrowRightIcon />
       </Dropdown.TriggerItem>
-      <Dropdown.Content
-        sideOffset={2}
-        alignOffset={-5}
-        css={{ maxHeight: "$64" }}
-      >
-        {availableSelfChangeRoles.map((role, i) => (
-          <Dropdown.Item
-            key={role}
-            css={{ justifyContent: "space-between" }}
-            onClick={async () => {
-              try {
-                await hmsActions.changeRole(localPeerId, role, true);
-              } catch (error) {
-                ToastManager.addToast({ title: error.message });
-              }
-            }}
-            data-testid={"change_to_role_" + role}
-          >
-            <Text variant="sm">{role}</Text>
-            {localPeerRole === role && <CheckIcon width={16} height={16} />}
-          </Dropdown.Item>
-        ))}
-      </Dropdown.Content>
-    </Dropdown.Root>
+      <Dropdown.Portal>
+        <Dropdown.SubContent
+          sideOffset={2}
+          alignOffset={-5}
+          css={{ maxHeight: "$64" }}
+        >
+          {availableSelfChangeRoles.map((role, i) => (
+            <Dropdown.Item
+              key={role}
+              css={{ justifyContent: "space-between" }}
+              onClick={async () => {
+                try {
+                  await hmsActions.changeRole(localPeerId, role, true);
+                } catch (error) {
+                  ToastManager.addToast({ title: error.message });
+                }
+              }}
+              data-testid={"change_to_role_" + role}
+            >
+              <Text variant="sm">{role}</Text>
+              {localPeerRole === role && <CheckIcon width={16} height={16} />}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.SubContent>
+      </Dropdown.Portal>
+    </Dropdown.Sub>
   );
 };

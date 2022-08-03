@@ -1,7 +1,20 @@
-import { Root, Trigger, TriggerItem, Content, Item, Separator, Label, Group } from '@radix-ui/react-dropdown-menu';
+import {
+  Root,
+  Trigger,
+  Sub,
+  SubContent,
+  SubTrigger as TriggerItem,
+  Content,
+  Item,
+  Separator,
+  Label,
+  Group,
+  Portal,
+} from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
 const DropdownRoot = styled(Root, {});
+const DropdownSub = styled(Sub, {});
 
 const DropdownTrigger = styled(Trigger, {
   cursor: 'pointer',
@@ -23,6 +36,13 @@ const DropdownTriggerItem = styled(TriggerItem, {
   p: '$8',
   display: 'flex',
   alignItems: 'center',
+  '&:hover': {
+    cursor: 'pointer',
+    bg: '$surfaceLighter',
+  },
+  '&:focus-visible': {
+    bg: '$surfaceLighter',
+  },
 });
 
 const DropdownItem = styled(Item, {
@@ -54,6 +74,18 @@ const DropdownContent = styled(Content, {
   backgroundColor: '$surfaceLight',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
+  zIndex: 20,
+});
+
+const DropdownSubContent = styled(SubContent, {
+  w: '$80',
+  maxHeight: '$64',
+  r: '$1',
+  py: '$4',
+  backgroundColor: '$surfaceLight',
+  overflowY: 'auto',
+  boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
+  zIndex: 20,
 });
 
 const DropdownLabel = styled(Label, {
@@ -75,4 +107,7 @@ export const Dropdown = {
   Label: DropdownLabel,
   Group: DropdownGroup,
   ItemSeparator: DropdownItemSeparator,
+  Sub: DropdownSub,
+  SubContent: DropdownSubContent,
+  Portal,
 };
