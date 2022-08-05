@@ -9,12 +9,13 @@ const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
   top: '10px',
   right: '10px',
-  zIndex: 20,
-  width: '36px',
-  height: '36px',
+  zIndex: 5,
+  width: '$14',
+  height: '$14',
   color: 'white',
   borderRadius: '$round',
   backgroundColor: '$menuBg',
+  border: 'none',
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
@@ -23,6 +24,7 @@ const StyledTrigger = styled(Popover.Trigger, {
 });
 
 const StyledContent = styled(Popover.Content, {
+  fontFamily: '$sans',
   backgroundColor: '$menuBg',
   padding: '10px 0px',
   display: 'flex',

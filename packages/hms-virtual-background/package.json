@@ -1,5 +1,5 @@
 {
-  "version": "1.4.3-alpha.3",
+  "version": "1.6.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -30,13 +30,13 @@
   "author": "ashish17",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.2.3-alpha.3"
+    "@100mslive/hms-video": "0.4.0"
   },
   "dependencies": {
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
     "@tensorflow/tfjs-core": "^3.3.0",
-    "@webassemblyjs/helper-wasm-bytecode": "^1.11.0",
-    "@webassemblyjs/wasm-gen": "^1.11.0",
+    "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+    "@webassemblyjs/wasm-gen": "1.11.1",
     "gifuct-js": "^2.1.2",
     "wasm-check": "^2.0.2"
   },

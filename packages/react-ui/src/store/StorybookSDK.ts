@@ -1,15 +1,6 @@
 import {
-  HMSActions,
-  IHMSStore,
-  HMSPeer,
-  HMSRoom,
-  HMSTrackSource,
-  HMSRoomState,
-  HMSMessageInput,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSConfig,
-  HMSSimulcastLayer,
+  HMSActions, HMSAudioTrackSettings, HMSConfig, HMSMessageInput, HMSPeer,
+  HMSRoom, HMSRoomState, HMSSimulcastLayer, HMSTrackSource, HMSVideoTrackSettings, IHMSStore
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
@@ -206,10 +197,6 @@ export class StoryBookSDK implements Partial<HMSActions> {
 
   private log(...args: any[]) {
     console.log('storybook sdk', ...args);
-  }
-
-  private randomUser() {
-    return this.randomFromArray(['You', 'Tushar', 'Eswar', 'Aniket', 'Kshitiz', 'Sagar']);
   }
 
   private randomNumber() {

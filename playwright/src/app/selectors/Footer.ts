@@ -53,7 +53,12 @@ export class Footer {
   //bottom right corner
   raise_hand_btn = '[data-testid="raise_hand_btn"]';
   brb_btn = '[data-testid="brb_btn"]';
-  chat_btn = '[data-testid="chat_btn"]';
+  chat_btn = '[data-testid="chat_btn"] >> visible=true';
+  chat_placeholder = 'css=[placeholder="Write something here"]';
+  first_chat_msg = '[data-testid="chat_msg"] >> p >> nth=3';
+  chat_peer_selector = "text=Everyone";
+  chat_to_text = '[data-testid="chat_msg"] >> p >> nth=1';
+  
   //bottom left corner
   screenshare_audio = 'button[data-testid="screenshare_audio"]';
   audio_playlist = 'button[data-testid="audio_playlist"]';

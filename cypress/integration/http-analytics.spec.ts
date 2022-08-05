@@ -74,7 +74,8 @@ describe('Http Analytics tests', () => {
     sdk.preview({ userName: 'test', authToken: invalidRoleToken, initEndpoint }, previewListener).catch(console.error);
     cy.get('@onError').should('be.calledOnce');
     cy.get('@setEnv').should('be.calledOnce');
-    cy.get('@sendEvent').should('be.calledOnce');
+    // sendEvent for connect and preview
+    cy.get('@sendEvent').should('be.calledTwice');
     cy.get('@addEventToStorage').should('not.be.called');
   });
 
@@ -87,9 +88,9 @@ describe('Http Analytics tests', () => {
     sdk.preview({ userName: 'test', authToken: invalidRoleToken, initEndpoint }, previewListener).catch(console.error);
     cy.get('@onError').should('be.calledOnce');
     cy.get('@setEnv').should('be.calledOnce');
-    cy.get('@sendEvent').should('be.calledOnce');
+    cy.get('@sendEvent').should('be.calledTwice');
     cy.get('@addEventToStorage')
-      .should('be.calledOnce')
+      .should('be.calledTwice')
       .then(() => {
         expect(localStorage.getItem('client-events')).to.not.equal(null);
         const newSdk = new HMSSdk();
@@ -99,7 +100,8 @@ describe('Http Analytics tests', () => {
         );
         //@ts-ignore
         newSdk.preview({ userName: 'test', authToken: token, initEndpoint }, previewListener).catch(console.error);
-        cy.get('@sendEvent').should('be.calledTwice');
+        // 2 for new sdk connect/preview success, 2 from storage for old sdk
+        cy.get('@sendEvent').should('have.callCount', 4);
       });
   });
 

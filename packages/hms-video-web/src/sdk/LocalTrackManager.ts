@@ -22,6 +22,7 @@ import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioContextHandler } from '../utils/media';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -41,6 +42,7 @@ export class LocalTrackManager {
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
+    private analyticsTimer: AnalyticsTimer,
   ) {}
 
   // eslint-disable-next-line complexity
@@ -67,6 +69,8 @@ export class LocalTrackManager {
       audio: canPublishAudio && !audioTrack && (initialSettings.isAudioMuted ? 'empty' : true),
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
+
+    this.analyticsTimer.start(TimedEvent.LOCAL_TRACKS);
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
@@ -78,6 +82,7 @@ export class LocalTrackManager {
         localStream,
       );
     }
+    this.analyticsTimer.end(TimedEvent.LOCAL_TRACKS);
 
     /**
      * concat local tracks only if both are true which means it is either join or switched from a role
@@ -111,15 +116,13 @@ export class LocalTrackManager {
     } catch (error) {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.publish({
-            devices: this.deviceManager.getDevices(),
-            error,
-            settings,
-          }),
-        );
-      }
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          devices: this.deviceManager.getDevices(),
+          error: error as Error,
+          settings,
+        }),
+      );
       throw error;
     }
   }

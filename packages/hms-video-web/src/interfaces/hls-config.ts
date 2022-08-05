@@ -3,7 +3,7 @@ export interface HLSConfig {
    * A list of meeting url which needs to be streamed as HLS feed, only one url is currently supported, all entries
    * except the first one will be ignored.
    */
-  variants: Array<HLSMeetingURLVariant>;
+  variants?: Array<HLSMeetingURLVariant>;
   /**
    * pass in this field if recording needs to be turned on as well
    */
@@ -30,4 +30,9 @@ export interface HLSMeetingURLVariant {
    * @alpha
    */
   metadata?: string;
+}
+
+export interface HLSTimedMetadata {
+  payload: string;
+  duration: number; // Duration in seconds
 }

@@ -30,7 +30,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       }
     }
 
-    const transceiver = this.connection!.addTransceiver(track.nativeTrack, {
+    const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
       direction: 'sendonly',
       sendEncodings: trackEncodings,
