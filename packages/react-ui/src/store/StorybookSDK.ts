@@ -9,7 +9,7 @@ import {
   HMSSimulcastLayer,
   HMSTrackSource,
   HMSVideoTrackSettings,
-  IHMSStore
+  IHMSStore,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
