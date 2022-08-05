@@ -97,9 +97,9 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
 };
 
 const VirtualizedSelectItemList = ({
-  role,
   peers,
-  peerId,
+  selectedRole,
+  selectedPeerId,
   searchValue,
   onSelect,
 }) => {
@@ -118,7 +118,7 @@ const VirtualizedSelectItemList = ({
 
   const listItems = useMemo(() => {
     const selectItems = [
-      <Everyone onSelect={onSelect} active={!role && !peerId} />,
+      <Everyone onSelect={onSelect} active={!selectedRole && !selectedRole} />,
     ];
 
     roles.length > 0 &&
@@ -127,7 +127,7 @@ const VirtualizedSelectItemList = ({
       selectItems.push(
         <RoleItem
           key={userRole}
-          active={role === userRole}
+          active={selectedRole === userRole}
           role={userRole}
           onSelect={onSelect}
         />
@@ -142,14 +142,14 @@ const VirtualizedSelectItemList = ({
           key={peer.id}
           name={peer.name}
           peerId={peer.id}
-          active={peer.id === peerId}
+          active={peer.id === selectedPeerId}
           onSelect={onSelect}
         />
       )
     );
 
     return selectItems;
-  }, [onSelect, role, peerId, roles, filteredPeers]);
+  }, [onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
     <Dropdown.Group ref={ref} css={{ height: "$64", overflowY: "auto" }}>
@@ -184,8 +184,8 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         </Box>
       )}
       <VirtualizedSelectItemList
-        role={role}
-        peerId={peerId}
+        selectedRole={role}
+        selectedPeerId={peerId}
         onSelect={onSelect}
         peers={peers}
         searchValue={search}
