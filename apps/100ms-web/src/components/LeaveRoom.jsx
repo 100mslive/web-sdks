@@ -123,7 +123,10 @@ export const LeaveRoom = () => {
                     <AlertTriangleIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="button" css={{ c: "$error" }}>
+                    <Text
+                      variant="button"
+                      css={{ c: "$error", fontSize: "$lg" }}
+                    >
                       End Room for All
                     </Text>
                     <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
@@ -142,7 +145,7 @@ export const LeaveRoom = () => {
                     <ExitIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="button">
+                    <Text variant="h6" css={{ fontSize: "$lg" }}>
                       Leave {isStreamKit ? "Studio" : "Room"}
                     </Text>
                     <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>

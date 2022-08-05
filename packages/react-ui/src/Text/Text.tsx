@@ -117,6 +117,10 @@ export const textVariants = {
     fontSize: '$md',
     lineHeight: '$md',
   },
+  lg: {
+    fontSize: '$lg',
+    lineHeight: '$lg',
+  },
 };
 
 export const Text = styled('p', {
