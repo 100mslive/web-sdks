@@ -119,16 +119,18 @@ export const LeaveRoom = () => {
                 data-testid="end_room_btn"
               >
                 <Flex gap={4}>
-                  <Box>
+                  <Box css={{ color: "$error" }}>
                     <AlertTriangleIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="h6" css={{ c: "$error" }}>
+                    <Text
+                      variant="h6"
+                      css={{ c: "$error", fontSize: "1.2rem" }}
+                    >
                       End Room for All
                     </Text>
-                    <Text variant="sm" css={{ c: "$textMedEmp" }}>
-                      The session will end for everyone. You can’t undo this
-                      action.
+                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                      Warning: You can’t undo this action
                     </Text>
                   </Flex>
                 </Flex>
@@ -143,12 +145,11 @@ export const LeaveRoom = () => {
                     <ExitIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="h6">
+                    <Text variant="h6" css={{ fontSize: "1.2rem" }}>
                       Leave {isStreamKit ? "Studio" : "Room"}
                     </Text>
-                    <Text variant="sm" css={{ c: "$textMedEmp" }}>
-                      Others will continue after you leave. You can join the
-                      {isStreamKit ? " studio" : " room"} again.
+                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                      You can always rejoin later
                     </Text>
                   </Flex>
                 </Flex>
