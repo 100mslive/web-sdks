@@ -137,7 +137,13 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
       <ItemRoot title="Font Family">
         <Select.Root>
           <Select.DefaultDownIcon />
-          <Select.Select onChange={e => change('font', e.target.value)} value={settings.font}>
+          <Select.Select
+            onChange={e => {
+              change('font', e.target.value);
+              document.documentElement.style.setProperty('--hms-ui-fonts-sans', e.target.value);
+            }}
+            value={settings.font}
+          >
             {Fonts.map(font => {
               return (
                 <option value={font} key={font}>
