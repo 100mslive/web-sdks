@@ -208,10 +208,6 @@ export class StoryBookSDK implements Partial<HMSActions> {
     console.log('storybook sdk', ...args);
   }
 
-  private randomUser() {
-    return this.randomFromArray(['You', 'Tushar', 'Eswar', 'Aniket', 'Kshitiz', 'Sagar']);
-  }
-
   private randomNumber() {
     return Number(Math.floor(Math.random() * 100000));
   }

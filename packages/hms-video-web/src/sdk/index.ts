@@ -696,7 +696,7 @@ export class HMSSdk implements HMSInterface {
     try {
       await this.transport?.startRTMPOrRecording(params);
     } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error, false));
+      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error));
       throw error;
     }
   }
@@ -716,7 +716,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async startHLSStreaming(params: HLSConfig) {
+  async startHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,

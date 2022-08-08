@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
 import LogRocket from "logrocket";
 import {
   HMSNotificationTypes,
@@ -12,18 +11,25 @@ import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { ToastManager } from "../Toast/ToastManager";
-import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
 import { ToastBatcher } from "../Toast/ToastBatcher";
-import { useIsHeadless } from "../AppData/useUISettings";
 import { PermissionErrorModal } from "./PermissionErrorModal";
+import { MessageNotifications } from "./MessageNotifications";
+import {
+  useHLSViewerRole,
+  useIsHeadless,
+  useSubscribedNotifications,
+} from "../AppData/useUISettings";
+import { useNavigation } from "../hooks/useNavigation";
+import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const navigate = useNavigate();
-  const { subscribedNotifications, HLS_VIEWER_ROLE } = useContext(AppContext);
+  const navigate = useNavigation();
+  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   useEffect(() => {
     if (!notification) {
@@ -47,15 +53,6 @@ export function Notifications() {
             " changed their name to " +
             notification.data.name
         );
-        break;
-      case HMSNotificationTypes.NEW_MESSAGE:
-        if (
-          !subscribedNotifications.NEW_MESSAGE ||
-          notification.data?.ignored ||
-          isHeadless
-        )
-          return;
-        ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.ERROR:
         if (
@@ -167,7 +164,6 @@ export function Notifications() {
   }, [
     notification,
     subscribedNotifications.ERROR,
-    subscribedNotifications.NEW_MESSAGE,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
@@ -181,6 +177,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
+      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );

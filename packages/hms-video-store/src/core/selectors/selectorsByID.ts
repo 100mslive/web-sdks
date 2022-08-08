@@ -44,7 +44,7 @@ export const selectPeerByID = byIDCurry(selectPeerByIDBare);
 export const selectAppData = byIDCurry(
   createSelector([selectFullAppData, selectAppDataKey], (appData, key) => {
     if (!appData) {
-      return {};
+      return undefined;
     }
     if (key) {
       return appData[key];
@@ -52,6 +52,24 @@ export const selectAppData = byIDCurry(
     return appData;
   }),
 );
+
+export const selectAppDataByPath = (...keys: string[]) =>
+  createSelector([selectFullAppData], appData => {
+    if (!appData) {
+      return undefined;
+    }
+    if (keys && keys.length > 0) {
+      let value = appData;
+      for (const key of keys) {
+        if (!key) {
+          return value;
+        }
+        value = value?.[key];
+      }
+      return value;
+    }
+    return appData;
+  });
 
 /**
  * Select the name of a {@link HMSPeer} given a peer ID.

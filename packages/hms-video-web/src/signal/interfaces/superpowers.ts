@@ -51,7 +51,7 @@ export interface UpdatePeerRequestParams {
 }
 
 export interface HLSRequestParams {
-  variants: Array<HLSVariant>;
+  variants?: Array<HLSVariant>;
   hls_recording?: {
     single_file_per_layer?: boolean; // false by default on server
     hls_vod?: boolean; // false by default on server

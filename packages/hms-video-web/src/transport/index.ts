@@ -545,17 +545,18 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: HLSConfig) {
-    const hlsParams: HLSRequestParams = {
-      variants: params.variants.map(variant => {
+  async startHLSStreaming(params?: HLSConfig) {
+    const hlsParams: HLSRequestParams = {};
+    if (params && params.variants && params.variants.length > 0) {
+      hlsParams.variants = params.variants.map(variant => {
         const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
         if (variant.metadata) {
           hlsVariant.metadata = variant.metadata;
         }
         return hlsVariant;
-      }),
-    };
-    if (params.recording) {
+      });
+    }
+    if (params?.recording) {
       hlsParams.hls_recording = {
         single_file_per_layer: params.recording.singleFilePerLayer,
         hls_vod: params.recording.hlsVod,
@@ -567,7 +568,7 @@ export default class HMSTransport implements ITransport {
   async stopHLSStreaming(params?: HLSConfig) {
     if (params) {
       const hlsParams: HLSRequestParams = {
-        variants: params?.variants.map(variant => {
+        variants: params?.variants?.map(variant => {
           const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
           if (variant.metadata) {
             hlsVariant.metadata = variant.metadata;

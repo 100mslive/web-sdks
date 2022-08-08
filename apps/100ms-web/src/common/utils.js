@@ -1,3 +1,5 @@
+import { QUERY_PARAM_SKIP_PREVIEW } from "./constants";
+
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
   let G = parseInt(color.substring(3, 5), 16);
@@ -63,4 +65,19 @@ export const mobileChatStyle = {
 
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
+};
+
+export const getDefaultMeetingUrl = () => {
+  return (
+    window.location.href.replace("meeting", "preview") +
+    `?${QUERY_PARAM_SKIP_PREVIEW}=true`
+  );
+};
+
+export const getRoutePrefix = () => {
+  return window.location.pathname.startsWith("/streaming") ? "/streaming" : "";
+};
+
+export const isStreamingKit = () => {
+  return window.location.pathname.startsWith("/streaming");
 };

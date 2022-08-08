@@ -3,14 +3,8 @@ import axios from 'axios';
 
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
-  let roomCode = null;
-  if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
-    const roomPart = path.split('/')[2];
-    if (roomPart?.trim()) {
-      roomCode = roomPart;
-    }
-  }
-  return roomCode;
+  const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
+  return path.match(regex)?.groups?.code || null;
 };
 
 export const getAuthInfo = () => {

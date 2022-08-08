@@ -22,6 +22,7 @@ export const getAvatarBg = (name: string): { initials: string; color: string } =
 };
 
 const colorsList = [
+  '#616161',
   '#F44336',
   '#3F51B5',
   '#4CAF50',
@@ -36,7 +37,6 @@ const colorsList = [
   '#00BCD4',
   '#C0CA33',
   '#F4511E',
-  '#616161',
   '#673AB7',
   '#009688',
   '#FBC02D',
