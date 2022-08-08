@@ -2,10 +2,10 @@
 import React, { useEffect } from "react";
 import LogRocket from "logrocket";
 import {
-  HMSNotificationTypes,
   useHMSNotifications,
+  HMSNotificationTypes,
 } from "@100mslive/react-sdk";
-import { Button, Flex, Text } from "@100mslive/react-ui";
+import { Flex, Text, Button } from "@100mslive/react-ui";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
@@ -23,7 +23,6 @@ import {
   useSubscribedNotifications,
 } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
-import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();

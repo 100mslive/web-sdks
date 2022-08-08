@@ -12,8 +12,8 @@ import {
   useParticipants,
 } from "@100mslive/react-sdk";
 import {
-  ChangeRoleIcon,
   CrossIcon,
+  ChangeRoleIcon,
   HandRaiseIcon,
   PeopleIcon,
   SearchIcon,
@@ -21,13 +21,13 @@ import {
   SpeakerIcon,
 } from "@100mslive/react-icons";
 import {
-  Avatar,
-  Box,
-  Dropdown,
   Flex,
+  Box,
   Text,
+  Avatar,
   textEllipsis,
   Input,
+  Dropdown,
   Slider,
 } from "@100mslive/react-ui";
 import { RoleChangeModal } from "../RoleChangeModal";

@@ -1,7 +1,7 @@
 import {
+  useHMSStore,
   selectLocalPeerID,
   selectPeerByCondition,
-  useHMSStore,
 } from "@100mslive/react-sdk";
 import { useCallback, useEffect, useMemo } from "react";
 import { useMyMetadata } from "../../components/hooks/useMetadata";

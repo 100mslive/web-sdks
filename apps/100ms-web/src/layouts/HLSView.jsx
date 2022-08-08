@@ -1,17 +1,17 @@
 import React, {
-  Fragment,
-  useCallback,
   useEffect,
   useRef,
+  Fragment,
   useState,
+  useCallback,
 } from "react";
 import Hls from "hls.js";
-import { selectHLSState, useHMSStore } from "@100mslive/react-sdk";
+import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  RecordIcon,
   SettingsIcon,
+  RecordIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
@@ -24,9 +24,9 @@ import {
 } from "@100mslive/react-ui";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
+  HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
-  HLSController,
 } from "../controllers/hls/HLSController";
 
 const HLSVideo = styled("video", {

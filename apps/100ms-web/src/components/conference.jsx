@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
+  selectRoomState,
   HMSRoomState,
   selectIsConnectedToRoom,
-  selectRoomState,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";

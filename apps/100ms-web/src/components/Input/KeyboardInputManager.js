@@ -1,9 +1,9 @@
 import {
-  parsedUserAgent,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
-  useHMSActions,
+  parsedUserAgent,
   useHMSVanillaStore,
+  useHMSActions,
   selectAppData,
 } from "@100mslive/react-sdk";
 import { useEffect } from "react";

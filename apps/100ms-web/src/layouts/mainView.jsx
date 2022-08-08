@@ -2,8 +2,8 @@ import React, { useEffect, Suspense } from "react";
 import {
   useHMSStore,
   useHMSActions,
-  selectPeerScreenSharing,
   selectPeerSharingAudio,
+  selectPeerScreenSharing,
   selectPeerSharingVideoPlaylist,
   selectLocalPeerRoleName,
   selectIsConnectedToRoom,
