@@ -30,7 +30,16 @@ import type { HMSLocalPeer } from '../../packages/hms-video-store/src/core/hmsSD
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('getToken', (role?: string) => {
-  const tokenEndpoint = Cypress.env('CYPRESS_TOKEN_ENDPOINT');
+  let tokenEndpoint = Cypress.env('CYPRESS_TOKEN_ENDPOINT');
+  if (!tokenEndpoint) {
+    throw new Error('cypress token endpoint is not configured');
+  }
+  if (!tokenEndpoint.endsWith('api/token')) {
+    if (!tokenEndpoint.endsWith('/')) {
+      tokenEndpoint += '/';
+    }
+    tokenEndpoint += 'api/token';
+  }
   const data = {
     room_id: Cypress.env('CYPRESS_ROOM_ID'),
     role: role || Cypress.env('CYPRESS_ROLE'),

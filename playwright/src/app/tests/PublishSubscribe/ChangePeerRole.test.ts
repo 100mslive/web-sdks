@@ -27,10 +27,9 @@ test(`Change peer Role`, async ({ context }) => {
     await pages[1].click("html");
     await pages[1].timeout(2000);
 
-    //page1
     await pages[0].click(
       pages[0].header.participant_list,
-      pages[0].header.setting_role_peer.replace("?", "2"),
+      pages[0].header.participant_setting.replace("?", pages[1].localName),
       pages[0].header.dialog_select_change_role_to
     );
 
