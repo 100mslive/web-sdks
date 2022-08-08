@@ -42,7 +42,7 @@
   "sideEffects": false,
   "dependencies": {
     "@100mslive/hms-video": "0.4.1-alpha.0",
-    "eventemitter2": "^6.4.5",
+    "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"
