@@ -119,7 +119,9 @@ export const textVariants = {
   },
   lg: {
     fontSize: '$lg',
-    lineHeight: '$lg',
+    lineHeight: '$md',
+    fontWeight: '$semiBold',
+    letterSpacing: '0.15px',
   },
 };
 
