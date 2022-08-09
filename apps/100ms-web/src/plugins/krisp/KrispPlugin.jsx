@@ -4,9 +4,10 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { AudioLevelIcon } from "@100mslive/react-icons";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { WiredMic } from "@100mslive/react-icons";
+import { Tooltip } from "@100mslive/react-ui";
 import FilterFactory from "./krispsdk.mjs";
+import IconButton from "../../IconButton.jsx";
 
 const ncOptions = {
   modelOption: FilterFactory.ModelOptions.model_nc_auto,
@@ -85,10 +86,9 @@ export const KrispPlugin = () => {
             await removePlugin();
           }
         }}
-        css={{ mx: "$4" }}
         data-testid="noise_suppression_btn"
       >
-        <AudioLevelIcon />
+        <WiredMic />
       </IconButton>
     </Tooltip>
   );

@@ -17,6 +17,7 @@ import PIPComponent from "../PIP/PIPComponent";
 import MetaActions from "../MetaActions";
 import { ChatToggle } from "./ChatToggle";
 import { Playlist } from "../../components/Playlist/Playlist";
+import { KrispPlugin } from "../../plugins/krisp/KrispPlugin";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
@@ -77,6 +78,7 @@ export const ConferencingFooter = () => {
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
         <NoiseSuppression />
+        <KrispPlugin />
         {FeatureFlags.enableTranscription && <TranscriptionButton />}
         <Flex
           align="center"
