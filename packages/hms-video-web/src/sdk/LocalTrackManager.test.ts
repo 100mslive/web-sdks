@@ -10,6 +10,7 @@ import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalPeer } from './models/peer';
 import { EventBus } from '../events/EventBus';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { AudioContextManager } from '../playlist-manager/AudioContextManager';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -31,6 +32,7 @@ const testObserver: ITransportObserver = {
 
 let testStore = new Store();
 let testEventBus = new EventBus();
+let testContextManager: AudioContextManager;
 
 const hostPublishParams: PublishParams = {
   allowed: ['audio', 'video', 'screen'],
@@ -179,6 +181,7 @@ describe('LocalTrackManager', () => {
   beforeEach(() => {
     testStore = new Store();
     testEventBus = new EventBus();
+    testContextManager = new AudioContextManager();
   });
 
   it('instantiates without any issues', () => {
@@ -188,6 +191,7 @@ describe('LocalTrackManager', () => {
       new DeviceManager(testStore, testEventBus),
       testEventBus,
       new AnalyticsTimer(),
+      testContextManager,
     );
     expect(manager).toBeDefined();
   });
@@ -199,6 +203,7 @@ describe('LocalTrackManager', () => {
       new DeviceManager(testStore, testEventBus),
       testEventBus,
       new AnalyticsTimer(),
+      testContextManager,
     );
     testStore.setPublishParams(hostPublishParams);
     await manager.getTracksToPublish({});
@@ -221,6 +226,7 @@ describe('LocalTrackManager', () => {
         new DeviceManager(testStore, testEventBus),
         testEventBus,
         new AnalyticsTimer(),
+        testContextManager,
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setPublishParams(hostPublishParams);
@@ -377,6 +383,7 @@ describe('LocalTrackManager', () => {
         new DeviceManager(testStore, testEventBus),
         testEventBus,
         new AnalyticsTimer(),
+        testContextManager,
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
@@ -411,6 +418,7 @@ describe('LocalTrackManager', () => {
         new DeviceManager(testStore, testEventBus),
         testEventBus,
         new AnalyticsTimer(),
+        testContextManager,
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
