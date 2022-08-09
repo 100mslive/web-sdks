@@ -55,7 +55,7 @@ const PIPComponent = () => {
   return (
     <>
       <Tooltip
-        title={`${isPipOn ? "Deactivate" : "Activate"} Person in Person view`}
+        title={`${isPipOn ? "Deactivate" : "Activate"} Picture in Picture view`}
       >
         <IconButton
           active={!isPipOn}
