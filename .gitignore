@@ -24,4 +24,3 @@ slackMessage.json
 package-lock.json
 slackMessage.txt
 .DS_Store
-yarn.lock
