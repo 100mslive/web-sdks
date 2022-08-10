@@ -1,4 +1,3 @@
-// @ts-check
 import React from "react";
 import {
   HorizontalMenuIcon,
@@ -45,7 +44,7 @@ const TileMenu = ({
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
-      <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
+      <StyledMenuTile.Content side="top" align="end" sideOffset={8}>
         {toggleVideo ? (
           <StyledMenuTile.ItemButton
             onClick={toggleVideo}

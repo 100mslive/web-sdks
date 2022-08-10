@@ -7,11 +7,11 @@ const Root = Popover.Root;
 
 const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
-  top: '10px',
-  right: '10px',
-  zIndex: 20,
-  width: '36px',
-  height: '36px',
+  bottom: '$2',
+  right: '$2',
+  zIndex: 10,
+  width: '$13',
+  height: '$13',
   color: 'white',
   borderRadius: '$round',
   backgroundColor: '$menuBg',

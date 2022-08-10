@@ -37,6 +37,8 @@ export type useParticipantsParams = {
    * @beta
    */
   metadata: Record<string, any>;
+  /** To filter by name/role (partial match) */
+  search: string;
 };
 
 /**
@@ -59,6 +61,12 @@ export const useParticipants = (params?: useParticipantsParams) => {
   }
   if (params?.role && availableRoles.includes(params.role)) {
     participantList = participantList.filter(peer => peer.roleName === params.role);
+  }
+  if (params?.search) {
+    const search = params.search.toLowerCase();
+    participantList = participantList.filter(
+      peer => peer.roleName?.toLowerCase().includes(search) || peer.name.toLowerCase().includes(search),
+    );
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };

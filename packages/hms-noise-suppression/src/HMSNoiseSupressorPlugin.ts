@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 // @ts-ignore
-import { NoiseModule } from './models/Noise.js';
+import NoiseModule from './models/Noise.js';
 import {
   HMSAudioPlugin,
   HMSAudioPluginType,

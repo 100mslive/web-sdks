@@ -403,14 +403,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('video Track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has video track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -425,14 +428,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('audio track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has audio track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -545,7 +551,7 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+  async startHLSStreaming(params?: sdkTypes.HLSConfig) {
     await this.sdk.startHLSStreaming(params);
   }
 
