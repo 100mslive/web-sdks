@@ -1,5 +1,5 @@
-import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
+import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 
 export const baseConfig = {
   theme: {
@@ -44,6 +44,7 @@ export const baseConfig = {
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+      surfaceDark: '#0F1115',
 
       backgroundDefault: '#0B0D0F',
       backgroundDark: '#090B0D',
