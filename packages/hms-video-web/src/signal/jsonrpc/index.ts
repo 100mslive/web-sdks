@@ -77,15 +77,8 @@ export default class JsonRpcSignal implements ISignal {
 
   constructor(observer: ISignalEventsObserver) {
     this.observer = observer;
-    window.addEventListener('offline', () => {
-      HMSLogger.d(this.TAG, 'Window network offline');
-      this.setIsConnected(false, 'Window network offline');
-    });
-
-    window.addEventListener('online', () => {
-      HMSLogger.d(this.TAG, 'Window network online');
-      this.observer.onNetworkOnline();
-    });
+    window.addEventListener('offline', this.offlineListener);
+    window.addEventListener('online', this.onlineListener);
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
     this.onMessageHandler = this.onMessageHandler.bind(this);
@@ -234,6 +227,8 @@ export default class JsonRpcSignal implements ISignal {
 
   leave() {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
+    window.removeEventListener('offline', this.offlineListener);
+    window.removeEventListener('online', this.onlineListener);
   }
 
   async endRoom(lock: boolean, reason: string) {
@@ -417,4 +412,14 @@ export default class JsonRpcSignal implements ISignal {
     HMSLogger.e(`Sending ${method} over WS failed after ${MAX_RETRIES} retries`, { method, params, error });
     throw error;
   }
+
+  private offlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network offline');
+    this.setIsConnected(false, 'Window network offline');
+  };
+
+  private onlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network online');
+    this.observer.onNetworkOnline();
+  };
 }
