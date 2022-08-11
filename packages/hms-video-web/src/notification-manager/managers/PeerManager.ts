@@ -77,7 +77,12 @@ export class PeerManager {
   handlePeerLeave = (peer: PeerNotification) => {
     const hmsPeer = this.store.getPeerById(peer.peer_id);
     this.store.removePeer(peer.peer_id);
-    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.store.getPeers());
+    HMSLogger.d(
+      this.TAG,
+      `PEER_LEAVE event`,
+      JSON.stringify(peer, null, 2),
+      JSON.stringify(this.store.getPeers(), null, 2),
+    );
 
     if (!hmsPeer) {
       return;
@@ -139,7 +144,7 @@ export class PeerManager {
     });
 
     this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
+    HMSLogger.d(this.TAG, `adding to the peerList`, JSON.stringify(hmsPeer, null, 2));
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({
