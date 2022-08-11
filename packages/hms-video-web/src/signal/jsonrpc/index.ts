@@ -127,6 +127,7 @@ export default class JsonRpcSignal implements ISignal {
     return new Promise((resolve, reject) => {
       // cleanup
       if (this.socket) {
+        this.socket.close();
         this.socket.removeEventListener('close', this.onCloseHandler);
         this.socket.removeEventListener('message', this.onMessageHandler);
       }
