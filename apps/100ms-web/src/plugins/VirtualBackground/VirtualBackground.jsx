@@ -4,9 +4,11 @@ import {
   useHMSStore,
   selectIsLocalVideoPluginPresent,
   selectIsAllowedToPublish,
+  selectLocalVideoTrackID,
 } from "@100mslive/react-sdk";
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/react-ui";
+import IconButton from "../../IconButton";
 import { getRandomVirtualBackground } from "./vbutils";
 
 export const VirtualBackground = () => {
@@ -14,6 +16,7 @@ export const VirtualBackground = () => {
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const [isVBSupported, setIsVBSupported] = useState(false);
+  const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const isVBPresent = useHMSStore(
     selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
   );
@@ -27,14 +30,18 @@ export const VirtualBackground = () => {
     }
   }
   useEffect(() => {
+    if (!localPeerVideoTrackID) {
+      return;
+    }
     createPlugin().then(() => {
       //check support of plugin
       const pluginSupport = hmsActions.validateVideoPluginSupport(
         pluginRef.current
       );
+      console.error(pluginSupport, pluginRef.current.checkSupport());
       setIsVBSupported(pluginSupport.isSupported);
     });
-  }, [hmsActions]);
+  }, [hmsActions, localPeerVideoTrackID]);
 
   async function addPlugin() {
     try {
@@ -66,7 +73,6 @@ export const VirtualBackground = () => {
         onClick={() => {
           !isVBPresent ? addPlugin() : removePlugin();
         }}
-        css={{ mx: "$4" }}
         data-testid="virtual_bg_btn"
       >
         <VirtualBackgroundIcon />

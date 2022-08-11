@@ -28,20 +28,27 @@ export const baseConfig = {
       grayLight: '#B0C3DB',
       grayDefault: '#657080',
       grayDark: '#303740',
+      secondaryGray: '#242A33',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
       textHighEmp: 'rgba(245, 249, 255, 0.95)',
       textMedEmp: 'rgba(224, 236, 255, 0.8)',
       textDisabled: 'rgba(195, 208, 229, 0.5)',
-      textMedWhite: 'rgba(255, 255, 255, 0.72)',
-      textDarkWhite: 'rgba(255, 255, 255, 0.48)',
-      textHighWhite: 'rgba(255, 255, 255, 0.98)',
-      textDisabledWhite: 'rgba(255, 255, 255, 0.48)',
-      surfaceDarker: '#06080A',
-      surfaceDark: '#080B0F',
+
+      // text variants when bg is accent (blue)
+      // same for both themes
+      textAccentHigh: 'rgba(255, 255, 255, 0.98)',
+      textAccentMedium: 'rgba(255, 255, 255, 0.72)',
+      textAccentDisabled: 'rgba(255, 255, 255, 0.48)',
+
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+
+      backgroundDefault: '#0B0D0F',
+      backgroundDark: '#090B0D',
+      backgroundDarker: '#040405',
+
       primaryLight: '#66A1FF',
       primaryDefault: '#2471ED',
       primaryDark: '#143466',
@@ -50,6 +57,10 @@ export const baseConfig = {
       secondaryDefault: '#475366',
       secondaryDark: '#2D3440',
       secondaryDisabled: '#242A33',
+      errorDefault: '#CC525F',
+      errorLight: '#D87983',
+      errorDark: '#9D2F3B',
+      errorDisabled: '#621D24',
     },
     shadows: {
       sm: '0 0 4px 0 rgba(0,0,0,0.3)',
@@ -69,6 +80,7 @@ export const baseConfig = {
       xs: '0.75rem',
       sm: '0.875rem',
       md: '1rem',
+      lg: '1.125rem',
     },
     fontWeights: {
       semiBold: 600,
@@ -92,6 +104,7 @@ export const baseConfig = {
       '1': '0.5rem',
       '2': '0.75rem',
       '3': '1rem',
+      '4': '1.5rem',
       round: '100rem',
     },
     space: {
@@ -136,6 +149,7 @@ export const baseConfig = {
       72: '18rem',
       80: '20rem',
       96: '24rem',
+      100: '27rem',
     },
     borderWidths: {
       light: '1px',

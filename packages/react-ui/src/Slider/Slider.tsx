@@ -17,7 +17,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$grayDefault',
+  backgroundColor: '$secondaryGray',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',
@@ -27,7 +27,7 @@ const Track = styled(BaseSlider.Track, {
 
 const Range = styled(BaseSlider.Range, {
   position: 'absolute',
-  backgroundColor: '$brandDefault',
+  backgroundColor: '$primaryDefault',
   borderRadius: '$round',
   height: '100%',
 });
@@ -37,17 +37,20 @@ const Thumb = styled(BaseSlider.Thumb, {
   display: 'block',
   width: '$8',
   height: '$8',
-  backgroundColor: '$brandDefault',
+  backgroundColor: '$primaryDefault',
   cursor: 'pointer',
   boxShadow: `0 2px 10px $colors$grayDefault`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: '$brandDefault' },
+  '&:hover': { backgroundColor: '$primaryDefault' },
   '&:focus': { boxShadow: 'none' },
 });
 
-type SliderProps = React.ComponentProps<typeof Root> & { thumbStyles?: CSS };
+type SliderProps = React.ComponentProps<typeof Root> & {
+  thumbStyles?: CSS;
+  showTooltip?: boolean;
+};
 
-export const Slider: React.FC<SliderProps> = ({
+export const Slider: React.FC<SliderProps & { showTooltip?: boolean }> = ({
   showTooltip = true,
   thumbStyles,
   ...props
@@ -56,10 +59,12 @@ export const Slider: React.FC<SliderProps> = ({
     <Track>
       <Range />
     </Track>
-    <Tooltip title={showTooltip ? String(props.value?.[0]) : null}>
+    {showTooltip ? (
+      <Tooltip title={String(props.value?.[0])}>
+        <Thumb css={thumbStyles} />
+      </Tooltip>
+    ) : (
       <Thumb css={thumbStyles} />
-    </Tooltip>
+    )}
   </Root>
 );
-
-Slider.displayName = 'Slider';

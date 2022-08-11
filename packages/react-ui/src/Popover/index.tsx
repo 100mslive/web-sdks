@@ -1,4 +1,4 @@
-import { Popover as Root, Content, Trigger } from '@radix-ui/react-popover';
+import { Popover as Root, Content, Trigger, Arrow } from '@radix-ui/react-popover';
 import { popoverAnimation } from '../utils/animations';
 import { styled } from '../Theme';
 
@@ -10,8 +10,13 @@ const StyledContent = styled(Content, {
   ...popoverAnimation,
 });
 
+const StyledArrow = styled(Arrow, {
+  ...popoverAnimation,
+});
+
 export const Popover = {
   Root,
   Content: StyledContent,
   Trigger,
+  Arrow: StyledArrow,
 };

@@ -17,8 +17,6 @@ import {
   SettingIcon,
   ShrinkIcon,
 } from "@100mslive/react-icons";
-import { ChatView } from "../components/chatView";
-import { useIsChatOpen } from "../components/AppData/useChatState";
 import {
   HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
@@ -26,23 +24,18 @@ import {
 } from "../controllers/hls/HLSController";
 import { ToastManager } from "../components/Toast/ToastManager";
 import { HMSVideoPlayer } from "../components/HMSVideo";
-import { VideoProgress } from "../components/HMSVideo/VideoProgress";
-import { PlayButton } from "../components/HMSVideo/PlayButton";
-import { VolumeControl } from "../components/HMSVideo/VolumeControl";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
-import { VideoTime } from "../components/HMSVideo/VideoTime";
 
 let hlsController;
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
-  const isChatOpen = useIsChatOpen();
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
+  const [isVideoLive, setIsVideoLive] = useState(true);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
-  const [isVideoLive, setIsVideoLive] = useState(true);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -292,28 +285,11 @@ const HLSView = () => {
           </HMSVideoPlayer.Root>
         </Flex>
       ) : (
-        <Flex align="center" justify="center" css={{ size: "100%" }}>
+        <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the Streaming to start...
           </Text>
         </Flex>
-      )}
-      {isChatOpen && (
-        <Box
-          css={{
-            height: "50%",
-            position: "absolute",
-            zIndex: 40,
-            bottom: "$20",
-            right: 0,
-            width: "20%",
-            "@sm": {
-              width: "75%",
-            },
-          }}
-        >
-          <ChatView />
-        </Box>
       )}
     </Box>
   );

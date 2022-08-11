@@ -1,31 +1,42 @@
 import { Fragment, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
+  selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { HangUpIcon } from "@100mslive/react-icons";
+import {
+  HangUpIcon,
+  ExitIcon,
+  AlertTriangleIcon,
+  VerticalMenuIcon,
+} from "@100mslive/react-icons";
 import {
   Button,
-  Popover,
   Dialog,
   Tooltip,
   Box,
   IconButton,
   styled,
+  Text,
+  Flex,
+  Dropdown,
 } from "@100mslive/react-ui";
 import {
   DialogCheckbox,
   DialogContent,
   DialogRow,
 } from "../primitives/DialogContent";
+import { useNavigation } from "./hooks/useNavigation";
+import { isStreamingKit } from "../common/utils";
 
 export const LeaveRoom = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigation();
   const params = useParams();
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
 
@@ -47,49 +58,113 @@ export const LeaveRoom = () => {
     redirectToLeavePage();
   };
 
+  const isStreamKit = isStreamingKit();
+  if (!permissions || !isConnected) {
+    return null;
+  }
+
   return (
     <Fragment>
       {permissions.endRoom ? (
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <LeaveIconButton
-              variant="danger"
-              key="LeaveRoom"
-              data-testid="leave_room_btn"
-            >
-              <Tooltip title="Leave Room">
+        <Flex>
+          <LeaveIconButton
+            variant="danger"
+            key="LeaveRoom"
+            data-testid="leave_room_btn"
+            css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+            onClick={leaveRoom}
+          >
+            <Tooltip title="Leave Room">
+              {!isStreamKit ? (
                 <Box>
                   <HangUpIcon key="hangUp" />
                 </Box>
-              </Tooltip>
-            </LeaveIconButton>
-          </Popover.Trigger>
-          <Popover.Content sideOffset={10}>
-            <Button
-              variant="standard"
-              css={{ w: "100%" }}
-              onClick={() => {
-                setShowEndRoomModal(true);
+              ) : (
+                <Flex gap={2}>
+                  <Box css={{ "@md": { transform: "rotate(180deg)" } }}>
+                    <ExitIcon key="hangUp" />
+                  </Box>
+                  <Text
+                    css={{ "@md": { display: "none" }, color: "inherit" }}
+                    variant="button"
+                  >
+                    Leave Studio
+                  </Text>
+                </Flex>
+              )}
+            </Tooltip>
+          </LeaveIconButton>
+          <Dropdown.Root>
+            <Dropdown.Trigger
+              asChild
+              css={{
+                '&[data-state="open"]': {
+                  bg: "$errorDark",
+                },
               }}
-              data-testid="end_room_btn"
             >
-              End Room
-            </Button>
-            <Button
-              variant="danger"
-              css={{ mt: "$4" }}
-              onClick={leaveRoom}
-              data-testid="just_leave_btn"
-            >
-              Just Leave
-            </Button>
-          </Popover.Content>
-        </Popover.Root>
+              <MenuTriggerButton
+                variant="danger"
+                data-testid="leave_end_dropdown_trigger"
+              >
+                <VerticalMenuIcon />
+              </MenuTriggerButton>
+            </Dropdown.Trigger>
+            <Dropdown.Content css={{ p: 0 }} alignOffset={-50} sideOffset={10}>
+              <Dropdown.Item
+                css={{ w: "100%", bg: "rgba(178, 71, 81, 0.1)" }}
+                onClick={() => {
+                  setShowEndRoomModal(true);
+                }}
+                data-testid="end_room_btn"
+              >
+                <Flex gap={4}>
+                  <Box css={{ color: "$error" }}>
+                    <AlertTriangleIcon />
+                  </Box>
+                  <Flex direction="column" align="start">
+                    <Text variant="lg" css={{ c: "$error" }}>
+                      End Room for All
+                    </Text>
+                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                      Warning: You can’t undo this action
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Dropdown.Item>
+              <Dropdown.Item
+                css={{ bg: "$surfaceDefault" }}
+                onClick={leaveRoom}
+                data-testid="just_leave_btn"
+              >
+                <Flex gap={4}>
+                  <Box>
+                    <ExitIcon />
+                  </Box>
+                  <Flex direction="column" align="start">
+                    <Text variant="lg">
+                      Leave {isStreamKit ? "Studio" : "Room"}
+                    </Text>
+                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                      You can always rejoin later
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
+        </Flex>
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom">
           <Tooltip title="Leave Room">
             <Box>
-              <HangUpIcon key="hangUp" />
+              {isStreamKit ? (
+                <Box css={{ "@md": { transform: "rotate(180deg)" } }}>
+                  <ExitIcon />
+                </Box>
+              ) : (
+                <HangUpIcon key="hangUp" />
+              )}
             </Box>
           </Tooltip>
         </LeaveIconButton>
@@ -128,13 +203,28 @@ export const LeaveRoom = () => {
 
 const LeaveIconButton = styled(IconButton, {
   color: "$white",
-  width: "$15",
-  mx: "$4",
+  h: "$14",
+  px: "$8",
+  r: "$1",
   bg: "$error",
   "&:not([disabled]):hover": {
     bg: "$errorTint",
   },
   "&:not([disabled]):active": {
     bg: "$errorTint",
+  },
+  "@md": {
+    px: "$4",
+    mx: 0,
+  },
+});
+
+const MenuTriggerButton = styled(LeaveIconButton, {
+  borderLeft: "1px solid $errorDark",
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  px: "$3",
+  "@md": {
+    px: "$2",
   },
 });
