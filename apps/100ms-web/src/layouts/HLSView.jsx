@@ -1,22 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
 import { useFullscreen } from "react-use";
-import {
-  Box,
-  Dropdown,
-  Flex,
-  IconButton,
-  Text,
-  Tooltip,
-} from "@100mslive/react-ui";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ExpandIcon,
-  SettingsIcon,
-  ShrinkIcon,
-} from "@100mslive/react-icons";
+import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
+import { Box, Flex, IconButton, Text, Tooltip } from "@100mslive/react-ui";
 import {
   HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
@@ -25,6 +12,7 @@ import {
 import { ToastManager } from "../components/Toast/ToastManager";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
+import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 
 let hlsController;
 const HLSView = () => {
@@ -36,7 +24,6 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
-  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   useFullscreen(hlsViewRef, isFullScreen, {
@@ -78,11 +65,6 @@ const HLSView = () => {
       return () => hlsController.reset();
     }
   }, []);
-
-  const getQualityText = level =>
-    `${level.height}p (${(Number(level.bitrate / 1024) / 1024).toFixed(
-      2
-    )} Mbps)`;
 
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
@@ -182,100 +164,24 @@ const HLSView = () => {
                       <Flex justify="center" gap={2} align="center">
                         <Box
                           css={{
-                            height: "0.5rem",
-                            width: "0.5rem",
+                            height: "$4",
+                            width: "$4",
                             background: isVideoLive ? "#CC525F" : "#FAFAFA",
                             borderRadius: "50%",
                           }}
                         />
-                        <Text css={{ fontSize: "0.75rem" }}>
+                        <Text variant="sm">
                           {isVideoLive ? "Live" : "Go to Live"}{" "}
                         </Text>
                       </Flex>
                     </Tooltip>
                   </IconButton>
                 ) : null}
-                <Dropdown.Root
-                  css={{ margin: "0px" }}
-                  open={qualityDropDownOpen}
-                  onOpenChange={value => setQualityDropDownOpen(value)}
-                >
-                  <Dropdown.Trigger asChild data-testid="quality_selector">
-                    <Flex
-                      css={{
-                        color: "$textPrimary",
-                        borderRadius: "$1",
-                        margin: "0px",
-                        cursor: "pointer",
-                        zIndex: 40,
-                        border: "1px solid $textDisabled",
-                        padding: "$2 $4",
-                      }}
-                    >
-                      <Tooltip title="Select Quality">
-                        <Flex>
-                          <SettingsIcon />
-                          <Text css={{ fontSize: "0.75rem" }} variant="md">
-                            {currentSelectedQualityText}
-                          </Text>
-                        </Flex>
-                      </Tooltip>
-
-                      <Box
-                        css={{
-                          "@lg": { display: "none" },
-                          color: "$textDisabled",
-                        }}
-                      >
-                        {qualityDropDownOpen ? (
-                          <ChevronUpIcon />
-                        ) : (
-                          <ChevronDownIcon />
-                        )}
-                      </Box>
-                    </Flex>
-                  </Dropdown.Trigger>
-                  {availableLevels.length > 0 && (
-                    <Dropdown.Content
-                      sideOffset={5}
-                      align="end"
-                      css={{ height: "auto", maxHeight: "$96" }}
-                    >
-                      <Dropdown.Item
-                        onClick={event =>
-                          qualitySelectorHandler({ height: "auto" })
-                        }
-                        css={{
-                          h: "auto",
-                          flexDirection: "column",
-                          flexWrap: "wrap",
-                          cursor: "pointer",
-                          alignItems: "flex-start",
-                        }}
-                        key="auto"
-                      >
-                        <Text>Automatic</Text>
-                      </Dropdown.Item>
-                      {availableLevels.map(level => {
-                        return (
-                          <Dropdown.Item
-                            onClick={() => qualitySelectorHandler(level)}
-                            css={{
-                              h: "auto",
-                              flexDirection: "column",
-                              flexWrap: "wrap",
-                              cursor: "pointer",
-                              alignItems: "flex-start",
-                            }}
-                            key={level.url}
-                          >
-                            <Text>{getQualityText(level)}</Text>
-                          </Dropdown.Item>
-                        );
-                      })}
-                    </Dropdown.Content>
-                  )}
-                </Dropdown.Root>
+                <HLSQualitySelector
+                  availableLevels={availableLevels}
+                  currentSelectedQualityText={currentSelectedQualityText}
+                  qualitySelectorHandler={qualitySelectorHandler}
+                />
                 <FullScreenButton
                   onToggle={toggleFullScreen}
                   icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
