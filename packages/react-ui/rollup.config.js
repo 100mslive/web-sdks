@@ -23,7 +23,7 @@ const config = {
     esbuild({ format: 'esm' }),
     resolve(),
     isProduction && terser(),
-    typescript({ sourceMap: true }),
+    typescript({ sourceMap: true, exclude: '**/*.stories.tsx' }),
   ],
 };
 
