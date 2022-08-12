@@ -44,57 +44,56 @@ export const MoreSettings = () => {
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
-        <Dropdown.Portal>
-          <Dropdown.Content
-            sideOffset={5}
-            align="center"
-            css={{ maxHeight: "$96", "@md": { w: "$64" } }}
+
+        <Dropdown.Content
+          sideOffset={5}
+          align="center"
+          css={{ maxHeight: "$96", "@md": { w: "$64" } }}
+        >
+          <Dropdown.Item
+            onClick={() => setShowChangeNameModal(value => !value)}
+            data-testid="change_name_btn"
           >
+            <PencilIcon />
+            <Text variant="sm" css={{ ml: "$4" }}>
+              Change Name
+            </Text>
+          </Dropdown.Item>
+          <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
+          <FullScreenItem />
+          {permissions.mute && (
             <Dropdown.Item
-              onClick={() => setShowChangeNameModal(value => !value)}
-              data-testid="change_name_btn"
+              onClick={() => setShowMuteAll(true)}
+              data-testid="mute_all_btn"
             >
-              <PencilIcon />
+              <MicOffIcon />
               <Text variant="sm" css={{ ml: "$4" }}>
-                Change Name
+                Mute All
               </Text>
             </Dropdown.Item>
-            <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
-            <FullScreenItem />
-            {permissions.mute && (
-              <Dropdown.Item
-                onClick={() => setShowMuteAll(true)}
-                data-testid="mute_all_btn"
-              >
-                <MicOffIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
-                  Mute All
-                </Text>
-              </Dropdown.Item>
-            )}
-            <Dropdown.ItemSeparator />
+          )}
+          <Dropdown.ItemSeparator />
+          <Dropdown.Item
+            onClick={() => setShowDeviceSettings(true)}
+            data-testid="device_settings_btn"
+          >
+            <SettingsIcon />
+            <Text variant="sm" css={{ ml: "$4" }}>
+              Settings
+            </Text>
+          </Dropdown.Item>
+          {FeatureFlags.enableStatsForNerds && (
             <Dropdown.Item
-              onClick={() => setShowDeviceSettings(true)}
-              data-testid="device_settings_btn"
+              onClick={() => setShowStatsForNerds(true)}
+              data-testid="stats_for_nreds_btn"
             >
-              <SettingsIcon />
+              <InfoIcon />
               <Text variant="sm" css={{ ml: "$4" }}>
-                Settings
+                Stats for Nerds
               </Text>
             </Dropdown.Item>
-            {FeatureFlags.enableStatsForNerds && (
-              <Dropdown.Item
-                onClick={() => setShowStatsForNerds(true)}
-                data-testid="stats_for_nreds_btn"
-              >
-                <InfoIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
-                  Stats for Nerds
-                </Text>
-              </Dropdown.Item>
-            )}
-          </Dropdown.Content>
-        </Dropdown.Portal>
+          )}
+        </Dropdown.Content>
       </Dropdown.Root>
       {showMuteAll && <MuteAllModal onOpenChange={setShowMuteAll} />}
       {showChangeNameModal && (

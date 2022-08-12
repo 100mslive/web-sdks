@@ -258,17 +258,16 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
           <VerticalMenuIcon />
         </Text>
       </Dropdown.Trigger>
-      <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={8} css={{ w: "$64" }}>
-          {canChangeRole && (
-            <Dropdown.Item onClick={() => onRoleChange(peerId)}>
-              <ChangeRoleIcon />
-              <Text css={{ ml: "$4" }}>Change Role</Text>
-            </Dropdown.Item>
-          )}
-          <ParticipantVolume peerId={peerId} />
-        </Dropdown.Content>
-      </Dropdown.Portal>
+
+      <Dropdown.Content align="end" sideOffset={8} css={{ w: "$64" }}>
+        {canChangeRole && (
+          <Dropdown.Item onClick={() => onRoleChange(peerId)}>
+            <ChangeRoleIcon />
+            <Text css={{ ml: "$4" }}>Change Role</Text>
+          </Dropdown.Item>
+        )}
+        <ParticipantVolume peerId={peerId} />
+      </Dropdown.Content>
     </Dropdown.Root>
   );
 };
