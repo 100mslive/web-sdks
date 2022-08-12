@@ -353,7 +353,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  join(config: HMSConfig, listener: HMSUpdateListener) {
+  async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
 
@@ -394,32 +394,36 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
-    this.transport
-      .join(
-        config.authToken,
-        this.localPeer!.peerId,
-        { name: config.userName, metaData: config.metaData || '' },
-        config.initEndpoint!,
-        config.autoVideoSubscribe,
-      )
-      .then(async () => {
-        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        HMSAudioContextHandler.resumeContext();
-        this.notifyJoin();
-        this.sendJoinAnalyticsEvent(isPreviewCalled);
-        if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
-          await this.publish(config.settings || defaultSettings);
-        }
-      })
-      .catch(error => {
-        this.analyticsTimer.end(TimedEvent.JOIN);
-        this.listener?.onError(error as HMSException);
-        this.sendJoinAnalyticsEvent(isPreviewCalled, error);
-        HMSLogger.e(this.TAG, 'Unable to join room', error);
-      })
-      .then(() => {
-        HMSLogger.timeEnd(`join-room-${roomId}`);
-      });
+
+    return new Promise<void>((resolve, reject) => {
+      this.transport
+        .join(
+          config.authToken,
+          this.localPeer!.peerId,
+          { name: config.userName, metaData: config.metaData || '' },
+          config.initEndpoint!,
+          config.autoVideoSubscribe,
+        )
+        .then(async () => {
+          HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+          HMSAudioContextHandler.resumeContext();
+          this.notifyAndResolveJoin(resolve);
+          this.sendJoinAnalyticsEvent(isPreviewCalled);
+          if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
+            await this.publish(config.settings || defaultSettings);
+          }
+        })
+        .catch(error => {
+          this.analyticsTimer.end(TimedEvent.JOIN);
+          this.listener?.onError(error as HMSException);
+          this.sendJoinAnalyticsEvent(isPreviewCalled, error);
+          HMSLogger.e(this.TAG, 'Unable to join room', error);
+          reject(error as HMSException);
+        })
+        .then(() => {
+          HMSLogger.timeEnd(`join-room-${roomId}`);
+        });
+    });
   }
 
   private stringifyMetadata(config: HMSConfig) {
@@ -875,7 +879,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.localAudioSilence.subscribe(this.sendAudioPresenceFailed);
   }
 
-  private notifyJoin() {
+  private notifyAndResolveJoin(resolve: (value: void | PromiseLike<void>) => void) {
     const localPeer = this.store.getLocalPeer();
     const room = this.store.getRoom();
     room.joinedAt = new Date();
@@ -886,10 +890,12 @@ export class HMSSdk implements HMSInterface {
     if (localPeer?.role) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.listener?.onJoin(room);
+      resolve();
     } else {
       this.eventBus.policyChange.subscribeOnce(() => {
         this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
+        resolve();
       });
     }
   }

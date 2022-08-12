@@ -113,14 +113,16 @@ export const usePreviewJoin = ({
   }, [actions, handleError, token, roomState, config, isConnected]);
 
   const join = useCallback(() => {
-    if (!token) {
-      return;
-    }
-    try {
-      actions.join(config);
-    } catch (err) {
-      handleError(err as Error, 'join');
-    }
+    (async () => {
+      if (!token) {
+        return;
+      }
+      try {
+        await actions.join(config);
+      } catch (err) {
+        handleError(err as Error, 'join');
+      }
+    })();
   }, [actions, config, handleError, token]);
 
   return {
