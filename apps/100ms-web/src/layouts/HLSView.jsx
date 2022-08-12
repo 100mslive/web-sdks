@@ -14,7 +14,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   ExpandIcon,
-  SettingIcon,
+  SettingsIcon,
   ShrinkIcon,
 } from "@100mslive/react-icons";
 import {
@@ -214,7 +214,7 @@ const HLSView = () => {
                     >
                       <Tooltip title="Select Quality">
                         <Flex>
-                          <SettingIcon />
+                          <SettingsIcon />
                           <Text css={{ fontSize: "0.75rem" }} variant="md">
                             {currentSelectedQualityText}
                           </Text>
