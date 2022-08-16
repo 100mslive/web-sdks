@@ -247,22 +247,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(
-        TAG,
-        '[Subscribe] onTrackAdd',
-        stringifyMediaStreamTrack(track.nativeTrack),
-        `peerId=${track.peerId}`,
-      );
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(
-        TAG,
-        '[Subscribe] onTrackRemove',
-        stringifyMediaStreamTrack(track.nativeTrack),
-        `peerId=${track.peerId}`,
-      );
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackRemove(track);
     },
 
