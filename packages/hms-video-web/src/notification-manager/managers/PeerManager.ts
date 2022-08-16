@@ -77,7 +77,12 @@ export class PeerManager {
   handlePeerLeave = (peer: PeerNotification) => {
     const hmsPeer = this.store.getPeerById(peer.peer_id);
     this.store.removePeer(peer.peer_id);
-    HMSLogger.d(this.TAG, `PEER_LEAVE event`, JSON.stringify(peer, null, 2), this.store.getPeers().toString());
+    HMSLogger.d(
+      this.TAG,
+      `PEER_LEAVE`,
+      JSON.stringify(peer, null, 2),
+      `remainingPeers=${this.store.getPeers().toString()}`,
+    );
 
     if (!hmsPeer) {
       return;
