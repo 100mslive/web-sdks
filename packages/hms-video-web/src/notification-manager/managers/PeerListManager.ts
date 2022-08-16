@@ -37,11 +37,11 @@ export class PeerListManager {
     if (method === HMSNotificationMethod.PEER_LIST) {
       const peerList = notification as PeerListNotification;
       if (isReconnecting) {
-        HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, JSON.stringify(peerList, null, 2));
+        HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList.toString());
         this.handleReconnectPeerList(peerList);
       } else {
         // TODO: Don't call initial peerlist if atleast 1room state had happen
-        HMSLogger.d(this.TAG, `PEER_LIST event`, JSON.stringify(peerList, null, 2));
+        HMSLogger.d(this.TAG, `PEER_LIST event`, peerList.toString());
         this.handleInitialPeerList(peerList);
       }
     } else if (method === HMSNotificationMethod.ROOM_STATE) {
@@ -89,7 +89,7 @@ export class PeerListManager {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, JSON.stringify({ peersToRemove }, null, 2));
+    HMSLogger.d(this.TAG, peersToRemove.toString());
 
     // Send peer-leave updates to all the missing peers
     peersToRemove.forEach(peer => {

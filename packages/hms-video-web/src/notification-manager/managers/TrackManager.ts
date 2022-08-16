@@ -3,7 +3,6 @@ import { HMSPeer, HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '.
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
-import { stringifyMediaStreamTrack, stringifyTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
@@ -65,7 +64,7 @@ export class TrackManager {
    * Sets the tracks to peer and returns the peer
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, stringifyTrack(track), stringifyMediaStreamTrack(track.nativeTrack));
+    HMSLogger.d(this.TAG, `ONTRACKADD`, track.toString());
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -75,7 +74,7 @@ export class TrackManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, stringifyTrack(track), stringifyMediaStreamTrack(track.nativeTrack));
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track.toString());
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
