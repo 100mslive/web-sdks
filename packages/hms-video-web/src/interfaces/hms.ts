@@ -18,7 +18,7 @@ import { HLSConfig } from './hls-config';
 import { ScreenShareConfig } from './track-settings';
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
-  join(config: HMSConfig, listener: HMSUpdateListener): void;
+  join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(): Promise<void>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
