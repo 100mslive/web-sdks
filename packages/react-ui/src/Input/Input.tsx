@@ -1,8 +1,8 @@
 import React, { ComponentProps } from 'react';
 import { styled } from '../Theme';
 import { CSS } from '@stitches/react';
-import { Box } from '../Layout';
-import { EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
+import { Box, Flex } from '../Layout';
+import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
 
 export const Input = styled('input', {
   fontFamily: '$sans',
@@ -32,17 +32,41 @@ export const Input = styled('input', {
   },
 });
 
-export const PasswordInput = (props: ComponentProps<typeof Input>, iconStyles?: CSS) => {
+export const PasswordInput = (
+  props: ComponentProps<typeof Input>,
+  hasPassword = true,
+  hasCopy = true,
+  onCopy?: () => void,
+  passwordIconStyle?: CSS,
+  copyIconStyle?: CSS,
+  css?: CSS,
+) => {
   const [showPassword, setShowPassword] = React.useState(false);
   return (
-    <Box css={{ w: 'inherit', position: 'relative' }}>
-      <Input css={{ w: '-webkit-fill-available' }} type={showPassword ? 'text' : 'password'} {...props}></Input>
-      <Box
-        css={{ position: 'absolute', top: '25%', right: '$4', ...iconStyles }}
-        onClick={() => setShowPassword(!showPassword)}
-      >
-        {showPassword ? <EyeOpenIcon></EyeOpenIcon> : <EyeCloseIcon></EyeCloseIcon>}
-      </Box>
+    <Box
+      css={{
+        w: '100%',
+        display: 'block',
+        position: 'relative',
+      }}
+    >
+      <Input
+        css={{ w: '-webkit-fill-available', display: 'block', ...css }}
+        type={showPassword ? 'text' : 'password'}
+        {...props}
+      ></Input>
+      <Flex css={{ position: 'absolute', top: '25%', zIndex: '10', right: '$4' }}>
+        {hasPassword ? (
+          <Box css={passwordIconStyle} onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}
+          </Box>
+        ) : null}
+        {hasCopy ? (
+          <Box css={copyIconStyle} onClick={onCopy}>
+            <CopyIcon></CopyIcon>
+          </Box>
+        ) : null}
+      </Flex>
     </Box>
   );
 };

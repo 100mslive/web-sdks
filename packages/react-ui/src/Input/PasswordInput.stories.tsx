@@ -6,7 +6,20 @@ import { Box } from '../Layout';
 export default {
   title: 'UI Components/PasswordInput',
   component: PasswordInput,
-  argTypes: {},
+  args: {
+    copyIconStyle: {},
+    passwordIconStyle: {},
+  },
+  argTypes: {
+    onChange: { action: 'clicked' },
+    onCopy: { action: 'clicked' },
+    hasPassword: { control: 'boolean' },
+    hasCopy: { control: 'boolean' },
+    loading: { control: 'boolean' },
+    css: { control: 'object' },
+    copyIconStyle: { control: 'object' },
+    passwordIconStyle: { control: 'object' },
+  },
 } as ComponentMeta<typeof PasswordInput>;
 
 //👇 We create a “template” of how args map to rendering
