@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react';
 import { styled } from '../Theme';
 import { CSS } from '@stitches/react';
-import { Box, Flex } from '../Layout';
+import { Flex } from '../Layout';
 import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
 
 export const Input = styled('input', {
@@ -43,15 +43,14 @@ export const PasswordInput = (
 ) => {
   const [showPassword, setShowPassword] = React.useState(false);
   return (
-    <Box
+    <Flex
       css={{
         w: '100%',
-        display: 'block',
         position: 'relative',
       }}
     >
       <Input
-        css={{ w: '-webkit-fill-available', display: 'block', ...css }}
+        css={{ flexGrow: 1, display: 'block', ...css }}
         type={showPassword ? 'text' : 'password'}
         {...props}
       ></Input>
@@ -67,6 +66,6 @@ export const PasswordInput = (
           </Flex>
         ) : null}
       </Flex>
-    </Box>
+    </Flex>
   );
 };
