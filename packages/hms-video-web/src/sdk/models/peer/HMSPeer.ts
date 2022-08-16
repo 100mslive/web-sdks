@@ -56,4 +56,17 @@ export class HMSPeer implements IHMSPeer {
   updateMetadata(data: string) {
     this.metadata = data;
   }
+
+  toString() {
+    return JSON.stringify(
+      {
+        name: this.name,
+        role: this.role?.name,
+        peerId: this.peerId,
+        customerUserId: this.customerUserId,
+      },
+      null,
+      2,
+    );
+  }
 }
