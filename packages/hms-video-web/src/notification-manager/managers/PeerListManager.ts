@@ -37,11 +37,11 @@ export class PeerListManager {
     if (method === HMSNotificationMethod.PEER_LIST) {
       const peerList = notification as PeerListNotification;
       if (isReconnecting) {
-        HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, peerList.toString());
+        HMSLogger.d(this.TAG, `RECONNECT_PEER_LIST event`, JSON.stringify(peerList, null, 2));
         this.handleReconnectPeerList(peerList);
       } else {
         // TODO: Don't call initial peerlist if atleast 1room state had happen
-        HMSLogger.d(this.TAG, `PEER_LIST event`, peerList.toString());
+        HMSLogger.d(this.TAG, `PEER_LIST event`, JSON.stringify(peerList, null, 2));
         this.handleInitialPeerList(peerList);
       }
     } else if (method === HMSNotificationMethod.ROOM_STATE) {
