@@ -93,36 +93,32 @@ export const usePreviewJoin = ({
     };
   }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview]);
 
-  const preview = useCallback(() => {
-    (async () => {
-      if (!token) {
-        return;
-      }
-      if (roomState !== HMSRoomState.Disconnected) {
-        return;
-      }
-      if (isConnected) {
-        await actions.leave();
-      }
-      try {
-        await actions.preview(config);
-      } catch (err) {
-        handleError(err as Error, 'preview');
-      }
-    })();
+  const preview = useCallback(async () => {
+    if (!token) {
+      return;
+    }
+    if (roomState !== HMSRoomState.Disconnected) {
+      return;
+    }
+    if (isConnected) {
+      await actions.leave();
+    }
+    try {
+      await actions.preview(config);
+    } catch (err) {
+      handleError(err as Error, 'preview');
+    }
   }, [actions, handleError, token, roomState, config, isConnected]);
 
-  const join = useCallback(() => {
-    (async () => {
-      if (!token) {
-        return;
-      }
-      try {
-        await actions.join(config);
-      } catch (err) {
-        handleError(err as Error, 'join');
-      }
-    })();
+  const join = useCallback(async () => {
+    if (!token) {
+      return;
+    }
+    try {
+      await actions.join(config);
+    } catch (err) {
+      handleError(err as Error, 'join');
+    }
   }, [actions, config, handleError, token]);
 
   return {
