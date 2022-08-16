@@ -157,7 +157,7 @@ const DeviceSelector = ({
             <Dropdown.Content
               align="start"
               sideOffset={8}
-              css={{ w: "100%" }}
+              css={{ w: "100%", maxHeight: "16vh !important" }}
               portalled={false}
             >
               {devices.map(device => {
