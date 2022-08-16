@@ -49,11 +49,7 @@ export const PasswordInput = (
         position: 'relative',
       }}
     >
-      <Input
-        css={{ flexGrow: 1, display: 'block', ...css }}
-        type={showPassword ? 'text' : 'password'}
-        {...props}
-      ></Input>
+      <Input css={{ flexGrow: 1, width: '100%', ...css }} type={showPassword ? 'text' : 'password'} {...props}></Input>
       <Flex css={{ position: 'absolute', top: 0, height: '100%', zIndex: '10', right: '$4', alignItems: 'center' }}>
         {hasPassword ? (
           <Flex css={passwordIconStyle} onClick={() => setShowPassword(!showPassword)}>
