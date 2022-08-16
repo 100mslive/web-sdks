@@ -14,7 +14,7 @@ export const replaceCircularOccurence = () => {
 };
 
 export const stringifyMediaStreamTrack = (track: MediaStreamTrack) => {
-  return JSON.stringify({ id: track.id, kind: track.kind, enabled: track.enabled, label: track.label }, null, 2);
+  return `trackId=${track.id}, kind=${track.kind}, enabled=${track.enabled}`;
 };
 
 export const stringifyTrack = (track: HMSTrack) => {

@@ -89,7 +89,7 @@ export class NotificationManager {
         HMSNotificationMethod.CONNECTION_QUALITY,
       ].includes(method)
     ) {
-      HMSLogger.d(this.TAG, `Received notification - ${method}`, JSON.stringify({ notification }, null, 2));
+      HMSLogger.d(this.TAG, `Received notification - ${method}`, { notification });
     }
     if (method === HMSNotificationMethod.SFU_STATS) {
       if (window.HMS?.ON_SFU_STATS && typeof window.HMS?.ON_SFU_STATS === 'function') {
