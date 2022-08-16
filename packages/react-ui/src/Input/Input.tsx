@@ -55,16 +55,16 @@ export const PasswordInput = (
         type={showPassword ? 'text' : 'password'}
         {...props}
       ></Input>
-      <Flex css={{ position: 'absolute', top: '25%', zIndex: '10', right: '$4' }}>
+      <Flex css={{ position: 'absolute', top: 0, height: '100%', zIndex: '10', right: '$4', alignItems: 'center' }}>
         {hasPassword ? (
-          <Box css={passwordIconStyle} onClick={() => setShowPassword(!showPassword)}>
+          <Flex css={passwordIconStyle} onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}
-          </Box>
+          </Flex>
         ) : null}
         {hasCopy ? (
-          <Box css={copyIconStyle} onClick={onCopy}>
+          <Flex css={copyIconStyle} onClick={onCopy}>
             <CopyIcon></CopyIcon>
-          </Box>
+          </Flex>
         ) : null}
       </Flex>
     </Box>
