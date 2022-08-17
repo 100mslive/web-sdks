@@ -28,12 +28,12 @@ export function getRandomVirtualBackground() {
   let randomIdx = Math.floor(Math.random() * backgroundList.length);
   if (randomIdx === 0) {
     return "blur";
-  } else if (randomIdx <= 3) {
+  } else if (randomIdx <= 7) {
     const img = document.createElement("img");
     img.alt = "VB";
     img.src = backgroundList[randomIdx];
     return img;
-  } else if (randomIdx === 4) {
+  } else if (randomIdx === 8) {
     return backgroundList[randomIdx];
   }
   /*} else {
