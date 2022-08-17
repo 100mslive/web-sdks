@@ -68,6 +68,10 @@ export class SDKToHMS {
       // @ts-ignore
       track.displaySurface = mediaSettings.displaySurface;
     }
+    if(track.type === 'video') {
+      // @ts-ignore
+      track.facingMode = mediaSettings.facingMode;
+    }
     track.height = mediaSettings.height;
     track.width = mediaSettings.width;
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
