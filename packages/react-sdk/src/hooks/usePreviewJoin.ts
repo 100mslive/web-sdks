@@ -49,7 +49,7 @@ export interface usePreviewResult {
   /**
    * call this function to join the room
    */
-  join: () => void;
+  join: () => Promise<void>;
   /**
    * once the user has joined the room, till leave happens this flag will be true. It can be used
    * to decide to show between preview form and conferencing component/video tiles.
@@ -58,7 +58,7 @@ export interface usePreviewResult {
   /**
    * call this function to join the room
    */
-  preview: () => void;
+  preview: () => Promise<void>;
 }
 
 /**
