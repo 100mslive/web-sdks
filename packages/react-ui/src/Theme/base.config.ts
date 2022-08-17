@@ -4,7 +4,7 @@ import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 export const baseConfig = {
   theme: {
     colors: {
-      white: '#ffffff',
+      white: '#FFFFFF',
       black: '#000000',
       transparent: '#00000000',
       orange: '#F69133',
@@ -19,7 +19,7 @@ export const baseConfig = {
       borderAccent: '#2471ED',
       success: '#36B37E',
       error: '#CC525F',
-      errorTint: '#ed4c5ae6',
+      errorTint: '#ED4C5AE6',
       warning: '#FFAB00',
       brandLight: '#74AAFF',
       brandDefault: '#2F80FF',
@@ -31,15 +31,15 @@ export const baseConfig = {
       secondaryGray: '#242A33',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
-      textHighEmp: '#f5f9fff2',
-      textMedEmp: '#e0ecffcc',
-      textDisabled: '#c3d0e580',
+      textHighEmp: '#F5F9FFF2',
+      textMedEmp: '#E0ECFFCC',
+      textDisabled: '#C3D0E580',
 
       // text variants when bg is accent (blue)
       // same for both themes
-      textAccentHigh: '#fffffffa',
-      textAccentMedium: '#ffffffb8',
-      textAccentDisabled: '#ffffff7a',
+      textAccentHigh: '#FFFFFFFA',
+      textAccentMedium: '#FFFFFFB8',
+      textAccentDisabled: '#FFFFFF7A',
 
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
@@ -64,8 +64,8 @@ export const baseConfig = {
       errorDisabled: '#621D24',
     },
     shadows: {
-      sm: '0 0 4px 0 #0000004d',
-      md: '0 0 8px 0 #0000004d',
+      sm: '0 0 4px 0 #0000004D',
+      md: '0 0 8px 0 #0000004D',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
