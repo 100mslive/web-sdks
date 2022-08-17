@@ -4,10 +4,10 @@ export function getRandomVirtualBackground() {
     "https://www.100ms.live/images/vb-1.jpeg",
     "https://www.100ms.live/images/vb-2.jpg",
     "https://www.100ms.live/images/vb-3.png",
-    "https://www.100ms.live/images/vb-4.png",
-    "https://www.100ms.live/images/vb-5.png",
-    "https://www.100ms.live/images/vb-6.png",
-    "https://www.100ms.live/images/vb-7.png",
+    "https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms1.png",
+    "https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms2.png",
+    "https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms3.png",
+    "https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms4.png",
   ];
 
   if (process.env["REACT_APP_VIDEO_VB"]) {
