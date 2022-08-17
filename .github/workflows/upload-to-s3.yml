@@ -57,6 +57,11 @@ jobs:
         if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ github.token }}
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -125,3 +130,23 @@ jobs:
         run: |
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+
+      - name: Notify slack success
+        if: github.event.inputs.env == 'prod' && success()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Success
+          color: good
+
+      - name: Notify slack fail
+        if: github.event.inputs.env == 'prod' && failure()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Failed
+          color: danger
