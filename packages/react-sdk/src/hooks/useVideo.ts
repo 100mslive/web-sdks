@@ -14,6 +14,10 @@ export interface useVideoInput {
    * when attach is false, even if tile is inView or enabled, it won't be rendered
    */
   attach?: boolean;
+  /**
+   * Number between 0 and 1 indication when the element is considered inView
+   */
+  threshold?: number;
 }
 
 export interface useVideoOutput {
@@ -25,12 +29,12 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectTrackByID(trackId));
 
-  const { ref: inViewRef, inView } = useInView({ threshold: 0.5 });
+  const { ref: inViewRef, inView } = useInView({ threshold });
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
