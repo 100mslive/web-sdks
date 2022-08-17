@@ -76,8 +76,8 @@ describe('add/remove track api', () => {
       });
   });
 
-  it('should add/remove a track to aux track on addTrack for localPeer', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
+  it('should add/remove a track to aux track on addTrack for localPeer', async () => {
+    await actions.join({ userName: 'test', authToken: token, initEndpoint });
 
     cy.get('@onTrackUpdate')
       .should('be.calledTwice')
