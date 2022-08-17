@@ -100,9 +100,9 @@ describe('add/remove track api', () => {
       });
   });
 
-  it('should add/remove aux track for remotePeer on add/removeTrack', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-    actions1.join({ userName: 'test1', authToken: token, initEndpoint });
+  it('should add/remove aux track for remotePeer on add/removeTrack', async () => {
+    await actions.join({ userName: 'test', authToken: token, initEndpoint });
+    await actions1.join({ userName: 'test1', authToken: token, initEndpoint });
     cy.get('@onTrackUpdate')
       .should('have.callCount', 4)
       .then(() => {
