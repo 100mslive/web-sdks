@@ -58,7 +58,7 @@ export class CypressPeer {
   }
 
   join = async () => {
-    this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
+    await this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
     await this.waitTillConnected();
     await this.waitForTracks(this.id);
     return `peer ${this.name} joined`;

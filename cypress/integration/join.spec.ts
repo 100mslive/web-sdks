@@ -27,11 +27,9 @@ describe('join api', () => {
   });
 
   it('should throw error if no token', () => {
-    try {
-      actions.join({ userName: 'test', authToken: '', initEndpoint });
-    } catch (error) {
+    actions.join({ userName: 'test', authToken: '', initEndpoint }).catch(error => {
       expect(error.message).to.include('Token is not in proper JWT format');
-    }
+    });
   });
 
   describe('join with token', () => {
