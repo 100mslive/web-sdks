@@ -54,7 +54,7 @@ const PasswordIcons = styled('div', {
   position: 'absolute',
   top: 0,
   height: '100%',
-  zIndex: '10',
+  zIndex: 10,
   right: '$4',
   alignItems: 'center',
 });
