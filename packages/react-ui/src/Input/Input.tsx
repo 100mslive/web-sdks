@@ -38,7 +38,7 @@ const PasswordRoot = styled('div', {
   display: 'flex',
 });
 
-const PasswordShowIcon = (showPassword: boolean, { ...props }) => {
+const PasswordShowIcon = ({ showPassword, ...props }) => {
   return <Flex {...props}>{showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}</Flex>;
 };
 
@@ -59,11 +59,11 @@ const PasswordIcons = styled('div', {
   alignItems: 'center',
 });
 
-const ReactPasswordInput: React.FC<PropsWithoutRef<typeof Input & { showPassword: boolean; css?: CSS }>> = (
-  showPassword: boolean,
-  { ...props },
-  css?: CSS,
-) => {
+const ReactPasswordInput: React.FC<PropsWithoutRef<typeof Input & { showPassword: boolean; css?: CSS }>> = ({
+  showPassword,
+  css,
+  ...props
+}) => {
   return (
     <Input css={{ flexGrow: 1, width: '100%', ...css }} type={showPassword ? 'text' : 'password'} {...props}></Input>
   );
