@@ -1,4 +1,4 @@
-import React, { ComponentProps } from 'react';
+import React, { PropsWithoutRef } from 'react';
 import { styled } from '../Theme';
 import { CSS } from '@stitches/react';
 import { Flex } from '../Layout';
@@ -32,36 +32,47 @@ export const Input = styled('input', {
   },
 });
 
-export const PasswordInput = (
-  props: ComponentProps<typeof Input>,
-  hasPassword = true,
-  hasCopy = true,
-  onCopy?: () => void,
-  passwordIconStyle?: CSS,
-  copyIconStyle?: CSS,
-  css?: CSS,
-) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+const PasswordRoot = styled('div', {
+  w: '100%',
+  position: 'relative',
+  display: 'flex',
+});
+
+const PasswordShowIcon = (showPassword: boolean, { ...props }) => {
+  return <Flex {...props}>{showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}</Flex>;
+};
+
+const PasswordCopyIcon = ({ ...props }) => {
   return (
-    <Flex
-      css={{
-        w: '100%',
-        position: 'relative',
-      }}
-    >
-      <Input css={{ flexGrow: 1, width: '100%', ...css }} type={showPassword ? 'text' : 'password'} {...props}></Input>
-      <Flex css={{ position: 'absolute', top: 0, height: '100%', zIndex: '10', right: '$4', alignItems: 'center' }}>
-        {hasPassword ? (
-          <Flex css={passwordIconStyle} onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}
-          </Flex>
-        ) : null}
-        {hasCopy ? (
-          <Flex css={copyIconStyle} onClick={onCopy}>
-            <CopyIcon></CopyIcon>
-          </Flex>
-        ) : null}
-      </Flex>
+    <Flex {...props}>
+      <CopyIcon></CopyIcon>
     </Flex>
   );
+};
+const PasswordIcons = styled('div', {
+  display: 'flex',
+  position: 'absolute',
+  top: 0,
+  height: '100%',
+  zIndex: '10',
+  right: '$4',
+  alignItems: 'center',
+});
+
+const ReactPasswordInput: React.FC<PropsWithoutRef<typeof Input & { showPassword: boolean; css?: CSS }>> = (
+  showPassword: boolean,
+  { ...props },
+  css?: CSS,
+) => {
+  return (
+    <Input css={{ flexGrow: 1, width: '100%', ...css }} type={showPassword ? 'text' : 'password'} {...props}></Input>
+  );
+};
+
+export const PasswordInput = {
+  Root: PasswordRoot,
+  Icons: PasswordIcons,
+  Input: ReactPasswordInput,
+  ShowIcon: PasswordShowIcon,
+  CopyIcon: PasswordCopyIcon,
 };
