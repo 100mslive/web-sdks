@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import screenfull from "screenfull";
 import { useFullscreen } from "react-use";
 import {
@@ -13,7 +13,6 @@ import TileMenu from "./TileMenu";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { UI_SETTINGS } from "../common/constants";
-import { useVideoZoom } from "./hooks/useVideoZoom";
 
 const labelStyles = {
   position: "unset",
@@ -36,7 +35,7 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
     isLocal: false,
     track,
   });
-  const fullscreenRef = useVideoZoom();
+  const fullscreenRef = useRef(null);
   // fullscreen is for desired state
   const [fullscreen, setFullscreen] = useState(false);
   // isFullscreen is for true state
@@ -54,7 +53,7 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
         <StyledVideoTile.Container
           transparentBg
           ref={fullscreenRef}
-          css={{ flexDirection: "column", zIndex: 9999 }}
+          css={{ flexDirection: "column" }}
           onMouseEnter={() => setIsMouseHovered(true)}
           onMouseLeave={() => {
             setIsMouseHovered(false);
