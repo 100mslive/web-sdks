@@ -74,3 +74,19 @@ export const getRoutePrefix = () => {
 export const isStreamingKit = () => {
   return window.location.pathname.startsWith("/streaming");
 };
+
+export const createSnapshotFromCanvas = inputCanvas => {
+  const link = document.createElement("a");
+  link.download = "snapshot.png";
+  link.href = inputCanvas.toDataURL("image/png");
+  link.click();
+};
+
+export const createSnapshotFromVideo = inputVideo => {
+  const canvas = document.createElement("canvas");
+  canvas.width = inputVideo.videoWidth;
+  canvas.height = inputVideo.videoHeight;
+  const context = canvas.getContext("2d");
+  context.drawImage(inputVideo, 0, 0, canvas.width, canvas.height);
+  createSnapshotFromCanvas(canvas);
+};

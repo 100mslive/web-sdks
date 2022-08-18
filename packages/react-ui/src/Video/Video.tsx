@@ -45,9 +45,27 @@ interface Props {
   attach?: boolean;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
-  const { videoRef } = useVideo({ trackId, attach });
-  return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
-};
+export const Video: React.FC<Props & StyledProps> = React.forwardRef<HTMLVideoElement, Props & StyledProps>(
+  ({ trackId, attach, ...props }, forwardRef) => {
+    const { videoRef } = useVideo({ trackId, attach });
+    return (
+      <StyledVideo
+        {...props}
+        autoPlay
+        muted
+        playsInline
+        controls={false}
+        ref={node => {
+          videoRef(node);
+          if (typeof forwardRef === 'function') {
+            forwardRef(node);
+          } else if (forwardRef) {
+            forwardRef.current = node;
+          }
+        }}
+      />
+    );
+  },
+);
 
 export default Video;

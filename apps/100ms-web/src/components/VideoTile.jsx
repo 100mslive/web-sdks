@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useRef, useState } from "react";
 import {
   Avatar,
   StyledVideoTile,
@@ -50,6 +50,7 @@ const Tile = ({ peerId, trackId, width, height }) => {
     track,
     isLocal,
   });
+  const videoRef = useRef(null);
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === "mouseenter");
   }, []);
@@ -96,6 +97,7 @@ const Tile = ({ peerId, trackId, width, height }) => {
               mirror={peerId === localPeerID && track?.source === "regular"}
               degraded={isVideoDegraded}
               data-testid="participant_video_tile"
+              ref={videoRef}
             />
           ) : null}
           <StyledVideoTile.AvatarContainer>
@@ -121,6 +123,7 @@ const Tile = ({ peerId, trackId, width, height }) => {
               peerID={peerId}
               audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
+              videoRef={videoRef.current}
             />
           ) : null}
           <PeerMetadata peerId={peerId} />

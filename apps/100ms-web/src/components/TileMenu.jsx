@@ -7,6 +7,7 @@ import {
   MicOnIcon,
   SpeakerIcon,
   RemoveUserIcon,
+  CameraFlipIcon,
 } from "@100mslive/react-icons";
 import {
   useHMSStore,
@@ -15,6 +16,7 @@ import {
   useRemoteAVToggle,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
+import { createSnapshotFromVideo } from "../common/utils";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -24,6 +26,7 @@ const TileMenu = ({
   videoTrackID,
   peerID,
   isScreenshare = false,
+  videoRef,
 }) => {
   const actions = useHMSActions();
   let { removeOthers } = useHMSStore(selectPermissions);
@@ -71,6 +74,28 @@ const TileMenu = ({
             <span>{`${isAudioEnabled ? "Mute" : "Request Unmute"}`}</span>
           </StyledMenuTile.ItemButton>
         ) : null}
+        {videoRef ? (
+          <StyledMenuTile.ItemButton
+            onClick={() => {
+              createSnapshotFromVideo(videoRef);
+            }}
+          >
+            <CameraFlipIcon />
+            <span>Take Snapshot</span>
+          </StyledMenuTile.ItemButton>
+        ) : null}
+        <StyledMenuTile.ItemButton
+          onClick={() => {
+            actions.sendDirectMessage(
+              JSON.stringify({ capture: true }),
+              peerID,
+              "CAPTURE_SNAPSHOT"
+            );
+          }}
+        >
+          <CameraFlipIcon />
+          <span>Request Snapshot</span>
+        </StyledMenuTile.ItemButton>
         {audioTrackID ? (
           <StyledMenuTile.VolumeItem data-testid="participant_volume_slider">
             <Flex align="center" gap={1}>
