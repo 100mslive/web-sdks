@@ -3081,6 +3081,11 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
+"@mediapipe/selfie_segmentation@^0.1.1632777926":
+  version "0.1.1632777926"
+  resolved "https://registry.yarnpkg.com/@mediapipe/selfie_segmentation/-/selfie_segmentation-0.1.1632777926.tgz#67d37a53b0de89efc4a0e3b63332a4da3a6ad9c8"
+  integrity sha512-OSGhYaZsdOXKyY0JCueOflq3ICLNMrBekI2V8vShum8wuoH3xjfEM6NnIujwJ5SlTdZEXi7Up2koOILDgQbWyg==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -5036,6 +5041,13 @@
     deepmerge "^4.2.2"
     svgo "^1.2.2"
 
+"@tensorflow-models/body-segmentation@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@tensorflow-models/body-segmentation/-/body-segmentation-1.0.1.tgz#333429a8202252185f0cc6ffba726b82f71943eb"
+  integrity sha512-IPQ+a848KDZ/yzxJwP+GDPGwa6RLJ3+VbFraxlSWxAfygqTKx0EQQWHUawbCKxILtlzcfeinW+Gdcyiq0Onkfw==
+  dependencies:
+    rimraf "^3.0.2"
+
 "@tensorflow/tfjs-backend-cpu@3.14.0":
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-3.14.0.tgz#f4db5cd17609e274709f86a0c34233d35cb886b2"
@@ -5056,18 +5068,24 @@
     "@types/webgl2" "0.0.6"
     seedrandom "2.4.3"
 
-"@tensorflow/tfjs-core@^3.3.0":
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-core/-/tfjs-core-3.14.0.tgz#2d73e76e2ae740c2f91c2cbf15312b9e61ec1c72"
-  integrity sha512-bS/iuI9BpDVZuqEPfLzIFLoHYd+ihNIiux+EXveuFO8phPx7FkgPqakatHYLzrdYlOfAXurIxIlGNAzVKNQOUQ==
+"@tensorflow/tfjs-converter@^3.19.0":
+  version "3.19.0"
+  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-converter/-/tfjs-converter-3.19.0.tgz#701db7255ef45578811a191478db5a09bcca6dda"
+  integrity sha512-B69HQq9/orsM8pGJPjNp1cV+hIcc90mxcRIsQSYGovTUNEcftmz2Sh+mqXDWysKUk0gRfx5CX6eJk6NaE55Xow==
+
+"@tensorflow/tfjs-core@^3.19.0":
+  version "3.19.0"
+  resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-core/-/tfjs-core-3.19.0.tgz#981c50bb38a6441a4375cfc8806784e7490f01bc"
+  integrity sha512-znJ+TOJ3NdNL5yjw8M7dn2jO96sokiH1wfFuD7gglCkbZ4SXlFpFj2xelNdRHHmeYanMhJzqeyOW9whUnNcBqw==
   dependencies:
     "@types/long" "^4.0.1"
     "@types/offscreencanvas" "~2019.3.0"
-    "@types/seedrandom" "2.4.27"
+    "@types/seedrandom" "^2.4.28"
     "@types/webgl-ext" "0.0.30"
+    "@webgpu/types" "0.1.16"
     long "4.0.0"
     node-fetch "~2.6.1"
-    seedrandom "2.4.3"
+    seedrandom "^3.0.5"
 
 "@testing-library/dom@^8.3.0":
   version "8.13.0"
@@ -5572,6 +5590,11 @@
   resolved "https://registry.yarnpkg.com/@types/seedrandom/-/seedrandom-2.4.27.tgz#9db563937dd86915f69092bc43259d2f48578e41"
   integrity sha1-nbVjk33YaRX2kJK8QyWdL0hXjkE=
 
+"@types/seedrandom@^2.4.28":
+  version "2.4.30"
+  resolved "https://registry.yarnpkg.com/@types/seedrandom/-/seedrandom-2.4.30.tgz#d2efe425869b84163c2d56e779dddadb9372cbfa"
+  integrity sha512-AnxLHewubLVzoF/A4qdxBGHCKifw8cY32iro3DQX9TPcetE95zBeVt3jnsvtvAUf1vwzMfwzp4t/L2yqPlnjkQ==
+
 "@types/serve-index@^1.9.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@types/serve-index/-/serve-index-1.9.1.tgz#1b5e85370a192c01ec6cec4735cf2917337a6278"
@@ -6074,6 +6097,11 @@
     "@webassemblyjs/ast" "1.9.0"
     "@webassemblyjs/wast-parser" "1.9.0"
     "@xtuc/long" "4.2.2"
+
+"@webgpu/types@0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.16.tgz#1f05497b95b7c013facf7035c8e21784645f5cc4"
+  integrity sha512-9E61voMP4+Rze02jlTXud++Htpjyyk8vw5Hyw9FGRrmhHQg2GqbuOfwf5Klrb8vTxc2XWI3EfO7RUHMpxTj26A==
 
 "@webpack-cli/configtest@^1.1.1":
   version "1.1.1"
@@ -16962,6 +16990,11 @@ seedrandom@2.4.3:
   resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-2.4.3.tgz#2438504dad33917314bff18ac4d794f16d6aaecc"
   integrity sha1-JDhQTa0zkXMUv/GKxNeU8W1qrsw=
 
+seedrandom@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-3.0.5.tgz#54edc85c95222525b0c7a6f6b3543d8e0b3aa0a7"
+  integrity sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
@@ -19011,9 +19044,9 @@ walker@^1.0.7, walker@~1.0.5:
     makeerror "1.0.12"
 
 wasm-check@^2.0.2:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/wasm-check/-/wasm-check-2.0.3.tgz#3fcc90353a0512edc9539970f0762089d5757cf0"
-  integrity sha512-UbZqpDMO4TZskoVKDH3B9NqY+yJllDJX8I9lUU4nuQjBGeU57jCjjgCslP3r8xiE+yf5GTIfeGvznvubgCdbhw==
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/wasm-check/-/wasm-check-2.1.2.tgz#15bf01d906e7451d70245bb286f58bdb29db617d"
+  integrity sha512-Eu162RfercUY9BZ4QN4PbOkuKkXwyuD+V5+iZ+VJ85W6ubDqZcNQMBAbBcqyrHs0Qb0D0IWVhPlfYFVhMoKhYw==
 
 watchpack-chokidar2@^2.0.1:
   version "2.0.1"

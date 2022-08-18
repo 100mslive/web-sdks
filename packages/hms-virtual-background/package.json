@@ -33,19 +33,14 @@
     "@100mslive/hms-video": "0.4.1-alpha.0"
   },
   "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1632777926",
+    "@tensorflow-models/body-segmentation": "^1.0.1",
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
-    "@tensorflow/tfjs-core": "^3.3.0",
+    "@tensorflow/tfjs-converter": "^3.19.0",
+    "@tensorflow/tfjs-core": "^3.19.0",
     "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
     "@webassemblyjs/wasm-gen": "1.11.1",
     "gifuct-js": "^2.1.2",
     "wasm-check": "^2.0.2"
-  },
-  "eslintIgnore": [
-    "tflite.js",
-    "tflite-simd.js",
-    "tflite.wasm",
-    "tflite-simd.wasm",
-    "defineTFLite.ts",
-    "importing.test.ts"
-  ]
+  }
 }
