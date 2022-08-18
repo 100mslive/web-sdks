@@ -87,7 +87,7 @@ const TileMenu = ({
         <StyledMenuTile.ItemButton
           onClick={() => {
             actions.sendDirectMessage(
-              JSON.stringify({ capture: true }),
+              JSON.stringify({ capture: Date.now() }),
               peerID,
               "CAPTURE_SNAPSHOT"
             );

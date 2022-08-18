@@ -58,13 +58,14 @@ const Tile = ({ peerId, trackId, width, height }) => {
   }, []);
   const headlessConfig = useAppConfig("headlessConfig");
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
+  const onEvent = useCallback(() => {
+    if (videoRef.current && isLocal) {
+      createSnapshotFromVideo(videoRef.current);
+    }
+  }, [isLocal]);
   useCustomEvent({
     type: "CAPTURE_SNAPSHOT",
-    onEvent: () => {
-      if (videoRef.current) {
-        createSnapshotFromVideo(videoRef.current);
-      }
-    },
+    onEvent,
   });
   return (
     <StyledVideoTile.Root
