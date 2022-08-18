@@ -21,6 +21,7 @@ const Chevron = styled('button', {
     color: '$grayDefault',
     cursor: 'not-allowed',
   },
+  display: 'flex',
 });
 
 const Dots = styled('div', {
@@ -47,6 +48,9 @@ const Dot = styled('button', {
       },
     },
   },
+  boxSizing: 'content-box',
+  padding: '0px',
+  cursor: 'pointer',
 });
 
 interface PaginationType {
