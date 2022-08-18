@@ -62,7 +62,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               }}
             >
               <Text variant="h5">Settings </Text>
-              <Flex direction="column" css={{ mx: isMobile ? "-$8" : 0 }}>
+              <Flex direction="column" css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto" }}>
                 <Tabs.Trigger
                   value="devices"
                   css={{ gap: "$8", mt: "$10", mb: "$4" }}
