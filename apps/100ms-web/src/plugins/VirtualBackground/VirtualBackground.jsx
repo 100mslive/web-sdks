@@ -17,16 +17,12 @@ export const VirtualBackground = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-  const isVBPresent = useHMSStore(
-    selectIsLocalVideoPluginPresent("@100mslive/hms-virtual-background")
-  );
+  const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent("HMSVB"));
 
   async function createPlugin() {
     if (!pluginRef.current) {
-      const { HMSVirtualBackgroundPlugin } = await import(
-        "@100mslive/hms-virtual-background"
-      );
-      pluginRef.current = new HMSVirtualBackgroundPlugin("none", true);
+      const { HMSVBPlugin } = await import("@100mslive/hms-virtual-background");
+      pluginRef.current = new HMSVBPlugin("none", true);
     }
   }
   useEffect(() => {
