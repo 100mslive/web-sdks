@@ -15,6 +15,7 @@ import {
   selectAudioTrackByPeerID,
   selectTrackByID,
   selectVideoTrackByPeerID,
+  useCustomEvent,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,
@@ -27,6 +28,7 @@ import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { useAppConfig } from "./AppData/useAppConfig";
 import { getVideoTileLabel } from "./peerTileUtils";
 import { UI_SETTINGS } from "../common/constants";
+import { createSnapshotFromVideo } from "../common/utils";
 
 const Tile = ({ peerId, trackId, width, height }) => {
   const trackSelector = trackId
@@ -56,6 +58,14 @@ const Tile = ({ peerId, trackId, width, height }) => {
   }, []);
   const headlessConfig = useAppConfig("headlessConfig");
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
+  useCustomEvent({
+    type: "CAPTURE_SNAPSHOT",
+    onEvent: () => {
+      if (videoRef.current) {
+        createSnapshotFromVideo(videoRef.current);
+      }
+    },
+  });
   return (
     <StyledVideoTile.Root
       css={{
