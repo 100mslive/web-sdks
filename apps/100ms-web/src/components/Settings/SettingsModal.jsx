@@ -100,7 +100,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 }}
               >
                 <Tabs.Content value="devices" css={{
-                  overflowX: "auto"
+                  overflowY: "auto"
                 }}>
                   <SettingsContentHeader
                     onBack={resetSelection}
@@ -111,7 +111,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   <DeviceSettings />
                 </Tabs.Content>
                 <Tabs.Content value="notifications" css={{
-                  overflowX: "auto"
+                  overflowY: "auto"
                 }}>
                   <SettingsContentHeader
                     onBack={resetSelection}
@@ -122,7 +122,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   <NotificationSettings />
                 </Tabs.Content>
                 <Tabs.Content value="layout" css={{
-                  overflowX: "auto"
+                  overflowY: "auto"
                 }}>
                   <SettingsContentHeader
                     onBack={resetSelection}
