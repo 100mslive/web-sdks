@@ -409,8 +409,9 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
-        this.publish(config.settings || defaultSettings).catch(err => {
-          throw err;
+        this.publish(config.settings || defaultSettings).catch(error => {
+          HMSLogger.e(this.TAG, 'Error in publish', error);
+          this.listener?.onError(error);
         });
       }
     } catch (error) {
