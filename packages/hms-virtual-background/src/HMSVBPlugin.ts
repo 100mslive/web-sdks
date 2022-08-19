@@ -43,20 +43,21 @@ export class HMSVBPlugin implements HMSVideoPlugin {
 
     this.log(TAG, 'Virtual Background plugin created');
     this.setBackground(this.background);
-    const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-    const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationTfjsModelConfig = {
-      runtime: 'tfjs',
-    };
-    bodySegmentation.createSegmenter(model, segmenterConfig).then(segmenter => {
-      this.segmenter = segmenter;
-    });
   }
 
   isSupported(): boolean {
     return this.checkSupport().isSupported;
   }
 
-  async init(): Promise<void> {}
+  async init(): Promise<void> {
+    if (!this.segmenter) {
+      const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
+      const segmenterConfig: bodySegmentation.MediaPipeSelfieSegmentationTfjsModelConfig = {
+        runtime: 'tfjs',
+      };
+      this.segmenter = await bodySegmentation.createSegmenter(model, segmenterConfig);
+    }
+  }
 
   checkSupport(): HMSPluginSupportResult {
     const browserResult = {} as HMSPluginSupportResult;
@@ -152,10 +153,20 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     const ctx = output.getContext('2d');
     this.outputCtx = ctx;
     if (typeof this.background !== 'string') {
+      ctx!.filter = 'none';
       ctx!.imageSmoothingEnabled = true;
       ctx!.imageSmoothingQuality = 'high';
-      ctx!.drawImage(this.background, 0, 0, input.width, input.height);
-      ctx!.filter = 'none';
+      ctx!.drawImage(
+        this.background,
+        0,
+        0,
+        this.background.width,
+        this.background.height,
+        0,
+        0,
+        input.width,
+        input.height,
+      );
       this.personMaskCanvas.width = mask.width;
       this.personMaskCanvas.height = mask.height;
       this.personMaskCtx!.putImageData(mask, 0, 0);
