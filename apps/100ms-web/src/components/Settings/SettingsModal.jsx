@@ -87,6 +87,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   flex: "1 1 0",
                   minWidth: 0,
                   mr: "$4",
+                  overflowY: "auto",
                   ...(isMobile
                     ? {
                         position: "absolute",
@@ -99,9 +100,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                <Tabs.Content value="devices" css={{
-                  overflowY: "auto"
-                }}>
+                <Tabs.Content value="devices">
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}
@@ -110,9 +109,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <DeviceSettings />
                 </Tabs.Content>
-                <Tabs.Content value="notifications" css={{
-                  overflowY: "auto"
-                }}>
+                <Tabs.Content value="notifications">
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}
@@ -121,9 +118,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <NotificationSettings />
                 </Tabs.Content>
-                <Tabs.Content value="layout" css={{
-                  overflowY: "auto"
-                }}>
+                <Tabs.Content value="layout">
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}
