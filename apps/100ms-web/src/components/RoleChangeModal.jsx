@@ -39,12 +39,29 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
         <Dialog.Overlay />
         <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
           <Dialog.Title css={{ p: 0 }}>
-            <Text variant="h6">Change Role</Text>
-            <Text
-              variant="body2"
-              css={{ fontWeight: 400, mt: "$4", mb: "$8", c: "$textMedEmp" }}
-            >{`Change the role of "${peer.name}" to`}</Text>
+            <Text as="span" variant="h6">
+              Change Role
+            </Text>
           </Dialog.Title>
+          <Dialog.Description
+            variant="body2"
+            css={{
+              mt: "$4",
+              mb: "$8",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Text
+              as="span"
+              variant="body2"
+              css={{
+                fontWeight: 400,
+                c: "$textMedEmp",
+              }}
+            >
+              {`Change the role of "${peer.name}" to`}
+            </Text>
+          </Dialog.Description>
           <Flex
             align="center"
             css={{
