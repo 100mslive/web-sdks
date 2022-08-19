@@ -161,11 +161,21 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
       key={message.time}
       data-testid="chat_msg"
     >
-      <Text css={{ color: "$textHighEmp", fontWeight: "$semiBold" }}>
+      <Text
+        css={{
+          color: "$textHighEmp",
+          fontWeight: "$semiBold",
+          overflowWrap: "anywhere",
+        }}
+      >
         {message.senderName || "Anonymous"}
-      </Text>
-      <Text variant="sm" css={{ ml: "$4", color: "$textSecondary" }}>
-        {formatTime(message.time)}
+        <Text
+          as="span"
+          variant="sm"
+          css={{ ml: "$4", color: "$textSecondary" }}
+        >
+          {formatTime(message.time)}
+        </Text>
       </Text>
       <MessageType
         hasCurrentUserSent={message.sender === localPeerId}
