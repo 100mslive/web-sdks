@@ -165,14 +165,14 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
         css={{
           color: "$textHighEmp",
           fontWeight: "$semiBold",
-          overflowWrap: "anywhere",
+          wordBreak: "break-all",
         }}
       >
         {message.senderName || "Anonymous"}
         <Text
           as="span"
           variant="sm"
-          css={{ ml: "$4", color: "$textSecondary" }}
+          css={{ ml: "$4", color: "$textSecondary", display: "inline-block" }}
         >
           {formatTime(message.time)}
         </Text>
