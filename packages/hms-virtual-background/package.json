@@ -42,5 +42,13 @@
     "@webassemblyjs/wasm-gen": "1.11.1",
     "gifuct-js": "^2.1.2",
     "wasm-check": "^2.0.2"
-  }
+  },
+  "eslintIgnore": [
+    "tflite.js",
+    "tflite-simd.js",
+    "tflite.wasm",
+    "tflite-simd.wasm",
+    "defineTFLite.ts",
+    "importing.test.ts"
+  ]
 }
