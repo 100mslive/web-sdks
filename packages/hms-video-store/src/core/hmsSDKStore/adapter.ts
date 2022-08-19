@@ -68,7 +68,7 @@ export class SDKToHMS {
       // @ts-ignore
       track.displaySurface = mediaSettings.displaySurface;
     }
-    if(track.type === 'video') {
+    if (track.type === 'video') {
       // @ts-ignore
       track.facingMode = mediaSettings.facingMode;
     }
