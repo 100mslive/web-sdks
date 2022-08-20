@@ -19,6 +19,7 @@ import {
   HMSRoleName,
   HMSRoom,
   HMSTrack,
+  HMSTrackFacingMode,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -68,9 +69,8 @@ export class SDKToHMS {
       // @ts-ignore
       track.displaySurface = mediaSettings.displaySurface;
     }
-    if (track.type === 'video') {
-      // @ts-ignore
-      track.facingMode = mediaSettings.facingMode;
+    if (track.type === 'video' && mediaSettings.facingMode) {
+      track.facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
     }
     track.height = mediaSettings.height;
     track.width = mediaSettings.width;
