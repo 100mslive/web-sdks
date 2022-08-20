@@ -7,7 +7,7 @@ export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
 export type HMSTrackDisplaySurface = 'application' | 'browser' | 'monitor' | 'window';
-export type HMSTrackFacingMode = 'user' | 'environement' | 'left' | 'right';
+export type HMSTrackFacingMode = 'user' | 'environment' | 'left' | 'right';
 
 /**
  * HMSPeer stores the details of individual participants in the room
