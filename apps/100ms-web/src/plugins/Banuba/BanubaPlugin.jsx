@@ -44,13 +44,9 @@ class BanubaPlugin {
     output.width = input.width;
     output.height = input.height;
     const ctx = output.getContext("2d");
-    ctx.drawImage(
-      await createImageBitmap(photo),
-      0,
-      0,
-      output.width,
-      output.height
-    );
+    const bm = await createImageBitmap(photo, 0, 0, input.width, input.height);
+    ctx.drawImage(bm, 0, 0, output.width, output.height);
+    bm.close();
   }
 
   stop() {
@@ -67,7 +63,7 @@ export const BanubaPluginIcon = () => {
       active={!isVBPresent}
       onClick={() => {
         !isVBPresent
-          ? actions.addPluginToVideoTrack(plugin, 15)
+          ? actions.addPluginToVideoTrack(plugin)
           : actions.removePluginFromVideoTrack(plugin);
       }}
     >
