@@ -58,10 +58,15 @@ module.exports = {
             loader: "esbuild-loader",
             options: {
               loader: "jsx",
-              target: "es6",
+              target: "esnext",
             },
           },
         ],
+      },
+      {
+        test: /\.wasm$/,
+        type: "javascript/auto",
+        loader: "file-loader",
       },
       {
         test: /\.css$/i,

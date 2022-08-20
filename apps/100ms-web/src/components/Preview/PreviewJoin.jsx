@@ -31,6 +31,7 @@ import {
   UserPreferencesKeys,
   defaultPreviewPreference,
 } from "../hooks/useUserPreferences";
+import { BanubaPluginIcon } from "../../plugins/Banuba/BanubaPlugin";
 
 const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
@@ -182,6 +183,7 @@ const PreviewControls = () => {
       <Flex css={{ gap: "$4" }}>
         <AudioVideoToggle compact />
         <VirtualBackground />
+        <BanubaPluginIcon />
       </Flex>
       <PreviewSettings />
     </Flex>
