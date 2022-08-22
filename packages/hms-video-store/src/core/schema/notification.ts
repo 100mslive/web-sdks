@@ -1,6 +1,6 @@
-import { HMSPeer, HMSTrack } from "./peer";
-import { HMSMessage } from "./message";
-import { HMSException } from "./error";
+import { HMSPeer, HMSTrack } from './peer';
+import { HMSMessage } from './message';
+import { HMSException } from './error';
 
 export interface HMSNotification {
   id: number;
