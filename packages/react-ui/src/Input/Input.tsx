@@ -1,4 +1,4 @@
-import React, { PropsWithoutRef } from 'react';
+import React, { ComponentProps, PropsWithChildren, PropsWithRef } from 'react';
 import { styled } from '../Theme';
 import { CSS } from '@stitches/react';
 import { Flex } from '../Layout';
@@ -38,42 +38,60 @@ const PasswordRoot = styled('div', {
   display: 'flex',
 });
 
-const PasswordShowIcon = ({ showPassword, ...props }) => {
+const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: boolean }> = ({
+  showPassword,
+  ...props
+}) => {
   return <Flex {...props}>{showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}</Flex>;
 };
 
-const PasswordCopyIcon = ({ ...props }) => {
+const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex>> = ({ ...props }) => {
   return (
     <Flex {...props}>
       <CopyIcon></CopyIcon>
     </Flex>
   );
 };
-const PasswordIcons = styled('div', {
-  display: 'flex',
-  position: 'absolute',
-  top: 0,
-  height: '100%',
-  zIndex: 10,
-  right: '$4',
-  bg: '$surfaceLight',
-  alignItems: 'center',
+
+const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<ComponentProps<typeof Flex>>>((props, ref) => {
+  return (
+    <Flex
+      css={{
+        position: 'absolute',
+        top: 0,
+        height: '100%',
+        zIndex: 10,
+        right: '$4',
+        bg: '$surfaceLight',
+        alignItems: 'center',
+      }}
+      ref={ref}
+      {...props}
+    >
+      {props.children}
+    </Flex>
+  );
 });
 
-const ReactPasswordInput: React.FC<PropsWithoutRef<typeof Input & { showPassword: boolean; css?: CSS }>> = ({
-  showPassword,
-  css,
-  ...props
-}) => {
-  return (
-    <Input css={{ flexGrow: 1, width: '100%', ...css }} type={showPassword ? 'text' : 'password'} {...props}></Input>
-  );
-};
+const ReactInput: React.FC<PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>> =
+  React.forwardRef<
+    HTMLInputElement,
+    PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>
+  >(({ showPassword = false, css, ...props }, ref) => {
+    return (
+      <Input
+        css={{ flexGrow: 1, width: '100%', ...css }}
+        type={showPassword ? 'text' : 'password'}
+        {...props}
+        ref={ref}
+      ></Input>
+    );
+  });
 
 export const PasswordInput = {
   Root: PasswordRoot,
   Icons: PasswordIcons,
-  Input: ReactPasswordInput,
+  Input: ReactInput,
   ShowIcon: PasswordShowIcon,
   CopyIcon: PasswordCopyIcon,
 };

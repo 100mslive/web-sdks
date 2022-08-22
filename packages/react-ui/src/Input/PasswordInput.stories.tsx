@@ -2,6 +2,7 @@ import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { PasswordInput } from './Input';
 import { Box } from '../Layout';
+import { useMeasure } from 'react-use';
 
 export default {
   title: 'UI Components/PasswordInput',
@@ -15,11 +16,16 @@ export default {
 const Template: ComponentStory<typeof PasswordInput.Root> = args => {
   const [text, setText] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
+  const [ref, { width }] = useMeasure<HTMLDivElement>();
   return (
     <Box css={{ w: '240px' }}>
       <PasswordInput.Root {...args}>
-        <PasswordInput.Input showPassword={showPassword} onChange={e => setText(e.target.value)} />
-        <PasswordInput.Icons>
+        <PasswordInput.Input
+          css={{ pr: width + 8 }}
+          showPassword={showPassword}
+          onChange={e => setText(e.target.value)}
+        />
+        <PasswordInput.Icons ref={ref}>
           <PasswordInput.ShowIcon
             showPassword={showPassword}
             onClick={() => {
