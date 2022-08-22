@@ -10,7 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex, styled, Text } from "@100mslive/react-ui";
+import { Box, Flex, styled, Text, Tooltip } from "@100mslive/react-ui";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -130,6 +130,12 @@ const getMessageType = ({ roles, receiver }) => {
   return receiver ? "private" : "";
 };
 
+const SenderName = styled("span", {
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+});
+
 const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const hmsActions = useHMSActions();
@@ -165,14 +171,26 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
         css={{
           color: "$textHighEmp",
           fontWeight: "$semiBold",
-          wordBreak: "break-all",
+          display: "inline-flex",
+          alignItems: "baseline",
+          width: "100%",
         }}
       >
-        {message.senderName || "Anonymous"}
+        {message.senderName === "You" ? (
+          <SenderName>{message.senderName || "Anonymous"}</SenderName>
+        ) : (
+          <Tooltip title={message.senderName} side="top" align="start">
+            <SenderName>{message.senderName || "Anonymous"}</SenderName>
+          </Tooltip>
+        )}
         <Text
           as="span"
           variant="sm"
-          css={{ ml: "$4", color: "$textSecondary", display: "inline-block" }}
+          css={{
+            ml: "$4",
+            color: "$textSecondary",
+            flexShrink: 0,
+          }}
         >
           {formatTime(message.time)}
         </Text>
