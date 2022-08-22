@@ -1,11 +1,12 @@
+import { HMSPeer, HMSTrack } from "./peer";
+import { HMSMessage } from "./message";
+import { HMSException } from "./error";
+
 export interface HMSNotification {
   id: number;
   type: string;
   message: string;
-  /**
-   * HMSPeer | HMSTrack | HMSMessage | HMSException
-   */
-  data?: any;
+  data?: HMSPeer | HMSTrack | HMSMessage | HMSException;
   severity?: HMSNotificationSeverity;
 }
 export enum HMSNotificationSeverity {
