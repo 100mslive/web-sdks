@@ -54,7 +54,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
         }
       }
     })();
-  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
+  }, [actions, inView, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
 
   // detach on unmount
   useEffect(() => {

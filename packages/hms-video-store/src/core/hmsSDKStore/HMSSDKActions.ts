@@ -149,6 +149,16 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async setProcessedVideoTrack(cb: (track: MediaStreamTrack) => Promise<MediaStreamTrack>) {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const track = this.hmsSDKTracks[trackID];
+      const processedTrack = await cb(track.nativeTrack);
+      await (track as SDKHMSLocalVideoTrack).setProcessedTrack(processedTrack);
+      this.syncRoomState('setProcessedTrack');
+    }
+  }
+
   async preview(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
