@@ -218,6 +218,9 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private async setGiF(url: string): Promise<void> {
+    if (typeof url !== 'string') {
+      return;
+    }
     this.log('setting gif to background', url);
     const resp = await fetch(url);
     const buff = await resp.arrayBuffer();
