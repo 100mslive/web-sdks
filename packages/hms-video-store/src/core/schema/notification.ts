@@ -1,12 +1,26 @@
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSMessage } from './message';
 import { HMSException } from './error';
+import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
+import { HMSDeviceChangeEvent } from './device-change';
+import { HMSPlaylistItem } from './playlist';
 
-export interface HMSNotification {
+export interface HMSNotification<T = any> {
   id: number;
   type: string;
   message: string;
-  data?: HMSPeer | HMSTrack | HMSMessage | HMSException;
+  data?:
+    | HMSPeer
+    | HMSPeer[]
+    | HMSTrack
+    | HMSMessage
+    | HMSException
+    | HMSChangeTrackStateRequest
+    | HMSChangeMultiTrackStateRequest
+    | HMSLeaveRoomRequest
+    | HMSDeviceChangeEvent
+    | HMSPlaylistItem<T>
+    | null;
   severity?: HMSNotificationSeverity;
 }
 export enum HMSNotificationSeverity {
