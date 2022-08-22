@@ -53,12 +53,13 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
+        exclude: path.resolve(__dirname, "src/plugins/Banuba/BanubaSDK.js"),
         use: [
           {
             loader: "esbuild-loader",
             options: {
               loader: "jsx",
-              target: "esnext",
+              target: "es6",
             },
           },
         ],
