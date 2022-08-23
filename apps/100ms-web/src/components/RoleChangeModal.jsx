@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   useHMSStore,
   selectPeerByID,
@@ -19,8 +19,28 @@ import {
   Box,
   Flex,
   Dropdown,
+  textEllipsis,
+  Tooltip,
 } from "@100mslive/react-ui";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
+
+const PeerName = forwardRef(({ children, ...rest }, ref) => (
+  <Text
+    {...rest}
+    ref={ref}
+    as="strong"
+    variant="body2"
+    css={{
+      ...textEllipsis(226),
+      display: "inline-block",
+      wordBreak: "break-all",
+      fontWeight: "$semiBold",
+      c: "inherit",
+    }}
+  >
+    {children}
+  </Text>
+));
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -30,6 +50,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
+  const [peerNameRef, setPeerNameRef] = useState();
   if (!peer) {
     return null;
   }
@@ -50,20 +71,20 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                 mt: "$4",
                 mb: "$8",
                 c: "$textMedEmp",
+                display: "flex",
+                flexWrap: "wrap",
+                columnGap: "4px",
               }}
             >
-              Change the role of{" "}
-              <Text
-                as="strong"
-                variant="body2"
-                css={{
-                  fontWeight: "$semiBold",
-                  wordBreak: "break-all",
-                  c: "inherit",
-                }}
-              >
-                {peer.name}
-              </Text>{" "}
+              Change the role of
+              {peerNameRef &&
+              peerNameRef.clientWidth === 226 ? (
+                <Tooltip title={peer.name} side="top">
+                  <PeerName ref={setPeerNameRef}>{peer.name}</PeerName>
+                </Tooltip>
+              ) : (
+                <PeerName ref={setPeerNameRef}>{peer.name}</PeerName>
+              )}
               to
             </Text>
           </Dialog.Description>
