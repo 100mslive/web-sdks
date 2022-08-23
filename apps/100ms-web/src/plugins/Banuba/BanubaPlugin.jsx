@@ -1,28 +1,19 @@
 import React from "react";
+import { HMSVideoPluginType, useHMSActions } from "@100mslive/react-sdk";
+import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import {
   Player,
-  // Image,
   Effect,
   ImageCapture,
   MediaStream as BanubaStream,
   MediaStreamCapture,
 } from "./BanubaSDK.js";
-import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import IconButton from "../../IconButton.jsx";
-import {
-  HMSVideoPluginType,
-  // useHMSStore,
-  useHMSActions,
-  // selectIsLocalVideoPluginPresent,
-} from "@100mslive/react-sdk";
 
 class BanubaPlugin {
   player;
   effect;
-  imageCapture;
-  getName() {
-    return "banuba";
-  }
+  name = "banuba";
 
   checkSupport() {
     return { isSupported: true };
@@ -44,21 +35,6 @@ class BanubaPlugin {
 
   getPluginType() {
     return HMSVideoPluginType.TRANSFORM;
-  }
-  async processVideoFrame(input, output) {
-    /* this.player.use(new Image(input.toDataURL()));
-    await this.player.play();
-    this.input = input;
-    const photo = await this.imageCapture.takePhoto({
-      width: input.width,
-      height: input.height,
-    }); */
-    output.width = input.width;
-    output.height = input.height;
-    const ctx = output.getContext("2d");
-    // const bm = await createImageBitmap(photo, 0, 0, input.width, input.height);
-    ctx.drawImage(input, 0, 0, output.width, output.height);
-    // bm.close();
   }
 
   stop() {
