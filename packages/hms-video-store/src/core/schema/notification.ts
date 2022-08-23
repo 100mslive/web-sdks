@@ -5,24 +5,58 @@ import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRo
 import { HMSDeviceChangeEvent } from './device-change';
 import { HMSPlaylistItem } from './playlist';
 
-export interface HMSNotification<T = any> {
+interface BaseNotification {
   id: number;
   type: string;
   message: string;
-  data?:
-    | HMSPeer
-    | HMSPeer[]
-    | HMSTrack
-    | HMSMessage
-    | HMSException
-    | HMSChangeTrackStateRequest
-    | HMSChangeMultiTrackStateRequest
-    | HMSLeaveRoomRequest
-    | HMSDeviceChangeEvent
-    | HMSPlaylistItem<T>
-    | null;
   severity?: HMSNotificationSeverity;
 }
+interface PeerNotification extends BaseNotification {
+  data?: HMSPeer;
+}
+
+interface PeerArrayNotification extends BaseNotification {
+  data?: HMSPeer[];
+}
+interface TrackNotification extends BaseNotification {
+  data?: HMSTrack;
+}
+interface MessageNotification extends BaseNotification {
+  data?: HMSMessage;
+}
+interface ExceptionNotification extends BaseNotification {
+  data?: HMSException;
+}
+interface ChangeTrackStateRequestNotification extends BaseNotification {
+  data?: HMSChangeTrackStateRequest;
+}
+interface ChangeMultiTrackStateRequestNotification extends BaseNotification {
+  data?: HMSChangeMultiTrackStateRequest;
+}
+
+interface LeaveRoomRequestNotification extends BaseNotification {
+  data?: HMSLeaveRoomRequest;
+}
+interface DeviceChangeEventNotification extends BaseNotification {
+  data?: HMSDeviceChangeEvent;
+}
+interface PlaylistItemNotification<T> extends BaseNotification {
+  data?: HMSPlaylistItem<T>;
+}
+
+export type HMSNotification<T> =
+  | PeerNotification
+  | PeerArrayNotification[]
+  | TrackNotification
+  | MessageNotification
+  | ExceptionNotification
+  | ChangeTrackStateRequestNotification
+  | ChangeMultiTrackStateRequestNotification
+  | LeaveRoomRequestNotification
+  | DeviceChangeEventNotification
+  | PlaylistItemNotification<T>
+  | null;
+
 export enum HMSNotificationSeverity {
   INFO = 'info',
   ERROR = 'error',
