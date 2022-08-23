@@ -44,7 +44,7 @@ interface PlaylistItemNotification<T> extends BaseNotification {
   data?: HMSPlaylistItem<T>;
 }
 
-export type HMSNotification<T> =
+export type HMSNotification<T = {}> =
   | PeerNotification
   | PeerArrayNotification[]
   | TrackNotification
