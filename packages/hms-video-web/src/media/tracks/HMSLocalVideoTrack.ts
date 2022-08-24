@@ -8,6 +8,7 @@ import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interface
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { EventBus } from '../../events/EventBus';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import { HMSVideoTrackPlugin } from '../../plugins/video/HMSVideoPlugin';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -21,6 +22,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private plugins = new Map<string, HMSVideoTrackPlugin>();
 
   /**
    * @internal
@@ -118,7 +120,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @see HMSVideoPlugin
    */
   getPlugins(): string[] {
-    return this.pluginsManager.getPlugins();
+    const plugins = Array.from(this.plugins.values()).map(plugin => plugin.name);
+    return [...this.pluginsManager.getPlugins(), ...plugins];
   }
 
   /**
@@ -126,6 +129,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
     return this.pluginsManager.addPlugin(plugin, pluginFrameRate);
+  }
+
+  async addTrackPlugin(plugin: HMSVideoTrackPlugin) {
+    this.plugins.set(plugin.name, plugin);
+    const updatedTrack = await plugin.init(this.processedTrack || this.nativeTrack);
+    await this.setProcessedTrack(updatedTrack);
+  }
+
+  async removeTrackPlugin(plugin: HMSVideoTrackPlugin) {
+    this.plugins.delete(plugin.name);
+    if (this.pluginsManager.getPlugins().length === 0) {
+      await this.setProcessedTrack(undefined);
+    }
   }
 
   /**

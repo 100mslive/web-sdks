@@ -29,10 +29,11 @@ export function getRandomVirtualBackground() {
   if (randomIdx === 0) {
     return "blur";
   } else if (randomIdx <= 7) {
-    const img = document.createElement("img");
-    img.alt = "VB";
-    img.src = backgroundList[randomIdx];
-    return img;
+    // const img = document.createElement("img");
+    // img.alt = "VB";
+    // img.src =
+    return backgroundList[randomIdx];
+    // return img;
   } else if (randomIdx === 8) {
     return backgroundList[randomIdx];
   }

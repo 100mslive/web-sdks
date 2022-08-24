@@ -57,6 +57,7 @@ import {
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
+  HMSVideoTrackPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
 } from '@100mslive/hms-video';
 import { IHMSStore } from '../IHMSStore';
@@ -149,13 +150,21 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async setProcessedVideoTrack(cb: (track: MediaStreamTrack) => Promise<MediaStreamTrack>) {
+  async addPluginWithTrack(plugin: HMSVideoTrackPlugin) {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
       const track = this.hmsSDKTracks[trackID];
-      const processedTrack = await cb(track.nativeTrack);
-      await (track as SDKHMSLocalVideoTrack).setProcessedTrack(processedTrack);
-      this.syncRoomState('setProcessedTrack');
+      await (track as SDKHMSLocalVideoTrack).addTrackPlugin(plugin);
+      this.syncRoomState('addPluginWithTrack');
+    }
+  }
+
+  async removePluginWithTrack(plugin: HMSVideoTrackPlugin) {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const track = this.hmsSDKTracks[trackID];
+      await (track as SDKHMSLocalVideoTrack).removeTrackPlugin(plugin);
+      this.syncRoomState('removePluginWithTrack');
     }
   }
 

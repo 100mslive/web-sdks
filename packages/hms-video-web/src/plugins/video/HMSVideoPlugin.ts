@@ -79,3 +79,10 @@ export enum HMSVideoPluginCanvasContextType {
   WEBGL = 'webgl',
   'WEBGL2' = 'webgl2',
 }
+
+export interface HMSVideoTrackPlugin {
+  name: string;
+  init(track: MediaStreamTrack | CanvasCaptureMediaStreamTrack): MediaStreamTrack | CanvasCaptureMediaStreamTrack;
+  checkSupport(): HMSPluginSupportResult;
+  stop(): Promise<void>;
+}
