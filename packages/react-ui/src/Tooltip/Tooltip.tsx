@@ -43,10 +43,12 @@ export type sideTooltip = 'bottom' | 'left' | 'right' | 'top' | undefined;
 export const Tooltip: React.FC<
   PropsWithChildren<{ title: React.ReactNode | string; outlined?: boolean; side?: sideTooltip; align?: alignTooltip }>
 > = ({ children, title, outlined = true, side = 'bottom', align = 'center' }) => (
-  <TooltipRoot delayDuration={200}>
-    <TooltipTrigger asChild>{children}</TooltipTrigger>
-    <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
-      {title}
-    </TooltipBox>
-  </TooltipRoot>
+  <BaseTooltip.Provider>
+    <TooltipRoot delayDuration={200}>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
+        {title}
+      </TooltipBox>
+    </TooltipRoot>
+  </BaseTooltip.Provider>
 );
