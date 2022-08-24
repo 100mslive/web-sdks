@@ -38,12 +38,14 @@ function makeException(name: string): HMSException {
 
 describe('hms notifications tests', () => {
   test('when unhandled peer event on Notification not to be called', () => {
-    notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, peer);
+    const notificationType = PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER];
+    notifications.sendPeerUpdate(notificationType, peer);
     expect(cb.mock.calls.length).toBe(0);
   });
 
   test('when peer joined on Notification to be called', () => {
-    notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_JOINED, peer);
+    const notificationType = PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_JOINED];
+    notifications.sendPeerUpdate(notificationType, peer);
     expect(cb.mock.calls.length).toBe(1);
     expect(cb.mock.results[0].value.type).toBe(PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_JOINED]);
     expect(cb.mock.results[0].value.data).toBe(peer);
@@ -51,7 +53,8 @@ describe('hms notifications tests', () => {
   });
 
   test('when peer left on Notification to be called', () => {
-    notifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_LEFT, peer);
+    const notificationType = PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT];
+    notifications.sendPeerUpdate(notificationType, peer);
     expect(cb.mock.calls.length).toBe(1);
     expect(cb.mock.results[0].value.type).toBe(PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT]);
     expect(cb.mock.results[0].value.data).toBe(peer);
