@@ -1,5 +1,12 @@
 import { createSelector } from 'reselect';
-import { selectHMSMessages, selectLocalPeerID, selectPeers, selectPeersMap, selectTracksMap } from './selectors';
+import {
+  selectFullAppData,
+  selectHMSMessages,
+  selectLocalPeerID,
+  selectPeers,
+  selectPeersMap,
+  selectTracksMap,
+} from './selectors';
 import { HMSPeerID, HMSRoleName, HMSStore, HMSTrack, HMSTrackID } from '../schema';
 import {
   getPeerTracksByCondition,
@@ -15,6 +22,7 @@ import { HMSLogger } from '../../common/ui-logger';
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
+const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -28,6 +36,40 @@ const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (st
  * Select the {@link HMSPeer} object given a peer ID.
  */
 export const selectPeerByID = byIDCurry(selectPeerByIDBare);
+
+/**
+ * Select a particular key from ui app data by passed in key.
+ * if key is not passed, full data is returned.
+ */
+export const selectAppData = byIDCurry(
+  createSelector([selectFullAppData, selectAppDataKey], (appData, key) => {
+    if (!appData) {
+      return undefined;
+    }
+    if (key) {
+      return appData[key];
+    }
+    return appData;
+  }),
+);
+
+export const selectAppDataByPath = (...keys: string[]) =>
+  createSelector([selectFullAppData], appData => {
+    if (!appData) {
+      return undefined;
+    }
+    if (keys && keys.length > 0) {
+      let value = appData;
+      for (const key of keys) {
+        if (!key) {
+          return value;
+        }
+        value = value?.[key];
+      }
+      return value;
+    }
+    return appData;
+  });
 
 /**
  * Select the name of a {@link HMSPeer} given a peer ID.
@@ -276,7 +318,7 @@ const selectMessagesByPeerIDInternal = createSelector(
         return false;
       }
       // if localPeer or peerID is not a sender remove this
-      if (![localPeerID, peerID].includes(message.sender)) {
+      if (message.sender && ![localPeerID, peerID].includes(message.sender)) {
         return false;
       }
       // at this point we know the sender is one of local or passed in peer, check the recipient side
@@ -353,3 +395,5 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
       return {};
     }
   });
+
+export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);

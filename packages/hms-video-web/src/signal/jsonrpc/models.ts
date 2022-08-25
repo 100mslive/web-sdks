@@ -39,6 +39,7 @@ export enum HMSSignalMethod {
   UPDATE_PEER_METADATA = 'peer-update',
   START_HLS_STREAMING = 'hls-start',
   STOP_HLS_STREAMING = 'hls-stop',
+  HLS_TIMED_METADATA = 'hls-timed-metadata',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

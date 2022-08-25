@@ -29,11 +29,20 @@ import type { HMSLocalPeer } from '../../packages/hms-video-store/src/core/hmsSD
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('getToken', () => {
-  const tokenEndpoint = Cypress.env('CYPRESS_TOKEN_ENDPOINT');
+Cypress.Commands.add('getToken', (role?: string) => {
+  let tokenEndpoint = Cypress.env('CYPRESS_TOKEN_ENDPOINT');
+  if (!tokenEndpoint) {
+    throw new Error('cypress token endpoint is not configured');
+  }
+  if (!tokenEndpoint.endsWith('api/token')) {
+    if (!tokenEndpoint.endsWith('/')) {
+      tokenEndpoint += '/';
+    }
+    tokenEndpoint += 'api/token';
+  }
   const data = {
     room_id: Cypress.env('CYPRESS_ROOM_ID'),
-    role: Cypress.env('CYPRESS_ROLE'),
+    role: role || Cypress.env('CYPRESS_ROLE'),
     env: Cypress.env('CYPRESS_API_ENV'),
     user_id: 'test',
   };
@@ -45,18 +54,25 @@ Cypress.Commands.add('getToken', () => {
     .should('exist');
 });
 
-Cypress.Commands.add('localTracksAdded', (localPeer: HMSLocalPeer) => {
-  return cy
-    .get('@onJoin')
-    .then(() => cy.get('@onTrackUpdate'))
-    .should(value => {
-      const spy = value as unknown as SinonSpy;
-      let count = 0;
-      spy.getCalls().forEach((call: SinonSpyCall) => {
-        if (expect(call.lastArg).to.equal(localPeer)) {
-          count++;
-        }
+Cypress.Commands.add(
+  'localTracksAdded',
+  (localPeer: HMSLocalPeer, { join = '@onJoin', trackUpdate = '@onTrackUpdate' } = {}) => {
+    return cy
+      .get(join)
+      .then(() => cy.get(trackUpdate))
+      .should(value => {
+        const spy = value as unknown as SinonSpy;
+        let count = 0;
+        console.log(spy);
+        spy.getCalls().forEach((call: SinonSpyCall) => {
+          if (expect(call.lastArg).to.equal(localPeer)) {
+            count++;
+          }
+        });
+        expect(count).to.equal(2);
+      })
+      .then(() => {
+        return Promise.resolve();
       });
-      expect(count).to.equal(2);
-    });
-});
+  },
+);

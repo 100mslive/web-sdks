@@ -12,6 +12,7 @@ import {
   UpdatePeerRequestParams,
   HLSRequestParams,
   BroadcastResponse,
+  HLSTimedMetadataParams,
 } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
@@ -24,9 +25,9 @@ export interface ISignal extends IAnalyticsTransportProvider {
   join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;
@@ -62,6 +63,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   startHLSStreaming(params: HLSRequestParams): Promise<void>;
 
   stopHLSStreaming(params?: HLSRequestParams): Promise<void>;
+
+  sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void>;
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
 

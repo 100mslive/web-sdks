@@ -26,6 +26,7 @@ export interface HMSStore {
   settings: HMSMediaSettings;
   devices: DeviceMap;
   roles: Record<string, HMSRole>;
+  appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }

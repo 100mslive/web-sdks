@@ -24,7 +24,7 @@ export const DialogContent = ({
   ...props
 }) => {
   return (
-    <>
+    <Dialog.Portal>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: "min(600px, 100%)", ...css }} {...props}>
         <Dialog.Title>
@@ -47,7 +47,7 @@ export const DialogContent = ({
         <HorizontalDivider css={{ mt: "0.8rem" }} />
         <Box>{children}</Box>
       </Dialog.Content>
-    </>
+    </Dialog.Portal>
   );
 };
 
@@ -86,16 +86,50 @@ export const RequestDialog = ({
   Icon,
 }) => (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
-    <DialogContent title={title} Icon={Icon}>
-      <DialogRow>
-        <Text variant="md">{body}</Text>
-      </DialogRow>
-      <DialogRow justify="end">
-        <Button variant="primary" onClick={onAction}>
-          {actionText}
-        </Button>
-      </DialogRow>
-    </DialogContent>
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
+        <Dialog.Title
+          css={{ p: 0, display: "flex", flexDirection: "row", gap: "$md" }}
+        >
+          {Icon ? Icon : null}
+          <Text variant="h6">{title}</Text>
+        </Dialog.Title>
+        <Text
+          variant="md"
+          css={{
+            fontWeight: 400,
+            mt: "$4",
+            mb: "$10",
+            c: "$textMedEmp",
+          }}
+        >
+          {body}
+        </Text>
+        <Flex
+          justify="center"
+          align="center"
+          css={{ width: "100%", gap: "$md" }}
+        >
+          <Box css={{ width: "50%" }}>
+            <Dialog.Close css={{ width: "100%" }}>
+              <Button variant="standard" outlined css={{ width: "100%" }}>
+                Cancel
+              </Button>
+            </Dialog.Close>
+          </Box>
+          <Box css={{ width: "50%" }}>
+            <Button
+              variant="primary"
+              css={{ width: "100%" }}
+              onClick={onAction}
+            >
+              {actionText}
+            </Button>
+          </Box>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Portal>
   </Dialog.Root>
 );
 
@@ -139,13 +173,15 @@ export const DialogSelect = ({
   labelField,
   selected,
   onChange,
+  ...props
 }) => {
   return (
     <DialogRow breakSm>
-      <Label>{title}:</Label>
+      <Label>{title}</Label>
       <Select.Root
         data-testid={`dialog_select_${title}`}
         css={{ width: "70%", "@sm": { width: "100%" } }}
+        {...props}
       >
         <Select.DefaultDownIcon />
         <Select.Select
@@ -179,7 +215,7 @@ export const DialogInput = ({
 }) => {
   return (
     <DialogRow breakSm>
-      <Label>{title}:</Label>
+      <Label>{title}</Label>
       <Input
         css={{ width: "70%", "@sm": { width: "100%" } }}
         value={value}
@@ -196,7 +232,7 @@ export const DialogInput = ({
 export const DialogSwitch = ({ title, value, onChange, disabled }) => {
   return (
     <DialogRow>
-      <Text>{title}:</Text>
+      <Text>{title}</Text>
       <Flex justify="end" css={{ width: "70%" }}>
         <Switch
           checked={value}
@@ -219,7 +255,7 @@ export const DialogCheckbox = ({
   return (
     <DialogRow css={css}>
       <Label htmlFor={id} css={{ cursor: "pointer" }}>
-        {title}:
+        {title}
       </Label>
       <Checkbox.Root
         checked={value}

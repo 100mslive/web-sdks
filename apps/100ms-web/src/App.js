@@ -1,33 +1,35 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, useCallback } from "react";
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
-  Redirect,
+  Navigate,
+  useParams,
 } from "react-router-dom";
 import { HMSRoomProvider } from "@100mslive/react-sdk";
 import { HMSThemeProvider, Box } from "@100mslive/react-ui";
-import { AppContextProvider } from "./components/context/AppContext.js";
 import { Notifications } from "./components/Notifications";
 import { Confetti } from "./plugins/confetti";
 import { ToastContainer } from "./components/Toast/ToastContainer";
+import FullPageProgress from "./components/FullPageProgress";
+import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
+import PostLeave from "./components/PostLeave";
+import { AppData } from "./components/AppData/AppData.jsx";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import ErrorPage from "./components/ErrorPage";
+import { Init } from "./components/init/Init";
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { FeatureFlags } from "./services/FeatureFlags";
-import { shadeColor } from "./common/utils";
 import {
   getUserToken as defaultGetUserToken,
   getBackendEndpoint,
 } from "./services/tokenService";
+import { getRoutePrefix, shadeColor } from "./common/utils";
 import "./base.css";
 import "./index.css";
-import LogoForLight from "./images/logo-dark.svg";
-import LogoForDark from "./images/logo-light.svg";
-import FullPageProgress from "./components/FullPageProgress";
-import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
-const ErrorPage = React.lazy(() => import("./components/ErrorPage"));
-const PostLeave = React.lazy(() => import("./components/PostLeave"));
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -38,7 +40,7 @@ const defaultTokenEndpoint = process.env
 
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 
-let appName = "";
+let appName;
 if (window.location.host.includes("localhost")) {
   appName = "localhost";
 } else {
@@ -46,6 +48,18 @@ if (window.location.host.includes("localhost")) {
 }
 
 document.title = `${appName}'s ${document.title}`;
+
+// TODO: remove now that there are options to change to portrait
+const getAspectRatio = ({ width, height }) => {
+  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+  const portraitDomains = (
+    process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
+  ).split(",");
+  if (portraitDomains.includes(host) && width > height) {
+    return { width: height, height: width };
+  }
+  return { width, height };
+};
 
 export function EdtechComponent({
   roomId = "",
@@ -58,9 +72,11 @@ export function EdtechComponent({
     logo = "",
     headerPresent = "false",
     metadata = "",
+    recordingUrl = "",
   },
   getUserToken = defaultGetUserToken,
   policyConfig = envPolicyConfig,
+  getDetails = () => {},
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
@@ -75,30 +91,41 @@ export function EdtechComponent({
     setThemeType(theme);
   }, [theme]);
 
+  const getUserTokenCallback = useCallback(getUserToken, []); //eslint-disable-line
+
   return (
-    <HMSThemeProvider
-      themeType={themeType}
-      aspectRatio={{ width, height }}
-      theme={{
-        colors: {
-          brandDefault: color,
-          brandDark: shadeColor(color, -30),
-          brandLight: shadeColor(color, 30),
-          brandDisabled: shadeColor(color, 10),
-        },
-        fonts: {
-          sans: [font, "Inter", "sans-serif"],
-        },
-      }}
-    >
-      <HMSRoomProvider isHMSStatsOn={FeatureFlags.enableStatsForNerds}>
-        <AppContextProvider
-          roomId={roomId}
-          tokenEndpoint={tokenEndpoint}
-          policyConfig={policyConfig}
-          appDetails={metadata}
-          logo={logo || (theme === "dark" ? LogoForDark : LogoForLight)}
+    <ErrorBoundary>
+      <HMSThemeProvider
+        themeType={themeType}
+        aspectRatio={getAspectRatio({ width, height })}
+        theme={{
+          colors: {
+            brandDefault: color,
+            brandDark: shadeColor(color, -30),
+            brandLight: shadeColor(color, 30),
+            brandDisabled: shadeColor(color, 10),
+          },
+          fonts: {
+            sans: [font, "Inter", "sans-serif"],
+          },
+        }}
+      >
+        <HMSRoomProvider
+          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+          actions={hmsActions}
+          store={hmsStore}
+          notifications={hmsNotifications}
+          stats={hmsStats}
         >
+          <AppData
+            appDetails={metadata}
+            policyConfig={policyConfig}
+            recordingUrl={recordingUrl}
+            logo={logo}
+            tokenEndpoint={tokenEndpoint}
+          />
+
+          <Init />
           <Box
             css={{
               bg: "$mainBg",
@@ -108,73 +135,117 @@ export function EdtechComponent({
                 : { h: "100%" }),
             }}
           >
-            <AppRoutes getUserToken={getUserToken} />
+            <AppRoutes
+              getUserToken={getUserTokenCallback}
+              getDetails={getDetails}
+            />
           </Box>
-        </AppContextProvider>
-      </HMSRoomProvider>
-    </HMSThemeProvider>
+        </HMSRoomProvider>
+      </HMSThemeProvider>
+    </ErrorBoundary>
   );
 }
 
-function AppRoutes({ getUserToken }) {
+const RedirectToPreview = ({ getDetails }) => {
+  const { roomId, role } = useParams();
+  useEffect(() => {
+    getDetails();
+  }, [roomId]); //eslint-disable-line
+
+  console.error({ roomId, role });
+
+  if (!roomId && !role) {
+    return <Navigate to="/" />;
+  }
+  if (!roomId) {
+    return <Navigate to="/" />;
+  }
+  if (["streaming", "preview", "meeting", "leave"].includes(roomId) && !role) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <Navigate to={`${getRoutePrefix()}/preview/${roomId}/${role || ""}`} />
+  );
+};
+
+const RouteList = ({ getUserToken, getDetails }) => {
+  return (
+    <Routes>
+      <Route path="preview">
+        <Route
+          path=":roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+        <Route
+          path=":roomId"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+      </Route>
+      <Route path="meeting">
+        <Route
+          path=":roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path=":roomId"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+      </Route>
+      <Route path="leave">
+        <Route path=":roomId/:role" element={<PostLeave />} />
+        <Route path=":roomId" element={<PostLeave />} />
+      </Route>
+      <Route
+        path="/:roomId/:role"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
+      <Route
+        path="/:roomId/"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
+      <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
+    </Routes>
+  );
+};
+
+function AppRoutes({ getUserToken, getDetails }) {
   return (
     <Router>
       <ToastContainer />
       <Notifications />
       <Confetti />
       <KeyboardHandler />
-      <Switch>
+      <Routes>
         <Route
-          path="/preview/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
-            }
-            if (
-              !params.roomId ||
-              ["preview", "meeting", "leave"].includes(params.roomId)
-            ) {
-              return <Redirect to="/" />;
-            }
-            return (
-              <Suspense fallback={<FullPageProgress />}>
-                <PreviewScreen getUserToken={getUserToken} />
-              </Suspense>
-            );
-          }}
+          path="/*"
+          element={
+            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+          }
         />
-        <Route path="/meeting/:roomId/:role?">
-          <Suspense fallback={<FullPageProgress />}>
-            <Conference />
-          </Suspense>
-        </Route>
-        <Route path="/leave/:roomId/:role?">
-          <Suspense fallback={<FullPageProgress />}>
-            <PostLeave />
-          </Suspense>
-        </Route>
         <Route
-          path="/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
-            }
-            if (!params.roomId) {
-              return <Redirect to="/" />;
-            }
-            return (
-              <Redirect to={`/preview/${params.roomId}/${params.role || ""}`} />
-            );
-          }}
+          path="/streaming/*"
+          element={
+            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+          }
         />
-        <Route path="*">
-          <Suspense fallback={<FullPageProgress />}>
-            <ErrorPage error="Invalid URL!" />
-          </Suspense>
-        </Route>
-      </Switch>
+      </Routes>
     </Router>
   );
 }

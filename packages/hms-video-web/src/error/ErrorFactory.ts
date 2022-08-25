@@ -5,6 +5,7 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
 
@@ -29,10 +30,10 @@ export enum HMSAction {
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
-    GenericConnect(action: HMSAction, description = '') {
+    FailedToConnect(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.WebSocketConnectionErrors.GENERIC_CONNECT,
-        'WebsocketConnection',
+        ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
+        'WebsocketFailedToConnect',
         action,
         `[WS]: ${description}`,
         `[WS]: ${description}`,
@@ -52,7 +53,7 @@ export const ErrorFactory = {
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description, true);
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -60,7 +61,7 @@ export const ErrorFactory = {
         ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
-        `Endpoint is not reachable.`,
+        `Endpoint is not reachable - ${description}`,
         description,
       );
     },
@@ -72,6 +73,7 @@ export const ErrorFactory = {
         action,
         `Token is not in proper JWT format - ${description}`,
         description,
+        true,
       );
     },
 
@@ -102,7 +104,7 @@ export const ErrorFactory = {
         ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
         'CantAccessCaptureDevice',
         action,
-        `[TRACK]: No permission to access capture device - ${deviceInfo}`,
+        `User denied permission to access capture device - ${deviceInfo}`,
         description,
       );
     },
@@ -196,6 +198,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    SystemDeniedPermission(action: HMSAction, deviceInfo: string, description = '') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+        'SystemDeniedPermission',
+        action,
+        `Operating System denied permission to access capture device - ${deviceInfo}`,
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {
@@ -251,7 +263,7 @@ export const ErrorFactory = {
   },
 
   WebsocketMethodErrors: {
-    ServerErrors(code: number, action: HMSAction, description: string) {
+    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
       return new HMSException(code, 'ServerErrors', action, description, description, true);
     },
 

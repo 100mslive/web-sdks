@@ -1,5 +1,6 @@
-import React, { useEffect, useContext, useState, useCallback } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { usePrevious } from "react-use";
 import {
   selectRoomState,
   HMSRoomState,
@@ -8,40 +9,56 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { ConferenceMainView } from "../layouts/mainView";
-import { AppContext } from "./context/AppContext";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import { useNavigation } from "./hooks/useNavigation";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const Conference = () => {
-  const history = useHistory();
+  const navigate = useNavigation();
   const { roomId, role } = useParams();
-  const { isHeadless, isAudioOnly } = useContext(AppContext);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const toggleChat = useCallback(() => {
-    setIsChatOpen(open => !open);
-  }, []);
-  const isConnectingToRoom =
-    useHMSStore(selectRoomState) === HMSRoomState.Connecting;
+  const isHeadless = useIsHeadless();
+  const roomState = useHMSStore(selectRoomState);
+  const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
 
   useEffect(() => {
     if (!roomId) {
-      history.push(`/`);
+      navigate(`/`);
+      return;
     }
-    if (!(isConnectingToRoom || isConnectedToRoom)) {
-      if (role) history.push(`/preview/${roomId || ""}/${role}`);
-      else history.push(`/preview/${roomId || ""}`);
+    if (
+      !prevState &&
+      !(
+        roomState === HMSRoomState.Connecting ||
+        roomState === HMSRoomState.Reconnecting ||
+        isConnectedToRoom
+      )
+    ) {
+      if (role) navigate(`/preview/${roomId || ""}/${role}`);
+      else navigate(`/preview/${roomId || ""}`);
     }
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
+
+  useEffect(() => {
+    // beam doesn't need to store messages, saves on unnecessary store updates in large calls
+    if (isHeadless) {
+      hmsActions.ignoreMessageTypes(["chat"]);
+    }
+  }, [isHeadless, hmsActions]);
+
+  useEffect(() => {
     return () => {
       // This is needed to handle mac touchpad swipe gesture
-      hmsActions.leave();
+      if (isConnectedToRoom) {
+        hmsActions.leave();
+      }
     };
-    // eslint-disable-next-line
-  }, []);
+  }, [hmsActions, isConnectedToRoom]);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;
@@ -50,7 +67,7 @@ const Conference = () => {
   return (
     <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
-        <Box css={{ h: "$18", "@md": { h: "$17" } }}>
+        <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
           <Header />
         </Box>
       )}
@@ -60,16 +77,13 @@ const Conference = () => {
           flex: "1 1 0",
           minHeight: 0,
         }}
+        data-testid="conferencing"
       >
-        <ConferenceMainView isChatOpen={isChatOpen} toggleChat={toggleChat} />
+        <ConferenceMainView />
       </Box>
       {!isHeadless && (
-        <Box css={{ flexShrink: 0, minHeight: "$24" }}>
-          <Footer
-            isChatOpen={isChatOpen}
-            toggleChat={toggleChat}
-            isAudioOnly={isAudioOnly}
-          />
+        <Box css={{ flexShrink: 0, minHeight: "$24" }} data-testid="footer">
+          <Footer />
         </Box>
       )}
       <RoleChangeRequestModal />

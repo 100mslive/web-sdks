@@ -13,7 +13,7 @@ export default class AnalyticsEventFactory {
   private static KEY_RESPONDED_AT = 'responded_at';
 
   static connect(
-    error?: HMSException,
+    error?: Error,
     additionalProperties?: AdditionalAnalyticsProperties,
     requestedAt: Date = new Date(),
     respondedAt: Date = new Date(),
@@ -35,7 +35,7 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static disconnect(error?: HMSException, additionalProperties?: AdditionalAnalyticsProperties) {
+  static disconnect(error?: Error, additionalProperties?: AdditionalAnalyticsProperties) {
     const name = 'disconnected';
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError(additionalProperties, error);
@@ -43,30 +43,48 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static join(requestedAt: Date, respondedAt: Date, error?: HMSException) {
-    const name = this.eventNameFor('join', error === undefined);
+  static preview({
+    error,
+    ...props
+  }: {
+    error?: Error;
+    time?: number;
+    init_response_time?: number;
+    ws_connect_time?: number;
+    on_policy_change_time?: number;
+    local_tracks_time?: number;
+  }) {
+    const name = this.eventNameFor('preview', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-
-    const properties = this.getPropertiesWithError(
-      {
-        [this.KEY_REQUESTED_AT]: requestedAt.getTime(),
-        [this.KEY_RESPONDED_AT]: respondedAt.getTime(),
-      },
-      error,
-    );
+    const properties = this.getPropertiesWithError(props, error);
 
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static publish({
-    devices,
-    settings,
+  static join({
     error,
+    ...props
   }: {
-    devices?: DeviceMap;
-    settings?: HMSTrackSettings;
-    error?: HMSException;
+    error?: Error;
+    is_preview_called?: boolean;
+    start?: Date;
+    end?: Date;
+    time?: number;
+    init_response_time?: number;
+    ws_connect_time?: number;
+    on_policy_change_time?: number;
+    local_tracks_time?: number;
+    retries_join?: number;
   }) {
+    const name = this.eventNameFor('join', error === undefined);
+    const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
+
+    const properties = this.getPropertiesWithError({ ...props, is_preview_called: !!props.is_preview_called }, error);
+
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
+  static publish({ devices, settings, error }: { devices?: DeviceMap; settings?: HMSTrackSettings; error?: Error }) {
     const name = this.eventNameFor('publish', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
     const properties = this.getPropertiesWithError(
@@ -84,10 +102,10 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static subscribeFail(error: HMSException) {
+  static subscribeFail(error: Error) {
     const name = this.eventNameFor('subscribe', false);
     const level = AnalyticsEventLevel.ERROR;
-    const properties = error.toAnalyticsProperties();
+    const properties = this.getErrorProperties(error);
 
     return new AnalyticsEvent({ name, level, properties });
   }
@@ -109,7 +127,7 @@ export default class AnalyticsEventFactory {
     selection: Partial<SelectedDevices>;
     type?: 'change' | 'list';
     devices: DeviceMap;
-    error?: HMSException;
+    error?: Error;
   }) {
     const name = this.eventNameFor(error ? 'publish' : `device.${type}`, error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
@@ -137,6 +155,10 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  /**
+   * TODO: remove once everything is switched to server side degradation, this
+   * event can be handled on server side as well.
+   */
   static degradationStats(track: HMSRemoteVideoTrack, isDegraded: boolean) {
     const name = 'video.degradation.stats';
     const level = AnalyticsEventLevel.INFO;
@@ -155,7 +177,7 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
-  static audioDetectionFail(error: HMSException, device?: MediaDeviceInfo): AnalyticsEvent {
+  static audioDetectionFail(error: Error, device?: MediaDeviceInfo): AnalyticsEvent {
     const properties = this.getPropertiesWithError({ device }, error);
     const level = AnalyticsEventLevel.ERROR;
     const name = 'audiopresence.failed';
@@ -171,15 +193,44 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static HLSError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `hls.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
+  static RTMPError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `rtmp.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
   }
 
-  private static getPropertiesWithError(initialProperties: any, error?: HMSException) {
-    if (error) {
-      initialProperties = { ...error.toAnalyticsProperties(), ...initialProperties };
-    }
+  private static getPropertiesWithError(initialProperties: any, error?: Error) {
+    const errorProperties = this.getErrorProperties(error);
+    initialProperties = { ...errorProperties, ...initialProperties };
     return initialProperties;
+  }
+
+  private static getErrorProperties(error?: Error): Record<string, any> {
+    if (error) {
+      return error instanceof HMSException
+        ? error.toAnalyticsProperties()
+        : {
+            error_name: error.name,
+            error_message: error.message,
+            error_description: error.cause,
+          };
+    } else {
+      return {};
+    }
   }
 }

@@ -8,7 +8,7 @@
 export const ErrorCodes = {
   WebSocketConnectionErrors: {
     // Error connecting to ws or init config not available
-    GENERIC_CONNECT: 1000,
+    FAILED_TO_CONNECT: 1000,
 
     // Network connection lost
     WEBSOCKET_CONNECTION_LOST: 1003,
@@ -60,6 +60,9 @@ export const ErrorCodes = {
 
     // No audio detected from track, indicates problem with device hardware
     NO_AUDIO_DETECTED: 3010,
+
+    // Operating System denied permission
+    SYSTEM_DENIED_PERMISSION: 3011,
   },
 
   WebrtcErrors: {

@@ -29,16 +29,19 @@ import {
   HMSWebrtcStats,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  HMSVideoPluginCanvasContextType,
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
   HMSHLS,
+  HLSTimedMetadata,
   HMSPeerStats,
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   parsedUserAgent,
   HMSConnectionQuality,
+  HLSMeetingURLVariant,
 } from '@100mslive/hms-video';
 
 export {
@@ -50,6 +53,7 @@ export {
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
+  HMSVideoPluginCanvasContextType,
   parsedUserAgent,
 };
 
@@ -79,6 +83,8 @@ export type {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
+  HLSTimedMetadata,
+  HLSMeetingURLVariant,
   HMSHLS,
   HMSPeerStats,
   HMSTrackStats,

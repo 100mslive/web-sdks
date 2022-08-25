@@ -13,3 +13,14 @@ cy-coverage
 tsconfig.tsbuildinfo
 docs
 .cache
+.dccache*
+storybook-static
+ConfigurationsTest/allure-report
+ConfigurationsTest/playwright-report
+build
+test-results/
+playwright-report/
+slackMessage.json
+package-lock.json
+slackMessage.txt
+.DS_Store

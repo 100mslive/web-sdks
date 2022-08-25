@@ -1,7 +1,9 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
+  apiBasePath,
   getAuthInfo,
   getRoomCodeFromUrl,
   getWithRetry,
@@ -12,6 +14,7 @@ import {
 
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
+import LogRocket from 'logrocket';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
@@ -19,12 +22,20 @@ const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSEdtechTemplate = React.lazy(() =>
   import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
 );
-const hostname = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+let hostname = window.location.hostname;
+if (!hostname.endsWith('app.100ms.live')) {
+  hostname = process.env.REACT_APP_HOST_NAME || hostname;
+} else if (hostname.endsWith('dev-app.100ms.live')) {
+  // route dev-app appropriately to qa or prod
+  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+} else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
+  hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
+}
 
 const App = () => {
   const prevSavedSettings = useRef({});
   const appInfo = useRef({ app_type: '', app_name: '' });
-  const [loading, setLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -39,6 +50,7 @@ const App = () => {
     logo_obj: null,
     logo_url: null,
     logo_name: null,
+    recording_url: '',
     metadataFields: {
       clicks: 0,
       metadata: '',
@@ -46,15 +58,54 @@ const App = () => {
   });
 
   useEffect(() => {
-    fetchData();
+    const code = getRoomCodeFromUrl();
+    if (code) {
+      fetchData();
+    }
   }, []);
+  useEffect(() => {
+    setUpdateMetadataOnWindow();
+  }, [settings]); //eslint-disable-line
+
+  const setUpdateMetadataOnWindow = () => {
+    if (!window.__hmsApp) {
+      window.__hmsApp = {};
+    }
+    window.__hmsApp.updateMetadata = async metadata => {
+      try {
+        const currentMetadata = !settings.metadataFields.metadata ? {} : JSON.parse(settings.metadataFields.metadata);
+        const metaUpdate = JSON.stringify(merge(currentMetadata, metadata));
+        console.log(metaUpdate);
+        await storeRoomSettings({
+          hostname,
+          appInfo: appInfo.current,
+          settings: {
+            ...settings,
+            metadataFields: {
+              ...settings.metadataFields,
+              metadata: metaUpdate,
+            },
+          },
+        });
+        changeSettings('metadataFields', {
+          ...settings.metadataFields,
+          metadata: metaUpdate,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  };
 
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
+    if (!code) {
+      LogRocket.track('roomIdNull', window.location.pathname);
+      return;
+    }
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-    const url = `${process.env.REACT_APP_BACKEND_API}get-token`;
-    var headers = {};
+    const url = `${apiBasePath}get-token`;
+    let headers;
     if (jwt) {
       headers = {
         Authorization: `Bearer ${jwt}`,
@@ -88,10 +139,8 @@ const App = () => {
 
   const fetchData = async () => {
     const jwt = getAuthInfo().token;
-    axios.create({ baseURL: process.env.REACT_APP_API_SERVER, timeout: 2000 });
-    const url = `${
-      process.env.REACT_APP_BACKEND_API
-    }apps/get-details?domain=${hostname}&room_id=${getRoomCodeFromUrl()}`;
+    const code = getRoomCodeFromUrl();
+    const url = `${apiBasePath}apps/get-details?domain=${hostname}&room_id=${code}`;
     const headers = {};
     if (jwt) {
       headers['Authorization'] = `Bearer ${jwt}`;
@@ -112,13 +161,13 @@ const App = () => {
             brand_color: prevSettings.color,
             logo_obj: null,
             logo_url: prevSettings.logo,
+            recording_url: prevSettings.recording_url,
             logo_name: null,
             metadataFields: {
               clicks: 0,
               metadata: prevSettings.metadata,
             },
           };
-          setLoading(false);
           setOnlyEmail(res.data.same_user);
           prevSavedSettings.current = Object.assign({}, prevSettings);
           appInfo.current = { app_name, app_type };
@@ -132,13 +181,13 @@ const App = () => {
           title: 'Something went wrong',
           body: errorMessage,
         };
+        LogRocket.track('getDetailsError', error);
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
             body: 'Please make sure the domain name is right',
           };
         }
-        setLoading(false);
         setError(error);
         console.error(errorMessage);
       });
@@ -189,15 +238,8 @@ const App = () => {
     storeSettings();
   };
 
-  if (loading) {
-    return (
-      <Flex justify="center" align="center" css={{ size: '100%' }}>
-        <Loading size={100} />
-      </Flex>
-    );
-  }
   return (
-    <Flex direction="column" css={{ size: '100%', overflow: 'hidden', bg: '$mainBg' }}>
+    <Flex direction="column" css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}>
       {error && (
         <Suspense fallback={null}>
           <ErrorModal title={error.title} body={error.body} />
@@ -216,7 +258,7 @@ const App = () => {
         </Suspense>
       )}
 
-      {!error && !loading && (
+      {!error && (
         <Suspense
           fallback={
             <Flex justify="center" align="center" css={{ size: '100%' }}>
@@ -225,7 +267,7 @@ const App = () => {
           }
         >
           <HMSEdtechTemplate
-            tokenEndpoint={`${process.env.REACT_APP_BACKEND_API + hostname}/`}
+            tokenEndpoint={`${apiBasePath + hostname}/`}
             themeConfig={{
               aspectRatio: settings.tile_shape,
               font: settings.font,
@@ -234,8 +276,10 @@ const App = () => {
               logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
               headerPresent: String(!!getAuthInfo().userEmail),
               metadata: settings.metadataFields.metadata,
+              recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
+            getDetails={fetchData}
           />
         </Suspense>
       )}

@@ -12,6 +12,7 @@ import {
   UpdatePeerRequestParams,
   HLSRequestParams,
   BroadcastResponse,
+  HLSTimedMetadataParams,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -28,6 +29,7 @@ import Message from '../../sdk/models/HMSMessage';
 import { HMSException } from '../../error/HMSException';
 import { Queue } from '../../utils/queue';
 import { isPageHidden } from '../../utils/support';
+import { sleep } from '../../utils/timer-utils';
 
 export default class JsonRpcSignal implements ISignal {
   readonly TAG = '[ SIGNAL ]: ';
@@ -57,7 +59,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
-    HMSLogger.d(this.TAG, 'isConnected set', { id: this.id, old: this._isConnected, new: newValue });
+    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue} }`);
     if (this._isConnected === newValue) {
       return;
     }
@@ -75,14 +77,8 @@ export default class JsonRpcSignal implements ISignal {
 
   constructor(observer: ISignalEventsObserver) {
     this.observer = observer;
-    window.addEventListener('offline', () => {
-      HMSLogger.d(this.TAG, 'Window network offline');
-      this.setIsConnected(false, 'Window network offline');
-    });
-
-    window.addEventListener('online', () => {
-      HMSLogger.d(this.TAG, 'Window network online');
-    });
+    window.addEventListener('offline', this.offlineListener);
+    window.addEventListener('online', this.onlineListener);
 
     this.onCloseHandler = this.onCloseHandler.bind(this);
     this.onMessageHandler = this.onMessageHandler.bind(this);
@@ -92,11 +88,11 @@ export default class JsonRpcSignal implements ISignal {
     return this.pongResponseTimes.toList();
   }
 
-  private async call<T>(method: string, params: any): Promise<T> {
+  private async internalCall<T>(method: string, params: any): Promise<T> {
     const id = uuid();
     const message = { method, params, id, jsonrpc: '2.0' } as JsonRpcRequest;
 
-    this.socket!.send(JSON.stringify(message));
+    this.socket?.send(JSON.stringify(message));
 
     try {
       const response = await new Promise<any>((resolve, reject) => {
@@ -117,13 +113,14 @@ export default class JsonRpcSignal implements ISignal {
   private notify(method: string, params: any) {
     const message = { method, params };
 
-    this.socket!.send(JSON.stringify(message));
+    this.socket?.send(JSON.stringify(message));
   }
 
   open(uri: string): Promise<void> {
     return new Promise((resolve, reject) => {
       // cleanup
       if (this.socket) {
+        this.socket.close();
         this.socket.removeEventListener('close', this.onCloseHandler);
         this.socket.removeEventListener('message', this.onMessageHandler);
       }
@@ -138,9 +135,9 @@ export default class JsonRpcSignal implements ISignal {
          */
         HMSLogger.e(this.TAG, 'Error from websocket', error);
         reject(
-          ErrorFactory.WebSocketConnectionErrors.GenericConnect(
+          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(
             HMSAction.JOIN,
-            `Error opening socket connection - ${error}`,
+            `Error opening websocket connection - ${error}`,
           ),
         );
       };
@@ -150,8 +147,8 @@ export default class JsonRpcSignal implements ISignal {
         resolve();
         this.setIsConnected(true);
         this.id++;
-        this.socket!.removeEventListener('open', openHandler);
-        this.socket!.removeEventListener('error', errorListener);
+        this.socket?.removeEventListener('open', openHandler);
+        this.socket?.removeEventListener('error', errorListener);
         this.pingPongLoop(this.id);
       };
 
@@ -176,12 +173,18 @@ export default class JsonRpcSignal implements ISignal {
   async join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.JOIN,
+        'Failed to send join over WS connection',
+      );
+    }
     const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
-    const response: RTCSessionDescriptionInit = await this.call(HMSSignalMethod.JOIN, params);
+    const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
     this.pendingTrickle.forEach(({ target, candidate }) => this.trickle(target, candidate));
@@ -224,6 +227,8 @@ export default class JsonRpcSignal implements ISignal {
 
   leave() {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
+    window.removeEventListener('offline', this.offlineListener);
+    window.removeEventListener('online', this.onlineListener);
   }
 
   async endRoom(lock: boolean, reason: string) {
@@ -244,7 +249,7 @@ export default class JsonRpcSignal implements ISignal {
         resolve(Date.now() - pingTime);
       }, timeout + 1);
     });
-    const pongTimeDiff = this.call(HMSSignalMethod.PING, { timestamp: pingTime })
+    const pongTimeDiff = this.internalCall(HMSSignalMethod.PING, { timestamp: pingTime })
       .then(() => Date.now() - pingTime)
       .catch(() => Date.now() - pingTime);
 
@@ -285,6 +290,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
     await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+  }
+
+  async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
+    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
@@ -379,4 +388,38 @@ export default class JsonRpcSignal implements ISignal {
       }
     }
   }
+
+  private async call<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
+    const MAX_RETRIES = 3;
+    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
+
+    for (let i = 0; i < MAX_RETRIES; i++) {
+      try {
+        HMSLogger.d(this.TAG, `Try number ${i + 1} sending ${method}`, params);
+        return await this.internalCall(method, params);
+      } catch (err) {
+        error = err as HMSException;
+        HMSLogger.e(this.TAG, `Failed sending ${method}`, { method, try: i + 1, params, error });
+        const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
+        if (!shouldRetry) {
+          break;
+        }
+
+        const delay = (2 + Math.random() * 2) * 1000;
+        await sleep(delay);
+      }
+    }
+    HMSLogger.e(`Sending ${method} over WS failed after ${MAX_RETRIES} retries`, { method, params, error });
+    throw error;
+  }
+
+  private offlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network offline');
+    this.setIsConnected(false, 'Window network offline');
+  };
+
+  private onlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network online');
+    this.observer.onNetworkOnline();
+  };
 }

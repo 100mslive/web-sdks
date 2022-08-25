@@ -34,8 +34,14 @@ module.exports = {
       events: false,
     },
   },
+  ignoreWarnings: [/Failed to parse source map/], // some libraries do not provide proper source maps which throws this warning
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      },
       {
         test: /\.jsx?$/,
         use: [
@@ -61,10 +67,6 @@ module.exports = {
         type: 'asset/inline',
       },
     ],
-  },
-  cache: {
-    type: 'filesystem',
-    cacheDirectory: path.resolve(__dirname, '.cache'),
   },
   optimization: {
     splitChunks: {

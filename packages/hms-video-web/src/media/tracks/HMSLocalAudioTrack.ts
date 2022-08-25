@@ -86,6 +86,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       await this.replaceTrackWith(this.settings);
     }
     await super.setEnabled(value);
+    if (value) {
+      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+    }
     this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
   }

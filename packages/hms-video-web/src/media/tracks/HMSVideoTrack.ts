@@ -6,6 +6,9 @@ export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
 
+  /**
+   * sink=video element rendering the video
+   */
   hasSinks() {
     return this.sinkCount > 0;
   }
@@ -30,9 +33,11 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   removeSink(videoElement: HTMLVideoElement) {
-    videoElement.srcObject = null;
-    if (this.sinkCount > 0) {
-      this.sinkCount--;
+    if (videoElement.srcObject !== null) {
+      videoElement.srcObject = null;
+      if (this.sinkCount > 0) {
+        this.sinkCount--;
+      }
     }
   }
 

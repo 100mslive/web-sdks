@@ -1,18 +1,14 @@
-import React, { useCallback, useRef, useState } from "react";
-import { Box, Button, Flex } from "@100mslive/react-ui";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { ChevronDownIcon } from "@100mslive/react-icons";
+import { useHMSActions } from "@100mslive/react-sdk";
+import { Button, Flex } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { ChatBody } from "./ChatBody";
-import { ChatSelector } from "./ChatSelector";
-import {
-  selectMessagesUnreadCountByPeerID,
-  selectMessagesUnreadCountByRole,
-  selectUnreadHMSMessagesCount,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { ChevronDownIcon } from "@100mslive/react-icons";
+import { useUnreadCount } from "./useUnreadCount";
 
-export const Chat = ({ onClose }) => {
+export const Chat = () => {
   const [chatOptions, setChatOptions] = useState({
     role: "",
     peerId: "",
@@ -20,73 +16,76 @@ export const Chat = ({ onClose }) => {
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const bodyRef = useRef(null);
-  const scrollToBottom = useCallback(() => {
-    if (!bodyRef.current) {
-      return;
-    }
-    bodyRef.current.scrollTo({
-      top: bodyRef.current.scrollHeight,
-    });
-  }, []);
+  const hmsActions = useHMSActions();
+  const scrollToBottom = useCallback(
+    (instant = false) => {
+      if (!bodyRef.current) {
+        return;
+      }
+      bodyRef.current.scrollTo({
+        top: bodyRef.current.scrollHeight,
+        behavior: instant ? "instant" : "smooth",
+      });
+      hmsActions.setMessageRead(true);
+    },
+    [hmsActions]
+  );
+
+  useEffect(() => {
+    scrollToBottom(true);
+  }, [scrollToBottom]);
+
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
-        open={isSelectorOpen}
+        selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
+        onSelect={setChatOptions}
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
         onToggle={() => {
           setSelectorOpen(value => !value);
         }}
-        onClose={onClose}
       />
-      <Box
+      <Flex
+        direction="column"
         css={{
           flex: "1 1 0",
-          overflowY: isSelectorOpen ? "hidden" : "auto",
-          bg: "$bgSecondary",
+          overflowY: "auto",
           pt: "$4",
           position: "relative",
+          // Below two are for pushing scroll to the edge of the box
+          mr: "-$10",
+          pr: "$10",
         }}
         ref={bodyRef}
       >
         <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-        {isSelectorOpen && (
-          <ChatSelector
-            role={chatOptions.role}
-            peerId={chatOptions.peerId}
-            onSelect={data => {
-              setChatOptions(state => ({
-                ...state,
-                ...data,
-              }));
-              setSelectorOpen(false);
-            }}
-          />
-        )}
-      </Box>
-
+        <ScrollHandler
+          scrollToBottom={scrollToBottom}
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+        />
+      </Flex>
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}
         onSend={scrollToBottom}
       >
-        <NewMessageIndicator
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-          onClick={scrollToBottom}
-        />
+        {!isSelectorOpen && (
+          <NewMessageIndicator
+            role={chatOptions.role}
+            peerId={chatOptions.peerId}
+            scrollToBottom={scrollToBottom}
+          />
+        )}
       </ChatFooter>
     </Flex>
   );
 };
 
-const NewMessageIndicator = ({ role, peerId, onClick }) => {
-  const unreadCountSelector = role
-    ? selectMessagesUnreadCountByRole(role)
-    : peerId
-    ? selectMessagesUnreadCountByPeerID(peerId)
-    : selectUnreadHMSMessagesCount;
-
-  const unreadCount = useHMSStore(unreadCountSelector);
+const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
+  const unreadCount = useUnreadCount({ role, peerId });
   if (!unreadCount) {
     return null;
   }
@@ -100,10 +99,26 @@ const NewMessageIndicator = ({ role, peerId, onClick }) => {
         position: "absolute",
       }}
     >
-      <Button onClick={onClick} css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}>
+      <Button
+        onClick={() => {
+          scrollToBottom();
+        }}
+        css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}
+      >
         New Messages
         <ChevronDownIcon width={16} height={16} />
       </Button>
     </Flex>
   );
+};
+
+const ScrollHandler = ({ scrollToBottom, role, peerId }) => {
+  const { ref, inView } = useInView({ threshold: 0.5 });
+  const unreadCount = useUnreadCount({ role, peerId });
+  useEffect(() => {
+    if (inView && unreadCount) {
+      scrollToBottom();
+    }
+  }, [inView, unreadCount, scrollToBottom]);
+  return <div ref={ref} style={{ height: 1 }}></div>;
 };

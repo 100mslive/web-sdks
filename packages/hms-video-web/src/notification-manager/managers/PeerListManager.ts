@@ -64,12 +64,23 @@ export class PeerListManager {
       // we can't process the peers yet we don't know enough about them(role info)
       return;
     }
-    const roomPeers = roomState.peers || {};
+    const roomPeers = roomState.peers;
+    if (roomPeers === null || roomPeers === undefined) {
+      // in this case, room state doesn't say anything about the peers,
+      // there can be optimisations in place to not send this field when it's unchanged from previously sent value.
+      // If there are no peers either roomState.peers will be empty object
+      // or peer_count will be 0(handled below)
+      if (roomState.peer_count === 0) {
+        this.handleRepeatedPeerList({});
+      }
+      return;
+    }
     // we don't get tracks inside the peer object in room state, we're adding
     // an empty value here so rest of the code flow can ignore this change, the below
     // can be changed when tracks will be sent as a separate object in future
     Object.keys(roomPeers).forEach(peer => {
-      roomPeers[peer]['tracks'] = {};
+      roomPeers[peer].tracks = {};
+      roomPeers[peer].is_from_room_state = true;
     });
     this.handleRepeatedPeerList(roomPeers);
   };

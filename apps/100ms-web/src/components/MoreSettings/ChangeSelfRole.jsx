@@ -1,30 +1,27 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useMedia } from "react-use";
 import {
   selectAvailableRoleNames,
   selectLocalPeerID,
-  selectLocalPeerRole,
+  selectLocalPeerRoleName,
   selectPermissions,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { ArrowRightIcon, CheckIcon, PersonIcon } from "@100mslive/react-icons";
 import { Dropdown, Text, config } from "@100mslive/react-ui";
-import { arrayIntersection } from "../../common/utils";
-import { AppContext } from "../context/AppContext";
 import { ToastManager } from "../Toast/ToastManager";
+import { useAppLayout } from "../AppData/useAppLayout";
+import { arrayIntersection } from "../../common/utils";
 
-export const ChangeSelfRole = ({ css, onClick }) => {
+export const ChangeSelfRole = ({ onClick }) => {
   const roles = useHMSStore(selectAvailableRoleNames);
   const permissions = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const localPeerRole = useHMSStore(selectLocalPeerRole);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const hideTriggerItem = useMedia(config.media.sm);
-  const {
-    appPolicyConfig: { selfRoleChangeTo },
-  } = useContext(AppContext);
-
+  const selfRoleChangeTo = useAppLayout("selfRoleChangeTo");
   const availableSelfChangeRoles = useMemo(
     () => arrayIntersection(selfRoleChangeTo, roles),
     [roles, selfRoleChangeTo]
@@ -34,7 +31,7 @@ export const ChangeSelfRole = ({ css, onClick }) => {
     return null;
   }
   return hideTriggerItem ? (
-    <Dropdown.Item css={css} onClick={onClick}>
+    <Dropdown.Item onClick={onClick}>
       <PersonIcon />
       <Text variant="sm" css={{ mx: "$4" }}>
         Change My Role
@@ -42,7 +39,7 @@ export const ChangeSelfRole = ({ css, onClick }) => {
     </Dropdown.Item>
   ) : (
     <Dropdown.Root>
-      <Dropdown.TriggerItem css={css} data-testid="change_my_role_btn">
+      <Dropdown.TriggerItem data-testid="change_my_role_btn">
         <PersonIcon />
         <Text variant="sm" css={{ flex: "1 1 0", mx: "$4" }}>
           Change My Role
@@ -57,7 +54,7 @@ export const ChangeSelfRole = ({ css, onClick }) => {
         {availableSelfChangeRoles.map((role, i) => (
           <Dropdown.Item
             key={role}
-            css={{ ...css, justifyContent: "space-between" }}
+            css={{ justifyContent: "space-between" }}
             onClick={async () => {
               try {
                 await hmsActions.changeRole(localPeerId, role, true);
@@ -65,12 +62,10 @@ export const ChangeSelfRole = ({ css, onClick }) => {
                 ToastManager.addToast({ title: error.message });
               }
             }}
-            data-testid={"change_to_role_" + i}
+            data-testid={"change_to_role_" + role}
           >
             <Text variant="sm">{role}</Text>
-            {localPeerRole.name === role && (
-              <CheckIcon width={16} height={16} />
-            )}
+            {localPeerRole === role && <CheckIcon width={16} height={16} />}
           </Dropdown.Item>
         ))}
       </Dropdown.Content>

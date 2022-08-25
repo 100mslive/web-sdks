@@ -3,13 +3,9 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { PersonIcon } from "@100mslive/react-icons";
-import { ToastManager } from "../Toast/ToastManager";
-import { TextWithIcon } from "./TextWithIcon";
-import {
-  UserPreferencesKeys,
-  useUserPreferences,
-} from "../hooks/useUserPreferences";
+import { ToastBatcher } from "../Toast/ToastBatcher";
+import { useSubscribedNotifications } from "../AppData/useUISettings";
+import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
@@ -19,44 +15,34 @@ const notificationTypes = [
 
 export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
-  const [{ subscribedNotifications }] = useUserPreferences(
-    UserPreferencesKeys.UI_SETTINGS
+  const isPeerJoinSubscribed = useSubscribedNotifications(
+    SUBSCRIBED_NOTIFICATIONS.PEER_JOINED
+  );
+  const isPeerLeftSubscribed = useSubscribedNotifications(
+    SUBSCRIBED_NOTIFICATIONS.PEER_LEFT
   );
   useEffect(() => {
     if (!notification) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
-    let toastText = "";
     switch (notification.type) {
       case HMSNotificationTypes.PEER_LIST:
-        if (subscribedNotifications.PEER_JOINED) {
-          toastText = `${notification.data?.length} peers joined`;
-        }
-        break;
       case HMSNotificationTypes.PEER_JOINED:
-        if (subscribedNotifications.PEER_JOINED) {
-          toastText = `${notification.data?.name} joined`;
+        if (!isPeerJoinSubscribed) {
+          return;
         }
         break;
       case HMSNotificationTypes.PEER_LEFT:
-        if (subscribedNotifications.PEER_LEFT) {
-          toastText = `${notification.data?.name} left`;
+        if (!isPeerLeftSubscribed) {
+          return;
         }
         break;
       default:
-        break;
+        return;
     }
-    if (toastText) {
-      ToastManager.addToast({
-        title: <TextWithIcon Icon={PersonIcon}>{toastText}</TextWithIcon>,
-      });
-    }
-  }, [
-    notification,
-    subscribedNotifications.PEER_JOINED,
-    subscribedNotifications.PEER_LEFT,
-  ]);
+    ToastBatcher.showToast({ notification });
+  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
 
   return null;
 };

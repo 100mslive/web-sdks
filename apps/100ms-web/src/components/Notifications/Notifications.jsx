@@ -1,8 +1,6 @@
 /* eslint-disable no-case-declarations */
-import React, { useContext, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useEffect } from "react";
 import LogRocket from "logrocket";
-import { HandIcon } from "@100mslive/react-icons";
 import {
   useHMSNotifications,
   HMSNotificationTypes,
@@ -13,18 +11,26 @@ import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { ToastManager } from "../Toast/ToastManager";
-import { AppContext } from "../context/AppContext";
 import { TrackNotifications } from "./TrackNotifications";
-import { TextWithIcon } from "./TextWithIcon";
 import { PeerNotifications } from "./PeerNotifications";
 import { ReconnectNotifications } from "./ReconnectNotifications";
+import { ToastBatcher } from "../Toast/ToastBatcher";
+import { PermissionErrorModal } from "./PermissionErrorModal";
+import { MessageNotifications } from "./MessageNotifications";
+import {
+  useHLSViewerRole,
+  useIsHeadless,
+  useSubscribedNotifications,
+} from "../AppData/useUISettings";
+import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const history = useHistory();
-  const { subscribedNotifications, isHeadless, HLS_VIEWER_ROLE } =
-    useContext(AppContext);
+  const navigate = useNavigation();
+  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const subscribedNotifications = useSubscribedNotifications() || {};
+  const isHeadless = useIsHeadless();
   useEffect(() => {
     if (!notification) {
       return;
@@ -34,18 +40,12 @@ export function Notifications() {
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal) return;
+        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless)
+          return;
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastManager.addToast({
-          title: (
-            <TextWithIcon Icon={HandIcon}>
-              {notification.data?.name} raised their hand.
-            </TextWithIcon>
-          ),
-          duration: 2000,
-        });
+        ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(
@@ -54,15 +54,11 @@ export function Notifications() {
             notification.data.name
         );
         break;
-      case HMSNotificationTypes.NEW_MESSAGE:
-        if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
-          return;
-        ToastManager.addToast({
-          title: `New message from ${notification.data?.senderName}`,
-        });
-        break;
       case HMSNotificationTypes.ERROR:
-        if (notification.data?.isTerminal) {
+        if (
+          notification.data?.isTerminal &&
+          notification.data?.action !== "INIT"
+        ) {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
@@ -70,7 +66,7 @@ export function Notifications() {
           } else {
             LogRocket.track("Disconnected");
             // show button action when the error is terminal
-            ToastManager.addToast({
+            const toastId = ToastManager.addToast({
               title: (
                 <Flex justify="between" css={{ w: "100%" }}>
                   <Text css={{ mr: "$4" }}>
@@ -81,6 +77,7 @@ export function Notifications() {
                     variant="primary"
                     css={{ mr: "$4" }}
                     onClick={() => {
+                      ToastManager.removeToast(toastId);
                       window.location.reload();
                     }}
                   >
@@ -94,15 +91,21 @@ export function Notifications() {
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
-            const previewLocation = history.location.pathname.replace(
+            const previewLocation = window.location.pathname.replace(
               "meeting",
               "leave"
             );
-            history.push(previewLocation);
+            ToastManager.clearAllToast();
+            navigate(previewLocation);
           }, 2000);
           return;
         }
-        if (notification.data?.code === 3008) {
+        // Autoplay error or user denied screen share(cancelled browser pop-up)
+        if (
+          notification.data?.code === 3008 ||
+          notification.data?.code === 3001 ||
+          notification.data?.code === 3011
+        ) {
           return;
         }
         if (notification.data?.action === "INIT") {
@@ -142,11 +145,11 @@ export function Notifications() {
               }`,
         });
         setTimeout(() => {
-          const leaveLocation = history.location.pathname.replace(
+          const leaveLocation = window.location.pathname.replace(
             "meeting",
             "leave"
           );
-          history.push(leaveLocation);
+          navigate(leaveLocation);
         }, 2000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
@@ -159,10 +162,8 @@ export function Notifications() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    history,
     notification,
     subscribedNotifications.ERROR,
-    subscribedNotifications.NEW_MESSAGE,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
@@ -175,6 +176,8 @@ export function Notifications() {
       <PeerNotifications />
       <ReconnectNotifications />
       <AutoplayBlockedModal />
+      <PermissionErrorModal />
+      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );

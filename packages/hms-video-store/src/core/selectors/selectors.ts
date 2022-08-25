@@ -51,6 +51,12 @@ export const selectTracksMap = (store: HMSStore) => store.tracks;
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
 
 /**
+ * select appData.
+ * @internal
+ */
+export const selectFullAppData = (store: HMSStore) => store.appData;
+
+/**
  * Select the available audio input, audio output and video input devices on your machine.
  * @param store
  * @returns An object of array of available audio input, audio output and video input devices.
@@ -89,12 +95,15 @@ export const selectIsConnectedToRoom = createSelector([selectRoom], room => room
 export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
   if (isConnected) {
     // if we have peer count from server return that else return number of peers in the store.
-    return room.peerCount || room.peers.length;
+    // In case the strongly consistent peer list is disabled and only eventual consistent count and peer
+    // details is sent, room.peerCount may be 0 for a few second even though local peer is connected, send 1 in that case.
+    // TODO: Fix this at populating room.peerCount level than in selector.
+    return room.peerCount !== undefined ? room.peerCount || 1 : room.peers.length;
   } else {
     // if we have peer count from server return that, else return number of peers except the local one because local is
     // not joined yet.
     // Math.max to ensure we're not returning -1, if the selector is called before local peer is put in the store
-    return Math.max(room.peerCount || room.peers.length - 1, 0);
+    return Math.max(room.peerCount !== undefined ? room.peerCount : room.peers.length - 1, 0);
   }
 });
 
@@ -125,6 +134,16 @@ export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room,
 export const selectLocalPeerID = createSelector(selectRoom, room => {
   return room.localPeer;
 });
+
+/**
+ * Select the peer name of your local peer.
+ */
+export const selectLocalPeerName = createSelector(selectLocalPeer, peer => peer?.name);
+
+/**
+ * Select the role name of your local peer.
+ */
+export const selectLocalPeerRoleName = createSelector(selectLocalPeer, peer => peer?.roleName);
 
 /**
  * Select the track ID of your local peer's primary audio track

@@ -48,6 +48,7 @@ export interface PolicyParams {
   known_roles: {
     [role: string]: HMSRole;
   };
+  template_id: string;
 }
 
 /**
@@ -85,6 +86,7 @@ export interface PeerNotification {
   tracks: {
     [track_id: string]: TrackState;
   };
+  is_from_room_state?: boolean;
 }
 
 export interface RoomState {
@@ -154,20 +156,20 @@ export interface ConnectionQualityList {
  * Represents the role change request received from the server
  */
 export interface RoleChangeRequestParams {
-  requested_by: string;
+  requested_by?: string;
   role: string;
   token: string;
 }
 
 export interface TrackUpdateRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   track_id: string;
   stream_id: string;
   mute: boolean;
 }
 
 export interface ChangeTrackMuteStateNotification {
-  requested_by: string;
+  requested_by?: string;
   roles?: string[];
   type?: 'audio' | 'video';
   source?: HMSTrackSource;
@@ -175,13 +177,13 @@ export interface ChangeTrackMuteStateNotification {
 }
 
 export interface PeerLeaveRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   reason: string;
   room_end: boolean;
 }
 
 export interface MessageNotification {
-  peer: {
+  peer?: {
     peer_id: string;
     info: {
       name: string;
@@ -202,21 +204,19 @@ export interface SendMessage {
 }
 
 export interface MessageNotificationInfo {
-  sender: string;
   message: any;
   type: string;
-  time?: string;
 }
 
 export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   error?: ServerError;
 }
 
 export interface RTMPNotification {
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   started_at?: number;
   error?: ServerError;
 }

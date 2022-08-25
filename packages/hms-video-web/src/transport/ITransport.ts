@@ -1,6 +1,13 @@
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
-import { HMSPeer, HMSRoleChangeRequest, RTMPRecordingConfig, HLSConfig } from '../interfaces';
+import {
+  HMSPeer,
+  HMSRoleChangeRequest,
+  RTMPRecordingConfig,
+  HLSConfig,
+  HMSRole,
+  HLSTimedMetadata,
+} from '../interfaces';
 import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
@@ -42,6 +49,7 @@ export default interface ITransport {
   startHLSStreaming(params: HLSConfig): Promise<void>;
 
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   changeName(name: string): Promise<void>;
 
@@ -50,4 +58,6 @@ export default interface ITransport {
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 
   changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams): Promise<void>;
+
+  handleLocalRoleUpdate({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }): Promise<void>;
 }

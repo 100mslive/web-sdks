@@ -2,7 +2,7 @@ import { Box, Dialog, Flex, HorizontalDivider, Text } from '@100mslive/react-ui'
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   return (
-    <>
+    <Dialog.Portal>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: 'min(600px, 100%)', ...css }} {...props}>
         <Dialog.Title>
@@ -21,8 +21,8 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
           </Flex>
         </Dialog.Title>
         <HorizontalDivider css={{ mt: '$6' }} />
-        <Box>{children}</Box>
+        <Box css={{ w: '100%', h: 'calc(100% - 100px)' }}>{children}</Box>
       </Dialog.Content>
-    </>
+    </Dialog.Portal>
   );
 };

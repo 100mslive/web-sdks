@@ -7,6 +7,7 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
+  HLSTimedMetadata,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -303,17 +304,35 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * If you want to start HLS streaming.
-   * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
+   * If you have configured HLS streaming from dashboard, no params are required.
+   * otherwise @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+
+  /**
+   * @alpha
+   * Used to define date range metadata in a media playlist.
+   * This api adds EXT-X-DATERANGE tags to the media playlist.
+   * It is useful for defining timed metadata for interstitial regions such as advertisements,
+   * but can be used to define any timed metadata needed by your stream.
+   * usage (e.g)
+   * const metadataList = [{
+   *  payload: "some string 1",
+   *  duration: 2
+   * },
+   * {
+   *  payload: "some string 2",
+   *  duration: 3
+   * }]
+   * sendHLSTimedMetadata(metadataList);
+   */
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   /**
    * If you want to update the name of peer.
@@ -363,4 +382,58 @@ export interface IHMSActions {
    * This will be available after joining the room
    */
   videoPlaylist: IHMSPlaylistActions;
+
+  /**
+   * @param data full app data object. use this to initialise app data in store.
+   * App Data is a small space in the store for UI to keep a few non updating
+   * global state fields for easy reference across UI.
+   * Note that if the fields are updating at high frequency or there
+   * are too many of them, it's recommended to have another UI side store
+   * to avoid performance issues.
+   */
+  initAppData(data: Record<string, any>): void;
+  /**
+   * use it for updating a particular property in the appdata
+   * @param key
+   *          a string. Does not check for existence. If the key is already not
+   *          a property of the appData, it is added.
+   * @param value
+   *          value to set for the key.
+   * @param merge
+   *          set it to true if you want to merge the appdata.
+   *          - Always replaces the value for a given key if this parameter is
+   *            not explicitly set to true.
+   *          - Always replaces if the value is anything other
+   *            than a plain object (i.e) JSON.parse()able.
+   *          - If set to true on non-plain objects, this is ignored.
+   * @example
+   * assume appdata is initially
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1',
+   *       setting2: 'val2',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * after calling,
+   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * it becomes
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1-edit',
+   *       setting2: 'val2',
+   *       setting3: 'val3',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * Note: This is not suitable for keeping large data or data which updates
+   * at a high frequency, it is recommended to use app side store for those
+   * cases.
+   **/
+  setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
+  setAppData(key: string, value: any): void;
 }

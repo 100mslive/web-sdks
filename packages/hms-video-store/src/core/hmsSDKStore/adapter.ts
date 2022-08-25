@@ -19,6 +19,7 @@ import {
   HMSRoleName,
   HMSRoom,
   HMSTrack,
+  HMSTrackFacingMode,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -67,6 +68,9 @@ export class SDKToHMS {
     if (track.source === 'screen' && track.type === 'video') {
       // @ts-ignore
       track.displaySurface = mediaSettings.displaySurface;
+    }
+    if (track.type === 'video') {
+      track.facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
     }
     track.height = mediaSettings.height;
     track.width = mediaSettings.width;
@@ -128,10 +132,10 @@ export class SDKToHMS {
 
   static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender.peerId,
-      senderName: sdkMessage.sender.name,
-      senderRole: sdkMessage.sender.role?.name,
-      senderUserId: sdkMessage.sender.customerUserId,
+      sender: sdkMessage.sender?.peerId,
+      senderName: sdkMessage.sender?.name,
+      senderRole: sdkMessage.sender?.role?.name,
+      senderUserId: sdkMessage.sender?.customerUserId,
       recipientPeer: sdkMessage.recipientPeer?.peerId,
       recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,

@@ -8,18 +8,19 @@ export const Toast = ({
   open,
   duration,
   onOpenChange,
+  icon,
+  ...props
 }) => {
   return (
-    <ToastPrimitive.Root
+    <ToastPrimitive.HMSToast
+      title={title}
+      description={description}
       open={open}
+      isClosable={close}
       onOpenChange={onOpenChange}
-      duration={duration}
-    >
-      <ToastPrimitive.Title>{title}</ToastPrimitive.Title>
-      {description && (
-        <ToastPrimitive.Description>{description}</ToastPrimitive.Description>
-      )}
-      {close && <ToastPrimitive.Close />}
-    </ToastPrimitive.Root>
+      duration={!close ? 600000 : duration}
+      icon={icon}
+      {...props}
+    />
   );
 };

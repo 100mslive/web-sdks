@@ -15,10 +15,16 @@ const config = {
   input: 'src/index.ts',
   external: [...deps, ...peerDeps],
   output: [
-    { file: pkg.main, format: 'cjs' },
-    { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src' },
+    { file: pkg.main, format: 'cjs', sourcemap: true },
+    { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
-  plugins: [commonjs(), esbuild({ format: 'esm' }), resolve(), isProduction && terser(), typescript()],
+  plugins: [
+    commonjs(),
+    esbuild({ format: 'esm' }),
+    resolve(),
+    isProduction && terser(),
+    typescript({ sourceMap: true }),
+  ],
 };
 
 export default config;
