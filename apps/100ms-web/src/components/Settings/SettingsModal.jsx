@@ -100,7 +100,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                <Tabs.Content value="devices" className={settingContent().className}  css={{ display: selection === 'devices' ? '' : 'none' }}>
+                <Tabs.Content value="devices" className={settingContent()}>
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}
@@ -109,7 +109,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <DeviceSettings />
                 </Tabs.Content>
-                <Tabs.Content value="notifications" className={settingContent().className} css={{ display: selection === 'notifications' ? '' : 'none' }}>
+                <Tabs.Content value="notifications" className={settingContent()} >
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}
@@ -118,7 +118,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <NotificationSettings />
                 </Tabs.Content>
-                <Tabs.Content value="layout" className={settingContent().className} css={{ display: selection === 'layout' ? '' : 'none' }}>
+                <Tabs.Content value="layout" className={settingContent()}>
                   <SettingsContentHeader
                     onBack={resetSelection}
                     isMobile={isMobile}

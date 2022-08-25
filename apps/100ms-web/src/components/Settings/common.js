@@ -9,4 +9,7 @@ export const settingOverflow = css({
 export const settingContent = css({
   display: "flex",
   flexDirection: "column",
+  "&[hidden]": {
+    display: "none",
+  },
 });
