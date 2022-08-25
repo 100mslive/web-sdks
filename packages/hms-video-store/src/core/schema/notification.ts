@@ -104,4 +104,3 @@ export enum HMSNotificationTypes {
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
 }
-
