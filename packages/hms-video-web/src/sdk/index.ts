@@ -353,7 +353,6 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  // eslint-disable-next-line complexity
   async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
@@ -379,7 +378,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
-      this.localPeer.metadata = config.metaData || '';
+      this.localPeer.metadata = config.metaData;
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -400,7 +399,7 @@ export class HMSSdk implements HMSInterface {
       await this.transport.join(
         config.authToken,
         this.localPeer!.peerId,
-        { name: config.userName, metaData: config.metaData || '' },
+        { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
       );
@@ -408,7 +407,7 @@ export class HMSSdk implements HMSInterface {
       HMSAudioContextHandler.resumeContext();
       await this.notifyJoin();
       this.sendJoinAnalyticsEvent(isPreviewCalled);
-      if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
+      if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
         this.publish(config.settings || defaultSettings).catch(error => {
           HMSLogger.e(this.TAG, 'Error in publish', error);
           this.listener?.onError(error);
@@ -426,7 +425,9 @@ export class HMSSdk implements HMSInterface {
 
   private stringifyMetadata(config: HMSConfig) {
     if (config.metaData && typeof config.metaData !== 'string') {
-      JSON.stringify(config.metaData);
+      config.metaData = JSON.stringify(config.metaData);
+    } else if (!config.metaData) {
+      config.metaData = '';
     }
   }
 
