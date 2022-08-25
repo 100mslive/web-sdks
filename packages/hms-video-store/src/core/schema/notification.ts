@@ -12,41 +12,58 @@ interface BaseNotification {
   severity?: HMSNotificationSeverity;
 }
 interface PeerNotification extends BaseNotification {
+  type: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT;
   data?: HMSPeer;
 }
 
 interface PeerArrayNotification extends BaseNotification {
+  type: HMSNotificationTypes.PEER_LIST;
   data?: HMSPeer[];
 }
 interface TrackNotification extends BaseNotification {
+  type:
+    | HMSNotificationTypes.TRACK_ADDED
+    | HMSNotificationTypes.TRACK_DEGRADED
+    | HMSNotificationTypes.TRACK_UNMUTED
+    | HMSNotificationTypes.TRACK_DESCRIPTION_CHANGED
+    | HMSNotificationTypes.TRACK_MUTED
+    | HMSNotificationTypes.TRACK_REMOVED
+    | HMSNotificationTypes.TRACK_RESTORED;
   data?: HMSTrack;
 }
 interface MessageNotification extends BaseNotification {
+  type: HMSNotificationTypes.NEW_MESSAGE;
   data?: HMSMessage;
 }
 interface ExceptionNotification extends BaseNotification {
+  type: HMSNotificationTypes.ERROR;
   data?: HMSException;
 }
 interface ChangeTrackStateRequestNotification extends BaseNotification {
+  type: HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST;
   data?: HMSChangeTrackStateRequest;
 }
 interface ChangeMultiTrackStateRequestNotification extends BaseNotification {
+  type: HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST;
   data?: HMSChangeMultiTrackStateRequest;
 }
 
 interface LeaveRoomRequestNotification extends BaseNotification {
+  type: HMSNotificationTypes.ROOM_ENDED | HMSNotificationTypes.REMOVED_FROM_ROOM;
   data?: HMSLeaveRoomRequest;
 }
 interface DeviceChangeEventNotification extends BaseNotification {
+  type: HMSNotificationTypes.DEVICE_CHANGE_UPDATE;
   data?: HMSDeviceChangeEvent;
 }
 interface PlaylistItemNotification<T> extends BaseNotification {
+  type: HMSNotificationTypes.PLAYLIST_TRACK_ENDED;
   data?: HMSPlaylistItem<T>;
 }
 
-export type HMSNotification<T = {}> =
+export type HMSNotification =
   | PeerNotification
-  | PeerArrayNotification[]
+  | PeerArrayNotification
   | TrackNotification
   | MessageNotification
   | ExceptionNotification
@@ -54,7 +71,7 @@ export type HMSNotification<T = {}> =
   | ChangeMultiTrackStateRequestNotification
   | LeaveRoomRequestNotification
   | DeviceChangeEventNotification
-  | PlaylistItemNotification<T>
+  | PlaylistItemNotification<any>
   | null;
 
 export enum HMSNotificationSeverity {
@@ -87,3 +104,18 @@ export enum HMSNotificationTypes {
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
 }
+
+// const notif1 : HMSNotification = {
+//   type: HMSNotificationTypes.PEER_JOINED,
+//   data: {
+//     id: 'a',
+//     name: 'sd',
+//     isLocal: false,
+//     auxiliaryTracks: ["asdf"]
+//   },
+//   id: 1,
+//   message: "dsfsadf",
+//   severity: HMSNotificationSeverity.INFO
+// }
+
+// notif1.data.

@@ -37,9 +37,9 @@ export class HMSNotifications implements IHMSNotifications {
       if (type) {
         let matchesType: boolean;
         if (Array.isArray(type)) {
-          matchesType = type.includes(notification.type as HMSNotificationTypes);
+          matchesType = type.includes(notification?.type as HMSNotificationTypes);
         } else {
-          matchesType = type === (notification.type as HMSNotificationTypes);
+          matchesType = type === (notification?.type as HMSNotificationTypes);
         }
         if (!matchesType) {
           return;
@@ -177,7 +177,7 @@ export class HMSNotifications implements IHMSNotifications {
     return {
       id: this.id,
       type,
-      message,
+      message, 
       data,
       severity,
     };
