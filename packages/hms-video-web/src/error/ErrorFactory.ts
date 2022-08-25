@@ -47,13 +47,15 @@ export const ErrorFactory = {
         action,
         `Network connection lost `,
         description,
+        false,
+        true,
       );
     },
   },
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true,true);
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -63,6 +65,8 @@ export const ErrorFactory = {
         action,
         `Endpoint is not reachable - ${description}`,
         description,
+        false,
+        true,
       );
     },
 
@@ -74,6 +78,7 @@ export const ErrorFactory = {
         `Token is not in proper JWT format - ${description}`,
         description,
         true,
+        true,
       );
     },
 
@@ -84,6 +89,8 @@ export const ErrorFactory = {
         action,
         `[INIT]: ${description}`,
         `[INIT]: ${description}`,
+        false,
+        true,
       );
     },
   },
@@ -96,6 +103,8 @@ export const ErrorFactory = {
         action,
         `[TRACK]: ${description}`,
         `[TRACK]: ${description}`,
+        false,
+        true,
       );
     },
 
@@ -106,6 +115,8 @@ export const ErrorFactory = {
         action,
         `User denied permission to access capture device - ${deviceInfo}`,
         description,
+        false,
+        false,
       );
     },
 
@@ -116,6 +127,8 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Capture device is no longer available - ${deviceInfo}`,
         description,
+        false,
+        true,
       );
     },
 
@@ -126,6 +139,8 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Capture device is in use by another application - ${deviceInfo}`,
         description,
+        false,
+        true,
       );
     },
 
@@ -136,6 +151,8 @@ export const ErrorFactory = {
         action,
         `Lost access to capture device midway - ${deviceInfo}`,
         description,
+        false,
+        true,
       );
     },
 
@@ -146,6 +163,8 @@ export const ErrorFactory = {
         action,
         `There is no media to return. Please select either video or audio or both.`,
         description,
+        false,
+        true,
       );
     },
 
@@ -176,6 +195,8 @@ export const ErrorFactory = {
         action,
         `Codec can't be changed mid call.`,
         description,
+        false,
+        true,
       );
     },
 
@@ -218,6 +239,8 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to create offer. `,
         description,
+        false,
+        true,
       );
     },
 
@@ -228,6 +251,8 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to create answer. `,
         description,
+        false,
+        true,
       );
     },
 
@@ -238,6 +263,8 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to set offer. `,
         description,
+        false,
+        true,
       );
     },
 
@@ -248,6 +275,8 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to set answer. `,
         description,
+        false,
+        true,
       );
     },
 
@@ -258,13 +287,15 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Ice connection state FAILED`,
         description,
+        false,
+        true,
       );
     },
   },
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description, true);
+      return new HMSException(code, 'ServerErrors', action, description, description, true, shouldRetryServerErrorCode(code));
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
@@ -274,6 +305,8 @@ export const ErrorFactory = {
         action,
         `[JOIN]: You have already joined this room.`,
         description,
+        true,
+        false,
       );
     },
 
@@ -316,6 +349,8 @@ export const ErrorFactory = {
         action,
         `Unknown exception: ${description}`,
         description,
+        true,
+        true,
       );
     },
 
@@ -340,6 +375,8 @@ export const ErrorFactory = {
         action,
         `Track Metadata Missing`,
         description,
+        true,
+        true,
       );
     },
 
@@ -350,6 +387,8 @@ export const ErrorFactory = {
         action,
         `RTC Track missing`,
         description,
+        true,
+        true
       );
     },
 
@@ -360,6 +399,8 @@ export const ErrorFactory = {
         action,
         `Peer Metadata Missing`,
         description,
+        true,
+        true,
       );
     },
 
@@ -472,3 +513,10 @@ export const ErrorFactory = {
     },
   },
 };
+
+const shouldRetryServerErrorCode = (errorCode: number) => {
+  if (errorCode < 500 && errorCode != 429) {
+    return false;
+}
+return true;
+}
