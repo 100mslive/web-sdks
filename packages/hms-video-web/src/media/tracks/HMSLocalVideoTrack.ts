@@ -120,8 +120,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @see HMSVideoPlugin
    */
   getPlugins(): string[] {
-    const plugins = Array.from(this.plugins.values()).map(plugin => plugin.name);
-    return [...this.pluginsManager.getPlugins(), ...plugins];
+    return [...this.pluginsManager.getPlugins(), ...this.plugins.keys()];
   }
 
   /**
@@ -139,7 +138,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   async removeTrackPlugin(plugin: HMSVideoTrackPlugin) {
     this.plugins.delete(plugin.name);
-    if (this.pluginsManager.getPlugins().length === 0) {
+    if (this.plugins.size === 0 && this.pluginsManager.getPlugins().length === 0) {
       await this.setProcessedTrack(undefined);
     }
   }
