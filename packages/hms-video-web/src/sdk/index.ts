@@ -885,18 +885,18 @@ export class HMSSdk implements HMSInterface {
       localPeer.joinedAt = room.joinedAt;
     }
 
+    if (localPeer?.role) {
+      this.analyticsTimer.end(TimedEvent.JOIN);
+      this.listener?.onJoin(room);
+      return;
+    }
+
     return new Promise<void>(resolve => {
-      if (localPeer?.role) {
+      this.eventBus.policyChange.subscribeOnce(() => {
         this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
         resolve();
-      } else {
-        this.eventBus.policyChange.subscribeOnce(() => {
-          this.analyticsTimer.end(TimedEvent.JOIN);
-          this.listener?.onJoin(room);
-          resolve();
-        });
-      }
+      });
     });
   }
 
