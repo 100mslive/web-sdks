@@ -14,7 +14,7 @@ test.afterEach(async () => {
 });
 
 test.describe("Beam tests @beam", () => {
-  test.only(`Start and Stop Browser Recording`, async () => {
+  test(`Start and Stop Browser Recording`, async () => {
     await page.click(
       page.footer.more_settings_btn,
       page.footer.streaming_recording_btn,
