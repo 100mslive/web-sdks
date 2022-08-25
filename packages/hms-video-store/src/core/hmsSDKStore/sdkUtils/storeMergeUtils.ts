@@ -1,5 +1,5 @@
-import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
+import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes
@@ -60,7 +60,7 @@ export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMS
     const oldStat = draftStats[trackID];
     const newStat = newStats[trackID];
     if (isEntityUpdated(oldStat, newStat)) {
-      Object.assign(oldStat, newStat);
+      Object.assign(oldStat || {}, newStat);
     } else if (isEntityRemoved(oldStat, newStat)) {
       delete draftStats[trackID];
     } else if (isEntityAdded(oldStat, newStat)) {
