@@ -157,7 +157,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   private createNotification<T>(
-    type: string,
+    type: HMSNotificationTypes,
     data?:
       | HMSPeer
       | HMSPeer[]
@@ -177,9 +177,9 @@ export class HMSNotifications implements IHMSNotifications {
     return {
       id: this.id,
       type,
-      message, 
+      message,
       data,
       severity,
-    };
+    } as HMSNotification;
   }
 }
