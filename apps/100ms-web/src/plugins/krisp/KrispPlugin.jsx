@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   selectIsLocalAudioPluginPresent,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
+import { Loading } from "@100mslive/react-ui";
 import { WiredMic } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
 import FilterFactory from "./krispsdk.mjs";
@@ -60,13 +61,16 @@ class Plugin {
 const plugin = new Plugin();
 
 export const KrispPlugin = () => {
+  const [loading, setLoading] = useState(false)
   const isPluginPresent = useHMSStore(
     selectIsLocalAudioPluginPresent("KrispPlugin")
   );
   const actions = useHMSActions();
 
-  const addPlugin = useCallback(() => {
-    actions.addPluginToAudioTrack(plugin);
+  const addPlugin = useCallback(async () => {
+    setLoading(true)
+    await actions.addPluginToAudioTrack(plugin);
+    setLoading(false)
   }, [actions]);
 
   const removePlugin = useCallback(() => {
@@ -88,7 +92,7 @@ export const KrispPlugin = () => {
         }}
         data-testid="noise_suppression_btn"
       >
-        <WiredMic />
+        {loading ? <Loading size={20} />:  <WiredMic /> }
       </IconButton>
     </Tooltip>
   );
