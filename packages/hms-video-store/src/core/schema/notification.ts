@@ -105,17 +105,3 @@ export enum HMSNotificationTypes {
   METADATA_UPDATED = 'METADATA_UPDATED',
 }
 
-// const notif1 : HMSNotification = {
-//   type: HMSNotificationTypes.PEER_JOINED,
-//   data: {
-//     id: 'a',
-//     name: 'sd',
-//     isLocal: false,
-//     auxiliaryTracks: ["asdf"]
-//   },
-//   id: 1,
-//   message: "dsfsadf",
-//   severity: HMSNotificationSeverity.INFO
-// }
-
-// notif1.data.
