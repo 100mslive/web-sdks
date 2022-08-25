@@ -34,7 +34,7 @@ export const NotificationSettings = () => {
   const subscribedNotifications = useSubscribedNotifications();
 
   return (
-    <Box className={settingOverflow().className}>
+    <Box className={settingOverflow()}>
       <NotificationItem
         label="Peer Joined"
         type={SUBSCRIBED_NOTIFICATIONS.PEER_JOINED}

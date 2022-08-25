@@ -34,7 +34,7 @@ export const LayoutSettings = () => {
   );
 
   return (
-    <Box className={settingOverflow().className}>
+    <Box className={settingOverflow()}>
       <SwitchWithLabel
         checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
         onChange={value => {

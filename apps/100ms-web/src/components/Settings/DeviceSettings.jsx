@@ -32,7 +32,7 @@ const Settings = () => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   return (
-    <Box className={settingOverflow().className}>
+    <Box className={settingOverflow()}>
       {videoInput?.length ? (
         <Fragment>
           {isVideoOn && (
