@@ -5,7 +5,7 @@ export class PreviewPage {
 
   preview_name_field = 'input[placeholder="Enter your name"]';
   preview_get_started_btn = 'text="Get Started "';
-  preview_join_btn = 'text="Join"';
+  preview_join_btn = 'text="Join Room"';
   preview_audio_btn = 'button[data-testid="audio_btn"]';
   preview_audio_on_btn = 'button[data-testid="audio_btn"] > svg[data-testid="audio_on_btn"]';
   preview_audio_off_btn = 'button[data-testid="audio_btn"] > svg[data-testid="audio_off_btn"]';
