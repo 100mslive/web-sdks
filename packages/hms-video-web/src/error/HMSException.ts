@@ -13,7 +13,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
     public message: string,
     public description: string,
     public isTerminal: boolean = false,
-    public canRety: boolean = false,
+    public canRetry: boolean = false,
   ) {
     super(message);
 

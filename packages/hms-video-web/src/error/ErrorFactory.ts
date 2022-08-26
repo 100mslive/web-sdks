@@ -61,7 +61,7 @@ export const ErrorFactory = {
         action,
         `[INIT]: Server error ${description}`,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -73,7 +73,7 @@ export const ErrorFactory = {
         action,
         `Endpoint is not reachable - ${description}`,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -247,7 +247,7 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to create offer. `,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -321,7 +321,7 @@ export const ErrorFactory = {
         action,
         `[JOIN]: You have already joined this room.`,
         description,
-        true,
+        false,
         false,
       );
     },
@@ -365,7 +365,7 @@ export const ErrorFactory = {
         action,
         `Unknown exception: ${description}`,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -391,7 +391,7 @@ export const ErrorFactory = {
         action,
         `Track Metadata Missing`,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -403,7 +403,7 @@ export const ErrorFactory = {
         action,
         `RTC Track missing`,
         description,
-        true,
+        false,
         true,
       );
     },
@@ -415,7 +415,7 @@ export const ErrorFactory = {
         action,
         `Peer Metadata Missing`,
         description,
-        true,
+        false,
         true,
       );
     },
