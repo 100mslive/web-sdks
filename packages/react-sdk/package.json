@@ -28,7 +28,7 @@
     "@types/react": "^18.0.8",
     "react": "^18.1.0",
     "rollup": "^2.70.1",
-    "rollup-plugin-esbuild": "^4.9.1",
+    "rollup-plugin-esbuild": "4.9.3",
     "rollup-plugin-terser": "^7.0.2"
   },
   "peerDependencies": {
