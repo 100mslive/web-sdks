@@ -120,14 +120,4 @@ export class CypressPeer {
       }, selectPeerByID(forPeerId));
     });
   };
-
-  private waitTillConnected = async () => {
-    return new Promise(resolve => {
-      this.store.subscribe(isConnected => {
-        if (isConnected) {
-          resolve(true);
-        }
-      }, selectIsConnectedToRoom);
-    });
-  };
 }
