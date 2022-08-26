@@ -55,7 +55,15 @@ export const ErrorFactory = {
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true,true);
+      return new HMSException(
+        code,
+        'ServerErrors',
+        action,
+        `[INIT]: Server error ${description}`,
+        description,
+        true,
+        true,
+      );
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -65,7 +73,7 @@ export const ErrorFactory = {
         action,
         `Endpoint is not reachable - ${description}`,
         description,
-        false,
+        true,
         true,
       );
     },
@@ -78,7 +86,7 @@ export const ErrorFactory = {
         `Token is not in proper JWT format - ${description}`,
         description,
         true,
-        true,
+        false,
       );
     },
 
@@ -239,7 +247,7 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to create offer. `,
         description,
-        false,
+        true,
         true,
       );
     },
@@ -295,7 +303,15 @@ export const ErrorFactory = {
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description, true, shouldRetryServerErrorCode(code));
+      return new HMSException(
+        code,
+        'ServerErrors',
+        action,
+        description,
+        description,
+        true,
+        shouldRetryServerErrorCode(code),
+      );
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
@@ -388,7 +404,7 @@ export const ErrorFactory = {
         `RTC Track missing`,
         description,
         true,
-        true
+        true,
       );
     },
 
@@ -515,8 +531,8 @@ export const ErrorFactory = {
 };
 
 const shouldRetryServerErrorCode = (errorCode: number) => {
-  if (errorCode < 500 && errorCode != 429) {
+  if (errorCode < 500 && errorCode !== 429) {
     return false;
-}
-return true;
-}
+  }
+  return true;
+};
