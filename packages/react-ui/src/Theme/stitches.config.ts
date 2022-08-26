@@ -18,7 +18,16 @@ const HmsStitches = createStitches({
   themeMap: defaultThemeMap,
 });
 
-export const { theme, createTheme: createThemeBase, styled, globalCss, keyframes, getCssText, config } = HmsStitches;
+export const {
+  theme,
+  createTheme: createThemeBase,
+  styled,
+  globalCss,
+  keyframes,
+  css,
+  getCssText,
+  config,
+} = HmsStitches;
 
 export const globalStyles = globalCss({
   '*': {
