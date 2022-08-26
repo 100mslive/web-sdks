@@ -18,7 +18,7 @@ const Init = () => {
   const toggleTheme = useTheme().toggleTheme;
 
   useEffect(() => {
-    window.toggleTheme = toggleTheme;
+    window.toggleUiTheme = toggleTheme;
   }, [toggleTheme]);
 
   useEffect(() => {
