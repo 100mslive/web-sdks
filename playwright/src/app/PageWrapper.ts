@@ -99,8 +99,9 @@ export class PageWrapper {
     console.log('Text sent: ', text, 'to element', elementId);
   }
 
-  async hasText(elementId: string, text: string) {
-    await expect(this.page.locator(elementId)).toContainText(text);
+  async hasText(elementId: string, msgSent: string) {
+    const innerText = (await this.getText(elementId)) as string;
+    expect(innerText.includes(msgSent)).toBeTruthy();
   }
 
   /**
