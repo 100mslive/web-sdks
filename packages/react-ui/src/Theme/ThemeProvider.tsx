@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
 import useSSR from './useSSR';
@@ -13,14 +13,24 @@ export type ThemeContextValue = {
   themeType: 'dark' | 'light';
   theme: Theme;
   aspectRatio: { width: number; height: number };
+  toggleTheme: () => void;
 };
+
 export type ThemeProviderProps = {
   themeType?: 'dark' | 'light';
   theme?: Theme;
   aspectRatio?: { width: number; height: number };
+  toggleTheme: () => void;
 };
 
-const defaultContext = { themeType: 'dark', theme, aspectRatio: { width: 1, height: 1 } };
+const defaultContext = {
+  themeType: 'dark',
+  theme,
+  aspectRatio: { width: 1, height: 1 },
+  toggleTheme: () => {
+    return;
+  },
+};
 export const ThemeContext = React.createContext(defaultContext);
 
 /**
@@ -37,11 +47,11 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   children,
 }) => {
   const systemTheme = useMedia('prefers-color-scheme: dark') ? 'dark' : 'light';
-  const resolvedTheme = themeType || systemTheme;
+  const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
   const previousClassName = useRef('');
   const { isBrowser } = useSSR();
   const updatedTheme = useMemo(() => {
-    const updatedTheme = createTheme({ themeType: resolvedTheme, theme: userTheme || {} });
+    const updatedTheme = createTheme({ themeType: currentTheme, theme: userTheme || {} });
     if (!isBrowser) {
       return updatedTheme;
     }
@@ -51,10 +61,22 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     previousClassName.current = updatedTheme.className;
     document.documentElement.classList.add(updatedTheme);
     return updatedTheme;
-  }, [userTheme, resolvedTheme, isBrowser]);
+  }, [userTheme, currentTheme, isBrowser]);
+
+  const toggleTheme = useCallback(() => {
+    setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  }, [currentTheme]);
+
+  useEffect(() => {
+    if (themeType) {
+      setCurrentTheme(themeType);
+    }
+  }, [themeType]);
 
   return (
-    <ThemeContext.Provider value={{ themeType: resolvedTheme, theme: updatedTheme as unknown as Theme, aspectRatio }}>
+    <ThemeContext.Provider
+      value={{ themeType: currentTheme, theme: updatedTheme as unknown as Theme, aspectRatio, toggleTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   );
