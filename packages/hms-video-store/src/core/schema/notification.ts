@@ -1,9 +1,9 @@
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSMessage } from './message';
-import { HMSException } from './error';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
 import { HMSDeviceChangeEvent } from './device-change';
 import { HMSPlaylistItem } from './playlist';
+import { HMSException } from './error';
 
 interface BaseNotification {
   id: number;
@@ -11,16 +11,16 @@ interface BaseNotification {
   message: string;
   severity?: HMSNotificationSeverity;
 }
-interface PeerNotification extends BaseNotification {
+export interface HMSPeerNotification extends BaseNotification {
   type: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT;
   data?: HMSPeer;
 }
 
-interface PeerArrayNotification extends BaseNotification {
+export interface HMSPeerArrayNotification extends BaseNotification {
   type: HMSNotificationTypes.PEER_LIST;
   data?: HMSPeer[];
 }
-interface TrackNotification extends BaseNotification {
+export interface HMSTrackNotification extends BaseNotification {
   type:
     | HMSNotificationTypes.TRACK_ADDED
     | HMSNotificationTypes.TRACK_DEGRADED
@@ -31,47 +31,47 @@ interface TrackNotification extends BaseNotification {
     | HMSNotificationTypes.TRACK_RESTORED;
   data?: HMSTrack;
 }
-interface MessageNotification extends BaseNotification {
+export interface HMSMessageNotification extends BaseNotification {
   type: HMSNotificationTypes.NEW_MESSAGE;
   data?: HMSMessage;
 }
-interface ExceptionNotification extends BaseNotification {
+export interface HMSExceptionNotification extends BaseNotification {
   type: HMSNotificationTypes.ERROR;
   data?: HMSException;
 }
-interface ChangeTrackStateRequestNotification extends BaseNotification {
+export interface HMSChangeTrackStateRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST;
   data?: HMSChangeTrackStateRequest;
 }
-interface ChangeMultiTrackStateRequestNotification extends BaseNotification {
+export interface HMSChangeMultiTrackStateRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST;
   data?: HMSChangeMultiTrackStateRequest;
 }
 
-interface LeaveRoomRequestNotification extends BaseNotification {
+export interface HMSLeaveRoomRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.ROOM_ENDED | HMSNotificationTypes.REMOVED_FROM_ROOM;
   data?: HMSLeaveRoomRequest;
 }
-interface DeviceChangeEventNotification extends BaseNotification {
+export interface HMSDeviceChangeEventNotification extends BaseNotification {
   type: HMSNotificationTypes.DEVICE_CHANGE_UPDATE;
   data?: HMSDeviceChangeEvent;
 }
-interface PlaylistItemNotification<T> extends BaseNotification {
+export interface HMSPlaylistItemNotification<T> extends BaseNotification {
   type: HMSNotificationTypes.PLAYLIST_TRACK_ENDED;
   data?: HMSPlaylistItem<T>;
 }
 
 export type HMSNotification =
-  | PeerNotification
-  | PeerArrayNotification
-  | TrackNotification
-  | MessageNotification
-  | ExceptionNotification
-  | ChangeTrackStateRequestNotification
-  | ChangeMultiTrackStateRequestNotification
-  | LeaveRoomRequestNotification
-  | DeviceChangeEventNotification
-  | PlaylistItemNotification<any>
+  | HMSPeerNotification
+  | HMSPeerArrayNotification
+  | HMSTrackNotification
+  | HMSMessageNotification
+  | HMSExceptionNotification
+  | HMSChangeTrackStateRequestNotification
+  | HMSChangeMultiTrackStateRequestNotification
+  | HMSLeaveRoomRequestNotification
+  | HMSDeviceChangeEventNotification
+  | HMSPlaylistItemNotification<any>
   | null;
 
 export enum HMSNotificationSeverity {
@@ -103,4 +103,77 @@ export enum HMSNotificationTypes {
   PLAYLIST_TRACK_ENDED = 'PLAYLIST_TRACK_ENDED',
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
+}
+
+export type HMSPeerNotificationCallback = (notification: HMSPeerNotification) => void;
+export type HMSPeerArrayNotificationCallback = (notification: HMSPeerArrayNotification) => void;
+export type HMSTrackNotificationCallback = (notification: HMSTrackNotification) => void;
+export type HMSExceptionNotificationCallback = (notification: HMSExceptionNotification) => void;
+export type HMSMessageNotificationCallback = (notification: HMSMessageNotification) => void;
+export type HMSChangeTrackReqNotificationCallback = (notification: HMSChangeTrackStateRequestNotification) => void;
+export type HMSChangeMultiTrackReqNotificationCallback = (
+  notification: HMSChangeMultiTrackStateRequestNotification,
+) => void;
+export type HMSLeaveRoomRequestNotificationCallback = (notification: HMSLeaveRoomRequestNotification) => void;
+export type HMSDeviceChangeNotificationCallback = (notificaiton: HMSDeviceChangeEventNotification) => void;
+export type HMSPlaylistItemNotificationCallback<T> = (notification: HMSPlaylistItemNotification<T>) => void;
+
+export type HMSNotificationCallback =
+  | HMSPeerNotificationCallback
+  | HMSPeerArrayNotificationCallback
+  | HMSTrackNotificationCallback
+  | HMSExceptionNotificationCallback
+  | HMSMessageNotificationCallback
+  | HMSChangeTrackReqNotificationCallback
+  | HMSChangeMultiTrackReqNotificationCallback
+  | HMSLeaveRoomRequestNotificationCallback
+  | HMSDeviceChangeNotificationCallback
+  | HMSPlaylistItemNotificationCallback<any>
+  | null;
+
+/**
+ * @category Core
+ */
+export interface IHMSNotifications {
+  /**
+   * you can subscribe to notifications for new message, peer add etc. using this function.
+   * note that this is not meant to maintain any state on your side, as the reactive store already
+   * does that. The intent of this function is mainly to display toast notifications or send analytics.
+   * We'll provide a display message which can be displayed as it is for common cases.
+   */
+  onNotification(
+    cb: HMSPeerNotificationCallback,
+    type?: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT,
+  ): () => void;
+  onNotification(cb: HMSPeerArrayNotificationCallback, type?: HMSNotificationTypes.PEER_LIST): () => void;
+  onNotification(
+    cb: HMSTrackNotificationCallback,
+    type?:
+      | HMSNotificationTypes.TRACK_ADDED
+      | HMSNotificationTypes.TRACK_DEGRADED
+      | HMSNotificationTypes.TRACK_UNMUTED
+      | HMSNotificationTypes.TRACK_DESCRIPTION_CHANGED
+      | HMSNotificationTypes.TRACK_MUTED
+      | HMSNotificationTypes.TRACK_REMOVED
+      | HMSNotificationTypes.TRACK_RESTORED,
+  ): () => void;
+  onNotification(cb: HMSExceptionNotificationCallback, type?: HMSNotificationTypes.ERROR): () => void;
+  onNotification(cb: HMSMessageNotificationCallback, type?: HMSNotificationTypes.NEW_MESSAGE): () => void;
+  onNotification(
+    cb: HMSChangeTrackReqNotificationCallback,
+    type?: HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+  ): () => void;
+  onNotification(
+    cb: HMSChangeTrackReqNotificationCallback,
+    type?: HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST,
+  ): () => void;
+  onNotification(
+    cb: HMSLeaveRoomRequestNotificationCallback,
+    type?: HMSNotificationTypes.ROOM_ENDED | HMSNotificationTypes.REMOVED_FROM_ROOM,
+  ): () => void;
+  onNotification(cb: HMSDeviceChangeNotificationCallback, type?: HMSNotificationTypes.DEVICE_CHANGE_UPDATE): () => void;
+  onNotification(
+    cb: HMSPlaylistItemNotificationCallback<any>,
+    type?: HMSNotificationTypes.PLAYLIST_TRACK_ENDED,
+  ): () => void;
 }

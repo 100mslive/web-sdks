@@ -16337,6 +16337,17 @@ rollup-plugin-esbuild@4.9.3:
     joycon "^3.0.1"
     jsonc-parser "^3.0.0"
 
+rollup-plugin-esbuild@^4.9.3:
+  version "4.10.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-esbuild/-/rollup-plugin-esbuild-4.10.1.tgz#84a32419b56680149a0456442a71456e49f122c0"
+  integrity sha512-/ymcRB283zjFp1JTBXO8ekxv0c9vRc2L6OTljghsLthQ4vqeDSDWa9BVz1tHiVrx6SbUnUpDPLC0K/MXK7j5TA==
+  dependencies:
+    "@rollup/pluginutils" "^4.1.1"
+    debug "^4.3.3"
+    es-module-lexer "^0.9.3"
+    joycon "^3.0.1"
+    jsonc-parser "^3.0.0"
+
 rollup-plugin-terser@^7.0.2:
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/rollup-plugin-terser/-/rollup-plugin-terser-7.0.2.tgz#e8fbba4869981b2dc35ae7e8a502d5c6c04d324d"
@@ -18058,7 +18069,7 @@ typedoc@^0.22.10:
     minimatch "^5.1.0"
     shiki "^0.10.1"
 
-typescript@4.7.4, typescript@^4.4.3, typescript@^4.4.4:
+typescript@^4.4.3, typescript@^4.4.4:
   version "4.7.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==

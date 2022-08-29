@@ -6,8 +6,8 @@ export type {
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
 export type { IHMSActions as HMSActions } from './IHMSActions';
-export type { IHMSNotifications as HMSNotifications } from './IHMSNotifications';
-export type { HMSNotificationCallback } from './IHMSNotifications';
+export type { IHMSNotifications as HMSNotifications } from './schema/notification';
+export type { HMSNotificationCallback } from './schema/notification';
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';

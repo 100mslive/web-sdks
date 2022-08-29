@@ -41,9 +41,6 @@
     "webpack-dev-server": "^4.7.4",
     "webpack-manifest-plugin": "^4.1.1"
   },
-  "resolutions": {
-    "typescript": "4.7.4"
-  },
   "scripts": {
     "lint": "lerna run lint --stream",
     "lint:fix": "lerna run lint:fix --stream",

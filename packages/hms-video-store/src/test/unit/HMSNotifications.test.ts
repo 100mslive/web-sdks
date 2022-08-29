@@ -123,7 +123,8 @@ describe('hms notifications tests', () => {
 
   test('when types are passed and does not match, callback not to be called', () => {
     const callback = jest.fn(val => val);
-    notifications.onNotification(callback, [HMSNotificationTypes.ERROR, HMSNotificationTypes.PEER_JOINED]);
+    notifications.onNotification(callback, HMSNotificationTypes.ERROR);
+    notifications.onNotification(callback, HMSNotificationTypes.PEER_JOINED);
     notifications.sendReconnected();
     expect(callback.mock.calls.length).toBe(0);
   });
@@ -131,7 +132,8 @@ describe('hms notifications tests', () => {
   test('when types are passed and matches, callback to be called', () => {
     const callback = jest.fn(val => val);
     const error = makeException('Test');
-    notifications.onNotification(callback, [HMSNotificationTypes.RECONNECTED, HMSNotificationTypes.RECONNECTING]);
+    notifications.onNotification(callback, HMSNotificationTypes.RECONNECTED);
+    notifications.onNotification(callback, HMSNotificationTypes.RECONNECTING);
     notifications.sendReconnecting(error);
     notifications.sendReconnected();
     expect(callback.mock.calls.length).toBe(2);
