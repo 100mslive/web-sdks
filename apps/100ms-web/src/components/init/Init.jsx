@@ -33,7 +33,7 @@ const Init = () => {
     return () => {
       window.removeEventListener("resize", resetHeight);
     };
-  }, [toggleTheme]);
+  }, []);
 
   useEffect(() => {
     if (localPeerID && localPeerRole && localPeerName) {
