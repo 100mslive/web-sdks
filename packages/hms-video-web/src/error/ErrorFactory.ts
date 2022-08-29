@@ -123,8 +123,6 @@ export const ErrorFactory = {
         action,
         `User denied permission to access capture device - ${deviceInfo}`,
         description,
-        false,
-        false,
       );
     },
 
