@@ -24,14 +24,14 @@ import {
 } from "@100mslive/react-ui";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
 
-const PeerName = forwardRef(({ children, ...rest }, ref) => (
+const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
   <Text
     {...rest}
     ref={ref}
     as="strong"
     variant="body2"
     css={{
-      ...textEllipsis(226),
+      ...textEllipsis(maxWidth),
       display: "inline-block",
       wordBreak: "break-all",
       fontWeight: "$semiBold",
@@ -54,6 +54,8 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   if (!peer) {
     return null;
   }
+
+  const peerNameMaxWidth = 226;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -77,10 +79,11 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
               }}
             >
               Change the role of
-              {peerNameRef &&
-              peerNameRef.clientWidth === 226 ? (
+              {peerNameRef && peerNameRef.clientWidth === peerNameMaxWidth ? (
                 <Tooltip title={peer.name} side="top">
-                  <PeerName ref={setPeerNameRef}>{peer.name}</PeerName>
+                  <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
+                    {peer.name}
+                  </PeerName>
                 </Tooltip>
               ) : (
                 <PeerName ref={setPeerNameRef}>{peer.name}</PeerName>
