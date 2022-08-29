@@ -21,7 +21,9 @@ export class Header {
   //participant list dropdown
   participant_list = 'button[data-testid="participant_list"]';
   participant_name = 'div[data-testid="participant_?"]';
+
   participant_setting = 'div[data-testid="participant_?"] p[type="button"]';
+
   participant_role_heading = 'text=?';
   dialog_select_change_role_to = 'div[data-testid="dialog_select_Change role to"]';
   role_list = ['audio', 'audio-video', 'audio-video-sshare', 'hls-viewer', 'screenshare', 'video', 'viewer'];

@@ -12,9 +12,10 @@ export class Footer {
   meeting_video_on_btn = 'button[data-testid="video_btn"] > svg[data-testid="video_on_btn"]';
   meeting_video_off_btn = 'button[data-testid="video_btn"] > svg[data-testid="video_off_btn"]';
 
+  leave_room_dropdown = 'button[data-testid="leave_end_dropdown_trigger"]';
   leave_room_btn = 'button[data-testid="leave_room_btn"]';
-  just_leave_btn = 'button[data-testid="just_leave_btn"]';
-  end_room_btn = 'button[data-testid="end_room_btn"]';
+  just_leave_btn = 'div[data-testid="just_leave_btn"]';
+  end_room_btn = "text='End Room for All'";
   lock_end_room = 'button[data-testid="lock_end_room"]';
 
   screen_share_btn = 'button[data-testid="screen_share_btn"]';
@@ -55,7 +56,9 @@ export class Footer {
   brb_btn = '[data-testid="brb_btn"]';
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
   chat_placeholder = 'css=[placeholder="Write something here"]';
-  first_chat_msg = '[data-testid="chat_msg"] >> p >> nth=3';
+
+  first_chat_msg = '[data-testid="chat_msg"]';
+
   chat_peer_selector = 'text=Everyone';
   chat_to_text = '[data-testid="chat_msg"] >> p >> nth=1';
 
@@ -81,11 +84,11 @@ export class Footer {
   }
 
   async leaveRoom() {
-    await this.page.click(this.leave_room_btn, this.just_leave_btn);
+    await this.page.click(this.leave_room_dropdown, this.just_leave_btn);
   }
 
   async endRoom() {
-    await this.page.click(this.leave_room_btn, this.end_room_btn, this.lock_end_room);
+    await this.page.click(this.leave_room_dropdown, this.end_room_btn, this.lock_end_room);
   }
 
   /**
