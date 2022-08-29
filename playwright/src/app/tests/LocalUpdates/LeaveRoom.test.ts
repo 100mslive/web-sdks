@@ -1,5 +1,5 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
@@ -14,7 +14,7 @@ test.afterEach(async () => {
 //leave and join again
 test(`Verify leave room`, async () => {
   await page.footer.leaveRoom();
-  await page.assertVisible(page.center.go_to_dashboard_btn);
+  await page.assertVisible(page.center.left_room_message);
   await page.click(page.center.join_again_btn);
   await page.assertVisible(page.preview.preview_join_btn);
 });
