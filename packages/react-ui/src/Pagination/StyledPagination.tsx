@@ -41,6 +41,9 @@ const Dot = styled('button', {
   width: '0.5rem',
   height: '0.5rem',
   backgroundColor: '$textDisabled',
+  padding: '0px',
+  border: 'none',
+  cursor: 'pointer',
   variants: {
     active: {
       true: {
@@ -48,9 +51,6 @@ const Dot = styled('button', {
       },
     },
   },
-  boxSizing: 'content-box',
-  padding: '0px',
-  cursor: 'pointer',
 });
 
 interface PaginationType {
