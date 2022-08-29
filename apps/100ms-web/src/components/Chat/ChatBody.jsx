@@ -177,7 +177,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
         }}
       >
         {message.senderName === "You" ? (
-          <SenderName>{message.senderName || "Anonymous"}</SenderName>
+          <SenderName>{message.senderName}</SenderName>
         ) : (
           <Tooltip title={message.senderName} side="top" align="start">
             <SenderName>{message.senderName || "Anonymous"}</SenderName>
