@@ -23,6 +23,7 @@ export const darkTheme = {
     inputBg: '$bgSecondary',
     toastBg: '$menuBg',
     borderDefault: '#1B1F26',
+    backgroundDefault: '#0B0D0F',
   },
 };
 
