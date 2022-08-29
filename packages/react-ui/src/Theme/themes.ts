@@ -13,11 +13,15 @@ export const darkTheme = {
     transparentBg: 'rgba(0, 0, 0, 0.22)',
     mainBg: '$black',
     tileBg: '#0F1115',
+    surfaceDefault: '#14171C',
+    surfaceDark: '#0F1115',
+    secondaryDisabled: '#F6F7F9',
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
     inputBg: '$bgSecondary',
     toastBg: '$menuBg',
+    borderDefault: '#1B1F26',
   },
 };
 
@@ -40,7 +44,7 @@ export const lightTheme = {
     menuBg: '#d9d9d9',
     inputBg: '$tileBg',
     toastBg: '$menuBg',
-
+    secondaryDisabled: '#242A33',
     // text variants
     textHighEmp: 'rgba(0, 0, 0, 0.95)',
     textMedEmp: 'rgba(0, 0, 0, 0.8)',
