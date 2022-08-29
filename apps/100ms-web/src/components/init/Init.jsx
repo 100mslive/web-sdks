@@ -15,7 +15,7 @@ const Init = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const localPeerName = useHMSStore(selectLocalPeerName);
   const sessionId = useHMSStore(selectSessionId);
-  const toggleTheme = useTheme().toggleTheme;
+  const { toggleTheme } = useTheme();
 
   useEffect(() => {
     window.toggleUiTheme = toggleTheme;
