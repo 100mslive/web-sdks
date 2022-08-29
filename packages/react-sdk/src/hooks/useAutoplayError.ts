@@ -32,9 +32,14 @@ export const useAutoplayError = (): useAutoplayErrorResult => {
   }, [actions]);
 
   useEffect(() => {
-      if (notification && notification?.type === HMSNotificationTypes.ERROR && notification.data && notification?.data.code === 3008) {
-        setError(notification?.data.message);
-      }
+    if (
+      notification &&
+      notification?.type === HMSNotificationTypes.ERROR &&
+      notification.data &&
+      notification?.data.code === 3008
+    ) {
+      setError(notification?.data.message);
+    }
   }, [notification]);
 
   return { error, unblockAudio, resetError: () => setError('') };
