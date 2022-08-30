@@ -7,14 +7,18 @@ import {
   MicOnIcon,
   SpeakerIcon,
   RemoveUserIcon,
+  ShareScreenIcon,
 } from "@100mslive/react-icons";
 import {
   useHMSStore,
   selectPermissions,
   useHMSActions,
   useRemoteAVToggle,
+  selectIsAllowedToPublish,
+  useCustomEvent,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
+import { remoteStopScreenshareType } from "../plugins/RemoteStopScreenshare";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -27,6 +31,7 @@ const TileMenu = ({
 }) => {
   const actions = useHMSActions();
   let { removeOthers } = useHMSStore(selectPermissions);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   removeOthers = removeOthers && !isScreenshare;
   const {
     isAudioEnabled,
@@ -36,6 +41,9 @@ const TileMenu = ({
     toggleVideo,
     volume,
   } = useRemoteAVToggle(audioTrackID, videoTrackID);
+  const { sendEvent } = useCustomEvent({
+    type: remoteStopScreenshareType,
+  });
   if (!(removeOthers || toggleAudio || toggleVideo || setVolume)) {
     return null;
   }
@@ -98,6 +106,13 @@ const TileMenu = ({
           >
             <RemoveUserIcon />
             <span>Remove Participant</span>
+          </StyledMenuTile.RemoveItem>
+        ) : null}
+
+        {isAllowedToPublish.screen ? (
+          <StyledMenuTile.RemoveItem onClick={() => sendEvent({})}>
+            <ShareScreenIcon />
+            <span> Stop Screenshare</span>
           </StyledMenuTile.RemoveItem>
         ) : null}
       </StyledMenuTile.Content>
