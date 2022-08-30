@@ -141,6 +141,7 @@ export interface IHMSNotifications {
    * does that. The intent of this function is mainly to display toast notifications or send analytics.
    * We'll provide a display message which can be displayed as it is for common cases.
    */
+  onNotification(cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]): () => void;
   onNotification(
     cb: HMSPeerNotificationCallback,
     type?: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT,

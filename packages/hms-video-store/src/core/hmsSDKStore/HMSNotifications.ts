@@ -43,8 +43,19 @@ export class HMSNotifications implements IHMSNotifications {
     this.eventEmitter = new EventEmitter();
   }
 
-  onNotification = (cb: any, type?: HMSNotificationTypes) => {
+  onNotification = (cb: any, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
     const eventCallback = (notification: HMSNotification) => {
+      if (type) {
+        let matchesType: boolean;
+        if (Array.isArray(type)) {
+          matchesType = type.includes(notification?.type as HMSNotificationTypes);
+        } else {
+          matchesType = type === (notification?.type as HMSNotificationTypes);
+        }
+        if (!matchesType) {
+          return;
+        }
+      }
       switch (type) {
         case (HMSNotificationTypes.PEER_JOINED, HMSNotificationTypes.PEER_LEFT): {
           cb(notification as HMSPeerNotification);
@@ -93,12 +104,6 @@ export class HMSNotifications implements IHMSNotifications {
           break;
         }
         default: {
-          if (type) {
-            const matchesType: boolean = type === (notification?.type as HMSNotificationTypes);
-            if (!matchesType) {
-              return;
-            }
-          }
           cb(notification);
         }
       }
