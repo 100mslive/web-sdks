@@ -1,16 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import {
-  IHMSNotifications,
-  HMSPeerNotification,
-  HMSPeerArrayNotification,
-  HMSExceptionNotification,
-  HMSMessageNotification,
-  HMSTrackNotification,
-  HMSChangeMultiTrackStateRequestNotification,
-  HMSLeaveRoomRequestNotification,
-  HMSDeviceChangeEventNotification,
-  HMSPlaylistItemNotification,
-} from '../schema/notification';
+import { IHMSNotifications } from '../schema/notification';
 import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';
 import * as sdkTypes from './sdkTypes';
@@ -56,57 +45,7 @@ export class HMSNotifications implements IHMSNotifications {
           return;
         }
       }
-      switch (type) {
-        case (HMSNotificationTypes.PEER_JOINED, HMSNotificationTypes.PEER_LEFT): {
-          cb(notification as HMSPeerNotification);
-          break;
-        }
-        case HMSNotificationTypes.PEER_LIST: {
-          cb(notification as HMSPeerArrayNotification);
-          break;
-        }
-        case (HMSNotificationTypes.TRACK_ADDED,
-        HMSNotificationTypes.TRACK_DEGRADED,
-        HMSNotificationTypes.TRACK_UNMUTED,
-        HMSNotificationTypes.TRACK_DESCRIPTION_CHANGED,
-        HMSNotificationTypes.TRACK_MUTED,
-        HMSNotificationTypes.TRACK_REMOVED,
-        HMSNotificationTypes.TRACK_RESTORED): {
-          cb(notification as HMSTrackNotification);
-          break;
-        }
-        case HMSNotificationTypes.NEW_MESSAGE: {
-          cb(notification as HMSMessageNotification);
-          break;
-        }
-        case HMSNotificationTypes.ERROR: {
-          cb(notification as HMSExceptionNotification);
-          break;
-        }
-        case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST: {
-          cb(notification as HMSChangeMultiTrackStateRequestNotification);
-          break;
-        }
-        case HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST: {
-          cb(notification as HMSChangeMultiTrackStateRequestNotification);
-          break;
-        }
-        case (HMSNotificationTypes.ROOM_ENDED, HMSNotificationTypes.REMOVED_FROM_ROOM): {
-          cb(notification as HMSLeaveRoomRequestNotification);
-          break;
-        }
-        case HMSNotificationTypes.DEVICE_CHANGE_UPDATE: {
-          cb(notification as HMSDeviceChangeEventNotification);
-          break;
-        }
-        case HMSNotificationTypes.PLAYLIST_TRACK_ENDED: {
-          cb(notification as HMSPlaylistItemNotification<any>);
-          break;
-        }
-        default: {
-          cb(notification);
-        }
-      }
+      cb(notification);
     };
     this.eventEmitter.addListener(HMS_NOTIFICATION_EVENT, eventCallback);
     return () => {
