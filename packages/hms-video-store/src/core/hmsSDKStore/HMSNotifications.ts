@@ -31,10 +31,10 @@ export class HMSNotifications implements IHMSNotifications {
     this.store = store;
     this.eventEmitter = new EventEmitter();
   }
-  onNotification<T extends HMSNotification>(
+  onNotification = <T extends HMSNotification>(
     cb: (notification: T) => void,
     type?: HMSNotificationTypes | HMSNotificationTypes[] | undefined,
-  ) {
+  ) => {
     const eventCallback = (notification: T) => {
       if (type) {
         let matchesType: boolean;
@@ -53,7 +53,7 @@ export class HMSNotifications implements IHMSNotifications {
     return () => {
       this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, eventCallback);
     };
-  }
+  };
 
   sendPlaylistTrackEnded<T>(item: HMSPlaylistItem<T>): void {
     const notification = this.createNotification(
