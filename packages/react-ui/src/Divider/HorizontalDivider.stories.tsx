@@ -17,7 +17,7 @@ export default {
 
 const HorizontalDividerComponent: ComponentStory<typeof HorizontalDivider> = ({ space, css }) => {
   return (
-    <Flex align="center" direction="column">
+    <Flex align="center" direction="column" css={{ maxWidth: "500px" }}>
       <div style={{ height: '20px', width: '20px', backgroundColor: 'red' }}></div>
       <HorizontalDivider space={space} css={css} />
       <div style={{ height: '20px', width: '20px', backgroundColor: 'green' }}></div>
