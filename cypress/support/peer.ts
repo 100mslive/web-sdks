@@ -1,14 +1,13 @@
 import {
   HMSConfigInitialSettings,
   HMSReactiveStore,
-  HMSRoomState,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectLocalAudioTrackID,
   selectLocalPeerID,
   selectLocalVideoTrackID,
   selectPeerByID,
   selectRoleByRoleName,
-  selectRoomState,
 } from '@100mslive/hms-video-store';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
@@ -125,7 +124,7 @@ export class CypressPeer {
   };
 
   isInPreview = () => {
-    return this.store.getState(selectRoomState) === HMSRoomState.Preview;
+    return this.store.getState(selectIsInPreview);
   };
 
   /**
