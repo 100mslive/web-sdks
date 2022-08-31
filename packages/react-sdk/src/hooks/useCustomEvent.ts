@@ -1,6 +1,6 @@
 import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { useCallback, useEffect } from 'react';
-import { HMSNotificationTypes } from '@100mslive/hms-video-store';
+import { HMSNotificationTypes, HMSMessageNotification } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
 
@@ -53,8 +53,8 @@ export const useCustomEvent = <T>({
     if (!notifications) {
       return;
     }
-    const unsubscribe = notifications.onNotification(notification => {
-      const msg = notification.data;
+    const unsubscribe = notifications.onNotification<HMSMessageNotification>(notification => {
+      const msg = notification?.data;
       if (msg && msg.type === type) {
         try {
           const data = JSON.parse(msg.message);

@@ -31,15 +31,17 @@ export class HMSNotifications implements IHMSNotifications {
     this.store = store;
     this.eventEmitter = new EventEmitter();
   }
-
-  onNotification = (cb: any, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
-    const eventCallback = (notification: HMSNotification) => {
+  onNotification<T extends HMSNotification>(
+    cb: (notification: T) => void,
+    type?: HMSNotificationTypes | HMSNotificationTypes[] | undefined,
+  ) {
+    const eventCallback = (notification: T) => {
       if (type) {
         let matchesType: boolean;
         if (Array.isArray(type)) {
           matchesType = type.includes(notification?.type as HMSNotificationTypes);
         } else {
-          matchesType = type === (notification?.type as HMSNotificationTypes);
+          matchesType = type === notification?.type;
         }
         if (!matchesType) {
           return;
@@ -51,7 +53,7 @@ export class HMSNotifications implements IHMSNotifications {
     return () => {
       this.eventEmitter.removeListener(HMS_NOTIFICATION_EVENT, eventCallback);
     };
-  };
+  }
 
   sendPlaylistTrackEnded<T>(item: HMSPlaylistItem<T>): void {
     const notification = this.createNotification(

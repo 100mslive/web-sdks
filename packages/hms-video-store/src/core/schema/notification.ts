@@ -105,7 +105,7 @@ export enum HMSNotificationTypes {
   METADATA_UPDATED = 'METADATA_UPDATED',
 }
 
-export type HMSPeerNotificationCallback = (notification: HMSPeerNotification) => void;
+/* export type HMSPeerNotificationCallback = (notification: HMSPeerNotification) => void;
 export type HMSPeerArrayNotificationCallback = (notification: HMSPeerArrayNotification) => void;
 export type HMSTrackNotificationCallback = (notification: HMSTrackNotification) => void;
 export type HMSExceptionNotificationCallback = (notification: HMSExceptionNotification) => void;
@@ -117,19 +117,19 @@ export type HMSChangeMultiTrackReqNotificationCallback = (
 export type HMSLeaveRoomRequestNotificationCallback = (notification: HMSLeaveRoomRequestNotification) => void;
 export type HMSDeviceChangeNotificationCallback = (notificaiton: HMSDeviceChangeEventNotification) => void;
 export type HMSPlaylistItemNotificationCallback<T> = (notification: HMSPlaylistItemNotification<T>) => void;
-
-export type HMSNotificationCallback =
-  | HMSPeerNotificationCallback
-  | HMSPeerArrayNotificationCallback
-  | HMSTrackNotificationCallback
-  | HMSExceptionNotificationCallback
-  | HMSMessageNotificationCallback
-  | HMSChangeTrackReqNotificationCallback
-  | HMSChangeMultiTrackReqNotificationCallback
-  | HMSLeaveRoomRequestNotificationCallback
-  | HMSDeviceChangeNotificationCallback
-  | HMSPlaylistItemNotificationCallback<any>
-  | null;
+ */
+export type HMSNotificationCallback<T> = (notification: HMSPlaylistItemNotification<T>) => void;
+// | HMSPeerNotificationCallback
+// | HMSPeerArrayNotificationCallback
+// | HMSTrackNotificationCallback
+// | HMSExceptionNotificationCallback
+// | HMSMessageNotificationCallback
+// | HMSChangeTrackReqNotificationCallback
+// | HMSChangeMultiTrackReqNotificationCallback
+// | HMSLeaveRoomRequestNotificationCallback
+// | HMSDeviceChangeNotificationCallback
+// | HMSPlaylistItemNotificationCallback<any>
+// | null;
 
 /**
  * @category Core
@@ -141,7 +141,11 @@ export interface IHMSNotifications {
    * does that. The intent of this function is mainly to display toast notifications or send analytics.
    * We'll provide a display message which can be displayed as it is for common cases.
    */
-  onNotification(cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]): () => void;
+  onNotification<T extends HMSNotification>(
+    cb: (notification: T) => void,
+    types?: HMSNotificationTypes | HMSNotificationTypes[],
+  ): () => void;
+  /* onNotification(cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]): () => void;
   onNotification(
     cb: HMSPeerNotificationCallback,
     type?: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT,
@@ -176,5 +180,5 @@ export interface IHMSNotifications {
   onNotification(
     cb: HMSPlaylistItemNotificationCallback<any>,
     type?: HMSNotificationTypes.PLAYLIST_TRACK_ENDED,
-  ): () => void;
+  ): () => void; */
 }

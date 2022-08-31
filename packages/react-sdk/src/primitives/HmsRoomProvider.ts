@@ -177,9 +177,9 @@ export const useHMSActions = () => {
  * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
  * rerenders for performance reasons.
  */
-export const useHMSNotifications = (type: HMSNotificationTypes) => {
+export const useHMSNotifications = <T extends HMSNotification>(type: HMSNotificationTypes): T | null => {
   const HMSContextConsumer = useContext(HMSContext);
-  const [notification, setNotification] = useState<HMSNotification | null>(null);
+  const [notification, setNotification] = useState<T | null>(null);
 
   if (!HMSContextConsumer) {
     throw new Error(hooksErrorMessage);
@@ -189,10 +189,9 @@ export const useHMSNotifications = (type: HMSNotificationTypes) => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification(
-      (notification: HMSNotification) => setNotification(notification),
-      type,
-    );
+    const unsubscribe = HMSContextConsumer.notifications.onNotification<T>((notification: T) => {
+      setNotification(notification);
+    }, type);
     return unsubscribe;
   }, [HMSContextConsumer.notifications, type]);
 
