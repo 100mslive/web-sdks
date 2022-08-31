@@ -3,6 +3,8 @@ export const darkTheme = {
     bgPrimary: '#0B0F15',
     bgSecondary: '#1D232B',
     bgTertiary: '#303740',
+    surfaceLight: '##1E232A',
+    surfaceLighter: '##282F39',
     textPrimary: '#FFFFFFE6',
     textSecondary: '#FFFFFFB8',
     textDisabled: '#FFFFFF61',
@@ -58,10 +60,10 @@ export const lightTheme = {
     surfaceDefault: '#EDEFF3',
     surfaceLight: '#F6F7F9',
     surfaceLighter: '#FCFCFD',
-
     backgroundDefault: '#E0E4EB',
     backgroundDark: '#DADFE7',
     backgroundDarker: '#D4DAE2',
+    surfaceDark: '$surfaceLight',
   },
 };
 
