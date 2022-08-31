@@ -35,7 +35,7 @@ describe('join api', () => {
       });
     });
 
-    it('should call onTrackUpdate twice with localpeer', () => {
+    it('should get 2 local tracks', () => {
       cy.wrap(localPeer.join()).then(() => {
         expect(localPeer.audioTrack).to.exist;
         expect(localPeer.videoTrack).to.exist;
