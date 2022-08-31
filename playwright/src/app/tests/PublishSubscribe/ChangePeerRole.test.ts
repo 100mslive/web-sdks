@@ -1,7 +1,7 @@
 import { PageWrapper } from '../../PageWrapper';
 import { test } from '@playwright/test';
 
-test(`Change peer Role`, async ({ context }) => {
+test.skip(`Change peer Role`, async ({ context }) => {
   const pages = await PageWrapper.openPages(context, 2);
 
   for (let i = 0; i < pages[0].header.role_list.length; i++) {
