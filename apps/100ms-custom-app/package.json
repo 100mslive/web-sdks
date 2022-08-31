@@ -42,17 +42,22 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.2",
-    "copy-webpack-plugin": "^10.2.1",
-    "css-loader": "^6.5.1",
-    "cssnano": "^5.0.15",
-    "dotenv": "^14.2.0",
-    "esbuild-loader": "^2.18.0",
-    "eslint-webpack-plugin": "^3.1.1",
+    "autoprefixer": "^10.4.8",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.1",
+    "cssnano": "^5.1.13",
+    "dotenv": "^16.0.2",
+    "esbuild-loader": "^2.19.0",
+    "esbuild-style-plugin": "^1.6.0",
     "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.5.2",
-    "postcss": "^8.4.5",
-    "source-map-loader": "^3.0.1",
-    "terser-webpack-plugin": "^5.3.1"
+    "mini-css-extract-plugin": "^2.6.1",
+    "postcss": "^8.4.16",
+    "postcss-loader": "^7.0.1",
+    "source-map-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.10.1",
+    "webpack-manifest-plugin": "^5.0.0"
   }
 }

@@ -1,7 +1,6 @@
+const stylePlugin = require('esbuild-style-plugin');
 const fs = require('fs');
 const esbuild = require('esbuild');
-const PostCssPlugin = require('esbuild-plugin-postcss2');
-const autoprefixer = require('autoprefixer');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -17,11 +16,7 @@ async function main() {
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
-  const plugins = [
-    PostCssPlugin.default({
-      plugins: [autoprefixer],
-    }),
-  ];
+  const plugins = [stylePlugin()];
   try {
     const commonOptions = {
       entryPoints: [source],
@@ -54,6 +49,8 @@ async function main() {
       .then(() => {
         fs.renameSync('./dist/App.js', './dist/index.js');
         fs.renameSync('./dist/App.css', './dist/index.css');
+        fs.renameSync('./dist/App.js.map', './dist/index.js.map');
+        fs.renameSync('./dist/App.css.map', './dist/index.css.map');
       });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
