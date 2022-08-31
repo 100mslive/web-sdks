@@ -16,7 +16,7 @@ export interface useCustomEventInput<T> {
    * The callback is optional in case you want to decouple sending event and
    * handling event in the UI.
    */
-  onEvent?: (data: T) => void;
+  onEvent?: (data?: T) => void;
   /**
    * function to handle errors happening during sending the event
    */
@@ -26,8 +26,18 @@ export interface useCustomEventInput<T> {
 export interface useCustomEventResult<T> {
   /**
    * sends the event data to others in the room who will receive it in onEvent
+   *
+   * @example to send message to peers of specific roles
+   * ```js
+   * sendEvent(data, ['host', 'guest'])
+   * ```
+   *
+   * @example to send message to single peer
+   * ```js
+   * sendEvent(data, peerID)
+   * ```
    */
-  sendEvent: (data: T) => void;
+  sendEvent: (data?: T, receiver?: string | string[]) => void;
 }
 
 /**
@@ -67,12 +77,18 @@ export const useCustomEvent = <T>({
     return unsubscribe;
   }, [notifications, type, onEvent, handleError]);
 
-  // this is to send message to remote peers and call onEvent
+  // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
-    async (data: T) => {
+    async (data?: T, receiver?: string | string[]) => {
       try {
         const dataStr = JSON.stringify(data || '');
-        await actions.sendBroadcastMessage(dataStr, type);
+        if (Array.isArray(receiver)) {
+          await actions.sendGroupMessage(dataStr, receiver, type);
+        } else if (typeof receiver === 'string') {
+          await actions.sendDirectMessage(dataStr, receiver, type);
+        } else {
+          await actions.sendBroadcastMessage(dataStr, type);
+        }
         onEvent?.(data);
       } catch (err) {
         handleError(err as Error, 'sendCustomEvent');

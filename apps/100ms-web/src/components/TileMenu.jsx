@@ -110,9 +110,9 @@ const TileMenu = ({
         ) : null}
 
         {isAllowedToPublish.screen ? (
-          <StyledMenuTile.RemoveItem onClick={() => sendEvent({})}>
+          <StyledMenuTile.RemoveItem onClick={() => sendEvent()}>
             <ShareScreenIcon />
-            <span> Stop Screenshare</span>
+            <span>Stop Screenshare</span>
           </StyledMenuTile.RemoveItem>
         ) : null}
       </StyledMenuTile.Content>
