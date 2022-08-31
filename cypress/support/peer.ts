@@ -1,11 +1,14 @@
 import {
+  HMSConfigInitialSettings,
   HMSReactiveStore,
+  HMSRoomState,
   selectIsConnectedToRoom,
   selectLocalAudioTrackID,
   selectLocalPeerID,
   selectLocalVideoTrackID,
   selectPeerByID,
   selectRoleByRoleName,
+  selectRoomState,
 } from '@100mslive/hms-video-store';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
@@ -57,14 +60,31 @@ export class CypressPeer {
     return this.store.getState(selectLocalAudioTrackID);
   }
 
-  join = async () => {
-    await this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
+  join = async (settings?: HMSConfigInitialSettings) => {
+    await this.actions.join({
+      userName: this.name,
+      authToken: this.authToken,
+      initEndpoint: this.initEndpoint,
+      settings,
+    });
     await this.waitForTracks(this.id);
     return `peer ${this.name} joined`;
   };
 
+  preview = async (settings?: HMSConfigInitialSettings) => {
+    await this.actions.preview({
+      userName: this.name,
+      authToken: this.authToken,
+      initEndpoint: this.initEndpoint,
+      settings,
+    });
+    await this.waitForTracks(this.id);
+    return `peer ${this.name} in preview`;
+  };
+
   waitForTracks = async (peerId: string) => {
     return new Promise(resolve => {
+      // eslint-disable-next-line complexity
       this.store.subscribe(peer => {
         if (!peer) {
           return;
@@ -102,6 +122,10 @@ export class CypressPeer {
 
   isConnected = () => {
     return this.store.getState(selectIsConnectedToRoom);
+  };
+
+  isInPreview = () => {
+    return this.store.getState(selectRoomState) === HMSRoomState.Preview;
   };
 
   /**
