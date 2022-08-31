@@ -18,7 +18,7 @@ import {
   useCustomEvent,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
-import { remoteStopScreenshareType } from "../plugins/RemoteStopScreenshare";
+import { REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -42,7 +42,7 @@ const TileMenu = ({
     volume,
   } = useRemoteAVToggle(audioTrackID, videoTrackID);
   const { sendEvent } = useCustomEvent({
-    type: remoteStopScreenshareType,
+    type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
   if (!(removeOthers || toggleAudio || toggleVideo || setVolume)) {
     return null;

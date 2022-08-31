@@ -1,7 +1,6 @@
-import { useCustomEvent, useHMSActions } from "@100mslive/react-sdk";
 import { useCallback } from "react";
-
-export const remoteStopScreenshareType = "REMOTE_STOP_SCREENSHARE";
+import { useCustomEvent, useHMSActions } from "@100mslive/react-sdk";
+import { REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
 export function RemoteStopScreenshare() {
   const actions = useHMSActions();
@@ -11,7 +10,7 @@ export function RemoteStopScreenshare() {
   }, [actions]);
 
   useCustomEvent({
-    type: remoteStopScreenshareType,
+    type: REMOTE_STOP_SCREENSHARE_TYPE,
     onEvent: onRemoteStopScreenshare,
   });
 
