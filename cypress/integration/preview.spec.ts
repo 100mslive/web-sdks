@@ -1,18 +1,8 @@
-import {
-  HMSReactiveStore,
-  selectIsInPreview,
-  selectLocalVideoTrackID,
-  selectRoomState,
-} from '../../packages/hms-video-store/src';
-import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
+import { selectLocalVideoTrackID, selectRoomState } from '@100mslive/hms-video-store';
+import { CypressPeer } from '../support/peer';
 
-let HMSStore;
-let actions: HMSSDKActions;
-let store: IHMSStoreReadOnly;
-let initEndpoint;
-
-let token;
+let localPeer: CypressPeer;
+let token: string;
 
 describe('preview api', () => {
   before(() => {
@@ -20,50 +10,49 @@ describe('preview api', () => {
       token = authToken;
     });
   });
+
   beforeEach(() => {
-    HMSStore = new HMSReactiveStore();
-    actions = HMSStore.getHMSActions();
-    store = HMSStore.getStore();
-    initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
-    //@ts-ignore
-    cy.spy(actions, 'onPreview').as('onPreview');
+    if (localPeer) {
+      localPeer.leave();
+    }
+
+    localPeer = new CypressPeer(token);
   });
+
   it('should throw error if no token', () => {
-    actions
-      .preview({ userName: 'test', authToken: '', initEndpoint })
-      .then(() => {})
-      .catch(error => {
-        expect(error.message).to.include('Token is not in proper JWT format');
-      });
+    const emptyTokenPeer = new CypressPeer('');
+    emptyTokenPeer.preview().catch(error => {
+      expect(error.message).to.include('Token is not in proper JWT format');
+    });
   });
 
   it('should update store on success', () => {
-    actions.preview({ userName: 'test', authToken: token, initEndpoint }).then(() => {
-      expect(store.getState(selectIsInPreview)).to.equal(true);
+    const previewPromise = new Promise<void>(resolve => {
+      localPeer.preview().then(() => resolve());
+      expect(localPeer.store.getState(selectRoomState)).to.equal('Connecting');
     });
-    expect(store.getState(selectRoomState)).to.equal('Connecting');
-    cy.get('@onPreview')
-      .should('be.calledOnce')
-      .then(() => {
-        expect(store.getState(selectIsInPreview)).to.equal(true);
-      });
+    cy.wrap(previewPromise).then(() => {
+      expect(localPeer.isInPreview()).to.be.true;
+    });
   });
 
   it('should not update local video trackid in store on disable/enable', () => {
-    actions.preview({ userName: 'test', authToken: token, initEndpoint });
-    cy.get('@onPreview')
-      .should('be.calledOnce')
-      .then(async () => {
-        const localVideoTrackID = store.getState(selectLocalVideoTrackID);
-        //@ts-ignore
-        const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack.id;
-        await actions.setLocalVideoEnabled(false);
-        //@ts-ignore
-        const sdkVideoTrackAfterDisabled = actions.sdk.getLocalPeer().videoTrack?.nativeTrack?.id;
-        expect(sdkVideoTrackAfterDisabled).to.not.equal(sdkVideoTrack);
-        await actions.setLocalVideoEnabled(true);
-        const trackId = store.getState(selectLocalVideoTrackID);
-        expect(localVideoTrackID).to.equal(trackId);
-      });
+    cy.wrap(localPeer.preview()).then(async () => {
+      expect(localPeer.isInPreview()).to.be.true;
+      const store = localPeer.store;
+      const actions = localPeer.actions;
+      const sdkPeer = localPeer.sdkPeer;
+
+      const localVideoTrackID = store.getState(selectLocalVideoTrackID);
+      const sdkVideoTrack = sdkPeer.videoTrack?.nativeTrack.id;
+      await actions.setLocalVideoEnabled(false);
+
+      const sdkVideoTrackAfterDisabled = sdkPeer.videoTrack?.nativeTrack?.id;
+      expect(sdkVideoTrackAfterDisabled).to.not.equal(sdkVideoTrack);
+
+      await actions.setLocalVideoEnabled(true);
+      const trackId = store.getState(selectLocalVideoTrackID);
+      return expect(localVideoTrackID).to.equal(trackId);
+    });
   });
 });
