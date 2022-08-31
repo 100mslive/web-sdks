@@ -35,15 +35,15 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
 
   return (
     <StyledPagination.Root>
-      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage} type="button">
+      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage} type="button" css={{ padding: 0, border: "none", backgroundColor: "$transparent" }}>
         <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
         {[...Array(numPages)].map((_, i) => (
-          <StyledPagination.Dot key={i} active={page === i} onClick={() => setPage(i)} type="button"/>
+          <StyledPagination.Dot key={i} active={page === i} onClick={() => handlePageChange(i)} type="button" />
         ))}
       </StyledPagination.Dots>
-      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage} type="button">
+      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage} type="button" css={{ padding: 0, border: "none", backgroundColor: "$transparent" }}>
         <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
     </StyledPagination.Root>
