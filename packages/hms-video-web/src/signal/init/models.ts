@@ -27,7 +27,7 @@ export interface InitConfig {
   readonly rtcConfiguration: RTCConfiguration;
   readonly pingTimeout?: number;
   readonly config: {
-    readonly enabledFlags?: Array<`${InitFlags}`>;
+    readonly enabledFlags?: Array<InitFlags>;
     readonly networkHealth: NetworkHealth;
   };
 }

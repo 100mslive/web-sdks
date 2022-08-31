@@ -6,15 +6,15 @@ let pages: PageWrapper[];
 test.beforeEach(async () => {});
 
 test.afterEach(async () => {
-  [0,1].forEach(async i => {
+  [0, 1].forEach(async i => {
     await pages[i].close();
   });
- });
+});
 
-const networkDisconnectedDurations = [5000, 35000];
+const networkDisconnectedDurations = [5000, 25000];
 
 test(`Verify network disconnection/reconnection notifications`, async ({ context }) => {
-   pages = await PageWrapper.openPages(context, 2, {
+  pages = await PageWrapper.openPages(context, 2, {
     mic: true,
   });
   await pages[0].delay(10000);
@@ -29,7 +29,7 @@ networkDisconnectedDurations.forEach(networkDisconnectedDuration => {
   test(`Verify local peer room state is updated for remote peer after network is restored after ${networkDisconnectedDuration} ms`, async ({
     context,
   }) => {
-     pages = await PageWrapper.openPages(context, 2, {
+    pages = await PageWrapper.openPages(context, 2, {
       mic: true,
     });
     await pages[0].timeout(5000);
