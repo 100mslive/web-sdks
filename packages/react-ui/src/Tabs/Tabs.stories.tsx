@@ -2,17 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { Tabs } from '.';
+import { Box } from '../Layout';
 
 export default {
   title: 'UI Components/Tabs',
   component: Tabs.Root,
   argTypes: {
-    value: { control: { type: 'text' } },
+    value: { control: { type: 'text' }, defaultValue: 'tab1' },
     onValueChange: { action: { type: 'click' } },
+    orientation: { options: ['horizontal', 'vertical'], defaultValue: 'horizontal', control: { type: 'select' } },
   },
 } as ComponentMeta<typeof Tabs.Root>;
 
-const Template: ComponentStory<typeof Tabs.Root> = ({ value: propValue = '', onValueChange: propOnValueChange }) => {
+const Template: ComponentStory<typeof Tabs.Root> = ({
+  value: propValue = '',
+  onValueChange: propOnValueChange,
+  ...rest
+}) => {
   const [value, setValue] = useState('tab1');
 
   function handleOnValueChange(value: string) {
@@ -30,17 +36,30 @@ const Template: ComponentStory<typeof Tabs.Root> = ({ value: propValue = '', onV
   }, [propValue]);
 
   return (
-    <Tabs.Root value={value} onValueChange={handleOnValueChange}>
-      <Tabs.List aria-label="tabs example">
+    <Tabs.Root
+      css={{
+        gap: '8px',
+        maxWidth: '500px',
+        width: 'max-content',
+        '&[data-orientation="horizontal"]': { flexDirection: 'column' },
+      }}
+      value={value}
+      onValueChange={handleOnValueChange}
+      {...rest}
+    >
+      <Tabs.List
+        aria-label="tabs example"
+        css={{ backgroundColor: 'lightblue', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
+      >
         <Tabs.Trigger value="tab1">One</Tabs.Trigger>
         <Tabs.Trigger value="tab2">Two</Tabs.Trigger>
         <Tabs.Trigger value="tab3">Three</Tabs.Trigger>
       </Tabs.List>
-      <div>
+      <Box css={{ r: '$1', bg: '$grayDefault' }}>
         <Tabs.Content value="tab1">Tab one content</Tabs.Content>
         <Tabs.Content value="tab2">Tab two content</Tabs.Content>
         <Tabs.Content value="tab3">Tab three content</Tabs.Content>
-      </div>
+      </Box>
     </Tabs.Root>
   );
 };
