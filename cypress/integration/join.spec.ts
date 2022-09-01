@@ -27,11 +27,9 @@ describe('join api', () => {
   });
 
   it('should throw error if no token', () => {
-    try {
-      actions.join({ userName: 'test', authToken: '', initEndpoint });
-    } catch (error) {
+    actions.join({ userName: 'test', authToken: '', initEndpoint }).catch(error => {
       expect(error.message).to.include('Token is not in proper JWT format');
-    }
+    });
   });
 
   describe('join with token', () => {
@@ -43,70 +41,77 @@ describe('join api', () => {
 
     it('should update store state on join', () => {
       const start = Date.now();
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      cy.get('@onJoin')
-        .should('be.calledOnce')
-        .then(() => {
-          expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
-          cy.log(String(Date.now() - start));
-        });
+      actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+        cy.get('@onJoin').should('be.calledOnce');
+        expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
+        cy.log(String(Date.now() - start));
+      });
     });
 
     it('should call onTrackUpdate twice with localpeer', () => {
-      actions.join({ userName: 'test', authToken: token, initEndpoint });
-      //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer());
+      actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+        //@ts-ignore
+        cy.localTracksAdded(actions.sdk.getLocalPeer());
+      });
     });
 
     it('should get canvas stream on video disabled', () => {
-      actions.join({
-        userName: 'test',
-        authToken: token,
-        initEndpoint,
-        settings: { isVideoMuted: true },
-      });
-
-      //@ts-ignore
-      cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
-        //@ts-ignore
-        const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack;
-        //@ts-ignore
-        expect(sdkVideoTrack).to.be.instanceOf(CanvasCaptureMediaStreamTrack);
-      });
+      actions
+        .join({
+          userName: 'test',
+          authToken: token,
+          initEndpoint,
+          settings: { isVideoMuted: true },
+        })
+        .then(() => {
+          //@ts-ignore
+          cy.localTracksAdded(actions.sdk.getLocalPeer()).then(() => {
+            //@ts-ignore
+            const sdkVideoTrack = actions.sdk.getLocalPeer().videoTrack?.nativeTrack;
+            //@ts-ignore
+            expect(sdkVideoTrack).to.be.instanceOf(CanvasCaptureMediaStreamTrack);
+          });
+        });
     });
 
     it('should not create extra track on joing with mute on preview and join with enabled video', () => {
       //@ts-ignore
       cy.spy(actions, 'onPreview').as('onPreview');
-      actions.preview({
-        userName: 'test',
-        authToken: token,
-        initEndpoint,
-        settings: { isVideoMuted: true },
-      });
-      let previewTrackIds;
-      cy.get('@onPreview')
-        .should('be.calledOnce')
-        .then(() => {
-          const tracks = store.getState(selectTracksMap);
-          previewTrackIds = Object.keys(tracks);
-          expect(previewTrackIds.length).to.equal(2);
-          return actions.setLocalVideoEnabled(true);
+      actions
+        .preview({
+          userName: 'test',
+          authToken: token,
+          initEndpoint,
+          settings: { isVideoMuted: true },
         })
         .then(() => {
-          actions.join({
-            userName: 'test',
-            authToken: token,
-            initEndpoint,
-          });
-          //@ts-ignore
-          return cy.localTracksAdded(actions.sdk.getLocalPeer());
-        })
-        .then(() => {
-          const tracks = Object.keys(store.getState(selectTracksMap));
-          expect(tracks.length).to.equal(2);
-          expect(tracks).to.include(previewTrackIds[0]);
-          expect(tracks).to.include(previewTrackIds[1]);
+          let previewTrackIds;
+          cy.get('@onPreview')
+            .should('be.calledOnce')
+            .then(() => {
+              const tracks = store.getState(selectTracksMap);
+              previewTrackIds = Object.keys(tracks);
+              expect(previewTrackIds.length).to.equal(2);
+              return actions.setLocalVideoEnabled(true);
+            })
+            .then(() => {
+              actions
+                .join({
+                  userName: 'test',
+                  authToken: token,
+                  initEndpoint,
+                })
+                .then(() => {
+                  //@ts-ignore
+                  return cy.localTracksAdded(actions.sdk.getLocalPeer());
+                });
+            })
+            .then(() => {
+              const tracks = Object.keys(store.getState(selectTracksMap));
+              expect(tracks.length).to.equal(2);
+              expect(tracks).to.include(previewTrackIds[0]);
+              expect(tracks).to.include(previewTrackIds[1]);
+            });
         });
     });
   });

@@ -171,7 +171,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  join(config: sdkTypes.HMSConfig) {
+  async join(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('room join is called again');
       return; // ignore
@@ -181,7 +181,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
-      this.sdkJoinWithListeners(config);
+      await this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -625,8 +625,8 @@ export class HMSSDKActions implements IHMSActions {
     }, reason);
   }
 
-  private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
-    this.sdk.join(config, {
+  private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
+    await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
