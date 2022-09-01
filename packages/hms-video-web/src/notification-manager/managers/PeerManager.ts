@@ -81,7 +81,7 @@ export class PeerManager {
       this.TAG,
       `PEER_LEAVE`,
       JSON.stringify(peer, null, 2),
-      `remainingPeers=${this.store.getPeers().toString()}`,
+      `remainingPeers=${this.store.getPeers().length}`,
     );
 
     if (!hmsPeer) {
