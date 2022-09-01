@@ -1,6 +1,7 @@
 import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
+import { stringify } from '../../../utils/json';
 
 export type HMSPeerInit = {
   peerId: string;
@@ -58,15 +59,11 @@ export class HMSPeer implements IHMSPeer {
   }
 
   toString() {
-    return JSON.stringify(
-      {
-        name: this.name,
-        role: this.role?.name,
-        peerId: this.peerId,
-        customerUserId: this.customerUserId,
-      },
-      null,
-      2,
-    );
+    return stringify({
+      name: this.name,
+      role: this.role?.name,
+      peerId: this.peerId,
+      customerUserId: this.customerUserId,
+    });
   }
 }

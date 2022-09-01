@@ -54,7 +54,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
-import { stringifyMediaStreamTrack } from '../utils/json';
+import { stringify } from '../utils/json';
 
 const TAG = '[HMSTransport]:';
 
@@ -247,12 +247,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringify(track.nativeTrack));
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringify(track.nativeTrack));
       this.observer.onTrackRemove(track);
     },
 

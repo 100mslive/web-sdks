@@ -1,6 +1,6 @@
 import HMSMediaStream from '../streams/HMSMediaStream';
 import { HMSTrackType } from './HMSTrackType';
-import { stringifyMediaStreamTrack } from '../../utils/json';
+import { stringify, stringifyMediaStreamTrack } from '../../utils/json';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 
@@ -95,18 +95,14 @@ export abstract class HMSTrack {
   }
 
   toString(): string {
-    return JSON.stringify(
-      {
-        streamId: this.stream.id,
-        peerId: this.peerId,
-        trackId: this.trackId,
-        logIdentifier: this.logIdentifier || undefined,
-        source: this.source,
-        enabled: this.enabled,
-        nativeTrack: stringifyMediaStreamTrack(this.nativeTrack),
-      },
-      null,
-      2,
-    );
+    return stringify({
+      streamId: this.stream.id,
+      peerId: this.peerId,
+      trackId: this.trackId,
+      logIdentifier: this.logIdentifier || undefined,
+      source: this.source,
+      enabled: this.enabled,
+      nativeTrack: stringifyMediaStreamTrack(this.nativeTrack),
+    });
   }
 }
