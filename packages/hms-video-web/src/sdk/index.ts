@@ -60,7 +60,6 @@ import { InitConfig } from '../signal/init/models';
 import { NetworkTestManager } from './NetworkTestManager';
 import { HMSAudioContextHandler } from '../utils/media';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
-import { replaceCircularOccurence } from '../utils/json';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -391,7 +390,7 @@ export class HMSSdk implements HMSInterface {
     );
     this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
 
-    HMSLogger.d(this.TAG, 'SDK Store', JSON.stringify(this.store, replaceCircularOccurence(), 2));
+    HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
