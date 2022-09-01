@@ -17,7 +17,7 @@ export class CypressRoom {
     for (const peer1 of this.peers) {
       for (const peer2 of this.peers) {
         if (peer1 !== peer2) {
-          promises.push(peer1.waitForTracks(peer2.id));
+          promises.push(peer1.waitForPeerTracks(peer2.id));
         }
       }
     }

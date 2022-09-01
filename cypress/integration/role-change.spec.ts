@@ -106,7 +106,7 @@ function verifySelfRoleChange(toRole: string, roleAv: { audio: boolean; video: b
   return cy.wrap(localPeer.changeRole(toRole)).then(() => {
     cy.log('selfRoleChange - ', toRole);
     cy.wrap(remotePeer.waitTillRoleChange(toRole, localPeer.id)).then(() => {
-      cy.wrap(remotePeer.waitForTracks(localPeer.id)).then(() => {
+      cy.wrap(remotePeer.waitForPeerTracks(localPeer.id)).then(() => {
         expectLocalAVExistence(roleAv.audio, roleAv.video);
       });
     });
@@ -117,7 +117,7 @@ function verifyRemoteRoleChange(toRole: string, roleAv: { audio: boolean; video:
   return cy.wrap(remotePeer.changeRole(toRole, localPeer.id)).then(() => {
     cy.log('remoteRoleChange - ', toRole);
     cy.wrap(localPeer.waitTillRoleChange(toRole)).then(() => {
-      cy.wrap(remotePeer.waitForTracks(localPeer.id)).then(() => {
+      cy.wrap(remotePeer.waitForPeerTracks(localPeer.id)).then(() => {
         expectLocalAVExistence(roleAv.audio, roleAv.video);
       });
     });

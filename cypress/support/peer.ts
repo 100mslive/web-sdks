@@ -10,6 +10,7 @@ import {
   selectPeerByID,
   selectRoleByRoleName,
   selectRemotePeers,
+  selectTrackByID,
 } from '@100mslive/hms-video-store';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
@@ -76,7 +77,7 @@ export class CypressPeer {
       initEndpoint: this.initEndpoint,
       settings,
     });
-    await this.waitForTracks(this.id);
+    await this.waitForPeerTracks(this.id);
     return `peer ${this.name} joined`;
   };
 
@@ -87,11 +88,11 @@ export class CypressPeer {
       initEndpoint: this.initEndpoint,
       settings,
     });
-    await this.waitForTracks(this.id);
+    await this.waitForPeerTracks(this.id);
     return `peer ${this.name} in preview`;
   };
 
-  waitForTracks = async (peerId: string) => {
+  waitForPeerTracks = async (peerId: string) => {
     return new Promise(resolve => {
       // eslint-disable-next-line complexity
       this.store.subscribe(peer => {
@@ -105,6 +106,16 @@ export class CypressPeer {
           resolve(true);
         }
       }, selectPeerByID(peerId));
+    });
+  };
+
+  waitForTrack = async (trackId: string) => {
+    return new Promise(resolve => {
+      this.store.subscribe(track => {
+        if (track) {
+          resolve(true);
+        }
+      }, selectTrackByID(trackId));
     });
   };
 
