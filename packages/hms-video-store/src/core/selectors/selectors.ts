@@ -158,7 +158,7 @@ export const selectLocalVideoTrackID = createSelector(selectLocalPeer, peer => p
 /**
  * Select an array of track IDs of your local peer's auxiliary tracks
  */
-const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => peer?.auxiliaryTracks);
+export const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => peer?.auxiliaryTracks);
 
 /**
  * Select an array of track IDs of all your local peer's tracks

@@ -6,8 +6,10 @@ import {
   selectLocalAudioTrackID,
   selectLocalPeerID,
   selectLocalVideoTrackID,
+  selectLocalAuxiliaryTrackIDs,
   selectPeerByID,
   selectRoleByRoleName,
+  selectRemotePeers,
 } from '@100mslive/hms-video-store';
 import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
@@ -57,6 +59,14 @@ export class CypressPeer {
 
   get audioTrack() {
     return this.store.getState(selectLocalAudioTrackID);
+  }
+
+  get auxiliaryTracks() {
+    return this.store.getState(selectLocalAuxiliaryTrackIDs);
+  }
+
+  get remotePeers() {
+    return this.store.getState(selectRemotePeers);
   }
 
   join = async (settings?: HMSConfigInitialSettings) => {

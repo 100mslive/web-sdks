@@ -1,25 +1,23 @@
-import {
-  HMSReactiveStore,
-  selectIsConnectedToRoom,
-  selectLocalPeer,
-  selectRemotePeers,
-} from '../../packages/hms-video-store/src';
-import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
+import { selectTracksMap } from '@100mslive/hms-video-store';
+import { CypressPeer } from '../support/peer';
+import { CypressRoom } from '../support/room';
 
-let HMSStore, HMSStore1;
-let actions: HMSSDKActions;
-let actions1: HMSSDKActions;
-let store: IHMSStoreReadOnly;
-let store1: IHMSStoreReadOnly;
-let initEndpoint;
-
-let token;
+let token: string;
+let localPeer: CypressPeer;
+let remotePeer: CypressPeer;
+let room: CypressRoom;
 
 const getTrack = () => {
   return navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
     return stream.getVideoTracks()[0];
   });
+};
+
+const getTrackCountInRoom = (peer: CypressPeer) => Object.keys(peer.store.getState(selectTracksMap)).length;
+
+const expectSameTrackCountAcrossPeers = (count: number) => {
+  expect(getTrackCountInRoom(localPeer)).to.equal(count);
+  expect(getTrackCountInRoom(remotePeer)).to.equal(count);
 };
 
 describe('add/remove track api', () => {
@@ -30,108 +28,61 @@ describe('add/remove track api', () => {
   });
 
   beforeEach(() => {
-    HMSStore = new HMSReactiveStore();
-    actions = HMSStore.getActions();
-    store = HMSStore.getStore();
-    HMSStore1 = new HMSReactiveStore();
-    store1 = HMSStore1.getStore();
-    actions1 = HMSStore1.getActions();
-    initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
-    //@ts-ignore
-    cy.spy(actions, 'onJoin').as('onJoin');
-    //@ts-ignore
-    cy.spy(actions, 'onTrackUpdate').as('onTrackUpdate');
-
-    //@ts-ignore
-    cy.spy(actions1, 'onJoin').as('onJoin1');
-    //@ts-ignore
-    cy.spy(actions1, 'onTrackUpdate').as('onTrackUpdate1');
+    localPeer = new CypressPeer(token);
+    remotePeer = new CypressPeer(token);
+    room = new CypressRoom(localPeer, remotePeer);
   });
 
   afterEach(() => {
-    if (actions) {
-      actions.leave();
-    }
-    if (actions1) {
-      actions1.leave();
+    if (room) {
+      room.leaveAll();
     }
   });
 
   it('both peers should join', () => {
     const start = Date.now();
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-    cy.get('@onJoin')
-      .should('be.calledOnce')
-      .then(() => {
-        expect(store.getState(selectIsConnectedToRoom)).to.equal(true);
-        cy.log(String(Date.now() - start));
-      });
-
-    actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-    cy.get('@onJoin1')
-      .should('be.calledOnce')
-      .then(() => {
-        expect(store1.getState(selectIsConnectedToRoom)).to.equal(true);
-        cy.log(String(Date.now() - start));
-      });
-  });
-
-  it('should add/remove a track to aux track on addTrack for localPeer', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
-      cy.get('@onTrackUpdate')
-        .should('be.calledTwice')
-        .then(() => getTrack())
-        .then((videoTrack: MediaStreamTrack) => {
-          actions.addTrack(videoTrack);
-          cy.get('@onTrackUpdate')
-            .should('be.calledThrice')
-            .then(() => {
-              const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-              expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
-              return actions.removeTrack(videoTrack.id);
-            })
-            .then(() => {
-              const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks.length).to.equal(0);
-              expect(localPeer.videoTrack).to.not.equal(undefined);
-            });
-        });
+    cy.wrap(room.joinAll()).then(() => {
+      expect(localPeer.isConnected()).to.be.true;
+      expect(remotePeer.isConnected()).to.be.true;
+      cy.log(String(Date.now() - start));
     });
   });
 
-  it('should add/remove aux track for remotePeer on add/removeTrack', async () => {
-    actions
-      .join({ userName: 'test', authToken: token, initEndpoint })
-      .then(() => {
-        return actions1.join({ userName: 'test1', authToken: token, initEndpoint });
-      })
-      .then(() => {
-        cy.get('@onTrackUpdate')
-          .should('have.callCount', 4)
-          .then(() => {
-            return cy.get('@onTrackUpdate1').should('have.callCount', 4);
-          })
-          // By this time both peers would have joined and got each others tracks
-          .then(() => getTrack())
-          .then((videoTrack: MediaStreamTrack) => {
-            actions.addTrack(videoTrack);
-            cy.get('@onTrackUpdate1')
-              .should('have.callCount', 5)
-              .then(() => {
-                const remotePeer = store1.getState(selectRemotePeers)[0];
-                expect(remotePeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-                expect(remotePeer.videoTrack).to.not.equal(videoTrack.id);
-                actions.removeTrack(videoTrack.id);
-                cy.get('@onTrackUpdate1')
-                  .should('have.callCount', 6)
-                  .then(() => {
-                    const remotePeer = store1.getState(selectRemotePeers)[0];
-                    expect(remotePeer.auxiliaryTracks.length).to.equal(0);
-                    expect(remotePeer.videoTrack).to.not.equal(undefined);
-                  });
-              });
+  it('should add/remove a track to aux track on addTrack for localPeer', () => {
+    cy.wrap(localPeer.join()).then(() => {
+      cy.wrap(getTrack()).then((videoTrack: MediaStreamTrack) => {
+        cy.wrap(localPeer.actions.addTrack(videoTrack, 'regular')).then(() => {
+          expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
+          expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
+
+          cy.wrap(localPeer.actions.removeTrack(videoTrack.id)).then(() => {
+            expect(localPeer.auxiliaryTracks.length).to.equal(0);
+            expect(localPeer.videoTrack).to.not.equal(undefined);
           });
+        });
       });
+    });
+  });
+
+  it('should add/remove aux track for remotePeer on add/removeTrack', () => {
+    cy.wrap(room.joinAll()).then(() => {
+      expectSameTrackCountAcrossPeers(4);
+
+      cy.wrap(getTrack()).then((videoTrack: MediaStreamTrack) => {
+        cy.wrap(localPeer.actions.addTrack(videoTrack, 'regular')).then(() => {
+          expectSameTrackCountAcrossPeers(7);
+          const localPeerInRemote = remotePeer.remotePeers[0];
+          expect(localPeerInRemote.auxiliaryTracks[0]).to.equal(videoTrack.id);
+          expect(localPeerInRemote.videoTrack).to.not.equal(videoTrack.id);
+
+          cy.wrap(localPeer.actions.removeTrack(videoTrack.id)).then(() => {
+            expectSameTrackCountAcrossPeers(4);
+            const localPeerInRemote = remotePeer.remotePeers[0];
+            expect(localPeerInRemote.auxiliaryTracks.length).to.equal(0);
+            expect(localPeerInRemote.videoTrack).to.not.equal(undefined);
+          });
+        });
+      });
+    });
   });
 });
