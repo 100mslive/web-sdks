@@ -4,6 +4,7 @@ export const darkTheme = {
     bgSecondary: '#1D232B',
     bgTertiary: '#303740',
     surfaceLight: '#1E232A',
+    surfaceLighter: '#282F39',
     textPrimary: '#FFFFFFE6',
     textSecondary: '#FFFFFFB8',
     textDisabled: '#FFFFFF61',
