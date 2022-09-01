@@ -70,7 +70,7 @@ describe('add/remove track api', () => {
 
       cy.wrap(getTrack()).then((videoTrack: MediaStreamTrack) => {
         cy.wrap(localPeer.actions.addTrack(videoTrack, 'regular')).then(() => {
-          expectSameTrackCountAcrossPeers(7);
+          expectSameTrackCountAcrossPeers(5);
           const localPeerInRemote = remotePeer.remotePeers[0];
           expect(localPeerInRemote.auxiliaryTracks[0]).to.equal(videoTrack.id);
           expect(localPeerInRemote.videoTrack).to.not.equal(videoTrack.id);
