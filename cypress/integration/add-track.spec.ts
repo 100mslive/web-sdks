@@ -70,17 +70,21 @@ describe('add/remove track api', () => {
 
       cy.wrap(getTrack()).then((videoTrack: MediaStreamTrack) => {
         cy.wrap(localPeer.actions.addTrack(videoTrack, 'regular')).then(() => {
-          cy.wrap(remotePeer.waitForTrack(videoTrack.id)).then(() => {
+          cy.wrap(remotePeer.waitForTrack(videoTrack.id)).then(hasTrack => {
+            expect(hasTrack).to.be.true;
             expectSameTrackCountAcrossPeers(5);
             const localPeerInRemote = remotePeer.remotePeers[0];
             expect(localPeerInRemote.auxiliaryTracks[0]).to.equal(videoTrack.id);
             expect(localPeerInRemote.videoTrack).to.not.equal(videoTrack.id);
 
             cy.wrap(localPeer.actions.removeTrack(videoTrack.id)).then(() => {
-              expectSameTrackCountAcrossPeers(4);
-              const localPeerInRemote = remotePeer.remotePeers[0];
-              expect(localPeerInRemote.auxiliaryTracks.length).to.equal(0);
-              expect(localPeerInRemote.videoTrack).to.not.equal(undefined);
+              cy.wrap(remotePeer.waitForTrack(videoTrack.id)).then(hasTrack => {
+                expect(hasTrack).to.be.false;
+                expectSameTrackCountAcrossPeers(4);
+                const localPeerInRemote = remotePeer.remotePeers[0];
+                expect(localPeerInRemote.auxiliaryTracks.length).to.equal(0);
+                expect(localPeerInRemote.videoTrack).to.not.equal(undefined);
+              });
             });
           });
         });

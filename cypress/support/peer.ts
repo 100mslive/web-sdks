@@ -92,7 +92,7 @@ export class CypressPeer {
     return `peer ${this.name} in preview`;
   };
 
-  waitForPeerTracks = async (peerId: string) => {
+  waitForPeerTracks = (peerId: string) => {
     return new Promise(resolve => {
       // eslint-disable-next-line complexity
       this.store.subscribe(peer => {
@@ -109,11 +109,13 @@ export class CypressPeer {
     });
   };
 
-  waitForTrack = async (trackId: string) => {
+  waitForTrack = (trackId: string): Promise<boolean> => {
     return new Promise(resolve => {
       this.store.subscribe(track => {
         if (track) {
           resolve(true);
+        } else {
+          resolve(false);
         }
       }, selectTrackByID(trackId));
     });
