@@ -1,5 +1,6 @@
-import { HMSVideoPluginType } from '@100mslive/hms-video';
-export class brighteningPlugin {
+import { HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
+
+export class BrighteningPlugin implements HMSVideoPlugin {
   private brightnessMul: number;
   private name;
 
@@ -28,11 +29,7 @@ export class brighteningPlugin {
 
   stop() {}
 
-  /**
-   * @param input {HTMLCanvasElement}
-   * @param output {HTMLCanvasElement}
-   */
-  processVideoFrame(input, output) {
+  processVideoFrame(input: HTMLCanvasElement, output: HTMLCanvasElement) {
     const width = input.width;
     const height = input.height;
     output.width = width;

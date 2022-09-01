@@ -1,12 +1,12 @@
 import { HMSReactiveStore } from '../../packages/hms-video-store/src';
 import { HMSSDKActions } from '../../packages/hms-video-store/src/core/hmsSDKStore/HMSSDKActions';
-import { brighteningPlugin } from '../brighteningPlugin';
+import { BrighteningPlugin } from '../BrighteningPlugin';
 
 let HMSStore;
 let actions: HMSSDKActions;
 let initEndpoint;
-let brighteningPlugin1: brighteningPlugin;
-let brighteningPlugin2: brighteningPlugin;
+let brighteningPlugin1: BrighteningPlugin;
+let brighteningPlugin2: BrighteningPlugin;
 
 let token;
 
@@ -19,8 +19,8 @@ describe('Video Plugins', () => {
   beforeEach(() => {
     HMSStore = new HMSReactiveStore();
     actions = HMSStore.getHMSActions();
-    brighteningPlugin1 = new brighteningPlugin();
-    brighteningPlugin2 = new brighteningPlugin(1.5, 'brightening-custom-plugin');
+    brighteningPlugin1 = new BrighteningPlugin();
+    brighteningPlugin2 = new BrighteningPlugin(1.5, 'brightening-custom-plugin');
     initEndpoint = Cypress.env('CYPRESS_INIT_ENDPOINT');
     //@ts-ignore
     cy.spy(actions, 'onJoin').as('onJoin');
