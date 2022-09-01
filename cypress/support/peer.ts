@@ -109,13 +109,11 @@ export class CypressPeer {
     });
   };
 
-  waitForTrack = (trackId: string): Promise<boolean> => {
+  waitForTrack = (trackId: string) => {
     return new Promise(resolve => {
       this.store.subscribe(track => {
         if (track) {
           resolve(true);
-        } else {
-          resolve(false);
         }
       }, selectTrackByID(trackId));
     });
