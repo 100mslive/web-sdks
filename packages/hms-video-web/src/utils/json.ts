@@ -17,9 +17,6 @@ export const stringify = (input: any): string => {
   if (typeof input !== 'object') {
     return input;
   }
-  if (input instanceof MediaStreamTrack) {
-    return stringifyMediaStreamTrack(input);
-  }
   return `${Object.keys(input).reduce<string>((acc, key) => {
     let value: any = input[key];
     if (!value) {
