@@ -1,3 +1,4 @@
+export { default as Svg100MsLogo } from './100MsLogo';
 export { default as ActivityIcon } from './ActivityIcon';
 export { default as AddCircleIcon } from './AddCircleIcon';
 export { default as AddIcon } from './AddIcon';
