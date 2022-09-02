@@ -145,14 +145,15 @@ type MappedNotifications<Type extends HMSNotificationTypes[]> = {
   [index in keyof Type]: HMSNotificationMapping<Type[index]>;
 };
 
-export type HMSNotificationInCallback<T extends HMSNotificationTypes | HMSNotificationTypes[]> =
-  T extends HMSNotificationTypes[]
-    ? MappedNotifications<T>[number]
-    : T extends HMSNotificationTypes
-    ? HMSNotificationMapping<T>
-    : HMSNotification;
+export type HMSNotificationTypeParam = HMSNotificationTypes | HMSNotificationTypes[] | undefined;
 
-export type HMSNotificationCallback<T extends HMSNotificationTypes | HMSNotificationTypes[]> = (
+export type HMSNotificationInCallback<T extends HMSNotificationTypeParam> = T extends HMSNotificationTypes[]
+  ? MappedNotifications<T>[number]
+  : T extends HMSNotificationTypes
+  ? HMSNotificationMapping<T>
+  : HMSNotification;
+
+export type HMSNotificationCallback<T extends HMSNotificationTypeParam> = (
   notification: HMSNotificationInCallback<T>,
 ) => void;
 
@@ -166,8 +167,5 @@ export interface IHMSNotifications {
    * does that. The intent of this function is mainly to display toast notifications or send analytics.
    * We'll provide a display message which can be displayed as it is for common cases.
    */
-  onNotification<T extends HMSNotificationTypes | HMSNotificationTypes[]>(
-    cb: HMSNotificationCallback<T>,
-    types?: T,
-  ): () => void;
+  onNotification<T extends HMSNotificationTypeParam>(cb: HMSNotificationCallback<T>, types?: T): () => void;
 }

@@ -8,7 +8,7 @@ import {
   HMSStatsStore,
   HMSStats,
   HMSStoreWrapper,
-  HMSNotificationTypes,
+  HMSNotificationTypeParam,
 } from '@100mslive/hms-video-store';
 import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
@@ -177,7 +177,7 @@ export const useHMSActions = () => {
  * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
  * rerenders for performance reasons.
  */
-export const useHMSNotifications = <T extends HMSNotificationTypes | HMSNotificationTypes[]>(
+export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
   type?: T,
 ): HMSNotificationInCallback<T> | null => {
   const HMSContextConsumer = useContext(HMSContext);
