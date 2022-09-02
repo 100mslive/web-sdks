@@ -190,7 +190,12 @@ export interface IHMSActions {
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): Promise<void>;
+  /**
+   * Subscribe/Unsubscribe audio for a given track
+   * @alpha
+   */
+  subscribeAudio(trackId: HMSTrackID, subscribe: boolean): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

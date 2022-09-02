@@ -156,7 +156,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async setPreferredLayerForRemoteVideoTrack(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer) {
     const storeTrack = this.store.getTrackById(track.trackId) as HMSRemoteVideoTrack;
     if (storeTrack) {
       const update = await this.transport?.updateVideoTrackLayer({
@@ -167,7 +167,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async setRemoteAudioTrackSubscription(track: HMSRemoteAudioTrack, subscribe: boolean) {
+  async setAudioSubscription(track: HMSRemoteAudioTrack, subscribe: boolean) {
     const storeTrack = this.store.getTrackById(track.trackId);
     if (storeTrack) {
       await this.transport?.updateAudioTrackSubscription({ track_id: track.trackId, subscribed: subscribe });

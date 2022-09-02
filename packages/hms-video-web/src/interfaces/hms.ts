@@ -64,8 +64,8 @@ export default interface HMS {
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;
   removeTrack(trackId: string): Promise<void>;
-  setPreferredLayerForRemoteVideoTrack(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer): Promise<void>;
-  setRemoteAudioTrackSubscription(track: HMSRemoteAudioTrack, subscribe: boolean): Promise<void>;
+  setPreferredLayer(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer): Promise<void>;
+  setAudioSubscription(track: HMSRemoteAudioTrack, subscribe: boolean): Promise<void>;
 
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
