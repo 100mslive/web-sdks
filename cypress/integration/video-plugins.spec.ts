@@ -32,10 +32,13 @@ describe('Video Plugins', () => {
     const actions = localPeer.actions;
     cy.wrap(localPeer.join()).then(() => {
       cy.wrap(actions.addPluginToVideoTrack(brighteningPlugin1)).then(() => {
-        cy.get('@brightening1Process').should('have.been.calledOnce');
-        cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin1)).then(() => {
-          cy.get('@brightening1Stop').should('have.been.calledOnce');
-        });
+        cy.get('@brightening1Process')
+          .should('have.been.calledOnce')
+          .then(() => {
+            cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin1)).then(() => {
+              cy.get('@brightening1Stop').should('have.been.calledOnce');
+            });
+          });
       });
     });
   });
@@ -44,16 +47,22 @@ describe('Video Plugins', () => {
     const actions = localPeer.actions;
     cy.wrap(localPeer.join()).then(() => {
       cy.wrap(actions.addPluginToVideoTrack(brighteningPlugin1)).then(() => {
-        cy.wrap(actions.addPluginToVideoTrack(brighteningPlugin2)).then(() => {
-          cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin1)).then(() => {
-            cy.get('@brightening1Process').should('have.been.calledOnce');
-            cy.get('@brightening1Stop').should('have.been.calledOnce');
-            cy.get('@brightening2Process').should('have.been.calledTwice');
-            cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin2)).then(() => {
-              cy.get('@brightening2Stop').should('have.been.calledOnce');
+        cy.get('@brightening1Process')
+          .should('have.been.calledOnce')
+          .then(() => {
+            cy.wrap(actions.addPluginToVideoTrack(brighteningPlugin2)).then(() => {
+              cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin1)).then(() => {
+                cy.get('@brightening1Stop').should('have.been.calledOnce');
+                cy.get('@brightening2Process')
+                  .should('have.been.calledTwice')
+                  .then(() => {
+                    cy.wrap(actions.removePluginFromVideoTrack(brighteningPlugin2)).then(() => {
+                      cy.get('@brightening2Stop').should('have.been.calledOnce');
+                    });
+                  });
+              });
             });
           });
-        });
       });
     });
   });
