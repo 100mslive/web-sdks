@@ -32,7 +32,7 @@ export const useAutoplayError = (): useAutoplayErrorResult => {
   }, [actions]);
 
   useEffect(() => {
-    if (notification && notification.data && notification?.data.code === 3008) {
+    if (notification?.data.code === 3008) {
       setError(notification?.data.message);
     }
   }, [notification]);

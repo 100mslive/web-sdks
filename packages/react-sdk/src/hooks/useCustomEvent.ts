@@ -54,7 +54,7 @@ export const useCustomEvent = <T>({
       return;
     }
     const unsubscribe = notifications.onNotification(notification => {
-      const msg = notification?.data;
+      const msg = notification.data;
       if (msg && msg.type === type) {
         try {
           const data = JSON.parse(msg.message);
