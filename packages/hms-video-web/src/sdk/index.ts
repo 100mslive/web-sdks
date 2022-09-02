@@ -407,6 +407,12 @@ export class HMSSdk implements HMSInterface {
       HMSAudioContextHandler.resumeContext();
       await this.notifyJoin();
       this.sendJoinAnalyticsEvent(isPreviewCalled);
+      HMSLogger.d(
+        this.TAG,
+        `publish conditions, publishParams=${!!this.store.getPublishParams()}, sdkStatePublished=${
+          this.sdkState.published
+        }`,
+      );
       if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
         this.publish(config.settings || defaultSettings).catch(error => {
           HMSLogger.e(this.TAG, 'Error in publish', error);
