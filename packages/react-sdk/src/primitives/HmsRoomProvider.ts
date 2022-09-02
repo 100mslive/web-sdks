@@ -3,7 +3,7 @@ import {
   HMSReactiveStore,
   HMSStore,
   HMSActions,
-  HMSNotification,
+  HMSNotificationMapping,
   HMSNotifications,
   HMSStatsStore,
   HMSStats,
@@ -177,9 +177,9 @@ export const useHMSActions = () => {
  * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
  * rerenders for performance reasons.
  */
-export const useHMSNotifications = <T extends HMSNotification>(type: HMSNotificationTypes): T | null => {
+export const useHMSNotifications = <T extends HMSNotificationTypes>(type: T): HMSNotificationMapping<T> | null => {
   const HMSContextConsumer = useContext(HMSContext);
-  const [notification, setNotification] = useState<T | null>(null);
+  const [notification, setNotification] = useState<HMSNotificationMapping<T> | null>(null);
 
   if (!HMSContextConsumer) {
     throw new Error(hooksErrorMessage);
@@ -189,7 +189,7 @@ export const useHMSNotifications = <T extends HMSNotification>(type: HMSNotifica
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification<T>((notification: T) => {
+    const unsubscribe = HMSContextConsumer.notifications.onNotification<T>(notification => {
       setNotification(notification);
     }, type);
     return unsubscribe;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { HMSExceptionNotification, HMSNotificationTypes } from '@100mslive/hms-video-store';
+import { HMSNotificationTypes } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSNotifications } from '../primitives/HmsRoomProvider';
 
 export interface useAutoplayErrorResult {
@@ -23,7 +23,7 @@ export interface useAutoplayErrorResult {
  * @returns {useAutoplayErrorResult}
  */
 export const useAutoplayError = (): useAutoplayErrorResult => {
-  const notification = useHMSNotifications<HMSExceptionNotification>(HMSNotificationTypes.ERROR);
+  const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [error, setError] = useState('');
   const actions = useHMSActions();
 
