@@ -27,7 +27,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
   constructor(store: IHMSStore) {
     this.store = store;
   }
-  setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): void {
+  setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
