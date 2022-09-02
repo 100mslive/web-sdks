@@ -35,6 +35,7 @@ export const lightTheme = {
     bgPrimary: '$white',
     bgSecondary: '#F5F5F5',
     bgTertiary: '#FFFFFF61',
+    twinYellow: '#ECC502',
     textPrimary: 'rgba(0,0,0, 0.9)',
     textSecondary: 'rgba(0,0,0, 0.72)',
     textInvert: '#FFFFFFE6',
