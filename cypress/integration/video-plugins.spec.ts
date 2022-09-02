@@ -28,7 +28,7 @@ describe('Video Plugins', () => {
     cy.spy(brighteningPlugin2, 'stop').as('brightening2Stop');
   });
 
-  it.only('should call plugin process/stop on add/remove plugin', () => {
+  it('should call plugin process/stop on add/remove plugin', () => {
     const actions = localPeer.actions;
     cy.wrap(localPeer.join()).then(() => {
       cy.wrap(actions.addPluginToVideoTrack(brighteningPlugin1)).then(() => {
