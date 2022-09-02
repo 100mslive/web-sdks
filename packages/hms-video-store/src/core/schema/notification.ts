@@ -169,6 +169,6 @@ export interface IHMSNotifications {
    */
   onNotification<T extends HMSNotificationTypes | HMSNotificationTypes[]>(
     cb: HMSNotificationCallback<T>,
-    types?: T | T[],
+    types?: T,
   ): () => void;
 }
