@@ -40,6 +40,8 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  PreferAudioLayerParams,
+  PreferVideoLayerParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
@@ -608,6 +610,14 @@ export default class HMSTransport implements ITransport {
 
   async changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams) {
     await this.signal.requestMultiTrackStateChange(trackUpdateRequest);
+  }
+
+  async updateVideoTrackLayer(params: PreferVideoLayerParams) {
+    return await this.signal.updateVideoTrackLayer(params);
+  }
+
+  async updateAudioTrackSubscription(params: PreferAudioLayerParams): Promise<void> {
+    await this.signal.updateAudioTrackSubscription(params);
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {

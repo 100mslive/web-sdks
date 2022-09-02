@@ -13,6 +13,9 @@ import {
   HLSRequestParams,
   BroadcastResponse,
   HLSTimedMetadataParams,
+  PreferVideoLayerParams,
+  PreferAudioLayerParams,
+  VideoTrackLayerUpdate,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -298,6 +301,17 @@ export default class JsonRpcSignal implements ISignal {
 
   async updatePeer(params: UpdatePeerRequestParams) {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+  }
+
+  async updateVideoTrackLayer(params: PreferVideoLayerParams) {
+    return await this.call<VideoTrackLayerUpdate>(HMSSignalMethod.PREFER_VIDEO_TRACK_LAYER, {
+      version: '2.0',
+      ...params,
+    });
+  }
+
+  async updateAudioTrackSubscription(params: PreferAudioLayerParams): Promise<void> {
+    await this.call(HMSSignalMethod.PREFER_VIDEO_TRACK_LAYER, { version: '2.0', ...params });
   }
 
   private onCloseHandler(event: CloseEvent) {

@@ -1,5 +1,5 @@
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
-import { HMSRemoteTrack } from '../media/tracks';
+import { HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
@@ -20,6 +20,7 @@ import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
 import { EventBus } from '../events/EventBus';
+import { VideoTrackLayerUpdate } from '../signal/interfaces';
 
 export class NotificationManager {
   private TAG = '[HMSNotificationManager]';
@@ -162,5 +163,9 @@ export class NotificationManager {
   updateLocalPeer = ({ name, metadata }: { name?: string; metadata?: string }) => {
     const peer = this.store.getLocalPeer();
     this.peerManager.handlePeerInfoUpdate({ peer, name, data: metadata });
+  };
+
+  handleVideoLayerUpdate = (track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) => {
+    this.trackManager.setLayer(track, layerUpdate);
   };
 }

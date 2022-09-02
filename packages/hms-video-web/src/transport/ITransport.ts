@@ -8,7 +8,13 @@ import {
   HMSRole,
   HLSTimedMetadata,
 } from '../interfaces';
-import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
+import {
+  MultiTrackUpdateRequestParams,
+  PreferAudioLayerParams,
+  PreferVideoLayerParams,
+  TrackUpdateRequestParams,
+  VideoTrackLayerUpdate,
+} from '../signal/interfaces';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
 export type IFetchTrackOptions = boolean | 'empty';
@@ -60,4 +66,8 @@ export default interface ITransport {
   changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams): Promise<void>;
 
   handleLocalRoleUpdate({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }): Promise<void>;
+
+  updateVideoTrackLayer(params: PreferVideoLayerParams): Promise<VideoTrackLayerUpdate>;
+
+  updateAudioTrackSubscription(params: PreferAudioLayerParams): Promise<void>;
 }

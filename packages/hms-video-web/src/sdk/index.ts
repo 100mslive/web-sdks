@@ -7,6 +7,7 @@ import {
   HMSPlaylistType,
   HMSRole,
   HMSRoleChangeRequest,
+  HMSSimulcastLayer,
   HMSVideoCodec,
   ScreenShareConfig,
 } from '../interfaces';
@@ -22,6 +23,7 @@ import {
   HMSLocalAudioTrack,
   HMSLocalTrack,
   HMSLocalVideoTrack,
+  HMSRemoteAudioTrack,
   HMSRemoteTrack,
   HMSRemoteVideoTrack,
   HMSTrackSource,
@@ -151,6 +153,24 @@ export class HMSSdk implements HMSInterface {
   private validateJoined(name: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, `Not connected - ${name}`);
+    }
+  }
+
+  async setPreferredLayerForRemoteVideoTrack(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer) {
+    const storeTrack = this.store.getTrackById(track.trackId) as HMSRemoteVideoTrack;
+    if (storeTrack) {
+      const update = await this.transport?.updateVideoTrackLayer({
+        track_id: track.trackId,
+        max_spatial_layer: layer,
+      });
+      this.notificationManager.handleVideoLayerUpdate(storeTrack, update);
+    }
+  }
+
+  async setRemoteAudioTrackSubscription(track: HMSRemoteAudioTrack, subscribe: boolean) {
+    const storeTrack = this.store.getTrackById(track.trackId);
+    if (storeTrack) {
+      await this.transport?.updateAudioTrackSubscription({ track_id: track.trackId, subscribed: subscribe });
     }
   }
 
