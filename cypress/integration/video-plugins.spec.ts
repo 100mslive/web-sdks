@@ -1,5 +1,5 @@
 import { CypressPeer } from '../support/peer';
-import { BrighteningPlugin } from '../BrighteningPlugin';
+import { BrighteningPlugin } from '../brighteningPlugin';
 
 let token: string;
 let localPeer: CypressPeer;
