@@ -47,7 +47,7 @@ export class NotificationManager {
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
     this.trackManager = new TrackManager(this.store, eventBus, this.listener);
-    this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
+    this.peerManager = new PeerManager(this.store, this.trackManager, eventBus, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
     this.policyChangeManager = new PolicyChangeManager(this.store, eventBus);

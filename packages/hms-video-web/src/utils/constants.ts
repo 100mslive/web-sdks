@@ -44,4 +44,6 @@ export const HMSEvents = {
   AUDIO_TRACK_ADDED: 'audio-track-added',
   AUDIO_TRACK_REMOVED: 'audio-track-removed',
   AUTOPLAY_ERROR: 'autoplay-error',
+  ROLE_UPDATE_AFTER_ROLE_CHANGE: 'role-update-after-role-change',
+  PUBLISH_COMPLETE_AFTER_JOIN: 'publish-complete-after-join',
 };

@@ -6,6 +6,7 @@ import HMSLogger from '../../utils/logger';
 import { PeerNotification } from '../HMSNotifications';
 import { TrackManager } from './TrackManager';
 import { convertDateNumToDate } from '../../utils/date';
+import { EventBus } from '../../events/EventBus';
 
 /**
  * Handles:
@@ -18,7 +19,12 @@ import { convertDateNumToDate } from '../../utils/date';
  * we add it to the store and call TrackManager to process it when RTC Track comes in.
  */
 export class PeerManager {
-  constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: IStore,
+    private trackManager: TrackManager,
+    private eventBus: EventBus,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   private get TAG() {
     return `[${this.constructor.name}]`;
@@ -108,6 +114,7 @@ export class PeerManager {
     if (peer.role && peer.role.name !== notification.role) {
       const newRole = this.store.getPolicyForRole(notification.role);
       peer.updateRole(newRole);
+      this.eventBus.roleUpdatedAfterRoleChange.publish(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
     this.handlePeerInfoUpdate({ peer, ...notification.info });

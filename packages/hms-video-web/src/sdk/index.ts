@@ -386,6 +386,7 @@ export class HMSSdk implements HMSInterface {
       this.transport,
       this.publish.bind(this),
       this.removeTrack.bind(this),
+      this.eventBus,
       this.listener,
     );
     this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
@@ -408,10 +409,14 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
-        this.publish(config.settings || defaultSettings).catch(error => {
-          HMSLogger.e(this.TAG, 'Error in publish', error);
-          this.listener?.onError(error);
-        });
+        this.publish(config.settings || defaultSettings)
+          .then(() => {
+            this.eventBus.publishCompleteAfterJoin.publish();
+          })
+          .catch(error => {
+            HMSLogger.e(this.TAG, 'Error in publish', error);
+            this.listener?.onError(error);
+          });
       }
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
@@ -664,6 +669,13 @@ export class HMSSdk implements HMSInterface {
     }
 
     await this.transport?.changeRole(forPeer, toRole, force);
+    await new Promise<void>(resolve => {
+      this.eventBus.roleUpdatedAfterRoleChange.subscribeOnce((peer: HMSPeer) => {
+        if (peer.peerId === forPeer.peerId) {
+          resolve();
+        }
+      });
+    });
   }
 
   async acceptChangeRole(request: HMSRoleChangeRequest) {

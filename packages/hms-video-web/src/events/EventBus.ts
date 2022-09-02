@@ -7,7 +7,7 @@ import { HMSWebrtcStats } from '../rtc-stats';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { PolicyParams } from '../notification-manager';
-import { HMSRemotePeer } from '../sdk/models/peer';
+import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
 import { HMSException } from '../error/HMSException';
 
 export class EventBus {
@@ -70,4 +70,14 @@ export class EventBus {
   );
 
   readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
+
+  readonly roleUpdatedAfterRoleChange = new HMSInternalEvent<HMSPeer>(
+    HMSEvents.ROLE_UPDATE_AFTER_ROLE_CHANGE,
+    this.eventEmitter,
+  );
+
+  readonly publishCompleteAfterJoin = new HMSInternalEvent<void>(
+    HMSEvents.PUBLISH_COMPLETE_AFTER_JOIN,
+    this.eventEmitter,
+  );
 }

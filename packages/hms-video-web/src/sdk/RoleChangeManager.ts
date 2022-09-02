@@ -1,3 +1,4 @@
+import { EventBus } from '../events/EventBus';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
@@ -16,6 +17,7 @@ export default class RoleChangeManager {
     private transport: ITransport,
     private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
     private removeAuxiliaryTrack: (trackId: string) => void,
+    private eventBus: EventBus,
     private listener?: HMSUpdateListener,
   ) {}
 
@@ -28,6 +30,21 @@ export default class RoleChangeManager {
 
     const wasPublishing = new Set(oldRole.publishParams.allowed || []);
     const isPublishing = new Set(newRole.publishParams.allowed || []);
+
+    await new Promise<void>(resolve => {
+      if (wasPublishing.size === 0) {
+        resolve();
+        return;
+      }
+      if (
+        (wasPublishing.has('audio') && !localPeer.audioTrack) ||
+        (wasPublishing.has('video') && !localPeer.videoTrack)
+      ) {
+        this.eventBus.publishCompleteAfterJoin.subscribeOnce(resolve);
+      } else {
+        resolve();
+      }
+    });
 
     const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
@@ -47,7 +64,7 @@ export default class RoleChangeManager {
     };
     // call publish with new settings, local track manager will diff policies
     await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
-
+    this.eventBus.roleUpdatedAfterRoleChange.publish(localPeer);
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
