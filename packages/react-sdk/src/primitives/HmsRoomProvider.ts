@@ -178,7 +178,7 @@ export const useHMSActions = () => {
  * rerenders for performance reasons.
  */
 export const useHMSNotifications = <T extends HMSNotificationTypes | HMSNotificationTypes[]>(
-  type: T,
+  type?: T,
 ): HMSNotificationInCallback<T> | null => {
   const HMSContextConsumer = useContext(HMSContext);
   const [notification, setNotification] = useState<HMSNotificationInCallback<T> | null>(null);
