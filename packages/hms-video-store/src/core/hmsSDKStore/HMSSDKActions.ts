@@ -1073,13 +1073,13 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack && sdkTrack.type === 'video') {
-      const storeTrack = this.store.getState(selectTrackByID(trackID)) as (HMSVideoTrack | HMSScreenVideoTrack);
+      const storeTrack = this.store.getState(selectTrackByID(trackID)) as HMSVideoTrack | HMSScreenVideoTrack;
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          (draft.tracks[trackID] as (HMSVideoTrack | HMSScreenVideoTrack)).layer = sdkTrack.getSimulcastLayer();
-          (draft.tracks[trackID] as (HMSVideoTrack | HMSScreenVideoTrack)).degraded = sdkTrack.degraded;
+          (draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack).layer = sdkTrack.getSimulcastLayer();
+          (draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack).degraded = sdkTrack.degraded;
         }, action);
       }
     }

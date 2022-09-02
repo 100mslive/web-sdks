@@ -68,22 +68,16 @@ export class SDKToHMS {
   static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
 
-    if (track.source === 'screen' && track.type === 'video') {
-      // @ts-ignore
-      track.displaySurface = mediaSettings.displaySurface;
-      track.height = mediaSettings.height;
-      track.width = mediaSettings.width;
-    }
-
-    if (track.type === 'video' && track.source === 'regular') {
-      track.facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
-    }
-    
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
       (track as HMSAudioTrack).volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
-    if(track.type === 'video' ) {
+    if (track.type === 'video') {
+      (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
+      if (track.source === 'screen') {
+        // @ts-ignore
+        track.displaySurface = mediaSettings.displaySurface;
+      }
       track.height = mediaSettings.height;
       track.width = mediaSettings.width;
       SDKToHMS.enrichVideoTrack(track as HMSVideoTrack, sdkTrack);

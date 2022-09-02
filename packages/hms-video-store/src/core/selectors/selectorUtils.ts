@@ -42,7 +42,7 @@ export function isVideoPlaylist(track: HMSTrack | undefined) {
 }
 
 export function isDegraded(track: HMSTrack | undefined) {
-  if(track?.type === 'video') {
+  if (track?.type === 'video') {
     return Boolean(track?.degraded);
   }
   return false;

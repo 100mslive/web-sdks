@@ -235,7 +235,7 @@ export const selectIsPeerVideoEnabled = byIDCurry((store: HMSStore, peerID?: str
  */
 export const selectIsAudioLocallyMuted = byIDCurry((store: HMSStore, trackID?: string) => {
   if (trackID && store.tracks[trackID]) {
-    return (store.tracks[trackID] as  HMSAudioTrack).volume === 0;
+    return (store.tracks[trackID] as HMSAudioTrack).volume === 0;
   }
   return undefined;
 });

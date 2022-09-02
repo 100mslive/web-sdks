@@ -41,8 +41,7 @@ export interface HMSPeer {
  * degraded - tells whether the track has been degraded(receiving lower video quality/no video) due to bad network locally
  */
 
-
- interface BaseTrack {
+interface BaseTrack {
   id: HMSTrackID;
   source?: HMSTrackSource;
   type: HMSTrackType;
@@ -68,7 +67,6 @@ export interface HMSVideoTrack extends BaseTrack {
   width?: number;
   degraded?: boolean;
 }
-
 
 export interface HMSScreenVideoTrack extends BaseTrack {
   source: 'screen';

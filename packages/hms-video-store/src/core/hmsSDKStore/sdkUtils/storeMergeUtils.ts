@@ -1,4 +1,4 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
@@ -76,8 +76,12 @@ const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) 
   if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
     newTrack.plugins = oldTrack.plugins;
   }
-  if (oldTrack.type === 'video' && newTrack.type === 'video' && oldTrack.layerDefinitions && areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)) {
-    newTrack.layerDefinitions = oldTrack.layerDefinitions;
+  if (
+    oldTrack.type === 'video' &&
+    oldTrack.layerDefinitions &&
+    areArraysEqual(oldTrack.layerDefinitions, (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions)
+  ) {
+    (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions = oldTrack.layerDefinitions;
   }
 };
 
