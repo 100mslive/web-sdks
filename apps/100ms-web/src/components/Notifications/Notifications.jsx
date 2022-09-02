@@ -1,5 +1,4 @@
 /* eslint-disable no-case-declarations */
-//@ts-check
 import React, { useEffect } from "react";
 import LogRocket from "logrocket";
 import {
