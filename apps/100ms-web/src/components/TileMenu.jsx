@@ -14,7 +14,6 @@ import {
   selectPermissions,
   useHMSActions,
   useRemoteAVToggle,
-  selectIsAllowedToPublish,
   useCustomEvent,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
@@ -30,9 +29,7 @@ const TileMenu = ({
   isScreenshare = false,
 }) => {
   const actions = useHMSActions();
-  let { removeOthers } = useHMSStore(selectPermissions);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  removeOthers = removeOthers && !isScreenshare;
+  const { removeOthers } = useHMSStore(selectPermissions);
   const {
     isAudioEnabled,
     isVideoEnabled,
@@ -49,7 +46,10 @@ const TileMenu = ({
   }
   return (
     <StyledMenuTile.Root>
-      <StyledMenuTile.Trigger data-testid="participant_menu_btn">
+      <StyledMenuTile.Trigger
+        isScreenshare={isScreenshare}
+        data-testid="participant_menu_btn"
+      >
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="top" align="end" sideOffset={8}>
@@ -109,7 +109,7 @@ const TileMenu = ({
           </StyledMenuTile.RemoveItem>
         ) : null}
 
-        {isAllowedToPublish.screen ? (
+        {removeOthers && isScreenshare ? (
           <StyledMenuTile.RemoveItem onClick={() => sendEvent()}>
             <ShareScreenIcon />
             <span>Stop Screenshare</span>
