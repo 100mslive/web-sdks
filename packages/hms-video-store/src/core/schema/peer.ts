@@ -1,3 +1,4 @@
+import { HMSVideoTrack } from '@100mslive/hms-video';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
 
@@ -40,24 +41,63 @@ export interface HMSPeer {
  * deviceID - this is the ID of the source device for the track. This can be a dummy ID when track is on mute.
  * degraded - tells whether the track has been degraded(receiving lower video quality/no video) due to bad network locally
  */
-export interface HMSTrack {
+
+
+ interface BaseTrack {
   id: HMSTrackID;
   source?: HMSTrackSource;
   type: HMSTrackType;
   enabled: boolean;
+  displayEnabled?: boolean;
   height?: number;
   width?: number;
   peerId?: string;
   deviceID?: string;
+  degraded?: boolean;
+}
+
+interface AudioTrack extends BaseTrack {
+  source?: 'audioplaylist' | string;
+  type: 'audio';
   plugins?: string[];
-  displayEnabled?: boolean;
   volume?: number;
+}
+interface VideoTrack extends BaseTrack {
+  source?: 'videoplaylist' | string;
+  type: 'video';
+  plugins?: string[];
   layer?: HMSSimulcastLayer;
   layerDefinitions?: SimulcastLayerDefinition[];
-  degraded?: boolean;
-  displaySurface?: HMSTrackDisplaySurface;
   facingMode?: HMSTrackFacingMode;
 }
+
+
+interface ScreenVideoTrack extends BaseTrack {
+  source?: 'screen' | string;
+  type: 'video';
+  plugins?: string[];
+  displaySurface?: HMSTrackDisplaySurface;
+}
+
+export type HMSTrack = VideoTrack | AudioTrack | ScreenVideoTrack;
+// export interface HMSTrack {
+//   id: HMSTrackID;
+//   source?: HMSTrackSource;
+//   type: HMSTrackType;
+//   enabled: boolean;
+//   height?: number;
+//   width?: number;
+//   peerId?: string;
+//   deviceID?: string;
+//   plugins?: string[];
+//   displayEnabled?: boolean;
+//   volume?: number;
+//   layer?: HMSSimulcastLayer;
+//   layerDefinitions?: SimulcastLayerDefinition[];
+//   degraded?: boolean;
+//   displaySurface?: HMSTrackDisplaySurface;
+//   facingMode?: HMSTrackFacingMode;
+// }
 
 /**
  * HMS Speaker stores the details of peers speaking at any point of time along with

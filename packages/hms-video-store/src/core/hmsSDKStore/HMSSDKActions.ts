@@ -1070,7 +1070,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
+    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack && sdkTrack.type === 'video' && sdkTrack.source === 'videoplaylist') {
       const storeTrack = this.store.getState(selectTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
