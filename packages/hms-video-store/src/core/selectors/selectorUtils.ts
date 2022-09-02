@@ -42,7 +42,10 @@ export function isVideoPlaylist(track: HMSTrack | undefined) {
 }
 
 export function isDegraded(track: HMSTrack | undefined) {
-  return Boolean(track?.degraded);
+  if(track?.type === 'video') {
+    return Boolean(track?.degraded);
+  }
+  return false;
 }
 
 export function isTrackEnabled(store: HMSStore, trackID?: string) {

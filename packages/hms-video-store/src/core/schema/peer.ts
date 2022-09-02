@@ -1,4 +1,3 @@
-import { HMSVideoTrack } from '@100mslive/hms-video';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
 
@@ -49,37 +48,40 @@ export interface HMSPeer {
   type: HMSTrackType;
   enabled: boolean;
   displayEnabled?: boolean;
-  height?: number;
-  width?: number;
   peerId?: string;
   deviceID?: string;
+  plugins?: string[];
+}
+
+export interface HMSAudioTrack extends BaseTrack {
+  source: 'regular' | 'audioplaylist' | string;
+  type: 'audio';
+  volume?: number;
+}
+export interface HMSVideoTrack extends BaseTrack {
+  source: 'regular' | 'videoplaylist' | string;
+  type: 'video';
+  facingMode?: HMSTrackFacingMode;
+  layer?: HMSSimulcastLayer;
+  layerDefinitions?: SimulcastLayerDefinition[];
+  height?: number;
+  width?: number;
   degraded?: boolean;
 }
 
-interface AudioTrack extends BaseTrack {
-  source?: 'audioplaylist' | string;
-  type: 'audio';
-  plugins?: string[];
-  volume?: number;
-}
-interface VideoTrack extends BaseTrack {
-  source?: 'videoplaylist' | string;
+
+export interface HMSScreenVideoTrack extends BaseTrack {
+  source: 'screen';
   type: 'video';
-  plugins?: string[];
+  displaySurface?: HMSTrackDisplaySurface;
   layer?: HMSSimulcastLayer;
   layerDefinitions?: SimulcastLayerDefinition[];
-  facingMode?: HMSTrackFacingMode;
+  height?: number;
+  width?: number;
+  degraded?: boolean;
 }
 
-
-interface ScreenVideoTrack extends BaseTrack {
-  source?: 'screen' | string;
-  type: 'video';
-  plugins?: string[];
-  displaySurface?: HMSTrackDisplaySurface;
-}
-
-export type HMSTrack = VideoTrack | AudioTrack | ScreenVideoTrack;
+export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack;
 // export interface HMSTrack {
 //   id: HMSTrackID;
 //   source?: HMSTrackSource;

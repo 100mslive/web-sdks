@@ -76,7 +76,7 @@ const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) 
   if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
     newTrack.plugins = oldTrack.plugins;
   }
-  if (oldTrack.layerDefinitions && areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)) {
+  if (oldTrack.type === 'video' && newTrack.type === 'video' && oldTrack.layerDefinitions && areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)) {
     newTrack.layerDefinitions = oldTrack.layerDefinitions;
   }
 };

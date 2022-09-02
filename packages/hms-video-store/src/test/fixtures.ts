@@ -7,7 +7,7 @@ export const makeFakeTrack = (type?: HMSTrackType): HMSTrack => {
     enabled: false,
     id: String(counter++),
     type: type || 'video',
-  };
+  } as HMSTrack;
 };
 
 export const makeFakePeer = (): HMSPeer => {

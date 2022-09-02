@@ -12,6 +12,8 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  HMSVideoTrack,
+  HMSScreenVideoTrack,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -1070,14 +1072,14 @@ export class HMSSDKActions implements IHMSActions {
    */
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack && sdkTrack.type === 'video' && sdkTrack.source === 'videoplaylist') {
-      const storeTrack = this.store.getState(selectTrackByID(trackID));
+    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack && sdkTrack.type === 'video') {
+      const storeTrack = this.store.getState(selectTrackByID(trackID)) as (HMSVideoTrack | HMSScreenVideoTrack);
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-          draft.tracks[trackID].degraded = sdkTrack.degraded;
+          (draft.tracks[trackID] as (HMSVideoTrack | HMSScreenVideoTrack)).layer = sdkTrack.getSimulcastLayer();
+          (draft.tracks[trackID] as (HMSVideoTrack | HMSScreenVideoTrack)).degraded = sdkTrack.degraded;
         }, action);
       }
     }
@@ -1149,7 +1151,7 @@ export class HMSSDKActions implements IHMSActions {
         track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');
