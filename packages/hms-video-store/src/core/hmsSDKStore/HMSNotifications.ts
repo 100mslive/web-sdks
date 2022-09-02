@@ -1,5 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSNotificationMapping, IHMSNotifications } from '../schema/notification';
+import { HMSNotificationCallback, HMSNotificationInCallback, IHMSNotifications } from '../schema/notification';
 import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';
 import * as sdkTypes from './sdkTypes';
@@ -31,11 +31,11 @@ export class HMSNotifications implements IHMSNotifications {
     this.store = store;
     this.eventEmitter = new EventEmitter();
   }
-  onNotification = <T extends HMSNotificationTypes>(
-    cb: (data: HMSNotificationMapping<T>) => void,
-    type?: HMSNotificationTypes | HMSNotificationTypes[] | undefined,
+  onNotification = <T extends HMSNotificationTypes | HMSNotificationTypes[]>(
+    cb: HMSNotificationCallback<T>,
+    type?: T,
   ) => {
-    const eventCallback = (notification: HMSNotificationMapping<T>) => {
+    const eventCallback = (notification: HMSNotificationInCallback<T>) => {
       if (type) {
         let matchesType: boolean;
         if (Array.isArray(type)) {
