@@ -12,13 +12,18 @@ interface BaseNotification {
   severity?: HMSNotificationSeverity;
 }
 export interface HMSPeerNotification extends BaseNotification {
-  type: HMSNotificationTypes.PEER_JOINED | HMSNotificationTypes.PEER_LEFT;
-  data?: HMSPeer;
+  type:
+    | HMSNotificationTypes.PEER_JOINED
+    | HMSNotificationTypes.PEER_LEFT
+    | HMSNotificationTypes.NAME_UPDATED
+    | HMSNotificationTypes.METADATA_UPDATED
+    | HMSNotificationTypes.ROLE_UPDATED;
+  data: HMSPeer;
 }
 
 export interface HMSPeerListNotification extends BaseNotification {
   type: HMSNotificationTypes.PEER_LIST;
-  data?: HMSPeer[];
+  data: HMSPeer[];
 }
 export interface HMSTrackNotification extends BaseNotification {
   type:
@@ -29,28 +34,28 @@ export interface HMSTrackNotification extends BaseNotification {
     | HMSNotificationTypes.TRACK_MUTED
     | HMSNotificationTypes.TRACK_REMOVED
     | HMSNotificationTypes.TRACK_RESTORED;
-  data?: HMSTrack;
+  data: HMSTrack;
 }
 export interface HMSMessageNotification extends BaseNotification {
   type: HMSNotificationTypes.NEW_MESSAGE;
-  data?: HMSMessage;
+  data: HMSMessage;
 }
 export interface HMSExceptionNotification extends BaseNotification {
   type: HMSNotificationTypes.ERROR;
-  data?: HMSException;
+  data: HMSException;
 }
 export interface HMSChangeTrackStateRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST;
-  data?: HMSChangeTrackStateRequest;
+  data: HMSChangeTrackStateRequest;
 }
 export interface HMSChangeMultiTrackStateRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST;
-  data?: HMSChangeMultiTrackStateRequest;
+  data: HMSChangeMultiTrackStateRequest;
 }
 
 export interface HMSLeaveRoomRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.ROOM_ENDED | HMSNotificationTypes.REMOVED_FROM_ROOM;
-  data?: HMSLeaveRoomRequest;
+  data: HMSLeaveRoomRequest;
 }
 export interface HMSDeviceChangeEventNotification extends BaseNotification {
   type: HMSNotificationTypes.DEVICE_CHANGE_UPDATE;
@@ -58,7 +63,7 @@ export interface HMSDeviceChangeEventNotification extends BaseNotification {
 }
 export interface HMSPlaylistItemNotification<T> extends BaseNotification {
   type: HMSNotificationTypes.PLAYLIST_TRACK_ENDED;
-  data?: HMSPlaylistItem<T>;
+  data: HMSPlaylistItem<T>;
 }
 
 export interface HMSReconnectionNotification extends BaseNotification {
@@ -146,7 +151,7 @@ export type HMSNotificationInCallback<T extends HMSNotificationTypes | HMSNotifi
     ? MappedNotifications<T>[number]
     : T extends HMSNotificationTypes
     ? HMSNotificationMapping<T>
-    : never;
+    : HMSNotification;
 
 export type HMSNotificationCallback<T extends HMSNotificationTypes | HMSNotificationTypes[]> = (
   notification: HMSNotificationInCallback<T>,
