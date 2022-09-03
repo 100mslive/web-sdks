@@ -1,5 +1,11 @@
 export const stringifyMediaStreamTrack = (track: MediaStreamTrack) => {
-  return `\n\ttrackId: ${track.id}\n\tkind: ${track.kind}\n\tenabled: ${track.enabled}\n\tmuted: ${track.muted}\n\treadyState: ${track.readyState}\n`;
+  return `
+    trackId: ${track.id}
+    kind: ${track.kind}
+    enabled: ${track.enabled}
+    muted: ${track.muted}
+    readyState: ${track.readyState}
+  `;
 };
 
 /**
@@ -23,6 +29,7 @@ export const stringify = (input: any): string => {
       return acc;
     }
     value = stringify(value);
-    return `${acc}\n${key}: ${value}`;
+    return `${acc}
+      ${key}: ${value}`;
   }, '')}\n`;
 };
