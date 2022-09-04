@@ -8,7 +8,7 @@ import {
   HMSRole,
   HLSTimedMetadata,
 } from '../interfaces';
-import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
+import { GetRoomMetadataResponse, MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
 export type IFetchTrackOptions = boolean | 'empty';
@@ -54,6 +54,10 @@ export default interface ITransport {
   changeName(name: string): Promise<void>;
 
   changeMetadata(metadata: string): Promise<void>;
+
+  getRoomMetadata(): Promise<GetRoomMetadataResponse>;
+
+  changeRoomMetadata(metadata: any): Promise<void>;
 
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 
