@@ -13,6 +13,8 @@ import {
   HLSRequestParams,
   BroadcastResponse,
   HLSTimedMetadataParams,
+  RoomMetadataUpdateParams,
+  GetRoomMetadataResponse,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -298,6 +300,14 @@ export default class JsonRpcSignal implements ISignal {
 
   async updatePeer(params: UpdatePeerRequestParams) {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+  }
+
+  async changeRoomMetadata(params: RoomMetadataUpdateParams) {
+    await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
+  }
+
+  getRoomMetadata() {
+    return this.call<GetRoomMetadataResponse>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
   }
 
   private onCloseHandler(event: CloseEvent) {
