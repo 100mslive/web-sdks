@@ -573,6 +573,19 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
+  async changeRoomMetadata(metadata: any) {
+    await this.sdk.changeRoomMetadata(metadata);
+    await this.getRoomMetadata();
+  }
+
+  async getRoomMetadata(): Promise<any> {
+    const metadata = await this.sdk.getRoomMetadata();
+    this.setState(draftStore => {
+      draftStore.room.metadata = metadata;
+    }, 'getRoomMetadata');
+    return metadata;
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];

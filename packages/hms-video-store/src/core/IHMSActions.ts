@@ -349,6 +349,22 @@ export interface IHMSActions {
   changeMetadata(metadata: string | any): Promise<void>;
 
   /**
+   * If you want to update the metadata of the room. If an object is passed, it should be serializable using
+   * JSON.stringify.
+   *
+   * Room metadata is available to every peer in the room and is persisted throughout a session
+   * till the last peer leaves a room
+   * @alpha
+   */
+  changeRoomMetadata(metadata: any): Promise<void>;
+
+  /**
+   * Fetch the current room metadata from the server
+   * @alpha
+   */
+  getRoomMetadata(): Promise<any>;
+
+  /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
    *
    * Note that HMSLogLevel is decremental meaning,
