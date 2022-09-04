@@ -8,12 +8,14 @@ import {
   PencilDrawIcon,
   ShareScreenIcon,
   VideoPlayerIcon,
+  ClipIcon,
 } from "@100mslive/react-icons";
 import {
   useScreenShare,
   selectPeerSharingVideoPlaylist,
   useHMSStore,
   selectLocalPeerID,
+  selectRoomMetadata,
 } from "@100mslive/react-sdk";
 import { usePlaylistMusic } from "../hooks/usePlaylistMusic";
 import { useScreenshareAudio } from "../hooks/useScreenshareAudio";
@@ -71,6 +73,7 @@ export const AdditionalRoomState = () => {
   const isVideoScreenSharingOn = !!screenShareVideoTrackId;
   const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } =
     useWhiteboardMetadata();
+  const roomMetadata = useHMSStore(selectRoomMetadata);
   const shouldShowScreenShareState = isAudioOnly && isVideoScreenSharingOn;
   const shouldShowVideoState = isAudioOnly && isVideoPlayListPlaying;
   if (
@@ -78,7 +81,8 @@ export const AdditionalRoomState = () => {
     isAudioshareInactive &&
     !shouldShowScreenShareState &&
     !shouldShowVideoState &&
-    !whiteboardOwner
+    !whiteboardOwner &&
+    !roomMetadata
   ) {
     return null;
   }
@@ -129,6 +133,13 @@ export const AdditionalRoomState = () => {
             <Tooltip title="Whiteboard">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <PencilDrawIcon width={24} height={24} />
+              </Flex>
+            </Tooltip>
+          )}
+          {roomMetadata && (
+            <Tooltip title="Room Metadata">
+              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+                <ClipIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
@@ -232,6 +243,16 @@ export const AdditionalRoomState = () => {
                 Stop
               </Text>
             )}
+          </Dropdown.Item>
+        )}
+        {roomMetadata && (
+          <Dropdown.Item css={{ color: "$textPrimary" }}>
+            <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
+              Room Metadata:{" "}
+              {typeof roomMetadata === "string"
+                ? roomMetadata
+                : JSON.stringify(roomMetadata)}
+            </Text>
           </Dropdown.Item>
         )}
       </Dropdown.Content>
