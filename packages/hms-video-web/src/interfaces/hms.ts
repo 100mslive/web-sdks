@@ -50,7 +50,7 @@ export default interface HMS {
   changeMetadata(metadata: string): Promise<void>;
 
   /** @alpha */
-  changeRoomMetadata(metadata: any): Promise<void>;
+  changeRoomMetadata(metadata: any, localOnly?: boolean): Promise<void>;
   /** @alpha */
   getRoomMetadata(): Promise<any>;
 
