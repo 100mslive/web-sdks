@@ -194,7 +194,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
-   * Video plugins can be added/removed at any time after the join is successful.
+   * Video plugins can be added/removed at any time after the video track is available.
    * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
    * @param pluginFrameRate number
@@ -211,7 +211,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
-   * Audio plugins can be added/removed at any time after the join is successful.
+   * Audio plugins can be added/removed at any time after the audio track is available
    * @param plugin HMSAudioPlugin
    * @see HMSAudioPlugin
    */
@@ -229,6 +229,9 @@ export interface IHMSActions {
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
