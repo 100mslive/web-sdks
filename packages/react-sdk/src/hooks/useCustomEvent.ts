@@ -37,7 +37,7 @@ export interface useCustomEventResult<T> {
    * sendEvent(data, peerID)
    * ```
    */
-  sendEvent: (data?: T, receiver?: string | string[]) => void;
+  sendEvent: (data: T, receiver?: string | string[]) => void;
 }
 
 /**
@@ -79,7 +79,7 @@ export const useCustomEvent = <T>({
 
   // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
-    async (data?: T, receiver?: HMSRoleName[] | HMSPeerID) => {
+    async (data: T, receiver?: HMSRoleName[] | HMSPeerID) => {
       try {
         const dataStr = JSON.stringify(data || '');
         if (Array.isArray(receiver)) {
