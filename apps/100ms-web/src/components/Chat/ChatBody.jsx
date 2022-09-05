@@ -192,7 +192,9 @@ export const ChatBody = ({ role, peerId }) => {
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  const messages = useHMSStore(storeMessageSelector) || [];
+  const messages = (useHMSStore(storeMessageSelector) || []).filter(
+    message => message.type === "chat"
+  );
 
   if (messages.length === 0) {
     return (
