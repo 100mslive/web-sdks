@@ -7,6 +7,8 @@ import {
 } from "@100mslive/react-sdk";
 import { addOrRemoveFromArray } from "../../common/utils";
 
+/** @TODO remove peerId from room metadata once peer leaves */
+
 export const useBlacklistPeers = () => {
   const hmsActions = useHMSActions();
   const roomMetadata = useHMSStore(selectRoomMetadata);
@@ -38,47 +40,23 @@ export const useBlacklistPeers = () => {
     onEvent: peerId => changeRoomMetadatalocally(peerId, false),
   });
 
-  const addBlacklistPeer = useCallback(
-    async peerId => {
-      const newBlacklistedPeers = addOrRemoveFromArray(
-        blacklistedPeers,
-        peerId,
-        true
-      );
-
-      if (newBlacklistedPeers) {
-        await hmsActions.changeRoomMetadata({
-          blacklistedPeers: newBlacklistedPeers,
-        });
-        await sendAddEvent(peerId);
-      }
-    },
-    [hmsActions, sendAddEvent, blacklistedPeers]
-  );
-
-  const removeBlacklistPeer = useCallback(
-    async peerId => {
-      const newBlacklistedPeers = addOrRemoveFromArray(
-        blacklistedPeers,
-        peerId,
-        false
-      );
-
-      if (newBlacklistedPeers) {
-        await hmsActions.changeRoomMetadata({
-          blacklistedPeers: newBlacklistedPeers,
-        });
-        await sendRemoveEvent(peerId);
-      }
-    },
-    [hmsActions, sendRemoveEvent, blacklistedPeers]
-  );
-
   const blacklistPeer = useCallback(
     async (peerId, add) => {
-      add ? await addBlacklistPeer(peerId) : await removeBlacklistPeer(peerId);
+      const newBlacklistedPeers = addOrRemoveFromArray(
+        blacklistedPeers,
+        peerId,
+        add
+      );
+
+      if (newBlacklistedPeers) {
+        await hmsActions.changeRoomMetadata({
+          blacklistedPeers: newBlacklistedPeers,
+        });
+        add ? await sendAddEvent(peerId) : await sendRemoveEvent(peerId);
+      }
     },
-    [addBlacklistPeer, removeBlacklistPeer]
+    [hmsActions, blacklistedPeers, sendAddEvent, sendRemoveEvent]
   );
+
   return { blacklistedPeers, blacklistPeer };
 };
