@@ -89,8 +89,11 @@ export type TrackWithPeer = { track?: HMSTrack; peer: HMSPeer };
 export const getModeAspectRatio = (tracks: TrackWithPeer[]): number | null =>
   mode(
     tracks
-      .filter(track => track.track?.width && track.track?.height)
+      .filter(track => track.track?.type === 'video' && track.track?.width && track.track?.height)
       .map(track => {
+        if (track.track?.type !== 'video') {
+          return 1;
+        }
         const width = track.track?.width;
         const height = track.track?.height;
         // Default to 1 if there are no video tracks

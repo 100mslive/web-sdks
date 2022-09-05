@@ -7,5 +7,5 @@ export const makeFakeTrack = (): HMSTrack => {
     enabled: false,
     id: String(counter++),
     type: 'video',
-  };
+  } as HMSTrack;
 };
