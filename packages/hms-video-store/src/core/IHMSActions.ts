@@ -356,7 +356,7 @@ export interface IHMSActions {
    * till the last peer leaves a room
    * @alpha
    */
-  changeRoomMetadata(metadata: any): Promise<void>;
+  changeRoomMetadata(metadata: any, localOnly?: boolean): Promise<void>;
 
   /**
    * Fetch the current room metadata from the server

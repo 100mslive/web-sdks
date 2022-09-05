@@ -573,9 +573,15 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
-  async changeRoomMetadata(metadata: any) {
-    await this.sdk.changeRoomMetadata(metadata);
-    await this.getRoomMetadata();
+  async changeRoomMetadata(metadata: any, localOnly = false) {
+    await this.sdk.changeRoomMetadata(metadata, localOnly);
+    if (localOnly) {
+      this.setState(draftStore => {
+        draftStore.room.metadata = metadata;
+      }, 'localRoomMetadataChange');
+    } else {
+      await this.getRoomMetadata();
+    }
   }
 
   async getRoomMetadata(): Promise<any> {
