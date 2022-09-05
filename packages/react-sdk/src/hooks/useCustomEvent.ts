@@ -16,7 +16,7 @@ export interface useCustomEventInput<T> {
    * The callback is optional in case you want to decouple sending event and
    * handling event in the UI.
    */
-  onEvent?: (data?: T) => void;
+  onEvent?: (data: T) => void;
   /**
    * function to handle errors happening during sending the event
    */
