@@ -130,7 +130,6 @@ const HLSView = () => {
           <Flex
             align="center"
             justify="end"
-            // css={{ width: "100%" }}
             css={{ marginRight: "$10", zIndex: "10" }}
           >
             {hlsController ? (
