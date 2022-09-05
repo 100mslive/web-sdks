@@ -1,6 +1,6 @@
 import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { useCallback, useEffect } from 'react';
-import { HMSNotificationTypes } from '@100mslive/hms-video-store';
+import { HMSNotificationTypes, HMSPeerID, HMSRoleName } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
 
@@ -79,7 +79,7 @@ export const useCustomEvent = <T>({
 
   // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
-    async (data?: T, receiver?: string | string[]) => {
+    async (data?: T, receiver?: HMSRoleName[] | HMSPeerID) => {
       try {
         const dataStr = JSON.stringify(data || '');
         if (Array.isArray(receiver)) {
