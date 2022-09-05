@@ -39,41 +39,41 @@ describe('Audio Plugins', () => {
   });
 
   it('should call plugin process/stop on add/remove plugin', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-
-    //@ts-ignore
-    cy.localTracksAdded(actions.sdk.getLocalPeer())
-      .then(() => {
-        return actions.addPluginToAudioTrack(gainPlugin1);
-      })
-      .then(() => {
-        cy.get('@gain1Process').should('have.been.calledOnce');
-        return actions.removePluginFromAudioTrack(gainPlugin1);
-      })
-      .then(() => {
-        cy.get('@gain1Stop').should('have.been.calledOnce');
-      });
+    actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer())
+        .then(() => {
+          return actions.addPluginToAudioTrack(gainPlugin1);
+        })
+        .then(() => {
+          cy.get('@gain1Process').should('have.been.calledOnce');
+          return actions.removePluginFromAudioTrack(gainPlugin1);
+        })
+        .then(() => {
+          cy.get('@gain1Stop').should('have.been.calledOnce');
+        });
+    });
   });
 
   it('should handle multiple plugins', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-
-    //@ts-ignore
-    cy.localTracksAdded(actions.sdk.getLocalPeer())
-      .then(() => {
-        return actions.addPluginToAudioTrack(gainPlugin1);
-      })
-      .then(() => {
-        return actions.addPluginToAudioTrack(gainPlugin2);
-      })
-      .then(() => {
-        return actions.removePluginFromAudioTrack(gainPlugin1);
-      })
-      .then(() => {
-        cy.get('@gain1Process').should('have.been.calledOnce');
-        cy.get('@gain1Stop').should('have.been.calledOnce');
-        cy.get('@gain2Process').should('have.been.calledTwice');
-        cy.get('@gain2Stop').should('have.been.calledOnce');
-      });
+    actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer())
+        .then(() => {
+          return actions.addPluginToAudioTrack(gainPlugin1);
+        })
+        .then(() => {
+          return actions.addPluginToAudioTrack(gainPlugin2);
+        })
+        .then(() => {
+          return actions.removePluginFromAudioTrack(gainPlugin1);
+        })
+        .then(() => {
+          cy.get('@gain1Process').should('have.been.calledOnce');
+          cy.get('@gain1Stop').should('have.been.calledOnce');
+          cy.get('@gain2Process').should('have.been.calledTwice');
+          cy.get('@gain2Stop').should('have.been.calledOnce');
+        });
+    });
   });
 });
