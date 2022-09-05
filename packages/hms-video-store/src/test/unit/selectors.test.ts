@@ -74,6 +74,8 @@ import {
   selectAppData,
   selectFullAppData,
   HMSAudioTrack,
+  HMSScreenVideoTrack,
+  HMSVideoTrack,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -167,10 +169,8 @@ describe('secondary selectors', () => {
   });
 
   test('some track degraded', () => {
-    if (remoteVideo.type === 'video' && screenShare.type === 'video') {
-      remoteVideo.degraded = true;
-      screenShare.degraded = true;
-    }
+    remoteVideo.degraded = true;
+    screenShare.degraded = true;
     expect(selectDegradedTracks(fakeStore)).toContain(remoteVideo);
     expect(selectDegradedTracks(fakeStore)).toContain(screenShare);
   });
@@ -261,10 +261,8 @@ describe('by ID selectors', () => {
 
   test('selectSimulcastLayerByTrack', () => {
     const peer = selectRemotePeers(fakeStore);
-    const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore);
-    if (track?.type === 'video') {
-      expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
-    }
+    const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore) as HMSVideoTrack | HMSScreenVideoTrack;
+    expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
   });
 
   test('selectMessagesByPeerID', () => {

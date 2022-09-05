@@ -1,4 +1,4 @@
-import { HMSTrack } from '@100mslive/hms-video-store';
+import { HMSVideoTrack, HMSTrack } from '@100mslive/hms-video-store';
 
 let counter = 100;
 
@@ -7,5 +7,5 @@ export const makeFakeTrack = (): HMSTrack => {
     enabled: false,
     id: String(counter++),
     type: 'video',
-  } as HMSTrack;
+  } as HMSVideoTrack;
 };

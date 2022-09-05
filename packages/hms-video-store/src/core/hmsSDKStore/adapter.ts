@@ -55,12 +55,12 @@ export class SDKToHMS {
   static convertTrack(sdkTrack: SDKHMSTrack, peerId?: HMSPeerID): HMSTrack {
     const track: HMSTrack = {
       id: sdkTrack.trackId,
-      source: sdkTrack.source || '',
+      source: sdkTrack.source,
       type: sdkTrack.type,
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
       peerId: sdkTrack.peerId || peerId,
-    };
+    } as HMSTrack;
     this.enrichTrack(track, sdkTrack);
     return track;
   }

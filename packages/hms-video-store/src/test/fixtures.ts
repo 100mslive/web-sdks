@@ -1,13 +1,21 @@
-import { HMSPeer, HMSTrack, HMSTrackType } from '../core';
+import { HMSAudioTrack, HMSPeer, HMSTrack, HMSVideoTrack, HMSTrackType } from '../core';
 
 let counter = 100;
 
 export const makeFakeTrack = (type?: HMSTrackType): HMSTrack => {
-  return {
-    enabled: false,
-    id: String(counter++),
-    type: type || 'video',
-  } as HMSTrack;
+  if (type === 'audio') {
+    return {
+      enabled: false,
+      id: String(counter++),
+      type: type,
+    } as HMSAudioTrack;
+  } else {
+    return {
+      enabled: false,
+      id: String(counter++),
+      type: type || 'video',
+    } as HMSVideoTrack;
+  }
 };
 
 export const makeFakePeer = (): HMSPeer => {

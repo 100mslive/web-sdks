@@ -188,7 +188,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: true,
           id: videoTrackID,
           type: 'video',
-          source: 'videoplaylist',
+          source: 'regular',
         };
       }
     });

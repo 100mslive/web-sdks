@@ -1,5 +1,5 @@
 import { HMSTrack as SDKTrack } from '@100mslive/hms-video';
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../core';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../core';
 import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../core/hmsSDKStore/sdkUtils/storeMergeUtils';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 
@@ -50,25 +50,19 @@ describe('tracks merge is happening properly', () => {
     expectNoReferenceChange();
     expect(draftTracks[fakeTrack.id]).toBe(fakeTrack);
     expect(fakeTrack.enabled).toBe(true);
-    if (fakeTrack.type === 'video') {
-      expect(fakeTrack.height).toBe(357);
-    }
+    expect((fakeTrack as HMSVideoTrack).height).toBe(357);
     expect(fakeTrack).not.toBe(clonedTrack);
   });
 
   test('partial update does not override older data', () => {
     const clonedTrack = { ...fakeTrack };
-    if (fakeTrack.type === 'video') {
-      fakeTrack.height = 450;
-    }
+    (fakeTrack as HMSVideoTrack).height = 450;
     draftTracks[fakeTrack.id] = fakeTrack;
     newTracks[clonedTrack.id] = clonedTrack;
     mergeNewTracksInDraft(draftTracks as trackMap, newTracks);
     expectNoReferenceChange();
-    if (fakeTrack.type === 'video' && clonedTrack.type === 'video') {
-      expect(fakeTrack.height).toBe(450);
-      expect(clonedTrack.height).toBeUndefined();
-    }
+    expect((fakeTrack as HMSVideoTrack).height).toBe(450);
+    expect((clonedTrack as HMSVideoTrack).height).toBeUndefined();
   });
 });
 

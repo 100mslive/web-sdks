@@ -10,7 +10,7 @@ import {
   HMSTrackType,
 } from '../../core';
 import { HMSSimulcastLayer } from '../../core/hmsSDKStore/sdkTypes';
-import { HMSPlaylist, HMSPlaylistType, HMSRole } from '../../core/schema';
+import { HMSPlaylist, HMSPlaylistType, HMSRole, HMSScreenVideoTrack, HMSVideoTrack } from '../../core/schema';
 
 function makeTrack(
   id: HMSTrackID,
@@ -37,8 +37,8 @@ export let remotePeerTwo: HMSPeer;
 export let peerScreenSharing: HMSPeer;
 export let localVideo: HMSTrack;
 export let localAudio: HMSTrack;
-export let remoteVideo: HMSTrack;
-export let screenShare: HMSTrack;
+export let remoteVideo: HMSVideoTrack;
+export let screenShare: HMSScreenVideoTrack;
 export let auxiliaryAudio: HMSTrack;
 export let localSpeaker: HMSSpeaker;
 export let screenshareAudio: HMSTrack;
@@ -284,8 +284,8 @@ export const makeFakeStore = (): HMSStore => {
   peerScreenSharing = fakeStore.peers['2'];
   localVideo = fakeStore.tracks['101'];
   localAudio = fakeStore.tracks['102'];
-  remoteVideo = fakeStore.tracks['103'];
-  screenShare = fakeStore.tracks['105'];
+  remoteVideo = fakeStore.tracks['103'] as HMSVideoTrack;
+  screenShare = fakeStore.tracks['105'] as HMSScreenVideoTrack;
   auxiliaryAudio = fakeStore.tracks['106'];
   screenshareAudio = fakeStore.tracks['107'];
   localSpeaker = fakeStore.speakers[localPeer.audioTrack!];
