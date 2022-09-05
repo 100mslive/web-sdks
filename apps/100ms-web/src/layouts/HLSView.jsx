@@ -32,6 +32,7 @@ import {
 const HLSVideo = styled("video", {
   h: "100%",
   margin: "0 auto",
+  position: "static",
   px: "$10",
 });
 
@@ -124,11 +125,13 @@ const HLSView = () => {
   return (
     <Fragment>
       {hlsUrl ? (
-        <>
+        <Flex css={{ flexDirection: "column" }}>
+          <HLSVideo ref={videoRef} autoPlay controls playsInline />
           <Flex
             align="center"
-            justify="center"
-            css={{ position: "absolute", right: "$10", zIndex: "10" }}
+            justify="end"
+            // css={{ width: "100%" }}
+            css={{ marginRight: "$10", zIndex: "10" }}
           >
             {hlsController ? (
               <Button
@@ -229,9 +232,7 @@ const HLSView = () => {
               )}
             </Dropdown.Root>
           </Flex>
-
-          <HLSVideo ref={videoRef} autoPlay controls playsInline />
-        </>
+        </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
