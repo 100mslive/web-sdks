@@ -5,6 +5,7 @@ import {
   MicOffIcon,
   SettingsIcon,
   PencilIcon,
+  RemoveUserIcon,
 } from "@100mslive/react-icons";
 import {
   selectLocalPeerID,
@@ -21,16 +22,20 @@ import { StatsForNerds } from "../StatsForNerds";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import IconButton from "../../IconButton";
+import { ChatBlacklistModal } from "./ChatBlacklist";
+import { useBlacklistPeers } from "../hooks/useBlacklistPeers";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
+  const { blacklistedPeers, blacklistPeer } = useBlacklistPeers();
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showMuteAll, setShowMuteAll] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
+  const [showChatBlacklist, setShowChatBlacklist] = useState(false);
 
   return (
     <Fragment>
@@ -72,6 +77,15 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
+          <Dropdown.Item
+            onClick={() => setShowChatBlacklist(true)}
+            data-testid="mute_all_btn"
+          >
+            <RemoveUserIcon />
+            <Text variant="sm" css={{ ml: "$4" }}>
+              Chat Blacklist
+            </Text>
+          </Dropdown.Item>
           <Dropdown.ItemSeparator />
           <Dropdown.Item
             onClick={() => setShowDeviceSettings(true)}
@@ -112,6 +126,13 @@ export const MoreSettings = () => {
         <RoleChangeModal
           peerId={localPeerId}
           onOpenChange={setShowSelfRoleChange}
+        />
+      )}
+      {showChatBlacklist && (
+        <ChatBlacklistModal
+          onOpenChange={setShowChatBlacklist}
+          blacklistPeer={blacklistPeer}
+          blacklistedPeers={blacklistedPeers}
         />
       )}
     </Fragment>

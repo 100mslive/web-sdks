@@ -74,3 +74,21 @@ export const getRoutePrefix = () => {
 export const isStreamingKit = () => {
   return window.location.pathname.startsWith("/streaming");
 };
+
+/**
+ * Add or remove element to array(like set)
+ * used for adding/removing peerIds to set of blacklisted peerIds
+ */
+export const addOrRemoveFromArray = (array, element, add) => {
+  const noOp =
+    (add && array.includes(element)) || (!add && !array.includes(element));
+  if (noOp) {
+    return;
+  }
+
+  if (add) {
+    return array.concat(element);
+  } else {
+    return array.filter(arrayItem => arrayItem !== element);
+  }
+};
