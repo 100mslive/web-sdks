@@ -50,19 +50,25 @@ describe('tracks merge is happening properly', () => {
     expectNoReferenceChange();
     expect(draftTracks[fakeTrack.id]).toBe(fakeTrack);
     expect(fakeTrack.enabled).toBe(true);
-    expect(fakeTrack.height).toBe(357);
+    if (fakeTrack.type === 'video') {
+      expect(fakeTrack.height).toBe(357);
+    }
     expect(fakeTrack).not.toBe(clonedTrack);
   });
 
   test('partial update does not override older data', () => {
     const clonedTrack = { ...fakeTrack };
-    fakeTrack.height = 450;
+    if (fakeTrack.type === 'video') {
+      fakeTrack.height = 450;
+    }
     draftTracks[fakeTrack.id] = fakeTrack;
     newTracks[clonedTrack.id] = clonedTrack;
     mergeNewTracksInDraft(draftTracks as trackMap, newTracks);
     expectNoReferenceChange();
-    expect(fakeTrack.height).toBe(450);
-    expect(clonedTrack.height).toBeUndefined();
+    if (fakeTrack.type === 'video' && clonedTrack.type === 'video') {
+      expect(fakeTrack.height).toBe(450);
+      expect(clonedTrack.height).toBeUndefined();
+    }
   });
 });
 

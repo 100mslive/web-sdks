@@ -73,6 +73,7 @@ import {
   selectConnectionQualities,
   selectAppData,
   selectFullAppData,
+  HMSAudioTrack,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -166,8 +167,10 @@ describe('secondary selectors', () => {
   });
 
   test('some track degraded', () => {
-    remoteVideo.degraded = true;
-    screenShare.degraded = true;
+    if (remoteVideo.type === 'video' && screenShare.type === 'video') {
+      remoteVideo.degraded = true;
+      screenShare.degraded = true;
+    }
     expect(selectDegradedTracks(fakeStore)).toContain(remoteVideo);
     expect(selectDegradedTracks(fakeStore)).toContain(screenShare);
   });
@@ -241,11 +244,11 @@ describe('by ID selectors', () => {
   });
 
   test('selectAudioVolumeByPeerID', () => {
-    expect(selectAudioVolumeByPeerID(localPeer.id)(fakeStore)).toBe(localAudio.volume);
+    expect(selectAudioVolumeByPeerID(localPeer.id)(fakeStore)).toBe((localAudio as HMSAudioTrack).volume);
   });
 
   test('selectAudioVolumeByTrackID', () => {
-    expect(selectAudioTrackVolume(localPeer.audioTrack)(fakeStore)).toBe(localAudio.volume);
+    expect(selectAudioTrackVolume(localPeer.audioTrack)(fakeStore)).toBe((localAudio as HMSAudioTrack).volume);
   });
 
   test('selectLocallyMutedByPeerID', () => {
@@ -259,7 +262,9 @@ describe('by ID selectors', () => {
   test('selectSimulcastLayerByTrack', () => {
     const peer = selectRemotePeers(fakeStore);
     const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore);
-    expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
+    if (track?.type === 'video') {
+      expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
+    }
   });
 
   test('selectMessagesByPeerID', () => {
