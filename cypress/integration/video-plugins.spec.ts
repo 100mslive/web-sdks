@@ -39,46 +39,46 @@ describe('Video Plugins', () => {
   });
 
   it('should call plugin process/stop on add/remove plugin', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-
-    //@ts-ignore
-    cy.localTracksAdded(actions.sdk.getLocalPeer())
-      .then(() => {
-        return actions.addPluginToVideoTrack(brighteningPlugin1);
-      })
-      .then(() => {
-        cy.get('@brightening1Process').should('have.been.calledOnce');
-        return actions.removePluginFromVideoTrack(brighteningPlugin1);
-      })
-      .then(() => {
-        cy.get('@brightening1Stop').should('have.been.calledOnce');
-      });
+    actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer())
+        .then(() => {
+          return actions.addPluginToVideoTrack(brighteningPlugin1);
+        })
+        .then(() => {
+          cy.get('@brightening1Process').should('have.been.calledOnce');
+          return actions.removePluginFromVideoTrack(brighteningPlugin1);
+        })
+        .then(() => {
+          cy.get('@brightening1Stop').should('have.been.calledOnce');
+        });
+    });
   });
 
   it('should handle multiple plugins', () => {
-    actions.join({ userName: 'test', authToken: token, initEndpoint });
-
-    //@ts-ignore
-    cy.localTracksAdded(actions.sdk.getLocalPeer())
-      .then(() => {
-        return actions.addPluginToVideoTrack(brighteningPlugin1);
-      })
-      .then(() => {
-        return actions.addPluginToVideoTrack(brighteningPlugin2);
-      })
-      .then(() => {
-        return actions.removePluginFromVideoTrack(brighteningPlugin1);
-      })
-      .then(() => {
-        cy.get('@brightening1Process').should('have.been.calledOnce');
-        cy.get('@brightening1Stop').should('have.been.calledOnce');
-        return cy.get('@brightening2Process').should('have.been.calledTwice');
-      })
-      .then(() => {
-        return actions.removePluginFromVideoTrack(brighteningPlugin2);
-      })
-      .then(() => {
-        cy.get('@brightening2Stop').should('have.been.calledOnce');
-      });
+    actions.join({ userName: 'test', authToken: token, initEndpoint }).then(() => {
+      //@ts-ignore
+      cy.localTracksAdded(actions.sdk.getLocalPeer())
+        .then(() => {
+          return actions.addPluginToVideoTrack(brighteningPlugin1);
+        })
+        .then(() => {
+          return actions.addPluginToVideoTrack(brighteningPlugin2);
+        })
+        .then(() => {
+          return actions.removePluginFromVideoTrack(brighteningPlugin1);
+        })
+        .then(() => {
+          cy.get('@brightening1Process').should('have.been.calledOnce');
+          cy.get('@brightening1Stop').should('have.been.calledOnce');
+          return cy.get('@brightening2Process').should('have.been.calledTwice');
+        })
+        .then(() => {
+          return actions.removePluginFromVideoTrack(brighteningPlugin2);
+        })
+        .then(() => {
+          cy.get('@brightening2Stop').should('have.been.calledOnce');
+        });
+    });
   });
 });

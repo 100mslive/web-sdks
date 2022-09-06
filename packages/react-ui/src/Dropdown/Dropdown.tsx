@@ -23,6 +23,13 @@ const DropdownTriggerItem = styled(TriggerItem, {
   p: '$8',
   display: 'flex',
   alignItems: 'center',
+  '&:hover': {
+    cursor: 'pointer',
+    bg: '$surfaceLighter',
+  },
+  '&:focus-visible': {
+    bg: '$surfaceLighter',
+  },
 });
 
 const DropdownItem = styled(Item, {
@@ -54,6 +61,7 @@ const DropdownContent = styled(Content, {
   backgroundColor: '$surfaceLight',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
+  zIndex: 20,
 });
 
 const DropdownLabel = styled(Label, {
