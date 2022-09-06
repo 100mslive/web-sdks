@@ -31,11 +31,9 @@ import {
 
 const HLSVideo = styled("video", {
   margin: "0 auto",
-  position: "absolute",
-  left: 0,
-  top: 0,
-  height: "100%",
-  width: "100%",
+  flex: "1 1 0",
+  minHeight: 0,
+  h: "100%",
 });
 
 let hlsController;
@@ -126,114 +124,112 @@ const HLSView = () => {
   return (
     <Fragment>
       {hlsUrl ? (
-        <>
+        <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          <Flex css={{ flexDirection: "column" }}>
-            <Flex align="center" justify="end" css={{ margin: "$4" }}>
-              {hlsController ? (
-                <Button
-                  variant="standard"
-                  css={{ marginRight: "0.3rem" }}
-                  onClick={() => {
-                    hlsController.jumpToLive();
-                    setIsVideoLive(true);
+          <Flex align="center" justify="end" css={{ margin: "$4" }}>
+            {hlsController ? (
+              <Button
+                variant="standard"
+                css={{ marginRight: "0.3rem" }}
+                onClick={() => {
+                  hlsController.jumpToLive();
+                  setIsVideoLive(true);
+                }}
+                key="LeaveRoom"
+                data-testid="leave_room_btn"
+              >
+                <Tooltip title="Jump to Live">
+                  <Flex css={{ gap: "$2" }}>
+                    <RecordIcon
+                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
+                      key="jumpToLive"
+                    />
+                    Live
+                  </Flex>
+                </Tooltip>
+              </Button>
+            ) : null}
+            <Dropdown.Root
+              open={qualityDropDownOpen}
+              onOpenChange={value => setQualityDropDownOpen(value)}
+            >
+              <Dropdown.Trigger asChild data-testid="quality_selector">
+                <Flex
+                  css={{
+                    color: "$textPrimary",
+                    borderRadius: "$1",
+                    cursor: "pointer",
+                    zIndex: 4,
+                    border: "$space$px solid $textDisabled",
+                    padding: "$4",
                   }}
-                  key="LeaveRoom"
-                  data-testid="leave_room_btn"
                 >
-                  <Tooltip title="Jump to Live">
+                  <Tooltip title="Select Quality">
                     <Flex>
-                      <RecordIcon
-                        color={isVideoLive ? "#CC525F" : "FAFAFA"}
-                        key="jumpToLive"
-                      />
-                      Live
+                      <SettingsIcon />
+                      <Text variant="md">{currentSelectedQualityText}</Text>
                     </Flex>
                   </Tooltip>
-                </Button>
-              ) : null}
-              <Dropdown.Root
-                open={qualityDropDownOpen}
-                onOpenChange={value => setQualityDropDownOpen(value)}
-              >
-                <Dropdown.Trigger asChild data-testid="quality_selector">
-                  <Flex
+
+                  <Box
                     css={{
-                      color: "$textPrimary",
-                      borderRadius: "$1",
-                      cursor: "pointer",
-                      zIndex: 4,
-                      border: "$space$px solid $textDisabled",
-                      padding: "$4",
+                      "@lg": { display: "none" },
+                      color: "$textDisabled",
                     }}
                   >
-                    <Tooltip title="Select Quality">
-                      <Flex>
-                        <SettingsIcon />
-                        <Text variant="md">{currentSelectedQualityText}</Text>
-                      </Flex>
-                    </Tooltip>
-
-                    <Box
-                      css={{
-                        "@lg": { display: "none" },
-                        color: "$textDisabled",
-                      }}
-                    >
-                      {qualityDropDownOpen ? (
-                        <ChevronUpIcon />
-                      ) : (
-                        <ChevronDownIcon />
-                      )}
-                    </Box>
-                  </Flex>
-                </Dropdown.Trigger>
-                {availableLevels.length > 0 && (
-                  <Dropdown.Content
-                    sideOffset={5}
-                    align="end"
-                    css={{ height: "auto", maxHeight: "$96" }}
+                    {qualityDropDownOpen ? (
+                      <ChevronDownIcon />
+                    ) : (
+                      <ChevronUpIcon />
+                    )}
+                  </Box>
+                </Flex>
+              </Dropdown.Trigger>
+              {availableLevels.length > 0 && (
+                <Dropdown.Content
+                  sideOffset={5}
+                  align="end"
+                  css={{ height: "auto", maxHeight: "$96" }}
+                >
+                  <Dropdown.Item
+                    onClick={event =>
+                      qualitySelectorHandler({ height: "auto" })
+                    }
+                    css={{
+                      h: "auto",
+                      flexDirection: "column",
+                      flexWrap: "wrap",
+                      cursor: "pointer",
+                      alignItems: "flex-start",
+                    }}
+                    key="auto"
                   >
-                    <Dropdown.Item
-                      onClick={event =>
-                        qualitySelectorHandler({ height: "auto" })
-                      }
-                      css={{
-                        h: "auto",
-                        flexDirection: "column",
-                        flexWrap: "wrap",
-                        cursor: "pointer",
-                        alignItems: "flex-start",
-                      }}
-                      key="auto"
-                    >
-                      <Text>Automatic</Text>
-                    </Dropdown.Item>
-                    {availableLevels.map(level => {
-                      return (
-                        <Dropdown.Item
-                          onClick={() => qualitySelectorHandler(level)}
-                          css={{
-                            h: "auto",
-                            flexDirection: "column",
-                            flexWrap: "wrap",
-                            cursor: "pointer",
-                            alignItems: "flex-start",
-                          }}
-                          key={level.url}
-                        >
-                          <Text>{`${level.height}p (${(
-                            Number(level.bitrate / 1024) / 1024
-                          ).toFixed(2)} Mbps)`}</Text>
-                        </Dropdown.Item>
-                      );
-                    })}
-                  </Dropdown.Content>
-                )}
-              </Dropdown.Root>
-            </Flex>
+                    <Text>Automatic</Text>
+                  </Dropdown.Item>
+                  {availableLevels.map(level => {
+                    return (
+                      <Dropdown.Item
+                        onClick={() => qualitySelectorHandler(level)}
+                        css={{
+                          h: "auto",
+                          flexDirection: "column",
+                          flexWrap: "wrap",
+                          cursor: "pointer",
+                          alignItems: "flex-start",
+                        }}
+                        key={level.url}
+                      >
+                        <Text>{`${level.height}p (${(
+                          Number(level.bitrate / 1024) / 1024
+                        ).toFixed(2)} Mbps)`}</Text>
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Content>
+              )}
+            </Dropdown.Root>
           </Flex>
-        </>
+        </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
