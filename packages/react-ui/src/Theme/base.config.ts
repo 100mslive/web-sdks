@@ -1,12 +1,12 @@
-import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
+import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 
 export const baseConfig = {
   theme: {
     colors: {
-      white: '#ffffff',
+      white: '#FFFFFF',
       black: '#000000',
-      transparent: 'rgba(0, 0, 0, 0)',
+      transparent: '#00000000',
       orange: '#F69133',
       cyan: '#8FF5FB',
       tamarind: '#F79133',
@@ -19,7 +19,7 @@ export const baseConfig = {
       borderAccent: '#2471ED',
       success: '#36B37E',
       error: '#CC525F',
-      errorTint: 'rgba(237,76, 90, 0.9)',
+      errorTint: '#ED4C5AE6',
       warning: '#FFAB00',
       brandLight: '#74AAFF',
       brandDefault: '#2F80FF',
@@ -31,19 +31,20 @@ export const baseConfig = {
       secondaryGray: '#242A33',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
-      textHighEmp: 'rgba(245, 249, 255, 0.95)',
-      textMedEmp: 'rgba(224, 236, 255, 0.8)',
-      textDisabled: 'rgba(195, 208, 229, 0.5)',
+      textHighEmp: '#F5F9FFF2',
+      textMedEmp: '#E0ECFFCC',
+      textDisabled: '#C3D0E580',
 
       // text variants when bg is accent (blue)
       // same for both themes
-      textAccentHigh: 'rgba(255, 255, 255, 0.98)',
-      textAccentMedium: 'rgba(255, 255, 255, 0.72)',
-      textAccentDisabled: 'rgba(255, 255, 255, 0.48)',
+      textAccentHigh: '#FFFFFFFA',
+      textAccentMedium: '#FFFFFFB8',
+      textAccentDisabled: '#FFFFFF7A',
 
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+      surfaceDark: '#0F1115',
 
       backgroundDefault: '#0B0D0F',
       backgroundDark: '#090B0D',
@@ -63,8 +64,8 @@ export const baseConfig = {
       errorDisabled: '#621D24',
     },
     shadows: {
-      sm: '0 0 4px 0 rgba(0,0,0,0.3)',
-      md: '0 0 8px 0 rgba(0,0,0,0.3)',
+      sm: '0 0 4px 0 #0000004D',
+      md: '0 0 8px 0 #0000004D',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
