@@ -50,9 +50,9 @@ export default interface HMS {
   changeMetadata(metadata: string): Promise<void>;
 
   /** @alpha */
-  changeRoomMetadata(metadata: any, localOnly?: boolean): Promise<void>;
+  changeSessionMetadata(metadata: any, localOnly?: boolean): Promise<void>;
   /** @alpha */
-  getRoomMetadata(): Promise<any>;
+  getSessionMetadata(): Promise<any>;
 
   /**
    * @deprecated The method should not be used

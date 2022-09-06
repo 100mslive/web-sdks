@@ -2,6 +2,6 @@ export interface BroadcastResponse {
   timestamp: number;
 }
 
-export interface GetRoomMetadataResponse {
+export interface GetSessionMetadataResponse {
   data?: any;
 }

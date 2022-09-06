@@ -50,7 +50,7 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
-export interface RoomMetadataUpdateParams {
+export interface SessionMetadataUpdateParams {
   data?: any;
 }
 

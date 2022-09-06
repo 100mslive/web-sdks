@@ -602,12 +602,12 @@ export default class HMSTransport implements ITransport {
     });
   }
 
-  getRoomMetadata() {
-    return this.signal.getRoomMetadata();
+  getSessionMetadata() {
+    return this.signal.getSessionMetadata();
   }
 
-  async changeRoomMetadata(metadata: any) {
-    await this.signal.changeRoomMetadata({ data: metadata });
+  async changeSessionMetadata(metadata: any) {
+    await this.signal.changeSessionMetadata({ data: metadata });
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

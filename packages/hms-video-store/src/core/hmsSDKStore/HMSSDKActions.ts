@@ -573,22 +573,22 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
-  async changeRoomMetadata(metadata: any, localOnly = false) {
-    await this.sdk.changeRoomMetadata(metadata, localOnly);
+  async changeSessionMetadata(metadata: any, localOnly = false) {
+    await this.sdk.changeSessionMetadata(metadata, localOnly);
     if (localOnly) {
       this.setState(draftStore => {
         draftStore.room.metadata = metadata;
-      }, 'localRoomMetadataChange');
+      }, 'localSessionMetadataChange');
     } else {
-      await this.getRoomMetadata();
+      await this.getSessionMetadata();
     }
   }
 
-  async getRoomMetadata(): Promise<any> {
-    const metadata = await this.sdk.getRoomMetadata();
+  async getSessionMetadata(): Promise<any> {
+    const metadata = await this.sdk.getSessionMetadata();
     this.setState(draftStore => {
       draftStore.room.metadata = metadata;
-    }, 'getRoomMetadata');
+    }, 'getSessionMetadata');
     return metadata;
   }
 

@@ -1,7 +1,7 @@
 import { ChatIcon, ChatUnreadIcon } from "@100mslive/react-icons";
 import {
   selectLocalPeerID,
-  selectRoomMetadata,
+  selectSessionMetadata,
   selectUnreadHMSMessagesCount,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -16,7 +16,7 @@ import { SIDE_PANE_OPTIONS } from "../../common/constants";
 export const ChatToggle = () => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isBlacklisted = (
-    useHMSStore(selectRoomMetadata)?.blacklistedPeers || []
+    useHMSStore(selectSessionMetadata)?.blacklistedPeers || []
   ).includes(localPeerId);
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);

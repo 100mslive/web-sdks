@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import {
-  selectRoomMetadata,
+  selectSessionMetadata,
   useCustomEvent,
   useHMSActions,
   useHMSStore,
@@ -11,20 +11,20 @@ import { addOrRemoveFromArray } from "../../common/utils";
 
 export const useBlacklistPeers = () => {
   const hmsActions = useHMSActions();
-  const roomMetadata = useHMSStore(selectRoomMetadata);
+  const sessionMetadata = useHMSStore(selectSessionMetadata);
   const blacklistedPeers = useMemo(
-    () => roomMetadata?.blacklistedPeers || [],
-    [roomMetadata]
+    () => sessionMetadata?.blacklistedPeers || [],
+    [sessionMetadata]
   );
 
-  const changeRoomMetadatalocally = (peerId, add) => {
+  const changeSessionMetadatalocally = (peerId, add) => {
     const newBlacklistedPeers = addOrRemoveFromArray(
       blacklistedPeers,
       peerId,
       add
     );
     if (newBlacklistedPeers) {
-      hmsActions.changeRoomMetadata(
+      hmsActions.changeSessionMetadata(
         { blacklistedPeers: newBlacklistedPeers },
         true
       );
@@ -33,11 +33,11 @@ export const useBlacklistPeers = () => {
 
   const { sendEvent: sendAddEvent } = useCustomEvent({
     type: "add-blacklist-peer",
-    onEvent: peerId => changeRoomMetadatalocally(peerId, true),
+    onEvent: peerId => changeSessionMetadatalocally(peerId, true),
   });
   const { sendEvent: sendRemoveEvent } = useCustomEvent({
     type: "remove-blacklist-peer",
-    onEvent: peerId => changeRoomMetadatalocally(peerId, false),
+    onEvent: peerId => changeSessionMetadatalocally(peerId, false),
   });
 
   const blacklistPeer = useCallback(
@@ -49,7 +49,7 @@ export const useBlacklistPeers = () => {
       );
 
       if (newBlacklistedPeers) {
-        await hmsActions.changeRoomMetadata({
+        await hmsActions.changeSessionMetadata({
           blacklistedPeers: newBlacklistedPeers,
         });
         add ? await sendAddEvent(peerId) : await sendRemoveEvent(peerId);
