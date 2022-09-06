@@ -95,7 +95,7 @@ const Link = styled("a", {
   },
 });
 
-const AnnotisedChat = ({ message }) => {
+export const AnnotisedMessage = ({ message }) => {
   if (!message) {
     return <Fragment />;
   }
@@ -208,7 +208,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           wordBreak: "break-word",
         }}
       >
-        <AnnotisedChat message={message.message} />
+        <AnnotisedMessage message={message.message} />
       </Text>
     </Flex>
   );
@@ -220,9 +220,7 @@ export const ChatBody = ({ role, peerId }) => {
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  const messages = (useHMSStore(storeMessageSelector) || []).filter(
-    message => message.type === "chat"
-  );
+  const messages = useHMSStore(storeMessageSelector) || [];
 
   if (messages.length === 0) {
     return (
