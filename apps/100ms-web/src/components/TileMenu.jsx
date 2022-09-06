@@ -47,7 +47,7 @@ const TileMenu = ({
   return (
     <StyledMenuTile.Root>
       <StyledMenuTile.Trigger
-        isScreenshare={isScreenshare}
+        screenshare={isScreenshare}
         data-testid="participant_menu_btn"
       >
         <HorizontalMenuIcon />

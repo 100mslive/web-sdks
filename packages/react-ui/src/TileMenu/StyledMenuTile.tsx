@@ -22,7 +22,7 @@ const StyledTrigger = styled(Popover.Trigger, {
     boxShadow: '0 0 0 3px $colors$brandLight',
   },
   variants: {
-    isScreenshare: {
+    screenshare: {
       true: {
         top: '$2',
       },

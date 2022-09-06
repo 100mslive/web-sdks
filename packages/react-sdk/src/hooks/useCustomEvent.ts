@@ -87,7 +87,7 @@ export const useCustomEvent = <T>({
     async (data: T, receiver?: EventReceiver) => {
       try {
         const dataStr = JSON.stringify(data || '');
-        if (Array.isArray(receiver?.roleNames) && receiver) {
+        if (receiver && Array.isArray(receiver?.roleNames)) {
           await actions.sendGroupMessage(dataStr, receiver.roleNames, type);
         } else if (typeof receiver?.peerId === 'string') {
           await actions.sendDirectMessage(dataStr, receiver.peerId, type);
