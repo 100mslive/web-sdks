@@ -17,7 +17,7 @@ export default {
 
 const Template: ComponentStory<typeof Fieldset> = ({ css }) => {
   return (
-    <Fieldset css={css}>
+    <Fieldset css={css} style={{ width: '70%' }}>
       <Label htmlFor="name">
         <Text variant="sub2">Input Label</Text>
       </Label>
