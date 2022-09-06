@@ -129,7 +129,7 @@ const HLSView = () => {
         <>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
           <Flex css={{ flexDirection: "column" }}>
-            <Flex align="center" justify="end" css={{ marginRight: "$10" }}>
+            <Flex align="center" justify="end" css={{ margin: "$4" }}>
               {hlsController ? (
                 <Button
                   variant="standard"
