@@ -126,7 +126,7 @@ const HLSView = () => {
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          <Flex align="center" justify="end" css={{ margin: "$4" }}>
+          <Flex align="center" justify="end">
             {hlsController ? (
               <Button
                 variant="standard"
