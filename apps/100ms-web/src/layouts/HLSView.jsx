@@ -233,7 +233,7 @@ const HLSView = () => {
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
-            Waiting for the Streaming to start...
+            Waiting for the Stream to start...
           </Text>
         </Flex>
       )}
