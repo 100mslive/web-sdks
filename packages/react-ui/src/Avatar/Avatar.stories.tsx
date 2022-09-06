@@ -8,15 +8,15 @@ export default {
   component: Avatar,
   argTypes: {
     ref: { table: { disable: true } },
-    shape: { defaultValue: 'square', control: { type: 'text' } },
+    shape: { options: ['square', 'circle'], defaultValue: 'square', control: { type: 'select' } },
   },
   args: {
     name: '100ms',
   },
 } as ComponentMeta<typeof Avatar>;
 
-const Template: ComponentStory<typeof Avatar> = args => {
-  return <Avatar {...args} />;
+const Template: ComponentStory<typeof Avatar> = ({ css, ...rest }) => {
+  return <Avatar css={{ width: '100px', height: '100px', ...css }} {...rest} />;
 };
 
 export const Example = Template.bind({});
