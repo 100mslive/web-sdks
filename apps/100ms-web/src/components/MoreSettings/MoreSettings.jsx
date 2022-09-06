@@ -5,7 +5,6 @@ import {
   MicOffIcon,
   SettingsIcon,
   PencilIcon,
-  RemoveUserIcon,
   ClipIcon,
 } from "@100mslive/react-icons";
 import {
@@ -23,15 +22,12 @@ import { StatsForNerds } from "../StatsForNerds";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import IconButton from "../../IconButton";
-import { ChatBlacklistModal } from "./ChatBlacklist";
-import { useBlacklistPeers } from "../hooks/useBlacklistPeers";
 import { usePinnedText } from "../hooks/usePinnedText";
 import { ChangePinnedTextModal } from "./ChangePinnedModal";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const { blacklistedPeers, blacklistPeer } = useBlacklistPeers();
   const { pinnedText, changePinnedText } = usePinnedText();
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
@@ -39,7 +35,6 @@ export const MoreSettings = () => {
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
-  const [showChatBlacklist, setShowChatBlacklist] = useState(false);
   const [showChangePinnedModal, setShowChangePinnedModal] = useState(false);
 
   return (
@@ -82,15 +77,6 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
-          <Dropdown.Item
-            onClick={() => setShowChatBlacklist(true)}
-            data-testid="chat_blacklist_btn"
-          >
-            <RemoveUserIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
-              Chat Blacklist
-            </Text>
-          </Dropdown.Item>
           <Dropdown.Item
             onClick={() => setShowChangePinnedModal(true)}
             data-testid="change_pinned_btn"
@@ -140,13 +126,6 @@ export const MoreSettings = () => {
         <RoleChangeModal
           peerId={localPeerId}
           onOpenChange={setShowSelfRoleChange}
-        />
-      )}
-      {showChatBlacklist && (
-        <ChatBlacklistModal
-          onOpenChange={setShowChatBlacklist}
-          blacklistPeer={blacklistPeer}
-          blacklistedPeers={blacklistedPeers}
         />
       )}
       {showChangePinnedModal && (

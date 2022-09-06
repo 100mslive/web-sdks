@@ -138,7 +138,7 @@ export const AdditionalRoomState = () => {
             </Tooltip>
           )}
           {pinnedText && (
-            <Tooltip title="Room Metadata">
+            <Tooltip title="Pinned Text">
               <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
                 <ClipIcon width={24} height={24} />
               </Flex>
