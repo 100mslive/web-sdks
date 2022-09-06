@@ -92,10 +92,8 @@ export const ConferenceMainView = () => {
           justifyContent: "space-evenly",
         }}
       >
-        <ViewComponent
-          css={localPeerRole === hlsViewerRole ? { width: "100%" } : undefined}
-        />
-        {localPeerRole === hlsViewerRole ? <SidePane /> : null}
+        <ViewComponent />
+        <SidePane />
       </Flex>
     </Suspense>
   );
