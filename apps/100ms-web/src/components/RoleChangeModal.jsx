@@ -33,7 +33,6 @@ const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
     css={{
       ...textEllipsis(maxWidth),
       display: "inline-block",
-      wordBreak: "break-all",
       fontWeight: "$semiBold",
       c: "inherit",
     }}
@@ -55,7 +54,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
     return null;
   }
 
-  const peerNameMaxWidth = 226;
+  const peerNameMaxWidth = 220;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -86,7 +85,9 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                   </PeerName>
                 </Tooltip>
               ) : (
-                <PeerName ref={setPeerNameRef}>{peer.name}</PeerName>
+                <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
+                  {peer.name}
+                </PeerName>
               )}
               to
             </Text>
