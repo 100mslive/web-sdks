@@ -80,24 +80,6 @@ export interface HMSScreenVideoTrack extends BaseTrack {
 }
 
 export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack;
-// export interface HMSTrack {
-//   id: HMSTrackID;
-//   source?: HMSTrackSource;
-//   type: HMSTrackType;
-//   enabled: boolean;
-//   height?: number;
-//   width?: number;
-//   peerId?: string;
-//   deviceID?: string;
-//   plugins?: string[];
-//   displayEnabled?: boolean;
-//   volume?: number;
-//   layer?: HMSSimulcastLayer;
-//   layerDefinitions?: SimulcastLayerDefinition[];
-//   degraded?: boolean;
-//   displaySurface?: HMSTrackDisplaySurface;
-//   facingMode?: HMSTrackFacingMode;
-// }
 
 /**
  * HMS Speaker stores the details of peers speaking at any point of time along with
