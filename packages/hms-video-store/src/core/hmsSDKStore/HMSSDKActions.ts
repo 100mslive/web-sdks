@@ -52,7 +52,6 @@ import {
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
-  HMSRemoteAudioTrack as SDKHMSRemoteAudioTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSSdk,
   HMSSimulcastLayer,
@@ -136,24 +135,11 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async subscribeAudio(trackId: string, subscribe: boolean) {
-    const track = this.hmsSDKTracks[trackId];
-    if (track) {
-      if (track instanceof SDKHMSRemoteAudioTrack) {
-        await this.sdk.setAudioSubscription(track, subscribe);
-      } else {
-        HMSLogger.w(`track ${trackId} is not an audio track`);
-      }
-    } else {
-      this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
-    }
-  }
-
-  async setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        await this.sdk.setPreferredLayer(track, layer);
+        track.preferLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);

@@ -13,9 +13,6 @@ import {
   HLSRequestParams,
   BroadcastResponse,
   HLSTimedMetadataParams,
-  PreferVideoLayerParams,
-  PreferAudioLayerParams,
-  VideoTrackLayerUpdate,
 } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
@@ -70,10 +67,6 @@ export interface ISignal extends IAnalyticsTransportProvider {
   sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void>;
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
-
-  updateVideoTrackLayer(params: PreferVideoLayerParams): Promise<VideoTrackLayerUpdate>;
-
-  updateAudioTrackSubscription(params: PreferAudioLayerParams): Promise<void>;
 
   close(): Promise<void>;
 }

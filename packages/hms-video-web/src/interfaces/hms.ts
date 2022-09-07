@@ -3,7 +3,7 @@ import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } fro
 import { HMSMessage } from './message';
 import { HMSLogLevel } from '../utils/logger';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackSource } from '../media/tracks';
+import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
 import { HMSRole } from './role';
 import { HMSPreviewListener } from './preview-listener';
@@ -16,7 +16,6 @@ import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
 import { ScreenShareConfig } from './track-settings';
-import { HMSSimulcastLayer } from './simulcast-layers';
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
@@ -64,8 +63,6 @@ export default interface HMS {
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;
   removeTrack(trackId: string): Promise<void>;
-  setPreferredLayer(track: HMSRemoteVideoTrack, layer: HMSSimulcastLayer): Promise<void>;
-  setAudioSubscription(track: HMSRemoteAudioTrack, subscribe: boolean): Promise<void>;
 
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;

@@ -1,6 +1,5 @@
 import {
   HMSConfig,
-  HMSSimulcastLayer,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSLogLevel,
@@ -186,16 +185,6 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): void;
 
   refreshDevices(): Promise<void>;
-  /**
-   * set the quality of the selected videoTrack for simulcast.
-   * @alpha
-   */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): Promise<void>;
-  /**
-   * Subscribe/Unsubscribe audio for a given track
-   * @alpha
-   */
-  subscribeAudio(trackId: HMSTrackID, subscribe: boolean): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

@@ -68,16 +68,6 @@ export interface HLSVariant {
   metadata?: string;
 }
 
-export interface PreferVideoLayerParams {
-  max_spatial_layer: HMSSimulcastLayer;
-  track_id: string;
-}
-
-export interface PreferAudioLayerParams {
-  subscribed: boolean;
-  track_id: string;
-}
-
 export interface VideoTrackLayerUpdate {
   current_layer: HMSSimulcastLayer;
   expected_layer: HMSSimulcastLayer;
