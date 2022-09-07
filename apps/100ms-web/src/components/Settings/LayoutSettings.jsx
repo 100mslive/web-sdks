@@ -53,6 +53,12 @@ export const LayoutSettings = () => {
         checked={isAudioOnly}
         onChange={toggleIsAudioOnly}
       />
+      <SwitchWithLabel
+        label="Disable Mirror Flipping"
+        id="mirronMode"
+        checked={isAudioOnly}
+        onChange={toggleIsAudioOnly}
+      />
       <Flex
         align="center"
         css={{ w: "100%", my: "$2", py: "$8", "@md": { display: "none" } }}
