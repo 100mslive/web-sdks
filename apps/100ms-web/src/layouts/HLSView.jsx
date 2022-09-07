@@ -9,10 +9,13 @@ import {
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
-import { ToastManager } from "../components/Toast/ToastManager";
-import { HMSVideoPlayer } from "../components/HMSVideo";
-import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
-import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
+
+const HLSVideo = styled("video", {
+  h: "100%",
+  margin: "0 auto",
+  position: "static",
+  px: "$10",
+});
 
 let hlsController;
 const HLSView = () => {
@@ -122,78 +125,113 @@ const HLSView = () => {
       }}
     >
       {hlsUrl ? (
-        <Flex
-          align="center"
-          justify="center"
-          css={{
-            width: "95%",
-            margin: "auto",
-            height: "90%",
-            "@md": { height: "90%" },
-            "@lg": { height: "80%" },
-          }}
-        >
-          <HMSVideoPlayer.Root ref={videoRef}>
-            <HMSVideoPlayer.Progress videoRef={videoRef} />
-            <HMSVideoPlayer.Controls.Root>
-              <HMSVideoPlayer.Controls.Left>
-                <HMSVideoPlayer.PlayButton
-                  onClick={() => {
-                    videoRef?.current?.paused
-                      ? videoRef?.current?.play()
-                      : videoRef?.current?.pause();
-                    setIsPaused(Boolean(videoRef?.current?.paused));
+        <Flex css={{ flexDirection: "column" }}>
+          <HLSVideo ref={videoRef} autoPlay controls playsInline />
+          <Flex align="center" justify="end" css={{ marginRight: "$10" }}>
+            {hlsController ? (
+              <Button
+                variant="standard"
+                css={{ marginRight: "0.3rem" }}
+                onClick={() => {
+                  hlsController.jumpToLive();
+                  setIsVideoLive(true);
+                }}
+                key="LeaveRoom"
+                data-testid="leave_room_btn"
+              >
+                <Tooltip title="Jump to Live">
+                  <Flex>
+                    <RecordIcon
+                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
+                      key="jumpToLive"
+                    />
+                    Live
+                  </Flex>
+                </Tooltip>
+              </Button>
+            ) : null}
+            <Dropdown.Root
+              open={qualityDropDownOpen}
+              onOpenChange={value => setQualityDropDownOpen(value)}
+            >
+              <Dropdown.Trigger asChild data-testid="quality_selector">
+                <Flex
+                  css={{
+                    color: "$textPrimary",
+                    borderRadius: "$1",
+                    cursor: "pointer",
+                    zIndex: 4,
+                    border: "$space$px solid $textDisabled",
+                    padding: "$4",
                   }}
-                  isPaused={isPaused}
-                />
-                <HMSVideoPlayer.Duration videoRef={videoRef} />
-                <HMSVideoPlayer.Volume videoRef={videoRef} />
-              </HMSVideoPlayer.Controls.Left>
-              <HMSVideoPlayer.Controls.Right>
-                {hlsController ? (
-                  <IconButton
-                    variant="standard"
-                    onClick={() => {
-                      hlsController.jumpToLive();
-                      setIsVideoLive(true);
-                    }}
-                    key="jump-to-live_btn"
-                    data-testid="jump-to-live_btn"
+                >
+                  <Tooltip title="Select Quality">
+                    <Flex>
+                      <SettingsIcon />
+                      <Text variant="md">{currentSelectedQualityText}</Text>
+                    </Flex>
+                  </Tooltip>
+
+                  <Box
+                    css={{ "@lg": { display: "none" }, color: "$textDisabled" }}
                   >
-                    <Tooltip title="Go to Live">
-                      <Flex justify="center" gap={2} align="center">
-                        <Box
-                          css={{
-                            height: "$4",
-                            width: "$4",
-                            background: isVideoLive ? "$error" : "$white",
-                            borderRadius: "50%",
-                          }}
-                        />
-                        <Text variant="sm">
-                          {isVideoLive ? "Live" : "Go to Live"}{" "}
-                        </Text>
-                      </Flex>
-                    </Tooltip>
-                  </IconButton>
-                ) : null}
-                <HLSQualitySelector
-                  availableLevels={availableLevels}
-                  currentSelectedQualityText={currentSelectedQualityText}
-                  qualitySelectorHandler={qualitySelectorHandler}
-                />
-                <FullScreenButton
-                  onToggle={toggleFullScreen}
-                  icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                />
-              </HMSVideoPlayer.Controls.Right>
-            </HMSVideoPlayer.Controls.Root>
-          </HMSVideoPlayer.Root>
+                    {qualityDropDownOpen ? (
+                      <ChevronUpIcon />
+                    ) : (
+                      <ChevronDownIcon />
+                    )}
+                  </Box>
+                </Flex>
+              </Dropdown.Trigger>
+              {availableLevels.length > 0 && (
+                <Dropdown.Content
+                  sideOffset={5}
+                  align="end"
+                  css={{ height: "auto", maxHeight: "$96" }}
+                >
+                  <Dropdown.Item
+                    onClick={event =>
+                      qualitySelectorHandler({ height: "auto" })
+                    }
+                    css={{
+                      h: "auto",
+                      flexDirection: "column",
+                      flexWrap: "wrap",
+                      cursor: "pointer",
+                      alignItems: "flex-start",
+                    }}
+                    key="auto"
+                  >
+                    <Text>Automatic</Text>
+                  </Dropdown.Item>
+                  {availableLevels.map(level => {
+                    return (
+                      <Dropdown.Item
+                        onClick={() => qualitySelectorHandler(level)}
+                        css={{
+                          h: "auto",
+                          flexDirection: "column",
+                          flexWrap: "wrap",
+                          cursor: "pointer",
+                          alignItems: "flex-start",
+                        }}
+                        key={level.url}
+                      >
+                        <Text>{`${level.height}p (${(
+                          Number(level.bitrate / 1024) / 1024
+                        ).toFixed(2)} Mbps)`}</Text>
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Content>
+              )}
+            </Dropdown.Root>
+          </Flex>
         </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
-            Waiting for the Streaming to start...
+            Waiting for the stream to start...
           </Text>
         </Flex>
       )}
