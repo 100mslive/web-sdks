@@ -36,6 +36,7 @@ import {
   selectRoomStarted,
   selectRoomState,
   selectTrackByID,
+  selectVideoTrackByID,
   selectTracksMap,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -1073,7 +1074,7 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack && sdkTrack.type === 'video') {
-      const storeTrack = this.store.getState(selectTrackByID(trackID)) as HMSVideoTrack | HMSScreenVideoTrack;
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
