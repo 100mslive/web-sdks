@@ -1,4 +1,7 @@
 export const stringifyMediaStreamTrack = (track: MediaStreamTrack) => {
+  if (!track) {
+    return '';
+  }
   return `
     trackId: ${track.id}
     kind: ${track.kind}
