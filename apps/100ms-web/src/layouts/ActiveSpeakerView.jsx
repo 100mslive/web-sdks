@@ -18,7 +18,7 @@ const ActiveSpeakerView = () => {
   if (dominantSpeaker) {
     latestDominantSpeakerRef.current = dominantSpeaker;
   }
-  if (!peers.length) {
+  if (peers.length === 0) {
     return null;
   }
   // show local peer if there hasn't been any dominant speaker
