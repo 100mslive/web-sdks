@@ -44,5 +44,5 @@ export function isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimul
     }
   };
 
-  return toInt(newLayer) < toInt(prevLayer);
+  return toInt(newLayer) < toInt(prevLayer) && newLayer === HMSSimulcastLayer.NONE;
 }
