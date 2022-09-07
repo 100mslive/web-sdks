@@ -180,7 +180,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: this.randomFromArray([true, false]),
           id: audioTrackID,
           type: 'audio',
-          source: 'audioplaylist',
+          source: 'regular',
         };
       }
       if (peer.videoTrack) {

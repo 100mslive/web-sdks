@@ -59,7 +59,7 @@ const selectTrackByVideoIDBare = createSelector([selectTracksMap, selectTrackID]
 
 const selectTrackByAudioIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
   trackID && storeTracks[trackID]
-    ? storeTracks[trackID].type !== 'video'
+    ? storeTracks[trackID].type === 'audio'
       ? (storeTracks[trackID] as HMSAudioTrack)
       : null
     : null,
