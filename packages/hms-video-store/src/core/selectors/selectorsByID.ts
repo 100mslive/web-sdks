@@ -38,7 +38,7 @@ const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (store
 );
 
 const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID
+  trackID && storeTracks[trackID]
     ? storeTracks[trackID].type === 'video'
       ? storeTracks[trackID].source === 'screen'
         ? (storeTracks[trackID] as HMSScreenVideoTrack)
@@ -48,7 +48,7 @@ const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (st
 );
 
 const selectTrackByVideoIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID
+  trackID && storeTracks[trackID]
     ? storeTracks[trackID].type === 'video'
       ? storeTracks[trackID].source !== 'screen'
         ? (storeTracks[trackID] as HMSVideoTrack)
@@ -58,11 +58,15 @@ const selectTrackByVideoIDBare = createSelector([selectTracksMap, selectTrackID]
 );
 
 const selectTrackByAudioIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID ? (storeTracks[trackID].type !== 'video' ? (storeTracks[trackID] as HMSAudioTrack) : null) : null,
+  trackID && storeTracks[trackID]
+    ? storeTracks[trackID].type !== 'video'
+      ? (storeTracks[trackID] as HMSAudioTrack)
+      : null
+    : null,
 );
 
 const selectTrackByScreenVideoIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID
+  trackID && storeTracks[trackID]
     ? storeTracks[trackID].type === 'video' && storeTracks[trackID].source === 'screen'
       ? (storeTracks[trackID] as HMSScreenVideoTrack)
       : null
