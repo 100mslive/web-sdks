@@ -46,10 +46,7 @@ const TileMenu = ({
   }
   return (
     <StyledMenuTile.Root>
-      <StyledMenuTile.Trigger
-        screenshare={isScreenshare}
-        data-testid="participant_menu_btn"
-      >
+      <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="top" align="end" sideOffset={8}>

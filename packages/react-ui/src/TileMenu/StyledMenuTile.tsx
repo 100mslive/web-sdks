@@ -21,13 +21,6 @@ const StyledTrigger = styled(Popover.Trigger, {
     outline: 'none',
     boxShadow: '0 0 0 3px $colors$brandLight',
   },
-  variants: {
-    screenshare: {
-      true: {
-        top: '$2',
-      },
-    },
-  },
 });
 
 const StyledContent = styled(Popover.Content, {
