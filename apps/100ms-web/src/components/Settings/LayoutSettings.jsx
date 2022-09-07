@@ -19,7 +19,7 @@ export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [{ isAudioOnly, uiViewMode, maxTileCount }, setUISettings] =
+  const [{ isAudioOnly, uiViewMode, maxTileCount, mirrorFlipping }, setUISettings] =
     useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
@@ -56,8 +56,12 @@ export const LayoutSettings = () => {
       <SwitchWithLabel
         label="Disable Mirror Flipping"
         id="mirronMode"
-        checked={isAudioOnly}
-        onChange={toggleIsAudioOnly}
+        checked={mirrorFlipping}
+        onChange={value => {
+          setUISettings({
+            [UI_SETTINGS.mirrorFlipping]: value,
+          });
+        }}
       />
       <Flex
         align="center"
