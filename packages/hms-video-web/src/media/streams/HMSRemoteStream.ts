@@ -65,21 +65,48 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @private
    */
   private syncWithApiChannel(sendVideoLayer = true) {
-    const data: SubscriptionMessage = {
-      streamId: this.id,
-      audio: this.audio,
-    };
     if (sendVideoLayer) {
-      data.video = this.video;
-      data.framerate = this.video;
+      const data: PreferVideoLayerParams = {
+        params: {
+          max_spatial_layer: this.video,
+          track_id: this.nativeStream.getVideoTracks()[0].id,
+        },
+        id: 'prefer-video-track-state',
+        method: 'prefer-video-track-state',
+        jsonrpc: '2.0',
+      };
+      this.connection.sendOverApiDataChannel(JSON.stringify(data));
+    } else {
+      const data: PreferAudioLayerParams = {
+        params: {
+          subscribed: this.audio,
+          track_id: this.nativeStream.getAudioTracks()[0].id,
+        },
+        method: 'prefer-audio-track-state',
+        id: 'prefer-audio-track-state',
+        jsonrpc: '2.0',
+      };
+      this.connection.sendOverApiDataChannel(JSON.stringify(data));
     }
-    this.connection.sendOverApiDataChannel(JSON.stringify(data));
   }
 }
 
-interface SubscriptionMessage {
-  streamId: string;
-  audio: boolean;
-  framerate?: HMSSimulcastLayer;
-  video?: HMSSimulcastLayer;
+interface PreferVideoLayerParams {
+  params: {
+    max_spatial_layer: HMSSimulcastLayer;
+    track_id: string;
+  };
+  method: 'prefer-video-track-state';
+  id: 'prefer-video-track-state';
+  jsonrpc: '2.0';
+}
+
+interface PreferAudioLayerParams {
+  params: {
+    subscribed: boolean;
+    track_id: string;
+  };
+  id: 'prefer-audio-track-state';
+  method: 'prefer-audio-track-state';
+  jsonrpc: '2.0';
 }

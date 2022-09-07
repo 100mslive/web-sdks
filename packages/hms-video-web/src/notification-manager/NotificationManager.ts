@@ -1,5 +1,5 @@
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
-import { HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
@@ -79,7 +79,7 @@ export class NotificationManager {
     this.connectionQualityManager.listener = qualityListener;
   }
 
-  handleNotification(message: { method: string; params: any }, isReconnecting = false) {
+  handleNotification(message: { method: string; params: any; result?: any; id?: string }, isReconnecting = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
@@ -108,6 +108,7 @@ export class NotificationManager {
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
+    this.handleVideoLayerUpdate(message.id, message.result);
   }
 
   // eslint-disable-next-line complexity
@@ -142,6 +143,13 @@ export class NotificationManager {
     }
   }
 
+  handleVideoLayerUpdate = (id?: string, notification?: VideoTrackLayerUpdate) => {
+    if (id !== 'prefer-video-track-state' || !notification) {
+      return;
+    }
+    this.trackManager.handleTrackLayerUpdate({ tracks: { [notification.track_id]: notification } });
+  };
+
   ignoreNotification = (method: string): boolean => {
     if (method === HMSNotificationMethod.PEER_LIST) {
       this.hasConsistentRoomStateArrived = true;
@@ -163,9 +171,5 @@ export class NotificationManager {
   updateLocalPeer = ({ name, metadata }: { name?: string; metadata?: string }) => {
     const peer = this.store.getLocalPeer();
     this.peerManager.handlePeerInfoUpdate({ peer, name, data: metadata });
-  };
-
-  handleVideoLayerUpdate = (track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) => {
-    this.trackManager.setLayer(track, layerUpdate);
   };
 }

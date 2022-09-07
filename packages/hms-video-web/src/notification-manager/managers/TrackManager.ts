@@ -1,12 +1,11 @@
 import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSPeer, HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import { VideoTrackLayerUpdate } from '../../signal/interfaces';
-import HMSLogger from '../../utils/logger';
-import { isTrackDegraded } from '../../utils/track';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
+import HMSLogger from '../../utils/logger';
 
 /**
  * Handles:
@@ -96,20 +95,6 @@ export class TrackManager {
     }
   };
 
-  setLayer(track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) {
-    const peer = this.store.getPeerByTrackId(track.trackId)!;
-    if (!peer) {
-      return;
-    }
-    const isDegraded = isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer);
-    track.setLayerFromServer(layerUpdate.current_layer, isDegraded);
-    if (isDegraded) {
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
-    } else {
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
-    }
-  }
-
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
@@ -172,6 +157,20 @@ export class TrackManager {
     });
   }
 
+  private setLayer(track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) {
+    const peer = this.store.getPeerByTrackId(track.trackId)!;
+    if (!peer) {
+      return;
+    }
+    const isDegraded = isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer);
+    track.setLayerFromServer(layerUpdate.current_layer, isDegraded);
+    if (isDegraded) {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
+    } else {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
+    }
+  }
+
   private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
     const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
     if (auxiliaryTrackIndex > -1) {
@@ -222,4 +221,21 @@ export class TrackManager {
     }
     return eventType;
   }
+}
+
+function isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
+  const toInt = (layer: HMSSimulcastLayer): number => {
+    switch (layer) {
+      case HMSSimulcastLayer.HIGH:
+        return 3;
+      case HMSSimulcastLayer.MEDIUM:
+        return 2;
+      case HMSSimulcastLayer.LOW:
+        return 1;
+      case HMSSimulcastLayer.NONE:
+        return 0;
+    }
+  };
+
+  return toInt(newLayer) < toInt(prevLayer) && newLayer === HMSSimulcastLayer.NONE;
 }
