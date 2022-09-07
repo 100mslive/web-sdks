@@ -3,27 +3,26 @@ import {
   selectPeers,
   useHMSStore,
   selectDominantSpeaker,
-  selectLocalPeer,
-  selectRemotePeers,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
-import { useIsHeadless } from "../components/AppData/useUISettings";
 
 const ActiveSpeakerView = () => {
-  const localPeer = useHMSStore(selectLocalPeer);
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   const latestDominantSpeakerRef = useRef(dominantSpeaker);
-  const isHeadless = useIsHeadless();
-  const peers = useHMSStore(isHeadless ? selectRemotePeers : selectPeers);
+  const peers = (useHMSStore(selectPeers) || []).filter(
+    peer =>
+      peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0
+  );
   // if there is no current dominant speaker latest keeps pointing to last
   if (dominantSpeaker) {
     latestDominantSpeakerRef.current = dominantSpeaker;
   }
+  if (!peers.length) {
+    return null;
+  }
   // show local peer if there hasn't been any dominant speaker
-  const activeSpeaker =
-    latestDominantSpeakerRef.current ||
-    (isHeadless && peers.length > 0 ? peers[0] : localPeer);
+  const activeSpeaker = latestDominantSpeakerRef.current || peers[0];
   const showSidePane = activeSpeaker && peers.length > 1;
 
   return (
