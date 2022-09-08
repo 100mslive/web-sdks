@@ -43,7 +43,7 @@ export class BroadcastManager {
       recipientPeer,
       time: new Date(messageNotification.timestamp),
     });
-    HMSLogger.d(this.TAG, `Received Message from sender=${notifPeer?.peer_id}: `, JSON.stringify(hmsMessage, null, 2));
+    HMSLogger.d(this.TAG, `Received Message from sender=${notifPeer?.peer_id}: `, hmsMessage.toString());
     this.listener?.onMessageReceived(hmsMessage);
   }
 
