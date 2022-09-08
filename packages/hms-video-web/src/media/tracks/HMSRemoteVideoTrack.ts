@@ -34,9 +34,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     try {
       const response = await (this.stream as HMSRemoteStream).setVideoLayer(layer, this.trackId, this.logIdentifier);
-      const result = (response as PreferVideoLayerResponse).result;
+      const layerUpdate = (response as PreferVideoLayerResponse).result;
       if (response) {
-        this.setLayerFromServer(result.current_layer, isTrackDegraded(result.expected_layer, result.current_layer));
+        this.setLayerFromServer(
+          layerUpdate.current_layer,
+          isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer),
+        );
+        HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, layerUpdate);
       }
       this.pushInHistory(`uiPreferLayer-${layer}`);
     } catch (error) {

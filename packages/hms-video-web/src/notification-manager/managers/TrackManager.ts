@@ -163,6 +163,7 @@ export class TrackManager {
     if (!peer) {
       return;
     }
+    HMSLogger.d(this.TAG, layerUpdate);
     const isDegraded = isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer);
     track.setLayerFromServer(layerUpdate.current_layer, isDegraded);
     if (isDegraded) {
