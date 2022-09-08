@@ -393,4 +393,4 @@ export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
 /** @alpha */
-export const selectSessionMetadata = createSelector(selectRoom, room => room.metadata);
+export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;
