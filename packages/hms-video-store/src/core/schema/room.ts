@@ -39,6 +39,4 @@ export interface HMSRoom {
    * if this number is available room.peers is not guaranteed to have all the peers.
    */
   peerCount?: number;
-  /** @alpha */
-  metadata?: any;
 }

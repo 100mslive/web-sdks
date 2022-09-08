@@ -577,19 +577,18 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.setSessionMetadata(metadata, localOnly);
     if (localOnly) {
       this.setState(draftStore => {
-        draftStore.room.metadata = metadata;
+        draftStore.sessionMetadata = metadata;
       }, 'localSessionMetadataChange');
     } else {
-      await this.getSessionMetadata();
+      await this.populateSessionMetadata();
     }
   }
 
-  async getSessionMetadata(): Promise<any> {
+  async populateSessionMetadata(): Promise<void> {
     const metadata = await this.sdk.getSessionMetadata();
     this.setState(draftStore => {
-      draftStore.room.metadata = metadata;
-    }, 'getSessionMetadata');
-    return metadata;
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {

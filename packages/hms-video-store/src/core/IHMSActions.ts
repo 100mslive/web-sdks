@@ -360,10 +360,11 @@ export interface IHMSActions {
   setSessionMetadata(metadata: any, localOnly?: boolean): Promise<void>;
 
   /**
-   * Fetch the current room metadata from the server
-   * @alpha
+   * Fetch the current room metadata from the server and populate it in store
+   *
+   * @alpha - the API is not stable and might have breaking changes later
    */
-  getSessionMetadata(): Promise<any>;
+  populateSessionMetadata(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
