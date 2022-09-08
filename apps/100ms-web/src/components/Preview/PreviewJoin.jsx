@@ -64,7 +64,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
       isVideoMuted: !isLocalVideoEnabled,
     });
     join().then(() => {
-      hmsActions.getSessionMetadata();
+      hmsActions.populateSessionMetadata();
     });
     onJoin && onJoin();
   }, [
