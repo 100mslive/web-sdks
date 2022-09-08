@@ -10,12 +10,12 @@ const videoElement = { srcObject: null } as HTMLVideoElement;
 
 describe('remoteVideoTrack', () => {
   let stream: HMSRemoteStream;
-  let sendOverApiDataChannel: jest.Mock;
+  let sendOverApiDataChannelWithResponse: jest.Mock;
   let track: HMSRemoteVideoTrack;
   let nativeTrack: MediaStreamTrack;
   beforeEach(() => {
-    sendOverApiDataChannel = jest.fn();
-    const connection = { sendOverApiDataChannel } as unknown as HMSSubscribeConnection;
+    sendOverApiDataChannelWithResponse = jest.fn();
+    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
     nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
     track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular');
@@ -47,11 +47,11 @@ describe('remoteVideoTrack', () => {
    * expectation on layers sent over data channel since start of the test
    */
   const expectLayersSent = (layers: HMSSimulcastLayer[]) => {
-    const allCalls = sendOverApiDataChannel.mock.calls;
+    const allCalls = sendOverApiDataChannelWithResponse.mock.calls;
     expect(allCalls.length).toBe(layers.length);
     for (let i = 0; i < allCalls.length; i++) {
-      const data = JSON.parse(allCalls[i][0]);
-      expect(data.video).toBe(layers[i]);
+      const data = allCalls[i][0];
+      expect(data.params.max_spatial_layer).toBe(layers[i]);
     }
   };
 
