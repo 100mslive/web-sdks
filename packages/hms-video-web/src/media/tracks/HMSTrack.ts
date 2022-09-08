@@ -94,15 +94,15 @@ export abstract class HMSTrack {
     this.nativeTrack?.stop();
   }
 
-  toString(): string {
-    return `
-      streamId: ${this.stream.id}
-      peerId: ${this.peerId}
-      trackId: ${this.trackId}
-      logIdentifier: ${this.logIdentifier}
-      source: ${this.source}
-      enabled: ${this.enabled}
-      nativeTrack: ${stringifyMediaStreamTrack(this.nativeTrack)}
-    `;
+  toString() {
+    return `{
+      streamId: ${this.stream.id};
+      peerId: ${this.peerId};
+      trackId: ${this.trackId};
+      logIdentifier: ${this.logIdentifier};
+      source: ${this.source};
+      enabled: ${this.enabled};
+      nativeTrack: ${stringifyMediaStreamTrack(this.nativeTrack)};
+    }`;
   }
 }

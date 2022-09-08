@@ -64,7 +64,7 @@ export class TrackManager {
    * Sets the tracks to peer and returns the peer
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, track.toString());
+    HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -74,7 +74,7 @@ export class TrackManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track.toString());
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
