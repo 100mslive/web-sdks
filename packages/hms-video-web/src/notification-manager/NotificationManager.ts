@@ -87,6 +87,7 @@ export class NotificationManager {
         HMSNotificationMethod.ACTIVE_SPEAKERS,
         HMSNotificationMethod.SFU_STATS,
         HMSNotificationMethod.CONNECTION_QUALITY,
+        undefined, // this is is to ignore notifications without any method
       ].includes(method)
     ) {
       HMSLogger.d(this.TAG, `Received notification - ${method}`, { notification });
