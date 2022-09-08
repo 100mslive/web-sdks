@@ -70,8 +70,8 @@ export class TrackAudioLevelMonitor {
   start() {
     this.stop();
     this.isMonitored = true;
-    HMSLogger.d(this.TAG, 'Starting track Monitor', this.track);
-    this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', this.track));
+    HMSLogger.d(this.TAG, 'Starting track Monitor', this.track.toString());
+    this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', this.track.toString()));
   }
 
   stop() {

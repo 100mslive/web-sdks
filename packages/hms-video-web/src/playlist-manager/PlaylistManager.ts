@@ -7,6 +7,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { EventBus } from '../events/EventBus';
 import { HMSLocalTrack } from '../media/tracks';
+import { stringifyMediaStreamTrack } from '../utils/json';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -45,6 +46,7 @@ export class PlaylistManager
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
+  private TAG = '[PlaylistManager]';
 
   constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();
@@ -376,15 +378,11 @@ export class PlaylistManager
 
   private addTrack = async (track: MediaStreamTrack, source: string) => {
     await this.sdk.addTrack(track, source);
-    HMSLogger.d(this.TAG, 'Playlist track added', track);
+    HMSLogger.d(this.TAG, 'Playlist track added', stringifyMediaStreamTrack(track));
   };
 
   private removeTrack = async (trackId: string) => {
     await this.sdk.removeTrack(trackId);
     HMSLogger.d(this.TAG, 'Playlist track removed', trackId);
   };
-
-  private get TAG() {
-    return 'PlaylistManager';
-  }
 }
