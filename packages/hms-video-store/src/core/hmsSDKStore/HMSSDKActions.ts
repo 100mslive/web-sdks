@@ -1064,7 +1064,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
-    HMSLogger.e('received error from sdk', error);
+    HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? error.toString() : error);
   }
 
   /**

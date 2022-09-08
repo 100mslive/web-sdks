@@ -133,6 +133,7 @@ export class AudioSinkManager {
         track.removeSink();
       }
     }
+    HMSLogger.d(this.TAG, 'Track updated', track.toString());
   };
 
   private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
@@ -143,7 +144,7 @@ export class AudioSinkManager {
 
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
-    HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
+    HMSLogger.d(this.TAG, 'Audio track added', track.toString());
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     // @ts-ignore
@@ -204,10 +205,10 @@ export class AudioSinkManager {
       await audioEl.play();
       this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);
-      HMSLogger.d(this.TAG, 'Played track', track.trackId);
+      HMSLogger.d(this.TAG, 'Played track', track.toString());
     } catch (err) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, err as Error);
+      HMSLogger.e(this.TAG, 'Failed to play track', track.toString(), err as Error);
       const error = err as Error;
       if (!this.state.autoplayFailed && error.name === 'NotAllowedError') {
         this.state.autoplayFailed = true;
@@ -234,7 +235,7 @@ export class AudioSinkManager {
       this.state.autoplayCheckPromise = undefined;
       this.state.autoplayFailed = undefined;
     }
-    HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
+    HMSLogger.d(this.TAG, 'Audio track removed', track.toString());
   };
 
   private unpauseAudioTracks = async () => {
