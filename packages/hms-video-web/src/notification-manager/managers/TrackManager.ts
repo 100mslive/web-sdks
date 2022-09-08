@@ -1,11 +1,12 @@
 import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import { VideoTrackLayerUpdate } from '../../signal/interfaces';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 import HMSLogger from '../../utils/logger';
+import { isTrackDegraded } from '../../utils/track';
 
 /**
  * Handles:
@@ -221,21 +222,4 @@ export class TrackManager {
     }
     return eventType;
   }
-}
-
-function isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
-  const toInt = (layer: HMSSimulcastLayer): number => {
-    switch (layer) {
-      case HMSSimulcastLayer.HIGH:
-        return 3;
-      case HMSSimulcastLayer.MEDIUM:
-        return 2;
-      case HMSSimulcastLayer.LOW:
-        return 1;
-      case HMSSimulcastLayer.NONE:
-        return 0;
-    }
-  };
-
-  return toInt(newLayer) < toInt(prevLayer) && newLayer === HMSSimulcastLayer.NONE;
 }

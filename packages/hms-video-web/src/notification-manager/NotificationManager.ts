@@ -20,7 +20,6 @@ import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { TrackManager } from './managers/TrackManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
 import { EventBus } from '../events/EventBus';
-import { VideoTrackLayerUpdate } from '../signal/interfaces';
 
 export class NotificationManager {
   private TAG = '[HMSNotificationManager]';
@@ -79,7 +78,7 @@ export class NotificationManager {
     this.connectionQualityManager.listener = qualityListener;
   }
 
-  handleNotification(message: { method: string; params: any; result?: any; id?: string }, isReconnecting = false) {
+  handleNotification(message: { method: string; params: any }, isReconnecting = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
@@ -108,7 +107,6 @@ export class NotificationManager {
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
-    this.handleVideoLayerUpdate(message.id, message.result);
   }
 
   // eslint-disable-next-line complexity
@@ -142,13 +140,6 @@ export class NotificationManager {
         break;
     }
   }
-
-  handleVideoLayerUpdate = (id?: string, notification?: VideoTrackLayerUpdate) => {
-    if (id !== 'prefer-video-track-state' || !notification) {
-      return;
-    }
-    this.trackManager.handleTrackLayerUpdate({ tracks: { [notification.track_id]: notification } });
-  };
 
   ignoreNotification = (method: string): boolean => {
     if (method === HMSNotificationMethod.PEER_LIST) {

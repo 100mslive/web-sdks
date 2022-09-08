@@ -1,7 +1,9 @@
+import { v4 as uuid } from 'uuid';
 import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
 import HMSLogger from '../../utils/logger';
 import { HMSSimulcastLayer } from '../../interfaces';
+import { PreferAudioLayerParams, PreferVideoLayerParams } from '../../signal/interfaces';
 
 /** @internal */
 export default class HMSRemoteStream extends HMSMediaStream {
@@ -14,13 +16,13 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  setAudio(enabled: boolean) {
+  setAudio(enabled: boolean, trackId: string) {
     if (this.audio === enabled) {
       return;
     }
 
     this.audio = enabled;
-    this.syncWithApiChannel(false);
+    this.syncWithApiChannel(false, trackId);
   }
 
   /**
@@ -40,10 +42,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayer(layer: HMSSimulcastLayer, identifier: string) {
+  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string) {
     this.setVideoLayerLocally(layer, identifier);
     HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Switching to ${layer} layer`);
-    this.syncWithApiChannel();
+    return this.syncWithApiChannel(true, trackId);
   }
 
   getSimulcastLayer() {
@@ -64,49 +66,29 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * SFU will appear as if remove sink was called and the track will never be recovered.
    * @private
    */
-  private syncWithApiChannel(sendVideoLayer = true) {
+  private syncWithApiChannel(sendVideoLayer = true, trackId: string) {
+    let data: PreferVideoLayerParams | PreferAudioLayerParams;
     if (sendVideoLayer) {
-      const data: PreferVideoLayerParams = {
+      data = {
         params: {
           max_spatial_layer: this.video,
-          track_id: this.nativeStream.getVideoTracks()[0].id,
+          track_id: trackId,
         },
-        id: 'prefer-video-track-state',
+        id: uuid(),
         method: 'prefer-video-track-state',
         jsonrpc: '2.0',
       };
-      this.connection.sendOverApiDataChannel(JSON.stringify(data));
     } else {
-      const data: PreferAudioLayerParams = {
+      data = {
         params: {
           subscribed: this.audio,
-          track_id: this.nativeStream.getAudioTracks()[0].id,
+          track_id: trackId,
         },
         method: 'prefer-audio-track-state',
-        id: 'prefer-audio-track-state',
+        id: uuid(),
         jsonrpc: '2.0',
       };
-      this.connection.sendOverApiDataChannel(JSON.stringify(data));
     }
+    return this.connection.sendOverApiDataChannelWithResponse(data);
   }
-}
-
-interface PreferVideoLayerParams {
-  params: {
-    max_spatial_layer: HMSSimulcastLayer;
-    track_id: string;
-  };
-  method: 'prefer-video-track-state';
-  id: 'prefer-video-track-state';
-  jsonrpc: '2.0';
-}
-
-interface PreferAudioLayerParams {
-  params: {
-    subscribed: boolean;
-    track_id: string;
-  };
-  id: 'prefer-audio-track-state';
-  method: 'prefer-audio-track-state';
-  jsonrpc: '2.0';
 }

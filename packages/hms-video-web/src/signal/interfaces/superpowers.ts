@@ -1,5 +1,5 @@
 import { HMSTrackSource } from '../..';
-import { HLSTimedMetadata, HMSSimulcastLayer, RTMPRecordingResolution } from '../../interfaces';
+import { HLSTimedMetadata, RTMPRecordingResolution } from '../../interfaces';
 
 /**
  * Parameteres for the role change request sent to the server.
@@ -66,12 +66,4 @@ export interface HLSTimedMetadataParams {
 export interface HLSVariant {
   meeting_url: string;
   metadata?: string;
-}
-
-export interface VideoTrackLayerUpdate {
-  current_layer: HMSSimulcastLayer;
-  expected_layer: HMSSimulcastLayer;
-  track_id: string;
-  subscriber_degraded: boolean;
-  publisher_degraded: boolean;
 }

@@ -139,8 +139,9 @@ export class HMSSDKActions implements IHMSActions {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        track.preferLayer(layer);
-        this.updateVideoLayer(trackId, 'setPreferredLayer');
+        track.preferLayer(layer).then(() => {
+          this.updateVideoLayer(trackId, 'setPreferredLayer');
+        });
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);
       }

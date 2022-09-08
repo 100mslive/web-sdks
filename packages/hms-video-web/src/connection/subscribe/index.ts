@@ -1,3 +1,4 @@
+import EventEmitter from 'eventemitter2';
 import HMSConnection from '../index';
 import { ISignal } from '../../signal/ISignal';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
@@ -9,6 +10,12 @@ import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
+import {
+  PreferAudioLayerParams,
+  PreferAudioLayerResponse,
+  PreferVideoLayerParams,
+  PreferVideoLayerResponse,
+} from '../../signal/interfaces';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
@@ -21,6 +28,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private pendingMessageQueue: string[] = [];
 
   private apiChannel?: HMSDataChannel;
+  private eventEmitter = new EventEmitter();
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
@@ -42,6 +50,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         e.channel,
         {
           onMessage: (value: string) => {
+            this.eventEmitter.emit('message', value);
             this.observer.onApiChannelMessage(value);
           },
         },
@@ -109,6 +118,32 @@ export default class HMSSubscribeConnection extends HMSConnection {
       HMSLogger.w(this.TAG, `API Data channel not ${this.apiChannel ? 'open' : 'present'}, queueing`, message);
       this.pendingMessageQueue.push(message);
     }
+  }
+
+  async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(message: T) {
+    if (this.apiChannel && this.apiChannel.readyState === 'open') {
+      this.apiChannel.send(JSON.stringify(message));
+      return await new Promise<
+        T extends PreferAudioLayerParams
+          ? PreferAudioLayerResponse
+          : T extends PreferVideoLayerParams
+          ? PreferVideoLayerResponse
+          : void
+      >((resolve, reject) => {
+        this.eventEmitter.on('message', (value: string) => {
+          if (value.includes(message.id)) {
+            const response = JSON.parse(value);
+            if (response.error) {
+              reject(response.error);
+              return;
+            }
+            resolve(response);
+          }
+        });
+      });
+    }
+    HMSLogger.w(this.TAG, `API Data channel not ${this.apiChannel ? 'open' : 'present'}, queueing`, message);
+    return;
   }
 
   async close() {

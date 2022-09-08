@@ -3,6 +3,8 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import HMSLogger from '../../utils/logger';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
+import { PreferVideoLayerResponse } from '../../signal/interfaces';
+import { isTrackDegraded } from '../../utils/track';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
@@ -26,12 +28,23 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
   }
 
-  preferLayer(layer: HMSSimulcastLayer) {
+  async preferLayer(layer: HMSSimulcastLayer) {
     if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
       return;
     }
-    (this.stream as HMSRemoteStream).setVideoLayer(layer, this.logIdentifier);
-    this.pushInHistory(`uiPreferLayer-${layer}`);
+    try {
+      const response = await (this.stream as HMSRemoteStream).setVideoLayer(layer, this.trackId, this.logIdentifier);
+      const result = (response as PreferVideoLayerResponse).result;
+      if (response) {
+        this.setLayerFromServer(result.current_layer, isTrackDegraded(result.expected_layer, result.current_layer));
+      }
+      this.pushInHistory(`uiPreferLayer-${layer}`);
+    } catch (error) {
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier}`,
+        `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
+      );
+    }
   }
 
   getSimulcastLayer() {
@@ -93,7 +106,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
-    (this.stream as HMSRemoteStream).setVideoLayer(newLayer, this.logIdentifier);
+    (this.stream as HMSRemoteStream).setVideoLayer(newLayer, this.trackId, this.logIdentifier);
   }
 
   private pushInHistory(action: string) {
