@@ -123,24 +123,20 @@ export default class HMSSubscribeConnection extends HMSConnection {
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(message: T) {
     if (this.apiChannel && this.apiChannel.readyState === 'open') {
       this.apiChannel.send(JSON.stringify(message));
-      return await new Promise<
-        T extends PreferAudioLayerParams
-          ? PreferAudioLayerResponse
-          : T extends PreferVideoLayerParams
-          ? PreferVideoLayerResponse
-          : void
-      >((resolve, reject) => {
-        this.eventEmitter.on('message', (value: string) => {
-          if (value.includes(message.id)) {
-            const response = JSON.parse(value);
-            if (response.error) {
-              reject(response.error);
-              return;
+      return await new Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse>(
+        (resolve, reject) => {
+          this.eventEmitter.on('message', (value: string) => {
+            if (value.includes(message.id)) {
+              const response = JSON.parse(value);
+              if (response.error) {
+                reject(response.error);
+                return;
+              }
+              resolve(response);
             }
-            resolve(response);
-          }
-        });
-      });
+          });
+        },
+      );
     }
     HMSLogger.w(this.TAG, `API Data channel not ${this.apiChannel ? 'open' : 'present'}, queueing`, message);
     return;

@@ -30,19 +30,6 @@ export function isEmptyTrack(track: MediaStreamTrack) {
   return 'canvas' in track || track.label === 'MediaStreamAudioDestinationNode' || track.label === '';
 }
 
-export function isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
-  const toInt = (layer: HMSSimulcastLayer): number => {
-    switch (layer) {
-      case HMSSimulcastLayer.HIGH:
-        return 3;
-      case HMSSimulcastLayer.MEDIUM:
-        return 2;
-      case HMSSimulcastLayer.LOW:
-        return 1;
-      case HMSSimulcastLayer.NONE:
-        return 0;
-    }
-  };
-
-  return toInt(newLayer) < toInt(prevLayer) && newLayer === HMSSimulcastLayer.NONE;
+export function isTrackDegraded(expectedLayer: HMSSimulcastLayer, currentLayer: HMSSimulcastLayer): boolean {
+  return currentLayer !== expectedLayer && currentLayer === HMSSimulcastLayer.NONE;
 }
