@@ -54,7 +54,7 @@ export const LayoutSettings = () => {
         onChange={toggleIsAudioOnly}
       />
       <SwitchWithLabel
-        label="Disable Mirror Flipping"
+        label="Mirror Flipping"
         id="mirronMode"
         checked={mirrorLocalVideo}
         onChange={value => {
