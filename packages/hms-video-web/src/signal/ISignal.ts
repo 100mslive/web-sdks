@@ -72,7 +72,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   getSessionMetadata(): Promise<GetSessionMetadataResponse>;
 
-  changeSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
+  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
 
   close(): Promise<void>;
 }

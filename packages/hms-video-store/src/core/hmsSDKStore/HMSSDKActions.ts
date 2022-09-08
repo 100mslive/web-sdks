@@ -573,8 +573,8 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
-  async changeSessionMetadata(metadata: any, localOnly = false) {
-    await this.sdk.changeSessionMetadata(metadata, localOnly);
+  async setSessionMetadata(metadata: any, localOnly = false) {
+    await this.sdk.setSessionMetadata(metadata, localOnly);
     if (localOnly) {
       this.setState(draftStore => {
         draftStore.room.metadata = metadata;

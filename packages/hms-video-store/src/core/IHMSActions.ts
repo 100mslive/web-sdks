@@ -354,9 +354,10 @@ export interface IHMSActions {
    *
    * Session metadata is available to every peer in the room and is persisted throughout a session
    * till the last peer leaves a room
-   * @alpha
+   *
+   * @alpha - the API is not stable and might have breaking changes later
    */
-  changeSessionMetadata(metadata: any, localOnly?: boolean): Promise<void>;
+  setSessionMetadata(metadata: any, localOnly?: boolean): Promise<void>;
 
   /**
    * Fetch the current room metadata from the server

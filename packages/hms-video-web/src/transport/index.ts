@@ -606,8 +606,8 @@ export default class HMSTransport implements ITransport {
     return this.signal.getSessionMetadata();
   }
 
-  async changeSessionMetadata(metadata: any) {
-    await this.signal.changeSessionMetadata({ data: metadata });
+  async setSessionMetadata(metadata: any) {
+    await this.signal.setSessionMetadata({ data: metadata });
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

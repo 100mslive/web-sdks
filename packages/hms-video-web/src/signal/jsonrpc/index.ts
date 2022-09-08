@@ -302,7 +302,7 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
-  async changeSessionMetadata(params: SessionMetadataUpdateParams) {
+  async setSessionMetadata(params: SessionMetadataUpdateParams) {
     await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
   }
 

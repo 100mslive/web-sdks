@@ -14,7 +14,7 @@ export const usePinnedText = () => {
   const changeSessionMetadatalocally = newText => {
     if (newText !== pinnedText) {
       ToastManager.addToast({ title: "Pinned Text Changed" });
-      hmsActions.changeSessionMetadata({ pinnedText: newText }, true);
+      hmsActions.setSessionMetadata({ pinnedText: newText }, true);
     }
   };
 
@@ -26,7 +26,7 @@ export const usePinnedText = () => {
   const changePinnedText = useCallback(
     async newText => {
       if (newText !== pinnedText) {
-        await hmsActions.changeSessionMetadata({
+        await hmsActions.setSessionMetadata({
           pinnedText: newText,
         });
         sendEvent(newText);

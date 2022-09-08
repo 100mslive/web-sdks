@@ -61,7 +61,7 @@ export default interface ITransport {
 
   getSessionMetadata(): Promise<GetSessionMetadataResponse>;
 
-  changeSessionMetadata(metadata: any): Promise<void>;
+  setSessionMetadata(metadata: any): Promise<void>;
 
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 
