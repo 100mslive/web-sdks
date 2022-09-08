@@ -14,13 +14,16 @@ export const usePinnedText = () => {
   const changeSessionMetadatalocally = newText => {
     if (newText !== pinnedText) {
       ToastManager.addToast({ title: "Pinned Text Changed" });
-      hmsActions.setSessionMetadata({ pinnedText: newText }, true);
+      hmsActions.setSessionMetadata(
+        { pinnedText: newText },
+        { localOnly: true }
+      );
     }
   };
 
   const { sendEvent } = useCustomEvent({
     type: "pinned-text-change",
-    onEvent: newText => changeSessionMetadatalocally(newText, true),
+    onEvent: newText => changeSessionMetadatalocally(newText),
   });
 
   const changePinnedText = useCallback(

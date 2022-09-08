@@ -50,7 +50,7 @@ export default interface HMS {
   changeMetadata(metadata: string): Promise<void>;
 
   /** @alpha */
-  setSessionMetadata(metadata: any, localOnly?: boolean): Promise<void>;
+  setSessionMetadata(metadata: any): Promise<void>;
   /** @alpha */
   getSessionMetadata(): Promise<any>;
 

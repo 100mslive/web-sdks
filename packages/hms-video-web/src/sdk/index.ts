@@ -766,10 +766,8 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.updateLocalPeer({ metadata });
   }
 
-  async setSessionMetadata(metadata: any, localOnly = false) {
-    if (!localOnly) {
-      await this.transport.setSessionMetadata(metadata);
-    }
+  async setSessionMetadata(metadata: any) {
+    await this.transport.setSessionMetadata(metadata);
   }
 
   async getSessionMetadata() {
