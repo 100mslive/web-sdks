@@ -58,11 +58,11 @@ export class HMSPeer implements IHMSPeer {
   }
 
   toString() {
-    return `
-      name: ${this.name}
-      role: ${this.role?.name}
-      peerId: ${this.peerId}
-      customerUserId: ${this.customerUserId}
-    `;
+    return `{
+      name: ${this.name};
+      role: ${this.role?.name};
+      peerId: ${this.peerId};
+      customerUserId: ${this.customerUserId};
+    }`;
   }
 }

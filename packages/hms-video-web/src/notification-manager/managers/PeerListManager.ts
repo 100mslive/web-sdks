@@ -89,7 +89,7 @@ export class PeerListManager {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, peersToRemove.toString());
+    HMSLogger.d(this.TAG, `${peersToRemove}`);
 
     // Send peer-leave updates to all the missing peers
     peersToRemove.forEach(peer => {
