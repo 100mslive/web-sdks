@@ -22,8 +22,6 @@ export interface HMSRoom {
   hls: HMSHLS;
   peerCount?: number;
   templateId?: string;
-  /** @alpha */
-  metadata?: any;
 }
 
 export interface HMSRecording {

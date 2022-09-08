@@ -770,12 +770,10 @@ export class HMSSdk implements HMSInterface {
     if (!localOnly) {
       await this.transport.setSessionMetadata(metadata);
     }
-    this.store.getRoom().metadata = metadata;
   }
 
   async getSessionMetadata() {
     const response = await this.transport.getSessionMetadata();
-    this.store.getRoom().metadata = response.data;
     return response.data;
   }
 
