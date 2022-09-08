@@ -129,7 +129,7 @@ const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-  const mirrorFlipping = useUISettings(UI_SETTINGS.mirrorFlipping);
+  const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
 
   const {
     aspectRatio: { width, height },
@@ -154,7 +154,7 @@ const PreviewTile = ({ name, error }) => {
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
-            mirror={mirrorFlipping}
+            mirror={mirrorLocalVideo}
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />
