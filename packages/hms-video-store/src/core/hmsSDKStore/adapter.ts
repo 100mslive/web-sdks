@@ -73,10 +73,11 @@ export class SDKToHMS {
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
     if (track.type === 'video') {
-      (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
       if (track.source === 'screen') {
         // @ts-ignore
         track.displaySurface = mediaSettings.displaySurface;
+      } else if (track.source === 'regular') {
+        (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
       }
       track.height = mediaSettings.height;
       track.width = mediaSettings.width;

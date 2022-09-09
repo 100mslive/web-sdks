@@ -38,17 +38,11 @@ const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (store
 );
 
 const selectTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID && storeTracks[trackID]
-    ? storeTracks[trackID].type === 'video'
-      ? storeTracks[trackID].source === 'screen'
-        ? (storeTracks[trackID] as HMSScreenVideoTrack)
-        : (storeTracks[trackID] as HMSVideoTrack)
-      : (storeTracks[trackID] as HMSAudioTrack)
-    : null,
+  trackID ? storeTracks[trackID] : null,
 );
 
 const selectTrackByVideoIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID && storeTracks[trackID]
+  trackID
     ? storeTracks[trackID].type === 'video'
       ? storeTracks[trackID].source !== 'screen'
         ? (storeTracks[trackID] as HMSVideoTrack)
@@ -58,15 +52,11 @@ const selectTrackByVideoIDBare = createSelector([selectTracksMap, selectTrackID]
 );
 
 const selectTrackByAudioIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID && storeTracks[trackID]
-    ? storeTracks[trackID].type === 'audio'
-      ? (storeTracks[trackID] as HMSAudioTrack)
-      : null
-    : null,
+  trackID ? (storeTracks[trackID].type === 'audio' ? (storeTracks[trackID] as HMSAudioTrack) : null) : null,
 );
 
 const selectTrackByScreenVideoIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID && storeTracks[trackID]
+  trackID
     ? storeTracks[trackID].type === 'video' && storeTracks[trackID].source === 'screen'
       ? (storeTracks[trackID] as HMSScreenVideoTrack)
       : null
@@ -125,19 +115,17 @@ export const selectTrackByID = byIDCurry(selectTrackByIDBare);
 /**
  * Select the {@link HMSVideoTrack} object given a track ID.
  */
-export const selectVideoTrackByID = byIDCurry<HMSStore, HMSVideoTrack | null>(selectTrackByVideoIDBare);
+export const selectVideoTrackByID = byIDCurry(selectTrackByVideoIDBare);
 
 /**
  * Select the {@link HMSAudioTrack} object given a track ID.
  */
-export const selectAudioTrackByID = byIDCurry<HMSStore, HMSAudioTrack | null>(selectTrackByAudioIDBare);
+export const selectAudioTrackByID = byIDCurry(selectTrackByAudioIDBare);
 
 /**
  * Select the {@link HMSScreenVideoTrack} object given a track ID.
  */
-export const selectScreenVideoTrackByID = byIDCurry<HMSStore, HMSScreenVideoTrack | null>(
-  selectTrackByScreenVideoIDBare,
-);
+export const selectScreenVideoTrackByID = byIDCurry(selectTrackByScreenVideoIDBare);
 
 /**
  * Select the primary video track of a peer given a peer ID.
