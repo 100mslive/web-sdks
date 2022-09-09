@@ -206,7 +206,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           w: "100%",
           mt: "$2",
           wordBreak: "break-word",
-          whiteSpace: "pre-line"
+          whiteSpace: "pre-wrap"
         }}
       >
         <AnnotisedChat message={message.message} />
