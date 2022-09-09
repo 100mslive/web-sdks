@@ -79,8 +79,8 @@ const FullScreenButton = styled('button', {
   justifyContent: 'center',
   alignItems: 'center',
   position: 'absolute',
-  bottom: '1rem',
-  right: '1rem',
+  top: '$2',
+  right: '$2',
   zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',

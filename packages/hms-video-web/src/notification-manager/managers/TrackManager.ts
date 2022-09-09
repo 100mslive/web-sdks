@@ -33,7 +33,7 @@ export class TrackManager {
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
-    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
+    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
 
     for (const trackId in params.tracks) {
       this.store.setTrackState({
@@ -49,7 +49,7 @@ export class TrackManager {
    * Sets the tracks to peer and returns the peer
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -59,7 +59,7 @@ export class TrackManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
