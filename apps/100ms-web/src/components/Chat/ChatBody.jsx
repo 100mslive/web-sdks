@@ -104,7 +104,7 @@ const AnnotisedChat = ({ message }) => {
     <Fragment>
       {message
         .trim()
-        .split(" ")
+        .split(/\s/)
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link
