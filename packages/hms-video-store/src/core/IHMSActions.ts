@@ -7,6 +7,7 @@ import {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HMSPluginSupportResult,
+  HLSTimedMetadata,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -48,7 +49,7 @@ export interface IHMSActions {
    *
    * @param config join config with room id, required for joining the room
    */
-  join(config: HMSConfig): void;
+  join(config: HMSConfig): Promise<void>;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
@@ -193,7 +194,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
-   * Video plugins can be added/removed at any time after the join is successful.
+   * Video plugins can be added/removed at any time after the video track is available.
    * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
    * @param pluginFrameRate number
@@ -210,7 +211,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
-   * Audio plugins can be added/removed at any time after the join is successful.
+   * Audio plugins can be added/removed at any time after the audio track is available
    * @param plugin HMSAudioPlugin
    * @see HMSAudioPlugin
    */
@@ -228,6 +229,9 @@ export interface IHMSActions {
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
@@ -303,17 +307,35 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * If you want to start HLS streaming.
-   * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
+   * If you have configured HLS streaming from dashboard, no params are required.
+   * otherwise @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+
+  /**
+   * @alpha
+   * Used to define date range metadata in a media playlist.
+   * This api adds EXT-X-DATERANGE tags to the media playlist.
+   * It is useful for defining timed metadata for interstitial regions such as advertisements,
+   * but can be used to define any timed metadata needed by your stream.
+   * usage (e.g)
+   * const metadataList = [{
+   *  payload: "some string 1",
+   *  duration: 2
+   * },
+   * {
+   *  payload: "some string 2",
+   *  duration: 3
+   * }]
+   * sendHLSTimedMetadata(metadataList);
+   */
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   /**
    * If you want to update the name of peer.

@@ -117,15 +117,13 @@ export class LocalTrackManager {
     } catch (error) {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.publish({
-            devices: this.deviceManager.getDevices(),
-            error,
-            settings,
-          }),
-        );
-      }
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          devices: this.deviceManager.getDevices(),
+          error: error as Error,
+          settings,
+        }),
+      );
       throw error;
     }
   }

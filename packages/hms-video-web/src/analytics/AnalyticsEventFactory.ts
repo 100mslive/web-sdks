@@ -74,6 +74,7 @@ export default class AnalyticsEventFactory {
     ws_connect_time?: number;
     on_policy_change_time?: number;
     local_tracks_time?: number;
+    retries_join?: number;
   }) {
     const name = this.eventNameFor('join', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
@@ -192,6 +193,22 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static HLSError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `hls.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
+  static RTMPError(error: Error, start = true) {
+    return new AnalyticsEvent({
+      name: `rtmp.${start ? 'start' : 'stop'}.failed`,
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getPropertiesWithError(error),
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
@@ -210,6 +227,7 @@ export default class AnalyticsEventFactory {
         : {
             error_name: error.name,
             error_message: error.message,
+            error_description: error.cause,
           };
     } else {
       return {};

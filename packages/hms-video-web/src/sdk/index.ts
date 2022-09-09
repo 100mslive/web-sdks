@@ -52,7 +52,7 @@ import { PlaylistManager } from '../playlist-manager';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { isNode } from '../utils/support';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig } from '../interfaces/hls-config';
+import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -356,7 +356,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  join(config: HMSConfig, listener: HMSUpdateListener) {
+  async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
 
@@ -382,7 +382,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
-      this.localPeer.metadata = config.metaData || '';
+      this.localPeer.metadata = config.metaData;
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -398,36 +398,40 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
-    this.transport
-      .join(
+
+    try {
+      await this.transport.join(
         config.authToken,
         this.localPeer!.peerId,
-        { name: config.userName, metaData: config.metaData || '' },
+        { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
-      )
-      .then(async () => {
-        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        this.notifyJoin();
-        this.sendJoinAnalyticsEvent(isPreviewCalled);
-        if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
-          await this.publish(config.settings || defaultSettings);
-        }
-      })
-      .catch(error => {
-        this.analyticsTimer.end(TimedEvent.JOIN);
-        this.listener?.onError(error as HMSException);
-        this.sendJoinAnalyticsEvent(isPreviewCalled, error);
-        HMSLogger.e(this.TAG, 'Unable to join room', error);
-      })
-      .then(() => {
-        HMSLogger.timeEnd(`join-room-${roomId}`);
-      });
+      );
+      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+      HMSAudioContextHandler.resumeContext();
+      await this.notifyJoin();
+      this.sendJoinAnalyticsEvent(isPreviewCalled);
+      if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
+        this.publish(config.settings || defaultSettings).catch(error => {
+          HMSLogger.e(this.TAG, 'Error in publish', error);
+          this.listener?.onError(error);
+        });
+      }
+    } catch (error) {
+      this.analyticsTimer.end(TimedEvent.JOIN);
+      this.listener?.onError(error as HMSException);
+      this.sendJoinAnalyticsEvent(isPreviewCalled, error as HMSException);
+      HMSLogger.e(this.TAG, 'Unable to join room', error);
+      throw error;
+    }
+    HMSLogger.timeEnd(`join-room-${roomId}`);
   }
 
   private stringifyMetadata(config: HMSConfig) {
     if (config.metaData && typeof config.metaData !== 'string') {
-      JSON.stringify(config.metaData);
+      config.metaData = JSON.stringify(config.metaData);
+    } else if (!config.metaData) {
+      config.metaData = '';
     }
   }
 
@@ -481,7 +485,7 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     if (peers.length < 50) {
       // the log is too big and frequent for large rooms
-      HMSLogger.d(this.TAG, `Got peers`, peers);
+      HMSLogger.d(this.TAG, `Got peers(${peers.length})`, peers.toString());
     }
     return peers;
   }
@@ -697,7 +701,12 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot start streaming or recording',
       );
     }
-    await this.transport?.startRTMPOrRecording(params);
+    try {
+      await this.transport?.startRTMPOrRecording(params);
+    } catch (error) {
+      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error));
+      throw error;
+    }
   }
 
   async stopRTMPAndRecording() {
@@ -707,17 +716,27 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop streaming or recording',
       );
     }
-    await this.transport?.stopRTMPOrRecording();
+    try {
+      await this.transport?.stopRTMPOrRecording();
+    } catch (error) {
+      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error, false));
+      throw error;
+    }
   }
 
-  async startHLSStreaming(params: HLSConfig) {
+  async startHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
         'No local peer present, cannot start HLS streaming',
       );
     }
-    await this.transport?.startHLSStreaming(params);
+    try {
+      await this.transport?.startHLSStreaming(params);
+    } catch (error) {
+      this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error));
+      throw error;
+    }
   }
 
   async stopHLSStreaming(params?: HLSConfig) {
@@ -727,7 +746,17 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop HLS streaming',
       );
     }
-    await this.transport?.stopHLSStreaming(params);
+    try {
+      await this.transport?.stopHLSStreaming(params);
+    } catch (error) {
+      this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error, false));
+      throw error;
+    }
+  }
+
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    this.validateJoined('sendHLSTimedMetadata');
+    await this.transport?.sendHLSTimedMetadata(metadataList);
   }
 
   async changeName(name: string) {
@@ -865,12 +894,16 @@ export class HMSSdk implements HMSInterface {
     if (localPeer?.role) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.listener?.onJoin(room);
-    } else {
+      return;
+    }
+
+    return new Promise<void>(resolve => {
       this.eventBus.policyChange.subscribeOnce(() => {
         this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
+        resolve();
       });
-    }
+    });
   }
 
   /**

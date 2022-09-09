@@ -1,4 +1,3 @@
-// @ts-check
 import React from "react";
 import {
   HorizontalMenuIcon,
@@ -8,14 +7,17 @@ import {
   MicOnIcon,
   SpeakerIcon,
   RemoveUserIcon,
+  ShareScreenIcon,
 } from "@100mslive/react-icons";
 import {
   useHMSStore,
   selectPermissions,
   useHMSActions,
   useRemoteAVToggle,
+  useCustomEvent,
 } from "@100mslive/react-sdk";
 import { Flex, StyledMenuTile, Slider } from "@100mslive/react-ui";
+import { REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -27,8 +29,7 @@ const TileMenu = ({
   isScreenshare = false,
 }) => {
   const actions = useHMSActions();
-  let { removeOthers } = useHMSStore(selectPermissions);
-  removeOthers = removeOthers && !isScreenshare;
+  const { removeOthers } = useHMSStore(selectPermissions);
   const {
     isAudioEnabled,
     isVideoEnabled,
@@ -37,6 +38,9 @@ const TileMenu = ({
     toggleVideo,
     volume,
   } = useRemoteAVToggle(audioTrackID, videoTrackID);
+  const { sendEvent } = useCustomEvent({
+    type: REMOTE_STOP_SCREENSHARE_TYPE,
+  });
   if (!(removeOthers || toggleAudio || toggleVideo || setVolume)) {
     return null;
   }
@@ -45,7 +49,7 @@ const TileMenu = ({
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
-      <StyledMenuTile.Content side="left" align="start" sideOffset={10}>
+      <StyledMenuTile.Content side="top" align="end" sideOffset={8}>
         {toggleVideo ? (
           <StyledMenuTile.ItemButton
             onClick={toggleVideo}
@@ -99,6 +103,13 @@ const TileMenu = ({
           >
             <RemoveUserIcon />
             <span>Remove Participant</span>
+          </StyledMenuTile.RemoveItem>
+        ) : null}
+
+        {removeOthers && isScreenshare ? (
+          <StyledMenuTile.RemoveItem onClick={() => sendEvent({})}>
+            <ShareScreenIcon />
+            <span>Stop Screenshare</span>
           </StyledMenuTile.RemoveItem>
         ) : null}
       </StyledMenuTile.Content>

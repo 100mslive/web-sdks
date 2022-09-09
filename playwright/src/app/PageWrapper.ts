@@ -1,12 +1,15 @@
 import { BrowserContext, ChromiumBrowserContext, Dialog, expect, Page as PlaywrightPage } from '@playwright/test';
 import { PreviewPage } from './selectors/PreviewPage';
+import { PrePreviewPage } from './selectors/PrePreviewPage';
 import { Header } from './selectors/Header';
 import { Center } from './selectors/Center';
 import { Footer } from './selectors/Footer';
 
 export class PageWrapper {
+  [x: string]: any;
   private page: PlaywrightPage;
   localName: string;
+  prepreview: PrePreviewPage;
   preview: PreviewPage;
   header: Header;
   center: Center;
@@ -16,6 +19,7 @@ export class PageWrapper {
     this.page = page;
     this.localName = '';
     this.preview = new PreviewPage(this);
+    this.prepreview = new PrePreviewPage(this);
     this.header = new Header(this);
     this.footer = new Footer(this);
     this.center = new Center(this);
@@ -96,8 +100,9 @@ export class PageWrapper {
     console.log('Text sent: ', text, 'to element', elementId);
   }
 
-  async hasText(elementId: string, text: string) {
-    await expect(this.page.locator(elementId)).toContainText(text);
+  async hasText(elementId: string, msgSent: string) {
+    const innerText = (await this.getText(elementId)) as string;
+    expect(innerText.includes(msgSent)).toBeTruthy();
   }
 
   /**
@@ -110,7 +115,7 @@ export class PageWrapper {
   }
 
   async gotoPreviewPage() {
-    await this.preview.gotoPreviewPage();
+    await this.prepreview.gotoPreviewPage(this.localName);
   }
 
   async goto({ url }: { url?: string } = {}) {
@@ -124,6 +129,10 @@ export class PageWrapper {
 
   async close() {
     await this.page.close({ runBeforeUnload: true });
+  }
+
+  async evaluateCommand(command: string) {
+    await this.page.evaluate(command);
   }
 
   async endRoom() {
@@ -140,9 +149,9 @@ export class PageWrapper {
     return currentUrl;
   }
 
-  async selectPopupOption(elementId: string) {
-    await this.page.locator('select').selectOption(elementId);
-  }
+  // async selectPopupOption(selectId: string, locatorId: string) {
+  //   await this.page.locator(locatorId).selectOption(selectId);
+  // }
 
   async assertLocalAudioState(enabled?: boolean) {
     await this.footer.assertLocalAudioState(enabled);
@@ -194,6 +203,39 @@ export class PageWrapper {
 
   async delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * accepts string values like F1 - F12, Digit0- Digit9, KeyA- KeyZ, Backquote, Minus, Equal,
+   *  Backslash, Backspace, Tab, Delete, Escape, ArrowDown, End, Enter, Home, Insert, PageDown, PageUp, ArrowRight, ArrowUp
+   */
+  async pressKey(key: string) {
+    await this.page.keyboard.press(key);
+  }
+
+  /**
+   * function to send message in chat to all, any peer or
+   * peers with specific role. Pass msg and "all", or "peername" or "roleName" for sending
+   * message to all or particular peer or peers with specific role.
+   */
+  async sendMessage(msg: string, to: string) {
+    await this.page.click(this.footer.chat_btn);
+    if (to == 'all') {
+      await this.sendText(this.footer.chat_placeholder, msg);
+    } else {
+      await this.selectPeerOrRole(to);
+      await this.sendText(this.footer.chat_placeholder, msg);
+    }
+    await this.pressKey('Enter');
+  }
+
+  /**
+   * function to select peer or role in chat
+   * pass peer name or role name to chat with
+   */
+  async selectPeerOrRole(name: string) {
+    await this.page.click(this.footer.chat_peer_selector);
+    await this.page.click(`text=${name}`);
   }
 }
 

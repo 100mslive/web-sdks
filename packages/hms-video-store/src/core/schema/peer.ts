@@ -1,13 +1,13 @@
-import { SimulcastLayerDefinition } from '@100mslive/hms-video';
-// noinspection ES6PreferShortImport
-import { HMSSimulcastLayer } from '../hmsSDKStore/sdkTypes';
+import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
 
+export type { SimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
 export type HMSTrackDisplaySurface = 'application' | 'browser' | 'monitor' | 'window';
+export type HMSTrackFacingMode = 'user' | 'environment' | 'left' | 'right';
 
 /**
  * HMSPeer stores the details of individual participants in the room
@@ -56,6 +56,7 @@ export interface HMSTrack {
   layerDefinitions?: SimulcastLayerDefinition[];
   degraded?: boolean;
   displaySurface?: HMSTrackDisplaySurface;
+  facingMode?: HMSTrackFacingMode;
 }
 
 /**

@@ -110,11 +110,43 @@ export const APP_DATA = {
   chatDraft: "chatDraft",
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
+  sidePane: "sidePane",
+  hlsViewerRole: "hlsViewerRole",
+  subscribedNotifications: "subscribedNotifications",
+  logo: "logo",
+  tokenEndpoint: "tokenEndpoint",
+  appLayout: "appLayout",
+  hlsStarted: "hlsStarted",
+  rtmpStarted: "rtmpStarted",
+  recordingStarted: "recordingStarted",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
   isHeadless: "isHeadless",
+  maxTileCount: "maxTileCount",
+  uiViewMode: "uiViewMode",
+  showStatsOnTiles: "showStatsOnTiles",
+  enableAmbientMusic: "enableAmbientMusic",
+  mirrorLocalVideo: "mirrorLocalVideo",
+};
+
+export const SIDE_PANE_OPTIONS = {
+  PARTICIPANTS: "Participants",
+  CHAT: "Chat",
+  STREAMING: "STREAMING",
+  TILES: "TILES",
+  SCREEN_TILES: "SCREEN_TILES",
+};
+
+export const SUBSCRIBED_NOTIFICATIONS = {
+  PEER_JOINED: "PEER_JOINED",
+  PEER_LEFT: "PEER_LEFT",
+  METADATA_UPDATED: "METADATA_UPDATED",
+  NEW_MESSAGE: "NEW_MESSAGE",
+  ERROR: "ERROR",
 };
 
 export const CREATE_ROOM_DOC_URL =
-  "https://github.com/100mslive/100ms-web#create-a-room";
+  "https://github.com/100mslive/100ms-web/wiki/Creating-and-joining-a-room";
+
+export const REMOTE_STOP_SCREENSHARE_TYPE = "REMOTE_STOP_SCREENSHARE";

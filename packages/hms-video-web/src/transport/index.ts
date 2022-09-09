@@ -31,12 +31,13 @@ import { RetryScheduler } from './RetryScheduler';
 import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole } from '../interfaces';
+import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
 import { TrackDegradationController } from '../degradation';
 import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
 import {
   HLSRequestParams,
+  HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
   StartRTMPOrRecordingRequestParams,
@@ -53,6 +54,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { stringifyMediaStreamTrack } from '../utils/json';
 
 const TAG = '[HMSTransport]:';
 
@@ -61,6 +63,13 @@ interface CallbackTriple {
   promise: PromiseCallbacks<boolean>;
   action: HMSAction;
   extra: any;
+}
+
+interface NegotiateJoinParams {
+  name: string;
+  data: string;
+  autoSubscribeVideo: boolean;
+  serverSubDegrade: boolean;
 }
 
 export default class HMSTransport implements ITransport {
@@ -75,6 +84,7 @@ export default class HMSTransport implements ITransport {
   private trackDegradationController?: TrackDegradationController;
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
+  private joinRetryCount = 0;
 
   constructor(
     private observer: ITransportObserver,
@@ -237,12 +247,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackRemove(track);
     },
 
@@ -287,15 +297,13 @@ export default class HMSTransport implements ITransport {
     try {
       return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
     } catch (error) {
-      if (error instanceof HMSException) {
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.publish({
-            error,
-            devices: this.deviceManager.getDevices(),
-            settings: new HMSTrackSettings(videoSettings, audioSettings, false),
-          }),
-        );
-      }
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          error: error as Error,
+          devices: this.deviceManager.getDevices(),
+          settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+        }),
+      );
       throw error;
     }
   }
@@ -413,7 +421,7 @@ export default class HMSTransport implements ITransport {
   async leave(): Promise<void> {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
-
+    HMSLogger.d(TAG, 'leaving in transport');
     try {
       this.state = TransportState.Leaving;
       this.webrtcInternals?.cleanUp();
@@ -422,6 +430,7 @@ export default class HMSTransport implements ITransport {
       await this.subscribeConnection?.close();
       try {
         this.signal.leave();
+        HMSLogger.d(TAG, 'signal leave done');
       } catch (err) {
         HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
       }
@@ -429,9 +438,7 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.reset();
       await this.signal.close();
     } catch (err) {
-      if (err instanceof HMSException) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
-      }
+      this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err as Error));
       HMSLogger.e(TAG, 'leave: FAILED ❌', err);
     } finally {
       this.state = TransportState.Disconnected;
@@ -458,14 +465,12 @@ export default class HMSTransport implements ITransport {
       try {
         await this.publishTrack(track);
       } catch (error) {
-        if (error instanceof HMSException) {
-          this.eventBus.analytics.publish(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-            }),
-          );
-        }
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            devices: this.deviceManager.getDevices(),
+            error: error as Error,
+          }),
+        );
       }
     }
   }
@@ -541,17 +546,18 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: HLSConfig) {
-    const hlsParams: HLSRequestParams = {
-      variants: params.variants.map(variant => {
+  async startHLSStreaming(params?: HLSConfig) {
+    const hlsParams: HLSRequestParams = {};
+    if (params && params.variants && params.variants.length > 0) {
+      hlsParams.variants = params.variants.map(variant => {
         const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
         if (variant.metadata) {
           hlsVariant.metadata = variant.metadata;
         }
         return hlsVariant;
-      }),
-    };
-    if (params.recording) {
+      });
+    }
+    if (params?.recording) {
       hlsParams.hls_recording = {
         single_file_per_layer: params.recording.singleFilePerLayer,
         hls_vod: params.recording.hlsVod,
@@ -563,7 +569,7 @@ export default class HMSTransport implements ITransport {
   async stopHLSStreaming(params?: HLSConfig) {
     if (params) {
       const hlsParams: HLSRequestParams = {
-        variants: params?.variants.map(variant => {
+        variants: params?.variants?.map(variant => {
           const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
           if (variant.metadata) {
             hlsVariant.metadata = variant.metadata;
@@ -576,6 +582,15 @@ export default class HMSTransport implements ITransport {
     await this.signal.stopHLSStreaming();
   }
 
+  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
+    if (metadataList.length > 0) {
+      const hlsMtParams: HLSTimedMetadataParams = {
+        metadata_objs: metadataList,
+      };
+
+      await this.signal.sendHLSTimedMetadata(hlsMtParams);
+    }
+  }
   async changeName(name: string) {
     await this.signal.updatePeer({
       name: name,
@@ -597,8 +612,12 @@ export default class HMSTransport implements ITransport {
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
-    track.publishedTrackId = track.nativeTrack.id;
-    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
+    track.publishedTrackId = track.getTrackIDBeingSent();
+    HMSLogger.d(
+      TAG,
+      `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`,
+      `${track}`,
+    );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -628,11 +647,11 @@ export default class HMSTransport implements ITransport {
         .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
-    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
+    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {
@@ -678,18 +697,18 @@ export default class HMSTransport implements ITransport {
     autoSubscribeVideo = false,
     isServerHandlingDegradation = true,
   ) {
-    const isWebrtc = this.doesLocalPeerNeedWebRTC();
-    if (isWebrtc) {
+    const isWebRTC = this.doesLocalPeerNeedWebRTC();
+    if (isWebRTC) {
       this.createPeerConnections();
     }
 
-    await this.negotiateJoin(
-      customData.name,
-      customData.metaData,
+    await this.negotiateJoinWithRetry({
+      name: customData.name,
+      data: customData.metaData,
       autoSubscribeVideo,
-      isServerHandlingDegradation,
-      isWebrtc,
-    );
+      serverSubDegrade: isServerHandlingDegradation,
+      isWebRTC,
+    });
   }
 
   private createPeerConnections() {
@@ -713,45 +732,69 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async negotiateJoin(
-    name: string,
-    data: string,
-    autoSubscribeVideo: boolean,
-    serverSubDegrade: boolean,
+  private async negotiateJoinWithRetry({
+    name,
+    data,
+    autoSubscribeVideo,
+    serverSubDegrade,
     isWebRTC = true,
-  ): Promise<boolean> {
+  }: NegotiateJoinParams & { isWebRTC: boolean }) {
     try {
-      if (isWebRTC) {
-        return await this.negotiateJoinWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
-      } else {
-        return await this.negotiateJoinNonWebRTC(name, data, autoSubscribeVideo, serverSubDegrade);
-      }
+      await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });
     } catch (error) {
-      HMSLogger.e(TAG, 'Publish negotiation failed ❌', error);
-      const task = async () => {
-        return await this.negotiateJoin(name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC);
-      };
+      HMSLogger.e(TAG, 'Join negotiation failed ❌', error);
+      const hmsError =
+        error instanceof HMSException
+          ? error
+          : ErrorFactory.WebsocketMethodErrors.ServerErrors(
+              500,
+              HMSAction.JOIN,
+              `Websocket join error - ${(error as Error).message}`,
+            );
+      const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
 
-      await this.retryScheduler.schedule({
-        category: TransportFailureCategory.PublishNegotiationFailed,
-        error: ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(
-          HMSAction.JOIN,
-          'Failed to send join over WS connection',
-        ),
-        task,
-        originalState: TransportState.Joined,
-      });
+      if (shouldRetry) {
+        this.joinRetryCount = 0;
+        hmsError.isTerminal = false;
+        const task = async () => {
+          this.joinRetryCount++;
+          return await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });
+        };
 
-      return false;
+        await this.retryScheduler.schedule({
+          category: TransportFailureCategory.JoinWSMessageFailed,
+          error: hmsError,
+          task,
+          originalState: TransportState.Joined,
+          maxFailedRetries: 3,
+          changeState: false,
+        });
+      } else {
+        throw error;
+      }
     }
   }
 
-  private async negotiateJoinWebRTC(
-    name: string,
-    data: string,
-    autoSubscribeVideo: boolean,
-    serverSubDegrade: boolean,
-  ): Promise<boolean> {
+  private async negotiateJoin({
+    name,
+    data,
+    autoSubscribeVideo,
+    serverSubDegrade,
+    isWebRTC = true,
+  }: NegotiateJoinParams & { isWebRTC: boolean }): Promise<boolean> {
+    if (isWebRTC) {
+      return await this.negotiateJoinWebRTC({ name, data, autoSubscribeVideo, serverSubDegrade });
+    } else {
+      return await this.negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo, serverSubDegrade });
+    }
+  }
+
+  private async negotiateJoinWebRTC({
+    name,
+    data,
+    autoSubscribeVideo,
+    serverSubDegrade,
+  }: NegotiateJoinParams): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     if (!this.publishConnection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
@@ -769,12 +812,12 @@ export default class HMSTransport implements ITransport {
     return !!answer;
   }
 
-  private async negotiateJoinNonWebRTC(
-    name: string,
-    data: string,
-    autoSubscribeVideo: boolean,
-    serverSubDegrade: boolean,
-  ): Promise<boolean> {
+  private async negotiateJoinNonWebRTC({
+    name,
+    data,
+    autoSubscribeVideo,
+    serverSubDegrade,
+  }: NegotiateJoinParams): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
     const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade);
     return !!response;
@@ -870,10 +913,10 @@ export default class HMSTransport implements ITransport {
       this.analyticsEventsService.flush();
       return this.initConfig;
     } catch (error) {
-      if (error instanceof HMSException && this.state !== TransportState.Reconnecting) {
+      if (this.state !== TransportState.Reconnecting) {
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.connect(
-            error,
+            error as Error,
             this.getAdditionalAnalyticsProperties(),
             connectRequestedAt,
             new Date(),
@@ -1064,7 +1107,7 @@ export default class HMSTransport implements ITransport {
       case TransportFailureCategory.SignalDisconnect:
         event = AnalyticsEventFactory.disconnect(error, additionalProps);
         break;
-      case TransportFailureCategory.PublishNegotiationFailed:
+      case TransportFailureCategory.JoinWSMessageFailed:
         event = AnalyticsEventFactory.join({
           error,
           time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
@@ -1072,6 +1115,7 @@ export default class HMSTransport implements ITransport {
           ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
           on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
           local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
+          retries_join: this.joinRetryCount,
         });
         break;
       case TransportFailureCategory.PublishIceConnectionFailed:
