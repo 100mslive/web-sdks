@@ -26,7 +26,7 @@ export const darkTheme = {
     toastBg: '$menuBg',
     borderDefault: '#1B1F26',
     backgroundDefault: '#0B0D0F',
-    borderLight2: '#2D3440',
+    borderLighter: '#2D3440',
   },
 };
 
@@ -58,14 +58,14 @@ export const lightTheme = {
 
     borderDefault: '#DDE2E9',
     borderLight: '#BCC4D2',
-    borderLight2: '#DFE4EC',
+    borderLighter: '#DFE4EC',
     surfaceDefault: '#EDEFF3',
     surfaceLight: '#F6F7F9',
     surfaceLighter: '#FCFCFD',
+    surfaceDark: '$surfaceLight',
     backgroundDefault: '#E0E4EB',
     backgroundDark: '#DADFE7',
     backgroundDarker: '#D4DAE2',
-    surfaceDark: '$surfaceLight',
   },
 };
 
