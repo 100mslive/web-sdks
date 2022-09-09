@@ -78,12 +78,12 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
-      # - name: Build for QA
-      #   if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-      #   run: yarn build
-      #   env:
-      #     REACT_APP_ENV: 'qa'
-      #     REACT_APP_ENABLE_WHITEBOARD: 'true'
+      - name: Build for QA
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        run: yarn build
+        env:
+          REACT_APP_ENV: 'qa'
+          REACT_APP_ENABLE_WHITEBOARD: 'true'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -92,14 +92,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
-      # - name: Upload to QA S3 Bucket
-      #   if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-      #   env:
-      #     BUCKET: ${{ secrets.S3_BUCKET }}
-      #   # upload static folder first and then upload the rest to ensure index.html assets are all present
-      #   run: |
-      #     aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-      #     aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+      - name: Upload to QA S3 Bucket
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET }}
+        # upload static folder first and then upload the rest to ensure index.html assets are all present
+        run: |
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
 
       - name: Build for Production
         if: github.event.inputs.env == 'prod'
