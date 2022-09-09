@@ -1,6 +1,6 @@
 import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { useCallback, useEffect } from 'react';
-import { HMSNotificationTypes } from '@100mslive/hms-video-store';
+import { HMSNotificationTypes, HMSPeerID, HMSRoleName } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
 import { logErrorHandler } from '../utils/commons';
 
@@ -23,11 +23,26 @@ export interface useCustomEventInput<T> {
   handleError?: hooksErrHandler;
 }
 
+export interface EventReceiver {
+  peerId?: HMSPeerID;
+  roleNames?: HMSRoleName[];
+}
+
 export interface useCustomEventResult<T> {
   /**
    * sends the event data to others in the room who will receive it in onEvent
+   *
+   * @example to send message to peers of specific roles
+   * ```js
+   * sendEvent(data, {roleNames: ['host','guest']})
+   * ```
+   *
+   * @example to send message to single peer
+   * ```js
+   * sendEvent(data, {peerId})
+   * ```
    */
-  sendEvent: (data: T) => void;
+  sendEvent: (data: T, receiver?: EventReceiver) => void;
 }
 
 /**
@@ -67,12 +82,18 @@ export const useCustomEvent = <T>({
     return unsubscribe;
   }, [notifications, type, onEvent, handleError]);
 
-  // this is to send message to remote peers and call onEvent
+  // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
-    async (data: T) => {
+    async (data: T, receiver?: EventReceiver) => {
       try {
         const dataStr = JSON.stringify(data || '');
-        await actions.sendBroadcastMessage(dataStr, type);
+        if (receiver && Array.isArray(receiver?.roleNames)) {
+          await actions.sendGroupMessage(dataStr, receiver.roleNames, type);
+        } else if (typeof receiver?.peerId === 'string') {
+          await actions.sendDirectMessage(dataStr, receiver.peerId, type);
+        } else {
+          await actions.sendBroadcastMessage(dataStr, type);
+        }
         onEvent?.(data);
       } catch (err) {
         handleError(err as Error, 'sendCustomEvent');
