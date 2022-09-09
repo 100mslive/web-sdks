@@ -19,7 +19,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Beam tests @beam', () => {
-  test(`Start and Stop Browser Recording`, async () => {
+  test.skip(`Start and Stop Browser Recording`, async () => {
     await page.click(page.header.start_recording_btn, page.header.start_recording_confirm_btn);
 
     await page.clickWithTimeout(
@@ -30,12 +30,12 @@ test.describe('Beam tests @beam', () => {
   });
 
   //hit hls m3u8 file and download
-  test(`Start and Stop HLS`, async () => {
+  test.skip(`Start and Stop HLS`, async () => {
     await page.click(page.header.go_live_btn, page.header.hls_stream_btn, page.header.start_hls_btn);
     await page.clickWithTimeout(beamWaitTimeout, page.header.end_stream_btn, page.header.stop_hls_btn);
   });
 
-  test(`Start and Stop HLS Recording`, async () => {
+  test.skip(`Start and Stop HLS Recording`, async () => {
     await page.click(
       page.header.go_live_btn,
       page.header.hls_stream_btn,
