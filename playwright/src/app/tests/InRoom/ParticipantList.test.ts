@@ -3,7 +3,12 @@ import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
-test.beforeEach(async () => {});
+test.beforeEach(async ({ page: nativePage }, testInfo) => {
+  if (testInfo.retry) {
+    page = await PageWrapper.openMeetingPage(nativePage);
+    await page.endRoom();
+  }
+});
 
 test.afterEach(async ({ context }) => {
   await context.close();
