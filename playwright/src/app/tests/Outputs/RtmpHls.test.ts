@@ -6,6 +6,11 @@ const beamWaitTimeout = Number(process.env.beam_wait_timeout);
 
 test.beforeEach(async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
+  // if (testInfo.retry) {
+  // await page.evaluateCommand('window.__hms.actions.stopHLSStreaming()');
+  // await page.evaluateCommand('window.__hms.actions.stopRTMPAndRecording');
+  // await page.endRoom();
+  // }
 });
 
 test.afterEach(async () => {
