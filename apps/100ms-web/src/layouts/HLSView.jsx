@@ -30,9 +30,10 @@ import {
 } from "../controllers/hls/HLSController";
 
 const HLSVideo = styled("video", {
-  h: "100%",
   margin: "0 auto",
-  px: "$10",
+  flex: "1 1 0",
+  minHeight: 0,
+  h: "100%",
 });
 
 let hlsController;
@@ -40,7 +41,6 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const hlsUrl = hlsState.variants[0]?.url;
-  // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
@@ -124,12 +124,9 @@ const HLSView = () => {
   return (
     <Fragment>
       {hlsUrl ? (
-        <>
-          <Flex
-            align="center"
-            justify="center"
-            css={{ position: "absolute", right: "$10", zIndex: "10" }}
-          >
+        <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
+          <HLSVideo ref={videoRef} autoPlay controls playsInline />
+          <Flex align="center" justify="end">
             {hlsController ? (
               <Button
                 variant="standard"
@@ -142,7 +139,7 @@ const HLSView = () => {
                 data-testid="leave_room_btn"
               >
                 <Tooltip title="Jump to Live">
-                  <Flex>
+                  <Flex css={{ gap: "$2" }}>
                     <RecordIcon
                       color={isVideoLive ? "#CC525F" : "FAFAFA"}
                       key="jumpToLive"
@@ -175,12 +172,15 @@ const HLSView = () => {
                   </Tooltip>
 
                   <Box
-                    css={{ "@lg": { display: "none" }, color: "$textDisabled" }}
+                    css={{
+                      "@lg": { display: "none" },
+                      color: "$textDisabled",
+                    }}
                   >
                     {qualityDropDownOpen ? (
-                      <ChevronUpIcon />
-                    ) : (
                       <ChevronDownIcon />
+                    ) : (
+                      <ChevronUpIcon />
                     )}
                   </Box>
                 </Flex>
@@ -229,13 +229,11 @@ const HLSView = () => {
               )}
             </Dropdown.Root>
           </Flex>
-
-          <HLSVideo ref={videoRef} autoPlay controls playsInline />
-        </>
+        </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
-            Waiting for the Streaming to start...
+            Waiting for the stream to start...
           </Text>
         </Flex>
       )}
