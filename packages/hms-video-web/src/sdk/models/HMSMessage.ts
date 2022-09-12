@@ -38,4 +38,15 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
     }
     return sendParams;
   }
+
+  toString() {
+    return `{
+      sender: ${this.sender};
+      recipientPeer: ${this.recipientPeer};
+      recipientRoles: ${this.recipientRoles?.map(role => role.name)};
+      message: ${this.message};
+      time: ${this.time};
+      type: ${this.type};
+    }`;
+  }
 }
