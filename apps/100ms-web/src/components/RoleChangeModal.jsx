@@ -54,7 +54,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
     return null;
   }
 
-  const peerNameMaxWidth = 220;
+  const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
