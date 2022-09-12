@@ -7,6 +7,7 @@ import {
   HMSAudioPlugin,
   HMSPluginSupportResult,
   HLSTimedMetadata,
+  HMSSimulcastLayer,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -185,6 +186,12 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): void;
 
   refreshDevices(): Promise<void>;
+
+  /**
+   * set the quality of the selected videoTrack for simulcast.
+   * @alpha
+   */
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

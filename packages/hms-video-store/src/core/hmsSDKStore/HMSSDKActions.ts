@@ -135,13 +135,12 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        track.preferLayer(layer).then(() => {
-          this.updateVideoLayer(trackId, 'setPreferredLayer');
-        });
+        await track.preferLayer(layer);
+        this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);
       }
