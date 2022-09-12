@@ -3,8 +3,7 @@ import HMSLogger from '../../utils/logger';
 import { userAgent } from '../../utils/support';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
-const TAG = 'InitService';
-
+const TAG = '[InitService]';
 export default class InitService {
   private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {

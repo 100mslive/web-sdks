@@ -6,7 +6,7 @@ import { enableOpusDtx, fixMsid } from '../utils/session-description';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { TrackState } from '../notification-manager';
 
-const TAG = 'HMSConnection';
+const TAG = '[HMSConnection]';
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;

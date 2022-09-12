@@ -22,7 +22,7 @@ import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
 import { EventBus } from '../events/EventBus';
 
 export class NotificationManager {
-  private TAG = '[HMSNotificationManager]';
+  private readonly TAG = '[HMSNotificationManager]';
   private trackManager: TrackManager;
   private peerManager: PeerManager;
   private peerListManager: PeerListManager;

@@ -34,7 +34,7 @@ const INITIAL_STATE: AudioSinkState = {
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
   private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
-  private TAG = '[AudioSinkManager]:';
+  private readonly TAG = '[AudioSinkManager]:';
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;

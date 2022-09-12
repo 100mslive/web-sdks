@@ -80,7 +80,7 @@ const INITIAL_STATE = {
 
 export class HMSSdk implements HMSInterface {
   private transport!: HMSTransport;
-  private TAG = '[HMSSdk]:';
+  private readonly TAG = '[HMSSdk]:';
   private listener?: HMSUpdateListener;
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;

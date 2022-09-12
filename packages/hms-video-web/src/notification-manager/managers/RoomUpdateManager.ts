@@ -16,7 +16,7 @@ import { HMSAction } from '../../error/ErrorFactory';
 import HMSLogger from '../../utils/logger';
 
 export class RoomUpdateManager {
-  private TAG = 'RoomUpdateManager';
+  private readonly TAG = '[RoomUpdateManager]';
 
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 

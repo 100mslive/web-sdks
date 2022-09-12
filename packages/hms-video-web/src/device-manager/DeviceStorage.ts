@@ -13,7 +13,7 @@ class DeviceStorage {
   private storage = new LocalStorage<SelectedDevices>('hms-device-selection');
   private remember = false;
   private devices?: DeviceMap;
-  private TAG = 'HMSDeviceStorage';
+  private readonly TAG = '[HMSDeviceStorage]';
 
   setDevices(devices: DeviceMap) {
     this.devices = devices;

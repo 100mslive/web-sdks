@@ -7,9 +7,8 @@ import HMSLogger from '../../utils/logger';
 import HMSTransport from '../../transport';
 import { HMSLocalTrack } from '../../media/tracks';
 
-const TAG = 'HMSPublishConnection';
-
 export default class HMSPublishConnection extends HMSConnection {
+  private readonly TAG = '[HMSPublishConnection]';
   private readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
   private readonly transport: HMSTransport;
@@ -47,7 +46,7 @@ export default class HMSPublishConnection extends HMSConnection {
 
   initAfterJoin() {
     this.nativeConnection.onnegotiationneeded = async () => {
-      HMSLogger.d(TAG, `onnegotiationneeded`);
+      HMSLogger.d(this.TAG, `onnegotiationneeded`);
       await this.observer.onRenegotiationNeeded();
     };
   }

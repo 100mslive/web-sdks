@@ -140,6 +140,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
                 reject(response.error);
                 return;
               }
+              HMSLogger.d(this.TAG, `response for ${id} -`, JSON.stringify(response, null, 2));
               resolve(response);
             }
           });
