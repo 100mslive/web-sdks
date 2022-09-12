@@ -57,6 +57,11 @@ export interface HMSAudioTrack extends BaseTrack {
   type: 'audio';
   volume?: number;
 }
+export interface HMSScreenAudioTrack extends BaseTrack {
+  source: 'screen';
+  type: 'audio';
+  volume?: number;
+}
 export interface HMSVideoTrack extends BaseTrack {
   source: 'regular' | 'videoplaylist' | string;
   type: 'video';

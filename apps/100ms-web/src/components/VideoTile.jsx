@@ -15,9 +15,7 @@ import {
   selectAudioTrackByPeerID,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
-} from "@100mslive/react-sdk";
-import {
-  HMSVideoTrack
+  HMSVideoTrack,
 } from "@100mslive/react-sdk";
 import {
   MicOffIcon,

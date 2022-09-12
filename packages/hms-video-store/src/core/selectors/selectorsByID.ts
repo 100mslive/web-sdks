@@ -55,6 +55,13 @@ const selectTrackByAudioIDBare = createSelector([selectTracksMap, selectTrackID]
   trackID ? (storeTracks[trackID].type === 'audio' ? (storeTracks[trackID] as HMSAudioTrack) : null) : null,
 );
 
+const selectTrackByScreenAudioIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
+  trackID
+    ? storeTracks[trackID].type === 'audio' && storeTracks[trackID].source === 'screen'
+      ? (storeTracks[trackID] as HMSAudioTrack)
+      : null
+    : null,
+);
 const selectTrackByScreenVideoIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
   trackID
     ? storeTracks[trackID].type === 'video' && storeTracks[trackID].source === 'screen'
@@ -121,6 +128,11 @@ export const selectVideoTrackByID = byIDCurry(selectTrackByVideoIDBare);
  * Select the {@link HMSAudioTrack} object given a track ID.
  */
 export const selectAudioTrackByID = byIDCurry(selectTrackByAudioIDBare);
+
+/**
+ * Select the {@link HMSScreenAudioTrack} object given a track ID.
+ */
+export const selectScreenAudioTrackByID = byIDCurry(selectTrackByScreenAudioIDBare);
 
 /**
  * Select the {@link HMSScreenVideoTrack} object given a track ID.
