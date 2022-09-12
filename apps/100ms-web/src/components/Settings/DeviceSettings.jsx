@@ -25,11 +25,12 @@ import { settingOverflow } from './common.js';
  * it'll give the user options to change input/output device as well as check speaker.
  * There is also another controlled way of using this by passing in open and onOpenChange.
  */
-const Settings = () => {
+const Settings = (isMobile) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const combinedAudio = [...audioInput, ...audioOutput];
 
   return (
     <Box className={settingOverflow()}>
@@ -65,36 +66,58 @@ const Settings = () => {
           />
         </Fragment>
       ) : null}
-      {audioInput?.length ? (
-        <DeviceSelector
-          title="Microphone"
-          icon={<MicOnIcon />}
-          devices={audioInput}
-          selection={selectedDeviceIDs.audioInput}
-          onChange={deviceId =>
-            updateDevice({
-              deviceId,
-              deviceType: DeviceType.audioInput,
-            })
-          }
-        />
-      ) : null}
-      {audioOutput?.length ? (
-        <DeviceSelector
-          title="Speaker"
-          icon={<SpeakerIcon />}
-          devices={audioOutput}
-          selection={selectedDeviceIDs.audioOutput}
-          onChange={deviceId =>
-            updateDevice({
-              deviceId,
-              deviceType: DeviceType.audioOutput,
-            })
-          }
-        >
-          <TestAudio id={selectedDeviceIDs.audioOutput} />
-        </DeviceSelector>
-      ) : null}
+      {
+        isMobile.isMobile ? 
+          (
+            combinedAudio?.length ? (
+              <DeviceSelector
+                title="Audio"
+                icon={<MicOnIcon />}
+                devices={audioInput}
+                selection={selectedDeviceIDs.audioInput}
+                onChange={deviceId =>
+                  updateDevice({
+                    deviceId,
+                    deviceType: DeviceType.audioInput,
+                  })
+                }
+              />
+            ) : null
+          )
+        :
+          (<>
+            {audioInput?.length ? (
+              <DeviceSelector
+                title="Microphone"
+                icon={<MicOnIcon />}
+                devices={audioInput}
+                selection={selectedDeviceIDs.audioInput}
+                onChange={deviceId =>
+                  updateDevice({
+                    deviceId,
+                    deviceType: DeviceType.audioInput,
+                  })
+                }
+              />
+            ) : null}
+            {audioOutput?.length ? (
+              <DeviceSelector
+                title="Speaker"
+                icon={<SpeakerIcon />}
+                devices={audioOutput}
+                selection={selectedDeviceIDs.audioOutput}
+                onChange={deviceId =>
+                  updateDevice({
+                    deviceId,
+                    deviceType: DeviceType.audioOutput,
+                  })
+                }
+              >
+                <TestAudio id={selectedDeviceIDs.audioOutput} />
+              </DeviceSelector>
+            ) : null}
+          </>)
+      }
     </Box>
   );
 };

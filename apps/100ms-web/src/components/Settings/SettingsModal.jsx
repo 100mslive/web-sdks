@@ -107,7 +107,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   >
                     Device Settings
                   </SettingsContentHeader>
-                  <DeviceSettings />
+                  <DeviceSettings isMobile={isMobile} />
                 </Tabs.Content>
                 <Tabs.Content value="notifications" className={settingContent()} >
                   <SettingsContentHeader
