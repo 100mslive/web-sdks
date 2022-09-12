@@ -124,13 +124,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(message: T) {
     if (this.apiChannel && this.apiChannel.readyState === 'open') {
       const id = uuid();
-      const request = JSON.stringify({
-        id,
-        jsonrpc: '2.0',
-        ...message,
-      });
-      this.apiChannel.send(request);
-      HMSLogger.d(this.TAG, `sending message: ${request}`);
+      this.apiChannel.send(
+        JSON.stringify({
+          id,
+          jsonrpc: '2.0',
+          ...message,
+        }),
+      );
       return await new Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse>(
         (resolve, reject) => {
           this.eventEmitter.on('message', (value: string) => {
