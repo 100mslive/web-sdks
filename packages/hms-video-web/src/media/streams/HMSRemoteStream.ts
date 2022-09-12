@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import HMSSubscribeConnection from '../../connection/subscribe';
+import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import HMSMediaStream from './HMSMediaStream';
 import HMSLogger from '../../utils/logger';
 import { HMSSimulcastLayer } from '../../interfaces';

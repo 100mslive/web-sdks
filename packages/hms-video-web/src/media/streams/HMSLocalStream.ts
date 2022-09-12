@@ -1,6 +1,6 @@
 import HMSMediaStream from './HMSMediaStream';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
-import HMSPublishConnection from '../../connection/publish';
+import HMSPublishConnection from '../../connection/publish/publishConnection';
 import HMSLogger from '../../utils/logger';
 import { SimulcastLayer } from '../../interfaces';
 import { isNode } from '../../utils/support';

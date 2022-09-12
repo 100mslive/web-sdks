@@ -1,7 +1,7 @@
 import ITransportObserver from './ITransportObserver';
 import ITransport from './ITransport';
-import HMSPublishConnection from '../connection/publish';
-import HMSSubscribeConnection from '../connection/subscribe';
+import HMSPublishConnection from '../connection/publish/publishConnection';
+import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import InitService from '../signal/init';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
