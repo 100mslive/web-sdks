@@ -3,7 +3,6 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import HMSLogger from '../../utils/logger';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
-import { PreferVideoLayerResponse } from '../../signal/interfaces';
 import { isTrackDegraded } from '../../utils/track';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
@@ -34,8 +33,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     try {
       const response = await (this.stream as HMSRemoteStream).setVideoLayer(layer, this.trackId, this.logIdentifier);
-      const layerUpdate = (response as PreferVideoLayerResponse).result;
       if (response) {
+        const layerUpdate = response.result;
         this.setLayerFromServer(
           layerUpdate.current_layer,
           isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer),

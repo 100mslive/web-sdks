@@ -1,7 +1,8 @@
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
 import { HMSRole } from '../interfaces/role';
-import { Track, VideoTrackLayerUpdate } from '../signal/interfaces';
+import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { VideoTrackLayerUpdate } from '../connection/channel-messages';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.

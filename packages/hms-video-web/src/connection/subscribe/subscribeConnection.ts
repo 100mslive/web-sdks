@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter2';
-import HMSConnection from '../index';
+import { v4 as uuid } from 'uuid';
+import HMSConnection from '../HMSConnection';
 import { ISignal } from '../../signal/ISignal';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSConnectionRole } from '../model';
@@ -15,7 +16,7 @@ import {
   PreferAudioLayerResponse,
   PreferVideoLayerParams,
   PreferVideoLayerResponse,
-} from '../../signal/interfaces';
+} from '../channel-messages';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
@@ -122,11 +123,18 @@ export default class HMSSubscribeConnection extends HMSConnection {
 
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(message: T) {
     if (this.apiChannel && this.apiChannel.readyState === 'open') {
-      this.apiChannel.send(JSON.stringify(message));
+      const id = uuid();
+      const request = JSON.stringify({
+        id,
+        jsonrpc: '2.0',
+        ...message,
+      });
+      this.apiChannel.send(request);
+      HMSLogger.d(this.TAG, `sending message: ${request}`);
       return await new Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse>(
         (resolve, reject) => {
           this.eventEmitter.on('message', (value: string) => {
-            if (value.includes(message.id)) {
+            if (value.includes(id)) {
               const response = JSON.parse(value);
               if (response.error) {
                 reject(response.error);

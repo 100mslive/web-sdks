@@ -3,10 +3,10 @@ import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
-import { VideoTrackLayerUpdate } from '../../signal/interfaces';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 import HMSLogger from '../../utils/logger';
 import { isTrackDegraded } from '../../utils/track';
+import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 
 /**
  * Handles:

@@ -1,0 +1,42 @@
+import { HMSSimulcastLayer } from '../interfaces';
+
+export interface PreferVideoLayerParams {
+  params: {
+    max_spatial_layer: HMSSimulcastLayer;
+    track_id: string;
+  };
+  method: 'prefer-video-track-state';
+}
+
+export interface PreferVideoLayerResponse {
+  result: VideoTrackLayerUpdate;
+  error?: {
+    code: number;
+    message: string;
+  };
+  method: 'prefer-video-track-state';
+}
+
+export interface PreferAudioLayerParams {
+  params: {
+    subscribed: boolean;
+    track_id: string;
+  };
+  method: 'prefer-audio-track-state';
+}
+
+export interface PreferAudioLayerResponse {
+  id: string;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+
+export interface VideoTrackLayerUpdate {
+  current_layer: HMSSimulcastLayer;
+  expected_layer: HMSSimulcastLayer;
+  track_id: string;
+  subscriber_degraded: boolean;
+  publisher_degraded: boolean;
+}

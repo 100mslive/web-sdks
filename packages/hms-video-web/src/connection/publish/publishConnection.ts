@@ -1,4 +1,4 @@
-import HMSConnection from '../index';
+import HMSConnection from '../HMSConnection';
 import { ISignal } from '../../signal/ISignal';
 import { IPublishConnectionObserver } from './IPublishConnectionObserver';
 import { HMSConnectionRole } from '../model';
