@@ -40,7 +40,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
           layerUpdate.current_layer,
           isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer),
         );
-        HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, layerUpdate);
+        HMSLogger.d(
+          `[Remote Track] ${this.logIdentifier}`,
+          `expected_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
+          `subscriber_degraded: ${layerUpdate.subscriber_degraded}, publisher_degraded: ${layerUpdate.publisher_degraded}`,
+        );
       }
       this.pushInHistory(`uiPreferLayer-${layer}`);
     } catch (error) {
