@@ -480,7 +480,7 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     if (peers.length < 50) {
       // the log is too big and frequent for large rooms
-      HMSLogger.d(this.TAG, `Got peers`, peers);
+      HMSLogger.d(this.TAG, `Got peers(${peers.length})`, peers.toString());
     }
     return peers;
   }

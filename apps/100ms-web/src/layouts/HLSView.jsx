@@ -30,10 +30,10 @@ import {
 } from "../controllers/hls/HLSController";
 
 const HLSVideo = styled("video", {
-  h: "100%",
   margin: "0 auto",
-  position: "static",
-  px: "$10",
+  flex: "1 1 0",
+  minHeight: 0,
+  h: "100%",
 });
 
 let hlsController;
@@ -41,7 +41,6 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const hlsUrl = hlsState.variants[0]?.url;
-  // console.log("HLS URL", hlsUrl);
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
@@ -87,7 +86,7 @@ const HLSView = () => {
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hlsController) {
-        hlsController.setCurrentLevel(getCurrentLevel(qualityLevel));
+        hlsController.setCurrentLevel(qualityLevel);
         const levelText =
           qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
         setCurrentSelectedQualityText(levelText);
@@ -96,38 +95,12 @@ const HLSView = () => {
     [availableLevels] //eslint-disable-line
   );
 
-  /**
-   *
-   * @param {the current quality level clicked by the user. It is the level object } qualityLevel
-   * @returns an integer ranging from 0 to (availableLevels.length - 1).
-   * (e.g) if 4 levels are available, 0 is the lowest quality and 3 is the highest.
-   *
-   * This function is used rather than just using availableLevels.findIndex(quality) because, HLS gives the
-   * levels in reverse.
-   * (e.g) if available levels in the m3u8 are 360p,480p,720p,1080p,
-   *
-   * hls.levels gives us an array of level objects in the order [1080p,720p,480p,360p];
-   *
-   * so setting hls.currentLevel = availableLevels.getIndexOf(1080p) will set the stream to 360p instead of 1080p
-   * because availableLevels.getIndexOf(1080p) will give 0 but level 0 is 360p.
-   */
-  const getCurrentLevel = qualityLevel => {
-    if (qualityLevel.height === "auto") {
-      return -1;
-    }
-    const index = availableLevels.findIndex(
-      ({ url }) => url === qualityLevel.url
-    );
-
-    return availableLevels.length - 1 - index;
-  };
-
   return (
     <Fragment>
       {hlsUrl ? (
-        <Flex css={{ flexDirection: "column" }}>
+        <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          <Flex align="center" justify="end" css={{ marginRight: "$10" }}>
+          <Flex align="center" justify="end">
             {hlsController ? (
               <Button
                 variant="standard"
@@ -140,7 +113,7 @@ const HLSView = () => {
                 data-testid="leave_room_btn"
               >
                 <Tooltip title="Jump to Live">
-                  <Flex>
+                  <Flex css={{ gap: "$2" }}>
                     <RecordIcon
                       color={isVideoLive ? "#CC525F" : "FAFAFA"}
                       key="jumpToLive"
@@ -173,12 +146,15 @@ const HLSView = () => {
                   </Tooltip>
 
                   <Box
-                    css={{ "@lg": { display: "none" }, color: "$textDisabled" }}
+                    css={{
+                      "@lg": { display: "none" },
+                      color: "$textDisabled",
+                    }}
                   >
                     {qualityDropDownOpen ? (
-                      <ChevronUpIcon />
-                    ) : (
                       <ChevronDownIcon />
+                    ) : (
+                      <ChevronUpIcon />
                     )}
                   </Box>
                 </Flex>
@@ -231,7 +207,7 @@ const HLSView = () => {
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
-            Waiting for the Streaming to start...
+            Waiting for the stream to start...
           </Text>
         </Flex>
       )}

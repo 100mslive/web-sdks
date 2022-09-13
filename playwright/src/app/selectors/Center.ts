@@ -27,6 +27,7 @@ export class Center {
   //dialoge
   dialog_confirm = 'text=Confirm';
   dialog_accept = 'text=Accept';
+  dialog_change_button = '//button[@data-testid="change_button"]';
 
   //network
   network_offline_notification =
