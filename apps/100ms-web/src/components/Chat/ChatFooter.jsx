@@ -114,24 +114,26 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
             <EmojiIcon />
           </IconButton>
         </Popover.Trigger>
-        <Popover.Content
-          alignOffset={-40}
-          sideOffset={16}
-          align="end"
-          css={{
-            p: 0,
-            "em-emoji-picker": {
-              width: "100%",
-              "--rgb-background": "transparent",
-            },
-          }}
-        >
-          <EmojiPicker
-            onSelect={emoji => {
-              inputRef.current.value += ` ${emoji.native} `;
+        <Popover.Portal>
+          <Popover.Content
+            alignOffset={-40}
+            sideOffset={16}
+            align="end"
+            css={{
+              p: 0,
+              "em-emoji-picker": {
+                width: "100%",
+                "--rgb-background": "transparent",
+              },
             }}
-          />
-        </Popover.Content>
+          >
+            <EmojiPicker
+              onSelect={emoji => {
+                inputRef.current.value += ` ${emoji.native} `;
+              }}
+            />
+          </Popover.Content>
+        </Popover.Portal>
       </Popover.Root>
       <IconButton
         onClick={sendMessage}
