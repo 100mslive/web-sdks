@@ -4,11 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-<<<<<<< HEAD
   "version": "0.3.1-alpha.12",
-=======
-  "version": "0.3.1-alpha.7",
->>>>>>> c36d85aeb4585b79d553a093d8832172ed51ba16
   "author": "100ms",
   "license": "MIT",
   "files": [
