@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import data from "@emoji-mart/data";
 import { Picker } from "emoji-mart";
-import { Box, Popover, Flex, IconButton, styled } from "@100mslive/react-ui";
 import { useHMSActions } from "@100mslive/react-sdk";
-import { ToastManager } from "../Toast/ToastManager";
 import { EmojiIcon, SendIcon } from "@100mslive/react-icons";
+import { Box, Popover, Flex, styled, IconButton } from "@100mslive/react-ui";
+import { ToastManager } from "../Toast/ToastManager";
 import { useChatDraftMessage } from "../AppData/useChatState";
 
 const TextArea = styled("textarea", {
