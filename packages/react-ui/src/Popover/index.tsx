@@ -7,7 +7,7 @@ const StyledContent = styled(Content, {
   borderRadius: '$2',
   backgroundColor: '$bgSecondary',
   boxShadow: '$sm',
-  zIndex: 10,
+  zIndex: 12,
   ...popoverAnimation,
 });
 
