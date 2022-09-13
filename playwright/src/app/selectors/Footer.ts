@@ -52,8 +52,8 @@ export class Footer {
   dialoge_cross_icon = 'button[data-testid="dialoge_cross_icon"]';
 
   //bottom right corner
-  raise_hand_btn = '[data-testid="raise_hand_btn"]';
-  brb_btn = '[data-testid="brb_btn"]';
+  raise_hand_btn = 'button[data-testid="raise_hand_btn"]';
+  brb_btn = '(//button[@data-testid="brb_btn"])[2]';
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
   chat_placeholder = 'css=[placeholder="Write something here"]';
 
