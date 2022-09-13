@@ -7,11 +7,8 @@ import HMSLogger from '../../utils/logger';
 import { MessageNotification } from '../HMSNotifications';
 
 export class BroadcastManager {
+  private readonly TAG = '[BroadcastManager]';
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any) {
     if (method !== HMSNotificationMethod.BROADCAST) {

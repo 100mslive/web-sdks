@@ -24,11 +24,8 @@ import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
  * - TRACK_UPDATE comes before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
  */
 export class TrackManager {
+  private readonly TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
 
