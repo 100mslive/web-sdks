@@ -17,12 +17,14 @@ import {
   PreferVideoLayerParams,
   PreferVideoLayerResponse,
 } from '../channel-messages';
+import { sleep } from '../../utils/timer-utils';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
 
   private readonly observer: ISubscribeConnectionObserver;
+  private readonly MAX_RETRIES = 3;
 
   readonly nativeConnection: RTCPeerConnection;
 
@@ -121,34 +123,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   }
 
-  async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(message: T) {
-    if (this.apiChannel && this.apiChannel.readyState === 'open') {
-      const id = uuid();
-      this.apiChannel.send(
-        JSON.stringify({
-          id,
-          jsonrpc: '2.0',
-          ...message,
-        }),
-      );
-      return await new Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse>(
-        (resolve, reject) => {
-          this.eventEmitter.on('message', (value: string) => {
-            if (value.includes(id)) {
-              const response = JSON.parse(value);
-              if (response.error) {
-                reject(response.error);
-                return;
-              }
-              HMSLogger.d(this.TAG, `response for ${id} -`, JSON.stringify(response, null, 2));
-              resolve(response);
-            }
-          });
-        },
-      );
-    }
-    HMSLogger.w(this.TAG, `API Data channel not ${this.apiChannel ? 'open' : 'present'}, queueing`, message);
-    return;
+  async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
+    message: T,
+    requestId?: string,
+  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> {
+    const id = uuid();
+    const request = JSON.stringify({
+      id: requestId || id,
+      jsonrpc: '2.0',
+      ...message,
+    });
+    return this.sendMessage<T>(request, id);
   }
 
   async close() {
@@ -162,5 +147,52 @@ export default class HMSSubscribeConnection extends HMSConnection {
       this.pendingMessageQueue.forEach(msg => this.sendOverApiDataChannel(msg));
       this.pendingMessageQueue.length = 0;
     }
+  };
+
+  private sendMessage = async <T extends PreferAudioLayerParams | PreferVideoLayerParams>(
+    request: string,
+    requestId: string,
+  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> => {
+    if (this.apiChannel?.readyState === 'open') {
+      let response: T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse;
+      for (let i = 0; i < this.MAX_RETRIES; i++) {
+        this.apiChannel.send(request);
+        response = await this.waitForResponse<T>(requestId);
+        const error = response.error;
+        if (error) {
+          HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
+          const shouldRetry = error.code / 100 === 5 || error.code === 429;
+          if (!shouldRetry) {
+            break;
+          }
+          const delay = (2 + Math.random() * 2) * 1000;
+          await sleep(delay);
+        } else {
+          break;
+        }
+      }
+      return response!;
+    } else {
+      await sleep(1000);
+      return this.sendMessage<T>(request, requestId);
+    }
+  };
+
+  private waitForResponse = <T extends PreferAudioLayerParams | PreferVideoLayerParams>(
+    requestId: string,
+  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> => {
+    return new Promise((resolve, reject) => {
+      this.eventEmitter.on('message', (value: string) => {
+        if (value.includes(requestId)) {
+          const response = JSON.parse(value);
+          if (response.error) {
+            reject(response.error);
+            return;
+          }
+          HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
+          resolve(response);
+        }
+      });
+    });
   };
 }
