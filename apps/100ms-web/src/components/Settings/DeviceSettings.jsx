@@ -18,7 +18,7 @@ import {
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import { settingOverflow } from './common.js';
+import { settingOverflow } from "./common.js";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
