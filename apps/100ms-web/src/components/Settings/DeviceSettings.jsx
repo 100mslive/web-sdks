@@ -32,7 +32,7 @@ const Settings = () => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
-  const shouldShowAudioOutput = !!window?.setSinkId
+  const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype
   
   return (
     <Box className={settingOverflow()}>
