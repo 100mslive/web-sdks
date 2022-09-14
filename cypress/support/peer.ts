@@ -148,6 +148,16 @@ export class CypressPeer {
     return this.store.getState(selectIsInPreview);
   };
 
+  sendMessage = async (msg: string, roles?: string[], peerid?: string) => {
+    if (roles) {
+      await this.actions.sendGroupMessage(msg, roles);
+    } else if (peerid) {
+      await this.actions.sendDirectMessage(msg, peerid);
+    } else {
+      await this.actions.sendBroadcastMessage(msg);
+    }
+  };
+
   /**
    * waits till the role for the passed in peer is changed to passed in toRole.
    * If peer is not passed wait till self role changes.
