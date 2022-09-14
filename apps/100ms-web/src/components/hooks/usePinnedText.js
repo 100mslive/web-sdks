@@ -5,25 +5,20 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { ToastManager } from "../Toast/ToastManager";
+
+const REFRESH_MESSAGE = "refresh";
 
 export const usePinnedText = () => {
   const hmsActions = useHMSActions();
   const pinnedText = useHMSStore(selectSessionMetadata)?.pinnedText;
 
-  const changeSessionMetadatalocally = newText => {
-    if (newText !== pinnedText) {
-      ToastManager.addToast({ title: "Pinned Text Changed" });
-      hmsActions.setSessionMetadata(
-        { pinnedText: newText },
-        { localOnly: true }
-      );
-    }
-  };
-
   const { sendEvent } = useCustomEvent({
-    type: "pinned-text-change",
-    onEvent: newText => changeSessionMetadatalocally(newText),
+    type: "metadata",
+    onEvent: message => {
+      if (message === REFRESH_MESSAGE) {
+        hmsActions.populateSessionMetadata();
+      }
+    },
   });
 
   const changePinnedText = useCallback(
@@ -32,7 +27,7 @@ export const usePinnedText = () => {
         await hmsActions.setSessionMetadata({
           pinnedText: newText,
         });
-        sendEvent(newText);
+        sendEvent(REFRESH_MESSAGE);
       }
     },
     [hmsActions, pinnedText, sendEvent]
