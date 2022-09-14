@@ -10957,10 +10957,10 @@ history@^5.2.0:
   dependencies:
     "@babel/runtime" "^7.7.6"
 
-hls.js@1.2.2-0.canary.8586:
-  version "1.2.2-0.canary.8586"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.2.2-0.canary.8586.tgz#49ae145b332c42f708795bc667dd2c95b7a365cc"
-  integrity sha512-wHfwgxaQM3m1cUQQd4uSu2vSkICkhyq1aNRSi173iiu5eh0Nf9SozYJzu4HVvzZ11/wbPxIenstcfqvBkfUg7Q==
+hls.js@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.2.3.tgz#9b9e5d5b05c4912dacec173962694b710eea33ac"
+  integrity sha512-CC/vHi82ldiiydIhliNI3whlcepRXxI2jdpd/KKb6lyEv+74e7lXs4cGk5PHfTLxZMKOj6+m5LX9VAbvV/r7AQ==
 
 hmac-drbg@^1.0.1:
   version "1.0.1"
