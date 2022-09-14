@@ -32,7 +32,7 @@ describe('send chat messages', () => {
       expect(localPeer.isConnected()).to.be.true;
       expect(remotePeer.isConnected()).to.be.true;
       remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.be(chatMessage);
+        expect(messages[0]).to.equal(chatMessage);
       }, selectHMSMessages);
       localPeer.sendMessage(chatMessage);
     });
@@ -43,7 +43,7 @@ describe('send chat messages', () => {
       expect(localPeer.isConnected()).to.be.true;
       expect(remotePeer.isConnected()).to.be.true;
       remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.be(chatMessage);
+        expect(messages[0]).to.equal(chatMessage);
       }, selectMessagesByRole('student'));
       localPeer.sendMessage(chatMessage, ['student']);
     });
@@ -54,7 +54,7 @@ describe('send chat messages', () => {
       expect(localPeer.isConnected()).to.be.true;
       expect(remotePeer.isConnected()).to.be.true;
       remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.be(chatMessage);
+        expect(messages[0]).to.equal(chatMessage);
       }, selectMessagesByPeerID(remotePeer.id));
       localPeer.sendMessage(chatMessage, undefined, remotePeer.id);
     });
