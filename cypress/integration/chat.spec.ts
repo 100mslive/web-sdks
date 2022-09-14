@@ -30,7 +30,6 @@ describe('send chat messages', () => {
   it('should send message to everyone', () => {
     cy.wrap(room.joinAll(), { timeout: 10000 })
       .then(() => {
-        console.log('send chat message test');
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
         return localPeer.sendMessage(chatMessage);
@@ -47,7 +46,6 @@ describe('send chat messages', () => {
   it('should broadcast message to everyone', () => {
     cy.wrap(room.joinAll(), { timeout: 10000 })
       .then(() => {
-        console.log('send chat message test');
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
         return localPeer.sendMessage(chatMessage);
@@ -64,7 +62,6 @@ describe('send chat messages', () => {
   it('should send message to group of roles', () => {
     cy.wrap(room.joinAll(), { timeout: 10000 })
       .then(() => {
-        console.log('send chat message test');
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
         return localPeer.sendMessage(chatMessage, ['student']);
@@ -81,7 +78,6 @@ describe('send chat messages', () => {
   it('should send message to particular peer', () => {
     cy.wrap(room.joinAll(), { timeout: 10000 })
       .then(() => {
-        console.log('send chat message test');
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
         return localPeer.sendMessage(chatMessage, undefined, remotePeer.id);
