@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { HMSPeer, HMSTrack, HMSTrackID } from '@100mslive/hms-video-store';
+import { HMSPeer, HMSTrack, HMSTrackID, HMSVideoTrack, HMSScreenVideoTrack } from '@100mslive/hms-video-store';
 
 export const chunk = <T>(elements: T[], chunkSize: number, onlyOnePage: boolean) =>
   elements.reduce((resultArray: T[][], tile: T, index: number) => {
@@ -46,7 +46,7 @@ export const chunkElements = <T>({
   const chunks: T[][] = chunk<T>(elements, tilesInFirstPage, onlyOnePage);
   return chunks.map((ch, page) =>
     ch.map(element => {
-      const isLastPage = page === chunks.length - 1;
+      const isLastPage: boolean = page === chunks.length - 1;
       const width = isLastPageDifferentFromFirstPage && isLastPage ? lastPageWidth : defaultWidth;
       const height = isLastPageDifferentFromFirstPage && isLastPage ? lastPageHeight : defaultHeight;
       return { ...element, height, width };
@@ -80,7 +80,7 @@ export function mode(array: number[]): number | null {
   return maxEl;
 }
 
-export type TrackWithPeer = { track?: HMSTrack; peer: HMSPeer };
+export type TrackWithPeer = { track?: HMSVideoTrack | HMSScreenVideoTrack; peer: HMSPeer };
 
 /**
  * get the aspect ration occurring with the highest frequency
@@ -89,11 +89,8 @@ export type TrackWithPeer = { track?: HMSTrack; peer: HMSPeer };
 export const getModeAspectRatio = (tracks: TrackWithPeer[]): number | null =>
   mode(
     tracks
-      .filter(track => track.track?.type === 'video' && track.track?.width && track.track?.height)
+      .filter(track => track.track?.width && track.track?.height)
       .map(track => {
-        if (track.track?.type !== 'video') {
-          return 1;
-        }
         const width = track.track?.width;
         const height = track.track?.height;
         // Default to 1 if there are no video tracks
@@ -441,7 +438,7 @@ export const getVideoTracksFromPeers = (
     if (onlyAudioTrack) {
       peerTiles.push({ peer: peer });
     } else if (peer.videoTrack && tracks[peer.videoTrack]) {
-      peerTiles.push({ track: tracks[peer.videoTrack], peer: peer });
+      peerTiles.push({ track: tracks[peer.videoTrack] as HMSVideoTrack, peer: peer });
     } else if (!filterNonPublishingPeers) {
       peerTiles.push({ peer: peer });
     }
@@ -461,7 +458,7 @@ export const getVideoTracksFromPeers = (
       });
       // Don't show tile if screenshare only has audio
       if (screenShareTrackID) {
-        peerTiles.push({ track: tracks[screenShareTrackID], peer: peer });
+        peerTiles.push({ track: tracks[screenShareTrackID] as HMSScreenVideoTrack, peer: peer });
       }
     }
   }
