@@ -82,7 +82,6 @@ export class CypressPeer {
       settings,
     });
     await this.waitForPeerTracks(this.id);
-    console.log('***************');
     return `peer ${this.name} joined`;
   };
 
