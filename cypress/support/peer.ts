@@ -11,10 +11,14 @@ import {
   selectRoleByRoleName,
   selectRemotePeers,
   selectTrackByID,
+  selectHMSMessages,
+  selectBroadcastMessages,
+  selectMessagesByPeerID,
+  selectMessagesByRole,
 } from '@100mslive/hms-video-store';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
+import { IHMSStoreReadOnly } from '@100mslive/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
-import { HMSSdk } from '../../packages/hms-video-web/src';
+import { HMSSdk } from '@100mslive/hms-video/src';
 
 /**
  * helper for dealing with peers creates in cypress.
@@ -78,6 +82,7 @@ export class CypressPeer {
       settings,
     });
     await this.waitForPeerTracks(this.id);
+    console.log('***************');
     return `peer ${this.name} joined`;
   };
 
@@ -151,11 +156,51 @@ export class CypressPeer {
   sendMessage = async (msg: string, roles?: string[], peerid?: string) => {
     if (roles) {
       await this.actions.sendGroupMessage(msg, roles);
-    } else if (peerid) {
+    } else if (!roles && peerid) {
       await this.actions.sendDirectMessage(msg, peerid);
     } else {
       await this.actions.sendBroadcastMessage(msg);
     }
+  };
+
+  onSelectHMSMessages = async () => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length > 0) {
+          resolve(messages);
+        }
+      }, selectHMSMessages);
+    });
+  };
+
+  onselectMessagesByRole = async roles => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length > 0) {
+          resolve(messages);
+        }
+      }, selectMessagesByRole(roles));
+    });
+  };
+
+  onSelectBroadcastMessages = async () => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length > 0) {
+          resolve(messages);
+        }
+      }, selectBroadcastMessages);
+    });
+  };
+
+  onselectMessagesByPeerID = async peerid => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length > 0) {
+          resolve(messages);
+        }
+      }, selectMessagesByPeerID(peerid));
+    });
   };
 
   /**

@@ -27,36 +27,71 @@ describe('send chat messages', () => {
     }
   });
 
+  it('should send message to everyone', () => {
+    cy.wrap(room.joinAll(), { timeout: 10000 })
+      .then(() => {
+        console.log('send chat message test');
+        expect(localPeer.isConnected()).to.be.true;
+        expect(remotePeer.isConnected()).to.be.true;
+        return localPeer.sendMessage(chatMessage);
+      })
+      .then(() => {
+        return remotePeer.onSelectHMSMessages();
+      })
+      .then(messages => {
+        expect(messages[0].message).to.equal(chatMessage);
+        expect(messages[0].sender).to.equal(localPeer.id);
+      });
+  });
+
   it('should broadcast message to everyone', () => {
-    cy.wrap(room.joinAll()).then(() => {
-      expect(localPeer.isConnected()).to.be.true;
-      expect(remotePeer.isConnected()).to.be.true;
-      remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.equal(chatMessage);
-      }, selectHMSMessages);
-      localPeer.sendMessage(chatMessage);
-    });
+    cy.wrap(room.joinAll(), { timeout: 10000 })
+      .then(() => {
+        console.log('send chat message test');
+        expect(localPeer.isConnected()).to.be.true;
+        expect(remotePeer.isConnected()).to.be.true;
+        return localPeer.sendMessage(chatMessage);
+      })
+      .then(() => {
+        return remotePeer.onSelectBroadcastMessages();
+      })
+      .then(messages => {
+        expect(messages[0].message).to.equal(chatMessage);
+        expect(messages[0].sender).to.equal(localPeer.id);
+      });
   });
 
   it('should send message to group of roles', () => {
-    cy.wrap(room.joinAll()).then(() => {
-      expect(localPeer.isConnected()).to.be.true;
-      expect(remotePeer.isConnected()).to.be.true;
-      remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.equal(chatMessage);
-      }, selectMessagesByRole('student'));
-      localPeer.sendMessage(chatMessage, ['student']);
-    });
+    cy.wrap(room.joinAll(), { timeout: 10000 })
+      .then(() => {
+        console.log('send chat message test');
+        expect(localPeer.isConnected()).to.be.true;
+        expect(remotePeer.isConnected()).to.be.true;
+        return localPeer.sendMessage(chatMessage, ['student']);
+      })
+      .then(() => {
+        return remotePeer.onselectMessagesByRole('student');
+      })
+      .then(messages => {
+        expect(messages[0].message).to.equal(chatMessage);
+        expect(messages[0].sender).to.equal(localPeer.id);
+      });
   });
 
   it('should send message to particular peer', () => {
-    cy.wrap(room.joinAll()).then(() => {
-      expect(localPeer.isConnected()).to.be.true;
-      expect(remotePeer.isConnected()).to.be.true;
-      remotePeer.store.subscribe(messages => {
-        expect(messages[0]).to.equal(chatMessage);
-      }, selectMessagesByPeerID(remotePeer.id));
-      localPeer.sendMessage(chatMessage, undefined, remotePeer.id);
-    });
+    cy.wrap(room.joinAll(), { timeout: 10000 })
+      .then(() => {
+        console.log('send chat message test');
+        expect(localPeer.isConnected()).to.be.true;
+        expect(remotePeer.isConnected()).to.be.true;
+        return localPeer.sendMessage(chatMessage, undefined, remotePeer.id);
+      })
+      .then(() => {
+        return remotePeer.onselectMessagesByPeerID(localPeer.id);
+      })
+      .then(messages => {
+        expect(messages[0].message).to.equal(chatMessage);
+        expect(messages[0].sender).to.equal(localPeer.id);
+      });
   });
 });
