@@ -8,9 +8,9 @@ import {
 
 const REFRESH_MESSAGE = "refresh";
 
-export const usePinnedText = () => {
+export const usePinnedMessage = () => {
   const hmsActions = useHMSActions();
-  const pinnedText = useHMSStore(selectSessionMetadata)?.pinnedText;
+  const pinnedMessage = useHMSStore(selectSessionMetadata)?.pinnedMessage;
 
   const { sendEvent } = useCustomEvent({
     type: "metadata",
@@ -21,17 +21,17 @@ export const usePinnedText = () => {
     },
   });
 
-  const changePinnedText = useCallback(
+  const setPinnedMessage = useCallback(
     async newText => {
-      if (newText !== pinnedText) {
+      if (newText !== pinnedMessage) {
         await hmsActions.setSessionMetadata({
-          pinnedText: newText,
+          pinnedMessage: newText,
         });
         sendEvent(REFRESH_MESSAGE);
       }
     },
-    [hmsActions, pinnedText, sendEvent]
+    [hmsActions, pinnedMessage, sendEvent]
   );
 
-  return { pinnedText, changePinnedText };
+  return { pinnedMessage, setPinnedMessage };
 };

@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { ChevronDownIcon } from "@100mslive/react-icons";
+import { ChevronDownIcon, PinIcon } from "@100mslive/react-icons";
 import { useHMSActions } from "@100mslive/react-sdk";
-import { Button, Flex } from "@100mslive/react-ui";
+import { Box, Button, Flex, Text } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
-import { ChatBody } from "./ChatBody";
+import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { useUnreadCount } from "./useUnreadCount";
+import { usePinnedMessage } from "../hooks/usePinnedMessage";
 
 export const Chat = () => {
   const [chatOptions, setChatOptions] = useState({
@@ -17,6 +18,8 @@ export const Chat = () => {
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const bodyRef = useRef(null);
   const hmsActions = useHMSActions();
+  const { pinnedMessage, setPinnedMessage } = usePinnedMessage();
+
   const scrollToBottom = useCallback(
     (instant = false) => {
       if (!bodyRef.current) {
@@ -47,6 +50,19 @@ export const Chat = () => {
           setSelectorOpen(value => !value);
         }}
       />
+      {pinnedMessage && (
+        <Flex
+          css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
+          align="center"
+        >
+          <Box>
+            <PinIcon />
+          </Box>
+          <Text variant="sm" css={{ ml: "$8", color: "$textMedEmp" }}>
+            <AnnotisedMessage message={pinnedMessage} />
+          </Text>
+        </Flex>
+      )}
       <Flex
         direction="column"
         css={{
@@ -60,7 +76,11 @@ export const Chat = () => {
         }}
         ref={bodyRef}
       >
-        <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
+        <ChatBody
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+          setPinnedMessage={setPinnedMessage}
+        />
         <ScrollHandler
           scrollToBottom={scrollToBottom}
           role={chatOptions.role}

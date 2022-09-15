@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import {
   selectHMSMessages,
@@ -10,7 +10,16 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex, styled, Text, Tooltip } from "@100mslive/react-ui";
+import {
+  Box,
+  Dropdown,
+  Flex,
+  IconButton,
+  styled,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
+import { HorizontalMenuIcon, PinIcon } from "@100mslive/react-icons";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -130,13 +139,40 @@ const getMessageType = ({ roles, receiver }) => {
   return receiver ? "private" : "";
 };
 
+const ChatActions = ({ onPin }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Trigger asChild>
+        <IconButton>
+          <Tooltip title="More options">
+            <Box>
+              <HorizontalMenuIcon />
+            </Box>
+          </Tooltip>
+        </IconButton>
+      </Dropdown.Trigger>
+
+      <Dropdown.Content sideOffset={5} align="center" css={{ width: "$48" }}>
+        <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
+          <PinIcon />
+          <Text variant="sm" css={{ ml: "$4" }}>
+            Pin Message
+          </Text>
+        </Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+};
+
 const SenderName = styled("span", {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
 });
 
-const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
+const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -173,27 +209,31 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           fontWeight: "$semiBold",
           display: "inline-flex",
           alignItems: "baseline",
+          justifyContent: "space-between",
           width: "100%",
         }}
       >
-        {message.senderName === "You" || !message.senderName ? (
-          <SenderName>{message.senderName || "Anonymous"}</SenderName>
-        ) : (
-          <Tooltip title={message.senderName} side="top" align="start">
-            <SenderName>{message.senderName}</SenderName>
-          </Tooltip>
-        )}
-        <Text
-          as="span"
-          variant="sm"
-          css={{
-            ml: "$4",
-            color: "$textSecondary",
-            flexShrink: 0,
-          }}
-        >
-          {formatTime(message.time)}
-        </Text>
+        <Box>
+          {message.senderName === "You" || !message.senderName ? (
+            <SenderName>{message.senderName || "Anonymous"}</SenderName>
+          ) : (
+            <Tooltip title={message.senderName} side="top" align="start">
+              <SenderName>{message.senderName}</SenderName>
+            </Tooltip>
+          )}
+          <Text
+            as="span"
+            variant="sm"
+            css={{
+              ml: "$4",
+              color: "$textSecondary",
+              flexShrink: 0,
+            }}
+          >
+            {formatTime(message.time)}
+          </Text>
+        </Box>
+        <ChatActions onPin={onPin} />
       </Text>
       <MessageType
         hasCurrentUserSent={message.sender === localPeerId}
@@ -206,7 +246,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           w: "100%",
           mt: "$2",
           wordBreak: "break-word",
-          whiteSpace: "pre-wrap"
+          whiteSpace: "pre-wrap",
         }}
       >
         <AnnotisedMessage message={message.message} />
@@ -215,7 +255,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
   );
 });
 
-export const ChatBody = ({ role, peerId }) => {
+export const ChatBody = ({ role, peerId, setPinnedMessage }) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
@@ -248,6 +288,7 @@ export const ChatBody = ({ role, peerId }) => {
             key={message.id}
             message={message}
             autoMarginTop={index === 0}
+            onPin={() => setPinnedMessage(message.message)}
           />
         );
       })}
