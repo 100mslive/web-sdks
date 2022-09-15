@@ -18,7 +18,7 @@ import {
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import { settingOverflow } from './common.js';
+import { settingOverflow } from "./common.js";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
@@ -32,8 +32,8 @@ const Settings = () => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
-  const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype
-  
+  const shouldShowAudioOutput = "setSinkId" in HTMLMediaElement.prototype;
+
   return (
     <Box className={settingOverflow()}>
       {videoInput?.length ? (
@@ -70,7 +70,7 @@ const Settings = () => {
       ) : null}
       {audioInput?.length ? (
         <DeviceSelector
-          title={ shouldShowAudioOutput ? "Microphone" : "Audio" }
+          title={shouldShowAudioOutput ? "Microphone" : "Audio"}
           icon={<MicOnIcon />}
           devices={audioInput}
           selection={selectedDeviceIDs.audioInput}
