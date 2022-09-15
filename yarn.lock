@@ -1424,6 +1424,11 @@
   resolved "https://registry.yarnpkg.com/@emoji-mart/data/-/data-1.0.5.tgz#62c837f1384eb2f94bec4c0dcfe8d230cc67e81d"
   integrity sha512-HulW+jI7w3ghqRN4+i1LZYJ04bdsMJg5fJ7dr6rlVpsIYKmhpVA7/ACl9R3OB5aoMf8dqNdXftVss8qHCoOi+g==
 
+"@emoji-mart/react@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@emoji-mart/react/-/react-1.0.1.tgz#46b6a2e92faf16fa9b7f9471f137fa2e3d1e8ac3"
+  integrity sha512-ALhLD96BOL5w+a4NI5NpmfqfF1aVjjj2qJE0dLst/OhjBfVmpteWNgn/h8LZy9ulU6AnbeS+13KnPFzDjCvRRw==
+
 "@endemolshinegroup/cosmiconfig-typescript-loader@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@endemolshinegroup/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-3.0.2.tgz#eea4635828dde372838b0909693ebd9aafeec22d"
@@ -8851,10 +8856,10 @@ emittery@^0.7.1:
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.7.2.tgz#25595908e13af0f5674ab419396e2fb394cdfa82"
   integrity sha512-A8OG5SR/ij3SsJdWDJdkkSYUjQdCUx6APQXem0SaEePBSRg4eymGYwBkKo1Y6DU+af/Jn2dBQqDBvjnr9Vi8nQ==
 
-emoji-mart@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.1.0.tgz#8a36a872e1297747342d1385bd7b7141ac2f4365"
-  integrity sha512-ytXgeemyw4FormPQqWd35Vh06ZSnQFhVUqW51kASZzzjhQOPSGtiN3VCC7vDq94Pkxmsbet+Gps/qj5N90mEnw==
+emoji-mart@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.2.2.tgz#1c093ffc19554dd6edfcfeec9aca43ff38bcc16e"
+  integrity sha512-BvcrX+Ps9MxSVEjnvxupclU3MBD6WVC4WZOY26csfC6oFdaWpFhdrzeVNVBmCLPOmzY1SE0aAsqZJRNVbZ1yhQ==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
