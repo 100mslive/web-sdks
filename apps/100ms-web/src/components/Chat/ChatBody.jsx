@@ -85,11 +85,11 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
 };
 
 const URL_REGEX =
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 const Link = styled("a", {
   color: "$brandDefault",
-  wordBreak: "break-all",
+  wordBreak: "break-word",
   "&:hover": {
     textDecoration: "underline",
   },
@@ -104,7 +104,7 @@ const AnnotisedChat = ({ message }) => {
     <Fragment>
       {message
         .trim()
-        .split(" ")
+        .split(/(\s)/)
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link
@@ -113,10 +113,10 @@ const AnnotisedChat = ({ message }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {part}{" "}
+              {part}
             </Link>
           ) : (
-            `${part} `
+            part
           )
         )}
     </Fragment>
@@ -206,6 +206,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           w: "100%",
           mt: "$2",
           wordBreak: "break-word",
+          whiteSpace: "pre-wrap"
         }}
       >
         <AnnotisedChat message={message.message} />

@@ -32,7 +32,7 @@ import { isPageHidden } from '../../utils/support';
 import { sleep } from '../../utils/timer-utils';
 
 export default class JsonRpcSignal implements ISignal {
-  readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[SIGNAL]: ';
   readonly observer: ISignalEventsObserver;
   readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
@@ -59,7 +59,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
-    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue} }`);
+    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue}`);
     if (this._isConnected === newValue) {
       return;
     }

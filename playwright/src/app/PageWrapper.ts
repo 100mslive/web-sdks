@@ -6,6 +6,7 @@ import { Center } from './selectors/Center';
 import { Footer } from './selectors/Footer';
 
 export class PageWrapper {
+  [x: string]: any;
   private page: PlaywrightPage;
   localName: string;
   prepreview: PrePreviewPage;
@@ -130,6 +131,10 @@ export class PageWrapper {
     await this.page.close({ runBeforeUnload: true });
   }
 
+  async evaluateCommand(command: string) {
+    await this.page.evaluate(command);
+  }
+
   async endRoom() {
     try {
       await this.footer.endRoom();
@@ -144,9 +149,9 @@ export class PageWrapper {
     return currentUrl;
   }
 
-  async selectPopupOption(elementId: string) {
-    await this.page.locator('select').selectOption(elementId);
-  }
+  // async selectPopupOption(selectId: string, locatorId: string) {
+  //   await this.page.locator(locatorId).selectOption(selectId);
+  // }
 
   async assertLocalAudioState(enabled?: boolean) {
     await this.footer.assertLocalAudioState(enabled);
