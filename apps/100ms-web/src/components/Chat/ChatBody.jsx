@@ -7,6 +7,7 @@ import {
   selectMessagesByPeerID,
   selectMessagesByRole,
   selectPeerNameByID,
+  selectPermissions,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -176,10 +177,13 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
+  const permissions = useHMSStore(selectPermissions);
   const messageType = getMessageType({
     roles: message.recipientRoles,
     receiver: message.recipientPeer,
   });
+  // show pin action only if peer has remove others permission and the message is of broadcast type
+  const showPinAction = permissions.removeOthers && !messageType;
 
   useEffect(() => {
     if (message.id && !message.read && inView) {
@@ -233,7 +237,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
             {formatTime(message.time)}
           </Text>
         </Box>
-        <ChatActions onPin={onPin} />
+        {showPinAction && <ChatActions onPin={onPin} />}
       </Text>
       <MessageType
         hasCurrentUserSent={message.sender === localPeerId}
