@@ -32,7 +32,7 @@ test.skip(`Send msg to particular peer`, async () => {
 });
 
 test(`Send msg to peers with specific role`, async () => {
-  const msg = 'Hello, how are you ? ';
+  const msg = 'Hello, how are you ?';
   const roleName = 'audio-video-sshare';
   await pages[0].sendMessage(msg, roleName);
   for (let i = 1; i < peersCount; i++) {
