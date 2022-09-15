@@ -292,7 +292,7 @@ export const ChatBody = ({ role, peerId, setPinnedMessage }) => {
             key={message.id}
             message={message}
             autoMarginTop={index === 0}
-            onPin={() => setPinnedMessage(message.message)}
+            onPin={() => setPinnedMessage(message)}
           />
         );
       })}

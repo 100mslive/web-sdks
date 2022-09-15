@@ -1,16 +1,19 @@
 import { useCallback } from "react";
 import {
+  selectPeerNameByID,
   selectSessionMetadata,
   useCustomEvent,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from "@100mslive/react-sdk";
 
 const REFRESH_MESSAGE = "refresh";
 
 export const usePinnedMessage = () => {
   const hmsActions = useHMSActions();
-  const pinnedMessage = useHMSStore(selectSessionMetadata)?.pinnedMessage;
+  const vanillaStore = useHMSVanillaStore();
+  const pinnedMessage = useHMSStore(selectSessionMetadata);
 
   const { sendEvent } = useCustomEvent({
     type: "metadata",
@@ -22,15 +25,20 @@ export const usePinnedMessage = () => {
   });
 
   const setPinnedMessage = useCallback(
-    async newText => {
-      if (newText !== pinnedMessage) {
-        await hmsActions.setSessionMetadata({
-          pinnedMessage: newText,
-        });
+    /**
+     * @param {import("@100mslive/react-sdk").HMSMessage} message
+     */
+    async message => {
+      const peerName = vanillaStore.getState(
+        selectPeerNameByID(message.sender)
+      );
+      const newPinnedMessage = `${peerName}: ${message.message}`;
+      if (newPinnedMessage !== pinnedMessage) {
+        await hmsActions.setSessionMetadata(newPinnedMessage);
         sendEvent(REFRESH_MESSAGE);
       }
     },
-    [hmsActions, pinnedMessage, sendEvent]
+    [hmsActions, vanillaStore, pinnedMessage, sendEvent]
   );
 
   return { pinnedMessage, setPinnedMessage };
