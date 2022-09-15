@@ -12,7 +12,7 @@ test.afterEach(async () => {
 });
 
 test(`Send msg to everyone`, async () => {
-  const msg = 'Hello, how are you ? ';
+  const msg = 'Hello, how are you ?';
   await pages[0].sendMessage(msg, 'all');
   for (let i = 1; i < peersCount; i++) {
     await pages[i].click(pages[i].footer.chat_btn);
