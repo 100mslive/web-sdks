@@ -5,7 +5,6 @@ import {
   MicOffIcon,
   SettingsIcon,
   PencilIcon,
-  ClipIcon,
 } from "@100mslive/react-icons";
 import {
   selectLocalPeerID,
@@ -22,20 +21,16 @@ import { StatsForNerds } from "../StatsForNerds";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import IconButton from "../../IconButton";
-import { usePinnedText } from "../hooks/usePinnedText";
-import { ChangePinnedTextModal } from "./ChangePinnedModal";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const { pinnedText, changePinnedText } = usePinnedText();
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showMuteAll, setShowMuteAll] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
-  const [showChangePinnedModal, setShowChangePinnedModal] = useState(false);
 
   return (
     <Fragment>
@@ -77,15 +72,6 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
-          <Dropdown.Item
-            onClick={() => setShowChangePinnedModal(true)}
-            data-testid="change_pinned_btn"
-          >
-            <ClipIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
-              Change Pinned Text
-            </Text>
-          </Dropdown.Item>
           <Dropdown.ItemSeparator />
           <Dropdown.Item
             onClick={() => setShowDeviceSettings(true)}
@@ -126,13 +112,6 @@ export const MoreSettings = () => {
         <RoleChangeModal
           peerId={localPeerId}
           onOpenChange={setShowSelfRoleChange}
-        />
-      )}
-      {showChangePinnedModal && (
-        <ChangePinnedTextModal
-          onOpenChange={setShowChangePinnedModal}
-          pinnedText={pinnedText}
-          changePinnedText={changePinnedText}
         />
       )}
     </Fragment>
