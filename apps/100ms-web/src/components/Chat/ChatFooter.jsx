@@ -114,7 +114,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
             <EmojiIcon />
           </IconButton>
         </Popover.Trigger>
-        <Popover.Portal>
+        <Popover.Portal forceMount={showEmoji}>
           <Popover.Content
             alignOffset={-40}
             sideOffset={16}
