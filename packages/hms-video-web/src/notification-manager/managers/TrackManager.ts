@@ -4,9 +4,8 @@ import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType 
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
-import HMSLogger from '../../utils/logger';
-import { isTrackDegraded } from '../../utils/track';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
+import HMSLogger from '../../utils/logger';
 
 /**
  * Handles:
@@ -160,9 +159,13 @@ export class TrackManager {
     if (!peer) {
       return;
     }
-    HMSLogger.d(this.TAG, layerUpdate);
-    const isDegraded = isTrackDegraded(layerUpdate.expected_layer, layerUpdate.current_layer);
-    track.setLayerFromServer(layerUpdate.current_layer, isDegraded);
+    HMSLogger.d(
+      this.TAG,
+      'track layer update from sfu',
+      `expected_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
+      `subscriber_degraded: ${layerUpdate.subscriber_degraded}, publisher_degraded: ${layerUpdate.publisher_degraded}`,
+    );
+    const isDegraded = track.setLayerFromServer(layerUpdate);
     if (isDegraded) {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
     } else {

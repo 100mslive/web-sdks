@@ -35,9 +35,9 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string) {
+  setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string, source: string) {
     this.video = layer;
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Setting layer field to - ${layer}`);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `source: ${source} Setting layer field to - ${layer}`);
   }
 
   /**
@@ -46,8 +46,8 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string) {
-    this.setVideoLayerLocally(layer, identifier);
+  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+    this.setVideoLayerLocally(layer, identifier, source);
     HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Switching to ${layer} layer`);
     return this.connection.sendOverApiDataChannelWithResponse({
       params: {
