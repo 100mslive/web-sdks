@@ -155,6 +155,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
+    if (!this.enabled && targetLayer !== HMSSimulcastLayer.NONE) {
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier}`,
+        `Not sending update, ${targetLayer}, source=${source} because video disabled`,
+      );
+      return false;
+    }
     if (currLayer === targetLayer) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
