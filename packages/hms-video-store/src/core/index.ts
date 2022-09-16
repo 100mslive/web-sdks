@@ -17,6 +17,7 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
+  HMSSimulcastLayer,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 

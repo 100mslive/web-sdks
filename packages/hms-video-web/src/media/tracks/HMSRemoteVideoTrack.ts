@@ -75,7 +75,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
-    const isDegraded = layerUpdate.subscriber_degraded && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
+    const isDegraded = layerUpdate.subscriber_degraded || layerUpdate.publisher_degraded;
     this._degraded = isDegraded;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
