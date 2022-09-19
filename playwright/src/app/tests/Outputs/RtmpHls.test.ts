@@ -17,7 +17,8 @@ test.afterEach(async () => {
   await page.close();
 });
 
-test(`Start and Stop Browser Recording @qaonly @webhook`, async () => {
+test(`Start and Stop Browser Recording @qaonly`, async () => {
+
   await page.click(page.header.start_recording_btn, page.header.start_recording_confirm_btn);
 
   await page.clickWithTimeout(beamWaitTimeout, page.header.stop_recording_btn, page.header.stop_recording_confirm_btn);
