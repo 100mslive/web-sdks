@@ -158,7 +158,6 @@ export class CypressPeer {
     } else if (!roles && peerid) {
       await this.actions.sendDirectMessage(msg, peerid);
     } else {
-      console.log('Sent ********');
       await this.actions.sendBroadcastMessage(msg);
     }
   };
