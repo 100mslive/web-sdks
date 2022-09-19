@@ -84,7 +84,7 @@ const HLSView = () => {
       setIsFullScreen(!isFullScreen);
     }
   }
-  
+
   return (
     <Box
       key="hls-viewer"
