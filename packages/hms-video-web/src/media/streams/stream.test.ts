@@ -38,7 +38,7 @@ describe('HMSRemoteStream', () => {
   });
 
   it('sends data channel message when layer is switched', () => {
-    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test');
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'testSource');
     expect(sendOverApiDataChannelWithResponse.mock.calls.length).toBe(1);
     expectVideoSubscriptionMessage({
       track_id: videoTrackId,
@@ -63,7 +63,7 @@ describe('HMSRemoteStream', () => {
       track_id: audioTrackId,
       subscribed: false,
     });
-    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test');
+    stream.setVideoLayer(HMSSimulcastLayer.HIGH, videoTrackId, 'test', 'test source');
     expectVideoSubscriptionMessage({
       track_id: videoTrackId,
       max_spatial_layer: HMSSimulcastLayer.HIGH,
@@ -73,7 +73,7 @@ describe('HMSRemoteStream', () => {
       track_id: audioTrackId,
       subscribed: true,
     });
-    stream.setVideoLayer(HMSSimulcastLayer.MEDIUM, videoTrackId, 'test');
+    stream.setVideoLayer(HMSSimulcastLayer.MEDIUM, videoTrackId, 'test', 'testSource');
     expectVideoSubscriptionMessage({
       track_id: videoTrackId,
       max_spatial_layer: HMSSimulcastLayer.MEDIUM,
