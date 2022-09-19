@@ -162,7 +162,7 @@ export class CypressPeer {
     }
   };
 
-  onSelectHMSMessages = async () => {
+  onSelectHMSMessages = () => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
         if (messages.length) {
@@ -172,7 +172,7 @@ export class CypressPeer {
     });
   };
 
-  onselectMessagesByRole = async roles => {
+  onselectMessagesByRole = roles => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
         if (messages.length) {
@@ -182,7 +182,7 @@ export class CypressPeer {
     });
   };
 
-  onSelectBroadcastMessages = async () => {
+  onSelectBroadcastMessages = () => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
         if (messages.length) {
@@ -192,7 +192,7 @@ export class CypressPeer {
     });
   };
 
-  onselectMessagesByPeerID = async peerid => {
+  onselectMessagesByPeerID = peerid => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
         if (messages.length) {

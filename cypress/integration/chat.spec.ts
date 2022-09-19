@@ -30,7 +30,7 @@ describe('send chat messages', () => {
   });
 
   it('should send message to everyone', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
@@ -46,7 +46,7 @@ describe('send chat messages', () => {
   });
 
   it('should broadcast message to everyone', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
@@ -62,7 +62,7 @@ describe('send chat messages', () => {
   });
 
   it('should send message to group of roles', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
@@ -79,7 +79,7 @@ describe('send chat messages', () => {
   });
 
   it('should send message to particular peer id', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
@@ -95,7 +95,7 @@ describe('send chat messages', () => {
   });
 
   it('should not send peer message to everyone', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
@@ -108,7 +108,7 @@ describe('send chat messages', () => {
   });
 
   it('should not send group messages to everyone', () => {
-    cy.wrap(room.joinAll(), { timeout: 10000 })
+    cy.wrap(room.joinAll())
       .then(() => {
         expect(localPeer.isConnected()).to.be.true;
         expect(remotePeer.isConnected()).to.be.true;
