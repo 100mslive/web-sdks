@@ -2,6 +2,7 @@ import { CypressPeer } from '../support/peer';
 import { CypressRoom } from '../support/room';
 
 let token: string;
+let teacherToken: string;
 let localPeer: CypressPeer;
 let remotePeer: CypressPeer;
 let remotePeer2: CypressPeer;
@@ -13,12 +14,15 @@ describe('send chat messages', () => {
     cy.getToken().then(authToken => {
       token = authToken;
     });
+    cy.getToken('teacher').then(authToken => {
+      teacherToken = authToken;
+    });
   });
 
   beforeEach(() => {
     localPeer = new CypressPeer(token);
     remotePeer = new CypressPeer(token);
-    remotePeer2 = new CypressPeer(token);
+    remotePeer2 = new CypressPeer(teacherToken);
 
     room = new CypressRoom(localPeer, remotePeer, remotePeer2);
   });
@@ -115,7 +119,7 @@ describe('send chat messages', () => {
         return localPeer.sendMessage(chatMessage, ['student']);
       })
       .then(() => {
-        const messages = remotePeer.store.getState().messages.allIDs;
+        const messages = remotePeer2.store.getState().messages.allIDs;
         expect(messages.length).to.equal(0);
       });
   });
