@@ -39,7 +39,6 @@ describe('session metadata api', () => {
 
         cy.wrap(remotePeer.actions.populateSessionMetadata()).then(() => {
           cy.wrap(remotePeer.store.getState(selectSessionMetadata)).then(remotePeerMetadata => {
-            console.log(remotePeer.store.getState());
             expect(remotePeerMetadata).equal(TEST_METADATA);
           });
         });
