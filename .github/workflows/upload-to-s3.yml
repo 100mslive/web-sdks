@@ -26,6 +26,7 @@ on:
       - 'cypress/**'
       - 'playwright/**'
       - 'internal-docs/**'
+      - '.github/**'
 
 jobs:
   upload:
