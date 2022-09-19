@@ -1,6 +1,5 @@
 import { PageWrapper } from '../../PageWrapper';
 import { test } from '@playwright/test';
-test.describe.configure({ mode: 'serial' });
 
 let page: PageWrapper;
 const beamWaitTimeout = Number(process.env.beam_wait_timeout);
