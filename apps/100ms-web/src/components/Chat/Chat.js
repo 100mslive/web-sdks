@@ -1,13 +1,35 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { ChevronDownIcon, PinIcon } from "@100mslive/react-icons";
-import { useHMSActions } from "@100mslive/react-sdk";
+import {
+  selectSessionMetadata,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { Box, Button, Flex, Text } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { useUnreadCount } from "./useUnreadCount";
-import { usePinnedMessage } from "../hooks/usePinnedMessage";
+import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+
+const PinnedMessage = () => {
+  const pinnedMessage = useHMSStore(selectSessionMetadata);
+
+  return pinnedMessage ? (
+    <Flex
+      css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
+      align="center"
+    >
+      <Box>
+        <PinIcon />
+      </Box>
+      <Text variant="sm" css={{ ml: "$8", color: "$textMedEmp" }}>
+        <AnnotisedMessage message={pinnedMessage} />
+      </Text>
+    </Flex>
+  ) : null;
+};
 
 export const Chat = () => {
   const [chatOptions, setChatOptions] = useState({
@@ -18,7 +40,7 @@ export const Chat = () => {
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const bodyRef = useRef(null);
   const hmsActions = useHMSActions();
-  const { pinnedMessage, setPinnedMessage } = usePinnedMessage();
+  const { setPinnedMessage } = useSetPinnedMessage();
 
   const scrollToBottom = useCallback(
     (instant = false) => {
@@ -50,19 +72,7 @@ export const Chat = () => {
           setSelectorOpen(value => !value);
         }}
       />
-      {pinnedMessage && (
-        <Flex
-          css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
-          align="center"
-        >
-          <Box>
-            <PinIcon />
-          </Box>
-          <Text variant="sm" css={{ ml: "$8", color: "$textMedEmp" }}>
-            <AnnotisedMessage message={pinnedMessage} />
-          </Text>
-        </Flex>
-      )}
+      <PinnedMessage />
       <Flex
         direction="column"
         css={{

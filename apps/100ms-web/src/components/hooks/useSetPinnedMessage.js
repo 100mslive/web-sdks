@@ -10,7 +10,7 @@ import {
 
 const REFRESH_MESSAGE = "refresh";
 
-export const usePinnedMessage = () => {
+export const useSetPinnedMessage = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const pinnedMessage = useHMSStore(selectSessionMetadata);
@@ -41,5 +41,5 @@ export const usePinnedMessage = () => {
     [hmsActions, vanillaStore, pinnedMessage, sendEvent]
   );
 
-  return { pinnedMessage, setPinnedMessage };
+  return { setPinnedMessage };
 };
