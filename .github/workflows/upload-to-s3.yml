@@ -22,6 +22,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'cypress/**'
+      - 'playwright/**'
+      - 'internal-docs/**'
 
 jobs:
   upload:
