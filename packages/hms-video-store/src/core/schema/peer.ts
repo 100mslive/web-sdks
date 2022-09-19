@@ -84,7 +84,7 @@ export interface HMSScreenVideoTrack extends BaseTrack {
   degraded?: boolean;
 }
 
-export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack;
+export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack | HMSScreenAudioTrack;
 
 /**
  * HMS Speaker stores the details of peers speaking at any point of time along with
