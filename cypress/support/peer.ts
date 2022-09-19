@@ -158,6 +158,7 @@ export class CypressPeer {
     } else if (!roles && peerid) {
       await this.actions.sendDirectMessage(msg, peerid);
     } else {
+      console.log('Sent ********');
       await this.actions.sendBroadcastMessage(msg);
     }
   };
@@ -165,7 +166,7 @@ export class CypressPeer {
   onSelectHMSMessages = async () => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
-        if (messages.length > 0) {
+        if (messages.length) {
           resolve(messages);
         }
       }, selectHMSMessages);
@@ -175,7 +176,7 @@ export class CypressPeer {
   onselectMessagesByRole = async roles => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
-        if (messages.length > 0) {
+        if (messages.length) {
           resolve(messages);
         }
       }, selectMessagesByRole(roles));
@@ -185,7 +186,7 @@ export class CypressPeer {
   onSelectBroadcastMessages = async () => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
-        if (messages.length > 0) {
+        if (messages.length) {
           resolve(messages);
         }
       }, selectBroadcastMessages);
@@ -195,7 +196,7 @@ export class CypressPeer {
   onselectMessagesByPeerID = async peerid => {
     return new Promise(resolve => {
       this.store.subscribe(messages => {
-        if (messages.length > 0) {
+        if (messages.length) {
           resolve(messages);
         }
       }, selectMessagesByPeerID(peerid));
