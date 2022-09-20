@@ -1,27 +1,20 @@
 
 FROM node:18-alpine AS builder
-ENV NODE_ENV production
 # Add a work directory
 WORKDIR /100ms-web
 
 # Copy app files
 COPY . .
 
-# Copy package.json and yarn.lock
-COPY package.json .
-COPY yarn.lock .
+RUN yarn install
 
-# production=false is needed. Otherwise,
-# since we have set NODE_ENV to poduction,
-# yarn won't install dev dependencies needed
-# for building the app.
-RUN yarn install --production=false
+ENV NODE_ENV production
+
 # Build the app
 RUN yarn build
 
 # Bundle static assets with nginx
 FROM nginx:1.23.1-alpine as production
-ENV NODE_ENV production
 # Copy built assets from builder
 COPY --from=builder /100ms-web/build /usr/share/nginx/html
 

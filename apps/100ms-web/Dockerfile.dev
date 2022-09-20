@@ -2,16 +2,12 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package.json ./
-
-COPY yarn.lock ./
+COPY . .
 
 RUN yarn install
 
-COPY . .
+RUN yarn start
 
 ENV PORT=8080
 
 EXPOSE 8080
-
-CMD ["npx", "http-server", "build"]
