@@ -88,7 +88,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     });
   }
 
-  join(...args: any[]): void {
+  async join(...args: any[]): Promise<void> {
     const joinParams = args[0];
     if (!(joinParams.username && joinParams.role && joinParams.roomId)) {
       this.log('invalid params');

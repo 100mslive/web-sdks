@@ -19,7 +19,7 @@ const GoLiveButton = () => {
   const { isStreamingOn, isBrowserRecordingOn } = useRecordingStreaming();
   const isHLSStartedFromUI = useIsHLSStartedFromUI();
   const isRTMPStartedFromUI = useIsRTMPStartedFromUI();
-  let tooltipText = "Start Streaming";
+  let tooltipText = "Start streaming";
   if (isHLSStartedFromUI || isRTMPStartedFromUI) {
     if (isHLSStartedFromUI) {
       tooltipText = "HLS start in progress";
@@ -34,6 +34,7 @@ const GoLiveButton = () => {
   return (
     <Tooltip title={tooltipText}>
       <Button
+        data-testid="go_live"
         variant={isStreamingSidepaneOpen ? "standard" : "primary"}
         onClick={toggleStreaming}
         icon

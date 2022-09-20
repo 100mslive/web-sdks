@@ -49,7 +49,7 @@ export interface usePreviewResult {
   /**
    * call this function to join the room
    */
-  join: () => void;
+  join: () => Promise<void>;
   /**
    * once the user has joined the room, till leave happens this flag will be true. It can be used
    * to decide to show between preview form and conferencing component/video tiles.
@@ -58,7 +58,7 @@ export interface usePreviewResult {
   /**
    * call this function to join the room
    */
-  preview: () => void;
+  preview: () => Promise<void>;
 }
 
 /**
@@ -93,31 +93,29 @@ export const usePreviewJoin = ({
     };
   }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview]);
 
-  const preview = useCallback(() => {
-    (async () => {
-      if (!token) {
-        return;
-      }
-      if (roomState !== HMSRoomState.Disconnected) {
-        return;
-      }
-      if (isConnected) {
-        await actions.leave();
-      }
-      try {
-        await actions.preview(config);
-      } catch (err) {
-        handleError(err as Error, 'preview');
-      }
-    })();
+  const preview = useCallback(async () => {
+    if (!token) {
+      return;
+    }
+    if (roomState !== HMSRoomState.Disconnected) {
+      return;
+    }
+    if (isConnected) {
+      await actions.leave();
+    }
+    try {
+      await actions.preview(config);
+    } catch (err) {
+      handleError(err as Error, 'preview');
+    }
   }, [actions, handleError, token, roomState, config, isConnected]);
 
-  const join = useCallback(() => {
+  const join = useCallback(async () => {
     if (!token) {
       return;
     }
     try {
-      actions.join(config);
+      await actions.join(config);
     } catch (err) {
       handleError(err as Error, 'join');
     }

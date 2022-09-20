@@ -10,7 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex, styled, Text } from "@100mslive/react-ui";
+import { Box, Flex, styled, Text, Tooltip } from "@100mslive/react-ui";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -85,11 +85,11 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
 };
 
 const URL_REGEX =
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 const Link = styled("a", {
   color: "$brandDefault",
-  wordBreak: "break-all",
+  wordBreak: "break-word",
   "&:hover": {
     textDecoration: "underline",
   },
@@ -104,7 +104,7 @@ const AnnotisedChat = ({ message }) => {
     <Fragment>
       {message
         .trim()
-        .split(" ")
+        .split(/(\s)/)
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link
@@ -113,10 +113,10 @@ const AnnotisedChat = ({ message }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {part}{" "}
+              {part}
             </Link>
           ) : (
-            `${part} `
+            part
           )
         )}
     </Fragment>
@@ -129,6 +129,12 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? "private" : "";
 };
+
+const SenderName = styled("span", {
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+});
 
 const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
@@ -161,11 +167,33 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
       key={message.time}
       data-testid="chat_msg"
     >
-      <Text css={{ color: "$textHighEmp", fontWeight: "$semiBold" }}>
-        {message.senderName || "Anonymous"}
-      </Text>
-      <Text variant="sm" css={{ ml: "$4", color: "$textSecondary" }}>
-        {formatTime(message.time)}
+      <Text
+        css={{
+          color: "$textHighEmp",
+          fontWeight: "$semiBold",
+          display: "inline-flex",
+          alignItems: "baseline",
+          width: "100%",
+        }}
+      >
+        {message.senderName === "You" || !message.senderName ? (
+          <SenderName>{message.senderName || "Anonymous"}</SenderName>
+        ) : (
+          <Tooltip title={message.senderName} side="top" align="start">
+            <SenderName>{message.senderName}</SenderName>
+          </Tooltip>
+        )}
+        <Text
+          as="span"
+          variant="sm"
+          css={{
+            ml: "$4",
+            color: "$textSecondary",
+            flexShrink: 0,
+          }}
+        >
+          {formatTime(message.time)}
+        </Text>
       </Text>
       <MessageType
         hasCurrentUserSent={message.sender === localPeerId}
@@ -178,6 +206,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false }) => {
           w: "100%",
           mt: "$2",
           wordBreak: "break-word",
+          whiteSpace: "pre-wrap"
         }}
       >
         <AnnotisedChat message={message.message} />

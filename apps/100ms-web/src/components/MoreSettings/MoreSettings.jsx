@@ -37,13 +37,14 @@ export const MoreSettings = () => {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
-            <Tooltip title="More Options">
+            <Tooltip title="More options">
               <Box>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
+
         <Dropdown.Content
           sideOffset={5}
           align="center"

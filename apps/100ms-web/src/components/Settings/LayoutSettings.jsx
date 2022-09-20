@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback } from "react";
-import { Flex, Slider, Text } from "@100mslive/react-ui";
+import { Flex, Slider, Text, Box  } from "@100mslive/react-ui";
 import {
   selectIsLocalScreenShared,
   selectIsLocalVideoEnabled,
@@ -13,12 +13,13 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from "../../common/constants";
+import { settingOverflow } from './common.js';
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [{ isAudioOnly, uiViewMode, maxTileCount }, setUISettings] =
+  const [{ isAudioOnly, uiViewMode, maxTileCount, mirrorLocalVideo }, setUISettings] =
     useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
@@ -33,7 +34,7 @@ export const LayoutSettings = () => {
   );
 
   return (
-    <Fragment>
+    <Box className={settingOverflow()}>
       <SwitchWithLabel
         checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
         onChange={value => {
@@ -51,6 +52,16 @@ export const LayoutSettings = () => {
         id="audioOnlyMode"
         checked={isAudioOnly}
         onChange={toggleIsAudioOnly}
+      />
+      <SwitchWithLabel
+        label="Mirror Local Video"
+        id="mirrorMode"
+        checked={mirrorLocalVideo}
+        onChange={value => {
+          setUISettings({
+            [UI_SETTINGS.mirrorLocalVideo]: value,
+          });
+        }}
       />
       <Flex
         align="center"
@@ -72,6 +83,6 @@ export const LayoutSettings = () => {
           />
         </Flex>
       </Flex>
-    </Fragment>
+    </Box>
   );
 };
