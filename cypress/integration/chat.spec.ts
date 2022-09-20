@@ -1,3 +1,4 @@
+import { selectBroadcastMessages } from '@100mslive/hms-video-store';
 import { CypressPeer } from '../support/peer';
 import { CypressRoom } from '../support/room';
 
@@ -106,7 +107,7 @@ describe('send chat messages', () => {
         return localPeer.sendMessage(chatMessage, undefined, remotePeer.id);
       })
       .then(() => {
-        const messages = remotePeer2.store.getState().messages.allIDs;
+        const messages = remotePeer2.store.getState(selectBroadcastMessages);
         expect(messages.length).to.equal(0);
       });
   });
@@ -119,7 +120,7 @@ describe('send chat messages', () => {
         return localPeer.sendMessage(chatMessage, ['student']);
       })
       .then(() => {
-        const messages = remotePeer2.store.getState().messages.allIDs;
+        const messages = remotePeer2.store.getState(selectBroadcastMessages);
         expect(messages.length).to.equal(0);
       });
   });
