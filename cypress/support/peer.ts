@@ -11,10 +11,14 @@ import {
   selectRoleByRoleName,
   selectRemotePeers,
   selectTrackByID,
+  selectHMSMessages,
+  selectBroadcastMessages,
+  selectMessagesByPeerID,
+  selectMessagesByRole,
 } from '@100mslive/hms-video-store';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
+import { IHMSStoreReadOnly } from '@100mslive/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
-import { HMSSdk } from '../../packages/hms-video-web/src';
+import { HMSSdk } from '@100mslive/hms-video/src';
 
 /**
  * helper for dealing with peers creates in cypress.
@@ -146,6 +150,56 @@ export class CypressPeer {
 
   isInPreview = () => {
     return this.store.getState(selectIsInPreview);
+  };
+
+  sendMessage = async (msg: string, roles?: string[], peerid?: string) => {
+    if (roles) {
+      await this.actions.sendGroupMessage(msg, roles);
+    } else if (!roles && peerid) {
+      await this.actions.sendDirectMessage(msg, peerid);
+    } else {
+      await this.actions.sendBroadcastMessage(msg);
+    }
+  };
+
+  onSelectHMSMessages = () => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length) {
+          resolve(messages);
+        }
+      }, selectHMSMessages);
+    });
+  };
+
+  onselectMessagesByRole = roles => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length) {
+          resolve(messages);
+        }
+      }, selectMessagesByRole(roles));
+    });
+  };
+
+  onSelectBroadcastMessages = () => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length) {
+          resolve(messages);
+        }
+      }, selectBroadcastMessages);
+    });
+  };
+
+  onselectMessagesByPeerID = peerid => {
+    return new Promise(resolve => {
+      this.store.subscribe(messages => {
+        if (messages.length) {
+          resolve(messages);
+        }
+      }, selectMessagesByPeerID(peerid));
+    });
   };
 
   /**
