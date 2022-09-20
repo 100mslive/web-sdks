@@ -37,9 +37,6 @@ export const decorators = [
         <HMSThemeProvider
           type={useDarkMode() ? 'dark' : 'light'}
           theme={{
-            colors: {
-              brandDefault: themeConfig.color,
-            },
             fonts: {
               sans: [themeConfig.font, 'Inter', 'sans-serif'],
             },
