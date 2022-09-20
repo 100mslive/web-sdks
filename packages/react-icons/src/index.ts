@@ -165,6 +165,7 @@ export { default as PersonContactIcon } from './PersonContactIcon';
 export { default as PersonIcon } from './PersonIcon';
 export { default as PhoneIcon } from './PhoneIcon';
 export { default as PhotoIcon } from './PhotoIcon';
+export { default as PinIcon } from './PinIcon';
 export { default as PlayCircleIcon } from './PlayCircleIcon';
 export { default as PlayIcon } from './PlayIcon';
 export { default as PlaySolidIcon } from './PlaySolidIcon';

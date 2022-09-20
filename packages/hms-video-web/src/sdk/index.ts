@@ -766,6 +766,15 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.updateLocalPeer({ metadata });
   }
 
+  async setSessionMetadata(metadata: any) {
+    await this.transport.setSessionMetadata(metadata);
+  }
+
+  async getSessionMetadata() {
+    const response = await this.transport.getSessionMetadata();
+    return response.data;
+  }
+
   getRoles(): HMSRole[] {
     return Object.values(this.store.getKnownRoles());
   }
