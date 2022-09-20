@@ -10,7 +10,14 @@ import {
   HMSTrackType,
 } from '../../core';
 import { HMSSimulcastLayer } from '../../core/hmsSDKStore/sdkTypes';
-import { HMSAudioTrack, HMSPlaylist, HMSPlaylistType, HMSRole, HMSScreenVideoTrack, HMSVideoTrack } from '../../core/schema';
+import {
+  HMSAudioTrack,
+  HMSPlaylist,
+  HMSPlaylistType,
+  HMSRole,
+  HMSScreenVideoTrack,
+  HMSVideoTrack,
+} from '../../core/schema';
 
 function makeTrack(
   id: HMSTrackID,

@@ -317,7 +317,9 @@ export const selectPeerSharingAudioPlaylist = createSelector(selectPeersMap, sel
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
  */
-export const selectDegradedTracks = createSelector(selectTracks, tracks => (tracks as HMSVideoTrack[]).filter(isDegraded));
+export const selectDegradedTracks = createSelector(selectTracks, tracks =>
+  (tracks as HMSVideoTrack[]).filter(isDegraded),
+);
 
 /**
  * Select the number of messages(sent and received).
