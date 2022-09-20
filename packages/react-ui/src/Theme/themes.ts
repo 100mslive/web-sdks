@@ -16,8 +16,6 @@ export const darkTheme = {
     transparentBg: 'rgba(0, 0, 0, 0.22)',
     mainBg: '$black',
     tileBg: '#0F1115',
-    surfaceDefault: '#14171C',
-    surfaceDark: '#0F1115',
     secondaryDisabled: '#F6F7F9',
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
