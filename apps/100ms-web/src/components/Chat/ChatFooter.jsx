@@ -122,6 +122,8 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
             }
           }
         }}
+        autocomplete="off"
+        aria-autocomplete="none"
       />
       <EmojiPicker
         onSelect={emoji => {

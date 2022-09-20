@@ -43,7 +43,9 @@
     "start": "webpack serve",
     "esbuild": "node ../../scripts/build-webapp",
     "dev": "node ../../scripts/dev-webapp",
-    "format": "prettier -w src"
+    "format": "prettier -w src",
+    "lint": "eslint -c .eslintrc",
+    "lint:fix": "yarn lint --fix"
   },
   "browserslist": {
     "production": [
