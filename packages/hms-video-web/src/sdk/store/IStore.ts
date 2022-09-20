@@ -41,6 +41,7 @@ export interface IStore {
   getRoom(): HMSRoom;
   getPolicyForRole(role: string): HMSRole;
   getKnownRoles(): KnownRoles;
+  setSimulcastEnabled(enabled: boolean): void;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
   getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;

@@ -45,9 +45,14 @@ class Store implements IStore {
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
+  private simulcastEnabled = false;
 
   getConfig() {
     return this.config;
+  }
+
+  setSimulcastEnabled(enabled: boolean) {
+    this.simulcastEnabled = enabled;
   }
 
   getEnv() {
@@ -265,6 +270,9 @@ class Store implements IStore {
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
+    if (!this.simulcastEnabled) {
+      return [];
+    }
     if (source === 'screen') {
       return this.screenshareLayers?.layers || [];
     }
@@ -300,15 +308,21 @@ class Store implements IStore {
   }
 
   setVideoSimulcastLayers(simulcastLayers: SimulcastLayers): void {
+    if (!this.simulcastEnabled) {
+      return;
+    }
     this.videoLayers = this.convertSimulcastLayers(simulcastLayers);
   }
 
   setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
+    if (!this.simulcastEnabled) {
+      return;
+    }
     this.screenshareLayers = this.convertSimulcastLayers(simulcastLayers);
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    if (!peer.role) {
+    if (!peer.role || !this.simulcastEnabled) {
       return [];
     }
 
