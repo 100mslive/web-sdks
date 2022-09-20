@@ -23,14 +23,11 @@ COPY --from=builder /100ms-web/build /usr/share/nginx/html
 # the app. Feel free to add more as per your needs.
 ENV REACT_APP_TILE_SHAPE=1-1
 ENV REACT_APP_THEME=dark
-ENV REACT_APP_SHOW_CHAT='true'
-ENV REACT_APP_SHOW_SCREENSHARE='true'
-ENV REACT_APP_ENABLE_STATS_FOR_NERDS='true'
-ENV REACT_APP_VIDEO_AVATAR='true'
+ENV REACT_APP_COLOR=#2F80FF
+ENV REACT_APP_FONT=Inter
 ENV REACT_APP_ENABLE_HLS_QUALITY_LVL='true'
 ENV REACT_APP_TOKEN_GENERATION_ENDPOINT='https://prod-in2.100ms.live/hmsapi/raam.app.100ms.live/'
 ENV REACT_APP_ENV=prod
-ENV REACT_APP_HEADLESS_JOIN='false'
 
 # Add your nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
