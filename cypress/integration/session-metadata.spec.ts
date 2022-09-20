@@ -33,7 +33,6 @@ describe('session metadata api', () => {
     cy.wrap(room.joinAll()).then(() => {
       cy.wrap(localPeer.actions.setSessionMetadata(TEST_METADATA)).then(() => {
         cy.wrap(localPeer.store.getState(selectSessionMetadata)).then(localPeerMetadata => {
-          console.log(localPeer.store.getState());
           expect(localPeerMetadata).equal(TEST_METADATA);
         });
 
