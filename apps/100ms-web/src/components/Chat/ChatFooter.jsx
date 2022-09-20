@@ -107,6 +107,8 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
             }
           }
         }}
+        autocomplete="off"
+        aria-autocomplete="none"
       />
       <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
         <Popover.Trigger asChild css={{ appearance: "none" }}>
@@ -117,6 +119,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         <Popover.Content
           alignOffset={-40}
           sideOffset={16}
+          align="end"
           css={{
             p: 0,
             "em-emoji-picker": {
