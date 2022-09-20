@@ -73,9 +73,6 @@ import {
   selectConnectionQualities,
   selectAppData,
   selectFullAppData,
-  HMSAudioTrack,
-  HMSScreenVideoTrack,
-  HMSVideoTrack,
 } from '../../core';
 
 let fakeStore: HMSStore;
@@ -244,11 +241,11 @@ describe('by ID selectors', () => {
   });
 
   test('selectAudioVolumeByPeerID', () => {
-    expect(selectAudioVolumeByPeerID(localPeer.id)(fakeStore)).toBe((localAudio as HMSAudioTrack).volume);
+    expect(selectAudioVolumeByPeerID(localPeer.id)(fakeStore)).toBe(localAudio.volume);
   });
 
   test('selectAudioVolumeByTrackID', () => {
-    expect(selectAudioTrackVolume(localPeer.audioTrack)(fakeStore)).toBe((localAudio as HMSAudioTrack).volume);
+    expect(selectAudioTrackVolume(localPeer.audioTrack)(fakeStore)).toBe(localAudio.volume);
   });
 
   test('selectLocallyMutedByPeerID', () => {
@@ -261,7 +258,7 @@ describe('by ID selectors', () => {
 
   test('selectSimulcastLayerByTrack', () => {
     const peer = selectRemotePeers(fakeStore);
-    const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore) as HMSVideoTrack | HMSScreenVideoTrack;
+    const track = selectVideoTrackByPeerID(peer[0].id)(fakeStore);
     expect(selectSimulcastLayerByTrack(track?.id)(fakeStore)).toBe(track?.layer);
   });
 

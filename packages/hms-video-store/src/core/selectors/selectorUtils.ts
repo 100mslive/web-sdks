@@ -1,4 +1,4 @@
-import { HMSPeer, HMSStore, HMSTrack, HMSTrackID } from '../schema';
+import { HMSPeer, HMSScreenVideoTrack, HMSStore, HMSTrack, HMSTrackID, HMSVideoTrack } from '../schema';
 
 type trackCheck = (track: HMSTrack | undefined) => boolean | undefined;
 
@@ -41,8 +41,8 @@ export function isVideoPlaylist(track: HMSTrack | undefined) {
   return track && track.source === 'videoplaylist';
 }
 
-export function isDegraded(track: HMSTrack | undefined) {
-  if (track?.type === 'video') {
+export function isDegraded(track: HMSVideoTrack | HMSScreenVideoTrack) {
+  if (track) {
     return Boolean(track?.degraded);
   }
   return false;

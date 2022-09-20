@@ -1,20 +1,23 @@
-import { HMSAudioTrack, HMSPeer, HMSTrack, HMSVideoTrack, HMSTrackType } from '../core';
+import { HMSAudioTrack, HMSPeer, HMSVideoTrack, HMSTrackType } from '../core';
 
 let counter = 100;
-
-export const makeFakeTrack = (type?: HMSTrackType): HMSTrack => {
+type HMSObjectType<T> = 
+  T extends "audio" ? HMSAudioTrack :
+  T extends "video" ? HMSVideoTrack :
+  HMSVideoTrack;
+export const makeFakeTrack = <T extends HMSTrackType>(type?: HMSTrackType): HMSObjectType<T> => {
   if (type === 'audio') {
     return {
       enabled: false,
       id: String(counter++),
       type: type,
-    } as HMSAudioTrack;
+    } as HMSObjectType<T>;
   } else {
     return {
       enabled: false,
       id: String(counter++),
       type: type || 'video',
-    } as HMSVideoTrack;
+    } as HMSObjectType<T>;
   }
 };
 
