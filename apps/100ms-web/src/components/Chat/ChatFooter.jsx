@@ -22,6 +22,7 @@ const TextArea = styled("textarea", {
 // function EmojiPicker({ onSelect }) {
 //   const ref = useRef();
 //   const pickerRef = useRef(null);
+//   const [showEmoji, setShowEmoji] = useState(false);
 
 //   useEffect(() => {
 //     if (!pickerRef.current) {
@@ -36,14 +37,37 @@ const TextArea = styled("textarea", {
 //     }
 //   }, []); //eslint-disable-line
 
-//   return <Box ref={ref} />;
+//   return (
+//     <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
+//       <Popover.Trigger asChild css={{ appearance: "none" }}>
+//         <IconButton as="div">
+//           <EmojiIcon />
+//         </IconButton>
+//       </Popover.Trigger>
+//       <Popover.Portal forceMount={showEmoji}>
+//         <Popover.Content
+//           alignOffset={-40}
+//           sideOffset={16}
+//           align="end"
+//           css={{
+//             p: 0,
+//             "em-emoji-picker": {
+//               width: "100%",
+//               "--rgb-background": "transparent",
+//             },
+//           }}
+//         >
+//           <Box ref={ref} />
+//         </Popover.Content>
+//       </Popover.Portal>
+//     </Popover.Root>
+//   );
 // }
 
 export const ChatFooter = ({ role, peerId, onSend, children }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
-  // const [showEmoji, setShowEmoji] = useState(false);
 
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
@@ -108,33 +132,11 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
           }
         }}
       />
-      {/* <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
-        <Popover.Trigger asChild css={{ appearance: "none" }}>
-          <IconButton as="div">
-            <EmojiIcon />
-          </IconButton>
-        </Popover.Trigger>
-        <Popover.Portal forceMount={showEmoji}>
-          <Popover.Content
-            alignOffset={-40}
-            sideOffset={16}
-            align="end"
-            css={{
-              p: 0,
-              "em-emoji-picker": {
-                width: "100%",
-                "--rgb-background": "transparent",
-              },
-            }}
-          >
-            <EmojiPicker
-              onSelect={emoji => {
-                inputRef.current.value += ` ${emoji.native} `;
-              }}
-            />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root> */}
+      {/* <EmojiPicker
+        onSelect={emoji => {
+          inputRef.current.value += ` ${emoji.native} `;
+        }}
+      /> */}
       <IconButton
         onClick={sendMessage}
         css={{ ml: "auto", height: "max-content", mr: "$4" }}
