@@ -576,6 +576,22 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
+  async setSessionMetadata(metadata: any, options = { localOnly: false }) {
+    if (!options.localOnly) {
+      await this.sdk.setSessionMetadata(metadata);
+    }
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, `setSessionMetadata${options.localOnly ? 'LocalOnly' : ''}`);
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
