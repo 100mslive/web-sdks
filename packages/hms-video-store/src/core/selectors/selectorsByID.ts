@@ -52,24 +52,37 @@ const selectVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
   return null;
 });
 
-const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID ? (storeTracks[trackID].type === 'audio' ? (storeTracks[trackID] as HMSAudioTrack) : null) : null,
-);
+const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) => {
+  if (!trackID) {
+    return null;
+  }
+  const track = storeTracks[trackID] as HMSAudioTrack;
+  if (track.type === 'audio') {
+    return track;
+  }
+  return null;
+});
 
-const selectScreenAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID
-    ? storeTracks[trackID].type === 'audio' && storeTracks[trackID].source === 'screen'
-      ? (storeTracks[trackID] as HMSAudioTrack)
-      : null
-    : null,
-);
-const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) =>
-  trackID
-    ? storeTracks[trackID].type === 'video' && storeTracks[trackID].source === 'screen'
-      ? (storeTracks[trackID] as HMSScreenVideoTrack)
-      : null
-    : null,
-);
+const selectScreenAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) => {
+  if (!trackID) {
+    return null;
+  }
+  const track = storeTracks[trackID] as HMSAudioTrack;
+  if (track.type === 'audio' && track.source === 'screen') {
+    return track;
+  }
+  return null;
+});
+const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID], (storeTracks, trackID) => {
+  if (!trackID) {
+    return null;
+  }
+  const track = storeTracks[trackID] as HMSScreenVideoTrack;
+  if (track.type === 'video' && track.source === 'screen') {
+    return track;
+  }
+  return null;
+});
 
 /**
  * Select the {@link HMSPeer} object given a peer ID.
