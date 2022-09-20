@@ -40,6 +40,8 @@ export enum HMSSignalMethod {
   START_HLS_STREAMING = 'hls-start',
   STOP_HLS_STREAMING = 'hls-stop',
   HLS_TIMED_METADATA = 'hls-timed-metadata',
+  SET_METADATA = 'set-metadata',
+  GET_METADATA = 'get-metadata',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {
