@@ -147,7 +147,7 @@ const setupEnv = () => {
     const baseUrl = process.env.base_url;
 
     const getUrl = (role: string) => {
-      return baseUrl + '/' + roomId + '/' + role;
+      return `${baseUrl}/${roomId}/${role}`;
     };
 
     console.log('env setup before all tests for worker - ', workerIndex, baseUrl, roomId);
