@@ -25,6 +25,8 @@ export interface useCustomEventInput<T> {
    * Set it to `false` if you want to send/receive only string messages
    *
    * Set it to `true` if you want to send/receive objects
+   *
+   * default value is true
    */
   json?: boolean;
   /**
@@ -54,6 +56,8 @@ export interface useCustomEventResult<T> {
    */
   sendEvent: (data: T, receiver?: EventReceiver) => void;
 }
+
+const stringifyData = <T>(data: T, json: boolean) => (json ? JSON.stringify(data || '') : (data as string));
 
 /**
  * A generic function to implement [custom events](https://www.100ms.live/docs/javascript/v2/features/chat#custom-events) in your UI.
@@ -93,13 +97,11 @@ export const useCustomEvent = <T>({
     return unsubscribe;
   }, [notifications, type, json, onEvent, handleError]);
 
-  const stringifyData = useCallback((data: T) => (json ? JSON.stringify(data || '') : (data as string)), [json]);
-
   // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
     async (data: T, receiver?: EventReceiver) => {
       try {
-        const dataStr = stringifyData(data);
+        const dataStr = stringifyData<T>(data, json);
         if (receiver && Array.isArray(receiver?.roleNames)) {
           await actions.sendGroupMessage(dataStr, receiver.roleNames, type);
         } else if (typeof receiver?.peerId === 'string') {
@@ -112,7 +114,7 @@ export const useCustomEvent = <T>({
         handleError(err as Error, 'sendCustomEvent');
       }
     },
-    [actions, handleError, onEvent, type, stringifyData],
+    [actions, handleError, onEvent, type, json],
   );
 
   return { sendEvent };
