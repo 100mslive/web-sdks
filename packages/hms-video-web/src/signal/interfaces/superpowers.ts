@@ -50,6 +50,10 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
+export interface SessionMetadataUpdateParams {
+  data?: any;
+}
+
 export interface HLSRequestParams {
   variants?: Array<HLSVariant>;
   hls_recording?: {

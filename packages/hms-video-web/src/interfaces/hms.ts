@@ -49,6 +49,11 @@ export default interface HMS {
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
 
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
+
   /**
    * @deprecated The method should not be used
    * @see sendBroadcastMessage
