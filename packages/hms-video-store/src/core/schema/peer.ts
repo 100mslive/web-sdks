@@ -72,15 +72,9 @@ export interface HMSVideoTrack extends BaseTrack {
   degraded?: boolean;
 }
 
-export interface HMSScreenVideoTrack extends BaseTrack {
+export interface HMSScreenVideoTrack extends Omit<HMSVideoTrack, 'facingMode'> {
   source: 'screen';
-  type: 'video';
   displaySurface?: HMSTrackDisplaySurface;
-  layer?: HMSSimulcastLayer;
-  layerDefinitions?: SimulcastLayerDefinition[];
-  height?: number;
-  width?: number;
-  degraded?: boolean;
 }
 
 export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack | HMSScreenAudioTrack;
