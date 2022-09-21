@@ -57,7 +57,7 @@ const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
     return null;
   }
   const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio') {
+  if (track.type === 'audio' && track.source !== 'screen') {
     return track;
   }
   return null;
