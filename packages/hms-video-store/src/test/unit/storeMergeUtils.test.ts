@@ -50,13 +50,13 @@ describe('tracks merge is happening properly', () => {
     expectNoReferenceChange();
     expect(draftTracks[fakeTrack.id]).toBe(fakeTrack);
     expect(fakeTrack.enabled).toBe(true);
-    expect((fakeTrack as HMSVideoTrack).height).toBe(357);
+    expect(fakeTrack.height).toBe(357);
     expect(fakeTrack).not.toBe(clonedTrack);
   });
 
   test('partial update does not override older data', () => {
     const clonedTrack = { ...fakeTrack };
-    (fakeTrack as HMSVideoTrack).height = 450;
+    fakeTrack.height = 450;
     draftTracks[fakeTrack.id] = fakeTrack;
     newTracks[clonedTrack.id] = clonedTrack;
     mergeNewTracksInDraft(draftTracks as trackMap, newTracks);
@@ -76,8 +76,8 @@ describe('peers merge is happening properly', () => {
     newTracks = {};
     draftPeersCopy = draftPeers;
     fakePeer = makeFakePeer();
-    const audio = makeFakeTrack('audio');
-    const video = makeFakeTrack('video');
+    const audio = makeFakeTrack<'audio'>('audio');
+    const video = makeFakeTrack<'video'>('video');
     const screenshare = makeFakeTrack('video');
     newTracks[audio.id] = audio;
     newTracks[video.id] = video;
@@ -145,7 +145,7 @@ describe('peers merge is happening properly', () => {
   test('replace track does not change peer.videoTrack', () => {
     fakePeer.isLocal = true;
     draftPeers[fakePeer.id] = fakePeer;
-    const newVideo = makeFakeTrack('video');
+    const newVideo = makeFakeTrack<'video'>('video');
     const clonedPeer = { ...fakePeer, videoTrack: newVideo.id };
     const newSDKTrack = {} as SDKTrack;
     newSDKTracks[newVideo.id] = newSDKTrack;
