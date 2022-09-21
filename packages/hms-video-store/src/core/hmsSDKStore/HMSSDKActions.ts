@@ -139,6 +139,11 @@ export class HMSSDKActions implements IHMSActions {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
+        //@ts-ignore
+        if (layer === HMSSimulcastLayer.NONE) {
+          HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          return;
+        }
         await track.preferLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
