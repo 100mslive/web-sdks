@@ -16,7 +16,7 @@ import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
 import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../IHMSNotifications';
+import { IHMSNotifications } from '../schema/notification';
 import { NamedSetState } from './internalTypes';
 import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';

@@ -573,6 +573,22 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
+  async setSessionMetadata(metadata: any, options = { localOnly: false }) {
+    if (!options.localOnly) {
+      await this.sdk.setSessionMetadata(metadata);
+    }
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, `setSessionMetadata${options.localOnly ? 'LocalOnly' : ''}`);
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
@@ -1061,7 +1077,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
-    HMSLogger.e('received error from sdk', error);
+    HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
   /**

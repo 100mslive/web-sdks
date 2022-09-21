@@ -30,6 +30,7 @@ const StyledContent = styled(Popover.Content, {
   display: 'flex',
   flexDirection: 'column',
   borderRadius: '12px',
+  zIndex: 10,
   ...popoverAnimation,
 });
 

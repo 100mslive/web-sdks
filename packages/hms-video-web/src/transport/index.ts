@@ -54,6 +54,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { stringifyMediaStreamTrack } from '../utils/json';
 
 const TAG = '[HMSTransport]:';
 
@@ -246,12 +247,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackRemove(track);
     },
 
@@ -602,6 +603,14 @@ export default class HMSTransport implements ITransport {
     });
   }
 
+  getSessionMetadata() {
+    return this.signal.getSessionMetadata();
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.signal.setSessionMetadata({ data: metadata });
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }
@@ -612,7 +621,11 @@ export default class HMSTransport implements ITransport {
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();
-    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
+    HMSLogger.d(
+      TAG,
+      `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`,
+      `${track}`,
+    );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -642,11 +655,11 @@ export default class HMSTransport implements ITransport {
         .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
     }
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
-    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
+    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {

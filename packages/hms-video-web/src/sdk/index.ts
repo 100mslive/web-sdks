@@ -480,7 +480,7 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     if (peers.length < 50) {
       // the log is too big and frequent for large rooms
-      HMSLogger.d(this.TAG, `Got peers`, peers);
+      HMSLogger.d(this.TAG, `Got peers(${peers.length})`, peers.toString());
     }
     return peers;
   }
@@ -764,6 +764,15 @@ export class HMSSdk implements HMSInterface {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
     this.notificationManager.updateLocalPeer({ metadata });
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.transport.setSessionMetadata(metadata);
+  }
+
+  async getSessionMetadata() {
+    const response = await this.transport.getSessionMetadata();
+    return response.data;
   }
 
   getRoles(): HMSRole[] {

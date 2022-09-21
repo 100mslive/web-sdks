@@ -21,12 +21,46 @@ export class Header {
   //participant list dropdown
   participant_list = 'button[data-testid="participant_list"]';
   participant_name = 'div[data-testid="participant_?"]';
-  participant_setting = 'div[data-testid="participant_?"] button';
+
+  participant_setting = 'div[data-testid="participant_?"] div p[data-testid="participant_more_actions"]';
+  participant_dropdown = 'div[data-testid="open_role_selection_dropdown"]';
   participant_role_heading = 'text=?';
-  dialog_select_change_role_to = 'div[data-testid="dialog_select_Change role to"]';
+  dialog_select_change_role_to = '//p[text()="Change Role"]';
   role_list = ['audio', 'audio-video', 'audio-video-sshare', 'hls-viewer', 'screenshare', 'video', 'viewer'];
   setting_role_peer = 'div[role="menuitem"]:nth-child(?) button';
   peerlist_network = 'div[data-testid="participant_?"] span[data-testid="tile_network"]';
+
+  //recording
+  start_recording_btn = 'button[data-testid="start_recording"]';
+  start_recording_confirm_btn = 'button[data-testid="start_recording_confirm"]';
+  recording_resolution_width_btn = 'button[data-testid="recording_resolution_width"]';
+  recording_resolution_height_btn = 'button[data-testid="recording_resolution_height"]';
+  stop_recording_btn = 'button[data-testid="stop_recording"]';
+  stop_recording_confirm_btn = 'button[data-testid="stop_recording_confirm"]';
+
+  //hls
+  go_live_btn = 'button[data-testid="go_live"]';
+  hls_stream_btn = 'div[data-testid="hls_stream"]';
+  hls_recording_toggle = 'button[data-testid="hls-recording"]';
+  start_hls_btn = 'button[data-testid="start_hls"]';
+  stop_hls_btn = 'button[data-testid="stop_hls"]';
+  end_stream_btn = 'button[data-testid="end_stream"]';
+
+  //rtmp
+  rtmp_stream_btn = 'div[data-testid="rtmp_stream"]';
+  rtmp_url_btn = 'input[data-testid="0_rtmp_url"]';
+  rtmp_key_btn = 'input[data-testid="0_rtmp_key"]';
+  rtmp_resolution_width_btn = 'div[data-testid="rtmp_resolution_width"]';
+  rtmp_resolution_height_btn = 'div[data-testid="rtmp_resolution_height"]';
+  rtmp_recording_btn = 'button[data-testid="rtmp_recording"]';
+  add_stream_btn = 'div[data-testid="add_stream"]';
+  start_rtmp_btn = 'button[data-testid="start_rtmp"]';
+  stop_rtmp_btn = 'button[data-testid="stop_rtmp"]';
+
+  //close stream popup
+  close_stream_section = 'div[data-testid="close_stream_section"]';
+  go_back_btn = 'div[data-testid="go_back"]';
+  close_streaming_btn = 'div[data-testid="close_streaming"]';
 
   constructor(page: PageWrapper) {
     this.page = page;
