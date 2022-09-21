@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { ChevronDownIcon, CrossIcon, PinIcon } from "@100mslive/react-icons";
 import {
+  selectPermissions,
   selectSessionMetadata,
   useHMSActions,
   useHMSStore,
@@ -14,6 +15,7 @@ import { useUnreadCount } from "./useUnreadCount";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
+  const permissions = useHMSStore(selectPermissions);
   const pinnedMessage = useHMSStore(selectSessionMetadata);
 
   return pinnedMessage ? (
@@ -36,11 +38,13 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
           <AnnotisedMessage message={pinnedMessage} />
         </Text>
       </Box>
-      <Box>
-        <IconButton onClick={() => clearPinnedMessage()}>
-          <CrossIcon />
-        </IconButton>
-      </Box>
+      {permissions.removeOthers && (
+        <Box>
+          <IconButton onClick={() => clearPinnedMessage()}>
+            <CrossIcon />
+          </IconButton>
+        </Box>
+      )}
     </Flex>
   ) : null;
 };
