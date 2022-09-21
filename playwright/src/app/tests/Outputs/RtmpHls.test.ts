@@ -7,6 +7,7 @@ const beamWaitTimeout = Number(process.env.beam_wait_timeout);
 test.beforeEach(async ({ page: nativePage }, testInfo) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   if (testInfo.retry) {
+    await page.delay(5000);
     await page.evaluateCommand('window.__hms.actions.stopHLSStreaming()');
   }
 });
@@ -17,6 +18,7 @@ test.afterEach(async () => {
 });
 
 test(`Start and Stop Browser Recording @qaonly`, async () => {
+
   await page.click(page.header.start_recording_btn, page.header.start_recording_confirm_btn);
 
   await page.clickWithTimeout(beamWaitTimeout, page.header.stop_recording_btn, page.header.stop_recording_confirm_btn);
