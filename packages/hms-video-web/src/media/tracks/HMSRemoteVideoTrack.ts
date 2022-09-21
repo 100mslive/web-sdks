@@ -28,7 +28,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
   }
 
-  async preferLayer(layer: HMSSimulcastLayer) {
+  async preferLayer(layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) {
     if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
       return;
     }

@@ -135,7 +135,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(trackId: string, layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
