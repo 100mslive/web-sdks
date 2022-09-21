@@ -18,6 +18,16 @@ export interface useCustomEventInput<T> {
    */
   onEvent?: (data: T) => void;
   /**
+   * flag to treat event payload as json.
+   * If true, the payload will be stringified before sending and
+   * parsed before calling the onEvent handler function.
+   *
+   * Set it to `false` if you want to send/receive only string messages
+   *
+   * Set it to `true` if you want to send/receive objects
+   */
+  json?: boolean;
+  /**
    * function to handle errors happening during sending the event
    */
   handleError?: hooksErrHandler;
@@ -52,6 +62,7 @@ export interface useCustomEventResult<T> {
  */
 export const useCustomEvent = <T>({
   type,
+  json = true,
   onEvent,
   handleError = logErrorHandler,
 }: useCustomEventInput<T>): useCustomEventResult<T> => {
@@ -72,7 +83,7 @@ export const useCustomEvent = <T>({
       const msg = notification.data;
       if (msg && msg.type === type) {
         try {
-          const data = JSON.parse(msg.message);
+          const data = json ? JSON.parse(msg.message) : msg.message;
           onEvent?.(data as T);
         } catch (err) {
           handleError(err as Error, 'handleCustomEvent');
@@ -80,13 +91,15 @@ export const useCustomEvent = <T>({
       }
     }, HMSNotificationTypes.NEW_MESSAGE);
     return unsubscribe;
-  }, [notifications, type, onEvent, handleError]);
+  }, [notifications, type, json, onEvent, handleError]);
+
+  const stringifyData = useCallback((data: T) => (json ? JSON.stringify(data || '') : (data as string)), [json]);
 
   // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
     async (data: T, receiver?: EventReceiver) => {
       try {
-        const dataStr = JSON.stringify(data || '');
+        const dataStr = stringifyData(data);
         if (receiver && Array.isArray(receiver?.roleNames)) {
           await actions.sendGroupMessage(dataStr, receiver.roleNames, type);
         } else if (typeof receiver?.peerId === 'string') {
@@ -99,7 +112,7 @@ export const useCustomEvent = <T>({
         handleError(err as Error, 'sendCustomEvent');
       }
     },
-    [actions, handleError, onEvent, type],
+    [actions, handleError, onEvent, type, stringifyData],
   );
 
   return { sendEvent };

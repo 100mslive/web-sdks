@@ -17,6 +17,7 @@ export const useSetPinnedMessage = () => {
 
   const { sendEvent } = useCustomEvent({
     type: "metadata",
+    json: false,
     onEvent: message => {
       if (message === REFRESH_MESSAGE) {
         hmsActions.populateSessionMetadata();
