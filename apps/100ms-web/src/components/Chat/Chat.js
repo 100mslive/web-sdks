@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { ChevronDownIcon, PinIcon } from "@100mslive/react-icons";
+import { ChevronDownIcon, CrossIcon, PinIcon } from "@100mslive/react-icons";
 import {
   selectSessionMetadata,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Button, Flex, Text } from "@100mslive/react-ui";
+import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { useUnreadCount } from "./useUnreadCount";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 
-const PinnedMessage = () => {
+const PinnedMessage = ({ clearPinnedMessage }) => {
   const pinnedMessage = useHMSStore(selectSessionMetadata);
 
   return pinnedMessage ? (
@@ -24,9 +24,23 @@ const PinnedMessage = () => {
       <Box>
         <PinIcon />
       </Box>
-      <Text variant="sm" css={{ ml: "$8", color: "$textMedEmp" }}>
-        <AnnotisedMessage message={pinnedMessage} />
-      </Text>
+      <Box
+        css={{
+          ml: "$8",
+          color: "$textMedEmp",
+          maxHeight: "$18",
+          overflowY: "auto",
+        }}
+      >
+        <Text variant="sm">
+          <AnnotisedMessage message={pinnedMessage} />
+        </Text>
+      </Box>
+      <Box>
+        <IconButton onClick={() => clearPinnedMessage()}>
+          <CrossIcon />
+        </IconButton>
+      </Box>
     </Flex>
   ) : null;
 };
@@ -72,7 +86,7 @@ export const Chat = () => {
           setSelectorOpen(value => !value);
         }}
       />
-      <PinnedMessage />
+      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
       <Flex
         direction="column"
         css={{
