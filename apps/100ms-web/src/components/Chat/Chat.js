@@ -22,6 +22,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
     <Flex
       css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
       align="center"
+      justify="between"
     >
       <Box>
         <PinIcon />
@@ -30,6 +31,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         css={{
           ml: "$8",
           color: "$textMedEmp",
+          w: "100%",
           maxHeight: "$18",
           overflowY: "auto",
         }}
