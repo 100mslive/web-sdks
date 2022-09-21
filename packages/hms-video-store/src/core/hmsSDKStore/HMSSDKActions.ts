@@ -38,6 +38,7 @@ import {
   selectTrackByID,
   selectVideoTrackByID,
   selectTracksMap,
+  selectScreenVideoTrackByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -1090,13 +1091,14 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID) || selectScreenVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          (draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack).layer = sdkTrack.getSimulcastLayer();
-          (draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack).degraded = sdkTrack.degraded;
+          const track = draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack;
+          track.layer = sdkTrack.getSimulcastLayer();
+          track.degraded = sdkTrack.degraded;
         }, action);
       }
     }

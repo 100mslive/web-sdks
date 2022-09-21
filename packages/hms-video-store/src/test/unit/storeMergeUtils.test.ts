@@ -8,14 +8,14 @@ type peerMap = Record<HMSTrackID, HMSPeer>;
 let newTracks: Record<HMSTrackID, Partial<HMSTrack>>;
 
 describe('tracks merge is happening properly', () => {
-  let fakeTrack: HMSTrack;
+  let fakeTrack: HMSVideoTrack;
   let draftTracksCopy: Record<HMSTrackID, Partial<HMSTrack>>;
   let draftTracks: Record<HMSTrackID, Partial<HMSTrack>>;
   beforeEach(() => {
     draftTracks = {};
     newTracks = {};
     draftTracksCopy = draftTracks;
-    fakeTrack = makeFakeTrack();
+    fakeTrack = makeFakeTrack<'video'>();
   });
 
   const expectNoReferenceChange = () => {
@@ -61,8 +61,8 @@ describe('tracks merge is happening properly', () => {
     newTracks[clonedTrack.id] = clonedTrack;
     mergeNewTracksInDraft(draftTracks as trackMap, newTracks);
     expectNoReferenceChange();
-    expect((fakeTrack as HMSVideoTrack).height).toBe(450);
-    expect((clonedTrack as HMSVideoTrack).height).toBeUndefined();
+    expect(fakeTrack.height).toBe(450);
+    expect(clonedTrack.height).toBeUndefined();
   });
 });
 
