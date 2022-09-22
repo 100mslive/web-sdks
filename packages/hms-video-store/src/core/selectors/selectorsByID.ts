@@ -46,7 +46,7 @@ const selectVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
     return null;
   }
   const track = storeTracks[trackID] as HMSVideoTrack;
-  if (track.type === 'video' && track.source !== 'screen') {
+  if (track.type === 'video') {
     return track;
   }
   return null;
@@ -57,7 +57,7 @@ const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
     return null;
   }
   const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio' && track.source !== 'screen') {
+  if (track.type === 'audio') {
     return track;
   }
   return null;
