@@ -5,7 +5,8 @@ import {
   HMSTrackID,
   selectAudioTrackVolume,
   selectPermissions,
-  selectTrackByID,
+  selectAudioTrackByID,
+  selectVideoTrackByID,
 } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { useCallback } from 'react';
@@ -66,8 +67,8 @@ export const useRemoteAVToggle = (
   handleError: hooksErrHandler = logErrorHandler,
 ): useRemoteAVToggleResult => {
   const actions = useHMSActions();
-  const audioTrack = useHMSStore(selectTrackByID(audioTrackId));
-  const videoTrack = useHMSStore(selectTrackByID(videoTrackId));
+  const audioTrack = useHMSStore(selectAudioTrackByID(audioTrackId));
+  const videoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const volume = useHMSStore(selectAudioTrackVolume(audioTrack?.id));
   const permissions = useHMSStore(selectPermissions);
   const canToggleVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
