@@ -1,7 +1,7 @@
 import { ENV, IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSSpeaker } from '../../interfaces';
+import { HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSTrack,
@@ -45,6 +45,7 @@ class Store implements IStore {
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
+  private frameworkInfo?: HMSFrameworkInfo;
 
   getConfig() {
     return this.config;
@@ -165,6 +166,10 @@ class Store implements IStore {
     return this.speakers.map(speaker => speaker.peer);
   }
 
+  getFrameworkInfo() {
+    return this.frameworkInfo;
+  }
+
   setRoom(room: HMSRoom) {
     this.room = room;
   }
@@ -205,6 +210,10 @@ class Store implements IStore {
 
   setPublishParams(params: PublishParams) {
     this.publishParams = params;
+  }
+
+  setFrameworkInfo(frameWorkInfo: HMSFrameworkInfo) {
+    this.frameworkInfo = frameWorkInfo;
   }
 
   addPeer(peer: HMSPeer) {

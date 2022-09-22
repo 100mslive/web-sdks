@@ -3,6 +3,7 @@ import {
   HMSConfig,
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPlaylistType,
   HMSRole,
@@ -819,6 +820,10 @@ export class HMSSdk implements HMSInterface {
       source,
       roles: roles?.map(role => role?.name),
     });
+  }
+
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
+    this.store.setFrameworkInfo(frameworkInfo);
   }
 
   private async publish(initialSettings: InitialSettings) {

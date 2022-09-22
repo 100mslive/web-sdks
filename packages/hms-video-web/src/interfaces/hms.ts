@@ -16,6 +16,8 @@ import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
 import { ScreenShareConfig } from './track-settings';
+import { HMSFrameworkInfo } from './framework-info';
+
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
@@ -71,6 +73,7 @@ export default interface HMS {
 
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo): void;
   addAudioListener(listener: HMSAudioListener): void;
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
 }
