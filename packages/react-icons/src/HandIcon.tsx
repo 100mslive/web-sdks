@@ -21,7 +21,7 @@ const SvgHandIcon = (props: SVGProps<SVGSVGElement>) => (
       style={{
         fill: 'none',
         fillRule: 'nonzero',
-        stroke: '#fff',
+        stroke: 'currentColor',
         strokeWidth: 1,
       }}
     />
