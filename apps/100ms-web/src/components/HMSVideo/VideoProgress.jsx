@@ -7,18 +7,20 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
 
   useEffect(() => {
     const videoEl = videoRef.current;
-    if (videoEl) {
-      videoEl.addEventListener("timeupdate", _ => {
-        const progress = Math.floor(
-          getPercentage(videoEl.currentTime, videoEl.duration)
-        );
+    const timeupdateHandler = _ => {
+      const progress = Math.floor(
+        getPercentage(videoEl.currentTime, videoEl.duration)
+      );
 
-        setVideoProgress(isNaN(progress) ? 0 : progress);
-      });
+      setVideoProgress(isNaN(progress) ? 0 : progress);
+    };
+
+    if (videoEl) {
+      videoEl.addEventListener("timeupdate", timeupdateHandler);
     }
     return function cleanup() {
       if (videoEl) {
-        videoEl.removeEventListener("timeupdate", null);
+        videoEl.removeEventListener("timeupdate", timeupdateHandler);
       }
     };
   }, []);

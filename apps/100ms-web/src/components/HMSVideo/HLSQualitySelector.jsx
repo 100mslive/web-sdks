@@ -1,10 +1,11 @@
+
+import { useState } from "react";
 import { Dropdown, Flex, Tooltip, Text, Box } from "@100mslive/react-ui";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   SettingsIcon,
 } from "@100mslive/react-icons";
-import { useState } from "react";
 
 export function HLSQualitySelector({
   availableLevels,
