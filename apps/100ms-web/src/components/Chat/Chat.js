@@ -41,11 +41,9 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         </Text>
       </Box>
       {permissions.removeOthers && (
-        <Box>
-          <IconButton onClick={() => clearPinnedMessage()}>
-            <CrossIcon />
-          </IconButton>
-        </Box>
+        <IconButton onClick={() => clearPinnedMessage()}>
+          <CrossIcon />
+        </IconButton>
       )}
     </Flex>
   ) : null;

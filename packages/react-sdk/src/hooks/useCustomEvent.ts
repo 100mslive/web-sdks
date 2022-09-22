@@ -57,7 +57,7 @@ export interface useCustomEventResult<T> {
   sendEvent: (data: T, receiver?: EventReceiver) => void;
 }
 
-const stringifyData = <T>(data: T, json: boolean) => (json ? JSON.stringify(data || '') : (data as string));
+const stringifyData = <T>(data: T, json: boolean) => (json ? JSON.stringify(data || '') : (data as unknown as string));
 
 /**
  * A generic function to implement [custom events](https://www.100ms.live/docs/javascript/v2/features/chat#custom-events) in your UI.
