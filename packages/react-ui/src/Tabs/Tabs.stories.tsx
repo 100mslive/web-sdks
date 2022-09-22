@@ -3,6 +3,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { Tabs } from '.';
 import { Box } from '../Layout';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Tabs',
@@ -49,16 +50,22 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
     >
       <Tabs.List
         aria-label="tabs example"
-        css={{ backgroundColor: 'lightblue', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
+        css={{ bg: '$bgSecondary', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
       >
         <Tabs.Trigger value="tab1">One</Tabs.Trigger>
         <Tabs.Trigger value="tab2">Two</Tabs.Trigger>
         <Tabs.Trigger value="tab3">Three</Tabs.Trigger>
       </Tabs.List>
-      <Box css={{ r: '$1', bg: '$grayDefault' }}>
-        <Tabs.Content value="tab1">Tab one content</Tabs.Content>
-        <Tabs.Content value="tab2">Tab two content</Tabs.Content>
-        <Tabs.Content value="tab3">Tab three content</Tabs.Content>
+      <Box css={{ r: '$1', bg: '$bgTertiary' }}>
+        <Tabs.Content value="tab1">
+          <Text>Tab one content</Text>
+        </Tabs.Content>
+        <Tabs.Content value="tab2">
+          <Text>Tab two content</Text>
+        </Tabs.Content>
+        <Tabs.Content value="tab3">
+          <Text>Tab three content</Text>
+        </Tabs.Content>
       </Box>
     </Tabs.Root>
   );
