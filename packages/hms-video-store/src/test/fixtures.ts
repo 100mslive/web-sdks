@@ -2,7 +2,7 @@ import { HMSAudioTrack, HMSPeer, HMSVideoTrack, HMSTrackType } from '../core';
 
 let counter = 100;
 type HMSObjectType<T> = T extends 'audio' ? HMSAudioTrack : T extends 'video' ? HMSVideoTrack : HMSVideoTrack;
-export const makeFakeTrack = <T extends HMSTrackType>(type?: HMSTrackType): HMSObjectType<T> => {
+export const makeFakeTrack = <T extends HMSTrackType>(type?: T): HMSObjectType<T> => {
   return {
     enabled: false,
     id: String(counter++),

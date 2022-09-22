@@ -15,7 +15,7 @@ describe('tracks merge is happening properly', () => {
     draftTracks = {};
     newTracks = {};
     draftTracksCopy = draftTracks;
-    fakeTrack = makeFakeTrack<'video'>();
+    fakeTrack = makeFakeTrack('video');
   });
 
   const expectNoReferenceChange = () => {
@@ -76,8 +76,8 @@ describe('peers merge is happening properly', () => {
     newTracks = {};
     draftPeersCopy = draftPeers;
     fakePeer = makeFakePeer();
-    const audio = makeFakeTrack<'audio'>('audio');
-    const video = makeFakeTrack<'video'>('video');
+    const audio = makeFakeTrack('audio');
+    const video = makeFakeTrack('video');
     const screenshare = makeFakeTrack('video');
     newTracks[audio.id] = audio;
     newTracks[video.id] = video;
@@ -145,7 +145,7 @@ describe('peers merge is happening properly', () => {
   test('replace track does not change peer.videoTrack', () => {
     fakePeer.isLocal = true;
     draftPeers[fakePeer.id] = fakePeer;
-    const newVideo = makeFakeTrack<'video'>('video');
+    const newVideo = makeFakeTrack('video');
     const clonedPeer = { ...fakePeer, videoTrack: newVideo.id };
     const newSDKTrack = {} as SDKTrack;
     newSDKTracks[newVideo.id] = newSDKTrack;
