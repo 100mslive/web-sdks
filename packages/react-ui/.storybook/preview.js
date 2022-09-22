@@ -1,6 +1,6 @@
 import React from 'react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
-import { useDarkMode } from 'storybook-dark-mode'
+import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
 
 import { setUpFakeStore, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
@@ -26,22 +26,10 @@ export const parameters = {
 setUpFakeStore();
 
 export const decorators = [
-  (Story) => {
-    const themeConfig = {
-      font: 'Roboto',
-      color: '#2F80FF',
-    };
-
+  Story => {
     return (
       <HMSRoomProvider store={storyBookStore} actions={storyBookSDK}>
-        <HMSThemeProvider
-          type={useDarkMode() ? 'dark' : 'light'}
-          theme={{
-            fonts: {
-              sans: [themeConfig.font, 'Inter', 'sans-serif'],
-            },
-          }}
-        >
+        <HMSThemeProvider themeType={useDarkMode() ? 'dark' : 'light'}>
           <Story />
         </HMSThemeProvider>
       </HMSRoomProvider>
