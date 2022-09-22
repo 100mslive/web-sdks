@@ -5,7 +5,7 @@ export const useEmojiPickerStyles = showing => {
   useEffect(() => {
     if (showing) {
       setTimeout(() => {
-        const root = document.querySelector("em-emoji-picker").shadowRoot;
+        const root = ref.current?.querySelector("em-emoji-picker").shadowRoot;
         const style = document.createElement("style");
         style.textContent = `
           #root {

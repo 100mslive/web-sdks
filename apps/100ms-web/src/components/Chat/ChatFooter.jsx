@@ -39,7 +39,13 @@ function EmojiPicker({ onSelect }) {
             p: 0,
           }}
         >
-          <Box css={{ minWidth: 352, minHeight: 435 }} ref={ref}>
+          <Box
+            css={{
+              minWidth: 352,
+              minHeight: 435,
+            }}
+            ref={ref}
+          >
             <Picker
               onEmojiSelect={onSelect}
               data={data}
