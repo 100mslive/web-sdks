@@ -46,6 +46,8 @@ export const DialogTitle = styled(DialogPrimitive.Title, {
   margin: 0,
 });
 
+export const DialogDescription = styled(DialogPrimitive.Description, {});
+
 export const DialogDefaultCloseIcon = (props: ComponentProps<typeof IconButton>) => (
   <DialogClose asChild>
     <IconButton {...props}>

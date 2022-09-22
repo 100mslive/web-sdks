@@ -12,6 +12,7 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  HMSVideoTrack,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -34,6 +35,7 @@ import {
   selectRoomStarted,
   selectRoomState,
   selectTrackByID,
+  selectVideoTrackByID,
   selectTracksMap,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -1087,13 +1089,14 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectTrackByID(trackID));
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-          draft.tracks[trackID].degraded = sdkTrack.degraded;
+          const track = draft.tracks[trackID] as HMSVideoTrack;
+          track.layer = sdkTrack.getSimulcastLayer();
+          track.degraded = sdkTrack.degraded;
         }, action);
       }
     }
@@ -1165,7 +1168,7 @@ export class HMSSDKActions implements IHMSActions {
         track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');
