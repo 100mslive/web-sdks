@@ -17,7 +17,6 @@ const StyledArrow = styled(Arrow, {
 
 const StyledTrigger = styled(Trigger, {})
 
-
 export const Popover = {
   Root,
   Content: StyledContent,

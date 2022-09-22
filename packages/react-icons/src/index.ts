@@ -1,3 +1,4 @@
+export { default as Svg100MsLogo } from './100MsLogo';
 export { default as ActivityIcon } from './ActivityIcon';
 export { default as AddCircleIcon } from './AddCircleIcon';
 export { default as AddIcon } from './AddIcon';
@@ -215,6 +216,7 @@ export { default as ThumbsDownIcon } from './ThumbsDownIcon';
 export { default as ThumbsUpIcon } from './ThumbsUpIcon';
 export { default as TranscriptIcon } from './TranscriptIcon';
 export { default as TrashIcon } from './TrashIcon';
+export { default as TwitterIcon } from './TwitterIcon';
 export { default as UploadIcon } from './UploadIcon';
 export { default as VerifiedIcon } from './VerifiedIcon';
 export { default as VerticalMenuIcon } from './VerticalMenuIcon';
