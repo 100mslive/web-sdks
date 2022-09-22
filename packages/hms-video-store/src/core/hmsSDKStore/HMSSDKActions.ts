@@ -13,7 +13,6 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrack,
-  HMSScreenVideoTrack,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -38,7 +37,6 @@ import {
   selectTrackByID,
   selectVideoTrackByID,
   selectTracksMap,
-  selectScreenVideoTrackByID,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
@@ -1091,15 +1089,12 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack =
-        sdkTrack.source === 'screen'
-          ? this.store.getState(selectScreenVideoTrackByID(trackID))
-          : this.store.getState(selectVideoTrackByID(trackID));
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          const track = draft.tracks[trackID] as HMSVideoTrack | HMSScreenVideoTrack;
+          const track = draft.tracks[trackID] as HMSVideoTrack;
           track.layer = sdkTrack.getSimulcastLayer();
           track.degraded = sdkTrack.degraded;
         }, action);
