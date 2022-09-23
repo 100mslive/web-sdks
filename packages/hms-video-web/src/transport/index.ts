@@ -603,6 +603,14 @@ export default class HMSTransport implements ITransport {
     });
   }
 
+  getSessionMetadata() {
+    return this.signal.getSessionMetadata();
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.signal.setSessionMetadata({ data: metadata });
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }

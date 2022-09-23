@@ -81,6 +81,7 @@ export type HMSNotification =
   | HMSChangeMultiTrackStateRequestNotification
   | HMSLeaveRoomRequestNotification
   | HMSDeviceChangeEventNotification
+  | HMSReconnectionNotification
   | HMSPlaylistItemNotification<any>;
 
 export enum HMSNotificationSeverity {
