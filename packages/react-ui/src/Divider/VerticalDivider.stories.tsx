@@ -19,7 +19,7 @@ const VerticalDividerComponent: ComponentStory<typeof VerticalDivider> = ({ spac
   return (
     <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
       <div style={{ height: '20px', width: '20px', backgroundColor: 'red' }}></div>
-      <VerticalDivider space={space} css={css} />
+      <VerticalDivider space={space} css={{ bg: '$textPrimary', ...css }} />
       <div style={{ height: '20px', width: '20px', backgroundColor: 'green' }}></div>
     </Flex>
   );
