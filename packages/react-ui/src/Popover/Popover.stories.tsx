@@ -1,11 +1,10 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { CrossIcon, ExpandIcon } from '@100mslive/react-icons';
+import { CrossIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Popover } from './index';
 import PopoverDocs from './Popover.mdx';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
-import { Tooltip } from '../Tooltip';
 import { Text } from '../Text';
 import { Label } from '../Label';
 import { Input } from '../Input';
@@ -30,18 +29,19 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
   <Flex css={{ w: '$80' }} justify="center">
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button variant="standard" css={{ aspectRatio: 1, r: '$round', p: '$2 $2' }}>
-          <Tooltip title="Leave Room">
-            <Box css={{ w: '$10', h: '$10' }}>
-              <ExpandIcon></ExpandIcon>
-            </Box>
-          </Tooltip>
+        <Button
+          variant="standard"
+          css={{ aspectRatio: 1, r: '$round', p: '$2 $2', bg: '$bgPrimary', '&:hover': { bg: '$bgSecondary !important' } }}
+        >
+          <Box css={{ w: '$10', h: '$10', c: '$textPrimary' }}>
+            <VerticalMenuIcon />
+          </Box>
         </Button>
       </Popover.Trigger>
-      <Popover.Content align="center" side="bottom">
+      <Popover.Content align="center" side="bottom" sideOffset={10}>
         <Flex css={{ flexDirection: 'column', gap: 10 }} justify="center" align="center">
           <Flex direction="row" justify="between" css={{ width: '100%' }}>
-            <Text as="div" variant="overline" css={{ color: '$textMedEmp' }}>
+            <Text as="div" variant="caption" css={{ color: '$textMedEmp' }}>
               Dimensions
             </Text>
             <Box css={{ color: '$textMedEmp' }}>
@@ -49,31 +49,38 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
             </Box>
           </Flex>
           <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
-            <Label htmlFor="width">
-              <Text variant="sub2">Width</Text>
+            <Label htmlFor="width" asChild>
+              <Text as="span" variant="sub2">
+                Width
+              </Text>
             </Label>
             <Input />
           </Fieldset>
-          <Fieldset>
-            <Label htmlFor="maxWidth">
-              <Text variant="sub2">Max. width</Text>
+          <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
+            <Label htmlFor="maxWidth" asChild>
+              <Text as="span" variant="sub2">
+                Max. width
+              </Text>
             </Label>
             <Input />
           </Fieldset>
-          <Fieldset>
-            <Label htmlFor="height">
-              <Text variant="sub2">Height</Text>
+          <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
+            <Label htmlFor="height" asChild>
+              <Text as="span" variant="sub2">
+                Height
+              </Text>
             </Label>
             <Input />
           </Fieldset>
-          <Fieldset>
-            <Label htmlFor="maxHeight">
-              <Text variant="sub2">Max. height</Text>
+          <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
+            <Label htmlFor="maxHeight" asChild>
+              <Text as="span" variant="sub2">
+                Max. height
+              </Text>
             </Label>
             <Input />
           </Fieldset>
         </Flex>
-        <Popover.Arrow css={{ width: '$4' }} />
       </Popover.Content>
     </Popover.Root>
   </Flex>
