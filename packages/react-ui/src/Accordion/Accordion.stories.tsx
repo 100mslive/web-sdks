@@ -7,29 +7,33 @@ export default {
   component: Accordion.Root,
 } as ComponentMeta<typeof Accordion.Root>;
 
+function AccordionItem({ value, header, content }: { value: string; header: string; content: string }) {
+  return (
+    <Accordion.Item value={value}>
+      <Accordion.Header css={{ padding: '$8 $9' }}>{header}</Accordion.Header>
+      <Accordion.Content contentStyles={{ padding: '$8 $9' }}>{content}</Accordion.Content>
+    </Accordion.Item>
+  );
+}
+
 const Template = () => {
   return (
     <Accordion.Root type="single" defaultValue="item-1" collapsible css={{ width: '300px' }}>
-      <Accordion.Item value="item-1">
-        <Accordion.Header css={{ padding: '$8 $9' }}>Is it accessible?</Accordion.Header>
-        <Accordion.Content contentStyles={{ padding: '$8 $9' }}>
-          Yes. It adheres to the WAI-ARIA design pattern.
-        </Accordion.Content>
-      </Accordion.Item>
-
-      <Accordion.Item value="item-2">
-        <Accordion.Header css={{ padding: '$8 $9' }}>Is it unstyled?</Accordion.Header>
-        <Accordion.Content contentStyles={{ padding: '$8 $9' }}>
-          Yes. It's unstyled by default, giving you freedom over the look and feel.
-        </Accordion.Content>
-      </Accordion.Item>
-
-      <Accordion.Item value="item-3">
-        <Accordion.Header css={{ padding: '$8 $9' }}>Can it be animated?</Accordion.Header>
-        <Accordion.Content contentStyles={{ padding: '$8 $9' }}>
-          Yes! You can animate the Accordion. with CSS or JavaScript.
-        </Accordion.Content>
-      </Accordion.Item>
+      <AccordionItem
+        value="item-1"
+        header="Is it accessible?"
+        content="Yes. It adheres to the WAI-ARIA design pattern."
+      />
+      <AccordionItem
+        value="item-2"
+        header="Is it unstyled?"
+        content="Yes. It's unstyled by default, giving you freedom over the look and feel."
+      />
+      <AccordionItem
+        value="item-3"
+        header="Can it be animated?"
+        content="Yes! You can animate the Accordion. with CSS or JavaScript."
+      />
     </Accordion.Root>
   );
 };
