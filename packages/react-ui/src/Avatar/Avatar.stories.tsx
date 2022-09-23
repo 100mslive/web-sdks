@@ -8,15 +8,26 @@ export default {
   component: Avatar,
   argTypes: {
     ref: { table: { disable: true } },
-    shape: { options: ['square', 'circle'], defaultValue: 'square', control: { type: 'select' } },
   },
   args: {
     name: '100ms',
   },
 } as ComponentMeta<typeof Avatar>;
 
-const Template: ComponentStory<typeof Avatar> = ({ css, ...rest }) => {
-  return <Avatar css={{ width: '100px', height: '100px', ...css }} {...rest} />;
+export const Square: ComponentStory<typeof Avatar> = args => {
+  return <Avatar css={{ width: '50px', height: '50px' }} shape="square" {...args} />;
 };
 
-export const Example = Template.bind({});
+export const Circle: ComponentStory<typeof Avatar> = args => {
+  return <Avatar css={{ width: '50px', height: '50px' }} shape="circle" {...args} />;
+};
+
+export const Playground = ({ height = 50, width = 50, css = {}, shape = 'circle' as const, name = '' }) => {
+  return <Avatar css={{ width: width, height: height, ...css }} name={name} shape={shape} />;
+};
+
+Playground.argTypes = {
+  height: { control: { type: 'number' } },
+  width: { control: { type: 'number' } },
+  shape: { options: ['square', 'circle'], defaultValue: 'square', control: { type: 'select' } },
+};
