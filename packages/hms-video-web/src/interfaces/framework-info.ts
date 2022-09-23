@@ -1,5 +1,5 @@
 export interface HMSFrameworkInfo {
   type: 'js' | 'react';
-  version: string;
+  version?: string;
   sdkVersion: string;
 }

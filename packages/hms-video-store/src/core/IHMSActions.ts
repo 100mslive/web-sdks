@@ -8,6 +8,7 @@ import {
   HMSAudioPlugin,
   HMSPluginSupportResult,
   HLSTimedMetadata,
+  HMSFrameworkInfo,
 } from '@100mslive/hms-video';
 import {
   HMSMessageID,
@@ -380,6 +381,13 @@ export interface IHMSActions {
    * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
    */
   setLogLevel(level: HMSLogLevel): void;
+
+  /**
+   * DO NOT USE IN APP CODE
+   * Used by SDK internally to collect version and framework info
+   * @internal
+   */
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo): void;
 
   /**
    * ignore messages with this type for storing in store. You can use this to have a clear segregation between

@@ -57,6 +57,8 @@ export class HMSReactiveStore {
       this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
 
+    this.actions.setFrameworkInfo({ type: 'js', sdkVersion: require('../../../package.json').version });
+
     this.initialTriggerOnSubscribe = false;
 
     if (isBrowser) {
