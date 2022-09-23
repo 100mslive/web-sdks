@@ -100,6 +100,14 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   }
 
   useEffect(() => {
+    providerProps.actions.setFrameworkInfo({
+      type: 'react',
+      version: React.version,
+      sdkVersion: require('../../package.json').version,
+    });
+  }, []);
+
+  useEffect(() => {
     if (isBrowser && leaveOnUnload) {
       window.addEventListener('beforeunload', () => providerProps.actions.leave());
       window.addEventListener('onunload', () => providerProps.actions.leave());
