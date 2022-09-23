@@ -266,7 +266,7 @@ class Store implements IStore {
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     if (source === 'screen') {
-      return this.screenshareLayers?.layers || [];
+      return []; //this.screenshareLayers?.layers || []; uncomment this when screenshare simulcast supported
     }
     return this.videoLayers?.layers || [];
   }
@@ -308,7 +308,8 @@ class Store implements IStore {
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    if (!peer.role) {
+    // TODO: remove screen check when screenshare simulcast is supported
+    if (!peer.role || source === 'screen') {
       return [];
     }
 
