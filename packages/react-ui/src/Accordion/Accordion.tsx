@@ -27,11 +27,12 @@ const StyledItem = styled(BaseAccordion.Item, {
 
   '&:first-child': {
     marginTop: 0,
-    borderTopLeftRadius: '$0',
-    borderTopRightRadius: '$0',
+    borderTopLeftRadius: '$4',
+    borderTopRightRadius: '$4',
   },
   '&:last-child': {
-    borderBottom: '0',
+    borderBottomLeftRadius: '$4',
+    borderBottomRightRadius: '$4',
   },
   '&:focus-within': {
     position: 'relative',
