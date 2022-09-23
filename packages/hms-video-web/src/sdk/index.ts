@@ -100,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
+  private frameworkInfo?: HMSFrameworkInfo;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -823,7 +824,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
-    this.store.setFrameworkInfo(frameworkInfo);
+    this.frameworkInfo = frameworkInfo;
   }
 
   private async publish(initialSettings: InitialSettings) {

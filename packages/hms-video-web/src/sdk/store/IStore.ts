@@ -1,4 +1,4 @@
-import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig, HMSFrameworkInfo } from '../../interfaces';
+import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
 import {
   HMSTrack,
   HMSAudioTrack,
@@ -45,7 +45,6 @@ export interface IStore {
   getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions | undefined;
   getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): SimulcastLayerDefinition[];
-  getFrameworkInfo(): HMSFrameworkInfo | undefined;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getRemotePeers(): HMSRemotePeer[];
@@ -73,7 +72,6 @@ export interface IStore {
   setConfig(config: HMSConfig): void;
   setPublishParams(params: PublishParams): void;
   setErrorListener(listener: IErrorListener): void;
-  setFrameworkInfo(frameWorkInfo: HMSFrameworkInfo): void;
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;
