@@ -7,7 +7,7 @@ import { Flex } from '../Layout';
 import { Select } from './ReactSelect';
 
 export default {
-  title: 'UI Components/ReactSelect',
+  title: 'UI Components/Select',
   component: Select.Root,
 } as ComponentMeta<typeof Select.Root>;
 
@@ -35,7 +35,7 @@ const data: {
   ],
 };
 
-const Template = () => {
+const Template: ComponentStory<typeof Select.Root> = () => {
   return (
     <Select.Root defaultValue="blueberry">
       <Select.Trigger css={{ bg: '$bgSecondary' }}>
@@ -80,4 +80,4 @@ const Template = () => {
   );
 };
 
-export const ReactSelectContent = Template.bind({});
+export const Multi = Template.bind({});

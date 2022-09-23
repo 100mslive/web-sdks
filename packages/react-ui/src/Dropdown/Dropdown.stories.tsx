@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { PeopleIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Box, Text, Avatar, textEllipsis, Flex } from '..';
 import { Dropdown } from './Dropdown';
@@ -14,7 +14,7 @@ const participants = [
   { id: '768456', name: 'Jonty', roleName: 'Student' },
 ];
 
-const Template = () => {
+const Template: ComponentStory<typeof Dropdown.Content> = () => {
   const [open, setOpen] = React.useState(true);
 
   return (
@@ -91,3 +91,4 @@ const Template = () => {
 };
 
 export const DropdownContent = Template.bind({});
+DropdownContent.storyName = 'Dropdown'

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import { Toast } from './Toast';
 import { Button } from '../Button';
-import { Text } from '../Text';
 import mdx from './Toast.mdx';
 
 const ReactToastStory = ({ ...props }) => {
@@ -44,7 +43,6 @@ const ReactToastComponent = ({ ...props }) => {
         description="Toast description goes here"
         open={true}
         isClosable={true}
-        action={<Text>Hello</Text>}
         onOpenChange={o => setIsOpen(o)}
         {...props}
       />
@@ -53,5 +51,5 @@ const ReactToastComponent = ({ ...props }) => {
   );
 };
 
-export const AppToast = ReactToastStory.bind({});
+export const Playground = ReactToastStory.bind({});
 export default ToastMeta;

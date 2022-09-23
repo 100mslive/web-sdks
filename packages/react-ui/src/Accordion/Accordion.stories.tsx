@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Accordion } from '.';
 
 export default {
@@ -38,4 +38,5 @@ const Template = () => {
   );
 };
 
-export const AccordionContent = Template.bind({});
+export const AccordionContent: ComponentStory<typeof Accordion.Root> = Template.bind({});
+AccordionContent.storyName = 'Accordion'

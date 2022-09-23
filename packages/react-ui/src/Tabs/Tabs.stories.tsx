@@ -72,3 +72,4 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Tabs'

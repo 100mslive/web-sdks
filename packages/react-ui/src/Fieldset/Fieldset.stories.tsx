@@ -27,3 +27,4 @@ const Template: ComponentStory<typeof Fieldset> = ({ css }) => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Fieldset';

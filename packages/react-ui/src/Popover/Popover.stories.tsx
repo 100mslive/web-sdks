@@ -86,5 +86,4 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
   </Flex>
 );
 export const Example = Template.bind({});
-
-Example.args = {};
+Example.storyName = 'Popover'

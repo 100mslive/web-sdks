@@ -1,7 +1,6 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { StyledPagination } from './StyledPagination';
-import { Box } from '../Layout';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 
 export default {
@@ -54,3 +53,4 @@ const Template: ComponentStory<typeof StyledPagination.Root> = args => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Pagination'

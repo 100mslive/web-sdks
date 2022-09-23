@@ -59,3 +59,4 @@ const Template: ComponentStory<typeof Footer.Root> = ({ css }) => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Footer'

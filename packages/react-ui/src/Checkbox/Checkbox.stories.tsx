@@ -59,3 +59,4 @@ const CheckboxWithLabelStory: ComponentStory<typeof CheckboxWithLabelComponent> 
 };
 
 export const Example = CheckboxWithLabelStory.bind({});
+Example.storyName = 'Checkbox'

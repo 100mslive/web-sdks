@@ -65,3 +65,4 @@ const Template: ComponentStory<typeof PaginationComponent> = args => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Pagination'

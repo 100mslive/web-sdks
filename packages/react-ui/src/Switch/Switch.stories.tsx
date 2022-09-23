@@ -35,9 +35,9 @@ const Template: ComponentStory<typeof Switch> = ({ checked: initialChecked, ...a
   );
 };
 
-export const Index = Template.bind({});
+export const Playground = Template.bind({});
 
-Index.args = {
+Playground.args = {
   checked: false,
   onCheckedChange: () => {
     return;

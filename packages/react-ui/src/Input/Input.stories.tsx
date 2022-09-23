@@ -23,3 +23,4 @@ const Template: ComponentStory<typeof Input> = args => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'Input'

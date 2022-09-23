@@ -25,7 +25,7 @@ const Template: ComponentStory<typeof Loading> = ({ color }) => {
   );
 };
 
-export const Example = Template.bind({});
+export const Multiple = Template.bind({});
 
 export const Playground: ComponentStory<typeof Loading> = args => <Loading {...args} />;
 

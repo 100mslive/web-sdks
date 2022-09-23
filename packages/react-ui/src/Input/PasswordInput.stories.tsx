@@ -50,3 +50,4 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'PasswordInput'

@@ -29,4 +29,4 @@ const Template = () => {
   );
 };
 
-export const SelectContent = Template.bind({});
+export const Single = Template.bind({});
