@@ -993,6 +993,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId, this.store));

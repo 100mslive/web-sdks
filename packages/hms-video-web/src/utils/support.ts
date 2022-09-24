@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { LocalStorage } from './local-storage';
 import { version } from './package.alias.json';
 import HMSLogger from './logger';
+import { HMSFrameworkInfo } from '../interfaces';
 
 export const parsedUserAgent = new UAParser();
 
@@ -21,7 +22,49 @@ const checkIsSupported = () => {
 
 export const isSupported = checkIsSupported();
 
-function createUserAgent(): string {
+export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
+  const sdk = 'web';
+  const sdk_version = require('../../package.json').version;
+
+  if (isNode) {
+    return convertObjectToString({
+      os: 'web_nodejs',
+      os_version: process.version,
+      sdk,
+      sdk_version,
+      framework: frameworkInfo?.type,
+      framework_version: frameworkInfo?.version,
+      framework_sdk_version: frameworkInfo?.sdkVersion,
+    });
+  }
+
+  const parsedOs = parsedUserAgent.getOS();
+  const parsedDevice = parsedUserAgent.getDevice();
+  const parsedBrowser = parsedUserAgent.getBrowser();
+
+  const os = replaceSpaces(`web_${parsedOs.name}`);
+  const os_version = parsedOs.version;
+
+  const browser = replaceSpaces(`${parsedBrowser.name}_${parsedBrowser.version}`);
+  let device_model = browser;
+  if (parsedDevice.type) {
+    const deviceVendor = replaceSpaces(`${parsedDevice.vendor}_${parsedDevice.type}`);
+    device_model = `${deviceVendor}/${browser}`;
+  }
+
+  return convertObjectToString({
+    os,
+    os_version,
+    sdk,
+    sdk_version,
+    device_model,
+    framework: frameworkInfo?.type,
+    framework_version: frameworkInfo?.version,
+    framework_sdk_version: frameworkInfo?.sdkVersion,
+  });
+}
+
+export function createUserAgentV1(): string {
   if (isNode) {
     return `hmsclient/${version} web_nodejs`;
   }
@@ -45,6 +88,12 @@ function createUserAgent(): string {
 function replaceSpaces(s: string) {
   return s.replace(/ /g, '_');
 }
+
+const convertObjectToString = (object: Record<string, string | undefined>, delimiter = ',') =>
+  Object.keys(object)
+    .filter(key => !!object[key])
+    .map(key => `${key}:${object[key]}`)
+    .join(delimiter);
 
 export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 
