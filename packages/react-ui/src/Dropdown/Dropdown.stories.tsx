@@ -39,7 +39,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
               <PeopleIcon />
               <Text variant="md">2</Text>
             </Box>
-            <Box>{open ? <ChevronUpIcon /> : <ChevronDownIcon />}</Box>
+            <Flex>{open ? <ChevronUpIcon /> : <ChevronDownIcon />}</Flex>
           </Box>
         </Box>
       </Dropdown.Trigger>
@@ -53,9 +53,9 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
               alignItems: 'flex-start',
             }}
           >
-            <Dropdown.Label>
+            <Dropdown.Label css={{ w: "initial "}}>
               <Text variant="md" data-testid={`role_student`}>
-                {'Students'}({participants.length})
+                {'Students '}({participants.length})
               </Text>
             </Dropdown.Label>
             {participants.map((peer, i) => (
