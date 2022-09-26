@@ -51,9 +51,9 @@ const MessageTypeContainer = ({ left, right }) => {
       }}
     >
       {left && (
-        <Text variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
-          <SenderName>{left}</SenderName>
-        </Text>
+        <SenderName variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
+          {left}
+        </SenderName>
       )}
       {left && right && (
         <Box
@@ -61,9 +61,9 @@ const MessageTypeContainer = ({ left, right }) => {
         />
       )}
       {right && (
-        <Text as="span" variant="tiny">
-          <SenderName>{right}</SenderName>
-        </Text>
+        <SenderName as="span" variant="tiny">
+          {right}
+        </SenderName>
       )}
     </Flex>
   );
@@ -167,11 +167,12 @@ const ChatActions = ({ onPin }) => {
   );
 };
 
-const SenderName = styled("p", {
+const SenderName = styled(Text, {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
   maxWidth: "24ch",
+  minWidth: 0,
 });
 
 const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
@@ -213,22 +214,20 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
           color: "$textHighEmp",
           fontWeight: "$semiBold",
           display: "inline-flex",
-          alignItems: "baseline",
+          alignItems: "center",
           justifyContent: "space-between",
           width: "100%",
         }}
         as="div"
       >
-        <Box
-          css={{
-            display: "flex",
-          }}
-        >
+        <Flex align="center">
           {message.senderName === "You" || !message.senderName ? (
-            <SenderName>{message.senderName || "Anonymous"}</SenderName>
+            <SenderName as="span">
+              {message.senderName || "Anonymous"}
+            </SenderName>
           ) : (
             <Tooltip title={message.senderName} side="top" align="start">
-              <SenderName>{message.senderName}</SenderName>
+              <SenderName as="span">{message.senderName}</SenderName>
             </Tooltip>
           )}
           <Text
@@ -238,13 +237,11 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
               ml: "$4",
               color: "$textSecondary",
               flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
             }}
           >
             {formatTime(message.time)}
           </Text>
-        </Box>
+        </Flex>
         <MessageType
           hasCurrentUserSent={message.sender === localPeerId}
           receiver={message.recipientPeer}
