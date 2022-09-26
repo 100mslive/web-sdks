@@ -34,7 +34,7 @@ export class HMSNotifications implements IHMSNotifications {
 
   constructor(store: IHMSStore) {
     this.store = store;
-    this.eventEmitter = new EventEmitter();
+    this.eventEmitter = new EventEmitter({ maxListeners: 20 });
   }
   onNotification = <T extends HMSNotificationTypeParam>(cb: HMSNotificationCallback<T>, type?: T) => {
     const eventCallback = (notification: HMSNotificationInCallback<T>) => {
