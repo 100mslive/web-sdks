@@ -52,7 +52,7 @@ const MessageTypeContainer = ({ left, right }) => {
     >
       {left && (
         <Text variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
-          {left}
+          <SenderName>{left}</SenderName>
         </Text>
       )}
       {left && right && (
@@ -62,7 +62,7 @@ const MessageTypeContainer = ({ left, right }) => {
       )}
       {right && (
         <Text as="span" variant="tiny">
-          {right}
+          <SenderName>{right}</SenderName>
         </Text>
       )}
     </Flex>
@@ -167,10 +167,11 @@ const ChatActions = ({ onPin }) => {
   );
 };
 
-const SenderName = styled("span", {
+const SenderName = styled("p", {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  maxWidth: "24ch",
 });
 
 const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
@@ -217,7 +218,11 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
           width: "100%",
         }}
       >
-        <Box>
+        <Box
+          css={{
+            display: "flex",
+          }}
+        >
           {message.senderName === "You" || !message.senderName ? (
             <SenderName>{message.senderName || "Anonymous"}</SenderName>
           ) : (
@@ -237,13 +242,13 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
             {formatTime(message.time)}
           </Text>
         </Box>
+        <MessageType
+          hasCurrentUserSent={message.sender === localPeerId}
+          receiver={message.recipientPeer}
+          roles={message.recipientRoles}
+        />
         {showPinAction && <ChatActions onPin={onPin} />}
       </Text>
-      <MessageType
-        hasCurrentUserSent={message.sender === localPeerId}
-        receiver={message.recipientPeer}
-        roles={message.recipientRoles}
-      />
       <Text
         variant="body2"
         css={{
