@@ -167,7 +167,7 @@ const ChatActions = ({ onPin }) => {
   );
 };
 
-const SenderName = styled("p", {
+const SenderName = styled("span", {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
