@@ -97,6 +97,8 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
         });
       }
     }
+
+    // @ts-ignore
     providerProps.actions.setFrameworkInfo({
       type: 'react-web',
       version: React.version,
