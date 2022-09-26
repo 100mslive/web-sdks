@@ -12,7 +12,7 @@ export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
       os_version: process.version,
       sdk,
       sdk_version,
-      framework: frameworkInfo?.type,
+      framework: 'node',
       framework_version: frameworkInfo?.version,
       framework_sdk_version: frameworkInfo?.sdkVersion,
     });

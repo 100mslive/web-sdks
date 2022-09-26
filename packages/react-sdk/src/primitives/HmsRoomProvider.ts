@@ -101,7 +101,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
 
   useEffect(() => {
     providerProps.actions.setFrameworkInfo({
-      type: 'react',
+      type: 'react-web',
       version: React.version,
       sdkVersion: require('../../package.json').version,
     });
