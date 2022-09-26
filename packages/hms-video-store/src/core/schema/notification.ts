@@ -134,7 +134,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.ROOM_ENDED]: HMSLeaveRoomRequestNotification;
   [HMSNotificationTypes.REMOVED_FROM_ROOM]: HMSLeaveRoomRequestNotification;
   [HMSNotificationTypes.DEVICE_CHANGE_UPDATE]: HMSDeviceChangeEventNotification;
-  [HMSNotificationTypes.PLAYLIST_TRACK_ENDED]: HMSPlaylistItem<C>;
+  [HMSNotificationTypes.PLAYLIST_TRACK_ENDED]: HMSPlaylistItemNotification<C>;
   [HMSNotificationTypes.ERROR]: HMSExceptionNotification;
   [HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST]: HMSChangeTrackStateRequestNotification;
   [HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST]: HMSChangeMultiTrackStateRequestNotification;
