@@ -217,6 +217,7 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
           justifyContent: "space-between",
           width: "100%",
         }}
+        as="div"
       >
         <Box
           css={{
