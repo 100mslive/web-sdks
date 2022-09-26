@@ -26,7 +26,7 @@ import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { createUserAgent } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
