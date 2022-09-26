@@ -38,6 +38,7 @@ export const WithIcon = () => (
 
 export const Playground: ComponentStory<typeof Button> = args => <Button {...args}>Hello World</Button>;
 
+Playground.storyName = 'Button'
 Playground.argTypes = {
   onClick: { action: 'clicked' },
   variant: {

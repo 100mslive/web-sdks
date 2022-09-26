@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Toast } from './Toast';
 import { Button } from '../Button';
 import mdx from './Toast.mdx';
+import { ComponentStory } from '@storybook/react';
 
 const ReactToastStory = ({ ...props }) => {
   return (
@@ -33,7 +34,7 @@ const ToastMeta = {
   },
 };
 
-const ReactToastComponent = ({ ...props }) => {
+const ReactToastComponent: ComponentStory<typeof ReactToastStory> = ({ ...props }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -52,4 +53,5 @@ const ReactToastComponent = ({ ...props }) => {
 };
 
 export const Playground = ReactToastStory.bind({});
+Playground.storyName = 'Toast'
 export default ToastMeta;

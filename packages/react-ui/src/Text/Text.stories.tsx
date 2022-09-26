@@ -19,3 +19,4 @@ export default {
 const Template: ComponentStory<typeof Text> = args => <Text {...args}>The Evil Rabbit jumps.</Text>;
 
 export const Playground = Template.bind({});
+Playground.storyName = 'Text'

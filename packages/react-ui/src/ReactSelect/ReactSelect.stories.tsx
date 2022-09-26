@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from '@100mslive/react-icons';
 
 import { Text } from '../Text';
@@ -80,4 +80,4 @@ const Template: ComponentStory<typeof Select.Root> = () => {
   );
 };
 
-export const Multi = Template.bind({});
+export const WithGroup = Template.bind({});

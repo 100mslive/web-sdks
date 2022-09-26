@@ -26,9 +26,12 @@ const Template: ComponentStory<typeof Loading> = ({ color }) => {
 };
 
 export const Multiple = Template.bind({});
+Multiple.args = {
+  color: 'red'
+}
 
 export const Playground: ComponentStory<typeof Loading> = args => <Loading {...args} />;
-
+Playground.storyName = 'Loading'
 Playground.argTypes = {
   size: { control: { type: 'number' }, defaultValue: 24 },
   color: { defaultValue: 'blue' },

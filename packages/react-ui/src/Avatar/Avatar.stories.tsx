@@ -26,6 +26,7 @@ export const Playground = ({ height = 50, width = 50, css = {}, shape = 'circle'
   return <Avatar css={{ width: width, height: height, ...css }} name={name} shape={shape} />;
 };
 
+Playground.storyName = 'Avatar'
 Playground.argTypes = {
   height: { control: { type: 'number' } },
   width: { control: { type: 'number' } },
