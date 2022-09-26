@@ -959,7 +959,7 @@ export default class HMSTransport implements ITransport {
     const url = new URL(this.initConfig.endpoint);
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
-    url.searchParams.set('user_agent', this.store.getUserAgent());
+    url.searchParams.set('user_agent_v2', this.store.getUserAgent());
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);

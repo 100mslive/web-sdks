@@ -63,7 +63,7 @@ export function getUrl(endpoint: string, peerId: string, userAgent: string, regi
       url.searchParams.set('region', region.trim());
     }
     url.searchParams.set('peer_id', peerId);
-    url.searchParams.set('user_agent', userAgent);
+    url.searchParams.set('user_agent_v2', userAgent);
     return url.toString();
   } catch (err) {
     const error = err as Error;
