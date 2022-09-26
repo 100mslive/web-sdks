@@ -1,8 +1,11 @@
 import React from 'react';
+import { AddIcon } from '@100mslive/react-icons';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { VerticalDivider } from '.';
 import { Flex } from '../Layout';
+import { Button } from '../Button';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Divider',
@@ -18,9 +21,19 @@ export default {
 const VerticalDividerComponent: ComponentStory<typeof VerticalDivider> = ({ space, css }) => {
   return (
     <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
-      <div style={{ height: '20px', width: '20px', backgroundColor: 'red' }}></div>
+      <Button icon variant="primary">
+        <AddIcon />
+        <Text as="span" variant="button" css={{ c: 'white' }}>
+          Add Stuff
+        </Text>
+      </Button>
       <VerticalDivider space={space} css={{ bg: '$textPrimary', ...css }} />
-      <div style={{ height: '20px', width: '20px', backgroundColor: 'green' }}></div>
+      <Button icon variant="danger">
+        <AddIcon />
+        <Text as="span" variant="button" css={{ c: 'white' }}>
+          Add Another Stuff
+        </Text>
+      </Button>
     </Flex>
   );
 };

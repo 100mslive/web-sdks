@@ -3,6 +3,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { HorizontalDivider } from '.';
 import { Flex } from '../Layout';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Divider',
@@ -17,10 +18,16 @@ export default {
 
 const HorizontalDividerComponent: ComponentStory<typeof HorizontalDivider> = ({ space, css }) => {
   return (
-    <Flex align="center" direction="column" css={{ maxWidth: '500px' }}>
-      <div style={{ height: '20px', width: '20px', backgroundColor: 'red' }}></div>
-      <HorizontalDivider space={space} css={{ bg: '$textPrimary', ...css }} />
-      <div style={{ height: '20px', width: '20px', backgroundColor: 'green' }}></div>
+    <Flex align="center" direction="column" css={{ width: 'max-content', bg: '$bgTertiary', p: '$8', r: '$4' }}>
+      <ul style={{ listStyle: 'none', padding: '0px', margin: '0px', textAlign: "center" }}>
+        <Text as="li">Item 1</Text>
+        <Text as="li">Item 2</Text>
+        <Text as="li">Item 3</Text>
+        <HorizontalDivider space={space} css={{ bg: '$textSecondary', width: '80px', ...css }} />
+        <Text as="li">Item 4</Text>
+        <Text as="li">Item 5</Text>
+        <Text as="li">Item 6</Text>
+      </ul>
     </Flex>
   );
 };
