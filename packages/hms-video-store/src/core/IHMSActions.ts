@@ -191,7 +191,7 @@ export interface IHMSActions {
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): Promise<void>;
+  setPreferredLayer(trackId: HMSTrackID, layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
@@ -348,6 +348,24 @@ export interface IHMSActions {
    * JSON.stringify.
    */
   changeMetadata(metadata: string | any): Promise<void>;
+
+  /**
+   * If you want to update the metadata of the session. If an object is passed, it should be serializable using
+   * JSON.stringify.
+   *
+   * Session metadata is available to every peer in the room and is persisted throughout a session
+   * till the last peer leaves a room
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  setSessionMetadata(metadata: any, options?: { localOnly: boolean }): Promise<void>;
+
+  /**
+   * Fetch the current room metadata from the server and populate it in store
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  populateSessionMetadata(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.

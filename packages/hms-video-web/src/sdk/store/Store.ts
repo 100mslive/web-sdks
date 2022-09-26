@@ -274,7 +274,7 @@ class Store implements IStore {
       return [];
     }
     if (source === 'screen') {
-      return this.screenshareLayers?.layers || [];
+      return []; //this.screenshareLayers?.layers || []; uncomment this when screenshare simulcast supported
     }
     return this.videoLayers?.layers || [];
   }
@@ -322,7 +322,8 @@ class Store implements IStore {
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    if (!peer.role || !this.simulcastEnabled) {
+    // TODO: remove screen check when screenshare simulcast is supported
+    if ([!peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value) {
       return [];
     }
 

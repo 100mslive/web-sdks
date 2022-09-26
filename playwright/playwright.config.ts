@@ -30,7 +30,9 @@ const config: PlaywrightTestConfig = {
   //   testMatch: '**.test.js',
 
   /* Maximum time one test can run for. */
-  timeout: 180 * 1000,
+
+  timeout: 500 * 1000,
+
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -41,7 +43,7 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   // forbidOnly: isCI,
   /* Retry on CI only */
-  retries: 1,
+  retries: 2,
   /* Opt out of parallel tests on CI. */
   workers: workers,
   fullyParallel: true,
@@ -147,9 +149,7 @@ const setupEnv = () => {
     const baseUrl = process.env.base_url;
 
     const getUrl = (role: string) => {
-
-      return baseUrl + '/' + roomId + '/' + role;
-
+      return `${baseUrl}/${roomId}/${role}`;
     };
 
     console.log('env setup before all tests for worker - ', workerIndex, baseUrl, roomId);

@@ -1,4 +1,4 @@
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
+import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
 import { createSelector } from 'reselect';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
@@ -317,7 +317,9 @@ export const selectPeerSharingAudioPlaylist = createSelector(selectPeersMap, sel
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
  */
-export const selectDegradedTracks = createSelector(selectTracks, tracks => tracks.filter(isDegraded));
+export const selectDegradedTracks = createSelector(selectTracks, tracks =>
+  (tracks as HMSVideoTrack[]).filter(isDegraded),
+);
 
 /**
  * Select the number of messages(sent and received).
@@ -392,3 +394,5 @@ export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
+/** @alpha */
+export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;

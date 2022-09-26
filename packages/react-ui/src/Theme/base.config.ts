@@ -11,6 +11,7 @@ export const baseConfig = {
       cyan: '#8FF5FB',
       tamarind: '#F79133',
       yellow: '#FAC919',
+      twinYellow: '#ECC502',
       green: '#00AE63',
       darkgreen: '37F28D',
       purple: '#6554C0',

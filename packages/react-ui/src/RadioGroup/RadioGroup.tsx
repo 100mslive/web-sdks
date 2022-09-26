@@ -19,6 +19,7 @@ const RadioGroupItem = styled(RadioGroupPrimitive.Item, {
   },
   '&[data-state="checked"]': {
     borderWidth: '$space$2',
+    p: '$1',
   },
 });
 const RadioGroupIndicator = styled(RadioGroupPrimitive.Indicator, {
