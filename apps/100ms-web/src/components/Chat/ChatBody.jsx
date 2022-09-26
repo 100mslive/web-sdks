@@ -51,7 +51,7 @@ const MessageTypeContainer = ({ left, right }) => {
       }}
     >
       {left && (
-        <Text variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
+        <Text variant="xs" as="span" css={{ color: "$textMedEmp" }}>
           <SenderName>{left}</SenderName>
         </Text>
       )}
@@ -237,6 +237,8 @@ const ChatMessage = React.memo(({ message, autoMarginTop = false, onPin }) => {
               ml: "$4",
               color: "$textSecondary",
               flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
             }}
           >
             {formatTime(message.time)}
