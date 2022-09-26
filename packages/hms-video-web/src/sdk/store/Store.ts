@@ -323,11 +323,11 @@ class Store implements IStore {
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
     // TODO: remove screen check when screenshare simulcast is supported
-    if ([!peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value) {
+    if ([!peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value)) {
       return [];
     }
 
-    const publishParams = this.getPolicyForRole(peer.role.name).publishParams;
+    const publishParams = this.getPolicyForRole(peer.role!.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;
     if (source === 'regular') {
       simulcastLayers = publishParams.videoSimulcastLayers;
