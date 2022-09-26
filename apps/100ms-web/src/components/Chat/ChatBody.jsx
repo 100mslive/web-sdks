@@ -51,7 +51,7 @@ const MessageTypeContainer = ({ left, right }) => {
       }}
     >
       {left && (
-        <Text variant="xs" as="span" css={{ color: "$textMedEmp" }}>
+        <Text variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
           <SenderName>{left}</SenderName>
         </Text>
       )}
