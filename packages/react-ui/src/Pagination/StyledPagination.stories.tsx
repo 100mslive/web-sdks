@@ -56,7 +56,7 @@ export default {
   argTypes: {
     setPage: { action: { type: 'click' } },
     page: { control: { type: 'number' }, defaultValue: 0 },
-    numPages: { control: { type: 'number' }, defaultValue: 1 },
+    numPages: { control: { type: 'number' }, defaultValue: 5 },
   },
 } as ComponentMeta<typeof PaginationComponent>;
 
