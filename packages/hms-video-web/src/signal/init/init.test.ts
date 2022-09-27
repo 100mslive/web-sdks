@@ -1,9 +1,10 @@
 import { HMSException } from '../../error/HMSException';
+import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import InitService, { getUrl, transformInitConfig } from './index';
 
 describe('getUrl', () => {
-  const userAgent = createUserAgent();
+  const userAgent = createUserAgent(ENV.PROD);
   const userAgentQueryParam = new URLSearchParams(`user_agent_v2=${userAgent}`).toString();
   const peerId = '1234';
   it('should return the URL even if unnecesary params are passed to the endpoint', () => {
@@ -75,7 +76,7 @@ describe('init API call', () => {
   const wrongToken =
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjEwY2Q5Y2JmMzBlNzczZjQ3NTc3YjBkIiwicm9vbV9pZCI6IjYxOGU5NGY1YWYzMTg4ZGYzM2U2N2Q0NyIsInVzZXJfaWQiOiJiZTM5MzQwZC04ZDgzLTQ5ZjQtOTNhMy00ZjRmMTgwZTVkZWUiLCJyb2xlIjoiaG9zdCIsImp0aSI6IjY0ZTRjMTgzLWZkNTktNGE2OS1hOGY2LWNkNGE5MzBmOTYzZSIsInR5cGUiOiJhcHAiLCJ2ZXJzaW9uIjoyLCJleHAiOjE2NTIyNjUyNzV9.tX4BZllTjOuA5L3bgItoDYKQa6J3d-L2cayvQiEntHY';
 
-  const userAgent = createUserAgent();
+  const userAgent = createUserAgent(ENV.PROD);
 
   const mockResponse = (init: RequestInit | undefined): Promise<Response> => {
     const headers = init?.headers as Record<string, string>;

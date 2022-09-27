@@ -1,4 +1,3 @@
-import { ENV } from '../sdk/store/IStore';
 import {
   CLIENT_ANAYLTICS_PROD_ENDPOINT,
   CLIENT_ANAYLTICS_QA_ENDPOINT,
@@ -6,6 +5,7 @@ import {
 } from '../utils/constants';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
+import { ENV } from '../utils/support';
 import AnalyticsEvent from './AnalyticsEvent';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 

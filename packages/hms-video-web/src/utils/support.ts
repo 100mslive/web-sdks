@@ -9,6 +9,12 @@ export const isNode =
 
 export const isBrowser = typeof window !== 'undefined';
 
+export enum ENV {
+  PROD = 'prod',
+  QA = 'qa',
+  DEV = 'dev',
+}
+
 const checkIsSupported = () => {
   if (isNode) {
     return false;

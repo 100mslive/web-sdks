@@ -18,17 +18,12 @@ import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradati
 import { Comparator } from './Comparator';
 import { TrackState } from '../../notification-manager';
 import { IErrorListener } from '../../interfaces/error-listener';
+import { ENV } from '../../utils/support';
 
 export type KnownRoles = { [role: string]: HMSRole };
 export interface TrackStateEntry {
   peerId: string;
   trackInfo: TrackState;
-}
-
-export enum ENV {
-  PROD = 'prod',
-  QA = 'qa',
-  DEV = 'dev',
 }
 
 export interface IStore {
