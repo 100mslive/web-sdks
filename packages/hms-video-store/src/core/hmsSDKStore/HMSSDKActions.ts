@@ -627,6 +627,10 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
+  setFrameworkInfo(frameworkInfo: sdkTypes.HMSFrameworkInfo) {
+    this.sdk.setFrameworkInfo(frameworkInfo);
+  }
+
   ignoreMessageTypes(msgTypes: string[], replace = false) {
     if (replace) {
       this.ignoredMessageTypes = msgTypes;

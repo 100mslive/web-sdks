@@ -48,6 +48,7 @@ export class AnalyticsEventsService {
         const event = this.pendingEvents.shift();
         if (event) {
           event.metadata.peer.peer_id = this.store.getLocalPeer()?.peerId;
+          event.metadata.userAgent = this.store.getUserAgent();
           if (this.transport && this.transport.transportProvider.isConnected) {
             this.transport.sendEvent(event);
           } else {

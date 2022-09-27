@@ -29,3 +29,4 @@ const Template: ComponentStory<typeof RadioGroup.Root> = args => (
 );
 
 export const Example = Template.bind({});
+Example.storyName = 'RadioGroup'

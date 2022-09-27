@@ -1,7 +1,7 @@
-import { ENV, IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSSpeaker } from '../../interfaces';
+import { HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSTrack,
@@ -26,6 +26,8 @@ import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
+import { createUserAgent } from '../../utils/user-agent';
+import { ENV } from '../../utils/support';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -46,6 +48,7 @@ class Store implements IStore {
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
+  private userAgent: string = createUserAgent(this.env);
 
   getConfig() {
     return this.config;
@@ -168,6 +171,14 @@ class Store implements IStore {
 
   getSpeakerPeers() {
     return this.speakers.map(speaker => speaker.peer);
+  }
+
+  getUserAgent() {
+    return this.userAgent;
+  }
+
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
+    this.userAgent = createUserAgent(this.env, frameworkInfo);
   }
 
   setRoom(room: HMSRoom) {

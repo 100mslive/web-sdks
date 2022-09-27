@@ -16,7 +16,7 @@ export const darkTheme = {
     transparentBg: 'rgba(0, 0, 0, 0.22)',
     mainBg: '$black',
     tileBg: '#0F1115',
-    secondaryDisabled: '#F6F7F9',
+    secondaryDisabled: '#242A33',
     previewBg: '#111111',
     statsBg: 'rgba(0,0,0,0.75)',
     menuBg: '$grayDark',
@@ -48,7 +48,7 @@ export const lightTheme = {
     menuBg: '#d9d9d9',
     inputBg: '$tileBg',
     toastBg: '$menuBg',
-    secondaryDisabled: '#242A33',
+    secondaryDisabled: '#F6F7F9',
     // text variants
     textHighEmp: '#000000F2',
     textMedEmp: '#000000CC',

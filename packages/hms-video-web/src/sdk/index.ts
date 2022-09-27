@@ -3,6 +3,7 @@ import {
   HMSConfig,
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPlaylistType,
   HMSRole,
@@ -99,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
+  private frameworkInfo?: HMSFrameworkInfo;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -371,6 +373,8 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -821,6 +825,10 @@ export class HMSSdk implements HMSInterface {
     });
   }
 
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
+    this.frameworkInfo = frameworkInfo;
+  }
+
   private async publish(initialSettings: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
@@ -921,6 +929,8 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }

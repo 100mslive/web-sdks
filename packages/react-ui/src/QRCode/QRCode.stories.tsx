@@ -26,5 +26,4 @@ const Template: ComponentStory<typeof QRCode> = ({ ...args }) => (
   </Flex>
 );
 export const Example = Template.bind({});
-
-Example.args = {};
+Example.storyName = 'QRCode'

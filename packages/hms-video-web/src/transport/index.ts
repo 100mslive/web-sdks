@@ -28,7 +28,6 @@ import { JoinParameters } from './models/JoinParameters';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { RetryScheduler } from './RetryScheduler';
-import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
@@ -651,7 +650,7 @@ export default class HMSTransport implements ITransport {
         .then(() => {
           HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
-        .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
+        .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate', error));
     }
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
@@ -905,12 +904,17 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async internalConnect(token: string, endpoint: string, peerId: string) {
+  private async internalConnect(token: string, initEndpoint: string, peerId: string) {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
       this.analyticsTimer.start(TimedEvent.INIT);
-      this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      this.initConfig = await InitService.fetchInitConfig({
+        token,
+        peerId,
+        userAgent: this.store.getUserAgent(),
+        initEndpoint,
+      });
       this.analyticsTimer.end(TimedEvent.INIT);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
@@ -928,7 +932,7 @@ export default class HMSTransport implements ITransport {
             this.getAdditionalAnalyticsProperties(),
             connectRequestedAt,
             new Date(),
-            endpoint,
+            initEndpoint,
           ),
         );
       }
@@ -955,7 +959,7 @@ export default class HMSTransport implements ITransport {
     const url = new URL(this.initConfig.endpoint);
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
-    url.searchParams.set('user_agent', userAgent);
+    url.searchParams.set('user_agent_v2', this.store.getUserAgent());
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);
