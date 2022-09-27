@@ -44,27 +44,6 @@ export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
   });
 }
 
-export function createUserAgentV1(): string {
-  if (isNode) {
-    return `hmsclient/${sdk_version} web_nodejs`;
-  }
-  const parsedOs = parsedUserAgent.getOS();
-  const parsedDevice = parsedUserAgent.getDevice();
-  const parsedBrowser = parsedUserAgent.getBrowser();
-
-  const sdk = `hmsclient/${sdk_version}`;
-  const osNameVersion = replaceSpaces(`${parsedOs.name}/${parsedOs.version}`);
-  const os = `web_${osNameVersion}`;
-  const browser = replaceSpaces(`${parsedBrowser.name}_${parsedBrowser.version}`);
-  let device = browser;
-  if (parsedDevice.type) {
-    const deviceVendor = replaceSpaces(`${parsedDevice.vendor}_${parsedDevice.type}`);
-    device = `${deviceVendor}/${browser}`;
-  }
-
-  return `${sdk} ${os} ${device}`;
-}
-
 function replaceSpaces(s: string) {
   return s.replace(/ /g, '_');
 }
