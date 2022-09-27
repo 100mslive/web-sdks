@@ -6,7 +6,7 @@ import {
   selectIsLocalVideoEnabled,
   useAVToggle,
   useHMSActions,
-  selectVideoTrackByPeerID,
+  selectVideoTrackByID,
 } from "@100mslive/react-sdk";
 import {
   styled,
@@ -136,7 +136,7 @@ const PreviewTile = ({ name, error }) => {
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
-  const trackSelector = selectVideoTrackByPeerID(localPeer?.id);
+  const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
 
   const {
