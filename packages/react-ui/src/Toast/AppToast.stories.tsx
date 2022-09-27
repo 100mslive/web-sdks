@@ -34,7 +34,7 @@ const ToastMeta = {
   },
 };
 
-const ReactToastComponent: ComponentStory<typeof ReactToastStory> = ({ ...props }) => {
+const ReactToastComponent: ComponentStory<typeof ReactToastStory> = args => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -45,13 +45,13 @@ const ReactToastComponent: ComponentStory<typeof ReactToastStory> = ({ ...props 
         open={true}
         isClosable={true}
         onOpenChange={o => setIsOpen(o)}
-        {...props}
+        {...args}
       />
       <Toast.Viewport css={{ bottom: '$24' }} />
     </>
   );
 };
 
-export const Playground = ReactToastStory.bind({});
-Playground.storyName = 'Toast'
+export const Playground: ComponentStory<typeof ReactToastStory> = ReactToastStory.bind({});
+Playground.storyName = 'Toast';
 export default ToastMeta;
