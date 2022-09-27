@@ -373,6 +373,7 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    this.store.createAndSetUserAgent(this.frameworkInfo);
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -927,6 +928,7 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
@@ -993,7 +995,6 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
-    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId, this.store));
