@@ -114,7 +114,7 @@ const EndStream = () => {
   );
 };
 
-export const StartRecording = () => {
+const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
@@ -222,7 +222,7 @@ export const StartRecording = () => {
                 record: true,
               });
             } catch (error) {
-              if (error.message.includes("stream alredy running")) {
+              if (error.message.includes("stream already running")) {
                 ToastManager.addToast({
                   title: "Recording already running",
                   variant: "error",

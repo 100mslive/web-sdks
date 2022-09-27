@@ -12,6 +12,7 @@ import {
   selectLocalPeerID,
   selectPermissions,
   useHMSStore,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import {
   Box,
@@ -42,6 +43,7 @@ export const MoreSettings = () => {
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
   const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const { isBrowserRecordingOn } = useRecordingStreaming();
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -67,7 +69,7 @@ export const MoreSettings = () => {
               >
                 <RecordIcon />
                 <Text variant="sm" css={{ ml: "$4" }}>
-                  Start/Stop Recording
+                  {isBrowserRecordingOn ? "Stop" : "Start"} Recording
                 </Text>
               </Dropdown.Item>
               <Dropdown.ItemSeparator />

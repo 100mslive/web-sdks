@@ -36,18 +36,17 @@ const StartRecording = ({ open, onOpenChange }) => {
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Content align="end" sideOffset={8} css={{ w: "$64" }}>
-            <Dialog.Title css={{ p: "0 $4" }}>
+          <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
+            <Dialog.Title>
               <Text variant="h6">End Recording</Text>
             </Dialog.Title>
-            <Text variant="body" css={{ color: "$textMedEmp" }}>
+            <Text variant="body" css={{ color: "$textMedEmp", my: "$4" }}>
               Are you sure you want to end the recording?
             </Text>
             <Button
-              data-testid="stop_recording_confirm"
+              data-testid="stop_recording_confirm_mobile"
               variant="danger"
               icon
-              css={{ ml: "auto" }}
               onClick={async () => {
                 try {
                   await hmsActions.stopRTMPAndRecording();
@@ -74,12 +73,12 @@ const StartRecording = ({ open, onOpenChange }) => {
           <Text variant="h6">Start Recording</Text>
         </Dialog.Title>
         <ResolutionInput
-          testId="recording_resolution"
+          testId="recording_resolution_mobile"
           css={{ flexDirection: "column", alignItems: "start" }}
           onResolutionChange={setResolution}
         />
         <Button
-          data-testid="start_recording_confirm"
+          data-testid="start_recording_confirm_mobile"
           variant="primary"
           icon
           css={{ ml: "auto" }}
@@ -94,7 +93,7 @@ const StartRecording = ({ open, onOpenChange }) => {
                 record: true,
               });
             } catch (error) {
-              if (error.message.includes("stream alredy running")) {
+              if (error.message.includes("stream already running")) {
                 ToastManager.addToast({
                   title: "Recording already running",
                   variant: "error",
