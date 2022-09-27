@@ -21,6 +21,7 @@ const Chevron = styled('button', {
     color: '$grayDefault',
     cursor: 'not-allowed',
   },
+  display: 'flex',
 });
 
 const Dots = styled('div', {
@@ -40,6 +41,9 @@ const Dot = styled('button', {
   width: '0.5rem',
   height: '0.5rem',
   backgroundColor: '$textDisabled',
+  padding: '0px',
+  border: 'none',
+  cursor: 'pointer',
   variants: {
     active: {
       true: {
