@@ -1,17 +1,31 @@
 import { HMSFrameworkInfo } from '../interfaces';
-import { isNode, parsedUserAgent } from './support';
+import { ENV, isNode, parsedUserAgent } from './support';
 
 const sdk_version = require('../../package.json').version;
 
-export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
+type UserAgent = {
+  os: string;
+  os_version: string;
+  sdk: 'web';
+  sdk_version: string;
+  env: 'debug' | 'prod';
+  device_model?: string;
+  framework?: HMSFrameworkInfo['type'] | 'node';
+  framework_version?: HMSFrameworkInfo['version'];
+  framework_sdk_version?: HMSFrameworkInfo['sdkVersion'];
+};
+
+export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo): string {
   const sdk = 'web';
+  const env = sdkEnv === ENV.PROD ? 'prod' : 'debug';
 
   if (isNode) {
-    return convertObjectToString({
+    return convertObjectToString<UserAgent>({
       os: 'web_nodejs',
       os_version: process.version,
       sdk,
       sdk_version,
+      env,
       framework: 'node',
       framework_version: process.version,
       framework_sdk_version: frameworkInfo?.sdkVersion,
@@ -23,7 +37,7 @@ export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
   const parsedBrowser = parsedUserAgent.getBrowser();
 
   const os = replaceSpaces(`web_${parsedOs.name}`);
-  const os_version = parsedOs.version;
+  const os_version = parsedOs.version || '';
 
   const browser = replaceSpaces(`${parsedBrowser.name}_${parsedBrowser.version}`);
   let device_model = browser;
@@ -32,12 +46,13 @@ export function createUserAgent(frameworkInfo?: HMSFrameworkInfo): string {
     device_model = `${deviceVendor}/${browser}`;
   }
 
-  return convertObjectToString({
+  return convertObjectToString<UserAgent>({
     os,
     os_version,
     sdk,
     sdk_version,
     device_model,
+    env,
     framework: frameworkInfo?.type,
     framework_version: frameworkInfo?.version,
     framework_sdk_version: frameworkInfo?.sdkVersion,
@@ -48,7 +63,7 @@ function replaceSpaces(s: string) {
   return s.replace(/ /g, '_');
 }
 
-const convertObjectToString = (object: Record<string, string | undefined>, delimiter = ',') =>
+const convertObjectToString = <T extends Record<string, string | undefined>>(object: T, delimiter = ',') =>
   Object.keys(object)
     .filter(key => !!object[key])
     .map(key => `${key}:${object[key]}`)
