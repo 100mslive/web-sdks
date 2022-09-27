@@ -1,12 +1,15 @@
 import React from 'react';
 import { HMSRoomProvider } from '@100mslive/react-sdk';
+import { useDarkMode } from 'storybook-dark-mode';
+import { themes } from '@storybook/theming';
+
 import { setUpFakeStore, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
 import { HMSThemeProvider } from '../src/Theme';
-import { themes } from '@storybook/theming';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
+    expanded: true,
     matchers: {
       color: /(background|color)$/i,
       date: /Date$/,
@@ -23,11 +26,13 @@ export const parameters = {
 setUpFakeStore();
 
 export const decorators = [
-  Story => (
-    <HMSRoomProvider store={storyBookStore} actions={storyBookSDK}>
-      <HMSThemeProvider type="dark">
-        <Story />
-      </HMSThemeProvider>
-    </HMSRoomProvider>
-  ),
+  Story => {
+    return (
+      <HMSRoomProvider store={storyBookStore} actions={storyBookSDK}>
+        <HMSThemeProvider themeType={useDarkMode() ? 'dark' : 'light'}>
+          <Story />
+        </HMSThemeProvider>
+      </HMSRoomProvider>
+    );
+  },
 ];
