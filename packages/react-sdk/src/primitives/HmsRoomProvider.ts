@@ -97,6 +97,13 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
         });
       }
     }
+
+    // @ts-ignore
+    providerProps.actions.setFrameworkInfo({
+      type: 'react-web',
+      version: React.version,
+      sdkVersion: require('../../package.json').version,
+    });
   }
 
   useEffect(() => {

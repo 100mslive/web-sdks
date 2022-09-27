@@ -18,3 +18,4 @@ export * from './hms';
 export * from './rtmp-recording-config';
 export * from './hls-config';
 export * from './webrtc-stats';
+export * from './framework-info';

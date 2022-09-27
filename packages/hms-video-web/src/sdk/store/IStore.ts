@@ -1,4 +1,4 @@
-import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
+import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig, HMSFrameworkInfo } from '../../interfaces';
 import {
   HMSTrack,
   HMSAudioTrack,
@@ -78,6 +78,9 @@ export interface IStore {
 
   getTrackState(trackId: string): TrackStateEntry;
   setTrackState(trackState: TrackStateEntry): void;
+
+  getUserAgent(): string;
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo): void;
 
   removePeer(peerId: string): void;
   removeTrack(trackId: string): void;
