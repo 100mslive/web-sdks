@@ -20,7 +20,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
   const env = sdkEnv === ENV.PROD ? 'prod' : 'debug';
 
   if (isNode) {
-    return convertObjectToString<UserAgent>({
+    return convertObjectToString({
       os: 'web_nodejs',
       os_version: process.version,
       sdk,
@@ -46,7 +46,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     device_model = `${deviceVendor}/${browser}`;
   }
 
-  return convertObjectToString<UserAgent>({
+  return convertObjectToString({
     os,
     os_version,
     sdk,
@@ -63,8 +63,8 @@ function replaceSpaces(s: string) {
   return s.replace(/ /g, '_');
 }
 
-const convertObjectToString = <T extends Record<string, string | undefined>>(object: T, delimiter = ',') =>
+const convertObjectToString = (object: UserAgent, delimiter = ',') =>
   Object.keys(object)
-    .filter(key => !!object[key])
-    .map(key => `${key}:${object[key]}`)
+    .filter(key => !!object[key as keyof UserAgent])
+    .map(key => `${key}:${object[key as keyof UserAgent]}`)
     .join(delimiter);
