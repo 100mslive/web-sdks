@@ -41,8 +41,8 @@ const ReactToastComponent: ComponentStory<typeof ReactToastStory> = args => {
       <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</Button>
       <Toast.HMSToast
         title="This is a title"
-        description="Toast description goes here"
-        open={true}
+        description="This is a toast using the HMSToast component."
+        open={isOpen}
         isClosable={true}
         onOpenChange={o => setIsOpen(o)}
         {...args}
@@ -53,5 +53,5 @@ const ReactToastComponent: ComponentStory<typeof ReactToastStory> = args => {
 };
 
 export const Playground: ComponentStory<typeof ReactToastStory> = ReactToastStory.bind({});
-Playground.storyName = 'Toast';
+Playground.storyName = 'HMSToast';
 export default ToastMeta;
