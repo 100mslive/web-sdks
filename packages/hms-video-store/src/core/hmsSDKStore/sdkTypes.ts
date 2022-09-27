@@ -42,6 +42,7 @@ import {
   parsedUserAgent,
   HMSConnectionQuality,
   HLSMeetingURLVariant,
+  HMSFrameworkInfo,
 } from '@100mslive/hms-video';
 
 export {
@@ -91,4 +92,5 @@ export type {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HMSConnectionQuality,
+  HMSFrameworkInfo,
 };

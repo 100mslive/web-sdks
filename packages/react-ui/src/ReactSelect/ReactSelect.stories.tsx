@@ -1,7 +1,9 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Text } from '..';
+
+import { Text } from '../Text';
+import { Flex } from '../Layout';
 import { Select } from './ReactSelect';
 
 export default {
@@ -33,15 +35,17 @@ const data: {
   ],
 };
 
-const Template = () => {
+const Template: ComponentStory<typeof Select.Root> = () => {
   return (
     <Select.Root defaultValue="blueberry">
-      <Select.Trigger>
+      <Select.Trigger css={{ bg: '$bgSecondary' }}>
         <Select.Value />
-        <ChevronDownIcon color="white" />
+        <Flex css={{ color: '$textPrimary' }}>
+          <ChevronDownIcon />
+        </Flex>
       </Select.Trigger>
       <Select.Content>
-        <Select.ScrollUpButton>
+        <Select.ScrollUpButton css={{ color: '$textPrimary' }}>
           <ChevronUpIcon />
         </Select.ScrollUpButton>
         <Select.Viewport>
@@ -49,7 +53,7 @@ const Template = () => {
             <>
               <Select.Group>
                 <Select.Label>
-                  <Text variant="xs" css={{ color: '$textMedEmp' }}>
+                  <Text variant="xs" css={{ color: '$textSecondary' }}>
                     {item}
                   </Text>
                 </Select.Label>
@@ -58,17 +62,17 @@ const Template = () => {
                     <Select.ItemText>
                       <Text variant="md">{type?.name}</Text>
                     </Select.ItemText>
-                    <Select.ItemIndicator>
+                    <Select.ItemIndicator css={{ color: '$textPrimary' }}>
                       <CheckIcon />
                     </Select.ItemIndicator>
                   </Select.Item>
                 ))}
               </Select.Group>
-              {index < Object.keys(data).length - 1 && <Select.Separator />}
+              {index < Object.keys(data).length - 1 && <Select.Separator css={{ bg: '$borderDefault' }} />}
             </>
           ))}
         </Select.Viewport>
-        <Select.ScrollDownButton>
+        <Select.ScrollDownButton css={{ color: '$textPrimary' }}>
           <ChevronDownIcon />
         </Select.ScrollDownButton>
       </Select.Content>
@@ -76,4 +80,5 @@ const Template = () => {
   );
 };
 
-export const ReactSelectContent = Template.bind({});
+export const WithGroup = Template.bind({});
+WithGroup.storyName = 'ReactSelect';

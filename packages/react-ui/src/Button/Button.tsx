@@ -63,6 +63,7 @@ const getButtonVariants = (base: string, hover: string, active: string, disabled
 
 const StyledButton = styled('button', {
   ...flexCenter,
+  cursor: 'pointer',
   fontFamily: '$sans',
   position: 'relative',
   outline: 'none',

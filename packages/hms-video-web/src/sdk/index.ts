@@ -3,6 +3,7 @@ import {
   HMSConfig,
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPlaylistType,
   HMSRole,
@@ -99,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
+  private frameworkInfo?: HMSFrameworkInfo;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -821,6 +823,10 @@ export class HMSSdk implements HMSInterface {
     });
   }
 
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
+    this.frameworkInfo = frameworkInfo;
+  }
+
   private async publish(initialSettings: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
@@ -987,6 +993,7 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId, this.store));
