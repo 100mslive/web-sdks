@@ -7,7 +7,7 @@ import { Flex } from '../Layout';
 import { Select } from './ReactSelect';
 
 export default {
-  title: 'UI Components/Select',
+  title: 'UI Components/ReactSelect',
   component: Select.Root,
 } as ComponentMeta<typeof Select.Root>;
 
@@ -81,3 +81,4 @@ const Template: ComponentStory<typeof Select.Root> = () => {
 };
 
 export const WithGroup = Template.bind({});
+WithGroup.storyName = 'ReactSelect';
