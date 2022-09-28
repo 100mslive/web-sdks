@@ -366,7 +366,9 @@ export const selectRolesMap = (store: HMSStore): Record<string, HMSRole> => {
 /**
  * Select an array of names of available roles in the room.
  */
-export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMap => Object.keys(rolesMap));
+export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMap =>
+  Object.keys(rolesMap).filter(role => !role.startsWith('__internal')),
+);
 
 /**
  * Select the {@link HMSRole} object of your local peer.
