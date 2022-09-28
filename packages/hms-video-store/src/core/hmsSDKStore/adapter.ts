@@ -151,9 +151,11 @@ export class SDKToHMS {
   static convertRoles(sdkRoles: HMSRole[]): Record<HMSRoleName, HMSRole> {
     const roles: Record<HMSRoleName, HMSRole> = {};
     if (sdkRoles) {
-      sdkRoles.forEach(role => {
-        roles[role.name] = role;
-      });
+      sdkRoles
+        .filter(role => !role.name.startsWith('__internal'))
+        .forEach(role => {
+          roles[role.name] = role;
+        });
     }
     return roles;
   }
