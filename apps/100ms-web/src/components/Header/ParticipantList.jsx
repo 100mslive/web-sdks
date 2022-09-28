@@ -211,6 +211,7 @@ const Participant = ({
       {showActions && (
         <ParticipantActions
           peerId={peer.id}
+          role={peer.roleName}
           onSettings={() => {
             onParticipantAction(peer.id);
           }}
@@ -224,7 +225,7 @@ const Participant = ({
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(({ onSettings, peerId }) => {
+const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
@@ -236,8 +237,12 @@ const ParticipantActions = React.memo(({ onSettings, peerId }) => {
     <Flex align="center" css={{ flexShrink: 0 }}>
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && <HandRaiseIcon />}
-      {shouldShowMoreActions && (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} />
+      {shouldShowMoreActions && role && (
+        <ParticipantMoreActions
+          onRoleChange={onSettings}
+          peerId={peerId}
+          role={role}
+        />
       )}
     </Flex>
   );

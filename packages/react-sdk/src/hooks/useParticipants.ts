@@ -52,7 +52,7 @@ export const useParticipants = (params?: useParticipantsParams) => {
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);
   let participantList = useHMSStore(isConnected ? selectPeers : selectRemotePeers);
-  const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName)));
+  const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName).filter(role => !!role)));
   const vanillaStore = useHMSVanillaStore();
   if (params?.metadata?.isHandRaised) {
     participantList = participantList.filter(peer => {
