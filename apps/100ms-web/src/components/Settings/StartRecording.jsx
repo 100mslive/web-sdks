@@ -6,12 +6,11 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { Button, Text, Dialog, Flex } from "@100mslive/react-ui";
 import { AlertTriangleIcon } from "@100mslive/react-icons";
+import { Button, Text, Dialog, Flex } from "@100mslive/react-ui";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
 import { ResolutionInput } from "../Streaming/ResolutionInput";
-
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { getDefaultMeetingUrl } from "../../common/utils";
 import {
@@ -52,13 +51,16 @@ const StartRecording = ({ open, onOpenChange }) => {
                 </Text>
               </Flex>
             </Dialog.Title>
-            <Text variant="sm" css={{ c: "$textMedEmp", my: "$4" }}>
+            <Text variant="sm" css={{ c: "$textMedEmp", my: "$8" }}>
               Are you sure you want to end recording? You can’t undo this
               action.
             </Text>
-            <Flex justify="between" css={{ mt: "$8" }}>
+            <Flex justify="end" css={{ mt: "$12" }}>
               <Dialog.Close asChild>
-                <Button outlined css={{ borderColor: "$secondaryLight" }}>
+                <Button
+                  outlined
+                  css={{ borderColor: "$secondaryLight", mr: "$4" }}
+                >
                   Don't end
                 </Button>
               </Dialog.Close>
