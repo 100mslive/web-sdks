@@ -58,8 +58,9 @@ const StartRecording = ({ open, onOpenChange }) => {
                 }
                 onOpenChange(false);
               }}
+              css={{ ml: "auto" }}
             >
-              Stop
+              End recording
             </Button>
           </Dialog.Content>
         </Dialog.Portal>
