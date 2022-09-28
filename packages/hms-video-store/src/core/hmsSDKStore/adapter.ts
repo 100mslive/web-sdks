@@ -40,7 +40,7 @@ export class SDKToHMS {
     return {
       id: sdkPeer.peerId,
       name: sdkPeer.name,
-      roleName: sdkPeer.role?.name,
+      roleName: sdkPeer.role?.name.startsWith('__internal') ? undefined : sdkPeer.role?.name,
       isLocal: sdkPeer.isLocal,
       videoTrack: sdkPeer.videoTrack?.trackId,
       audioTrack: sdkPeer.audioTrack?.trackId,
