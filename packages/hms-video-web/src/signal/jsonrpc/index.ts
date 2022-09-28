@@ -13,6 +13,8 @@ import {
   HLSRequestParams,
   BroadcastResponse,
   HLSTimedMetadataParams,
+  SessionMetadataUpdateParams,
+  GetSessionMetadataResponse,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -32,7 +34,7 @@ import { isPageHidden } from '../../utils/support';
 import { sleep } from '../../utils/timer-utils';
 
 export default class JsonRpcSignal implements ISignal {
-  readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[SIGNAL]: ';
   readonly observer: ISignalEventsObserver;
   readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
@@ -59,7 +61,7 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
-    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue} }`);
+    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue}`);
     if (this._isConnected === newValue) {
       return;
     }
@@ -298,6 +300,14 @@ export default class JsonRpcSignal implements ISignal {
 
   async updatePeer(params: UpdatePeerRequestParams) {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+  }
+
+  async setSessionMetadata(params: SessionMetadataUpdateParams) {
+    await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
+  }
+
+  getSessionMetadata() {
+    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
   }
 
   private onCloseHandler(event: CloseEvent) {

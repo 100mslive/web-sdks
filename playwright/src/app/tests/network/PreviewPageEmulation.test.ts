@@ -1,11 +1,11 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
 test.beforeEach(async ({ page: nativePage }) => {
   page = new PageWrapper(nativePage);
-  await page.preview.gotoPreviewPage();
+  await page.prepreview.gotoPreviewPage(page.localName);
 });
 
 test.afterEach(async () => {

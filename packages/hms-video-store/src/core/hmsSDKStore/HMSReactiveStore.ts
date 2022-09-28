@@ -16,7 +16,7 @@ import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
 import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../IHMSNotifications';
+import { IHMSNotifications } from '../schema/notification';
 import { NamedSetState } from './internalTypes';
 import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';
@@ -56,6 +56,9 @@ export class HMSReactiveStore {
       this.sdk = new HMSSdk();
       this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
+
+    // @ts-ignore
+    this.actions.setFrameworkInfo({ type: 'js', sdkVersion: require('../../../package.json').version });
 
     this.initialTriggerOnSubscribe = false;
 

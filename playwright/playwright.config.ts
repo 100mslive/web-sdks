@@ -1,7 +1,7 @@
-import { PlaywrightTestConfig } from "@playwright/test";
+import { PlaywrightTestConfig } from '@playwright/test';
 
 const envPath = process.env.ENV_PATH;
-require("dotenv").config({ path: envPath });
+require('dotenv').config({ path: envPath });
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -16,7 +16,7 @@ if (process.env.room_ids) {
   if (process.env.CI) {
     workers = 8;
   }
-  console.log("using number of workers", workers);
+  console.log('using number of workers', workers);
 }
 
 const isCI = !!process.env.CI;
@@ -26,11 +26,13 @@ const isCI = !!process.env.CI;
  */
 const config: PlaywrightTestConfig = {
   //globalSetup: require.resolve('./global-setup'),
-  testDir: "./src/app/tests",
+  testDir: './src/app/tests',
   //   testMatch: '**.test.js',
 
   /* Maximum time one test can run for. */
-  timeout: 180 * 1000,
+
+  timeout: 500 * 1000,
+
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -41,18 +43,14 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   // forbidOnly: isCI,
   /* Retry on CI only */
-  retries: 1,
+  retries: 2,
   /* Opt out of parallel tests on CI. */
   workers: workers,
   fullyParallel: true,
   // workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   // reporter: process.env.CI ? 'allure-playwright' : 'github',
-  reporter: [
-    ["html", { open: "never", outputFolder: "playwright-report" }],
-    ["./src/slackReporter.ts"],
-    ["dot"],
-  ],
+  reporter: [['html', { open: 'never', outputFolder: 'playwright-report' }], ['./src/slackReporter.ts'], ['dot']],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -62,13 +60,13 @@ const config: PlaywrightTestConfig = {
     baseURL: process.env.BASE_URL,
     headless: isCI,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "retain-on-failure",
+    trace: 'retain-on-failure',
     // Tell all tests to load signed-in state from 'storageState.json'.
     // storageState: `auth${env}.json`,
-    screenshot: "only-on-failure",
+    screenshot: 'only-on-failure',
     // capturing and discarding video takes CPU, avoid it on CI
-    video: isCI ? "on-first-retry" : "retain-on-failure",
-    permissions: ["microphone", "camera"],
+    video: isCI ? 'on-first-retry' : 'retain-on-failure',
+    permissions: ['microphone', 'camera'],
   },
 
   /* Configure projects for major browsers */
@@ -118,14 +116,14 @@ const config: PlaywrightTestConfig = {
     //     },
 
     {
-      name: "Google Chrome",
+      name: 'Google Chrome',
       use: {
-        channel: "chrome",
+        channel: 'chrome',
         launchOptions: {
           args: [
-            "--use-fake-device-for-media-stream",
-            "--use-fake-ui-for-media-stream",
-            "--autoplay-policy=no-user-gesture-required",
+            '--use-fake-device-for-media-stream',
+            '--use-fake-ui-for-media-stream',
+            '--autoplay-policy=no-user-gesture-required',
           ],
         },
       },
@@ -146,23 +144,23 @@ const setupEnv = () => {
   const workerIndex = Number(process.env.TEST_PARALLEL_INDEX);
   const roomIDsStr = process.env.room_ids;
   if (roomIDsStr && workerIndex !== undefined) {
-    const roomIds = roomIDsStr.split(",");
+    const roomIds = roomIDsStr.split(',');
     const roomId = roomIds[workerIndex];
     const baseUrl = process.env.base_url;
 
     const getUrl = (role: string) => {
-      return baseUrl + "/" + roomId + "/" + role;
+      return `${baseUrl}/${roomId}/${role}`;
     };
 
-    console.log("env setup before all tests for worker - ", workerIndex, baseUrl, roomId);
+    console.log('env setup before all tests for worker - ', workerIndex, baseUrl, roomId);
 
-    process.env.audio_url = getUrl("audio");
-    process.env.audio_video_url = getUrl("audio-video");
-    process.env.audio_video_screenshare_url = getUrl("audio-video-sshare");
-    process.env.screen_share_url = getUrl("screenshare");
-    process.env.video_url = getUrl("video");
-    process.env.viewer_url = getUrl("viewer");
-    process.env.hls_viewer_url = getUrl("hls-viewer");
+    process.env.audio_url = getUrl('audio');
+    process.env.audio_video_url = getUrl('audio-video');
+    process.env.audio_video_screenshare_url = getUrl('audio-video-sshare');
+    process.env.screen_share_url = getUrl('screenshare');
+    process.env.video_url = getUrl('video');
+    process.env.viewer_url = getUrl('viewer');
+    process.env.hls_viewer_url = getUrl('hls-viewer');
 
     const randomNumber = Math.floor(Math.random() * 10000);
     process.env.peer_name = `peer_${randomNumber}_`;

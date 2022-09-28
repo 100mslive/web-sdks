@@ -58,8 +58,7 @@ export class CypressPeer {
   }
 
   join = async () => {
-    this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
-    await this.waitTillConnected();
+    await this.actions.join({ userName: this.name, authToken: this.authToken, initEndpoint: this.initEndpoint });
     await this.waitForTracks(this.id);
     return `peer ${this.name} joined`;
   };
@@ -119,16 +118,6 @@ export class CypressPeer {
           resolve(true);
         }
       }, selectPeerByID(forPeerId));
-    });
-  };
-
-  private waitTillConnected = async () => {
-    return new Promise(resolve => {
-      this.store.subscribe(isConnected => {
-        if (isConnected) {
-          resolve(true);
-        }
-      }, selectIsConnectedToRoom);
     });
   };
 }
