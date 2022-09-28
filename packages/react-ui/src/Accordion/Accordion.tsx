@@ -31,7 +31,8 @@ const StyledItem = styled(BaseAccordion.Item, {
     borderTopRightRadius: '$0',
   },
   '&:last-child': {
-    borderBottom: '0',
+    borderBottomLeftRadius: '$4',
+    borderBottomRightRadius: '$4',
   },
   '&:focus-within': {
     position: 'relative',
