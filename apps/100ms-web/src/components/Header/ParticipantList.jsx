@@ -38,8 +38,8 @@ import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
 } from "../AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
 import { isInternalRole } from "../../common/utils";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -69,7 +69,7 @@ export const ParticipantList = () => {
             selection={filter}
             onSelection={setFilter}
             isConnected={isConnected}
-            roles={rolesWithParticipants.filter(role => !isInternalRole(role))}
+            roles={rolesWithParticipants}
           />
           <IconButton
             onClick={toggleSidepane}
