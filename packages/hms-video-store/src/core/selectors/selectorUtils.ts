@@ -1,4 +1,12 @@
-import { HMSPeer, HMSStore, HMSTrack, HMSTrackID, HMSVideoTrack } from '../schema';
+import {
+  HMSPeer,
+  HMSScreenAudioTrack,
+  HMSScreenVideoTrack,
+  HMSStore,
+  HMSTrack,
+  HMSTrackID,
+  HMSVideoTrack,
+} from '../schema';
 
 type trackCheck = (track: HMSTrack | undefined) => boolean | undefined;
 
@@ -18,7 +26,8 @@ export function getPeerTracksByCondition(
       }
     }
   }
-  return { video: videoTrack, audio: audioTrack };
+  // to use the proper type, right now it is only used for screenshare.
+  return { video: videoTrack as HMSScreenVideoTrack, audio: audioTrack as HMSScreenAudioTrack };
 }
 
 export function isAudio(track: HMSTrack | undefined) {
