@@ -35,7 +35,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                     </Flex>
                   </Dropdown.Trigger>
                   <Dropdown.Portal>
-                    <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth }}>
+                    <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
                       {roles.map(role => {
                         return (
                           <Dropdown.Item
