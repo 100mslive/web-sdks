@@ -157,7 +157,8 @@ const DeviceSelector = ({
               }}
               icon={icon}
               title={
-                devices.find(({ deviceId }) => deviceId === selection)?.label
+                devices.find(({ deviceId }) => deviceId === selection)?.label ||
+                "Select device from list"
               }
               open={open}
             />
@@ -166,7 +167,6 @@ const DeviceSelector = ({
                 align="start"
                 sideOffset={8}
                 css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
-                sticky="always"
               >
                 {devices.map(device => {
                   return (
