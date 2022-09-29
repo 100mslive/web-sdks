@@ -40,7 +40,7 @@ export class SDKToHMS {
     return {
       id: sdkPeer.peerId,
       name: sdkPeer.name,
-      roleName: sdkPeer.role?.name.startsWith('__internal') ? undefined : sdkPeer.role?.name,
+      roleName: sdkPeer.role?.name,
       isLocal: sdkPeer.isLocal,
       videoTrack: sdkPeer.videoTrack?.trackId,
       audioTrack: sdkPeer.audioTrack?.trackId,
@@ -151,11 +151,9 @@ export class SDKToHMS {
   static convertRoles(sdkRoles: HMSRole[]): Record<HMSRoleName, HMSRole> {
     const roles: Record<HMSRoleName, HMSRole> = {};
     if (sdkRoles) {
-      sdkRoles
-        .filter(role => !role.name.startsWith('__internal'))
-        .forEach(role => {
-          roles[role.name] = role;
-        });
+      sdkRoles.forEach(role => {
+        roles[role.name] = role;
+      });
     }
     return roles;
   }

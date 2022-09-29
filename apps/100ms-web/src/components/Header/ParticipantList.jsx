@@ -39,6 +39,7 @@ import {
   useSidepaneToggle,
 } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import { isInternalRole } from "../../common/utils";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -68,7 +69,7 @@ export const ParticipantList = () => {
             selection={filter}
             onSelection={setFilter}
             isConnected={isConnected}
-            roles={rolesWithParticipants}
+            roles={rolesWithParticipants.filter(role => !isInternalRole(role))}
           />
           <IconButton
             onClick={toggleSidepane}
@@ -237,7 +238,7 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
     <Flex align="center" css={{ flexShrink: 0 }}>
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && <HandRaiseIcon />}
-      {shouldShowMoreActions && role && (
+      {shouldShowMoreActions && !isInternalRole(role) && (
         <ParticipantMoreActions
           onRoleChange={onSettings}
           peerId={peerId}
