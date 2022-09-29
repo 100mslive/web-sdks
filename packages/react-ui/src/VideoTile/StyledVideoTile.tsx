@@ -58,15 +58,13 @@ const AudioIndicator = styled('div', {
   position: 'absolute',
   top: '$2',
   right: '$2',
-  color: '$textHighEmp',
+  color: '$white',
   bg: '$error',
   borderRadius: '$round',
   width: '$13',
   height: '$13',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
   mb: '5px',
+  ...flexCenter
 });
 
 const FullScreenButton = styled('button', {
