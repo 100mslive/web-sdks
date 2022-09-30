@@ -65,3 +65,4 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
 );
 
 export const Example = Template.bind({});
+Example.storyName = 'Dialog'

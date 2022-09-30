@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { PeopleIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Box, Text, Avatar, textEllipsis, Flex } from '..';
 import { Dropdown } from './Dropdown';
@@ -14,7 +14,7 @@ const participants = [
   { id: '768456', name: 'Jonty', roleName: 'Student' },
 ];
 
-const Template = () => {
+const Template: ComponentStory<typeof Dropdown.Content> = () => {
   const [open, setOpen] = React.useState(true);
 
   return (
@@ -39,7 +39,7 @@ const Template = () => {
               <PeopleIcon />
               <Text variant="md">2</Text>
             </Box>
-            <Box>{open ? <ChevronUpIcon /> : <ChevronDownIcon />}</Box>
+            <Flex>{open ? <ChevronUpIcon /> : <ChevronDownIcon />}</Flex>
           </Box>
         </Box>
       </Dropdown.Trigger>
@@ -53,9 +53,9 @@ const Template = () => {
               alignItems: 'flex-start',
             }}
           >
-            <Dropdown.Label>
+            <Dropdown.Label css={{ w: "initial "}}>
               <Text variant="md" data-testid={`role_student`}>
-                {'Students'}({participants.length})
+                {'Students '}({participants.length})
               </Text>
             </Dropdown.Label>
             {participants.map((peer, i) => (
@@ -91,3 +91,4 @@ const Template = () => {
 };
 
 export const DropdownContent = Template.bind({});
+DropdownContent.storyName = 'Dropdown'
