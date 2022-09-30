@@ -29,6 +29,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     data: string,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    simulcast: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
