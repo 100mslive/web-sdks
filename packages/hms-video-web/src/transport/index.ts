@@ -28,7 +28,6 @@ import { JoinParameters } from './models/JoinParameters';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { RetryScheduler } from './RetryScheduler';
-import { userAgent } from '../utils/support';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
@@ -54,6 +53,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import { getNetworkInfo } from '../utils/network-info';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { stringifyMediaStreamTrack } from '../utils/json';
 
 const TAG = '[HMSTransport]:';
 
@@ -246,12 +246,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', track);
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
       this.observer.onTrackRemove(track);
     },
 
@@ -602,6 +602,14 @@ export default class HMSTransport implements ITransport {
     });
   }
 
+  getSessionMetadata() {
+    return this.signal.getSessionMetadata();
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.signal.setSessionMetadata({ data: metadata });
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }
@@ -612,7 +620,11 @@ export default class HMSTransport implements ITransport {
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {
     track.publishedTrackId = track.getTrackIDBeingSent();
-    HMSLogger.d(TAG, `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`, track);
+    HMSLogger.d(
+      TAG,
+      `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`,
+      `${track}`,
+    );
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -639,14 +651,14 @@ export default class HMSTransport implements ITransport {
         .then(() => {
           HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
         })
-        .catch(error => HMSLogger.e(TAG, 'Failed setting maxBitrate', error));
+        .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate', error));
     }
 
-    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, track, this.callbacks);
+    HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
   private async unpublishTrack(track: HMSLocalTrack): Promise<void> {
-    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, track);
+    HMSLogger.d(TAG, `⏳ unpublishTrack: trackId=${track.trackId}`, `${track}`);
     if (track.publishedTrackId && this.trackStates.has(track.publishedTrackId)) {
       this.trackStates.delete(track.publishedTrackId);
     } else {
@@ -893,12 +905,17 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async internalConnect(token: string, endpoint: string, peerId: string) {
+  private async internalConnect(token: string, initEndpoint: string, peerId: string) {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
       this.analyticsTimer.start(TimedEvent.INIT);
-      this.initConfig = await InitService.fetchInitConfig(token, peerId, endpoint);
+      this.initConfig = await InitService.fetchInitConfig({
+        token,
+        peerId,
+        userAgent: this.store.getUserAgent(),
+        initEndpoint,
+      });
       this.analyticsTimer.end(TimedEvent.INIT);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
@@ -915,7 +932,7 @@ export default class HMSTransport implements ITransport {
             this.getAdditionalAnalyticsProperties(),
             connectRequestedAt,
             new Date(),
-            endpoint,
+            initEndpoint,
           ),
         );
       }
@@ -942,7 +959,7 @@ export default class HMSTransport implements ITransport {
     const url = new URL(this.initConfig.endpoint);
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
-    url.searchParams.set('user_agent', userAgent);
+    url.searchParams.set('user_agent_v2', this.store.getUserAgent());
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);

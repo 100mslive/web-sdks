@@ -5,7 +5,7 @@
   "excludeInternal": true,
   "excludePrivate": true,
   "excludeProtected": true,
-  "excludeTags": ["privateremarks"],
+  "excludeTags": ["@privateRemarks"],
   "hideBreadcrumbs": true,
   "hideInPageTOC": true,
   "publicPath": "/api-reference/javascript/v2/",

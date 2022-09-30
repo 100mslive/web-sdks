@@ -5,6 +5,7 @@ declare global {
       peer_name: string;
       beam_wait_timeout: string;
       twitch_rtmp_url: string;
+      twitch_rtmp_key: string;
       yt_rtmp_url: string;
       multi_peer_count: string;
     }

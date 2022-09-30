@@ -35,4 +35,16 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
   addNativeError(error: Error) {
     this.nativeError = error;
   }
+
+  toString() {
+    return `{
+      code: ${this.code};
+      name: ${this.name};
+      action: ${this.action};
+      message: ${this.message};
+      description: ${this.description};
+      isTerminal: ${this.isTerminal};
+      nativeError: ${this.nativeError?.message};
+    }`;
+  }
 }

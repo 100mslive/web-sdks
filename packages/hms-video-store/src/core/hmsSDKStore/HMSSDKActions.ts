@@ -12,6 +12,7 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  HMSVideoTrack,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -34,6 +35,7 @@ import {
   selectRoomStarted,
   selectRoomState,
   selectTrackByID,
+  selectVideoTrackByID,
   selectTracksMap,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -171,7 +173,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  join(config: sdkTypes.HMSConfig) {
+  async join(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('room join is called again');
       return; // ignore
@@ -181,7 +183,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
-      this.sdkJoinWithListeners(config);
+      await this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -573,6 +575,20 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
+  async setSessionMetadata(metadata: any) {
+    await this.sdk.setSessionMetadata(metadata);
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'setSessionMetadata');
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
@@ -604,6 +620,10 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
+  setFrameworkInfo(frameworkInfo: sdkTypes.HMSFrameworkInfo) {
+    this.sdk.setFrameworkInfo(frameworkInfo);
+  }
+
   ignoreMessageTypes(msgTypes: string[], replace = false) {
     if (replace) {
       this.ignoredMessageTypes = msgTypes;
@@ -625,8 +645,8 @@ export class HMSSDKActions implements IHMSActions {
     }, reason);
   }
 
-  private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
-    this.sdk.join(config, {
+  private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
+    await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
@@ -1061,7 +1081,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
-    HMSLogger.e('received error from sdk', error);
+    HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
   /**
@@ -1071,13 +1091,14 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectTrackByID(trackID));
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-          draft.tracks[trackID].degraded = sdkTrack.degraded;
+          const track = draft.tracks[trackID] as HMSVideoTrack;
+          track.layer = sdkTrack.getSimulcastLayer();
+          track.degraded = sdkTrack.degraded;
         }, action);
       }
     }
@@ -1149,7 +1170,7 @@ export class HMSSDKActions implements IHMSActions {
         track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');

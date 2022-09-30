@@ -16,9 +16,10 @@ import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HLSConfig } from './hls-config';
 import { ScreenShareConfig } from './track-settings';
+
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
-  join(config: HMSConfig, listener: HMSUpdateListener): void;
+  join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(): Promise<void>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
@@ -48,6 +49,11 @@ export default interface HMS {
   getHLSState(): HMSHLS | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
+
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
 
   /**
    * @deprecated The method should not be used

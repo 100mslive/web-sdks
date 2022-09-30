@@ -7,6 +7,7 @@ import {
   HMSTrack as SDKHMSTrack,
 } from '@100mslive/hms-video';
 import {
+  HMSAudioTrack,
   HMSDeviceChangeEvent,
   HMSException,
   HMSMessage,
@@ -19,6 +20,8 @@ import {
   HMSRoleName,
   HMSRoom,
   HMSTrack,
+  HMSTrackFacingMode,
+  HMSVideoTrack,
 } from '../schema';
 
 import * as sdkTypes from './sdkTypes';
@@ -57,24 +60,29 @@ export class SDKToHMS {
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
       peerId: sdkTrack.peerId || peerId,
-    };
+    } as HMSTrack;
     this.enrichTrack(track, sdkTrack);
     return track;
   }
 
   static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
-    if (track.source === 'screen' && track.type === 'video') {
-      // @ts-ignore
-      track.displaySurface = mediaSettings.displaySurface;
-    }
-    track.height = mediaSettings.height;
-    track.width = mediaSettings.width;
+
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
-      track.volume = sdkTrack.getVolume() || 0;
+      (track as HMSAudioTrack).volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
-    SDKToHMS.enrichVideoTrack(track, sdkTrack);
+    if (track.type === 'video') {
+      if (track.source === 'screen') {
+        // @ts-ignore
+        track.displaySurface = mediaSettings.displaySurface;
+      } else if (track.source === 'regular') {
+        (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
+      }
+      track.height = mediaSettings.height;
+      track.width = mediaSettings.width;
+      SDKToHMS.enrichVideoTrack(track as HMSVideoTrack, sdkTrack);
+    }
     SDKToHMS.enrichPluginsDetails(track, sdkTrack);
   }
 
@@ -86,7 +94,7 @@ export class SDKToHMS {
     }
   }
 
-  static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+  static enrichVideoTrack(track: HMSVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
       track.degraded = sdkTrack.degraded;
