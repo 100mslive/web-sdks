@@ -160,7 +160,7 @@ export default class JsonRpcSignal implements ISignal {
             ),
           );
         }
-      }
+      };
 
       this.socket.addEventListener('error', errorListener);
 
