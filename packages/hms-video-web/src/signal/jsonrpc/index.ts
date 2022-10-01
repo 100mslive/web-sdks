@@ -152,6 +152,7 @@ export default class JsonRpcSignal implements ISignal {
         if (promiseSettled) {
           this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
         } else {
+          promiseSettled = true;
           reject(
             ErrorFactory.WebSocketConnectionErrors.AbnormalClose(
               HMSAction.JOIN,
