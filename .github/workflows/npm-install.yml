@@ -24,5 +24,6 @@ jobs:
           node-version: '17'
       - name: NPM INSTALLS
         # working-directory: apps/100ms-web
-        run: npm install
+        run: ls
+        run: npm ci
       
