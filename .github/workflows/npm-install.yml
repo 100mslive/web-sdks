@@ -15,13 +15,11 @@ jobs:
   #     - run: npm install
   install-npm-mac:
     runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: apps/100ms-web
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
-      - run: pwd
-      - run: pwd && npm install
+      - uses: bahmutov/npm-install@v1.4.5
+        with:
+          working-directory: apps/100ms-web
