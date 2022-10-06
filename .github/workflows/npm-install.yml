@@ -16,11 +16,14 @@ jobs:
   install-npm-mac:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout files
+        uses: Bhacaz/checkout-files@v2
+        with:
+          files: apps/100ms-web
+      - name: Install Node
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
       - name: NPM INSTALLS
-        working-directory: apps/100ms-web
         run: npm install
       
