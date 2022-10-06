@@ -1,0 +1,22 @@
+name: npm-install
+run-name: ${{ github.actor }} is installing using npm
+on: [push]
+jobs:
+  install-npm-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '17'
+      - run: npm install
+      - run: npm run build
+  install-npm-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '17'
+      - run: npm install
+      - run: npm run build
