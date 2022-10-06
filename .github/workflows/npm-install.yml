@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '17'
       - name: NPM INSTALLS
-        # working-directory: apps/100ms-web
+        working-directory: apps/100ms-web
         run: ls
       # - run: cd apps/100ms-web
       - run: ls
