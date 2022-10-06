@@ -20,6 +20,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
-      - uses: bahmutov/npm-install@v1.4.5
-        with:
-          working-directory: apps/100ms-web
+      - name: NPM INSTALLS
+        run: npm install
+        working-directory: apps/100ms-web
+      
