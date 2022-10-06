@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: Bhacaz/checkout-files@v2
         with:
-          files: apps/100ms-web/
+          files: apps/100ms-web
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
