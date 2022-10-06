@@ -4,6 +4,9 @@ on: [push]
 jobs:
   install-npm-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: apps/100ms-web
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -13,10 +16,15 @@ jobs:
       - run: npm install
   install-npm-mac:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: apps/100ms-web
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
+      - run: echo "running npm install in mac at"
+      - run: pwd
       - run: cd apps/100ms-web
       - run: npm install
