@@ -24,4 +24,4 @@ jobs:
         with:
           node-version: '17'
       - run: pwd
-      - run: npm install
+      - run: pwd && npm install
