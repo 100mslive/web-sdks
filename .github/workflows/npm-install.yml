@@ -18,11 +18,11 @@ jobs:
     steps:
       - uses: Bhacaz/checkout-files@v2
         with:
-          files: package.json
+          files: apps/100ms-web
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
       - name: NPM INSTALLS
-        working-directory: apps/100ms-web
+        # working-directory: apps/100ms-web
         run: npm install
       
