@@ -17,7 +17,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout files
-        uses: Bhacaz/checkout-files@v2
+      - uses: Bhacaz/checkout-files@v2
         with:
           files: apps/100ms-web
       - name: Install Node
