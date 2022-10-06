@@ -9,6 +9,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
+      - run: cd apps/100ms-web
       - run: npm install
   install-npm-mac:
     runs-on: macos-latest
@@ -17,4 +18,5 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '17'
+      - run: cd apps/100ms-web
       - run: npm install
