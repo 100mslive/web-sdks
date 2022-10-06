@@ -21,6 +21,6 @@ jobs:
         with:
           node-version: '17'
       - name: NPM INSTALLS
-        run: npm install
         working-directory: apps/100ms-web
+        run: npm install
       
