@@ -25,7 +25,7 @@ jobs:
       - name: NPM INSTALLS
         # working-directory: apps/100ms-web
         run: ls
-      - run: cd 100ms-web
+      - run: cd apps/100ms-web
       - run: ls
       - run: npm ci
       
