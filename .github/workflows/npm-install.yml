@@ -11,7 +11,7 @@ jobs:
           node-version: '17'
       - name: npm install
         working-directory: apps/100ms-web
-      - run: npm install
+        run: npm install
   install-npm-mac:
     runs-on: macos-latest
     steps:
