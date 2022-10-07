@@ -29,7 +29,6 @@ const HLSView = React.lazy(() => import("./HLSView"));
 const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
 
 export const ConferenceMainView = () => {
-  console.log("TESTING GITHUB ACTIONS");
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
