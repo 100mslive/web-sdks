@@ -27,25 +27,23 @@ export default class RoleChangeManager {
       return;
     }
 
-    const wasPublishing = new Set(oldRole.publishParams.allowed || []);
-    const isPublishing = new Set(newRole.publishParams.allowed || []);
+    const wasPublishing = new Set(oldRole.publishParams.allowed);
+    const isPublishing = new Set(newRole.publishParams.allowed);
 
-    const shouldRemoveVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
+    const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
     const videoHasSimulcastDifference = this.hasSimulcastDifference(
       oldRole.publishParams.videoSimulcastLayers,
       newRole.publishParams.videoSimulcastLayers,
     );
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
-    const shouldRemoveScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
+    const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
     const screenHasSimulcastDifference = this.hasSimulcastDifference(
       oldRole.publishParams.screenSimulcastLayers,
       newRole.publishParams.screenSimulcastLayers,
     );
-    const removeVideo = [shouldRemoveVideo, videoHasSimulcastDifference].some(Boolean);
-    const removeScreen = [shouldRemoveScreen, screenHasSimulcastDifference].some(Boolean);
     await this.removeAudioTrack(removeAudio);
-    await this.removeVideoTracks(removeVideo);
-    await this.removeScreenTracks(removeScreen);
+    await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
+    await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
     this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
