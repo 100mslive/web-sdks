@@ -1,5 +1,5 @@
 name: npm-install
-run-name: ${{ github.actor }} is installing using npm
+run-name: ${{ github.actor }} is checking if npm install is working!
 on: [push]
 jobs:
   install-npm:
@@ -16,25 +16,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - name: ls
-        working-directory: apps/100ms-web
-        run: ls
       - name: npm install
         working-directory: apps/100ms-web
         run: npm install
-      - name: ls 2
-        working-directory: apps/100ms-web/node_modules/@100mslive
-        run: ls
-
-  # install-npm-mac:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: Bhacaz/checkout-files@v2
-  #       with:
-  #         files: apps/100ms-web
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '17'
-  #     - name: npm install
-  #       working-directory: apps/100ms-web
-  #       run: npm install
