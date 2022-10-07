@@ -19,7 +19,7 @@ jobs:
           filters: |
             webapp:
               - 'apps/100ms-web/**'
-        - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
