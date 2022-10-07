@@ -23,7 +23,7 @@ jobs:
         working-directory: apps/100ms-web
         run: npm install
       - name: ls 2
-        working-directory: apps/100ms-web/node_modules
+        working-directory: apps/100ms-web/node_modules/@100mslive
         run: ls
 
   # install-npm-mac:
