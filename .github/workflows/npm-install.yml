@@ -2,28 +2,33 @@ name: npm-install
 run-name: ${{ github.actor }} is installing using npm
 on: [push]
 jobs:
-  install-npm-windows:
-    runs-on: windows-latest
+  install-npm:
+    runs-on: [windows-latest, mac-latest]
+        strategy:
+      matrix:
+        node: [ 16, 17, 18 ]
+         os: [ubuntu-latest, windows-latest]
+    name: Testing with Node ${{ matrix.node }} on ${{ matrix.runs-on}}
     steps:
       - uses: Bhacaz/checkout-files@v2
         with:
           files: apps/100ms-web
       - uses: actions/setup-node@v3
         with:
-          node-version: '17'
+          node-version: ${{ matrix.node }}
       - name: npm install
         working-directory: apps/100ms-web
         run: npm install
 
-  install-npm-mac:
-    runs-on: macos-latest
-    steps:
-      - uses: Bhacaz/checkout-files@v2
-        with:
-          files: apps/100ms-web
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '17'
-      - name: npm install
-        working-directory: apps/100ms-web
-        run: npm install
+  # install-npm-mac:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: Bhacaz/checkout-files@v2
+  #       with:
+  #         files: apps/100ms-web
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '17'
+  #     - name: npm install
+  #       working-directory: apps/100ms-web
+  #       run: npm install
