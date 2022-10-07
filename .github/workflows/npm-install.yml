@@ -3,11 +3,11 @@ run-name: ${{ github.actor }} is installing using npm
 on: [push]
 jobs:
   install-npm:
-    runs-on: [windows-latest, mac-latest]
-        strategy:
-          matrix:
-            node: [ 16, 17, 18 ]
-            os: [ubuntu-latest, windows-latest]
+    strategy:
+      matrix:
+        node: [ 16, 17, 18 ]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: runs-on: ${{ matrix.os }}
     name: Testing with Node ${{ matrix.node }} on ${{ matrix.runs-on}}
     steps:
       - uses: Bhacaz/checkout-files@v2
