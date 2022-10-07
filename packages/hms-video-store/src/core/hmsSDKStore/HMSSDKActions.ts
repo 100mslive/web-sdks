@@ -121,7 +121,7 @@ export class HMSSDKActions implements IHMSActions {
 
   async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
-      this.setTrackVolume(value, trackId);
+      await this.setTrackVolume(value, trackId);
     } else {
       await this.sdk.getAudioOutput().setVolume(value);
       this.syncRoomState('setOutputVolume');
