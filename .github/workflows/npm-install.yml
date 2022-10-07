@@ -2,7 +2,6 @@ name: npm-install
 run-name: ${{ github.actor }} is installing using npm
 on: [push]
 jobs:
-  install-npm:
     runs-on: [windows-latest, mac-latest]
         strategy:
       matrix:
