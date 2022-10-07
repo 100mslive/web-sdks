@@ -22,6 +22,7 @@ jobs:
       - name: npm install
         working-directory: apps/100ms-web
         run: npm install
+      - name: ls 2
         working-directory: apps/100ms-web/node_modules
         run: ls
 
