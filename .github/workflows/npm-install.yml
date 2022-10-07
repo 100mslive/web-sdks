@@ -16,9 +16,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - name: npm install
+      - name: ls
         working-directory: apps/100ms-web
         run: ls
+      - name: npm install
+        working-directory: apps/100ms-web
         run: npm install
         working-directory: apps/100ms-web/node_modules
         run: ls
