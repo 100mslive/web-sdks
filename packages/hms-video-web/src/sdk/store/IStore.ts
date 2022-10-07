@@ -8,12 +8,7 @@ import {
   HMSLocalTrack,
 } from '../../media/tracks';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import {
-  SimulcastLayer,
-  SimulcastDimensions,
-  SimulcastLayers,
-  SimulcastLayerDefinition,
-} from '../../interfaces/simulcast-layers';
+import { SimulcastLayer, SimulcastDimensions, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import { Comparator } from './Comparator';
 import { TrackState } from '../../notification-manager';
@@ -63,8 +58,6 @@ export interface IStore {
 
   setRoom(room: HMSRoom): void;
   setKnownRoles(knownRoles: KnownRoles): void;
-  setVideoSimulcastLayers(layers: SimulcastLayers): void;
-  setScreenshareSimulcastLayers(layers: SimulcastLayers): void;
   setConfig(config: HMSConfig): void;
   setPublishParams(params: PublishParams): void;
   setErrorListener(listener: IErrorListener): void;
