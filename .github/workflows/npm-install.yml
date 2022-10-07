@@ -17,12 +17,12 @@ jobs:
         id: filter
         with:
           filters: |
-            100ms-web:
+            webapp:
               - 'apps/100ms-web/**'
         - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
-        if: steps.filter.outputs.backend == 'true'
+        if: steps.filter.outputs.webapp == 'true'
         working-directory: apps/100ms-web
         run: npm install
