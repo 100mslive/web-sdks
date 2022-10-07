@@ -41,8 +41,8 @@ export default class RoleChangeManager {
       oldRole.publishParams.screenSimulcastLayers,
       newRole.publishParams.screenSimulcastLayers,
     );
-    const removeVideo = [shouldRemoveVideo, videoHasSimulcastDifference].includes(true);
-    const removeScreen = [shouldRemoveScreen, screenHasSimulcastDifference].includes(true);
+    const removeVideo = [shouldRemoveVideo, videoHasSimulcastDifference].some(Boolean);
+    const removeScreen = [shouldRemoveScreen, screenHasSimulcastDifference].some(Boolean);
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo);
     await this.removeScreenTracks(removeScreen);
