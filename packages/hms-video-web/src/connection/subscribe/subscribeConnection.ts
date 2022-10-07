@@ -155,7 +155,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
           HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
           const shouldRetry = error.code / 100 === 5 || error.code === 429;
           if (!shouldRetry) {
-            break;
+            throw Error(`code=${error.code}, message=${error.message}`);
           }
           const delay = (2 + Math.random() * 2) * 1000;
           await sleep(delay);
