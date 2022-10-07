@@ -1,5 +1,6 @@
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
+import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
@@ -30,12 +31,20 @@ export default class RoleChangeManager {
     const isPublishing = new Set(newRole.publishParams.allowed || []);
 
     const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
+    const videoHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.videoSimulcastLayers,
+      newRole.publishParams.videoSimulcastLayers,
+    );
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
     const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
+    const screenHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.screenSimulcastLayers,
+      newRole.publishParams.screenSimulcastLayers,
+    );
 
-    await this.removeVideoTracks(removeVideo);
     await this.removeAudioTrack(removeAudio);
-    await this.removeScreenTracks(removeScreen);
+    await this.removeVideoTracks([removeVideo, videoHasSimulcastDifference].includes(true));
+    await this.removeScreenTracks([removeScreen, screenHasSimulcastDifference].includes(true));
     this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
@@ -101,5 +110,18 @@ export default class RoleChangeManager {
 
   private removeTrack(wasPublishing: Set<string>, isPublishing: Set<string>, type: string) {
     return wasPublishing.has(type) && !isPublishing.has(type);
+  }
+
+  private hasSimulcastDifference(oldLayers: SimulcastLayers, newLayers: SimulcastLayers) {
+    if (!oldLayers && !newLayers) {
+      return false;
+    }
+    if (oldLayers.width !== newLayers.width || oldLayers.height !== newLayers.height) {
+      return true;
+    }
+    if (oldLayers.layers.length !== newLayers.layers.length) {
+      return true;
+    }
+    return false;
   }
 }

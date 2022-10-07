@@ -221,6 +221,11 @@ class Store implements IStore {
 
   setPublishParams(params: PublishParams) {
     this.publishParams = params;
+    if (!this.simulcastEnabled) {
+      return;
+    }
+    this.videoLayers = this.convertSimulcastLayers(params.videoSimulcastLayers);
+    this.screenshareLayers = this.convertSimulcastLayers(params.screenSimulcastLayers);
   }
 
   addPeer(peer: HMSPeer) {
@@ -318,20 +323,6 @@ class Store implements IStore {
         };
       }),
     };
-  }
-
-  setVideoSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    if (!this.simulcastEnabled) {
-      return;
-    }
-    this.videoLayers = this.convertSimulcastLayers(simulcastLayers);
-  }
-
-  setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    if (!this.simulcastEnabled) {
-      return;
-    }
-    this.screenshareLayers = this.convertSimulcastLayers(simulcastLayers);
   }
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
