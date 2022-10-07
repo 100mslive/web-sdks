@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
-      working-directory: apps/100ms-web
+        working-directory: apps/100ms-web
         run: ls
         working-directory: apps/100ms-web
         run: npm install
