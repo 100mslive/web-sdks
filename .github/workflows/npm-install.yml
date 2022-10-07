@@ -13,9 +13,16 @@ jobs:
       - uses: Bhacaz/checkout-files@v2
         with:
           files: apps/100ms-web
-      - uses: actions/setup-node@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            100ms-web:
+              - 'apps/100ms-web/**'
+        - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
+        if: steps.filter.outputs.backend == 'true'
         working-directory: apps/100ms-web
         run: npm install
