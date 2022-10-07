@@ -119,11 +119,11 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
-  setVolume(value: number, trackId?: HMSTrackID): void {
+  async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
       this.setTrackVolume(value, trackId);
     } else {
-      this.sdk.getAudioOutput().setVolume(value);
+      await this.sdk.getAudioOutput().setVolume(value);
       this.syncRoomState('setOutputVolume');
     }
   }
@@ -1168,11 +1168,11 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
-  private setTrackVolume(value: number, trackId: HMSTrackID) {
+  private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
-        track.setVolume(value);
+        await track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
           if (track && track.type === 'audio') {

@@ -177,7 +177,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device

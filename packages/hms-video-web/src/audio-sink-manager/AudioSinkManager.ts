@@ -58,8 +58,8 @@ export class AudioSinkManager {
     return this.volume;
   }
 
-  setVolume(value: number) {
-    this.store.updateAudioOutputVolume(value);
+  async setVolume(value: number) {
+    await this.store.updateAudioOutputVolume(value);
     this.volume = value;
   }
 
