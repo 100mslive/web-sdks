@@ -14,13 +14,13 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  setAudio(enabled: boolean, trackId: string) {
+  async setAudio(enabled: boolean, trackId: string) {
     if (this.audio === enabled) {
       return;
     }
 
     this.audio = enabled;
-    this.connection.sendOverApiDataChannelWithResponse({
+    await this.connection.sendOverApiDataChannelWithResponse({
       params: {
         subscribed: this.audio,
         track_id: trackId,
@@ -48,7 +48,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
    */
   setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
     this.setVideoLayerLocally(layer, identifier, source);
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Switching to ${layer} layer`);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `request ${layer} layer`);
     return this.connection.sendOverApiDataChannelWithResponse({
       params: {
         max_spatial_layer: this.video,

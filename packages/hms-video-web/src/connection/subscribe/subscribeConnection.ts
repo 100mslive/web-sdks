@@ -11,12 +11,7 @@ import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
-import {
-  PreferAudioLayerParams,
-  PreferAudioLayerResponse,
-  PreferVideoLayerParams,
-  PreferVideoLayerResponse,
-} from '../channel-messages';
+import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
 import { sleep } from '../../utils/timer-utils';
 
 export default class HMSSubscribeConnection extends HMSConnection {
@@ -126,14 +121,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
   async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
     message: T,
     requestId?: string,
-  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> {
+  ): Promise<PreferLayerResponse> {
     const id = uuid();
     const request = JSON.stringify({
       id: requestId || id,
       jsonrpc: '2.0',
       ...message,
     });
-    return this.sendMessage<T>(request, id);
+    return this.sendMessage(request, id);
   }
 
   async close() {
@@ -149,15 +144,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   };
 
-  private sendMessage = async <T extends PreferAudioLayerParams | PreferVideoLayerParams>(
-    request: string,
-    requestId: string,
-  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> => {
+  private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
     if (this.apiChannel?.readyState === 'open') {
-      let response: T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse;
+      let response: PreferLayerResponse;
       for (let i = 0; i < this.MAX_RETRIES; i++) {
         this.apiChannel.send(request);
-        response = await this.waitForResponse<T>(requestId);
+        response = await this.waitForResponse(requestId);
         const error = response.error;
         if (error) {
           HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
@@ -174,13 +166,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return response!;
     } else {
       await sleep(1000);
-      return this.sendMessage<T>(request, requestId);
+      return this.sendMessage(request, requestId);
     }
   };
 
-  private waitForResponse = <T extends PreferAudioLayerParams | PreferVideoLayerParams>(
-    requestId: string,
-  ): Promise<T extends PreferAudioLayerParams ? PreferAudioLayerResponse : PreferVideoLayerResponse> => {
+  private waitForResponse = (requestId: string): Promise<PreferLayerResponse> => {
     return new Promise((resolve, reject) => {
       this.eventEmitter.on('message', (value: string) => {
         if (value.includes(requestId)) {
