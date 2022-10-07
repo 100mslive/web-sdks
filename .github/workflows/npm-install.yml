@@ -3,10 +3,10 @@ run-name: ${{ github.actor }} is checking if npm install is working!
 on: 
   push:
     paths-ignore:
-  - 'cypress/**'
-  - 'playwright/**'
-  - 'internal-docs/**'
-  - '.github/**'
+      - 'cypress/**'
+      - 'playwright/**'
+      - 'internal-docs/**'
+      - '.github/**'
 
 jobs:
   install-npm:
