@@ -357,7 +357,7 @@ export default class HMSTransport implements ITransport {
       HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
       this.state = TransportState.Failed;
       const ex = error as HMSException;
-      ex.isTerminal = ex.code === 500;
+      ex.isTerminal = ex.isTerminal || ex.code === 500;
       await this.observer.onStateChange(this.state, ex);
       throw ex;
     }
