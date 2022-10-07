@@ -8,7 +8,7 @@ jobs:
         node: [ 16, 17, 18 ]
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    name: OS - ${{ matrix.runsOn}} Node - ${{ matrix.node }}
+    name: Testing Node - ${{ matrix.node }} on ${{ matrix.os }} 
     steps:
       - uses: Bhacaz/checkout-files@v2
         with:
