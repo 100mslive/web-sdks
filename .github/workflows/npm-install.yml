@@ -17,8 +17,12 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
+      working-directory: apps/100ms-web
+        run: ls
         working-directory: apps/100ms-web
         run: npm install
+        working-directory: apps/100ms-web/node_modules
+        run: ls
 
   # install-npm-mac:
   #   runs-on: macos-latest
