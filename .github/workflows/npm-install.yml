@@ -25,6 +25,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: npm install
-        if: ${{ steps.filter.outputs.webapp == 'true' }}
+        # if: ${{ steps.filter.outputs.webapp == 'true' }}
         working-directory: ./apps/100ms-web
         run: npm install
