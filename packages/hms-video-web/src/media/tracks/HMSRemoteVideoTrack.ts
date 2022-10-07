@@ -46,10 +46,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       );
       return;
     }
-    const updated = await this.requestLayer(layer, 'preferLayer');
-    if (updated) {
-      this.pushInHistory(`uiPreferLayer-${layer}`);
-    }
+    await this.requestLayer(layer, 'preferLayer');
+    this.pushInHistory(`uiPreferLayer-${layer}`);
   }
 
   getSimulcastLayer() {
@@ -136,22 +134,14 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         this.logIdentifier,
         source,
       );
-      if (response) {
-        const layerUpdate = response.result;
-        this.setLayerFromServer(layerUpdate);
-        HMSLogger.d(
-          `[Remote Track] ${this.logIdentifier} source:${source}`,
-          `expected_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
-          `subscriber_degraded: ${layerUpdate.subscriber_degraded}, publisher_degraded: ${layerUpdate.publisher_degraded}`,
-        );
-      }
-      return true;
+      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${this.source}`);
+      return response;
     } catch (error) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
       );
-      return false;
+      throw error;
     }
   }
 

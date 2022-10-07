@@ -8,13 +8,12 @@ export interface PreferVideoLayerParams {
   method: 'prefer-video-track-state';
 }
 
-export interface PreferVideoLayerResponse {
-  result: VideoTrackLayerUpdate;
+export interface PreferLayerResponse {
+  id: string;
   error?: {
     code: number;
     message: string;
   };
-  method: 'prefer-video-track-state';
 }
 
 export interface PreferAudioLayerParams {
@@ -23,14 +22,6 @@ export interface PreferAudioLayerParams {
     track_id: string;
   };
   method: 'prefer-audio-track-state';
-}
-
-export interface PreferAudioLayerResponse {
-  id: string;
-  error?: {
-    code: number;
-    message: string;
-  };
 }
 
 export interface VideoTrackLayerUpdate {

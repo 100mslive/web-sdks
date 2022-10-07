@@ -262,8 +262,10 @@ class Store implements IStore {
     this.speakers = speakers;
   }
 
-  updateAudioOutputVolume(value: number) {
-    this.getAudioTracks().forEach(track => track.setVolume(value));
+  async updateAudioOutputVolume(value: number) {
+    for (const track of this.getAudioTracks()) {
+      await track.setVolume(value);
+    }
   }
 
   updateAudioOutputDevice(device: MediaDeviceInfo) {

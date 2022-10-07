@@ -31,7 +31,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     throw new Error('Method not implemented.');
   }
 
-  setVolume(_value: number, _trackId?: string): void {
+  setVolume(_value: number, _trackId?: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
