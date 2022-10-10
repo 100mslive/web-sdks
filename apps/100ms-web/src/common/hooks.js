@@ -4,13 +4,13 @@ import {
   useHMSStore,
   selectPeerCount,
   selectPermissions,
-  selectHLSState,
-  selectRTMPState,
-  selectRecordingState,
   selectIsConnectedToRoom,
+  useRecordingStreaming,
+  selectAvailableRoleNames,
 } from "@100mslive/react-sdk";
 import { useEffect, useRef, useState } from "react";
 import { useIsHeadless } from "../components/AppData/useUISettings";
+import { isInternalRole } from "./utils";
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -27,6 +27,7 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 
   useEffect(() => {
     if (alone && !cbTimeout.current) {
+      // @ts-ignore
       cbTimeout.current = setTimeout(() => {
         setAloneForLong(true);
       }, thresholdMs);
@@ -39,7 +40,9 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 
   useEffect(() => {
     return () => {
-      clearTimeout(cbTimeout.current);
+      if (cbTimeout.current) {
+        clearTimeout(cbTimeout.current);
+      }
     };
   }, []);
 
@@ -51,9 +54,8 @@ export const useBeamAutoLeave = () => {
   const permissions = useHMSStore(selectPermissions);
   const isHeadless = useIsHeadless();
   const { aloneForLong } = useWhenAloneInRoom();
-  const hls = useHMSStore(selectHLSState);
-  const rtmp = useHMSStore(selectRTMPState);
-  const recording = useHMSStore(selectRecordingState);
+  const { isHLSRunning, isRTMPRunning, isBrowserRecordingOn } =
+    useRecordingStreaming();
 
   /**
    * End room after 5 minutes of being alone in the room to stop beam
@@ -61,19 +63,34 @@ export const useBeamAutoLeave = () => {
    */
   useEffect(() => {
     if (aloneForLong && isHeadless) {
-      if (permissions.endRoom) {
+      if (permissions?.endRoom) {
         hmsActions.endRoom(false, "Stop Beam");
       } else {
-        if (hls.running && permissions.streaming) {
+        if (isHLSRunning && permissions?.hlsStreaming) {
           hmsActions.stopHLSStreaming();
         }
         if (
-          (rtmp.running && permissions.streaming) ||
-          (recording.browser.running && permissions.recording)
+          (isRTMPRunning && permissions?.rtmpStreaming) ||
+          (isBrowserRecordingOn && permissions?.browserRecording)
         ) {
           hmsActions.stopRTMPAndRecording();
         }
       }
     }
-  }, [aloneForLong, isHeadless, hmsActions, permissions, hls, recording, rtmp]);
+  }, [
+    aloneForLong,
+    isHeadless,
+    hmsActions,
+    permissions,
+    isHLSRunning,
+    isRTMPRunning,
+    isBrowserRecordingOn,
+  ]);
+};
+
+export const useFilteredRoles = () => {
+  const roles = useHMSStore(selectAvailableRoleNames).filter(
+    role => !isInternalRole(role)
+  );
+  return roles;
 };

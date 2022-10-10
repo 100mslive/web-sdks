@@ -3,7 +3,7 @@ import { DeviceManager } from '.';
 
 export interface IAudioOutputManager {
   getDevice(): MediaDeviceInfo | undefined;
-  setDevice(deviceId: string): MediaDeviceInfo | undefined;
+  setDevice(deviceId: string): Promise<MediaDeviceInfo | undefined>;
   getVolume(): number;
   setVolume(value: number): void;
 }

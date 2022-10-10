@@ -49,11 +49,21 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    AbnormalClose(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
+        'WebSocketAbnormalClose',
+        action,
+        `Websocket closed abnormally`,
+        description,
+      );
+    },
   },
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description, true);
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -61,7 +71,7 @@ export const ErrorFactory = {
         ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
-        `Endpoint is not reachable.`,
+        `Endpoint is not reachable - ${description}`,
         description,
       );
     },

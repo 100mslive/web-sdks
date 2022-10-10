@@ -34,6 +34,7 @@ import {
   HMSAudioPlugin,
   HLSConfig,
   HMSHLS,
+  HLSTimedMetadata,
   HMSPeerStats,
   HMSTrackStats,
   HMSLocalTrackStats,
@@ -41,6 +42,7 @@ import {
   parsedUserAgent,
   HMSConnectionQuality,
   HLSMeetingURLVariant,
+  HMSFrameworkInfo,
 } from '@100mslive/hms-video';
 
 export {
@@ -82,6 +84,7 @@ export type {
   HMSVideoPlugin,
   HMSAudioPlugin,
   HLSConfig,
+  HLSTimedMetadata,
   HLSMeetingURLVariant,
   HMSHLS,
   HMSPeerStats,
@@ -89,4 +92,5 @@ export type {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HMSConnectionQuality,
+  HMSFrameworkInfo,
 };

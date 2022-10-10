@@ -1,5 +1,5 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 test.beforeEach(async () => {});
 

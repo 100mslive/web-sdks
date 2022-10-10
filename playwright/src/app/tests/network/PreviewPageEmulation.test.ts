@@ -1,28 +1,22 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
 test.beforeEach(async ({ page: nativePage }) => {
   page = new PageWrapper(nativePage);
-  await page.preview.gotoPreviewPage();
+  await page.prepreview.gotoPreviewPage(page.localName);
 });
 
 test.afterEach(async () => {
   await page.close();
 });
 
-
-test(`Verify you are offline now notification`, async () => {
+test(`Verify network connection/disconnection notification on preview page`, async () => {
   await page.assertVisible(page.preview.preview_audio_on_btn);
-  await page.emulateNetwork(true, -1, -1, -1);
+  await page.setInternetEnabled(false);
   await page.assertVisible(page.center.network_offline_notification);
-});
-
-test(`Verify you are now connected notification`, async () => {
-  await page.assertVisible(page.preview.preview_audio_on_btn);
-  await page.emulateNetwork(true, -1, -1, -1);
-    await page.assertVisible(page.center.network_offline_notification);
-    await page.emulateNetwork(false, 0, 500, 500);
-    await page.assertVisible(page.center.network_connected_notification);
+  await page.delay(5000);
+  await page.setInternetEnabled(true);
+  await page.assertVisible(page.center.network_connected_notification);
 });

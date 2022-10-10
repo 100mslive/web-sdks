@@ -4,10 +4,11 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
-import { UI_SETTINGS } from "../common/constants";
-import { isScreenshareSupported } from "../common/utils";
+import { Tooltip } from "@100mslive/react-ui";
+import IconButton from "../IconButton";
 import { useUISettings } from "./AppData/useUISettings";
+import { isScreenshareSupported } from "../common/utils";
+import { UI_SETTINGS } from "../common/constants";
 
 export const ScreenshareToggle = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -22,7 +23,7 @@ export const ScreenshareToggle = ({ css }) => {
     return null;
   }
   return (
-    <Tooltip title={`${!isVideoScreenshare ? "Start" : "Stop"} Screen sharing`}>
+    <Tooltip title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}>
       <IconButton
         active={!isVideoScreenshare}
         css={css}

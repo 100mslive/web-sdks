@@ -19,8 +19,12 @@ export class AnalyticsTimer {
   }
 
   end(eventName: TimedEvent) {
-    this.eventPerformanceMeasures[eventName] = performance.measure(eventName, eventName);
-    HMSLogger.d('[HMSPerformanceTiming]', eventName, this.eventPerformanceMeasures[eventName]?.duration);
+    try {
+      this.eventPerformanceMeasures[eventName] = performance.measure(eventName, eventName);
+      HMSLogger.d('[HMSPerformanceTiming]', eventName, this.eventPerformanceMeasures[eventName]?.duration);
+    } catch (error) {
+      HMSLogger.w('[AnalyticsTimer]', `Error in measuring performance for event ${eventName}`, { error });
+    }
   }
 
   getTimeTaken(eventName: TimedEvent) {

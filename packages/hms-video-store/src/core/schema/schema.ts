@@ -28,6 +28,7 @@ export interface HMSStore {
   roles: Record<string, HMSRole>;
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
+  sessionMetadata?: any;
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 

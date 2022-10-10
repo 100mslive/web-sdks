@@ -12,6 +12,7 @@ import {
   HMSTrack,
   HMSTrackID,
   HMSTrackSource,
+  HMSVideoTrack,
   IHMSPlaylistActions,
 } from '../schema';
 import { IHMSActions } from '../IHMSActions';
@@ -34,6 +35,7 @@ import {
   selectRoomStarted,
   selectRoomState,
   selectTrackByID,
+  selectVideoTrackByID,
   selectTracksMap,
 } from '../selectors';
 import { HMSLogger } from '../../common/ui-logger';
@@ -66,7 +68,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { NamedSetState } from './internalTypes';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import { HMSPlaylist } from './HMSPlaylist';
-import { ACTION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -126,8 +128,8 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setAudioOutputDevice(deviceId: string): void {
-    const deviceInfo = this.sdk.getAudioOutput().setDevice(deviceId);
+  async setAudioOutputDevice(deviceId: string): Promise<void> {
+    const deviceInfo = await this.sdk.getAudioOutput().setDevice(deviceId);
     if (deviceInfo) {
       this.setState(draftStore => {
         draftStore.settings.audioOutputDeviceId = deviceId;
@@ -171,7 +173,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  join(config: sdkTypes.HMSConfig) {
+  async join(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('room join is called again');
       return; // ignore
@@ -181,7 +183,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
-      this.sdkJoinWithListeners(config);
+      await this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -376,10 +378,13 @@ export class HMSSDKActions implements IHMSActions {
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+    if (sdkTrack?.type === 'video') {
+      (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
       this.updateVideoLayer(trackID, 'detachVideo');
     } else {
+      if (videoElement) {
+        videoElement.srcObject = null; // so chrome can clean up
+      }
       this.logPossibleInconsistency('no video track found to remove sink');
     }
   }
@@ -400,14 +405,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('video Track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has video track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -422,14 +430,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('audio track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has audio track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -542,7 +553,7 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+  async startHLSStreaming(params?: sdkTypes.HLSConfig) {
     await this.sdk.startHLSStreaming(params);
   }
 
@@ -550,6 +561,9 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopHLSStreaming(params);
   }
 
+  async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
+    await this.sdk.sendHLSTimedMetadata(metadataList);
+  }
   async changeName(name: string) {
     await this.sdk.changeName(name);
   }
@@ -559,6 +573,20 @@ export class HMSSDKActions implements IHMSActions {
       metadata = JSON.stringify(metadata);
     }
     await this.sdk.changeMetadata(metadata);
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.sdk.setSessionMetadata(metadata);
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'setSessionMetadata');
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -592,6 +620,10 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
+  setFrameworkInfo(frameworkInfo: sdkTypes.HMSFrameworkInfo) {
+    this.sdk.setFrameworkInfo(frameworkInfo);
+  }
+
   ignoreMessageTypes(msgTypes: string[], replace = false) {
     if (replace) {
       this.ignoredMessageTypes = msgTypes;
@@ -605,16 +637,16 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private resetState(reason = 'resetState') {
-    this.setState(store => {
-      Object.assign(store, createDefaultStoreState());
-    }, reason);
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
     HMSLogger.cleanUp();
+    this.setState(store => {
+      Object.assign(store, createDefaultStoreState());
+    }, reason);
   }
 
-  private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
-    this.sdk.join(config, {
+  private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
+    await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
@@ -670,8 +702,6 @@ export class HMSSDKActions implements IHMSActions {
         Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
       }
     }, 'deviceChange');
-    // sync is needed to update the current selected device
-    // this.syncRoomState('deviceChangeSync');
     // send notification only on device change - selection is present
     if (event.selection) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
@@ -731,7 +761,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
       this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
@@ -750,7 +780,8 @@ export class HMSSDKActions implements IHMSActions {
    * interested in with a new reference.
    * @protected
    */
-  protected syncRoomState(action?: string) {
+  protected syncRoomState(action: string) {
+    action = `${action}_fullSync`;
     HMSLogger.time(`store-sync-${action}`);
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
@@ -846,11 +877,10 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  //@ts-ignore
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room));
-    }, 'RoomUpdate');
+    }, type);
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
@@ -881,7 +911,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
     } else {
-      const actionName = type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
+      const actionName = TRACK_NOTIFICATION_TYPES[type] || 'trackUpdate';
       this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
@@ -1051,7 +1081,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
-    HMSLogger.e('received error from sdk', error);
+    HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
   /**
@@ -1061,10 +1091,16 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      this.setState(draft => {
-        draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-        draft.tracks[trackID].degraded = sdkTrack.degraded;
-      }, action);
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
+      const hasFieldChanged =
+        storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
+      if (hasFieldChanged) {
+        this.setState(draft => {
+          const track = draft.tracks[trackID] as HMSVideoTrack;
+          track.layer = sdkTrack.getSimulcastLayer();
+          track.degraded = sdkTrack.degraded;
+        }, action);
+      }
     }
   }
 
@@ -1134,7 +1170,7 @@ export class HMSSDKActions implements IHMSActions {
         track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');
@@ -1263,7 +1299,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    const actionName = ACTION_TYPES[type];
+    const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {

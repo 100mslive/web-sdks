@@ -12,6 +12,9 @@ import {
   UpdatePeerRequestParams,
   HLSRequestParams,
   BroadcastResponse,
+  HLSTimedMetadataParams,
+  SessionMetadataUpdateParams,
+  GetSessionMetadataResponse,
 } from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
@@ -63,7 +66,13 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   stopHLSStreaming(params?: HLSRequestParams): Promise<void>;
 
+  sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void>;
+
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
+
+  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+
+  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
 
   close(): Promise<void>;
 }
