@@ -29,7 +29,7 @@ export const MainGridView = () => {
    * In case there is only one person in the room, then too sidepane will be shown
    * and center would be taken up by a banner image.
    *
-   * In Addition, Peers with non-publishing roles are prohibited from appearing
+   * In Addition, Peers with non-publishing and non-subscribed roles are prohibited from appearing
    * in center view.
    */
   let showSidePane = centerPeers.length > 0 && sidebarPeers.length > 0;
