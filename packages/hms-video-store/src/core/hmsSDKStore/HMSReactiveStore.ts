@@ -146,6 +146,9 @@ export class HMSReactiveStore {
     const prevGetState = hmsStore.getState;
     // eslint-disable-next-line complexity
     hmsStore.getState = <StateSlice>(selector?: StateSelector<T, StateSlice>) => {
+      if (!isBrowser) {
+        return selector ? selector(prevGetState()) : prevGetState();
+      }
       if (selector) {
         const name = selector.name || 'byIDSelector';
         // @ts-ignore
