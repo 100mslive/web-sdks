@@ -6,12 +6,16 @@
  */
 
 export const ErrorCodes = {
+  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
   WebSocketConnectionErrors: {
     // Error connecting to ws or init config not available
     FAILED_TO_CONNECT: 1000,
 
     // Network connection lost
     WEBSOCKET_CONNECTION_LOST: 1003,
+
+    // Abnormal close without receiving a Close control frame
+    ABNORMAL_CLOSE: 1006,
   },
 
   InitAPIErrors: {
