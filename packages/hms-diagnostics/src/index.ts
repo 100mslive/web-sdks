@@ -10,18 +10,20 @@ import type { InitConfig } from '@100mslive/hms-video';
 import cloneDeep from 'lodash.clonedeep';
 import setInObject from 'lodash.set';
 import { initialState } from './initial-state';
-import { HMSDiagnosticsInterface, HMSDiagnosticsOutput } from './interfaces';
+import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
 import type { ConnectivityKeys } from './interfaces';
 import { getToken } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
+  private listener?: HMSDiagnosticUpdateListener;
 
   constructor() {
     this.result = cloneDeep(initialState);
   }
 
-  async start() {
+  async start(listener: HMSDiagnosticUpdateListener) {
+    this.listener = listener;
     this.checkwebRTC();
     await this.checkConnectivity();
     await this.checkDevices();
@@ -210,5 +212,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     info?: Record<string, any>;
   }) {
     setInObject(this.result, path, { success, errorMessage, info });
+    this.listener?.onUpdate(this.result);
   }
 }

@@ -22,11 +22,15 @@ export interface HMSDiagnosticsOutput {
   webRTC: HMSDiagnosticsOutputValue;
 }
 
+export interface HMSDiagnosticUpdateListener {
+  onUpdate: (output: HMSDiagnosticsOutput) => void;
+}
+
 export interface HMSDiagnosticsInterface {
   /**
    * Start all the checks in 100ms followup
    */
-  start(): Promise<HMSDiagnosticsOutput>;
+  start(listener: HMSDiagnosticUpdateListener): Promise<HMSDiagnosticsOutput>;
   /**
    * start connectivity test - stun, turn, init etc.
    */
