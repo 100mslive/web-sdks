@@ -56,11 +56,11 @@ export class DeviceManager implements HMSDeviceManager {
     });
   }
 
-  updateOutputDevice = (deviceId?: string) => {
+  updateOutputDevice = async (deviceId?: string) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
-      this.store.updateAudioOutputDevice(newDevice);
+      await this.store.updateAudioOutputDevice(newDevice);
       DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
@@ -74,7 +74,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.initialized = true;
     await this.enumerateDevices();
     this.logDevices('Init');
-    this.setOutputDevice();
+    await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
@@ -177,7 +177,7 @@ export class DeviceManager implements HMSDeviceManager {
     );
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
-    this.setOutputDevice(true);
+    await this.setOutputDevice(true);
     await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
   };
@@ -213,7 +213,7 @@ export class DeviceManager implements HMSDeviceManager {
    * 3. select the default one if nothing was found
    * 4. select the first option if there is no default
    */
-  setOutputDevice(deviceChange = false) {
+  async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
     this.outputDevice = undefined;
@@ -228,7 +228,7 @@ export class DeviceManager implements HMSDeviceManager {
       // select default deviceId device if available, otherwise select 0th device
       this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
     }
-    this.store.updateAudioOutputDevice(this.outputDevice);
+    await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
       this.eventBus.deviceChange.publish({
