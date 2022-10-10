@@ -16,9 +16,7 @@ export const MainGridView = () => {
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const peers = useHMSStore(selectPeers);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const centerPeers = peers.filter(
-    peer => !!peer.videoTrack && centerRoles.includes(peer.roleName)
-  );
+  const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
