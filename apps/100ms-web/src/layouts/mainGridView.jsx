@@ -26,9 +26,10 @@ export const MainGridView = () => {
    * them into two parts, those who show in center and those who show in sidepane.
    * In case there is only one person in the room, then too sidepane will be shown
    * and center would be taken up by a banner image.
-   *
-   * In Addition, Peers with non-publishing and non-subscribed roles are prohibited from appearing
-   * in center view.
+   * There is an issue currently, where the banner is still shown if there are
+   * multiple viewers in the room but no publisher. Depending on the use case
+   * this can be useful(for webinar) or look odd(for showing you're the only one).
+   * Note that both center peers and sidebar peers have only publishing peers in them.
    */
   let showSidePane = centerPeers.length > 0 && sidebarPeers.length > 0;
   if (centerPeers.length === 0) {
