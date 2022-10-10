@@ -13,6 +13,7 @@ import { ToastManager } from "../components/Toast/ToastManager";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
+import { FontSize } from "@tldraw/tldraw";
 
 let hlsController;
 const HLSView = () => {
@@ -146,7 +147,12 @@ const HLSView = () => {
                             borderRadius: "50%",
                           }}
                         />
-                        <Text variant="sm">
+                        <Text
+                          variant={{
+                            "@md": "@md",
+                            "@sm": "xs",
+                          }}
+                        >
                           {isVideoLive ? "Live" : "Go to Live"}{" "}
                         </Text>
                       </Flex>

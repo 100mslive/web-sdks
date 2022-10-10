@@ -33,9 +33,12 @@ export function HLSQualitySelector({
           }}
         >
           <Tooltip title="Select Quality">
-            <Flex>
+            <Flex align={"center"}>
               <SettingsIcon />
-              <Text variant="sm">{currentSelectedQualityText}</Text>
+              <Text variant={{
+                            "@md": "@sm",
+                            "@sm": "xs",
+                          }}>{currentSelectedQualityText}</Text>
             </Flex>
           </Tooltip>
 
