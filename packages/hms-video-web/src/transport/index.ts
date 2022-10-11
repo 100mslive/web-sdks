@@ -1,5 +1,6 @@
 import ITransportObserver from './ITransportObserver';
 import ITransport from './ITransport';
+import HMSConnection from '../connection';
 import HMSPublishConnection from '../connection/publish';
 import HMSSubscribeConnection from '../connection/subscribe';
 import InitService from '../signal/init';
@@ -234,6 +235,10 @@ export default class HMSTransport implements ITransport {
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
       this.logPeerConnectionStateChange(HMSConnectionRole.Publish, newState);
 
+      if (newState === 'connected') {
+        this.logSelectedIceCandidate(this.publishConnection);
+      }
+
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
@@ -279,6 +284,7 @@ export default class HMSTransport implements ITransport {
       }
 
       if (newState === 'connected') {
+        this.logSelectedIceCandidate(this.subscribeConnection);
         const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
         this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
@@ -1149,12 +1155,51 @@ export default class HMSTransport implements ITransport {
   ) {
     const log = (tag: string, ...data: any[]) =>
       newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
-    log(
-      TAG,
-      `${role === HMSConnectionRole.Publish ? 'Publish' : 'Subscribe'} ${
-        iceConnection ? 'ice' : ''
-      } connection state change: ${newState}`,
-    );
+    log(TAG, `${HMSConnectionRole[role]} ${iceConnection ? 'ice connection' : 'connection'} state change: ${newState}`);
+  }
+
+  private logSelectedIceCandidate(connection: HMSConnection | null) {
+    if (!connection) {
+      return;
+    }
+
+    /**
+     * for the very first peer in the room we don't have any subscribe ice candidates
+     * because the peer hasn't subscribed to anything.
+     *
+     * For all peers joining after this peer, we have published and subscribed at the time of join itself
+     * so we're able to log both publish and subscribe ice candidates.
+     */
+    const transmitters =
+      connection.role === HMSConnectionRole.Publish ? connection.getSenders() : connection.getReceivers();
+
+    transmitters.forEach(transmitter => {
+      const kindOfTrack = transmitter.track?.kind;
+      try {
+        if (transmitter.transport) {
+          const iceTransport = transmitter.transport.iceTransport;
+          const logSelectedCandidate = () => {
+            // @ts-expect-error
+            const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+            HMSLogger.d(
+              TAG,
+              `${HMSConnectionRole[connection.role]} connection`,
+              `selected ${kindOfTrack || 'unknown'} candidate pair`,
+              JSON.stringify(selectedCandidatePair, null, 2),
+            );
+          };
+          // @ts-expect-error
+          iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
+          logSelectedCandidate();
+        }
+      } catch (error) {
+        HMSLogger.w(
+          TAG,
+          `Error in printing selected ice candidate pair for ${HMSConnectionRole[connection.role]} connection`,
+          error,
+        );
+      }
+    });
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {

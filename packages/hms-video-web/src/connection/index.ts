@@ -96,6 +96,10 @@ export default abstract class HMSConnection {
     return this.nativeConnection.getSenders();
   }
 
+  getReceivers() {
+    return this.nativeConnection.getReceivers();
+  }
+
   removeTrack(sender: RTCRtpSender) {
     this.nativeConnection.removeTrack(sender);
   }
