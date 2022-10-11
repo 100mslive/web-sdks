@@ -33,3 +33,5 @@ export type {
   HLSConfig,
   HLSMeetingURLVariant,
 } from './hmsSDKStore/sdkTypes';
+
+export * from '../controller/beam/BeamController';
