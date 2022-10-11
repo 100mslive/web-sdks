@@ -82,7 +82,7 @@ export interface IStore {
 
   updateSpeakers(speakers: HMSSpeaker[]): void;
   updateAudioOutputVolume(volume: number): void;
-  updateAudioOutputDevice(device: MediaDeviceInfo): void;
+  updateAudioOutputDevice(device: MediaDeviceInfo): Promise<void>;
 
   hasRoleDetailsArrived(): boolean;
 
