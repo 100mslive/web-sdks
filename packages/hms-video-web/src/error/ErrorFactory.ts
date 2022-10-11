@@ -49,6 +49,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    AbnormalClose(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
+        'WebSocketAbnormalClose',
+        action,
+        `Websocket closed abnormally`,
+        description,
+      );
+    },
   },
 
   InitAPIErrors: {
