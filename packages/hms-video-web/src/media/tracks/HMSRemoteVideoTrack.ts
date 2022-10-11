@@ -10,7 +10,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
-  private layerWhenRemoveSink?: HMSSimulcastLayer;
+  private lastSelectedLayer?: HMSSimulcastLayer;
 
   public get degraded() {
     return this._degraded;
@@ -38,7 +38,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
     if (!this.hasSinks()) {
-      this.layerWhenRemoveSink = layer;
+      this.lastSelectedLayer = layer;
       (this.stream as HMSRemoteStream).setVideoLayerLocally(layer, this.logIdentifier, 'preferLayer');
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
@@ -62,6 +62,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
+    const currentLayer = this.getSimulcastLayer();
+    if (currentLayer !== HMSSimulcastLayer.NONE) {
+      this.lastSelectedLayer = currentLayer;
+    }
     await this.updateLayer('removeSink');
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
@@ -112,12 +116,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private async updateLayer(source: string) {
     const newLayer =
-      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.layerWhenRemoveSink || HMSSimulcastLayer.HIGH;
+      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.lastSelectedLayer || HMSSimulcastLayer.HIGH;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
     await this.requestLayer(newLayer, source);
-    this.layerWhenRemoveSink = undefined;
+    this.lastSelectedLayer = undefined;
   }
 
   private pushInHistory(action: string) {
@@ -164,7 +168,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     //if there is layerWhenRemoveSink there is a possibility of layer not being sent to server
     // evne if current and target layer is same
-    if (currLayer === targetLayer && !this.layerWhenRemoveSink) {
+    if (currLayer === targetLayer && !this.lastSelectedLayer) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Not sending update, already on layer ${targetLayer}, source=${source}`,
