@@ -75,7 +75,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
             await actions.setVideoSettings({ deviceId });
             break;
           case DeviceType.audioOutput:
-            actions.setAudioOutputDevice(deviceId);
+            await actions.setAudioOutputDevice(deviceId);
             break;
         }
       } catch (err) {

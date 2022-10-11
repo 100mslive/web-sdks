@@ -183,7 +183,7 @@ export interface IHMSActions {
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */
-  setAudioOutputDevice(deviceId: string): void;
+  setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
 

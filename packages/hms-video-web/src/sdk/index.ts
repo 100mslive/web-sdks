@@ -869,7 +869,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     await this.deviceManager.init();
-    this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    await this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 

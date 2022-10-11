@@ -45,8 +45,8 @@ const selectVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSVideoTrack;
-  if (track.type === 'video') {
+  const track = storeTracks[trackID] as HMSVideoTrack | undefined;
+  if (track?.type === 'video') {
     return track;
   }
   return null;
@@ -56,8 +56,8 @@ const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio') {
+  const track = storeTracks[trackID] as HMSAudioTrack | undefined;
+  if (track?.type === 'audio') {
     return track;
   }
   return null;
@@ -67,8 +67,8 @@ const selectScreenAudioTrackByIDBare = createSelector([selectTracksMap, selectTr
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio' && track.source === 'screen') {
+  const track = storeTracks[trackID] as HMSAudioTrack | undefined;
+  if (track?.type === 'audio' && track?.source === 'screen') {
     return track;
   }
   return null;
@@ -77,8 +77,8 @@ const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTr
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSScreenVideoTrack;
-  if (track.type === 'video' && track.source === 'screen') {
+  const track = storeTracks[trackID] as HMSScreenVideoTrack | undefined;
+  if (track?.type === 'video' && track?.source === 'screen') {
     return track;
   }
   return null;
