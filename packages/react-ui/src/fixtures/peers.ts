@@ -1,12 +1,12 @@
 import { HMSPeerWithMuteStatus } from '@100mslive/hms-video-store';
 
-let counter = 1;
+let counter = 0;
 export const makeFakeParticipant = (name: string, role = 'Student') => {
   return {
     peer: {
       id: String(counter++),
       name,
-      role: role,
+      roleName: role,
       auxiliaryTracks: [],
       isLocal: counter === 1,
     },
