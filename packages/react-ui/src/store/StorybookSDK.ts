@@ -166,7 +166,6 @@ export class StoryBookSDK implements Partial<HMSActions> {
       this.store.setState(state => {
         state.tracks[forRemoteTrackID].enabled = enabled;
       });
-    } else {
     }
     this.log('set local video enabled state - ', enabled);
   }
