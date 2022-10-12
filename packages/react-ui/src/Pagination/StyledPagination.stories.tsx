@@ -10,7 +10,7 @@ type PaginationProps = {
   numPages: number;
 };
 
-const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages }: PaginationProps) => {
+export const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages }: PaginationProps) => {
   const [page, setPage] = useState(propsPage);
 
   const disableLeft = page === 0;
