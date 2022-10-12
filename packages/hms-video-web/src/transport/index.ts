@@ -222,7 +222,8 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      HMSLogger.d('publisher ice connection state change, ', newState);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Publish ice connection state change: ${newState}`);
 
       // @TODO: Uncomment this and remove connectionstatechange
       if (newState === 'failed') {
@@ -232,7 +233,12 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      HMSLogger.d('publisher connection state change, ', newState);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Publish connection state change: ${newState}`);
+
+      if (newState === 'connected') {
+        this.publishConnection?.logSelectedIceCandidatePairs();
+      }
 
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
@@ -256,7 +262,9 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      HMSLogger.d('subscriber ice connection state change, ', newState);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Subscribe ice connection state change: ${newState}`);
+
       if (newState === 'failed') {
         // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
@@ -273,12 +281,15 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      HMSLogger.d('subscriber connection state change, ', newState);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Subscribe connection state change: ${newState}`);
+
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
 
       if (newState === 'connected') {
+        this.subscribeConnection?.logSelectedIceCandidatePairs();
         const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
         this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
