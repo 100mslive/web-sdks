@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { MicOffIcon } from '@100mslive/react-icons';
-import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
+import {
+  selectPeers,
+  useHMSStore,
+  useVideoList,
+} from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
 import { StyledVideoTile } from '../VideoTile';
 import Video from '../Video/Video';
 import { getLeft } from './videoListUtils';
 import { ComponentStory } from '@storybook/react';
+import { PaginationComponent as Pagination } from '../Pagination/StyledPagination.stories';
 
 const VideoListMeta = {
-  title: 'Video/VideoList',
+  title: 'Hooks/useVideoList',
 };
 
 export default VideoListMeta;
@@ -42,13 +47,14 @@ interface VideoListProps {
 
 const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio }) => {
   const peers = useHMSStore(selectPeers);
-  const [page] = useState(0);
+  const [page, setPage] = useState(0);
   const { ref, pagesWithTiles } = useVideoList({
     peers,
     offsetY: 50,
     maxTileCount,
     aspectRatio,
   });
+
   return (
     <StyledVideoList.Root css={{ height: '100vh', width: '100%' }} ref={ref}>
       <StyledVideoList.Container>
@@ -63,7 +69,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
                 {tiles.map((tile, i) =>
                   tile.track?.source === 'screen' ? null : (
                     <VideoTile
-                      key={tile.track?.id || tile.peer.id + i}
+                      key={i}
                       width={tile.width}
                       height={tile.height}
                       trackId={tile.track?.id || ''}
@@ -75,6 +81,11 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
             ))
           : null}
       </StyledVideoList.Container>
+      <div>
+        {pagesWithTiles.length > 1 ? (
+          <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} />
+        ) : null}
+      </div>
     </StyledVideoList.Root>
   );
 };
@@ -82,6 +93,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
 const Template: ComponentStory<typeof VideoListStory> = args => <VideoListStory {...args} />;
 
 export const Example = Template.bind({});
+Example.storyName = 'useVideoList';
 
 Example.args = {
   maxTileCount: 2,
