@@ -1,6 +1,5 @@
 import ITransportObserver from './ITransportObserver';
 import ITransport from './ITransport';
-import HMSConnection from '../connection';
 import HMSPublishConnection from '../connection/publish';
 import HMSSubscribeConnection from '../connection/subscribe';
 import InitService from '../signal/init';
@@ -240,7 +239,7 @@ export default class HMSTransport implements ITransport {
       log(TAG, `Publish connection state change: ${newState}`);
 
       if (newState === 'connected') {
-        this.logSelectedIceCandidate(this.publishConnection);
+        this.publishConnection?.logSelectedIceCandidatePairs();
       }
 
       if (newState === 'failed') {
@@ -294,7 +293,7 @@ export default class HMSTransport implements ITransport {
       }
 
       if (newState === 'connected') {
-        this.logSelectedIceCandidate(this.subscribeConnection);
+        this.subscribeConnection?.logSelectedIceCandidatePairs();
         const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
         this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
 
@@ -1156,50 +1155,6 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
-  }
-
-  private logSelectedIceCandidate(connection: HMSConnection | null) {
-    if (!connection) {
-      return;
-    }
-
-    /**
-     * for the very first peer in the room we don't have any subscribe ice candidates
-     * because the peer hasn't subscribed to anything.
-     *
-     * For all peers joining after this peer, we have published and subscribed at the time of join itself
-     * so we're able to log both publish and subscribe ice candidates.
-     */
-    const transmitters =
-      connection.role === HMSConnectionRole.Publish ? connection.getSenders() : connection.getReceivers();
-
-    transmitters.forEach(transmitter => {
-      const kindOfTrack = transmitter.track?.kind;
-      try {
-        if (transmitter.transport) {
-          const iceTransport = transmitter.transport.iceTransport;
-          const logSelectedCandidate = () => {
-            // @ts-expect-error
-            const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
-            HMSLogger.d(
-              TAG,
-              `${HMSConnectionRole[connection.role]} connection`,
-              `selected ${kindOfTrack || 'unknown'} candidate pair`,
-              JSON.stringify(selectedCandidatePair, null, 2),
-            );
-          };
-          // @ts-expect-error
-          iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
-          logSelectedCandidate();
-        }
-      } catch (error) {
-        HMSLogger.w(
-          TAG,
-          `Error in printing selected ice candidate pair for ${HMSConnectionRole[connection.role]} connection`,
-          error,
-        );
-      }
-    });
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
