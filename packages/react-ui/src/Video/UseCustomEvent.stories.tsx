@@ -8,7 +8,7 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<{ emoji: string }>();
 
-  const handleEmojiReaction = useCallback((data: any) => {
+  const handleEmojiReaction = useCallback((data: { emoji: string }) => {
     setOpen(true);
     setData(data);
   }, []);
