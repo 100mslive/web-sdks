@@ -96,10 +96,6 @@ export default abstract class HMSConnection {
     return this.nativeConnection.getSenders();
   }
 
-  getReceivers() {
-    return this.nativeConnection.getReceivers();
-  }
-
   logSelectedIceCandidatePairs() {
     /**
      * for the very first peer in the room we don't have any subscribe ice candidates
@@ -168,5 +164,9 @@ export default abstract class HMSConnection {
 
   async close() {
     this.nativeConnection.close();
+  }
+
+  private getReceivers() {
+    return this.nativeConnection.getReceivers();
   }
 }
