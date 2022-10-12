@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dropdown, Flex, Tooltip, Text, Box } from "@100mslive/react-ui";
 import {
@@ -33,12 +32,16 @@ export function HLSQualitySelector({
           }}
         >
           <Tooltip title="Select Quality">
-            <Flex align={"center"}>
+            <Flex align="center">
               <SettingsIcon />
-              <Text variant={{
-                            "@md": "@sm",
-                            "@sm": "xs",
-                          }}>{currentSelectedQualityText}</Text>
+              <Text
+                variant={{
+                  "@md": "sm",
+                  "@sm": "xs",
+                }}
+              >
+                {currentSelectedQualityText}
+              </Text>
             </Flex>
           </Tooltip>
 
