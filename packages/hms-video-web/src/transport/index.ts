@@ -222,8 +222,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      const log = (tag: string, ...data: any[]) =>
-        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
       log(TAG, `Publish ice connection state change: ${newState}`);
 
       // @TODO: Uncomment this and remove connectionstatechange
@@ -234,8 +233,7 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      const log = (tag: string, ...data: any[]) =>
-        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
       log(TAG, `Publish connection state change: ${newState}`);
 
       if (newState === 'connected') {
@@ -264,8 +262,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      const log = (tag: string, ...data: any[]) =>
-        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
       log(TAG, `Subscribe ice connection state change: ${newState}`);
 
       if (newState === 'failed') {
@@ -284,8 +281,7 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      const log = (tag: string, ...data: any[]) =>
-        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
       log(TAG, `Subscribe connection state change: ${newState}`);
 
       if (newState === 'failed') {

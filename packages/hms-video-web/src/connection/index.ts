@@ -124,7 +124,10 @@ export default abstract class HMSConnection {
           };
 
           // @ts-expect-error
-          iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
+          if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
+            // @ts-expect-error
+            iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
+          }
           logSelectedCandidate();
         }
       } catch (error) {
