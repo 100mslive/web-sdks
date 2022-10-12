@@ -56,7 +56,6 @@ const toggleTrackEnabled = async (
 
 /**
  * This hook can be used to implement remote mute/unmute + audio volume changer on tile level.
- * @param peerId of the peer whose tracks need to be managed
  * @param audioTrackId of the peer whose tracks need to be managed
  * @param videoTrackId of the peer whose tracks need to be managed
  * @param handleError to handle any error during toggle of audio/video
