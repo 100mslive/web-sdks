@@ -170,19 +170,15 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   };
 
-  private waitForResponse = (requestId: string): Promise<PreferLayerResponse> => {
-    return new Promise((resolve, reject) => {
-      this.eventEmitter.on('message', (value: string) => {
-        if (value.includes(requestId)) {
-          const response = JSON.parse(value);
-          if (response.error) {
-            reject(response.error);
-            return;
-          }
-          HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
-          resolve(response);
-        }
-      });
+  private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
+    const res = await this.eventEmitter.waitFor('message', function (value) {
+      return value.includes(requestId);
     });
+    const response = JSON.parse(res[0] as string);
+    if (response.error) {
+      throw response.error;
+    }
+    HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
+    return response;
   };
 }
