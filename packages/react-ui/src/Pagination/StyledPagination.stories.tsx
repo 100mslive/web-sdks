@@ -31,7 +31,7 @@ export const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, nu
 
   useEffect(() => {
     handlePageChange(propsPage);
-  }, [propsPage]);
+  }, [propsPage, handlePageChange]);
 
   return (
     <StyledPagination.Root>

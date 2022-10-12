@@ -31,7 +31,7 @@ function CheckboxWithLabelComponent({ label, checked = true, css, onCheckedChang
 
   useEffect(() => {
     handleOnCheckedChange(checked);
-  }, [checked]);
+  }, [checked, handleOnCheckedChange]);
 
   function handleOnCheckedChange(checked: boolean) {
     setInternalChecked(checked);

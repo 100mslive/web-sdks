@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { Tabs } from '.';
@@ -22,19 +22,22 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
 }) => {
   const [value, setValue] = useState('tab1');
 
-  function handleOnValueChange(value: string) {
-    setValue(value);
-    if (propOnValueChange) {
-      propOnValueChange(value);
-    }
-  }
+  const handleOnValueChange = useCallback(
+    (value: string) => {
+      setValue(value);
+      if (propOnValueChange) {
+        propOnValueChange(value);
+      }
+    },
+    [setValue, propOnValueChange],
+  );
 
   useEffect(() => {
     handleOnValueChange(propValue);
     if (propOnValueChange) {
       propOnValueChange(value);
     }
-  }, [propValue]);
+  }, [propValue, handleOnValueChange, propOnValueChange, value]);
 
   return (
     <Tabs.Root
@@ -72,4 +75,4 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
 };
 
 export const Example = Template.bind({});
-Example.storyName = 'Tabs'
+Example.storyName = 'Tabs';
