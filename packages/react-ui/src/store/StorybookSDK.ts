@@ -10,6 +10,9 @@ import {
   HMSVideoTrackSettings,
   HMSConfig,
   HMSSimulcastLayer,
+  selectLocalVideoTrackID,
+  HMSRole,
+  HMSTrackID,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
@@ -23,6 +26,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
   private dummyTrackURLs: Record<string, string> = {};
   private counter = 100;
   private localPeer?: HMSPeer;
+  private ignoredMessageTypes: string[] = [];
 
   constructor(store: IHMSStore) {
     this.store = store;
@@ -128,7 +132,8 @@ export class StoryBookSDK implements Partial<HMSActions> {
   }
 
   async detachVideo(_trackID: string, videoElement: HTMLVideoElement): Promise<void> {
-    videoElement.srcObject = null;
+    videoElement.removeAttribute('src');
+    videoElement.load();
     this.log('video removed');
   }
 
@@ -147,6 +152,22 @@ export class StoryBookSDK implements Partial<HMSActions> {
   }
 
   async setLocalVideoEnabled(enabled: boolean): Promise<void> {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    this.store.setState(state => {
+      if (trackID) {
+        state.tracks[trackID].enabled = enabled;
+      }
+    });
+    this.log('set local video enabled state - ', enabled);
+  }
+
+  async setRemoteTrackEnabled(forRemoteTrackID: HMSTrackID | HMSTrackID[], enabled: boolean): Promise<void> {
+    if (typeof forRemoteTrackID === 'string') {
+      this.store.setState(state => {
+        state.tracks[forRemoteTrackID].enabled = enabled;
+      });
+    } else {
+    }
     this.log('set local video enabled state - ', enabled);
   }
 
@@ -160,6 +181,18 @@ export class StoryBookSDK implements Partial<HMSActions> {
     });
   }
 
+  ignoreMessageTypes(msgTypes: string[], replace = false) {
+    if (replace) {
+      this.ignoredMessageTypes = msgTypes;
+    } else {
+      for (const msgType of msgTypes) {
+        if (!this.ignoredMessageTypes.includes(msgType)) {
+          this.ignoredMessageTypes.push(msgType);
+        }
+      }
+    }
+  }
+
   addTestPeerAndSpeaker(peer: HMSPeer) {
     const randomURL = this.randomFromArray(this.videoURLs);
     const videoTrackID = String(this.videoURLs.indexOf(randomURL) || this.counter++);
@@ -168,6 +201,9 @@ export class StoryBookSDK implements Partial<HMSActions> {
     peer.audioTrack = audioTrackID;
     peer.videoTrack = videoTrackID;
     this.store.setState(store => {
+      if (peer.isLocal) {
+        store.room.localPeer = peer.id;
+      }
       store.peers[peer.id] = peer;
       store.room.peers.push(peer.id);
       store.speakers[audioTrackID] = {
@@ -204,6 +240,12 @@ export class StoryBookSDK implements Partial<HMSActions> {
 
   getPeers(): HMSPeer[] {
     return Object.values(this.store.getState().peers);
+  }
+
+  setRoles(roles: Record<string, HMSRole>) {
+    this.store.setState(store => {
+      store.roles = roles;
+    });
   }
 
   private log(...args: any[]) {
