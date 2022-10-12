@@ -419,7 +419,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async leave(): Promise<void> {
+  async leave(notifyServer: boolean): Promise<void> {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
@@ -429,11 +429,13 @@ export default class HMSTransport implements ITransport {
       this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
-      try {
-        this.signal.leave();
-        HMSLogger.d(TAG, 'signal leave done');
-      } catch (err) {
-        HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
+      if (notifyServer) {
+        try {
+          this.signal.leave();
+          HMSLogger.d(TAG, 'signal leave done');
+        } catch (err) {
+          HMSLogger.w(TAG, 'failed to send leave on websocket to server', err);
+        }
       }
       this.analyticsEventsService.flushFailedClientEvents();
       this.analyticsEventsService.reset();
