@@ -223,7 +223,9 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      this.logPeerConnectionStateChange(HMSConnectionRole.Publish, newState, true);
+      const log = (tag: string, ...data: any[]) =>
+        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      log(TAG, `Publish ice connection state change: ${newState}`);
 
       // @TODO: Uncomment this and remove connectionstatechange
       if (newState === 'failed') {
@@ -233,7 +235,9 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      this.logPeerConnectionStateChange(HMSConnectionRole.Publish, newState);
+      const log = (tag: string, ...data: any[]) =>
+        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      log(TAG, `Publish connection state change: ${newState}`);
 
       if (newState === 'connected') {
         this.logSelectedIceCandidate(this.publishConnection);
@@ -261,7 +265,10 @@ export default class HMSTransport implements ITransport {
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
-      this.logPeerConnectionStateChange(HMSConnectionRole.Subscribe, newState, true);
+      const log = (tag: string, ...data: any[]) =>
+        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      log(TAG, `Subscribe ice connection state change: ${newState}`);
+
       if (newState === 'failed') {
         // await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
@@ -278,7 +285,10 @@ export default class HMSTransport implements ITransport {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     onConnectionStateChange: async (newState: RTCPeerConnectionState) => {
-      this.logPeerConnectionStateChange(HMSConnectionRole.Subscribe, newState);
+      const log = (tag: string, ...data: any[]) =>
+        newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
+      log(TAG, `Subscribe connection state change: ${newState}`);
+
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
@@ -1146,16 +1156,6 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
-  }
-
-  private logPeerConnectionStateChange(
-    role: HMSConnectionRole,
-    newState: RTCIceConnectionState | RTCPeerConnectionState,
-    iceConnection = false,
-  ) {
-    const log = (tag: string, ...data: any[]) =>
-      newState === 'disconnected' ? HMSLogger.w(tag, ...data) : HMSLogger.d(tag, ...data);
-    log(TAG, `${HMSConnectionRole[role]} ${iceConnection ? 'ice connection' : 'connection'} state change: ${newState}`);
   }
 
   private logSelectedIceCandidate(connection: HMSConnection | null) {
