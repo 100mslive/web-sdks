@@ -1,4 +1,4 @@
-import { HMSReactiveStore, HMSStore, createDefaultStoreState } from '@100mslive/react-sdk';
+import { HMSReactiveStore, HMSStore, createDefaultStoreState, HMSRole } from '@100mslive/react-sdk';
 import create from 'zustand';
 import { fakeMessages } from '../fixtures/chats';
 import { fakeParticipants } from '../fixtures/peers';
@@ -28,5 +28,13 @@ export function setUpFakeStore() {
   });
   fakeMessages.forEach(msg => {
     storyBookSDK.sendBroadcastMessage(msg.message);
+  });
+  storyBookSDK.setRoles({
+    Teacher: {
+      name: 'Teacher',
+      publishParams: { allowed: ['audio', 'video', 'screen'] },
+      subscribeParams: {},
+      permissions: { changeRole: true, unmute: true, mute: true },
+    } as HMSRole,
   });
 }
