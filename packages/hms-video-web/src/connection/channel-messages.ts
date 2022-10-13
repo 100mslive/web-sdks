@@ -26,7 +26,7 @@ export interface PreferAudioLayerParams {
 
 export interface VideoTrackLayerUpdate {
   current_layer: HMSSimulcastLayer;
-  expected_layer: HMSSimulcastLayer;
+  expected_layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
   track_id: string;
   subscriber_degraded: boolean;
   publisher_degraded: boolean;
