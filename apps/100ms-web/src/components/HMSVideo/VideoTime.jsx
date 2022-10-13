@@ -22,7 +22,6 @@ export const VideoTime = ({ videoRef }) => {
   return videoRef.current ? (
     <Text
       variant={{
-        "@md": "@md",
         "@sm": "xs",
       }}
     >{`${videoTime}`}</Text>

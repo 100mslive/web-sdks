@@ -149,7 +149,6 @@ const HLSView = () => {
                         />
                         <Text
                           variant={{
-                            "@md": "@md",
                             "@sm": "xs",
                           }}
                         >
