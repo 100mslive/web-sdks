@@ -31,6 +31,7 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsSto
       if (!unsubscribe) {
         unsubscribe = initAndSubscribeWebrtcStore(sdk, webrtcStore, store);
       }
+      // room state can go to disconnecting and back to connected if leave fails, we don't want to resubscribe in that case
     } else if ([HMSRoomState.Disconnected, HMSRoomState.Failed].includes(roomState)) {
       if (unsubscribe) {
         resetHMSStatsStore(webrtcStore, roomState);
