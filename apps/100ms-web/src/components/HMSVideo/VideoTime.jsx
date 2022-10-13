@@ -19,5 +19,11 @@ export const VideoTime = ({ videoRef }) => {
     };
   }, []);
 
-  return videoRef.current ? <Text>{`${videoTime}`}</Text> : null;
+  return videoRef.current ? (
+    <Text
+      variant={{
+        "@sm": "xs",
+      }}
+    >{`${videoTime}`}</Text>
+  ) : null;
 };
