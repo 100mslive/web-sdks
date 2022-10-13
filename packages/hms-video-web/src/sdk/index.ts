@@ -258,7 +258,7 @@ export class HMSSdk implements HMSInterface {
       requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
-    this.leave();
+    this.internalLeave(false);
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
@@ -460,7 +460,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async leave() {
+  leave() {
+    return this.internalLeave();
+  }
+
+  private async internalLeave(notifyServer = true) {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
@@ -470,7 +474,7 @@ export class HMSSdk implements HMSInterface {
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
-      await this.transport?.leave();
+      await this.transport?.leave(notifyServer);
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
