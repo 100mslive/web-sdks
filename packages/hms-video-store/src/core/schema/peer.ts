@@ -66,6 +66,7 @@ export interface HMSVideoTrack extends BaseTrack {
   type: 'video';
   facingMode?: HMSTrackFacingMode;
   layer?: HMSSimulcastLayer;
+  expectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
   layerDefinitions?: SimulcastLayerDefinition[];
   height?: number;
   width?: number;

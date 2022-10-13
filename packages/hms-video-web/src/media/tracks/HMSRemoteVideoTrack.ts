@@ -11,6 +11,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private lastSelectedLayer?: HMSSimulcastLayer;
+  private expectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
 
   public get degraded() {
     return this._degraded;
@@ -38,6 +39,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
     if (!this.hasSinks()) {
+      this.expectedLayer = layer;
       this.lastSelectedLayer = layer;
       (this.stream as HMSRemoteStream).setVideoLayerLocally(layer, this.logIdentifier, 'preferLayer');
       HMSLogger.d(
@@ -52,6 +54,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   getSimulcastLayer() {
     return (this.stream as HMSRemoteStream).getSimulcastLayer();
+  }
+
+  getExpectedLayer() {
+    return this.expectedLayer;
   }
 
   async addSink(videoElement: HTMLVideoElement) {
@@ -96,6 +102,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._degraded = isDegraded;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
+    this.expectedLayer = layerUpdate.expected_layer;
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);

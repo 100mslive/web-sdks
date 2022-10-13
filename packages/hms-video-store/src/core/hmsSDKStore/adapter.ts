@@ -97,6 +97,7 @@ export class SDKToHMS {
   static enrichVideoTrack(track: HMSVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
+      track.expectedLayer = sdkTrack.getExpectedLayer();
       track.degraded = sdkTrack.degraded;
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
