@@ -35,6 +35,7 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsSto
       if (unsubscribe) {
         resetHMSStatsStore(webrtcStore, roomState);
         unsubscribe();
+        // set flag to defined after unsubscribing to enable subscribing again
         unsubscribe = undefined;
       }
     }
