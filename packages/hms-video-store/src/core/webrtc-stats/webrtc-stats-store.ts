@@ -12,6 +12,7 @@ import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMer
 
 type Unsubscribe = (() => void) | undefined;
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
+  // also used as flag to check if webrtc internals has been initialised
   let unsubscribe: Unsubscribe;
   /**
    * Connected to room, webrtc internals can be initialized
@@ -30,10 +31,11 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsSto
       if (!unsubscribe) {
         unsubscribe = initAndSubscribeWebrtcStore(sdk, webrtcStore, store);
       }
-    } else {
+    } else if ([HMSRoomState.Disconnected, HMSRoomState.Failed].includes(roomState)) {
       if (unsubscribe) {
-        resetHMSStatsStore(webrtcStore);
+        resetHMSStatsStore(webrtcStore, roomState);
         unsubscribe();
+        unsubscribe = undefined;
       }
     }
   }, selectRoomState);
