@@ -5,7 +5,7 @@ export const Root = styled('div', {
   position: 'absolute',
   top: '0.3rem',
   left: '0.3rem',
-  zIndex: 10,
+  zIndex: 7,
   borderRadius: '$2',
   padding: '5px',
   fontSize: '$xs',
