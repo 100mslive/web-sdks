@@ -1,19 +1,6 @@
-import { isBrowser } from '@100mslive/hms-video';
-declare global {
-  interface Window {
-    __beam: BeamController;
-  }
-}
-export class BeamController {
-  constructor() {
-    if (isBrowser) {
-      window.__beam = this;
-    }
-  }
-  add = (x: number, y: number) => {
-    return x + y;
-  };
-}
+import { HMSStore, IHMSStore } from '../../core';
+import { IHMSActions } from '../../core/IHMSActions';
+import { IHMSStoreReadOnly } from '../../core/IHMSStore';
 
 // enum HealthState {
 //   CONNECTED,
@@ -57,24 +44,58 @@ export class BeamController {
 //   // can be used similarly to know local peer id, session id etc. as necessary
 //   hmsSubscribe(selector, fn);
 // }
+export function pubSub() {
+  const subscribers: { [key: string]: Array<any> } = {};
+  function publish(eventName: string, data: any) {
+    if (!Array.isArray(subscribers[eventName])) {
+      return;
+    }
+    subscribers[eventName].forEach((callback: any) => {
+      callback(data);
+    });
+  }
+  function subscribe(eventName: string, callback: any) {
+    if (!Array.isArray(subscribers[eventName])) {
+      subscribers[eventName] = [];
+    }
+    subscribers[eventName].push(callback);
+  }
+  return {
+    publish,
+    subscribe,
+    subscribers,
+  };
+}
+export class BeamControllerStore {
+  // perform action to add, remove beam
+  private readonly actions: IHMSActions;
+  // get all details from store about room, peers, tracks.
+  private readonly store: IHMSStore;
+  private readonly listeners: any;
+  constructor(hmsStore: IHMSStore, hmsActions: IHMSActions) {
+    this.store = hmsStore;
+    this.actions = hmsActions;
 
-// export class BeamController extends Event {
-//   private listeners: any[] = [];
+    this.listeners = pubSub();
+    this.store.subscribe((state: HMSStore) => {
+      this.listeners.publish('peer-count', state.room.peers.length);
+    });
+  }
 
-//   addListener(listener?: any) {
-//     if (!listener) {
-//       throw new Error("listener connected be null");
-//     }
-//     this.listeners.push(listener);
-//   }
-//   removeListener(listener?: any) {
-//     const index = this.listeners.indexOf(listener);
-//     if (index === -1) {
-//       throw new Error("Listener not found");
-//     }
-//     this.listeners.splice(index, 1);
-//   }
-//   // emit = (listener: any) => {
-//   //   listener.
-//   // }
-// }
+  /**
+   * A reactive store which has a subscribe method you can use in combination with selectors
+   * to subscribe to a subset of the store. The store serves as a single source of truth for
+   * all data related to the corresponding HMS Room.
+   */
+  getStore(): IHMSStoreReadOnly {
+    return this.store;
+  }
+
+  /**
+   * Any action which may modify the store or may need to talk to the SDK will happen
+   * through the IHMSActions instance returned by this
+   */
+  getActions(): IHMSActions {
+    return this.actions;
+  }
+}
