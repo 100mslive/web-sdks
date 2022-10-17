@@ -21,7 +21,7 @@ type DeviceAndGroup = Partial<MediaTrackSettings>;
  * Normally we do audio input-output matching to ensure that audio input and output are from the same device.
  * @see {DeviceManager.setOutputDevice}
  * But some audio input devices(mics) that have a headphone jack come up in the list of available audio output devices as well
- * although they don't really have a speaker. To avoid selecting these false speaker devices
+ * although they don't really have a speaker. To avoid selecting these false speaker devices, never ignore input-output matching and select default device
  */
 const OUTPUT_MATCHING_BLACKLISTED_DEVICES = ['yeti'];
 
