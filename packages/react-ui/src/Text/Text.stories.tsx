@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Text } from './Text';
 import { textVariants } from './Text';
 
@@ -18,6 +18,5 @@ export default {
 
 const Template: ComponentStory<typeof Text> = args => <Text {...args}>The Evil Rabbit jumps.</Text>;
 
-export const Primary = Template.bind({});
-
-Primary.args = {};
+export const Playground = Template.bind({});
+Playground.storyName = 'Text'

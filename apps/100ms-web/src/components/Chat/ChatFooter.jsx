@@ -1,9 +1,12 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { Flex, IconButton, styled } from "@100mslive/react-ui";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import { useHMSActions } from "@100mslive/react-sdk";
+import { SendIcon, EmojiIcon } from "@100mslive/react-icons";
+import { Flex, styled, IconButton, Box, Popover } from "@100mslive/react-ui";
 import { ToastManager } from "../Toast/ToastManager";
-import { SendIcon } from "@100mslive/react-icons";
 import { useChatDraftMessage } from "../AppData/useChatState";
+import { useEmojiPickerStyles } from "./useEmojiPickerStyles";
 
 const TextArea = styled("textarea", {
   width: "100%",
@@ -17,10 +20,50 @@ const TextArea = styled("textarea", {
   },
 });
 
+function EmojiPicker({ onSelect }) {
+  const [showEmoji, setShowEmoji] = useState(false);
+  const ref = useEmojiPickerStyles(showEmoji);
+  return (
+    <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
+      <Popover.Trigger asChild css={{ appearance: "none" }}>
+        <IconButton as="div">
+          <EmojiIcon />
+        </IconButton>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          alignOffset={-40}
+          sideOffset={16}
+          align="end"
+          css={{
+            p: 0,
+          }}
+        >
+          <Box
+            css={{
+              minWidth: 352,
+              minHeight: 435,
+            }}
+            ref={ref}
+          >
+            <Picker
+              onEmojiSelect={onSelect}
+              data={data}
+              previewPosition="none"
+              skinPosition="search"
+            />
+          </Box>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
 export const ChatFooter = ({ role, peerId, onSend, children }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
+
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -61,13 +104,13 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        borderTop: "1px solid $borderDefault",
-        bg: "$menuBg",
+        bg: "$surfaceLight",
         minHeight: "$16",
         maxHeight: "$24",
         position: "relative",
-        py: "$4",
+        py: "$6",
         pl: "$8",
+        r: "$1",
       }}
     >
       {children}
@@ -82,6 +125,13 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
               await sendMessage();
             }
           }
+        }}
+        autoComplete="off"
+        aria-autocomplete="none"
+      />
+      <EmojiPicker
+        onSelect={emoji => {
+          inputRef.current.value += ` ${emoji.native} `;
         }}
       />
       <IconButton

@@ -1,19 +1,53 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { ChevronDownIcon } from "@100mslive/react-icons";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { Box, Button, Flex } from "@100mslive/react-ui";
+import { ChevronDownIcon, CrossIcon, PinIcon } from "@100mslive/react-icons";
+import {
+  selectPermissions,
+  selectSessionMetadata,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
-import { ChatBody } from "./ChatBody";
-import { ChatSelector } from "./ChatSelector";
+import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { useUnreadCount } from "./useUnreadCount";
+import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+
+const PinnedMessage = ({ clearPinnedMessage }) => {
+  const permissions = useHMSStore(selectPermissions);
+  const pinnedMessage = useHMSStore(selectSessionMetadata);
+
+  return pinnedMessage ? (
+    <Flex
+      css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
+      align="center"
+      justify="between"
+    >
+      <Box>
+        <PinIcon />
+      </Box>
+      <Box
+        css={{
+          ml: "$8",
+          color: "$textMedEmp",
+          w: "100%",
+          maxHeight: "$18",
+          overflowY: "auto",
+        }}
+      >
+        <Text variant="sm">
+          <AnnotisedMessage message={pinnedMessage} />
+        </Text>
+      </Box>
+      {permissions.removeOthers && (
+        <IconButton onClick={() => clearPinnedMessage()}>
+          <CrossIcon />
+        </IconButton>
+      )}
+    </Flex>
+  ) : null;
+};
 
 export const Chat = () => {
   const [chatOptions, setChatOptions] = useState({
@@ -24,6 +58,8 @@ export const Chat = () => {
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const bodyRef = useRef(null);
   const hmsActions = useHMSActions();
+  const { setPinnedMessage } = useSetPinnedMessage();
+
   const scrollToBottom = useCallback(
     (instant = false) => {
       if (!bodyRef.current) {
@@ -47,44 +83,38 @@ export const Chat = () => {
       <ChatHeader
         selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
+        onSelect={setChatOptions}
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
         onToggle={() => {
           setSelectorOpen(value => !value);
         }}
       />
-      <Box
+      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+      <Flex
+        direction="column"
         css={{
           flex: "1 1 0",
-          overflowY: isSelectorOpen ? "hidden" : "auto",
-          bg: "$bgSecondary",
+          overflowY: "auto",
           pt: "$4",
           position: "relative",
+          // Below two are for pushing scroll to the edge of the box
+          mr: "-$10",
+          pr: "$10",
         }}
         ref={bodyRef}
       >
-        {isSelectorOpen ? (
-          <ChatSelector
-            role={chatOptions.role}
-            peerId={chatOptions.peerId}
-            onSelect={data => {
-              setChatOptions(state => ({
-                ...state,
-                ...data,
-              }));
-              setSelectorOpen(false);
-            }}
-          />
-        ) : (
-          <Fragment>
-            <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-            <ScrollHandler
-              scrollToBottom={scrollToBottom}
-              role={chatOptions.role}
-              peerId={chatOptions.peerId}
-            />
-          </Fragment>
-        )}
-      </Box>
-
+        <ChatBody
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+          setPinnedMessage={setPinnedMessage}
+        />
+        <ScrollHandler
+          scrollToBottom={scrollToBottom}
+          role={chatOptions.role}
+          peerId={chatOptions.peerId}
+        />
+      </Flex>
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}

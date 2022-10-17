@@ -8,23 +8,23 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
 
   useEffect(() => {
     const videoEl = videoRef.current;
+    const timeupdateHandler = () => {
+      const videoProgress = Math.floor(
+        getPercentage(videoEl.currentTime, videoEl.duration)
+      );
+      const bufferProgress = Math.floor(
+        getPercentage(videoEl.buffered.end(0), videoEl.duration)
+      );
+
+      setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
+      setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
+    };
     if (videoEl) {
-      videoEl.addEventListener("timeupdate", _ => {
-        const videoProgress = Math.floor(
-          getPercentage(videoEl.currentTime, videoEl.duration)
-        );
-
-        const bufferProgress = Math.floor(
-          getPercentage(videoEl.buffered.end(0), videoEl.duration)
-        );
-
-        setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
-        setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
-      });
+      videoEl.addEventListener("timeupdate", timeupdateHandler);
     }
     return function cleanup() {
       if (videoEl) {
-        videoEl.removeEventListener("timeupdate", null);
+        videoEl.removeEventListener("timeupdate", timeupdateHandler);
       }
     };
   }, []);
@@ -44,8 +44,6 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
 
   return videoRef.current ? (
     <div
-      justify="center"
-      align="center"
       ref={progressRootRef}
       style={{ cursor: "pointer", display: "flex" }}
       onClick={onProgressChangeHandler}

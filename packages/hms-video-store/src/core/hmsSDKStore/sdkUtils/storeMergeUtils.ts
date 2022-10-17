@@ -1,5 +1,5 @@
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
 
 /**
  * updates draftPeers with newPeers ensuring minimal reference changes
@@ -60,7 +60,7 @@ export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMS
     const oldStat = draftStats[trackID];
     const newStat = newStats[trackID];
     if (isEntityUpdated(oldStat, newStat)) {
-      Object.assign(oldStat, newStat);
+      Object.assign(oldStat!, newStat);
     } else if (isEntityRemoved(oldStat, newStat)) {
       delete draftStats[trackID];
     } else if (isEntityAdded(oldStat, newStat)) {
@@ -76,8 +76,12 @@ const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) 
   if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
     newTrack.plugins = oldTrack.plugins;
   }
-  if (oldTrack.layerDefinitions && areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)) {
-    newTrack.layerDefinitions = oldTrack.layerDefinitions;
+  if (
+    oldTrack.type === 'video' &&
+    oldTrack.layerDefinitions &&
+    areArraysEqual(oldTrack.layerDefinitions, (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions)
+  ) {
+    (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions = oldTrack.layerDefinitions;
   }
 };
 

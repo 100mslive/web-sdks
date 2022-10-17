@@ -1,16 +1,17 @@
-import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
+import { defaultThemeMap as defaultStitchesThemeMap } from '@stitches/react';
 
 export const baseConfig = {
   theme: {
     colors: {
-      white: '#ffffff',
+      white: '#FFFFFF',
       black: '#000000',
-      transparent: 'rgba(0, 0, 0, 0)',
+      transparent: '#00000000',
       orange: '#F69133',
       cyan: '#8FF5FB',
       tamarind: '#F79133',
       yellow: '#FAC919',
+      twinYellow: '#ECC502',
       green: '#00AE63',
       darkgreen: '37F28D',
       purple: '#6554C0',
@@ -19,7 +20,7 @@ export const baseConfig = {
       borderAccent: '#2471ED',
       success: '#36B37E',
       error: '#CC525F',
-      errorTint: 'rgba(237,76, 90, 0.9)',
+      errorTint: '#ED4C5AE6',
       warning: '#FFAB00',
       brandLight: '#74AAFF',
       brandDefault: '#2F80FF',
@@ -28,20 +29,28 @@ export const baseConfig = {
       grayLight: '#B0C3DB',
       grayDefault: '#657080',
       grayDark: '#303740',
+      secondaryGray: '#242A33',
       grayDisabled: '#DCE4EF',
       menuBg: '$grayDark',
-      textHighEmp: 'rgba(245, 249, 255, 0.95)',
-      textMedEmp: 'rgba(224, 236, 255, 0.8)',
-      textDisabled: 'rgba(195, 208, 229, 0.5)',
-      textMedWhite: 'rgba(255, 255, 255, 0.72)',
-      textDarkWhite: 'rgba(255, 255, 255, 0.48)',
-      textHighWhite: 'rgba(255, 255, 255, 0.98)',
-      textDisabledWhite: 'rgba(255, 255, 255, 0.48)',
-      surfaceDarker: '#06080A',
-      surfaceDark: '#080B0F',
+      textHighEmp: '#F5F9FFF2',
+      textMedEmp: '#E0ECFFCC',
+      textDisabled: '#C3D0E580',
+
+      // text variants when bg is accent (blue)
+      // same for both themes
+      textAccentHigh: '#FFFFFFFA',
+      textAccentMedium: '#FFFFFFB8',
+      textAccentDisabled: '#FFFFFF7A',
+
       surfaceDefault: '#14171C',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
+      surfaceDark: '#0F1115',
+
+      backgroundDefault: '#0B0D0F',
+      backgroundDark: '#090B0D',
+      backgroundDarker: '#040405',
+
       primaryLight: '#66A1FF',
       primaryDefault: '#2471ED',
       primaryDark: '#143466',
@@ -50,10 +59,14 @@ export const baseConfig = {
       secondaryDefault: '#475366',
       secondaryDark: '#2D3440',
       secondaryDisabled: '#242A33',
+      errorDefault: '#CC525F',
+      errorLight: '#D87983',
+      errorDark: '#9D2F3B',
+      errorDisabled: '#621D24',
     },
     shadows: {
-      sm: '0 0 4px 0 rgba(0,0,0,0.3)',
-      md: '0 0 8px 0 rgba(0,0,0,0.3)',
+      sm: '0 0 4px 0 #0000004D',
+      md: '0 0 8px 0 #0000004D',
     },
     fonts: {
       sans: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
@@ -69,6 +82,7 @@ export const baseConfig = {
       xs: '0.75rem',
       sm: '0.875rem',
       md: '1rem',
+      lg: '1.125rem',
     },
     fontWeights: {
       semiBold: 600,
@@ -92,6 +106,7 @@ export const baseConfig = {
       '1': '0.5rem',
       '2': '0.75rem',
       '3': '1rem',
+      '4': '1.5rem',
       round: '100rem',
     },
     space: {
@@ -136,6 +151,7 @@ export const baseConfig = {
       72: '18rem',
       80: '20rem',
       96: '24rem',
+      100: '27rem',
     },
     borderWidths: {
       light: '1px',

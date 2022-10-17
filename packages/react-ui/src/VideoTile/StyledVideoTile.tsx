@@ -1,4 +1,6 @@
+import { Box } from '../Layout';
 import { styled } from '../Theme';
+import { flexCenter } from '../utils';
 
 export const Root = styled('div', {
   padding: '0.75rem',
@@ -47,13 +49,6 @@ const Info = styled('div', {
   fontFamily: '$sans',
 });
 
-const AvatarContainer = styled('div', {
-  position: 'absolute',
-  left: '50%',
-  top: '50%',
-  transform: 'translateX(-50%) translateY(-50%)',
-});
-
 const AttributeBox = styled('div', {
   position: 'absolute',
   color: '$textPrimary',
@@ -61,36 +56,48 @@ const AttributeBox = styled('div', {
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  bottom: '20px',
+  top: '$2',
+  right: '$2',
   color: '$white',
   bg: '$error',
   borderRadius: '$round',
-  width: '28px',
-  height: '28px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
+  width: '$13',
+  height: '$13',
   mb: '5px',
+  ...flexCenter
 });
 
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
-  color: '$white',
+  color: '$textHighEmp',
   borderRadius: '$round',
   backgroundColor: '$menuBg',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   position: 'absolute',
-  bottom: '1rem',
-  right: '1rem',
-  zIndex: 20,
+  top: '$2',
+  right: '$2',
+  zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
     boxShadow: '0 0 0 3px $colors$brandLight',
+  },
+});
+
+const AvatarContainer = styled(Box, {
+  ...flexCenter,
+  flexDirection: 'column',
+  position: 'absolute',
+  left: '50%',
+  top: '50%',
+  transform: 'translateX(-50%) translateY(-50%)',
+  width: '100%',
+  height: '100%',
+  '& > * + *': {
+    marginBottom: '0',
+    marginTop: '$4',
   },
 });
 

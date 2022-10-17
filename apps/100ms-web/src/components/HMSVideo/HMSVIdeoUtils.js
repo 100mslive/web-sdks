@@ -15,11 +15,13 @@ export function getDurationFromSeconds(timeInSeconds) {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time - minutes * 60);
 
-  let videoTimeStr = `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+  const prefixedMinutes = `${minutes < 10 ? "0" + minutes : minutes}`;
+  const prefixedSeconds = `${seconds < 10 ? "0" + seconds : seconds}`;
+
+  let videoTimeStr = `${prefixedMinutes}:${prefixedSeconds}`;
   if (hours) {
-    videoTimeStr = `${hours}:${minutes}:${
-      seconds < 10 ? "0" + seconds : seconds
-    }`;
+    const prefixedHours = `${hours < 10 ? "0" + hours : hours}`;
+    videoTimeStr = `${prefixedHours}:${prefixedMinutes}:${prefixedSeconds}`;
   }
   return videoTimeStr;
 }

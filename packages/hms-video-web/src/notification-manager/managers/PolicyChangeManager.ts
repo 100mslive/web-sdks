@@ -27,8 +27,6 @@ export class PolicyChangeManager {
     this.store.setPublishParams(publishParams);
     this.setSimulcastLayers(publishParams);
 
-    this.handleStreamingRecordingPermissions(params.known_roles[params.name]?.permissions);
-
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
       const oldRole = localPeer.role;
@@ -43,18 +41,6 @@ export class PolicyChangeManager {
       const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
       this.store.setVideoSimulcastLayers(videoSimulcastLayers);
       this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
-    }
-  }
-
-  // TODO: remove this fn with hard coded value of rtmp and recording permissions when they're sent from the server.
-  handleStreamingRecordingPermissions(permissions?: { recording?: boolean; streaming?: boolean }) {
-    if (permissions) {
-      if (permissions.recording === undefined) {
-        permissions.recording = true;
-      }
-      if (permissions.streaming === undefined) {
-        permissions.streaming = true;
-      }
     }
   }
 }

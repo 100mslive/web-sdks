@@ -117,6 +117,12 @@ export const textVariants = {
     fontSize: '$md',
     lineHeight: '$md',
   },
+  lg: {
+    fontSize: '$lg',
+    lineHeight: '$md',
+    fontWeight: '$semiBold',
+    letterSpacing: '0.15px',
+  },
 };
 
 export const Text = styled('p', {

@@ -88,7 +88,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     });
   }
 
-  join(...args: any[]): void {
+  async join(...args: any[]): Promise<void> {
     const joinParams = args[0];
     if (!(joinParams.username && joinParams.role && joinParams.roomId)) {
       this.log('invalid params');
@@ -180,6 +180,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: this.randomFromArray([true, false]),
           id: audioTrackID,
           type: 'audio',
+          source: 'regular',
         };
       }
       if (peer.videoTrack) {
@@ -187,6 +188,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: true,
           id: videoTrackID,
           type: 'video',
+          source: 'regular',
         };
       }
     });
@@ -206,10 +208,6 @@ export class StoryBookSDK implements Partial<HMSActions> {
 
   private log(...args: any[]) {
     console.log('storybook sdk', ...args);
-  }
-
-  private randomUser() {
-    return this.randomFromArray(['You', 'Tushar', 'Eswar', 'Aniket', 'Kshitiz', 'Sagar']);
   }
 
   private randomNumber() {

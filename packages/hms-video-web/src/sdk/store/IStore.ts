@@ -1,4 +1,4 @@
-import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
+import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig, HMSFrameworkInfo } from '../../interfaces';
 import {
   HMSTrack,
   HMSAudioTrack,
@@ -18,17 +18,12 @@ import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradati
 import { Comparator } from './Comparator';
 import { TrackState } from '../../notification-manager';
 import { IErrorListener } from '../../interfaces/error-listener';
+import { ENV } from '../../utils/support';
 
 export type KnownRoles = { [role: string]: HMSRole };
 export interface TrackStateEntry {
   peerId: string;
   trackInfo: TrackState;
-}
-
-export enum ENV {
-  PROD = 'prod',
-  QA = 'qa',
-  DEV = 'dev',
 }
 
 export interface IStore {
@@ -79,12 +74,15 @@ export interface IStore {
   getTrackState(trackId: string): TrackStateEntry;
   setTrackState(trackState: TrackStateEntry): void;
 
+  getUserAgent(): string;
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo): void;
+
   removePeer(peerId: string): void;
   removeTrack(trackId: string): void;
 
   updateSpeakers(speakers: HMSSpeaker[]): void;
   updateAudioOutputVolume(volume: number): void;
-  updateAudioOutputDevice(device: MediaDeviceInfo): void;
+  updateAudioOutputDevice(device: MediaDeviceInfo): Promise<void>;
 
   hasRoleDetailsArrived(): boolean;
 

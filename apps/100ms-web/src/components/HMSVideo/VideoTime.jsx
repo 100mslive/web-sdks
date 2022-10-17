@@ -7,17 +7,23 @@ export const VideoTime = ({ videoRef }) => {
 
   useEffect(() => {
     const videoEl = videoRef.current;
+    const timeupdateHandler = _ =>
+      setVideoTime(getDurationFromSeconds(videoEl.currentTime));
     if (videoEl) {
-      videoEl.addEventListener("timeupdate", _ =>
-        setVideoTime(getDurationFromSeconds(videoEl.currentTime))
-      );
+      videoEl.addEventListener("timeupdate", timeupdateHandler);
     }
     return function cleanup() {
       if (videoEl) {
-        videoEl.removeEventListener("timeupdate", null);
+        videoEl.removeEventListener("timeupdate", timeupdateHandler);
       }
     };
   }, []);
 
-  return videoRef.current ? <Text>{`${videoTime}`}</Text> : null;
+  return videoRef.current ? (
+    <Text
+      variant={{
+        "@sm": "xs",
+      }}
+    >{`${videoTime}`}</Text>
+  ) : null;
 };

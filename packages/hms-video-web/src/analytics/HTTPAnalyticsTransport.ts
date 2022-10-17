@@ -1,4 +1,3 @@
-import { ENV } from '../sdk/store/IStore';
 import {
   CLIENT_ANAYLTICS_PROD_ENDPOINT,
   CLIENT_ANAYLTICS_QA_ENDPOINT,
@@ -6,7 +5,7 @@ import {
 } from '../utils/constants';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
-import { userAgent } from '../utils/support';
+import { ENV } from '../utils/support';
 import AnalyticsEvent from './AnalyticsEvent';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
@@ -28,7 +27,6 @@ interface ClientEventBody {
   };
   timestamp: number;
   payload: Record<string, any>;
-  agent: string;
   device_id: string;
 }
 
@@ -54,13 +52,16 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       event_id: String(event.timestamp),
       peer: event.metadata.peer,
       timestamp: event.timestamp,
-      agent: userAgent,
       device_id: event.device_id,
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
     fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.metadata.token}` },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${event.metadata.token}`,
+        user_agent_v2: event.metadata.userAgent,
+      },
       body: JSON.stringify(requestBody),
     })
       .then(response => {

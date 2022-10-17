@@ -16,7 +16,7 @@ import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
 import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../IHMSNotifications';
+import { IHMSNotifications } from '../schema/notification';
 import { NamedSetState } from './internalTypes';
 import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';
@@ -56,6 +56,9 @@ export class HMSReactiveStore {
       this.sdk = new HMSSdk();
       this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
+
+    // @ts-ignore
+    this.actions.setFrameworkInfo({ type: 'js', sdkVersion: require('../../../package.json').version });
 
     this.initialTriggerOnSubscribe = false;
 
@@ -143,28 +146,7 @@ export class HMSReactiveStore {
     const prevGetState = hmsStore.getState;
     // eslint-disable-next-line complexity
     hmsStore.getState = <StateSlice>(selector?: StateSelector<T, StateSlice>) => {
-      if (selector) {
-        const name = selector.name || 'byIDSelector';
-        // @ts-ignore
-        if (!window.selectorsCount) {
-          // @ts-ignore
-          window.selectorsCount = {};
-        }
-        // @ts-ignore
-        window.selectorsCount[name] = (window.selectorsCount[name] || 0) + 1;
-        const start = performance.now();
-        const updatedState = selector(prevGetState());
-        const diff = performance.now() - start;
-        // store selectors that take more than 1ms
-        if (diff > 1) {
-          // @ts-ignore
-          window.expensiveSelectors = window.expensiveSelectors || new Map();
-          // @ts-ignore
-          window.expensiveSelectors.set(name, diff);
-        }
-        return updatedState;
-      }
-      return prevGetState();
+      return selector ? selector(prevGetState()) : prevGetState();
     };
     HMSReactiveStore.compareWithShallowCheckInSubscribe(hmsStore);
     const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, storeName);

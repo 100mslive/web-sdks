@@ -13,6 +13,8 @@ import {
   HLSRequestParams,
   BroadcastResponse,
   HLSTimedMetadataParams,
+  SessionMetadataUpdateParams,
+  GetSessionMetadataResponse,
 } from '../interfaces';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
@@ -32,7 +34,7 @@ import { isPageHidden } from '../../utils/support';
 import { sleep } from '../../utils/timer-utils';
 
 export default class JsonRpcSignal implements ISignal {
-  readonly TAG = '[ SIGNAL ]: ';
+  readonly TAG = '[SIGNAL]: ';
   readonly observer: ISignalEventsObserver;
   readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);
 
@@ -54,12 +56,14 @@ export default class JsonRpcSignal implements ISignal {
   private _isConnected = false;
   private id = 0;
 
+  private onCloseHandler: (event: CloseEvent) => void = () => {};
+
   public get isConnected(): boolean {
     return this._isConnected;
   }
 
   public setIsConnected(newValue: boolean, reason = '') {
-    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue} }`);
+    HMSLogger.d(this.TAG, `isConnected set id: ${this.id}, oldValue: ${this._isConnected}, newValue: ${newValue}`);
     if (this._isConnected === newValue) {
       return;
     }
@@ -77,17 +81,9 @@ export default class JsonRpcSignal implements ISignal {
 
   constructor(observer: ISignalEventsObserver) {
     this.observer = observer;
-    window.addEventListener('offline', () => {
-      HMSLogger.d(this.TAG, 'Window network offline');
-      this.setIsConnected(false, 'Window network offline');
-    });
+    window.addEventListener('offline', this.offlineListener);
+    window.addEventListener('online', this.onlineListener);
 
-    window.addEventListener('online', () => {
-      HMSLogger.d(this.TAG, 'Window network online');
-      this.observer.onNetworkOnline();
-    });
-
-    this.onCloseHandler = this.onCloseHandler.bind(this);
     this.onMessageHandler = this.onMessageHandler.bind(this);
   }
 
@@ -125,8 +121,10 @@ export default class JsonRpcSignal implements ISignal {
 
   open(uri: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      let promiseSettled = false;
       // cleanup
       if (this.socket) {
+        this.socket.close();
         this.socket.removeEventListener('close', this.onCloseHandler);
         this.socket.removeEventListener('message', this.onMessageHandler);
       }
@@ -140,6 +138,7 @@ export default class JsonRpcSignal implements ISignal {
          * device is breaking the websocket connecting(which can happen even after a successful connect).
          */
         HMSLogger.e(this.TAG, 'Error from websocket', error);
+        promiseSettled = true;
         reject(
           ErrorFactory.WebSocketConnectionErrors.FailedToConnect(
             HMSAction.JOIN,
@@ -147,9 +146,26 @@ export default class JsonRpcSignal implements ISignal {
           ),
         );
       };
+
+      this.onCloseHandler = (event: CloseEvent) => {
+        HMSLogger.e(`Websocket closed code=${event.code}`);
+        if (promiseSettled) {
+          this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
+        } else {
+          promiseSettled = true;
+          reject(
+            ErrorFactory.WebSocketConnectionErrors.AbnormalClose(
+              HMSAction.JOIN,
+              `Error opening websocket connection - websocket closed unexpectedly with code=${event.code}`,
+            ),
+          );
+        }
+      };
+
       this.socket.addEventListener('error', errorListener);
 
       const openHandler = () => {
+        promiseSettled = true;
         resolve();
         this.setIsConnected(true);
         this.id++;
@@ -165,6 +181,9 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async close(): Promise<void> {
+    window.removeEventListener('offline', this.offlineListener);
+    window.removeEventListener('online', this.onlineListener);
+
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     if (this.socket) {
       this.socket.close(1000, 'Normal Close');
@@ -304,21 +323,12 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
-  private onCloseHandler(event: CloseEvent) {
-    HMSLogger.d(`Websocket closed code=${event.code}`);
-    this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
-    // https://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
+  async setSessionMetadata(params: SessionMetadataUpdateParams) {
+    await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
+  }
 
-    // @DISCUSS: onOffline would have thrown error already.
-    // if (event.code !== 1000) {
-    //   HMSLogger.e(`Websocket closed code=${event.code}, reason=${event.reason}`);
-    //   // 1000 code indicated `Normal Closure` [https://tools.ietf.org/html/rfc6455#section-7.4.1]
-    //   const error = ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
-    //     HMSAction.INIT,
-    //     `${event.reason} [${event.code}]`,
-    //   );
-    //   this.observer.onFailure(error);
-    // }
+  getSessionMetadata() {
+    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
   }
 
   private onMessageHandler(event: MessageEvent) {
@@ -416,4 +426,14 @@ export default class JsonRpcSignal implements ISignal {
     HMSLogger.e(`Sending ${method} over WS failed after ${MAX_RETRIES} retries`, { method, params, error });
     throw error;
   }
+
+  private offlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network offline');
+    this.setIsConnected(false, 'Window network offline');
+  };
+
+  private onlineListener = () => {
+    HMSLogger.d(this.TAG, 'Window network online');
+    this.observer.onNetworkOnline();
+  };
 }

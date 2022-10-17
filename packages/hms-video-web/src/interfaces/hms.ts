@@ -19,7 +19,7 @@ import { ScreenShareConfig } from './track-settings';
 
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
-  join(config: HMSConfig, listener: HMSUpdateListener): void;
+  join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(): Promise<void>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
@@ -42,13 +42,18 @@ export default interface HMS {
   /**
    * @param {HLSConfig} params
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
   getHLSState(): HMSHLS | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
+
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
 
   /**
    * @deprecated The method should not be used

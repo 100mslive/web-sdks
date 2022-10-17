@@ -12,7 +12,7 @@ const deps = Object.keys(pkg.dependencies || {});
 const peerDeps = Object.keys(pkg.peerDependencies || {});
 
 const config = {
-  input: 'src/index.tsx',
+  input: 'src/index.ts',
   external: [...deps, ...peerDeps],
   output: [
     { file: pkg.main, format: 'cjs', sourcemap: true },

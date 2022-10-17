@@ -3,6 +3,7 @@ import {
   HMSConfig,
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPlaylistType,
   HMSRole,
@@ -99,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
+  private frameworkInfo?: HMSFrameworkInfo;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -256,7 +258,7 @@ export class HMSSdk implements HMSInterface {
       requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
-    this.leave();
+    this.internalLeave(false);
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
@@ -353,7 +355,7 @@ export class HMSSdk implements HMSInterface {
     this.errorListener?.onError(error);
   };
 
-  join(config: HMSConfig, listener: HMSUpdateListener) {
+  async join(config: HMSConfig, listener: HMSUpdateListener) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
 
@@ -371,6 +373,8 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -378,7 +382,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.name = config.userName;
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
-      this.localPeer.metadata = config.metaData || '';
+      this.localPeer.metadata = config.metaData;
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -394,37 +398,40 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
-    this.transport
-      .join(
+
+    try {
+      await this.transport.join(
         config.authToken,
         this.localPeer!.peerId,
-        { name: config.userName, metaData: config.metaData || '' },
+        { name: config.userName, metaData: config.metaData! },
         config.initEndpoint!,
         config.autoVideoSubscribe,
-      )
-      .then(async () => {
-        HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-        HMSAudioContextHandler.resumeContext();
-        this.notifyJoin();
-        this.sendJoinAnalyticsEvent(isPreviewCalled);
-        if (this.store.getPublishParams() && !this.sdkState.published && !isNode) {
-          await this.publish(config.settings || defaultSettings);
-        }
-      })
-      .catch(error => {
-        this.analyticsTimer.end(TimedEvent.JOIN);
-        this.listener?.onError(error as HMSException);
-        this.sendJoinAnalyticsEvent(isPreviewCalled, error);
-        HMSLogger.e(this.TAG, 'Unable to join room', error);
-      })
-      .then(() => {
-        HMSLogger.timeEnd(`join-room-${roomId}`);
-      });
+      );
+      HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
+      HMSAudioContextHandler.resumeContext();
+      await this.notifyJoin();
+      this.sendJoinAnalyticsEvent(isPreviewCalled);
+      if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
+        this.publish(config.settings || defaultSettings).catch(error => {
+          HMSLogger.e(this.TAG, 'Error in publish', error);
+          this.listener?.onError(error);
+        });
+      }
+    } catch (error) {
+      this.analyticsTimer.end(TimedEvent.JOIN);
+      this.listener?.onError(error as HMSException);
+      this.sendJoinAnalyticsEvent(isPreviewCalled, error as HMSException);
+      HMSLogger.e(this.TAG, 'Unable to join room', error);
+      throw error;
+    }
+    HMSLogger.timeEnd(`join-room-${roomId}`);
   }
 
   private stringifyMetadata(config: HMSConfig) {
     if (config.metaData && typeof config.metaData !== 'string') {
-      JSON.stringify(config.metaData);
+      config.metaData = JSON.stringify(config.metaData);
+    } else if (!config.metaData) {
+      config.metaData = '';
     }
   }
 
@@ -453,7 +460,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async leave() {
+  leave() {
+    return this.internalLeave();
+  }
+
+  private async internalLeave(notifyServer = true) {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
@@ -463,7 +474,7 @@ export class HMSSdk implements HMSInterface {
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
-      await this.transport?.leave();
+      await this.transport?.leave(notifyServer);
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
@@ -477,7 +488,7 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     if (peers.length < 50) {
       // the log is too big and frequent for large rooms
-      HMSLogger.d(this.TAG, `Got peers`, peers);
+      HMSLogger.d(this.TAG, `Got peers(${peers.length})`, peers.toString());
     }
     return peers;
   }
@@ -696,7 +707,7 @@ export class HMSSdk implements HMSInterface {
     try {
       await this.transport?.startRTMPOrRecording(params);
     } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error, false));
+      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error));
       throw error;
     }
   }
@@ -716,7 +727,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async startHLSStreaming(params: HLSConfig) {
+  async startHLSStreaming(params?: HLSConfig) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(
         HMSAction.VALIDATION,
@@ -761,6 +772,15 @@ export class HMSSdk implements HMSInterface {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
     this.notificationManager.updateLocalPeer({ metadata });
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.transport.setSessionMetadata(metadata);
+  }
+
+  async getSessionMetadata() {
+    const response = await this.transport.getSessionMetadata();
+    return response.data;
   }
 
   getRoles(): HMSRole[] {
@@ -809,6 +829,10 @@ export class HMSSdk implements HMSInterface {
     });
   }
 
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
+    this.frameworkInfo = frameworkInfo;
+  }
+
   private async publish(initialSettings: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
@@ -849,7 +873,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     await this.deviceManager.init();
-    this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    await this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 
@@ -886,12 +910,16 @@ export class HMSSdk implements HMSInterface {
     if (localPeer?.role) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.listener?.onJoin(room);
-    } else {
+      return;
+    }
+
+    return new Promise<void>(resolve => {
       this.eventBus.policyChange.subscribeOnce(() => {
         this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
+        resolve();
       });
-    }
+    });
   }
 
   /**
@@ -905,6 +933,8 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }

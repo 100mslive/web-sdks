@@ -1,18 +1,62 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
-import { Tooltip } from './Tooltip';
+import { alignTooltip, sideTooltip, Tooltip } from './Tooltip';
+import { Flex } from '../Layout';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Tooltip',
+  argTypes: {
+    outlined: { control: 'boolean' },
+    side: { control: 'radio' },
+    align: { control: 'radio' },
+  },
+  args: {
+    outlined: false,
+    side: 'bottom',
+    align: 'center',
+  },
   component: Tooltip,
 } as ComponentMeta<typeof Tooltip>;
 
-const TooltipStory = () => {
+const TooltipStoryWithString = (
+  args: JSX.IntrinsicAttributes & {
+    title?: React.ReactNode;
+    outlined?: boolean | undefined;
+    side?: sideTooltip;
+    align?: alignTooltip;
+  } & { children?: React.ReactNode },
+) => {
   return (
-    <Tooltip title="Tooltip Text">
-      <span>Hover to see Tooltip</span>
-    </Tooltip>
+    <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
+      <Tooltip title="This is title" {...args}>
+        <Text>Hover to see Tooltip</Text>
+      </Tooltip>
+    </Flex>
   );
 };
 
-export const Example = TooltipStory.bind({});
+export const ExampleWithString = TooltipStoryWithString.bind({});
+
+const ExampleTitle = () => {
+  return <h3 style={{ color: '$textPrimary' }}>This is title</h3>;
+};
+
+const TooltipStorywithReactNode = (
+  args: JSX.IntrinsicAttributes & {
+    title?: React.ReactNode;
+    outlined?: boolean | undefined;
+    side?: sideTooltip;
+    align?: alignTooltip;
+  } & { children?: React.ReactNode },
+) => {
+  return (
+    <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
+      <Tooltip title={<ExampleTitle />} {...args}>
+        <Text>Hover to see tooltip</Text>
+      </Tooltip>
+    </Flex>
+  );
+};
+
+export const ExampleWithReactNode = TooltipStorywithReactNode.bind({});
