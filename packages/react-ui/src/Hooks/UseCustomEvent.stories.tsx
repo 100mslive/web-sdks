@@ -1,8 +1,9 @@
-import { StyledVideo } from './Video';
+import React from 'react';
+import { StyledVideo } from '../Video/Video';
 import { ComponentStory } from '@storybook/react';
 import { useCustomEvent } from '@100mslive/react-sdk';
 import { useCallback, useState } from 'react';
-import { Toast } from '../Toast';
+import { Toast } from '../Toast/Toast';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);

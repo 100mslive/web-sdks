@@ -1,5 +1,5 @@
 import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
-import Video, { StyledVideo } from './Video';
+import Video, { StyledVideo } from '../Video/Video';
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
 
