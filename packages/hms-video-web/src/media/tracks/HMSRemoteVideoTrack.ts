@@ -10,7 +10,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
-  private lastSelectedLayer?: HMSSimulcastLayer;
+  private lastSelectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
   private expectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
 
   public get degraded() {
@@ -62,6 +62,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
+    this.expectedLayer = this.lastSelectedLayer || HMSSimulcastLayer.HIGH;
     await this.updateLayer('addSink');
     this.pushInHistory(`uiSetLayer-high`);
   }
