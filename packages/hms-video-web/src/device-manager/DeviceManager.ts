@@ -17,6 +17,14 @@ export type SelectedDevices = {
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
 
+/**
+ * Normally we do audio input-output matching to ensure that audio input and output are from the same device.
+ * @see {DeviceManager.setOutputDevice}
+ * But some audio input devices(mics) that have a headphone jack come up in the list of available audio output devices as well
+ * although they don't really have a speaker. To avoid selecting these false speaker devices
+ */
+const OUTPUT_MATCHING_BLACKLISTED_DEVICES = ['yeti'];
+
 interface HMSDeviceManager extends DeviceMap {
   outputDevice?: MediaDeviceInfo;
   hasWebcamPermission: boolean;
@@ -216,14 +224,8 @@ export class DeviceManager implements HMSDeviceManager {
   async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
-    this.outputDevice = undefined;
-    if (inputDevice?.groupId) {
-      // only check for label because if groupId check is added it will select speaker
-      // when an external earphone without microphone is added
-      this.outputDevice = this.audioOutput.find(
-        device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
-      );
-    }
+    this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
+
     if (!this.outputDevice) {
       // select default deviceId device if available, otherwise select 0th device
       this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
@@ -337,6 +339,21 @@ export class DeviceManager implements HMSDeviceManager {
       } as HMSDeviceChangeEvent);
     }
   };
+
+  private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {
+    // perform output matching only when the input device label is not a substring of any of the blacklisted device labels
+    const shouldPerformOutputMatching = !OUTPUT_MATCHING_BLACKLISTED_DEVICES.some(deviceLabel =>
+      inputDevice?.label.toLowerCase().includes(deviceLabel),
+    );
+
+    if (shouldPerformOutputMatching && inputDevice?.groupId) {
+      // only check for label because if groupId check is added it will select speaker
+      // when an external earphone without microphone is added
+      return this.audioOutput.find(device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label);
+    }
+
+    return;
+  }
 
   private logDevices(label = '') {
     HMSLogger.d(
