@@ -27,7 +27,7 @@ const ScreenShare: ComponentStory<typeof Tooltip> = () => {
             <ShareScreenIcon />
           </IconButton>
         </Tooltip>
-        <Text variant="button">Screensharing {!isVideoScreenshare ? 'Inactive' : 'Active'}</Text>
+        <Text>Screensharing {!isVideoScreenshare ? 'Inactive' : 'Active'}</Text>
       </Flex>
     </Flex>
   );
