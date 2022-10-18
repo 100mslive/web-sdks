@@ -37,4 +37,17 @@ export function setUpFakeStore() {
       permissions: { changeRole: true, unmute: true, mute: true },
     } as HMSRole,
   });
+  storyBookSDK.addDevices({
+    audioInput: [],
+    audioOutput: [
+      createMediaDeviceInfoStub({ deviceId: '1', groupId: '1', kind: 'audiooutput', label: 'Stub Audio Output 1' }),
+      createMediaDeviceInfoStub({ deviceId: '2', groupId: '2', kind: 'audiooutput', label: 'Stub Audio Output 2' }),
+    ],
+    videoInput: [],
+  });
+}
+
+function createMediaDeviceInfoStub(data: any) {
+  data.__proto__ = MediaDeviceInfo.prototype;
+  return data as MediaDeviceInfo;
 }

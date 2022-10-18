@@ -13,6 +13,8 @@ import {
   selectLocalVideoTrackID,
   HMSRole,
   HMSTrackID,
+  selectLocalPeerID,
+  DeviceMap,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
@@ -171,6 +173,14 @@ export class StoryBookSDK implements Partial<HMSActions> {
   }
 
   async setScreenShareEnabled(enabled: boolean): Promise<void> {
+    const localPeerID = this.store.getState(selectLocalPeerID);
+    this.store.setState(store => {
+      if (enabled) {
+        store.peers[localPeerID].auxiliaryTracks = ['69'];
+      } else {
+        store.peers[localPeerID].auxiliaryTracks = [];
+      }
+    });
     this.log('set screenshare enabled state - ', enabled);
   }
 
@@ -202,6 +212,13 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.store.setState(store => {
       if (peer.isLocal) {
         store.room.localPeer = peer.id;
+        // dummy screen share
+        store.tracks['69'] = {
+          enabled: false,
+          id: '69',
+          type: 'video',
+          source: 'screen',
+        };
       }
       store.peers[peer.id] = peer;
       store.room.peers.push(peer.id);
@@ -245,6 +262,16 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.store.setState(store => {
       store.roles = roles;
     });
+  }
+
+  addDevices(devices: DeviceMap) {
+    this.store.setState(store => {
+      store.devices = devices;
+    });
+  }
+
+  async setAudioOutputDevice(deviceId: string): Promise<void> {
+    this.log(`setting audio output to ${deviceId}`);
   }
 
   private log(...args: any[]) {
