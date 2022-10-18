@@ -1,0 +1,65 @@
+## UseParticipants
+
+- This can be used to get the total count of participants in the room, participants
+- Filtered by role or metadata with isHandRaised or the entire participants if no params are passed
+- Participants result will provide details about HMSPeer, peerCount, and respective roles.
+
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
+
+```jsx
+import { HMSPeer, HMSRoleName } from '@100mslive/hms-video-store';
+export interface useParticipantsResult {
+  /**
+   * list of participants that match the given filters
+   */
+  participants: HMSPeer[];
+  /**
+   * Total number of participants in the room
+   */
+  peerCount: number;
+  /**
+   * is joined in the room
+   */
+  isConnected: boolean;
+  /**
+   * role names with atleast one participant present with that role
+   */
+  rolesWithParticipants: HMSRoleName[];
+}
+```
+
+```jsx
+import { HMSRoleName } from '@100mslive/hms-video-store';
+export type useParticipantsParams = {
+  /** To filter by particular role */
+  role: HMSRoleName,
+  /**
+   * To filter by particular by metadata. only supports { isHandRaised: true } for now
+   * @beta
+   */
+  metadata: Record<string, any>,
+  /** To filter by name/role (partial match) */
+  search: string,
+};
+```
+
+### Example
+
+<Preview>
+  <Story id="hooks-useparticipants--use-participants-hook" />
+</Preview>
+
+```jsx
+import { useParticipants } from '@100mslive/react-sdk';
+const UseParticipants = () => {
+  const { isConnected, participants, peerCount } = useParticipants();
+  return (
+    <Box>
+      <Text css={{ mb: '$4' }}>{peerCount} Participants</Text>
+      <VirtualizedParticipants participants={participants} />
+    </Box>
+  );
+};
+```
