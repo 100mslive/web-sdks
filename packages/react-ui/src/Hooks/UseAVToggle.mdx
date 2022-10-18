@@ -1,0 +1,32 @@
+## useAVToggle
+
+- Use this hook to implement mute/unmute for audio and video.
+- handleError parameter to handle any error during toggle of audio/video
+
+import { Story } from '@storybook/addon-docs';
+
+```jsx
+import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
+function Peer({ peer }) {
+  const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(
+    (err: Error, method?: string) => {
+      console.log(err);
+    },
+  );
+  return (
+    <div>
+      <button onClick={() => toggleVideo && toggleVideo()}>
+        {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
+      </button>
+      <button onClick={() => toggleAudio && toggleAudio()}>
+        {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
+      </button>
+      <Video css={{ bg: '$backgroundDark' }} trackId={localVideoTrackID} />
+    </div>
+  );
+}
+export default Peer;
+```
+
+<Story id="rendering-video-video-component--avtoogle-example" />
