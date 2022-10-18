@@ -1,0 +1,113 @@
+## useVideoList
+
+This hook can be used to build a paginated gallery view of video tiles. You can give the hook
+a list of all the peers which need to be shown and it tells you how to structure the UI by giving
+a list of pages with every page having a list of video tiles.
+Please check the documentation of input and output types for more details.
+
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
+
+```jsx
+interface useVideoListInput {
+  /**
+   * peers is the list of all peers you need to display
+   */
+  peers: HMSPeer[];
+  /**
+   * Max tiles in a  page. Overrides maxRowCount and maxColCount
+   */
+  maxTileCount?: number;
+  /**
+   * Max rows in a  page. Only applied if maxTileCount is not present
+   */
+  maxRowCount?: number;
+  /**
+   * Max columns in a  page. Only applied if maxTileCount and maxRowCount are not present
+   */
+  maxColCount?: number;
+  /**
+   * A function which tells whether to show the screenShare for a peer who is screensharing. A peer is passed
+   * and a boolean value is expected.
+   * This can be useful if there are multiple screenShares in the room where you may want to show the main one in the
+   * center view and others in video list along side other tiles. No screenShare is included by default.
+   * e.g. includeScreenShare = (peer) => return peer.id !== mainScreenSharingPeer.id
+   */
+  includeScreenShareForPeer?: (peer: HMSPeer) => boolean;
+  /**
+   * Aspect ratio of VideoTiles, ideally this should be the same as the aspect ratio selected for
+   * capture in the dashboard template.
+   */
+  aspectRatio?: { width: number; height: number };
+  /**
+   * By default this will be true. Only publishing(audio/video/screen) peers in the passed in peer list
+   * will be filtered. If you wish to show all peers, pass false for this.
+   */
+  filterNonPublishingPeers?: boolean;
+  /**
+   * Height that would be subtracted from the parent's height to give the available height, use case: if your pagination is inside the parent component then offsetY would be the height of pagination
+   */
+  offsetY?: number;
+}
+```
+
+```jsx
+interface useVideoResult {
+  /**
+   * This returns a list of all pages with every page containing the list of all tiles on it.
+   */
+  pagesWithTiles: useVideoListTile[][];
+  /**
+   * add the ref to the element going to render the video list, this is used to measure the available
+   * space/dimensions in order to calculate the best fit
+   */
+  ref: React.MutableRefObject<any>;
+}
+```
+
+### Example
+
+<Story id="hooks-usevideolist--example" />
+
+```jsx
+const VideoList = ({ maxTileCount, aspectRatio }) => {
+  const peers = useHMSStore(selectPeers);
+  const [page, setPage] = useState(0);
+  const { ref, pagesWithTiles } = useVideoList({
+    peers,
+    offsetY: 50,
+    maxTileCount,
+    aspectRatio,
+  });
+
+  return (
+    <StyledVideoList.Root>
+      <StyledVideoList.Container>
+        {pagesWithTiles && pagesWithTiles.length > 0
+          ? pagesWithTiles.map((tiles, pageNo) => (
+              <StyledVideoList.View>
+                {tiles.map((tile, i) =>
+                  tile.track?.source === 'screen' ? null : (
+                    <VideoTile
+                      key={i}
+                      width={tile.width}
+                      height={tile.height}
+                      trackId={tile.track?.id || ''}
+                      name={tile.peer.name}
+                    />
+                  ),
+                )}
+              </StyledVideoList.View>
+            ))
+          : null}
+      </StyledVideoList.Container>
+      <div>
+        {pagesWithTiles.length > 1 ? (
+          <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} />
+        ) : null}
+      </div>
+    </StyledVideoList.Root>
+  );
+};
+```

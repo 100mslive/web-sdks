@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { MicOffIcon } from '@100mslive/react-icons';
-import {
-  selectPeers,
-  useHMSStore,
-  useVideoList,
-} from '@100mslive/react-sdk';
+import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
 import { StyledVideoTile } from '../VideoTile';
 import Video from '../Video/Video';
 import { getLeft } from './videoListUtils';
 import { ComponentStory } from '@storybook/react';
 import { PaginationComponent as Pagination } from '../Pagination/StyledPagination.stories';
+import mdx from './useVideoList.mdx';
 
 const VideoListMeta = {
   title: 'Hooks/useVideoList',
+  parameters: {
+    docs: {
+      page: mdx,
+    },
+  },
 };
 
 export default VideoListMeta;
