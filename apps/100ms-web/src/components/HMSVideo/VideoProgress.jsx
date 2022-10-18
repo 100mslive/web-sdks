@@ -1,3 +1,4 @@
+import { Box, Flex } from "@100mslive/react-ui";
 import { useEffect, useState, useRef } from "react";
 import { getPercentage } from "./HMSVIdeoUtils";
 
@@ -43,36 +44,36 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
   };
 
   return videoRef.current ? (
-    <div
+    <Flex
       ref={progressRootRef}
-      style={{ cursor: "pointer", display: "flex" }}
+      style={{ cursor: "pointer" }}
       onClick={onProgressChangeHandler}
     >
-      <div
+      <Box
         id="video-actual"
-        style={{
+        css={{
           display: "inline",
           width: `${videoProgress}%`,
-          background: "#2471ED",
+          background: "$primaryDefault",
           height: "0.3rem",
         }}
-      ></div>
-      <div
+      />
+      <Box
         id="video-buffer"
-        style={{
+        css={{
           width: `${bufferProgress - videoProgress}%`,
-          background: "#143466",
+          background: "$primaryDark",
           height: "0.3rem",
         }}
-      ></div>
-      <div
+      />
+      <Box
         id="video-rest"
-        style={{
+        css={{
           width: `${100 - bufferProgress}%`,
-          background: "#B0C3DB",
+          background: "$grayLight",
           height: "0.3rem",
         }}
-      ></div>
-    </div>
+      />
+    </Flex>
   ) : null;
 };
