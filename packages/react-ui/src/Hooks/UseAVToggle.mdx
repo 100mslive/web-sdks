@@ -6,8 +6,27 @@
 import { Story } from '@storybook/addon-docs';
 
 ```jsx
-const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle();
+import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
+function Peer({ peer }) {
+  const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(
+    (err: Error, method?: string) => {
+      console.log(err);
+    },
+  );
+  return (
+    <div>
+      <button onClick={() => toggleVideo && toggleVideo()}>
+        {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
+      </button>
+      <button onClick={() => toggleAudio && toggleAudio()}>
+        {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
+      </button>
+      <Video css={{ bg: '$backgroundDark' }} trackId={localVideoTrackID} />
+    </div>
+  );
+}
+export default Peer;
 ```
 
-<Story id="rendering-video-component--avtoogle-example" />
+<Story id="rendering-video-video-component--avtoogle-example" />
