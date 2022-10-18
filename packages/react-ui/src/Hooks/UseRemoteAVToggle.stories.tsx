@@ -4,7 +4,7 @@ import React from 'react';
 import { ComponentStory } from '@storybook/react';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
-  const videoTrackId = '100';
+  const videoTrackId = '1';
   const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle('1', videoTrackId);
 
   return (

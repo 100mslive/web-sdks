@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ComponentStory } from '@storybook/react';
 import { Box, Flex } from '../Layout';
 import { DeviceType, useDevices } from '@100mslive/react-sdk';
 import { Text } from '../Text';

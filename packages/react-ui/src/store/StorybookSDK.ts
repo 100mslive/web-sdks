@@ -169,7 +169,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
         state.tracks[forRemoteTrackID].enabled = enabled;
       });
     }
-    this.log('set local video enabled state - ', enabled);
+    this.log('set remote video enabled state - ', enabled);
   }
 
   async setScreenShareEnabled(enabled: boolean): Promise<void> {
@@ -212,6 +212,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.store.setState(store => {
       if (peer.isLocal) {
         store.room.localPeer = peer.id;
+        store.room.isConnected = true;
         // dummy screen share
         store.tracks['69'] = {
           enabled: false,
@@ -271,6 +272,9 @@ export class StoryBookSDK implements Partial<HMSActions> {
   }
 
   async setAudioOutputDevice(deviceId: string): Promise<void> {
+    this.store.setState(store => {
+      store.settings.audioOutputDeviceId = deviceId;
+    });
     this.log(`setting audio output to ${deviceId}`);
   }
 
