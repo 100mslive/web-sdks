@@ -3,6 +3,7 @@ import React from 'react';
 import { Avatar } from '../Avatar';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
+import UseParticipantsDocs from './UseParticipants.mdx';
 
 const VirtualizedParticipants = ({ participants }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -57,6 +58,11 @@ const UseParticipants = () => {
 const Participants = {
   title: 'Hooks/useParticipants',
   component: UseParticipants,
+  parameters: {
+    docs: {
+      page: UseParticipantsDocs,
+    }
+  },
 };
 
 export default Participants;
