@@ -3,30 +3,42 @@
 - Use this hook to implement mute/unmute for audio and video.
 - handleError parameter to handle any error during toggle of audio/video
 
-import { Story } from '@storybook/addon-docs';
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
 
 ```jsx
-import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
-function Peer({ peer }) {
-  const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(
-    (err: Error, method?: string) => {
-      console.log(err);
-    },
-  );
-  return (
-    <div>
-      <button onClick={() => toggleVideo && toggleVideo()}>
-        {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
-      </button>
-      <button onClick={() => toggleAudio && toggleAudio()}>
-        {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
-      </button>
-      <Video css={{ bg: '$backgroundDark' }} trackId={localVideoTrackID} />
-    </div>
-  );
+interface useAVToggleInput {
+/**
+ * Use this hook to implement mute/unmute for audio and video.
+ * isAllowedToPublish can be used to decide whether to show the toggle buttons in the UI.
+ * @param handleError to handle any error during toggle of audio/video
+ */
+ handleError: (err: Error, method?: string) => void;
 }
-export default Peer;
 ```
 
-<Story id="rendering-video-video-component--avtoogle-example" />
+```jsx
+interface useAVToggleResult {
+  /**
+   * true if unmuted and vice versa
+   */
+  isLocalAudioEnabled: boolean;
+  isLocalVideoEnabled: boolean;
+  /**
+   * use this function to toggle audio state, the function will only be present if the user
+   * has permission to unmute audio
+   */
+  toggleAudio?: () => void;
+  /**
+   * use this function to toggle video state, the function will only be present if the user
+   * has permission to unmute video
+   */
+  toggleVideo?: () => void;
+}
+```
+
+### Example
+<Preview>
+  <Story id="hooks-useavtoggle--use-video-hook" />
+</Preview>
