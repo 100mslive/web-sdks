@@ -1,10 +1,10 @@
 import { useRemoteAVToggle } from '@100mslive/react-sdk';
-import Video, { StyledVideo } from './Video';
+import Video, { StyledVideo } from '../Video/Video';
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
-  const videoTrackId = '104';
+  const videoTrackId = '100';
   const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle('1', videoTrackId);
 
   return (
