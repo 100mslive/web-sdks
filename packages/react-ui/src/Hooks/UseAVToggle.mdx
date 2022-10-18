@@ -1,0 +1,13 @@
+## useAVToggle
+
+- Use this hook to implement mute/unmute for audio and video.
+- handleError parameter to handle any error during toggle of audio/video
+
+import { Story } from '@storybook/addon-docs';
+
+```jsx
+const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
+const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle();
+```
+
+<Story id="rendering-video-component--avtoogle-example" />
