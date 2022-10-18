@@ -1,10 +1,71 @@
-import React, { useState } from 'react';
-import { Box, Flex } from '../Layout';
-import { DeviceType, useDevices } from '@100mslive/react-sdk';
-import { Text } from '../Text';
-import { Dropdown } from '../Dropdown';
-import { ChevronDownIcon, ChevronUpIcon, SpeakerIcon } from '@100mslive/react-icons';
-import mdx from './UseDevices.mdx'
+## useDevices
+
+This hook can be used to implement a UI component which allows the user to manually change their
+audio/video device. It returns the list of all devices as well as the currently selected one. The input
+devices will be returned based on what the user is allowed to publish, so a audio only user won't get
+the audioInput field. This can be used to show the UI dropdowns properly.
+
+Note:
+- Browsers give access to the list of devices only if the user has given permission to access them
+- Changing devices manually work best in combination with remembering the user's selection for the next time, do
+  pass the rememberDeviceSelection flag at time of join for this to happen.
+
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
+
+```jsx
+interface useDevicesInput {
+/**
+ * to handle any error during toggle of audio/video
+ */
+ handleError?: (err: Error, method?: string) => void;
+}
+```
+
+````jsx
+interface useDevicesResult {
+  /**
+   * list of all devices by type
+   */
+  allDevices: DeviceTypeAndInfo<MediaDeviceInfo[]>;
+  /**
+   * selected device ids for all types
+   */
+  selectedDeviceIDs: DeviceTypeAndInfo<string>;
+  /**
+   * function to call to update device
+   */
+  updateDevice: ({ deviceType, deviceId }: { deviceType: DeviceType; deviceId: string }) => Promise<void>;
+}
+````
+
+### Example
+
+<Story id="hooks-usedevices--use-devices" />
+
+```jsx
+const Devices = () => {
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+
+  return (
+    <Flex>
+      <DeviceSelector
+        title="Speaker"
+        icon={<SpeakerIcon />}
+        devices={allDevices.audioOutput}
+        selection={selectedDeviceIDs.audioOutput}
+        onChange={deviceId =>
+          updateDevice({
+            deviceId,
+            deviceType: DeviceType.audioOutput,
+          })
+        }
+        children={null}
+      />
+    </Flex>
+  );
+};
 
 const DialogDropdownTrigger = ({ title, css, open, icon, titleCSS = {} }) => {
   return (
@@ -112,40 +173,4 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
     </Box>
   );
 };
-
-const Devices = () => {
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
-
-  return (
-    <Flex>
-      <DeviceSelector
-        title="Speaker"
-        icon={<SpeakerIcon />}
-        devices={allDevices.audioOutput}
-        selection={selectedDeviceIDs.audioOutput}
-        onChange={deviceId =>
-          updateDevice({
-            deviceId,
-            deviceType: DeviceType.audioOutput,
-          })
-        }
-        children={null}
-      />
-    </Flex>
-  );
-};
-
-const Story = {
-  title: 'Hooks/useDevices',
-  component: Devices,
-  parameters: {
-    docs: {
-      page: mdx,
-    },
-  },
-};
-
-export default Story;
-
-export const UseDevices = Devices.bind({});
-UseDevices.storyName = 'useDevices';
+```
