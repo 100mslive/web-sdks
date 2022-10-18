@@ -7,6 +7,7 @@ import { ComponentStory } from '@storybook/react';
 import { Text } from '../Text';
 import { Flex } from '../Layout';
 import { Video } from '../Video';
+import mdx from './UseScreenShare.mdx';
 
 const ScreenShare: ComponentStory<typeof Tooltip> = () => {
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
@@ -36,7 +37,11 @@ const ScreenShare: ComponentStory<typeof Tooltip> = () => {
 const Story = {
   title: 'Hooks/useScreenShare',
   component: ScreenShare,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
+  parameters: {
+    docs: {
+      page: mdx,
+    },
+  },
 };
 
 export default Story;

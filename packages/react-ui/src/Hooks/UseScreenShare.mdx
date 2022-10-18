@@ -1,0 +1,83 @@
+## useScreenShare
+
+This hook can be used to implement a screenshare toggle button as well as know about the screenshare in the room.
+This works best if your application only needs to show one screenshare in large view at a time with other screenshares
+similar to normal user tiles.
+For any complicated requirement with multiple screenshares it's best to use the store directly.
+For viewing the screenshare this hook is best used in combination with useVideo.
+For implementing control bar for local peer, this is used based with useAVToggle.
+
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
+
+
+```jsx
+interface useScreenShareInput {
+ /**
+  * to handle any error during toggle of audio/video
+  */
+  handleError: (err: Error, method?: string) => void;
+}
+```
+
+```jsx
+interface useScreenShareResult {
+  /**
+   * true if the local user is screensharing, false otherwise
+   */
+  amIScreenSharing: boolean;
+  /**
+   * toggle screenshare for the local user, will only be present if the user has the permission to toggle
+   */
+  toggleScreenShare?: () => void;
+  /**
+   * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
+   * In case of multiple screenshares, the behaviour of which one is picked is not defined.
+   */
+  screenSharingPeerId?: HMSPeerID;
+  /**
+   * the name of the peer who is currently screensharing. Will be undefined if no one is sharing the screen.
+   * In case of multiple screenshares, the behavior of which one is picked is not defined.
+   */
+  screenSharingPeerName?: string;
+  /**
+   * screenShare audio track id, will only be present if there is a screenshare with video track
+   */
+  screenShareVideoTrackId?: HMSTrackID;
+  /**
+   * screenShare audio track id, will only be present if there is a screenshare with audio track
+   */
+  screenShareAudioTrackId?: HMSTrackID;
+}
+```
+
+### Example
+
+<Story id="hooks-usescreenshare--use-screen-share" />
+
+```jsx
+const ScreenShare = () => {
+  const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
+  const isVideoScreenshare = amIScreenSharing && !!video;
+
+  return (
+    <Flex>
+      <Video trackId={video} />
+      <Flex>
+        <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>
+          <IconButton
+            active={!isVideoScreenshare}
+            onClick={() => {
+              toggleScreenShare && toggleScreenShare();
+            }}
+          >
+            <ShareScreenIcon />
+          </IconButton>
+        </Tooltip>
+        <Text>Screensharing {!isVideoScreenshare ? 'Inactive' : 'Active'}</Text>
+      </Flex>
+    </Flex>
+  );
+};
+```
