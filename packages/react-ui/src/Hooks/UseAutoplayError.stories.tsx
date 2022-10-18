@@ -25,7 +25,7 @@ export const DialogContent = ({ title, closeable = true, children }) => {
 };
 
 export const DialogRow = ({ justify = 'between', children }) => {
-  let finalCSS = {
+  const finalCSS = {
     margin: '$10 0',
     w: '100%',
   };
