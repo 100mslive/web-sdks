@@ -118,7 +118,7 @@ export default class RoleChangeManager {
     if (oldLayers.width !== newLayers.width || oldLayers.height !== newLayers.height) {
       return true;
     }
-    if (oldLayers.layers.length !== newLayers.layers.length) {
+    if (oldLayers.layers?.length !== newLayers.layers?.length) {
       return true;
     }
     return false;
