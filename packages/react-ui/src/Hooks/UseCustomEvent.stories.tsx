@@ -4,6 +4,7 @@ import { ComponentStory } from '@storybook/react';
 import { useCustomEvent } from '@100mslive/react-sdk';
 import { useCallback, useState } from 'react';
 import { Toast } from '../Toast/Toast';
+import mdx from './UseCustomEvent.mdx';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);
@@ -37,7 +38,11 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
 const VideoStories = {
   title: 'Hooks/useCustomEvent',
   component: VideoHook,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
+  parameters: {
+    docs: {
+      page: mdx,
+    },
+  },
 };
 
 export default VideoStories;
