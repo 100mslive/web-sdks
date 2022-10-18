@@ -87,13 +87,13 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
 
   if (store.getState(selectLocalAudioTrackID)) {
     webrtcStore.namedSetState(draft => {
-      draft.localPeer.videoTrack = store.getState(selectLocalAudioTrackID);
+      draft.localPeer.audioTrack = store.getState(selectLocalAudioTrackID);
     }, 'localpeer-audiotrack-id');
   } else {
     unsubAudioTrackID = store.subscribe(audioTrackID => {
       audioTrackID &&
         webrtcStore.namedSetState(draft => {
-          draft.localPeer.videoTrack = audioTrackID;
+          draft.localPeer.audioTrack = audioTrackID;
         }, 'localpeer-audiotrack-id');
     }, selectLocalAudioTrackID);
   }
