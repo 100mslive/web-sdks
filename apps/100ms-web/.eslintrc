@@ -63,14 +63,6 @@
             "(services)",
             "(utils)",
             "(constants)",
-            // // Other relative imports. Put same-folder imports and `.`.
-            // "^\\./(?=[^constants|utils].*/)(?!/?$)",
-            // "^\\.(?!/?$)",
-            // "^\\./?$",
-            // "^\\.(\\.)?/components/(.*)",
-            // "^\\.(\\.)?/services/(.*)",
-            // "^\\.(\\.)?/utils/(.*)",
-            // "^\\.(\\.)?/constants/(.*)",
             // Style imports.
             "^.+\\.?(css)$"
           ]
