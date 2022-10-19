@@ -218,21 +218,24 @@ export class DeviceManager implements HMSDeviceManager {
    * Algo:
    * 1. find the non default input device if selected one is default by matching device label
    * 2. find the corresponding output device which has the same group id or same label
-   * 3. select the default one if nothing was found
-   * 4. select the first option if there is no default
+   * 3. select the previous selected device if nothing was found
+   * 4. select the default one if no matching device was found and previous device doesn't exist anymore
+   * 5. select the first option if there is no default
    */
   async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
-    const prevSelection = this.createIdentifier(this.outputDevice);
-    this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
+    const prevSelectedIdentifier = this.createIdentifier(this.outputDevice);
+    const prevSelectedDevice = this.audioInput.find(device => this.createIdentifier(device) === prevSelectedIdentifier);
+    this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice) || prevSelectedDevice;
 
+    // select default device only if previously selected speaker is not available
     if (!this.outputDevice) {
       // select default deviceId device if available, otherwise select 0th device
       this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
     }
     await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
-    if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
+    if (deviceChange && prevSelectedIdentifier !== this.createIdentifier(this.outputDevice)) {
       this.eventBus.deviceChange.publish({
         selection: this.outputDevice,
         type: 'audioOutput',
