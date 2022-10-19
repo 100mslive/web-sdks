@@ -50,9 +50,9 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
+      speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
     },
     captureNetworkQualityInPreview: true,
-    speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
     handleError: (_, method) => {
       if (method === "preview") {
         setPreviewError(true);
