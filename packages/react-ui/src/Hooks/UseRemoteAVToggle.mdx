@@ -1,0 +1,69 @@
+## UseRemoteAVToggle
+
+- This hook can be use to implement remote mute/unmute.
+- It can used to change audio volume on tile level.
+- It took peerId, audioTrackId, videoTrackId to implement above part.
+
+### interface
+
+```jsx
+export interface useRemoteAVToggleResult {
+  /**
+   * true if unmuted and vice versa
+   */
+  isAudioEnabled: boolean;
+  isVideoEnabled: boolean;
+  /**
+   * current volume of the audio track
+   */
+  volume?: number;
+  /**
+   * use this function to toggle audio state, the function will only be present if the user
+   * has permission to mute/unmute remote audio
+   */
+  toggleAudio?: () => void;
+  /**
+   * use this function to toggle video state, the function will only be present if the user
+   * has permission to mute/unmute remote video
+   */
+  toggleVideo?: () => void;
+  /**
+   * use this function to set the volume of peer's audio track for the local user, the function will
+   * only be present if the remote peer has an audio track to change volume for
+   */
+  setVolume?: (volume: number) => void;
+}
+```
+
+```jsx
+export type hooksErrHandler = (err: Error, method?: string) => void;
+```
+
+### Example
+
+<Preview>
+  <Story id="hooks-useremoteavtoggle--use-video-hook" />
+</Preview>
+
+```jsx
+import { useRemoteAVToggle } from '@100mslive/react-sdk';
+import Video, { StyledVideo } from '../Video/Video';
+() => {
+  const videoTrackId = '1';
+  const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle(
+    '1',
+    videoTrackId,
+    (err: Error, method?: string) => {
+      console.log(err);
+    },
+  );
+
+  return (
+    <div>
+      <button onClick={() => toggleVideo && toggleVideo()}>{isVideoEnabled ? 'Disable video' : 'Enable video'}</button>
+      <button onClick={() => toggleAudio && toggleAudio()}>{isAudioEnabled ? 'Disable audio' : 'Enable audio'}</button>
+      <Video css={{ bg: '$backgroundDark' }} trackId={videoTrackId} />
+    </div>
+  );
+};
+```

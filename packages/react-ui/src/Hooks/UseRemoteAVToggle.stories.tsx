@@ -1,5 +1,6 @@
 import { useRemoteAVToggle } from '@100mslive/react-sdk';
 import Video, { StyledVideo } from '../Video/Video';
+import UseRemoteAVToggleDocs from './UseRemoteAVToggle.mdx';
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
 
@@ -20,6 +21,11 @@ const VideoStories = {
   title: 'Hooks/useRemoteAVToggle',
   component: VideoHook,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
+  parameters: {
+    docs: {
+      page: UseRemoteAVToggleDocs
+    }
+  }
 };
 
 export default VideoStories;

@@ -2,7 +2,7 @@ import React from 'react';
 import { useAutoplayError } from '@100mslive/react-sdk';
 import { Dialog, Text, Button, Flex, HorizontalDivider, Box } from '@100mslive/react-ui';
 
-export const DialogContent = ({ title, closeable = true, children }) => {
+const DialogContent = ({ title, closeable = true, children }) => {
   return (
     <Dialog.Portal>
       <Dialog.Overlay />
@@ -24,7 +24,7 @@ export const DialogContent = ({ title, closeable = true, children }) => {
   );
 };
 
-export const DialogRow = ({ justify = 'between', children }) => {
+const DialogRow = ({ justify = 'between', children }) => {
   const finalCSS = {
     margin: '$10 0',
     w: '100%',
@@ -36,48 +36,46 @@ export const DialogRow = ({ justify = 'between', children }) => {
   );
 };
 
-const AutoplayErrorHook = () => {
+const UseAutoplayErrorHook = () => {
   const { error, resetError, unblockAudio } = useAutoplayError();
   return (
-    <>
-      <Dialog.Root
-        open={!!error}
-        onOpenChange={value => {
-          if (!value) {
-            unblockAudio();
-          }
-          resetError();
-        }}
-      >
-        <DialogContent title="Autoplay Error" closeable={false}>
-          <DialogRow>
-            <Text variant="md">
-              The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
-            </Text>
-          </DialogRow>
-          <DialogRow justify="end">
-            <Button
-              variant="primary"
-              onClick={() => {
-                unblockAudio();
-                resetError();
-              }}
-            >
-              Allow Audio
-            </Button>
-          </DialogRow>
-        </DialogContent>
-      </Dialog.Root>
-    </>
+    <Dialog.Root
+      open={!!error}
+      onOpenChange={value => {
+        if (!value) {
+          unblockAudio();
+        }
+        resetError();
+      }}
+    >
+      <DialogContent title="Autoplay Error" closeable={false}>
+        <DialogRow>
+          <Text variant="md">
+            The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
+          </Text>
+        </DialogRow>
+        <DialogRow justify="end">
+          <Button
+            variant="primary"
+            onClick={() => {
+              unblockAudio();
+              resetError();
+            }}
+          >
+            Allow Audio
+          </Button>
+        </DialogRow>
+      </DialogContent>
+    </Dialog.Root>
   );
 };
 
 const AutoplayErrorStories = {
   title: 'Hooks/useAutoplayError',
-  component: AutoplayErrorHook,
+  component: UseAutoplayErrorHook,
 };
 
 export default AutoplayErrorStories;
 
-export const UseAutoplayErroHook = AutoplayErrorHook.bind({});
+export const UseAutoplayErroHook = UseAutoplayErrorHook.bind({});
 AutoplayErrorStories.storyName = 'useAutoplayError';
