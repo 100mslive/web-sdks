@@ -1,14 +1,20 @@
-import { HMSReactiveStore, HMSStore, createDefaultStoreState, HMSRole } from '@100mslive/react-sdk';
+import {
+  HMSReactiveStore,
+  HMSStore,
+  createDefaultStoreState,
+  HMSRole,
+} from '@100mslive/react-sdk';
 import create from 'zustand';
 import { fakeMessages } from '../fixtures/chats';
 import { fakeParticipants } from '../fixtures/peers';
+import { StoryBookNotifications } from './StorybookNotifications';
 import { StoryBookSDK } from './StorybookSDK';
 
 const store = HMSReactiveStore.createNewHMSStore('HMSStore', createDefaultStoreState);
 
-// @ts-ignore
 export const storyBookStore = create<HMSStore>(store);
-export const storyBookSDK = new StoryBookSDK(store);
+export const storyBookNotifications = new StoryBookNotifications(store);
+export const storyBookSDK = new StoryBookSDK(store, storyBookNotifications);
 
 const videoURLS = [
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',

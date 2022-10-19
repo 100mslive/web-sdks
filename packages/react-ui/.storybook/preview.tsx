@@ -1,11 +1,10 @@
 import React from 'react';
-import { HMSRoomProvider } from '@100mslive/react-sdk';
+import { HMSRoomProvider, HMSActions } from '@100mslive/react-sdk';
 import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
 
-import { setUpFakeStore, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
+import { setUpFakeStore, storyBookNotifications, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
 import { HMSThemeProvider, ThemeTypes } from '../src/Theme';
-import { IHMSActions } from '@100mslive/hms-video-store/dist/core/IHMSActions';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -29,7 +28,11 @@ setUpFakeStore();
 export const decorators = [
   Story => {
     return (
-      <HMSRoomProvider store={storyBookStore} actions={storyBookSDK as unknown as IHMSActions}>
+      <HMSRoomProvider
+        store={storyBookStore}
+        actions={storyBookSDK as unknown as HMSActions}
+        notifications={storyBookNotifications}
+      >
         <HMSThemeProvider themeType={useDarkMode() ? ThemeTypes.dark : ThemeTypes.light}>
           <Story />
         </HMSThemeProvider>

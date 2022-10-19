@@ -1,3 +1,4 @@
+import { HMSException } from '@100mslive/hms-video';
 import {
   HMSActions,
   IHMSStore,
@@ -17,6 +18,7 @@ import {
   DeviceMap,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
+import { StoryBookNotifications } from './StorybookNotifications';
 
 /*
 This is a dummy bridge with no connected backend. It can be used for
@@ -29,10 +31,13 @@ export class StoryBookSDK implements Partial<HMSActions> {
   private counter = 100;
   private localPeer?: HMSPeer;
   private ignoredMessageTypes: string[] = [];
+  private hmsNotifications: StoryBookNotifications;
 
-  constructor(store: IHMSStore) {
+  constructor(store: IHMSStore, notifications: StoryBookNotifications) {
     this.store = store;
+    this.hmsNotifications = notifications;
   }
+
   setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): void {
     throw new Error('Method not implemented.');
   }
@@ -52,9 +57,11 @@ export class StoryBookSDK implements Partial<HMSActions> {
   addTrack(_track: MediaStreamTrack, _type: HMSTrackSource): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
   removeTrack(_trackId: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
   setEnabledTrack(_trackId: string, _enabled: boolean): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -269,6 +276,15 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.store.setState(store => {
       store.devices = devices;
     });
+  }
+
+  sendError(error: HMSException) {
+    // @ts-ignore
+    this.hmsNotifications.sendError(error);
+  }
+
+  async unblockAudio() {
+    this.log('unblocking audio');
   }
 
   async setAudioOutputDevice(deviceId: string): Promise<void> {
