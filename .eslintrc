@@ -1,14 +1,41 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": ["@typescript-eslint", "prettier", "simple-import-sort"],
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "react-app"],
   "env": { "browser": true, "node": true },
   "overrides": [
     {
       // enable the rule specifically for TypeScript files
-      "files": ["*.ts", "*.js"],
+      "files": ["*.ts", "*.js", ".tsx",".jsx"],
       "rules": {
+        "import/first": "error",
+        "import/no-duplicates": "error",
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              [
+                // Packages `react` related packages come first.
+                "^react",
+                "^@?\\w",
+                // Internal packages.
+                "^(@|react-icons|react-sdk|react-ui)(/.*|$)",
+                // Side effect imports.
+                "^\\u0000",
+                // Other relative imports. Put same-folder imports and `.` last.
+                "^\\./(?=.*/)(?!/?$)",
+                "^\\.(?!/?$)",
+                "^\\./?$",
+                // Parent imports. Put `..` last.
+                "^\\.\\.(?!/?$)",
+                "^\\.\\./?$",
+                // Style imports.
+                "^.+\\.?(css)$"
+              ]
+            ]
+          }
+        ],
         "@typescript-eslint/explicit-module-boundary-types": [0],
         "@typescript-eslint/ban-ts-comment": 0,
         "@typescript-eslint/no-var-requires": 0,
