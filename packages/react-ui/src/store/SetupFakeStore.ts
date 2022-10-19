@@ -1,9 +1,4 @@
-import {
-  HMSReactiveStore,
-  HMSStore,
-  createDefaultStoreState,
-  HMSRole,
-} from '@100mslive/react-sdk';
+import { HMSReactiveStore, HMSStore, createDefaultStoreState, HMSRole } from '@100mslive/react-sdk';
 import create from 'zustand';
 import { fakeMessages } from '../fixtures/chats';
 import { fakeParticipants } from '../fixtures/peers';
