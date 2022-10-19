@@ -225,7 +225,9 @@ export class DeviceManager implements HMSDeviceManager {
   async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelectedIdentifier = this.createIdentifier(this.outputDevice);
-    const prevSelectedDevice = this.audioInput.find(device => this.createIdentifier(device) === prevSelectedIdentifier);
+    const prevSelectedDevice = this.audioOutput.find(
+      device => this.createIdentifier(device) === prevSelectedIdentifier,
+    );
     this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice) || prevSelectedDevice;
 
     // select default device only if previously selected speaker is not available
