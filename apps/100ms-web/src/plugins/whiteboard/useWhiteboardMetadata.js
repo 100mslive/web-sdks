@@ -1,12 +1,12 @@
+import { useCallback, useEffect, useMemo } from "react";
 import {
-  useHMSStore,
   selectLocalPeerID,
   selectPeerByCondition,
+  useHMSStore,
 } from "@100mslive/react-sdk";
-import { useCallback, useEffect, useMemo } from "react";
-import { getMetadata } from "../../common/utils";
-import { useMyMetadata } from "../../components/hooks/useMetadata";
 import { FeatureFlags } from "../../services/FeatureFlags";
+import { useMyMetadata } from "../../components/hooks/useMetadata";
+import { getMetadata } from "../../common/utils";
 
 const isWhiteboardOwner = peer => {
   return !!getMetadata(peer?.metadata).whiteboardOwner;

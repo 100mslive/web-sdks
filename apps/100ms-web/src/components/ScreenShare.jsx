@@ -1,12 +1,12 @@
-import { ShareScreenIcon } from "@100mslive/react-icons";
 import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
+import { ShareScreenIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
-import IconButton from "../IconButton";
 import { useUISettings } from "./AppData/useUISettings";
+import IconButton from "../IconButton";
 import { isScreenshareSupported } from "../common/utils";
 import { UI_SETTINGS } from "../common/constants";
 

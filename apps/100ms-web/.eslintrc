@@ -50,14 +50,26 @@
             "^@100mslive/react-ui",
             // Side effect imports.
             "^\\u0000",
+            
+            "(components)",
             // Other relative imports. Put same-folder imports and `.`.
-            "^\\./(?=[^constants|utils].*/)(?!/?$)",
+            "^\\./(?=.*/)(?!/?$)",
             "^\\.(?!/?$)",
             "^\\./?$",
-            "^\\.(\\.)?/components/(.*)",
-            "^\\.(\\.)?/services/(.*)",
-            "^\\.(\\.)?/utils/(.*)",
-            "^\\.(\\.)?/constants/(.*)",
+            "(plugins)",
+            "(components)(.*)(use.*)",
+            ".*(hooks)",
+            "(common)",
+            "(constants)$",
+            "(utils)$",
+            // // Other relative imports. Put same-folder imports and `.`.
+            // "^\\./(?=[^constants|utils].*/)(?!/?$)",
+            // "^\\.(?!/?$)",
+            // "^\\./?$",
+            // "^\\.(\\.)?/components/(.*)",
+            // "^\\.(\\.)?/services/(.*)",
+            // "^\\.(\\.)?/utils/(.*)",
+            // "^\\.(\\.)?/constants/(.*)",
             // Style imports.
             "^.+\\.?(css)$"
           ]

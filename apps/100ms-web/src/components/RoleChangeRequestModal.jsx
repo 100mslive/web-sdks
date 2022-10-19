@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  useHMSActions,
   selectRoleChangeRequest,
+  useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { RequestDialog } from "../primitives/DialogContent";
 import { useIsHeadless } from "./AppData/useUISettings";
+import { RequestDialog } from "../primitives/DialogContent";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
