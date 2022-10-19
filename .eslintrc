@@ -7,7 +7,7 @@
   "overrides": [
     {
       // enable the rule specifically for TypeScript files
-      "files": ["*.ts", "*.js", ".tsx",".jsx"],
+      "files": ["*.ts", "*.js", ".tsx", ".jsx"],
       "rules": {
         "import/first": "error",
         "import/no-duplicates": "error",
@@ -20,7 +20,12 @@
                 "^react",
                 "^@?\\w",
                 // Internal packages.
-                "^(@|react-icons|react-sdk|react-ui)(/.*|$)",
+                // Internal packages.
+                "^@100mslive/hms-video",
+                "^@100mslive/hms-video-store",
+                "^@100mslive/react-sdk",
+                "^@100mslive/react-icons",
+                "^@100mslive/react-ui",
                 // Side effect imports.
                 "^\\u0000",
                 // Other relative imports. Put same-folder imports and `.` last.

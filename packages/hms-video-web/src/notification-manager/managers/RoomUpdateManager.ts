@@ -1,3 +1,11 @@
+import { HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
+import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
+import { ServerError } from '../../interfaces/internal';
+import { IStore } from '../../sdk/store';
+import { convertDateNumToDate } from '../../utils/date';
+import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
   HLSNotification,
   PeerListNotification,
@@ -6,14 +14,6 @@ import {
   RoomState,
   RTMPNotification,
 } from '../HMSNotifications';
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
-import { IStore } from '../../sdk/store';
-import { convertDateNumToDate } from '../../utils/date';
-import { ServerError } from '../../interfaces/internal';
-import { HMSException } from '../../error/HMSException';
-import { HMSAction } from '../../error/ErrorFactory';
-import HMSLogger from '../../utils/logger';
 
 export class RoomUpdateManager {
   private TAG = 'RoomUpdateManager';
