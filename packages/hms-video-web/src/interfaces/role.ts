@@ -42,6 +42,8 @@ export interface PublishParams {
     height: number;
   };
   allowed: string[];
-  videoSimulcastLayers: SimulcastLayers;
-  screenSimulcastLayers: SimulcastLayers;
+  simulcast?: {
+    video: SimulcastLayers;
+    screen: SimulcastLayers;
+  };
 }

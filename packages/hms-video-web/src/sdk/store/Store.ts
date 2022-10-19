@@ -15,7 +15,6 @@ import {
 import {
   SimulcastLayer,
   SimulcastLayers,
-  SimulcastDimensions,
   simulcastMapping,
   RID,
   SimulcastLayerDefinition,
@@ -40,8 +39,8 @@ class Store implements IStore {
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
   private speakers: HMSSpeaker[] = [];
-  private videoLayers: SimulcastLayers | null = null;
-  private screenshareLayers: SimulcastLayers | null = null;
+  private videoLayers?: SimulcastLayers;
+  // private screenshareLayers?: SimulcastLayers;
   private config?: HMSConfig;
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
@@ -224,8 +223,8 @@ class Store implements IStore {
     if (!this.simulcastEnabled) {
       return;
     }
-    this.videoLayers = this.convertSimulcastLayers(params.videoSimulcastLayers);
-    this.screenshareLayers = this.convertSimulcastLayers(params.screenSimulcastLayers);
+    this.videoLayers = this.convertSimulcastLayers(params.simulcast?.video);
+    // this.screenshareLayers = this.convertSimulcastLayers(params.simulcast?.screen);
   }
 
   addPeer(peer: HMSPeer) {
@@ -299,23 +298,16 @@ class Store implements IStore {
     return this.videoLayers?.layers || [];
   }
 
-  getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions {
-    const layers = source === 'screen' ? this.screenshareLayers : this.videoLayers;
-    const width = layers?.width;
-    const height = layers?.height;
-    return {
-      width,
-      height,
-    };
-  }
-
   /**
    * Convert maxBitrate from kbps to bps
    * @internal
    * @param simulcastLayers
    * @returns {SimulcastLayers}
    */
-  private convertSimulcastLayers(simulcastLayers: SimulcastLayers) {
+  private convertSimulcastLayers(simulcastLayers?: SimulcastLayers) {
+    if (!simulcastLayers) {
+      return;
+    }
     return {
       ...simulcastLayers,
       layers: (simulcastLayers.layers || []).map(layer => {
@@ -335,13 +327,17 @@ class Store implements IStore {
 
     const publishParams = this.getPolicyForRole(peer.role!.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;
+    let width: number;
+    let height: number;
     if (source === 'regular') {
-      simulcastLayers = publishParams.videoSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.video;
+      width = publishParams.video.width;
+      height = publishParams.video.height;
     } else if (source === 'screen') {
-      simulcastLayers = publishParams.screenSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.screen;
+      width = publishParams.screen.width;
+      height = publishParams.screen.height;
     }
-    const width = simulcastLayers?.width;
-    const height = simulcastLayers?.height;
     return (
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];

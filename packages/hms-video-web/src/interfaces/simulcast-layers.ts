@@ -12,18 +12,18 @@ export interface SimulcastLayer {
   maxFramerate: number;
 }
 
-export interface SimulcastDimensions {
+export interface SimulcastResolution {
   width?: number;
   height?: number;
 }
 
-export interface SimulcastLayers extends SimulcastDimensions {
+export interface SimulcastLayers {
   layers: SimulcastLayer[];
 }
 
 export interface SimulcastLayerDefinition {
   layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
-  resolution: SimulcastDimensions;
+  resolution: SimulcastResolution;
 }
 
 export type RID = 'f' | 'h' | 'q';

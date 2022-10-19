@@ -1057,7 +1057,6 @@ export class HMSSdk implements HMSInterface {
 
   private getScreenshareSettings = (videoOnly: boolean) => {
     const { screen } = this.store.getPublishParams()!;
-    const dimensions = this.store.getSimulcastDimensions('screen');
 
     return {
       video: new HMSVideoTrackSettingsBuilder()
@@ -1066,8 +1065,8 @@ export class HMSSdk implements HMSInterface {
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec as HMSVideoCodec)
         .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
+        .setWidth(screen.width)
+        .setHeight(screen.height)
         .build(),
       audio: videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
     };
