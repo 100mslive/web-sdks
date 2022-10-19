@@ -1,0 +1,67 @@
+## useAutoplayError
+
+Use this hook to show a UI(modal or a toast) when autoplay is blocked by browser and allow the user to
+unblock the browser autoplay block
+
+import { Story, Preview } from '@storybook/addon-docs';
+
+### Interface
+
+```ts
+interface useAutoplayErrorResult {
+  /*
+   * Autoplay error message
+   */
+  error: string;
+  /**
+   * call this method on a UI element click to unblock the blocked audio autoplay.
+   */
+  unblockAudio: () => Promise<void>;
+  /**
+   * Call this method to reset(hide) the UI that is rendered when there was an error
+   */
+  resetError: () => void;
+}
+```
+
+### Example
+<Story id="hooks-useautoplayerror--use-autoplay-erro-hook" />
+
+```jsx
+import { useAutoplayError } from '@100mslive/react-sdk';
+import { Dialog, Text, Button } from '@100mslive/react-ui';
+
+() => {
+  const { error, resetError, unblockAudio } = useAutoplayError();
+
+  return (
+    <Dialog.Root
+      open={!!error}
+      onOpenChange={value => {
+        if (!value) {
+          unblockAudio();
+        }
+        resetError();
+      }}
+    >
+      <DialogContent>
+        <DialogRow>
+          <Text>
+            The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
+          </Text>
+        </DialogRow>
+        <DialogRow>
+          <Button
+            onClick={() => {
+              unblockAudio();
+              resetError();
+            }}
+          >
+            Allow Audio
+          </Button>
+        </DialogRow>
+      </DialogContent>
+    </Dialog.Root>
+  );
+};
+```
