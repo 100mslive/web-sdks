@@ -8,8 +8,9 @@ import { Story, Preview } from '@storybook/addon-docs';
 
 ### Interface
 
-```jsx
+```ts
 import { HMSPeer, HMSRoleName } from '@100mslive/hms-video-store';
+
 export interface useParticipantsResult {
   /**
    * list of participants that match the given filters
@@ -30,8 +31,9 @@ export interface useParticipantsResult {
 }
 ```
 
-```jsx
+```ts
 import { HMSRoleName } from '@100mslive/hms-video-store';
+
 export type useParticipantsParams = {
   /** To filter by particular role */
   role: HMSRoleName,
@@ -47,19 +49,38 @@ export type useParticipantsParams = {
 
 ### Example
 
-<Preview>
-  <Story id="hooks-useparticipants--use-participants-hook" />
-</Preview>
+<Story id="hooks-useparticipants--use-participants-hook" />
 
 ```jsx
 import { useParticipants } from '@100mslive/react-sdk';
-const UseParticipants = () => {
+import { Box, Flex, Text, Avatar } from '100mslive/react-ui';
+
+() => {
   const { isConnected, participants, peerCount } = useParticipants();
+
   return (
     <Box>
-      <Text css={{ mb: '$4' }}>{peerCount} Participants</Text>
-      <VirtualizedParticipants participants={participants} />
+      <Text>{peerCount} Participants</Text>
+      <Flex>
+        {participants.map(participant => (
+          <Participant key={participant.id} peer={participant} isLocal={participant.id === localPeerId} />
+        ))}
+      </Flex>
     </Box>
+  );
+};
+
+const Participant = ({ peer, isLocal = false }) => {
+  return (
+    <Flex>
+      <Avatar name={peer.name} />
+      <Flex>
+        <Text>
+          {isLocal ? 'You' : peer.name}
+        </Text>
+        <Text>{peer.roleName}</Text>
+      </Flex>
+    </Flex>
   );
 };
 ```

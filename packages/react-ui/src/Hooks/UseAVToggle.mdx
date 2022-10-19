@@ -1,13 +1,13 @@
 ## useAVToggle
 
-- Use this hook to implement mute/unmute for audio and video.
-- handleError parameter to handle any error during toggle of audio/video
+Use this hook to implement mute/unmute for audio and video.
+`isAllowedToPublish` can be used to decide whether to show the toggle buttons in the UI.
 
 import { Story, Preview } from '@storybook/addon-docs';
 
 ### Interface
 
-```jsx
+```ts
 interface useAVToggleInput {
 /**
  * to handle any error during toggle of audio/video
@@ -16,7 +16,7 @@ interface useAVToggleInput {
 }
 ```
 
-```jsx
+```ts
 interface useAVToggleResult {
   /**
    * true if unmuted and vice versa
@@ -37,31 +37,32 @@ interface useAVToggleResult {
 ```
 
 ### Example
-<Preview>
-  <Story id="hooks-useavtoggle--use-video-hook" />
-</Preview>
+<Story id="hooks-useavtoggle--use-video-hook" />
 
 ```jsx
 import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
+import { Flex, Box, Video } from '@100mslive/react-ui';
 
 () => {
   const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(
-    (err: Error, method?: string) => {
+    (err) => {
       console.log(err);
     },
   );
   
   return (
-    <div>
-      <button onClick={() => toggleVideo && toggleVideo()}>
-        {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
-      </button>
-      <button onClick={() => toggleAudio && toggleAudio()}>
-        {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
-      </button>
-      <Video css={{ bg: '$backgroundDark' }} trackId={localVideoTrackID} />
-    </div>
+    <Box>
+      <Flex gap="1">
+        <button onClick={() => toggleVideo && toggleVideo()}>
+          {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
+        </button>
+        <button onClick={() => toggleAudio && toggleAudio()}>
+          {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
+        </button>
+      </Flex>
+      <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={localVideoTrackID} />
+    </Box>
   );
 }
 ```

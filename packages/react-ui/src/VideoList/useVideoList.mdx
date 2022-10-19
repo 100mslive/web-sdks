@@ -9,7 +9,7 @@ import { Story, Preview } from '@storybook/addon-docs';
 
 ### Interface
 
-```jsx
+```ts
 interface useVideoListInput {
   /**
    * peers is the list of all peers you need to display
@@ -52,7 +52,7 @@ interface useVideoListInput {
 }
 ```
 
-```jsx
+```ts
 interface useVideoResult {
   /**
    * This returns a list of all pages with every page containing the list of all tiles on it.
@@ -71,7 +71,11 @@ interface useVideoResult {
 <Story id="hooks-usevideolist--example" />
 
 ```jsx
-const VideoList = ({ maxTileCount, aspectRatio }) => {
+import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
+import { Video, StyledVideoList, getLeft } from '@100mslive/react-ui';
+import { MicOffIcon } from '@100mslive/react-icons';
+
+({ maxTileCount, aspectRatio }) => {
   const peers = useHMSStore(selectPeers);
   const [page, setPage] = useState(0);
   const { ref, pagesWithTiles } = useVideoList({
@@ -86,7 +90,13 @@ const VideoList = ({ maxTileCount, aspectRatio }) => {
       <StyledVideoList.Container>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tiles, pageNo) => (
-              <StyledVideoList.View>
+              <StyledVideoList.View
+                key={pageNo}
+                css={{
+                  left: getLeft(pageNo, page),
+                  transition: 'left 0.3s ease-in-out',
+                }}
+              >
                 {tiles.map((tile, i) =>
                   tile.track?.source === 'screen' ? null : (
                     <VideoTile
@@ -108,6 +118,20 @@ const VideoList = ({ maxTileCount, aspectRatio }) => {
         ) : null}
       </div>
     </StyledVideoList.Root>
+  );
+};
+
+const VideoTile = ({ width, height, trackId, name }) => {
+  return (
+    <StyledVideoTile.Root css={{ width, height }}>
+      <StyledVideoTile.Container>
+        <Video trackId={trackId} />
+        <StyledVideoTile.Info>{name}</StyledVideoTile.Info>
+        <StyledVideoTile.AudioIndicator>
+          <MicOffIcon />
+        </StyledVideoTile.AudioIndicator>
+      </StyledVideoTile.Container>
+    </StyledVideoTile.Root>
   );
 };
 ```

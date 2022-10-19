@@ -38,11 +38,14 @@ interface useVideoOutput {
 <Story id="rendering-video-video-component--video-example" />
 
 ```jsx
-const VideoComponent = () => {
+import { useVideo } from '@100mslive/react-sdk';
+import { StyledVideo } from "@100mslive/react-ui"
+
+() => {
   const { videoRef } = useVideo({
     trackId: '1',
   });
 
-  return <StyledVideo css={{ bg: '$backgroundDark' }} ref={videoRef} autoPlay muted />;
+  return <StyledVideo ref={videoRef} autoPlay muted />;
 };
 ```

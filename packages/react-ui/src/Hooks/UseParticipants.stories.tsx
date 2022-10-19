@@ -1,11 +1,11 @@
-import { selectLocalPeerID, useHMSStore, useParticipants } from '@100mslive/react-sdk';
+import { HMSPeer, selectLocalPeerID, useHMSStore, useParticipants } from '@100mslive/react-sdk';
 import React from 'react';
 import { Avatar } from '../Avatar';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import UseParticipantsDocs from './UseParticipants.mdx';
 
-const VirtualizedParticipants = ({ participants }) => {
+const VirtualizedParticipants = ({ participants }: { participants: HMSPeer[] }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
     <Flex css={{ flexWrap: 'wrap' }}>
@@ -16,14 +16,9 @@ const VirtualizedParticipants = ({ participants }) => {
   );
 };
 
-const Participant = ({ peer, isLocal = false }) => {
+const Participant = ({ peer, isLocal = false }: { peer: HMSPeer; isLocal?: boolean }) => {
   return (
-    <Flex
-      key={peer.id}
-      css={{ w: '100%', py: '$4', pr: '$10' }}
-      align="center"
-      data-testid={'participant_' + peer.name}
-    >
+    <Flex css={{ w: '100%', py: '$4', pr: '$10' }} align="center">
       <Avatar
         name={peer.name}
         css={{
@@ -47,6 +42,7 @@ const Participant = ({ peer, isLocal = false }) => {
 
 const UseParticipants = () => {
   const { isConnected, participants, peerCount } = useParticipants();
+
   return (
     <Box>
       <Text css={{ mb: '$4' }}>{peerCount} Participants</Text>
@@ -61,7 +57,7 @@ const Participants = {
   parameters: {
     docs: {
       page: UseParticipantsDocs,
-    }
+    },
   },
 };
 

@@ -1,13 +1,24 @@
+import { Story } from '@storybook/addon-docs';
+
 ## UseRemoteAVToggle
 
 - This hook can be use to implement remote mute/unmute.
 - It can used to change audio volume on tile level.
 - It took peerId, audioTrackId, videoTrackId to implement above part.
 
-### interface
+### Interface
 
 ```jsx
-export interface useRemoteAVToggleResult {
+interface useRemoteAVToggleInput {
+  /**
+  * to handle any error during toggle of audio/video
+  */
+  handleError?: (err: Error, method?: string) => void;
+}
+```
+
+```jsx
+interface useRemoteAVToggleResult {
   /**
    * true if unmuted and vice versa
    */
@@ -35,35 +46,30 @@ export interface useRemoteAVToggleResult {
 }
 ```
 
-```jsx
-export type hooksErrHandler = (err: Error, method?: string) => void;
-```
-
 ### Example
 
-<Preview>
-  <Story id="hooks-useremoteavtoggle--use-video-hook" />
-</Preview>
+<Story id="hooks-useremoteavtoggle--use-video-hook" />
 
 ```jsx
 import { useRemoteAVToggle } from '@100mslive/react-sdk';
-import Video, { StyledVideo } from '../Video/Video';
+import { Video, StyledVideo, Box, Flex } from "@100mslive/react-ui"
+
 () => {
   const videoTrackId = '1';
-  const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle(
-    '1',
-    videoTrackId,
-    (err: Error, method?: string) => {
-      console.log(err);
-    },
-  );
+  const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle('1', videoTrackId);
 
   return (
-    <div>
-      <button onClick={() => toggleVideo && toggleVideo()}>{isVideoEnabled ? 'Disable video' : 'Enable video'}</button>
-      <button onClick={() => toggleAudio && toggleAudio()}>{isAudioEnabled ? 'Disable audio' : 'Enable audio'}</button>
-      <Video css={{ bg: '$backgroundDark' }} trackId={videoTrackId} />
-    </div>
+    <Box>
+      <Flex gap="2">
+        <button onClick={() => toggleVideo && toggleVideo()}>
+          {isVideoEnabled ? 'Disable video' : 'Enable video'}
+        </button>
+        <button onClick={() => toggleAudio && toggleAudio()}>
+          {isAudioEnabled ? 'Disable audio' : 'Enable audio'}
+        </button>
+      </Flex>
+      <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={videoTrackId} />
+    </Box>
   );
 };
 ```

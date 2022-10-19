@@ -67,6 +67,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
                 css={{
                   left: getLeft(pageNo, page),
                   transition: 'left 0.3s ease-in-out',
+                  overflowY: 'auto',
                 }}
               >
                 {tiles.map((tile, i) =>

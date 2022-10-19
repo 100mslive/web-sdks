@@ -11,8 +11,7 @@ import { Story, Preview } from '@storybook/addon-docs';
 
 ### Interface
 
-
-```jsx
+```ts
 interface useScreenShareInput {
  /**
   * to handle any error during toggle of audio/video
@@ -21,7 +20,7 @@ interface useScreenShareInput {
 }
 ```
 
-```jsx
+```ts
 interface useScreenShareResult {
   /**
    * true if the local user is screensharing, false otherwise
@@ -57,7 +56,11 @@ interface useScreenShareResult {
 <Story id="hooks-usescreenshare--use-screen-share" />
 
 ```jsx
-const ScreenShare = () => {
+import { useScreenShare } from '@100mslive/react-sdk';
+import { ShareScreenIcon } from '@100mslive/react-icons';
+import { Video, Flex, Tooltip, IconButton } from "@100mslive/react-ui"
+
+() => {
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
   const isVideoScreenshare = amIScreenSharing && !!video;
 
