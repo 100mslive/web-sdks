@@ -9,9 +9,9 @@ import {
 } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
 import { StyledVideoTile, Video, VideoTileStats } from "@100mslive/react-ui";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { getVideoTileLabel } from "./peerTileUtils";
 import TileMenu from "./TileMenu";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
 
 const labelStyles = {

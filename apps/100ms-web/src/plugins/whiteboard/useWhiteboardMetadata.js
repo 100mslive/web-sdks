@@ -4,9 +4,9 @@ import {
   selectPeerByCondition,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { FeatureFlags } from "../../services/FeatureFlags";
 import { useMyMetadata } from "../../components/hooks/useMetadata";
 import { getMetadata } from "../../common/utils";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 const isWhiteboardOwner = peer => {
   return !!getMetadata(peer?.metadata).whiteboardOwner;

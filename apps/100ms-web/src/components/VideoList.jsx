@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Freeze } from "react-freeze";
 import { useVideoList } from "@100mslive/react-sdk";
 import { getLeft, StyledVideoList, useTheme } from "@100mslive/react-ui";
-import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless } from "./AppData/useUISettings";
-import { FeatureFlags } from "../services/FeatureFlags";
 import { Pagination } from "./Pagination";
 import ScreenshareTile from "./ScreenshareTile";
 import VideoTile from "./VideoTile";
+import { useAppConfig } from "./AppData/useAppConfig";
+import { useIsHeadless } from "./AppData/useUISettings";
+import { FeatureFlags } from "../services/FeatureFlags";
 
 const List = ({
   maxTileCount,

@@ -21,8 +21,8 @@ import {
   textEllipsis,
   Tooltip,
 } from "@100mslive/react-ui";
-import { useFilteredRoles } from "../common/hooks";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
+import { useFilteredRoles } from "../common/hooks";
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
   <Text

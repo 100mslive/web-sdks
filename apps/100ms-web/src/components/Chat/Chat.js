@@ -11,8 +11,8 @@ import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
-import { useUnreadCount } from "./useUnreadCount";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+import { useUnreadCount } from "./useUnreadCount";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);

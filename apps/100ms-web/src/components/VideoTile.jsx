@@ -21,11 +21,11 @@ import {
   Video,
   VideoTileStats,
 } from "@100mslive/react-ui";
-import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import TileConnection from "./Connection/TileConnection";
 import { getVideoTileLabel } from "./peerTileUtils";
 import TileMenu from "./TileMenu";
+import { useAppConfig } from "./AppData/useAppConfig";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
 
 const Tile = ({ peerId, trackId, width, height }) => {

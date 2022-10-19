@@ -16,8 +16,8 @@ import {
   Switch,
   Text,
 } from "@100mslive/react-ui";
-import { useSetUiSettings } from "./AppData/useUISettings";
 import { DialogDropdownTrigger } from "../primitives/DropdownTrigger";
+import { useSetUiSettings } from "./AppData/useUISettings";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
 import { UI_SETTINGS } from "../common/constants";
 

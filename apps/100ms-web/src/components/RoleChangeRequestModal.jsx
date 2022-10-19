@@ -4,8 +4,8 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { useIsHeadless } from "./AppData/useUISettings";
 import { RequestDialog } from "../primitives/DialogContent";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
