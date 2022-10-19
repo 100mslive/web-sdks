@@ -10,8 +10,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
-  private lastSelectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
-  private expectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
+  private expectedLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> = HMSSimulcastLayer.HIGH;
 
   public get degraded() {
     return this._degraded;
@@ -35,11 +34,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
       return;
     }
+    this.expectedLayer = layer;
     if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
       return;
     }
-    this.expectedLayer = layer;
-    this.lastSelectedLayer = layer;
     if (!this.hasSinks()) {
       (this.stream as HMSRemoteStream).setVideoLayerLocally(layer, this.logIdentifier, 'preferLayer');
       HMSLogger.d(
@@ -62,7 +60,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.expectedLayer = this.lastSelectedLayer || HMSSimulcastLayer.HIGH;
+    this.expectedLayer = this.expectedLayer || HMSSimulcastLayer.HIGH;
     await this.updateLayer('addSink');
     this.pushInHistory(`uiSetLayer-high`);
   }
@@ -71,7 +69,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     super.removeSink(videoElement);
     const currentLayer = this.getSimulcastLayer();
     if (currentLayer !== HMSSimulcastLayer.NONE) {
-      this.lastSelectedLayer = currentLayer;
+      this.expectedLayer = currentLayer;
     }
     await this.updateLayer('removeSink');
     this._degraded = false;
@@ -124,12 +122,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private async updateLayer(source: string) {
     const newLayer =
-      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.lastSelectedLayer || HMSSimulcastLayer.HIGH;
+      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer || HMSSimulcastLayer.HIGH;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
     await this.requestLayer(newLayer, source);
-    this.lastSelectedLayer = undefined;
   }
 
   private pushInHistory(action: string) {
@@ -174,9 +171,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
-    //if there is layerWhenRemoveSink there is a possibility of layer not being sent to server
-    // evne if current and target layer is same
-    if (currLayer === targetLayer && !this.lastSelectedLayer) {
+    if (currLayer === targetLayer) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Not sending update, already on layer ${targetLayer}, source=${source}`,
