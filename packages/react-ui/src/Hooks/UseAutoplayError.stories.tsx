@@ -60,7 +60,6 @@ const UseAutoplayErrorHook = () => {
   const actions = useHMSActions();
   function sendAutoplayError() {
     (actions as unknown as StoryBookSDK).sendError(
-      // @ts-ignore
       new HMSException(3008, 'Autoplay error', 'NONE', 'Nothing has happened.', 'Nothing has happened.'),
     );
   }
