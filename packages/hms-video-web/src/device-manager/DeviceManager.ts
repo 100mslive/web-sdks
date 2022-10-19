@@ -337,17 +337,17 @@ export class DeviceManager implements HMSDeviceManager {
   };
 
   private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {
-    // perform output matching only when the input device label is not a substring of any of the blacklisted device labels
-    const speakerAutoSelectionBlacklist = this.store.getConfig()?.speakerAutoSelectionBlacklist;
-    const shouldPerformOutputMatching = !(
-      speakerAutoSelectionBlacklist &&
-      (speakerAutoSelectionBlacklist === 'all' ||
-        speakerAutoSelectionBlacklist.some(deviceLabel =>
-          inputDevice?.label.toLowerCase().includes(deviceLabel.toLowerCase()),
-        ))
-    );
+    const blacklist = this.store.getConfig()?.settings?.speakerAutoSelectionBlacklist || [];
+    if (blacklist === 'all') {
+      return;
+    }
 
-    if (shouldPerformOutputMatching && inputDevice?.groupId) {
+    const inputLabel = inputDevice?.label.toLowerCase() || '';
+    if (blacklist.some(label => inputLabel.includes(label.toLowerCase()))) {
+      return;
+    }
+
+    if (inputDevice?.groupId) {
       // only check for label because if groupId check is added it will select speaker
       // when an external earphone without microphone is added
       return this.audioOutput.find(device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label);
