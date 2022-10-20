@@ -101,7 +101,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._degraded = isDegraded;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
-    this.expectedLayer = layerUpdate.expected_layer;
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
