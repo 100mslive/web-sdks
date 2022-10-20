@@ -1,6 +1,6 @@
 ## useAVToggle
 
-Use this hook to implement mute/unmute for audio and video.
+Use this hook to implement mute/unmute for local audio and video.
 `isAllowedToPublish` can be used to decide whether to show the toggle buttons in the UI.
 
 import { Story, Preview } from '@storybook/addon-docs';
@@ -9,10 +9,10 @@ import { Story, Preview } from '@storybook/addon-docs';
 
 ```ts
 interface useAVToggleInput {
-/**
- * to handle any error during toggle of audio/video
- */
- handleError?: (err: Error, method?: string) => void;
+  /**
+   * to handle any error during toggle of audio/video
+   */
+  handleError?: (err: Error, method?: string) => void;
 }
 ```
 
@@ -37,6 +37,7 @@ interface useAVToggleResult {
 ```
 
 ### Example
+
 <Story id="hooks-useavtoggle--use-video-hook" />
 
 ```jsx
@@ -45,12 +46,10 @@ import { Flex, Box, Video } from '@100mslive/react-ui';
 
 () => {
   const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(
-    (err) => {
-      console.log(err);
-    },
-  );
-  
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleVideo, toggleAudio } = useAVToggle(err => {
+    console.log(err);
+  });
+
   return (
     <Box>
       <Flex gap="1">
@@ -64,5 +63,5 @@ import { Flex, Box, Video } from '@100mslive/react-ui';
       <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={localVideoTrackID} />
     </Box>
   );
-}
+};
 ```
