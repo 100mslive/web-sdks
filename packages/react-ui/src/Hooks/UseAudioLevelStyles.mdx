@@ -1,0 +1,42 @@
+## useAudioLevelStyles
+
+This hook can be used to apply css properties on an element based on the current audio level for the passed in track.
+It doesn't return the audio level as it's optimised for performance. As audio level could be changing frequently we
+want to minimise the number of components an audio level change causes to re render.
+An e.g. use of this hook will be to apply box-shadow on parent tile based on audio level.
+
+### Example
+
+```jsx
+import { useCallback, useRef } from 'react';
+import { useTheme } from '@100mslive/react-ui';
+import { useAudioLevelStyles } from '@100mslive/react-sdk';
+import { HMSTrackID } from '@100mslive/hms-video-store';
+
+export function adjustBorderAudioLevel(audioTrackId?: HMSTrackID) {
+  const { theme } = useTheme();
+  const color = theme.colors.brandDefault.value;
+  const getStyle = useCallback(
+    (level: number) => {
+      const style: Record<string, string> = {
+        transition: 'box-shadow 0.4s ease-in-out',
+      };
+      style['box-shadow'] = level
+        ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
+        : '';
+      return style;
+    },
+    [color],
+  );
+  const ref = useRef(null);
+  useAudioLevelStyles({
+    trackId: audioTrackId,
+    getStyle,
+    ref,
+  });
+  return ref;
+}
+const sigmoid = (z: number) => {
+  return 1 / (1 + Math.exp(-z));
+};
+```
