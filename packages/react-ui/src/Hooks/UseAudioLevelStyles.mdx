@@ -5,6 +5,25 @@ It doesn't return the audio level as it's optimised for performance. As audio le
 want to minimise the number of components an audio level change causes to re render.
 An e.g. use of this hook will be to apply box-shadow on parent tile based on audio level.
 
+### Interface
+
+```ts
+interface useAudioLevelStylesInput {
+ /**
+  * audio track id for which audio level needs to be used
+  */
+  trackId?: HMSTrackID;
+ /**
+  * a function which can take in current audio level and return the style to apply for the ref
+  */
+  getStyle: (level: number) => Record<string, string>;
+ /**
+  * the ref of the element on which you want the css to apply
+  */
+  ref: React.RefObject<any>;
+}
+```
+
 ### Example
 
 ```jsx
@@ -18,25 +37,29 @@ export function adjustBorderAudioLevel(audioTrackId?: HMSTrackID) {
   const color = theme.colors.brandDefault.value;
   const getStyle = useCallback(
     (level: number) => {
-      const style: Record<string, string> = {
+      return {
         transition: 'box-shadow 0.4s ease-in-out',
+        'box-shadow': level
+          ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
+          : '',
       };
-      style['box-shadow'] = level
-        ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
-        : '';
-      return style;
     },
-    [color],
+    [color]
   );
+
   const ref = useRef(null);
+
   useAudioLevelStyles({
     trackId: audioTrackId,
     getStyle,
     ref,
   });
+
   return ref;
 }
+
 const sigmoid = (z: number) => {
   return 1 / (1 + Math.exp(-z));
 };
+
 ```
