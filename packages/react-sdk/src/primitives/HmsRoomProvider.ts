@@ -13,7 +13,6 @@ import {
 import create from 'zustand';
 import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
-import { version as sdkVersion } from '../../package.json';
 
 export interface HMSRoomProviderProps {
   actions?: HMSActions;
@@ -103,7 +102,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     providerProps.actions.setFrameworkInfo({
       type: 'react-web',
       version: React.version,
-      sdkVersion,
+      sdkVersion: require('../../package.json').version,
     });
   }
 

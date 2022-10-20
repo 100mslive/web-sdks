@@ -3,7 +3,6 @@ import resolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
-import json from '@rollup/plugin-json';
 
 import pkg from './package.json';
 
@@ -25,7 +24,6 @@ const config = {
     resolve(),
     isProduction && terser(),
     typescript({ sourceMap: true }),
-    json(),
   ],
 };
 
