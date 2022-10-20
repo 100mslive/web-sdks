@@ -42,7 +42,7 @@ interface useAVToggleResult {
 
 ```jsx
 import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
-import { Flex, Box, Video } from '@100mslive/react-ui';
+import { Flex, Box, Video, Button } from '@100mslive/react-ui';
 
 () => {
   const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
@@ -53,14 +53,14 @@ import { Flex, Box, Video } from '@100mslive/react-ui';
   return (
     <Box>
       <Flex gap="1">
-        <button onClick={() => toggleVideo && toggleVideo()}>
+        <Button onClick={() => toggleVideo && toggleVideo()}>
           {isLocalVideoEnabled ? 'Disable video' : 'Enable video'}
-        </button>
-        <button onClick={() => toggleAudio && toggleAudio()}>
+        </Button>
+        <Button variant="standard" onClick={() => toggleAudio && toggleAudio()}>
           {isLocalAudioEnabled ? 'Disable audio' : 'Enable audio'}
-        </button>
+        </Button>
       </Flex>
-      <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={localVideoTrackID} />
+      <Video trackId={localVideoTrackID} />
     </Box>
   );
 };

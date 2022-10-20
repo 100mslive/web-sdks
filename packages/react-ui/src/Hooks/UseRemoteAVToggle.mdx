@@ -52,7 +52,7 @@ interface useRemoteAVToggleResult {
 
 ```jsx
 import { useRemoteAVToggle } from '@100mslive/react-sdk';
-import { Video, StyledVideo, Box, Flex } from "@100mslive/react-ui"
+import { Video, Box, Flex, Button } from "@100mslive/react-ui"
 
 () => {
   const videoTrackId = '1';
@@ -60,15 +60,15 @@ import { Video, StyledVideo, Box, Flex } from "@100mslive/react-ui"
 
   return (
     <Box>
-      <Flex gap="2">
-        <button onClick={() => toggleVideo && toggleVideo()}>
+      <Flex gap="1">
+        <Button onClick={() => toggleVideo && toggleVideo()}>
           {isVideoEnabled ? 'Disable video' : 'Enable video'}
-        </button>
-        <button onClick={() => toggleAudio && toggleAudio()}>
+        </Button>
+        <Button variant="standard" onClick={() => toggleAudio && toggleAudio()}>
           {isAudioEnabled ? 'Disable audio' : 'Enable audio'}
-        </button>
+        </Button>
       </Flex>
-      <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={videoTrackId} />
+      <Video trackId={videoTrackId} />
     </Box>
   );
 };
