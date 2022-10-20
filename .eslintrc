@@ -7,7 +7,7 @@
   "overrides": [
     {
       // enable the rule specifically for TypeScript files
-      "files": ["*.ts", "*.js", ".tsx", ".jsx"],
+      "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
       "rules": {
         "import/first": "error",
         "import/no-duplicates": "error",

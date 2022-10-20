@@ -1,7 +1,7 @@
-import { useVideo } from '@100mslive/react-sdk';
-import { StyledVideo } from './Video';
-import UseVideoDocs from './UseVideo.mdx';
 import React from 'react';
+import { useVideo } from '@100mslive/react-sdk';
+import UseVideoDocs from './UseVideo.mdx';
+import { StyledVideo } from './Video';
 
 const VideoHook = () => {
   const { videoRef } = useVideo({

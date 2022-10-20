@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { RadioGroup } from './RadioGroup';
-import { Flex } from '../Layout';
 import { Label } from '../Label';
+import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/RadioGroup',
@@ -29,4 +29,4 @@ const Template: ComponentStory<typeof RadioGroup.Root> = args => (
 );
 
 export const Example = Template.bind({});
-Example.storyName = 'RadioGroup'
+Example.storyName = 'RadioGroup';
