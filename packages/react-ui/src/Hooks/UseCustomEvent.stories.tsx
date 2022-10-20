@@ -5,6 +5,7 @@ import { useCustomEvent } from '@100mslive/react-sdk';
 import { useCallback, useState } from 'react';
 import { Toast } from '../Toast/Toast';
 import mdx from './UseCustomEvent.mdx';
+import { Button } from '../Button';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
 
   return (
     <Toast.Provider>
-      <button onClick={() => sendEvent({ emoji: '🚀' })}>Rockets</button>
+      <Button onClick={() => sendEvent({ emoji: '🚀' })}>Rockets</Button>
       <Toast.HMSToast
         title="EMOJI_REACTION"
         description={JSON.stringify(data)}

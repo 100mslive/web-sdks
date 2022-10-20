@@ -9,7 +9,7 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
     trackId: '1',
   });
 
-  return <StyledVideo css={{ bg: '$backgroundDark' }} ref={videoRef} autoPlay muted />;
+  return <StyledVideo css={{ bg: '$backgroundDark', maxWidth: '800px' }} ref={videoRef} autoPlay muted />;
 };
 
 const VideoStories = {

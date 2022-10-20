@@ -4,6 +4,7 @@ import UseRemoteAVToggleDocs from './UseRemoteAVToggle.mdx';
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
 import { Box, Flex } from '../Layout';
+import { Button } from '../Button';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const videoTrackId = '1';
@@ -12,14 +13,14 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   return (
     <Box>
       <Flex gap="1">
-        <button onClick={() => toggleVideo && toggleVideo()}>
+        <Button onClick={() => toggleVideo && toggleVideo()}>
           {isVideoEnabled ? 'Disable video' : 'Enable video'}
-        </button>
-        <button onClick={() => toggleAudio && toggleAudio()}>
+        </Button>
+        <Button variant="standard" onClick={() => toggleAudio && toggleAudio()}>
           {isAudioEnabled ? 'Disable audio' : 'Enable audio'}
-        </button>
+        </Button>
       </Flex>
-      <Video css={{ bg: '$backgroundDark', mt: '$4' }} trackId={videoTrackId} />
+      <Video css={{ bg: '$backgroundDark', mt: '$4', maxWidth: '800px' }} trackId={videoTrackId} />
     </Box>
   );
 };
