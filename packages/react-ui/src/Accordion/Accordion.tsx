@@ -1,9 +1,9 @@
-import React, { PropsWithChildren } from 'react';
-import { keyframes, CSS } from '@stitches/react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { styled } from '../Theme';
+import { CSS, keyframes } from '@stitches/react';
+import React, { PropsWithChildren } from 'react';
 import { Box } from '../Layout';
+import { styled } from '../Theme';
 
 const slideDown = keyframes({
   from: { height: 0 },
@@ -16,8 +16,6 @@ const slideUp = keyframes({
 });
 
 const StyledAccordion = styled(BaseAccordion.Root, {
-  borderRadius: '$4',
-  backgroundColor: '$surfaceDefault',
   cursor: 'pointer',
 });
 
@@ -48,8 +46,6 @@ const StyledHeader = styled(BaseAccordion.Header, {
 const StyledTrigger = styled(BaseAccordion.Trigger, {
   all: 'unset',
   fontFamily: '$sans',
-  backgroundColor: '$surfaceDefault',
-
   flex: 1,
   display: 'flex',
   alignItems: 'center',
@@ -57,9 +53,9 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   fontSize: '$md',
   lineHeight: '$md',
   color: '$textHighEmp',
-  '&[data-state="closed"]': { backgroundColor: '$surfaceDefault' },
-  '&[data-state="open"]': { backgroundColor: '$surfaceDefault' },
-  '&:hover': { backgroundColor: '$surfaceDefault' },
+  // '&[data-state="closed"]': { backgroundColor: '$surfaceDefault' },
+  // '&[data-state="open"]': { backgroundColor: '$surfaceDefault' },
+  // '&:hover': { backgroundColor: '$surfaceDefault' },
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
@@ -67,8 +63,6 @@ const StyledContent = styled(BaseAccordion.Content, {
   fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
-  backgroundColor: '$surfaceDefault',
-
   '&[data-state="open"]': {
     animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
