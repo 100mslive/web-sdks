@@ -1,4 +1,4 @@
-### usePreviewJoin
+## usePreviewJoin
 
 This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
 token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
@@ -7,10 +7,11 @@ Any device change or mute/unmute will be carried across to join.
 
 ### Interface
 
-```jsx
+```ts
 import { HMSConfigInitialSettings } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from '@100mslive/react-sdk';
-export interface usePreviewInput {
+
+interface usePreviewInput {
   /**
    * name of user who is joining, this is only required if join is called
    */
@@ -42,8 +43,8 @@ export interface usePreviewInput {
 }
 ```
 
-```jsx
-export interface usePreviewResult {
+```ts
+interface usePreviewResult {
   /**
    * enable the join button for the user only when this is true
    */
