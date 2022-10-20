@@ -52,11 +52,13 @@ const hostPublishParams: PublishParams = {
     height: 1080,
     bitRate: 400,
   },
-  videoSimulcastLayers: {
-    layers: [],
-  },
-  screenSimulcastLayers: {
-    layers: [],
+  simulcast: {
+    video: {
+      layers: [],
+    },
+    screen: {
+      layers: [],
+    },
   },
 };
 
