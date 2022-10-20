@@ -1,0 +1,67 @@
+### usePreviewJoin
+
+This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
+token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
+muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
+Any device change or mute/unmute will be carried across to join.
+
+### Interface
+
+```jsx
+import { HMSConfigInitialSettings } from '@100mslive/hms-video-store';
+import { hooksErrHandler } from '@100mslive/react-sdk';
+export interface usePreviewInput {
+  /**
+   * name of user who is joining, this is only required if join is called
+   */
+  name?: string;
+  /**
+   * app side authentication token
+   */
+  token: string;
+  /**
+   * any extra metadata info for the peer
+   */
+  metadata?: string;
+  /**
+   * function to handle errors happening during preview
+   */
+  handleError?: hooksErrHandler;
+  initEndpoint?: string;
+  /**
+   * initial settings for audio/video and device to be used.
+   */
+  initialSettings?: HMSConfigInitialSettings;
+  /**
+   * Enable to get a network quality score while in preview. The score ranges from -1 to 5.
+   * -1 when we are not able to connect to 100ms servers within an expected time limit
+   * 0 when there is a timeout/failure when measuring the quality
+   * 1-5 ranges from poor to good quality.
+   */
+  captureNetworkQualityInPreview?: boolean;
+}
+```
+
+```jsx
+export interface usePreviewResult {
+  /**
+   * enable the join button for the user only when this is true
+   */
+  enableJoin: boolean;
+  /**
+   * call this function to join the room
+   */
+  join: () => Promise<void>;
+  /**
+   * once the user has joined the room, till leave happens this flag will be true. It can be used
+   * to decide to show between preview form and conferencing component/video tiles.
+   */
+  isConnected: boolean;
+  /**
+   * call this function to join the room
+   */
+  preview: () => Promise<void>;
+}
+```
+
+### Example
