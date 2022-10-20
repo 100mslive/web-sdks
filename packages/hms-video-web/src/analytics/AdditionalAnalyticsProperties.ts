@@ -1,5 +1,33 @@
 import { TransportState } from '../transport/models/TransportState';
 
+// native APIs missing in TS
+enum ConnectionType {
+  'bluetooth',
+  'cellular',
+  'ethernet',
+  'mixed',
+  'none',
+  'other',
+  'unknown',
+  'wifi',
+  'wimax',
+}
+
+enum EffectiveConnectionType {
+  '2g',
+  '3g',
+  '4g',
+  'slow-2g',
+}
+
+interface NetworkInformation {
+  type: ConnectionType;
+  effectiveType: EffectiveConnectionType;
+  downlinkMax: number;
+  downlink: number;
+  rtt: number;
+}
+
 export interface AdditionalAnalyticsProperties {
   bitrate?: {
     publish?: number;
