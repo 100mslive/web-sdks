@@ -29,7 +29,7 @@ interface useAutoplayErrorResult {
 
 ```jsx
 import { useAutoplayError } from '@100mslive/react-sdk';
-import { Dialog, Text, Button } from '@100mslive/react-ui';
+import { Dialog, Text, Button, Box, Flex } from '@100mslive/react-ui';
 
 () => {
   const { error, resetError, unblockAudio } = useAutoplayError();
@@ -45,12 +45,12 @@ import { Dialog, Text, Button } from '@100mslive/react-ui';
       }}
     >
       <DialogContent>
-        <DialogRow>
+        <Flex>
           <Text>
             The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
           </Text>
-        </DialogRow>
-        <DialogRow>
+        </Flex>
+        <Flex>
           <Button
             onClick={() => {
               unblockAudio();
@@ -59,9 +59,35 @@ import { Dialog, Text, Button } from '@100mslive/react-ui';
           >
             Allow Audio
           </Button>
-        </DialogRow>
+        </Flex>
       </DialogContent>
     </Dialog.Root>
+  );
+};
+
+const DialogContent = ({
+  title,
+  closeable = true,
+  children,
+}) => {
+  return (
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content>
+        <Dialog.Title>
+          <Flex>
+            <Flex>
+              <Text variant="h6" inline>
+                {title}
+              </Text>
+            </Flex>
+            {closeable && <Dialog.DefaultClose />}
+          </Flex>
+        </Dialog.Title>
+        <HorizontalDivider />
+        <Box>{children}</Box>
+      </Dialog.Content>
+    </Dialog.Portal>
   );
 };
 ```
