@@ -45,8 +45,8 @@ const selectVideoTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSVideoTrack;
-  if (track.type === 'video') {
+  const track = storeTracks[trackID] as HMSVideoTrack | undefined;
+  if (track?.type === 'video') {
     return track;
   }
   return null;
@@ -56,8 +56,8 @@ const selectAudioTrackByIDBare = createSelector([selectTracksMap, selectTrackID]
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio') {
+  const track = storeTracks[trackID] as HMSAudioTrack | undefined;
+  if (track?.type === 'audio') {
     return track;
   }
   return null;
@@ -67,8 +67,8 @@ const selectScreenAudioTrackByIDBare = createSelector([selectTracksMap, selectTr
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSAudioTrack;
-  if (track.type === 'audio' && track.source === 'screen') {
+  const track = storeTracks[trackID] as HMSAudioTrack | undefined;
+  if (track?.type === 'audio' && track?.source === 'screen') {
     return track;
   }
   return null;
@@ -77,8 +77,8 @@ const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTr
   if (!trackID) {
     return null;
   }
-  const track = storeTracks[trackID] as HMSScreenVideoTrack;
-  if (track.type === 'video' && track.source === 'screen') {
+  const track = storeTracks[trackID] as HMSScreenVideoTrack | undefined;
+  if (track?.type === 'video' && track?.source === 'screen') {
     return track;
   }
   return null;
@@ -225,11 +225,11 @@ export const selectConnectionQualityByPeerID = byIDCurry((store: HMSStore, peerI
 /**
  * Select the first auxiliary audio track of a peer given a peer ID.
  */
-export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID): HMSTrack | undefined => {
+export const selectAuxiliaryAudioByPeerID = byIDCurry((store: HMSStore, peerID?: HMSPeerID) => {
   const peer = selectPeerByIDBare(store, peerID);
   if (peer) {
     const trackID = peer?.auxiliaryTracks.find(trackID => isAudio(store.tracks[trackID]));
-    return trackID ? store.tracks[trackID] : undefined;
+    return trackID ? (store.tracks[trackID] as HMSAudioTrack) : undefined;
   }
   return undefined;
 });
@@ -240,7 +240,7 @@ export const selectVideoPlaylistVideoTrackByPeerID = byIDCurry(
       const track = tracks[trackID];
       return isVideoPlaylist(track) && isVideo(track);
     });
-    return trackID ? tracks[trackID] : undefined;
+    return trackID ? (tracks[trackID] as HMSVideoTrack) : undefined;
   }),
 );
 
@@ -250,7 +250,7 @@ export const selectVideoPlaylistAudioTrackByPeerID = byIDCurry(
       const track = tracks[trackID];
       return isVideoPlaylist(track) && isAudio(track);
     });
-    return trackID ? tracks[trackID] : undefined;
+    return trackID ? (tracks[trackID] as HMSAudioTrack) : undefined;
   }),
 );
 
@@ -260,7 +260,7 @@ export const selectAudioPlaylistTrackByPeerID = byIDCurry(
       const track = tracks[trackID];
       return isAudioPlaylist(track) && isAudio(track);
     });
-    return trackID ? tracks[trackID] : undefined;
+    return trackID ? (tracks[trackID] as HMSAudioTrack) : undefined;
   }),
 );
 

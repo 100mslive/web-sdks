@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, LinkIcon } from '@100mslive/react-icons';
 import { Dialog, Flex, Text, IconButton, Box, Dropdown, Button, QRCode } from '@100mslive/react-ui';
 
@@ -6,6 +6,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
   const roles = Object.keys(roomLinks);
   const [selectedRole, setSelectedRole] = useState(roles[0]);
   const [open, setOpen] = useState(false);
+  const ref = useRef();
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <Dialog.Portal>
@@ -19,6 +20,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                 <Dropdown.Root open={open} onOpenChange={setOpen}>
                   <Dropdown.Trigger
                     asChild
+                    ref={ref}
                     css={{
                       border: '1px solid $borderLight',
                       bg: '$surfaceLight',
@@ -32,21 +34,24 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                       {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
                     </Flex>
                   </Dropdown.Trigger>
-                  <Dropdown.Content align="start" sideOffset={8} css={{ w: '100%' }} portalled={false}>
-                    {roles.map(role => {
-                      return (
-                        <Dropdown.Item
-                          key={role}
-                          css={{
-                            bg: selectedRole === role ? '$primaryDark' : undefined,
-                          }}
-                          onClick={() => setSelectedRole(role)}
-                        >
-                          {role}
-                        </Dropdown.Item>
-                      );
-                    })}
-                  </Dropdown.Content>
+                  <Dropdown.Portal>
+                    <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+                      {roles.map(role => {
+                        return (
+                          <Dropdown.Item
+                            key={role}
+                            css={{
+                              bg: selectedRole === role ? '$primaryDark' : undefined,
+                              px: '$9'
+                            }}
+                            onClick={() => setSelectedRole(role)}
+                          >
+                            {role}
+                          </Dropdown.Item>
+                        );
+                      })}
+                    </Dropdown.Content>
+                  </Dropdown.Portal>
                 </Dropdown.Root>
                 <Text variant="sm" css={{ color: '$textMedEmp', my: '$10' }}>
                   Select a role with relevant permissions that you want to share, to join the room.
@@ -94,12 +99,6 @@ const LeftContainer = ({ children }) => {
     <Flex
       direction="column"
       css={{
-        '[data-radix-popper-content-wrapper]': {
-          width: '100%',
-          minWidth: '0 !important',
-          transform: 'translateY($space$20) !important',
-          zIndex: 11,
-        },
         position: 'relative',
         minWidth: 0,
         flex: '1 1 0',

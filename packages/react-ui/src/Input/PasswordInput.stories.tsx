@@ -25,16 +25,22 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
           showPassword={showPassword}
           onChange={e => setText(e.target.value)}
         />
-        <PasswordInput.Icons ref={ref}>
+        <PasswordInput.Icons ref={ref} css={{ bg: '$transparent' }}>
           <PasswordInput.ShowIcon
             showPassword={showPassword}
             onClick={() => {
               setShowPassword(!showPassword);
             }}
+            css={{
+              color: '$textPrimary',
+            }}
           />
           <PasswordInput.CopyIcon
             onClick={() => {
               navigator.clipboard.writeText(text);
+            }}
+            css={{
+              color: '$textPrimary',
             }}
           />
         </PasswordInput.Icons>
@@ -44,3 +50,4 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
 };
 
 export const Example = Template.bind({});
+Example.storyName = 'PasswordInput'

@@ -3,46 +3,46 @@ import { useCallback } from "react";
 import {
   selectPeerNameByID,
   selectSessionMetadata,
-  useCustomEvent,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
+import {
+  METADATA_MESSAGE_TYPE,
+  REFRESH_MESSAGE,
+} from "./useRefreshSessionMetadata";
 
-const REFRESH_MESSAGE = "refresh";
-
+/**
+ * set pinned chat message by updating the session metadata
+ * and broadcasting metadata refresh message to other peers
+ */
 export const useSetPinnedMessage = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const pinnedMessage = useHMSStore(selectSessionMetadata);
-
-  const { sendEvent } = useCustomEvent({
-    type: "metadata",
-    json: false,
-    onEvent: message => {
-      if (message === REFRESH_MESSAGE) {
-        hmsActions.populateSessionMetadata();
-      }
-    },
-  });
 
   const setPinnedMessage = useCallback(
     /**
      * @param {import("@100mslive/react-sdk").HMSMessage | undefined} message
      */
     async message => {
-      const peerName = vanillaStore.getState(
-        selectPeerNameByID(message?.sender)
-      );
+      const peerName =
+        vanillaStore.getState(selectPeerNameByID(message?.sender)) ||
+        message?.senderName;
       const newPinnedMessage = message
-        ? `${peerName}: ${message.message}`
+        ? peerName
+          ? `${peerName}: ${message.message}`
+          : message.message
         : null;
       if (newPinnedMessage !== pinnedMessage) {
         await hmsActions.setSessionMetadata(newPinnedMessage);
-        sendEvent(REFRESH_MESSAGE);
+        await hmsActions.sendBroadcastMessage(
+          REFRESH_MESSAGE,
+          METADATA_MESSAGE_TYPE
+        );
       }
     },
-    [hmsActions, vanillaStore, pinnedMessage, sendEvent]
+    [hmsActions, vanillaStore, pinnedMessage]
   );
 
   return { setPinnedMessage };

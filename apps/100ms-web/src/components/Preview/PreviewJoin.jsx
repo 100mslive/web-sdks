@@ -5,7 +5,7 @@ import {
   useHMSStore,
   selectIsLocalVideoEnabled,
   useAVToggle,
-  useHMSActions,
+  selectVideoTrackByID,
 } from "@100mslive/react-sdk";
 import {
   styled,
@@ -50,6 +50,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
+      speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
     },
     captureNetworkQualityInPreview: true,
     handleError: (_, method) => {
@@ -58,19 +59,15 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
       }
     },
   });
-  const hmsActions = useHMSActions();
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
       isAudioMuted: !isLocalAudioEnabled,
       isVideoMuted: !isLocalVideoEnabled,
     });
-    join().then(() => {
-      hmsActions.populateSessionMetadata();
-    });
+    join();
     onJoin && onJoin();
   }, [
-    hmsActions,
     join,
     isLocalAudioEnabled,
     isLocalVideoEnabled,
@@ -135,6 +132,8 @@ const PreviewTile = ({ name, error }) => {
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
+  const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
+  const track = useHMSStore(trackSelector);
 
   const {
     aspectRatio: { width, height },
@@ -159,7 +158,7 @@ const PreviewTile = ({ name, error }) => {
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
-            mirror={mirrorLocalVideo}
+            mirror={track?.facingMode !== "environment" && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />

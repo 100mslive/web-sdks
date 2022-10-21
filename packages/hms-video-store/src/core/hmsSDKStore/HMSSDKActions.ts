@@ -128,8 +128,8 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setAudioOutputDevice(deviceId: string): void {
-    const deviceInfo = this.sdk.getAudioOutput().setDevice(deviceId);
+  async setAudioOutputDevice(deviceId: string): Promise<void> {
+    const deviceInfo = await this.sdk.getAudioOutput().setDevice(deviceId);
     if (deviceInfo) {
       this.setState(draftStore => {
         draftStore.settings.audioOutputDeviceId = deviceId;
@@ -575,13 +575,11 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
-  async setSessionMetadata(metadata: any, options = { localOnly: false }) {
-    if (!options.localOnly) {
-      await this.sdk.setSessionMetadata(metadata);
-    }
+  async setSessionMetadata(metadata: any) {
+    await this.sdk.setSessionMetadata(metadata);
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
-    }, `setSessionMetadata${options.localOnly ? 'LocalOnly' : ''}`);
+    }, 'setSessionMetadata');
   }
 
   async populateSessionMetadata(): Promise<void> {

@@ -183,7 +183,7 @@ export interface IHMSActions {
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */
-  setAudioOutputDevice(deviceId: string): void;
+  setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
   /**
@@ -357,7 +357,7 @@ export interface IHMSActions {
    *
    * @alpha - the API is not stable and might have breaking changes later
    */
-  setSessionMetadata(metadata: any, options?: { localOnly: boolean }): Promise<void>;
+  setSessionMetadata(metadata: any): Promise<void>;
 
   /**
    * Fetch the current room metadata from the server and populate it in store

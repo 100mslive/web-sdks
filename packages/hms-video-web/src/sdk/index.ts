@@ -258,7 +258,7 @@ export class HMSSdk implements HMSInterface {
       requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
-    this.leave();
+    this.internalLeave(false);
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
@@ -373,6 +373,8 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -458,7 +460,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async leave() {
+  leave() {
+    return this.internalLeave();
+  }
+
+  private async internalLeave(notifyServer = true) {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
@@ -468,7 +474,7 @@ export class HMSSdk implements HMSInterface {
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
-      await this.transport?.leave();
+      await this.transport?.leave(notifyServer);
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
@@ -867,7 +873,9 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     await this.deviceManager.init();
-    this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    if (!(await this.deviceManager.updateOutputDevice(this.store.getConfig()?.settings?.audioOutputDeviceId))) {
+      await this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    }
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 
@@ -927,6 +935,8 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
@@ -993,7 +1003,6 @@ export class HMSSdk implements HMSInterface {
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
 
-    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId, this.store));

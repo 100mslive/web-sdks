@@ -5,6 +5,7 @@ import {
   useHMSStore,
   selectLocalVideoTrackID,
   selectIsLocalVideoEnabled,
+  selectVideoTrackByID,
 } from "@100mslive/react-sdk";
 import { MicOnIcon, SpeakerIcon, VideoOnIcon } from "@100mslive/react-icons";
 import {
@@ -19,6 +20,8 @@ import {
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
 import { settingOverflow } from "./common.js";
+import { useUISettings } from "../AppData/useUISettings";
+import { UI_SETTINGS } from "../../common/constants";
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,
@@ -33,6 +36,9 @@ const Settings = () => {
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = "setSinkId" in HTMLMediaElement.prototype;
+  const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
+  const trackSelector = selectVideoTrackByID(videoTrackId);
+  const track = useHMSStore(trackSelector);
 
   return (
     <Box className={settingOverflow()}>
@@ -46,12 +52,12 @@ const Settings = () => {
                 height: "$48",
                 bg: "transparent",
                 m: "$10 auto",
-                "@md": {
-                  display: "none",
-                },
               }}
             >
-              <Video trackId={videoTrackId} />
+              <Video
+                trackId={videoTrackId}
+                mirror={track?.facingMode !== "environment" && mirrorLocalVideo}
+              />
             </StyledVideoTile.Container>
           )}
           <DeviceSelector
@@ -112,6 +118,8 @@ const DeviceSelector = ({
 }) => {
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
+  const ref = useRef(null);
+
   return (
     <Box css={{ mb: "$10" }}>
       <Text css={{ mb: "$4" }}>{title}</Text>
@@ -131,12 +139,6 @@ const DeviceSelector = ({
             flex: "1 1 0",
             w: "100%",
             minWidth: 0,
-            "[data-radix-popper-content-wrapper]": {
-              w: "100%",
-              minWidth: "0 !important",
-              transform: "translateY($space$17) !important",
-              zIndex: 11,
-            },
             "@md": {
               mb: children ? "$8" : 0,
             },
@@ -144,6 +146,7 @@ const DeviceSelector = ({
         >
           <Dropdown.Root open={open} onOpenChange={setOpen}>
             <DialogDropdownTrigger
+              ref={ref}
               css={{
                 ...(children
                   ? {
@@ -154,32 +157,36 @@ const DeviceSelector = ({
               }}
               icon={icon}
               title={
-                devices.find(({ deviceId }) => deviceId === selection)?.label
+                devices.find(({ deviceId }) => deviceId === selection)?.label ||
+                "Select device from list"
               }
               open={open}
             />
-            <Dropdown.Content
-              align="start"
-              sideOffset={8}
-              css={{ w: "100%" }}
-              portalled={false}
-            >
-              {devices.map(device => {
-                return (
-                  <Dropdown.Item
-                    key={device.label}
-                    onSelect={() => onChange(device.deviceId)}
-                    css={{
-                      px: "$9",
-                      bg:
-                        device.deviceId === selection ? selectionBg : undefined,
-                    }}
-                  >
-                    {device.label}
-                  </Dropdown.Item>
-                );
-              })}
-            </Dropdown.Content>
+            <Dropdown.Portal>
+              <Dropdown.Content
+                align="start"
+                sideOffset={8}
+                css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
+              >
+                {devices.map(device => {
+                  return (
+                    <Dropdown.Item
+                      key={device.label}
+                      onSelect={() => onChange(device.deviceId)}
+                      css={{
+                        px: "$9",
+                        bg:
+                          device.deviceId === selection
+                            ? selectionBg
+                            : undefined,
+                      }}
+                    >
+                      {device.label}
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Content>
+            </Dropdown.Portal>
           </Dropdown.Root>
         </Box>
         {children}
