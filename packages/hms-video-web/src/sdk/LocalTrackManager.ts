@@ -490,7 +490,9 @@ export class LocalTrackManager {
         this.eventBus,
         settings.video,
       );
-      videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'video'));
+      videoTrack.setSimulcastDefinitons(
+        this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'regular'),
+      );
       tracks.push(videoTrack);
     }
     return tracks;
