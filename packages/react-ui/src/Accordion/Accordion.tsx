@@ -30,10 +30,6 @@ const StyledItem = styled(BaseAccordion.Item, {
     borderBottomLeftRadius: '$4',
     borderBottomRightRadius: '$4',
   },
-  '&:focus-within': {
-    position: 'relative',
-    zIndex: 1,
-  },
 });
 
 const StyledHeader = styled(BaseAccordion.Header, {
