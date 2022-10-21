@@ -63,32 +63,6 @@ describe('local tracks stats selectors', () => {
   test('selectLocalVideoTrackStats', () => {
     expect(selectHMSStats.localVideoTrackStats(fakeStore)).toBe(localVideoTrackStats);
   });
-
-  test('selectLocalAudioTrackBitrate', () => {
-    expect(selectHMSStats.localAudioTrackBitrate(fakeStore)).toBe(localAudioTrackStats.bitrate);
-  });
-
-  test('selectLocalVideoTrackBitrate', () => {
-    expect(selectHMSStats.localVideoTrackBitrate(fakeStore)).toBe(localVideoTrackStats.bitrate);
-  });
-
-  test('selectLocalAudioTrackBytesSent', () => {
-    expect(selectHMSStats.localAudioTrackBytesSent(fakeStore)).toBe(localAudioTrackStats.bytesSent);
-  });
-
-  test('selectLocalVideoTrackBytesSent', () => {
-    expect(selectHMSStats.localVideoTrackBytesSent(fakeStore)).toBe(localVideoTrackStats.bytesSent);
-  });
-
-  test('selectLocalVideoTrackBytesSent', () => {
-    expect(selectHMSStats.localVideoTrackFramerate(fakeStore)).toBe(localVideoTrackStats.framesPerSecond);
-  });
-
-  test('selectLocalVideoTrackBytesSent', () => {
-    expect(selectHMSStats.localVideoTrackQualityLimitationReason(fakeStore)).toBe(
-      localVideoTrackStats.qualityLimitationReason,
-    );
-  });
 });
 
 describe('track stats by ID', () => {

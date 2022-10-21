@@ -8,7 +8,7 @@ import {
 } from '../selectors';
 import { IHMSStore, IHMSStatsStore } from '../IHMSStore';
 import { HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID, createDefaultStatsStore } from '../schema';
-import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
+import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 
 type Unsubscribe = (() => void) | undefined;
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
@@ -124,7 +124,7 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcSta
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
     const newPeerStats = { [localPeerID]: stats.getLocalPeerStats() };
     mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(store.peerStats, newPeerStats);
-    Object.assign(store.localTrackStats, stats.getLocalTrackStats());
+    mergeLocalTrackStats(store.localTrackStats, stats.getLocalTrackStats());
   }, 'webrtc-stats');
 };
 

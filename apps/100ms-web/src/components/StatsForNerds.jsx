@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   selectHMSStats,
+  selectLocalPeerID,
   selectPeersMap,
   selectTracksMap,
   useHMSStatsStore,
@@ -30,7 +31,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
     ],
     [tracksWithLabels]
   );
-  const [selectedStat, setSelectedStat] = useState("local-peer");
+  const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
   const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(
     UI_SETTINGS.showStatsOnTiles
   );
@@ -40,8 +41,8 @@ export const StatsForNerds = ({ onOpenChange }) => {
 
   useEffect(() => {
     if (
-      selectedStat !== "local-peer" &&
-      !tracksWithLabels.find(track => track.id === selectedStat)
+      selectedStat.id !== "local-peer" &&
+      !tracksWithLabels.find(track => track.id === selectedStat.id)
     ) {
       setSelectedStat("local-peer");
     }
@@ -94,10 +95,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
               onOpenChange={setOpen}
             >
               <DialogDropdownTrigger
-                title={
-                  statsOptions.find(({ id }) => id === selectedStat)?.label ||
-                  "Select Stats"
-                }
+                title={selectedStat.label || "Select Stats"}
                 css={{ mt: "$4" }}
                 titleCSS={{ mx: 0 }}
                 open={open}
@@ -109,34 +107,39 @@ export const StatsForNerds = ({ onOpenChange }) => {
                   sideOffset={8}
                   css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
                 >
-                  {statsOptions.map(option => (
-                    <Dropdown.Item
-                      key={option.id}
-                      onClick={() => {
-                        setSelectedStat(option.id);
-                      }}
-                      css={{
-                        px: "$9",
-                        bg:
-                          option.id === selectedStat ? selectionBg : undefined,
-                        c:
-                          option.id === selectedStat
-                            ? "$white"
-                            : "$textPrimary",
-                      }}
-                    >
-                      {option.label}
-                    </Dropdown.Item>
-                  ))}
+                  {statsOptions.map(option => {
+                    const isSelected =
+                      option.id === selectedStat.id &&
+                      option.layer === selectedStat.layer;
+                    return (
+                      <Dropdown.Item
+                        key={option.label}
+                        onClick={() => {
+                          setSelectedStat(option);
+                        }}
+                        css={{
+                          px: "$9",
+                          bg: isSelected ? selectionBg : undefined,
+                          c: isSelected ? "$white" : "$textPrimary",
+                        }}
+                      >
+                        {option.label}
+                      </Dropdown.Item>
+                    );
+                  })}
                 </Dropdown.Content>
               </Dropdown.Portal>
             </Dropdown.Root>
           </Flex>
           {/* Stats */}
-          {selectedStat === "local-peer" ? (
+          {selectedStat.id === "local-peer" ? (
             <LocalPeerStats />
           ) : (
-            <TrackStats trackID={selectedStat} />
+            <TrackStats
+              trackID={selectedStat.id}
+              layer={selectedStat.layer}
+              local={selectedStat.local}
+            />
           )}
         </Dialog.Content>
       </Dialog.Portal>
@@ -147,16 +150,33 @@ export const StatsForNerds = ({ onOpenChange }) => {
 const useTracksWithLabel = () => {
   const tracksMap = useHMSStore(selectTracksMap);
   const peersMap = useHMSStore(selectPeersMap);
+  const localPeerID = useHMSStore(selectLocalPeerID);
   const tracksWithLabels = useMemo(
     () =>
-      Object.values(tracksMap).map(track => {
+      Object.values(tracksMap).reduce((res, track) => {
         const peerName = peersMap[track.peerId]?.name;
-        return {
+        const isLocalTrack = track.peerId === localPeerID;
+        if (isLocalTrack && track.layerDefinitions) {
+          res = res.concat(
+            track.layerDefinitions?.map(({ layer }) => {
+              return {
+                id: track.id,
+                layer,
+                local: true,
+                label: `${peerName} ${track.source} ${track.type} - ${layer}`,
+              };
+            })
+          );
+          return res;
+        }
+        res.push({
           id: track.id,
+          local: isLocalTrack,
           label: `${peerName} ${track.source} ${track.type}`,
-        };
-      }),
-    [tracksMap, peersMap]
+        });
+        return res;
+      }, []),
+    [tracksMap, peersMap, localPeerID]
   );
   return tracksWithLabels;
 };
@@ -192,14 +212,17 @@ const LocalPeerStats = () => {
   );
 };
 
-const TrackStats = ({ trackID }) => {
-  const stats = useHMSStatsStore(selectHMSStats.trackStatsByID(trackID));
+const TrackStats = ({ trackID, layer, local }) => {
+  const selector = layer
+    ? selectHMSStats.localVideoTrackStatsByLayer(layer)
+    : local
+    ? selectHMSStats.localAudioTrackStats
+    : selectHMSStats.trackStatsByID(trackID);
+  const stats = useHMSStatsStore(selector);
   if (!stats) {
     return null;
   }
   const inbound = stats.type.includes("inbound");
-
-  console.log(stats);
 
   return (
     <Flex css={{ flexWrap: "wrap", gap: "$10" }}>

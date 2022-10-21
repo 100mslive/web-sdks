@@ -99,6 +99,8 @@ export class SDKToHMS {
       track.layer = sdkTrack.getSimulcastLayer();
       track.expectedLayer = sdkTrack.getExpectedLayer();
       track.degraded = sdkTrack.degraded;
+    }
+    if (sdkTrack instanceof SDKHMSRemoteVideoTrack || sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
       }

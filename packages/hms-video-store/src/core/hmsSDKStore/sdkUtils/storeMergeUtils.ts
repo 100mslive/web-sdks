@@ -69,6 +69,24 @@ export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMS
   }
 };
 
+export const mergeLocalTrackStats = (
+  draftStats: Record<HMSTrackID, HMSTrackStats[] | undefined>,
+  newStats: Record<HMSTrackID, Record<string, HMSTrackStats>>,
+) => {
+  const IDs = union(Object.keys(draftStats), Object.keys(newStats)) as HMSTrackID[];
+  for (const trackID of IDs) {
+    const oldStat = draftStats[trackID];
+    const newStat = Object.values(newStats[trackID]);
+    if (isEntityUpdated(oldStat, newStat)) {
+      Object.assign(oldStat!, newStat);
+    } else if (isEntityRemoved(oldStat, newStat)) {
+      delete draftStats[trackID];
+    } else if (isEntityAdded(oldStat, newStat)) {
+      draftStats[trackID] = newStat as HMSTrackStats[];
+    }
+  }
+};
+
 /**
  * array's are usually created with new reference, avoid that update if both arrays are same
  */

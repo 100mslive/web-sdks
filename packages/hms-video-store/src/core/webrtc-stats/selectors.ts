@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { HMSLocalTrackStats } from '../hmsSDKStore/sdkTypes';
+import { HMSLocalTrackStats, HMSSimulcastLayer, RID, simulcastMapping } from '../hmsSDKStore/sdkTypes';
 import { HMSStatsStore, HMSPeerID, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
@@ -10,6 +10,7 @@ const selectPeerID = (_store: HMSStatsStore, peerID: HMSPeerID | undefined) => p
 const selectTrackID = (_store: HMSStatsStore, trackID: HMSTrackID | undefined) => trackID;
 const selectTrackStatsMap = (store: HMSStatsStore) => store.trackStats;
 const selectPeerStatsMap = (store: HMSStatsStore) => store.peerStats;
+const selectLocalTrackStatsMap = (store: HMSStatsStore) => store.localTrackStats;
 
 /**
  * Local peer stats selectors
@@ -118,26 +119,21 @@ const packetsLostByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, 
  * Local track stats selectors
  */
 
-const localAudioTrackStats = createSelector([selectTrackStatsMap, selectLocalAudioTrackID], (trackStatsMap, trackID) =>
-  trackID ? (trackStatsMap[trackID] as HMSLocalTrackStats) : undefined,
+const localAudioTrackStats = createSelector(
+  [selectLocalTrackStatsMap, selectLocalAudioTrackID],
+  (trackStatsMap, trackID) => (trackID ? (trackStatsMap[trackID]?.[0] as HMSLocalTrackStats) : undefined),
 );
 
-const localVideoTrackStats = createSelector([selectTrackStatsMap, selectLocalVideoTrackID], (trackStatsMap, trackID) =>
-  trackID ? (trackStatsMap[trackID] as HMSLocalTrackStats) : undefined,
+const localVideoTrackStats = createSelector(
+  [selectLocalTrackStatsMap, selectLocalVideoTrackID],
+  (trackStatsMap, trackID) => (trackID ? (trackStatsMap[trackID] as HMSLocalTrackStats[]) : undefined),
 );
 
-const localAudioTrackBitrate = createSelector(localAudioTrackStats, stats => stats?.bitrate);
-const localVideoTrackBitrate = createSelector(localVideoTrackStats, stats => stats?.bitrate);
-
-const localAudioTrackBytesSent = createSelector(localAudioTrackStats, stats => stats?.bytesSent);
-const localVideoTrackBytesSent = createSelector(localVideoTrackStats, stats => stats?.bytesSent);
-
-const localVideoTrackFramerate = createSelector(localVideoTrackStats, stats => stats?.framesPerSecond);
-
-const localVideoTrackQualityLimitationReason = createSelector(
-  localVideoTrackStats,
-  stats => stats?.qualityLimitationReason,
-);
+const localVideoTrackStatsByLayer = (layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) =>
+  createSelector(localVideoTrackStats, stats => {
+    const rid = (Object.keys(simulcastMapping) as RID[]).find(key => simulcastMapping[key] === layer);
+    return stats?.find(stat => stat.rid === rid);
+  });
 
 export const selectHMSStats = {
   localPeerStats,
@@ -158,10 +154,5 @@ export const selectHMSStats = {
   packetsLostByTrackID,
   localAudioTrackStats,
   localVideoTrackStats,
-  localAudioTrackBitrate,
-  localVideoTrackBitrate,
-  localAudioTrackBytesSent,
-  localVideoTrackBytesSent,
-  localVideoTrackFramerate,
-  localVideoTrackQualityLimitationReason,
+  localVideoTrackStatsByLayer,
 };
