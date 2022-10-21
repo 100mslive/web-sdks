@@ -1,4 +1,4 @@
-import { HMSStore, IHMSStore } from '../../core';
+import { IHMSStore, selectPeerCount, selectError, HMSException, selectIsConnectedToRoom } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 import { IHMSStoreReadOnly } from '../../core/IHMSStore';
 
@@ -56,9 +56,9 @@ export function pubSub() {
   }
   function subscribe(eventName: string, callback: any) {
     if (!Array.isArray(subscribers[eventName])) {
-      subscribers[eventName] = [];
+      subscribers[eventName] = [callback];
     }
-    subscribers[eventName].push(callback);
+    // subscribers[eventName].push(callback);
   }
   return {
     publish,
@@ -77,9 +77,17 @@ export class BeamControllerStore {
     this.actions = hmsActions;
 
     this.listeners = pubSub();
-    this.store.subscribe((state: HMSStore) => {
-      this.listeners.publish('peer-count', state.room.peers.length);
-    });
+    this.store.subscribe((peerCount: number) => {
+      this.listeners.publish('peer-count', peerCount);
+    }, selectPeerCount);
+    this.store.subscribe((error: HMSException | null) => {
+      if (error) {
+        this.listeners.publish('error', error);
+      }
+    }, selectError);
+    this.store.subscribe((connected: boolean | undefined) => {
+      this.listeners.publish('is-connected', connected || false);
+    }, selectIsConnectedToRoom);
   }
 
   /**

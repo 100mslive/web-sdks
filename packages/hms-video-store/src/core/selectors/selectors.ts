@@ -1,4 +1,5 @@
 import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
+import { HMSException } from '../schema/error';
 import { createSelector } from 'reselect';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
@@ -17,7 +18,16 @@ import {
  * @param store
  */
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
+/**
+ * Select the current {@link HMSException[]} object to monitor the error logs
+ * @param store
+ */
+export const selectErrors = (store: HMSStore): HMSException[] => store.errors;
 
+/**
+ * It will help to get the all the error
+ */
+export const selectError = createSelector(selectErrors, error => (error.length === 0 ? null : error[error.length - 1]));
 /**
  * Select the ID of the current room to which you are connected.
  */
