@@ -132,7 +132,7 @@ const localVideoTrackStats = createSelector(
 const localVideoTrackStatsByLayer = (layer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) =>
   createSelector(localVideoTrackStats, stats => {
     const rid = (Object.keys(simulcastMapping) as RID[]).find(key => simulcastMapping[key] === layer);
-    return stats?.find(stat => stat.rid === rid);
+    return layer ? stats?.find(stat => stat.rid === rid) : stats?.[0];
   });
 
 export const selectHMSStats = {
