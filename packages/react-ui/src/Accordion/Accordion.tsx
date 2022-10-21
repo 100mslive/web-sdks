@@ -16,11 +16,9 @@ const slideUp = keyframes({
 });
 
 const StyledAccordion = styled(BaseAccordion.Root, {
-  cursor: 'pointer',
 });
 
 const StyledItem = styled(BaseAccordion.Item, {
-  overflow: 'hidden',
   marginTop: '$px',
 
   '&:first-child': {
@@ -60,7 +58,6 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
-  overflow: 'hidden',
   fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
