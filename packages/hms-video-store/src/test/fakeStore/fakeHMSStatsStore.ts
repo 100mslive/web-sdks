@@ -235,6 +235,7 @@ export const makeFakeInternalsStore = (): HMSStatsStore => {
         estimatedPlayoutTimestamp: 3848808636606,
       },
     },
+    localTrackStats: {},
     publishStats: {
       type: 'publish',
       packetsLost: 19,

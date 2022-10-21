@@ -1,4 +1,4 @@
-import { HMSTrack, HMSLocalTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 import {
   HMSPeerStats,
   HMSTrackStats,
@@ -8,35 +8,77 @@ import {
 import { isPresent } from '../utils/validations';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
 import HMSLogger from '../utils/logger';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
 
-const getTrackAndConnectionType = (track: HMSTrack) => {
-  const outbound = track.stream instanceof HMSLocalStream;
-  const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
-  const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
-  return { peerConnectionType, nativeTrack };
+export const getLocalTrackStats = async (
+  getStats: HMSWebrtcStats['getStats'],
+  track: HMSLocalTrack,
+  peerName?: string,
+  prevTrackStats?: Record<string, HMSTrackStats>,
+): Promise<Record<string, HMSTrackStats> | undefined> => {
+  let trackReport: RTCStatsReport | undefined;
+  const trackStats: Record<string, HMSTrackStats> = {};
+  try {
+    trackReport = await getStats['publish']?.(track.getTrackBeingSent());
+    const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
+    const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
+    const remote: Record<string, RTCRemoteInboundRtpStreamStats> = {};
+    trackReport?.forEach(stat => {
+      switch (stat.type) {
+        case 'outbound-rtp':
+          outbound[stat.id] = stat;
+          break;
+        case 'remote-inbound-rtp':
+          remote[stat.id] = stat;
+          break;
+        case 'codec':
+          mimeTypes[stat.id] = stat.mimeType;
+          break;
+        default:
+          break;
+      }
+    });
+
+    Object.keys(outbound).forEach(stat => {
+      const codecId = outbound[stat]?.codecId;
+      const mimeType = codecId ? mimeTypes[codecId] : undefined;
+      let codec: string | undefined;
+      if (mimeType) {
+        codec = mimeType.substring(mimeType.indexOf('/') + 1);
+      }
+      trackStats[stat] = {
+        ...outbound[stat],
+        bitrate: computeBitrate('bytesReceived' as any, outbound[stat], prevTrackStats?.[stat]),
+        packetsLostRate: computeStatRate('packetsLost', outbound[stat], prevTrackStats?.[stat]),
+        peerName,
+        peerID: track.peerId,
+        codec,
+        remote: {
+          ...remote[stat],
+          packetsLostRate: computeStatRate('packetsLost', trackStats.remote, prevTrackStats?.remote),
+        },
+      };
+    });
+  } catch (err) {
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, err);
+  }
+  return trackStats;
 };
 
 export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
-  track: HMSTrack,
+  track: HMSRemoteTrack,
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
-  const { peerConnectionType, nativeTrack } = getTrackAndConnectionType(track);
   let trackReport: RTCStatsReport | undefined;
   try {
-    trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+    trackReport = await getStats['subscribe']?.(track.nativeTrack);
   } catch (err) {
-    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, nativeTrack, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
-  const bitrate = computeBitrate(
-    (peerConnectionType === 'publish' ? 'bytesSent' : 'bytesReceived') as any,
-    trackStats,
-    prevTrackStats,
-  );
+  const bitrate = computeBitrate('bytesReceived' as any, trackStats, prevTrackStats);
 
   const packetsLostRate = computeStatRate('packetsLost', trackStats, prevTrackStats);
 

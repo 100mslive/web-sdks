@@ -108,8 +108,9 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
 const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
+    const localPeerID = hmsStore.getState(selectLocalPeerID);
     const newTrackStats: Record<HMSTrackID, HMSTrackStats> = {};
-    const trackIDs = Object.keys(tracks);
+    const trackIDs = Object.keys(tracks).filter(trackID => tracks[trackID].peerId !== localPeerID);
 
     for (const trackID of trackIDs) {
       const sdkTrackStats = stats.getTrackStats(trackID);
@@ -121,9 +122,9 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcSta
     mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
 
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
-    const localPeerID = hmsStore.getState(selectLocalPeerID);
     const newPeerStats = { [localPeerID]: stats.getLocalPeerStats() };
     mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(store.peerStats, newPeerStats);
+    Object.assign(store.localTrackStats, stats.getLocalTrackStats());
   }, 'webrtc-stats');
 };
 

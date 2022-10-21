@@ -6,14 +6,17 @@ import {
   getTrackStats,
   getLocalPeerStatsFromReport,
   getPacketsLostAndJitterFromReport,
+  getLocalTrackStats,
 } from './utils';
 import HMSLogger from '../utils/logger';
+import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 
 export class HMSWebrtcStats {
   private readonly TAG = '[HMSWebrtcStats]';
   private localPeerID?: string;
   private peerStats: Record<string, HMSPeerStats> = {};
   private trackStats: Record<string, HMSTrackStats> = {};
+  private localTrackStats: Record<string, Record<string, HMSTrackStats>> = {};
 
   /**
    * Removed localPeerID check in other places as it will be present before
@@ -34,11 +37,16 @@ export class HMSWebrtcStats {
     return this.trackStats[trackId];
   }
 
+  getLocalTrackStats() {
+    return this.localTrackStats;
+  }
+
   /**
    * @internal
    */
   async updateStats() {
     await this.updateLocalPeerStats();
+    await this.updateLocalTrackStats();
     await this.updateTrackStats();
   }
 
@@ -77,15 +85,34 @@ export class HMSWebrtcStats {
 
   private async updateTrackStats() {
     const tracks = this.store.getTracksMap();
-    const trackIDs = union(Object.keys(this.trackStats), Object.keys(tracks));
+    const trackIDs = union(Object.keys(this.trackStats), Object.keys(tracks)).filter(
+      trackId => tracks[trackId].peerId !== this.localPeerID,
+    );
     for (const trackID of trackIDs) {
       const track = tracks[trackID];
       if (track) {
         const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
         const prevTrackStats = this.getTrackStats(track.trackId);
-        const trackStats = await getTrackStats(this.getStats, track, peerName, prevTrackStats);
+        const trackStats = await getTrackStats(this.getStats, track as HMSRemoteTrack, peerName, prevTrackStats);
         if (trackStats) {
           this.trackStats[trackID] = trackStats;
+        }
+      } else {
+        delete this.trackStats[trackID];
+      }
+    }
+  }
+
+  private async updateLocalTrackStats() {
+    const tracks = this.store.getTracksMap();
+    const trackIDs = this.store.getLocalPeerTracks().map(track => track.getTrackIDBeingSent());
+    for (const trackID of trackIDs) {
+      const track = tracks[trackID] as HMSLocalTrack;
+      if (track) {
+        const peerName = this.store.getLocalPeer()?.name;
+        const trackStats = await getLocalTrackStats(this.getStats, track, peerName, this.localTrackStats[trackID]);
+        if (trackStats) {
+          this.localTrackStats[trackID] = trackStats;
         }
       } else {
         delete this.trackStats[trackID];

@@ -34,6 +34,7 @@ export interface HMSStore {
 
 export interface HMSStatsStore {
   trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  localTrackStats: Record<HMSTrackID, HMSTrackStats[] | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
   localPeer: {
     id: HMSPeerID;
@@ -117,6 +118,7 @@ export const createDefaultStatsStore = (): HMSStatsStore => {
   return {
     peerStats: {},
     trackStats: {},
+    localTrackStats: {},
     localPeer: { id: '' },
   };
 };
