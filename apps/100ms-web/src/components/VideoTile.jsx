@@ -77,13 +77,6 @@ const Tile = ({ peerId, trackId, width, height }) => {
               : borderAudioRef
           }
         >
-          <TileConnection
-            hideLabel={hideLabel}
-            name={label}
-            isTile
-            peerId={peerId}
-            width={width}
-          />
           {showStatsOnTiles ? (
             <VideoTileStats
               audioTrackID={audioTrack?.id}
@@ -132,6 +125,13 @@ const Tile = ({ peerId, trackId, width, height }) => {
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
+          <TileConnection
+            hideLabel={hideLabel}
+            name={label}
+            isTile
+            peerId={peerId}
+            width={width}
+          />
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>
