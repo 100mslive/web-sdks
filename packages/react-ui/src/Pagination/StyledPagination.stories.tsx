@@ -10,16 +10,19 @@ type PaginationProps = {
   numPages: number;
 };
 
-export const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages }: PaginationProps) => {
+const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages }: PaginationProps) => {
   const [page, setPage] = useState(propsPage);
 
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
 
-  const handlePageChange = useCallback((page: number) => {
-    setPage(page);
-    propsSetPage(page);
-  }, [setPage, propsSetPage])
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setPage(page);
+      propsSetPage(page);
+    },
+    [setPage, propsSetPage],
+  );
 
   const nextPage = () => {
     handlePageChange(Math.min(page + 1, numPages - 1));
@@ -35,7 +38,7 @@ export const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, nu
 
   return (
     <StyledPagination.Root>
-      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage} type="button" css={{ padding: 0, border: "none", backgroundColor: "$transparent" }}>
+      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage} type="button">
         <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
@@ -43,7 +46,7 @@ export const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, nu
           <StyledPagination.Dot key={i} active={page === i} onClick={() => handlePageChange(i)} type="button" />
         ))}
       </StyledPagination.Dots>
-      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage} type="button" css={{ padding: 0, border: "none", backgroundColor: "$transparent" }}>
+      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage} type="button">
         <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
     </StyledPagination.Root>
@@ -65,4 +68,4 @@ const Template: ComponentStory<typeof PaginationComponent> = args => {
 };
 
 export const Example = Template.bind({});
-Example.storyName = 'Pagination'
+Example.storyName = 'Pagination';
