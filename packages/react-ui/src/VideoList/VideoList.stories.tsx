@@ -1,13 +1,62 @@
-import React, { useState } from 'react';
-import { MicOffIcon } from '@100mslive/react-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ChevronLeftIcon, ChevronRightIcon, MicOffIcon } from '@100mslive/react-icons';
 import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { StyledVideoList } from './StyledVideoList';
 import { StyledVideoTile } from '../VideoTile';
 import Video from '../Video/Video';
 import { getLeft } from './videoListUtils';
 import { ComponentStory } from '@storybook/react';
-import { PaginationComponent as Pagination } from '../Pagination/StyledPagination.stories';
 import mdx from './useVideoList.mdx';
+import { StyledPagination } from '../Pagination';
+
+type PaginationProps = {
+  page: number;
+  setPage: (page: number) => void;
+  numPages: number;
+};
+
+const Pagination = ({ page: propsPage, setPage: propsSetPage, numPages }: PaginationProps) => {
+  const [page, setPage] = useState(propsPage);
+
+  const disableLeft = page === 0;
+  const disableRight = page === numPages - 1;
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setPage(page);
+      propsSetPage(page);
+    },
+    [setPage, propsSetPage],
+  );
+
+  const nextPage = () => {
+    handlePageChange(Math.min(page + 1, numPages - 1));
+  };
+
+  const prevPage = () => {
+    handlePageChange(Math.max(page - 1, 0));
+  };
+
+  useEffect(() => {
+    handlePageChange(propsPage);
+  }, [handlePageChange, propsPage]);
+
+  return (
+    <StyledPagination.Root>
+      <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage} type="button">
+        <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
+      </StyledPagination.Chevron>
+      <StyledPagination.Dots>
+        {[...Array(numPages)].map((_, i) => (
+          <StyledPagination.Dot key={i} active={page === i} onClick={() => handlePageChange(i)} type="button" />
+        ))}
+      </StyledPagination.Dots>
+      <StyledPagination.Chevron disabled={disableRight} onClick={nextPage} type="button">
+        <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
+      </StyledPagination.Chevron>
+    </StyledPagination.Root>
+  );
+};
 
 const VideoListMeta = {
   title: 'Hooks/useVideoList',
@@ -58,7 +107,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
   });
 
   return (
-    <StyledVideoList.Root css={{ height: '100vh', width: '800px', maxHeight: '550px' }} ref={ref}>
+    <StyledVideoList.Root css={{ height: '100vh', width: '800px', maxHeight: '550px', marginInline: 'auto' }} ref={ref}>
       <StyledVideoList.Container>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles.map((tiles, pageNo) => (
