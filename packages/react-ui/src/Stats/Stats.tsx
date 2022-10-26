@@ -15,15 +15,19 @@ export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
   audioTrackID?: HMSTrackID;
   peerID?: HMSPeerID;
+  isLocal: boolean;
 }
 
 /**
  * This component can be used to overlay webrtc stats over the Video Tile. For the local tracks it also includes
  * remote inbound stats as sent by the SFU in receiver report.
  */
-export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTileStatsProps) {
-  const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
-  const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = false }: VideoTileStatsProps) {
+  const audioSelector = isLocal ? selectHMSStats.localAudioTrackStatsByID: selectHMSStats.trackStatsByID;
+  const audioTrackStats = useHMSStatsStore(audioSelector(audioTrackID));
+  const localVideoTrackStats = useHMSStatsStore(selectHMSStats.localVideoTrackStatsByID(videoTrackID));
+  const remoteVideoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+  const videoTrackStats = isLocal ? localVideoTrackStats?.[0] : remoteVideoTrackStats;
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {

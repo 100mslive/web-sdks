@@ -82,6 +82,7 @@ const Tile = ({ peerId, trackId, width, height }) => {
               audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
               peerID={peerId}
+              isLocal={isLocal}
             />
           ) : null}
 

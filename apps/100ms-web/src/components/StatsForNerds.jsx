@@ -214,9 +214,9 @@ const LocalPeerStats = () => {
 
 const TrackStats = ({ trackID, layer, local }) => {
   const selector = layer
-    ? selectHMSStats.localVideoTrackStatsByLayer(layer)
+    ? selectHMSStats.localVideoTrackStatsByLayer(layer)(trackID)
     : local
-    ? selectHMSStats.localAudioTrackStats
+    ? selectHMSStats.localAudioTrackStatsByID(trackID)
     : selectHMSStats.trackStatsByID(trackID);
   const stats = useHMSStatsStore(selector);
   if (!stats) {
