@@ -1,5 +1,5 @@
 import React from 'react';
-import { HMSRoomProvider, HMSActions } from '@100mslive/react-sdk';
+import { HMSActions, HMSRoomProvider } from '@100mslive/react-sdk';
 import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
 

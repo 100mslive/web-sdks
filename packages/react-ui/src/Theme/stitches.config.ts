@@ -6,7 +6,13 @@ import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
   prefix: 'hms-ui',
-  theme: baseConfig.theme,
+  theme: {
+    ...baseConfig.theme,
+    colors: {
+      ...baseConfig.theme.colors,
+      ...darkTheme.colors,
+    },
+  },
   media: defaultMedia,
   utils: defaultUtils,
   themeMap: defaultThemeMap,
@@ -51,7 +57,7 @@ export const createTheme = ({
   }
   return createThemeBase(
     className || `${themeType}-theme`,
-    merge(themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
+    merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
   );
 };
 
