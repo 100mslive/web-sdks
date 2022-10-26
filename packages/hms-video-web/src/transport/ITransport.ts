@@ -24,7 +24,7 @@ export interface IFetchAVTrackOptions {
 export default interface ITransport {
   join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void>;
 
-  leave(): Promise<void>;
+  leave(notifyServer: boolean): Promise<void>;
 
   publish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
