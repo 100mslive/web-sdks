@@ -57,11 +57,11 @@ describe('local peer stats selectors', () => {
 
 describe('local tracks stats selectors', () => {
   test('selectLocalAudioTrackStats', () => {
-    expect(selectHMSStats.localAudioTrackStats(fakeStore)).toBe(localAudioTrackStats);
+    expect(selectHMSStats.localAudioTrackStatsByID('102')(fakeStore)).toBe(localAudioTrackStats);
   });
 
   test('selectLocalVideoTrackStats', () => {
-    expect(selectHMSStats.localVideoTrackStats(fakeStore)?.[0]).toBe(localVideoTrackStats);
+    expect(selectHMSStats.localVideoTrackStatsByID('101')(fakeStore)?.[0]).toBe(localVideoTrackStats);
   });
 });
 
