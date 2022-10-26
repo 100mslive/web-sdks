@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { theme, createTheme } from './stitches.config';
 import type { Theme } from './stitches.config';
-import useSSR from './useSSR';
 import { useMedia } from 'react-use';
 
 const defaultAspectRatio = {
@@ -58,20 +57,11 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
 }) => {
   const systemTheme = useMedia('prefers-color-scheme: dark') ? ThemeTypes.dark : ThemeTypes.light;
   const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
-  const previousClassName = useRef('');
-  const { isBrowser } = useSSR();
-  const updatedTheme = useMemo(() => {
-    const updatedTheme = createTheme({ themeType: currentTheme, theme: userTheme || {} });
-    if (!isBrowser) {
-      return updatedTheme;
-    }
-    if (previousClassName.current) {
-      document.documentElement.classList.remove(previousClassName.current);
-    }
-    previousClassName.current = updatedTheme.className;
-    document.documentElement.classList.add(updatedTheme.className);
-    return updatedTheme;
-  }, [userTheme, currentTheme, isBrowser]);
+
+  const lightTheme = useMemo(
+    () => createTheme({ themeType: ThemeTypes.light, theme: userTheme || {} }),
+    [userTheme],
+  );
 
   const toggleTheme = useCallback(
     (themeToUpdateTo?: ThemeTypes) => {
@@ -84,15 +74,29 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     [currentTheme],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (themeType) {
+      if (typeof window !== "undefined") {
+        if (currentTheme === ThemeTypes.light) {
+          document.documentElement.classList.remove(lightTheme.className);
+        }
+
+        if (themeType === ThemeTypes.light) {
+          document.documentElement.classList.add(lightTheme.className);
+        }
+      }
       setCurrentTheme(themeType);
     }
   }, [themeType]);
 
   return (
     <ThemeContext.Provider
-      value={{ themeType: currentTheme, theme: updatedTheme as unknown as Theme, aspectRatio, toggleTheme }}
+      value={{
+        themeType: currentTheme,
+        theme: currentTheme === ThemeTypes.light ? (lightTheme as unknown as Theme) : theme,
+        aspectRatio,
+        toggleTheme,
+      }}
     >
       {children}
     </ThemeContext.Provider>
