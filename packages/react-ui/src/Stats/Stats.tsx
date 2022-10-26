@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
   useHMSStatsStore,
   HMSTrackID,
@@ -23,7 +23,7 @@ export interface VideoTileStatsProps {
  * remote inbound stats as sent by the SFU in receiver report.
  */
 export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = false }: VideoTileStatsProps) {
-  const audioSelector = isLocal ? selectHMSStats.localAudioTrackStatsByID: selectHMSStats.trackStatsByID;
+  const audioSelector = isLocal ? selectHMSStats.localAudioTrackStatsByID : selectHMSStats.trackStatsByID;
   const audioTrackStats = useHMSStatsStore(audioSelector(audioTrackID));
   const localVideoTrackStats = useHMSStatsStore(selectHMSStats.localVideoTrackStatsByID(videoTrackID));
   const remoteVideoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
@@ -47,19 +47,46 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             label="Height"
             value={videoTrackStats?.frameHeight?.toString()}
           />
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
-            label="FPS"
-            value={`${videoTrackStats?.framesPerSecond} ${
-              isNotNullishAndNot0(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
-            }`}
-          />
+          {isLocal ? (
+            <Fragment>
+              {localVideoTrackStats?.map(stat => {
+                return (
+                  <Fragment>
+                    <StatsRow
+                      show={isNotNullishAndNot0(stat?.framesPerSecond)}
+                      label={`FPS(${stat?.rid})`}
+                      value={`${stat?.framesPerSecond} ${
+                        isNotNullishAndNot0(stat?.framesDropped) ? `(${stat?.framesDropped} dropped)` : ''
+                      }`}
+                    />
+                    <StatsRow
+                      show={isNotNullish(stat?.bitrate)}
+                      label={`Bitrate(V)(${stat?.rid})`}
+                      value={formatBytes(stat?.bitrate, 'b/s')}
+                    />
+                  </Fragment>
+                );
+              })}
+            </Fragment>
+          ) : (
+            <Fragment>
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
+                label="FPS"
+                value={`${videoTrackStats?.framesPerSecond} ${
+                  isNotNullishAndNot0(videoTrackStats?.framesDropped)
+                    ? `(${videoTrackStats?.framesDropped} dropped)`
+                    : ''
+                }`}
+              />
 
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.bitrate)}
-            label="Bitrate(V)"
-            value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
-          />
+              <StatsRow
+                show={isNotNullish(videoTrackStats?.bitrate)}
+                label="Bitrate(V)"
+                value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
+              />
+            </Fragment>
+          )}
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.bitrate)}
