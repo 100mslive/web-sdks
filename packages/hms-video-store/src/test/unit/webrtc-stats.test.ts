@@ -61,7 +61,7 @@ describe('local tracks stats selectors', () => {
   });
 
   test('selectLocalVideoTrackStats', () => {
-    expect(selectHMSStats.localVideoTrackStats(fakeStore)).toBe(localVideoTrackStats);
+    expect(selectHMSStats.localVideoTrackStats(fakeStore)?.[0]).toBe(localVideoTrackStats);
   });
 });
 
