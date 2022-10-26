@@ -69,7 +69,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
       document.documentElement.classList.remove(previousClassName.current);
     }
     previousClassName.current = updatedTheme.className;
-    document.documentElement.classList.add(updatedTheme);
+    document.documentElement.classList.add(updatedTheme.className);
     return updatedTheme;
   }, [userTheme, currentTheme, isBrowser]);
 
