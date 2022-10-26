@@ -34,10 +34,7 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
 
   useEffect(() => {
     handleOnValueChange(propValue);
-    if (propOnValueChange) {
-      propOnValueChange(value);
-    }
-  }, [propValue, handleOnValueChange, propOnValueChange, value]);
+  }, [propValue, handleOnValueChange, propOnValueChange]);
 
   return (
     <Tabs.Root
