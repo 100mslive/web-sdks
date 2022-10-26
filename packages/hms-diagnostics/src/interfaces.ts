@@ -23,7 +23,7 @@ export interface HMSDiagnosticsOutput {
 }
 
 export interface HMSDiagnosticUpdateListener {
-  onUpdate: (output: HMSDiagnosticsOutput) => void;
+  onUpdate: (output: HMSDiagnosticsOutputValue, path: string) => void;
 }
 
 export interface HMSDiagnosticsInterface {

@@ -33,7 +33,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   async checkConnectivity() {
     try {
       const initConfig = await this.checkInit();
-      this.updateStatus({ path: 'connectivity.init', info: initConfig });
       await this.checkSTUNAndTURNConnectivity(initConfig);
     } catch (error) {
       this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: (error as Error).message });
@@ -193,7 +192,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       { name: 'diagnostics' },
       false,
     );
-
+    this.updateStatus({ path: 'connectivity.init', info: initConfig });
     //@ts-ignore
     this.updateStatus({ path: 'connectivity.websocket', success: sdk.transport.signal.isConnected });
     return initConfig;
@@ -211,6 +210,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     info?: Record<string, any>;
   }) {
     setInObject(this.result, path, { success, errorMessage, info });
-    this.listener?.onUpdate(this.result);
+    this.listener?.onUpdate({ success, errorMessage, info }, path);
   }
 }
