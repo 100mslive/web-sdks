@@ -181,6 +181,9 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async close(): Promise<void> {
+    window.removeEventListener('offline', this.offlineListener);
+    window.removeEventListener('online', this.onlineListener);
+
     // For `1000` Refer: https://tools.ietf.org/html/rfc6455#section-7.4.1
     if (this.socket) {
       this.socket.close(1000, 'Normal Close');
@@ -249,8 +252,6 @@ export default class JsonRpcSignal implements ISignal {
 
   leave() {
     this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
-    window.removeEventListener('offline', this.offlineListener);
-    window.removeEventListener('online', this.onlineListener);
   }
 
   async endRoom(lock: boolean, reason: string) {
