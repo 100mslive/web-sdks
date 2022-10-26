@@ -158,7 +158,7 @@ const useTracksWithLabel = () => {
         const isLocalTrack = track.peerId === localPeerID;
         if (isLocalTrack && track.layerDefinitions) {
           res = res.concat(
-            track.layerDefinitions?.map(({ layer }) => {
+            track.layerDefinitions.map(({ layer }) => {
               return {
                 id: track.id,
                 layer,
