@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CheckIcon } from '@100mslive/react-icons';
 
@@ -29,16 +29,16 @@ type CheckboxWithLabelComponentProps = {
 function CheckboxWithLabelComponent({ label, checked = true, css, onCheckedChange }: CheckboxWithLabelComponentProps) {
   const [internalChecked, setInternalChecked] = useState(checked);
 
-  useEffect(() => {
-    handleOnCheckedChange(checked);
-  }, [checked, handleOnCheckedChange]);
-
-  function handleOnCheckedChange(checked: boolean) {
+  const handleOnCheckedChange = useCallback((checked: boolean) => {
     setInternalChecked(checked);
     if (onCheckedChange) {
       onCheckedChange(checked);
     }
-  }
+  }, [onCheckedChange, setInternalChecked]);
+
+  useEffect(() => {
+    handleOnCheckedChange(checked);
+  }, [checked, handleOnCheckedChange]);
 
   return (
     <Flex align="center">
@@ -59,4 +59,4 @@ const CheckboxWithLabelStory: ComponentStory<typeof CheckboxWithLabelComponent> 
 };
 
 export const Example = CheckboxWithLabelStory.bind({});
-Example.storyName = 'Checkbox'
+Example.storyName = 'Checkbox';
