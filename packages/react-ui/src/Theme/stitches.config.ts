@@ -57,7 +57,7 @@ export const createTheme = ({
   }
   return createThemeBase(
     className || `${themeType}-theme`,
-    merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
+    merge(merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme), theme),
   );
 };
 
