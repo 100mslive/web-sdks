@@ -1,3 +1,5 @@
+import { DomainCategory } from '../analytics/AnalyticsEventDomains';
+import { domainCategory } from '../analytics/domain-analytics';
 import { HMSFrameworkInfo } from '../interfaces';
 import { ENV, isNode, parsedUserAgent } from './support';
 
@@ -9,6 +11,7 @@ type UserAgent = {
   sdk: 'web';
   sdk_version: string;
   env: 'debug' | 'prod';
+  domain: DomainCategory;
   device_model?: string;
   framework?: HMSFrameworkInfo['type'] | 'node';
   framework_version?: HMSFrameworkInfo['version'];
@@ -17,7 +20,7 @@ type UserAgent = {
 
 export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo): string {
   const sdk = 'web';
-  const env = sdkEnv === ENV.PROD ? 'prod' : 'debug';
+  const env = domainCategory !== DomainCategory.LOCAL && sdkEnv === ENV.PROD ? 'prod' : 'debug';
 
   if (isNode) {
     return convertObjectToString({
@@ -26,6 +29,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
       sdk,
       sdk_version,
       env,
+      domain: domainCategory,
       framework: 'node',
       framework_version: process.version,
       framework_sdk_version: frameworkInfo?.sdkVersion,
@@ -53,6 +57,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     sdk_version,
     device_model,
     env,
+    domain: domainCategory,
     framework: frameworkInfo?.type,
     framework_version: frameworkInfo?.version,
     framework_sdk_version: frameworkInfo?.sdkVersion,
