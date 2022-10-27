@@ -1,7 +1,7 @@
 import React from 'react';
+import type { VariantProps } from '@stitches/react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
 import { styled } from '../Theme';
-import type { VariantProps } from '@stitches/react';
 
 export const StyledVideo = styled('video', {
   width: '100%',

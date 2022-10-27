@@ -1,32 +1,31 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
-import HMSRoom from '../models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
-import { IErrorListener } from '../../interfaces/error-listener';
-import {
-  HMSTrack,
-  HMSVideoTrack,
-  HMSAudioTrack,
-  HMSTrackType,
-  HMSTrackSource,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-} from '../../media/tracks';
-import {
-  SimulcastLayer,
-  SimulcastLayers,
-  simulcastMapping,
-  RID,
-  SimulcastLayerDefinition,
-} from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
-import { HMSConfig, PublishParams } from '../../interfaces';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { createUserAgent } from '../../utils/user-agent';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
+import {
+  RID,
+  SimulcastLayer,
+  SimulcastLayerDefinition,
+  SimulcastLayers,
+  simulcastMapping,
+} from '../../interfaces/simulcast-layers';
+import {
+  HMSAudioTrack,
+  HMSLocalTrack,
+  HMSRemoteVideoTrack,
+  HMSTrack,
+  HMSTrackSource,
+  HMSTrackType,
+  HMSVideoTrack,
+} from '../../media/tracks';
 import { ENV } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
+import HMSRoom from '../models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);

@@ -1,10 +1,10 @@
+import { IStore } from './store';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
-import { IStore } from './store';
 
 export type PublishConfig = {
   publishAudio?: boolean;

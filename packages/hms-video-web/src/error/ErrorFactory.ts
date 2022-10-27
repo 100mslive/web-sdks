@@ -5,9 +5,9 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
-import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export enum HMSAction {
   NONE = 'NONE',

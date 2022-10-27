@@ -1,8 +1,8 @@
-import { EventBus } from '../events/EventBus';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
+import { EventBus } from '../events/EventBus';
 import { IStore } from '../sdk/store';
-import HMSLogger from '../utils/logger';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
+import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
 
 export class HMSWebrtcInternals {

@@ -1,9 +1,9 @@
+import { Dependencies as TFCDependencies, TransportFailureCategory as TFC } from './models/TransportFailureCategory';
+import { TransportState } from './models/TransportState';
 import { HMSException } from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
-import { TransportFailureCategory as TFC, Dependencies as TFCDependencies } from './models/TransportFailureCategory';
-import { TransportState } from './models/TransportState';
 
 /**
  * Task which is executed by [RetryScheduler.schedule] until max retry count

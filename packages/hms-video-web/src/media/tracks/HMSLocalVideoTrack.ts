@@ -1,13 +1,13 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import { getVideoTrack } from '../../utils/track';
-import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
-import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { EventBus } from '../../events/EventBus';
+import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
+import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
+import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import { getVideoTrack } from '../../utils/track';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(

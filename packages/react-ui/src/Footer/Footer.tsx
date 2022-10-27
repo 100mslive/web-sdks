@@ -1,5 +1,5 @@
-import { styled } from '../Theme';
 import { Flex } from '../Layout';
+import { styled } from '../Theme';
 
 const Root = styled(Flex, {
   justifyContent: 'space-between',

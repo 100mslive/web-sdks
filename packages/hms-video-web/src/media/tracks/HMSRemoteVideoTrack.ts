@@ -1,9 +1,9 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
-import HMSLogger from '../../utils/logger';
+import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
+import HMSLogger from '../../utils/logger';
+import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
@@ -101,7 +101,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._degraded = isDegraded;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
-    this.expectedLayer = layerUpdate.expected_layer;
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);

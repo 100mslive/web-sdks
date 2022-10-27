@@ -1,11 +1,11 @@
-import { EventBus } from '../events/EventBus';
-import { Store } from '../sdk/store';
 import { DeviceManager } from './DeviceManager';
 import {
   DevicesWiredHeadphonesWithMic,
   DevicesWiredHeadphonesWithoutMic,
   DevicesWithStereoHeadphones,
 } from './DeviceTestData';
+import { EventBus } from '../events/EventBus';
+import { Store } from '../sdk/store';
 
 describe('DeviceManager', () => {
   const store = new Store();
