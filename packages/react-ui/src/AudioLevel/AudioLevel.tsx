@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
-import { useTheme } from '../Theme';
-import { useAudioLevelStyles } from '@100mslive/react-sdk';
 import { HMSTrackID } from '@100mslive/hms-video-store';
+import { useAudioLevelStyles } from '@100mslive/react-sdk';
+import { useTheme } from '../Theme';
 
 /**
  * pass in a track id and get a ref. That ref can be attached to an element which will have border

@@ -1,6 +1,6 @@
+import { EventBus } from '../../events/EventBus';
 import { IStore } from '../../sdk/store';
 import { PolicyParams } from '../HMSNotifications';
-import { EventBus } from '../../events/EventBus';
 
 /**
  * Handles:

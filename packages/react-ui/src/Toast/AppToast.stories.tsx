@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-
-import { Toast } from './Toast';
-import { Button } from '../Button';
-import mdx from './Toast.mdx';
 import { ComponentStory } from '@storybook/react';
+import { Toast } from './Toast';
+import mdx from './Toast.mdx';
+import { Button } from '../Button';
 
 const ReactToastStory = ({ ...props }) => {
   return (

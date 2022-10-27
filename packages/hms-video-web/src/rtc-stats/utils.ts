@@ -1,13 +1,13 @@
-import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
+import { HMSWebrtcStats } from './HMSWebrtcStats';
 import {
   HMSPeerStats,
   HMSTrackStats,
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
-import { isPresent } from '../utils/validations';
-import { HMSWebrtcStats } from './HMSWebrtcStats';
+import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 import HMSLogger from '../utils/logger';
+import { isPresent } from '../utils/validations';
 
 export const getLocalTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],

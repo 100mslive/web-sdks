@@ -1,3 +1,4 @@
+import { HMSStatsStore, selectHMSStats } from '../../core';
 import {
   localAudioTrackStats,
   localPeerStats,
@@ -6,7 +7,6 @@ import {
   remoteAudioTrackStats,
   remoteVideoTrackStats,
 } from '../fakeStore';
-import { HMSStatsStore, selectHMSStats } from '../../core';
 
 let fakeStore: HMSStatsStore;
 

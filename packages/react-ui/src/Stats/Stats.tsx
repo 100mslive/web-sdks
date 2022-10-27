@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 import {
-  useHMSStatsStore,
+  HMSPeerID,
   HMSTrackID,
   HMSTrackStats,
+  selectConnectionQualityByPeerID,
   selectHMSStats,
-  HMSPeerID,
+  useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
-import { selectConnectionQualityByPeerID } from '@100mslive/react-sdk';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
@@ -96,9 +96,9 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
 
           <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
 
-          <StatsRow show={isNotNullish(videoTrackStats?.codec)} label={'Codec(V)'} value={videoTrackStats?.codec} />
+          <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
 
-          <StatsRow show={isNotNullish(audioTrackStats?.codec)} label={'Codec(A)'} value={audioTrackStats?.codec} />
+          <StatsRow show={isNotNullish(audioTrackStats?.codec)} label="Codec(A)" value={audioTrackStats?.codec} />
 
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
@@ -137,7 +137,7 @@ const TrackPacketsLostRow = ({
   stats?: Pick<HMSTrackStats, 'packetsLost' | 'packetsLostRate'>;
   label: string;
 }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
+  const packetsLostRate = `${stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0}/s`;
 
   return (
     <StatsRow

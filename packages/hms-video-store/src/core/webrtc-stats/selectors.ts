@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { HMSSimulcastLayer, RID, simulcastMapping } from '../hmsSDKStore/sdkTypes';
-import { HMSStatsStore, HMSPeerID, HMSTrackID } from '../schema';
+import { HMSPeerID, HMSStatsStore, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
 const selectLocalPeerID = (store: HMSStatsStore) => store.localPeer.id;

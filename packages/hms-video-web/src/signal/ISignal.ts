@@ -1,21 +1,21 @@
+import {
+  AcceptRoleChangeParams,
+  BroadcastResponse,
+  GetSessionMetadataResponse,
+  HLSRequestParams,
+  HLSTimedMetadataParams,
+  MultiTrackUpdateRequestParams,
+  RemovePeerRequest,
+  RequestForRoleChangeParams,
+  SessionMetadataUpdateParams,
+  StartRTMPOrRecordingRequestParams,
+  Track,
+  TrackUpdateRequestParams,
+  UpdatePeerRequestParams,
+} from './interfaces';
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
-import {
-  Track,
-  AcceptRoleChangeParams,
-  RequestForRoleChangeParams,
-  TrackUpdateRequestParams,
-  RemovePeerRequest,
-  MultiTrackUpdateRequestParams,
-  StartRTMPOrRecordingRequestParams,
-  UpdatePeerRequestParams,
-  HLSRequestParams,
-  BroadcastResponse,
-  HLSTimedMetadataParams,
-  SessionMetadataUpdateParams,
-  GetSessionMetadataResponse,
-} from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;

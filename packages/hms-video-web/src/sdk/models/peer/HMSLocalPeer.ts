@@ -1,5 +1,5 @@
-import { HMSLocalPeer as IHMSLocalPeer } from '../../../interfaces/peer';
 import { HMSPeer, HMSPeerInit } from './HMSPeer';
+import { HMSLocalPeer as IHMSLocalPeer } from '../../../interfaces/peer';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../../../media/tracks';
 import HMSIdFactory from '../../../utils/id-factory';
 

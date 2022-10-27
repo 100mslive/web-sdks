@@ -1,3 +1,22 @@
+import Message from './models/HMSMessage';
+import HMSRoom from './models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
+import { LocalTrackManager } from './LocalTrackManager';
+import { NetworkTestManager } from './NetworkTestManager';
+import RoleChangeManager from './RoleChangeManager';
+import { IStore, Store } from './store';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { AudioSinkManager } from '../audio-sink-manager';
+import { AudioOutputManager, DeviceManager } from '../device-manager';
+import { DeviceStorageManager } from '../device-manager/DeviceStorage';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
 import {
   HMSChangeMultiTrackStateParams,
   HMSConfig,
@@ -11,14 +30,17 @@ import {
   HMSVideoCodec,
   ScreenShareConfig,
 } from '../interfaces';
-import InitialSettings from '../interfaces/settings';
+import { DeviceChangeListener } from '../interfaces/device-change-listener';
+import { IErrorListener } from '../interfaces/error-listener';
+import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import HMSInterface from '../interfaces/hms';
-import HMSTransport from '../transport';
-import ITransportObserver from '../transport/ITransportObserver';
+import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
+import { HMSPreviewListener } from '../interfaces/preview-listener';
+import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import HMSLogger, { HMSLogLevel } from '../utils/logger';
-import decodeJWT from '../utils/jwt';
-import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
   HMSLocalTrack,
@@ -28,39 +50,17 @@ import {
   HMSTrackSource,
   HMSTrackType,
 } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import HMSRoom from './models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
-import Message from './models/HMSMessage';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
-import { AudioSinkManager } from '../audio-sink-manager';
-import { AudioOutputManager, DeviceManager } from '../device-manager';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
-import { TransportState } from '../transport/models/TransportState';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { ErrorCodes } from '../error/ErrorCodes';
-import { HMSPreviewListener } from '../interfaces/preview-listener';
-import { IErrorListener } from '../interfaces/error-listener';
-import { IStore, Store } from './store';
-import { DeviceChangeListener } from '../interfaces/device-change-listener';
-import RoleChangeManager from './RoleChangeManager';
-import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
-import { DeviceStorageManager } from '../device-manager/DeviceStorage';
-import { LocalTrackManager } from './LocalTrackManager';
+import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
-import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { isNode } from '../utils/support';
-import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
-import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
-import { NetworkTestManager } from './NetworkTestManager';
+import HMSTransport from '../transport';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import decodeJWT from '../utils/jwt';
+import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
-import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { isNode } from '../utils/support';
+import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -1059,7 +1059,6 @@ export class HMSSdk implements HMSInterface {
 
   private getScreenshareSettings = (videoOnly: boolean) => {
     const { screen } = this.store.getPublishParams()!;
-    const dimensions = this.store.getSimulcastDimensions('screen');
 
     return {
       video: new HMSVideoTrackSettingsBuilder()
@@ -1068,8 +1067,8 @@ export class HMSSdk implements HMSInterface {
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec as HMSVideoCodec)
         .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
+        .setWidth(screen.width)
+        .setHeight(screen.height)
         .build(),
       audio: videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
     };

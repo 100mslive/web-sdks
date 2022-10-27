@@ -1,33 +1,31 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
-import HMSRoom from '../models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
-import { IErrorListener } from '../../interfaces/error-listener';
-import {
-  HMSTrack,
-  HMSVideoTrack,
-  HMSAudioTrack,
-  HMSTrackType,
-  HMSTrackSource,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-} from '../../media/tracks';
-import {
-  SimulcastLayer,
-  SimulcastLayers,
-  SimulcastDimensions,
-  simulcastMapping,
-  RID,
-  SimulcastLayerDefinition,
-} from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
-import { HMSConfig, PublishParams } from '../../interfaces';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { createUserAgent } from '../../utils/user-agent';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
+import {
+  RID,
+  SimulcastLayer,
+  SimulcastLayerDefinition,
+  SimulcastLayers,
+  simulcastMapping,
+} from '../../interfaces/simulcast-layers';
+import {
+  HMSAudioTrack,
+  HMSLocalTrack,
+  HMSRemoteVideoTrack,
+  HMSTrack,
+  HMSTrackSource,
+  HMSTrackType,
+  HMSVideoTrack,
+} from '../../media/tracks';
 import { ENV } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
+import HMSRoom from '../models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -40,8 +38,8 @@ class Store implements IStore {
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
   private speakers: HMSSpeaker[] = [];
-  private videoLayers: SimulcastLayers | null = null;
-  private screenshareLayers: SimulcastLayers | null = null;
+  private videoLayers?: SimulcastLayers;
+  // private screenshareLayers?: SimulcastLayers;
   private config?: HMSConfig;
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
@@ -224,8 +222,8 @@ class Store implements IStore {
     if (!this.simulcastEnabled) {
       return;
     }
-    this.videoLayers = this.convertSimulcastLayers(params.videoSimulcastLayers);
-    this.screenshareLayers = this.convertSimulcastLayers(params.screenSimulcastLayers);
+    this.videoLayers = this.convertSimulcastLayers(params.simulcast?.video);
+    // this.screenshareLayers = this.convertSimulcastLayers(params.simulcast?.screen);
   }
 
   addPeer(peer: HMSPeer) {
@@ -299,23 +297,16 @@ class Store implements IStore {
     return this.videoLayers?.layers || [];
   }
 
-  getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions {
-    const layers = source === 'screen' ? this.screenshareLayers : this.videoLayers;
-    const width = layers?.width;
-    const height = layers?.height;
-    return {
-      width,
-      height,
-    };
-  }
-
   /**
    * Convert maxBitrate from kbps to bps
    * @internal
    * @param simulcastLayers
    * @returns {SimulcastLayers}
    */
-  private convertSimulcastLayers(simulcastLayers: SimulcastLayers) {
+  private convertSimulcastLayers(simulcastLayers?: SimulcastLayers) {
+    if (!simulcastLayers) {
+      return;
+    }
     return {
       ...simulcastLayers,
       layers: (simulcastLayers.layers || []).map(layer => {
@@ -335,13 +326,17 @@ class Store implements IStore {
 
     const publishParams = this.getPolicyForRole(peer.role!.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;
+    let width: number;
+    let height: number;
     if (source === 'regular') {
-      simulcastLayers = publishParams.videoSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.video;
+      width = publishParams.video.width;
+      height = publishParams.video.height;
     } else if (source === 'screen') {
-      simulcastLayers = publishParams.screenSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.screen;
+      width = publishParams.screen.width;
+      height = publishParams.screen.height;
     }
-    const width = simulcastLayers?.width;
-    const height = simulcastLayers?.height;
     return (
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];

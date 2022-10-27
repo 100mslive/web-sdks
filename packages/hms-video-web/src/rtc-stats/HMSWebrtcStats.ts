@@ -1,15 +1,15 @@
-import { IStore } from '../sdk/store';
-import { PeerConnectionType, HMSPeerStats, HMSTrackStats } from '../interfaces/webrtc-stats';
 import {
-  union,
   computeNumberRate,
-  getTrackStats,
   getLocalPeerStatsFromReport,
-  getPacketsLostAndJitterFromReport,
   getLocalTrackStats,
+  getPacketsLostAndJitterFromReport,
+  getTrackStats,
+  union,
 } from './utils';
-import HMSLogger from '../utils/logger';
+import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
 import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
 
 export class HMSWebrtcStats {
   private readonly TAG = '[HMSWebrtcStats]';

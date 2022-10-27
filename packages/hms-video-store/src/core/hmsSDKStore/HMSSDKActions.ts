@@ -1,45 +1,4 @@
 import {
-  createDefaultStoreState,
-  HMSChangeMultiTrackStateParams,
-  HMSMediaSettings,
-  HMSMessage,
-  HMSMessageInput,
-  HMSPeer,
-  HMSPeerID,
-  HMSPlaylistType,
-  HMSRoomState,
-  HMSStore,
-  HMSTrack,
-  HMSTrackID,
-  HMSTrackSource,
-  HMSVideoTrack,
-  IHMSPlaylistActions,
-} from '../schema';
-import { IHMSActions } from '../IHMSActions';
-import * as sdkTypes from './sdkTypes';
-import { SDKToHMS } from './adapter';
-import {
-  HMSRoleChangeRequest,
-  selectHMSMessagesCount,
-  selectIsLocalScreenShared,
-  selectIsLocalVideoDisplayEnabled,
-  selectIsLocalVideoEnabled,
-  selectLocalAudioTrackID,
-  selectLocalMediaSettings,
-  selectLocalPeer,
-  selectLocalTrackIDs,
-  selectLocalVideoTrackID,
-  selectPeerByID,
-  selectPermissions,
-  selectRolesMap,
-  selectRoomStarted,
-  selectRoomState,
-  selectTrackByID,
-  selectVideoTrackByID,
-  selectTracksMap,
-} from '../selectors';
-import { HMSLogger } from '../../common/ui-logger';
-import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
@@ -61,14 +20,54 @@ import {
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
 } from '@100mslive/hms-video';
-import { IHMSStore } from '../IHMSStore';
-
-import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
-import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState } from './internalTypes';
-import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { isRemoteTrack } from './sdkUtils/sdkUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import { SDKToHMS } from './adapter';
+import { HMSNotifications } from './HMSNotifications';
+import { HMSPlaylist } from './HMSPlaylist';
+import { NamedSetState } from './internalTypes';
+import * as sdkTypes from './sdkTypes';
+import { HMSLogger } from '../../common/ui-logger';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStore } from '../IHMSStore';
+import {
+  createDefaultStoreState,
+  HMSChangeMultiTrackStateParams,
+  HMSMediaSettings,
+  HMSMessage,
+  HMSMessageInput,
+  HMSPeer,
+  HMSPeerID,
+  HMSPlaylistType,
+  HMSRoomState,
+  HMSStore,
+  HMSTrack,
+  HMSTrackID,
+  HMSTrackSource,
+  HMSVideoTrack,
+  IHMSPlaylistActions,
+} from '../schema';
+import {
+  HMSRoleChangeRequest,
+  selectHMSMessagesCount,
+  selectIsLocalScreenShared,
+  selectIsLocalVideoDisplayEnabled,
+  selectIsLocalVideoEnabled,
+  selectLocalAudioTrackID,
+  selectLocalMediaSettings,
+  selectLocalPeer,
+  selectLocalTrackIDs,
+  selectLocalVideoTrackID,
+  selectPeerByID,
+  selectPermissions,
+  selectRolesMap,
+  selectRoomStarted,
+  selectRoomState,
+  selectTrackByID,
+  selectTracksMap,
+  selectVideoTrackByID,
+} from '../selectors';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 

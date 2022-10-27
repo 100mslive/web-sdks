@@ -1,5 +1,5 @@
-import { ErrorFactory } from '../error/ErrorFactory';
 import HMSLogger from './logger';
+import { ErrorFactory } from '../error/ErrorFactory';
 
 const TAG = `[VALIDATIONS]`;
 
