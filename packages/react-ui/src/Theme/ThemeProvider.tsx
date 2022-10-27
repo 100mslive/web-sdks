@@ -87,7 +87,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
       }
       setCurrentTheme(themeType);
     }
-  }, [themeType]);
+  }, [themeType, currentTheme, lightTheme.className]);
 
   return (
     <ThemeContext.Provider
