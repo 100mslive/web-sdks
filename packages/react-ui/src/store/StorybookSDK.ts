@@ -42,8 +42,24 @@ export class StoryBookSDK implements Partial<HMSActions> {
     throw new Error('Method not implemented.');
   }
 
-  setVolume(_value: number, _trackId?: string): void {
-    throw new Error('Method not implemented.');
+  setVolume(value: number, trackId?: string): void {
+    this.store.setState(store => {
+      if (trackId) {
+        const track = store.tracks[trackId]
+        if (track.type === 'audio') {
+          track.volume = value
+        }
+      }
+    })
+  }
+
+  setAudioLevel(value: number, trackId: string): void {
+    this.store.setState(store => {
+      if (trackId) {
+        const speaker = store.speakers[trackId]
+        speaker.audioLevel = value
+      }
+    })
   }
 
   setOutputDevice(_deviceId: string) {
@@ -237,10 +253,11 @@ export class StoryBookSDK implements Partial<HMSActions> {
       };
       if (peer.audioTrack) {
         store.tracks[audioTrackID] = {
-          enabled: this.randomFromArray([true, false]),
+          enabled: true,
           id: audioTrackID,
           type: 'audio',
           source: 'regular',
+          volume: 100
         };
       }
       if (peer.videoTrack) {
