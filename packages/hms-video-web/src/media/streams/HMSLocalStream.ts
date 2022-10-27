@@ -1,9 +1,9 @@
 import HMSMediaStream from './HMSMediaStream';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 import HMSPublishConnection from '../../connection/publish';
-import HMSLogger from '../../utils/logger';
 import { SimulcastLayer } from '../../interfaces';
+import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
 const TAG = 'HMSLocalStream';
 

@@ -1,4 +1,4 @@
-import { HMSRecording, HMSRTMP, HMSHLS, HLSVariant } from '@100mslive/hms-video';
+import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP } from '@100mslive/hms-video';
 import { HMSPeerID } from './peer';
 
 export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };

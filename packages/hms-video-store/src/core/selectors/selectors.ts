@@ -1,16 +1,16 @@
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
 import { createSelector } from 'reselect';
-// noinspection ES6PreferShortImport
-import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
   getPeerTracksByCondition,
+  isAudioPlaylist,
   isDegraded,
-  isVideoPlaylist,
   isTrackDisplayEnabled,
   isTrackEnabled,
-  isAudioPlaylist,
   isVideo,
+  isVideoPlaylist,
 } from './selectorUtils';
+// noinspection ES6PreferShortImport
+import { HMSRole } from '../hmsSDKStore/sdkTypes';
+import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
 
 /**
  * Select the current {@link HMSRoom} object to which you are connected.

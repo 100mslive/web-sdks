@@ -39,4 +39,4 @@ const Template = () => {
 };
 
 export const AccordionContent: ComponentStory<typeof Accordion.Root> = Template.bind({});
-AccordionContent.storyName = 'Accordion'
+AccordionContent.storyName = 'Accordion';

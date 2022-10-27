@@ -1,5 +1,5 @@
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
+import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 
 export type { SimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
