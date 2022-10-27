@@ -42,6 +42,8 @@ import {
   HMSWebrtcStats,
   parsedUserAgent,
   RID,
+  RTMPRecordingConfig,
+  SimulcastLayerDefinition,
   simulcastMapping,
 } from '@100mslive/hms-video';
 
