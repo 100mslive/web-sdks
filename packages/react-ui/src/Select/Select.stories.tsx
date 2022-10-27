@@ -9,7 +9,7 @@ export default {
 
 const Template: ComponentStory<typeof Select.Root> = () => {
   return (
-    <Select.Root css={{ width: '70%' }} >
+    <Select.Root css={{ width: '70%' }}>
       <Select.DefaultDownIcon />
       <Select.Select css={{ width: '100%' }}>
         <option value="orange" key="orange">
@@ -30,4 +30,4 @@ const Template: ComponentStory<typeof Select.Root> = () => {
 };
 
 export const Single = Template.bind({});
-Single.storyName = 'Select'
+Single.storyName = 'Select';

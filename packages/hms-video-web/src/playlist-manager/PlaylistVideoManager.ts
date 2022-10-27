@@ -1,6 +1,6 @@
+import { AudioContextManager } from './AudioContextManager';
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
-import { AudioContextManager } from './AudioContextManager';
 
 /**
  * This class handles video playlist management

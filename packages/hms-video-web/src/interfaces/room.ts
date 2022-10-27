@@ -1,6 +1,6 @@
-import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 import { ServerError } from './internal';
 import { HMSException } from '../error/HMSException';
+import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 
 export enum HMSRoomType {
   DEFAULT,

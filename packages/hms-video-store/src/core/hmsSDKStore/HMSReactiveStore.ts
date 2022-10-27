@@ -1,25 +1,24 @@
 import produce from 'immer';
+import shallow from 'zustand/shallow';
 import create, {
-  StateSelector,
-  StoreApi,
-  SetState,
-  StateSliceListener,
   EqualityChecker,
   PartialState,
+  SetState,
   State,
+  StateSelector,
+  StateSliceListener,
+  StoreApi,
 } from 'zustand/vanilla';
-import shallow from 'zustand/shallow';
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
-import { IHMSActions } from '../IHMSActions';
-import { HMSSDKActions } from './HMSSDKActions';
-import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../schema/notification';
+import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
-import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
+import { createDefaultStoreState, HMSStore } from '../schema';
+import { IHMSNotifications } from '../schema/notification';
+import { HMSStats } from '../webrtc-stats';
 
 declare global {
   interface Window {

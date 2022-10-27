@@ -1,14 +1,14 @@
+import { useCallback, useMemo } from 'react';
+import { HMSConfig } from '@100mslive/hms-video';
 import {
+  HMSConfigInitialSettings,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
-  HMSConfigInitialSettings,
 } from '@100mslive/hms-video-store';
-import { useCallback, useMemo } from 'react';
-import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { hooksErrHandler } from './types';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { HMSConfig } from '@100mslive/hms-video';
 
 export interface usePreviewInput {
   /**

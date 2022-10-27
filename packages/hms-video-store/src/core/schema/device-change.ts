@@ -1,5 +1,5 @@
-import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 import { HMSException } from './error';
+import { DeviceMap } from '../hmsSDKStore/sdkTypes';
 
 export type { DeviceMap };
 

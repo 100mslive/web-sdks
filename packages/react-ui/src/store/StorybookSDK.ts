@@ -1,15 +1,15 @@
 import {
   HMSActions,
-  IHMSStore,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSMessageInput,
   HMSPeer,
   HMSRoom,
-  HMSTrackSource,
   HMSRoomState,
-  HMSMessageInput,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSConfig,
   HMSSimulcastLayer,
+  HMSTrackSource,
+  HMSVideoTrackSettings,
+  IHMSStore,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
