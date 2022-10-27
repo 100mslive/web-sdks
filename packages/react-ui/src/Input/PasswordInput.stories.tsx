@@ -1,8 +1,8 @@
 import React from 'react';
+import { useMeasure } from 'react-use';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { PasswordInput } from './Input';
 import { Box } from '../Layout';
-import { useMeasure } from 'react-use';
 
 export default {
   title: 'UI Components/PasswordInput',
@@ -50,4 +50,4 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
 };
 
 export const Example = Template.bind({});
-Example.storyName = 'PasswordInput'
+Example.storyName = 'PasswordInput';

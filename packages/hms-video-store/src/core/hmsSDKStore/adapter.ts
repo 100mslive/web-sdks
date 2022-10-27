@@ -6,6 +6,8 @@ import {
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSTrack as SDKHMSTrack,
 } from '@100mslive/hms-video';
+import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+import * as sdkTypes from './sdkTypes';
 import {
   HMSAudioTrack,
   HMSDeviceChangeEvent,
@@ -23,9 +25,6 @@ import {
   HMSTrackFacingMode,
   HMSVideoTrack,
 } from '../schema';
-
-import * as sdkTypes from './sdkTypes';
-import { areArraysEqual } from './sdkUtils/storeMergeUtils';
 
 /**
  * This file has conversion functions from schema defined in sdk to normalised schema defined in store.

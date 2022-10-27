@@ -2,6 +2,29 @@
 # yarn lockfile v1
 
 
+"@100mslive/hms-video@0.5.3-alpha.2":
+  version "0.5.3-alpha.2"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.5.3-alpha.2.tgz#71ed21805199afc2f7919f8420884fa941e7c372"
+  integrity sha512-rCx1Nnxy0yaelQTpYDl8SXSiBsbOhMRbpfxX637kq8mxX7LyeIMBWd1RqpC9bTHzQhHxoMXKU48O2uzAQo6a0g==
+  dependencies:
+    eventemitter2 "^6.4.7"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-virtual-background@1.7.3-alpha.1":
+  version "1.7.3-alpha.1"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.7.3-alpha.1.tgz#c56579d0504e0053a4f41cd32f054244c987054b"
+  integrity sha512-aiX/fV4LFCeJbFGAZbj5HWTRqlCnL7OTGovgijv1Vj02PxLtOtveguIfmiOvExc1zle7aaQdXHMtDVgjS88ILQ==
+  dependencies:
+    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
+    "@tensorflow/tfjs-core" "^3.3.0"
+    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
+    "@webassemblyjs/wasm-gen" "1.11.1"
+    gifuct-js "^2.1.2"
+    wasm-check "^2.0.2"
+
 "@adobe/css-tools@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.0.1.tgz#b38b444ad3aa5fedbb15f2f746dcd934226a12dd"
@@ -9181,6 +9204,11 @@ eslint-plugin-react@^7.27.1:
     resolve "^2.0.0-next.3"
     semver "^6.3.0"
     string.prototype.matchall "^4.0.7"
+
+eslint-plugin-simple-import-sort@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-8.0.0.tgz#9d9a2372b0606e999ea841b10458a370a6ccc160"
+  integrity sha512-bXgJQ+lqhtQBCuWY/FUWdB27j4+lqcvXv5rUARkzbeWLwea+S5eBZEQrhnO+WgX3ZoJHVj0cn943iyXwByHHQw==
 
 eslint-plugin-testing-library@^5.0.1:
   version "5.6.0"

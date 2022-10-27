@@ -1,8 +1,8 @@
-import HMSLogger from '../utils/logger';
-import { Queue } from '../utils/queue';
 import AnalyticsEvent from './AnalyticsEvent';
 import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
+import HMSLogger from '../utils/logger';
+import { Queue } from '../utils/queue';
 
 export abstract class AnalyticsTransport {
   abstract transportProvider: IAnalyticsTransportProvider;

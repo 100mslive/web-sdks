@@ -1,8 +1,8 @@
 import MediaPluginsAnalyticsFactory from '../../analytics/MediaPluginsAnalyticsFactory';
-import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
+import HMSLogger from '../../utils/logger';
 
 export class AudioPluginsAnalytics {
   private readonly TAG = '[AudioPluginsAnalytics]';

@@ -1,7 +1,12 @@
-import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
-import { HMSRemoteTrack } from '../media/tracks';
-import { IStore } from '../sdk/store';
-import HMSLogger from '../utils/logger';
+import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
+import { BroadcastManager } from './managers/BroadcastManager';
+import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
+import { PeerListManager } from './managers/PeerListManager';
+import { PeerManager } from './managers/PeerManager';
+import { PolicyChangeManager } from './managers/PolicyChangeManager';
+import { RequestManager } from './managers/RequestManager';
+import { RoomUpdateManager } from './managers/RoomUpdateManager';
+import { TrackManager } from './managers/TrackManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
@@ -10,16 +15,11 @@ import {
   SpeakerList,
   TrackStateNotification,
 } from './HMSNotifications';
-import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
-import { BroadcastManager } from './managers/BroadcastManager';
-import { PeerListManager } from './managers/PeerListManager';
-import { PeerManager } from './managers/PeerManager';
-import { PolicyChangeManager } from './managers/PolicyChangeManager';
-import { RequestManager } from './managers/RequestManager';
-import { RoomUpdateManager } from './managers/RoomUpdateManager';
-import { TrackManager } from './managers/TrackManager';
-import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
 import { EventBus } from '../events/EventBus';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
+import { HMSRemoteTrack } from '../media/tracks';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
 
 export class NotificationManager {
   private readonly TAG = '[HMSNotificationManager]';

@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { HMSPeer, HMSTrack, HMSTrackID, HMSVideoTrack, HMSScreenVideoTrack } from '@100mslive/hms-video-store';
+import { HMSPeer, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '@100mslive/hms-video-store';
 
 export const chunk = <T>(elements: T[], chunkSize: number, onlyOnePage: boolean) =>
   elements.reduce((resultArray: T[][], tile: T, index: number) => {

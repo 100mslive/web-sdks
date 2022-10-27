@@ -17,4 +17,4 @@ const TileMenuStory: ComponentStory<typeof TileMenu> = () => {
 };
 
 export const Base = TileMenuStory.bind({});
-Base.storyName = 'TileMenu'
+Base.storyName = 'TileMenu';

@@ -1,11 +1,11 @@
 /* eslint-disable complexity */
 import { HMSVideoPlugin, HMSVideoPluginCanvasContextType, HMSVideoPluginType } from './HMSVideoPlugin';
-import { HMSLocalVideoTrack } from '../../media/tracks';
-import HMSLogger from '../../utils/logger';
-import { sleep } from '../../utils/timer-utils';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
+import { HMSLocalVideoTrack } from '../../media/tracks';
+import HMSLogger from '../../utils/logger';
+import { sleep } from '../../utils/timer-utils';
 import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;

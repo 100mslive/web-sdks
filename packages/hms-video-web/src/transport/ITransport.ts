@@ -1,13 +1,13 @@
-import { HMSLocalTrack } from '../media/tracks';
-import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
 import {
+  HLSConfig,
+  HLSTimedMetadata,
   HMSPeer,
+  HMSRole,
   HMSRoleChangeRequest,
   RTMPRecordingConfig,
-  HLSConfig,
-  HMSRole,
-  HLSTimedMetadata,
 } from '../interfaces';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
+import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
   MultiTrackUpdateRequestParams,

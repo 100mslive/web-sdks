@@ -1,7 +1,7 @@
-import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
+import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 const streamId = '123';
 const trackId = '456';

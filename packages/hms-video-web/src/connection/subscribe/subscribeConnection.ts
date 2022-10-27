@@ -1,18 +1,18 @@
 import EventEmitter from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
-import HMSConnection from '../HMSConnection';
-import { ISignal } from '../../signal/ISignal';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
-import { HMSConnectionRole } from '../model';
 import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
-import HMSDataChannel from '../HMSDataChannel';
-import { API_DATA_CHANNEL } from '../../utils/constants';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
+import { ISignal } from '../../signal/ISignal';
+import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
-import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
 import { sleep } from '../../utils/timer-utils';
+import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
+import HMSConnection from '../HMSConnection';
+import HMSDataChannel from '../HMSDataChannel';
+import { HMSConnectionRole } from '../model';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';

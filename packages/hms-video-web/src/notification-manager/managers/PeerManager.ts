@@ -1,11 +1,11 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { TrackManager } from './TrackManager';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
-import HMSLogger from '../../utils/logger';
-import { PeerNotification } from '../HMSNotifications';
-import { TrackManager } from './TrackManager';
 import { convertDateNumToDate } from '../../utils/date';
+import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { PeerNotification } from '../HMSNotifications';
 
 /**
  * Handles:

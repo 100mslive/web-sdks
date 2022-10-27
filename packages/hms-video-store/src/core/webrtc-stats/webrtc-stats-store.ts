@@ -1,4 +1,7 @@
-import { HMSSdk, HMSWebrtcStats, HMSPeerStats, HMSTrackStats } from '@100mslive/hms-video';
+import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '@100mslive/hms-video';
+import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
+import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
+import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
 import {
   selectLocalAudioTrackID,
   selectLocalPeerID,
@@ -6,9 +9,6 @@ import {
   selectRoomState,
   selectTracksMap,
 } from '../selectors';
-import { IHMSStore, IHMSStatsStore } from '../IHMSStore';
-import { HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID, createDefaultStatsStore } from '../schema';
-import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 
 type Unsubscribe = (() => void) | undefined;
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
