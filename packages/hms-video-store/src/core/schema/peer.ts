@@ -24,11 +24,6 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
-  /**
-   * @deprecated
-   * Use metadata field instead.
-   */
-  customerDescription?: string;
 }
 
 /**
