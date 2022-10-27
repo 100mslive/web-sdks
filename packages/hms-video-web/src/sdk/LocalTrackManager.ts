@@ -425,13 +425,12 @@ export class LocalTrackManager {
     // Get device from the tracks already added in preview
     const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
     const video = publishParams.video;
-    const { width = video.width, height = video.height } = this.store.getSimulcastDimensions('regular') || {};
     return new HMSVideoTrackSettingsBuilder()
       .codec(video.codec as HMSVideoCodec)
       .maxBitrate(video.bitRate)
       .maxFramerate(video.frameRate)
-      .setWidth(width) // take simulcast width if available
-      .setHeight(height) // take simulcast width if available
+      .setWidth(video.width) // take simulcast width if available
+      .setHeight(video.height) // take simulcast width if available
       .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
       .build();
   }
@@ -442,7 +441,6 @@ export class LocalTrackManager {
       return null;
     }
     const screen = publishParams.screen;
-    const { width = screen.width, height = screen.height } = this.store.getSimulcastDimensions('screen') || {};
     return (
       new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
@@ -450,8 +448,8 @@ export class LocalTrackManager {
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec as HMSVideoCodec)
         .maxFramerate(screen.frameRate)
-        .setWidth(width)
-        .setHeight(height)
+        .setWidth(screen.width)
+        .setHeight(screen.height)
         .build()
     );
   }

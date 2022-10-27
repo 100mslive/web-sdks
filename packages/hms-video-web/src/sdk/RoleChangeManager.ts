@@ -32,14 +32,14 @@ export default class RoleChangeManager {
 
     const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
     const videoHasSimulcastDifference = this.hasSimulcastDifference(
-      oldRole.publishParams.videoSimulcastLayers,
-      newRole.publishParams.videoSimulcastLayers,
+      oldRole.publishParams.simulcast?.video,
+      newRole.publishParams.simulcast?.video,
     );
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
     const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
     const screenHasSimulcastDifference = this.hasSimulcastDifference(
-      oldRole.publishParams.screenSimulcastLayers,
-      newRole.publishParams.screenSimulcastLayers,
+      oldRole.publishParams.simulcast?.screen,
+      newRole.publishParams.simulcast?.screen,
     );
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
@@ -111,14 +111,11 @@ export default class RoleChangeManager {
     return wasPublishing.has(type) && !isPublishing.has(type);
   }
 
-  private hasSimulcastDifference(oldLayers: SimulcastLayers, newLayers: SimulcastLayers) {
+  private hasSimulcastDifference(oldLayers?: SimulcastLayers, newLayers?: SimulcastLayers) {
     if (!oldLayers && !newLayers) {
       return false;
     }
-    if (oldLayers.width !== newLayers.width || oldLayers.height !== newLayers.height) {
-      return true;
-    }
-    if (oldLayers.layers?.length !== newLayers.layers?.length) {
+    if (oldLayers?.layers?.length !== newLayers?.layers?.length) {
       return true;
     }
     return false;
