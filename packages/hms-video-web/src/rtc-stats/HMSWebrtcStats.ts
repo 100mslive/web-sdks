@@ -86,7 +86,7 @@ export class HMSWebrtcStats {
   private async updateRemoteTrackStats() {
     const tracks = this.store.getTracksMap();
     const trackIDs = union(Object.keys(this.remoteTrackStats), Object.keys(tracks)).filter(
-      trackId => tracks[trackId].peerId !== this.localPeerID,
+      trackId => tracks[trackId] && tracks[trackId].peerId !== this.localPeerID,
     );
     for (const trackID of trackIDs) {
       const track = tracks[trackID];
