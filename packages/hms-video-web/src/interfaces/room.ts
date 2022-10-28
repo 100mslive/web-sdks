@@ -2,10 +2,6 @@ import { ServerError } from './internal';
 import { HMSException } from '../error/HMSException';
 import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 
-export enum HMSRoomType {
-  DEFAULT,
-}
-
 export interface HMSRoom {
   id: string;
   name?: string;
@@ -14,9 +10,6 @@ export interface HMSRoom {
   startedAt?: Date;
   localPeer: HMSLocalPeer;
   peers: HMSPeer[];
-  shareableLink: string;
-  type: HMSRoomType;
-  hasWaitingRoom: boolean;
   recording: HMSRecording;
   rtmp: HMSRTMP;
   hls: HMSHLS;
