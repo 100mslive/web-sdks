@@ -20,7 +20,7 @@ const StyledAccordion = styled(BaseAccordion.Root, {
 
 const StyledItem = styled(BaseAccordion.Item, {
   marginTop: '$px',
-
+  display: "block",
   '&:first-child': {
     marginTop: 0,
     borderTopLeftRadius: '$0',
@@ -48,12 +48,10 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   fontSize: '$md',
   lineHeight: '$md',
   color: '$textHighEmp',
-  // '&[data-state="closed"]': { backgroundColor: '$surfaceDefault' },
-  // '&[data-state="open"]': { backgroundColor: '$surfaceDefault' },
-  // '&:hover': { backgroundColor: '$surfaceDefault' },
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
+  display: "contents",
   fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
@@ -68,7 +66,7 @@ const StyledContent = styled(BaseAccordion.Content, {
 const StyledChevron = styled(ChevronDownIcon, {
   color: '$textPrimary',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-  '[data-state=open] &': { transform: 'rotate(180deg)' },
+  '[data-state=closed] &': { transform: 'rotate(180deg)' },
 });
 
 // Exports
