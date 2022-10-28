@@ -98,7 +98,7 @@ jobs:
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
       - name: Upload to QA S3 Bucket
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main' || github.ref_name == 'feat/WEB-1291-stats'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
