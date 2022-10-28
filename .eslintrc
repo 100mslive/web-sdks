@@ -7,40 +7,8 @@
   "overrides": [
     {
       // enable the rule specifically for TypeScript files
-      "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
+      "files": ["*.ts", "*.js"],
       "rules": {
-        "import/first": "error",
-        "import/no-duplicates": "error",
-        "simple-import-sort/imports": [
-          "error",
-          {
-            "groups": [
-              [
-                // Packages `react` related packages come first.
-                "^react",
-                "^@?\\w",
-                // Internal packages.
-                // Internal packages.
-                "^@100mslive/hms-video",
-                "^@100mslive/hms-video-store",
-                "^@100mslive/react-sdk",
-                "^@100mslive/react-icons",
-                "^@100mslive/react-ui",
-                // Side effect imports.
-                "^\\u0000",
-                // Other relative imports. Put same-folder imports and `.` last.
-                "^\\./(?=.*/)(?!/?$)",
-                "^\\.(?!/?$)",
-                "^\\./?$",
-                // Parent imports. Put `..` last.
-                "^\\.\\.(?!/?$)",
-                "^\\.\\./?$",
-                // Style imports.
-                "^.+\\.?(css)$"
-              ]
-            ]
-          }
-        ],
         "@typescript-eslint/explicit-module-boundary-types": [0],
         "@typescript-eslint/ban-ts-comment": 0,
         "@typescript-eslint/no-var-requires": 0,
@@ -86,6 +54,43 @@
         "no-unused-expressions": "off",
         "@typescript-eslint/no-unused-expressions": ["off"]
       }
+    },
+    {
+       "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
+       "rules": {
+         "import/first": "error",
+         "import/no-duplicates": "error",
+         "simple-import-sort/imports": [
+           "error",
+           {
+             "groups": [
+               [
+                 // Packages `react` related packages come first.
+                 "^react",
+                 "^@?\\w",
+                 // Internal packages.
+                 // Internal packages.
+                 "^@100mslive/hms-video",
+                 "^@100mslive/hms-video-store",
+                 "^@100mslive/react-sdk",
+                 "^@100mslive/react-icons",
+                 "^@100mslive/react-ui",
+                 // Side effect imports.
+                 "^\\u0000",
+                 // Other relative imports. Put same-folder imports and `.` last.
+                 "^\\./(?=.*/)(?!/?$)",
+                 "^\\.(?!/?$)",
+                 "^\\./?$",
+                 // Parent imports. Put `..` last.
+                 "^\\.\\.(?!/?$)",
+                 "^\\.\\./?$",
+                 // Style imports.
+                 "^.+\\.?(css)$"
+               ]
+             ]
+           }
+         ]
+        }
     }
   ],
   "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js"]
