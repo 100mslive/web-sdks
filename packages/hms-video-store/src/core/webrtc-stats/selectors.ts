@@ -4,6 +4,8 @@ import { HMSPeerID, HMSStatsStore, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
 const selectLocalPeerID = (store: HMSStatsStore) => store.localPeer.id;
+const selectLocalAudioTrackID = (store: HMSStatsStore) => store.localPeer.audioTrack;
+const selectLocalVideoTrackID = (store: HMSStatsStore) => store.localPeer.videoTrack;
 const selectPeerID = (_store: HMSStatsStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStatsStore, trackID: HMSTrackID | undefined) => trackID;
 const selectTrackStatsMap = (store: HMSStatsStore) => store.trackStats;
@@ -90,40 +92,21 @@ const peerStatsByID = byIDCurry(selectPeerStatsByIDBare);
 const trackStatsByID = byIDCurry(selectTrackStatsByIDBare);
 
 /**
- * The bitrate at which the track's data is being received
- */
-const bitrateByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bitrate));
-
-/**
- * Bytes received from a particular track
- */
-const bytesReceivedByTrackID = byIDCurry(
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.bytesReceived),
-);
-
-/**
- * The framerate(frames per second) of a particular video track
- */
-const framerateByTrackID = byIDCurry(
-  createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.framesPerSecond),
-);
-
-/**
- * The jitter faced while receiving a particular track
- */
-const jitterByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.jitter));
-
-/**
- * The number of packets lost while receiving a particular track
- */
-const packetsLostByTrackID = byIDCurry(createSelector(selectTrackStatsByIDBare, trackStats => trackStats?.packetsLost));
-
-/**
  * Local track stats selectors
  */
 
+const localAudioTrackStats = createSelector(
+  [selectLocalTrackStatsMap, selectLocalAudioTrackID],
+  (trackStats, trackID) => (trackID ? trackStats[trackID]?.[0] : undefined),
+);
+
 const localAudioTrackStatsByID = byIDCurry(
   createSelector(selectLocalTrackStatsByIDBare, trackStats => trackStats?.[0]),
+);
+
+const localVideoTrackStats = createSelector(
+  [selectLocalTrackStatsMap, selectLocalVideoTrackID],
+  (trackStats, trackID) => (trackID ? trackStats[trackID]?.[0] : undefined),
 );
 
 const localVideoTrackStatsByID = byIDCurry(createSelector(selectLocalTrackStatsByIDBare, trackStats => trackStats));
@@ -148,12 +131,9 @@ export const selectHMSStats = {
   totalBytesReceived,
   peerStatsByID,
   trackStatsByID,
-  bitrateByTrackID,
-  bytesReceivedByTrackID,
-  framerateByTrackID,
-  jitterByTrackID,
-  packetsLostByTrackID,
   localAudioTrackStatsByID,
   localVideoTrackStatsByID,
   localVideoTrackStatsByLayer,
+  localAudioTrackStats,
+  localVideoTrackStats,
 };

@@ -70,31 +70,4 @@ describe('track stats by ID', () => {
     expect(selectHMSStats.trackStatsByID('103')(fakeStore)).toBe(remoteVideoTrackStats);
     expect(selectHMSStats.trackStatsByID('104')(fakeStore)).toBe(remoteAudioTrackStats);
   });
-
-  test('selectBitrateByTrackID', () => {
-    expect(selectHMSStats.bitrateByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.bitrate);
-    expect(selectHMSStats.bitrateByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.bitrate);
-  });
-
-  test('selectBytesReceivedByTrackID', () => {
-    expect(selectHMSStats.bytesReceivedByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.bytesReceived);
-
-    expect(selectHMSStats.bytesReceivedByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.bytesReceived);
-  });
-
-  test('selectJitterByTrackID', () => {
-    expect(selectHMSStats.jitterByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.jitter);
-
-    expect(selectHMSStats.jitterByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.jitter);
-  });
-
-  test('selectPacketsLostByTrackID', () => {
-    expect(selectHMSStats.packetsLostByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.packetsLost);
-
-    expect(selectHMSStats.packetsLostByTrackID('104')(fakeStore)).toBe(remoteAudioTrackStats.packetsLost);
-  });
-
-  test('selectFramerateByTrackID', () => {
-    expect(selectHMSStats.framerateByTrackID('103')(fakeStore)).toBe(remoteVideoTrackStats.framesPerSecond);
-  });
 });
