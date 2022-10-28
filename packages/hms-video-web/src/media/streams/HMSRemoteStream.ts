@@ -1,7 +1,7 @@
-import HMSSubscribeConnection from '../../connection/subscribe';
 import HMSMediaStream from './HMSMediaStream';
-import HMSLogger from '../../utils/logger';
+import HMSSubscribeConnection from '../../connection/subscribe';
 import { HMSSimulcastLayer } from '../../interfaces';
+import HMSLogger from '../../utils/logger';
 
 /** @internal */
 export default class HMSRemoteStream extends HMSMediaStream {

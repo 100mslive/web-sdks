@@ -1,6 +1,6 @@
-import { HMSStore } from '../../schema';
-import { IHMSStore } from '../../IHMSStore';
 import { HMSLogger } from '../../../common/ui-logger';
+import { IHMSStore } from '../../IHMSStore';
+import { HMSStore } from '../../schema';
 
 type ActionName = string;
 type SetTimeOutId = number;

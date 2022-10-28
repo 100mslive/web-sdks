@@ -1,7 +1,7 @@
+import InitService, { getUrl, transformInitConfig } from './index';
 import { HMSException } from '../../error/HMSException';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
-import InitService, { getUrl, transformInitConfig } from './index';
 
 describe('getUrl', () => {
   const userAgent = createUserAgent(ENV.PROD);

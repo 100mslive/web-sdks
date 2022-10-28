@@ -1,8 +1,8 @@
 import React from 'react';
-import { CSS } from '@stitches/react';
 import * as BaseSlider from '@radix-ui/react-slider';
-import { Tooltip } from '../Tooltip';
+import { CSS } from '@stitches/react';
 import { styled } from '../Theme';
+import { Tooltip } from '../Tooltip';
 
 const Root = styled(BaseSlider.Root, {
   position: 'relative',

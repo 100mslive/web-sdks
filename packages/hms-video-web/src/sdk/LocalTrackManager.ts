@@ -1,4 +1,14 @@
+import { IStore } from './store';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { DeviceManager } from '../device-manager';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSException } from '../error/HMSException';
+import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { EventBus } from '../events/EventBus';
 import { HMSAudioCodec, HMSVideoCodec } from '../interfaces';
+import InitialSettings from '../interfaces/settings';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -7,22 +17,12 @@ import {
   HMSVideoTrackSettings,
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
-import InitialSettings from '../interfaces/settings';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
-import { IStore } from './store';
-import { IFetchAVTrackOptions } from '../transport/ITransport';
-import HMSLogger from '../utils/logger';
-import { HMSException } from '../error/HMSException';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import ITransportObserver from '../transport/ITransportObserver';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { DeviceManager } from '../device-manager';
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
-import { ErrorCodes } from '../error/ErrorCodes';
-import { EventBus } from '../events/EventBus';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
+import { IFetchAVTrackOptions } from '../transport/ITransport';
+import ITransportObserver from '../transport/ITransportObserver';
+import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
-import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 
 const defaultSettings = {
   isAudioMuted: false,

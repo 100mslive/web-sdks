@@ -1,7 +1,7 @@
+import React, { PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { CSS, keyframes } from '@stitches/react';
-import React, { PropsWithChildren } from 'react';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
 
