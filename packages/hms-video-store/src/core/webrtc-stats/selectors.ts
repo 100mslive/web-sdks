@@ -8,7 +8,7 @@ const selectLocalAudioTrackID = (store: HMSStatsStore) => store.localPeer.audioT
 const selectLocalVideoTrackID = (store: HMSStatsStore) => store.localPeer.videoTrack;
 const selectPeerID = (_store: HMSStatsStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStatsStore, trackID: HMSTrackID | undefined) => trackID;
-const selectTrackStatsMap = (store: HMSStatsStore) => store.trackStats;
+const selectRemoteTrackStatsMap = (store: HMSStatsStore) => store.remoteTrackStats;
 const selectPeerStatsMap = (store: HMSStatsStore) => store.peerStats;
 const selectLocalTrackStatsMap = (store: HMSStatsStore) => store.localTrackStats;
 
@@ -72,8 +72,9 @@ const selectPeerStatsByIDBare = createSelector([selectPeerStatsMap, selectPeerID
   peerID ? storePeerStats[peerID] : undefined,
 );
 
-const selectTrackStatsByIDBare = createSelector([selectTrackStatsMap, selectTrackID], (storeTrackStats, trackID) =>
-  trackID ? storeTrackStats[trackID] : undefined,
+const selectTrackStatsByIDBare = createSelector(
+  [selectRemoteTrackStatsMap, selectTrackID],
+  (storeTrackStats, trackID) => (trackID ? storeTrackStats[trackID] : undefined),
 );
 
 const selectLocalTrackStatsByIDBare = createSelector(

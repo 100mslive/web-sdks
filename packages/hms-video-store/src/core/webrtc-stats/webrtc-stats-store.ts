@@ -113,13 +113,13 @@ const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcSta
     const trackIDs = Object.keys(tracks).filter(trackID => tracks[trackID].peerId !== localPeerID);
 
     for (const trackID of trackIDs) {
-      const sdkTrackStats = stats.getTrackStats(trackID);
+      const sdkTrackStats = stats.getRemoteTrackStats(trackID);
       if (sdkTrackStats) {
         newTrackStats[trackID] = sdkTrackStats;
       }
     }
 
-    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
+    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.remoteTrackStats, newTrackStats);
 
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
     const newPeerStats = { [localPeerID]: stats.getLocalPeerStats() };

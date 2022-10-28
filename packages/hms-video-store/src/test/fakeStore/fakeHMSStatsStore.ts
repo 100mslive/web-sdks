@@ -157,7 +157,7 @@ export const makeFakeInternalsStore = (): HMSStatsStore => {
         },
       ],
     },
-    trackStats: {
+    remoteTrackStats: {
       '103': {
         id: 'RTCInboundRTPVideoStream_1148593599',
         timestamp: 1639819837327.776,
@@ -256,8 +256,8 @@ export const makeFakeInternalsStore = (): HMSStatsStore => {
   localPeerStats = fakeInternalsStore.peerStats['1'] as HMSPeerStats;
   localVideoTrackStats = fakeInternalsStore.localTrackStats['101'][0] as HMSTrackStats;
   localAudioTrackStats = fakeInternalsStore.localTrackStats['102'][0] as HMSTrackStats;
-  remoteVideoTrackStats = fakeInternalsStore.trackStats['103'] as HMSTrackStats;
-  remoteAudioTrackStats = fakeInternalsStore.trackStats['104'] as HMSTrackStats;
+  remoteVideoTrackStats = fakeInternalsStore.remoteTrackStats['103'] as HMSTrackStats;
+  remoteAudioTrackStats = fakeInternalsStore.remoteTrackStats['104'] as HMSTrackStats;
 
   return fakeInternalsStore as HMSStatsStore;
 };

@@ -15,7 +15,7 @@ export class HMSWebrtcStats {
   private readonly TAG = '[HMSWebrtcStats]';
   private localPeerID?: string;
   private peerStats: Record<string, HMSPeerStats> = {};
-  private trackStats: Record<string, HMSTrackStats> = {};
+  private remoteTrackStats: Record<string, HMSTrackStats> = {};
   private localTrackStats: Record<string, Record<string, HMSTrackStats>> = {};
 
   /**
@@ -33,8 +33,8 @@ export class HMSWebrtcStats {
     return this.peerStats[this.localPeerID!];
   }
 
-  getTrackStats(trackId: string): HMSTrackStats | undefined {
-    return this.trackStats[trackId];
+  getRemoteTrackStats(trackId: string): HMSTrackStats | undefined {
+    return this.remoteTrackStats[trackId];
   }
 
   getLocalTrackStats() {
@@ -47,7 +47,7 @@ export class HMSWebrtcStats {
   async updateStats() {
     await this.updateLocalPeerStats();
     await this.updateLocalTrackStats();
-    await this.updateTrackStats();
+    await this.updateRemoteTrackStats();
   }
 
   private async updateLocalPeerStats() {
@@ -83,22 +83,22 @@ export class HMSWebrtcStats {
     this.peerStats[this.localPeerID!] = { publish: publishStats, subscribe: subscribeStats };
   }
 
-  private async updateTrackStats() {
+  private async updateRemoteTrackStats() {
     const tracks = this.store.getTracksMap();
-    const trackIDs = union(Object.keys(this.trackStats), Object.keys(tracks)).filter(
+    const trackIDs = union(Object.keys(this.remoteTrackStats), Object.keys(tracks)).filter(
       trackId => tracks[trackId].peerId !== this.localPeerID,
     );
     for (const trackID of trackIDs) {
       const track = tracks[trackID];
       if (track) {
         const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
-        const prevTrackStats = this.getTrackStats(track.trackId);
+        const prevTrackStats = this.getRemoteTrackStats(track.trackId);
         const trackStats = await getTrackStats(this.getStats, track as HMSRemoteTrack, peerName, prevTrackStats);
         if (trackStats) {
-          this.trackStats[trackID] = trackStats;
+          this.remoteTrackStats[trackID] = trackStats;
         }
       } else {
-        delete this.trackStats[trackID];
+        delete this.remoteTrackStats[trackID];
       }
     }
   }
@@ -115,7 +115,7 @@ export class HMSWebrtcStats {
           this.localTrackStats[trackID] = trackStats;
         }
       } else {
-        delete this.trackStats[trackID];
+        delete this.remoteTrackStats[trackID];
       }
     }
   }
