@@ -45,7 +45,6 @@ export class SDKToHMS {
       audioTrack: sdkPeer.audioTrack?.trackId,
       auxiliaryTracks: sdkPeer.auxiliaryTracks.map(track => track.trackId),
       customerUserId: sdkPeer.customerUserId,
-      customerDescription: sdkPeer.metadata,
       metadata: sdkPeer.metadata,
       joinedAt: sdkPeer.joinedAt,
     };
@@ -124,8 +123,6 @@ export class SDKToHMS {
       id: sdkRoom.id,
       name: sdkRoom.name,
       localPeer: sdkRoom.localPeer?.peerId ?? '',
-      hasWaitingRoom: sdkRoom.hasWaitingRoom,
-      shareableLink: sdkRoom.shareableLink,
       recording,
       rtmp,
       hls,
