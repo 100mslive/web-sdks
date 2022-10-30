@@ -168,6 +168,11 @@ export class DeviceManager implements HMSDeviceManager {
 
   private handleDeviceChange = async () => {
     await this.enumerateDevices();
+    this.logDevices('After Device Change');
+    const localPeer = this.store.getLocalPeer();
+    await this.setOutputDevice(true);
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
+    await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
@@ -175,11 +180,6 @@ export class DeviceManager implements HMSDeviceManager {
         devices: this.getDevices(),
       }),
     );
-    this.logDevices('After Device Change');
-    const localPeer = this.store.getLocalPeer();
-    await this.setOutputDevice(true);
-    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
   };
 
   /**
@@ -229,6 +229,13 @@ export class DeviceManager implements HMSDeviceManager {
     await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioOutput: inputDevice },
+          devices: this.getDevices(),
+          type: 'audioOutput',
+        }),
+      );
       this.eventBus.deviceChange.publish({
         selection: this.outputDevice,
         type: 'audioOutput',
@@ -272,6 +279,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
           devices: this.getDevices(),
+          type: 'audioInput',
           error: error as HMSException,
         }),
       );
@@ -324,6 +332,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
           devices: this.getDevices(),
+          type: 'video',
           error: error as HMSException,
         }),
       );
