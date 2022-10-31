@@ -60,17 +60,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.expectedLayer = this.expectedLayer || HMSSimulcastLayer.HIGH;
     await this.updateLayer('addSink');
     this.pushInHistory(`uiSetLayer-high`);
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
-    const currentLayer = this.getSimulcastLayer();
-    if (currentLayer !== HMSSimulcastLayer.NONE) {
-      this.expectedLayer = currentLayer;
-    }
     await this.updateLayer('removeSink');
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
@@ -120,8 +115,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer =
-      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer || HMSSimulcastLayer.HIGH;
+    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
