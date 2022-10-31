@@ -21,10 +21,14 @@ export const getLocalTrackStats = async (
     trackReport = await getStats['publish']?.(track.getTrackBeingSent());
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
+    const inbound: Record<string, RTCInboundRtpStreamStats> = {};
     trackReport?.forEach(stat => {
       switch (stat.type) {
         case 'outbound-rtp':
           outbound[stat.id] = stat;
+          break;
+        case 'remote-inbound-rtp':
+          inbound[stat.ssrc] = stat;
           break;
         case 'codec':
           mimeTypes[stat.id] = stat.mimeType;
@@ -41,10 +45,13 @@ export const getLocalTrackStats = async (
       if (mimeType) {
         codec = mimeType.substring(mimeType.indexOf('/') + 1);
       }
+      const out = outbound[stat];
+      const inStats = inbound[out.ssrc];
       trackStats[stat] = {
-        ...outbound[stat],
-        bitrate: computeBitrate('bytesSent' as any, outbound[stat], prevTrackStats?.[stat]),
-        packetsLostRate: computeStatRate('packetsLost', outbound[stat], prevTrackStats?.[stat]),
+        ...out,
+        bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
+        packetsLost: inStats.packetsLost,
+        jitter: inStats.jitter,
         peerName,
         peerID: track.peerId,
         codec,
@@ -70,7 +77,7 @@ export const getTrackStats = async (
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
-  const bitrate = computeBitrate('bytesReceived' as any, trackStats, prevTrackStats);
+  const bitrate = computeBitrate('bytesReceived', trackStats, prevTrackStats);
 
   const packetsLostRate = computeStatRate('packetsLost', trackStats, prevTrackStats);
 
