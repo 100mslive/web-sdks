@@ -116,7 +116,7 @@ const localVideoTrackStatsByLayer = (layer?: Exclude<HMSSimulcastLayer, HMSSimul
   byIDCurry(
     createSelector(selectLocalTrackStatsByIDBare, stats => {
       const rid = (Object.keys(simulcastMapping) as RID[]).find(key => simulcastMapping[key] === layer);
-      return layer ? stats?.find(stat => stat.rid === rid) : stats?.[0];
+      return layer ? stats?.find(stat => stat.rid === rid) || stats?.[0] : stats?.[0];
     }),
   );
 
