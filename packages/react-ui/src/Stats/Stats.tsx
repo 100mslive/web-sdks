@@ -5,6 +5,7 @@ import {
   HMSTrackStats,
   selectConnectionQualityByPeerID,
   selectHMSStats,
+  simulcastMapping,
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -37,31 +38,36 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
     <Stats.Root>
       <table>
         <tbody>
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
-            label="Width"
-            value={videoTrackStats?.frameWidth?.toString()}
-          />
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
-            label="Height"
-            value={videoTrackStats?.frameHeight?.toString()}
-          />
           {isLocal ? (
             <Fragment>
               {localVideoTrackStats?.map(stat => {
+                if (!stat) {
+                  return null;
+                }
+                const layer = stat.rid ? simulcastMapping[stat.rid] : '';
                 return (
                   <Fragment>
+                    {layer && <StatsRow label={layer.toUpperCase()} value={''}></StatsRow>}
                     <StatsRow
-                      show={isNotNullishAndNot0(stat?.framesPerSecond)}
-                      label={`FPS(${stat?.rid})`}
-                      value={`${stat?.framesPerSecond} ${
-                        isNotNullishAndNot0(stat?.framesDropped) ? `(${stat?.framesDropped} dropped)` : ''
+                      show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+                      label="Width"
+                      value={stat.frameWidth?.toString()}
+                    />
+                    <StatsRow
+                      show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+                      label="Height"
+                      value={stat.frameHeight?.toString()}
+                    />
+                    <StatsRow
+                      show={isNotNullishAndNot0(stat.framesPerSecond)}
+                      label="FPS"
+                      value={`${stat.framesPerSecond} ${
+                        isNotNullishAndNot0(stat.framesDropped) ? `(${stat.framesDropped} dropped)` : ''
                       }`}
                     />
                     <StatsRow
-                      show={isNotNullish(stat?.bitrate)}
-                      label={`Bitrate(V)(${stat?.rid})`}
+                      show={isNotNullish(stat.bitrate)}
+                      label="Bitrate(V)"
                       value={formatBytes(stat?.bitrate, 'b/s')}
                     />
                   </Fragment>
@@ -70,6 +76,16 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             </Fragment>
           ) : (
             <Fragment>
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+                label="Width"
+                value={videoTrackStats?.frameWidth?.toString()}
+              />
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+                label="Height"
+                value={videoTrackStats?.frameHeight?.toString()}
+              />
               <StatsRow
                 show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
                 label="FPS"
