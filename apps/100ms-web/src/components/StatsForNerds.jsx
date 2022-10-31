@@ -250,7 +250,7 @@ const TrackStats = ({ trackID, layer, local }) => {
   );
 };
 
-const StatsRow = ({ label, value }) => (
+const StatsRow = React.memo(({ label, value }) => (
   <Box css={{ bg: "$surfaceLight", w: "calc(50% - $6)", p: "$8", r: "$3" }}>
     <Text
       variant="overline"
@@ -269,7 +269,7 @@ const StatsRow = ({ label, value }) => (
       {value}
     </Text>
   </Box>
-);
+));
 
 const formatBytes = (bytes, unit = "B", decimals = 2) => {
   if (bytes === 0) return "0 " + unit;
