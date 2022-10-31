@@ -229,7 +229,7 @@ const TrackStats = ({ trackID, layer, local }) => {
       <StatsRow label="Type" value={stats.type + " " + stats.kind} />
       <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, "b/s")} />
       <StatsRow label="Packets Lost" value={stats.packetsLost || "-"} />
-      <StatsRow label="Jitter" value={stats.jitter || "-"} />
+      <StatsRow label="Jitter" value={stats.jitter?.toFixed(3) || "-"} />
       <StatsRow
         label={inbound ? "Bytes Received" : "Bytes Sent"}
         value={formatBytes(inbound ? stats.bytesReceived : stats.bytesSent)}
