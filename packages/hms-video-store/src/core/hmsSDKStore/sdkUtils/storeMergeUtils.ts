@@ -75,15 +75,11 @@ export const mergeLocalTrackStats = (
 ) => {
   const IDs = union(Object.keys(draftStats), Object.keys(newStats)) as HMSTrackID[];
   for (const trackID of IDs) {
-    const oldStat = draftStats[trackID];
-    const newStat = Object.values(newStats[trackID]);
-    if (isEntityUpdated(oldStat, newStat)) {
-      Object.assign(oldStat!, newStat);
-    } else if (isEntityRemoved(oldStat, newStat)) {
+    if (!newStats[trackID]) {
       delete draftStats[trackID];
-    } else if (isEntityAdded(oldStat, newStat)) {
-      draftStats[trackID] = newStat as HMSTrackStats[];
+      continue;
     }
+    draftStats[trackID] = Object.values(newStats[trackID]);
   }
 };
 

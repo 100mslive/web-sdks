@@ -104,8 +104,11 @@ export class HMSWebrtcStats {
   }
 
   private async updateLocalTrackStats() {
-    const tracks = this.store.getTracksMap();
-    const trackIDs = this.store.getLocalPeerTracks().map(track => track.getTrackIDBeingSent());
+    const tracks = this.store.getLocalPeerTracks().reduce<Record<string, HMSLocalTrack>>((res, track) => {
+      res[track.getTrackIDBeingSent()] = track;
+      return res;
+    }, {});
+    const trackIDs = union(Object.keys(this.localTrackStats), Object.keys(tracks));
     for (const trackID of trackIDs) {
       const track = tracks[trackID] as HMSLocalTrack;
       if (track) {
@@ -115,7 +118,7 @@ export class HMSWebrtcStats {
           this.localTrackStats[trackID] = trackStats;
         }
       } else {
-        delete this.remoteTrackStats[trackID];
+        delete this.localTrackStats[trackID];
       }
     }
   }
