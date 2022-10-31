@@ -1,9 +1,7 @@
 import React from 'react';
-import { ColorPalette, ColorItem } from '@storybook/addon-docs';
-import { baseConfig } from './base.config';
+import { ColorItem, ColorPalette } from '@storybook/addon-docs';
 
 const ThemeStory = () => {
-  const colors = baseConfig.theme.colors;
   return (
     <ColorPalette>
       <ColorItem

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CheckIcon } from '@100mslive/react-icons';
-
-import { Flex } from '../Layout';
-import { Label } from '../Label';
 import { Checkbox } from '.';
+import { Label } from '../Label';
+import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/Checkbox',

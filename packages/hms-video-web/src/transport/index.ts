@@ -1,39 +1,38 @@
-import ITransportObserver from './ITransportObserver';
-import ITransport from './ITransport';
-import HMSPublishConnection from '../connection/publish';
-import HMSSubscribeConnection from '../connection/subscribe';
-import InitService from '../signal/init';
-import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
-import JsonRpcSignal from '../signal/jsonrpc';
-import { HMSConnectionRole, HMSTrickle } from '../connection/model';
-import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
-import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
-import { HMSTrack, HMSLocalTrack } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import { PromiseCallbacks } from '../utils/promise';
-import {
-  MAX_TRANSPORT_RETRIES,
-  RENEGOTIATION_CALLBACK_ID,
-  SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
-  SUBSCRIBE_TIMEOUT,
-} from '../utils/constants';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import HMSLogger from '../utils/logger';
-import { HMSVideoTrackSettings, HMSAudioTrackSettings, HMSTrackSettings } from '../media/settings';
-import { TrackState } from '../notification-manager';
-import { TransportState } from './models/TransportState';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { JoinParameters } from './models/JoinParameters';
-import { InitConfig, InitFlags } from '../signal/init/models';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
+import { TransportState } from './models/TransportState';
+import ITransport from './ITransport';
+import ITransportObserver from './ITransportObserver';
 import { RetryScheduler } from './RetryScheduler';
-import { ErrorCodes } from '../error/ErrorCodes';
+import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
-import { HMSPeer, HMSRoleChangeRequest, HLSConfig, HMSRole, HLSTimedMetadata } from '../interfaces';
+import { HMSConnectionRole, HMSTrickle } from '../connection/model';
+import HMSPublishConnection from '../connection/publish';
+import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
+import HMSSubscribeConnection from '../connection/subscribe';
+import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import { TrackDegradationController } from '../degradation';
-import { IStore } from '../sdk/store';
 import { DeviceManager } from '../device-manager';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
+import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
+import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { HMSAudioTrackSettings, HMSTrackSettings, HMSVideoTrackSettings } from '../media/settings';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalTrack, HMSTrack } from '../media/tracks';
+import { TrackState } from '../notification-manager';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { LocalTrackManager } from '../sdk/LocalTrackManager';
+import Message from '../sdk/models/HMSMessage';
+import { IStore } from '../sdk/store';
+import InitService from '../signal/init';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import {
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -42,18 +41,19 @@ import {
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
-import Message from '../sdk/models/HMSMessage';
 import { ISignal } from '../signal/ISignal';
-import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { LocalTrackManager } from '../sdk/LocalTrackManager';
-import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
-import { EventBus } from '../events/EventBus';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
-import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
-import { getNetworkInfo } from '../utils/network-info';
-import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
+import JsonRpcSignal from '../signal/jsonrpc';
+import {
+  MAX_TRANSPORT_RETRIES,
+  RENEGOTIATION_CALLBACK_ID,
+  SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
+  SUBSCRIBE_TIMEOUT,
+} from '../utils/constants';
 import { stringifyMediaStreamTrack } from '../utils/json';
+import HMSLogger from '../utils/logger';
+import { getNetworkInfo } from '../utils/network-info';
+import { PromiseCallbacks } from '../utils/promise';
 
 const TAG = '[HMSTransport]:';
 

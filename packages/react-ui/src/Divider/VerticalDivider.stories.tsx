@@ -1,10 +1,9 @@
 import React from 'react';
-import { AddIcon } from '@100mslive/react-icons';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-
+import { AddIcon } from '@100mslive/react-icons';
 import { VerticalDivider } from '.';
-import { Flex } from '../Layout';
 import { Button } from '../Button';
+import { Flex } from '../Layout';
 import { Text } from '../Text';
 
 export default {

@@ -3,8 +3,9 @@ import { HMSActions, HMSRoomProvider } from '@100mslive/react-sdk';
 import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
 
-import { setUpFakeStore, storyBookNotifications, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
+import { setUpFakeStore, storyBookSDK, storyBookNotifications, storyBookStore } from '../src/store/SetupFakeStore';
 import { HMSThemeProvider, ThemeTypes } from '../src/Theme';
+import {DecoratorFn} from '@storybook/react';
 import "./base.css"
 
 export const parameters = {
@@ -26,15 +27,16 @@ export const parameters = {
 
 setUpFakeStore();
 
-export const decorators = [
+export const decorators: DecoratorFn[] = [
   Story => {
+    const isDark = useDarkMode();
     return (
       <HMSRoomProvider
         store={storyBookStore}
         actions={storyBookSDK as unknown as HMSActions}
         notifications={storyBookNotifications}
       >
-        <HMSThemeProvider themeType={useDarkMode() ? ThemeTypes.dark : ThemeTypes.light}>
+        <HMSThemeProvider themeType={isDark ? ThemeTypes.dark : ThemeTypes.light}>
           <Story />
         </HMSThemeProvider>
       </HMSRoomProvider>

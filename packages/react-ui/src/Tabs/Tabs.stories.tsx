@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-
 import { Tabs } from '.';
 import { Box } from '../Layout';
 import { Text } from '../Text';

@@ -5,9 +5,6 @@ import {
   HMSPeer,
   HMSRoom,
   HMSTrackSource,
-  HMSRoomState,
-  HMSMessageInput,
-  HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSConfig,
   HMSSimulcastLayer,
@@ -45,21 +42,21 @@ export class StoryBookSDK implements Partial<HMSActions> {
   setVolume(value: number, trackId?: string): void {
     this.store.setState(store => {
       if (trackId) {
-        const track = store.tracks[trackId]
+        const track = store.tracks[trackId];
         if (track.type === 'audio') {
-          track.volume = value
+          track.volume = value;
         }
       }
-    })
+    });
   }
 
   setAudioLevel(value: number, trackId: string): void {
     this.store.setState(store => {
       if (trackId) {
-        const speaker = store.speakers[trackId]
-        speaker.audioLevel = value
+        const speaker = store.speakers[trackId];
+        speaker.audioLevel = value;
       }
-    })
+    });
   }
 
   setOutputDevice(_deviceId: string) {
@@ -257,7 +254,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           id: audioTrackID,
           type: 'audio',
           source: 'regular',
-          volume: 100
+          volume: 100,
         };
       }
       if (peer.videoTrack) {
