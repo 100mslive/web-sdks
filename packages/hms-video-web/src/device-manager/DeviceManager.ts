@@ -176,7 +176,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
-        type: 'list',
+        type: 'change',
         devices: this.getDevices(),
       }),
     );
@@ -231,7 +231,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
-          selection: { audioOutput: inputDevice },
+          selection: { audioOutput: this.outputDevice },
           devices: this.getDevices(),
           type: 'audioOutput',
         }),
