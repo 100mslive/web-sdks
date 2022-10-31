@@ -50,15 +50,15 @@ export const getLocalTrackStats = async (
       trackStats[stat] = {
         ...out,
         bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
-        packetsLost: inStats.packetsLost,
-        jitter: inStats.jitter,
+        packetsLost: inStats?.packetsLost,
+        jitter: inStats?.jitter,
         peerName,
         peerID: track.peerId,
         codec,
       };
     });
   } catch (err) {
-    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err);
   }
   return trackStats;
 };
@@ -73,7 +73,7 @@ export const getTrackStats = async (
   try {
     trackReport = await getStats['subscribe']?.(track.nativeTrack);
   } catch (err) {
-    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
