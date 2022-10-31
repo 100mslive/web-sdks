@@ -1,13 +1,13 @@
 import React from 'react';
-import { ShareScreenIcon } from '@100mslive/react-icons';
-import { useScreenShare } from '@100mslive/react-sdk';
-import { Tooltip } from '../Tooltip';
-import { IconButton } from '../IconButton';
 import { ComponentStory } from '@storybook/react';
-import { Text } from '../Text';
-import { Flex } from '../Layout';
-import { Video } from '../Video';
+import { useScreenShare } from '@100mslive/react-sdk';
+import { ShareScreenIcon } from '@100mslive/react-icons';
 import mdx from './UseScreenShare.mdx';
+import { IconButton } from '../IconButton';
+import { Flex } from '../Layout';
+import { Text } from '../Text';
+import { Tooltip } from '../Tooltip';
+import { Video } from '../Video';
 
 const ScreenShare: ComponentStory<typeof Tooltip> = () => {
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();

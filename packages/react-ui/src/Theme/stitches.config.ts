@@ -1,9 +1,9 @@
-import { createStitches } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
-import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
-import { darkTheme, lightTheme } from './themes';
+import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
+import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
 import { ThemeTypes } from './ThemeProvider';
+import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
   prefix: 'hms-ui',

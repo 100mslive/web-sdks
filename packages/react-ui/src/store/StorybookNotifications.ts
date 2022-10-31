@@ -1,4 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import { HMSPeerUpdate, HMSTrackUpdate } from '@100mslive/hms-video';
 import {
   HMSChangeMultiTrackStateRequest,
   HMSChangeTrackStateRequest,
@@ -21,7 +22,6 @@ import {
   selectPeerByID,
   selectTrackByID,
 } from '@100mslive/react-sdk';
-import { HMSPeerUpdate, HMSTrackUpdate } from '@100mslive/hms-video';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 

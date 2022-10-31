@@ -1,9 +1,9 @@
-import { HMSPeer, selectLocalPeerID, useHMSStore, useParticipants } from '@100mslive/react-sdk';
 import React from 'react';
+import { HMSPeer, selectLocalPeerID, useHMSStore, useParticipants } from '@100mslive/react-sdk';
+import UseParticipantsDocs from './UseParticipants.mdx';
 import { Avatar } from '../Avatar';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
-import UseParticipantsDocs from './UseParticipants.mdx';
 
 const VirtualizedParticipants = ({ participants }: { participants: HMSPeer[] }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);

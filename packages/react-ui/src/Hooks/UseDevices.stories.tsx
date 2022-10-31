@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Flex } from '../Layout';
 import { DeviceType, useDevices } from '@100mslive/react-sdk';
-import { Text } from '../Text';
-import { Dropdown } from '../Dropdown';
 import { ChevronDownIcon, ChevronUpIcon, SpeakerIcon } from '@100mslive/react-icons';
 import mdx from './UseDevices.mdx'
+import { Dropdown } from '../Dropdown';
+import { Box, Flex } from '../Layout';
+import { Text } from '../Text';
 
 const DialogDropdownTrigger = ({ title, css, open, icon, titleCSS = {} }) => {
   return (

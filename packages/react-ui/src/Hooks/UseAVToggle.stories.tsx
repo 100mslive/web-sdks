@@ -1,10 +1,10 @@
-import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
-import Video, { StyledVideo } from '../Video/Video';
 import React from 'react';
-import UseAVToggleDocs from './UseAVToggle.mdx';
 import { ComponentStory } from '@storybook/react';
-import { Box, Flex } from '../Layout';
+import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
+import UseAVToggleDocs from './UseAVToggle.mdx';
 import { Button } from '../Button';
+import { Box, Flex } from '../Layout';
+import Video, { StyledVideo } from '../Video/Video';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);

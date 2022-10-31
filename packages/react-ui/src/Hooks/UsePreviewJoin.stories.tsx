@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box } from '../Layout';
-
 import mdx from './UsePreviewJoin.mdx';
+import { Box } from '../Layout';
 
 const PreviewJoin = () => {
   return (

@@ -1,8 +1,8 @@
-import { useVideo } from '@100mslive/react-sdk';
-import { StyledVideo } from '../Video/Video';
-import UseVideoDocs from './UseVideo.mdx';
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
+import { useVideo } from '@100mslive/react-sdk';
+import UseVideoDocs from './UseVideo.mdx';
+import { StyledVideo } from '../Video/Video';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const { videoRef } = useVideo({

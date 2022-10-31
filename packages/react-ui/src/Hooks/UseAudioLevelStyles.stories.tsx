@@ -1,12 +1,12 @@
 import React from 'react';
-import { useBorderAudioLevel } from '../AudioLevel';
-import { Box, Flex } from '../Layout';
 import { selectTrackAudioByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { StoryBookSDK } from '../store/StorybookSDK';
-import { Slider } from '../Slider';
-import { Avatar } from '../Avatar';
-import { Text } from '../Text';
 import mdx from './UseAudioLevelStyles.mdx';
+import { useBorderAudioLevel } from '../AudioLevel';
+import { Avatar } from '../Avatar';
+import { Box, Flex } from '../Layout';
+import { Slider } from '../Slider';
+import { StoryBookSDK } from '../store/StorybookSDK';
+import { Text } from '../Text';
 
 const AudioLevelStyles = () => {
   const trackId = '101';
