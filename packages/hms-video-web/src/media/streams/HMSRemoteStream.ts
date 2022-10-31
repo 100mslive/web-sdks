@@ -14,13 +14,13 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  async setAudio(enabled: boolean, trackId: string) {
+  async setAudio(enabled: boolean, trackId: string, identifier: string) {
     if (this.audio === enabled) {
       return;
     }
 
     this.audio = enabled;
-    HMSLogger.d(`[Remote stream] ${this.id}`, `subscribing audio - ${this.audio}`);
+    HMSLogger.d(`[Remote stream] ${identifier} ${this.id}`, `subscribing audio - ${this.audio}`);
     await this.connection.sendOverApiDataChannelWithResponse({
       params: {
         subscribed: this.audio,
