@@ -20,6 +20,7 @@ export default class HMSRemoteStream extends HMSMediaStream {
     }
 
     this.audio = enabled;
+    HMSLogger.d(`[Remote stream] ${this.id}`, `subscribing audio - ${this.audio}`);
     await this.connection.sendOverApiDataChannelWithResponse({
       params: {
         subscribed: this.audio,
