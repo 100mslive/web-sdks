@@ -256,6 +256,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.getNewAudioInputDevice();
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioInput: undefined },
+          error: new Error('Audio device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'audioInput',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
@@ -304,6 +312,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.videoInput[0];
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { videoInput: undefined },
+          error: new Error('Video device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'video',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Video device not found');
       return;
     }
