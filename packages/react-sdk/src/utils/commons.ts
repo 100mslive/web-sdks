@@ -1,5 +1,5 @@
-import { hooksErrHandler } from '../hooks/types';
 import HMSLogger from './logger';
+import { hooksErrHandler } from '../hooks/types';
 
 const TAG = 'react-sdk';
 

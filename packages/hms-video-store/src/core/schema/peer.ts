@@ -1,5 +1,5 @@
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
+import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 
 export type { SimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
@@ -24,11 +24,6 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
-  /**
-   * @deprecated
-   * Use metadata field instead.
-   */
-  customerDescription?: string;
 }
 
 /**

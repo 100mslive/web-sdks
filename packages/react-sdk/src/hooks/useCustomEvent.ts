@@ -1,7 +1,7 @@
-import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { useCallback, useEffect } from 'react';
 import { HMSNotificationTypes, HMSPeerID, HMSRoleName } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
+import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 
 export interface useCustomEventInput<T> {

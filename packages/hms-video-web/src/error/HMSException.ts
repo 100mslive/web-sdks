@@ -1,6 +1,6 @@
+import { HMSAction } from './ErrorFactory';
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
-import { HMSAction } from './ErrorFactory';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
   action: string;

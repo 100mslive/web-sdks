@@ -1,6 +1,6 @@
-import { HMSException } from '../error/HMSException';
-import { HMSTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { TransportState } from './models/TransportState';
+import { HMSException } from '../error/HMSException';
+import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
 
 export default interface ITransportObserver {
   /**

@@ -1,5 +1,5 @@
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import HMSLogger from './logger';
+import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 
 export async function getLocalStream(constraints: MediaStreamConstraints): Promise<MediaStream> {
   try {

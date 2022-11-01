@@ -1,4 +1,4 @@
-import { IHMSStore, selectPeerCount, selectError, HMSException, selectIsConnectedToRoom } from '../../core';
+import { HMSException, IHMSStore, selectError, selectIsConnectedToRoom, selectPeerCount } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 import { IHMSStoreReadOnly } from '../../core/IHMSStore';
 
