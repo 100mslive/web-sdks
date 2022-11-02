@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { HlsStatsForNerds } from "@100mslive/hls-stats-for-nerds";
+import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import {
   selectAppData,
@@ -27,6 +27,7 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
   HLS_STREAM_NO_LONGER_LIVE,
@@ -43,15 +44,13 @@ const HLSVideo = styled("video", {
 });
 
 let hlsController;
-let hlsStatsForNerds;
+let hlsStats;
 
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
-  const enablHlsStatsForNerds = useHMSStore(
-    selectAppData(APP_DATA.hlsStatsForNerds)
-  );
-  let [hlsStats, setHlsStats] = useState(null);
+  const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
+  let [hlsStatsState, setHlsStatsState] = useState(null);
   const [isStatsSubscribed, setIsStatsSubscribed] = useState(false);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
@@ -63,7 +62,7 @@ const HLSView = () => {
   if (videoRef.current && hlsUrl) {
     if (Hls.isSupported() && !hlsController) {
       hlsController = new HLSController(hlsUrl, videoRef);
-      hlsStatsForNerds = new HlsStatsForNerds(
+      hlsStats = new HlsStats(
         hlsController.getHlsJsInstance(),
         videoRef.current
       );
@@ -93,16 +92,16 @@ const HLSView = () => {
   }
 
   useEffect(() => {
-    if (hlsStatsForNerds) {
-      if (enablHlsStatsForNerds && !isStatsSubscribed) {
-        hlsStatsForNerds.subscribe(1000, state => setHlsStats(state));
+    if (hlsStats) {
+      if (enablHlsStats && !isStatsSubscribed) {
+        hlsStats.subscribe(1000, state => setHlsStatsState(state));
         setIsStatsSubscribed(true);
-      } else if (!enablHlsStatsForNerds && isStatsSubscribed) {
-        hlsStatsForNerds.unsubscribe();
+      } else if (!enablHlsStats && isStatsSubscribed) {
+        hlsStats.unsubscribe();
         setIsStatsSubscribed(false);
       }
     }
-  }, [hlsStats, isStatsSubscribed, enablHlsStatsForNerds]);
+  }, [hlsStatsState, isStatsSubscribed, enablHlsStats]);
 
   useEffect(() => {
     if (hlsController) {
@@ -124,197 +123,8 @@ const HLSView = () => {
 
   return (
     <Fragment>
-      {hlsStats?.url && enablHlsStatsForNerds ? (
-        <Box>
-          <table
-            style={{
-              borderCollapse: "collapse",
-              position: "absolute",
-              tableLayout: "fixed",
-              wordWrap: "break-word",
-              padding: "0.5rem",
-              zIndex: 100,
-              backgroundColor: "rgba(101,112,128, 0.25)",
-            }}
-          >
-            <tbody>
-              <tr>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    URL
-                  </Text>
-                </td>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    <a
-                      href={`${hlsStats?.url}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >{`${hlsStats?.url}`}</a>
-                  </Text>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    Video Size
-                  </Text>
-                </td>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >{` ${hlsStats?.videoSize.width}x${hlsStats.videoSize.height}`}</Text>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    Buffer Health
-                  </Text>
-                </td>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >{`${hlsStats?.bufferHealth.toFixed(2)}`}</Text>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    Connection Speed
-                  </Text>
-                </td>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    {`${(hlsStats?.bandwidthEstimate / (1000 * 1000)).toFixed(
-                      2
-                    )}Mbps`}
-                  </Text>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    Bitrate
-                  </Text>
-                </td>
-                <td
-                  style={{
-                    maxWidth: "320px",
-                    verticalAlign: "top",
-                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
-                  }}
-                >
-                  <Text
-                    css={{
-                      "@md": { fontSize: "1rem" },
-                      "@sm": { fontSize: "0.75rem" },
-                    }}
-                  >
-                    {`${(hlsStats?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}
-                  </Text>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </Box>
+      {hlsStatsState?.url && enablHlsStats ? (
+        <HlsStatsOverlay hlsStatsState={hlsStatsState} />
       ) : null}
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>

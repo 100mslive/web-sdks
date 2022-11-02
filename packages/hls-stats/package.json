@@ -1,5 +1,5 @@
 {
-  "name": "@100mslive/hls-stats-for-nerds",
+  "name": "@100mslive/hls-stats",
   "version": "0.0.1",
   "description": "A simple library that provides stats for your hls stream",
   "main": "dist/src/index.js",

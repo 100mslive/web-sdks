@@ -34,10 +34,10 @@ export class KeyboardInputManager {
     }
   };
 
-  #toggleHlsStatsForNerds = () => {
+  #toggleHlsStats = () => {
     this.#actions.setAppData(
-      APP_DATA.hlsStatsForNerds,
-      !this.#store.getState(selectAppData(APP_DATA.hlsStatsForNerds))
+      APP_DATA.hlsStats,
+      !this.#store.getState(selectAppData(APP_DATA.hlsStats))
     );
   };
 
@@ -61,7 +61,7 @@ export class KeyboardInputManager {
     } else if (SHORTCUT_SIDEPANE_CLOSE) {
       this.#hideSidepane();
     } else if (SHORTCUT_STATS_FOR_NERDS) {
-      this.#toggleHlsStatsForNerds();
+      this.#toggleHlsStats();
     }
   };
 

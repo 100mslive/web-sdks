@@ -2,10 +2,6 @@ import Hls from 'hls.js';
 import { BaseAdapter } from './BaseAdapter';
 
 export class HlsJsAdapter extends BaseAdapter {
-  constructor(hlsInstance: Hls, videoEl: HTMLVideoElement) {
-    super(hlsInstance, videoEl);
-  }
-
   timeUpdateHandler = _ => {
     let totalBufferHealth = 0;
 
@@ -49,6 +45,7 @@ export class HlsJsAdapter extends BaseAdapter {
   };
 
   startGatheringStats(): void {
+    console.log('Start Gathering stats');
     this.hlsInstance.on(Hls.Events.FRAG_CHANGED, this.fragChangedHandler);
 
     this.hlsInstance.on(Hls.Events.LEVEL_LOADED, this.levelLoadedHandler);
