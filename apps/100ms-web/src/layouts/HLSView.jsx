@@ -6,7 +6,12 @@ import React, {
   useCallback,
 } from "react";
 import Hls from "hls.js";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import {
+  useHMSStore,
+  selectHLSState,
+  selectAppData,
+} from "@100mslive/react-sdk";
+import { HlsStatsForNerds } from "@100mslive/hls-stats-for-nerds";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -28,6 +33,7 @@ import {
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
 } from "../controllers/hls/HLSController";
+import { APP_DATA } from "../common/constants";
 
 const HLSVideo = styled("video", {
   margin: "0 auto",
@@ -37,9 +43,16 @@ const HLSVideo = styled("video", {
 });
 
 let hlsController;
+let hlsStatsForNerds;
+
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
+  const enablHlsStatsForNerds = useHMSStore(
+    selectAppData(APP_DATA.hlsStatsForNerds)
+  );
+  let [hlsStats, setHlsStats] = useState(null);
+  const [isStatsSubscribed, setIsStatsSubscribed] = useState(false);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
@@ -47,37 +60,49 @@ const HLSView = () => {
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
 
+  if (videoRef.current && hlsUrl) {
+    if (Hls.isSupported() && !hlsController) {
+      hlsController = new HLSController(hlsUrl, videoRef);
+      hlsStatsForNerds = new HlsStatsForNerds(
+        hlsController.getHlsJsInstance(),
+        videoRef.current
+      );
+
+      hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
+        setIsVideoLive(false);
+      });
+      hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
+        console.log(
+          `%c Payload: ${payload}`,
+          "color:#2b2d42; background:#d80032"
+        );
+        console.log(rest);
+        ToastManager.addToast({
+          title: `Payload from timed Metadata ${payload}`,
+        });
+      });
+
+      hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
+        const onlyVideoLevels = removeAudioLevels(levels);
+        setAvailableLevels(onlyVideoLevels);
+        setCurrentSelectedQualityText("Auto");
+      });
+    } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
+      videoRef.current.src = hlsUrl;
+    }
+  }
+
   useEffect(() => {
-    if (videoRef.current && hlsUrl) {
-      if (Hls.isSupported()) {
-        hlsController = new HLSController(hlsUrl, videoRef);
-
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-          setIsVideoLive(false);
-        });
-        hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
-          console.log(
-            `%c Payload: ${payload}`,
-            "color:#2b2d42; background:#d80032"
-          );
-          console.log(rest);
-          ToastManager.addToast({
-            title: `Payload from timed Metadata ${payload}`,
-          });
-        });
-
-        hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
-          const onlyVideoLevels = removeAudioLevels(levels);
-          setAvailableLevels(onlyVideoLevels);
-          setCurrentSelectedQualityText("Auto");
-        });
-      } else if (
-        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
-      ) {
-        videoRef.current.src = hlsUrl;
+    if (hlsStatsForNerds) {
+      if (enablHlsStatsForNerds && !isStatsSubscribed) {
+        hlsStatsForNerds.subscribe(1000, state => setHlsStats(state));
+        setIsStatsSubscribed(true);
+      } else if (!enablHlsStatsForNerds && isStatsSubscribed) {
+        hlsStatsForNerds.unsubscribe();
+        setIsStatsSubscribed(false);
       }
     }
-  }, [hlsUrl]);
+  }, [hlsStats, isStatsSubscribed, enablHlsStatsForNerds]);
 
   useEffect(() => {
     if (hlsController) {
@@ -99,6 +124,198 @@ const HLSView = () => {
 
   return (
     <Fragment>
+      {hlsStats?.url && enablHlsStatsForNerds ? (
+        <Box>
+          <table
+            style={{
+              borderCollapse: "collapse",
+              position: "absolute",
+              tableLayout: "fixed",
+              wordWrap: "break-word",
+              padding: "0.5rem",
+              zIndex: 100,
+              backgroundColor: "rgba(101,112,128, 0.25)",
+            }}
+          >
+            <tbody>
+              <tr>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    URL
+                  </Text>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    <a
+                      href={`${hlsStats?.url}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >{`${hlsStats?.url}`}</a>
+                  </Text>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    Video Size
+                  </Text>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >{` ${hlsStats?.videoSize.width}x${hlsStats.videoSize.height}`}</Text>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    Buffer Health
+                  </Text>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >{`${hlsStats?.bufferHealth.toFixed(2)}`}</Text>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    Connection Speed
+                  </Text>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    {`${(hlsStats?.bandwidthEstimate / (1000 * 1000)).toFixed(
+                      2
+                    )}Mbps`}
+                  </Text>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    Bitrate
+                  </Text>
+                </td>
+                <td
+                  style={{
+                    maxWidth: "320px",
+                    verticalAlign: "top",
+                    padding: "0.25rem 0.5rem 0.25rem 0.5rem",
+                  }}
+                >
+                  <Text
+                    css={{
+                      "@md": { fontSize: "1rem" },
+                      "@sm": { fontSize: "0.75rem" },
+                    }}
+                  >
+                    {`${(hlsStats?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}
+                  </Text>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </Box>
+      ) : null}
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />

@@ -111,6 +111,7 @@ export const APP_DATA = {
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
   sidePane: "sidePane",
+  hlsStatsForNerds: "hlsStatsForNerds",
   hlsViewerRole: "hlsViewerRole",
   subscribedNotifications: "subscribedNotifications",
   logo: "logo",

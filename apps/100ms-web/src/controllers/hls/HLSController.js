@@ -21,11 +21,6 @@ export class HLSController {
       HLS_TIMED_METADATA_LOADED,
       HLS_STREAM_NO_LONGER_LIVE,
     ];
-
-    console.log("======================");
-    console.log(" STATS FOR NERDS INIT ");
-    console.log("======================");
-    const snf = StatsForNerds(this.hls);
   }
 
   reset() {
@@ -55,6 +50,10 @@ export class HLSController {
       level => level.height === currentLevel.height
     );
     this.hls.currentLevel = newLevel;
+  }
+
+  getHlsJsInstance() {
+    return this.hls;
   }
 
   jumpToLive() {

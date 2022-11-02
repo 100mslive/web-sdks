@@ -14,6 +14,7 @@
         "@typescript-eslint/no-var-requires": 0,
         "@typescript-eslint/no-empty-function": 0,
         "@typescript-eslint/no-non-null-assertion": 0,
+        "@typescript-eslint/no-useless-constructor": "off",
         "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
         "complexity": ["error", 6], // if a function is getting too complex it should be broken down
         "curly": ["error", "all"], // use curly brace even for single line functions
