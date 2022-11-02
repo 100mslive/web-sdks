@@ -97,7 +97,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
-      `[Remote Track] ${layerUpdate.track_id} ${this.logIdentifier} - layer update from server`,
+      `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from server`,
       `currLayer=${layerUpdate.current_layer}, expectedLayer=${layerUpdate.expected_layer}`,
       `sub_degraded=${layerUpdate.subscriber_degraded}`,
       `pub_degraded=${layerUpdate.publisher_degraded}`,
