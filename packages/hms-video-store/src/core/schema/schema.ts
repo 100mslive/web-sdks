@@ -1,12 +1,12 @@
-import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
+import { HMSException } from './error';
 import { HMSMessage, HMSMessageID } from './message';
+import { HMSPeer, HMSPeerID, HMSSpeaker, HMSTrack, HMSTrackID } from './peer';
+import { HMSPlaylist } from './playlist';
+import { HMSRoleChangeStoreRequest } from './requests';
+import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSPeerStats, HMSTrackStats, HMSConnectionQuality } from '../hmsSDKStore/sdkTypes';
-import { HMSRole } from './role';
-import { HMSRoleChangeStoreRequest } from './requests';
-import { HMSException } from './error';
-import { HMSPlaylist } from './playlist';
+import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -52,9 +52,7 @@ export const createDefaultStoreState = (): HMSStore => {
       isConnected: false,
       name: '',
       peers: [],
-      shareableLink: '',
       localPeer: '',
-      hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {
         browser: {

@@ -9,10 +9,9 @@ import {
   ShareScreenIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
-
 import { Footer } from '.';
-import { IconButton } from '../IconButton';
 import { Button } from '../Button';
+import { IconButton } from '../IconButton';
 
 export default {
   title: 'UI Components/Footer',
@@ -59,4 +58,4 @@ const Template: ComponentStory<typeof Footer.Root> = ({ css }) => {
 };
 
 export const Example = Template.bind({});
-Example.storyName = 'Footer'
+Example.storyName = 'Footer';

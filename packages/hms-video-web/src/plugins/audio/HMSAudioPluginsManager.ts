@@ -1,9 +1,9 @@
+import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
-import { EventBus } from '../../events/EventBus';
 
 const TAG = 'AudioPluginsManager';
 const DEFAULT_SAMPLE_RATE = 48000;

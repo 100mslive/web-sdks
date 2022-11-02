@@ -1,22 +1,22 @@
 import React, {
+  Fragment,
+  useCallback,
   useEffect,
   useRef,
-  Fragment,
   useState,
-  useCallback,
 } from "react";
+import { HlsStatsForNerds } from "@100mslive/hls-stats-for-nerds";
 import Hls from "hls.js";
 import {
-  useHMSStore,
-  selectHLSState,
   selectAppData,
+  selectHLSState,
+  useHMSStore,
 } from "@100mslive/react-sdk";
-import { HlsStatsForNerds } from "@100mslive/hls-stats-for-nerds";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  SettingsIcon,
   RecordIcon,
+  SettingsIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
@@ -29,9 +29,9 @@ import {
 } from "@100mslive/react-ui";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
-  HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
+  HLSController,
 } from "../controllers/hls/HLSController";
 import { APP_DATA } from "../common/constants";
 

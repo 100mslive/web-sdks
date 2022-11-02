@@ -4,7 +4,8 @@ import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
 
 import { setUpFakeStore, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
-import { HMSThemeProvider } from '../src/Theme';
+import { HMSThemeProvider, ThemeTypes } from '../src/Theme';
+import {DecoratorFn} from '@storybook/react';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -25,12 +26,14 @@ export const parameters = {
 
 setUpFakeStore();
 
-export const decorators = [
+export const decorators: DecoratorFn[] = [
   Story => {
+    const isDark = useDarkMode();
     return (
+      //@ts-ignore
       <HMSRoomProvider store={storyBookStore} actions={storyBookSDK}>
-        <HMSThemeProvider themeType={useDarkMode() ? 'dark' : 'light'}>
-          <Story />
+        <HMSThemeProvider themeType={ isDark ? ThemeTypes.dark : ThemeTypes.light}>
+          {Story()}
         </HMSThemeProvider>
       </HMSRoomProvider>
     );

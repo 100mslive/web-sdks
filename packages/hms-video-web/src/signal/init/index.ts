@@ -1,6 +1,6 @@
 import { InitConfig } from './models';
-import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import HMSLogger from '../../utils/logger';
 
 const TAG = 'InitService';
 

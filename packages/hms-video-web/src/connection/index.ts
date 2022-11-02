@@ -1,10 +1,10 @@
 import { HMSConnectionRole } from './model';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSLocalTrack } from '../media/tracks';
+import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
-import { HMSLocalTrack } from '../media/tracks';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { TrackState } from '../notification-manager';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
