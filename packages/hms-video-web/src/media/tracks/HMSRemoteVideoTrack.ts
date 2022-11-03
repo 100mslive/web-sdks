@@ -50,6 +50,14 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this.pushInHistory(`uiPreferLayer-${layer}`);
   }
 
+  /**
+   * @deprecated
+   * @returns {HMSSimulcastLayer}
+   */
+  getSimulcastLayer() {
+    return (this.stream as HMSRemoteStream).getSimulcastLayer();
+  }
+
   getCurrentLayer() {
     return (this.stream as HMSRemoteStream).getVideoLayer();
   }

@@ -59,6 +59,14 @@ export default class HMSRemoteStream extends HMSMediaStream {
     });
   }
 
+  /**
+   * @deprecated
+   * @returns {HMSSimulcastLayer}
+   */
+  getSimulcastLayer() {
+    return this.video;
+  }
+
   getVideoLayer() {
     return this.video;
   }
