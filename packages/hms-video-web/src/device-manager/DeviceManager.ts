@@ -258,7 +258,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (!newSelection || !newSelection.deviceId) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
-          selection: { audioInput: undefined },
+          selection: { audioInput: newSelection },
           error: new Error('Audio device not found') as HMSException,
           devices: this.getDevices(),
           type: 'audioInput',
@@ -314,7 +314,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (!newSelection || !newSelection.deviceId) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
-          selection: { videoInput: undefined },
+          selection: { videoInput: newSelection },
           error: new Error('Video device not found') as HMSException,
           devices: this.getDevices(),
           type: 'video',
