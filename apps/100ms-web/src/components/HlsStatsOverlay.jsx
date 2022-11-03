@@ -10,7 +10,7 @@ export function HlsStatsOverlay({ hlsStatsState }) {
           position: "absolute",
           tableLayout: "fixed",
           wordWrap: "break-word",
-          padding: "0.5rem",
+          padding: "@h3",
           zIndex: 100,
           backgroundColor: "rgba(101,112,128, 0.25)",
         }}
@@ -26,8 +26,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 URL
@@ -42,8 +42,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                   cursor: "pointer",
                   textDecoration: "underline",
                 }}
@@ -66,8 +66,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 Video Size
@@ -82,8 +82,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >{` ${hlsStatsState?.videoSize.width}x${hlsStatsState?.videoSize.height}`}</Text>
             </td>
@@ -98,8 +98,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 Buffer Health
@@ -114,8 +114,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >{`${hlsStatsState?.bufferHealth.toFixed(2)}`}</Text>
             </td>
@@ -130,8 +130,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 Connection Speed
@@ -146,8 +146,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(
@@ -166,8 +166,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 Bitrate
@@ -182,8 +182,8 @@ export function HlsStatsOverlay({ hlsStatsState }) {
             >
               <Text
                 css={{
-                  "@md": { fontSize: "1rem" },
-                  "@sm": { fontSize: "0.75rem" },
+                  "@md": { fontSize: "@md" },
+                  "@sm": { fontSize: "@xs" },
                 }}
               >
                 {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}

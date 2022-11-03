@@ -10,6 +10,7 @@ import Hls from "hls.js";
 import {
   selectAppData,
   selectHLSState,
+  useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import {
@@ -50,6 +51,7 @@ const HLSView = () => {
   const videoRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
+  const hmsActions = useHMSActions();
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const [isStatsSubscribed, setIsStatsSubscribed] = useState(false);
   const hlsUrl = hlsState.variants[0]?.url;
@@ -92,12 +94,20 @@ const HLSView = () => {
   }
 
   useEffect(() => {
+    console.log("MOUNTING....");
+  }, []);
+  useEffect(() => {
     if (hlsStats) {
       if (enablHlsStats && !isStatsSubscribed) {
-        hlsStats.subscribe(1000, state => setHlsStatsState(state));
+        console.log("SUBBING");
+        // hlsStats.subscribe(5000, state => {
+        //   console.log("GOT STATE");
+        //   setHlsStatsState(state);
+        // });
         setIsStatsSubscribed(true);
       } else if (!enablHlsStats && isStatsSubscribed) {
-        hlsStats.unsubscribe();
+        console.log("UN SUBBING");
+        // hlsStats.unsubscribe();
         setIsStatsSubscribed(false);
       }
     }
@@ -121,14 +131,25 @@ const HLSView = () => {
     [availableLevels] //eslint-disable-line
   );
 
+  const sfnHiddenSwitchHandler = event => {
+    console.log("CLICK", event);
+    if (event.detail === 5) {
+      hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
+    }
+  };
   return (
     <Fragment>
-      {hlsStatsState?.url && enablHlsStats ? (
-        <HlsStatsOverlay hlsStatsState={hlsStatsState} />
-      ) : null}
+      {/* {hlsStatsState?.url && enablHlsStats ? (
+        // <HlsStatsOverlay hlsStatsState={hlsStatsState} />
+        <h1 style={{ position: "absolute", color:"#FAFAFA" }}>OVERLAY</h1>
+      ) : null} */}
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
+          <Box
+            onClick={sfnHiddenSwitchHandler}
+            css={{ minHeight: "$lg", width: "100%" }}
+          />
           <Flex align="center" justify="end">
             {hlsController ? (
               <Button
