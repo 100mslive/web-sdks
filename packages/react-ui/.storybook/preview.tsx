@@ -1,7 +1,5 @@
 import React from 'react';
-import { useDarkMode } from 'storybook-dark-mode';
 import { themes } from '@storybook/theming';
-
 import { setUpFakeStore } from '../src/store/SetupFakeStore';
 import {DecoratorFn} from '@storybook/react';
 
@@ -26,7 +24,6 @@ setUpFakeStore();
 
 export const decorators: DecoratorFn[] = [
   Story => {
-    const isDark = useDarkMode();
     return (
       <Story />
     );

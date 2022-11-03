@@ -6,18 +6,9 @@ module.exports = {
   },
   addons: [
     '@storybook/addon-links',
-    {
-      name: '@storybook/addon-essentials',
-      options: {
-        actions: true,
-        controls: false,
-        measure: false,
-        outline: false,
-        backgrounds: false
-      }
-    },
-    '@storybook/addon-controls',
+    '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    '@storybook/addon-a11y',
     'storybook-dark-mode'
   ],
   framework: '@storybook/react',
