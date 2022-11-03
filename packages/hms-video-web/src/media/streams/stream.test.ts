@@ -33,7 +33,7 @@ describe('HMSRemoteStream', () => {
 
   // no video is subscribed by default
   it('returns none by default for video, true for audio', () => {
-    expect(stream.getSimulcastLayer()).toBe(HMSSimulcastLayer.NONE);
+    expect(stream.getVideoLayer()).toBe(HMSSimulcastLayer.NONE);
     expect(stream.isAudioSubscribed()).toBe(true);
   });
 

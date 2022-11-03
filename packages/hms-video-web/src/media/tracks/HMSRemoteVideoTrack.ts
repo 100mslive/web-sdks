@@ -50,8 +50,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this.pushInHistory(`uiPreferLayer-${layer}`);
   }
 
-  getSimulcastLayer() {
-    return (this.stream as HMSRemoteStream).getSimulcastLayer();
+  getCurrentLayer() {
+    return (this.stream as HMSRemoteStream).getVideoLayer();
   }
 
   getExpectedLayer() {
@@ -130,7 +130,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private pushInHistory(action: string) {
     if (MAINTAIN_TRACK_HISTORY) {
-      this.history.push({ name: action, layer: this.getSimulcastLayer(), degraded: this.degraded });
+      this.history.push({ name: action, layer: this.getCurrentLayer(), degraded: this.degraded });
     }
   }
 
@@ -166,7 +166,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @private
    */
   private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer, source: string) {
-    const currLayer = this.getSimulcastLayer();
+    const currLayer = this.getCurrentLayer();
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
