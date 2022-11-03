@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
+import { useDarkMode } from 'storybook-dark-mode';
 import type { Theme } from './stitches.config';
 import { createTheme, theme } from './stitches.config';
 import useSSR from './useSSR';
@@ -51,13 +51,12 @@ export const ThemeContext = React.createContext(defaultContext);
  * </ThemeProvider>
  */
 export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderProps>> = ({
-  themeType,
   theme: userTheme,
   aspectRatio = defaultAspectRatio,
   children,
 }) => {
-  const systemTheme = useMedia('prefers-color-scheme: dark') ? ThemeTypes.dark : ThemeTypes.light;
-  const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
+  const isDark = useDarkMode();
+  const [currentTheme, setCurrentTheme] = useState(isDark ? ThemeTypes.dark : ThemeTypes.light);
   const previousClassName = useRef('');
   const { isBrowser } = useSSR();
   const updatedTheme = useMemo(() => {
@@ -85,10 +84,8 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   );
 
   useEffect(() => {
-    if (themeType) {
-      setCurrentTheme(themeType);
-    }
-  }, [themeType]);
+    setCurrentTheme(isDark ? ThemeTypes.dark : ThemeTypes.light);
+  }, [isDark]);
 
   return (
     <ThemeContext.Provider

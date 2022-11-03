@@ -37,11 +37,11 @@ const ChatStory = () => {
   );
 };
 
-const ChatExample = () => {
+const Chat = () => {
   return (
     <StoryHMSProviderWrapper>
       <ChatStory />
     </StoryHMSProviderWrapper>
   );
 }
-export const ChatStoryExample = ChatExample.bind({});
+export const ChatStoryExample = Chat.bind({});
