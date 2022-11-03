@@ -1,7 +1,7 @@
 import React from 'react';
 import { themes } from '@storybook/theming';
 import { setUpFakeStore } from '../src/store/SetupFakeStore';
-import {DecoratorFn} from '@storybook/react';
+import { DecoratorFn } from '@storybook/react';
 import { HMSThemeProvider } from '../src/Theme';
 
 export const parameters = {
@@ -18,7 +18,6 @@ export const parameters = {
     dark: { ...themes.dark, appBg: '#181818' },
     // Override the default light theme
     light: { ...themes.normal, appBg: 'lightgray' },
-    current: 'dark'
   },
 };
 
