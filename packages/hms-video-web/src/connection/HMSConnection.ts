@@ -114,13 +114,16 @@ export default abstract class HMSConnection {
 
           const logSelectedCandidate = () => {
             // @ts-expect-error
-            const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
-            HMSLogger.d(
-              TAG,
-              `${HMSConnectionRole[this.role]} connection`,
-              `selected ${kindOfTrack || 'unknown'} candidate pair`,
-              JSON.stringify(selectedCandidatePair, null, 2),
-            );
+            if (typeof iceTransport.getSelectedCandidatePair === 'function') {
+              // @ts-expect-error
+              const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+              HMSLogger.d(
+                TAG,
+                `${HMSConnectionRole[this.role]} connection`,
+                `selected ${kindOfTrack || 'unknown'} candidate pair`,
+                JSON.stringify(selectedCandidatePair, null, 2),
+              );
+            }
           };
 
           // @ts-expect-error
