@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import type { Theme } from './stitches.config';
 import { createTheme, theme } from './stitches.config';
 import useSSR from './useSSR';
@@ -55,8 +56,8 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   aspectRatio = defaultAspectRatio,
   children,
 }) => {
-  const systemTheme = themeType === ThemeTypes.dark ? ThemeTypes.dark : ThemeTypes.light;
-  const [currentTheme, setCurrentTheme] = useState(systemTheme);
+  const systemTheme = useMedia('prefers-color-scheme: dark') ? ThemeTypes.dark : ThemeTypes.light;
+  const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
   const previousClassName = useRef('');
   const { isBrowser } = useSSR();
   const updatedTheme = useMemo(() => {
