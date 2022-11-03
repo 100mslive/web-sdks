@@ -1,7 +1,4 @@
 
-const path = require('path');
-const webpack = require('webpack');
-
 module.exports = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   core: {
@@ -12,7 +9,7 @@ module.exports = {
     {
       name: '@storybook/addon-essentials',
       options: {
-        actions: false,
+        actions: true,
         controls: false,
         measure: false,
         outline: false,

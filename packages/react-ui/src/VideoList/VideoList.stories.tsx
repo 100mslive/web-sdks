@@ -4,6 +4,7 @@ import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
 import { StyledVideoList } from './StyledVideoList';
 import { getLeft } from './videoListUtils';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import Video from '../Video/Video';
 import { StyledVideoTile } from '../VideoTile';
 
@@ -79,7 +80,14 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
   );
 };
 
-const Template: ComponentStory<typeof VideoListStory> = args => <VideoListStory {...args} />;
+const Template: ComponentStory<typeof VideoListStory> = args => {
+ return (
+  <StoryHMSProviderWrapper>
+    <VideoListStory {...args} />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 
 export const Example = Template.bind({});
 

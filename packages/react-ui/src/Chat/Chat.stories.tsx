@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { selectHMSMessages, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import ChatDocs from './Chat.mdx';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const ChatStories = {
   title: 'Chat/Broadcast Message',
@@ -14,7 +15,7 @@ const ChatStories = {
 
 export default ChatStories;
 
-const ChatExample = () => {
+const ChatStory = () => {
   const chats = useHMSStore(selectHMSMessages);
   const actions = useHMSActions();
   const [input, setInput] = useState('');
@@ -36,4 +37,11 @@ const ChatExample = () => {
   );
 };
 
+const ChatExample = () => {
+  return (
+    <StoryHMSProviderWrapper>
+      <ChatStory />
+    </StoryHMSProviderWrapper>
+  );
+}
 export const ChatStoryExample = ChatExample.bind({});

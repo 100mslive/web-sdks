@@ -2,12 +2,20 @@ import React from 'react';
 import { useVideo } from '@100mslive/react-sdk';
 import UseVideoDocs from './UseVideo.mdx';
 import { StyledVideo } from './Video';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
-const VideoHook = () => {
+const VideoHookWrapper = () => {
   const { videoRef } = useVideo({
     trackId: '1',
   });
   return <StyledVideo ref={videoRef} autoPlay playsInline muted />;
+}
+const VideoHook = () => {
+  return (
+    <StoryHMSProviderWrapper>
+      <VideoHookWrapper />
+    </StoryHMSProviderWrapper>
+  )
 };
 
 const VideoStories = {

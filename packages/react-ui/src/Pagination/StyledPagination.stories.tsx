@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '.';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 type PaginationProps = {
   page: number;
@@ -59,18 +60,25 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
   );
 };
 
+const PaginationComponentWrapper = (args: PaginationProps) => {
+  return ( 
+    <StoryHMSProviderWrapper>
+      <PaginationComponent {...args} />
+    </StoryHMSProviderWrapper>
+  );
+}
 export default {
   title: 'UI Components/Pagination',
-  component: PaginationComponent,
+  component: PaginationComponentWrapper,
   argTypes: {
-    setPage: { action: { type: 'click' } },
     page: { control: { type: 'number' }, defaultValue: 0 },
     numPages: { control: { type: 'number' }, defaultValue: 5 },
+    setPage: { action: { type: 'click' } },
   },
-} as ComponentMeta<typeof PaginationComponent>;
+} as ComponentMeta<typeof PaginationComponentWrapper>;
 
 const Template: ComponentStory<typeof PaginationComponent> = args => {
-  return <PaginationComponent {...args} />;
+  return <PaginationComponentWrapper {...args} />;
 };
 
 export const Example = Template.bind({});
