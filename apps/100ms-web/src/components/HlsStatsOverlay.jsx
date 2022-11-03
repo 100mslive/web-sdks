@@ -11,7 +11,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
         maxWidth: "60%",
         "@md": { maxWidth: "60%" },
         "@sm": { maxWidth: "100%" },
-        padding: "$8",
+        padding: "$2 $4 $2 $4",
         zIndex: 100,
         backgroundColor: "rgba(101,112,128, 0.25)",
       }}
