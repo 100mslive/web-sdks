@@ -89,25 +89,21 @@ const HLSView = () => {
         setCurrentSelectedQualityText("Auto");
       });
     } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
-      videoRef.current.src = hlsUrl;
+      if (!videoRef.current.src) {
+        videoRef.current.src = hlsUrl;
+      }
     }
   }
 
   useEffect(() => {
-    console.log("MOUNTING....");
-  }, []);
-  useEffect(() => {
     if (hlsStats) {
       if (enablHlsStats && !isStatsSubscribed) {
-        console.log("SUBBING");
-        // hlsStats.subscribe(5000, state => {
-        //   console.log("GOT STATE");
-        //   setHlsStatsState(state);
-        // });
+        hlsStats.subscribe(3000, state => {
+          setHlsStatsState(state);
+        });
         setIsStatsSubscribed(true);
       } else if (!enablHlsStats && isStatsSubscribed) {
-        console.log("UN SUBBING");
-        // hlsStats.unsubscribe();
+        hlsStats.unsubscribe();
         setIsStatsSubscribed(false);
       }
     }
@@ -131,18 +127,24 @@ const HLSView = () => {
     [availableLevels] //eslint-disable-line
   );
 
+  const sfnOverlayClose = () => {
+    hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
+  };
+
   const sfnHiddenSwitchHandler = event => {
-    console.log("CLICK", event);
     if (event.detail === 5) {
-      hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
+      sfnOverlayClose();
     }
   };
+
   return (
     <Fragment>
-      {/* {hlsStatsState?.url && enablHlsStats ? (
-        // <HlsStatsOverlay hlsStatsState={hlsStatsState} />
-        <h1 style={{ position: "absolute", color:"#FAFAFA" }}>OVERLAY</h1>
-      ) : null} */}
+      {hlsStatsState?.url && enablHlsStats ? (
+        <HlsStatsOverlay
+          hlsStatsState={hlsStatsState}
+          onClose={sfnOverlayClose}
+        />
+      ) : null}
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
