@@ -2,6 +2,7 @@ import React from 'react';
 import { MicOffIcon } from '@100mslive/react-icons';
 import { StyledVideoTile } from './StyledVideoTile';
 import VideoTileDocs from './VideoTile.mdx';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import Video from '../Video/Video';
 
 const VideoTileMeta = {
@@ -17,15 +18,17 @@ export default VideoTileMeta;
 
 const VideoTileStory = () => {
   return (
-    <StyledVideoTile.Root css={{ width: 500, height: 300 }}>
-      <StyledVideoTile.Container>
-        <Video trackId="1" />
-        <StyledVideoTile.Info>Deepankar</StyledVideoTile.Info>
-        <StyledVideoTile.AudioIndicator>
-          <MicOffIcon />
-        </StyledVideoTile.AudioIndicator>
-      </StyledVideoTile.Container>
-    </StyledVideoTile.Root>
+    <StoryHMSProviderWrapper>
+      <StyledVideoTile.Root css={{ width: 500, height: 300 }}>
+        <StyledVideoTile.Container>
+          <Video trackId="1" />
+          <StyledVideoTile.Info>Deepankar</StyledVideoTile.Info>
+          <StyledVideoTile.AudioIndicator>
+            <MicOffIcon />
+          </StyledVideoTile.AudioIndicator>
+        </StyledVideoTile.Container>
+      </StyledVideoTile.Root>
+    </StoryHMSProviderWrapper>
   );
 };
 

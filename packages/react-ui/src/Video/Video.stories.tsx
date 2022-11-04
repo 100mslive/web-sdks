@@ -1,13 +1,22 @@
 import React from 'react';
 import { Video } from './Video';
 import VideoDocs from './Video.mdx';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VideoComponent = () => {
-  return <Video trackId="2" />;
+  return (
+    <StoryHMSProviderWrapper>
+      <Video trackId="2" />
+    </StoryHMSProviderWrapper>
+  )
 };
 
 const StyledVideoComponent = () => {
-  return <Video css={{ width: 500, height: 300 }} trackId="2" />;
+  return (
+    <StoryHMSProviderWrapper>
+      <Video css={{ width: 500, height: 300 }} trackId="2" />;
+    </StoryHMSProviderWrapper>
+  );
 };
 
 const VideoStories = {

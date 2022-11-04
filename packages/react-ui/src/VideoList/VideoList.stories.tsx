@@ -6,6 +6,7 @@ import { StyledVideoList } from './StyledVideoList';
 import mdx from './useVideoList.mdx';
 import { getLeft } from './videoListUtils';
 import { StyledPagination } from '../Pagination';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import Video from '../Video/Video';
 import { StyledVideoTile } from '../VideoTile';
 
@@ -142,7 +143,14 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
   );
 };
 
-const Template: ComponentStory<typeof VideoListStory> = args => <VideoListStory {...args} />;
+const Template: ComponentStory<typeof VideoListStory> = args => {
+ return (
+  <StoryHMSProviderWrapper>
+    <VideoListStory {...args} />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 
 export const Example = Template.bind({});
 Example.storyName = 'useVideoList';

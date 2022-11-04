@@ -1,20 +1,27 @@
 import React from 'react';
-import { ComponentStory } from '@storybook/react';
 import { useVideo } from '@100mslive/react-sdk';
 import UseVideoDocs from './UseVideo.mdx';
-import { StyledVideo } from '../Video/Video';
+import { StyledVideo } from '../Video';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
-const VideoHook: ComponentStory<typeof StyledVideo> = () => {
+const VideoHook = () => {
   const { videoRef } = useVideo({
     trackId: '1',
   });
+  return <StyledVideo ref={videoRef} autoPlay playsInline muted />;
+}
 
-  return <StyledVideo css={{ bg: '$backgroundDark', maxWidth: '800px' }} ref={videoRef} autoPlay muted />;
-};
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <VideoHook />
+  </StoryHMSProviderWrapper>
+ );
+}
 
 const VideoStories = {
   title: 'Hooks/useVideo',
-  component: VideoHook,
+  component: Template,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   parameters: {
     docs: {
@@ -25,5 +32,5 @@ const VideoStories = {
 
 export default VideoStories;
 
-export const UseVideoHook = VideoHook.bind({});
+export const UseVideoHook = Template.bind({});
 UseVideoHook.storyName = 'useVideo';
