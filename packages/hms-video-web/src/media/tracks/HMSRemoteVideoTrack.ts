@@ -101,7 +101,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
     const isDegraded = layerUpdate.subscriber_degraded;
-    this._degraded = isDegraded;
+    // TODO: remove && check later when degraded status handling is updated. This is to keep in sink with android and ios
+    this._degraded = isDegraded && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
