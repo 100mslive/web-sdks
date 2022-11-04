@@ -10,7 +10,7 @@ export class StatsForNerdsController {
     this.adapter = hlsJsAdapter;
   }
 
-  subscribe(interval: number, callback: (state: HlsPlayerStats) => void) {
+  subscribe(callback: (state: HlsPlayerStats) => void, interval = 2000) {
     this.adapter.startGatheringStats();
     //@ts-ignore
     this.intervalFunctionId = setInterval(() => {

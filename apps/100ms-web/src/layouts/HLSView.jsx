@@ -61,44 +61,51 @@ const HLSView = () => {
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
 
-  if (videoRef.current && hlsUrl) {
-    if (Hls.isSupported() && !hlsController) {
-      hlsController = new HLSController(hlsUrl, videoRef);
-      hlsStats = new HlsStats(
-        hlsController.getHlsJsInstance(),
-        videoRef.current
-      );
-
-      hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-        setIsVideoLive(false);
-      });
-      hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
-        console.log(
-          `%c Payload: ${payload}`,
-          "color:#2b2d42; background:#d80032"
+  useEffect(() => {
+    if (videoRef.current && hlsUrl) {
+      if (Hls.isSupported()) {
+        hlsController = new HLSController(hlsUrl, videoRef);
+        hlsStats = new HlsStats(
+          hlsController.getHlsJsInstance(),
+          videoRef.current
         );
-        console.log(rest);
-        ToastManager.addToast({
-          title: `Payload from timed Metadata ${payload}`,
-        });
-      });
 
-      hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
-        const onlyVideoLevels = removeAudioLevels(levels);
-        setAvailableLevels(onlyVideoLevels);
-        setCurrentSelectedQualityText("Auto");
-      });
-    } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
-      if (!videoRef.current.src) {
-        videoRef.current.src = hlsUrl;
+        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
+          setIsVideoLive(false);
+        });
+        hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
+          console.log(
+            `%c Payload: ${payload}`,
+            "color:#2b2d42; background:#d80032"
+          );
+          console.log(rest);
+          ToastManager.addToast({
+            title: `Payload from timed Metadata ${payload}`,
+          });
+        });
+
+        hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
+          const onlyVideoLevels = removeAudioLevels(levels);
+          setAvailableLevels(onlyVideoLevels);
+          setCurrentSelectedQualityText("Auto");
+        });
+      } else if (
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
+      ) {
+        if (!videoRef.current.src) {
+          videoRef.current.src = hlsUrl;
+        }
       }
     }
-  }
+    return () => {
+      hlsStats = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (hlsStats) {
       if (enablHlsStats && !isStatsSubscribed) {
-        hlsStats.subscribe(3000, state => {
+        hlsStats.subscribe(state => {
           setHlsStatsState(state);
         });
         setIsStatsSubscribed(true);

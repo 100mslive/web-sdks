@@ -22,119 +22,54 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
           <CloseIcon />
         </IconButton>
       </Flex>
-      <Flex id="hls-stats-row" gap={1}>
-        <Text
-          id="hls-stats-label"
-          css={{
-            width: "30%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
+      <HlsStatsRow label="URL">
+        <a
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+          href={hlsStatsState?.url}
+          target="_blank"
+          rel="noreferrer"
         >
-          URL
-        </Text>
-        <Text
-          id="hls-stats-value"
-          css={{
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-            width: "70%",
-            cursor: "pointer",
-            textDecoration: "underline",
-            overflowWrap: "break-word",
-          }}
-        >
-          <a
-            href={`${hlsStatsState?.url}`}
-            target="_blank"
-            rel="noreferrer"
-          >{`${hlsStatsState?.url}`}</a>
-        </Text>
-      </Flex>
-      <Flex id="hls-stats-row" gap={2}>
-        <Text
-          id="hls-stats-label"
-          css={{
-            width: "30%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >
-          Video Size
-        </Text>
-        <Text
-          id="hls-stats-value"
-          css={{
-            width: "70%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >{` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}</Text>
-      </Flex>
-      <Flex id="hls-stats-row" gap={2}>
-        <Text
-          id="hls-stats-label"
-          css={{
-            width: "30%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >
-          Buffer Health
-        </Text>
-        <Text
-          id="hls-stats-value"
-          css={{
-            width: "70%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >
-          {hlsStatsState?.bufferHealth?.toFixed(2)}
-        </Text>
-      </Flex>
-      <Flex id="hls-stats-row" gap={2}>
-        <Text
-          id="hls-stats-label"
-          css={{
-            width: "30%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >
-          Connection Speed
-        </Text>
-        <Text
-          id="hls-stats-value"
-          css={{
-            width: "70%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >{`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(
-          2
-        )}Mbps`}</Text>
-      </Flex>
-      <Flex id="hls-stats-row" gap={2}>
-        <Text
-          id="hls-stats-label"
-          css={{
-            width: "30%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >
-          Bitrate
-        </Text>
-        <Text
-          id="hls-stats-value"
-          css={{
-            width: "70%",
-            "@md": { fontSize: "$md" },
-            "@sm": { fontSize: "$sm" },
-          }}
-        >{`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}</Text>
-      </Flex>
+          {hlsStatsState?.url}
+        </a>
+      </HlsStatsRow>
+      <HlsStatsRow label="Video Size">
+        {` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}
+      </HlsStatsRow>
+      <HlsStatsRow label="Buffer Health">
+        {hlsStatsState?.bufferHealth?.toFixed(2)}{" "}
+      </HlsStatsRow>
+      <HlsStatsRow label="Connection Speed">
+        {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(2)}Mbps`}
+      </HlsStatsRow>
+      <HlsStatsRow label="Bitrate">
+        {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}
+      </HlsStatsRow>
     </Flex>
   );
 }
+
+const HlsStatsRow = ({ label, children }) => {
+  return (
+    <Flex id="hls-stats-row" gap={1}>
+      <Text
+        css={{
+          width: "30%",
+          "@md": { fontSize: "$md" },
+          "@sm": { fontSize: "$sm" },
+        }}
+      >
+        {label}
+      </Text>
+      <Text
+        css={{
+          "@md": { fontSize: "$md" },
+          "@sm": { fontSize: "$sm" },
+          width: "70%",
+          overflowWrap: "break-word",
+        }}
+      >
+        {children}
+      </Text>
+    </Flex>
+  );
+};
