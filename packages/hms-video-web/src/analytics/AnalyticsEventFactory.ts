@@ -125,7 +125,7 @@ export default class AnalyticsEventFactory {
     error,
   }: {
     selection: Partial<SelectedDevices>;
-    type?: 'change' | 'list';
+    type?: 'change' | 'list' | 'audioInput' | 'audioOutput' | 'video';
     devices: DeviceMap;
     error?: Error;
   }) {
