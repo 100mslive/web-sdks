@@ -1,5 +1,4 @@
 import React from 'react';
-import { ComponentStory } from '@storybook/react';
 import { useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import mdx from './UseScreenShare.mdx';
@@ -8,8 +7,9 @@ import { Flex } from '../Layout';
 import { Text } from '../Text';
 import { Tooltip } from '../Tooltip';
 import { Video } from '../Video';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
-const ScreenShare: ComponentStory<typeof Tooltip> = () => {
+const ScreenShare = () => {
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
   const isVideoScreenshare = amIScreenSharing && !!video;
 
@@ -34,9 +34,17 @@ const ScreenShare: ComponentStory<typeof Tooltip> = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <ScreenShare />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const Story = {
   title: 'Hooks/useScreenShare',
-  component: ScreenShare,
+  component: Template,
   parameters: {
     docs: {
       page: mdx,
@@ -46,5 +54,5 @@ const Story = {
 
 export default Story;
 
-export const UseScreenShare = ScreenShare.bind({});
+export const UseScreenShare = Template.bind({});
 UseScreenShare.storyName = 'useScreenShare';

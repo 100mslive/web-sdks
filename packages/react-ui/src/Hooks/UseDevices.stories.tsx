@@ -5,6 +5,7 @@ import mdx from './UseDevices.mdx'
 import { Dropdown } from '../Dropdown';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const DialogDropdownTrigger = ({ title, css, open, icon, titleCSS = {} }) => {
   return (
@@ -135,9 +136,17 @@ const Devices = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <Devices />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const Story = {
   title: 'Hooks/useDevices',
-  component: Devices,
+  component: Template,
   parameters: {
     docs: {
       page: mdx,
@@ -147,5 +156,5 @@ const Story = {
 
 export default Story;
 
-export const UseDevices = Devices.bind({});
+export const UseDevices = Template.bind({});
 UseDevices.storyName = 'useDevices';

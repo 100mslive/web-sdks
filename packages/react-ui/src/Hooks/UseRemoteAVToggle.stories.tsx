@@ -5,6 +5,7 @@ import UseRemoteAVToggleDocs from './UseRemoteAVToggle.mdx';
 import { Button } from '../Button';
 import { Box, Flex } from '../Layout';
 import Video, { StyledVideo } from '../Video/Video';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const videoTrackId = '1';
@@ -25,9 +26,17 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <VideoHook />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const VideoStories = {
   title: 'Hooks/useRemoteAVToggle',
-  component: VideoHook,
+  component: Template,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   parameters: {
     docs: {
@@ -38,5 +47,5 @@ const VideoStories = {
 
 export default VideoStories;
 
-export const UseVideoHook = VideoHook.bind({});
+export const UseVideoHook = Template.bind({});
 UseVideoHook.storyName = 'useRemoteAVToggle';

@@ -7,6 +7,7 @@ import { Box, Flex } from '../Layout';
 import { Slider } from '../Slider';
 import { StoryBookSDK } from '../store/StorybookSDK';
 import { Text } from '../Text';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const AudioLevelStyles = () => {
   const trackId = '101';
@@ -41,9 +42,17 @@ const AudioLevelStyles = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <AudioLevelStyles />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const AudioLevelStylesStory = {
   title: 'Hooks/useAudioLevelStyles',
-  component: AudioLevelStyles,
+  component: Template,
   parameters: {
     docs: {
       page: mdx,
@@ -53,5 +62,5 @@ const AudioLevelStylesStory = {
 
 export default AudioLevelStylesStory;
 
-export const UseAudioLevelStyles = AudioLevelStyles.bind({});
+export const UseAudioLevelStyles = Template.bind({});
 UseAudioLevelStyles.storyName = 'useAudioLevelStyles';

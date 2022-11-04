@@ -4,6 +4,7 @@ import UseParticipantsDocs from './UseParticipants.mdx';
 import { Avatar } from '../Avatar';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VirtualizedParticipants = ({ participants }: { participants: HMSPeer[] }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -51,9 +52,17 @@ const UseParticipants = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <UseParticipants />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const Participants = {
   title: 'Hooks/useParticipants',
-  component: UseParticipants,
+  component: Template,
   parameters: {
     docs: {
       page: UseParticipantsDocs,
@@ -63,5 +72,5 @@ const Participants = {
 
 export default Participants;
 
-export const UseParticipantsHook = UseParticipants.bind({});
+export const UseParticipantsHook = Template.bind({});
 UseParticipantsHook.storyName = 'useParticipants';

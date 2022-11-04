@@ -5,6 +5,7 @@ import mdx from './UseCustomEvent.mdx';
 import { Button } from '../Button';
 import { Toast } from '../Toast/Toast';
 import { StyledVideo } from '../Video/Video';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);
@@ -35,9 +36,17 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <VideoHook />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const VideoStories = {
   title: 'Hooks/useCustomEvent',
-  component: VideoHook,
+  component: Template,
   parameters: {
     docs: {
       page: mdx,
@@ -47,5 +56,5 @@ const VideoStories = {
 
 export default VideoStories;
 
-export const UseVideoHook = VideoHook.bind({});
+export const UseVideoHook = Template.bind({});
 UseVideoHook.storyName = 'useCustomEvent';

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HMSException } from '@100mslive/hms-video';
 import { useAutoplayError, useHMSActions } from '@100mslive/react-sdk';
 import { Box,Button, Dialog, Flex, HorizontalDivider, Text } from '@100mslive/react-ui';
 import mdx from './UseAutoplayError.mdx';
 import { StoryBookSDK } from '../store/StorybookSDK';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const DialogContent = ({
   title,
@@ -100,9 +101,17 @@ const UseAutoplayErrorHook = () => {
   );
 };
 
+const Template = () => {
+ return (
+  <StoryHMSProviderWrapper>
+    <UseAutoplayErrorHook />
+  </StoryHMSProviderWrapper>
+ );
+}
+
 const AutoplayErrorStories = {
   title: 'Hooks/useAutoplayError',
-  component: UseAutoplayErrorHook,
+  component: Template,
   parameters: {
     docs: {
       page: mdx,
@@ -112,5 +121,5 @@ const AutoplayErrorStories = {
 
 export default AutoplayErrorStories;
 
-export const UseAutoplayErroHook = UseAutoplayErrorHook.bind({});
+export const UseAutoplayErroHook = Template.bind({});
 UseAutoplayErroHook.storyName = 'useAutoplayError';
