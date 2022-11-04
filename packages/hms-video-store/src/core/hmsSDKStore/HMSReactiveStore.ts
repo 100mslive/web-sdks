@@ -65,7 +65,7 @@ export class HMSReactiveStore {
 
     if (isBrowser) {
       window.__hms = this;
-      window.__beam = new BeamControllerStore(this.store, this.actions);
+      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
     }
   }
 
