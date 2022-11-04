@@ -1,8 +1,8 @@
 import React from 'react';
 import { useVideo } from '@100mslive/react-sdk';
 import UseVideoDocs from './UseVideo.mdx';
-import { StyledVideo } from '../Video';
 import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
+import { StyledVideo } from '../Video';
 
 const VideoHook = () => {
   const { videoRef } = useVideo({

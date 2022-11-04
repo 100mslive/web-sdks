@@ -5,8 +5,8 @@ import { ChevronLeftIcon, ChevronRightIcon, MicOffIcon } from '@100mslive/react-
 import { StyledVideoList } from './StyledVideoList';
 import mdx from './useVideoList.mdx';
 import { getLeft } from './videoListUtils';
-import { StyledPagination } from '../Pagination';
 import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
+import { StyledPagination } from '../Pagination';
 import Video from '../Video/Video';
 import { StyledVideoTile } from '../VideoTile';
 

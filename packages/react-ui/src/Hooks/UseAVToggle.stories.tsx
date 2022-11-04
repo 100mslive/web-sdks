@@ -3,9 +3,9 @@ import { ComponentStory } from '@storybook/react';
 import { selectLocalVideoTrackID, useAVToggle, useHMSStore } from '@100mslive/react-sdk';
 import UseAVToggleDocs from './UseAVToggle.mdx';
 import { Button } from '../Button';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import { Box, Flex } from '../Layout';
 import Video, { StyledVideo } from '../Video/Video';
-import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const localVideoTrackID = useHMSStore(selectLocalVideoTrackID);
@@ -27,12 +27,12 @@ const VideoHook: ComponentStory<typeof StyledVideo> = () => {
 };
 
 const Template = () => {
- return (
-  <StoryHMSProviderWrapper>
-    <VideoHook />
-  </StoryHMSProviderWrapper>
- );
-}
+  return (
+    <StoryHMSProviderWrapper>
+      <VideoHook />
+    </StoryHMSProviderWrapper>
+  );
+};
 
 const VideoStories = {
   title: 'Hooks/useAVToggle',

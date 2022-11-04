@@ -3,11 +3,11 @@ import { selectTrackAudioByID, useHMSActions, useHMSStore } from '@100mslive/rea
 import mdx from './UseAudioLevelStyles.mdx';
 import { useBorderAudioLevel } from '../AudioLevel';
 import { Avatar } from '../Avatar';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import { Box, Flex } from '../Layout';
 import { Slider } from '../Slider';
 import { StoryBookSDK } from '../store/StorybookSDK';
 import { Text } from '../Text';
-import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const AudioLevelStyles = () => {
   const trackId = '101';

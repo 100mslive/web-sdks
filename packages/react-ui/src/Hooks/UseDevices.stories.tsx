@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { DeviceType, useDevices } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, SpeakerIcon } from '@100mslive/react-icons';
 import mdx from './UseDevices.mdx'
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import { Dropdown } from '../Dropdown';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
-import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const DialogDropdownTrigger = ({ title, css, open, icon, titleCSS = {} }) => {
   return (

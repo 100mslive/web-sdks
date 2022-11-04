@@ -2,12 +2,12 @@ import React from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import mdx from './UseScreenShare.mdx';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import { IconButton } from '../IconButton';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
 import { Tooltip } from '../Tooltip';
 import { Video } from '../Video';
-import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const ScreenShare = () => {
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();

@@ -3,9 +3,9 @@ import { ComponentStory } from '@storybook/react';
 import { useCustomEvent } from '@100mslive/react-sdk';
 import mdx from './UseCustomEvent.mdx';
 import { Button } from '../Button';
+import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 import { Toast } from '../Toast/Toast';
 import { StyledVideo } from '../Video/Video';
-import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
   const [open, setOpen] = useState(false);
