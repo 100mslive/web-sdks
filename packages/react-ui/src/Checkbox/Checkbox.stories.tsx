@@ -12,7 +12,7 @@ export default {
     onCheckedChange: { action: { type: 'clicked' } },
     checked: { control: { type: 'boolean' } },
     label: { control: { type: 'text' } },
-    css: { control: { type: 'object' } },
+    css: { table: { disable: true } },
   },
   args: {
     checked: true,

@@ -7,6 +7,9 @@ import { Flex } from '../Layout';
 export default {
   title: 'UI Components/Loading',
   component: Loading,
+  argTypes: {
+    css: { table: { disable: true } },
+  },
   parameters: {
     docs: {
       page: mdx,

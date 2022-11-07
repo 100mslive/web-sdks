@@ -18,7 +18,7 @@ export default {
   component: Footer.Root,
   argTypes: {
     as: { table: { disable: true } },
-    css: { control: { type: 'object' } },
+    css: { table: { disable: true } },
   },
 } as ComponentMeta<typeof Footer.Root>;
 

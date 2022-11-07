@@ -8,6 +8,7 @@ export default {
   argTypes: {
     ref: { table: { disable: true } },
     as: { table: { disable: true } },
+    css: { table: { disable: true } },
     placeholder: { control: { type: 'text' } },
     error: { control: { type: 'boolean' } },
   },

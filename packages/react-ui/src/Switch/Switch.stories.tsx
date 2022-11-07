@@ -9,6 +9,7 @@ export default {
   component: Switch,
   argTypes: {
     asChild: { control: false },
+    css: { table: { disable: true } },
   },
   args: {
     disabled: false,

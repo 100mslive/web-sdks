@@ -6,6 +6,9 @@ import { Box } from '..';
 export default {
   title: 'UI Components/Slider',
   component: Slider,
+  argTypes: {
+    css: { table: { disable: true } },
+  },
 } as ComponentMeta<typeof Slider>;
 
 const Template: ComponentStory<typeof Slider> = () => {

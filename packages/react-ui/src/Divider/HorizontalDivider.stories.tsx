@@ -10,6 +10,7 @@ export default {
   argTypes: {
     ref: { table: { disable: true } },
     as: { table: { disable: true } },
+    css: { table: { disable: true } },
     space: { defaultValue: 1, control: { type: 'number', min: 1, max: 4 } },
   },
 } as ComponentMeta<typeof HorizontalDivider>;

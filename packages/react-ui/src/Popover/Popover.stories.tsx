@@ -13,9 +13,9 @@ import { Text } from '../Text';
 export default {
   title: 'UI Components/Popover',
   component: Popover.Root,
-  argTypes: { onClick: { action: 'clicked' } },
-  args: {
-    css: {},
+  argTypes: {
+    onClick: { action: 'clicked' },
+    css: { table: { disable: true } },
   },
   parameters: {
     docs: {

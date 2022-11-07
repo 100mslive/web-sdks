@@ -6,6 +6,8 @@ export default {
   title: 'UI Components/Text',
   component: Text,
   argTypes: {
+    css: { table: { disable: true } },
+    as: { table: { disable: true } },
     variant: {
       control: {
         type: 'select',

@@ -14,6 +14,7 @@ export default {
     outlined: { description: 'Give button an outlined style' },
     icon: { description: 'Give space between children' },
     loading: { description: 'Button is in a loading state' },
+    css: { table: { disable: true } },
   },
   parameters: {
     docs: {

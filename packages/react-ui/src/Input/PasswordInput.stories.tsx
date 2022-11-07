@@ -8,7 +8,7 @@ export default {
   title: 'UI Components/PasswordInput',
   component: PasswordInput.Root,
   argTypes: {
-    css: { control: 'object' },
+    css: { table: { disable: true } },
   },
 } as ComponentMeta<typeof PasswordInput.Root>;
 

@@ -5,6 +5,9 @@ import { Accordion } from '.';
 export default {
   title: 'UI Components/Accordion',
   component: Accordion.Root,
+  argTypes: {
+    css: { table: { disable: true } },
+  },
 } as ComponentMeta<typeof Accordion.Root>;
 
 function AccordionItem({ value, header, content }: { value: string; header: string; content: string }) {

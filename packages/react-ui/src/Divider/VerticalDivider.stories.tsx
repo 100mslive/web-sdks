@@ -12,7 +12,7 @@ export default {
   argTypes: {
     ref: { table: { disable: true }, control: { type: null } },
     as: { table: { disable: true }, control: { type: null } },
-    css: { control: { type: 'object' } },
+    css: { table: { disable: true } },
     space: { defaultValue: 1, control: { type: 'number', min: 1, max: 4 } },
   },
 } as ComponentMeta<typeof VerticalDivider>;

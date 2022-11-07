@@ -11,6 +11,7 @@ export default {
   argTypes: {
     ref: { table: { disable: true } },
     as: { table: { disable: true } },
+    css: { table: { disable: true } },
   },
 } as ComponentMeta<typeof Fieldset>;
 

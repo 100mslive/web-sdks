@@ -13,7 +13,10 @@ import { Text } from '../Text';
 export default {
   title: 'UI Components/Dialog',
   component: Dialog.Root,
-  argTypes: { onClick: { action: 'clicked' } },
+  argTypes: {
+    onClick: { action: 'clicked' },
+    css: { table: { disable: true } },
+  },
   parameters: {
     docs: {
       page: DialogDocs,

@@ -7,6 +7,9 @@ import { Avatar, Box, Flex, Text, textEllipsis } from '..';
 export default {
   title: 'UI Components/Dropdown',
   component: Dropdown.Content,
+  argTypes: {
+    css: { table: { disable: true } },
+  },
 } as ComponentMeta<typeof Dropdown.Content>;
 
 const participants = [
