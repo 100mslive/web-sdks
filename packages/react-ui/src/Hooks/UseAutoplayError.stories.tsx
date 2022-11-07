@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HMSException } from '@100mslive/hms-video';
 import { useAutoplayError, useHMSActions } from '@100mslive/react-sdk';
-import { Box,Button, Dialog, Flex, HorizontalDivider, Text } from '@100mslive/react-ui';
 import mdx from './UseAutoplayError.mdx';
+import { Button } from '../Button';
 import { StoryHMSProviderWrapper } from '../common/HMSProviderWrapper';
+import { HorizontalDivider } from '../Divider';
+import { Box, Flex } from '../Layout';
+import { Dialog } from '../Modal';
 import { StoryBookSDK } from '../store/StorybookSDK';
+import { Text } from '../Text';
 
 const DialogContent = ({
   title,
@@ -102,12 +106,12 @@ const UseAutoplayErrorHook = () => {
 };
 
 const Template = () => {
- return (
-  <StoryHMSProviderWrapper>
-    <UseAutoplayErrorHook />
-  </StoryHMSProviderWrapper>
- );
-}
+  return (
+    <StoryHMSProviderWrapper>
+      <UseAutoplayErrorHook />
+    </StoryHMSProviderWrapper>
+  );
+};
 
 const AutoplayErrorStories = {
   title: 'Hooks/useAutoplayError',
