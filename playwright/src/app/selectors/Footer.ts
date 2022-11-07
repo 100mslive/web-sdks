@@ -57,7 +57,7 @@ export class Footer {
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
   chat_placeholder = 'css=[placeholder="Write something here"]';
 
-  first_chat_msg = '[data-testid="chat_msg"]';
+  first_chat_msg = 'div[data-testid="chat_msg"]';
 
   chat_peer_selector = 'text=Everyone';
   chat_to_text = '[data-testid="chat_msg"] >> p >> nth=1';

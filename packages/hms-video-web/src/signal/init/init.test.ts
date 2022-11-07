@@ -1,46 +1,48 @@
-import { HMSException } from '../../error/HMSException';
-import { userAgent } from '../../utils/support';
 import InitService, { getUrl, transformInitConfig } from './index';
+import { HMSException } from '../../error/HMSException';
+import { ENV } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
 
 describe('getUrl', () => {
-  const ua = new URLSearchParams(`user_agent=${userAgent}`).toString();
+  const userAgent = createUserAgent(ENV.PROD);
+  const userAgentQueryParam = new URLSearchParams(`user_agent_v2=${userAgent}`).toString();
   const peerId = '1234';
   it('should return the URL even if unnecesary params are passed to the endpoint', () => {
-    expect(getUrl('https://prod-init.100ms.live/something_completely_redundant?this=that', peerId, 'in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
-    );
+    expect(
+      getUrl('https://prod-init.100ms.live/something_completely_redundant?this=that', peerId, userAgent, 'in'),
+    ).toEqual(`https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${userAgentQueryParam}`);
   });
 
   it('should return the URL with regions if region is provided', () => {
-    expect(getUrl('https://prod-init.100ms.live', peerId, 'in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, 'in')).toEqual(
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, 'us')).toEqual(
-      `https://prod-init.100ms.live/init?region=us&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, 'us')).toEqual(
+      `https://prod-init.100ms.live/init?region=us&peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, ' in')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, ' in')).toEqual(
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, ' in ')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, ' in ')).toEqual(
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, 'in ')).toEqual(
-      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, 'in ')).toEqual(
+      `https://prod-init.100ms.live/init?region=in&peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, ' i n ')).toEqual(
-      `https://prod-init.100ms.live/init?region=i+n&peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, ' i n ')).toEqual(
+      `https://prod-init.100ms.live/init?region=i+n&peer_id=${peerId}&${userAgentQueryParam}`,
     );
   });
 
   it('should return the URL without region if region is not provided or invalid', () => {
-    expect(getUrl('https://prod-init.100ms.live', peerId, ' ')).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, ' ')).toEqual(
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId, '')).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent, '')).toEqual(
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${userAgentQueryParam}`,
     );
-    expect(getUrl('https://prod-init.100ms.live', peerId)).toEqual(
-      `https://prod-init.100ms.live/init?peer_id=${peerId}&${ua}`,
+    expect(getUrl('https://prod-init.100ms.live', peerId, userAgent)).toEqual(
+      `https://prod-init.100ms.live/init?peer_id=${peerId}&${userAgentQueryParam}`,
     );
   });
 });
@@ -73,6 +75,8 @@ describe('init API call', () => {
   // Wrong room ID
   const wrongToken =
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjEwY2Q5Y2JmMzBlNzczZjQ3NTc3YjBkIiwicm9vbV9pZCI6IjYxOGU5NGY1YWYzMTg4ZGYzM2U2N2Q0NyIsInVzZXJfaWQiOiJiZTM5MzQwZC04ZDgzLTQ5ZjQtOTNhMy00ZjRmMTgwZTVkZWUiLCJyb2xlIjoiaG9zdCIsImp0aSI6IjY0ZTRjMTgzLWZkNTktNGE2OS1hOGY2LWNkNGE5MzBmOTYzZSIsInR5cGUiOiJhcHAiLCJ2ZXJzaW9uIjoyLCJleHAiOjE2NTIyNjUyNzV9.tX4BZllTjOuA5L3bgItoDYKQa6J3d-L2cayvQiEntHY';
+
+  const userAgent = createUserAgent(ENV.PROD);
 
   const mockResponse = (init: RequestInit | undefined): Promise<Response> => {
     const headers = init?.headers as Record<string, string>;
@@ -128,13 +132,13 @@ describe('init API call', () => {
   global.fetch = jest.fn((_: RequestInfo, init?: RequestInit) => mockResponse(init)) as jest.Mock;
 
   it('returns correct config for correct token', async () => {
-    const config = await InitService.fetchInitConfig(correctToken, peerId);
+    const config = await InitService.fetchInitConfig({ token: correctToken, peerId, userAgent });
     expect(config.endpoint).toEqual('wss://prod-in2.100ms.live/v2/ws');
   });
 
   it('throws INIT exception for wrong token', async () => {
     try {
-      await InitService.fetchInitConfig(wrongToken, peerId);
+      await InitService.fetchInitConfig({ token: wrongToken, peerId, userAgent });
     } catch (error: any) {
       expect(error).toBeInstanceOf(HMSException);
       expect(error.name).toEqual('ServerErrors');

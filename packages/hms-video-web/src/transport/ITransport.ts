@@ -1,14 +1,18 @@
-import { HMSLocalTrack } from '../media/tracks';
-import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
 import {
+  HLSConfig,
+  HLSTimedMetadata,
   HMSPeer,
+  HMSRole,
   HMSRoleChangeRequest,
   RTMPRecordingConfig,
-  HLSConfig,
-  HMSRole,
-  HLSTimedMetadata,
 } from '../interfaces';
-import { MultiTrackUpdateRequestParams, TrackUpdateRequestParams } from '../signal/interfaces';
+import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
+import { HMSLocalTrack } from '../media/tracks';
+import {
+  GetSessionMetadataResponse,
+  MultiTrackUpdateRequestParams,
+  TrackUpdateRequestParams,
+} from '../signal/interfaces';
 
 // For AV track, we could get a normal track(true), empty track(empty) or no track at all(false)
 export type IFetchTrackOptions = boolean | 'empty';
@@ -20,7 +24,7 @@ export interface IFetchAVTrackOptions {
 export default interface ITransport {
   join(authToken: string, peerId: string, customData: any, initEndpoint?: string): Promise<void>;
 
-  leave(): Promise<void>;
+  leave(notifyServer: boolean): Promise<void>;
 
   publish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
@@ -54,6 +58,10 @@ export default interface ITransport {
   changeName(name: string): Promise<void>;
 
   changeMetadata(metadata: string): Promise<void>;
+
+  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+
+  setSessionMetadata(metadata: any): Promise<void>;
 
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 

@@ -1,11 +1,11 @@
-import HMSConnection from '../index';
-import { ISignal } from '../../signal/ISignal';
 import { IPublishConnectionObserver } from './IPublishConnectionObserver';
-import { HMSConnectionRole } from '../model';
+import { HMSLocalTrack } from '../../media/tracks';
+import { ISignal } from '../../signal/ISignal';
+import HMSTransport from '../../transport';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import HMSTransport from '../../transport';
-import { HMSLocalTrack } from '../../media/tracks';
+import HMSConnection from '../index';
+import { HMSConnectionRole } from '../model';
 
 const TAG = 'HMSPublishConnection';
 

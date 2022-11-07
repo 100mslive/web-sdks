@@ -1,14 +1,14 @@
-import { HMSSdk } from '../sdk';
-import { HMSPlaylistItem, HMSPlaylistType, HMSPlaylistManager, HMSPlaylistProgressEvent } from '../interfaces';
+import { AudioContextManager } from './AudioContextManager';
 import { PlaylistAudioManager } from './PlaylistAudioManager';
 import { PlaylistVideoManager } from './PlaylistVideoManager';
-import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { EventBus } from '../events/EventBus';
+import { HMSPlaylistItem, HMSPlaylistManager, HMSPlaylistProgressEvent, HMSPlaylistType } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { HMSSdk } from '../sdk';
 import { stringifyMediaStreamTrack } from '../utils/json';
-import { AudioContextManager } from './AudioContextManager';
+import HMSLogger from '../utils/logger';
+import { TypedEventEmitter } from '../utils/typed-event-emitter';
 
 type PlaylistManagerState<T> = {
   audio: {

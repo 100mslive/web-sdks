@@ -1,8 +1,8 @@
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { QRCode } from './QRCode';
-import { Flex } from '../Layout';
 import QRCodeDocs from './QRCode.mdx';
+import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/QRCode',
@@ -26,5 +26,4 @@ const Template: ComponentStory<typeof QRCode> = ({ ...args }) => (
   </Flex>
 );
 export const Example = Template.bind({});
-
-Example.args = {};
+Example.storyName = 'QRCode';

@@ -1,12 +1,12 @@
-import { HMSException } from '../error/HMSException';
-import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
-import { SelectedDevices } from '../device-manager';
-import { DeviceMap } from '../interfaces';
+import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
+import { SelectedDevices } from '../device-manager';
+import { HMSException } from '../error/HMSException';
+import { DeviceMap } from '../interfaces';
+import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks';
-import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -125,7 +125,7 @@ export default class AnalyticsEventFactory {
     error,
   }: {
     selection: Partial<SelectedDevices>;
-    type?: 'change' | 'list';
+    type?: 'change' | 'list' | 'audioInput' | 'audioOutput' | 'video';
     devices: DeviceMap;
     error?: Error;
   }) {

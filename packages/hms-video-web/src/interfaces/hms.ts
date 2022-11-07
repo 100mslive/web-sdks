@@ -1,21 +1,22 @@
-import { HMSConfig } from './config';
-import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
-import { HMSMessage } from './message';
-import { HMSLogLevel } from '../utils/logger';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
-import { HMSRole } from './role';
-import { HMSPreviewListener } from './preview-listener';
-import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
-import { HMSRoleChangeRequest } from './role-change-request';
-import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
-import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSHLS, HMSRecording, HMSRTMP } from './room';
-import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSConfig } from './config';
 import { HLSConfig } from './hls-config';
+import { HMSMessage } from './message';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSPlaylistManager } from './playlist';
+import { HMSPreviewListener } from './preview-listener';
+import { HMSRole } from './role';
+import { HMSRoleChangeRequest } from './role-change-request';
+import { HMSHLS, HMSRecording, HMSRTMP } from './room';
+import { RTMPRecordingConfig } from './rtmp-recording-config';
 import { ScreenShareConfig } from './track-settings';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
+import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSLogLevel } from '../utils/logger';
+
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
@@ -48,6 +49,11 @@ export default interface HMS {
   getHLSState(): HMSHLS | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
+
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
 
   /**
    * @deprecated The method should not be used

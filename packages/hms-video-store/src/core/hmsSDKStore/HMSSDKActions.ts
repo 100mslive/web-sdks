@@ -1,43 +1,4 @@
 import {
-  createDefaultStoreState,
-  HMSChangeMultiTrackStateParams,
-  HMSMediaSettings,
-  HMSMessage,
-  HMSMessageInput,
-  HMSPeer,
-  HMSPeerID,
-  HMSPlaylistType,
-  HMSRoomState,
-  HMSStore,
-  HMSTrack,
-  HMSTrackID,
-  HMSTrackSource,
-  IHMSPlaylistActions,
-} from '../schema';
-import { IHMSActions } from '../IHMSActions';
-import * as sdkTypes from './sdkTypes';
-import { SDKToHMS } from './adapter';
-import {
-  HMSRoleChangeRequest,
-  selectHMSMessagesCount,
-  selectIsLocalScreenShared,
-  selectIsLocalVideoDisplayEnabled,
-  selectIsLocalVideoEnabled,
-  selectLocalAudioTrackID,
-  selectLocalMediaSettings,
-  selectLocalPeer,
-  selectLocalTrackIDs,
-  selectLocalVideoTrackID,
-  selectPeerByID,
-  selectPermissions,
-  selectRolesMap,
-  selectRoomStarted,
-  selectRoomState,
-  selectTrackByID,
-  selectTracksMap,
-} from '../selectors';
-import { HMSLogger } from '../../common/ui-logger';
-import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
@@ -59,14 +20,54 @@ import {
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
 } from '@100mslive/hms-video';
-import { IHMSStore } from '../IHMSStore';
-
-import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
-import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState } from './internalTypes';
-import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { HMSPlaylist } from './HMSPlaylist';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { isRemoteTrack } from './sdkUtils/sdkUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import { SDKToHMS } from './adapter';
+import { HMSNotifications } from './HMSNotifications';
+import { HMSPlaylist } from './HMSPlaylist';
+import { NamedSetState } from './internalTypes';
+import * as sdkTypes from './sdkTypes';
+import { HMSLogger } from '../../common/ui-logger';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStore } from '../IHMSStore';
+import {
+  createDefaultStoreState,
+  HMSChangeMultiTrackStateParams,
+  HMSMediaSettings,
+  HMSMessage,
+  HMSMessageInput,
+  HMSPeer,
+  HMSPeerID,
+  HMSPlaylistType,
+  HMSRoomState,
+  HMSStore,
+  HMSTrack,
+  HMSTrackID,
+  HMSTrackSource,
+  HMSVideoTrack,
+  IHMSPlaylistActions,
+} from '../schema';
+import {
+  HMSRoleChangeRequest,
+  selectHMSMessagesCount,
+  selectIsLocalScreenShared,
+  selectIsLocalVideoDisplayEnabled,
+  selectIsLocalVideoEnabled,
+  selectLocalAudioTrackID,
+  selectLocalMediaSettings,
+  selectLocalPeer,
+  selectLocalTrackIDs,
+  selectLocalVideoTrackID,
+  selectPeerByID,
+  selectPermissions,
+  selectRolesMap,
+  selectRoomStarted,
+  selectRoomState,
+  selectTrackByID,
+  selectTracksMap,
+  selectVideoTrackByID,
+} from '../selectors';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -126,8 +127,8 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setAudioOutputDevice(deviceId: string): void {
-    const deviceInfo = this.sdk.getAudioOutput().setDevice(deviceId);
+  async setAudioOutputDevice(deviceId: string): Promise<void> {
+    const deviceInfo = await this.sdk.getAudioOutput().setDevice(deviceId);
     if (deviceInfo) {
       this.setState(draftStore => {
         draftStore.settings.audioOutputDeviceId = deviceId;
@@ -573,6 +574,20 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeMetadata(metadata);
   }
 
+  async setSessionMetadata(metadata: any) {
+    await this.sdk.setSessionMetadata(metadata);
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'setSessionMetadata');
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
+  }
+
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
       const track = this.hmsSDKTracks[trackID];
@@ -602,6 +617,10 @@ export class HMSSDKActions implements IHMSActions {
   setLogLevel(level: HMSLogLevel) {
     HMSLogger.level = level;
     this.sdk.setLogLevel(level);
+  }
+
+  setFrameworkInfo(frameworkInfo: sdkTypes.HMSFrameworkInfo) {
+    this.sdk.setFrameworkInfo(frameworkInfo);
   }
 
   ignoreMessageTypes(msgTypes: string[], replace = false) {
@@ -1071,13 +1090,14 @@ export class HMSSDKActions implements IHMSActions {
   private updateVideoLayer(trackID: string, action: string) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectTrackByID(trackID));
+      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
       if (hasFieldChanged) {
         this.setState(draft => {
-          draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-          draft.tracks[trackID].degraded = sdkTrack.degraded;
+          const track = draft.tracks[trackID] as HMSVideoTrack;
+          track.layer = sdkTrack.getSimulcastLayer();
+          track.degraded = sdkTrack.degraded;
         }, action);
       }
     }
@@ -1149,7 +1169,7 @@ export class HMSSDKActions implements IHMSActions {
         track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');

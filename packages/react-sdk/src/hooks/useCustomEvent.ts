@@ -1,7 +1,7 @@
-import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { useCallback, useEffect } from 'react';
 import { HMSNotificationTypes, HMSPeerID, HMSRoleName } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from './types';
+import { useHMSActions, useHMSVanillaNotifications } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
 
 export interface useCustomEventInput<T> {
@@ -17,6 +17,18 @@ export interface useCustomEventInput<T> {
    * handling event in the UI.
    */
   onEvent?: (data: T) => void;
+  /**
+   * flag to treat event payload as json.
+   * If true, the payload will be stringified before sending and
+   * parsed before calling the onEvent handler function.
+   *
+   * Set it to `false` if you want to send/receive only string messages
+   *
+   * Set it to `true` if you want to send/receive objects
+   *
+   * default value is true
+   */
+  json?: boolean;
   /**
    * function to handle errors happening during sending the event
    */
@@ -45,6 +57,8 @@ export interface useCustomEventResult<T> {
   sendEvent: (data: T, receiver?: EventReceiver) => void;
 }
 
+const stringifyData = <T>(data: T, json: boolean) => (json ? JSON.stringify(data || '') : (data as unknown as string));
+
 /**
  * A generic function to implement [custom events](https://www.100ms.live/docs/javascript/v2/features/chat#custom-events) in your UI.
  * The data to be sent to remote is expected to be a serializable JSON. The serialization
@@ -52,6 +66,7 @@ export interface useCustomEventResult<T> {
  */
 export const useCustomEvent = <T>({
   type,
+  json = true,
   onEvent,
   handleError = logErrorHandler,
 }: useCustomEventInput<T>): useCustomEventResult<T> => {
@@ -72,7 +87,7 @@ export const useCustomEvent = <T>({
       const msg = notification.data;
       if (msg && msg.type === type) {
         try {
-          const data = JSON.parse(msg.message);
+          const data = json ? JSON.parse(msg.message) : msg.message;
           onEvent?.(data as T);
         } catch (err) {
           handleError(err as Error, 'handleCustomEvent');
@@ -80,13 +95,13 @@ export const useCustomEvent = <T>({
       }
     }, HMSNotificationTypes.NEW_MESSAGE);
     return unsubscribe;
-  }, [notifications, type, onEvent, handleError]);
+  }, [notifications, type, json, onEvent, handleError]);
 
   // this is to send message to remote peers, peers of specific role or single peer, and call onEvent
   const sendEvent = useCallback(
     async (data: T, receiver?: EventReceiver) => {
       try {
-        const dataStr = JSON.stringify(data || '');
+        const dataStr = stringifyData<T>(data, json);
         if (receiver && Array.isArray(receiver?.roleNames)) {
           await actions.sendGroupMessage(dataStr, receiver.roleNames, type);
         } else if (typeof receiver?.peerId === 'string') {
@@ -99,7 +114,7 @@ export const useCustomEvent = <T>({
         handleError(err as Error, 'sendCustomEvent');
       }
     },
-    [actions, handleError, onEvent, type],
+    [actions, handleError, onEvent, type, json],
   );
 
   return { sendEvent };

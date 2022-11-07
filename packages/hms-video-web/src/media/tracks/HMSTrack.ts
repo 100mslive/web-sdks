@@ -1,6 +1,6 @@
-import HMSMediaStream from '../streams/HMSMediaStream';
 import { HMSTrackType } from './HMSTrackType';
 import { stringifyMediaStreamTrack } from '../../utils/json';
+import HMSMediaStream from '../streams/HMSMediaStream';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 

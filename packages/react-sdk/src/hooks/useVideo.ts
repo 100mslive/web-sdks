@@ -1,6 +1,6 @@
-import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
@@ -32,7 +32,7 @@ export interface useVideoOutput {
 export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const track = useHMSStore(selectTrackByID(trackId));
+  const track = useHMSStore(selectVideoTrackByID(trackId));
 
   const { ref: inViewRef, inView } = useInView({ threshold });
 

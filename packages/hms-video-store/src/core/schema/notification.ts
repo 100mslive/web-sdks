@@ -1,9 +1,9 @@
-import { HMSPeer, HMSTrack } from './peer';
-import { HMSMessage } from './message';
-import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
 import { HMSDeviceChangeEvent } from './device-change';
-import { HMSPlaylistItem } from './playlist';
 import { HMSException } from './error';
+import { HMSMessage } from './message';
+import { HMSPeer, HMSTrack } from './peer';
+import { HMSPlaylistItem } from './playlist';
+import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
 
 interface BaseNotification {
   id: number;
@@ -81,6 +81,7 @@ export type HMSNotification =
   | HMSChangeMultiTrackStateRequestNotification
   | HMSLeaveRoomRequestNotification
   | HMSDeviceChangeEventNotification
+  | HMSReconnectionNotification
   | HMSPlaylistItemNotification<any>;
 
 export enum HMSNotificationSeverity {
@@ -133,7 +134,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.ROOM_ENDED]: HMSLeaveRoomRequestNotification;
   [HMSNotificationTypes.REMOVED_FROM_ROOM]: HMSLeaveRoomRequestNotification;
   [HMSNotificationTypes.DEVICE_CHANGE_UPDATE]: HMSDeviceChangeEventNotification;
-  [HMSNotificationTypes.PLAYLIST_TRACK_ENDED]: HMSPlaylistItem<C>;
+  [HMSNotificationTypes.PLAYLIST_TRACK_ENDED]: HMSPlaylistItemNotification<C>;
   [HMSNotificationTypes.ERROR]: HMSExceptionNotification;
   [HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST]: HMSChangeTrackStateRequestNotification;
   [HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST]: HMSChangeMultiTrackStateRequestNotification;

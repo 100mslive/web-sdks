@@ -12,32 +12,33 @@ import {
   useParticipants,
 } from "@100mslive/react-sdk";
 import {
-  CrossIcon,
   ChangeRoleIcon,
+  CrossIcon,
   HandRaiseIcon,
   PeopleIcon,
   SearchIcon,
-  VerticalMenuIcon,
   SpeakerIcon,
+  VerticalMenuIcon,
 } from "@100mslive/react-icons";
 import {
-  Flex,
-  Box,
-  Text,
   Avatar,
-  textEllipsis,
-  Input,
+  Box,
   Dropdown,
+  Flex,
+  Input,
   Slider,
+  Text,
+  textEllipsis,
 } from "@100mslive/react-ui";
-import { RoleChangeModal } from "../RoleChangeModal";
-import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
-import { ParticipantFilter } from "./ParticipantFilter";
 import IconButton from "../../IconButton";
+import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
+import { RoleChangeModal } from "../RoleChangeModal";
+import { ParticipantFilter } from "./ParticipantFilter";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneToggle,
 } from "../AppData/useSidepane";
+import { isInternalRole } from "../../common/utils";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
@@ -151,7 +152,13 @@ const VirtualizedParticipants = ({
 }) => {
   const [ref, { width, height }] = useMeasure();
   return (
-    <Box ref={ref} css={{ flex: "1 1 0" }}>
+    <Box
+      ref={ref}
+      css={{
+        flex: "1 1 0",
+        mr: "-$10",
+      }}
+    >
       <FixedSizeList
         itemSize={68}
         itemCount={participants.length}
@@ -184,7 +191,7 @@ const Participant = ({
   return (
     <Flex
       key={peer.id}
-      css={{ w: "100%", py: "$4" }}
+      css={{ w: "100%", py: "$4", pr: "$10" }}
       align="center"
       data-testid={"participant_" + peer.name}
     >
@@ -211,6 +218,7 @@ const Participant = ({
       {showActions && (
         <ParticipantActions
           peerId={peer.id}
+          role={peer.roleName}
           onSettings={() => {
             onParticipantAction(peer.id);
           }}
@@ -224,7 +232,7 @@ const Participant = ({
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(({ onSettings, peerId }) => {
+const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
@@ -236,8 +244,12 @@ const ParticipantActions = React.memo(({ onSettings, peerId }) => {
     <Flex align="center" css={{ flexShrink: 0 }}>
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && <HandRaiseIcon />}
-      {shouldShowMoreActions && (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} />
+      {shouldShowMoreActions && !isInternalRole(role) && (
+        <ParticipantMoreActions
+          onRoleChange={onSettings}
+          peerId={peerId}
+          role={role}
+        />
       )}
     </Flex>
   );
@@ -258,16 +270,17 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
           <VerticalMenuIcon />
         </Text>
       </Dropdown.Trigger>
-
-      <Dropdown.Content align="end" sideOffset={8} css={{ w: "$64" }}>
-        {canChangeRole && (
-          <Dropdown.Item onClick={() => onRoleChange(peerId)}>
-            <ChangeRoleIcon />
-            <Text css={{ ml: "$4" }}>Change Role</Text>
-          </Dropdown.Item>
-        )}
-        <ParticipantVolume peerId={peerId} />
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content align="end" sideOffset={8} css={{ w: "$64" }}>
+          {canChangeRole && (
+            <Dropdown.Item onClick={() => onRoleChange(peerId)}>
+              <ChangeRoleIcon />
+              <Text css={{ ml: "$4" }}>Change Role</Text>
+            </Dropdown.Item>
+          )}
+          <ParticipantVolume peerId={peerId} />
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };
@@ -336,6 +349,8 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
         onChange={event => {
           setValue(event.currentTarget.value);
         }}
+        autoComplete="off"
+        aria-autocomplete="none"
       />
     </Box>
   );

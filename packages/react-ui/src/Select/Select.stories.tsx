@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Select } from './Select';
 
 export default {
@@ -7,9 +7,9 @@ export default {
   component: Select.Root,
 } as ComponentMeta<typeof Select.Root>;
 
-const Template = () => {
+const Template: ComponentStory<typeof Select.Root> = () => {
   return (
-    <Select.Root css={{ width: '70%' }} >
+    <Select.Root css={{ width: '70%' }}>
       <Select.DefaultDownIcon />
       <Select.Select css={{ width: '100%' }}>
         <option value="orange" key="orange">
@@ -29,4 +29,5 @@ const Template = () => {
   );
 };
 
-export const SelectContent = Template.bind({});
+export const Single = Template.bind({});
+Single.storyName = 'Select';

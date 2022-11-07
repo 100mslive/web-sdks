@@ -1,17 +1,17 @@
 import React, {
+  Fragment,
+  useCallback,
   useEffect,
   useRef,
-  Fragment,
   useState,
-  useCallback,
 } from "react";
 import Hls from "hls.js";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import { selectHLSState, useHMSStore } from "@100mslive/react-sdk";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  SettingsIcon,
   RecordIcon,
+  SettingsIcon,
 } from "@100mslive/react-icons";
 import {
   Box,
@@ -24,9 +24,9 @@ import {
 } from "@100mslive/react-ui";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
-  HLSController,
   HLS_STREAM_NO_LONGER_LIVE,
   HLS_TIMED_METADATA_LOADED,
+  HLSController,
 } from "../controllers/hls/HLSController";
 
 const HLSVideo = styled("video", {
@@ -55,18 +55,20 @@ const HLSView = () => {
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
-        hlsController.on(HLS_TIMED_METADATA_LOADED, payload => {
+        hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
           console.log(
             `%c Payload: ${payload}`,
             "color:#2b2d42; background:#d80032"
           );
+          console.log(rest);
           ToastManager.addToast({
             title: `Payload from timed Metadata ${payload}`,
           });
         });
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
-          setAvailableLevels(levels);
+          const onlyVideoLevels = removeAudioLevels(levels);
+          setAvailableLevels(onlyVideoLevels);
           setCurrentSelectedQualityText("Auto");
         });
       } else if (
@@ -214,5 +216,23 @@ const HLSView = () => {
     </Fragment>
   );
 };
+
+/**
+ *
+ * This function is needed because HLSJS currently doesn't
+ * support switching to audio rendition from a video rendition.
+ * more on this here
+ * https://github.com/video-dev/hls.js/issues/4881
+ * https://github.com/video-dev/hls.js/issues/3480#issuecomment-778799541
+ * https://github.com/video-dev/hls.js/issues/163#issuecomment-169773788
+ *
+ * @param {Array} levels array from hlsJS
+ * @returns a new array with only video levels.
+ */
+function removeAudioLevels(levels) {
+  return levels.filter(
+    ({ videoCodec, width, height }) => !!videoCodec || !!(width && height)
+  );
+}
 
 export default HLSView;

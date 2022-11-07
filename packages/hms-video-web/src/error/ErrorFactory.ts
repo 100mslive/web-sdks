@@ -5,9 +5,9 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
-import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export enum HMSAction {
   NONE = 'NONE',
@@ -46,6 +46,16 @@ export const ErrorFactory = {
         'WebSocketConnectionLost',
         action,
         `Network connection lost `,
+        description,
+      );
+    },
+
+    AbnormalClose(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
+        'WebSocketAbnormalClose',
+        action,
+        `Websocket closed abnormally`,
         description,
       );
     },

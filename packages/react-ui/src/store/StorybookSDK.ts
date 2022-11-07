@@ -1,15 +1,15 @@
 import {
   HMSActions,
-  IHMSStore,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSMessageInput,
   HMSPeer,
   HMSRoom,
-  HMSTrackSource,
   HMSRoomState,
-  HMSMessageInput,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSConfig,
   HMSSimulcastLayer,
+  HMSTrackSource,
+  HMSVideoTrackSettings,
+  IHMSStore,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
@@ -180,6 +180,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: this.randomFromArray([true, false]),
           id: audioTrackID,
           type: 'audio',
+          source: 'regular',
         };
       }
       if (peer.videoTrack) {
@@ -187,6 +188,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: true,
           id: videoTrackID,
           type: 'video',
+          source: 'regular',
         };
       }
     });

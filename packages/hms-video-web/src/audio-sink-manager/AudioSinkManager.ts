@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
-import { HMSRemoteAudioTrack } from '../media/tracks';
-import HMSLogger from '../utils/logger';
-import { IStore } from '../sdk/store';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
-import { HMSRemotePeer } from '../sdk/models/peer';
-import { EventBus } from '../events/EventBus';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { EventBus } from '../events/EventBus';
+import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSRemoteAudioTrack } from '../media/tracks';
 import { AudioContextManager } from '../playlist-manager/AudioContextManager';
+import { HMSRemotePeer } from '../sdk/models/peer';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
