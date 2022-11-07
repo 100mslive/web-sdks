@@ -38,6 +38,7 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private audio?: HTMLAudioElement;
+  private stream?: MediaStream;
   // private destination?: MediaStreamAudioDestinationNode;
 
   constructor(private store: IStore, private audioContextManager: AudioContextManager, private eventBus: EventBus) {
@@ -50,10 +51,6 @@ export class AudioSinkManager {
   setListener(listener?: HMSUpdateListener) {
     this.listener = listener;
   }
-
-  // private get outputDevice() {
-  //   return this.deviceManager.outputDevice;
-  // }
 
   getVolume() {
     return this.volume;
@@ -83,8 +80,10 @@ export class AudioSinkManager {
     const userElement = elementId && document.getElementById(elementId);
     const audioSinkParent = userElement || document.body;
     audioSinkParent.append(audioSink);
-
     this.audioSink = audioSink;
+    this.stream = new MediaStream();
+    this.audio = new Audio();
+    this.audio.srcObject = this.stream;
   }
 
   cleanUp() {
@@ -98,47 +97,17 @@ export class AudioSinkManager {
     this.state = { ...INITIAL_STATE };
   }
 
-  /* private handleAudioPaused = (event: any) => {
-    const audioEl = event.target as HTMLAudioElement;
-    //@ts-ignore
-    const track = audioEl.srcObject?.getAudioTracks()[0];
-    if (!track?.enabled) {
-      // No need to play if already disabled
-      return;
-    }
-    // this means the audio paused because of external factors(headset removal)
-    HMSLogger.d(this.TAG, 'Audio Paused', event.target.id);
-    if (!this.state.autoplayFailed) {
-      this.audio?.play().catch(console.error);
-    }
-  };
- */
   private handleTrackUpdate = ({ track }: { track: HMSRemoteAudioTrack; enabled: boolean }) => {
     HMSLogger.d(this.TAG, 'Track updated', `${track}`);
   };
 
-  // eslint-disable-next-line complexity
   private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
     track.setVolume(this.volume);
     const context = this.audioContextManager.getContext();
+    this.stream?.addTrack(track.nativeTrack);
     const source = context.createMediaStreamSource(new MediaStream([track.nativeTrack]));
     const gainNode = context.createGain();
     track.setAudioSource(source, gainNode);
-    // let error: Error | null = null;
-    /* if (!this.audio) {
-      this.destination = context.createMediaStreamDestination();
-      this.audio = new Audio();
-      this.audio.srcObject = this.destination.stream;
-      this.audioSink?.append(this.audio);
-      this.audio.addEventListener('pause', this.handleAudioPaused);
-      // @ts-ignore
-      this.outputDevice && (await this.audio.setSinkId(this.outputDevice.deviceId));
-      try {
-        await this.audio.play();
-      } catch (ex) {
-        error = ex as Error;
-      }
-    } */
     gainNode.connect(context.destination!);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`, context.state);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, peer);
@@ -160,6 +129,7 @@ export class AudioSinkManager {
 
   private handleTrackRemove = (track: HMSRemoteAudioTrack) => {
     this.autoPausedTracks.delete(track);
+    this.stream?.removeTrack(track.nativeTrack);
     HMSLogger.d(this.TAG, 'Audio track removed', `${track}`);
   };
 }
