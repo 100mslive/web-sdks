@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SVGProps } from 'react';
 
 const SvgHandRaiseSlashedIcon = (props: SVGProps<SVGSVGElement>) => (
-  <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <svg width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M3.046 4.107a.75.75 0 1 1 1.06-1.06l16.848 16.846a.75.75 0 1 1-1.06 1.06L3.045 4.108Z"
       fill="currentColor"
