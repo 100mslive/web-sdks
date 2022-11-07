@@ -1,9 +1,9 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { HMSUpdateListener } from '../../interfaces';
 import Message from '../../sdk/models/HMSMessage';
 import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { MessageNotification } from '../HMSNotifications';
 
 export class BroadcastManager {

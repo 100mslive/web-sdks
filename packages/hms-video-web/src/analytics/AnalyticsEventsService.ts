@@ -1,10 +1,10 @@
+import AnalyticsEvent from './AnalyticsEvent';
 import { HMSAnalyticsLevel } from './AnalyticsEventLevel';
+import { AnalyticsTransport } from './AnalyticsTransport';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
+import { IStore } from '../sdk/store';
 import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
-import AnalyticsEvent from './AnalyticsEvent';
-import { AnalyticsTransport } from './AnalyticsTransport';
-import { IStore } from '../sdk/store';
-import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 
 const TAG = 'AnalyticsEventsService';
 

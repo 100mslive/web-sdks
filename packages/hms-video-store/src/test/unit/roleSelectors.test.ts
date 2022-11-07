@@ -1,12 +1,12 @@
 import {
   HMSStore,
   selectAvailableRoleNames,
-  selectRolesMap,
+  selectIsAllowedToPublish,
+  selectIsAllowedToSubscribe,
   selectLocalPeerRole,
   selectRoleByRoleName,
   selectRoleChangeRequest,
-  selectIsAllowedToPublish,
-  selectIsAllowedToSubscribe,
+  selectRolesMap,
 } from '../../core';
 import { hostRole, localPeer, makeFakeStore, remotePeerOne, ROLES, speakerRole } from '../fakeStore';
 

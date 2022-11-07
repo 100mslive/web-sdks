@@ -1,7 +1,7 @@
-import { IStore } from '../sdk/store/IStore';
-import { HMSRemoteVideoTrack } from '../media/tracks';
-import HMSLogger from '../utils/logger';
 import { EventBus } from '../events/EventBus';
+import { HMSRemoteVideoTrack } from '../media/tracks';
+import { IStore } from '../sdk/store/IStore';
+import HMSLogger from '../utils/logger';
 
 /** @see docs/Subscribe-Degradation.md */
 export class TrackDegradationController {

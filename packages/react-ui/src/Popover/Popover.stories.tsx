@@ -1,14 +1,14 @@
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CrossIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Popover } from './index';
 import PopoverDocs from './Popover.mdx';
 import { Button } from '../Button';
+import { Fieldset } from '../Fieldset';
+import { Input } from '../Input';
+import { Label } from '../Label';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
-import { Label } from '../Label';
-import { Input } from '../Input';
-import { Fieldset } from '../Fieldset';
 
 export default {
   title: 'UI Components/Popover',
@@ -31,7 +31,13 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
       <Popover.Trigger asChild>
         <Button
           variant="standard"
-          css={{ aspectRatio: 1, r: '$round', p: '$2 $2', bg: '$bgPrimary', '&:hover': { bg: '$bgSecondary !important' } }}
+          css={{
+            aspectRatio: 1,
+            r: '$round',
+            p: '$2 $2',
+            bg: '$bgPrimary',
+            '&:hover': { bg: '$bgSecondary !important' },
+          }}
         >
           <Box css={{ w: '$10', h: '$10', c: '$textPrimary' }}>
             <VerticalMenuIcon />
@@ -45,7 +51,7 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
               Dimensions
             </Text>
             <Box css={{ color: '$textMedEmp' }}>
-              <CrossIcon width="0.75rem" height="0.75rem"></CrossIcon>
+              <CrossIcon width="0.75rem" height="0.75rem" />
             </Box>
           </Flex>
           <Fieldset css={{ justifyContent: 'between', width: '100%' }}>
@@ -86,4 +92,4 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
   </Flex>
 );
 export const Example = Template.bind({});
-Example.storyName = 'Popover'
+Example.storyName = 'Popover';

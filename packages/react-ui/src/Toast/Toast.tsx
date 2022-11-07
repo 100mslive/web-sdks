@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
-import { Flex, Box } from '../Layout';
+import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { styled } from '../Theme';
 import { toastAnimation } from '../utils';

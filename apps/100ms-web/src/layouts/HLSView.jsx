@@ -1,19 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import Hls from "hls.js";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen } from "react-use";
-import { useHMSStore, selectHLSState } from "@100mslive/react-sdk";
+import Hls from "hls.js";
+import { selectHLSState, useHMSStore } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Text, Tooltip } from "@100mslive/react-ui";
-import {
-  HLSController,
-  HLS_STREAM_NO_LONGER_LIVE,
-  HLS_TIMED_METADATA_LOADED,
-} from "../controllers/hls/HLSController";
-import { ToastManager } from "../components/Toast/ToastManager";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
-import { FontSize } from "@tldraw/tldraw";
+import { ToastManager } from "../components/Toast/ToastManager";
+import {
+  HLS_STREAM_NO_LONGER_LIVE,
+  HLS_TIMED_METADATA_LOADED,
+  HLSController,
+} from "../controllers/hls/HLSController";
 
 let hlsController;
 const HLSView = () => {

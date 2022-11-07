@@ -9,7 +9,7 @@ type Props = {
    * Color of Loader
    */
   color?: string;
-}
+};
 
 type LoadingProps = Props & React.SVGProps<SVGSVGElement>;
 

@@ -1,8 +1,8 @@
-import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
+import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { hooksErrHandler } from '../hooks/types';
 
 export enum DeviceType {
   videoInput = 'videoInput',

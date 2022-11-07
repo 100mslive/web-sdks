@@ -1,15 +1,15 @@
+import { HMSLocalPeer } from './models/peer';
 import { LocalTrackManager } from './LocalTrackManager';
 import { Store } from './store';
-import ITransportObserver from '../transport/ITransportObserver';
-import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import { TransportState } from '../transport/models/TransportState';
-import { DeviceManager } from '../device-manager';
-import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalPeer } from './models/peer';
-import { EventBus } from '../events/EventBus';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { DeviceManager } from '../device-manager';
+import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},

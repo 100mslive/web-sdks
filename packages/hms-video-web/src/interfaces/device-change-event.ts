@@ -1,5 +1,5 @@
-import { HMSException } from '../error/HMSException';
 import { DeviceMap } from './HMSDeviceManager';
+import { HMSException } from '../error/HMSException';
 
 export interface HMSDeviceChangeEvent {
   error?: HMSException;

@@ -1,5 +1,5 @@
-import * as BaseTooltip from '@radix-ui/react-tooltip';
 import React, { PropsWithChildren } from 'react';
+import * as BaseTooltip from '@radix-ui/react-tooltip';
 import { styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
 

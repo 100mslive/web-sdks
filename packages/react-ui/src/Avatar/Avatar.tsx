@@ -1,8 +1,8 @@
+import React from 'react';
 import { VariantProps } from '@stitches/react';
+import { getAvatarBg } from './getAvatarBg';
 import { styled } from '../Theme';
 import { flexCenter } from '../utils/styles';
-import { getAvatarBg } from './getAvatarBg';
-import React from 'react';
 
 const getAvatarShape = (radii: string) => ({
   borderRadius: radii,
