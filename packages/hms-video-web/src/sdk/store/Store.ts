@@ -260,12 +260,12 @@ class Store implements IStore {
     this.getAudioTracks().forEach(track => track.setVolume(value));
   }
 
-  async updateAudioOutputDevice(device: MediaDeviceInfo) {
-    const promises: Promise<void>[] = [];
-    this.getAudioTracks().forEach(track => {
-      promises.push(track.setOutputDevice(device));
-    });
-    await Promise.all(promises);
+  async updateAudioOutputDevice() {
+    // const promises: Promise<void>[] = [];
+    // this.getAudioTracks().forEach(track => {
+    //   promises.push(track.setOutputDevice(device));
+    // });
+    // await Promise.all(promises);
   }
 
   getSubscribeDegradationParams() {
