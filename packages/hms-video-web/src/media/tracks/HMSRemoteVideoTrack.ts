@@ -50,8 +50,16 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this.pushInHistory(`uiPreferLayer-${layer}`);
   }
 
+  /**
+   * @deprecated
+   * @returns {HMSSimulcastLayer}
+   */
   getSimulcastLayer() {
     return (this.stream as HMSRemoteStream).getSimulcastLayer();
+  }
+
+  getCurrentLayer() {
+    return (this.stream as HMSRemoteStream).getVideoLayer();
   }
 
   getExpectedLayer() {
@@ -60,17 +68,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.expectedLayer = this.expectedLayer || HMSSimulcastLayer.HIGH;
     await this.updateLayer('addSink');
     this.pushInHistory(`uiSetLayer-high`);
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
-    const currentLayer = this.getSimulcastLayer();
-    if (currentLayer !== HMSSimulcastLayer.NONE) {
-      this.expectedLayer = currentLayer;
-    }
     await this.updateLayer('removeSink');
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
@@ -98,9 +101,16 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
     const isDegraded = layerUpdate.subscriber_degraded;
-    this._degraded = isDegraded;
+    // TODO: remove && check later when degraded status handling is updated. This is to keep in sink with android and ios
+    this._degraded = isDegraded && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
     this._degradedAt = isDegraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
+    HMSLogger.d(
+      `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from server`,
+      `currLayer=${layerUpdate.current_layer}, expectedLayer=${layerUpdate.expected_layer}`,
+      `sub_degraded=${layerUpdate.subscriber_degraded}`,
+      `pub_degraded=${layerUpdate.publisher_degraded}`,
+    );
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
@@ -120,8 +130,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer =
-      this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer || HMSSimulcastLayer.HIGH;
+    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
@@ -130,7 +139,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private pushInHistory(action: string) {
     if (MAINTAIN_TRACK_HISTORY) {
-      this.history.push({ name: action, layer: this.getSimulcastLayer(), degraded: this.degraded });
+      this.history.push({ name: action, layer: this.getCurrentLayer(), degraded: this.degraded });
     }
   }
 
@@ -166,7 +175,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @private
    */
   private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer, source: string) {
-    const currLayer = this.getSimulcastLayer();
+    const currLayer = this.getCurrentLayer();
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }

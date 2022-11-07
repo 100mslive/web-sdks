@@ -320,7 +320,7 @@ class Store implements IStore {
 
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
     // TODO: remove screen check when screenshare simulcast is supported
-    if ([!peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value)) {
+    if ([!peer || !peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value)) {
       return [];
     }
 

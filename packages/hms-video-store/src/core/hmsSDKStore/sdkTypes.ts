@@ -41,8 +41,10 @@ import {
   HMSWebrtcInternals,
   HMSWebrtcStats,
   parsedUserAgent,
+  RID,
   RTMPRecordingConfig,
   SimulcastLayerDefinition,
+  simulcastMapping,
 } from '@100mslive/hms-video';
 
 export {
@@ -56,6 +58,7 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
+  simulcastMapping,
 };
 
 export type {
@@ -93,4 +96,5 @@ export type {
   HMSRemoteTrackStats,
   HMSConnectionQuality,
   HMSFrameworkInfo,
+  RID,
 };

@@ -108,7 +108,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   protected async subscribeToAudio(value: boolean) {
     if (this.stream instanceof HMSRemoteStream) {
-      await this.stream.setAudio(value, this.trackId);
+      await this.stream.setAudio(value, this.trackId, this.logIdentifier);
     }
   }
 }

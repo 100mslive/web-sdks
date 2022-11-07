@@ -1097,13 +1097,13 @@ export class HMSSDKActions implements IHMSActions {
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
-        storeTrack?.layer !== sdkTrack.getSimulcastLayer() ||
+        storeTrack?.layer !== sdkTrack.getCurrentLayer() ||
         storeTrack?.degraded !== sdkTrack.degraded ||
         storeTrack?.expectedLayer !== sdkTrack.getExpectedLayer();
       if (hasFieldChanged) {
         this.setState(draft => {
           const track = draft.tracks[trackID] as HMSVideoTrack;
-          track.layer = sdkTrack.getSimulcastLayer();
+          track.layer = sdkTrack.getCurrentLayer();
           track.expectedLayer = sdkTrack.getExpectedLayer();
           track.degraded = sdkTrack.degraded;
         }, action);

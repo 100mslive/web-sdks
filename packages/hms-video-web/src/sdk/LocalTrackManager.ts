@@ -177,6 +177,7 @@ export class LocalTrackManager {
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
     const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videosettings);
+    videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'screen'));
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
@@ -486,6 +487,9 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.video,
+      );
+      videoTrack.setSimulcastDefinitons(
+        this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'regular'),
       );
       tracks.push(videoTrack);
     }

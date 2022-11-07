@@ -1,3 +1,4 @@
+import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
 import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
@@ -66,6 +67,26 @@ export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMS
     } else if (isEntityAdded(oldStat, newStat)) {
       draftStats[trackID] = newStat as T;
     }
+  }
+};
+
+export const mergeLocalTrackStats = (
+  draftStats: Record<HMSTrackID, HMSTrackStats[] | undefined>,
+  newStats: Record<HMSTrackID, Record<string, HMSTrackStats>>,
+  tracks: SDKHMSLocalTrack[],
+) => {
+  const trackMap: Record<string, HMSTrackStats[]> = tracks.reduce((acc, track) => {
+    // @ts-ignore
+    acc[track.firstTrackId] = Object.values(newStats[track.getTrackIDBeingSent()] || {});
+    return acc;
+  }, {});
+  const IDs = union(Object.keys(draftStats), Object.keys(trackMap));
+  for (const trackID of IDs) {
+    if (!trackMap[trackID]) {
+      delete draftStats[trackID];
+      continue;
+    }
+    draftStats[trackID] = trackMap[trackID];
   }
 };
 
