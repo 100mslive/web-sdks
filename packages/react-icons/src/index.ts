@@ -199,6 +199,7 @@ export { default as ShieldIcon } from './ShieldIcon';
 export { default as ShrinkIcon } from './ShrinkIcon';
 export { default as ShuffleIcon } from './ShuffleIcon';
 export { default as SlackIcon } from './SlackIcon';
+export { default as SolidCheckCircleIcon } from './SolidCheckCircleIcon';
 export { default as SpeakerIcon } from './SpeakerIcon';
 export { default as SpotlightIcon } from './SpotlightIcon';
 export { default as SquareMenuIcon } from './SquareMenuIcon';
