@@ -8,16 +8,16 @@ const VideoHook = () => {
   const { videoRef } = useVideo({
     trackId: '1',
   });
-  return <StyledVideo ref={videoRef} autoPlay playsInline muted />;
-}
+  return <StyledVideo css={{ maxWidth: '800px' }} ref={videoRef} autoPlay playsInline muted />;
+};
 
 const Template = () => {
- return (
-  <StoryHMSProviderWrapper>
-    <VideoHook />
-  </StoryHMSProviderWrapper>
- );
-}
+  return (
+    <StoryHMSProviderWrapper>
+      <VideoHook />
+    </StoryHMSProviderWrapper>
+  );
+};
 
 const VideoStories = {
   title: 'Hooks/useVideo',

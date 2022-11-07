@@ -15,7 +15,7 @@ const ScreenShare = () => {
 
   return (
     <Flex direction="column">
-      <Video trackId={video} css={{ bg: '$bgSecondary', mb: '$4', maxWidth: '600px' }} />
+      <Video trackId={video} css={{ bg: '$bgSecondary', mb: '$4', maxWidth: '800px' }} />
       <Flex align="center" gap="2">
         <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>
           <IconButton
