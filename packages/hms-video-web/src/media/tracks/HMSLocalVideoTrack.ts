@@ -152,6 +152,21 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * only for screenshare track to crop to a cropTarget
+   * @internal
+   */
+  async cropTo(cropTarget: object) {
+    if (this.source !== 'screen') {
+      return;
+    }
+    // @ts-ignore
+    if (this.nativeTrack.cropTo) {
+      // @ts-ignore
+      await this.nativeTrack.cropTo(cropTarget);
+    }
+  }
+
+  /**
    * once the plugin manager has done its processing it can set or remove processed track via this method
    * note that replacing sender track only makes sense if the native track is enabled. if it's disabled there is
    * no point in replacing it. We'll update the processed track variable though so next time unmute happens

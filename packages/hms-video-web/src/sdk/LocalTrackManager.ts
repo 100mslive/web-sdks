@@ -148,10 +148,15 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  async getLocalScreen(config?: HMSScreenShareConfig) {
-    const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config?.videoOnly);
+  async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
+    const config = await this.getOrDefaultScreenshareConfig(partialConfig);
+    const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
       video: videoSettings.toConstraints(),
+      preferCurrentTab: config.preferCurrentTab,
+      selfBrowserSurface: config.selfBrowserSurface,
+      surfaceSwitching: config.surfaceSwitching,
+      systemAudio: config.systemAudio,
     } as MediaStreamConstraints;
     if (audioSettings) {
       const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
@@ -168,6 +173,7 @@ export class LocalTrackManager {
     }
     let stream;
     try {
+      HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
@@ -187,6 +193,9 @@ export class LocalTrackManager {
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
     const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videoSettings);
+    if (config.cropTarget) {
+      await videoTrack.cropTo(config.cropTarget);
+    }
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
@@ -461,6 +470,38 @@ export class LocalTrackManager {
         .build(),
       audio: isVideoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
     };
+  }
+
+  // eslint-disable-next-line complexity
+  private async getOrDefaultScreenshareConfig(partialConfig?: Partial<HMSScreenShareConfig>) {
+    type RequiredConfig = HMSScreenShareConfig & Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement'>>;
+    const config: RequiredConfig = Object.assign(
+      {
+        videoOnly: false,
+        audioOnly: false,
+        forceCurrentTab: false,
+        preferCurrentTab: false,
+        selfBrowserSurface: 'exclude', // don't give self tab in options
+        surfaceSwitching: 'include', // give option to switch tabs while sharing
+        systemAudio: 'exclude', // system audio share leads to echo in windows
+      },
+      partialConfig || {},
+    );
+    if (config.forceCurrentTab) {
+      config.videoOnly = true; // there will be echo otherwise
+      config.preferCurrentTab = true;
+      config.selfBrowserSurface = 'include';
+      config.surfaceSwitching = 'exclude';
+    }
+    if (config.preferCurrentTab) {
+      config.selfBrowserSurface = 'include';
+    }
+    // @ts-ignore
+    if (config.cropElement && window.CropTarget?.fromElement) {
+      // @ts-ignore
+      config.cropTarget = await window.CropTarget.fromElement(config.cropElement);
+    }
+    return config;
   }
 
   private createHMSLocalTracks(
