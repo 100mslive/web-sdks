@@ -14,6 +14,7 @@ import {
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSScreenShareConfig,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
@@ -219,17 +220,14 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
-    const sdkConfig = { audioOnly: false, videoOnly: false };
-    if (typeof config === 'object') {
-      Object.assign(sdkConfig, config);
-    } else if (typeof config === 'boolean') {
-      // for backward compatibility
-      sdkConfig.audioOnly = config;
+  async setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig) {
+    // TODO: remove this, purely for backward compatibility
+    if (typeof config === 'boolean') {
+      config = { audioOnly: config };
     }
     try {
       if (enabled) {
-        await this.startScreenShare(sdkConfig);
+        await this.startScreenShare(config);
       } else {
         await this.stopScreenShare();
       }
@@ -742,7 +740,7 @@ export class HMSSDKActions implements IHMSActions {
     }, 'ConnectionQuality');
   }
 
-  private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
+  private async startScreenShare(config?: HMSScreenShareConfig) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
       await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);

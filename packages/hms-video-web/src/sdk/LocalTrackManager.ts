@@ -7,7 +7,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSVideoCodec } from '../interfaces';
+import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import {
   HMSAudioTrackSettings,
@@ -47,7 +47,7 @@ export class LocalTrackManager {
 
   // eslint-disable-next-line complexity
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
-    const trackSettings = this.getTrackSettings(initialSettings);
+    const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
     }
@@ -148,12 +148,13 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings?: HMSAudioTrackSettings) {
+  async getLocalScreen(config?: HMSScreenShareConfig) {
+    const screenSettings = this.getScreenshareSettings(config?.videoOnly);
     const constraints = {
-      video: videosettings.toConstraints(),
+      video: screenSettings?.video?.toConstraints(),
     } as MediaStreamConstraints;
-    if (audioSettings) {
-      const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
+    if (screenSettings?.audio) {
+      const audioConstraints: MediaTrackConstraints = screenSettings?.audio?.toConstraints();
       // remove advanced constraints as it not supported for screenshare audio
       delete audioConstraints.advanced;
       constraints.audio = {
@@ -170,18 +171,33 @@ export class LocalTrackManager {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
+      const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          error: error as Error,
+          devices: this.deviceManager.getDevices(),
+          settings: new HMSTrackSettings(screenSettings?.video, screenSettings?.audio, false),
+        }),
+      );
+      throw error;
     }
 
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videosettings);
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, screenSettings?.video);
     videoTrack.setSimulcastDefinitons(this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, 'screen'));
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
-      const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'screen', this.eventBus, audioSettings);
+      const audioTrack = new HMSLocalAudioTrack(
+        local,
+        nativeAudioTrack,
+        'screen',
+        this.eventBus,
+        screenSettings?.audio,
+      );
       tracks.push(audioTrack);
     }
 
@@ -268,14 +284,13 @@ export class LocalTrackManager {
     }
   }
 
-  private getTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
+  private getAVTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
     const audioSettings = this.getAudioSettings(initialSettings);
     const videoSettings = this.getVideoSettings(initialSettings);
     if (!audioSettings && !videoSettings) {
       return null;
     }
-    const screenSettings = this.getScreenSettings();
-    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
+    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).build();
   }
 
   // eslint-disable-next-line complexity
@@ -436,14 +451,14 @@ export class LocalTrackManager {
       .build();
   }
 
-  private getScreenSettings() {
+  private getScreenshareSettings(isVideoOnly = false) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams || !publishParams.allowed?.includes('screen')) {
       return null;
     }
     const screen = publishParams.screen;
-    return (
-      new HMSVideoTrackSettingsBuilder()
+    return {
+      video: new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
         // If publish params doesn't have bitRate value - don't set maxBitrate.
         .maxBitrate(screen.bitRate, false)
@@ -451,8 +466,9 @@ export class LocalTrackManager {
         .maxFramerate(screen.frameRate)
         .setWidth(screen.width)
         .setHeight(screen.height)
-        .build()
-    );
+        .build(),
+      audio: isVideoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
+    };
   }
 
   private createHMSLocalTracks(

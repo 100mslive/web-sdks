@@ -30,6 +30,7 @@ import {
   HMSRoom,
   HMSRoomUpdate,
   HMSRTMP,
+  HMSScreenShareConfig,
   HMSSimulcastLayer,
   HMSSpeaker,
   HMSTrackStats,
@@ -95,6 +96,7 @@ export type {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HMSConnectionQuality,
+  HMSScreenShareConfig,
   HMSFrameworkInfo,
   RID,
 };
