@@ -1,31 +1,32 @@
-import { ENV, IStore, KnownRoles, TrackStateEntry } from './IStore';
-import HMSRoom from '../models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSSpeaker } from '../../interfaces';
-import { IErrorListener } from '../../interfaces/error-listener';
-import {
-  HMSTrack,
-  HMSVideoTrack,
-  HMSAudioTrack,
-  HMSTrackType,
-  HMSTrackSource,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-} from '../../media/tracks';
-import {
-  SimulcastLayer,
-  SimulcastLayers,
-  SimulcastDimensions,
-  simulcastMapping,
-  RID,
-  SimulcastLayerDefinition,
-} from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
-import { HMSConfig, PublishParams } from '../../interfaces';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
+import {
+  RID,
+  SimulcastDimensions,
+  SimulcastLayer,
+  SimulcastLayerDefinition,
+  SimulcastLayers,
+  simulcastMapping,
+} from '../../interfaces/simulcast-layers';
+import {
+  HMSAudioTrack,
+  HMSLocalTrack,
+  HMSRemoteVideoTrack,
+  HMSTrack,
+  HMSTrackSource,
+  HMSTrackType,
+  HMSVideoTrack,
+} from '../../media/tracks';
+import { ENV } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
+import HMSRoom from '../models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -45,6 +46,7 @@ class Store implements IStore {
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
+  private userAgent: string = createUserAgent(this.env);
 
   getConfig() {
     return this.config;
@@ -165,6 +167,14 @@ class Store implements IStore {
     return this.speakers.map(speaker => speaker.peer);
   }
 
+  getUserAgent() {
+    return this.userAgent;
+  }
+
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
+    this.userAgent = createUserAgent(this.env, frameworkInfo);
+  }
+
   setRoom(room: HMSRoom) {
     this.room = room;
   }
@@ -250,10 +260,12 @@ class Store implements IStore {
     this.getAudioTracks().forEach(track => track.setVolume(value));
   }
 
-  updateAudioOutputDevice(device: MediaDeviceInfo) {
+  async updateAudioOutputDevice(device: MediaDeviceInfo) {
+    const promises: Promise<void>[] = [];
     this.getAudioTracks().forEach(track => {
-      track.setOutputDevice(device);
+      promises.push(track.setOutputDevice(device));
     });
+    await Promise.all(promises);
   }
 
   getSubscribeDegradationParams() {

@@ -1,9 +1,9 @@
 import React, { ComponentProps } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CrossIcon } from '@100mslive/react-icons';
+import { IconButton } from '../IconButton';
 import { styled } from '../Theme';
 import { dialogClose, dialogOpen } from '../utils/animations';
-import { IconButton } from '../IconButton';
 
 export const DialogClose = styled(DialogPrimitive.Close, {});
 
@@ -45,6 +45,8 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
 export const DialogTitle = styled(DialogPrimitive.Title, {
   margin: 0,
 });
+
+export const DialogDescription = styled(DialogPrimitive.Description, {});
 
 export const DialogDefaultCloseIcon = (props: ComponentProps<typeof IconButton>) => (
   <DialogClose asChild>

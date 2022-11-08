@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid';
-import { HMSRemoteAudioTrack } from '../media/tracks';
-import { DeviceManager } from '../device-manager';
-import HMSLogger from '../utils/logger';
-import { IStore } from '../sdk/store';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
-import { HMSRemotePeer } from '../sdk/models/peer';
-import { isMobile } from '../utils/support';
-import { EventBus } from '../events/EventBus';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { DeviceManager } from '../device-manager';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { EventBus } from '../events/EventBus';
+import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSRemoteAudioTrack } from '../media/tracks';
+import { HMSRemotePeer } from '../sdk/models/peer';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
+import { isMobile } from '../utils/support';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -133,6 +133,7 @@ export class AudioSinkManager {
         track.removeSink();
       }
     }
+    HMSLogger.d(this.TAG, 'Track updated', `${track}`);
   };
 
   private handleTrackAdd = async ({ track, peer }: { track: HMSRemoteAudioTrack; peer: HMSRemotePeer }) => {
@@ -143,7 +144,7 @@ export class AudioSinkManager {
 
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
-    HMSLogger.d(this.TAG, 'Audio track added', track.trackId);
+    HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     // @ts-ignore
@@ -204,10 +205,10 @@ export class AudioSinkManager {
       await audioEl.play();
       this.state.autoplayFailed = false;
       this.autoPausedTracks.delete(track);
-      HMSLogger.d(this.TAG, 'Played track', track.trackId);
+      HMSLogger.d(this.TAG, 'Played track', `${track}`);
     } catch (err) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'Failed to play track', track.trackId, err as Error);
+      HMSLogger.e(this.TAG, 'Failed to play track', `${track}`, err as Error);
       const error = err as Error;
       if (!this.state.autoplayFailed && error.name === 'NotAllowedError') {
         this.state.autoplayFailed = true;
@@ -234,7 +235,7 @@ export class AudioSinkManager {
       this.state.autoplayCheckPromise = undefined;
       this.state.autoplayFailed = undefined;
     }
-    HMSLogger.d(this.TAG, 'Audio track removed', track.trackId);
+    HMSLogger.d(this.TAG, 'Audio track removed', `${track}`);
   };
 
   private unpauseAudioTracks = async () => {

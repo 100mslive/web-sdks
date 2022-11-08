@@ -1,24 +1,29 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { IHMSNotifications, HMSNotificationCallback } from '../IHMSNotifications';
-import { IHMSStore } from '../IHMSStore';
-import { selectPeerByID, selectTrackByID } from '../selectors';
-import * as sdkTypes from './sdkTypes';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import * as sdkTypes from './sdkTypes';
+import { IHMSStore } from '../IHMSStore';
 import {
-  HMSNotification,
-  HMSNotificationTypes,
-  HMSNotificationSeverity,
-  HMSPeer,
+  HMSChangeMultiTrackStateRequest,
+  HMSChangeTrackStateRequest,
+  HMSDeviceChangeEvent,
   HMSException,
+  HMSLeaveRoomRequest,
   HMSMessage,
+  HMSNotification,
+  HMSNotificationSeverity,
+  HMSNotificationTypes,
+  HMSPeer,
+  HMSPlaylistItem,
   HMSTrack,
   HMSTrackID,
-  HMSChangeTrackStateRequest,
-  HMSChangeMultiTrackStateRequest,
-  HMSLeaveRoomRequest,
-  HMSDeviceChangeEvent,
-  HMSPlaylistItem,
 } from '../schema';
+import {
+  HMSNotificationCallback,
+  HMSNotificationInCallback,
+  HMSNotificationTypeParam,
+  IHMSNotifications,
+} from '../schema/notification';
+import { selectPeerByID, selectTrackByID } from '../selectors';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
@@ -29,17 +34,16 @@ export class HMSNotifications implements IHMSNotifications {
 
   constructor(store: IHMSStore) {
     this.store = store;
-    this.eventEmitter = new EventEmitter();
+    this.eventEmitter = new EventEmitter({ maxListeners: Object.keys(HMSNotificationTypes).length });
   }
-
-  onNotification = (cb: HMSNotificationCallback, type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
-    const eventCallback = (notification: HMSNotification) => {
+  onNotification = <T extends HMSNotificationTypeParam>(cb: HMSNotificationCallback<T>, type?: T) => {
+    const eventCallback = (notification: HMSNotificationInCallback<T>) => {
       if (type) {
         let matchesType: boolean;
         if (Array.isArray(type)) {
           matchesType = type.includes(notification.type as HMSNotificationTypes);
         } else {
-          matchesType = type === (notification.type as HMSNotificationTypes);
+          matchesType = type === notification.type;
         }
         if (!matchesType) {
           return;
@@ -157,7 +161,7 @@ export class HMSNotifications implements IHMSNotifications {
   }
 
   private createNotification<T>(
-    type: string,
+    type: HMSNotificationTypes,
     data?:
       | HMSPeer
       | HMSPeer[]
@@ -180,6 +184,6 @@ export class HMSNotifications implements IHMSNotifications {
       message,
       data,
       severity,
-    };
+    } as HMSNotification;
   }
 }

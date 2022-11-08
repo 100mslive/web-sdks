@@ -1,10 +1,10 @@
+import AnalyticsEvent from './AnalyticsEvent';
 import { HMSAnalyticsLevel } from './AnalyticsEventLevel';
+import { AnalyticsTransport } from './AnalyticsTransport';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
+import { IStore } from '../sdk/store';
 import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
-import AnalyticsEvent from './AnalyticsEvent';
-import { AnalyticsTransport } from './AnalyticsTransport';
-import { IStore } from '../sdk/store';
-import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
 
 const TAG = 'AnalyticsEventsService';
 
@@ -43,13 +43,13 @@ export class AnalyticsEventsService {
     HTTPAnalyticsTransport.flushFailedEvents();
   }
 
-  // eslint-disable-next-line complexity
   flush() {
     try {
       while (this.pendingEvents.length > 0) {
         const event = this.pendingEvents.shift();
         if (event) {
           event.metadata.peer.peer_id = this.store.getLocalPeer()?.peerId;
+          event.metadata.userAgent = this.store.getUserAgent();
           if (this.transport && this.transport.transportProvider.isConnected) {
             this.transport.sendEvent(event);
           } else {

@@ -1,25 +1,25 @@
 import {
-  HMSConfig,
-  HMSSimulcastLayer,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSLogLevel,
-  HMSVideoPlugin,
-  HMSAudioPlugin,
-  HMSPluginSupportResult,
   HLSTimedMetadata,
+  HMSAudioPlugin,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSLogLevel,
+  HMSPluginSupportResult,
+  HMSSimulcastLayer,
+  HMSVideoPlugin,
+  HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
+import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
+  HMSChangeMultiTrackStateParams,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
-  HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -183,7 +183,7 @@ export interface IHMSActions {
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */
-  setAudioOutputDevice(deviceId: string): void;
+  setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
   /**
@@ -194,7 +194,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
-   * Video plugins can be added/removed at any time after the join is successful.
+   * Video plugins can be added/removed at any time after the video track is available.
    * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
    * @param pluginFrameRate number
@@ -211,7 +211,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
-   * Audio plugins can be added/removed at any time after the join is successful.
+   * Audio plugins can be added/removed at any time after the audio track is available
    * @param plugin HMSAudioPlugin
    * @see HMSAudioPlugin
    */
@@ -229,6 +229,9 @@ export interface IHMSActions {
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
@@ -344,6 +347,24 @@ export interface IHMSActions {
    * JSON.stringify.
    */
   changeMetadata(metadata: string | any): Promise<void>;
+
+  /**
+   * If you want to update the metadata of the session. If an object is passed, it should be serializable using
+   * JSON.stringify.
+   *
+   * Session metadata is available to every peer in the room and is persisted throughout a session
+   * till the last peer leaves a room
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  setSessionMetadata(metadata: any): Promise<void>;
+
+  /**
+   * Fetch the current room metadata from the server and populate it in store
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  populateSessionMetadata(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.

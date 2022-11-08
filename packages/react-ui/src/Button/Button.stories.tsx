@@ -1,69 +1,52 @@
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { HangUpIcon } from '@100mslive/react-icons';
 import { Button } from './Button';
-import ButtonDocs from './Button.mdx';
+import mdx from './Button.mdx';
 
 export default {
   title: 'UI Components/Button',
   component: Button,
   argTypes: {
-    onClick: { action: 'clicked' },
     variant: {
-      control: {
-        type: 'select',
-        options: ['primary', 'standard', 'danger'],
-      },
+      description: 'Button styled variants',
     },
-    outlined: { control: 'boolean' },
-    icon: { control: 'boolean' },
-    loading: { control: 'boolean' },
+    outlined: { description: 'Give button an outlined style' },
+    icon: { description: 'Give space between children' },
+    loading: { description: 'Button is in a loading state' },
   },
   parameters: {
     docs: {
-      page: ButtonDocs,
+      page: mdx,
     },
   },
 } as ComponentMeta<typeof Button>;
 
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Button> = args => <Button {...args}>Hello World</Button>;
+export const Primary = () => <Button variant="primary">Hello, World</Button>;
 
-const WithIcon: ComponentStory<typeof Button> = args => (
-  <Button {...args}>
+export const Standard = () => <Button variant="standard">Hello, World</Button>;
+
+export const Danger = () => <Button variant="danger">Hello, World</Button>;
+
+export const WithIcon = () => (
+  <Button variant="danger" icon>
     <HangUpIcon />
     Leave Room
   </Button>
 );
 
-export const Primary = Template.bind({});
+export const Playground: ComponentStory<typeof Button> = args => <Button {...args}>Hello World</Button>;
 
-Primary.args = {
-  variant: 'primary',
-  outlined: false,
-  loading: false,
-};
-
-export const Standard = Template.bind({});
-
-Standard.args = {
-  variant: 'standard',
-  outlined: false,
-  loading: false,
-};
-
-export const Danger = Template.bind({});
-
-Danger.args = {
-  variant: 'danger',
-  outlined: false,
-  loading: false,
-};
-
-export const Icon = WithIcon.bind({});
-Icon.args = {
-  variant: 'danger',
-  icon: true,
-  outlined: false,
-  loading: false,
+Playground.storyName = 'Button';
+Playground.argTypes = {
+  onClick: { action: 'clicked' },
+  variant: {
+    control: {
+      type: 'select',
+      options: ['primary', 'standard', 'danger'],
+    },
+  },
+  outlined: { control: 'boolean' },
+  icon: { control: 'boolean' },
+  loading: { control: 'boolean' },
 };

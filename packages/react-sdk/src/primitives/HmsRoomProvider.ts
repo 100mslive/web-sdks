@@ -1,17 +1,17 @@
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
-import {
-  HMSReactiveStore,
-  HMSStore,
-  HMSActions,
-  HMSNotification,
-  HMSNotifications,
-  HMSStatsStore,
-  HMSStats,
-  HMSStoreWrapper,
-  HMSNotificationTypes,
-} from '@100mslive/hms-video-store';
 import create from 'zustand';
-import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
+import {
+  HMSActions,
+  HMSNotificationInCallback,
+  HMSNotifications,
+  HMSNotificationTypeParam,
+  HMSReactiveStore,
+  HMSStats,
+  HMSStatsStore,
+  HMSStore,
+  HMSStoreWrapper,
+} from '@100mslive/hms-video-store';
+import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
 export interface HMSRoomProviderProps {
@@ -97,6 +97,13 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
         });
       }
     }
+
+    // @ts-ignore
+    providerProps.actions.setFrameworkInfo({
+      type: 'react-web',
+      version: React.version,
+      sdkVersion: require('../../package.json').version,
+    });
   }
 
   useEffect(() => {
@@ -177,9 +184,11 @@ export const useHMSActions = () => {
  * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
  * rerenders for performance reasons.
  */
-export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificationTypes[]) => {
+export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
+  type?: T,
+): HMSNotificationInCallback<T> | null => {
   const HMSContextConsumer = useContext(HMSContext);
-  const [notification, setNotification] = useState<HMSNotification | null>(null);
+  const [notification, setNotification] = useState<HMSNotificationInCallback<T> | null>(null);
 
   if (!HMSContextConsumer) {
     throw new Error(hooksErrorMessage);
@@ -189,10 +198,9 @@ export const useHMSNotifications = (type?: HMSNotificationTypes | HMSNotificatio
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification(
-      (notification: HMSNotification) => setNotification(notification),
-      type,
-    );
+    const unsubscribe = HMSContextConsumer.notifications.onNotification<T>(notification => {
+      setNotification(notification);
+    }, type);
     return unsubscribe;
   }, [HMSContextConsumer.notifications, type]);
 

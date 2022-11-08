@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface Props {
+type Props = {
   /**
    * Adjusts width and height
    */
@@ -9,7 +9,7 @@ interface Props {
    * Color of Loader
    */
   color?: string;
-}
+};
 
 type LoadingProps = Props & React.SVGProps<SVGSVGElement>;
 

@@ -1,5 +1,5 @@
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 import { HMSRoleName } from './role';
+import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
 
 export type { SimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
@@ -24,11 +24,6 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
-  /**
-   * @deprecated
-   * Use metadata field instead.
-   */
-  customerDescription?: string;
 }
 
 /**
@@ -40,24 +35,44 @@ export interface HMSPeer {
  * deviceID - this is the ID of the source device for the track. This can be a dummy ID when track is on mute.
  * degraded - tells whether the track has been degraded(receiving lower video quality/no video) due to bad network locally
  */
-export interface HMSTrack {
+
+interface BaseTrack {
   id: HMSTrackID;
   source?: HMSTrackSource;
   type: HMSTrackType;
   enabled: boolean;
-  height?: number;
-  width?: number;
+  displayEnabled?: boolean;
   peerId?: string;
   deviceID?: string;
   plugins?: string[];
-  displayEnabled?: boolean;
+}
+
+export interface HMSAudioTrack extends BaseTrack {
+  source: 'regular' | 'audioplaylist' | string;
+  type: 'audio';
   volume?: number;
+}
+export interface HMSScreenAudioTrack extends HMSAudioTrack {
+  source: 'screen';
+  type: 'audio';
+}
+export interface HMSVideoTrack extends BaseTrack {
+  source: 'regular' | 'videoplaylist' | string;
+  type: 'video';
+  facingMode?: HMSTrackFacingMode;
   layer?: HMSSimulcastLayer;
   layerDefinitions?: SimulcastLayerDefinition[];
+  height?: number;
+  width?: number;
   degraded?: boolean;
-  displaySurface?: HMSTrackDisplaySurface;
-  facingMode?: HMSTrackFacingMode;
 }
+
+export interface HMSScreenVideoTrack extends Omit<HMSVideoTrack, 'facingMode'> {
+  source: 'screen';
+  displaySurface?: HMSTrackDisplaySurface;
+}
+
+export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack | HMSScreenAudioTrack;
 
 /**
  * HMS Speaker stores the details of peers speaking at any point of time along with

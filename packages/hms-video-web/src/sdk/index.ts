@@ -1,8 +1,28 @@
+import Message from './models/HMSMessage';
+import HMSRoom from './models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
+import { LocalTrackManager } from './LocalTrackManager';
+import { NetworkTestManager } from './NetworkTestManager';
+import RoleChangeManager from './RoleChangeManager';
+import { IStore, Store } from './store';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { AudioSinkManager } from '../audio-sink-manager';
+import { AudioOutputManager, DeviceManager } from '../device-manager';
+import { DeviceStorageManager } from '../device-manager/DeviceStorage';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
 import {
   HMSChangeMultiTrackStateParams,
   HMSConfig,
   HMSConnectionQualityListener,
   HMSDeviceChangeEvent,
+  HMSFrameworkInfo,
   HMSMessageInput,
   HMSPlaylistType,
   HMSRole,
@@ -10,14 +30,17 @@ import {
   HMSVideoCodec,
   ScreenShareConfig,
 } from '../interfaces';
-import InitialSettings from '../interfaces/settings';
+import { DeviceChangeListener } from '../interfaces/device-change-listener';
+import { IErrorListener } from '../interfaces/error-listener';
+import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import HMSInterface from '../interfaces/hms';
-import HMSTransport from '../transport';
-import ITransportObserver from '../transport/ITransportObserver';
+import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
+import { HMSPreviewListener } from '../interfaces/preview-listener';
+import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import HMSLogger, { HMSLogLevel } from '../utils/logger';
-import decodeJWT from '../utils/jwt';
-import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
   HMSLocalTrack,
@@ -27,39 +50,17 @@ import {
   HMSTrackSource,
   HMSTrackType,
 } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import HMSRoom from './models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
-import Message from './models/HMSMessage';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
-import { AudioSinkManager } from '../audio-sink-manager';
-import { AudioOutputManager, DeviceManager } from '../device-manager';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
-import { TransportState } from '../transport/models/TransportState';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { ErrorCodes } from '../error/ErrorCodes';
-import { HMSPreviewListener } from '../interfaces/preview-listener';
-import { IErrorListener } from '../interfaces/error-listener';
-import { IStore, Store } from './store';
-import { DeviceChangeListener } from '../interfaces/device-change-listener';
-import RoleChangeManager from './RoleChangeManager';
-import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
-import { DeviceStorageManager } from '../device-manager/DeviceStorage';
-import { LocalTrackManager } from './LocalTrackManager';
+import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
-import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { isNode } from '../utils/support';
-import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
-import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { InitConfig } from '../signal/init/models';
-import { NetworkTestManager } from './NetworkTestManager';
+import HMSTransport from '../transport';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import decodeJWT from '../utils/jwt';
+import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
-import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { isNode } from '../utils/support';
+import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
@@ -99,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
+  private frameworkInfo?: HMSFrameworkInfo;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -256,7 +258,7 @@ export class HMSSdk implements HMSInterface {
       requestedBy: peer,
     };
     this.listener?.onRemovedFromRoom(request);
-    this.leave();
+    this.internalLeave(false);
   };
 
   async preview(config: HMSConfig, listener: HMSPreviewListener) {
@@ -371,6 +373,8 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -456,7 +460,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async leave() {
+  leave() {
+    return this.internalLeave();
+  }
+
+  private async internalLeave(notifyServer = true) {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
@@ -466,7 +474,7 @@ export class HMSSdk implements HMSInterface {
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
-      await this.transport?.leave();
+      await this.transport?.leave(notifyServer);
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
@@ -480,7 +488,7 @@ export class HMSSdk implements HMSInterface {
     const peers = this.store.getPeers();
     if (peers.length < 50) {
       // the log is too big and frequent for large rooms
-      HMSLogger.d(this.TAG, `Got peers`, peers);
+      HMSLogger.d(this.TAG, `Got peers(${peers.length})`, peers.toString());
     }
     return peers;
   }
@@ -766,6 +774,15 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.updateLocalPeer({ metadata });
   }
 
+  async setSessionMetadata(metadata: any) {
+    await this.transport.setSessionMetadata(metadata);
+  }
+
+  async getSessionMetadata() {
+    const response = await this.transport.getSessionMetadata();
+    return response.data;
+  }
+
   getRoles(): HMSRole[] {
     return Object.values(this.store.getKnownRoles());
   }
@@ -812,6 +829,10 @@ export class HMSSdk implements HMSInterface {
     });
   }
 
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
+    this.frameworkInfo = frameworkInfo;
+  }
+
   private async publish(initialSettings: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
@@ -852,7 +873,9 @@ export class HMSSdk implements HMSInterface {
     }
     this.sdkState.deviceManagersInitialised = true;
     await this.deviceManager.init();
-    this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    if (!(await this.deviceManager.updateOutputDevice(this.store.getConfig()?.settings?.audioOutputDeviceId))) {
+      await this.deviceManager.updateOutputDevice(DeviceStorageManager.getSelection()?.audioOutput?.deviceId);
+    }
     this.audioSinkManager.init(this.store.getConfig()?.audioSinkElementId);
   }
 
@@ -912,6 +935,8 @@ export class HMSSdk implements HMSInterface {
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
+    /** set after config since we need config to get env for user agent */
+    this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }

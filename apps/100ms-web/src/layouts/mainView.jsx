@@ -1,26 +1,27 @@
-import React, { useEffect, Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import {
-  useHMSStore,
-  useHMSActions,
-  selectPeerSharingAudio,
-  selectPeerScreenSharing,
-  selectPeerSharingVideoPlaylist,
-  selectLocalPeerRoleName,
   selectIsConnectedToRoom,
+  selectLocalPeerRoleName,
+  selectPeerScreenSharing,
+  selectPeerSharingAudio,
+  selectPeerSharingVideoPlaylist,
+  useHMSActions,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
-import { MainGridView } from "./mainGridView";
-import SidePane from "./SidePane";
 import FullPageProgress from "../components/FullPageProgress";
+import { MainGridView } from "./mainGridView";
 import ScreenShareView from "./screenShareView";
+import SidePane from "./SidePane";
+import { useWhiteboardMetadata } from "../plugins/whiteboard";
+import { useAppConfig } from "../components/AppData/useAppConfig";
 import {
   useHLSViewerRole,
   useIsHeadless,
   useUISettings,
 } from "../components/AppData/useUISettings";
+import { useRefreshSessionMetadata } from "../components/hooks/useRefreshSessionMetadata";
 import { useBeamAutoLeave } from "../common/hooks";
-import { useWhiteboardMetadata } from "../plugins/whiteboard";
-import { useAppConfig } from "../components/AppData/useAppConfig";
 import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
@@ -35,6 +36,7 @@ export const ConferenceMainView = () => {
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   useBeamAutoLeave();
+  useRefreshSessionMetadata();
   const hmsActions = useHMSActions();
   const isHeadless = useIsHeadless();
   const headlessUIMode = useAppConfig("headlessConfig", "uiMode");

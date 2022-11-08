@@ -1,5 +1,7 @@
-import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
 import React, { useMemo } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
+import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
+import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import {
   calculateLayoutSizes,
   chunkElements,
@@ -7,8 +9,6 @@ import {
   getVideoTracksFromPeers,
   TrackWithPeer,
 } from '../utils/layout';
-import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
-import { useResizeDetector } from 'react-resize-detector';
 
 export interface useVideoListInput {
   /**

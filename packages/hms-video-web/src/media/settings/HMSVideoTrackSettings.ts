@@ -1,5 +1,5 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings, HMSVideoCodec } from '../../interfaces';
+import { HMSVideoCodec, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width?: number = 320;

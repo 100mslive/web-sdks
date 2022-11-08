@@ -1,14 +1,14 @@
 import React from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { CrossIcon, InfoIcon } from '@100mslive/react-icons';
 import { Dialog } from './Dialog';
 import DialogDocs from './Dialog.mdx';
 import { Button } from '../Button';
+import { Fieldset } from '../Fieldset';
 import { Input } from '../Input';
 import { Label } from '../Label';
-import { Fieldset } from '../Fieldset';
-import { Text } from '../Text';
 import { Flex } from '../Layout';
-import { CrossIcon, InfoIcon } from '@100mslive/react-icons';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Dialog',
@@ -33,11 +33,11 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
         <Dialog.Title css={{ c: '$textHighEmp', position: 'relative' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Flex justify="start" align="center" gap="3">
-              <InfoIcon></InfoIcon>
+              <InfoIcon />
               <Text variant="h5">Dialog Heading</Text>
             </Flex>
             <Dialog.DefaultClose css={{ position: 'absolute', top: '-1rem', right: '-1rem' }}>
-              <CrossIcon></CrossIcon>
+              <CrossIcon />
             </Dialog.DefaultClose>
           </Flex>
         </Dialog.Title>
@@ -65,3 +65,4 @@ const Template: ComponentStory<typeof Dialog.Root> = () => (
 );
 
 export const Example = Template.bind({});
+Example.storyName = 'Dialog';

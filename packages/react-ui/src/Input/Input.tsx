@@ -1,3 +1,7 @@
+import React, { ComponentProps, PropsWithChildren, PropsWithRef } from 'react';
+import { CSS } from '@stitches/react';
+import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
+import { Flex } from '../Layout';
 import { styled } from '../Theme';
 
 export const Input = styled('input', {
@@ -27,3 +31,75 @@ export const Input = styled('input', {
     },
   },
 });
+
+const PasswordRoot = styled('div', {
+  w: '100%',
+  position: 'relative',
+  display: 'flex',
+});
+
+const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: boolean; css?: CSS }> = ({
+  showPassword,
+  css,
+  ...props
+}) => {
+  return (
+    <Flex css={{ ...css }} {...props}>
+      {showPassword ? <EyeOpenIcon /> : <EyeCloseIcon />}
+    </Flex>
+  );
+};
+
+const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex & { css?: CSS }>> = ({ css, ...props }) => {
+  return (
+    <Flex css={{ ...css }} {...props}>
+      <CopyIcon />
+    </Flex>
+  );
+};
+
+const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<ComponentProps<typeof Flex & { css?: CSS }>>>(
+  ({ css, ...props }, ref) => {
+    return (
+      <Flex
+        css={{
+          position: 'absolute',
+          top: 0,
+          height: '100%',
+          zIndex: 10,
+          right: '$4',
+          bg: '$surfaceLight',
+          alignItems: 'center',
+          ...css,
+        }}
+        ref={ref}
+        {...props}
+      >
+        {props.children}
+      </Flex>
+    );
+  },
+);
+
+const ReactInput: React.FC<PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>> =
+  React.forwardRef<
+    HTMLInputElement,
+    PropsWithRef<ComponentProps<typeof Input> & { showPassword?: boolean; css?: CSS }>
+  >(({ showPassword = false, css, ...props }, ref) => {
+    return (
+      <Input
+        css={{ flexGrow: 1, width: '100%', ...css }}
+        type={showPassword ? 'text' : 'password'}
+        {...props}
+        ref={ref}
+      />
+    );
+  });
+
+export const PasswordInput = {
+  Root: PasswordRoot,
+  Icons: PasswordIcons,
+  Input: ReactInput,
+  ShowIcon: PasswordShowIcon,
+  CopyIcon: PasswordCopyIcon,
+};

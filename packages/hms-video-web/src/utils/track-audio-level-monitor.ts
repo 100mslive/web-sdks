@@ -1,8 +1,8 @@
-import { HMSInternalEvent } from '../events/HMSInternalEvent';
-import { HMSLocalAudioTrack } from '../media/tracks';
 import HMSLogger from './logger';
 import { Queue } from './queue';
 import { sleep } from './timer-utils';
+import { HMSInternalEvent } from '../events/HMSInternalEvent';
+import { HMSLocalAudioTrack } from '../media/tracks';
 
 /** Send update only if audio level is above THRESHOLD */
 const THRESHOLD = 35;
@@ -70,8 +70,8 @@ export class TrackAudioLevelMonitor {
   start() {
     this.stop();
     this.isMonitored = true;
-    HMSLogger.d(this.TAG, 'Starting track Monitor', this.track);
-    this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', this.track));
+    HMSLogger.d(this.TAG, 'Starting track Monitor', `${this.track}`);
+    this.loop().then(() => HMSLogger.d(this.TAG, 'Stopping track Monitor', `${this.track}`));
   }
 
   stop() {

@@ -1,42 +1,43 @@
 import React, { Fragment, useCallback, useState } from "react";
 import {
-  Avatar,
-  StyledVideoTile,
-  Video,
-  VideoTileStats,
-  useBorderAudioLevel,
-} from "@100mslive/react-ui";
-import {
-  useHMSStore,
-  selectIsPeerAudioEnabled,
-  selectPeerMetadata,
-  selectLocalPeerID,
-  selectPeerNameByID,
   selectAudioTrackByPeerID,
-  selectTrackByID,
+  selectIsPeerAudioEnabled,
+  selectLocalPeerID,
+  selectPeerMetadata,
+  selectPeerNameByID,
+  selectVideoTrackByID,
   selectVideoTrackByPeerID,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import {
-  MicOffIcon,
-  HandRaiseFilledIcon,
   BrbIcon,
+  HandRaiseFilledIcon,
+  MicOffIcon,
 } from "@100mslive/react-icons";
-import TileMenu from "./TileMenu";
+import {
+  Avatar,
+  StyledVideoTile,
+  useBorderAudioLevel,
+  Video,
+  VideoTileStats,
+} from "@100mslive/react-ui";
 import TileConnection from "./Connection/TileConnection";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { useAppConfig } from "./AppData/useAppConfig";
 import { getVideoTileLabel } from "./peerTileUtils";
+import TileMenu from "./TileMenu";
+import { useAppConfig } from "./AppData/useAppConfig";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
 
 const Tile = ({ peerId, trackId, width, height }) => {
   const trackSelector = trackId
-    ? selectTrackByID(trackId)
+    ? selectVideoTrackByID(trackId)
     : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const isHeadless = useIsHeadless();
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -93,7 +94,12 @@ const Tile = ({ peerId, trackId, width, height }) => {
             <Video
               trackId={track?.id}
               attach={isLocal ? undefined : !isAudioOnly}
-              mirror={peerId === localPeerID && track?.source === "regular"}
+              mirror={
+                mirrorLocalVideo &&
+                peerId === localPeerID &&
+                track?.source === "regular" &&
+                track?.facingMode !== "environment"
+              }
               degraded={isVideoDegraded}
               data-testid="participant_video_tile"
             />

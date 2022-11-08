@@ -1,26 +1,36 @@
 import React, { Fragment, useState } from "react";
-import {
-  VerticalMenuIcon,
-  InfoIcon,
-  MicOffIcon,
-  SettingsIcon,
-  PencilIcon,
-} from "@100mslive/react-icons";
+import { useMedia } from "react-use";
 import {
   selectLocalPeerID,
   selectPermissions,
   useHMSStore,
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { Box, Dropdown, Text, Tooltip } from "@100mslive/react-ui";
+import {
+  InfoIcon,
+  MicOffIcon,
+  PencilIcon,
+  RecordIcon,
+  SettingsIcon,
+  VerticalMenuIcon,
+} from "@100mslive/react-icons";
+import {
+  Box,
+  config as cssConfig,
+  Dropdown,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
+import IconButton from "../../IconButton";
+import { RoleChangeModal } from "../RoleChangeModal";
+import SettingsModal from "../Settings/SettingsModal";
+import StartRecording from "../Settings/StartRecording";
+import { StatsForNerds } from "../StatsForNerds";
+import { ChangeNameModal } from "./ChangeNameModal";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { FullScreenItem } from "./FullScreenItem";
-import SettingsModal from "../Settings/SettingsModal";
-import { RoleChangeModal } from "../RoleChangeModal";
-import { ChangeNameModal } from "./ChangeNameModal";
-import { StatsForNerds } from "../StatsForNerds";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import IconButton from "../../IconButton";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
@@ -31,7 +41,9 @@ export const MoreSettings = () => {
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
-
+  const [showStartRecording, setShowStartRecording] = useState(false);
+  const isMobile = useMedia(cssConfig.media.md);
+  const { isBrowserRecordingOn } = useRecordingStreaming();
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -50,6 +62,19 @@ export const MoreSettings = () => {
           align="center"
           css={{ maxHeight: "$96", "@md": { w: "$64" } }}
         >
+          {isMobile && permissions?.browserRecording ? (
+            <>
+              <Dropdown.Item
+                onClick={() => setShowStartRecording(value => !value)}
+              >
+                <RecordIcon />
+                <Text variant="sm" css={{ ml: "$4" }}>
+                  {isBrowserRecordingOn ? "Stop" : "Start"} Recording
+                </Text>
+              </Dropdown.Item>
+              <Dropdown.ItemSeparator />
+            </>
+          ) : null}
           <Dropdown.Item
             onClick={() => setShowChangeNameModal(value => !value)}
             data-testid="change_name_btn"
@@ -112,6 +137,12 @@ export const MoreSettings = () => {
         <RoleChangeModal
           peerId={localPeerId}
           onOpenChange={setShowSelfRoleChange}
+        />
+      )}
+      {showStartRecording && (
+        <StartRecording
+          open={showStartRecording}
+          onOpenChange={setShowStartRecording}
         />
       )}
     </Fragment>

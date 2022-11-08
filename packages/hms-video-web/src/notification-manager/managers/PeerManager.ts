@@ -1,11 +1,11 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { TrackManager } from './TrackManager';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
-import HMSLogger from '../../utils/logger';
-import { PeerNotification } from '../HMSNotifications';
-import { TrackManager } from './TrackManager';
 import { convertDateNumToDate } from '../../utils/date';
+import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { PeerNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -47,6 +47,7 @@ export class PeerManager {
 
   handlePeerList = (peers: PeerNotification[]) => {
     if (peers.length === 0) {
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, []);
       return;
     }
     const hmsPeers: HMSRemotePeer[] = [];
@@ -77,7 +78,7 @@ export class PeerManager {
   handlePeerLeave = (peer: PeerNotification) => {
     const hmsPeer = this.store.getPeerById(peer.peer_id);
     this.store.removePeer(peer.peer_id);
-    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.store.getPeers());
+    HMSLogger.d(this.TAG, `PEER_LEAVE`, peer.peer_id, `remainingPeers=${this.store.getPeers().length}`);
 
     if (!hmsPeer) {
       return;
@@ -139,7 +140,7 @@ export class PeerManager {
     });
 
     this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
+    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer.toString());
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({

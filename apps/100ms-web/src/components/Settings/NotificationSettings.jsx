@@ -12,8 +12,8 @@ import {
   useSetSubscribedNotifications,
   useSubscribedNotifications,
 } from "../AppData/useUISettings";
+import { settingOverflow } from "./common.js";
 import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
-import { settingOverflow } from './common.js';
 
 const NotificationItem = ({ type, label, icon, checked }) => {
   const [, setSubscribedNotifications] = useSetSubscribedNotifications(type);
