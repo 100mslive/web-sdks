@@ -53,7 +53,6 @@ const HLSView = () => {
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const hmsActions = useHMSActions();
   let [hlsStatsState, setHlsStatsState] = useState(null);
-  const [isStatsSubscribed, setIsStatsSubscribed] = useState(false);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
@@ -100,7 +99,7 @@ const HLSView = () => {
     return () => {
       hlsStats = null;
     };
-  }, []);
+  }, [hlsUrl]);
 
   useEffect(() => {
     if (!hlsStats) {
