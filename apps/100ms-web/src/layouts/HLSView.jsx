@@ -103,18 +103,20 @@ const HLSView = () => {
   }, []);
 
   useEffect(() => {
-    if (hlsStats) {
-      if (enablHlsStats && !isStatsSubscribed) {
-        hlsStats.subscribe(state => {
-          setHlsStatsState(state);
-        });
-        setIsStatsSubscribed(true);
-      } else if (!enablHlsStats && isStatsSubscribed) {
-        hlsStats.unsubscribe();
-        setIsStatsSubscribed(false);
-      }
+    if (!hlsStats) {
+      return;
     }
-  }, [hlsStatsState, isStatsSubscribed, enablHlsStats]);
+    if (enablHlsStats) {
+      hlsStats.subscribe(state => {
+        setHlsStatsState(state);
+      });
+    } else if (!enablHlsStats) {
+      hlsStats.unsubscribe();
+    }
+    return () => {
+      hlsStats?.unsubscribe();
+    };
+  }, [enablHlsStats]);
 
   useEffect(() => {
     if (hlsController) {
@@ -138,12 +140,6 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  const sfnHiddenSwitchHandler = event => {
-    if (event.detail === 5) {
-      sfnOverlayClose();
-    }
-  };
-
   return (
     <Fragment>
       {hlsStatsState?.url && enablHlsStats ? (
@@ -155,10 +151,6 @@ const HLSView = () => {
       {hlsUrl ? (
         <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
           <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          <Box
-            onClick={sfnHiddenSwitchHandler}
-            css={{ minHeight: "$lg", width: "100%" }}
-          />
           <Flex align="center" justify="end">
             {hlsController ? (
               <Button

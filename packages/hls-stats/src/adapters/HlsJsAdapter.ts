@@ -3,19 +3,17 @@ import { BaseAdapter } from './BaseAdapter';
 
 export class HlsJsAdapter extends BaseAdapter {
   timeUpdateHandler = _ => {
-    let totalBufferHealth = 0;
-
-    for (let i = 0; i < this.videoEl.buffered.length; i++) {
-      totalBufferHealth += this.videoEl.buffered.end(i) - this.videoEl.buffered.start(i);
-    }
-
+    const bufferedDuration =
+      this.videoEl.buffered.length > 0 ? this.videoEl.buffered.end(0) - this.videoEl.buffered.start(0) : 0;
+    const distanceFromLive =
+      (this.hlsInstance?.liveSyncPosition ? this.hlsInstance?.liveSyncPosition - this.videoEl.currentTime : 0) * 1000;
+    const quality = this.videoEl.getVideoPlaybackQuality();
+    const droppedFrames = quality.droppedVideoFrames;
     this.hlsStatsState = {
       ...this.hlsStatsState,
-      liveSyncPosition: this.hlsInstance?.liveSyncPosition as number,
-      distanceFromLiveSync: this.hlsInstance?.liveSyncPosition
-        ? this.hlsInstance?.liveSyncPosition - this.videoEl.currentTime
-        : 0,
-      bufferHealth: totalBufferHealth,
+      distanceFromLive: distanceFromLive > 0 ? distanceFromLive : 0,
+      bufferedDuration,
+      droppedFrames,
     };
   };
 
@@ -36,7 +34,6 @@ export class HlsJsAdapter extends BaseAdapter {
   fragChangedHandler = (_, { frag }) => {
     const { stats, baseurl } = frag;
     const { bwEstimate } = stats;
-
     this.hlsStatsState = {
       ...this.hlsStatsState,
       bandwidthEstimate: bwEstimate,
@@ -45,9 +42,7 @@ export class HlsJsAdapter extends BaseAdapter {
   };
 
   startGatheringStats(): void {
-    console.log('Start Gathering stats');
     this.hlsInstance.on(Hls.Events.FRAG_CHANGED, this.fragChangedHandler);
-
     this.hlsInstance.on(Hls.Events.LEVEL_LOADED, this.levelLoadedHandler);
     this.videoEl.addEventListener('timeupdate', this.timeUpdateHandler);
   }
