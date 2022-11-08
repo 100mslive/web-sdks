@@ -26,7 +26,7 @@ export interface HMSVideoTrackSettings {
   advanced?: Array<MediaTrackConstraintSet>;
 }
 
-export interface ScreenShareConfig {
+export interface HMSScreenShareConfig {
   audioOnly: boolean;
   videoOnly: boolean;
 }
