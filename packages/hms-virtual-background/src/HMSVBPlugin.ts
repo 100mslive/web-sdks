@@ -1,14 +1,14 @@
 /* eslint-disable complexity */
 import * as bodySegmentation from '@tensorflow-models/body-segmentation';
-// Register WebGL backend.
-import '@tensorflow/tfjs-backend-webgl';
-import { parseGIF, decompressFrames } from 'gifuct-js';
+import { decompressFrames, parseGIF } from 'gifuct-js';
 import {
   HMSPluginSupportResult,
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
+// Register WebGL backend.
+import '@tensorflow/tfjs-backend-webgl';
 
 const TAG = 'VBProcessor';
 const segmentationConfig = { flipHorizontal: true };
