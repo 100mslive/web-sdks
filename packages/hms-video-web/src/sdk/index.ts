@@ -544,7 +544,7 @@ export class HMSSdk implements HMSInterface {
     return hmsMessage;
   }
 
-  async startScreenShare(onStop: () => void, config?: Partial<HMSScreenShareConfig>) {
+  async startScreenShare(onStop: () => void, config?: HMSScreenShareConfig) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams) {
       return;
@@ -1026,7 +1026,7 @@ export class HMSSdk implements HMSInterface {
    * @param config
    * @returns
    */
-  private async getScreenshareTracks(onStop: () => void, config?: Partial<HMSScreenShareConfig>) {
+  private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
     const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
 
     const handleEnded = () => {
@@ -1037,7 +1037,11 @@ export class HMSSdk implements HMSInterface {
     if (config?.audioOnly) {
       videoTrack.nativeTrack.stop();
       if (!audioTrack) {
-        throw Error('Select share audio when sharing screen');
+        throw ErrorFactory.TracksErrors.NothingToReturn(
+          HMSAction.TRACK,
+          'Select share audio when sharing screen',
+          'No audio found',
+        );
       }
       tracks.push(audioTrack);
       audioTrack.nativeTrack.onended = handleEnded;

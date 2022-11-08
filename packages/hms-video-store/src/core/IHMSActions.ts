@@ -64,7 +64,7 @@ export interface IHMSActions {
    * @param enabled boolean
    * @param config check the config object for details about the fields
    */
-  setScreenShareEnabled(enabled: boolean, config?: Partial<HMSScreenShareConfig>): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)

@@ -215,7 +215,7 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, config?: Partial<HMSScreenShareConfig>) {
+  async setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig) {
     // TODO: remove this, purely for backward compatibility
     if (typeof config === 'boolean') {
       config = { audioOnly: config };
@@ -735,7 +735,7 @@ export class HMSSDKActions implements IHMSActions {
     }, 'ConnectionQuality');
   }
 
-  private async startScreenShare(config?: Partial<HMSScreenShareConfig>) {
+  private async startScreenShare(config?: HMSScreenShareConfig) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
       await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);

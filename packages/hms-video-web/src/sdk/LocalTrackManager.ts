@@ -148,7 +148,7 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  async getLocalScreen(config?: Partial<HMSScreenShareConfig>) {
+  async getLocalScreen(config?: HMSScreenShareConfig) {
     const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config?.videoOnly);
     const constraints = {
       video: videoSettings.toConstraints(),
