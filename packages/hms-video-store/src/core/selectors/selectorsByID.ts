@@ -9,7 +9,7 @@ import {
   selectTracksMap,
 } from './selectors';
 import {
-  getPeerTracksByCondition,
+  getScreenSharesByPeer,
   isAudio,
   isAudioPlaylist,
   isTrackEnabled,
@@ -266,7 +266,7 @@ export const selectAudioPlaylistTrackByPeerID = byIDCurry(
 
 export const selectScreenSharesByPeerId = byIDCurry(
   createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
-    return getPeerTracksByCondition(tracks, peer);
+    return getScreenSharesByPeer(tracks, peer);
   }),
 );
 
