@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { IStore } from './store';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
@@ -7,7 +8,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec } from '../interfaces';
+import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import {
   HMSAudioTrackSettings,
@@ -36,6 +37,7 @@ let blankCanvas: any;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
+  private captureHandleIdentifier?: string;
 
   constructor(
     private store: IStore,
@@ -43,7 +45,9 @@ export class LocalTrackManager {
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
     private analyticsTimer: AnalyticsTimer,
-  ) {}
+  ) {
+    this.setScreenCaptureHandleConfig();
+  }
 
   // eslint-disable-next-line complexity
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
@@ -193,9 +197,16 @@ export class LocalTrackManager {
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
     const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videoSettings);
-    if (config.cropTarget) {
+
+    try {
+      const isCurrentTabShared = this.validateCurrentTabCapture(videoTrack, config.forceCurrentTab);
+      videoTrack.isCurrentTab = isCurrentTabShared;
       await videoTrack.cropTo(config.cropTarget);
+    } catch (err) {
+      stream.getTracks().forEach(track => track.stop());
+      throw err;
     }
+
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
@@ -205,6 +216,31 @@ export class LocalTrackManager {
 
     HMSLogger.v(this.TAG, 'getLocalScreen', tracks);
     return tracks;
+  }
+
+  setScreenCaptureHandleConfig(config?: Partial<ScreenCaptureHandleConfig>) {
+    // @ts-ignore
+    if (!navigator.mediaDevices?.setCaptureHandleConfig) {
+      return;
+    }
+    config = config || {};
+    config.handle ||= uuid();
+    config.exposeOrigin ||= false;
+    config.permittedOrigins ||= [window.location.origin];
+    HMSLogger.d('setting capture handle - ', config.handle);
+    // @ts-ignore
+    navigator.mediaDevices.setCaptureHandleConfig(config);
+    this.captureHandleIdentifier = config.handle;
+  }
+
+  validateCurrentTabCapture(track: HMSLocalVideoTrack, forceCurrentTab: boolean): boolean {
+    const trackHandle = track.getCaptureHandle();
+    const isCurrentTabShared = !!(this.captureHandleIdentifier && trackHandle?.handle === this.captureHandleIdentifier);
+    if (forceCurrentTab && !isCurrentTabShared) {
+      HMSLogger.e(this.TAG, 'current tab was not shared with forceCurrentTab as true');
+      throw ErrorFactory.TracksErrors.CurrentTabNotShared();
+    }
+    return isCurrentTabShared;
   }
 
   async requestPermissions() {

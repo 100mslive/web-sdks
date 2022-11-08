@@ -90,3 +90,12 @@ export interface HMSScreenShareConfig {
    */
   cropTarget?: object;
 }
+
+export interface ScreenCaptureHandle {
+  handle: string;
+  exposeOrigin: boolean;
+}
+
+export interface ScreenCaptureHandleConfig extends ScreenCaptureHandle {
+  permittedOrigins: string[];
+}
