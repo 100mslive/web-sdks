@@ -44,6 +44,14 @@ export interface HMSScreenShareConfig {
    */
   videoOnly?: boolean;
   /**
+   * preselect the relevant tab in screenshare menu
+   * browser - for preferring a browser tab
+   * window - for application window
+   * monitor - for full screen
+   * @default monitor
+   */
+  displaySurface?: 'browser' | 'monitor' | 'window';
+  /**
    * show the current tab first in supported browser, throws
    * error if user doesn't select current tab for sharing.
    * @default false
