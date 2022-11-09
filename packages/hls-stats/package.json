@@ -2,11 +2,26 @@
   "name": "@100mslive/hls-stats",
   "version": "0.0.1",
   "description": "A simple library that provides stats for your hls stream",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": ["src", "dist"],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "prestart": "rm -rf dist",
-    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "prestart": "rm -rf dist && yarn types:build",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "prebuild": "rm -rf dist",
+    "build": "yarn build:only && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.json",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix"
   },
