@@ -1,2 +1,2 @@
-export { HlsStats } from './controllers/StatsForNerdsController';
-export type { IHlsStats } from './interfaces/IStatsForNerdsController';
+export { HlsStats } from './controllers/HlsStats';
+export type { IHlsStats } from './interfaces/IHlsStats';

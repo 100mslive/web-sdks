@@ -1,7 +1,7 @@
 import { BaseAdapter } from '../adapters/BaseAdapter';
 import { HlsJsAdapter } from '../adapters/HlsJsAdapter';
 import { HlsInstance, HlsPlayerStats } from '../interfaces';
-import { IHlsStats } from '../interfaces/IStatsForNerdsController';
+import { IHlsStats } from '../interfaces/IHlsStats';
 
 export class HlsStats implements IHlsStats {
   adapter: BaseAdapter;
