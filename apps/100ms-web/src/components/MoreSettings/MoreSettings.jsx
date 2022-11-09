@@ -3,6 +3,7 @@ import { useMedia } from "react-use";
 import {
   parsedUserAgent,
   selectAppData,
+  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPermissions,
@@ -35,6 +36,7 @@ import StartRecording from "../Settings/StartRecording";
 import { StatsForNerds } from "../StatsForNerds";
 import { ChangeNameModal } from "./ChangeNameModal";
 import { ChangeSelfRole } from "./ChangeSelfRole";
+import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
@@ -46,6 +48,7 @@ const isMobileOS = OSName === "android" || OSName === "ios";
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
@@ -53,6 +56,7 @@ export const MoreSettings = () => {
   const [open, setOpen] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showMuteAll, setShowMuteAll] = useState(false);
+  const [showOpenUrl, setShowOpenUrl] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
@@ -101,6 +105,9 @@ export const MoreSettings = () => {
           </Dropdown.Item>
           <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
           <FullScreenItem />
+          {isAllowedToPublish.screen && (
+            <EmbedUrl setShowOpenUrl={setShowOpenUrl} />
+          )}
           {permissions.mute && (
             <Dropdown.Item
               onClick={() => setShowMuteAll(true)}
@@ -190,6 +197,7 @@ export const MoreSettings = () => {
           onOpenChange={setShowStartRecording}
         />
       )}
+      {showOpenUrl && <EmbedUrlModal onOpenChange={setShowOpenUrl} />}
     </Fragment>
   );
 };
