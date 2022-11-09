@@ -1,5 +1,5 @@
 /* eslint-disable complexity */
-import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
+import { Results as MediaPipeResults, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 import { decompressFrames, parseGIF } from 'gifuct-js';
 import {
   HMSPluginSupportResult,
@@ -9,10 +9,13 @@ import {
 } from '@100mslive/hms-video';
 
 const TAG = '[VBProcessor]';
+type HMSBackgroundInput = HTMLImageElement | HTMLVideoElement | HTMLCanvasElement;
+export type HMSVirtualBackground = 'blur' | 'none' | HMSBackgroundInput;
+type HMSVirtualBackgroundType = 'blur' | 'none' | 'gif' | 'image' | 'video' | 'canvas';
+
 export class HMSVBPlugin implements HMSVideoPlugin {
-  background: string | HTMLImageElement | HTMLVideoElement;
-  isVirtualBackground: boolean;
-  backgroundType: 'image' | 'video' | 'gif' | 'none' | 'blur' = 'none';
+  background: HMSVirtualBackground;
+  backgroundType: HMSVirtualBackgroundType = 'none';
   segmentation!: SelfieSegmentation;
   outputCanvas?: HTMLCanvasElement;
   outputCtx?: CanvasRenderingContext2D | null;
@@ -24,9 +27,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   tempGifContext: any;
   giflocalCount: number;
 
-  constructor(background: string) {
+  constructor(background: HMSVirtualBackground) {
     this.background = background;
-    this.isVirtualBackground = false;
     this.gifFrames = null;
     this.gifFramesIndex = 0;
     this.gifFrameImageData = null;
@@ -34,24 +36,12 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.tempGifContext = this.tempGifCanvas.getContext('2d');
     this.giflocalCount = 0;
 
-    this.log(TAG, 'Virtual Background plugin created');
+    this.log('Virtual Background plugin created');
     this.setBackground(this.background);
   }
 
   isSupported(): boolean {
     return this.checkSupport().isSupported;
-  }
-
-  async init(): Promise<void> {
-    if (!this.segmentation) {
-      this.segmentation = new SelfieSegmentation({
-        locateFile: (file: string) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`;
-        },
-      });
-      this.segmentation.setOptions({ selfieMode: false, modelSelection: 1 });
-      this.segmentation.onResults(this.handleResults);
-    }
   }
 
   checkSupport(): HMSPluginSupportResult {
@@ -75,43 +65,53 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     return HMSVideoPluginType.TRANSFORM;
   }
 
-  async setBackground(bg: string | HTMLImageElement | HTMLVideoElement) {
+  async init(): Promise<void> {
+    if (!this.segmentation) {
+      this.segmentation = new SelfieSegmentation({
+        locateFile: (file: string) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`;
+        },
+      });
+      this.segmentation.setOptions({ selfieMode: false, modelSelection: 1 });
+      this.segmentation.onResults(this.handleResults);
+    }
+  }
+
+  async setBackground(bg: HMSVirtualBackground) {
     if (!bg) {
       throw new Error('Invalid background supplied, see the docs to check supported background type');
     }
     if (bg === 'none' || bg === 'blur') {
       this.background = bg;
       this.backgroundType = bg;
-      this.isVirtualBackground = false;
     } else if (bg instanceof HTMLImageElement) {
       this.log('setting background to image', bg);
-      const img = await this.setImage(bg as HTMLImageElement);
+      const img = await this.setImage(bg);
       if (!img || !img.complete || !img.naturalHeight) {
         throw new Error('Invalid image. Provide a valid and successfully loaded HTMLImageElement');
       } else {
-        this.isVirtualBackground = true;
         this.background = img;
         this.backgroundType = 'image';
       }
     } else if (bg instanceof HTMLVideoElement) {
       this.log('setting background to video', bg);
-      this.background = bg as HTMLVideoElement;
+      this.background = bg;
       this.background.crossOrigin = 'anonymous';
       this.background.muted = true;
       this.background.loop = true;
       this.background.oncanplaythrough = async () => {
-        if (this.background != null) {
-          await (this.background! as HTMLVideoElement).play();
-          this.isVirtualBackground = true;
-          this.backgroundType = 'video';
-        }
+        await (this.background as HTMLVideoElement)?.play();
+        this.backgroundType = 'video';
       };
+    } else if (bg instanceof HTMLCanvasElement) {
+      this.background = bg;
+      this.backgroundType = 'canvas';
     } else if (typeof bg === 'string') {
-      console.log('setting gif to background');
-      this.gifFrames = await this.setGiF(bg as string);
+      this.log('setting gif to background', bg);
+      this.gifFrames = await this.loadGIF(bg);
+      this.background = bg;
       if (this.gifFrames != null && this.gifFrames.length > 0) {
         this.backgroundType = 'gif';
-        this.isVirtualBackground = true;
       } else {
         throw new Error('Invalid background supplied, see the docs to check supported background type');
       }
@@ -119,12 +119,16 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   stop(): void {
-    this.segmentation?.reset();
+    if (this.background !== 'blur' && this.background !== 'none') {
+      this.segmentation?.reset();
+    }
     //gif related
     this.gifFrameImageData = null;
     this.gifFrames = null;
     this.giflocalCount = 0;
     this.gifFramesIndex = 0;
+    this.background = 'none';
+    this.backgroundType = 'none';
   }
 
   async processVideoFrame(input: HTMLCanvasElement, output: HTMLCanvasElement, skipProcessing?: boolean) {
@@ -138,6 +142,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     output.height = input.height;
     this.outputCanvas = output;
     this.outputCtx = output.getContext('2d');
+    if (this.background === 'none') {
+      this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
+      return;
+    }
     await this.segmentation.send({ image: input });
   }
 
@@ -149,46 +157,23 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     });
   }
 
-  private handleResults = (results: Results) => {
+  private handleResults = (results: MediaPipeResults) => {
     if (!this.outputCanvas || !this.outputCtx) {
       return;
     }
     this.outputCtx.save();
     this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    // Only overwrite existing pixels.
     if (typeof this.background !== 'string') {
-      this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-      this.outputCtx.filter = 'none';
-      this.outputCtx.imageSmoothingEnabled = true;
-      this.outputCtx.imageSmoothingQuality = 'high';
-      this.outputCtx.globalCompositeOperation = 'source-out';
-      this.outputCtx.drawImage(
-        this.background,
-        0,
-        0,
-        this.background.width,
-        this.background.height,
-        0,
-        0,
-        this.outputCanvas.width,
-        this.outputCanvas.height,
-      );
-      // Only overwrite missing pixels.
-      this.outputCtx.globalCompositeOperation = 'destination-atop';
-      this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    } else {
-      this.outputCtx!.filter = 'none';
-      this.outputCtx!.globalCompositeOperation = 'source-out';
-      this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-      this.outputCtx!.globalCompositeOperation = 'destination-atop';
-      this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-      this.outputCtx!.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
-      this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+      this.renderBackground(results, this.background);
+    } else if (this.background === 'blur') {
+      this.renderBlur(results);
+    } else if (this.backgroundType === 'gif') {
+      this.renderGIF(results);
     }
     this.outputCtx.restore();
   };
 
-  private setGiF(url: string): Promise<any> {
+  private loadGIF(url: string): Promise<any> {
     return fetch(url)
       .then(resp => resp.arrayBuffer())
       .then(buff => parseGIF(buff))
@@ -197,7 +182,63 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       });
   }
 
-  private log(tag: string, ...data: any[]) {
-    console.debug(tag, ...data);
+  private log(...data: any[]) {
+    console.debug(TAG, ...data);
+  }
+
+  private renderBackground = (results: MediaPipeResults, background: HMSBackgroundInput) => {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType === 'none' || this.backgroundType === 'blur') {
+      return;
+    }
+    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.filter = 'none';
+    this.outputCtx.imageSmoothingEnabled = true;
+    this.outputCtx.imageSmoothingQuality = 'high';
+    // Only overwrite existing pixels.
+    this.outputCtx.globalCompositeOperation = 'source-out';
+    this.outputCtx.drawImage(
+      background,
+      0,
+      0,
+      background.width,
+      background.height,
+      0,
+      0,
+      this.outputCanvas.width,
+      this.outputCanvas.height,
+    );
+    // Only overwrite missing pixels.
+    this.outputCtx.globalCompositeOperation = 'destination-atop';
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+  };
+
+  private renderBlur(results: MediaPipeResults) {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'blur') {
+      return;
+    }
+    this.outputCtx!.filter = 'none';
+    this.outputCtx!.globalCompositeOperation = 'source-out';
+    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx!.globalCompositeOperation = 'destination-atop';
+    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx!.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
+    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+  }
+
+  private renderGIF(results: MediaPipeResults) {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'gif') {
+      return;
+    }
+    if (this.gifFrameImageData == null) {
+      const dims = this.gifFrames[this.gifFramesIndex].dims;
+      this.tempGifCanvas.width = dims.width;
+      this.tempGifCanvas.height = dims.height;
+      this.gifFrameImageData = this.tempGifContext.createImageData(dims.width, dims.height);
+    }
+    // set the patch data as an override
+    this.gifFrameImageData.data.set(this.gifFrames[this.gifFramesIndex].patch);
+    this.tempGifContext.putImageData(this.gifFrameImageData, 0, 0);
+    this.gifFramesIndex = (this.gifFramesIndex + 1) % this.gifFrames.length;
+    this.renderBackground(results, this.tempGifCanvas);
   }
 }
