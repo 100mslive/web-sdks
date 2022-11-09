@@ -2,6 +2,8 @@ name: npm-install
 run-name: ${{ github.actor }} is checking if npm install is working!
 on: 
   push:
+    branches:
+      - main
     paths-ignore:
       - 'cypress/**'
       - 'playwright/**'

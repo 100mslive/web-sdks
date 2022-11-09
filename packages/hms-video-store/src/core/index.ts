@@ -33,4 +33,5 @@ export type {
   HLSConfig,
   HLSMeetingURLVariant,
   HMSScreenShareConfig,
+  ScreenCaptureHandle,
 } from './hmsSDKStore/sdkTypes';

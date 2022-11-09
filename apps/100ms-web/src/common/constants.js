@@ -109,6 +109,7 @@ export const APP_DATA = {
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
   sidePane: "sidePane",
+  hlsStats: "hlsStats",
   hlsViewerRole: "hlsViewerRole",
   subscribedNotifications: "subscribedNotifications",
   logo: "logo",
@@ -117,6 +118,7 @@ export const APP_DATA = {
   hlsStarted: "hlsStarted",
   rtmpStarted: "rtmpStarted",
   recordingStarted: "recordingStarted",
+  embedConfig: "embedConfig",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
