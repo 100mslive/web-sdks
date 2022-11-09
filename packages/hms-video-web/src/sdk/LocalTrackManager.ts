@@ -220,13 +220,12 @@ export class LocalTrackManager {
 
   setScreenCaptureHandleConfig(config?: Partial<ScreenCaptureHandleConfig>) {
     // @ts-ignore
-    if (!navigator.mediaDevices?.setCaptureHandleConfig) {
+    if (!navigator.mediaDevices?.setCaptureHandleConfig || this.isInIframe()) {
+      // setCaptureHandleConfig can't be called from within an iframe
       return;
     }
     config = config || {};
-    config.handle ||= uuid();
-    config.exposeOrigin ||= false;
-    config.permittedOrigins ||= [window.location.origin];
+    Object.assign(config, { handle: uuid(), exposeOrigin: false, permittedOrigins: [window.location.origin] });
     HMSLogger.d('setting capture handle - ', config.handle);
     // @ts-ignore
     navigator.mediaDevices.setCaptureHandleConfig(config);
@@ -329,6 +328,14 @@ export class LocalTrackManager {
       return null;
     }
     return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).build();
+  }
+
+  private isInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
   }
 
   // eslint-disable-next-line complexity
