@@ -156,7 +156,7 @@ export class LocalTrackManager {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
-      video: videoSettings.toConstraints(),
+      video: { ...videoSettings.toConstraints(), displaySurface: config.displaySurface },
       preferCurrentTab: config.preferCurrentTab,
       selfBrowserSurface: config.selfBrowserSurface,
       surfaceSwitching: config.surfaceSwitching,
@@ -527,6 +527,7 @@ export class LocalTrackManager {
         selfBrowserSurface: 'exclude', // don't give self tab in options
         surfaceSwitching: 'include', // give option to switch tabs while sharing
         systemAudio: 'exclude', // system audio share leads to echo in windows
+        displaySurface: 'monitor',
       },
       partialConfig || {},
     );
