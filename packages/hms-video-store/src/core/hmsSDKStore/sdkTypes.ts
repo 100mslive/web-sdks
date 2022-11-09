@@ -43,6 +43,7 @@ import {
   HMSWebrtcStats,
   parsedUserAgent,
   RTMPRecordingConfig,
+  ScreenCaptureHandle,
   SimulcastLayerDefinition,
 } from '@100mslive/hms-video';
 
@@ -95,4 +96,5 @@ export type {
   HMSConnectionQuality,
   HMSScreenShareConfig,
   HMSFrameworkInfo,
+  ScreenCaptureHandle,
 };
