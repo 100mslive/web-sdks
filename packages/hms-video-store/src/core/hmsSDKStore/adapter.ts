@@ -106,7 +106,10 @@ export class SDKToHMS {
 
   static enrichScreenTrack(track: HMSScreenVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
-      track.captureHandle = sdkTrack.getCaptureHandle?.();
+      const newCaptureHandle = sdkTrack.getCaptureHandle?.();
+      if (newCaptureHandle?.handle !== track.captureHandle?.handle) {
+        track.captureHandle = newCaptureHandle;
+      }
       if (sdkTrack.isCurrentTab) {
         track.displaySurface = 'selfBrowser';
       }
