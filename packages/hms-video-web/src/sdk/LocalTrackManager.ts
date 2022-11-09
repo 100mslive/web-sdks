@@ -156,7 +156,7 @@ export class LocalTrackManager {
     const config = await this.getOrDefaultScreenshareConfig(partialConfig);
     const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
-      video: { ...videoSettings.toConstraints(), displaySurface: config.displaySurface },
+      video: { ...videoSettings.toConstraints(true), displaySurface: config.displaySurface },
       preferCurrentTab: config.preferCurrentTab,
       selfBrowserSurface: config.selfBrowserSurface,
       surfaceSwitching: config.surfaceSwitching,
