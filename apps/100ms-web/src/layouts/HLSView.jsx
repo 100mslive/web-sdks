@@ -59,16 +59,12 @@ const HLSView = () => {
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
-
+  const videoEl = videoRef.current;
   useEffect(() => {
-    if (videoRef.current && hlsUrl) {
+    if (videoEl && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
-        hlsStats = new HlsStats(
-          hlsController.getHlsJsInstance(),
-          videoRef.current
-        );
-
+        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
@@ -88,11 +84,9 @@ const HLSView = () => {
           setAvailableLevels(onlyVideoLevels);
           setCurrentSelectedQualityText("Auto");
         });
-      } else if (
-        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
-      ) {
-        if (!videoRef.current.src) {
-          videoRef.current.src = hlsUrl;
+      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+        if (!videoEl.src) {
+          videoEl.src = hlsUrl;
         }
       }
     }

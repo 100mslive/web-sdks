@@ -1,8 +1,9 @@
 import { BaseAdapter } from '../adapters/BaseAdapter';
 import { HlsJsAdapter } from '../adapters/HlsJsAdapter';
 import { HlsInstance, HlsPlayerStats } from '../interfaces';
+import { IStatsForNerdsController } from '../interfaces/IStatsForNerdsController';
 
-export class StatsForNerdsController {
+export class StatsForNerdsController implements IStatsForNerdsController {
   adapter: BaseAdapter;
   intervalFunctionId = -1;
   constructor(hlsLibraryInstance: HlsInstance, videoEl: HTMLVideoElement) {

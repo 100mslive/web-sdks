@@ -1,11 +1,10 @@
-import React from "react";
+import React, { memo } from "react";
 import { CloseIcon, LinkIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text } from "@100mslive/react-ui";
 
 export function HlsStatsOverlay({ hlsStatsState, onClose }) {
   return (
     <Flex
-      id="hls-stats-overlay"
       css={{
         position: "absolute",
         minWidth: "60%",
@@ -21,7 +20,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       }}
       direction="column"
     >
-      <Flex id="hls-stats-row" justify="end">
+      <Flex justify="end">
         <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
@@ -39,19 +38,19 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
           </a>
         </Flex>
       </HlsStatsRow>
-      <HlsStatsRow label="Video Size">
+      <HlsStatsRow label="Video size">
         {` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}
       </HlsStatsRow>
-      <HlsStatsRow label="Buffer Durartion">
+      <HlsStatsRow label="Buffer duration">
         {hlsStatsState?.bufferedDuration?.toFixed(2)}{" "}
       </HlsStatsRow>
-      <HlsStatsRow label="Connection Speed">
+      <HlsStatsRow label="Connection speed">
         {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(2)}Mbps`}
       </HlsStatsRow>
       <HlsStatsRow label="Bitrate">
         {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}
       </HlsStatsRow>
-      <HlsStatsRow label="distance from Live">
+      <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
       <HlsStatsRow label="Total frames dropped">
@@ -84,9 +83,9 @@ export function getDurationFromSeconds(timeInSeconds) {
   return videoTimeStr;
 }
 
-const HlsStatsRow = ({ label, children }) => {
+const HlsStatsRow = memo(({ label, children }) => {
   return (
-    <Flex id="hls-stats-row" gap={4} justify="between" css={{ width: "100%" }}>
+    <Flex gap={4} justify="between" css={{ width: "100%" }}>
       <Text
         css={{
           width: "30%",
@@ -109,4 +108,4 @@ const HlsStatsRow = ({ label, children }) => {
       </Text>
     </Flex>
   );
-};
+});

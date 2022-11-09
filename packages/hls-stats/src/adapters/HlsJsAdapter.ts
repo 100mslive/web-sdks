@@ -6,7 +6,7 @@ export class HlsJsAdapter extends BaseAdapter {
     const bufferedDuration =
       this.videoEl.buffered.length > 0 ? this.videoEl.buffered.end(0) - this.videoEl.buffered.start(0) : 0;
     const distanceFromLive =
-      (this.hlsInstance?.liveSyncPosition ? this.hlsInstance?.liveSyncPosition - this.videoEl.currentTime : 0) * 1000;
+      (this.hlsInstance.liveSyncPosition ? this.hlsInstance.liveSyncPosition - this.videoEl.currentTime : 0) * 1000;
     const quality = this.videoEl.getVideoPlaybackQuality();
     const droppedFrames = quality.droppedVideoFrames;
     this.hlsStatsState = {

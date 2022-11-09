@@ -1,7 +1,7 @@
 import { HlsInstance, HlsPlayerStats } from '../interfaces';
 
 export abstract class BaseAdapter {
-  hlsInstance: HlsInstance;
+  hlsInstance: HlsInstance = {} as HlsInstance;
   videoEl: HTMLVideoElement;
   hlsStatsState: HlsPlayerStats = {};
   constructor(hlsInstance: HlsInstance, videoEl: HTMLVideoElement) {
