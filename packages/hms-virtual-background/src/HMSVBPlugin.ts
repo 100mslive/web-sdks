@@ -95,21 +95,25 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       }
     } else if (bg instanceof HTMLVideoElement) {
       this.log('setting background to video', bg);
+      this.backgroundType = 'none';
       this.background = bg;
       this.background.crossOrigin = 'anonymous';
       this.background.muted = true;
       this.background.loop = true;
       this.background.oncanplaythrough = async () => {
-        await (this.background as HTMLVideoElement)?.play();
-        this.backgroundType = 'video';
+        if (this.background) {
+          await (this.background as HTMLVideoElement).play();
+          this.backgroundType = 'video';
+        }
       };
     } else if (bg instanceof HTMLCanvasElement) {
       this.background = bg;
       this.backgroundType = 'canvas';
     } else if (typeof bg === 'string') {
       this.log('setting gif to background', bg);
-      this.gifFrames = await this.loadGIF(bg);
+      this.backgroundType = 'none';
       this.background = bg;
+      this.gifFrames = await this.loadGIF(bg);
       if (this.gifFrames != null && this.gifFrames.length > 0) {
         this.backgroundType = 'gif';
       } else {
@@ -142,7 +146,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     output.height = input.height;
     this.outputCanvas = output;
     this.outputCtx = output.getContext('2d');
-    if (this.background === 'none') {
+    if (this.backgroundType === 'none') {
       this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
       return;
     }
@@ -163,12 +167,18 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     }
     this.outputCtx.save();
     this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    if (typeof this.background !== 'string') {
-      this.renderBackground(results, this.background);
-    } else if (this.background === 'blur') {
-      this.renderBlur(results);
-    } else if (this.backgroundType === 'gif') {
-      this.renderGIF(results);
+    switch (this.backgroundType) {
+      case 'image':
+      case 'canvas':
+      case 'video':
+        this.renderBackground(results, this.background as HMSBackgroundInput);
+        break;
+      case 'gif':
+        this.renderGIF(results);
+        break;
+      case 'blur':
+        this.renderBlur(results);
+        break;
     }
     this.outputCtx.restore();
   };
