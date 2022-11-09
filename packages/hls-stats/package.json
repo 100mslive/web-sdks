@@ -29,6 +29,6 @@
   "license": "ISC",
   "devDependencies": {},
   "dependencies": {
-    "hls.js": "^1.2.4"
+    "hls.js": "^1.2.5"
   }
 }
