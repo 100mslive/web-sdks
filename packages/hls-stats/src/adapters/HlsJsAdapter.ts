@@ -2,7 +2,7 @@ import Hls from 'hls.js';
 import { BaseAdapter } from './BaseAdapter';
 
 export class HlsJsAdapter extends BaseAdapter {
-  timeUpdateHandler = _ => {
+  timeUpdateHandler = () => {
     const bufferedDuration =
       this.videoEl.buffered.length > 0 ? this.videoEl.buffered.end(0) - this.videoEl.buffered.start(0) : 0;
     const distanceFromLive =
@@ -17,8 +17,7 @@ export class HlsJsAdapter extends BaseAdapter {
     };
   };
 
-  levelLoadedHandler = (_, data) => {
-    const { level } = data;
+  levelLoadedHandler = (_: any, { level }: { level: number }) => {
     const currentLevel = this.hlsInstance.levels[level];
     const { bitrate, height, width } = currentLevel;
     this.hlsStatsState = {
@@ -31,7 +30,7 @@ export class HlsJsAdapter extends BaseAdapter {
     };
   };
 
-  fragChangedHandler = (_, { frag }) => {
+  fragChangedHandler = (_: any, { frag }: { frag: { stats: { bwEstimate: number }; baseurl: string } }) => {
     const { stats, baseurl } = frag;
     const { bwEstimate } = stats;
     this.hlsStatsState = {

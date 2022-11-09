@@ -1,17 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es6",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noImplicitAny": false,
-    "removeComments": true,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "declaration": true
+    "composite": false,
+    "incremental": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "emitDeclarationOnly": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
