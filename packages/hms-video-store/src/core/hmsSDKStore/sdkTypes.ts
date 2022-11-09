@@ -44,6 +44,7 @@ import {
   parsedUserAgent,
   RID,
   RTMPRecordingConfig,
+  ScreenCaptureHandle,
   SimulcastLayerDefinition,
   simulcastMapping,
 } from '@100mslive/hms-video';
@@ -99,4 +100,5 @@ export type {
   HMSScreenShareConfig,
   HMSFrameworkInfo,
   RID,
+  ScreenCaptureHandle,
 };

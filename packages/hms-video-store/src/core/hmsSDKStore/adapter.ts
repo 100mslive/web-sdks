@@ -21,6 +21,7 @@ import {
   HMSRoleChangeStoreRequest,
   HMSRoleName,
   HMSRoom,
+  HMSScreenVideoTrack,
   HMSTrack,
   HMSTrackFacingMode,
   HMSVideoTrack,
@@ -74,6 +75,7 @@ export class SDKToHMS {
       if (track.source === 'screen') {
         // @ts-ignore
         track.displaySurface = mediaSettings.displaySurface;
+        SDKToHMS.enrichScreenTrack(track as HMSScreenVideoTrack, sdkTrack);
       } else if (track.source === 'regular') {
         (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
       }
@@ -101,6 +103,18 @@ export class SDKToHMS {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack || sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
+      }
+    }
+  }
+
+  static enrichScreenTrack(track: HMSScreenVideoTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+      const newCaptureHandle = sdkTrack.getCaptureHandle?.();
+      if (newCaptureHandle?.handle !== track.captureHandle?.handle) {
+        track.captureHandle = newCaptureHandle;
+      }
+      if (sdkTrack.isCurrentTab) {
+        track.displaySurface = 'selfBrowser';
       }
     }
   }

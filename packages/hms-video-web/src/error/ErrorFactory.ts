@@ -222,6 +222,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    CurrentTabNotShared() {
+      return new HMSException(
+        ErrorCodes.TracksErrors.CURRENT_TAB_NOT_SHARED,
+        'CurrentTabNotShared',
+        HMSAction.TRACK,
+        'The app requires you to share the current tab',
+        'You must screen share the current tab in order to proceed',
+      );
+    },
   },
 
   WebrtcErrors: {
