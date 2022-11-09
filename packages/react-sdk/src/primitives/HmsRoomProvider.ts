@@ -11,6 +11,7 @@ import {
   HMSStore,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
+import { version } from './package.alias.json';
 import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
@@ -102,7 +103,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     providerProps.actions.setFrameworkInfo({
       type: 'react-web',
       version: React.version,
-      sdkVersion: require('../../package.json').version,
+      sdkVersion: version,
     });
   }
 

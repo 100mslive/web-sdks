@@ -1,9 +1,9 @@
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
-import esbuild from 'rollup-plugin-esbuild';
 import typescript from '@rollup/plugin-typescript';
-
+import esbuild from 'rollup-plugin-esbuild';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -21,6 +21,7 @@ const config = {
   plugins: [
     commonjs(),
     esbuild({ format: 'esm' }),
+    json(),
     resolve(),
     isProduction && terser(),
     typescript({ sourceMap: true }),
