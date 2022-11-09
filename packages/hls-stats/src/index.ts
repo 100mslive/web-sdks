@@ -1,4 +1,2 @@
-import { StatsForNerdsController } from './controllers/StatsForNerdsController';
-
-export const HlsStats = StatsForNerdsController;
-export type { IStatsForNerdsController as IHlsStats } from './interfaces/IStatsForNerdsController';
+export { HlsStats } from './controllers/StatsForNerdsController';
+export type { IHlsStats } from './interfaces/IStatsForNerdsController';

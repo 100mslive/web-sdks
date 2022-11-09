@@ -56,6 +56,7 @@ const HLSView = () => {
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
+
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
@@ -99,15 +100,16 @@ const HLSView = () => {
     if (!hlsStats) {
       return;
     }
+    let unsubscribe;
     if (enablHlsStats) {
-      hlsStats.subscribe(state => {
+      unsubscribe = hlsStats.subscribe(state => {
         setHlsStatsState(state);
       });
-    } else if (!enablHlsStats) {
-      hlsStats.unsubscribe();
+    } else {
+      unsubscribe?.();
     }
     return () => {
-      hlsStats?.unsubscribe();
+      unsubscribe?.();
     };
   }, [enablHlsStats]);
 
