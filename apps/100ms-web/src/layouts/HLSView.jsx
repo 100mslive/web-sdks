@@ -64,7 +64,10 @@ const HLSView = () => {
     if (videoRef.current && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
-        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoRef.current);
+        hlsStats = new HlsStats(
+          hlsController.getHlsJsInstance(),
+          videoRef.current
+        );
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
@@ -84,7 +87,9 @@ const HLSView = () => {
           setAvailableLevels(onlyVideoLevels);
           setCurrentSelectedQualityText("Auto");
         });
-      } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
+      } else if (
+        videoRef.current.canPlayType("application/vnd.apple.mpegurl")
+      ) {
         if (!videoRef.current.src) {
           videoRef.current.src = hlsUrl;
         }
