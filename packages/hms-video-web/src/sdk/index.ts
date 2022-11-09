@@ -27,8 +27,7 @@ import {
   HMSPlaylistType,
   HMSRole,
   HMSRoleChangeRequest,
-  HMSVideoCodec,
-  ScreenShareConfig,
+  HMSScreenShareConfig,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/device-change-listener';
 import { IErrorListener } from '../interfaces/error-listener';
@@ -39,7 +38,6 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -135,7 +133,6 @@ export class HMSSdk implements HMSInterface {
       this.observer,
       this.deviceManager,
       this.store,
-      this.localTrackManager,
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
@@ -547,7 +544,7 @@ export class HMSSdk implements HMSInterface {
     return hmsMessage;
   }
 
-  async startScreenShare(onStop: () => void, config: ScreenShareConfig = { audioOnly: false, videoOnly: false }) {
+  async startScreenShare(onStop: () => void, config?: HMSScreenShareConfig) {
     const publishParams = this.store.getPublishParams();
     if (!publishParams) {
       return;
@@ -1025,24 +1022,26 @@ export class HMSSdk implements HMSInterface {
 
   /**
    * Get screenshare based on policy and audioOnly flag
-   * @param {PublishParams} publishParams
    * @param {function} onStop
    * @param config
    * @returns
    */
-  private async getScreenshareTracks(onStop: () => void, config: ScreenShareConfig) {
-    const { video, audio } = this.getScreenshareSettings(config.videoOnly);
-    const [videoTrack, audioTrack] = await this.transport!.getLocalScreen(video, audio);
+  private async getScreenshareTracks(onStop: () => void, config?: HMSScreenShareConfig) {
+    const [videoTrack, audioTrack] = await this.localTrackManager.getLocalScreen(config);
 
     const handleEnded = () => {
       this.stopEndedScreenshare(onStop);
     };
 
     const tracks = [];
-    if (config.audioOnly) {
+    if (config?.audioOnly) {
       videoTrack.nativeTrack.stop();
       if (!audioTrack) {
-        throw Error('Select share audio when sharing screen');
+        throw ErrorFactory.TracksErrors.NothingToReturn(
+          HMSAction.TRACK,
+          'Select share audio when sharing screen',
+          'No audio found',
+        );
       }
       tracks.push(audioTrack);
       audioTrack.nativeTrack.onended = handleEnded;
@@ -1056,24 +1055,6 @@ export class HMSSdk implements HMSInterface {
     }
     return tracks;
   }
-
-  private getScreenshareSettings = (videoOnly: boolean) => {
-    const { screen } = this.store.getPublishParams()!;
-    const dimensions = this.store.getSimulcastDimensions('screen');
-
-    return {
-      video: new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build(),
-      audio: videoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
-    };
-  };
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);

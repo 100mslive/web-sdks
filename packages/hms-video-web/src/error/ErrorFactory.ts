@@ -149,12 +149,16 @@ export const ErrorFactory = {
       );
     },
 
-    NothingToReturn(action: HMSAction, description = '') {
+    NothingToReturn(
+      action: HMSAction,
+      description = '',
+      message = `There is no media to return. Please select either video or audio or both.`,
+    ) {
       return new HMSException(
         ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
-        `There is no media to return. Please select either video or audio or both.`,
+        message,
         description,
       );
     },

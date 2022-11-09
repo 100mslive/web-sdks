@@ -23,12 +23,10 @@ import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import { HMSAudioTrackSettings, HMSTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
-import { LocalTrackManager } from '../sdk/LocalTrackManager';
 import Message from '../sdk/models/HMSMessage';
 import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
@@ -89,7 +87,6 @@ export default class HMSTransport implements ITransport {
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private store: IStore,
-    private localTrackManager: LocalTrackManager,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
@@ -299,24 +296,6 @@ export default class HMSTransport implements ITransport {
       }
     },
   };
-
-  async getLocalScreen(
-    videoSettings: HMSVideoTrackSettings,
-    audioSettings?: HMSAudioTrackSettings,
-  ): Promise<Array<HMSLocalTrack>> {
-    try {
-      return await this.localTrackManager.getLocalScreen(videoSettings, audioSettings);
-    } catch (error) {
-      this.eventBus.analytics.publish(
-        AnalyticsEventFactory.publish({
-          error: error as Error,
-          devices: this.deviceManager.getDevices(),
-          settings: new HMSTrackSettings(videoSettings, audioSettings, false),
-        }),
-      );
-      throw error;
-    }
-  }
 
   getWebrtcInternals() {
     return this.webrtcInternals;

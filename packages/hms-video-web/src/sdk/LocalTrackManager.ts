@@ -7,7 +7,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
-import { HMSAudioCodec, HMSVideoCodec } from '../interfaces';
+import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import {
   HMSAudioTrackSettings,
@@ -47,7 +47,7 @@ export class LocalTrackManager {
 
   // eslint-disable-next-line complexity
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
-    const trackSettings = this.getTrackSettings(initialSettings);
+    const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
     }
@@ -148,9 +148,10 @@ export class LocalTrackManager {
     return nativeTracks;
   }
 
-  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings?: HMSAudioTrackSettings) {
+  async getLocalScreen(config?: HMSScreenShareConfig) {
+    const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config?.videoOnly);
     const constraints = {
-      video: videosettings.toConstraints(),
+      video: videoSettings.toConstraints(),
     } as MediaStreamConstraints;
     if (audioSettings) {
       const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
@@ -170,13 +171,22 @@ export class LocalTrackManager {
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
+      const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          error: error as Error,
+          devices: this.deviceManager.getDevices(),
+          settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+        }),
+      );
+      throw error;
     }
 
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videosettings);
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videoSettings);
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
@@ -267,14 +277,13 @@ export class LocalTrackManager {
     }
   }
 
-  private getTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
+  private getAVTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
     const audioSettings = this.getAudioSettings(initialSettings);
     const videoSettings = this.getVideoSettings(initialSettings);
     if (!audioSettings && !videoSettings) {
       return null;
     }
-    const screenSettings = this.getScreenSettings();
-    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
+    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).build();
   }
 
   // eslint-disable-next-line complexity
@@ -436,24 +445,22 @@ export class LocalTrackManager {
       .build();
   }
 
-  private getScreenSettings() {
-    const publishParams = this.store.getPublishParams();
-    if (!publishParams || !publishParams.allowed?.includes('screen')) {
-      return null;
-    }
-    const screen = publishParams.screen;
-    const { width = screen.width, height = screen.height } = this.store.getSimulcastDimensions('screen') || {};
-    return (
-      new HMSVideoTrackSettingsBuilder()
+  private getScreenshareSettings(isVideoOnly = false) {
+    const { screen } = this.store.getPublishParams()!;
+    const dimensions = this.store.getSimulcastDimensions('screen');
+
+    return {
+      video: new HMSVideoTrackSettingsBuilder()
         // Don't cap maxBitrate for screenshare.
         // If publish params doesn't have bitRate value - don't set maxBitrate.
         .maxBitrate(screen.bitRate, false)
         .codec(screen.codec as HMSVideoCodec)
         .maxFramerate(screen.frameRate)
-        .setWidth(width)
-        .setHeight(height)
-        .build()
-    );
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build(),
+      audio: isVideoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
+    };
   }
 
   private createHMSLocalTracks(

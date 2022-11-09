@@ -26,7 +26,21 @@ export interface HMSVideoTrackSettings {
   advanced?: Array<MediaTrackConstraintSet>;
 }
 
-export interface ScreenShareConfig {
-  audioOnly: boolean;
-  videoOnly: boolean;
+/**
+ * Config to have control over screenshare being captured. Note that
+ * not all fields are supported on all browsers. Even when they're supported
+ * the fields acts as hints and the browser can override them.
+ */
+export interface HMSScreenShareConfig {
+  /**
+   * discard the video and only share audio track with others, useful
+   * for sharing music.
+   * @default false
+   */
+  audioOnly?: boolean;
+  /**
+   * do not give an option to share audio while screen sharing.
+   * @default false
+   */
+  videoOnly?: boolean;
 }
