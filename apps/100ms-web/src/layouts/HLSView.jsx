@@ -86,9 +86,7 @@ const HLSView = () => {
           setCurrentSelectedQualityText("Auto");
         });
       } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        if (!videoEl.src) {
-          videoEl.src = hlsUrl;
-        }
+        videoEl.src = hlsUrl;
       }
     }
     return () => {
