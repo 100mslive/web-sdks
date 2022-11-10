@@ -31,10 +31,10 @@
   "author": "Ragzzy-R",
   "license": "ISC",
   "devDependencies": {
-    "hls.js": "^1.2.4"
+    "hls.js": "^1.2.5"
   },
   "peerDependencies": {
-    "hls.js": "^1.2.4"
+    "hls.js": "^1.2.5"
   },
   "dependencies": {}
 }
