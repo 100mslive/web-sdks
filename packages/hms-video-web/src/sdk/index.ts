@@ -701,12 +701,7 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot start streaming or recording',
       );
     }
-    try {
-      await this.transport?.startRTMPOrRecording(params);
-    } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error));
-      throw error;
-    }
+    await this.transport?.startRTMPOrRecording(params);
   }
 
   async stopRTMPAndRecording() {
@@ -716,12 +711,7 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop streaming or recording',
       );
     }
-    try {
-      await this.transport?.stopRTMPOrRecording();
-    } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.RTMPError(error as Error, false));
-      throw error;
-    }
+    await this.transport?.stopRTMPOrRecording();
   }
 
   async startHLSStreaming(params?: HLSConfig) {
@@ -731,12 +721,7 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot start HLS streaming',
       );
     }
-    try {
-      await this.transport?.startHLSStreaming(params);
-    } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error));
-      throw error;
-    }
+    await this.transport?.startHLSStreaming(params);
   }
 
   async stopHLSStreaming(params?: HLSConfig) {
@@ -746,12 +731,7 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop HLS streaming',
       );
     }
-    try {
-      await this.transport?.stopHLSStreaming(params);
-    } catch (error) {
-      this.sendAnalyticsEvent(AnalyticsEventFactory.HLSError(error as Error, false));
-      throw error;
-    }
+    await this.transport?.stopHLSStreaming(params);
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
