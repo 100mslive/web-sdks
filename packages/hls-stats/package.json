@@ -5,7 +5,10 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "files": ["src", "dist"],
+  "files": [
+    "src",
+    "dist"
+  ],
   "exports": {
     ".": {
       "require": "./dist/index.cjs.js",
@@ -27,8 +30,11 @@
   },
   "author": "Ragzzy-R",
   "license": "ISC",
-  "devDependencies": {},
-  "dependencies": {
+  "devDependencies": {
     "hls.js": "^1.2.5"
-  }
+  },
+  "peerDependencies": {
+    "hls.js": "^1.2.5"
+  },
+  "dependencies": {}
 }
