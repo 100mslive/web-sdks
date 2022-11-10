@@ -1,6 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
-import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import esbuild from 'rollup-plugin-esbuild';
 import { terser } from 'rollup-plugin-terser';
@@ -19,9 +19,9 @@ const config = {
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
   plugins: [
+    replace({ preventAssignment: true, 'process.env.REACT_SDK_VERSION': JSON.stringify(pkg.version) }),
     commonjs(),
     esbuild({ format: 'esm' }),
-    json(),
     resolve(),
     isProduction && terser(),
     typescript({ sourceMap: true }),
