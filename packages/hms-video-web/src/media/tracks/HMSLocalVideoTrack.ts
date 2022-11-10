@@ -1,10 +1,12 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
+import { HMSVideoTrackSettings as IHMSVideoTrackSettings, ScreenCaptureHandle } from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import HMSLogger from '../../utils/logger';
 import { getVideoTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
@@ -21,6 +23,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private TAG = 'LocalVideoTrack';
+
+  /**
+   * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
+   * at the point of writing this comment.
+   */
+  isCurrentTab = false;
 
   /**
    * @internal
@@ -149,6 +158,43 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+  }
+
+  /**
+   * only for screenshare track to crop to a cropTarget
+   * @internal
+   */
+  async cropTo(cropTarget?: object) {
+    if (!cropTarget) {
+      return;
+    }
+    if (this.source !== 'screen') {
+      return;
+    }
+    try {
+      // @ts-ignore
+      if (this.nativeTrack.cropTo) {
+        // @ts-ignore
+        await this.nativeTrack.cropTo(cropTarget);
+      }
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'failed to crop screenshare capture - ', err);
+      throw ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, 'failed to crop screenshare capture');
+    }
+  }
+
+  /**
+   * only for screenshare track to get the captureHandle
+   * TODO: add an API for capturehandlechange event
+   * @internal
+   */
+  getCaptureHandle(): ScreenCaptureHandle | undefined {
+    // @ts-ignore
+    if (this.nativeTrack.getCaptureHandle) {
+      // @ts-ignore
+      return this.nativeTrack.getCaptureHandle();
+    }
+    return undefined;
   }
 
   /**

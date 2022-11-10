@@ -30,6 +30,7 @@ import {
   HMSRoom,
   HMSRoomUpdate,
   HMSRTMP,
+  HMSScreenShareConfig,
   HMSSimulcastLayer,
   HMSSpeaker,
   HMSTrackStats,
@@ -42,6 +43,7 @@ import {
   HMSWebrtcStats,
   parsedUserAgent,
   RTMPRecordingConfig,
+  ScreenCaptureHandle,
   SimulcastLayerDefinition,
 } from '@100mslive/hms-video';
 
@@ -92,5 +94,7 @@ export type {
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HMSConnectionQuality,
+  HMSScreenShareConfig,
   HMSFrameworkInfo,
+  ScreenCaptureHandle,
 };
