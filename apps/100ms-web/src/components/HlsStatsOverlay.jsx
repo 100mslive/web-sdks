@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { CloseIcon, LinkIcon } from "@100mslive/react-icons";
+import { CloseIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text } from "@100mslive/react-ui";
 
 export function HlsStatsOverlay({ hlsStatsState, onClose }) {
@@ -9,23 +9,6 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
         position: "absolute",
         width: "$80",
         marginLeft: "$8",
-        // "@xl": {
-        //   minWidth: "30%",
-        // },
-        // "@lg": {
-        //   minWidth: "40%",
-        // },
-        // "@md": {
-        //   minWidth: "40%",
-        // },
-        // "@sm": {
-        //   minWidth: "45%",
-        //   margin: "$0",
-        // },
-        // "@xs": {
-        //   minWidth: "100%",
-        //   margin: "$0",
-        // },
         padding: "$8 $8 $10",
         zIndex: 100,
         backgroundColor: "rgba(55,59,66, 0.84)",
@@ -34,17 +17,14 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       }}
       direction="column"
     >
-      {/* <Flex justify="end"> */}
       <IconButton
         css={{ position: "absolute", top: "$2", right: "$2" }}
         onClick={onClose}
       >
         <CloseIcon />
       </IconButton>
-      {/* </Flex> */}
       <HlsStatsRow label="URL">
         <Flex align="center">
-          {/* <LinkIcon /> */}
           <a
             style={{ cursor: "pointer", textDecoration: "underline" }}
             href={hlsStatsState?.url}
