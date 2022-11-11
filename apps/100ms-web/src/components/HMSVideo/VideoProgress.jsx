@@ -1,5 +1,5 @@
+import { useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@100mslive/react-ui";
-import { useEffect, useState, useRef } from "react";
 import { getPercentage } from "./HMSVIdeoUtils";
 
 export const VideoProgress = ({ onValueChange, videoRef }) => {
