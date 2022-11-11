@@ -50,6 +50,7 @@ export default class InitService {
       if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
         throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
       }
+      HMSLogger.e(TAG, `${error}`);
       throw error;
     }
   }
