@@ -4,16 +4,8 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { CSS, keyframes } from '@stitches/react';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
+import {slideDown,slideUp} from "../utils"
 
-const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: 'var(--radix-accordion-content-height)' },
-});
-
-const slideUp = keyframes({
-  from: { height: 'var(--radix-accordion-content-height)' },
-  to: { height: 0 },
-});
 
 const StyledAccordion = styled(BaseAccordion.Root, {
 });

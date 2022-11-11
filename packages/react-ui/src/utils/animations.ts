@@ -1,5 +1,15 @@
 import { keyframes } from '../Theme';
 
+export const slideDown = keyframes({
+  from: { height: 0 },
+  to: { height: 'var(--radix-accordion-content-height)' },
+});
+
+export const slideUp = keyframes({
+  from: { height: 'var(--radix-accordion-content-height)' },
+  to: { height: 0 },
+});
+
 export const dialogOpen = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
   '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
