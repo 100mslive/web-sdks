@@ -46,7 +46,7 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
   return videoRef.current ? (
     <Flex
       ref={progressRootRef}
-      style={{ cursor: "pointer" }}
+      css={{ paddingLeft: "$8", paddingRight: "$8", cursor: "pointer" }}
       onClick={onProgressChangeHandler}
     >
       <Box

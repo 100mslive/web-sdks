@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useFullscreen } from "react-use";
+import { useFullscreen, useToggle } from "react-use";
+import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import {
   selectAppData,
@@ -7,15 +8,12 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { HlsStats } from "@100mslive/hls-stats";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Text, Tooltip } from "@100mslive/react-ui";
-
+import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
-
-import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
   HLS_STREAM_NO_LONGER_LIVE,
@@ -40,13 +38,16 @@ const HLSView = () => {
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  // const [isFullScreen, setIsFullScreen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  useFullscreen(hlsViewRef, isFullScreen, {
-    onClose: () => setIsFullScreen(false),
-  });
+  // useFullscreen(hlsViewRef, isFullScreen, {
+  //   onClose: () => setIsFullScreen(false),
+  // });
 
-  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+  const [show, toggle] = useToggle(false);
+  const isFullScreen = useFullscreen(hlsViewRef, show, {
+    onClose: () => toggle(false),
+  });
   useEffect(() => {
     let videoEl = videoRef.current;
     if (videoEl && hlsUrl) {
@@ -71,6 +72,12 @@ const HLSView = () => {
           const onlyVideoLevels = removeAudioLevels(levels);
           setAvailableLevels(onlyVideoLevels);
           setCurrentSelectedQualityText("Auto");
+        });
+        hlsController.on(Hls.Events.LEVEL_UPDATED, (_, { details, level }) => {
+          const qualityLevel = hlsController.getHlsJsInstance().levels[level];
+          const levelText =
+            qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
+          setCurrentSelectedQualityText(levelText);
         });
       } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         videoEl.src = hlsUrl;
@@ -108,37 +115,32 @@ const HLSView = () => {
     qualityLevel => {
       if (hlsController) {
         hlsController.setCurrentLevel(qualityLevel);
-        const levelText =
-          qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
-        setCurrentSelectedQualityText(levelText);
       }
     },
     [availableLevels] //eslint-disable-line
   );
 
-  function toggleFullScreen() {
-    if (hlsViewRef) {
-      setIsFullScreen(!isFullScreen);
-    }
-  }
+  // function toggleFullScreen() {
+  //   if (hlsViewRef) {
+  //     setIsFullScreen(!isFullScreen);
+  //   }
+  // }
 
-  return (
-    <Box
-      key="hls-viewer"
-      id="hls-viewer"
-      ref={hlsViewRef}
-      css={{
-        verticalAlign: "middle",
-        display: "inline",
-        height: "100%",
-      }}
-    >
   const sfnOverlayClose = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
   return (
-    <Fragment>
+    <Flex
+      key="hls-viewer"
+      id="hls-viewer"
+      ref={hlsViewRef}
+      css={{
+        verticalAlign: "middle",
+        width: "100%",
+        height: "100%",
+      }}
+    >
       {hlsStatsState?.url && enablHlsStats ? (
         <HlsStatsOverlay
           hlsStatsState={hlsStatsState}
@@ -147,10 +149,11 @@ const HLSView = () => {
       ) : null}
       {hlsUrl ? (
         <Flex
+          id="hls-player-container"
           align="center"
           justify="center"
           css={{
-            width: "95%",
+            width: "100%",
             margin: "auto",
             height: "90%",
             "@md": { height: "90%" },
@@ -159,7 +162,9 @@ const HLSView = () => {
         >
           <HMSVideoPlayer.Root ref={videoRef}>
             <HMSVideoPlayer.Progress videoRef={videoRef} />
-            <HMSVideoPlayer.Controls.Root>
+            <HMSVideoPlayer.Controls.Root
+              css={{ paddingLeft: "$8", paddingRight: "$8" }}
+            >
               <HMSVideoPlayer.Controls.Left>
                 <HMSVideoPlayer.PlayButton
                   onClick={() => {
@@ -211,7 +216,7 @@ const HLSView = () => {
                   qualitySelectorHandler={qualitySelectorHandler}
                 />
                 <FullScreenButton
-                  onToggle={toggleFullScreen}
+                  onToggle={toggle}
                   icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
                 />
               </HMSVideoPlayer.Controls.Right>
@@ -225,7 +230,7 @@ const HLSView = () => {
           </Text>
         </Flex>
       )}
-    </Box>
+    </Flex>
   );
 };
 

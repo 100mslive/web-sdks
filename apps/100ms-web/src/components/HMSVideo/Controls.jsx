@@ -8,13 +8,13 @@ export const VideoControls = styled(Flex, {
 });
 
 export const LeftControls = styled(Flex, {
-  justifyContent: "start",
+  justifyContent: "flex-start",
   alignItems: "center",
   width: "100%",
   gap: 2,
 });
 export const RightControls = styled(Flex, {
-  justifyContent: "end",
+  justifyContent: "flex-end",
   alignItems: "center",
   width: "100%",
   gap: 2,

@@ -7,17 +7,26 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
     <Flex
       css={{
         position: "absolute",
-        minWidth: "60%",
-        margin: "$8 0  0 $20",
-        "@md": {
-          minWidth: "60%",
-          margin: "$8 0  0 $8",
-        },
-        "@sm": {
-          minWidth: "100%",
-          margin: "$0",
-        },
-        padding: "$2 $4 $2 $4",
+        width: "$80",
+        marginLeft: "$8",
+        // "@xl": {
+        //   minWidth: "30%",
+        // },
+        // "@lg": {
+        //   minWidth: "40%",
+        // },
+        // "@md": {
+        //   minWidth: "40%",
+        // },
+        // "@sm": {
+        //   minWidth: "45%",
+        //   margin: "$0",
+        // },
+        // "@xs": {
+        //   minWidth: "100%",
+        //   margin: "$0",
+        // },
+        padding: "$8 $8 $10",
         zIndex: 100,
         backgroundColor: "rgba(55,59,66, 0.84)",
 
@@ -25,14 +34,17 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       }}
       direction="column"
     >
-      <Flex justify="end">
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      </Flex>
+      {/* <Flex justify="end"> */}
+      <IconButton
+        css={{ position: "absolute", top: "$2", right: "$2" }}
+        onClick={onClose}
+      >
+        <CloseIcon />
+      </IconButton>
+      {/* </Flex> */}
       <HlsStatsRow label="URL">
         <Flex align="center">
-          <LinkIcon />
+          {/* <LinkIcon /> */}
           <a
             style={{ cursor: "pointer", textDecoration: "underline" }}
             href={hlsStatsState?.url}
@@ -58,7 +70,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
-      <HlsStatsRow label="Total frames dropped">
+      <HlsStatsRow label="Dropped frames">
         {`${hlsStatsState?.droppedFrames}`}
       </HlsStatsRow>
     </Flex>
@@ -90,12 +102,13 @@ export function getDurationFromSeconds(timeInSeconds) {
 
 const HlsStatsRow = memo(({ label, children }) => {
   return (
-    <Flex gap={4} justify="between" css={{ width: "100%" }}>
+    <Flex gap={4} justify="center" css={{ width: "100%" }}>
       <Text
         css={{
-          width: "30%",
+          width: "50%",
           "@md": { fontSize: "$md" },
           "@sm": { fontSize: "$sm" },
+          // textAlign: "right",
         }}
       >
         {label}
@@ -104,9 +117,9 @@ const HlsStatsRow = memo(({ label, children }) => {
         css={{
           "@md": { fontSize: "$md" },
           "@sm": { fontSize: "$sm" },
-          maxWidth: "70%",
-          minWidth: "50%",
+          width: "50%",
           overflowWrap: "break-word",
+          // textAlign: "left",
         }}
       >
         {children}

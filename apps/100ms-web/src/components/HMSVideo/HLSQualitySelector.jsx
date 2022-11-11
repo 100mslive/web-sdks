@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Dropdown, Flex, Tooltip, Text, Box } from "@100mslive/react-ui";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   SettingsIcon,
 } from "@100mslive/react-icons";
+import { Box, Dropdown, Flex, Text, Tooltip } from "@100mslive/react-ui";
 
 export function HLSQualitySelector({
   availableLevels,
@@ -26,7 +26,6 @@ export function HLSQualitySelector({
             borderRadius: "$1",
             margin: "0px",
             cursor: "pointer",
-            zIndex: 40,
             border: "1px solid $textDisabled",
             padding: "$2 $4",
           }}
