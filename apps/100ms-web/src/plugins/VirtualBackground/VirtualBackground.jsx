@@ -17,7 +17,9 @@ export const VirtualBackground = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-  const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent("HMSVB"));
+  const isVBPresent = useHMSStore(
+    selectIsLocalVideoPluginPresent("HMSPosePlugin")
+  );
 
   async function createPlugin() {
     if (!pluginRef.current) {
