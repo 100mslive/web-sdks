@@ -111,7 +111,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
     drawLandmarks(this.outputCtx, results.poseLandmarks, {
       color: '#FFF',
       lineWidth: 2,
-      radius: 2,
+      radius: 4,
       fillColor: 'rgb(255,138,0)',
     });
     this.outputCtx.restore();
