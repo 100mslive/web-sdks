@@ -33,6 +33,8 @@
     "@100mslive/hms-video": "0.5.5-alpha.7"
   },
   "dependencies": {
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
+    "@mediapipe/pose": "^0.5.1635988162",
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
     "@tensorflow-models/body-segmentation": "^1.0.1",
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
