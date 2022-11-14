@@ -52,6 +52,7 @@ import {
 import {
   HMSRoleChangeRequest,
   selectHMSMessagesCount,
+  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -192,9 +193,12 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async leave() {
+    const isInPreview = this.store.getState(selectIsInPreview);
     const hasRoomStarted = this.store.getState(selectRoomStarted);
-    if (!hasRoomStarted) {
-      this.logPossibleInconsistency('room leave is called when no room is connected');
+    if (!hasRoomStarted || isInPreview) {
+      if (!hasRoomStarted) {
+        this.logPossibleInconsistency('room leave is called when no room is connected');
+      }
       return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
