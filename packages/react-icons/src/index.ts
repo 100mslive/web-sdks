@@ -68,6 +68,7 @@ export { default as DoorIcon } from './DoorIcon';
 export { default as DownloadIcon } from './DownloadIcon';
 export { default as DragHandleIcon } from './DragHandleIcon';
 export { default as EditIcon } from './EditIcon';
+export { default as EllipsisIcon } from './EllipsisIcon';
 export { default as EmojiIcon } from './EmojiIcon';
 export { default as EndStreamIcon } from './EndStreamIcon';
 export { default as ExitIcon } from './ExitIcon';
