@@ -585,9 +585,12 @@ export default class HMSTransport implements ITransport {
     }
   }
   async changeName(name: string) {
-    await this.signal.updatePeer({
-      name: name,
-    });
+    const peer = this.store.getLocalPeer();
+    if (peer && peer.name !== name) {
+      await this.signal.updatePeer({
+        name: name,
+      });
+    }
   }
 
   async changeMetadata(metadata: string) {
