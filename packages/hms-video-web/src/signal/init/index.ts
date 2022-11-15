@@ -1,5 +1,6 @@
 import { InitConfig } from './models';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
 import HMSLogger from '../../utils/logger';
 
 const TAG = 'InitService';
@@ -46,12 +47,17 @@ export default class InitService {
       HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
       return transformInitConfig(config);
     } catch (err) {
-      const error = err as Error;
-      if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
+      if (err instanceof HMSException) {
+        HMSLogger.e(TAG, `${err}`);
+        throw err;
+      } else {
+        // handle network error thrown by fetch
+        const error = err as Error;
+        if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
+          throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
+        }
+        throw error;
       }
-      HMSLogger.e(TAG, `${error}`);
-      throw error;
     }
   }
 }
