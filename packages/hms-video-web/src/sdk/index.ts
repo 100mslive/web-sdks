@@ -57,9 +57,9 @@ import { TransportState } from '../transport/models/TransportState';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
+import { RTCLoopback } from '../utils/rtcloopback';
 import { isNode } from '../utils/support';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-import { RTCLoopback } from '../utils/rtcloopback';
 
 // @DISCUSS: Adding it here as a hotfix
 const defaultSettings = {
