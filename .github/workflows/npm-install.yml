@@ -1,0 +1,30 @@
+name: npm-install
+run-name: ${{ github.actor }} is checking if npm install is working!
+on: 
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'cypress/**'
+      - 'playwright/**'
+      - 'internal-docs/**'
+      - '.github/**'
+
+jobs:
+  install-npm:
+    strategy:
+      matrix:
+        node: [ 16, 17, 18 ]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: Testing Node - ${{ matrix.node }} on ${{ matrix.os }} 
+    steps:
+      - uses: Bhacaz/checkout-files@v2
+        with:
+          files: apps/100ms-web
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - name: npm install
+        working-directory: apps/100ms-web
+        run: npm install

@@ -12,7 +12,9 @@ export interface ISignalEventsObserver {
 
   onFailure(exception: HMSException): void;
 
-  onOffline(): void;
+  onOffline(reason: string): void;
 
   onOnline(): void;
+
+  onNetworkOnline(): void;
 }

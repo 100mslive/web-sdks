@@ -1,6 +1,7 @@
+import { SelectedDevices } from './DeviceManager';
 import { DeviceMap } from '../interfaces';
 import { LocalStorage } from '../utils/local-storage';
-import { SelectedDevices } from './DeviceManager';
+import HMSLogger from '../utils/logger';
 
 type DeviceInfo = { deviceId?: string; groupId?: string };
 /**
@@ -12,6 +13,7 @@ class DeviceStorage {
   private storage = new LocalStorage<SelectedDevices>('hms-device-selection');
   private remember = false;
   private devices?: DeviceMap;
+  private TAG = 'HMSDeviceStorage';
 
   setDevices(devices: DeviceMap) {
     this.devices = devices;
@@ -33,6 +35,7 @@ class DeviceStorage {
     }
     const newSelection = this.devices[type].find(device => this.isSame({ deviceId, groupId }, device));
     if (!newSelection) {
+      HMSLogger.w(this.TAG, `Could not find device with deviceId: ${deviceId}, groupId: ${groupId}`);
       return;
     }
     const selectedDevices = this.storage.get() || {};

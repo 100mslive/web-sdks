@@ -1,14 +1,22 @@
 {
-  "version": "0.2.88",
+  "version": "0.7.1",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "engines": {
     "node": ">=12"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
@@ -17,7 +25,7 @@
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.build.json",
+    "types:build": "tsc -p tsconfig.json",
     "format": "prettier --write src/**/*.ts",
     "test": "jest --maxWorkers=1",
     "test:watch": "jest --watch",
@@ -33,8 +41,8 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.1.42",
-    "eventemitter2": "^6.4.5",
+    "@100mslive/hms-video": "0.6.1",
+    "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"

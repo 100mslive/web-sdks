@@ -10,7 +10,14 @@ import {
   HMSTrackType,
 } from '../../core';
 import { HMSSimulcastLayer } from '../../core/hmsSDKStore/sdkTypes';
-import { HMSPlaylist, HMSPlaylistType, HMSRole } from '../../core/schema';
+import {
+  HMSAudioTrack,
+  HMSPlaylist,
+  HMSPlaylistType,
+  HMSRole,
+  HMSScreenVideoTrack,
+  HMSVideoTrack,
+} from '../../core/schema';
 
 function makeTrack(
   id: HMSTrackID,
@@ -35,10 +42,10 @@ export let localPeer: HMSPeer;
 export let remotePeerOne: HMSPeer;
 export let remotePeerTwo: HMSPeer;
 export let peerScreenSharing: HMSPeer;
-export let localVideo: HMSTrack;
-export let localAudio: HMSTrack;
-export let remoteVideo: HMSTrack;
-export let screenShare: HMSTrack;
+export let localVideo: HMSVideoTrack;
+export let localAudio: HMSAudioTrack;
+export let remoteVideo: HMSVideoTrack;
+export let screenShare: HMSScreenVideoTrack;
 export let auxiliaryAudio: HMSTrack;
 export let localSpeaker: HMSSpeaker;
 export let screenshareAudio: HMSTrack;
@@ -61,14 +68,15 @@ export const makeFakeStore = (): HMSStore => {
       name: 'test room',
       peers: ['1', '2', '3'],
       localPeer: '1',
-      shareableLink: '',
-      hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {
         browser: {
           running: false,
         },
         server: {
+          running: false,
+        },
+        hls: {
           running: false,
         },
       },
@@ -80,6 +88,9 @@ export const makeFakeStore = (): HMSStore => {
         variants: [],
       },
       sessionId: '',
+    },
+    appData: {
+      isAudioOnly: true,
     },
     peers: {
       '1': {
@@ -184,6 +195,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hello!',
           time: new Date(),
+          ignored: false,
         },
         '202': {
           id: '202',
@@ -195,6 +207,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hi!',
           time: new Date(),
+          ignored: false,
         },
         '203': {
           id: '203',
@@ -206,6 +219,7 @@ export const makeFakeStore = (): HMSStore => {
           type: HMSMessageType.CHAT,
           message: 'hi!',
           time: new Date(),
+          ignored: false,
         },
       },
       allIDs: ['201', '202', '203'],
@@ -215,6 +229,16 @@ export const makeFakeStore = (): HMSStore => {
         audioLevel: 75,
         peerID: '1',
         trackID: '102',
+      },
+    },
+    connectionQualities: {
+      '1': {
+        peerID: '1',
+        downlinkQuality: 50,
+      },
+      '2': {
+        peerID: '2',
+        downlinkQuality: 80,
       },
     },
     settings: {
@@ -263,10 +287,10 @@ export const makeFakeStore = (): HMSStore => {
   remotePeerOne = fakeStore.peers['2'];
   remotePeerTwo = fakeStore.peers['3'];
   peerScreenSharing = fakeStore.peers['2'];
-  localVideo = fakeStore.tracks['101'];
-  localAudio = fakeStore.tracks['102'];
-  remoteVideo = fakeStore.tracks['103'];
-  screenShare = fakeStore.tracks['105'];
+  localVideo = fakeStore.tracks['101'] as HMSVideoTrack;
+  localAudio = fakeStore.tracks['102'] as HMSAudioTrack;
+  remoteVideo = fakeStore.tracks['103'] as HMSVideoTrack;
+  screenShare = fakeStore.tracks['105'] as HMSScreenVideoTrack;
   auxiliaryAudio = fakeStore.tracks['106'];
   screenshareAudio = fakeStore.tracks['107'];
   localSpeaker = fakeStore.speakers[localPeer.audioTrack!];

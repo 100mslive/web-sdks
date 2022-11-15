@@ -1,30 +1,32 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
-import HMSRoom from '../models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import { HMSSpeaker } from '../../interfaces';
-import { IErrorListener } from '../../interfaces/error-listener';
-import {
-  HMSTrack,
-  HMSVideoTrack,
-  HMSAudioTrack,
-  HMSTrackType,
-  HMSTrackSource,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-} from '../../media/tracks';
-import {
-  SimulcastLayer,
-  SimulcastLayers,
-  SimulcastDimensions,
-  simulcastMapping,
-  RID,
-  SimulcastLayerDefinition,
-} from '../../interfaces/simulcast-layers';
 import { Comparator } from './Comparator';
-import { HMSConfig, PublishParams } from '../../interfaces';
+import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
+import {
+  RID,
+  SimulcastDimensions,
+  SimulcastLayer,
+  SimulcastLayerDefinition,
+  SimulcastLayers,
+  simulcastMapping,
+} from '../../interfaces/simulcast-layers';
+import {
+  HMSAudioTrack,
+  HMSLocalTrack,
+  HMSRemoteVideoTrack,
+  HMSTrack,
+  HMSTrackSource,
+  HMSTrackType,
+  HMSVideoTrack,
+} from '../../media/tracks';
+import { ENV } from '../../utils/support';
+import { createUserAgent } from '../../utils/user-agent';
+import HMSRoom from '../models/HMSRoom';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
   private readonly comparator: Comparator = new Comparator(this);
@@ -42,9 +44,16 @@ class Store implements IStore {
   private config?: HMSConfig;
   private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
+  private roleDetailsArrived = false;
+  private env: ENV = ENV.PROD;
+  private userAgent: string = createUserAgent(this.env);
 
   getConfig() {
     return this.config;
+  }
+
+  getEnv() {
+    return this.env;
   }
 
   getPublishParams() {
@@ -122,7 +131,27 @@ class Store implements IStore {
   }
 
   getTrackById(trackId: string) {
-    return this.tracks[trackId];
+    const track = this.tracks[trackId];
+    if (track) {
+      return track;
+    }
+    const localPeer = this.getLocalPeer();
+    /**
+     * handle case of audio level coming from server for local peer's track where local peer
+     * didn't initially gave audio permission. So track.firstTrackId is that of dummy track and
+     * this.tracks[trackId] doesn't exist.
+     * Example repro which this solves -
+     * - call preview with audio muted, unmute audio in preview then join the room, now initial
+     * track id is that from dummy track but the track id which server knows will be different
+     */
+    if (localPeer) {
+      if (localPeer.audioTrack?.isPublishedTrackId(trackId)) {
+        return localPeer.audioTrack;
+      } else if (localPeer.videoTrack?.isPublishedTrackId(trackId)) {
+        return localPeer.videoTrack;
+      }
+    }
+    return undefined;
   }
 
   getPeerByTrackId(trackId: string) {
@@ -138,15 +167,29 @@ class Store implements IStore {
     return this.speakers.map(speaker => speaker.peer);
   }
 
+  getUserAgent() {
+    return this.userAgent;
+  }
+
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
+    this.userAgent = createUserAgent(this.env, frameworkInfo);
+  }
+
   setRoom(room: HMSRoom) {
     this.room = room;
   }
 
   setKnownRoles(knownRoles: KnownRoles) {
     this.knownRoles = knownRoles;
+    this.roleDetailsArrived = true;
     this.updatePeersPolicy();
   }
 
+  hasRoleDetailsArrived(): boolean {
+    return this.roleDetailsArrived;
+  }
+
+  // eslint-disable-next-line complexity
   setConfig(config: HMSConfig) {
     DeviceStorageManager.rememberDevices(Boolean(config.rememberDeviceSelection));
     if (config.rememberDeviceSelection) {
@@ -167,6 +210,7 @@ class Store implements IStore {
       }
     }
     this.config = config;
+    this.setEnv();
   }
 
   setPublishParams(params: PublishParams) {
@@ -216,10 +260,12 @@ class Store implements IStore {
     this.getAudioTracks().forEach(track => track.setVolume(value));
   }
 
-  updateAudioOutputDevice(device: MediaDeviceInfo) {
+  async updateAudioOutputDevice(device: MediaDeviceInfo) {
+    const promises: Promise<void>[] = [];
     this.getAudioTracks().forEach(track => {
-      track.setOutputDevice(device);
+      promises.push(track.setOutputDevice(device));
     });
+    await Promise.all(promises);
   }
 
   getSubscribeDegradationParams() {
@@ -285,22 +331,21 @@ class Store implements IStore {
     } else if (source === 'screen') {
       simulcastLayers = publishParams.screenSimulcastLayers;
     }
-    if (!simulcastLayers || !simulcastLayers.layers || simulcastLayers.layers.length === 0) {
-      return [];
-    }
-    const width = simulcastLayers.width;
-    const height = simulcastLayers.height;
-    return simulcastLayers.layers.map(value => {
-      const layer = simulcastMapping[value.rid as RID];
-      const resolution = {
-        width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
-        height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
-      };
-      return {
-        layer,
-        resolution,
-      } as SimulcastLayerDefinition;
-    });
+    const width = simulcastLayers?.width;
+    const height = simulcastLayers?.height;
+    return (
+      simulcastLayers?.layers?.map(value => {
+        const layer = simulcastMapping[value.rid as RID];
+        const resolution = {
+          width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
+          height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
+        };
+        return {
+          layer,
+          resolution,
+        } as SimulcastLayerDefinition;
+      }) || []
+    );
   }
 
   cleanUp() {
@@ -308,7 +353,10 @@ class Store implements IStore {
     for (const track of tracks) {
       track.cleanup();
     }
+    this.room = undefined;
     this.config = undefined;
+    this.localPeerId = undefined;
+    this.roleDetailsArrived = false;
   }
 
   setErrorListener(listener: IErrorListener) {
@@ -323,6 +371,21 @@ class Store implements IStore {
       }
       peer.role = this.getPolicyForRole(peer.role.name);
     });
+  }
+
+  private setEnv() {
+    const endPoint = this.config?.initEndpoint!;
+    const url = endPoint.split('https://')[1];
+    let env: ENV = ENV.PROD;
+    if (url.startsWith(ENV.PROD)) {
+      env = ENV.PROD;
+    } else if (url.startsWith(ENV.QA)) {
+      env = ENV.QA;
+    } else if (url.startsWith(ENV.DEV)) {
+      env = ENV.DEV;
+    }
+    this.env = env;
+    HTTPAnalyticsTransport.setEnv(env);
   }
 }
 

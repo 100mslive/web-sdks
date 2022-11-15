@@ -1,16 +1,26 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSDeviceChangeEvent } from '../interfaces';
-import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
-import { HMSRemoteVideoTrack } from '../media/tracks';
+import AnalyticsEvent from '../analytics/AnalyticsEvent';
+import { HMSException } from '../error/HMSException';
+import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { PolicyParams } from '../notification-manager';
 import { HMSWebrtcStats } from '../rtc-stats';
+import { HMSRemotePeer } from '../sdk/models/peer';
+import { HMSEvents } from '../utils/constants';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
   readonly deviceChange = new HMSInternalEvent<HMSDeviceChangeEvent>(HMSEvents.DEVICE_CHANGE, this.eventEmitter);
-  readonly localAudioEnabled = new HMSInternalEvent<boolean>(HMSEvents.LOCAL_AUDIO_ENABLED, this.eventEmitter);
-  readonly localVideoEnabled = new HMSInternalEvent<boolean>(HMSEvents.LOCAL_VIDEO_ENABLED, this.eventEmitter);
+  readonly localAudioEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalAudioTrack }>(
+    HMSEvents.LOCAL_AUDIO_ENABLED,
+    this.eventEmitter,
+  );
+  readonly localVideoEnabled = new HMSInternalEvent<{ enabled: boolean; track: HMSLocalVideoTrack }>(
+    HMSEvents.LOCAL_VIDEO_ENABLED,
+    this.eventEmitter,
+  );
 
   /**
    * Emitter which processes raw RTC stats from rtcStatsUpdate and calls client callback
@@ -27,4 +37,37 @@ export class EventBus {
     HMSEvents.TRACK_AUDIO_LEVEL_UPDATE,
     this.eventEmitter,
   );
+
+  readonly audioPluginFailed = new HMSInternalEvent<HMSException>(HMSEvents.AUDIO_PLUGIN_FAILED, this.eventEmitter);
+
+  readonly localAudioSilence = new HMSInternalEvent<{ track: HMSLocalAudioTrack }>(
+    HMSEvents.LOCAL_AUDIO_SILENCE,
+    this.eventEmitter,
+  );
+
+  readonly analytics = new HMSInternalEvent<AnalyticsEvent>(HMSEvents.ANALYTICS, this.eventEmitter);
+
+  readonly policyChange = new HMSInternalEvent<PolicyParams>(HMSEvents.POLICY_CHANGE, this.eventEmitter);
+
+  readonly localRoleUpdate = new HMSInternalEvent<{ oldRole: HMSRole; newRole: HMSRole }>(
+    HMSEvents.LOCAL_ROLE_UPDATE,
+    this.eventEmitter,
+  );
+
+  readonly audioTrackUpdate = new HMSInternalEvent<{ track: HMSRemoteAudioTrack; enabled: boolean }>(
+    HMSEvents.AUDIO_TRACK_UPDATE,
+    this.eventEmitter,
+  );
+
+  readonly audioTrackAdded = new HMSInternalEvent<{ track: HMSRemoteAudioTrack; peer: HMSRemotePeer }>(
+    HMSEvents.AUDIO_TRACK_ADDED,
+    this.eventEmitter,
+  );
+
+  readonly audioTrackRemoved = new HMSInternalEvent<HMSRemoteAudioTrack>(
+    HMSEvents.AUDIO_TRACK_REMOVED,
+    this.eventEmitter,
+  );
+
+  readonly autoplayError = new HMSInternalEvent<HMSException>(HMSEvents.AUTOPLAY_ERROR, this.eventEmitter);
 }

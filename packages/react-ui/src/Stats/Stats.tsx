@@ -1,20 +1,30 @@
 import React from 'react';
-import { useHMSStatsStore, HMSTrackID, HMSTrackStats, selectHMSStats } from '@100mslive/react-sdk';
+import {
+  HMSPeerID,
+  HMSTrackID,
+  HMSTrackStats,
+  selectConnectionQualityByPeerID,
+  selectHMSStats,
+  useHMSStatsStore,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
   audioTrackID?: HMSTrackID;
+  peerID?: HMSPeerID;
 }
 
 /**
  * This component can be used to overlay webrtc stats over the Video Tile. For the local tracks it also includes
  * remote inbound stats as sent by the SFU in receiver report.
  */
-export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsProps) {
+export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTileStatsProps) {
   const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
   const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+  const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
@@ -53,6 +63,12 @@ export function VideoTileStats({ videoTrackID, audioTrackID }: VideoTileStatsPro
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 
+          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
+
+          <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
+
+          <StatsRow show={isNotNullish(audioTrackStats?.codec)} label="Codec(A)" value={audioTrackStats?.codec} />
+
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
       </table>
@@ -90,7 +106,7 @@ const TrackPacketsLostRow = ({
   stats?: Pick<HMSTrackStats, 'packetsLost' | 'packetsLostRate'>;
   label: string;
 }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
+  const packetsLostRate = `${stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0}/s`;
 
   return (
     <StatsRow
@@ -125,6 +141,6 @@ export function isNotNullishAndNot0(value: number | undefined | null) {
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNotNullish(value: number | undefined | null) {
+export function isNotNullish(value: number | string | undefined | null) {
   return value !== undefined && value !== null;
 }

@@ -1,4 +1,6 @@
-import { styled } from '../stitches.config';
+import { Box } from '../Layout';
+import { styled } from '../Theme';
+import { flexCenter } from '../utils';
 
 export const Root = styled('div', {
   padding: '0.75rem',
@@ -16,6 +18,14 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  background: '$tileBg',
+  variants: {
+    transparentBg: {
+      true: {
+        background: 'transparent',
+      },
+    },
+  },
 });
 
 const Overlay = styled('div', {
@@ -25,7 +35,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$fg',
+  color: '$textPrimary',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -36,36 +46,59 @@ const Info = styled('div', {
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
-});
-
-const AvatarContainer = styled('div', {
-  position: 'absolute',
-  left: '50%',
-  top: '50%',
-  transform: 'translateX(-50%) translateY(-50%)',
+  fontFamily: '$sans',
 });
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  left: '20px',
-  bottom: '20px',
-  color: '$fg',
+  color: '$textPrimary',
 });
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  bottom: '20px',
-  color: 'white',
-  bg: '$redMain',
+  top: '$2',
+  right: '$2',
+  color: '$white',
+  bg: '$error',
   borderRadius: '$round',
-  width: '28px',
-  height: '28px',
+  width: '$13',
+  height: '$13',
+  mb: '5px',
+  ...flexCenter,
+});
+
+const FullScreenButton = styled('button', {
+  width: '2.25rem',
+  height: '2.25rem',
+  color: '$textHighEmp',
+  borderRadius: '$round',
+  backgroundColor: '$menuBg',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  mb: '5px',
+  position: 'absolute',
+  top: '$2',
+  right: '$2',
+  zIndex: 5,
+  '&:not([disabled]):focus': {
+    outline: 'none',
+    boxShadow: '0 0 0 3px $colors$brandLight',
+  },
+});
+
+const AvatarContainer = styled(Box, {
+  ...flexCenter,
+  flexDirection: 'column',
+  position: 'absolute',
+  left: '50%',
+  top: '50%',
+  transform: 'translateX(-50%) translateY(-50%)',
+  width: '100%',
+  height: '100%',
+  '& > * + *': {
+    marginBottom: '0',
+    marginTop: '$4',
+  },
 });
 
 interface VideoTileType {
@@ -76,6 +109,7 @@ interface VideoTileType {
   AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
   AttributeBox: typeof AttributeBox;
+  FullScreenButton: typeof FullScreenButton;
 }
 
 export const StyledVideoTile: VideoTileType = {
@@ -85,5 +119,6 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AudioIndicator,
   AvatarContainer,
-  AttributeBox: AttributeBox,
+  AttributeBox,
+  FullScreenButton,
 };

@@ -1,22 +1,27 @@
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
-// noinspection ES6PreferShortImport
-import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
-  getPeerTracksByCondition,
+  getScreenSharesByPeer,
+  isAudioPlaylist,
   isDegraded,
-  isVideoPlaylist,
   isTrackDisplayEnabled,
   isTrackEnabled,
-  isAudioPlaylist,
   isVideo,
+  isVideoPlaylist,
 } from './selectorUtils';
+// noinspection ES6PreferShortImport
+import { HMSRole } from '../hmsSDKStore/sdkTypes';
+import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
 
 /**
  * Select the current {@link HMSRoom} object to which you are connected.
  * @param store
  */
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
+
+/**
+ * Select the ID of the current room to which you are connected.
+ */
+export const selectRoomID = createSelector(selectRoom, room => room.id);
 
 /**
  * @internal
@@ -46,6 +51,12 @@ export const selectTracksMap = (store: HMSStore) => store.tracks;
 export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
 
 /**
+ * select appData.
+ * @internal
+ */
+export const selectFullAppData = (store: HMSStore) => store.appData;
+
+/**
  * Select the available audio input, audio output and video input devices on your machine.
  * @param store
  * @returns An object of array of available audio input, audio output and video input devices.
@@ -65,13 +76,36 @@ export const selectSpeakers = (store: HMSStore) => {
   return store.speakers;
 };
 
+export const selectConnectionQualities = (store: HMSStore) => {
+  return store.connectionQualities;
+};
+
 /**
  * Select a boolean flag denoting whether you've joined a room.
  * NOTE: Returns true only after join, returns false during preview.
  */
 export const selectIsConnectedToRoom = createSelector([selectRoom], room => room && room.isConnected);
 
-export const selectPeerCount = createSelector(selectRoom, room => room.peers.length);
+/**
+ * selectPeerCount gives the number of peers Inside the room. This doesn't count the local peer if
+ * they're still in preview and haven't yet joined the room. Note that this will not necessarily equal the
+ * number of peers received through selectPeers, it's possible to know total number of people in the room
+ * without having details of everyone depending on dashboard settings.
+ */
+export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRoom], (isConnected, room) => {
+  if (isConnected) {
+    // if we have peer count from server return that else return number of peers in the store.
+    // In case the strongly consistent peer list is disabled and only eventual consistent count and peer
+    // details is sent, room.peerCount may be 0 for a few second even though local peer is connected, send 1 in that case.
+    // TODO: Fix this at populating room.peerCount level than in selector.
+    return room.peerCount !== undefined ? room.peerCount || 1 : room.peers.length;
+  } else {
+    // if we have peer count from server return that, else return number of peers except the local one because local is
+    // not joined yet.
+    // Math.max to ensure we're not returning -1, if the selector is called before local peer is put in the store
+    return Math.max(room.peerCount !== undefined ? room.peerCount : room.peers.length - 1, 0);
+  }
+});
 
 /**
  * Select an array of peers(remote peers and your local peer) present in the room.
@@ -100,6 +134,16 @@ export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room,
 export const selectLocalPeerID = createSelector(selectRoom, room => {
   return room.localPeer;
 });
+
+/**
+ * Select the peer name of your local peer.
+ */
+export const selectLocalPeerName = createSelector(selectLocalPeer, peer => peer?.name);
+
+/**
+ * Select the role name of your local peer.
+ */
+export const selectLocalPeerRoleName = createSelector(selectLocalPeer, peer => peer?.roleName);
 
 /**
  * Select the track ID of your local peer's primary audio track
@@ -190,7 +234,7 @@ export const selectIsLocalVideoDisplayEnabled = (store: HMSStore) => {
  * Select a boolean denoting whether your screen is shared to remote peers in the room.
  */
 export const selectIsLocalScreenShared = createSelector(selectLocalPeer, selectTracksMap, (localPeer, tracksMap) => {
-  const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
+  const { video, audio } = getScreenSharesByPeer(tracksMap, localPeer);
   return !!(video || audio);
 });
 
@@ -201,7 +245,7 @@ export const selectPeerScreenSharing = createSelector(selectPeersMap, selectTrac
   let screensharePeer = undefined;
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       return peer;
     } else if (audio && !screensharePeer) {
@@ -224,7 +268,7 @@ export const selectIsSomeoneScreenSharing = createSelector(selectPeerScreenShari
 export const selectPeerSharingAudio = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
+    const { audio, video } = getScreenSharesByPeer(tracksMap, peer);
     if (!video && !!audio) {
       return peer;
     }
@@ -240,7 +284,7 @@ export const selectPeersScreenSharing = createSelector(selectPeersMap, selectTra
   const audioPeers = [];
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       videoPeers.push(peer);
     } else if (audio) {
@@ -273,7 +317,9 @@ export const selectPeerSharingAudioPlaylist = createSelector(selectPeersMap, sel
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
  */
-export const selectDegradedTracks = createSelector(selectTracks, tracks => tracks.filter(isDegraded));
+export const selectDegradedTracks = createSelector(selectTracks, tracks =>
+  (tracks as HMSVideoTrack[]).filter(isDegraded),
+);
 
 /**
  * Select the number of messages(sent and received).
@@ -348,3 +394,5 @@ export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
+/** @alpha */
+export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;

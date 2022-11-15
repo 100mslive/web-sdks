@@ -1,23 +1,26 @@
 import {
-  HMSConfig,
-  HMSSimulcastLayer,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSLogLevel,
-  HMSVideoPlugin,
+  HLSTimedMetadata,
   HMSAudioPlugin,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSLogLevel,
+  HMSPluginSupportResult,
+  HMSScreenShareConfig,
+  HMSSimulcastLayer,
+  HMSVideoPlugin,
+  HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
+import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
+  HMSChangeMultiTrackStateParams,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
-  HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -47,7 +50,7 @@ export interface IHMSActions {
    *
    * @param config join config with room id, required for joining the room
    */
-  join(config: HMSConfig): void;
+  join(config: HMSConfig): Promise<void>;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
@@ -59,9 +62,9 @@ export interface IHMSActions {
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
-   * @param audioOnly boolean To publish only audio from screenshare
+   * @param config check the config object for details about the fields
    */
-  setScreenShareEnabled(enabled: boolean, audioOnly?: boolean): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
@@ -184,18 +187,18 @@ export interface IHMSActions {
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */
-  setAudioOutputDevice(deviceId: string): void;
+  setAudioOutputDevice(deviceId: string): Promise<void>;
 
+  refreshDevices(): Promise<void>;
   /**
-   * set the quality of the selected videoTrack
-   * @param trackId
-   * @param layer
+   * set the quality of the selected videoTrack for simulcast.
+   * @alpha
    */
   setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
-   * Video plugins can be added/removed at any time after the join is successful.
+   * Video plugins can be added/removed at any time after the video track is available.
    * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
    * @param pluginFrameRate number
@@ -203,13 +206,36 @@ export interface IHMSActions {
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
+  /**
+   * To check the support of the plugin, based on browser, os and audio devices
+   * @param plugin HMSVideoPlugin
+   * @see HMSPluginSupportResult
+   */
+  validateVideoPluginSupport(plugin: HMSVideoPlugin): HMSPluginSupportResult;
+
+  /**
+   * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
+   * Audio plugins can be added/removed at any time after the audio track is available
+   * @param plugin HMSAudioPlugin
+   * @see HMSAudioPlugin
+   */
   addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
+
+  /**
+   * To check the support of the plugin, based on browser, os and audio devices
+   * @param plugin HMSAudioPlugin
+   * @see HMSPluginSupportResult
+   */
+  validateAudioPluginSupport(plugin: HMSAudioPlugin): HMSPluginSupportResult;
 
   /**
    * @see addPluginToVideoTrack
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
 
   /**
@@ -285,29 +311,64 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * If you want to start HLS streaming.
-   * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
+   * If you have configured HLS streaming from dashboard, no params are required.
+   * otherwise @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
 
   /**
+   * @alpha
+   * Used to define date range metadata in a media playlist.
+   * This api adds EXT-X-DATERANGE tags to the media playlist.
+   * It is useful for defining timed metadata for interstitial regions such as advertisements,
+   * but can be used to define any timed metadata needed by your stream.
+   * usage (e.g)
+   * const metadataList = [{
+   *  payload: "some string 1",
+   *  duration: 2
+   * },
+   * {
+   *  payload: "some string 2",
+   *  duration: 3
+   * }]
+   * sendHLSTimedMetadata(metadataList);
+   */
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
+
+  /**
    * If you want to update the name of peer.
-   * @beta
    */
   changeName(name: string): Promise<void>;
 
   /**
-   * If you want to update the metadata of peer.
-   * @beta
+   * If you want to update the metadata of local peer. If an object is passed, it should be serializable using
+   * JSON.stringify.
    */
   changeMetadata(metadata: string | any): Promise<void>;
+
+  /**
+   * If you want to update the metadata of the session. If an object is passed, it should be serializable using
+   * JSON.stringify.
+   *
+   * Session metadata is available to every peer in the room and is persisted throughout a session
+   * till the last peer leaves a room
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  setSessionMetadata(metadata: any): Promise<void>;
+
+  /**
+   * Fetch the current room metadata from the server and populate it in store
+   *
+   * @alpha - the API is not stable and might have breaking changes later
+   */
+  populateSessionMetadata(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
@@ -318,11 +379,23 @@ export interface IHMSActions {
    * - HMSLogLevel.INFO(2) - will log important info, warnings and errors.
    * - HMSLogLevel.WARN(3) - will log warnings and errors.
    * - HMSLogLevel.ERROR(4) - will log only errors.
-   * - HMSLogLevel.NONE(5) - won't log anything.
+   * - HMSLogLevel.NONE(5) - won't log anything(Not recommended).
    *
    * Usage: `hmsActions.setLogLevel(4)` or `hmsActions.setLogLevel(HMSlogLevel.ERROR)`.
    */
   setLogLevel(level: HMSLogLevel): void;
+
+  /**
+   * ignore messages with this type for storing in store. You can use this to have a clear segregation between
+   * chat messages(you would want to persist for the duration of the call) and one off custom events(emoji reactions,
+   * stop screenshare, moderator messages, etc.). You can also use this to store messages on your own side if some additional
+   * processing is required(the default type is "chat").
+   * Notifications for the ignored messages will still be sent, it'll only not be put in the store.
+   * @param msgTypes list of messages types to ignore for storing
+   * @param replace (default is false) whether to replace the list of ignored messages. Types are appended to the existing
+   * list by default so you can call this method from different places and all will hold.
+   */
+  ignoreMessageTypes(msgTypes: string[], replace?: boolean): void;
 
   /**
    * audio Playlist contains all actions that can be performed on the audio playlist
@@ -334,4 +407,58 @@ export interface IHMSActions {
    * This will be available after joining the room
    */
   videoPlaylist: IHMSPlaylistActions;
+
+  /**
+   * @param data full app data object. use this to initialise app data in store.
+   * App Data is a small space in the store for UI to keep a few non updating
+   * global state fields for easy reference across UI.
+   * Note that if the fields are updating at high frequency or there
+   * are too many of them, it's recommended to have another UI side store
+   * to avoid performance issues.
+   */
+  initAppData(data: Record<string, any>): void;
+  /**
+   * use it for updating a particular property in the appdata
+   * @param key
+   *          a string. Does not check for existence. If the key is already not
+   *          a property of the appData, it is added.
+   * @param value
+   *          value to set for the key.
+   * @param merge
+   *          set it to true if you want to merge the appdata.
+   *          - Always replaces the value for a given key if this parameter is
+   *            not explicitly set to true.
+   *          - Always replaces if the value is anything other
+   *            than a plain object (i.e) JSON.parse()able.
+   *          - If set to true on non-plain objects, this is ignored.
+   * @example
+   * assume appdata is initially
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1',
+   *       setting2: 'val2',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * after calling,
+   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * it becomes
+   *  {
+   *     mySettings: {
+   *       setting1: 'val1-edit',
+   *       setting2: 'val2',
+   *       setting3: 'val3',
+   *     },
+   *     mySettings2: 43,
+   *     mySettings3: false,
+   *   };
+   *
+   * Note: This is not suitable for keeping large data or data which updates
+   * at a high frequency, it is recommended to use app side store for those
+   * cases.
+   **/
+  setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
+  setAppData(key: string, value: any): void;
 }

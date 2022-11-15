@@ -1,10 +1,11 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { TrackManager } from './TrackManager';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
+import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PeerNotification } from '../HMSNotifications';
-import { TrackManager } from './TrackManager';
 
 /**
  * Handles:
@@ -46,9 +47,20 @@ export class PeerManager {
 
   handlePeerList = (peers: PeerNotification[]) => {
     if (peers.length === 0) {
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, []);
       return;
     }
     const hmsPeers: HMSRemotePeer[] = [];
+    const newPeers = new Set(peers.map(peer => peer.peer_id));
+    this.store.getRemotePeers().forEach(({ peerId, fromRoomState }) => {
+      /**
+       * Remove only if the peer join happened from preview roomstate update. This will prevent the peer joined
+       * from peer-join event post join from being removed from the store.
+       */
+      if (!newPeers.has(peerId) && fromRoomState) {
+        this.store.removePeer(peerId);
+      }
+    });
     for (const peer of peers) {
       hmsPeers.push(this.makePeer(peer));
     }
@@ -66,7 +78,7 @@ export class PeerManager {
   handlePeerLeave = (peer: PeerNotification) => {
     const hmsPeer = this.store.getPeerById(peer.peer_id);
     this.store.removePeer(peer.peer_id);
-    HMSLogger.d(this.TAG, `PEER_LEAVE event`, peer, this.store.getPeers());
+    HMSLogger.d(this.TAG, `PEER_LEAVE`, peer.peer_id, `remainingPeers=${this.store.getPeers().length}`);
 
     if (!hmsPeer) {
       return;
@@ -123,10 +135,12 @@ export class PeerManager {
       customerUserId: peer.info.user_id,
       metadata: peer.info.data,
       role: this.store.getPolicyForRole(peer.role),
+      joinedAt: convertDateNumToDate(peer.joined_at),
+      fromRoomState: !!peer.is_from_room_state,
     });
 
     this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer);
+    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer.toString());
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({

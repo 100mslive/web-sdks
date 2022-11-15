@@ -1,8 +1,8 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier"],
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["@typescript-eslint", "prettier", "simple-import-sort"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "react-app"],
   "env": { "browser": true, "node": true },
   "overrides": [
     {
@@ -15,7 +15,7 @@
         "@typescript-eslint/no-empty-function": 0,
         "@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
-        "complexity": ["warn", 6], // if a function is getting too complex it should be broken down
+        "complexity": ["error", 6], // if a function is getting too complex it should be broken down
         "curly": ["error", "all"], // use curly brace even for single line functions
         "comma-dangle": ["error", "always-multiline"], // easier to see git diff
         "prefer-template": ["error"], // easier to read code when variables are used,
@@ -31,9 +31,67 @@
           "error",
           { "vars": "all", "args": "after-used", "ignoreRestSiblings": false, "argsIgnorePattern": "^_" }
         ],
-        "@typescript-eslint/no-explicit-any": 0
+        "@typescript-eslint/no-explicit-any": 0,
+        "react/jsx-curly-brace-presence": [
+          2,
+          {
+            "props": "never"
+          }
+        ],
+        "react/self-closing-comp": [
+          "error",
+          {
+            "component": true,
+            "html": false
+          }
+        ]
       }
+    },
+    {
+      // https://stackoverflow.com/questions/37558795/nice-way-to-get-rid-of-no-unused-expressions-linter-error-with-chai
+      "files": ["*.spec.ts"],
+      "rules": {
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-unused-expressions": ["off"]
+      }
+    },
+    {
+       "files": ["*.ts", "*.js", "*.tsx", "*.jsx"],
+       "rules": {
+         "import/first": "error",
+         "import/no-duplicates": "error",
+         "simple-import-sort/imports": [
+           "error",
+           {
+             "groups": [
+               [
+                 // Packages `react` related packages come first.
+                 "^react",
+                 "^@?\\w",
+                 // Internal packages.
+                 // Internal packages.
+                 "^@100mslive/hms-video",
+                 "^@100mslive/hms-video-store",
+                 "^@100mslive/react-sdk",
+                 "^@100mslive/react-icons",
+                 "^@100mslive/react-ui",
+                 // Side effect imports.
+                 "^\\u0000",
+                 // Other relative imports. Put same-folder imports and `.` last.
+                 "^\\./(?=.*/)(?!/?$)",
+                 "^\\.(?!/?$)",
+                 "^\\./?$",
+                 // Parent imports. Put `..` last.
+                 "^\\.\\.(?!/?$)",
+                 "^\\.\\./?$",
+                 // Style imports.
+                 "^.+\\.?(css)$"
+               ]
+             ]
+           }
+         ]
+        }
     }
   ],
-  "ignorePatterns": ["**/dist/**"]
+  "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js"]
 }

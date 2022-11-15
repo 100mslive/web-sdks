@@ -2,6 +2,7 @@ const fs = require('fs');
 const esbuild = require('esbuild');
 const { gzip } = require('zlib');
 
+// eslint-disable-next-line complexity
 async function main() {
   if (fs.existsSync('./dist')) {
     fs.rmSync('./dist', { recursive: true }, e => {
@@ -12,33 +13,31 @@ async function main() {
   }
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
-  const isReact = pkg.name.includes('react');
   const external = Object.keys(pkg.dependencies || {});
-  if (isReact) {
-    external.push('react');
+  external.push(...Object.keys(pkg.peerDependencies || {}));
+  if (pkg.name === '@100mslive/hms-noise-suppression') {
+    external.push('fs', 'path', './src/models/Noise.js');
   }
+  const commonOptions = {
+    entryPoints: [source],
+    bundle: true,
+    target: 'es6',
+    external,
+    tsconfig: 'tsconfig.json',
+    minify: true,
+    sourcemap: true,
+  };
   try {
-    esbuild.buildSync({
-      entryPoints: [source],
+    await esbuild.build({
+      ...commonOptions,
       outfile: 'dist/index.cjs.js',
-      minify: true,
-      bundle: true,
       format: 'cjs',
-      target: 'es6',
-      tsconfig: 'tsconfig.json',
-      external,
-      metafile: true,
     });
 
-    const esmResult = esbuild.buildSync({
-      entryPoints: [source],
+    const esmResult = await esbuild.build({
+      ...commonOptions,
       outfile: 'dist/index.js',
-      minify: true,
-      bundle: true,
       format: 'esm',
-      target: 'es6',
-      tsconfig: 'tsconfig.build.json',
-      external,
       metafile: true,
     });
 

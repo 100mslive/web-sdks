@@ -1,6 +1,7 @@
-import { HMSRecording, HMSRTMP, HMSHLS } from '@100mslive/hms-video';
+import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP } from '@100mslive/hms-video';
 import { HMSPeerID } from './peer';
 
+export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };
 export type HMSRoomID = string;
 
 /**
@@ -25,13 +26,15 @@ export interface HMSRoom {
   isConnected?: boolean;
   peers: HMSPeerID[];
   localPeer: HMSPeerID;
-  shareableLink: string;
-  hasWaitingRoom: boolean;
   roomState: HMSRoomState;
   recording: HMSRecording;
   rtmp: HMSRTMP;
   hls: HMSHLS;
   sessionId: string;
   startedAt?: Date;
+  joinedAt?: Date;
+  /**
+   * if this number is available room.peers is not guaranteed to have all the peers.
+   */
   peerCount?: number;
 }

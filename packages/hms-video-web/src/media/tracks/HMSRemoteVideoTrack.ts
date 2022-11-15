@@ -1,11 +1,14 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
+import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
+import HMSLogger from '../../utils/logger';
+import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
+  private history = new TrackHistory();
 
   public get degraded() {
     return this._degraded;
@@ -20,16 +23,15 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    // If remote track is muted when degraded, reset degraded state
-    if (this._degraded && !value) {
-      this._degraded = false;
-    }
-
     await super.setEnabled(value);
   }
 
   preferLayer(layer: HMSSimulcastLayer) {
-    (this.stream as HMSRemoteStream).setVideo(layer);
+    if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
+      return;
+    }
+    (this.stream as HMSRemoteStream).setVideoLayer(layer, this.logIdentifier);
+    this.pushInHistory(`uiPreferLayer-${layer}`);
   }
 
   getSimulcastLayer() {
@@ -38,12 +40,15 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    this.updateLayer();
+    this.updateLayer('addSink');
+    this.pushInHistory('uiSetLayer-high');
   }
 
   removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
-    this.updateLayer();
+    this.updateLayer('removeSink');
+    this._degraded = false;
+    this.pushInHistory('uiSetLayer-none');
   }
 
   /**
@@ -60,21 +65,80 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._layerDefinitions = definitions;
   }
 
-  /** @internal */
-  setDegraded(value: boolean) {
-    this._degraded = value;
-    if (value) {
-      this._degradedAt = new Date();
-    }
-
-    this.updateLayer();
+  /** @internal
+   * SFU will change track's layer(degrade or restore) and tell the sdk to update
+   * it locally.
+   * */
+  setLayerFromServer(layer: HMSSimulcastLayer, isDegraded: boolean) {
+    this._degraded = isDegraded;
+    this._degradedAt = isDegraded ? new Date() : this._degradedAt;
+    // No need to send preferLayer update, as server has done it already
+    (this.stream as HMSRemoteStream).setVideoLayerLocally(layer, this.logIdentifier);
+    this.pushInHistory(`sfuLayerUpdate-${layer}`);
   }
 
-  private updateLayer() {
-    let newLayer = this.hasSinks() ? HMSSimulcastLayer.HIGH : HMSSimulcastLayer.NONE;
-    if (this.degraded) {
-      newLayer = HMSSimulcastLayer.NONE;
+  /** @internal
+   * If degradation is being managed by sdk, sdk will let the track know of status
+   * post which it'll set it as well and send prefer layer message to SFU.
+   * */
+  setDegradedFromSdk(value: boolean) {
+    this._degraded = value;
+    this._degradedAt = value ? new Date() : this._degradedAt;
+    this.updateLayer('sdkDegradation');
+    this.pushInHistory(value ? 'sdkDegraded-none' : 'sdkRecovered-high');
+  }
+
+  private updateLayer(source: string) {
+    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : HMSSimulcastLayer.HIGH;
+    if (!this.shouldSendVideoLayer(newLayer, source)) {
+      return;
     }
-    (this.stream as HMSRemoteStream).setVideo(newLayer);
+    (this.stream as HMSRemoteStream).setVideoLayer(newLayer, this.logIdentifier);
+  }
+
+  private pushInHistory(action: string) {
+    if (MAINTAIN_TRACK_HISTORY) {
+      this.history.push({ name: action, layer: this.getSimulcastLayer(), degraded: this.degraded });
+    }
+  }
+
+  /**
+   * given the new layer, figure out if the update should be sent to server or not.
+   * It won't be sent if the track is already on the targetLayer. If the track is
+   * degraded though and the target layer is none, update will be sent.
+   * If there are tracks degraded on a page and user paginates away to other page,
+   * it's necessary to send the layer none message to SFU so it knows that the app
+   * is no longer interested in the track and doesn't recover degraded tracks on non
+   * visible pages.
+   *
+   * TODO: if track is degraded, send the update if target layer is lower than current layer
+   * @private
+   */
+  private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer, source: string) {
+    const currLayer = this.getSimulcastLayer();
+    if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
+      return true;
+    }
+    if (currLayer === targetLayer) {
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier}`,
+        `Not sending update, already on layer ${targetLayer}, source=${source}`,
+      );
+      return false;
+    }
+    return true;
+  }
+}
+
+/**
+ * to store history of everything that happened to a remote track which decides
+ * it's current layer and degraded status.
+ */
+class TrackHistory {
+  history: Record<string, any>[] = [];
+
+  push(action: Record<string, any>) {
+    action.time = new Date().toISOString().split('T')[1];
+    this.history.push(action);
   }
 }

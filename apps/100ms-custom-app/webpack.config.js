@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
@@ -9,8 +9,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode: isProduction ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
   entry: './index.js',
   output: {
@@ -19,8 +20,11 @@ module.exports = {
     assetModuleFilename: 'static/media/[name].[hash][ext]',
     publicPath: '/',
     clean: true,
+    devtoolModuleFilenameTemplate: info => {
+      return path.relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath).replace(/\\/g, '/');
+    },
   },
-  devtool: 'source-map',
+  devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
   target: 'web',
   resolve: {
     extensions: ['.js', '.jsx', '.css', '.svg'],
@@ -30,8 +34,14 @@ module.exports = {
       events: false,
     },
   },
+  ignoreWarnings: [/Failed to parse source map/], // some libraries do not provide proper source maps which throws this warning
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      },
       {
         test: /\.jsx?$/,
         use: [
@@ -60,23 +70,39 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
+      /* chunks: 'all',
       cacheGroups: {
-        vendor: {
-          name: 'vendor',
+        react: {
+          name: 'react',
           enforce: true,
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
           reuseExistingChunk: true,
-          chunks: 'all',
+        },
+        vendor: {
+          name(module) {
+            // get the name. E.g. node_modules/packageName/not/this/part.js
+            // or node_modules/packageName
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            // npm package names are URL-safe, but some servers don't like @ symbols
+            return `vendor-${packageName.replace('@', '')}`;
+          },
+          enforce: true,
+          test: /[\\/]node_modules[\\/](?!react|react-dom)/,
+          reuseExistingChunk: true,
+          maxSize: 204800,
         },
         default: {
           reuseExistingChunk: true,
-          chunks: 'all',
         },
-      },
+      }, */
     },
-    runtimeChunk: true,
-    minimize: process.env.NODE_ENV === 'production',
-    minimizer: [new ESBuildMinifyPlugin()],
+    runtimeChunk: false,
+    minimize: isProduction,
+    minimizer: [
+      new TerserPlugin({
+        minify: TerserPlugin.esbuildMinify,
+      }),
+    ],
   },
   plugins: [
     new webpack.ProgressPlugin(),
@@ -107,7 +133,7 @@ module.exports = {
           from: path.resolve(__dirname, './public'),
           to: path.resolve(__dirname, './build'),
           filter: async resourcePath => {
-            if (/index.html|manifest.json/.test(resourcePath)) {
+            if (/index.html/.test(resourcePath)) {
               return false;
             }
             return true;

@@ -1,7 +1,7 @@
+import { IStore } from './IStore';
 import { HMSTrack } from '../..';
 import { HMSTrackType } from '../../media/tracks';
 import { HMSPeer } from '../models/peer';
-import { IStore } from './IStore';
 
 /**
  * Function passed as argument to the sort method of the list.
@@ -63,8 +63,9 @@ export class Comparator implements IComparator {
             -1,
         ),
 
+      // role priority - low value, high importance, so reverse peers for comparison
       rolePriority: (peerA: HMSPeer, peerB: HMSPeer) =>
-        this.primitiveComparator<number>(peerA.role?.priority || 0, peerB.role?.priority || 0),
+        this.primitiveComparator<number>(peerB.role?.priority || 0, peerA.role?.priority || 0),
     };
   }
 
@@ -97,10 +98,11 @@ export class Comparator implements IComparator {
       screenShare: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator(trackA.source === 'screen', trackB.source === 'screen'),
 
+      // role priority - low value, high importance
       rolePriority: (trackA: HMSTrack, trackB: HMSTrack) =>
         this.primitiveComparator<number>(
-          this.store.getPeerByTrackId(trackA.trackId)?.role?.priority || 0,
           this.store.getPeerByTrackId(trackB.trackId)?.role?.priority || 0,
+          this.store.getPeerByTrackId(trackA.trackId)?.role?.priority || 0,
         ),
     };
   }

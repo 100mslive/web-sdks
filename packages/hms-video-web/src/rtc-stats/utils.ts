@@ -1,12 +1,21 @@
-import { HMSTrack, HMSLocalAudioTrack, HMSLocalVideoTrack, HMSLocalTrack } from '../media/tracks';
+import { HMSWebrtcStats } from './HMSWebrtcStats';
 import {
   HMSPeerStats,
   HMSTrackStats,
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalTrack, HMSTrack } from '../media/tracks';
+import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
-import { HMSWebrtcStats } from './HMSWebrtcStats';
+
+const getTrackAndConnectionType = (track: HMSTrack) => {
+  const outbound = track.stream instanceof HMSLocalStream;
+  const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
+  const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
+  return { peerConnectionType, nativeTrack };
+};
 
 export const getTrackStats = async (
   getStats: HMSWebrtcStats['getStats'],
@@ -14,11 +23,13 @@ export const getTrackStats = async (
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
-  const outbound = track instanceof HMSLocalAudioTrack || track instanceof HMSLocalVideoTrack;
-  const peerConnectionType: PeerConnectionType = outbound ? 'publish' : 'subscribe';
-  const nativeTrack: MediaStreamTrack = outbound ? (track as HMSLocalTrack).getTrackBeingSent() : track.nativeTrack;
-
-  const trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+  const { peerConnectionType, nativeTrack } = getTrackAndConnectionType(track);
+  let trackReport: RTCStatsReport | undefined;
+  try {
+    trackReport = await getStats[peerConnectionType]?.(nativeTrack);
+  } catch (err) {
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting track stats', track, nativeTrack, err);
+  }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
 
   const bitrate = computeBitrate(
@@ -42,6 +53,7 @@ export const getTrackStats = async (
       packetsLostRate,
       peerId: track.peerId,
       peerName,
+      codec: trackStats.codec,
     })
   );
 };
@@ -51,6 +63,8 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
   // Valid by Webrtc spec, not in TS
   // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
   let remoteStreamStats: RTCRemoteInboundRtpStreamStats | undefined;
+
+  const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
   trackReport?.forEach(stat => {
     switch (stat.type) {
       case 'inbound-rtp':
@@ -62,12 +76,27 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
       case 'remote-inbound-rtp':
         remoteStreamStats = stat;
         break;
+      case 'codec':
+        mimeTypes[stat.id] = stat.mimeType;
+        break;
       default:
         break;
     }
   });
 
-  return streamStats && Object.assign(streamStats, { remote: remoteStreamStats });
+  const mimeType = streamStats?.codecId ? mimeTypes[streamStats.codecId] : undefined;
+  let codec: string | undefined;
+  if (mimeType) {
+    codec = mimeType.substring(mimeType.indexOf('/') + 1);
+  }
+
+  return (
+    streamStats &&
+    Object.assign(streamStats, {
+      remote: remoteStreamStats,
+      codec: codec,
+    })
+  );
 };
 
 export const getLocalPeerStatsFromReport = (
@@ -141,15 +170,16 @@ const computeStatRate = <T extends HMSTrackStats>(
 ): number => {
   const newVal = newReport && newReport[statName];
   const oldVal = oldReport ? oldReport[statName] : null;
-  if (newReport && oldReport && isPresent(newVal) && isPresent(oldVal)) {
+  const conditions = [newReport, oldReport, isPresent(newVal), isPresent(oldVal)];
+  if (conditions.every(condition => !!condition)) {
     // Type not null checked in `isPresent`
     // * 1000 - ms to s
     return (
       computeNumberRate(
         newVal as unknown as number,
         oldVal as unknown as number,
-        newReport.timestamp,
-        oldReport.timestamp,
+        newReport?.timestamp,
+        oldReport?.timestamp,
       ) * 1000
     );
   } else {

@@ -6,12 +6,16 @@
  */
 
 export const ErrorCodes = {
+  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
   WebSocketConnectionErrors: {
     // Error connecting to ws or init config not available
-    GENERIC_CONNECT: 1000,
+    FAILED_TO_CONNECT: 1000,
 
     // Network connection lost
     WEBSOCKET_CONNECTION_LOST: 1003,
+
+    // Abnormal close without receiving a Close control frame
+    ABNORMAL_CLOSE: 1006,
   },
 
   InitAPIErrors: {
@@ -57,6 +61,15 @@ export const ErrorCodes = {
 
     // Over constrained error - device hardware unable to satisfy requested constraints
     OVER_CONSTRAINED: 3009,
+
+    // No audio detected from track, indicates problem with device hardware
+    NO_AUDIO_DETECTED: 3010,
+
+    // Operating System denied permission
+    SYSTEM_DENIED_PERMISSION: 3011,
+
+    // Current tab is not shared when forceCurrentTab was set to true for screenshare
+    CURRENT_TAB_NOT_SHARED: 3012,
   },
 
   WebrtcErrors: {

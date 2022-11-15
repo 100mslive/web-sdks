@@ -1,12 +1,12 @@
-import { HMSLocalTrack, HMSTrackSource } from '../../media/tracks';
 import { HMSRemotePeer, HMSRoleChangeRequest, HMSUpdateListener } from '../../interfaces';
+import { HMSLocalTrack, HMSTrackSource } from '../../media/tracks';
 import { IStore } from '../../sdk/store';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
+  ChangeTrackMuteStateNotification,
   RoleChangeRequestParams,
   TrackUpdateRequestNotification,
-  ChangeTrackMuteStateNotification,
 } from '../HMSNotifications';
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
 
 /**
  * Handles request from remote peers to change something on the local side. For eg. role change, track mute/unmute.
@@ -34,7 +34,9 @@ export class RequestManager {
 
   private handleRoleChangeRequest(notification: RoleChangeRequestParams) {
     const request: HMSRoleChangeRequest = {
-      requestedBy: this.store.getPeerById(notification.requested_by) as HMSRemotePeer,
+      requestedBy: notification.requested_by
+        ? (this.store.getPeerById(notification.requested_by) as HMSRemotePeer)
+        : undefined,
       role: this.store.getPolicyForRole(notification.role),
       token: notification.token,
     };
@@ -42,12 +44,13 @@ export class RequestManager {
     this.listener?.onRoleChangeRequest(request);
   }
 
+  // eslint-disable-next-line complexity
   private handleTrackUpdateRequest(trackUpdateRequest: TrackUpdateRequestNotification) {
     const { requested_by, track_id, mute } = trackUpdateRequest;
-    const peer = this.store.getPeerById(requested_by);
+    const peer = requested_by ? this.store.getPeerById(requested_by) : undefined;
     const track = this.store.getLocalPeerTracks().find(track => track.publishedTrackId === track_id);
 
-    if (!peer || peer.isLocal || !track) {
+    if (!track) {
       return;
     }
 
@@ -74,11 +77,8 @@ export class RequestManager {
 
   private handleChangeTrackStateRequest(request: ChangeTrackMuteStateNotification) {
     const { type, source, value, requested_by } = request;
-    const peer = this.store.getPeerById(requested_by);
+    const peer = requested_by ? this.store.getPeerById(requested_by) : undefined;
 
-    if (!peer) {
-      return;
-    }
     // value true means the track has to be muted
     const enabled = !value;
     const tracksToBeUpdated = this.getTracksToBeUpdated({ type, source, enabled });

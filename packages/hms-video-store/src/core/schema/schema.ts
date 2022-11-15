@@ -1,12 +1,12 @@
-import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
+import { HMSException } from './error';
 import { HMSMessage, HMSMessageID } from './message';
+import { HMSPeer, HMSPeerID, HMSSpeaker, HMSTrack, HMSTrackID } from './peer';
+import { HMSPlaylist } from './playlist';
+import { HMSRoleChangeStoreRequest } from './requests';
+import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
-import { HMSRole } from './role';
-import { HMSRoleChangeStoreRequest } from './requests';
-import { HMSException } from './error';
-import { HMSPlaylist } from './playlist';
+import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
@@ -16,6 +16,7 @@ export interface HMSStore {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
+  connectionQualities: Record<HMSPeerID, HMSConnectionQuality>;
   tracks: Record<HMSTrackID, HMSTrack>;
   playlist: HMSPlaylist<any>;
   messages: {
@@ -25,7 +26,9 @@ export interface HMSStore {
   settings: HMSMediaSettings;
   devices: DeviceMap;
   roles: Record<string, HMSRole>;
+  appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
+  sessionMetadata?: any;
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
@@ -49,9 +52,7 @@ export const createDefaultStoreState = (): HMSStore => {
       isConnected: false,
       name: '',
       peers: [],
-      shareableLink: '',
       localPeer: '',
-      hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {
         browser: {
@@ -60,6 +61,7 @@ export const createDefaultStoreState = (): HMSStore => {
         server: {
           running: false,
         },
+        hls: { running: false },
       },
       rtmp: {
         running: false,
@@ -92,6 +94,7 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     messages: { byID: {}, allIDs: [] },
     speakers: {},
+    connectionQualities: {},
     settings: {
       audioInputDeviceId: '',
       audioOutputDeviceId: '',

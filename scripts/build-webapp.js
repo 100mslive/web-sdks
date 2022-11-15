@@ -1,9 +1,7 @@
 const fs = require('fs');
 const esbuild = require('esbuild');
-const { gzip } = require('zlib');
 const PostCssPlugin = require('esbuild-plugin-postcss2');
 const autoprefixer = require('autoprefixer');
-const tailwindcss = require('tailwindcss');
 
 async function main() {
   if (fs.existsSync('./dist')) {
@@ -13,58 +11,50 @@ async function main() {
       }
     });
   }
+  require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/App.js';
   const external = Object.keys(pkg.dependencies || {});
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
+  const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
     PostCssPlugin.default({
-      plugins: [tailwindcss, autoprefixer],
+      plugins: [autoprefixer],
     }),
   ];
   try {
-    esbuild.build({
+    const commonOptions = {
       entryPoints: [source],
-      outfile: 'dist/index.cjs.js',
       assetNames: '[name]',
       minify: false,
       bundle: true,
+      target: 'es6',
+      external,
+      treeShaking: true,
+      sourcemap: true,
+      loader,
+      define,
+      plugins,
+    };
+
+    esbuild.build({
+      outfile: 'dist/index.cjs.js',
       format: 'cjs',
-      target: 'es6',
-      external,
-      metafile: true,
-      loader,
-      plugins,
+      ...commonOptions,
     });
 
-    const esmResult = esbuild.build({
-      entryPoints: [source],
-      outfile: 'dist/index.js',
-      assetNames: '[name]',
-      minify: true,
-      bundle: true,
-      format: 'esm',
-      target: 'es6',
-      external,
-      metafile: true,
-      loader,
-      plugins,
-    });
-
-    let esmSize = 0;
-    Object.values(esmResult.metafile?.outputs || {}).forEach(output => {
-      esmSize += output.bytes;
-    });
-
-    fs.readFile('./dist/index.js', (_err, data) => {
-      gzip(data, (_err, result) => {
-        console.log(
-          `✔ ${pkg.name}: Built pkg. ${(esmSize / 1000).toFixed(2)}kb (${(result.length / 1000).toFixed(
-            2,
-          )}kb minified)`,
-        );
+    esbuild
+      .build({
+        entryPoints: [source],
+        outdir: 'dist/',
+        format: 'esm',
+        splitting: true,
+        ...commonOptions,
+      })
+      .then(() => {
+        fs.renameSync('./dist/App.js', './dist/index.js');
+        fs.renameSync('./dist/App.css', './dist/index.css');
       });
-    });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);

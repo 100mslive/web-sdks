@@ -1,9 +1,9 @@
-import { AudioSinkManager } from '../audio-sink-manager';
 import { DeviceManager } from '.';
+import { AudioSinkManager } from '../audio-sink-manager';
 
 export interface IAudioOutputManager {
   getDevice(): MediaDeviceInfo | undefined;
-  setDevice(deviceId: string): MediaDeviceInfo | undefined;
+  setDevice(deviceId: string): Promise<MediaDeviceInfo | undefined>;
   getVolume(): number;
   setVolume(value: number): void;
 }

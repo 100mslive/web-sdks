@@ -1,10 +1,10 @@
 import { HMSConnectionRole } from './model';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSLocalTrack } from '../media/tracks';
+import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
-import { HMSLocalTrack } from '../media/tracks';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { TrackState } from '../notification-manager';
 
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
@@ -45,10 +45,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.addTransceiver(track, init);
   }
 
-  async createOffer(
-    options: RTCOfferOptions | undefined = undefined,
-    tracks: Map<string, TrackState>,
-  ): Promise<RTCSessionDescriptionInit> {
+  async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
       HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
@@ -99,6 +96,53 @@ export default abstract class HMSConnection {
     return this.nativeConnection.getSenders();
   }
 
+  logSelectedIceCandidatePairs() {
+    /**
+     * for the very first peer in the room we don't have any subscribe ice candidates
+     * because the peer hasn't subscribed to anything.
+     *
+     * For all peers joining after this peer, we have published and subscribed at the time of join itself
+     * so we're able to log both publish and subscribe ice candidates.
+     */
+    const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
+
+    transmitters.forEach(transmitter => {
+      const kindOfTrack = transmitter.track?.kind;
+      try {
+        if (transmitter.transport) {
+          const iceTransport = transmitter.transport.iceTransport;
+
+          const logSelectedCandidate = () => {
+            // @ts-expect-error
+            if (typeof iceTransport.getSelectedCandidatePair === 'function') {
+              // @ts-expect-error
+              const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+              HMSLogger.d(
+                TAG,
+                `${HMSConnectionRole[this.role]} connection`,
+                `selected ${kindOfTrack || 'unknown'} candidate pair`,
+                JSON.stringify(selectedCandidatePair, null, 2),
+              );
+            }
+          };
+
+          // @ts-expect-error
+          if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
+            // @ts-expect-error
+            iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
+          }
+          logSelectedCandidate();
+        }
+      } catch (error) {
+        HMSLogger.w(
+          TAG,
+          `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
+          error,
+        );
+      }
+    });
+  }
+
   removeTrack(sender: RTCRtpSender) {
     this.nativeConnection.removeTrack(sender);
   }
@@ -126,5 +170,9 @@ export default abstract class HMSConnection {
 
   async close() {
     this.nativeConnection.close();
+  }
+
+  private getReceivers() {
+    return this.nativeConnection.getReceivers();
   }
 }

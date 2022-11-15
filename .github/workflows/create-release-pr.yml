@@ -3,19 +3,19 @@ on:
   workflow_dispatch:
     inputs:
       versionBump:
-        description: 'which version to bump eg: patch, minor, major'
+        description: 'which version to bump eg: prerelease, patch'
         required: true
-        default: 'patch'
+        default: 'prerelease'
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
-        if: github.ref != 'refs/heads/main'
+        if: github.event.inputs.versionBump != 'prerelease' && github.ref != 'refs/heads/main'
         run: exit 1
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Configure Git user
@@ -31,6 +31,11 @@ jobs:
           lerna add @100mslive/react-ui --scope=100ms_edtech_template --exact
           lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact
           lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact
+          lerna add @100mslive/hms-virtual-background --scope=100ms_edtech_template --exact
+          lerna add @100mslive/hms-noise-suppression --scope=100ms_edtech_template --exact
+          lerna add @100mslive/hls-stats --scope=100ms_edtech_template --exact
+          lerna add @100mslive/react-icons --scope=100ms-custom-app --exact
+          lerna add @100mslive/react-ui --scope=100ms-custom-app --exact
 
       - name: Get current version
         id: version
@@ -42,7 +47,7 @@ jobs:
           echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
           echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
-      - uses: peter-evans/create-pull-request@v3
+      - uses: peter-evans/create-pull-request@v4
         with:
           commit-message: 'build: update versions for release'
           title: 'build: update versions for release'
@@ -50,6 +55,5 @@ jobs:
             - @100mslive/hms-video-web - ${{ steps.version.outputs.sdk_version }}
             - @100mslive/hms-video-store - ${{ steps.version.outputs.store_version }}
           branch: release
-          branch-suffix: timestamp
-          base: main
+          branch-suffix: short-commit-hash
           delete-branch: true

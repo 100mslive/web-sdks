@@ -1,14 +1,16 @@
 import * as React from 'react';
+import { SVGProps } from 'react';
 
-function SvgInfoIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="24px" height="24px" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path
-        d="M8 16.476c4.255 0 7.756-3.501 7.756-7.757 0-4.262-3.5-7.763-7.763-7.763S.236 4.456.236 8.719c0 4.256 3.501 7.757 7.764 7.757zM7.993 6.368a1.17 1.17 0 01-1.158-1.157c0-.652.528-1.165 1.158-1.165.63 0 1.15.513 1.15 1.165 0 .63-.52 1.157-1.15 1.157zM6.6 12.843c-.41 0-.732-.286-.732-.718 0-.388.322-.703.732-.703h.842V8.814h-.695c-.418 0-.733-.293-.733-.71 0-.395.315-.703.733-.703h1.501c.527 0 .798.359.798.915v3.106h.667c.41 0 .732.315.732.703 0 .432-.322.718-.732.718H6.6z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+const SvgInfoIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg width="24px" height="24px" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M10 3.864a6.136 6.136 0 1 0 0 12.272 6.136 6.136 0 0 0 0-12.272ZM2.5 10a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Zm7.5-.682c.377 0 .682.305.682.682v2.727a.682.682 0 1 1-1.364 0V10c0-.377.305-.682.682-.682Zm0-2.727a.682.682 0 1 0 0 1.364h.007a.682.682 0 1 0 0-1.364H10Z"
+      fill="currentColor"
+      fillOpacity={0.8}
+    />
+  </svg>
+);
 
 export default SvgInfoIcon;

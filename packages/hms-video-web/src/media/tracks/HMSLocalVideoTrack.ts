@@ -1,13 +1,15 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import { getVideoTrack } from '../../utils/track';
-import { HMSVideoPlugin } from '../../plugins';
-import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
+import { HMSVideoTrackSettings as IHMSVideoTrackSettings, ScreenCaptureHandle } from '../../interfaces';
+import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
+import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import HMSLogger from '../../utils/logger';
+import { getVideoTrack } from '../../utils/track';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -21,6 +23,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private TAG = 'LocalVideoTrack';
+
+  /**
+   * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
+   * at the point of writing this comment.
+   */
+  isCurrentTab = false;
 
   /**
    * @internal
@@ -31,8 +40,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * It won't be same as native track id, as the native track can change post join(and publish), when the nativetrack
    * changes, replacetrack is used which doesn't involve republishing which means from server's point of view, the track id
    * is same as what was initially published.
+   * This will only be available if the track was actually published and won't be set for preview tracks.
    */
-  publishedTrackId: string;
+  publishedTrackId?: string;
 
   constructor(
     stream: HMSLocalStream,
@@ -49,8 +59,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (settings.deviceId === 'default' && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSVideoPluginsManager(this);
-    this.publishedTrackId = this.trackId;
+    this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
   }
 
@@ -73,11 +82,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
+        this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
     }
     await super.setEnabled(value);
-    this.eventBus.localVideoEnabled.publish(value);
+    this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
     (this.stream as HMSLocalStream).trackUpdate(this);
+  }
+
+  /**
+   * verify if the track id being passed is of this track for correlating server messages like degradation
+   */
+  isPublishedTrackId(trackId: string) {
+    return this.publishedTrackId === trackId;
   }
 
   /**
@@ -128,12 +145,56 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * @see HMSVideoPlugin
+   */
+  validatePlugin(plugin: HMSVideoPlugin): HMSPluginSupportResult {
+    return this.pluginsManager.validatePlugin(plugin);
+  }
+
+  /**
    * @internal
    */
   async cleanup() {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+  }
+
+  /**
+   * only for screenshare track to crop to a cropTarget
+   * @internal
+   */
+  async cropTo(cropTarget?: object) {
+    if (!cropTarget) {
+      return;
+    }
+    if (this.source !== 'screen') {
+      return;
+    }
+    try {
+      // @ts-ignore
+      if (this.nativeTrack.cropTo) {
+        // @ts-ignore
+        await this.nativeTrack.cropTo(cropTarget);
+      }
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'failed to crop screenshare capture - ', err);
+      throw ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, 'failed to crop screenshare capture');
+    }
+  }
+
+  /**
+   * only for screenshare track to get the captureHandle
+   * TODO: add an API for capturehandlechange event
+   * @internal
+   */
+  getCaptureHandle(): ScreenCaptureHandle | undefined {
+    // @ts-ignore
+    if (this.nativeTrack.getCaptureHandle) {
+      // @ts-ignore
+      return this.nativeTrack.getCaptureHandle();
+    }
+    return undefined;
   }
 
   /**
@@ -178,11 +239,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * The one whose data is currently being sent, which will be used when removing from connection senders.
    */
   getTrackIDBeingSent() {
-    return this.processedTrack ? this.processedTrack.id : this.nativeTrack.id;
+    return this.getTrackBeingSent().id;
   }
 
   getTrackBeingSent() {
-    return this.processedTrack || this.nativeTrack;
+    return this.enabled ? this.processedTrack || this.nativeTrack : this.nativeTrack;
   }
 
   /**

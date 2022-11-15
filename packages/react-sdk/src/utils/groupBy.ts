@@ -1,20 +1,29 @@
 import { HMSPeer } from '@100mslive/hms-video-store';
-
-export const groupBy = (peers: HMSPeer[]) => {
-  const res: Array<[string, HMSPeer[]]> = [];
-  const roleMap: Record<string, HMSPeer[]> = {};
-  for (const peer of peers) {
-    if (peer.roleName) {
-      if (!roleMap[peer.roleName]) {
-        roleMap[peer.roleName] = [];
-      }
-      roleMap[peer.roleName].push(peer);
-    }
+/**
+ * Give array like [
+ * { name: 'peer1', id: 1, roleName: 'role1' },
+ * { name: 'peer2', id: 2, roleName: 'role2' }
+ *]
+ * the output will be
+ * {
+ * 'role1': [{'name': 'peer1', id: 1, roleName: 'role1'}],
+ * 'role2': [{ name: 'peer2', id: 2, roleName: 'role2' }]
+ * }
+ * @param {HMSPeer[]} peers
+ * @returns
+ */
+export const groupByRoles = (peers: HMSPeer[]) => {
+  if (!peers || !Array.isArray(peers) || peers.length === 0) {
+    return {};
   }
-  for (const role in roleMap) {
-    if (roleMap[role].length) {
-      res.push([role, roleMap[role]]);
+  return peers.reduce((res: Record<string, HMSPeer[]>, peer) => {
+    if (!peer.roleName) {
+      return res;
     }
-  }
-  return res;
+    if (!res[peer.roleName]) {
+      res[peer.roleName] = [];
+    }
+    res[peer.roleName].push(peer);
+    return res;
+  }, {});
 };

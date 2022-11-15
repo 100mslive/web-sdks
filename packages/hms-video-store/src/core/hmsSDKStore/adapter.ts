@@ -6,7 +6,10 @@ import {
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSTrack as SDKHMSTrack,
 } from '@100mslive/hms-video';
+import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+import * as sdkTypes from './sdkTypes';
 import {
+  HMSAudioTrack,
   HMSDeviceChangeEvent,
   HMSException,
   HMSMessage,
@@ -18,11 +21,19 @@ import {
   HMSRoleChangeStoreRequest,
   HMSRoleName,
   HMSRoom,
+  HMSScreenVideoTrack,
   HMSTrack,
+  HMSTrackFacingMode,
+  HMSVideoTrack,
 } from '../schema';
 
-import * as sdkTypes from './sdkTypes';
-import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+/**
+ * This file has conversion functions from schema defined in sdk to normalised schema defined in store.
+ * A lot of conversions below involve deep clone as once the object goes into store it becomes unmodifiable
+ * due to immer, so it can't be mutated later.
+ *
+ * Objects directly from the SDK are not stored as is and cloned because the SDK might modify it later
+ */
 
 export class SDKToHMS {
   static convertPeer(sdkPeer: sdkTypes.HMSPeer): Partial<HMSPeer> & Pick<HMSPeer, 'id'> {
@@ -35,8 +46,8 @@ export class SDKToHMS {
       audioTrack: sdkPeer.audioTrack?.trackId,
       auxiliaryTracks: sdkPeer.auxiliaryTracks.map(track => track.trackId),
       customerUserId: sdkPeer.customerUserId,
-      customerDescription: sdkPeer.metadata,
       metadata: sdkPeer.metadata,
+      joinedAt: sdkPeer.joinedAt,
     };
   }
 
@@ -48,24 +59,30 @@ export class SDKToHMS {
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
       peerId: sdkTrack.peerId || peerId,
-    };
+    } as HMSTrack;
     this.enrichTrack(track, sdkTrack);
     return track;
   }
 
   static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
-    if (track.source === 'screen' && track.type === 'video') {
-      // @ts-ignore
-      track.displaySurface = mediaSettings.displaySurface;
-    }
-    track.height = mediaSettings.height;
-    track.width = mediaSettings.width;
+
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
-      track.volume = sdkTrack.getVolume() || 0;
+      (track as HMSAudioTrack).volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
-    SDKToHMS.enrichVideoTrack(track, sdkTrack);
+    if (track.type === 'video') {
+      if (track.source === 'screen') {
+        // @ts-ignore
+        track.displaySurface = mediaSettings.displaySurface;
+        SDKToHMS.enrichScreenTrack(track as HMSScreenVideoTrack, sdkTrack);
+      } else if (track.source === 'regular') {
+        (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
+      }
+      track.height = mediaSettings.height;
+      track.width = mediaSettings.width;
+      SDKToHMS.enrichVideoTrack(track as HMSVideoTrack, sdkTrack);
+    }
     SDKToHMS.enrichPluginsDetails(track, sdkTrack);
   }
 
@@ -77,12 +94,24 @@ export class SDKToHMS {
     }
   }
 
-  static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+  static enrichVideoTrack(track: HMSVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       track.layer = sdkTrack.getSimulcastLayer();
       track.degraded = sdkTrack.degraded;
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
+      }
+    }
+  }
+
+  static enrichScreenTrack(track: HMSScreenVideoTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+      const newCaptureHandle = sdkTrack.getCaptureHandle?.();
+      if (newCaptureHandle?.handle !== track.captureHandle?.handle) {
+        track.captureHandle = newCaptureHandle;
+      }
+      if (sdkTrack.isCurrentTab) {
+        track.displaySurface = 'selfBrowser';
       }
     }
   }
@@ -96,32 +125,31 @@ export class SDKToHMS {
   }
 
   static convertRoom(sdkRoom: sdkTypes.HMSRoom): Partial<HMSRoom> {
+    const { recording, rtmp, hls } = SDKToHMS.convertRecordingStreamingState(
+      sdkRoom?.recording,
+      sdkRoom?.rtmp,
+      sdkRoom?.hls,
+    );
     return {
       id: sdkRoom.id,
       name: sdkRoom.name,
       localPeer: sdkRoom.localPeer?.peerId ?? '',
-      hasWaitingRoom: sdkRoom.hasWaitingRoom,
-      shareableLink: sdkRoom.shareableLink,
-      recording: {
-        browser: {
-          running: !!sdkRoom.recording?.browser.running,
-        },
-        server: { running: !!sdkRoom.recording?.server.running },
-      },
-      rtmp: { running: !!sdkRoom.rtmp?.running },
-      hls: { running: !!sdkRoom.hls?.running, variants: sdkRoom.hls?.variants || [] },
+      recording,
+      rtmp,
+      hls,
       sessionId: sdkRoom.sessionId,
-      startedAt: sdkRoom.startedAt && new Date(sdkRoom.startedAt),
+      startedAt: sdkRoom.startedAt,
+      joinedAt: sdkRoom.joinedAt,
       peerCount: sdkRoom.peerCount,
     };
   }
 
   static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender.peerId,
-      senderName: sdkMessage.sender.name,
-      senderRole: sdkMessage.sender.role?.name,
-      senderUserId: sdkMessage.sender.customerUserId,
+      sender: sdkMessage.sender?.peerId,
+      senderName: sdkMessage.sender?.name,
+      senderRole: sdkMessage.sender?.role?.name,
+      senderUserId: sdkMessage.sender?.customerUserId,
       recipientPeer: sdkMessage.recipientPeer?.peerId,
       recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,
@@ -222,19 +250,28 @@ export class SDKToHMS {
   }
 
   static convertRecordingStreamingState(
-    recording: sdkTypes.HMSRecording | undefined,
-    rtmp: sdkTypes.HMSRTMP | undefined,
-    hls: sdkTypes.HMSHLS | undefined,
+    recording?: sdkTypes.HMSRecording,
+    rtmp?: sdkTypes.HMSRTMP,
+    hls?: sdkTypes.HMSHLS,
   ): { recording: sdkTypes.HMSRecording; rtmp: sdkTypes.HMSRTMP; hls: sdkTypes.HMSHLS } {
     return {
       recording: {
         browser: {
-          running: !!recording?.browser?.running,
+          running: false,
+          ...recording?.browser,
         },
-        server: { running: !!recording?.server?.running },
+        server: {
+          running: false,
+          ...recording?.server,
+        },
+        hls: { running: false, ...recording?.hls },
       },
-      rtmp: { running: !!rtmp?.running },
-      hls: { variants: hls?.variants || [], running: !!hls?.running },
+      rtmp: { running: false, ...rtmp },
+      hls: {
+        variants: hls?.variants?.map(variant => variant) || [],
+        running: !!hls?.running,
+        error: hls?.error,
+      },
     };
   }
 }

@@ -1,18 +1,24 @@
-import { IStore } from '../sdk/store';
-import { PeerConnectionType, HMSPeerStats, HMSTrackStats } from '../interfaces/webrtc-stats';
 import {
-  union,
   computeNumberRate,
-  getTrackStats,
   getLocalPeerStatsFromReport,
   getPacketsLostAndJitterFromReport,
+  getTrackStats,
+  union,
 } from './utils';
+import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
 
 export class HMSWebrtcStats {
+  private readonly TAG = '[HMSWebrtcStats]';
   private localPeerID?: string;
   private peerStats: Record<string, HMSPeerStats> = {};
   private trackStats: Record<string, HMSTrackStats> = {};
 
+  /**
+   * Removed localPeerID check in other places as it will be present before
+   * this is initialized
+   */
   constructor(
     private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
     private store: IStore,
@@ -21,10 +27,7 @@ export class HMSWebrtcStats {
   }
 
   getLocalPeerStats(): HMSPeerStats | undefined {
-    if (!this.localPeerID) {
-      return;
-    }
-    return this.peerStats[this.localPeerID];
+    return this.peerStats[this.localPeerID!];
   }
 
   getTrackStats(trackId: string): HMSTrackStats | undefined {
@@ -40,17 +43,22 @@ export class HMSWebrtcStats {
   }
 
   private async updateLocalPeerStats() {
-    if (!this.localPeerID) {
-      return;
-    }
-
     const prevLocalPeerStats = this.getLocalPeerStats();
-
-    const publishReport = await this.getStats.publish?.();
+    let publishReport: RTCStatsReport | undefined;
+    try {
+      publishReport = await this.getStats.publish?.();
+    } catch (err) {
+      HMSLogger.w(this.TAG, 'Error in getting publish stats', err);
+    }
     const publishStats: HMSPeerStats['publish'] | undefined =
       publishReport && getLocalPeerStatsFromReport('publish', publishReport, prevLocalPeerStats);
 
-    const subscribeReport = await this.getStats.subscribe?.();
+    let subscribeReport: RTCStatsReport | undefined;
+    try {
+      subscribeReport = await this.getStats.subscribe?.();
+    } catch (err) {
+      HMSLogger.w(this.TAG, 'Error in getting subscribe stats', err);
+    }
     const baseSubscribeStats =
       subscribeReport && getLocalPeerStatsFromReport('subscribe', subscribeReport, prevLocalPeerStats);
     const { packetsLost, jitter } = getPacketsLostAndJitterFromReport(subscribeReport);
@@ -64,7 +72,7 @@ export class HMSWebrtcStats {
     const subscribeStats: HMSPeerStats['subscribe'] =
       baseSubscribeStats && Object.assign(baseSubscribeStats, { packetsLostRate, jitter, packetsLost });
 
-    this.peerStats[this.localPeerID] = { publish: publishStats, subscribe: subscribeStats };
+    this.peerStats[this.localPeerID!] = { publish: publishStats, subscribe: subscribeStats };
   }
 
   private async updateTrackStats() {

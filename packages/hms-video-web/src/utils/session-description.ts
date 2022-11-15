@@ -1,12 +1,12 @@
 import * as sdpTransform from 'sdp-transform';
-import { TrackState } from '../notification-manager';
 import { isPresent } from './validations';
+import { TrackState } from '../notification-manager';
 
 /**
  * @DISCUSS: Should we have a wrapper over RTCSessionDescriptionInit(SDP) and have these methods in it?
  */
 
-export function fixMsid(desc: RTCSessionDescriptionInit, tracks: Map<string, TrackState>): RTCSessionDescriptionInit {
+export function fixMsid(desc: RTCSessionDescriptionInit, tracks?: Map<string, TrackState>): RTCSessionDescriptionInit {
   const parsedSdp = sdpTransform.parse(desc.sdp!);
 
   if (!parsedSdp.origin?.username.startsWith('mozilla')) {
@@ -14,7 +14,7 @@ export function fixMsid(desc: RTCSessionDescriptionInit, tracks: Map<string, Tra
     return desc;
   }
 
-  const mediaTracks = Array.from(tracks.values());
+  const mediaTracks = tracks ? Array.from(tracks.values()) : [];
 
   parsedSdp.media.forEach(m => {
     const streamId = m.msid?.split(' ')[0];

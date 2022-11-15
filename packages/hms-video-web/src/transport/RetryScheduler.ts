@@ -1,12 +1,9 @@
-import AnalyticsEvent from '../analytics/AnalyticsEvent';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import { Dependencies as TFCDependencies, TransportFailureCategory as TFC } from './models/TransportFailureCategory';
+import { TransportState } from './models/TransportState';
 import { HMSException } from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
-import { TransportFailureCategory as TFC, Dependencies as TFCDependencies } from './models/TransportFailureCategory';
-import { TransportState } from './models/TransportState';
 
 /**
  * Task which is executed by [RetryScheduler.schedule] until max retry count
@@ -23,29 +20,33 @@ type RetryTask = () => Promise<boolean>;
 
 const TAG = '[RetryScheduler]';
 
-export class RetryScheduler {
-  private analyticsEventsService: AnalyticsEventsService;
-  private onStateChange: (state: TransportState, error?: HMSException) => void;
+interface ScheduleTaskParams {
+  category: TFC;
+  error: HMSException;
+  task: RetryTask;
+  originalState: TransportState;
+  maxFailedRetries?: number;
+  changeState?: boolean;
+}
 
+export class RetryScheduler {
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
   constructor(
-    analyticsEventsService: AnalyticsEventsService,
-    onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
-  ) {
-    this.analyticsEventsService = analyticsEventsService;
-    this.onStateChange = onStateChange;
-  }
+    private onStateChange: (state: TransportState, error?: HMSException) => Promise<void>,
+    private sendEvent: (error: HMSException, category: TFC) => void,
+  ) {}
 
-  async schedule(
-    category: TFC,
-    error: HMSException,
-    task: RetryTask,
+  async schedule({
+    category,
+    error,
+    task,
+    originalState,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     changeState = true,
-  ) {
-    await this.scheduleTask(category, error, changeState, task, maxFailedRetries);
+  }: ScheduleTaskParams) {
+    await this.scheduleTask({ category, error, changeState, task, originalState, maxFailedRetries });
   }
 
   reset() {
@@ -54,14 +55,16 @@ export class RetryScheduler {
     this.inProgress.clear();
   }
 
-  private async scheduleTask(
-    category: TFC,
-    error: HMSException,
-    changeState: boolean,
-    task: RetryTask,
+  // eslint-disable-next-line complexity
+  private async scheduleTask({
+    category,
+    error,
+    changeState,
+    task,
+    originalState,
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
-  ): Promise<void> {
+  }: ScheduleTaskParams & { failedRetryCount?: number }): Promise<void> {
     HMSLogger.d(TAG, 'schedule: ', { category: TFC[category], error });
 
     // First schedule call
@@ -138,7 +141,7 @@ export class RetryScheduler {
       this.onStateChange(TransportState.Reconnecting, error);
     }
 
-    const delay = this.getDelayForRetryCount(failedRetryCount);
+    const delay = this.getDelayForRetryCount(category, failedRetryCount);
 
     HMSLogger.i(
       TAG,
@@ -163,36 +166,34 @@ export class RetryScheduler {
       taskPromise?.resolve(failedRetryCount);
 
       if (changeState && this.inProgress.size === 0) {
-        this.onStateChange(TransportState.Joined);
+        this.onStateChange(originalState);
       }
       HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
-      await this.scheduleTask(category, error, changeState, task, maxFailedRetries, failedRetryCount + 1);
+      await this.scheduleTask({
+        category,
+        error,
+        changeState,
+        task,
+        originalState,
+        maxFailedRetries,
+        failedRetryCount: failedRetryCount + 1,
+      });
     }
   }
 
-  private sendEvent(error: HMSException, category: TFC) {
-    let event: AnalyticsEvent;
-    switch (category) {
-      case TFC.ConnectFailed:
-        event = AnalyticsEventFactory.connect(error);
-        break;
-      case TFC.SignalDisconnect:
-        event = AnalyticsEventFactory.disconnect(error);
-        break;
-      case TFC.PublishIceConnectionFailed:
-        event = AnalyticsEventFactory.publish({ error });
-        break;
-      case TFC.SubscribeIceConnectionFailed:
-        event = AnalyticsEventFactory.subscribeFail(error);
-        break;
+  private getBaseDelayForTask(category: TFC, n: number) {
+    if (category === TFC.JoinWSMessageFailed) {
+      // linear backoff(2 + jitter for every retry)
+      return 2;
     }
-    this.analyticsEventsService.queue(event!).flush();
+    // exponential backoff
+    return Math.pow(2, n);
   }
 
-  private getDelayForRetryCount(n: number) {
-    const delay = Math.pow(2, n);
-    const jitter = Math.random();
+  private getDelayForRetryCount(category: TFC, n: number) {
+    const delay = this.getBaseDelayForTask(category, n);
+    const jitter = category === TFC.JoinWSMessageFailed ? Math.random() * 2 : Math.random();
     return Math.round(Math.min(delay + jitter, MAX_TRANSPORT_RETRY_DELAY) * 1000);
   }
 

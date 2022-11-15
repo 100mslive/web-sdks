@@ -1,3 +1,5 @@
+import { HMSPluginSupportResult } from '../audio';
+
 /**
  * A plugin implementing this interface can be registered with HMSLocalVideoTrack to transform, process or
  * analyze the local video track.These can include applications like video filters, virtual background, live
@@ -15,6 +17,11 @@ export interface HMSVideoPlugin {
    * This function will be called before the call to init, it is used to check whether the plugin supports current
    * OS and device or not. An error will be thrown back to the user if they try to use an unsupported plugin.
    */
+  checkSupport(): HMSPluginSupportResult;
+
+  /**
+   * @deprecated. Will be deleted in future updates. Use checkSupport instead.
+   */
   isSupported(): boolean;
 
   /**
@@ -28,6 +35,8 @@ export interface HMSVideoPlugin {
    * @see HMSVideoPluginType
    */
   getPluginType(): HMSVideoPluginType;
+
+  getContextType?(): HMSVideoPluginCanvasContextType;
 
   /**
    * This function will be called by the SDK for every video frame which the plugin needs to process.
@@ -63,4 +72,10 @@ export interface HMSVideoPlugin {
 export enum HMSVideoPluginType {
   TRANSFORM = 'TRANSFORM',
   ANALYZE = 'ANALYZE',
+}
+
+export enum HMSVideoPluginCanvasContextType {
+  '2D' = '2d',
+  WEBGL = 'webgl',
+  'WEBGL2' = 'webgl2',
 }

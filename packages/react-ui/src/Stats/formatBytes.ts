@@ -13,7 +13,7 @@ export const formatBytes = (bytes?: number, unit = 'B', decimals = 2) => {
   let i = Math.floor(Math.log(bytes) / Math.log(k));
 
   // B to KB
-  i == 0 && i++;
+  i === 0 && i++;
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };

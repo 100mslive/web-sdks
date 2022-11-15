@@ -1,27 +1,26 @@
 import {
-  auxiliaryAudio,
-  hostRole,
-  localAudio,
-  localPeer,
-  localSpeaker,
-  localVideo,
-  makeFakeStore,
-  peerScreenSharing,
-  remoteVideo,
-  screenShare,
-  screenshareAudio,
-  playlist,
-  remotePeerTwo,
-  remotePeerOne,
-} from '../fakeStore';
-import {
+  HMSRoomState,
   HMSStore,
+  selectAppData,
+  selectAudioPlaylist,
+  selectAudioTrackByPeerID,
+  selectAudioTrackVolume,
+  selectAudioVolumeByPeerID,
+  selectAuxiliaryAudioByPeerID,
+  selectBroadcastMessages,
+  selectBroadcastMessagesUnreadCount,
   selectCameraStreamByPeerID,
+  selectConnectionQualities,
+  selectDegradedTracks,
   selectDominantSpeaker,
+  selectFullAppData,
   selectHMSMessages,
   selectHMSMessagesCount,
+  selectIsAudioLocallyMuted,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectIsLocalAudioEnabled,
+  selectIsLocallyMutedByPeerID,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -33,44 +32,48 @@ import {
   selectLocalPeer,
   selectLocalPeerID,
   selectLocalVideoTrackID,
+  selectMessagesByPeerID,
+  selectMessagesByRole,
+  selectMessagesUnreadCountByPeerID,
+  selectMessagesUnreadCountByRole,
   selectPeerAudioByID,
   selectPeerByID,
+  selectPeerMetadata,
+  selectPeers,
+  selectPeersByRole,
   selectPeerScreenSharing,
   selectPeersScreenSharing,
   selectPeersWithAudioStatus,
+  selectPermissions,
   selectRemotePeers,
   selectRoom,
-  selectAuxiliaryAudioByPeerID,
-  selectScreenShareByPeerID,
-  selectSpeakers,
-  selectUnreadHMSMessagesCount,
-  selectScreenShareAudioByPeerID,
-  selectAudioVolumeByPeerID,
-  selectAudioTrackVolume,
-  selectIsLocallyMutedByPeerID,
-  selectIsAudioLocallyMuted,
-  selectVideoTrackByPeerID,
-  selectAudioTrackByPeerID,
-  selectTrackAudioByID,
-  selectSimulcastLayerByTrack,
-  selectDegradedTracks,
-  selectPermissions,
-  selectRoomState,
-  HMSRoomState,
-  selectIsInPreview,
   selectRoomStarted,
-  selectMessagesByPeerID,
-  selectMessagesByRole,
-  selectBroadcastMessages,
-  selectMessagesUnreadCountByRole,
-  selectBroadcastMessagesUnreadCount,
-  selectMessagesUnreadCountByPeerID,
-  selectAudioPlaylist,
+  selectRoomState,
+  selectScreenShareAudioByPeerID,
+  selectScreenShareByPeerID,
+  selectSimulcastLayerByTrack,
+  selectSpeakers,
+  selectTrackAudioByID,
+  selectUnreadHMSMessagesCount,
   selectVideoPlaylist,
-  selectPeersByRole,
-  selectPeers,
-  selectPeerMetadata,
+  selectVideoTrackByPeerID,
 } from '../../core';
+import {
+  auxiliaryAudio,
+  hostRole,
+  localAudio,
+  localPeer,
+  localSpeaker,
+  localVideo,
+  makeFakeStore,
+  peerScreenSharing,
+  playlist,
+  remotePeerOne,
+  remotePeerTwo,
+  remoteVideo,
+  screenShare,
+  screenshareAudio,
+} from '../fakeStore';
 
 let fakeStore: HMSStore;
 
@@ -152,6 +155,10 @@ describe('secondary selectors', () => {
       trackID: peerScreenSharing.audioTrack!,
     };
     expect(selectDominantSpeaker(fakeStore)).toBe(localPeer);
+  });
+
+  test('connectionQualities', () => {
+    expect(selectConnectionQualities(fakeStore)).toBe(fakeStore.connectionQualities);
   });
 
   test('remote peers', () => {
@@ -312,5 +319,14 @@ describe('derived selectors', () => {
       { peer: peerScreenSharing, isAudioEnabled: false },
       { peer: remotePeerTwo, isAudioEnabled: false },
     ]);
+  });
+});
+
+describe('appData', () => {
+  test('select AppData', () => {
+    expect(selectFullAppData(fakeStore)).toEqual(fakeStore.appData);
+  });
+  test('select AppDataByKey', () => {
+    expect(selectAppData('isAudioOnly')(fakeStore)).toEqual(true);
   });
 });

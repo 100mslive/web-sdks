@@ -1,4 +1,4 @@
-import { PeerNotification, PeerListNotification, SpeakerList, MessageNotification } from './HMSNotifications';
+import { MessageNotification, PeerListNotification, PeerNotification, SpeakerList } from './HMSNotifications';
 
 export const FAKE_PEER_ID = 'peer_id_1';
 
@@ -65,6 +65,7 @@ export const fakePeerList: PeerListNotification = {
     recording: {
       sfu: { enabled: false },
       browser: { enabled: false },
+      hls: { enabled: false },
     },
     streaming: {
       enabled: false,
@@ -130,6 +131,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
     recording: {
       sfu: { enabled: false },
       browser: { enabled: false },
+      hls: { enabled: false },
     },
     streaming: {
       enabled: false,
@@ -167,7 +169,6 @@ export const fakeMessage: MessageNotification = {
   roles: [], // empty for broadcast
   timestamp: 0,
   info: {
-    sender: FAKE_PEER_ID,
     message: 'Test',
     type: 'chat',
   },

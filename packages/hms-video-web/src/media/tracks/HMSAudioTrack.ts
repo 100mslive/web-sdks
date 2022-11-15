@@ -1,8 +1,8 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
+import HMSLogger from '../../utils/logger';
 import HMSMediaStream from '../streams/HMSMediaStream';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
-import HMSLogger from '../../utils/logger';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
@@ -95,7 +95,7 @@ export class HMSAudioTrack extends HMSTrack {
       return;
     }
     const srcObject = this.audioElement.srcObject;
-    if (srcObject !== null && srcObject instanceof MediaStream) {
+    if (srcObject instanceof MediaStream) {
       const existingTrackID = srcObject.getAudioTracks()[0]?.id;
       if (existingTrackID === this.nativeTrack.id) {
         // it's already attached, no need to attach again

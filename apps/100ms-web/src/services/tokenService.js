@@ -36,6 +36,11 @@ export default async function getToken(tokenEndpoint, userId, role, roomId) {
 
     const data = await response.json();
     const { token } = data;
+    // response will be sucess and token is null when url is valid but response
+    // domain is not present in 100ms
+    if (token === null) {
+      throw Error(data.msg);
+    }
     return token;
   } catch (err) {
     console.error(err);
@@ -46,16 +51,8 @@ export default async function getToken(tokenEndpoint, userId, role, roomId) {
 export async function getUserToken(name) {
   const extractUrlCode = () => {
     const path = window.location.pathname;
-    let roomCode = null;
-    if (path.startsWith("/preview/") || path.startsWith("/meeting/")) {
-      roomCode = "";
-      for (let i = 9; i < path.length; i++) {
-        if (path[i] === "/") break;
-        roomCode += path[i];
-      }
-      if (roomCode.trim() === "") roomCode = null;
-    }
-    return roomCode;
+    const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
+    return path.match(regex)?.groups?.code || null;
   };
 
   const code = extractUrlCode();
@@ -67,21 +64,23 @@ export async function getUserToken(name) {
     subdomain: process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN,
   };
 
-  try {
-    const response = await fetchWithRetry(url, {
-      method: "post",
-      body: JSON.stringify({
-        code: code,
-        user_id: name,
-      }),
-      headers,
-    });
-    const { token } = await response.json();
-    return token;
-  } catch (e) {
-    console.log(e);
-    return null;
+  const response = await fetchWithRetry(url, {
+    method: "post",
+    body: JSON.stringify({
+      code: code,
+      user_id: name,
+    }),
+    headers,
+  });
+
+  if (!response.ok) {
+    let error = new Error("Request failed!");
+    error.response = response;
+    throw error;
   }
+
+  const { token } = await response.json();
+  return token;
 }
 
 export function getBackendEndpoint() {
@@ -99,8 +98,9 @@ export function getBackendEndpoint() {
       process.env.REACT_APP_PROD_BACKEND_API ||
       "https://prod-in.100ms.live/hmsapi/";
   } else {
-    BASE_BACKEND_URL =
-      process.env.REACT_APP_BACKEND_API || "https://prod-in.100ms.live/hmsapi/";
+    const env = process.env.REACT_APP_ENV || "prod";
+    const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
+    BASE_BACKEND_URL = apiBasePath || "https://prod-in.100ms.live/hmsapi/";
   }
   return BASE_BACKEND_URL;
 }

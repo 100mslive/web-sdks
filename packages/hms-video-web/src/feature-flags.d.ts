@@ -5,5 +5,7 @@ interface Window {
     AUDIO_SINK?: boolean;
     GAIN_VALUE: number;
     ON_SFU_STATS: (params: any) => void;
+    NETWORK_TEST: boolean;
+    CLIENT_EVENTS: boolean;
   };
 }

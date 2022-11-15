@@ -1,9 +1,10 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { EventBus } from '../../events/EventBus';
+import { HMSPeer, HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import { TrackStateNotification } from '../HMSNotifications';
+import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -27,10 +28,27 @@ export class TrackManager {
     return `[${this.constructor.name}]`;
   }
 
-  constructor(private store: IStore, private eventEmitter: EventEmitter, public listener?: HMSUpdateListener) {}
+  constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
+
+  isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
+    const toInt = (layer: HMSSimulcastLayer): number => {
+      switch (layer) {
+        case HMSSimulcastLayer.HIGH:
+          return 3;
+        case HMSSimulcastLayer.MEDIUM:
+          return 2;
+        case HMSSimulcastLayer.LOW:
+          return 1;
+        case HMSSimulcastLayer.NONE:
+          return 0;
+      }
+    };
+
+    return toInt(newLayer) < toInt(prevLayer);
+  }
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
-    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, params);
+    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
 
     for (const trackId in params.tracks) {
       this.store.setTrackState({
@@ -46,7 +64,7 @@ export class TrackManager {
    * Sets the tracks to peer and returns the peer
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -56,7 +74,7 @@ export class TrackManager {
    * Sets the track of corresponding peer to null and returns the peer
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, track, track.nativeTrack);
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
@@ -64,43 +82,42 @@ export class TrackManager {
     }
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
-    track.type === HMSTrackType.AUDIO && this.eventEmitter.emit('track-removed', { detail: track });
+    track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
     if (!hmsPeer) {
       return;
     }
-
-    const removeAuxiliaryTrack = () => {
-      const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
-      if (auxiliaryTrackIndex > -1) {
-        hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
-      }
-    };
-
-    switch (track.type) {
-      case HMSTrackType.AUDIO:
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.audioTrack = undefined;
-        }
-        break;
-      case HMSTrackType.VIDEO: {
-        if (track.source !== 'regular') {
-          removeAuxiliaryTrack();
-        } else {
-          hmsPeer.videoTrack = undefined;
-        }
-      }
-    }
-
+    this.removePeerTracks(hmsPeer, track);
     this.store.removeTrack(track.trackId);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 
-  handleTrackUpdate = (params: TrackStateNotification) => {
-    HMSLogger.d(this.TAG, `TRACK_UPDATE`, params);
+  handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
+    for (const trackId in params.tracks) {
+      const trackEntry = params.tracks[trackId];
+      const track = this.store.getTrackById(trackId);
+      if (!track) {
+        continue;
+      }
 
+      const peer = this.store.getPeerByTrackId(trackId)!;
+      if (!peer) {
+        continue;
+      }
+
+      if (track instanceof HMSRemoteVideoTrack) {
+        const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
+        track.setLayerFromServer(trackEntry.current_layer, isDegraded);
+        if (isDegraded) {
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
+        } else {
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
+        }
+      }
+    }
+  };
+
+  handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
       return;
@@ -122,16 +139,9 @@ export class TrackManager {
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
-        if (currentTrackStateInfo.mute !== trackEntry.mute) {
-          if (trackEntry.mute) {
-            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, hmsPeer);
-          } else {
-            this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_UNMUTED, track, hmsPeer);
-          }
-          track.type === HMSTrackType.AUDIO &&
-            this.eventEmitter.emit('track-updated', { detail: { track, enabled: !trackEntry.mute } });
-        } else if (currentTrackStateInfo.description !== trackEntry.description) {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track, hmsPeer);
+        const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
+        if (eventType) {
+          this.listener?.onTrackUpdate(eventType, track, hmsPeer);
         }
       }
     }
@@ -153,36 +163,70 @@ export class TrackManager {
 
       track.source = state.trackInfo.source;
       track.peerId = hmsPeer.peerId;
+      // set log identifier to initial name of the peer
+      track.logIdentifier = hmsPeer.name;
       track.setEnabled(!state.trackInfo.mute);
-
-      switch (track.type) {
-        case HMSTrackType.AUDIO:
-          if (!hmsPeer.audioTrack && track.source === 'regular') {
-            hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
-          } else {
-            hmsPeer.auxiliaryTracks.push(track);
-          }
-          break;
-        case HMSTrackType.VIDEO: {
-          const remoteTrack = track as HMSRemoteVideoTrack;
-          const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
-          remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-          if (!hmsPeer.videoTrack && track.source === 'regular') {
-            hmsPeer.videoTrack = remoteTrack;
-          } else {
-            hmsPeer.auxiliaryTracks.push(remoteTrack);
-          }
-        }
-      }
-
+      this.addAudioTrack(hmsPeer, track);
+      this.addVideoTrack(hmsPeer, track);
       /**
        * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
        * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
        **/
       track.type === HMSTrackType.AUDIO
-        ? this.eventEmitter.emit('track-added', { detail: { track, peer: hmsPeer } })
+        ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
         : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(track.trackId);
     });
+  }
+
+  private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
+    if (auxiliaryTrackIndex > -1) {
+      hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
+    } else {
+      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack?.trackId === track.trackId) {
+        hmsPeer.audioTrack = undefined;
+      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack?.trackId === track.trackId) {
+        hmsPeer.videoTrack = undefined;
+      }
+    }
+  }
+
+  private addAudioTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    if (track.type !== HMSTrackType.AUDIO) {
+      return;
+    }
+    if (!hmsPeer.audioTrack && track.source === 'regular') {
+      hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
+    } else {
+      hmsPeer.auxiliaryTracks.push(track);
+    }
+  }
+
+  private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    if (track.type !== HMSTrackType.VIDEO) {
+      return;
+    }
+    const remoteTrack = track as HMSRemoteVideoTrack;
+    const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
+    remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
+    if (!hmsPeer.videoTrack && track.source === 'regular') {
+      hmsPeer.videoTrack = remoteTrack;
+    } else {
+      hmsPeer.auxiliaryTracks.push(remoteTrack);
+    }
+  }
+
+  private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
+    let eventType;
+    track.setEnabled(!trackState.mute);
+    if (currentTrackState.mute !== trackState.mute) {
+      eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
+      track.type === HMSTrackType.AUDIO &&
+        this.eventBus.audioTrackUpdate.publish({ track: track as HMSRemoteAudioTrack, enabled: !trackState.mute });
+    } else if (currentTrackState.description !== trackState.description) {
+      eventType = HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED;
+    }
+    return eventType;
   }
 }

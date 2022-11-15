@@ -1,7 +1,8 @@
+import AnalyticsEvent from './AnalyticsEvent';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
+import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 import HMSLogger from '../utils/logger';
 import { Queue } from '../utils/queue';
-import AnalyticsEvent from './AnalyticsEvent';
-import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 export abstract class AnalyticsTransport {
   abstract transportProvider: IAnalyticsTransportProvider;
@@ -17,13 +18,18 @@ export abstract class AnalyticsTransport {
     }
   }
 
-  flushFailedEvents() {
+  flushFailedEvents(currentPeerId?: string) {
     try {
       HMSLogger.d(this.TAG, 'Flushing failed events', this.failedEvents);
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
         if (event) {
-          this.sendSingleEvent(event);
+          const isEventFromCurrentPeer = event.metadata?.peer.peer_id === currentPeerId;
+          if (isEventFromCurrentPeer || !event.metadata.peer.peer_id) {
+            this.sendSingleEvent(event);
+          } else {
+            HTTPAnalyticsTransport.sendEvent(event);
+          }
         }
       }
     } catch (error) {
@@ -33,17 +39,13 @@ export abstract class AnalyticsTransport {
 
   private sendSingleEvent(event: AnalyticsEvent) {
     try {
-      HMSLogger.d(this.TAG, 'Sending event', { event });
       this.transportProvider.sendEvent(event);
+      HMSLogger.d(this.TAG, 'Sent event', event.name, event);
     } catch (error) {
-      HMSLogger.w(
-        this.TAG,
-        `${this.transportProvider.constructor.name}.sendEvent failed, adding to local storage events`,
-        {
-          event,
-          error,
-        },
-      );
+      HMSLogger.w(this.TAG, `${this.transportProvider.TAG}.sendEvent failed, adding to local storage events`, {
+        event,
+        error,
+      });
       this.failedEvents.enqueue(event);
       throw error;
     }

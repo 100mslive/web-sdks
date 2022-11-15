@@ -1,0 +1,51 @@
+{
+  "version": "1.8.1",
+  "license": "MIT",
+  "main": "dist/index.cjs.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/tflite",
+    "src/models"
+  ],
+  "scripts": {
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "build": "yarn build:only && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.json",
+    "test": "jest --maxWorkers=1 --passWithNoTests",
+    "lint": "eslint -c ../../.eslintrc .",
+    "lint:fix": "yarn lint --fix",
+    "prepare": "yarn build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "peerDependencies": {
+    "@100mslive/hms-video": "^0.5.2"
+  },
+  "name": "@100mslive/hms-virtual-background",
+  "author": "ashish17",
+  "module": "dist/index.js",
+  "devDependencies": {
+    "@100mslive/hms-video": "0.6.1"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs-backend-webgl": "^3.3.0",
+    "@tensorflow/tfjs-core": "^3.3.0",
+    "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
+    "@webassemblyjs/wasm-gen": "1.11.1",
+    "gifuct-js": "^2.1.2",
+    "wasm-check": "^2.0.2"
+  },
+  "eslintIgnore": [
+    "tflite.js",
+    "tflite-simd.js",
+    "tflite.wasm",
+    "tflite-simd.wasm",
+    "defineTFLite.ts",
+    "importing.test.ts"
+  ]
+}

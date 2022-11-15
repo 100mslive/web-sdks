@@ -1,1 +1,1 @@
-export { AudioLevel } from './AudioLevel';
+export { useBorderAudioLevel } from './AudioLevel';

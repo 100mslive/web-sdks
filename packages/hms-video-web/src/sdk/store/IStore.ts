@@ -1,23 +1,24 @@
-import { HMSRoom, HMSSpeaker, HMSRole, PublishParams, HMSConfig } from '../../interfaces';
+import { Comparator } from './Comparator';
+import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
+import { IErrorListener } from '../../interfaces/error-listener';
 import {
-  HMSTrack,
-  HMSAudioTrack,
-  HMSVideoTrack,
-  HMSTrackSource,
-  HMSRemoteVideoTrack,
-  HMSLocalTrack,
-} from '../../media/tracks';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
-import {
-  SimulcastLayer,
   SimulcastDimensions,
-  SimulcastLayers,
+  SimulcastLayer,
   SimulcastLayerDefinition,
+  SimulcastLayers,
 } from '../../interfaces/simulcast-layers';
 import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
-import { Comparator } from './Comparator';
+import {
+  HMSAudioTrack,
+  HMSLocalTrack,
+  HMSRemoteVideoTrack,
+  HMSTrack,
+  HMSTrackSource,
+  HMSVideoTrack,
+} from '../../media/tracks';
 import { TrackState } from '../../notification-manager';
-import { IErrorListener } from '../../interfaces/error-listener';
+import { ENV } from '../../utils/support';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 export type KnownRoles = { [role: string]: HMSRole };
 export interface TrackStateEntry {
@@ -27,6 +28,7 @@ export interface TrackStateEntry {
 
 export interface IStore {
   getConfig(): HMSConfig | undefined;
+  getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
 
   getComparator(): Comparator;
@@ -72,12 +74,17 @@ export interface IStore {
   getTrackState(trackId: string): TrackStateEntry;
   setTrackState(trackState: TrackStateEntry): void;
 
+  getUserAgent(): string;
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo): void;
+
   removePeer(peerId: string): void;
   removeTrack(trackId: string): void;
 
   updateSpeakers(speakers: HMSSpeaker[]): void;
   updateAudioOutputVolume(volume: number): void;
-  updateAudioOutputDevice(device: MediaDeviceInfo): void;
+  updateAudioOutputDevice(device: MediaDeviceInfo): Promise<void>;
+
+  hasRoleDetailsArrived(): boolean;
 
   cleanUp(): void;
 }

@@ -7,6 +7,7 @@
 
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export enum HMSAction {
   NONE = 'NONE',
@@ -29,10 +30,10 @@ export enum HMSAction {
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
-    GenericConnect(action: HMSAction, description = '') {
+    FailedToConnect(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.WebSocketConnectionErrors.GENERIC_CONNECT,
-        'WebsocketConnection',
+        ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
+        'WebsocketFailedToConnect',
         action,
         `[WS]: ${description}`,
         `[WS]: ${description}`,
@@ -48,11 +49,21 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    AbnormalClose(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
+        'WebSocketAbnormalClose',
+        action,
+        `Websocket closed abnormally`,
+        description,
+      );
+    },
   },
 
   InitAPIErrors: {
     ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error`, description);
+      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
@@ -60,7 +71,7 @@ export const ErrorFactory = {
         ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
-        `Endpoint is not reachable.`,
+        `Endpoint is not reachable - ${description}`,
         description,
       );
     },
@@ -72,6 +83,7 @@ export const ErrorFactory = {
         action,
         `Token is not in proper JWT format - ${description}`,
         description,
+        true,
       );
     },
 
@@ -102,7 +114,7 @@ export const ErrorFactory = {
         ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
         'CantAccessCaptureDevice',
         action,
-        `[TRACK]: No permission to access capture device - ${deviceInfo}`,
+        `User denied permission to access capture device - ${deviceInfo}`,
         description,
       );
     },
@@ -137,12 +149,16 @@ export const ErrorFactory = {
       );
     },
 
-    NothingToReturn(action: HMSAction, description = '') {
+    NothingToReturn(
+      action: HMSAction,
+      description = '',
+      message = `There is no media to return. Please select either video or audio or both.`,
+    ) {
       return new HMSException(
         ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
-        `There is no media to return. Please select either video or audio or both.`,
+        message,
         description,
       );
     },
@@ -184,6 +200,36 @@ export const ErrorFactory = {
         action,
         `[TRACK]: Requested constraints cannot be satisfied with the device hardware - ${deviceInfo}`,
         description,
+      );
+    },
+
+    NoAudioDetected(action: HMSAction, description = 'Please check the mic or use another audio input') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.NO_AUDIO_DETECTED,
+        'NoAudioDetected',
+        action,
+        'No audio input detected from microphone',
+        description,
+      );
+    },
+
+    SystemDeniedPermission(action: HMSAction, deviceInfo: string, description = '') {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SYSTEM_DENIED_PERMISSION,
+        'SystemDeniedPermission',
+        action,
+        `Operating System denied permission to access capture device - ${deviceInfo}`,
+        description,
+      );
+    },
+
+    CurrentTabNotShared() {
+      return new HMSException(
+        ErrorCodes.TracksErrors.CURRENT_TAB_NOT_SHARED,
+        'CurrentTabNotShared',
+        HMSAction.TRACK,
+        'The app requires you to share the current tab',
+        'You must screen share the current tab in order to proceed',
       );
     },
   },
@@ -241,7 +287,7 @@ export const ErrorFactory = {
   },
 
   WebsocketMethodErrors: {
-    ServerErrors(code: number, action: HMSAction, description: string) {
+    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
       return new HMSException(code, 'ServerErrors', action, description, description, true);
     },
 
@@ -416,6 +462,16 @@ export const ErrorFactory = {
 
     AddAlreadyInProgress(action: HMSAction, description = '') {
       return new HMSException(7004, 'AddAlreadyInProgress', action, 'Plugin add already in progress', description);
+    },
+
+    DeviceNotSupported(action: HMSAction, description = '') {
+      return new HMSException(
+        7005,
+        'DeviceNotSupported',
+        action,
+        'Check HMS Docs to see the list of supported devices',
+        description,
+      );
     },
   },
 

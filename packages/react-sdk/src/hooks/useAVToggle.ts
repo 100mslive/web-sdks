@@ -1,12 +1,12 @@
+import { useCallback } from 'react';
 import {
   selectIsAllowedToPublish,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
 } from '@100mslive/hms-video-store';
-import { useCallback } from 'react';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { hooksErrHandler } from '../hooks/types';
 
 export interface useAVToggleResult {
   /**
@@ -35,23 +35,23 @@ export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): use
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const hmsActions = useHMSActions();
+  const actions = useHMSActions();
 
   const toggleAudio = useCallback(async () => {
     try {
-      await hmsActions.setLocalAudioEnabled(!isLocalAudioEnabled);
+      await actions.setLocalAudioEnabled(!isLocalAudioEnabled);
     } catch (err) {
       handleError(err as Error, 'toggleAudio');
     }
-  }, [isLocalAudioEnabled, hmsActions]);
+  }, [actions, isLocalAudioEnabled, handleError]);
 
   const toggleVideo = useCallback(async () => {
     try {
-      await hmsActions.setLocalVideoEnabled(!isLocalVideoEnabled);
+      await actions.setLocalVideoEnabled(!isLocalVideoEnabled);
     } catch (err) {
       handleError(err as Error, 'toggleVideo');
     }
-  }, [isLocalVideoEnabled, hmsActions]);
+  }, [actions, isLocalVideoEnabled, handleError]);
 
   return {
     isLocalAudioEnabled,

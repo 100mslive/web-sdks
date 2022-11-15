@@ -1,5 +1,5 @@
-import { HMSPeer } from '../sdk/models/peer';
 import { HMSRole } from './role';
+import { HMSPeer } from '../sdk/models/peer';
 
 export interface HMSMessageInput {
   recipientPeer?: HMSPeer;
@@ -8,7 +8,7 @@ export interface HMSMessageInput {
   message: string;
 }
 export interface HMSMessage {
-  sender: HMSPeer;
+  sender?: HMSPeer;
   recipientPeer?: HMSPeer;
   recipientRoles?: HMSRole[];
   time: Date;

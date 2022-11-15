@@ -1,11 +1,12 @@
 import {
+  createDefaultStoreState,
+  HMSException,
   HMSNotificationSeverity,
+  HMSNotificationTypes,
   HMSPeer,
   HMSReactiveStore,
   HMSStore,
   HMSTrack,
-  HMSException,
-  createDefaultStoreState,
 } from '../../core';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../core/hmsSDKStore/common/mapping';
 import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
@@ -57,11 +58,6 @@ describe('hms notifications tests', () => {
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
   });
 
-  test('when unhandled track event on Notification not to be called', () => {
-    notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track.id);
-    expect(cb.mock.calls.length).toBe(0);
-  });
-
   test('when track added on Notification to be called', () => {
     notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_ADDED, track.id);
     expect(cb.mock.calls.length).toBe(1);
@@ -109,5 +105,35 @@ describe('hms notifications tests', () => {
     unsub();
     notifications.sendReconnected();
     expect(cb.mock.calls.length).toBe(0);
+  });
+
+  test('when type is passed and does not match, callback not to be called', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, HMSNotificationTypes.ERROR);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(0);
+  });
+
+  test('when type is passed and matches, callback to be called, ', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, HMSNotificationTypes.RECONNECTED);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(1);
+  });
+
+  test('when types are passed and does not match, callback not to be called', () => {
+    const callback = jest.fn(val => val);
+    notifications.onNotification(callback, [HMSNotificationTypes.ERROR, HMSNotificationTypes.PEER_JOINED]);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(0);
+  });
+
+  test('when types are passed and matches, callback to be called', () => {
+    const callback = jest.fn(val => val);
+    const error = makeException('Test');
+    notifications.onNotification(callback, [HMSNotificationTypes.RECONNECTED, HMSNotificationTypes.RECONNECTING]);
+    notifications.sendReconnecting(error);
+    notifications.sendReconnected();
+    expect(callback.mock.calls.length).toBe(2);
   });
 });

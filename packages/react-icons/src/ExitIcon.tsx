@@ -1,16 +1,16 @@
 import * as React from 'react';
+import { SVGProps } from 'react';
 
-function SvgExitIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.333 3.375a1.827 1.827 0 00-1.772 1.89v13.47a1.828 1.828 0 001.772 1.89h9.205a1.828 1.828 0 001.773-1.89v-3.36a.75.75 0 00-1.5 0v3.409a.328.328 0 01-.297.341H5.357a.328.328 0 01-.297-.341V5.25v-.034a.327.327 0 01.297-.341h9.157a.328.328 0 01.298.341l-.001.034v3.375a.75.75 0 001.5 0v-3.36a1.828 1.828 0 00-1.773-1.89H5.333zm12.51 5.285a.75.75 0 011.06 0l2.813 2.813a.747.747 0 010 1.06l-2.813 2.813a.75.75 0 11-1.06-1.06l1.532-1.533H9.373a.75.75 0 010-1.5h10.002l-1.532-1.532a.75.75 0 010-1.06z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+const SvgExitIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg width="24px" height="24px" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M8.733 7.6A1.133 1.133 0 0 0 7.6 8.733V24.6a1.133 1.133 0 0 0 1.133 1.133h4.534a1.133 1.133 0 1 1 0 2.267H8.733a3.4 3.4 0 0 1-3.4-3.4V8.733a3.4 3.4 0 0 1 3.4-3.4h4.534a1.133 1.133 0 1 1 0 2.267H8.733ZM20.4 10.199a1.133 1.133 0 0 1 1.603 0l5.663 5.663.037.039a1.128 1.128 0 0 1 .203 1.222 1.13 1.13 0 0 1-.24.349l-5.663 5.663a1.133 1.133 0 0 1-1.603-1.603L24.13 17.8H13.267a1.133 1.133 0 1 1 0-2.267H24.13l-3.732-3.732a1.133 1.133 0 0 1 0-1.602Z"
+      fill="currentColor"
+      fillOpacity={0.95}
+    />
+  </svg>
+);
 
 export default SvgExitIcon;

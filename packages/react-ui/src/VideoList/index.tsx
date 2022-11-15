@@ -1,2 +1,2 @@
-export { VideoList, getLeft } from './VideoList';
+export { getLeft } from './videoListUtils';
 export { StyledVideoList } from './StyledVideoList';

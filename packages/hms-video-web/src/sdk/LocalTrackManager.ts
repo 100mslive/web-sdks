@@ -1,4 +1,15 @@
-import { HMSAudioCodec, HMSVideoCodec, PublishParams } from '../interfaces';
+import { v4 as uuid } from 'uuid';
+import { IStore } from './store';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { DeviceManager } from '../device-manager';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSException } from '../error/HMSException';
+import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
+import { EventBus } from '../events/EventBus';
+import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
+import InitialSettings from '../interfaces/settings';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -7,21 +18,12 @@ import {
   HMSVideoTrackSettings,
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
-import InitialSettings from '../interfaces/settings';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
-import { IStore } from './store';
-import { IFetchAVTrackOptions } from '../transport/ITransport';
-import HMSLogger from '../utils/logger';
-import { HMSException } from '../error/HMSException';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import ITransportObserver from '../transport/ITransportObserver';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import analyticsEventsService from '../analytics/AnalyticsEventsService';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { DeviceManager } from '../device-manager';
-import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
-import { ErrorCodes } from '../error/ErrorCodes';
-import { EventBus } from '../events/EventBus';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
+import { IFetchAVTrackOptions } from '../transport/ITransport';
+import ITransportObserver from '../transport/ITransportObserver';
+import HMSLogger from '../utils/logger';
+import { HMSAudioContextHandler } from '../utils/media';
 
 const defaultSettings = {
   isAudioMuted: false,
@@ -35,61 +37,32 @@ let blankCanvas: any;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
+  private captureHandleIdentifier?: string;
 
   constructor(
     private store: IStore,
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,
-  ) {}
+    private analyticsTimer: AnalyticsTimer,
+  ) {
+    this.setScreenCaptureHandleConfig();
+  }
 
+  // eslint-disable-next-line complexity
   async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
-    const publishParams = this.store.getPublishParams();
-    if (!publishParams) {
-      return [];
-    }
-
-    const { allowed } = publishParams;
-    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
-    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-
-    if (!canPublishAudio && !canPublishVideo) {
-      return [];
-    }
-    let tracksToPublish: Array<HMSLocalTrack> = [];
-
-    const trackSettings = this.getTrackSettings(initialSettings, publishParams);
-
+    const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
     }
-
-    const localTracks = this.store.getLocalPeerTracks();
-    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
-      | HMSLocalVideoTrack
-      | undefined;
-    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
-      | HMSLocalAudioTrack
-      | undefined;
-    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
-      | HMSLocalVideoTrack
-      | undefined;
-
+    const canPublishAudio = !!trackSettings.audio;
+    const canPublishVideo = !!trackSettings.video;
+    let tracksToPublish: Array<HMSLocalTrack> = [];
+    const { videoTrack, audioTrack } = await this.updateCurrentLocalTrackSettings(trackSettings);
+    const localStream = (videoTrack?.stream || audioTrack?.stream) as HMSLocalStream | undefined;
     // The track gets added to the store only after it is published.
     const isVideoTrackPublished = Boolean(videoTrack && this.store.getTrackById(videoTrack.trackId));
     const isAudioTrackPublished = Boolean(audioTrack && this.store.getTrackById(audioTrack.trackId));
-
-    if (videoTrack && trackSettings.video) {
-      await videoTrack.setSettings(trackSettings.video);
-    }
-
-    if (audioTrack && trackSettings.audio) {
-      await audioTrack.setSettings(trackSettings.audio);
-    }
-
-    if (screenTrack && trackSettings.screen) {
-      screenTrack.setSettings(trackSettings.screen);
-    }
 
     if (isVideoTrackPublished && isAudioTrackPublished) {
       // there is nothing to publish
@@ -100,12 +73,20 @@ export class LocalTrackManager {
       audio: canPublishAudio && !audioTrack && (initialSettings.isAudioMuted ? 'empty' : true),
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
+
+    this.analyticsTimer.start(TimedEvent.LOCAL_TRACKS);
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
-      tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings);
+      tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
     } catch (error) {
-      tracksToPublish = await this.retryGetLocalTracks(error, trackSettings, fetchTrackOptions);
+      tracksToPublish = await this.retryGetLocalTracks(
+        error as HMSException,
+        trackSettings,
+        fetchTrackOptions,
+        localStream,
+      );
     }
+    this.analyticsTimer.end(TimedEvent.LOCAL_TRACKS);
 
     /**
      * concat local tracks only if both are true which means it is either join or switched from a role
@@ -125,45 +106,34 @@ export class LocalTrackManager {
     return tracksToPublish;
   }
 
+  /**
+   * @throws {HMSException}
+   */
   async getLocalTracks(
     fetchTrackOptions: IFetchAVTrackOptions = { audio: true, video: true },
     settings: HMSTrackSettings,
+    localStream?: HMSLocalStream,
   ): Promise<Array<HMSLocalTrack>> {
     try {
       const nativeTracks = await this.getNativeLocalTracks(fetchTrackOptions, settings);
-      const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
-      const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
-      const local = new HMSLocalStream(new MediaStream(nativeTracks));
-
-      const tracks: Array<HMSLocalTrack> = [];
-      if (nativeAudioTrack && settings?.audio) {
-        const audioTrack = new HMSLocalAudioTrack(local, nativeAudioTrack, 'regular', this.eventBus, settings.audio);
-        tracks.push(audioTrack);
-      }
-
-      if (nativeVideoTrack && settings?.video) {
-        const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'regular', this.eventBus, settings.video);
-        tracks.push(videoTrack);
-      }
-      return tracks;
+      return this.createHMSLocalTracks(nativeTracks, settings, localStream);
     } catch (error) {
       // TOOD: On OverConstrained error, retry with dropping all constraints.
       // Just retry getusermedia again - it sometimes work when AbortError or NotFoundError is thrown on a few devices
-      if (error instanceof HMSException) {
-        analyticsEventsService
-          .queue(
-            AnalyticsEventFactory.publish({
-              devices: this.deviceManager.getDevices(),
-              error,
-              settings,
-            }),
-          )
-          .flush();
-      }
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          devices: this.deviceManager.getDevices(),
+          error: error as Error,
+          settings,
+        }),
+      );
       throw error;
     }
   }
 
+  /**
+   * @throws {HMSException}
+   */
   private async getNativeLocalTracks(
     fetchTrackOptions: IFetchAVTrackOptions = { audio: false, video: false },
     settings: HMSTrackSettings,
@@ -178,44 +148,65 @@ export class LocalTrackManager {
     if (trackSettings.audio || trackSettings.video) {
       nativeTracks.push(...(await this.getAVTracks(trackSettings)));
     }
-
-    if (fetchTrackOptions.audio === 'empty') {
-      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
-    }
-
-    if (fetchTrackOptions.video === 'empty') {
-      nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
-    }
-
+    nativeTracks.push(...this.getEmptyTracks(fetchTrackOptions));
     return nativeTracks;
   }
 
-  async getLocalScreen(videosettings: HMSVideoTrackSettings, audioSettings: HMSAudioTrackSettings) {
-    const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
-    // remove advanced constraints as it not supported for screenshare audio
-    delete audioConstraints.advanced;
+  async getLocalScreen(partialConfig?: HMSScreenShareConfig) {
+    const config = await this.getOrDefaultScreenshareConfig(partialConfig);
+    const { video: videoSettings, audio: audioSettings } = this.getScreenshareSettings(config.videoOnly);
     const constraints = {
-      video: videosettings.toConstraints(),
-      audio: {
+      video: { ...videoSettings.toConstraints(true), displaySurface: config.displaySurface },
+      preferCurrentTab: config.preferCurrentTab,
+      selfBrowserSurface: config.selfBrowserSurface,
+      surfaceSwitching: config.surfaceSwitching,
+      systemAudio: config.systemAudio,
+    } as MediaStreamConstraints;
+    if (audioSettings) {
+      const audioConstraints: MediaTrackConstraints = audioSettings.toConstraints();
+      // remove advanced constraints as it not supported for screenshare audio
+      delete audioConstraints.advanced;
+      constraints.audio = {
         ...audioConstraints,
         autoGainControl: false,
         noiseSuppression: false,
+        // @ts-ignore
         googAutoGainControl: false,
         echoCancellation: false,
-      },
-    } as MediaStreamConstraints;
+      };
+    }
     let stream;
     try {
+      HMSLogger.d('retrieving screenshare with ', { config }, { constraints });
       // @ts-ignore [https://github.com/microsoft/TypeScript/issues/33232]
       stream = (await navigator.mediaDevices.getDisplayMedia(constraints)) as MediaStream;
     } catch (err) {
-      throw BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      HMSLogger.w(this.TAG, 'error in getting screenshare - ', err);
+      const error = BuildGetMediaError(err as Error, HMSGetMediaActions.SCREEN);
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.publish({
+          error: error as Error,
+          devices: this.deviceManager.getDevices(),
+          settings: new HMSTrackSettings(videoSettings, audioSettings, false),
+        }),
+      );
+      throw error;
     }
 
     const tracks: Array<HMSLocalTrack> = [];
     const local = new HMSLocalStream(stream);
     const nativeVideoTrack = stream.getVideoTracks()[0];
-    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videosettings);
+    const videoTrack = new HMSLocalVideoTrack(local, nativeVideoTrack, 'screen', this.eventBus, videoSettings);
+
+    try {
+      const isCurrentTabShared = this.validateCurrentTabCapture(videoTrack, config.forceCurrentTab);
+      videoTrack.isCurrentTab = isCurrentTabShared;
+      await videoTrack.cropTo(config.cropTarget);
+    } catch (err) {
+      stream.getTracks().forEach(track => track.stop());
+      throw err;
+    }
+
     tracks.push(videoTrack);
     const nativeAudioTrack = stream.getAudioTracks()[0];
     if (nativeAudioTrack) {
@@ -225,6 +216,30 @@ export class LocalTrackManager {
 
     HMSLogger.v(this.TAG, 'getLocalScreen', tracks);
     return tracks;
+  }
+
+  setScreenCaptureHandleConfig(config?: Partial<ScreenCaptureHandleConfig>) {
+    // @ts-ignore
+    if (!navigator.mediaDevices?.setCaptureHandleConfig || this.isInIframe()) {
+      // setCaptureHandleConfig can't be called from within an iframe
+      return;
+    }
+    config = config || {};
+    Object.assign(config, { handle: uuid(), exposeOrigin: false, permittedOrigins: [window.location.origin] });
+    HMSLogger.d('setting capture handle - ', config.handle);
+    // @ts-ignore
+    navigator.mediaDevices.setCaptureHandleConfig(config);
+    this.captureHandleIdentifier = config.handle;
+  }
+
+  validateCurrentTabCapture(track: HMSLocalVideoTrack, forceCurrentTab: boolean): boolean {
+    const trackHandle = track.getCaptureHandle();
+    const isCurrentTabShared = !!(this.captureHandleIdentifier && trackHandle?.handle === this.captureHandleIdentifier);
+    if (forceCurrentTab && !isCurrentTabShared) {
+      HMSLogger.e(this.TAG, 'current tab was not shared with forceCurrentTab as true');
+      throw ErrorFactory.TracksErrors.CurrentTabNotShared();
+    }
+    return isCurrentTabShared;
   }
 
   async requestPermissions() {
@@ -271,16 +286,19 @@ export class LocalTrackManager {
   }
 
   static getEmptyAudioTrack(): MediaStreamTrack {
-    const ctx = new AudioContext();
+    const ctx = HMSAudioContextHandler.getAudioContext();
     const oscillator = ctx.createOscillator();
-    const dst = oscillator.connect(ctx.createMediaStreamDestination());
+    const dst = ctx.createMediaStreamDestination();
+    oscillator.connect(dst);
     oscillator.start();
-    // @ts-expect-error
     const emptyTrack = dst.stream.getAudioTracks()[0];
     emptyTrack.enabled = false;
     return emptyTrack;
   }
 
+  /**
+   * @throws {HMSException}
+   */
   private async getAVTracks(settings: HMSTrackSettings): Promise<Array<MediaStreamTrack>> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -290,91 +308,42 @@ export class LocalTrackManager {
 
       return stream.getVideoTracks().concat(stream.getAudioTracks());
     } catch (error) {
-      let videoError = false;
-      let audioError = false;
-
       await this.deviceManager.init();
-
-      if (!this.deviceManager.hasWebcamPermission && settings.video) {
-        videoError = true;
-      }
-
-      if (!this.deviceManager.hasMicrophonePermission && settings.audio) {
-        audioError = true;
-      }
-
+      const videoError = !!(!this.deviceManager.hasWebcamPermission && settings.video);
+      const audioError = !!(!this.deviceManager.hasMicrophonePermission && settings.audio);
       /**
        * TODO: Only permission error throws correct device info in error(audio or video or both),
        * Right now for other errors such as overconstrained error we are unable to get whether audio/video failure.
        * Fix this by checking the native error message.
        */
-      if (videoError && audioError) {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.AV);
-      } else if (videoError) {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
-      } else {
-        throw BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
-      }
+      const errorType = this.getErrorType(videoError, audioError);
+      throw BuildGetMediaError(error as Error, errorType);
     }
   }
 
-  private getTrackSettings(initialSettings: InitialSettings, publishParams: PublishParams): HMSTrackSettings | null {
-    const { audio, video, screen, allowed } = publishParams;
-    const canPublishAudio = Boolean(allowed && allowed.includes('audio'));
-    const canPublishVideo = Boolean(allowed && allowed.includes('video'));
-    const canPublishScreen = Boolean(allowed && allowed.includes('screen'));
-
-    if (!canPublishAudio && !canPublishVideo) {
+  private getAVTrackSettings(initialSettings: InitialSettings): HMSTrackSettings | null {
+    const audioSettings = this.getAudioSettings(initialSettings);
+    const videoSettings = this.getVideoSettings(initialSettings);
+    if (!audioSettings && !videoSettings) {
       return null;
     }
-    const localPeer = this.store.getLocalPeer();
-    const videoTrack = localPeer?.videoTrack;
-    const audioTrack = localPeer?.audioTrack;
-    // Get device from the tracks already added in preview
-    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
-    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
-
-    let audioSettings: HMSAudioTrackSettings | null = null;
-    let videoSettings: HMSVideoTrackSettings | null = null;
-    let screenSettings: HMSVideoTrackSettings | null = null;
-    if (canPublishAudio) {
-      audioSettings = new HMSAudioTrackSettingsBuilder()
-        .codec(audio.codec as HMSAudioCodec)
-        .maxBitrate(audio.bitRate)
-        .deviceId(audioDeviceId || defaultSettings.audioInputDeviceId)
-        .build();
-    }
-    if (canPublishVideo) {
-      const dimensions = this.store.getSimulcastDimensions('regular');
-      videoSettings = new HMSVideoTrackSettingsBuilder()
-        .codec(video.codec as HMSVideoCodec)
-        .maxBitrate(video.bitRate)
-        .maxFramerate(video.frameRate)
-        .setWidth(dimensions?.width || video.width) // take simulcast width if available
-        .setHeight(dimensions?.height || video.height) // take simulcast width if available
-        .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
-        .build();
-    }
-    if (canPublishScreen) {
-      const dimensions = this.store.getSimulcastDimensions('screen');
-      screenSettings = new HMSVideoTrackSettingsBuilder()
-        // Don't cap maxBitrate for screenshare.
-        // If publish params doesn't have bitRate value - don't set maxBitrate.
-        .maxBitrate(screen.bitRate, false)
-        .codec(screen.codec as HMSVideoCodec)
-        .maxFramerate(screen.frameRate)
-        .setWidth(dimensions?.width || screen.width)
-        .setHeight(dimensions?.height || screen.height)
-        .build();
-    }
-
-    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).screen(screenSettings).build();
+    return new HMSTrackSettingsBuilder().video(videoSettings).audio(audioSettings).build();
   }
 
+  private isInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  // eslint-disable-next-line complexity
   private async retryGetLocalTracks(
-    error: unknown,
+    error: HMSException,
     trackSettings: HMSTrackSettings,
     fetchTrackOptions: IFetchAVTrackOptions,
+    localStream?: HMSLocalStream,
   ): Promise<Array<HMSLocalTrack>> {
     if (error instanceof HMSException && error.action === HMSAction.TRACK) {
       this.observer.onFailure(error);
@@ -397,7 +366,7 @@ export class LocalTrackManager {
 
         try {
           // Try get local tracks with no constraints
-          return await this.getLocalTracks(fetchTrackOptions, newTrackSettings);
+          return await this.getLocalTracks(fetchTrackOptions, newTrackSettings, localStream);
         } catch (error) {
           /**
            * This error shouldn't be overconstrained error(as we've dropped all constraints).
@@ -415,7 +384,7 @@ export class LocalTrackManager {
             ex = newError;
           }
 
-          return await this.retryGetLocalTracks(ex, trackSettings, fetchTrackOptions);
+          return await this.retryGetLocalTracks(ex as HMSException, trackSettings, fetchTrackOptions, localStream);
         }
       }
 
@@ -423,18 +392,197 @@ export class LocalTrackManager {
       fetchTrackOptions.video = videoFailure ? 'empty' : fetchTrackOptions.video;
       HMSLogger.w(this.TAG, 'Fetch AV Tracks failed', { fetchTrackOptions }, error);
       try {
-        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
       } catch (error) {
         HMSLogger.w(this.TAG, 'Fetch empty tacks failed', error);
         fetchTrackOptions.audio = fetchTrackOptions.audio && 'empty';
         fetchTrackOptions.video = fetchTrackOptions.video && 'empty';
-        this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
-        return await this.getLocalTracks(fetchTrackOptions, trackSettings);
+        this.observer.onFailure(error as HMSException);
+        return await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
       }
     } else {
       HMSLogger.w(this.TAG, 'Fetch AV Tracks failed - unknown exception', error);
-      this.observer.onFailure(ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, (error as Error).message));
+      this.observer.onFailure(error);
       return [];
     }
+  }
+
+  private getErrorType(videoError: boolean, audioError: boolean): HMSGetMediaActions {
+    if (videoError && audioError) {
+      return HMSGetMediaActions.AV;
+    }
+    if (videoError) {
+      return HMSGetMediaActions.VIDEO;
+    }
+    if (audioError) {
+      return HMSGetMediaActions.AUDIO;
+    }
+    return HMSGetMediaActions.UNKNOWN;
+  }
+
+  private getEmptyTracks(fetchTrackOptions: IFetchAVTrackOptions) {
+    const nativeTracks: MediaStreamTrack[] = [];
+    if (fetchTrackOptions.audio === 'empty') {
+      nativeTracks.push(LocalTrackManager.getEmptyAudioTrack());
+    }
+
+    if (fetchTrackOptions.video === 'empty') {
+      nativeTracks.push(LocalTrackManager.getEmptyVideoTrack());
+    }
+    return nativeTracks;
+  }
+
+  private async updateCurrentLocalTrackSettings(trackSettings: HMSTrackSettings | null) {
+    const localTracks = this.store.getLocalPeerTracks();
+    const videoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'regular') as
+      | HMSLocalVideoTrack
+      | undefined;
+    const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
+      | HMSLocalAudioTrack
+      | undefined;
+    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
+      | HMSLocalVideoTrack
+      | undefined;
+
+    if (trackSettings?.video) {
+      await videoTrack?.setSettings(trackSettings.video);
+    }
+
+    if (trackSettings?.audio) {
+      await audioTrack?.setSettings(trackSettings.audio);
+    }
+
+    if (trackSettings?.screen) {
+      await screenTrack?.setSettings(trackSettings.screen);
+    }
+
+    return { videoTrack, audioTrack };
+  }
+
+  private getAudioSettings(initialSettings: InitialSettings) {
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed?.includes('audio')) {
+      return null;
+    }
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    // Get device from the tracks already added in preview
+    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
+
+    return new HMSAudioTrackSettingsBuilder()
+      .codec(publishParams.audio.codec as HMSAudioCodec)
+      .maxBitrate(publishParams.audio.bitRate)
+      .deviceId(audioDeviceId || defaultSettings.audioInputDeviceId)
+      .build();
+  }
+
+  private getVideoSettings(initialSettings: InitialSettings) {
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams || !publishParams.allowed?.includes('video')) {
+      return null;
+    }
+    const localPeer = this.store.getLocalPeer();
+    const videoTrack = localPeer?.videoTrack;
+    // Get device from the tracks already added in preview
+    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
+    const video = publishParams.video;
+    const { width = video.width, height = video.height } = this.store.getSimulcastDimensions('regular') || {};
+    return new HMSVideoTrackSettingsBuilder()
+      .codec(video.codec as HMSVideoCodec)
+      .maxBitrate(video.bitRate)
+      .maxFramerate(video.frameRate)
+      .setWidth(width) // take simulcast width if available
+      .setHeight(height) // take simulcast width if available
+      .deviceId(videoDeviceId || defaultSettings.videoDeviceId)
+      .build();
+  }
+
+  private getScreenshareSettings(isVideoOnly = false) {
+    const { screen } = this.store.getPublishParams()!;
+    const dimensions = this.store.getSimulcastDimensions('screen');
+
+    return {
+      video: new HMSVideoTrackSettingsBuilder()
+        // Don't cap maxBitrate for screenshare.
+        // If publish params doesn't have bitRate value - don't set maxBitrate.
+        .maxBitrate(screen.bitRate, false)
+        .codec(screen.codec as HMSVideoCodec)
+        .maxFramerate(screen.frameRate)
+        .setWidth(dimensions?.width || screen.width)
+        .setHeight(dimensions?.height || screen.height)
+        .build(),
+      audio: isVideoOnly ? undefined : new HMSAudioTrackSettingsBuilder().build(),
+    };
+  }
+
+  // eslint-disable-next-line complexity
+  private async getOrDefaultScreenshareConfig(partialConfig?: Partial<HMSScreenShareConfig>) {
+    type RequiredConfig = HMSScreenShareConfig & Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement'>>;
+    const config: RequiredConfig = Object.assign(
+      {
+        videoOnly: false,
+        audioOnly: false,
+        forceCurrentTab: false,
+        preferCurrentTab: false,
+        selfBrowserSurface: 'exclude', // don't give self tab in options
+        surfaceSwitching: 'include', // give option to switch tabs while sharing
+        systemAudio: 'exclude', // system audio share leads to echo in windows
+        displaySurface: 'monitor',
+      },
+      partialConfig || {},
+    );
+    if (config.forceCurrentTab) {
+      config.videoOnly = true; // there will be echo otherwise
+      config.preferCurrentTab = true;
+      config.selfBrowserSurface = 'include';
+      config.surfaceSwitching = 'exclude';
+    }
+    if (config.preferCurrentTab) {
+      config.selfBrowserSurface = 'include';
+    }
+    // @ts-ignore
+    if (config.cropElement && window.CropTarget?.fromElement) {
+      // @ts-ignore
+      config.cropTarget = await window.CropTarget.fromElement(config.cropElement);
+    }
+    return config;
+  }
+
+  private createHMSLocalTracks(
+    nativeTracks: MediaStreamTrack[],
+    settings: HMSTrackSettings,
+    localStream?: HMSLocalStream,
+  ) {
+    const nativeVideoTrack = nativeTracks.find(track => track.kind === 'video');
+    const nativeAudioTrack = nativeTracks.find(track => track.kind === 'audio');
+    if (localStream) {
+      nativeTracks.forEach(track => localStream?.nativeStream.addTrack(track));
+    } else {
+      localStream = new HMSLocalStream(new MediaStream(nativeTracks));
+    }
+
+    const tracks: Array<HMSLocalTrack> = [];
+    if (nativeAudioTrack && settings?.audio) {
+      const audioTrack = new HMSLocalAudioTrack(
+        localStream,
+        nativeAudioTrack,
+        'regular',
+        this.eventBus,
+        settings.audio,
+      );
+      tracks.push(audioTrack);
+    }
+
+    if (nativeVideoTrack && settings?.video) {
+      const videoTrack = new HMSLocalVideoTrack(
+        localStream,
+        nativeVideoTrack,
+        'regular',
+        this.eventBus,
+        settings.video,
+      );
+      tracks.push(videoTrack);
+    }
+    return tracks;
   }
 }

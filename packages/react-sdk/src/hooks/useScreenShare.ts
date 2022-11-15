@@ -1,13 +1,15 @@
-import { hooksErrHandler } from '../hooks/types';
+import { useCallback } from 'react';
 import {
   HMSPeerID,
+  HMSScreenShareConfig,
   HMSTrackID,
   selectIsLocalScreenShared,
   selectPeerScreenSharing,
   selectScreenSharesByPeerId,
 } from '@100mslive/hms-video-store';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { useCallback } from 'react';
+import { logErrorHandler } from '../utils/commons';
 
 export interface useScreenShareResult {
   /**
@@ -17,12 +19,17 @@ export interface useScreenShareResult {
   /**
    * toggle screenshare for the local user, will only be present if the user has the permission to toggle
    */
-  toggleScreenShare?: () => void;
+  toggleScreenShare?: (config?: HMSScreenShareConfig) => Promise<void>;
   /**
    * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
    * In case of multiple screenshares, the behaviour of which one is picked is not defined.
    */
   screenSharingPeerId?: HMSPeerID;
+  /**
+   * the name of the peer who is currently screensharing. Will be undefined if no one is sharing the screen.
+   * In case of multiple screenshares, the behavior of which one is picked is not defined.
+   */
+  screenSharingPeerName?: string;
   /**
    * screenShare audio track id, will only be present if there is a screenshare with video track
    */
@@ -32,8 +39,6 @@ export interface useScreenShareResult {
    */
   screenShareAudioTrackId?: HMSTrackID;
 }
-
-const logErrorHandler = (e: Error) => console.log('Error: ', e);
 
 /**
  * This hook can be used to implement a screenshare toggle button as well as know about the screenshare in the room.
@@ -50,17 +55,21 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const screenSharePeer = useHMSStore(selectPeerScreenSharing);
   const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
 
-  const toggleScreenShare = useCallback(async () => {
-    try {
-      await actions.setScreenShareEnabled(!amIScreenSharing);
-    } catch (error) {
-      handleError(error as Error);
-    }
-  }, [actions]);
+  const toggleScreenShare = useCallback(
+    async (config?: HMSScreenShareConfig) => {
+      try {
+        await actions.setScreenShareEnabled(!amIScreenSharing, config);
+      } catch (err) {
+        handleError(err as Error, 'toggleScreenShare');
+      }
+    },
+    [actions, amIScreenSharing, handleError],
+  );
 
   return {
     amIScreenSharing,
     screenSharingPeerId: screenSharePeer?.id,
+    screenSharingPeerName: screenSharePeer?.name,
     screenShareVideoTrackId: screenShare?.video?.id,
     screenShareAudioTrackId: screenShare?.audio?.id,
     toggleScreenShare,

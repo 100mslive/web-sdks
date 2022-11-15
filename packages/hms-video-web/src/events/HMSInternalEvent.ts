@@ -1,3 +1,4 @@
+import type { WaitForFilter, WaitForOptions } from 'eventemitter2';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 export class HMSInternalEvent<T> {
@@ -14,6 +15,11 @@ export class HMSInternalEvent<T> {
   };
   unsubscribe = (fn: (event: T) => void | Promise<void>) => {
     this.eventEmitter.off(this.eventName, fn);
+  };
+  waitFor = (predicate: WaitForFilter) => {
+    return this.eventEmitter.waitFor(this.eventName, {
+      filter: predicate,
+    } as WaitForOptions);
   };
   removeAllListeners = () => {
     this.eventEmitter.removeAllListeners(this.eventName);

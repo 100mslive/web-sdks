@@ -1,22 +1,19 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
+import create from 'zustand';
 import {
-  HMSReactiveStore,
-  HMSStore,
   HMSActions,
-  HMSNotification,
+  HMSNotificationInCallback,
   HMSNotifications,
-  HMSStatsStore,
-  IStoreReadOnly,
+  HMSNotificationTypeParam,
+  HMSReactiveStore,
   HMSStats,
+  HMSStatsStore,
+  HMSStore,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
-import create, { EqualityChecker, StateSelector } from 'zustand';
-import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
+import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
-export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends IStoreReadOnly<S> {
-  <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
-}
 export interface HMSRoomProviderProps {
   actions?: HMSActions;
   store?: HMSStoreWrapper;
@@ -26,6 +23,7 @@ export interface HMSRoomProviderProps {
    * if true this will enable webrtc stats collection
    */
   isHMSStatsOn?: boolean;
+  leaveOnUnload?: boolean;
 }
 
 /**
@@ -41,13 +39,15 @@ let providerProps: HMSContextProviderProps;
  * react part of your code.
  * @constructor
  */
-export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
+// eslint-disable-next-line complexity
+export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> = ({
   children,
   actions,
   store,
   notifications,
   stats,
   isHMSStatsOn = false,
+  leaveOnUnload = true,
 }) => {
   if (!providerProps) {
     // adding a dummy function for setstate and destroy because zustan'd create expects them
@@ -97,14 +97,21 @@ export const HMSRoomProvider: React.FC<HMSRoomProviderProps> = ({
         });
       }
     }
+
+    // @ts-ignore
+    providerProps.actions.setFrameworkInfo({
+      type: 'react-web',
+      version: React.version,
+      sdkVersion: process.env.REACT_SDK_VERSION,
+    });
   }
 
   useEffect(() => {
-    if (isBrowser) {
+    if (isBrowser && leaveOnUnload) {
       window.addEventListener('beforeunload', () => providerProps.actions.leave());
       window.addEventListener('onunload', () => providerProps.actions.leave());
     }
-  }, []);
+  }, [leaveOnUnload]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
 };
@@ -139,6 +146,28 @@ export const useHMSVanillaStore = () => {
 };
 
 /*
+ * `useHMSVanillaNotifications` returns the vanilla HMSNotifications object. This makes it a bit easier to ensure
+ * a notification is processed only once in your components. The other way is to use the hook version and put
+ * the component high enough in the chain.
+ * Usage:
+ * ```
+ * useEffect(() => {
+ *   const unsub = notifications.onNotification((notification) => {
+ *     console.log(notification);
+ *   }, notificationType);
+ *   return unsub;
+ * }, [])
+ * ```
+ */
+export const useHMSVanillaNotifications = () => {
+  const HMSContextConsumer = useContext(HMSContext);
+  if (!HMSContextConsumer) {
+    throw new Error(hooksErrorMessage);
+  }
+  return HMSContextConsumer.notifications;
+};
+
+/*
  * `useHMSActions` is a write only hook which can be used to dispatch actions.
  */
 export const useHMSActions = () => {
@@ -151,10 +180,15 @@ export const useHMSActions = () => {
 
 /**
  * `useHMSNotifications` is a read only hook which gives the latest notification(HMSNotification) received.
+ * @param type can be a string or an array of string for the types of notifications to listen to. If an array is passed
+ * either declare it outside the functional component or use a useMemo to make sure its reference stays same across
+ * rerenders for performance reasons.
  */
-export const useHMSNotifications = () => {
+export const useHMSNotifications = <T extends HMSNotificationTypeParam>(
+  type?: T,
+): HMSNotificationInCallback<T> | null => {
   const HMSContextConsumer = useContext(HMSContext);
-  const [notification, setNotification] = useState<HMSNotification | null>(null);
+  const [notification, setNotification] = useState<HMSNotificationInCallback<T> | null>(null);
 
   if (!HMSContextConsumer) {
     throw new Error(hooksErrorMessage);
@@ -164,11 +198,11 @@ export const useHMSNotifications = () => {
     if (!HMSContextConsumer.notifications) {
       return;
     }
-    const unsubscribe = HMSContextConsumer.notifications.onNotification((notification: HMSNotification) =>
-      setNotification(notification),
-    );
+    const unsubscribe = HMSContextConsumer.notifications.onNotification<T>(notification => {
+      setNotification(notification);
+    }, type);
     return unsubscribe;
-  }, [HMSContextConsumer.notifications]);
+  }, [HMSContextConsumer.notifications, type]);
 
   return notification;
 };

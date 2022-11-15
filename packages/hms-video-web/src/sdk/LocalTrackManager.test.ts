@@ -1,14 +1,15 @@
+import { HMSLocalPeer } from './models/peer';
 import { LocalTrackManager } from './LocalTrackManager';
 import { Store } from './store';
-import ITransportObserver from '../transport/ITransportObserver';
-import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import { TransportState } from '../transport/models/TransportState';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
-import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalPeer } from './models/peer';
+import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -67,6 +68,7 @@ const mockMediaStream = {
   getAudioTracks: jest.fn(() => [
     { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
   ]),
+  addTrack: jest.fn(() => {}),
 };
 
 const gumSuccess = (constraints: any) => {
@@ -139,6 +141,8 @@ const mockMediaDevices = {
 // @ts-ignore
 global.navigator.mediaDevices = mockMediaDevices;
 global.MediaStream = jest.fn().mockImplementation(() => mockMediaStream);
+global.performance.mark = require('perf_hooks').performance.mark;
+global.performance.measure = require('perf_hooks').performance.measure;
 
 const mockAudioContext = {
   createOscillator() {
@@ -183,6 +187,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
     expect(manager).toBeDefined();
   });
@@ -193,6 +198,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
     testStore.setPublishParams(hostPublishParams);
     await manager.getTracksToPublish({});
@@ -214,6 +220,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
       testStore.setPublishParams(hostPublishParams);
@@ -290,6 +297,7 @@ describe('LocalTrackManager', () => {
       expect(mockDenyGetUserMedia).toHaveBeenCalledTimes(1);
     });
 
+    // eslint-disable-next-line complexity
     it('handles overconstrained error', async () => {
       global.navigator.mediaDevices.enumerateDevices = mockEnumerateDevices({
         videoInput: true,
@@ -320,7 +328,9 @@ describe('LocalTrackManager', () => {
       }
       for (const constraint in videoConstraints) {
         if (constraint in hostPublishParams.video) {
-          expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+          const constraintValue = videoConstraints[constraint];
+          const value = typeof constraintValue === 'object' ? constraintValue?.ideal : constraintValue;
+          expect(value).toEqual((hostPublishParams.video as any)[constraint]);
         }
       }
       for (const constraint in droppedConstraints.audio) {
@@ -368,6 +378,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});
@@ -401,6 +412,7 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       testStore.setPublishParams(hostPublishParams);
       const tracksToPublish = await manager.getTracksToPublish({});

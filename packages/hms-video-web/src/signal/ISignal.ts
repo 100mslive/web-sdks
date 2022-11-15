@@ -1,28 +1,35 @@
+import {
+  AcceptRoleChangeParams,
+  BroadcastResponse,
+  GetSessionMetadataResponse,
+  HLSRequestParams,
+  HLSTimedMetadataParams,
+  MultiTrackUpdateRequestParams,
+  RemovePeerRequest,
+  RequestForRoleChangeParams,
+  SessionMetadataUpdateParams,
+  StartRTMPOrRecordingRequestParams,
+  Track,
+  TrackUpdateRequestParams,
+  UpdatePeerRequestParams,
+} from './interfaces';
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
-import {
-  Track,
-  AcceptRoleChangeParams,
-  RequestForRoleChangeParams,
-  TrackUpdateRequestParams,
-  RemovePeerRequest,
-  MultiTrackUpdateRequestParams,
-  StartRTMPOrRecordingRequestParams,
-  UpdatePeerRequestParams,
-  HLSRequestParams,
-} from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
+
+  getPongResponseTimes: () => number[];
 
   open(uri: string): Promise<void>;
 
   join(
     name: string,
     data: string,
-    offer: RTCSessionDescriptionInit,
     disableVidAutoSub: boolean,
+    serverSubDegrade: boolean,
+    offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
   trickle(target: HMSConnectionRole, candidate: RTCIceCandidateInit): void;
@@ -33,7 +40,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   trackUpdate(tracks: Map<string, Track>): void;
 
-  broadcast(message: HMSMessage): Promise<void>;
+  broadcast(message: HMSMessage): Promise<BroadcastResponse>;
 
   leave(): void;
 
@@ -59,7 +66,13 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   stopHLSStreaming(params?: HLSRequestParams): Promise<void>;
 
+  sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void>;
+
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
+
+  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+
+  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
 
   close(): Promise<void>;
 }

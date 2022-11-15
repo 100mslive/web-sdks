@@ -1,24 +1,25 @@
-import { HMSConfig } from './config';
-import { HMSAudioListener, HMSUpdateListener } from './update-listener';
-import { HMSMessage } from './message';
-import { HMSLogLevel } from '../utils/logger';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
-import { HMSRole } from './role';
-import { HMSPreviewListener } from './preview-listener';
-import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
-import { HMSRoleChangeRequest } from './role-change-request';
-import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
-import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSHLS, HMSRecording, HMSRTMP } from './room';
-import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSConfig } from './config';
 import { HLSConfig } from './hls-config';
+import { HMSMessage } from './message';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSPlaylistManager } from './playlist';
+import { HMSPreviewListener } from './preview-listener';
+import { HMSRole } from './role';
+import { HMSRoleChangeRequest } from './role-change-request';
+import { HMSHLS, HMSRecording, HMSRTMP } from './room';
+import { RTMPRecordingConfig } from './rtmp-recording-config';
+import { HMSScreenShareConfig } from './track-settings';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
+import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSLogLevel } from '../utils/logger';
 
 export default interface HMS {
-  preview(config: HMSConfig, listener: HMSPreviewListener): void;
-  join(config: HMSConfig, listener: HMSUpdateListener): void;
+  preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
+  join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(): Promise<void>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
@@ -27,6 +28,7 @@ export default interface HMS {
   getAudioOutput(): IAudioOutputManager;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
+  refreshDevices(): Promise<void>;
 
   changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
   acceptChangeRole(request: HMSRoleChangeRequest): void;
@@ -40,13 +42,18 @@ export default interface HMS {
   /**
    * @param {HLSConfig} params
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
   getRecordingState(): HMSRecording | undefined;
   getRTMPState(): HMSRTMP | undefined;
   getHLSState(): HMSHLS | undefined;
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
+
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
 
   /**
    * @deprecated The method should not be used
@@ -57,7 +64,7 @@ export default interface HMS {
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
-  startScreenShare(onStop: () => void, audioOnly: boolean): Promise<void>;
+  startScreenShare(onStop: () => void, config?: HMSScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;
@@ -67,4 +74,5 @@ export default interface HMS {
   setLogLevel(level: HMSLogLevel): void;
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
+  addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
 }

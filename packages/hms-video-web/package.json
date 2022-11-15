@@ -1,15 +1,23 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.42",
-  "license": "UNLICENSED",
+  "version": "0.6.1",
+  "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
   "module": "dist/index.js",
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "engines": {
     "node": ">=10"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
@@ -18,7 +26,7 @@
     "build:only": "node ../../scripts/build",
     "build": "yarn build:only && yarn types:build",
     "types": "tsc -w",
-    "types:build": "tsc -p tsconfig.build.json",
+    "types:build": "tsc -p tsconfig.json",
     "test": "jest --maxWorkers=1",
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix",
@@ -36,7 +44,7 @@
     "tslib": "^2.2.0"
   },
   "dependencies": {
-    "eventemitter2": "^6.4.5",
+    "eventemitter2": "^6.4.7",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^1.0.1",
     "uuid": "^8.3.2",

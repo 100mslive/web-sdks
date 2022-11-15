@@ -12,8 +12,8 @@ export enum HMSMessageType {
 
 export interface HMSMessage {
   id: HMSMessageID;
-  sender: HMSPeerID;
-  senderName: string;
+  sender?: HMSPeerID;
+  senderName?: string;
   senderUserId?: string;
   senderRole?: string;
   recipientPeer?: HMSPeerID;
@@ -22,6 +22,10 @@ export interface HMSMessage {
   read: boolean;
   type: string;
   message: any;
+  /**
+   * true if message will not be put it in store because it has been ignored
+   */
+  ignored: boolean;
 }
 
 /**

@@ -1,33 +1,36 @@
-import React from "react";
+import React, { Suspense, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
-  Switch,
+  Navigate,
   Route,
-  Redirect,
+  Routes,
+  useParams,
 } from "react-router-dom";
+import { HMSRoomProvider } from "@100mslive/react-sdk";
+import { Box, HMSThemeProvider } from "@100mslive/react-ui";
+import { AppData } from "./components/AppData/AppData.jsx";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import ErrorPage from "./components/ErrorPage";
+import FullPageProgress from "./components/FullPageProgress";
+import { Init } from "./components/init/Init";
+import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
+import { Notifications } from "./components/Notifications";
+import PostLeave from "./components/PostLeave";
+import { ToastContainer } from "./components/Toast/ToastContainer";
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
+import { Confetti } from "./plugins/confetti";
+import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
+import { getRoutePrefix, shadeColor } from "./common/utils";
+import { FeatureFlags } from "./services/FeatureFlags";
 import {
-  HMSRoomProvider,
-  HMSThemeProvider,
-  PostLeaveDisplay,
-} from "@100mslive/hms-video-react";
-import PreviewScreen from "./pages/PreviewScreen";
-import { Conference } from "./pages/conference.jsx";
-import ErrorPage from "./pages/ErrorPage";
-import { AppContextProvider } from "./store/AppContext.js";
-import { shadeColor } from "./common/utils";
-import {
-  getUserToken as defaultGetUserToken,
   getBackendEndpoint,
+  getUserToken as defaultGetUserToken,
 } from "./services/tokenService";
-import { hmsToast } from "./views/components/notifications/hms-toast";
-import { Notifications } from "./views/components/notifications/Notifications";
-import {
-  HMSRoomProvider as ReactRoomProvider,
-  HMSReactiveStore,
-} from "@100mslive/react-sdk";
-import { FeatureFlags } from "./store/FeatureFlags";
-import { lightTheme } from "@100mslive/react-ui";
+import "./base.css";
 import "./index.css";
+
+const Conference = React.lazy(() => import("./components/conference"));
+const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
 
 const defaultTokenEndpoint = process.env
   .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
@@ -38,7 +41,7 @@ const defaultTokenEndpoint = process.env
 
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 
-let appName = "";
+let appName;
 if (window.location.host.includes("localhost")) {
   appName = "localhost";
 } else {
@@ -47,7 +50,17 @@ if (window.location.host.includes("localhost")) {
 
 document.title = `${appName}'s ${document.title}`;
 
-const hmsReactiveStore = new HMSReactiveStore();
+// TODO: remove now that there are options to change to portrait
+const getAspectRatio = ({ width, height }) => {
+  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+  const portraitDomains = (
+    process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
+  ).split(",");
+  if (portraitDomains.includes(host) && width > height) {
+    return { width: height, height: width };
+  }
+  return { width, height };
+};
 
 export function EdtechComponent({
   roomId = "",
@@ -57,154 +70,175 @@ export function EdtechComponent({
     font = "Roboto",
     color = "#2F80FF",
     theme = "dark",
-    showChat = "true",
-    showScreenshare = "true",
     logo = "",
-    showAvatar = "true",
-    avatarType = "initial",
     headerPresent = "false",
-    logoClass = "",
     metadata = "",
+    recordingUrl = "",
   },
   getUserToken = defaultGetUserToken,
   policyConfig = envPolicyConfig,
+  getDetails = () => {},
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
+
+  const getUserTokenCallback = useCallback(getUserToken, []); //eslint-disable-line
+
   return (
-    <div
-      className={`w-full dark:bg-black ${
-        headerPresent === "true" ? "flex-1" : "h-full"
-      } ${theme === "light" ? lightTheme : ""}`}
-    >
+    <ErrorBoundary>
       <HMSThemeProvider
-        config={{
-          theme: {
-            extend: {
-              fontFamily: {
-                sans: [font, "Inter", "sans-serif"],
-                body: [font, "Inter", "sans-serif"],
-              },
-              colors: {
-                brand: {
-                  main: color,
-                  tint: shadeColor(color, 30),
-                },
-              },
-            },
+        themeType={theme}
+        aspectRatio={getAspectRatio({ width, height })}
+        theme={{
+          colors: {
+            brandDefault: color,
+            brandDark: shadeColor(color, -30),
+            brandLight: shadeColor(color, 30),
+            brandDisabled: shadeColor(color, 10),
+          },
+          fonts: {
+            sans: [font, "Inter", "sans-serif"],
           },
         }}
-        appBuilder={{
-          theme: theme || "dark",
-          enableChat: showChat === "true",
-          enableScreenShare: showScreenshare === "true",
-          logo: logo,
-          logoClass: logoClass,
-          headerPresent: headerPresent === "true",
-          videoTileAspectRatio: { width, height },
-          showAvatar: showAvatar === "true",
-          avatarType: avatarType,
-        }}
-        toast={(message, options = {}) => hmsToast(message, options)}
       >
-        <ReactRoomProvider
-          actions={hmsReactiveStore.getActions()}
-          store={hmsReactiveStore.getStore()}
-          notifications={hmsReactiveStore.getNotifications()}
-          stats={
-            FeatureFlags.enableStatsForNerds
-              ? hmsReactiveStore.getStats()
-              : undefined
-          }
+        <HMSRoomProvider
+          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+          actions={hmsActions}
+          store={hmsStore}
+          notifications={hmsNotifications}
+          stats={hmsStats}
         >
-          <HMSRoomProvider
-            actions={hmsReactiveStore.getActions()}
-            store={hmsReactiveStore.getStore()}
-            notifications={hmsReactiveStore.getNotifications()}
-            stats={
-              FeatureFlags.enableStatsForNerds
-                ? hmsReactiveStore.getStats()
-                : undefined
-            }
+          <AppData
+            appDetails={metadata}
+            policyConfig={policyConfig}
+            recordingUrl={recordingUrl}
+            logo={logo}
+            tokenEndpoint={tokenEndpoint}
+          />
+
+          <Init />
+          <Box
+            css={{
+              bg: "$mainBg",
+              w: "100%",
+              ...(headerPresent === "true"
+                ? { flex: "1 1 0", minHeight: 0 }
+                : { h: "100%" }),
+            }}
           >
-            <AppContextProvider
-              roomId={roomId}
-              tokenEndpoint={tokenEndpoint}
-              policyConfig={policyConfig}
-              appDetails={metadata}
-            >
-              <AppRoutes getUserToken={getUserToken} />
-            </AppContextProvider>
-          </HMSRoomProvider>
-        </ReactRoomProvider>
+            <AppRoutes
+              getUserToken={getUserTokenCallback}
+              getDetails={getDetails}
+            />
+          </Box>
+        </HMSRoomProvider>
       </HMSThemeProvider>
-    </div>
+    </ErrorBoundary>
   );
 }
 
-function AppRoutes({ getUserToken }) {
+const RedirectToPreview = ({ getDetails }) => {
+  const { roomId, role } = useParams();
+  useEffect(() => {
+    getDetails();
+  }, [roomId]); //eslint-disable-line
+
+  console.error({ roomId, role });
+
+  if (!roomId && !role) {
+    return <Navigate to="/" />;
+  }
+  if (!roomId) {
+    return <Navigate to="/" />;
+  }
+  if (["streaming", "preview", "meeting", "leave"].includes(roomId) && !role) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <Navigate to={`${getRoutePrefix()}/preview/${roomId}/${role || ""}`} />
+  );
+};
+
+const RouteList = ({ getUserToken, getDetails }) => {
+  return (
+    <Routes>
+      <Route path="preview">
+        <Route
+          path=":roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+        <Route
+          path=":roomId"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <PreviewScreen getUserToken={getUserToken} />
+            </Suspense>
+          }
+        />
+      </Route>
+      <Route path="meeting">
+        <Route
+          path=":roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+        <Route
+          path=":roomId"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Conference />
+            </Suspense>
+          }
+        />
+      </Route>
+      <Route path="leave">
+        <Route path=":roomId/:role" element={<PostLeave />} />
+        <Route path=":roomId" element={<PostLeave />} />
+      </Route>
+      <Route
+        path="/:roomId/:role"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
+      <Route
+        path="/:roomId/"
+        element={<RedirectToPreview getDetails={getDetails} />}
+      />
+      <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
+    </Routes>
+  );
+};
+
+function AppRoutes({ getUserToken, getDetails }) {
   return (
     <Router>
+      <ToastContainer />
       <Notifications />
-      <Switch>
-        {/* <Route path="/createRoom">
-              <CreateRoom />
-            </Route> */}
+      <Confetti />
+      <RemoteStopScreenshare />
+      <KeyboardHandler />
+      <Routes>
         <Route
-          path="/preview/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
-            }
-            if (
-              !params.roomId ||
-              ["preview", "meeting", "leave"].includes(params.roomId)
-            ) {
-              return <Redirect to="/" />;
-            }
-            return <PreviewScreen getUserToken={getUserToken} />;
-          }}
-        />
-        <Route path="/meeting/:roomId/:role?">
-          <Conference />
-        </Route>
-        <Route
-          path="/leave/:roomId/:role?"
-          render={({ history, match }) => (
-            <PostLeaveDisplay
-              goToDashboardOnClick={() => {
-                window.open("https://dashboard.100ms.live/", "_blank");
-              }}
-              joinRoomOnClick={() => {
-                let previewUrl = "/preview/" + match.params.roomId;
-                if (match.params.role) previewUrl += "/" + match.params.role;
-                history.push(previewUrl);
-              }}
-              getFeedbackOnClick={setShowModal => {
-                setShowModal(true);
-              }}
-            />
-          )}
+          path="/*"
+          element={
+            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+          }
         />
         <Route
-          path="/:roomId/:role?"
-          render={({ match }) => {
-            const { params } = match;
-            if (!params.roomId && !params.role) {
-              return <Redirect to="/" />;
-            }
-            if (!params.roomId) {
-              return <Redirect to="/" />;
-            }
-            return (
-              <Redirect to={`/preview/${params.roomId}/${params.role || ""}`} />
-            );
-          }}
+          path="/streaming/*"
+          element={
+            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+          }
         />
-        <Route path="*" render={() => <ErrorPage error="Invalid URL!" />} />
-      </Switch>
+      </Routes>
     </Router>
   );
 }
@@ -218,11 +252,6 @@ export default function App() {
         color: process.env.REACT_APP_COLOR,
         logo: process.env.REACT_APP_LOGO,
         font: process.env.REACT_APP_FONT,
-        showChat: process.env.REACT_APP_SHOW_CHAT,
-        showScreenshare: process.env.REACT_APP_SHOW_SCREENSHARE,
-        showAvatar: process.env.REACT_APP_VIDEO_AVATAR,
-        avatarType: process.env.REACT_APP_AVATAR_TYPE,
-        logoClass: process.env.REACT_APP_LOGO_CLASS,
         headerPresent: process.env.REACT_APP_HEADER_PRESENT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
