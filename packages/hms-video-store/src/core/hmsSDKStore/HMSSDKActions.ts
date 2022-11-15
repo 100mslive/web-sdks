@@ -52,7 +52,7 @@ import {
 import {
   HMSRoleChangeRequest,
   selectHMSMessagesCount,
-  selectIsInPreview,
+  selectIsConnectedToRoom,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -64,7 +64,6 @@ import {
   selectPeerByID,
   selectPermissions,
   selectRolesMap,
-  selectRoomStarted,
   selectRoomState,
   selectTrackByID,
   selectTracksMap,
@@ -193,12 +192,8 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async leave() {
-    const isInPreview = this.store.getState(selectIsInPreview);
-    const hasRoomStarted = this.store.getState(selectRoomStarted);
-    if (!hasRoomStarted || isInPreview) {
-      if (!hasRoomStarted) {
-        this.logPossibleInconsistency('room leave is called when no room is connected');
-      }
+    const isConnectedToRoom = this.store.getState(selectIsConnectedToRoom);
+    if (!isConnectedToRoom) {
       return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
