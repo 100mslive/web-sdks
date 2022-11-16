@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { HMSVirtualBackgroundTypes } from "@100mslive/hms-virtual-background";
 import {
   selectIsAllowedToPublish,
   selectIsLocalVideoPluginPresent,
@@ -22,7 +23,10 @@ export const VirtualBackground = () => {
   async function createPlugin() {
     if (!pluginRef.current) {
       const { HMSVBPlugin } = await import("@100mslive/hms-virtual-background");
-      pluginRef.current = new HMSVBPlugin("none", true);
+      pluginRef.current = new HMSVBPlugin(
+        HMSVirtualBackgroundTypes.NONE,
+        HMSVirtualBackgroundTypes.NONE
+      );
     }
   }
   useEffect(() => {
@@ -42,7 +46,8 @@ export const VirtualBackground = () => {
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
-      await pluginRef.current.setBackground(getRandomVirtualBackground());
+      const { background, backgroundType } = getRandomVirtualBackground();
+      await pluginRef.current.setBackground(background, backgroundType);
       //Running VB on every alternate frame rate for optimized cpu usage
       await hmsActions.addPluginToVideoTrack(pluginRef.current, 15);
     } catch (err) {
