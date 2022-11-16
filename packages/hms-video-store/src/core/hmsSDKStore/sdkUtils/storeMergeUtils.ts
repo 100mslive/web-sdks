@@ -77,7 +77,12 @@ export const mergeLocalTrackStats = (
 ) => {
   const trackMap: Record<string, HMSTrackStats[]> = tracks.reduce((acc, track) => {
     // @ts-ignore
-    acc[track.firstTrackId] = Object.values(newStats[track.getTrackIDBeingSent()] || {});
+    acc[track.firstTrackId] = Object.values(newStats[track.getTrackIDBeingSent()] || {}).sort((a, b) => {
+      if (!a.rid || !b.rid) {
+        return 0;
+      }
+      return a.rid < b.rid ? -1 : 1;
+    });
     return acc;
   }, {});
   const IDs = union(Object.keys(draftStats), Object.keys(trackMap));

@@ -47,14 +47,14 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 const layer = stat.rid ? simulcastMapping[stat.rid] : '';
                 return (
                   <Fragment>
-                    {layer && <StatsRow label={layer.toUpperCase()} value={''}></StatsRow>}
+                    {layer && <StatsRow label={layer.toUpperCase()} value=""></StatsRow>}
                     <StatsRow
-                      show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+                      show={isNotNullishAndNot0(stat.frameWidth)}
                       label="Width"
                       value={stat.frameWidth?.toString()}
                     />
                     <StatsRow
-                      show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+                      show={isNotNullishAndNot0(stat.frameHeight)}
                       label="Height"
                       value={stat.frameHeight?.toString()}
                     />
@@ -68,8 +68,9 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                     <StatsRow
                       show={isNotNullish(stat.bitrate)}
                       label="Bitrate(V)"
-                      value={formatBytes(stat?.bitrate, 'b/s')}
+                      value={formatBytes(stat.bitrate, 'b/s')}
                     />
+                    <Stats.Gap />
                   </Fragment>
                 );
               })}
@@ -95,7 +96,6 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                     : ''
                 }`}
               />
-
               <StatsRow
                 show={isNotNullish(videoTrackStats?.bitrate)}
                 label="Bitrate(V)"
@@ -169,7 +169,7 @@ const RawStatsRow = ({ label = '', value = '', show = true }) => {
     <>
       {show ? (
         <Stats.Row>
-          <Stats.Label>{label}</Stats.Label>
+          <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>
           {value === '' ? <Stats.Value /> : <Stats.Value>{value}</Stats.Value>}
         </Stats.Row>
       ) : null}

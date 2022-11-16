@@ -34,12 +34,17 @@ export const Value = styled('td', {
   color: '$textPrimary',
 });
 
+export const Gap = styled('tr', {
+  height: '$4',
+})
+
 interface StatsType {
   Root: typeof Root;
   Row: typeof Row;
   Label: typeof Label;
   Value: typeof Value;
   Table: typeof Table;
+  Gap: typeof Gap;
 }
 
 export const Stats: StatsType = {
@@ -48,4 +53,5 @@ export const Stats: StatsType = {
   Label,
   Value,
   Table,
+  Gap
 };
