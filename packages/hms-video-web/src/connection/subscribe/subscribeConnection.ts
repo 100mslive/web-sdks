@@ -137,6 +137,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   }
 
   private handlePendingApiMessages = () => {
+    this.eventEmitter.emit('open', true);
     if (this.pendingMessageQueue.length > 0) {
       HMSLogger.d(this.TAG, 'Found pending message queue, sending messages');
       this.pendingMessageQueue.forEach(msg => this.sendOverApiDataChannel(msg));
@@ -145,29 +146,27 @@ export default class HMSSubscribeConnection extends HMSConnection {
   };
 
   private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
-    if (this.apiChannel?.readyState === 'open') {
-      let response: PreferLayerResponse;
-      for (let i = 0; i < this.MAX_RETRIES; i++) {
-        this.apiChannel.send(request);
-        response = await this.waitForResponse(requestId);
-        const error = response.error;
-        if (error) {
-          HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
-          const shouldRetry = error.code / 100 === 5 || error.code === 429;
-          if (!shouldRetry) {
-            throw Error(`code=${error.code}, message=${error.message}`);
-          }
-          const delay = (2 + Math.random() * 2) * 1000;
-          await sleep(delay);
-        } else {
-          break;
-        }
-      }
-      return response!;
-    } else {
-      await sleep(1000);
-      return this.sendMessage(request, requestId);
+    if (this.apiChannel?.readyState !== 'open') {
+      await this.eventEmitter.waitFor('open');
     }
+    let response: PreferLayerResponse;
+    for (let i = 0; i < this.MAX_RETRIES; i++) {
+      this.apiChannel!.send(request);
+      response = await this.waitForResponse(requestId);
+      const error = response.error;
+      if (error) {
+        HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
+        const shouldRetry = error.code / 100 === 5 || error.code === 429;
+        if (!shouldRetry) {
+          throw Error(`code=${error.code}, message=${error.message}`);
+        }
+        const delay = (2 + Math.random() * 2) * 1000;
+        await sleep(delay);
+      } else {
+        break;
+      }
+    }
+    return response!;
   };
 
   private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
