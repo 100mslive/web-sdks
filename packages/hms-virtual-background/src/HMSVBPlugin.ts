@@ -73,48 +73,67 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     }
   }
 
-  async setBackground(bg: HMSVirtualBackground, bgType: HMSVirtualBackgroundTypes) {
-    if (!bg) {
+  /**
+   * For bgType HMSVirtualBackgroundTypes.IMAGE pass bg as an image element
+   * For bgType HMSVirtualBackgroundTypes.VIDEO pass video
+   * For bgType HMSVirtualBackgroundTypes.GIF pass the gif url
+   * @param {HMSVirtualBackground} background
+   * @param {HMSVirtualBackgroundTypes} backgroundType
+   */
+  async setBackground(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
+    if (!background) {
       throw new Error('Invalid background supplied, see the docs to check supported background type');
     }
-    if (bgType === 'none' || bgType === 'blur') {
-      this.background = bg;
-      this.backgroundType = bgType;
-    } else if (bg instanceof HTMLImageElement) {
-      this.log('setting background to image', bg);
-      const img = await this.setImage(bg);
-      if (!img || !img.complete || !img.naturalHeight) {
-        throw new Error('Invalid image. Provide a valid and successfully loaded HTMLImageElement');
-      } else {
-        this.background = img;
-        this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-      }
-    } else if (bg instanceof HTMLVideoElement) {
-      this.log('setting background to video', bg);
-      this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-      this.background = bg;
-      this.background.crossOrigin = 'anonymous';
-      this.background.muted = true;
-      this.background.loop = true;
-      this.background.oncanplaythrough = async () => {
-        if (this.background) {
-          await (this.background as HTMLVideoElement).play();
-          this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+    switch (backgroundType) {
+      case HMSVirtualBackgroundTypes.NONE:
+      case HMSVirtualBackgroundTypes.BLUR:
+        this.background = background;
+        this.backgroundType = backgroundType;
+        break;
+      case HMSVirtualBackgroundTypes.IMAGE:
+        this.log('setting background to image', background);
+        // eslint-disable-next-line no-case-declarations
+        const img = await this.setImage(background as HTMLImageElement);
+        if (!img || !img.complete || !img.naturalHeight) {
+          throw new Error('Invalid image. Provide a valid and successfully loaded HTMLImageElement');
+        } else {
+          this.background = img;
+          this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
         }
-      };
-    } else if (bg instanceof HTMLCanvasElement) {
-      this.background = bg;
-      this.backgroundType = HMSVirtualBackgroundTypes.CANVAS;
-    } else if (typeof bg === 'string') {
-      this.log('setting gif to background', bg);
-      this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-      this.background = bg;
-      this.gifFrames = await this.loadGIF(bg);
-      if (this.gifFrames != null && this.gifFrames.length > 0) {
-        this.backgroundType = HMSVirtualBackgroundTypes.GIF;
-      } else {
-        throw new Error('Invalid background supplied, see the docs to check supported background type');
-      }
+        break;
+      case HMSVirtualBackgroundTypes.VIDEO:
+        this.log('setting background to video', background);
+        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+        this.background = background as HTMLVideoElement;
+        this.background.crossOrigin = 'anonymous';
+        this.background.muted = true;
+        this.background.loop = true;
+        this.background.oncanplaythrough = async () => {
+          if (this.background) {
+            await (this.background as HTMLVideoElement).play();
+            this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+          }
+        };
+        break;
+      case HMSVirtualBackgroundTypes.CANVAS:
+        this.background = background;
+        this.backgroundType = HMSVirtualBackgroundTypes.CANVAS;
+        break;
+      case HMSVirtualBackgroundTypes.GIF:
+        this.log('setting gif to background', background);
+        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+        this.background = background as string;
+        this.gifFrames = await this.loadGIF(this.background);
+        if (this.gifFrames != null && this.gifFrames.length > 0) {
+          this.backgroundType = HMSVirtualBackgroundTypes.GIF;
+        } else {
+          throw new Error('Invalid background supplied, see the docs to check supported background type');
+        }
+        break;
+      default:
+        this.log(
+          `backgroundType did not match with any of the supported background types - ${HMSVirtualBackgroundTypes}`,
+        );
     }
   }
 

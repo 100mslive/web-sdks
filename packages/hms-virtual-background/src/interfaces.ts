@@ -7,4 +7,9 @@ export enum HMSVirtualBackgroundTypes {
   VIDEO = 'video',
   CANVAS = 'canvas',
 }
-export type HMSVirtualBackground = HMSVirtualBackgroundTypes.BLUR | HMSVirtualBackgroundTypes.NONE | HMSBackgroundInput;
+
+export type HMSVirtualBackground =
+  | string
+  | HMSVirtualBackgroundTypes.BLUR
+  | HMSVirtualBackgroundTypes.NONE
+  | HMSBackgroundInput;
