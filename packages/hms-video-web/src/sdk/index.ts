@@ -74,6 +74,7 @@ const INITIAL_STATE = {
   isInitialised: false,
   isReconnecting: false,
   isPreviewInProgress: false,
+  isJoinInProgress: false,
   deviceManagersInitialised: false,
 };
 
@@ -223,6 +224,18 @@ export class HMSSdk implements HMSInterface {
     },
 
     onStateChange: async (state: TransportState, error?: HMSException) => {
+      const handleFailedState = async (error?: HMSException) => {
+        await this.internalLeave(true, error);
+        /**
+         * no need to call onError here when preview/join is in progress
+         * since preview/join will call onError when they receive leave event from the above call
+         */
+        if (!this.sdkState.isPreviewInProgress && !this.sdkState.isJoinInProgress) {
+          this.errorListener?.onError?.(error!);
+        }
+        this.sdkState.isReconnecting = false;
+      };
+
       switch (state) {
         case TransportState.Preview:
         case TransportState.Joined:
@@ -231,10 +244,7 @@ export class HMSSdk implements HMSInterface {
           }
           break;
         case TransportState.Failed:
-          await this.leave();
-
-          this.errorListener?.onError?.(error!);
-          this.sdkState.isReconnecting = false;
+          await handleFailedState(error);
           break;
         case TransportState.Reconnecting:
           this.sdkState.isReconnecting = true;
@@ -299,7 +309,17 @@ export class HMSSdk implements HMSInterface {
         resolve();
       };
 
+      const errorHandler = (ex?: HMSException) => {
+        this.analyticsTimer.end(TimedEvent.PREVIEW);
+        ex && this.errorListener?.onError(ex);
+        this.sendPreviewAnalyticsEvent(ex);
+        this.sdkState.isPreviewInProgress = false;
+        reject(ex as HMSException);
+      };
+
       this.eventBus.policyChange.subscribeOnce(policyHandler);
+      this.eventBus.leave.subscribeOnce(errorHandler);
+
       this.transport
         .preview(
           config.authToken,
@@ -317,13 +337,7 @@ export class HMSSdk implements HMSInterface {
             });
           }
         })
-        .catch(ex => {
-          this.analyticsTimer.end(TimedEvent.PREVIEW);
-          this.errorListener?.onError(ex as HMSException);
-          this.sendPreviewAnalyticsEvent(ex);
-          this.sdkState.isPreviewInProgress = false;
-          reject(ex as HMSException);
-        });
+        .catch(errorHandler);
     });
   }
 
@@ -361,6 +375,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     this.analyticsTimer.start(TimedEvent.JOIN);
+    this.sdkState.isJoinInProgress = true;
 
     const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
@@ -407,6 +422,7 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       HMSAudioContextHandler.resumeContext();
       await this.notifyJoin();
+      this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
         this.publish(config.settings || defaultSettings).catch(error => {
@@ -416,6 +432,7 @@ export class HMSSdk implements HMSInterface {
       }
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
+      this.sdkState.isJoinInProgress = false;
       this.listener?.onError(error as HMSException);
       this.sendJoinAnalyticsEvent(isPreviewCalled, error as HMSException);
       HMSLogger.e(this.TAG, 'Unable to join room', error);
@@ -461,11 +478,12 @@ export class HMSSdk implements HMSInterface {
     return this.internalLeave();
   }
 
-  private async internalLeave(notifyServer = true) {
+  private async internalLeave(notifyServer = true, error?: HMSException) {
     const room = this.store.getRoom();
     if (room) {
       const roomId = room.id;
       this.networkTestManager?.stop();
+      this.eventBus.leave.publish(error);
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of
       // tab refresh or close. Therefore prioritise the leave action over anything else, if tab is closed/refreshed
@@ -892,11 +910,15 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve, reject) => {
       this.eventBus.policyChange.subscribeOnce(() => {
         this.analyticsTimer.end(TimedEvent.JOIN);
         this.listener?.onJoin(room);
         resolve();
+      });
+
+      this.eventBus.leave.subscribeOnce(ex => {
+        reject(ex);
       });
     });
   }
