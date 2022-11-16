@@ -9,7 +9,14 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
-import { Box, Flex, IconButton, Text, Tooltip } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Text,
+  Tooltip,
+  useTheme,
+} from "@100mslive/react-ui";
 import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
@@ -31,6 +38,7 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const hmsActions = useHMSActions();
+  const { themeType } = useTheme();
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
@@ -38,11 +46,8 @@ const HLSView = () => {
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
-  // const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  // useFullscreen(hlsViewRef, isFullScreen, {
-  //   onClose: () => setIsFullScreen(false),
-  // });
+
+  const [isPaused, setIsPaused] = useState(undefined);
 
   const [show, toggle] = useToggle(false);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -120,20 +125,24 @@ const HLSView = () => {
     [availableLevels] //eslint-disable-line
   );
 
-  // function toggleFullScreen() {
-  //   if (hlsViewRef) {
-  //     setIsFullScreen(!isFullScreen);
-  //   }
-  // }
-
   const sfnOverlayClose = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
+  useEffect(() => {
+    // if (isPaused === undefined) {
+    console.log("Setting paused on mount", videoRef?.current?.paused);
+    setIsPaused(videoRef?.current?.paused);
+    // }
+  }, [videoRef?.current?.paused]);
+  // useEffect(() => {
+  //   isPaused ? videoRef?.current?.play() : videoRef?.current?.pause();
+  // }, [isPaused]);
+
   return (
     <Flex
       key="hls-viewer"
-      id="hls-viewer"
+      id={`hls-viewer-${themeType}`}
       ref={hlsViewRef}
       css={{
         verticalAlign: "middle",
@@ -168,10 +177,11 @@ const HLSView = () => {
               <HMSVideoPlayer.Controls.Left>
                 <HMSVideoPlayer.PlayButton
                   onClick={() => {
-                    videoRef?.current?.paused
+                    isPaused
                       ? videoRef?.current?.play()
                       : videoRef?.current?.pause();
                     setIsPaused(Boolean(videoRef?.current?.paused));
+                    console.log(videoRef?.current.paused, isPaused);
                   }}
                   isPaused={isPaused}
                 />

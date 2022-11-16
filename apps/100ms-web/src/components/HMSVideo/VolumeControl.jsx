@@ -4,7 +4,7 @@ import { Flex, Slider } from "@100mslive/react-ui";
 
 export const VolumeControl = ({ videoRef }) => {
   const videoEl = videoRef.current;
-  const [volume, setVolume] = useState(videoEl ? videoEl.volume : 100);
+  const [volume, setVolume] = useState(0);
 
   return (
     <Flex align="center" css={{ color: "$white" }}>
