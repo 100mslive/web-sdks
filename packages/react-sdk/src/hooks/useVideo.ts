@@ -33,7 +33,7 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach, threshold = 0.5, visible }: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
