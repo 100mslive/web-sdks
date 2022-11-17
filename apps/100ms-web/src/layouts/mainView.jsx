@@ -96,7 +96,6 @@ export const ConferenceMainView = () => {
         css={{
           size: "100%",
           position: "relative",
-          justifyContent: "space-evenly",
         }}
       >
         <ViewComponent />
