@@ -75,6 +75,11 @@ import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { Video, StyledVideoList, getLeft } from '@100mslive/react-ui';
 import { MicOffIcon } from '@100mslive/react-icons';
 
+// refer to the Pagination example in the Pagination story
+import Pagination from './Pagination';
+// refer to the VideoTile example in the VideoTile story
+import VideoTile from './VideoTile';
+
 ({ maxTileCount, aspectRatio }) => {
   const peers = useHMSStore(selectPeers);
   const [page, setPage] = useState(0);
@@ -118,20 +123,6 @@ import { MicOffIcon } from '@100mslive/react-icons';
         ) : null}
       </div>
     </StyledVideoList.Root>
-  );
-};
-
-const VideoTile = ({ width, height, trackId, name }) => {
-  return (
-    <StyledVideoTile.Root css={{ width, height }}>
-      <StyledVideoTile.Container>
-        <Video trackId={trackId} />
-        <StyledVideoTile.Info>{name}</StyledVideoTile.Info>
-        <StyledVideoTile.AudioIndicator>
-          <MicOffIcon />
-        </StyledVideoTile.AudioIndicator>
-      </StyledVideoTile.Container>
-    </StyledVideoTile.Root>
   );
 };
 ```
