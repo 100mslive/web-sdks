@@ -12,9 +12,7 @@ export const VolumeControl = ({ videoRef }) => {
       <Slider
         css={{
           mx: "$4",
-          w: "$14",
-          "@lg": { w: "$20" },
-          "@md": { w: "$20" },
+          w: "$20",
           "@sm": { w: "$14" },
           "@xs": { w: "$14" },
         }}
