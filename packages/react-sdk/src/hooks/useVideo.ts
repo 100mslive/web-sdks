@@ -18,6 +18,10 @@ export interface useVideoInput {
    * Number between 0 and 1 indication when the element is considered inView
    */
   threshold?: number;
+  /**
+   * Boolean indicating whether the element is visible or not
+   */
+  visible?: boolean;
 }
 
 export interface useVideoOutput {
@@ -29,12 +33,12 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach, threshold = 0.5, visible }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
-  const { ref: inViewRef, inView } = useInView({ threshold, trackVisibility: true, delay: 300 });
+  const { ref: inViewRef, inView } = useInView({ threshold });
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
@@ -47,9 +51,10 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
   );
 
   useEffect(() => {
+    // eslint-disable-next-line complexity
     (async () => {
       if (videoRef.current && track?.id) {
-        if (inView && track.enabled && attach !== false) {
+        if (inView && track.enabled && visible && attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track.id, videoRef.current);
         } else {
@@ -58,7 +63,7 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
         }
       }
     })();
-  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
+  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach, visible]);
 
   // detach on unmount
   useEffect(() => {
