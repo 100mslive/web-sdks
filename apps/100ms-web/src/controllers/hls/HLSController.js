@@ -46,7 +46,6 @@ export class HLSController {
    * set the stream to. -1 for Auto
    */
   setCurrentLevel(currentLevel) {
-    console.log("USER ASKED TO CHANGE LEVEL", currentLevel.height);
     const newLevel = this.hls.levels.findIndex(
       level => level.height === currentLevel.height
     );

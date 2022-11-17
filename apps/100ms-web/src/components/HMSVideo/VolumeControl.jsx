@@ -10,7 +10,14 @@ export const VolumeControl = ({ videoRef }) => {
     <Flex align="center" css={{ color: "$white" }}>
       <SpeakerIcon style={{ cursor: "pointer" }} onClick={() => setVolume(0)} />
       <Slider
-        css={{ mx: "$4", w: "$20" }}
+        css={{
+          mx: "$4",
+          w: "$14",
+          "@lg": { w: "$20" },
+          "@md": { w: "$20" },
+          "@sm": { w: "$14" },
+          "@xs": { w: "$14" },
+        }}
         min={0}
         max={100}
         step={1}

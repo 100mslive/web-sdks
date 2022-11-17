@@ -37,6 +37,7 @@ export function HLSQualitySelector({
                 variant={{
                   "@md": "sm",
                   "@sm": "xs",
+                  "@xs": "tiny",
                 }}
               >
                 {currentSelectedQualityText}
