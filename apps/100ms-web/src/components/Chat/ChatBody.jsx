@@ -281,12 +281,11 @@ const Chat = React.memo(
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const rowRef = useRef({});
     useEffect(() => {
-      console.log("rowRef ", rowRef.current, index);
       if (rowRef.current) {
         setRowHeight(index, rowRef.current.clientHeight);
       }
       // eslint-disable-next-line
-  }, [rowRef]);
+    }, [rowRef]);
 
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
@@ -319,6 +318,7 @@ const Chat = React.memo(
         }}
         key={message.time}
         data-testid="chat_msg"
+        style={style}
       >
         <div ref={rowRef}>
           <Text
@@ -382,21 +382,38 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
+    console.log("row height ", index, rowHeights.current);
     return rowHeights.current[index] + 8 || 82;
   }
 
   function setRowHeight(index, size) {
-    console.log("row height ", index, size);
-    listRef.current.resetAfterIndex(0);
     rowHeights.current = { ...rowHeights.current, [index]: size };
   }
 
+  function scrollToBottom() {
+    if (listRef.current && listRef.current.scrollToItem) {
+      listRef.current?.scrollToItem(messages.length - 1, "end");
+      requestAnimationFrame(() => {
+        listRef.current?.scrollToItem(messages.length - 1, "end");
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+      setTimeout(() => {
+        scrollToBottom();
+      }, 0);
+    }
+    // eslint-disable-next-line
+  }, [messages]);
   return (
     <AutoSizer
       style={{
         width: "100%",
         height: "100%",
-        overflow: "none",
+        overflow: "none !important",
       }}
     >
       {({ height, width }) => (
@@ -406,6 +423,9 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
           itemSize={getRowHeight}
           width={width}
           height={height}
+          style={{
+            overflow: "none !important",
+          }}
         >
           {({ index, style }) => (
             <Chat
