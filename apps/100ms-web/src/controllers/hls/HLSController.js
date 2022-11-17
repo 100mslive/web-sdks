@@ -42,10 +42,11 @@ export class HLSController {
 
   /**
    *
-   * @param { Number } currentLevel - currentLevel we want to
+   * @param { Hls.Level } currentLevel - currentLevel we want to
    * set the stream to. -1 for Auto
    */
   setCurrentLevel(currentLevel) {
+    console.log("USER ASKED TO CHANGE LEVEL", currentLevel.height);
     const newLevel = this.hls.levels.findIndex(
       level => level.height === currentLevel.height
     );
@@ -89,6 +90,14 @@ export class HLSController {
       this.hls.on(eventName, eventCallback);
     } else {
       this.eventEmitter.addListener(eventName, eventCallback);
+    }
+  }
+
+  off(eventName, eventCallback) {
+    if (this.ControllerEvents.indexOf(eventName === -1)) {
+      this.hls.off(eventName, eventCallback);
+    } else {
+      this.eventEmitter.removeListener(eventName, eventCallback);
     }
   }
 

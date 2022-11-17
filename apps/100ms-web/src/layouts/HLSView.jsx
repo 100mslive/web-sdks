@@ -43,11 +43,13 @@ const HLSView = () => {
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
+  const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
+  const [currentSelectedQuality, setisCurrentSelectedQuality] = useState(null);
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
 
-  const [isPaused, setIsPaused] = useState(undefined);
+  const [isPaused, setIsPaused] = useState(false);
 
   const [show, toggle] = useToggle(false);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -55,14 +57,21 @@ const HLSView = () => {
   });
   useEffect(() => {
     let videoEl = videoRef.current;
+    const manifestLoadedHandler = (_, { levels }) => {
+      const onlyVideoLevels = removeAudioLevels(levels);
+      setAvailableLevels(onlyVideoLevels);
+      setCurrentSelectedQualityText("Auto");
+    };
+    const levelUpdatedHandler = (_, { details, level }) => {
+      const qualityLevel = hlsController.getHlsJsInstance().levels[level];
+      setisCurrentSelectedQuality(qualityLevel);
+    };
+
     if (videoEl && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-          setIsVideoLive(false);
-        });
-        hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
+        const metadataLoadedHandler = ({ payload, ...rest }) => {
           console.log(
             `%c Payload: ${payload}`,
             "color:#2b2d42; background:#d80032"
@@ -71,28 +80,33 @@ const HLSView = () => {
           ToastManager.addToast({
             title: `Payload from timed Metadata ${payload}`,
           });
+        };
+        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
+          setIsVideoLive(false);
         });
+        hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
 
-        hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
-          const onlyVideoLevels = removeAudioLevels(levels);
-          setAvailableLevels(onlyVideoLevels);
-          setCurrentSelectedQualityText("Auto");
-        });
-        hlsController.on(Hls.Events.LEVEL_UPDATED, (_, { details, level }) => {
-          const qualityLevel = hlsController.getHlsJsInstance().levels[level];
-          const levelText =
-            qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
-          setCurrentSelectedQualityText(levelText);
-        });
+        hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
+        hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         videoEl.src = hlsUrl;
       }
     }
     return () => {
       hlsStats = null;
+      hlsController.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsController.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
     };
   }, [hlsUrl]);
 
+  useEffect(() => {
+    if (currentSelectedQuality) {
+      const levelText = isUserSelectedAuto
+        ? `Auto(${currentSelectedQuality.height}p)`
+        : `${currentSelectedQuality.height}p`;
+      setCurrentSelectedQualityText(levelText);
+    }
+  }, [currentSelectedQuality]);
   useEffect(() => {
     if (!hlsStats) {
       return;
@@ -111,6 +125,12 @@ const HLSView = () => {
   }, [enablHlsStats]);
 
   useEffect(() => {
+    videoRef.current.addEventListener("play", event => {
+      setIsPaused(false);
+    });
+    videoRef.current.addEventListener("pause", event => {
+      setIsPaused(true);
+    });
     if (hlsController) {
       return () => hlsController.reset();
     }
@@ -119,6 +139,11 @@ const HLSView = () => {
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hlsController) {
+        if (qualityLevel.height.toString().toLowerCase() === "auto") {
+          setIsUserSelectedAuto(true);
+        } else {
+          setIsUserSelectedAuto(false);
+        }
         hlsController.setCurrentLevel(qualityLevel);
       }
     },
@@ -128,16 +153,6 @@ const HLSView = () => {
   const sfnOverlayClose = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
-
-  useEffect(() => {
-    // if (isPaused === undefined) {
-    console.log("Setting paused on mount", videoRef?.current?.paused);
-    setIsPaused(videoRef?.current?.paused);
-    // }
-  }, [videoRef?.current?.paused]);
-  // useEffect(() => {
-  //   isPaused ? videoRef?.current?.play() : videoRef?.current?.pause();
-  // }, [isPaused]);
 
   return (
     <Flex
@@ -180,8 +195,6 @@ const HLSView = () => {
                     isPaused
                       ? videoRef?.current?.play()
                       : videoRef?.current?.pause();
-                    setIsPaused(Boolean(videoRef?.current?.paused));
-                    console.log(videoRef?.current.paused, isPaused);
                   }}
                   isPaused={isPaused}
                 />

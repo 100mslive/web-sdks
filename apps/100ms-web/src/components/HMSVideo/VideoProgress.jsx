@@ -13,9 +13,12 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
       const videoProgress = Math.floor(
         getPercentage(videoEl.currentTime, videoEl.duration)
       );
-      const bufferProgress = Math.floor(
-        getPercentage(videoEl.buffered.end(0), videoEl.duration)
-      );
+      let bufferProgress = 0;
+      if (videoEl.buffered.length > 0) {
+        bufferProgress = Math.floor(
+          getPercentage(videoEl.buffered?.end(0), videoEl.duration)
+        );
+      }
 
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
       setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
