@@ -25,10 +25,10 @@ export class NetworkTestManager {
     });
     try {
       const res = await fetch(`${url}?${Date.now()}`, { signal });
-      const reader = res.body?.getReader();
-      if (!reader) {
-        throw Error('unable to process request');
+      if (!res.ok) {
+        throw Error(`Failed fetching NetworkTest endpoint (${res.status} - ${res.statusText})`);
       }
+      const reader = res.body?.getReader();
       const readData = async () => {
         if (!reader) {
           return;
@@ -60,12 +60,12 @@ export class NetworkTestManager {
           );
         });
     } catch (error) {
-      HMSLogger.e(this.TAG, error);
-      if ((error as Error).name !== 'AbortError') {
-        this.updateScoreToListener(0);
-        this.eventBus.analytics.publish(
-          AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
-        );
+      if (error instanceof Error) {
+        HMSLogger.e(this.TAG, error);
+        if (error.name !== 'AbortError') {
+          this.updateScoreToListener(0);
+          this.eventBus.analytics.publish(AnalyticsEventFactory.previewNetworkQuality({ error: error.message }));
+        }
       }
     }
   };
