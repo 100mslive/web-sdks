@@ -160,7 +160,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     output.height = input.height;
     this.outputCanvas = output;
     this.outputCtx = output.getContext('2d');
-    if (this.backgroundType === 'none') {
+    if (this.backgroundType === HMSVirtualBackgroundTypes.NONE) {
       this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
       return;
     }
@@ -237,7 +237,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   };
 
   private renderBlur(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'blur') {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
       return;
     }
     this.outputCtx!.filter = 'none';
@@ -250,7 +250,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private renderGIF(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'gif') {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.GIF) {
       return;
     }
     if (this.gifFrameImageData == null) {
