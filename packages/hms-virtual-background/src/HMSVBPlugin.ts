@@ -103,17 +103,12 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         break;
       case HMSVirtualBackgroundTypes.VIDEO:
         this.log('setting background to video', background);
-        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+        this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
         this.background = background as HTMLVideoElement;
         this.background.crossOrigin = 'anonymous';
         this.background.muted = true;
         this.background.loop = true;
-        this.background.oncanplaythrough = async () => {
-          if (this.background) {
-            await (this.background as HTMLVideoElement).play();
-            this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
-          }
-        };
+        this.background.autoplay = true;
         break;
       case HMSVirtualBackgroundTypes.CANVAS:
         this.background = background;
@@ -184,7 +179,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     switch (this.backgroundType) {
       case HMSVirtualBackgroundTypes.IMAGE:
       case HMSVirtualBackgroundTypes.CANVAS:
+        this.renderBackground(results, this.background as HMSBackgroundInput);
+        break;
       case HMSVirtualBackgroundTypes.VIDEO:
+        console.error('start video background');
         this.renderBackground(results, this.background as HMSBackgroundInput);
         break;
       case HMSVirtualBackgroundTypes.GIF:
@@ -215,7 +213,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       !this.outputCanvas ||
       !this.outputCtx ||
       this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
-      this.backgroundType === HMSVirtualBackgroundTypes.BLUR
+      this.backgroundType === HMSVirtualBackgroundTypes.BLUR ||
+      this.backgroundType === HMSVirtualBackgroundTypes.GIF
     ) {
       return;
     }
@@ -225,12 +224,15 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.outputCtx.imageSmoothingQuality = 'high';
     // Only overwrite existing pixels.
     this.outputCtx.globalCompositeOperation = 'source-out';
+    const bgWidth = background instanceof HTMLVideoElement ? background.videoWidth : background.width;
+    const bgHeight = background instanceof HTMLVideoElement ? background.videoHeight : background.height;
+
     this.outputCtx.drawImage(
       background,
       0,
       0,
-      background.width,
-      background.height,
+      bgWidth,
+      bgHeight,
       0,
       0,
       this.outputCanvas.width,
