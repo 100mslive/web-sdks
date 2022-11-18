@@ -32,6 +32,7 @@
     "react-use": "^17.4.0",
     "react-window": "^1.8.7",
     "react-virtualized-auto-sizer": "^1.0.7",
+    "react-virtuoso": "^3.1.4",
     "recordrtc": "^5.6.2",
     "screenfull": "^5.1.0",
     "uuid": "^8.3.2",

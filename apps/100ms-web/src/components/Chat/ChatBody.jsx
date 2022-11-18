@@ -1,7 +1,8 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { VariableSizeList } from "react-window";
+// import AutoSizer from "react-virtualized-auto-sizer";
+import { Virtuoso } from "react-virtuoso";
+// import { VariableSizeList } from "react-window";
 import {
   selectHMSMessages,
   selectLocalPeerID,
@@ -177,273 +178,401 @@ const SenderName = styled(Text, {
   minWidth: 0,
 });
 
-const ChatMessage = React.memo(
-  ({ style = {}, message, autoMarginTop = false, onPin }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-    const hmsActions = useHMSActions();
-    const localPeerId = useHMSStore(selectLocalPeerID);
-    const permissions = useHMSStore(selectPermissions);
-    const messageType = getMessageType({
-      roles: message.recipientRoles,
-      receiver: message.recipientPeer,
-    });
-    // show pin action only if peer has remove others permission and the message is of broadcast type
-    const showPinAction = permissions.removeOthers && !messageType;
+// const ChatMessage = React.memo(
+//   ({ style = {}, message, autoMarginTop = false, onPin }) => {
+//     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+//     const hmsActions = useHMSActions();
+//     const localPeerId = useHMSStore(selectLocalPeerID);
+//     const permissions = useHMSStore(selectPermissions);
+//     const messageType = getMessageType({
+//       roles: message.recipientRoles,
+//       receiver: message.recipientPeer,
+//     });
+//     // show pin action only if peer has remove others permission and the message is of broadcast type
+//     const showPinAction = permissions.removeOthers && !messageType;
 
-    useEffect(() => {
-      if (message.id && !message.read && inView) {
-        hmsActions.setMessageRead(true, message.id);
-      }
-    }, [message.read, hmsActions, inView, message.id]);
+//     useEffect(() => {
+//       if (message.id && !message.read && inView) {
+//         hmsActions.setMessageRead(true, message.id);
+//       }
+//     }, [message.read, hmsActions, inView, message.id]);
 
-    return (
-      <Flex
-        ref={ref}
-        align="center"
-        css={{
-          flexWrap: "wrap",
-          bg: messageType ? "$surfaceLight" : undefined,
-          px: messageType ? "$4" : "$2",
-          py: messageType ? "$4" : 0,
-          r: "$1",
-          mb: "$10",
-          mt: autoMarginTop ? "auto" : undefined,
-        }}
-        style={style}
-        key={message.time}
-        data-testid="chat_msg"
-      >
-        <Text
-          css={{
-            color: "$textHighEmp",
-            fontWeight: "$semiBold",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-          as="div"
-        >
-          <Flex align="center">
-            {message.senderName === "You" || !message.senderName ? (
-              <SenderName as="span">
-                {message.senderName || "Anonymous"}
-              </SenderName>
-            ) : (
-              <Tooltip title={message.senderName} side="top" align="start">
-                <SenderName as="span">{message.senderName}</SenderName>
-              </Tooltip>
-            )}
-            <Text
-              as="span"
-              variant="sm"
-              css={{
-                ml: "$4",
-                color: "$textSecondary",
-                flexShrink: 0,
-              }}
-            >
-              {formatTime(message.time)}
-            </Text>
-          </Flex>
-          <MessageType
-            hasCurrentUserSent={message.sender === localPeerId}
-            receiver={message.recipientPeer}
-            roles={message.recipientRoles}
-          />
-          {showPinAction && <ChatActions onPin={onPin} />}
-        </Text>
-        <Text
-          variant="body2"
-          css={{
-            w: "100%",
-            mt: "$2",
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          <AnnotisedMessage message={message.message} />
-        </Text>
-      </Flex>
-    );
-  }
-);
+//     return (
+//       <Flex
+//         ref={ref}
+//         align="center"
+//         css={{
+//           flexWrap: "wrap",
+//           bg: messageType ? "$surfaceLight" : undefined,
+//           px: messageType ? "$4" : "$2",
+//           py: messageType ? "$4" : 0,
+//           r: "$1",
+//           mb: "$10",
+//           mt: autoMarginTop ? "auto" : undefined,
+//         }}
+//         style={style}
+//         key={message.time}
+//         data-testid="chat_msg"
+//       >
+//         <Text
+//           css={{
+//             color: "$textHighEmp",
+//             fontWeight: "$semiBold",
+//             display: "inline-flex",
+//             alignItems: "center",
+//             justifyContent: "space-between",
+//             width: "100%",
+//           }}
+//           as="div"
+//         >
+//           <Flex align="center">
+//             {message.senderName === "You" || !message.senderName ? (
+//               <SenderName as="span">
+//                 {message.senderName || "Anonymous"}
+//               </SenderName>
+//             ) : (
+//               <Tooltip title={message.senderName} side="top" align="start">
+//                 <SenderName as="span">{message.senderName}</SenderName>
+//               </Tooltip>
+//             )}
+//             <Text
+//               as="span"
+//               variant="sm"
+//               css={{
+//                 ml: "$4",
+//                 color: "$textSecondary",
+//                 flexShrink: 0,
+//               }}
+//             >
+//               {formatTime(message.time)}
+//             </Text>
+//           </Flex>
+//           <MessageType
+//             hasCurrentUserSent={message.sender === localPeerId}
+//             receiver={message.recipientPeer}
+//             roles={message.recipientRoles}
+//           />
+//           {showPinAction && <ChatActions onPin={onPin} />}
+//         </Text>
+//         <Text
+//           variant="body2"
+//           css={{
+//             w: "100%",
+//             mt: "$2",
+//             wordBreak: "break-word",
+//             whiteSpace: "pre-wrap",
+//           }}
+//         >
+//           <AnnotisedMessage message={message.message} />
+//         </Text>
+//       </Flex>
+//     );
+//   }
+// );
 
-const Chat = React.memo(
-  ({
-    index,
-    style = {},
-    message,
-    setRowHeight,
-    onPin,
-    autoMarginTop = false,
-  }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-    const rowRef = useRef({});
-    useEffect(() => {
-      if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight);
-      }
-      // eslint-disable-next-line
-    }, [rowRef]);
+// const Chat = React.memo(
+//   ({
+//     index,
+//     style = {},
+//     message,
+//     setRowHeight,
+//     onPin,
+//     autoMarginTop = false,
+//   }) => {
+//     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+//     const rowRef = useRef({});
+//     useEffect(() => {
+//       if (rowRef.current) {
+//         setRowHeight(index, rowRef.current.clientHeight);
+//       }
+//       // eslint-disable-next-line
+//     }, [rowRef]);
 
-    const hmsActions = useHMSActions();
-    const localPeerId = useHMSStore(selectLocalPeerID);
-    const permissions = useHMSStore(selectPermissions);
-    const messageType = getMessageType({
-      roles: message.recipientRoles,
-      receiver: message.recipientPeer,
-    });
-    // show pin action only if peer has remove others permission and the message is of broadcast type
-    const showPinAction = permissions.removeOthers && !messageType;
+//     const hmsActions = useHMSActions();
+//     const localPeerId = useHMSStore(selectLocalPeerID);
+//     const permissions = useHMSStore(selectPermissions);
+//     const messageType = getMessageType({
+//       roles: message.recipientRoles,
+//       receiver: message.recipientPeer,
+//     });
+//     // show pin action only if peer has remove others permission and the message is of broadcast type
+//     const showPinAction = permissions.removeOthers && !messageType;
 
-    useEffect(() => {
-      if (message.id && !message.read && inView) {
-        hmsActions.setMessageRead(true, message.id);
-      }
-    }, [message.read, hmsActions, inView, message.id]);
+//     useEffect(() => {
+//       if (message.id && !message.read && inView) {
+//         hmsActions.setMessageRead(true, message.id);
+//       }
+//     }, [message.read, hmsActions, inView, message.id]);
 
-    return (
-      <Flex
-        ref={ref}
-        align="center"
-        css={{
-          flexWrap: "wrap",
-          bg: messageType ? "$surfaceLight" : undefined,
-          px: messageType ? "$4" : "$2",
-          py: messageType ? "$4" : 0,
-          r: "$1",
-          mb: "$10",
-          mt: autoMarginTop ? "auto" : undefined,
-        }}
-        key={message.time}
-        data-testid="chat_msg"
-        style={style}
-      >
-        <div ref={rowRef}>
-          <Text
-            css={{
-              color: "$textHighEmp",
-              fontWeight: "$semiBold",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-            as="div"
-          >
-            <Flex align="center">
-              {message.senderName === "You" || !message.senderName ? (
-                <SenderName as="span">
-                  {message.senderName || "Anonymous"}
-                </SenderName>
-              ) : (
-                <Tooltip title={message.senderName} side="top" align="start">
-                  <SenderName as="span">{message.senderName}</SenderName>
-                </Tooltip>
-              )}
-              <Text
-                as="span"
-                variant="sm"
-                css={{
-                  ml: "$4",
-                  color: "$textSecondary",
-                  flexShrink: 0,
-                }}
-              >
-                {formatTime(message.time)}
-              </Text>
-            </Flex>
-            <MessageType
-              hasCurrentUserSent={message.sender === localPeerId}
-              receiver={message.recipientPeer}
-              roles={message.recipientRoles}
-            />
-            {showPinAction && <ChatActions onPin={onPin} />}
-          </Text>
-          <Text
-            variant="body2"
-            css={{
-              w: "100%",
-              mt: "$2",
-              wordBreak: "break-word",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            <AnnotisedMessage message={message.message} />
-          </Text>
-        </div>
-      </Flex>
-    );
-  }
-);
-const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
-  const listRef = useRef({});
-  const rowHeights = useRef({});
+//     return (
+//       <Flex
+//         ref={ref}
+//         align="center"
+//         css={{
+//           flexWrap: "wrap",
+//           bg: messageType ? "$surfaceLight" : undefined,
+//           px: messageType ? "$4" : "$2",
+//           py: messageType ? "$4" : 0,
+//           r: "$1",
+//           mb: "$10",
+//           mt: autoMarginTop ? "auto" : undefined,
+//         }}
+//         key={message.time}
+//         data-testid="chat_msg"
+//         style={style}
+//       >
+//         <div ref={rowRef}>
+//           <Text
+//             css={{
+//               color: "$textHighEmp",
+//               fontWeight: "$semiBold",
+//               display: "inline-flex",
+//               alignItems: "center",
+//               justifyContent: "space-between",
+//               width: "100%",
+//             }}
+//             as="div"
+//           >
+//             <Flex align="center">
+//               {message.senderName === "You" || !message.senderName ? (
+//                 <SenderName as="span">
+//                   {message.senderName || "Anonymous"}
+//                 </SenderName>
+//               ) : (
+//                 <Tooltip title={message.senderName} side="top" align="start">
+//                   <SenderName as="span">{message.senderName}</SenderName>
+//                 </Tooltip>
+//               )}
+//               <Text
+//                 as="span"
+//                 variant="sm"
+//                 css={{
+//                   ml: "$4",
+//                   color: "$textSecondary",
+//                   flexShrink: 0,
+//                 }}
+//               >
+//                 {formatTime(message.time)}
+//               </Text>
+//             </Flex>
+//             <MessageType
+//               hasCurrentUserSent={message.sender === localPeerId}
+//               receiver={message.recipientPeer}
+//               roles={message.recipientRoles}
+//             />
+//             {showPinAction && <ChatActions onPin={onPin} />}
+//           </Text>
+//           <Text
+//             variant="body2"
+//             css={{
+//               w: "100%",
+//               mt: "$2",
+//               wordBreak: "break-word",
+//               whiteSpace: "pre-wrap",
+//             }}
+//           >
+//             <AnnotisedMessage message={message.message} />
+//           </Text>
+//         </div>
+//       </Flex>
+//     );
+//   }
+// );
+// const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
+//   const listRef = useRef({});
+//   const rowHeights = useRef({});
 
-  function getRowHeight(index) {
-    console.log("row height ", index, rowHeights.current);
-    return rowHeights.current[index] + 8 || 82;
-  }
+//   function getRowHeight(index) {
+//     console.log("row height ", index, rowHeights.current);
+//     return rowHeights.current[index] + 8 || 82;
+//   }
 
-  function setRowHeight(index, size) {
-    rowHeights.current = { ...rowHeights.current, [index]: size };
-  }
+//   function setRowHeight(index, size) {
+//     rowHeights.current = { ...rowHeights.current, [index]: size };
+//   }
 
-  function scrollToBottom() {
-    if (listRef.current && listRef.current.scrollToItem) {
-      listRef.current?.scrollToItem(messages.length - 1, "end");
-      requestAnimationFrame(() => {
-        listRef.current?.scrollToItem(messages.length - 1, "end");
-      });
-    }
-  }
+//   function scrollToBottom() {
+//     if (listRef.current && listRef.current.scrollToItem) {
+//       listRef.current?.scrollToItem(messages.length - 1, "end");
+//       requestAnimationFrame(() => {
+//         listRef.current?.scrollToItem(messages.length - 1, "end");
+//       });
+//     }
+//   }
+
+//   useEffect(() => {
+//     if (messages.length > 0) {
+//       scrollToBottom();
+//       setTimeout(() => {
+//         scrollToBottom();
+//       }, 0);
+//     }
+//     // eslint-disable-next-line
+//   }, [messages]);
+//   return (
+//     <AutoSizer
+//       style={{
+//         width: "100%",
+//         height: "100%",
+//         overflow: "none !important",
+//       }}
+//     >
+//       {({ height, width }) => (
+//         <VariableSizeList
+//           ref={listRef}
+//           itemCount={messages.length}
+//           itemSize={getRowHeight}
+//           width={width}
+//           height={height}
+//           style={{
+//             overflow: "none !important",
+//           }}
+//         >
+//           {({ index, style }) => (
+//             <Chat
+//               style={style}
+//               index={index}
+//               key={messages[index].id}
+//               message={messages[index]}
+//               autoMarginTop={index === 0}
+//               setRowHeight={setRowHeight}
+//               onPin={() => setPinnedMessage(messages[index])}
+//             />
+//           )}
+//         </VariableSizeList>
+//       )}
+//     </AutoSizer>
+//   );
+// };
+
+const ChatMessage1 = React.memo(({ message, autoMarginTop = false, onPin }) => {
+  const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+  const hmsActions = useHMSActions();
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const permissions = useHMSStore(selectPermissions);
+  const messageType = getMessageType({
+    roles: message.recipientRoles,
+    receiver: message.recipientPeer,
+  });
+  // show pin action only if peer has remove others permission and the message is of broadcast type
+  const showPinAction = permissions.removeOthers && !messageType;
 
   useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom();
-      setTimeout(() => {
-        scrollToBottom();
-      }, 0);
+    if (message.id && !message.read && inView) {
+      hmsActions.setMessageRead(true, message.id);
     }
-    // eslint-disable-next-line
-  }, [messages]);
+  }, [message.read, hmsActions, inView, message.id]);
+
   return (
-    <AutoSizer
-      style={{
-        width: "100%",
-        height: "100%",
-        overflow: "none !important",
+    <Flex
+      ref={ref}
+      align="center"
+      css={{
+        flexWrap: "wrap",
+        bg: messageType ? "$surfaceLight" : undefined,
+        px: messageType ? "$4" : "$2",
+        py: messageType ? "$4" : 0,
+        r: "$1",
+        pb: "$10", // margin unsupported for virtuoso
+        mt: autoMarginTop ? "auto" : undefined,
       }}
+      key={message.time}
+      data-testid="chat_msg"
     >
-      {({ height, width }) => (
-        <VariableSizeList
-          ref={listRef}
-          itemCount={messages.length}
-          itemSize={getRowHeight}
-          width={width}
-          height={height}
-          style={{
-            overflow: "none !important",
-          }}
-        >
-          {({ index, style }) => (
-            <Chat
-              style={style}
-              index={index}
-              key={messages[index].id}
-              message={messages[index]}
-              autoMarginTop={index === 0}
-              setRowHeight={setRowHeight}
-              onPin={() => setPinnedMessage(messages[index])}
-            />
+      <Text
+        css={{
+          color: "$textHighEmp",
+          fontWeight: "$semiBold",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+        as="div"
+      >
+        <Flex align="center">
+          {message.senderName === "You" || !message.senderName ? (
+            <SenderName as="span">
+              {message.senderName || "Anonymous"}
+            </SenderName>
+          ) : (
+            <Tooltip title={message.senderName} side="top" align="start">
+              <SenderName as="span">{message.senderName}</SenderName>
+            </Tooltip>
           )}
-        </VariableSizeList>
-      )}
-    </AutoSizer>
+          <Text
+            as="span"
+            variant="sm"
+            css={{
+              ml: "$4",
+              color: "$textSecondary",
+              flexShrink: 0,
+            }}
+          >
+            {formatTime(message.time)}
+          </Text>
+        </Flex>
+        <MessageType
+          hasCurrentUserSent={message.sender === localPeerId}
+          receiver={message.recipientPeer}
+          roles={message.recipientRoles}
+        />
+        {showPinAction && <ChatActions onPin={onPin} />}
+      </Text>
+      <Text
+        variant="body2"
+        css={{
+          w: "100%",
+          mt: "$2",
+          wordBreak: "break-word",
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        <AnnotisedMessage message={message.message} />
+      </Text>
+    </Flex>
+  );
+});
+export const VirtusoChatMessage = ({ messages, setPinnedMessage }) => {
+  const ref = useRef(null);
+  // function moveToPinnedMessage(index) {
+  //   if (ref.current && ref.current.scrollToIndex) {
+  //     ref.current.scrollToIndex(index);
+  //   }
+  // }
+  // function scrollToBottom() {
+  //   if (ref.current && ref.current.scrollToBottom) {
+  //     ref.current.autoscrollToBottom();
+  //   }
+  // }
+  return (
+    <Virtuoso
+      ref={ref}
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+      initialTopMostItemIndex={messages.length - 1}
+      data={messages}
+      followOutput={isAtBottom => {
+        return "smooth";
+      }}
+      atBottomStateChange={bottom => {
+        if (!bottom) ref.current.autoscrollToBottom();
+      }}
+      itemContent={index => {
+        return (
+          <ChatMessage1
+            key={messages[index].id}
+            message={messages[index]}
+            autoMarginTop={index === 0}
+            onPin={() => setPinnedMessage(messages[index])}
+          />
+        );
+      }}
+    />
   );
 };
-
 export const ChatBody = ({ role, peerId, setPinnedMessage }) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
@@ -480,8 +609,12 @@ export const ChatBody = ({ role, peerId, setPinnedMessage }) => {
             onPin={() => setPinnedMessage(message)}
           />
         );
-      })} */}
+      })}
       <VirtualizedChatMessages
+        messages={messages}
+        setPinnedMessage={setPinnedMessage}
+      /> */}
+      <VirtusoChatMessage
         messages={messages}
         setPinnedMessage={setPinnedMessage}
       />
