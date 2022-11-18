@@ -211,7 +211,12 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private renderBackground = (results: MediaPipeResults, background: HMSBackgroundInput) => {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType === 'none' || this.backgroundType === 'blur') {
+    if (
+      !this.outputCanvas ||
+      !this.outputCtx ||
+      this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
+      this.backgroundType === HMSVirtualBackgroundTypes.BLUR
+    ) {
       return;
     }
     this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
