@@ -23,28 +23,25 @@ export function getRandomVirtualBackground() {
 
   backgroundList.push(...images);
 
-  if (process.env["REACT_APP_VIDEO_VB"]) {
-    const gifList = [
-      {
-        background: "https://www.100ms.live/images/vb-1.gif",
-        backgroundType: HMSVirtualBackgroundTypes.GIF,
-      },
-    ];
-    backgroundList.push(...gifList);
+  const gifList = [
+    {
+      background: "https://www.100ms.live/images/vb-1.gif",
+      backgroundType: HMSVirtualBackgroundTypes.GIF,
+    },
+  ];
+  backgroundList.push(...gifList);
 
-    //Not Supporting video backgrounds until web worker issue is resolved
-    /* const videoList = [
-      "https://www.100ms.live/images/video-1.mp4",
-      "https://www.100ms.live/images/video-2.mp4",
-      "https://www.100ms.live/images/video-5.mp4",
-      "https://www.100ms.live/images/video-7.mp4",
-      "https://www.100ms.live/images/video-8.mp4",
-    ].map(url => ({
-      background: url,
-      backgroundType: HMSVirtualBackgroundTypes.VIDEO,
-    }));
-    backgroundList.push(...videoList); */
-  }
+  const videoList = [
+    "https://www.100ms.live/images/video-1.mp4",
+    "https://www.100ms.live/images/video-2.mp4",
+    "https://www.100ms.live/images/video-5.mp4",
+    "https://www.100ms.live/images/video-7.mp4",
+    "https://www.100ms.live/images/video-8.mp4",
+  ].map(url => ({
+    background: url,
+    backgroundType: HMSVirtualBackgroundTypes.VIDEO,
+  }));
+  backgroundList.push(...videoList);
 
   const randomIdx = Math.floor(Math.random() * backgroundList.length);
   const virtualBackground = backgroundList[randomIdx];
@@ -57,8 +54,9 @@ export function getRandomVirtualBackground() {
       return virtualBackground;
     case HMSVirtualBackgroundTypes.VIDEO:
       const videoEl = document.createElement("video");
-      videoEl.src = backgroundList[randomIdx];
-      return videoEl;
+      videoEl.src = backgroundList[randomIdx].background;
+      virtualBackground.background = videoEl;
+      return virtualBackground;
     default:
       return virtualBackground;
   }
