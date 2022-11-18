@@ -103,12 +103,15 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         break;
       case HMSVirtualBackgroundTypes.VIDEO:
         this.log('setting background to video', background);
-        this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
         this.background = background as HTMLVideoElement;
         this.background.crossOrigin = 'anonymous';
         this.background.muted = true;
         this.background.loop = true;
         this.background.autoplay = true;
+        this.background.oncanplaythrough = () => {
+          this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+        };
         break;
       case HMSVirtualBackgroundTypes.CANVAS:
         this.background = background;
@@ -179,10 +182,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     switch (this.backgroundType) {
       case HMSVirtualBackgroundTypes.IMAGE:
       case HMSVirtualBackgroundTypes.CANVAS:
-        this.renderBackground(results, this.background as HMSBackgroundInput);
-        break;
       case HMSVirtualBackgroundTypes.VIDEO:
-        console.error('start video background');
         this.renderBackground(results, this.background as HMSBackgroundInput);
         break;
       case HMSVirtualBackgroundTypes.GIF:
@@ -213,12 +213,11 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       !this.outputCanvas ||
       !this.outputCtx ||
       this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
-      this.backgroundType === HMSVirtualBackgroundTypes.BLUR ||
-      this.backgroundType === HMSVirtualBackgroundTypes.GIF
+      this.backgroundType === HMSVirtualBackgroundTypes.BLUR
     ) {
       return;
     }
-    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.filter = 'none';
     this.outputCtx.imageSmoothingEnabled = true;
     this.outputCtx.imageSmoothingQuality = 'high';
