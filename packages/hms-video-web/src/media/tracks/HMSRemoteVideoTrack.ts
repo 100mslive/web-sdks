@@ -10,7 +10,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degradedAt: Date | null = null;
   private _layerDefinitions: SimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
-  private expectedLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> = HMSSimulcastLayer.HIGH;
+  private preferredLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> = HMSSimulcastLayer.HIGH;
 
   public get degraded() {
     return this._degraded;
@@ -34,7 +34,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
       return;
     }
-    this.expectedLayer = layer;
+    this.preferredLayer = layer;
     if (!this.shouldSendVideoLayer(layer, 'preferLayer')) {
       return;
     }
@@ -58,12 +58,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return (this.stream as HMSRemoteStream).getSimulcastLayer();
   }
 
-  getCurrentLayer() {
+  getLayer() {
     return (this.stream as HMSRemoteStream).getVideoLayer();
   }
 
-  getExpectedLayer() {
-    return this.expectedLayer;
+  getPreferredLayer() {
+    return this.preferredLayer;
   }
 
   async addSink(videoElement: HTMLVideoElement) {
@@ -130,7 +130,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.expectedLayer;
+    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
@@ -139,7 +139,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private pushInHistory(action: string) {
     if (MAINTAIN_TRACK_HISTORY) {
-      this.history.push({ name: action, layer: this.getCurrentLayer(), degraded: this.degraded });
+      this.history.push({ name: action, layer: this.getLayer(), degraded: this.degraded });
     }
   }
 
@@ -175,7 +175,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @private
    */
   private shouldSendVideoLayer(targetLayer: HMSSimulcastLayer, source: string) {
-    const currLayer = this.getCurrentLayer();
+    const currLayer = this.getLayer();
     if (this.degraded && targetLayer === HMSSimulcastLayer.NONE) {
       return true;
     }
