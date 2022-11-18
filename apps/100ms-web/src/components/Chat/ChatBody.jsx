@@ -183,14 +183,7 @@ const SenderName = styled(Text, {
 });
 
 const ChatMessage = React.memo(
-  ({
-    index,
-    style = {},
-    message,
-    setRowHeight,
-    onPin,
-    autoMarginTop = false,
-  }) => {
+  ({ index, style = {}, message, setRowHeight, onPin }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const rowRef = useRef(null);
     useEffect(() => {
@@ -292,7 +285,7 @@ const ChatMessage = React.memo(
 const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   const listRef = useRef({});
   const rowHeights = useRef({});
-
+  const [topHeight, setTopHeight] = useState(428);
   function getRowHeight(index) {
     return rowHeights.current[index] || 72;
   }
@@ -317,39 +310,58 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
       setTimeout(() => {
         scrollToBottom();
       }, 0);
+      const last = Object.keys(rowHeights.current)[
+        Object.keys(rowHeights.current).length - 1
+      ];
+      if (last > 0 && topHeight > 0) {
+        setTopHeight(
+          topHeight - rowHeights.current[last] <= 0
+            ? 0
+            : topHeight - rowHeights.current[last]
+        );
+      }
     }
     // eslint-disable-next-line
   }, [messages]);
+
   return (
-    <AutoSizer
+    <div
       style={{
-        width: "100%",
-        height: "100%",
-        overflow: "none !important",
+        height: `calc(100% - ${topHeight}px)`,
+        display: "block",
+        marginTop: "auto",
+        marginRight: "-1.45rem",
       }}
     >
-      {({ height, width }) => (
-        <VariableSizeList
-          ref={listRef}
-          itemCount={messages.length}
-          itemSize={getRowHeight}
-          width={width}
-          height={height}
-        >
-          {({ index, style }) => (
-            <ChatMessage
-              style={style}
-              index={index}
-              key={messages[index].id}
-              message={messages[index]}
-              autoMarginTop={index === 0}
-              setRowHeight={setRowHeight}
-              onPin={() => setPinnedMessage(messages[index])}
-            />
-          )}
-        </VariableSizeList>
-      )}
-    </AutoSizer>
+      <AutoSizer
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "none !important",
+        }}
+      >
+        {({ height, width }) => (
+          <VariableSizeList
+            ref={listRef}
+            itemCount={messages.length}
+            itemSize={getRowHeight}
+            width={width}
+            height={height}
+          >
+            {({ index, style }) => (
+              <ChatMessage
+                style={style}
+                index={index}
+                key={messages[index].id}
+                message={messages[index]}
+                setRowHeight={setRowHeight}
+                onPin={() => setPinnedMessage(messages[index])}
+              />
+            )}
+          </VariableSizeList>
+        )}
+      </AutoSizer>
+    </div>
   );
 };
 
