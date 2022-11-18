@@ -27,7 +27,7 @@ describe('remoteVideoTrack', () => {
 
   const expectDegradationLayerAndSink = (isDegraded: boolean, layer: HMSSimulcastLayer, hasSink: boolean) => {
     expect(track.degraded).toBe(isDegraded);
-    expect(track.getCurrentLayer()).toBe(layer);
+    expect(track.getLayer()).toBe(layer);
     expect(track.hasSinks()).toBe(hasSink);
   };
 
