@@ -183,98 +183,6 @@ const SenderName = styled(Text, {
 });
 
 const ChatMessage = React.memo(
-  ({ style = {}, message, autoMarginTop = false, onPin }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-    const hmsActions = useHMSActions();
-    const localPeerId = useHMSStore(selectLocalPeerID);
-    const permissions = useHMSStore(selectPermissions);
-    const messageType = getMessageType({
-      roles: message.recipientRoles,
-      receiver: message.recipientPeer,
-    });
-    // show pin action only if peer has remove others permission and the message is of broadcast type
-    const showPinAction = permissions.removeOthers && !messageType;
-
-    useEffect(() => {
-      if (message.id && !message.read && inView) {
-        hmsActions.setMessageRead(true, message.id);
-      }
-    }, [message.read, hmsActions, inView, message.id]);
-
-    return (
-      <Flex
-        ref={ref}
-        align="center"
-        css={{
-          flexWrap: "wrap",
-          bg: messageType ? "$surfaceLight" : undefined,
-          px: messageType ? "$4" : "$2",
-          py: messageType ? "$4" : 0,
-          r: "$1",
-          mb: "$10",
-          mt: autoMarginTop ? "auto" : undefined,
-        }}
-        style={style}
-        key={message.time}
-        data-testid="chat_msg"
-      >
-        <Text
-          css={{
-            color: "$textHighEmp",
-            fontWeight: "$semiBold",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-          as="div"
-        >
-          <Flex align="center">
-            {message.senderName === "You" || !message.senderName ? (
-              <SenderName as="span">
-                {message.senderName || "Anonymous"}
-              </SenderName>
-            ) : (
-              <Tooltip title={message.senderName} side="top" align="start">
-                <SenderName as="span">{message.senderName}</SenderName>
-              </Tooltip>
-            )}
-            <Text
-              as="span"
-              variant="sm"
-              css={{
-                ml: "$4",
-                color: "$textSecondary",
-                flexShrink: 0,
-              }}
-            >
-              {formatTime(message.time)}
-            </Text>
-          </Flex>
-          <MessageType
-            hasCurrentUserSent={message.sender === localPeerId}
-            receiver={message.recipientPeer}
-            roles={message.recipientRoles}
-          />
-          {showPinAction && <ChatActions onPin={onPin} />}
-        </Text>
-        <Text
-          variant="body2"
-          css={{
-            w: "100%",
-            mt: "$2",
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          <AnnotisedMessage message={message.message} />
-        </Text>
-      </Flex>
-    );
-  }
-);
-
-const Chat = React.memo(
   ({
     index,
     style = {},
@@ -326,11 +234,7 @@ const Chat = React.memo(
         data-testid="chat_msg"
         style={style}
       >
-        <Text
-          ref={rowRef}
-          as="div"
-          css={{ display: "flex", justifyContent: "space-between" }}
-        >
+        <Text ref={rowRef} as="div" css={{ width: "inherit" }}>
           <Text
             css={{
               color: "$textHighEmp",
@@ -392,7 +296,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
-    return rowHeights.current[index] || 82;
+    return rowHeights.current[index] || 72;
   }
 
   function setRowHeight(index, size) {
@@ -435,7 +339,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
           height={height}
         >
           {({ index, style }) => (
-            <Chat
+            <ChatMessage
               style={style}
               index={index}
               key={messages[index].id}
@@ -478,16 +382,6 @@ export const ChatBody = ({ role, peerId, setPinnedMessage }) => {
 
   return (
     <Fragment>
-      {/* {messages.map((message, index) => {
-        return (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            autoMarginTop={index === 0}
-            onPin={() => setPinnedMessage(message)}
-          />
-        );
-      })} */}
       <VirtualizedChatMessages
         messages={messages}
         setPinnedMessage={setPinnedMessage}
