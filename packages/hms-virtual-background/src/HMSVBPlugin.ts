@@ -32,8 +32,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.tempGifCanvas = document.createElement('canvas');
     this.tempGifContext = this.tempGifCanvas.getContext('2d');
 
-    this.log('Virtual Background plugin created');
     this.setBackground(this.background, this.backgroundType);
+    this.log('Virtual background plugin initialised');
   }
 
   isSupported(): boolean {
