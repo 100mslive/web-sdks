@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { HMSVirtualBackgroundTypes } from "@100mslive/hms-virtual-background";
 export function getRandomVirtualBackground() {
   const backgroundList = [
@@ -45,20 +46,20 @@ export function getRandomVirtualBackground() {
     backgroundList.push(...videoList); */
   }
 
-  let randomIdx = Math.floor(Math.random() * backgroundList.length);
-  if (randomIdx === 0) {
-    return backgroundList[randomIdx];
-  } else if (randomIdx <= 7) {
-    const img = document.createElement("img");
-    img.alt = "VB";
-    img.src = backgroundList[randomIdx].background;
-    return { background: img, backgroundType: HMSVirtualBackgroundTypes.IMAGE };
-  } else if (randomIdx === 8) {
-    return backgroundList[randomIdx];
+  const randomIdx = Math.floor(Math.random() * backgroundList.length);
+  const virtualBackground = backgroundList[randomIdx];
+  switch (virtualBackground.backgroundType) {
+    case HMSVirtualBackgroundTypes.IMAGE:
+      const img = document.createElement("img");
+      img.alt = "VB";
+      img.src = backgroundList[randomIdx].background;
+      virtualBackground.background = img;
+      return virtualBackground;
+    case HMSVirtualBackgroundTypes.VIDEO:
+      const videoEl = document.createElement("video");
+      videoEl.src = backgroundList[randomIdx];
+      return videoEl;
+    default:
+      return virtualBackground;
   }
-  /*} else {
-    const videoEl = document.createElement("video");
-    videoEl.src = backgroundList[randomIdx];
-    return videoEl;
-  }*/
 }
