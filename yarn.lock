@@ -5665,18 +5665,6 @@
   dependencies:
     "@use-gesture/core" "10.2.20"
 
-"@virtuoso.dev/react-urx@^0.2.12":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@virtuoso.dev/react-urx/-/react-urx-0.2.13.tgz#e2cfc42d259d2a002695e7517d34cb97b64ee9c4"
-  integrity sha512-MY0ugBDjFb5Xt8v2HY7MKcRGqw/3gTpMlLXId2EwQvYJoC8sP7nnXjAxcBtTB50KTZhO0SbzsFimaZ7pSdApwA==
-  dependencies:
-    "@virtuoso.dev/urx" "^0.2.13"
-
-"@virtuoso.dev/urx@^0.2.12", "@virtuoso.dev/urx@^0.2.13":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@virtuoso.dev/urx/-/urx-0.2.13.tgz#a65e7e8d923cb03397ac876bfdd45c7f71c8edf1"
-  integrity sha512-iirJNv92A1ZWxoOHHDYW/1KPoi83939o83iUBQHIim0i3tMeSKEh+bxhJdTHQ86Mr4uXx9xGUTq69cp52ZP8Xw==
-
 "@webassemblyjs/ast@1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.1.tgz#2bfd767eae1a6996f432ff7e8d7fc75679c0b6a7"
@@ -15739,14 +15727,6 @@ react-virtualized-auto-sizer@^1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.7.tgz#bfb8414698ad1597912473de3e2e5f82180c1195"
   integrity sha512-Mxi6lwOmjwIjC1X4gABXMJcKHsOo0xWl3E3ugOgufB8GJU+MqrtY35aBuvCYv/razQ1Vbp7h1gWJjGjoNN5pmA==
-
-react-virtuoso@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-3.1.4.tgz#d9dcf218328d22eeb598ce490224dc04bdfc884a"
-  integrity sha512-oZt22JrSi/yLkp3HWa8teo0wqUg8zOA3i7y4dhHoM12njr5B8qGbVrq2fKGp3sbiZ9xiwX44KH5EEBo2GN2S4Q==
-  dependencies:
-    "@virtuoso.dev/react-urx" "^0.2.12"
-    "@virtuoso.dev/urx" "^0.2.12"
 
 react-window@^1.8.7:
   version "1.8.7"
