@@ -55,6 +55,10 @@ const HLSView = () => {
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
+
+  /**
+   * initialize HLSController and add event listeners.
+   */
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
@@ -99,6 +103,9 @@ const HLSView = () => {
     };
   }, [hlsUrl]);
 
+  /**
+   * update quality level text whenever a level is changed
+   */
   useEffect(() => {
     if (currentSelectedQuality) {
       const levelText = isUserSelectedAuto
@@ -107,6 +114,10 @@ const HLSView = () => {
       setCurrentSelectedQualityText(levelText);
     }
   }, [currentSelectedQuality]);
+
+  /**
+   * initialize and subscribe to hlsState
+   */
   useEffect(() => {
     if (!hlsStats) {
       return;
@@ -124,6 +135,9 @@ const HLSView = () => {
     };
   }, [enablHlsStats]);
 
+  /**
+   * On mount. Add listeners for Video play/pause
+   */
   useEffect(() => {
     videoRef.current.addEventListener("play", event => {
       setIsPaused(false);
@@ -131,19 +145,15 @@ const HLSView = () => {
     videoRef.current.addEventListener("pause", event => {
       setIsPaused(true);
     });
-    if (hlsController) {
-      return () => hlsController.reset();
-    }
+    return () => hlsController?.reset();
   }, []);
 
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
       if (hlsController) {
-        if (qualityLevel.height.toString().toLowerCase() === "auto") {
-          setIsUserSelectedAuto(true);
-        } else {
-          setIsUserSelectedAuto(false);
-        }
+        setIsUserSelectedAuto(
+          qualityLevel.height.toString().toLowerCase() === "auto"
+        );
         hlsController.setCurrentLevel(qualityLevel);
       }
     },
@@ -193,8 +203,8 @@ const HLSView = () => {
                 <HMSVideoPlayer.PlayButton
                   onClick={() => {
                     isPaused
-                      ? videoRef?.current?.play()
-                      : videoRef?.current?.pause();
+                      ? videoRef.current?.play()
+                      : videoRef.current?.pause();
                   }}
                   isPaused={isPaused}
                 />
