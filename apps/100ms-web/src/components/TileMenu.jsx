@@ -46,7 +46,7 @@ const TileMenu = ({
   });
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
-    track?.layerDefinitions?.length || track.degraded || !track.enabled;
+    !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   if (
     !(removeOthers || toggleAudio || toggleVideo || setVolume) &&
     hideSimulcastLayers
