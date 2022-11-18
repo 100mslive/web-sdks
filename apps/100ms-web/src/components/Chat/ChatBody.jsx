@@ -226,9 +226,7 @@ const ChatMessage = React.memo(
           bg: messageType ? "$surfaceLight" : undefined,
           px: messageType ? "$4" : "$2",
           py: messageType ? "$4" : 0,
-          r: "$1",
           mb: "$10",
-          mt: autoMarginTop ? "auto" : undefined,
         }}
         key={message.time}
         data-testid="chat_msg"
