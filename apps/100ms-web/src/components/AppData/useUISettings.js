@@ -76,6 +76,10 @@ export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
 
+export const usePinnedPeerId = () => {
+  return useHMSStore(selectAppData(APP_DATA.pinnedPeerId));
+};
+
 export const useSubscribedNotifications = notificationKey => {
   const notificationPreference = useHMSStore(
     selectAppDataByPath(APP_DATA.subscribedNotifications, notificationKey)

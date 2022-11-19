@@ -14,13 +14,15 @@ import {
   RemoveUserIcon,
   ShareScreenIcon,
   SpeakerIcon,
+  StarIcon,
   VideoOffIcon,
   VideoOnIcon,
 } from "@100mslive/react-icons";
 import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ChatDotIcon } from "./Chat/ChatDotIcon";
+import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
-import { REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
+import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -44,11 +46,22 @@ const TileMenu = ({
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
+  const [pinnedPeerId, setPinnedPeerId] = useSetAppDataByKey(
+    APP_DATA.pinnedPeerId
+  );
+  const isPeerPinned = peerID === pinnedPeerId;
+
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   if (
-    !(removeOthers || toggleAudio || toggleVideo || setVolume) &&
+    !(
+      removeOthers ||
+      toggleAudio ||
+      toggleVideo ||
+      setVolume ||
+      setPinnedPeerId
+    ) &&
     hideSimulcastLayers
   ) {
     return null;
@@ -101,6 +114,14 @@ const TileMenu = ({
             />
           </StyledMenuTile.VolumeItem>
         ) : null}
+        <StyledMenuTile.ItemButton
+          onClick={() =>
+            isPeerPinned ? setPinnedPeerId() : setPinnedPeerId(peerID)
+          }
+        >
+          <StarIcon />
+          <span>{`${isPeerPinned ? "Unpin" : "Pin"}`} Peer</span>
+        </StyledMenuTile.ItemButton>
         <SimulcastLayers trackId={videoTrackID} />
         {removeOthers ? (
           <StyledMenuTile.RemoveItem

@@ -19,6 +19,7 @@ import { useAppConfig } from "../components/AppData/useAppConfig";
 import {
   useHLSViewerRole,
   useIsHeadless,
+  usePinnedPeerId,
   useUISettings,
   useUrlToEmbed,
 } from "../components/AppData/useUISettings";
@@ -29,9 +30,11 @@ import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
 const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
+const PinnedPeerView = React.lazy(() => import("./PinnedPeerView"));
 
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const pinnedPeer = usePinnedPeerId();
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
@@ -86,6 +89,8 @@ export const ConferenceMainView = () => {
     (isHeadless && headlessUIMode === UI_MODE_ACTIVE_SPEAKER)
   ) {
     ViewComponent = ActiveSpeakerView;
+  } else if (pinnedPeer) {
+    ViewComponent = PinnedPeerView;
   } else {
     ViewComponent = MainGridView;
   }
