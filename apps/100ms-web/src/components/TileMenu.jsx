@@ -11,10 +11,10 @@ import {
   HorizontalMenuIcon,
   MicOffIcon,
   MicOnIcon,
+  PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
   SpeakerIcon,
-  StarIcon,
   VideoOffIcon,
   VideoOnIcon,
 } from "@100mslive/react-icons";
@@ -119,7 +119,7 @@ const TileMenu = ({
             isPeerPinned ? setPinnedPeerId() : setPinnedPeerId(peerID)
           }
         >
-          <StarIcon />
+          <PinIcon />
           <span>{`${isPeerPinned ? "Unpin" : "Pin"}`} Peer</span>
         </StyledMenuTile.ItemButton>
         <SimulcastLayers trackId={videoTrackID} />
