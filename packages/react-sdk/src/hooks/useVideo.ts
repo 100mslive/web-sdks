@@ -93,9 +93,8 @@ export const useVideo = ({
   );
 
   useEffect(() => {
-    console.debug('effect running for - ', track?.id);
     setLayerByResolution();
-  }, [setLayerByResolution, track?.id]);
+  }, [setLayerByResolution]);
 
   useEffect(() => {
     // eslint-disable-next-line complexity
