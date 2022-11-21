@@ -40,7 +40,7 @@ export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: u
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
   const { ref: inViewRef, inView } = useInView({ threshold, trackVisibility: true, delay: 300 });
-  const { width = 0, height = 0, ref: resizeRef } = useResizeDetector();
+  const { width = 0, height = 0, ref: resizeRef } = useResizeDetector({ refreshMode: 'debounce', refreshRate: 300 });
 
   // eslint-disable-next-line complexity
   const setLayerByResolution = useCallback(async () => {
