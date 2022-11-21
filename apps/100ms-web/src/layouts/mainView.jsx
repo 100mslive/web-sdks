@@ -19,7 +19,7 @@ import { useAppConfig } from "../components/AppData/useAppConfig";
 import {
   useHLSViewerRole,
   useIsHeadless,
-  usePinnedPeerId,
+  usePinnedPeer,
   useUISettings,
   useUrlToEmbed,
 } from "../components/AppData/useUISettings";
@@ -34,7 +34,7 @@ const PinnedPeerView = React.lazy(() => import("./PinnedPeerView"));
 
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const pinnedPeer = usePinnedPeerId();
+  const pinnedPeer = usePinnedPeer();
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);

@@ -1,12 +1,11 @@
 import React from "react";
-import { selectPeerByID, selectPeers, useHMSStore } from "@100mslive/react-sdk";
+import { selectPeers, useHMSStore } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
-import { usePinnedPeerId } from "../components/AppData/useUISettings";
+import { usePinnedPeer } from "../components/AppData/useUISettings";
 
 const PinnedPeerView = () => {
-  const pinnedPeerId = usePinnedPeerId();
-  const pinnedPeer = useHMSStore(selectPeerByID(pinnedPeerId));
+  const pinnedPeer = usePinnedPeer();
   const peers = (useHMSStore(selectPeers) || []).filter(
     peer =>
       peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0

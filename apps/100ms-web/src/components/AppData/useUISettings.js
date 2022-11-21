@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import {
   selectAppData,
   selectAppDataByPath,
+  selectPeerByID,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -76,8 +77,9 @@ export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
 
-export const usePinnedPeerId = () => {
-  return useHMSStore(selectAppData(APP_DATA.pinnedPeerId));
+export const usePinnedPeer = () => {
+  const pinnedPeerId = useHMSStore(selectAppData(APP_DATA.pinnedPeerId));
+  return useHMSStore(selectPeerByID(pinnedPeerId));
 };
 
 export const useSubscribedNotifications = notificationKey => {
