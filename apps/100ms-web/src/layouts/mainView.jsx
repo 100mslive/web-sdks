@@ -84,13 +84,13 @@ export const ConferenceMainView = () => {
     !isAudioOnly
   ) {
     ViewComponent = ScreenShareView;
+  } else if (pinnedPeer) {
+    ViewComponent = PinnedPeerView;
   } else if (
     uiViewMode === UI_MODE_ACTIVE_SPEAKER ||
     (isHeadless && headlessUIMode === UI_MODE_ACTIVE_SPEAKER)
   ) {
     ViewComponent = ActiveSpeakerView;
-  } else if (pinnedPeer) {
-    ViewComponent = PinnedPeerView;
   } else {
     ViewComponent = MainGridView;
   }
