@@ -76,3 +76,15 @@ export const isStreamingKit = () => {
 };
 
 export const isInternalRole = role => role && role.startsWith("__internal");
+
+/**
+ * check if a role is allowed to publish either of audio or video
+ * @param {import("@100mslive/react-sdk").HMSRole} role
+ */
+export function canRolePublishAV(role) {
+  const params = role?.publishParams;
+  if (params?.allowed) {
+    return params.allowed.includes("video") || params.allowed.includes("audio");
+  }
+  return false;
+}
