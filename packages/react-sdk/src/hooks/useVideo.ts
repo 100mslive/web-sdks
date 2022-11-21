@@ -23,6 +23,11 @@ export interface useVideoInput {
    * Boolean indicating whether the element is visible or not
    */
   visible?: boolean;
+  /**
+   * Boolean indicating whether the preferredLayer should be auto selected based on video width/height
+   * if enabled, this will select the closestLayer available when simulcast is enabled
+   */
+  autoSelectPreferredLayer?: boolean;
 }
 
 export interface useVideoOutput {
@@ -34,7 +39,13 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: useVideoInput): useVideoOutput => {
+export const useVideo = ({
+  trackId,
+  attach,
+  threshold = 0.5,
+  visible = true,
+  autoSelectPreferredLayer = true,
+}: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
@@ -44,7 +55,16 @@ export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: u
 
   // eslint-disable-next-line complexity
   const setLayerByResolution = useCallback(async () => {
-    if (width > 0 && height > 0 && track?.layerDefinitions && resizeRef.current) {
+    if (
+      width > 0 &&
+      height > 0 &&
+      inView &&
+      track?.layerDefinitions &&
+      resizeRef.current &&
+      autoSelectPreferredLayer &&
+      track?.enabled &&
+      !track?.degraded
+    ) {
       let diff = Number.MAX_VALUE;
       let closestLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> | undefined = undefined;
       for (const { resolution, layer } of track.layerDefinitions) {
@@ -56,7 +76,8 @@ export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: u
       }
       await actions.setPreferredLayer(track?.id, closestLayer!);
     }
-  }, [width, height, track?.layerDefinitions, track?.id, resizeRef, actions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height, track?.id, actions, autoSelectPreferredLayer, track?.enabled, track?.degraded, resizeRef, inView]);
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
@@ -72,8 +93,9 @@ export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: u
   );
 
   useEffect(() => {
+    console.debug('effect running for - ', track?.id);
     setLayerByResolution();
-  }, [setLayerByResolution]);
+  }, [setLayerByResolution, track?.id]);
 
   useEffect(() => {
     // eslint-disable-next-line complexity
