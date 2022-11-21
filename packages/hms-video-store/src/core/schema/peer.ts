@@ -1,7 +1,12 @@
 import { HMSRoleName } from './role';
-import { HMSSimulcastLayer, ScreenCaptureHandle, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
+import {
+  HMSPreferredSimulcastLayer,
+  HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
+  ScreenCaptureHandle,
+} from '../hmsSDKStore/sdkTypes';
 
-export type { SimulcastLayerDefinition, HMSSimulcastLayer };
+export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
@@ -71,8 +76,8 @@ export interface HMSVideoTrack extends BaseTrack {
   type: 'video';
   facingMode?: HMSTrackFacingMode;
   layer?: HMSSimulcastLayer;
-  expectedLayer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
-  layerDefinitions?: SimulcastLayerDefinition[];
+  expectedLayer?: HMSPreferredSimulcastLayer;
+  layerDefinitions?: HMSSimulcastLayerDefinition[];
   height?: number;
   width?: number;
   degraded?: boolean;

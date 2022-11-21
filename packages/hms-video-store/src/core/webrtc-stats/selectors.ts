@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { HMSSimulcastLayer, RID, simulcastMapping } from '../hmsSDKStore/sdkTypes';
+import { HMSPreferredSimulcastLayer, RID, simulcastMapping } from '../hmsSDKStore/sdkTypes';
 import { HMSPeerID, HMSStatsStore, HMSTrackID } from '../schema';
 import { byIDCurry } from '../selectors/common';
 
@@ -112,7 +112,7 @@ const localVideoTrackStats = createSelector(
 
 const localVideoTrackStatsByID = byIDCurry(createSelector(selectLocalTrackStatsByIDBare, trackStats => trackStats));
 
-const localVideoTrackStatsByLayer = (layer?: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) =>
+const localVideoTrackStatsByLayer = (layer?: HMSPreferredSimulcastLayer) =>
   byIDCurry(
     createSelector(selectLocalTrackStatsByIDBare, stats => {
       const rid = (Object.keys(simulcastMapping) as RID[]).find(key => simulcastMapping[key] === layer);

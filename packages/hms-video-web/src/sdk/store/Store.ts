@@ -7,9 +7,9 @@ import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
+  HMSSimulcastLayerDefinition,
   RID,
   SimulcastLayer,
-  SimulcastLayerDefinition,
   SimulcastLayers,
   simulcastMapping,
 } from '../../interfaces/simulcast-layers';
@@ -341,13 +341,13 @@ class Store implements IStore {
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];
         const resolution = {
-          width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
-          height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
+          width: width / value.scaleResolutionDownBy,
+          height: height / value.scaleResolutionDownBy,
         };
         return {
           layer,
           resolution,
-        } as SimulcastLayerDefinition;
+        } as HMSSimulcastLayerDefinition;
       }) || []
     );
   }

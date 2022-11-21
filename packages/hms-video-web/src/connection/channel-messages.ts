@@ -1,4 +1,5 @@
 import { HMSSimulcastLayer } from '../interfaces';
+import { HMSPreferredSimulcastLayer } from '../interfaces/simulcast-layers';
 
 export interface PreferVideoLayerParams {
   params: {
@@ -26,7 +27,7 @@ export interface PreferAudioLayerParams {
 
 export interface VideoTrackLayerUpdate {
   current_layer: HMSSimulcastLayer;
-  expected_layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
+  expected_layer: HMSPreferredSimulcastLayer;
   track_id: string;
   subscriber_degraded: boolean;
   publisher_degraded: boolean;

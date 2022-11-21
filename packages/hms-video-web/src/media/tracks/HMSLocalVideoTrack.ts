@@ -3,9 +3,9 @@ import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
 import {
+  HMSSimulcastLayerDefinition,
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
-  SimulcastLayerDefinition,
 } from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
@@ -27,7 +27,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
-  private _layerDefinitions: SimulcastLayerDefinition[] = [];
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[LocalVideoTrack]';
 
   /**
@@ -69,15 +69,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /** @internal */
-  setSimulcastDefinitons(definitions: SimulcastLayerDefinition[]) {
+  setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
     this._layerDefinitions = definitions;
   }
 
   /**
    * Method to get available simulcast definitions for the track
-   * @returns {SimulcastLayerDefinition[]}
+   * @returns {HMSSimulcastLayerDefinition[]}
    */
-  getSimulcastDefinitions(): SimulcastLayerDefinition[] {
+  getSimulcastDefinitions(): HMSSimulcastLayerDefinition[] {
     return this._layerDefinitions;
   }
 

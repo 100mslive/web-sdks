@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useResizeDetector } from 'react-resize-detector';
-import { HMSSimulcastLayer, HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
+import { HMSPreferredSimulcastLayer, HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
@@ -66,9 +66,9 @@ export const useVideo = ({
       !track?.degraded
     ) {
       let diff = Number.MAX_VALUE;
-      let closestLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> | undefined = undefined;
+      let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
       for (const { resolution, layer } of track.layerDefinitions) {
-        const currDiff = Math.abs(width - (resolution.width || 0)) + Math.abs(height - (resolution.height || 0));
+        const currDiff = Math.abs(width - resolution.width) + Math.abs(height - resolution.height);
         if (currDiff < diff) {
           diff = currDiff;
           closestLayer = layer;

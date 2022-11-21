@@ -1,6 +1,10 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../../interfaces/simulcast-layers';
+import {
+  HMSPreferredSimulcastLayer,
+  HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
+} from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
@@ -8,9 +12,9 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
   private _degradedAt: Date | null = null;
-  private _layerDefinitions: SimulcastLayerDefinition[] = [];
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
-  private preferredLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> = HMSSimulcastLayer.HIGH;
+  private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
 
   public get degraded() {
     return this._degraded;
@@ -28,7 +32,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
   }
 
-  async preferLayer(layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>) {
+  async preferLayer(layer: HMSPreferredSimulcastLayer) {
     //@ts-ignore
     if (layer === HMSSimulcastLayer.NONE) {
       HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
@@ -80,7 +84,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   /**
    * Method to get available simulcast definitions for the track
-   * @returns {SimulcastLayerDefinition[]}
+   * @returns {HMSSimulcastLayerDefinition[]}
    */
   getSimulcastDefinitions() {
     // send a clone to store as it will freeze the object from further updates
@@ -88,7 +92,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   /** @internal */
-  setSimulcastDefinitons(definitions: SimulcastLayerDefinition[]) {
+  setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
     this._layerDefinitions = definitions;
   }
 

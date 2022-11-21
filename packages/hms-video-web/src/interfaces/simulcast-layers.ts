@@ -7,22 +7,23 @@ export enum HMSSimulcastLayer {
 
 export interface SimulcastLayer {
   rid: string;
-  scaleResolutionDownBy?: number;
+  scaleResolutionDownBy: number;
   maxBitrate: number;
   maxFramerate: number;
 }
 
 export interface SimulcastResolution {
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
 }
 
 export interface SimulcastLayers {
   layers: SimulcastLayer[];
 }
 
-export interface SimulcastLayerDefinition {
-  layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
+export type HMSPreferredSimulcastLayer = Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;
+export interface HMSSimulcastLayerDefinition {
+  layer: HMSPreferredSimulcastLayer;
   resolution: SimulcastResolution;
 }
 
