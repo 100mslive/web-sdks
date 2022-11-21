@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
+import { useResizeDetector } from 'react-resize-detector';
+import { HMSSimulcastLayer, HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
@@ -39,16 +40,40 @@ export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: u
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
   const { ref: inViewRef, inView } = useInView({ threshold, trackVisibility: true, delay: 300 });
+  const { width = 0, height = 0, ref: resizeRef } = useResizeDetector();
+
+  // eslint-disable-next-line complexity
+  const setLayerByResolution = useCallback(async () => {
+    if (width > 0 && height > 0 && track?.layerDefinitions && resizeRef.current) {
+      let diff = Number.MAX_VALUE;
+      let closestLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> | undefined = undefined;
+      for (const { resolution, layer } of track.layerDefinitions) {
+        const currDiff = Math.abs(width - (resolution.width || 0)) + Math.abs(height - (resolution.height || 0));
+        if (currDiff < diff) {
+          diff = currDiff;
+          closestLayer = layer;
+        }
+      }
+      await actions.setPreferredLayer(track?.id, closestLayer!);
+    }
+  }, [width, height, track?.layerDefinitions, track?.id, resizeRef, actions]);
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
       if (node) {
         videoRef.current = node;
         inViewRef(node);
+        if (track?.layerDefinitions?.length) {
+          resizeRef.current = node;
+        }
       }
     },
-    [inViewRef],
+    [inViewRef, track?.layerDefinitions?.length, resizeRef],
   );
+
+  useEffect(() => {
+    setLayerByResolution();
+  }, [setLayerByResolution]);
 
   useEffect(() => {
     // eslint-disable-next-line complexity

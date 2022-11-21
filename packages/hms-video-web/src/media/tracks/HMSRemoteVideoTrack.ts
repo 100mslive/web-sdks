@@ -39,7 +39,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
     if (!this.hasSinks()) {
-      (this.stream as HMSRemoteStream).setVideoLayerLocally(layer, this.logIdentifier, 'preferLayer');
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
         `Track does not have any sink, saving ${layer}, source=${this.source}`,
