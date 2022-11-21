@@ -1,5 +1,4 @@
 import LogRocket from "logrocket";
-import { canRolePublishAV } from "../../common/utils";
 
 const logRocketKey = process.env.REACT_APP_LOGROCKET_ID;
 let logRocketInitialised;
@@ -100,6 +99,17 @@ LogRocketRecording.run();
 // }
 
 /**
+ * check if a role is allowed to publish either of audio or video
+ */
+function canPublishAV(role) {
+  const params = role?.publishParams;
+  if (params?.allowed) {
+    return params.allowed.includes("video") || params.allowed.includes("audio");
+  }
+  return false;
+}
+
+/**
  * Figure out the layout for each role. There is some extra work being done
  * here currently to figure out the layout for roles other than local peer too
  * which can be avoided.
@@ -123,8 +133,7 @@ export const normalizeAppPolicyConfig = (
     if (!newConfig[roleName].center) {
       const publishingRoleNames = roleNames.filter(
         roleName =>
-          canRolePublishAV(rolesMap[roleName]) &&
-          subscribedRoles.includes(roleName)
+          canPublishAV(rolesMap[roleName]) && subscribedRoles.includes(roleName)
       );
       if (isNotSubscribingOrSubscribingToSelf) {
         newConfig[roleName].center = [roleName];
@@ -140,7 +149,7 @@ export const normalizeAppPolicyConfig = (
       if (isNotSubscribingOrSubscribingToSelf) {
         newConfig[roleName].sidepane = [];
       } else {
-        newConfig[roleName].sidepane = canRolePublishAV(rolesMap[roleName])
+        newConfig[roleName].sidepane = canPublishAV(rolesMap[roleName])
           ? [roleName]
           : [];
       }

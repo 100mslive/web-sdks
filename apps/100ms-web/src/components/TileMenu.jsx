@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import {
   selectPermissions,
   selectTrackByID,
+  selectVideoTrackByPeerID,
   useCustomEvent,
   useHMSActions,
   useHMSStore,
@@ -46,10 +47,12 @@ const TileMenu = ({
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
-  const [pinnedPeerId, setPinnedPeerId] = useSetAppDataByKey(
-    APP_DATA.pinnedPeerId
+  const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(
+    APP_DATA.pinnedTrackId
   );
-  const isPeerPinned = peerID === pinnedPeerId;
+  const isTilePinned = videoTrackID === pinnedTrackId;
+  const isPrimaryVideoTrack =
+    useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
@@ -60,7 +63,7 @@ const TileMenu = ({
       toggleAudio ||
       toggleVideo ||
       setVolume ||
-      setPinnedPeerId
+      setPinnedTrackId
     ) &&
     hideSimulcastLayers
   ) {
@@ -114,14 +117,16 @@ const TileMenu = ({
             />
           </StyledMenuTile.VolumeItem>
         ) : null}
-        <StyledMenuTile.ItemButton
-          onClick={() =>
-            isPeerPinned ? setPinnedPeerId() : setPinnedPeerId(peerID)
-          }
-        >
-          <PinIcon />
-          <span>{`${isPeerPinned ? "Unpin" : "Pin"}`} Peer</span>
-        </StyledMenuTile.ItemButton>
+        {isPrimaryVideoTrack && (
+          <StyledMenuTile.ItemButton
+            onClick={() =>
+              isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID)
+            }
+          >
+            <PinIcon />
+            <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
+          </StyledMenuTile.ItemButton>
+        )}
         <SimulcastLayers trackId={videoTrackID} />
         {removeOthers ? (
           <StyledMenuTile.RemoveItem

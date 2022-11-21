@@ -119,7 +119,7 @@ export const APP_DATA = {
   rtmpStarted: "rtmpStarted",
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
-  pinnedPeerId: "pinnedPeerId",
+  pinnedTrackId: "pinnedTrackId",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",

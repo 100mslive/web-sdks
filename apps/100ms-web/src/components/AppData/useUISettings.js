@@ -1,9 +1,8 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import {
   selectAppData,
   selectAppDataByPath,
-  selectPeerByID,
-  selectRoleByRoleName,
+  selectTrackByID,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -12,7 +11,6 @@ import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
-import { canRolePublishAV } from "../../common/utils";
 import { APP_DATA, UI_SETTINGS } from "../../common/constants";
 
 /**
@@ -79,21 +77,9 @@ export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
 
-export const usePinnedPeer = () => {
-  const hmsActions = useHMSActions();
-  const pinnedPeerId = useHMSStore(selectAppData(APP_DATA.pinnedPeerId));
-  const pinnedPeer = useHMSStore(selectPeerByID(pinnedPeerId));
-  const pinnedPeerRole = useHMSStore(
-    selectRoleByRoleName(pinnedPeer?.roleName)
-  );
-
-  useEffect(() => {
-    if (pinnedPeer && !canRolePublishAV(pinnedPeerRole)) {
-      hmsActions.setAppData(APP_DATA.pinnedPeerId, undefined);
-    }
-  }, [pinnedPeer, pinnedPeerRole, hmsActions]);
-
-  return pinnedPeer;
+export const usePinnedTrack = () => {
+  const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
+  return useHMSStore(selectTrackByID(pinnedTrackId));
 };
 
 export const useSubscribedNotifications = notificationKey => {
