@@ -25,9 +25,21 @@ describe('test closest layer', () => {
     expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.HIGH);
   });
 
+  test('closest layer should be high', () => {
+    const width = 600;
+    const height = 600;
+    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.HIGH);
+  });
+
   test('closest layer should be medium', () => {
     const width = 284;
     const height = 207;
+    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
+  });
+
+  test('closest layer should be medium', () => {
+    const width = 400;
+    const height = 400;
     expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
   });
 });
