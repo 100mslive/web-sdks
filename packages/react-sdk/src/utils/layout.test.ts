@@ -6,15 +6,22 @@ describe('test closest layer', () => {
     {
       layer: HMSSimulcastLayer.HIGH,
       resolution: {
-        width: 854,
-        height: 480,
+        width: 960,
+        height: 720,
       },
     },
     {
       layer: HMSSimulcastLayer.MEDIUM,
       resolution: {
-        width: 427,
-        height: 240,
+        width: 480,
+        height: 360,
+      },
+    },
+    {
+      layer: HMSSimulcastLayer.LOW,
+      resolution: {
+        width: 240,
+        height: 180,
       },
     },
   ];
@@ -25,21 +32,15 @@ describe('test closest layer', () => {
     expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.HIGH);
   });
 
-  test('closest layer should be high', () => {
-    const width = 600;
-    const height = 600;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.HIGH);
+  test('closest layer should be medium', () => {
+    const width = 520;
+    const height = 390;
+    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
   });
 
-  test('closest layer should be medium', () => {
+  test('closest layer should be low', () => {
     const width = 284;
     const height = 207;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
-  });
-
-  test('closest layer should be medium', () => {
-    const width = 400;
-    const height = 400;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
+    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.LOW);
   });
 });
