@@ -57,18 +57,7 @@ const TileMenu = ({
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
-  if (
-    !(
-      removeOthers ||
-      toggleAudio ||
-      toggleVideo ||
-      setVolume ||
-      setPinnedTrackId
-    ) &&
-    hideSimulcastLayers
-  ) {
-    return null;
-  }
+
   return (
     <StyledMenuTile.Root>
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
@@ -127,7 +116,7 @@ const TileMenu = ({
             <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
           </StyledMenuTile.ItemButton>
         )}
-        <SimulcastLayers trackId={videoTrackID} />
+        {!hideSimulcastLayers && <SimulcastLayers trackId={videoTrackID} />}
         {removeOthers ? (
           <StyledMenuTile.RemoveItem
             onClick={async () => {
