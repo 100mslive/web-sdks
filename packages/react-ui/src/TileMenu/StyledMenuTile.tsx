@@ -26,11 +26,12 @@ const StyledTrigger = styled(Popover.Trigger, {
 const StyledContent = styled(Popover.Content, {
   fontFamily: '$sans',
   backgroundColor: '$menuBg',
-  padding: '10px 0px',
+  padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
-  borderRadius: '12px',
+  borderRadius: '$space$6',
   zIndex: 10,
+  width: '$60',
   ...popoverAnimation,
 });
 
@@ -39,13 +40,13 @@ const styledItem = {
   color: '$textPrimary',
   display: 'flex',
   alignItems: 'center',
-  padding: '8px 12px',
+  padding: '$4 $6',
   width: '100%',
 };
 
 const StyledItemButton = styled('button', {
   ...styledItem,
-  height: '40px',
+  height: '$14',
   '&:hover': {
     backgroundColor: '$menuBg',
   },
@@ -56,7 +57,7 @@ const StyledItemButton = styled('button', {
   },
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '0.5rem',
+    marginLeft: '$4',
   },
 });
 
@@ -72,7 +73,7 @@ export const Flex = styled('div', {
   display: 'flex',
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '0.5rem',
+    marginLeft: '$4',
   },
 });
 
