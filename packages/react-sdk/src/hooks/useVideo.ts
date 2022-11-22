@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useResizeDetector } from 'react-resize-detector';
-import { HMSPreferredSimulcastLayer, HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
+import {  HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { getClosestLayer } from '../utils/layout';
 import HMSLogger from '../utils/logger';
 
 export interface useVideoInput {
@@ -65,6 +66,7 @@ export const useVideo = ({
       track?.enabled &&
       !track?.degraded
     ) {
+<<<<<<< HEAD
       let diff = Number.MAX_VALUE;
       let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
       for (const { resolution, layer } of track.layerDefinitions) {
@@ -74,6 +76,9 @@ export const useVideo = ({
           closestLayer = layer;
         }
       }
+=======
+      const closestLayer = getClosestLayer({ layerDefinitions: track.layerDefinitions!, width, height });
+>>>>>>> feat/WEB-751-simulcast
       await actions.setPreferredLayer(track?.id, closestLayer!);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
