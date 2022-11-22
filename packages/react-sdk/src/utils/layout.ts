@@ -5,10 +5,10 @@ import {
   HMSPeer,
   HMSPreferredSimulcastLayer,
   HMSScreenVideoTrack,
+  HMSSimulcastLayerDefinition,
   HMSTrack,
   HMSTrackID,
   HMSVideoTrack,
-  SimulcastLayerDefinition,
 } from '@100mslive/hms-video-store';
 
 export const chunk = <T>(elements: T[], chunkSize: number, onlyOnePage: boolean) =>
@@ -478,7 +478,7 @@ export const getClosestLayer = ({
   width,
   height,
 }: {
-  layerDefinitions: SimulcastLayerDefinition[];
+  layerDefinitions: HMSSimulcastLayerDefinition[];
   width: number;
   height: number;
 }): HMSPreferredSimulcastLayer => {
