@@ -23,6 +23,7 @@ import {
   HMSPlaylistItem,
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
+  HMSPreferredSimulcastLayer,
   HMSRecording,
   HMSRemotePeer,
   HMSRemoteTrackStats,
@@ -32,6 +33,7 @@ import {
   HMSRTMP,
   HMSScreenShareConfig,
   HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
   HMSSpeaker,
   HMSTrackStats,
   HMSTrackUpdate,
@@ -45,7 +47,6 @@ import {
   RID,
   RTMPRecordingConfig,
   ScreenCaptureHandle,
-  SimulcastLayerDefinition,
   simulcastMapping,
 } from '@100mslive/hms-video';
 
@@ -76,7 +77,7 @@ export type {
   HMSRole,
   HMSLocalPeer,
   HMSRemotePeer,
-  SimulcastLayerDefinition,
+  HMSSimulcastLayerDefinition,
   HMSDeviceChangeEvent,
   HMSPlaylistItem,
   HMSPlaylistManager,
@@ -101,4 +102,5 @@ export type {
   HMSFrameworkInfo,
   RID,
   ScreenCaptureHandle,
+  HMSPreferredSimulcastLayer,
 };

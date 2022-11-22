@@ -8,7 +8,7 @@ export * from './role';
 export * from './role-change-request';
 export * from './change-track-state';
 export * from './leave-room-request';
-export type { SimulcastLayerDefinition, SimulcastLayer, RID } from './simulcast-layers';
+export type { HMSSimulcastLayerDefinition, SimulcastLayer, RID, HMSPreferredSimulcastLayer } from './simulcast-layers';
 export { HMSSimulcastLayer, simulcastMapping } from './simulcast-layers';
 export type { DeviceMap } from './HMSDeviceManager';
 export * from './track-settings';

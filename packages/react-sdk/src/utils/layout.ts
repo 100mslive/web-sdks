@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import {
   HMSPeer,
+  HMSPreferredSimulcastLayer,
   HMSScreenVideoTrack,
-  HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
   HMSTrack,
   HMSTrackID,
   HMSVideoTrack,
-  SimulcastLayerDefinition,
 } from '@100mslive/hms-video-store';
 
 export const chunk = <T>(elements: T[], chunkSize: number, onlyOnePage: boolean) =>
@@ -478,12 +478,12 @@ export const getClosestLayer = ({
   width,
   height,
 }: {
-  layerDefinitions: SimulcastLayerDefinition[];
+  layerDefinitions: HMSSimulcastLayerDefinition[];
   width: number;
   height: number;
-}): Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> => {
+}): HMSPreferredSimulcastLayer => {
   let diff = Number.MAX_VALUE;
-  let closestLayer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE> | undefined = undefined;
+  let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
   for (const { resolution, layer } of layerDefinitions) {
     const currDiff = Math.abs(width - (resolution.width || 0)) + Math.abs(height - (resolution.height || 0));
     if (currDiff < diff) {

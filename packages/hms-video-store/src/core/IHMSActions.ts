@@ -5,8 +5,8 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
   HMSScreenShareConfig,
-  HMSSimulcastLayer,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
@@ -188,7 +188,7 @@ export interface IHMSActions {
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>): Promise<void>;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

@@ -1,8 +1,8 @@
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '@100mslive/hms-video-store';
+import { HMSSimulcastLayer, HMSSimulcastLayerDefinition } from '@100mslive/hms-video-store';
 import { getClosestLayer } from './layout';
 
 describe('test closest layer', () => {
-  const layerDefinitions: SimulcastLayerDefinition[] = [
+  const layerDefinitions: HMSSimulcastLayerDefinition[] = [
     {
       layer: HMSSimulcastLayer.HIGH,
       resolution: {
