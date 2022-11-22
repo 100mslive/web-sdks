@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useResizeDetector } from 'react-resize-detector';
 import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { getClosestLayer } from '../utils/layout';
 import HMSLogger from '../utils/logger';
 
 export interface useVideoInput {
@@ -22,6 +24,11 @@ export interface useVideoInput {
    * Boolean indicating whether the element is visible or not
    */
   visible?: boolean;
+  /**
+   * Boolean indicating whether the preferredLayer should be auto selected based on video width/height
+   * if enabled, this will select the closestLayer available when simulcast is enabled
+   */
+  autoSelectPreferredLayer?: boolean;
 }
 
 export interface useVideoOutput {
@@ -33,22 +40,54 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach, threshold = 0.5, visible = true }: useVideoInput): useVideoOutput => {
+export const useVideo = ({
+  trackId,
+  attach,
+  threshold = 0.5,
+  visible = true,
+  autoSelectPreferredLayer = true,
+}: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
   const { ref: inViewRef, inView } = useInView({ threshold, trackVisibility: true, delay: 300 });
+  const { width = 0, height = 0, ref: resizeRef } = useResizeDetector({ refreshMode: 'debounce', refreshRate: 300 });
+
+  // eslint-disable-next-line complexity
+  const setLayerByResolution = useCallback(async () => {
+    if (
+      width > 0 &&
+      height > 0 &&
+      inView &&
+      track?.layerDefinitions &&
+      resizeRef.current &&
+      autoSelectPreferredLayer &&
+      track?.enabled &&
+      !track?.degraded
+    ) {
+      const closestLayer = getClosestLayer({ layerDefinitions: track.layerDefinitions!, width, height });
+      await actions.setPreferredLayer(track?.id, closestLayer!);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height, track?.id, actions, autoSelectPreferredLayer, track?.enabled, track?.degraded, resizeRef, inView]);
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
       if (node) {
         videoRef.current = node;
         inViewRef(node);
+        if (track?.layerDefinitions?.length) {
+          resizeRef.current = node;
+        }
       }
     },
-    [inViewRef],
+    [inViewRef, track?.layerDefinitions?.length, resizeRef],
   );
+
+  useEffect(() => {
+    setLayerByResolution();
+  }, [setLayerByResolution]);
 
   useEffect(() => {
     // eslint-disable-next-line complexity
