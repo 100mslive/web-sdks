@@ -52,18 +52,14 @@ interface Props {
    */
   threshold?: number;
   /**
-   * Boolean indicating whether the element is visible or not
-   */
-  visible?: boolean;
-  /**
    * Boolean indicating whether the preferredLayer should be auto selected based on video width/height
    * if enabled, this will select the closestLayer available when simulcast is enabled
    */
    autoSelectPreferredLayer?: boolean;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, threshold, visible, autoSelectPreferredLayer, ...props }) => {
-  const { videoRef } = useVideo({ trackId, attach, threshold, visible, autoSelectPreferredLayer });
+export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, threshold, autoSelectPreferredLayer, ...props }) => {
+  const { videoRef } = useVideo({ trackId, attach, threshold, autoSelectPreferredLayer });
   return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
 };
 

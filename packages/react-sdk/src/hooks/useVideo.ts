@@ -3,6 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { useResizeDetector } from 'react-resize-detector';
 import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { isBrowser } from '../utils/isBrowser';
 import { getClosestLayer } from '../utils/layout';
 import HMSLogger from '../utils/logger';
 
@@ -20,10 +21,6 @@ export interface useVideoInput {
    * Number between 0 and 1 indication when the element is considered inView
    */
   threshold?: number;
-  /**
-   * Boolean indicating whether the element is visible or not
-   */
-  visible?: boolean;
   /**
    * Boolean indicating whether the preferredLayer should be auto selected based on video width/height
    * if enabled, this will select the closestLayer available when simulcast is enabled
@@ -44,14 +41,13 @@ export const useVideo = ({
   trackId,
   attach,
   threshold = 0.5,
-  visible = true,
   autoSelectPreferredLayer = true,
 }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
-  const { ref: inViewRef, inView } = useInView({ threshold, trackVisibility: true, delay: 300 });
+  const { ref: inViewRef, inView } = useInView({ threshold });
   const { width = 0, height = 0, ref: resizeRef } = useResizeDetector({ refreshMode: 'debounce', refreshRate: 300 });
 
   // eslint-disable-next-line complexity
@@ -93,6 +89,10 @@ export const useVideo = ({
     // eslint-disable-next-line complexity
     (async () => {
       if (videoRef.current && track?.id) {
+        let visible = true;
+        if (isBrowser) {
+          visible = window.getComputedStyle(videoRef.current).visibility === 'visible';
+        }
         if (inView && track.enabled && visible && attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track.id, videoRef.current);
@@ -102,7 +102,7 @@ export const useVideo = ({
         }
       }
     })();
-  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach, visible]);
+  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
 
   // detach on unmount
   useEffect(() => {
