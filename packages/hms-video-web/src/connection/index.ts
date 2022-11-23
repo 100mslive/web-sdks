@@ -24,6 +24,8 @@ export default abstract class HMSConnection {
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
 
+  selectedCandidatePair: any;
+
   protected constructor(role: HMSConnectionRole, signal: ISignal) {
     this.role = role;
     this.signal = signal;
@@ -116,12 +118,12 @@ export default abstract class HMSConnection {
             // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
               // @ts-expect-error
-              const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+              this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
               HMSLogger.d(
                 TAG,
                 `${HMSConnectionRole[this.role]} connection`,
                 `selected ${kindOfTrack || 'unknown'} candidate pair`,
-                JSON.stringify(selectedCandidatePair, null, 2),
+                JSON.stringify(this.selectedCandidatePair, null, 2),
               );
             }
           };
