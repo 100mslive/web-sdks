@@ -1097,12 +1097,12 @@ export class HMSSDKActions implements IHMSActions {
       const hasFieldChanged =
         storeTrack?.layer !== sdkTrack.getLayer() ||
         storeTrack?.degraded !== sdkTrack.degraded ||
-        storeTrack?.expectedLayer !== sdkTrack.getPreferredLayer();
+        storeTrack?.preferredLayer !== sdkTrack.getPreferredLayer();
       if (hasFieldChanged) {
         this.setState(draft => {
           const track = draft.tracks[trackID] as HMSVideoTrack;
           track.layer = sdkTrack.getLayer();
-          track.expectedLayer = sdkTrack.getPreferredLayer();
+          track.preferredLayer = sdkTrack.getPreferredLayer();
           track.degraded = sdkTrack.degraded;
         }, action);
       }

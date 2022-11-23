@@ -162,7 +162,7 @@ export class TrackManager {
     HMSLogger.d(
       this.TAG,
       `track layer update from sfu for - ${track.logIdentifier}`,
-      `expected_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
+      `preferred_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
       `subscriber_degraded: ${layerUpdate.subscriber_degraded}, publisher_degraded: ${layerUpdate.publisher_degraded}`,
     );
     const isDegraded = track.setLayerFromServer(layerUpdate);

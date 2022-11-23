@@ -110,7 +110,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
       `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from server`,
-      `currLayer=${layerUpdate.current_layer}, expectedLayer=${layerUpdate.expected_layer}`,
+      `currLayer=${layerUpdate.current_layer}, preferredLayer=${layerUpdate.expected_layer}`,
       `sub_degraded=${layerUpdate.subscriber_degraded}`,
       `pub_degraded=${layerUpdate.publisher_degraded}`,
     );
