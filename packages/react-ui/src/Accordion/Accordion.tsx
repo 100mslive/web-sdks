@@ -48,10 +48,10 @@ const StyledContent = styled(BaseAccordion.Content, {
   fontFamily: '$sans',
   color: '$textMedEmp',
   '&[data-state="open"]': {
-    animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideDown("--radix-accordion-content-height")} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
   '&[data-state="closed"]': {
-    animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideUp("--radix-accordion-content-height")} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
 });
 

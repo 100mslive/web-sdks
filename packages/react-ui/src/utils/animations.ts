@@ -1,14 +1,16 @@
 import { keyframes } from '../Theme';
 
-export const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: 'var(--radix-accordion-content-height)' },
-});
+export const slideDown = (controller: string) =>
+  keyframes({
+    from: { height: 0 },
+    to: { height: `var(${controller})` },
+  });
 
-export const slideUp = keyframes({
-  from: { height: 'var(--radix-accordion-content-height)' },
-  to: { height: 0 },
-});
+export const slideUp = (controller: string) =>
+  keyframes({
+    from: { height: `var(${controller})` },
+    to: { height: 0 },
+  });
 
 export const dialogOpen = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
