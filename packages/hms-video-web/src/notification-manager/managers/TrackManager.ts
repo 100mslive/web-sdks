@@ -159,12 +159,6 @@ export class TrackManager {
     if (!peer) {
       return;
     }
-    HMSLogger.d(
-      this.TAG,
-      `track layer update from sfu for - ${track.logIdentifier}`,
-      `preferred_layer: ${layerUpdate.expected_layer}, current_layer: ${layerUpdate.current_layer}`,
-      `subscriber_degraded: ${layerUpdate.subscriber_degraded}, publisher_degraded: ${layerUpdate.publisher_degraded}`,
-    );
     const isDegraded = track.setLayerFromServer(layerUpdate);
     if (isDegraded) {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
