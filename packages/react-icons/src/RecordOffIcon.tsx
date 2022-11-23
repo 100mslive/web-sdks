@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgRecordOffIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
@@ -12,5 +11,4 @@ const SvgRecordOffIcon = (props: SVGProps<SVGSVGElement>) => (
     <rect x={2} y={3} width={1.5} height={27.195} rx={0.75} transform="rotate(-45 2 3)" fill="currentColor" />
   </svg>
 );
-
 export default SvgRecordOffIcon;

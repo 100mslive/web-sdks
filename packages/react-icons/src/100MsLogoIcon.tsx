@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const Svg100MsLogoIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width="24px"
@@ -225,5 +224,4 @@ const Svg100MsLogoIcon = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 );
-
 export default Svg100MsLogoIcon;

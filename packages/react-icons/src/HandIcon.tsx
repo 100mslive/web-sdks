@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgHandIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
@@ -27,5 +26,4 @@ const SvgHandIcon = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-
 export default SvgHandIcon;

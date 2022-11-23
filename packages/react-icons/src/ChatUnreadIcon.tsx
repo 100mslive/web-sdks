@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgChatUnreadIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
@@ -12,5 +11,4 @@ const SvgChatUnreadIcon = (props: SVGProps<SVGSVGElement>) => (
     <rect x={12} y={2} width={10} height={10} rx={5} fill="#2F80FF" />
   </svg>
 );
-
 export default SvgChatUnreadIcon;
