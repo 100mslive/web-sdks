@@ -8,8 +8,8 @@ import { Box, Flex } from '../Layout';
 import Video, { StyledVideo } from '../Video/Video';
 
 const VideoHook: ComponentStory<typeof StyledVideo> = () => {
-  const videoTrackId = '1';
-  const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle('1', videoTrackId);
+  const videoTrackId = '1', audioTrackId = '1';
+  const { isVideoEnabled, isAudioEnabled, toggleVideo, toggleAudio } = useRemoteAVToggle(audioTrackId, videoTrackId);
 
   return (
     <Box>
