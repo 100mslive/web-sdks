@@ -98,8 +98,8 @@ const HLSView = () => {
     }
     return () => {
       hlsStats = null;
-      hlsController.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
-      hlsController.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
     };
   }, [hlsUrl]);
 
@@ -139,10 +139,10 @@ const HLSView = () => {
    * On mount. Add listeners for Video play/pause
    */
   useEffect(() => {
-    videoRef.current.addEventListener("play", event => {
+    videoRef.current?.addEventListener("play", event => {
       setIsPaused(false);
     });
-    videoRef.current.addEventListener("pause", event => {
+    videoRef.current?.addEventListener("pause", event => {
       setIsPaused(true);
     });
     return () => hlsController?.reset();
