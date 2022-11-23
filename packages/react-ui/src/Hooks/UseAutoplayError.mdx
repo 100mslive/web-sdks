@@ -44,50 +44,40 @@ import { Dialog, Text, Button, Box, Flex } from '@100mslive/react-ui';
         resetError();
       }}
     >
-      <DialogContent>
-        <Flex>
-          <Text>
-            The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
-          </Text>
-        </Flex>
-        <Flex>
-          <Button
-            onClick={() => {
-              unblockAudio();
-              resetError();
-            }}
-          >
-            Allow Audio
-          </Button>
-        </Flex>
-      </DialogContent>
-    </Dialog.Root>
-  );
-};
-
-const DialogContent = ({
-  title,
-  closeable = true,
-  children,
-}) => {
-  return (
-    <Dialog.Portal>
-      <Dialog.Overlay />
-      <Dialog.Content>
-        <Dialog.Title>
-          <Flex>
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content>
+          <Dialog.Title>
             <Flex>
-              <Text variant="h6" inline>
-                {title}
+              <Flex>
+                <Text variant="h6" inline>
+                  Autoplay Error
+                </Text>
+              </Flex>
+              <Dialog.DefaultClose />
+            </Flex>
+          </Dialog.Title>
+          <HorizontalDivider />
+          <Box>
+            <Flex>
+              <Text>
+                The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
               </Text>
             </Flex>
-            {closeable && <Dialog.DefaultClose />}
-          </Flex>
-        </Dialog.Title>
-        <HorizontalDivider />
-        <Box>{children}</Box>
-      </Dialog.Content>
-    </Dialog.Portal>
+            <Flex>
+              <Button
+                onClick={() => {
+                  unblockAudio();
+                  resetError();
+                }}
+              >
+                Allow Audio
+              </Button>
+            </Flex>
+          </Box>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 ```
