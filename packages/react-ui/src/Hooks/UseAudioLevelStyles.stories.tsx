@@ -1,5 +1,5 @@
 import React from 'react';
-import { selectTrackAudioByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalAudioTrackID, selectTrackAudioByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import mdx from './UseAudioLevelStyles.mdx';
 import { useBorderAudioLevel } from '../AudioLevel';
 import { Avatar } from '../Avatar';
@@ -10,7 +10,7 @@ import { StoryBookSDK } from '../store/StorybookSDK';
 import { Text } from '../Text';
 
 const AudioLevelStyles = () => {
-  const trackId = '101';
+  const trackId = useHMSStore(selectLocalAudioTrackID);
   const ref = useBorderAudioLevel(trackId);
 
   // ignore: use to simulate changing speaker audio levels
@@ -32,7 +32,7 @@ const AudioLevelStyles = () => {
       </Flex>
       <Text>Set Audio Level</Text>
       <Slider
-        defaultValue={[0]}
+        defaultValue={[1]}
         step={1}
         value={[currVolume]}
         onValueChange={e => actions.setAudioLevel(e[0], trackId)}
