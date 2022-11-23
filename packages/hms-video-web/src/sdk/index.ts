@@ -474,8 +474,8 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  leave() {
-    return this.internalLeave();
+  leave(notifyServer?: boolean) {
+    return this.internalLeave(notifyServer);
   }
 
   private async internalLeave(notifyServer = true, error?: HMSException) {
