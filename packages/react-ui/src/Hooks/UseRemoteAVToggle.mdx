@@ -11,6 +11,14 @@ import { Story } from '@storybook/addon-docs';
 ```jsx
 interface useRemoteAVToggleInput {
   /**
+  * Audio track id of the peer whose tracks need to be managed
+  */
+  audioTrackId: HMSTrackID;
+  /**
+  * Video track id of the peer whose tracks need to be managed
+  */
+  videoTrackId: HMSTrackID;
+  /**
   * to handle any error during toggle of audio/video
   */
   handleError?: (err: Error, method?: string) => void;
