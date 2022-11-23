@@ -517,7 +517,8 @@ export class LocalTrackManager {
 
   // eslint-disable-next-line complexity
   private async getOrDefaultScreenshareConfig(partialConfig?: Partial<HMSScreenShareConfig>) {
-    type RequiredConfig = HMSScreenShareConfig & Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement'>>;
+    type RequiredConfig = HMSScreenShareConfig &
+      Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement' | 'displaySurface'>>;
     const config: RequiredConfig = Object.assign(
       {
         videoOnly: false,
@@ -539,6 +540,7 @@ export class LocalTrackManager {
     }
     if (config.preferCurrentTab) {
       config.selfBrowserSurface = 'include';
+      config.displaySurface = undefined; // so the default selected is the current tab
     }
     // @ts-ignore
     if (config.cropElement && window.CropTarget?.fromElement) {
