@@ -6,6 +6,11 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
+interface RTCIceCandidatePair {
+  local: RTCIceCandidate;
+  remote: RTCIceCandidate;
+}
+
 const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
@@ -24,7 +29,7 @@ export default abstract class HMSConnection {
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
 
-  selectedCandidatePair: any;
+  selectedCandidatePair?: RTCIceCandidatePair;
 
   protected constructor(role: HMSConnectionRole, signal: ISignal) {
     this.role = role;

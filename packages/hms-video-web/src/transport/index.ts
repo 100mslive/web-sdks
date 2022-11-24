@@ -889,7 +889,8 @@ export default class HMSTransport implements ITransport {
         category: TransportFailureCategory.PublishIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(
           HMSAction.PUBLISH,
-          JSON.stringify(this.publishConnection?.selectedCandidatePair),
+          this.publishConnection?.selectedCandidatePair &&
+            JSON.stringify(this.publishConnection?.selectedCandidatePair),
         ),
         task: this.retryPublishIceFailedTask,
         originalState: TransportState.Joined,
@@ -899,7 +900,8 @@ export default class HMSTransport implements ITransport {
         category: TransportFailureCategory.SubscribeIceConnectionFailed,
         error: ErrorFactory.WebrtcErrors.ICEFailure(
           HMSAction.SUBSCRIBE,
-          JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
+          this.subscribeConnection?.selectedCandidatePair &&
+            JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
         ),
         task: this.retrySubscribeIceFailedTask,
         originalState: TransportState.Joined,
