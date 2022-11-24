@@ -20,7 +20,7 @@ import { HMSLogLevel } from '../utils/logger';
 export default interface HMS {
   preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
-  leave(): Promise<void>;
+  leave(notifyServer?: boolean): Promise<void>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];

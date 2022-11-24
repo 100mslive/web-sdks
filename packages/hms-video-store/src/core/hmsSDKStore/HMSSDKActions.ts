@@ -198,16 +198,17 @@ export class HMSSDKActions implements IHMSActions {
 
   async leave() {
     const isConnectedToRoom = this.store.getState(selectIsConnectedToRoom);
+    let notifyServer = true;
     if (!isConnectedToRoom) {
+      notifyServer = false;
       this.logPossibleInconsistency('room leave is called when no room is connected');
-      return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
     this.setState(store => {
       store.room.roomState = HMSRoomState.Disconnecting;
     }, 'leaving');
     return this.sdk
-      .leave()
+      .leave(notifyServer)
       .then(() => {
         this.resetState('leave');
         HMSLogger.i('left room');
