@@ -210,22 +210,19 @@ const ChatMessage = React.memo(
     }, [message.read, hmsActions, inView, message.id]);
 
     return (
-      <Box
-        ref={ref}
-        css={{
-          display: "flex",
-          flexWrap: "wrap",
-          align: "center",
-          bg: messageType ? "$surfaceLight" : undefined,
-          px: messageType ? "$4" : "$2",
-          py: messageType ? "$4" : 0,
-          mb: "$10",
-        }}
-        key={message.time}
-        data-testid="chat_msg"
-        style={style}
-      >
-        <Text ref={rowRef} as="div" css={{ width: "inherit" }}>
+      <Box ref={ref} as="div" css={{ mb: "$10" }} style={style}>
+        <Flex
+          ref={rowRef}
+          align="center"
+          css={{
+            flexWrap: "wrap",
+            bg: messageType ? "$surfaceLight" : undefined,
+            px: messageType ? "$4" : "$2",
+            py: messageType ? "$4" : 0,
+          }}
+          key={message.time}
+          data-testid="chat_msg"
+        >
           <Text
             css={{
               color: "$textHighEmp",
@@ -277,7 +274,7 @@ const ChatMessage = React.memo(
           >
             <AnnotisedMessage message={message.message} />
           </Text>
-        </Text>
+        </Flex>
       </Box>
     );
   }
@@ -285,9 +282,8 @@ const ChatMessage = React.memo(
 const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   const listRef = useRef({});
   const rowHeights = useRef({});
-  const [topHeight, setTopHeight] = useState(428);
   function getRowHeight(index) {
-    return rowHeights.current[index] || 72;
+    return rowHeights.current[index] + 16 || 72;
   }
 
   function setRowHeight(index, size) {
@@ -310,16 +306,6 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
       setTimeout(() => {
         scrollToBottom();
       }, 0);
-      const last = Object.keys(rowHeights.current)[
-        Object.keys(rowHeights.current).length - 1
-      ];
-      if (last > 0 && topHeight > 0) {
-        setTopHeight(
-          topHeight - rowHeights.current[last] <= 0
-            ? 0
-            : topHeight - rowHeights.current[last]
-        );
-      }
     }
     // eslint-disable-next-line
   }, [messages]);
@@ -327,8 +313,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   return (
     <div
       style={{
-        height: `calc(100% - ${topHeight}px)`,
-        display: "block",
+        height: `calc(100%)`,
         marginTop: "auto",
         marginRight: "-1.45rem",
       }}
