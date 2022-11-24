@@ -146,7 +146,7 @@ export class HMSSDKActions implements IHMSActions {
           HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
           return;
         }
-        await track.preferLayer(layer);
+        await track.setPreferredLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not an video track`);

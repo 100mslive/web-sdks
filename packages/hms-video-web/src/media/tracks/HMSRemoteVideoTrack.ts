@@ -32,7 +32,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     await super.setEnabled(value);
   }
 
-  async preferLayer(layer: HMSPreferredSimulcastLayer) {
+  async setPreferredLayer(layer: HMSPreferredSimulcastLayer) {
     //@ts-ignore
     if (layer === HMSSimulcastLayer.NONE) {
       HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
