@@ -104,11 +104,11 @@ describe('remoteVideoTrack', () => {
 
   test('prefer layer', async () => {
     expectNonDegradedNotVisible();
-    await track.preferLayer(HMSSimulcastLayer.LOW);
+    await track.setPreferredLayer(HMSSimulcastLayer.LOW);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
     await track.addSink(videoElement);
     expectNonDegradedVisible(HMSSimulcastLayer.LOW);
-    await track.preferLayer(HMSSimulcastLayer.MEDIUM);
+    await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.MEDIUM, true);
     expectLayersSent([HMSSimulcastLayer.LOW, HMSSimulcastLayer.MEDIUM]);
   });
