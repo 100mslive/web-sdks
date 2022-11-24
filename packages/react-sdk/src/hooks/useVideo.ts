@@ -21,11 +21,6 @@ export interface useVideoInput {
    * Number between 0 and 1 indication when the element is considered inView
    */
   threshold?: number;
-  /**
-   * Boolean indicating whether the preferredLayer should be auto selected based on video width/height
-   * if enabled, this will select the closestLayer available when simulcast is enabled
-   */
-  autoSelectPreferredLayer?: boolean;
 }
 
 export interface useVideoOutput {
@@ -37,12 +32,7 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({
-  trackId,
-  attach,
-  threshold = 0.5,
-  autoSelectPreferredLayer = true,
-}: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
@@ -58,15 +48,15 @@ export const useVideo = ({
       inView &&
       track?.layerDefinitions &&
       resizeRef.current &&
-      autoSelectPreferredLayer &&
       track?.enabled &&
       !track?.degraded
     ) {
       const closestLayer = getClosestLayer({ layerDefinitions: track.layerDefinitions!, width, height });
       await actions.setPreferredLayer(track?.id, closestLayer!);
     }
+    // needed for layerDefinitions as the reference always changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height, track?.id, actions, autoSelectPreferredLayer, track?.enabled, track?.degraded, resizeRef, inView]);
+  }, [width, height, track?.id, actions, track?.enabled, track?.degraded, resizeRef, inView]);
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
