@@ -46,7 +46,7 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
       width > 0 &&
       height > 0 &&
       inView &&
-      track?.layerDefinitions &&
+      track?.layerDefinitions?.length &&
       resizeRef.current &&
       track?.enabled &&
       !track?.degraded
