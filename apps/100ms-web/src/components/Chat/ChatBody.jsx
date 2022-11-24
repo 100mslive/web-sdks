@@ -210,7 +210,7 @@ const ChatMessage = React.memo(
     }, [message.read, hmsActions, inView, message.id]);
 
     return (
-      <Box ref={ref} as="div" css={{ mb: "$10", pr: "1.45rem" }} style={style}>
+      <Box ref={ref} as="div" css={{ mb: "$10", pr: "$10" }} style={style}>
         <Flex
           ref={rowRef}
           align="center"
@@ -284,6 +284,8 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   const listRef = useRef({});
   const rowHeights = useRef({});
   function getRowHeight(index) {
+    // 72 will be default row height for any message length
+    // 16 will add margin value as clientHeight don't include margin
     return rowHeights.current[index] + 16 || 72;
   }
 
@@ -309,12 +311,12 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
       }, 0);
     }
     // eslint-disable-next-line
-  }, [messages]);
+  }, [messages.length]);
 
   return (
     <Box
       css={{
-        mr: "-1.45rem",
+        mr: "-$10",
         h: "100%",
       }}
       as="div"
