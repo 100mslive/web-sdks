@@ -313,9 +313,9 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
 
   return (
     <Box
-      style={{
-        height: `calc(100%)`,
-        marginRight: "-1.45rem",
+      css={{
+        mr: "-1.45rem",
+        h: "100%",
       }}
       as="div"
     >
