@@ -4,9 +4,9 @@ import {
   HMSConfig,
   HMSMessageInput,
   HMSPeer,
+  HMSPreferredSimulcastLayer,
   HMSRoom,
   HMSRoomState,
-  HMSSimulcastLayer,
   HMSTrackSource,
   HMSVideoTrackSettings,
   IHMSStore,
@@ -27,7 +27,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
   constructor(store: IHMSStore) {
     this.store = store;
   }
-  setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): Promise<void> {
+  setPreferredLayer(_trackId: string, _layer: HMSPreferredSimulcastLayer): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
