@@ -210,13 +210,14 @@ const ChatMessage = React.memo(
     }, [message.read, hmsActions, inView, message.id]);
 
     return (
-      <Box ref={ref} as="div" css={{ mb: "$10" }} style={style}>
+      <Box ref={ref} as="div" css={{ mb: "$10", pr: "1.45rem" }} style={style}>
         <Flex
           ref={rowRef}
           align="center"
           css={{
             flexWrap: "wrap",
             bg: messageType ? "$surfaceLight" : undefined,
+            r: messageType ? "$1" : undefined,
             px: messageType ? "$4" : "$2",
             py: messageType ? "$4" : 0,
           }}
@@ -311,16 +312,16 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
   }, [messages]);
 
   return (
-    <div
+    <Box
       style={{
         height: `calc(100%)`,
-        marginTop: "auto",
         marginRight: "-1.45rem",
       }}
+      as="div"
     >
       <AutoSizer
         style={{
-          width: "100%",
+          width: "90%",
           height: "100%",
           overflow: "none !important",
         }}
@@ -346,7 +347,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
           </VariableSizeList>
         )}
       </AutoSizer>
-    </div>
+    </Box>
   );
 };
 
