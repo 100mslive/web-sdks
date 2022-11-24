@@ -149,7 +149,7 @@ export class HMSSDKActions implements IHMSActions {
         await track.setPreferredLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
-        HMSLogger.w(`track ${trackId} is not an video track`);
+        HMSLogger.w(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
