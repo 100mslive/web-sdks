@@ -1,4 +1,10 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useInView } from "react-intersection-observer";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { VariableSizeList } from "react-window";
@@ -294,14 +300,14 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
     rowHeights.current = { ...rowHeights.current, [index]: size };
   }
 
-  function scrollToBottom() {
+  const scrollToBottom = useCallback(() => {
     if (listRef.current && listRef.current.scrollToItem) {
       listRef.current?.scrollToItem(messages.length - 1, "end");
       requestAnimationFrame(() => {
         listRef.current?.scrollToItem(messages.length - 1, "end");
       });
     }
-  }
+  }, [messages.length]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -310,8 +316,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
         scrollToBottom();
       }, 0);
     }
-    // eslint-disable-next-line
-  }, [messages.length]);
+  });
 
   return (
     <Box
