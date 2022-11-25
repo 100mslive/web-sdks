@@ -1,12 +1,17 @@
 import { HMSConnectionRole } from './model';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { HMSLocalTrack } from '../media/tracks';
+import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
-import { HMSLocalTrack } from '../media/tracks';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { TrackState } from '../notification-manager';
 
-const TAG = 'HMSConnection';
+const TAG = '[HMSConnection]';
+interface RTCIceCandidatePair {
+  local: RTCIceCandidate;
+  remote: RTCIceCandidate;
+}
+
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;
@@ -23,6 +28,8 @@ export default abstract class HMSConnection {
    *  - [HMSSubscribeConnection] clears this list as soon as we call [addIceCandidate]
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
+
+  selectedCandidatePair?: RTCIceCandidatePair;
 
   protected constructor(role: HMSConnectionRole, signal: ISignal) {
     this.role = role;
@@ -114,13 +121,16 @@ export default abstract class HMSConnection {
 
           const logSelectedCandidate = () => {
             // @ts-expect-error
-            const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
-            HMSLogger.d(
-              TAG,
-              `${HMSConnectionRole[this.role]} connection`,
-              `selected ${kindOfTrack || 'unknown'} candidate pair`,
-              JSON.stringify(selectedCandidatePair, null, 2),
-            );
+            if (typeof iceTransport.getSelectedCandidatePair === 'function') {
+              // @ts-expect-error
+              this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+              HMSLogger.d(
+                TAG,
+                `${HMSConnectionRole[this.role]} connection`,
+                `selected ${kindOfTrack || 'unknown'} candidate pair`,
+                JSON.stringify(this.selectedCandidatePair, null, 2),
+              );
+            }
           };
 
           // @ts-expect-error

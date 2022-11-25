@@ -1,15 +1,15 @@
+import { HMSLocalPeer } from './models/peer';
 import { LocalTrackManager } from './LocalTrackManager';
 import { Store } from './store';
-import ITransportObserver from '../transport/ITransportObserver';
-import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import { TransportState } from '../transport/models/TransportState';
-import { DeviceManager } from '../device-manager';
-import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalPeer } from './models/peer';
-import { EventBus } from '../events/EventBus';
 import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { DeviceManager } from '../device-manager';
+import { HMSException } from '../error/HMSException';
+import { EventBus } from '../events/EventBus';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -52,11 +52,13 @@ const hostPublishParams: PublishParams = {
     height: 1080,
     bitRate: 400,
   },
-  videoSimulcastLayers: {
-    layers: [],
-  },
-  screenSimulcastLayers: {
-    layers: [],
+  simulcast: {
+    video: {
+      layers: [],
+    },
+    screen: {
+      layers: [],
+    },
   },
 };
 
@@ -328,7 +330,9 @@ describe('LocalTrackManager', () => {
       }
       for (const constraint in videoConstraints) {
         if (constraint in hostPublishParams.video) {
-          expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+          const constraintValue = videoConstraints[constraint];
+          const value = typeof constraintValue === 'object' ? constraintValue?.ideal : constraintValue;
+          expect(value).toEqual((hostPublishParams.video as any)[constraint]);
         }
       }
       for (const constraint in droppedConstraints.audio) {

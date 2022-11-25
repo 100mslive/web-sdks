@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid';
-import { HMSRemoteAudioTrack } from '../media/tracks';
-import { DeviceManager } from '../device-manager';
-import HMSLogger from '../utils/logger';
-import { IStore } from '../sdk/store';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSDeviceChangeEvent, HMSUpdateListener, HMSTrackUpdate } from '../interfaces';
-import { HMSRemotePeer } from '../sdk/models/peer';
-import { isMobile } from '../utils/support';
-import { EventBus } from '../events/EventBus';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { DeviceManager } from '../device-manager';
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { EventBus } from '../events/EventBus';
+import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
+import { HMSRemoteAudioTrack } from '../media/tracks';
+import { HMSRemotePeer } from '../sdk/models/peer';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
+import { isMobile } from '../utils/support';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -34,7 +34,7 @@ const INITIAL_STATE: AudioSinkState = {
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
   private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
-  private TAG = '[AudioSinkManager]:';
+  private readonly TAG = '[AudioSinkManager]:';
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
@@ -58,8 +58,8 @@ export class AudioSinkManager {
     return this.volume;
   }
 
-  setVolume(value: number) {
-    this.store.updateAudioOutputVolume(value);
+  async setVolume(value: number) {
+    await this.store.updateAudioOutputVolume(value);
     this.volume = value;
   }
 

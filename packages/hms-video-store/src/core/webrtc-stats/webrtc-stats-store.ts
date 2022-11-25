@@ -1,4 +1,7 @@
-import { HMSSdk, HMSWebrtcStats, HMSPeerStats, HMSTrackStats } from '@100mslive/hms-video';
+import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '@100mslive/hms-video';
+import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
+import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
+import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
 import {
   selectLocalAudioTrackID,
   selectLocalPeerID,
@@ -6,9 +9,6 @@ import {
   selectRoomState,
   selectTracksMap,
 } from '../selectors';
-import { IHMSStore, IHMSStatsStore } from '../IHMSStore';
-import { HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID, createDefaultStatsStore } from '../schema';
-import { mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 
 type Unsubscribe = (() => void) | undefined;
 export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
@@ -49,7 +49,7 @@ const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, s
   sdk.getWebrtcInternals()?.start();
   const unsubSdkStats = sdk
     .getWebrtcInternals()
-    ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store));
+    ?.onStatsChange(stats => updateWebrtcStoreStats(webrtcStore, stats, store, sdk));
 
   return () => {
     unsubLocalPeer();
@@ -87,13 +87,13 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
 
   if (store.getState(selectLocalAudioTrackID)) {
     webrtcStore.namedSetState(draft => {
-      draft.localPeer.videoTrack = store.getState(selectLocalAudioTrackID);
+      draft.localPeer.audioTrack = store.getState(selectLocalAudioTrackID);
     }, 'localpeer-audiotrack-id');
   } else {
     unsubAudioTrackID = store.subscribe(audioTrackID => {
       audioTrackID &&
         webrtcStore.namedSetState(draft => {
-          draft.localPeer.videoTrack = audioTrackID;
+          draft.localPeer.audioTrack = audioTrackID;
         }, 'localpeer-audiotrack-id');
     }, selectLocalAudioTrackID);
   }
@@ -105,25 +105,32 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
   };
 };
 
-const updateWebrtcStoreStats = (webrtcStore: IHMSStatsStore, stats: HMSWebrtcStats, hmsStore: IHMSStore) => {
+const updateWebrtcStoreStats = (
+  webrtcStore: IHMSStatsStore,
+  stats: HMSWebrtcStats,
+  hmsStore: IHMSStore,
+  sdk: HMSSdk,
+) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);
   webrtcStore.namedSetState(store => {
+    const localPeerID = hmsStore.getState(selectLocalPeerID);
     const newTrackStats: Record<HMSTrackID, HMSTrackStats> = {};
-    const trackIDs = Object.keys(tracks);
+    const trackIDs = Object.keys(tracks).filter(trackID => tracks[trackID].peerId !== localPeerID);
 
     for (const trackID of trackIDs) {
-      const sdkTrackStats = stats.getTrackStats(trackID);
+      const sdkTrackStats = stats.getRemoteTrackStats(trackID);
       if (sdkTrackStats) {
         newTrackStats[trackID] = sdkTrackStats;
       }
     }
 
-    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.trackStats, newTrackStats);
+    mergeNewIndividualStatsInDraft<HMSTrackID, HMSTrackStats>(store.remoteTrackStats, newTrackStats);
 
     // @TODO: Include all peer stats, own ticket, transmit local peer stats to other peer's using biz
-    const localPeerID = hmsStore.getState(selectLocalPeerID);
     const newPeerStats = { [localPeerID]: stats.getLocalPeerStats() };
     mergeNewIndividualStatsInDraft<HMSPeerID, HMSPeerStats>(store.peerStats, newPeerStats);
+    // @ts-ignore
+    mergeLocalTrackStats(store.localTrackStats, stats.getLocalTrackStats(), sdk.store.getLocalPeerTracks());
   }, 'webrtc-stats');
 };
 

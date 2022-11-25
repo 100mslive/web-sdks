@@ -1,11 +1,11 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { TrackManager } from './TrackManager';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
-import HMSLogger from '../../utils/logger';
-import { PeerNotification } from '../HMSNotifications';
-import { TrackManager } from './TrackManager';
 import { convertDateNumToDate } from '../../utils/date';
+import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { PeerNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -18,11 +18,8 @@ import { convertDateNumToDate } from '../../utils/date';
  * we add it to the store and call TrackManager to process it when RTC Track comes in.
  */
 export class PeerManager {
+  private readonly TAG = '[PeerManager]';
   constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any) {
     switch (method) {

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { MicOffIcon } from '@100mslive/react-icons';
-import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
-import { StyledVideoList } from './StyledVideoList';
-import { StyledVideoTile } from '../VideoTile';
-import Video from '../Video/Video';
-import { getLeft } from './videoListUtils';
 import { ComponentStory } from '@storybook/react';
+import { selectPeers, useHMSStore, useVideoList } from '@100mslive/react-sdk';
+import { MicOffIcon } from '@100mslive/react-icons';
+import { StyledVideoList } from './StyledVideoList';
+import { getLeft } from './videoListUtils';
+import Video from '../Video/Video';
+import { StyledVideoTile } from '../VideoTile';
 
 const VideoListMeta = {
   title: 'Video/VideoList',

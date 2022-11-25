@@ -5,7 +5,7 @@ export interface DataChannelObserver {
 }
 
 export default class HMSDataChannel {
-  private readonly TAG = 'HMSDataChannel';
+  private readonly TAG = '[HMSDataChannel]';
   private readonly nativeChannel: RTCDataChannel;
   private readonly observer: DataChannelObserver;
   private readonly metadata: string;

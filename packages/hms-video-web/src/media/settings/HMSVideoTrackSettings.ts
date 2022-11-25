@@ -1,5 +1,5 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings, HMSVideoCodec } from '../../interfaces';
+import { HMSVideoCodec, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width?: number = 320;
@@ -100,10 +100,14 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     this.advanced = advanced;
   }
 
-  toConstraints(): MediaTrackConstraints {
+  toConstraints(isScreenShare?: boolean): MediaTrackConstraints {
+    let dimensionConstraintKey = 'ideal';
+    if (isScreenShare) {
+      dimensionConstraintKey = 'max';
+    }
     return {
-      width: this.width,
-      height: this.height,
+      width: { [dimensionConstraintKey]: this.width },
+      height: { [dimensionConstraintKey]: this.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
     };

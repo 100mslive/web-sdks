@@ -11,14 +11,22 @@ function AccordionItem({ value, header, content }: { value: string; header: stri
   return (
     <Accordion.Item value={value}>
       <Accordion.Header css={{ padding: '$8 $9' }}>{header}</Accordion.Header>
-      <Accordion.Content contentStyles={{ padding: '$8 $9' }}>{content}</Accordion.Content>
+      <Accordion.Content contentStyles={{ padding: '$8 $9' }}>
+        <>
+          {content}
+          <Accordion.Item value={value + '1'}>
+            <Accordion.Header css={{ padding: '$8 $9' }}>nested header</Accordion.Header>
+            <Accordion.Content contentStyles={{ padding: '$8 $9' }}>nested item</Accordion.Content>
+          </Accordion.Item>
+        </>
+      </Accordion.Content>
     </Accordion.Item>
   );
 }
 
 const Template = () => {
   return (
-    <Accordion.Root type="single" defaultValue="item-1" collapsible css={{ width: '300px' }}>
+    <Accordion.Root type="multiple" defaultValue="item-1" collapsible css={{ width: '300px' }}>
       <AccordionItem
         value="item-1"
         header="Is it accessible?"
@@ -39,4 +47,4 @@ const Template = () => {
 };
 
 export const AccordionContent: ComponentStory<typeof Accordion.Root> = Template.bind({});
-AccordionContent.storyName = 'Accordion'
+AccordionContent.storyName = 'Accordion';

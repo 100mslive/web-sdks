@@ -6,6 +6,6 @@ export class HMSRemoteAudioTrack extends HMSAudioTrack {
       return;
     }
     await super.setEnabled(value);
-    this.subscribeToAudio(value);
+    await this.subscribeToAudio(value);
   }
 }

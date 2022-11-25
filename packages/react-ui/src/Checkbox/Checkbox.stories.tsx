@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CheckIcon } from '@100mslive/react-icons';
-
-import { Flex } from '../Layout';
-import { Label } from '../Label';
 import { Checkbox } from '.';
+import { Label } from '../Label';
+import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/Checkbox',
@@ -59,4 +58,4 @@ const CheckboxWithLabelStory: ComponentStory<typeof CheckboxWithLabelComponent> 
 };
 
 export const Example = CheckboxWithLabelStory.bind({});
-Example.storyName = 'Checkbox'
+Example.storyName = 'Checkbox';

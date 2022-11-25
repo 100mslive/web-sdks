@@ -1,37 +1,37 @@
 import { v4 as uuid } from 'uuid';
-import { ISignal } from '../ISignal';
-import { ISignalEventsObserver } from '../ISignalEventsObserver';
-import {
-  Track,
-  AcceptRoleChangeParams,
-  RequestForRoleChangeParams,
-  TrackUpdateRequestParams,
-  RemovePeerRequest,
-  MultiTrackUpdateRequestParams,
-  StartRTMPOrRecordingRequestParams,
-  UpdatePeerRequestParams,
-  HLSRequestParams,
-  BroadcastResponse,
-  HLSTimedMetadataParams,
-  SessionMetadataUpdateParams,
-  GetSessionMetadataResponse,
-} from '../interfaces';
-import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
-import { PromiseCallbacks } from '../../utils/promise';
-import HMSLogger from '../../utils/logger';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
+import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
+import Message from '../../sdk/models/HMSMessage';
 import {
-  DEFAULT_SIGNAL_PING_TIMEOUT,
   DEFAULT_SIGNAL_PING_INTERVAL,
+  DEFAULT_SIGNAL_PING_TIMEOUT,
   PONG_RESPONSE_TIMES_SIZE,
 } from '../../utils/constants';
-import Message from '../../sdk/models/HMSMessage';
-import { HMSException } from '../../error/HMSException';
+import HMSLogger from '../../utils/logger';
+import { PromiseCallbacks } from '../../utils/promise';
 import { Queue } from '../../utils/queue';
 import { isPageHidden } from '../../utils/support';
 import { sleep } from '../../utils/timer-utils';
+import {
+  AcceptRoleChangeParams,
+  BroadcastResponse,
+  GetSessionMetadataResponse,
+  HLSRequestParams,
+  HLSTimedMetadataParams,
+  MultiTrackUpdateRequestParams,
+  RemovePeerRequest,
+  RequestForRoleChangeParams,
+  SessionMetadataUpdateParams,
+  StartRTMPOrRecordingRequestParams,
+  Track,
+  TrackUpdateRequestParams,
+  UpdatePeerRequestParams,
+} from '../interfaces';
+import { ISignal } from '../ISignal';
+import { ISignalEventsObserver } from '../ISignalEventsObserver';
 
 export default class JsonRpcSignal implements ISignal {
   readonly TAG = '[SIGNAL]: ';
@@ -200,6 +200,7 @@ export default class JsonRpcSignal implements ISignal {
     data: string,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    simulcast: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
     if (!this.isConnected) {
@@ -208,7 +209,7 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to send join over WS connection',
       );
     }
-    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
+    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade, simulcast };
     const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;

@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { byIDCurry } from './common';
 import {
   selectFullAppData,
   selectHMSMessages,
@@ -8,25 +9,24 @@ import {
   selectTracksMap,
 } from './selectors';
 import {
+  getScreenSharesByPeer,
+  isAudio,
+  isAudioPlaylist,
+  isTrackEnabled,
+  isVideo,
+  isVideoPlaylist,
+} from './selectorUtils';
+import { HMSLogger } from '../../common/ui-logger';
+import {
+  HMSAudioTrack,
   HMSPeerID,
   HMSRoleName,
+  HMSScreenVideoTrack,
   HMSStore,
   HMSTrack,
   HMSTrackID,
-  HMSAudioTrack,
   HMSVideoTrack,
-  HMSScreenVideoTrack,
 } from '../schema';
-import {
-  getPeerTracksByCondition,
-  isAudio,
-  isVideoPlaylist,
-  isTrackEnabled,
-  isVideo,
-  isAudioPlaylist,
-} from './selectorUtils';
-import { byIDCurry } from './common';
-import { HMSLogger } from '../../common/ui-logger';
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
@@ -266,7 +266,7 @@ export const selectAudioPlaylistTrackByPeerID = byIDCurry(
 
 export const selectScreenSharesByPeerId = byIDCurry(
   createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
-    return getPeerTracksByCondition(tracks, peer);
+    return getScreenSharesByPeer(tracks, peer);
   }),
 );
 

@@ -1,13 +1,14 @@
-import { hooksErrHandler } from '../hooks/types';
+import { useCallback } from 'react';
 import {
   HMSPeerID,
+  HMSScreenShareConfig,
   HMSTrackID,
   selectIsLocalScreenShared,
   selectPeerScreenSharing,
   selectScreenSharesByPeerId,
 } from '@100mslive/hms-video-store';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { useCallback } from 'react';
 import { logErrorHandler } from '../utils/commons';
 
 export interface useScreenShareResult {
@@ -18,7 +19,7 @@ export interface useScreenShareResult {
   /**
    * toggle screenshare for the local user, will only be present if the user has the permission to toggle
    */
-  toggleScreenShare?: () => void;
+  toggleScreenShare?: (config?: HMSScreenShareConfig) => Promise<void>;
   /**
    * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
    * In case of multiple screenshares, the behaviour of which one is picked is not defined.
@@ -55,9 +56,9 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
 
   const toggleScreenShare = useCallback(
-    async (audioOnly = false) => {
+    async (config?: HMSScreenShareConfig) => {
       try {
-        await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
+        await actions.setScreenShareEnabled(!amIScreenSharing, config);
       } catch (err) {
         handleError(err as Error, 'toggleScreenShare');
       }

@@ -1,12 +1,12 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { PeerManager } from './PeerManager';
+import { TrackManager } from './TrackManager';
 import { HMSUpdateListener } from '../..';
 import { HMSTrackUpdate } from '../../interfaces';
 import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
-import { PeerManager } from './PeerManager';
-import { TrackManager } from './TrackManager';
 
 /**
  * Handles:
@@ -22,16 +22,13 @@ import { TrackManager } from './TrackManager';
  *    - Track state change(enabled) as track update
  */
 export class PeerListManager {
+  private readonly TAG = '[PeerListManager]';
   constructor(
     private store: IStore,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
     public listener?: HMSUpdateListener,
   ) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any, isReconnecting: boolean) {
     if (method === HMSNotificationMethod.PEER_LIST) {

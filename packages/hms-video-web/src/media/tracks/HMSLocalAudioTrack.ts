@@ -1,15 +1,15 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
-import { getAudioTrack, isEmptyTrack } from '../../utils/track';
-import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
-import HMSLogger from '../../utils/logger';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { HMSException } from '../../error/HMSException';
+import { EventBus } from '../../events/EventBus';
+import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
-import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
-import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { EventBus } from '../../events/EventBus';
-import { HMSException } from '../../error/HMSException';
+import HMSLogger from '../../utils/logger';
+import { getAudioTrack, isEmptyTrack } from '../../utils/track';
+import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
+import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -17,9 +17,8 @@ function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>,
   };
 }
 
-const TAG = 'HMSLocalAudioTrack';
-
 export class HMSLocalAudioTrack extends HMSAudioTrack {
+  private readonly TAG = '[HMSLocalAudioTrack]';
   settings: HMSAudioTrackSettings;
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
@@ -170,7 +169,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (this.audioLevelMonitor) {
       this.destroyAudioLevelMonitor();
     }
-    HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
+    HMSLogger.d(this.TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
     this.audioLevelMonitor = new TrackAudioLevelMonitor(
       this,
       this.eventBus.trackAudioLevelUpdate,

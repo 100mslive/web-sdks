@@ -1,9 +1,8 @@
 import { InitConfig } from './models';
-import HMSLogger from '../../utils/logger';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import HMSLogger from '../../utils/logger';
 
-const TAG = 'InitService';
-
+const TAG = '[InitService]';
 export default class InitService {
   private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {

@@ -1,13 +1,12 @@
-import { HMSLocalTrack } from '../media/tracks';
-import { HMSVideoTrackSettings, HMSAudioTrackSettings } from '../media/settings';
 import {
+  HLSConfig,
+  HLSTimedMetadata,
   HMSPeer,
+  HMSRole,
   HMSRoleChangeRequest,
   RTMPRecordingConfig,
-  HLSConfig,
-  HMSRole,
-  HLSTimedMetadata,
 } from '../interfaces';
+import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
   MultiTrackUpdateRequestParams,
@@ -29,12 +28,6 @@ export default interface ITransport {
   publish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
   unpublish(tracks: Array<HMSLocalTrack>): Promise<void>;
-
-  getLocalScreen(
-    videoSettings: HMSVideoTrackSettings,
-    audioSettings: HMSAudioTrackSettings,
-    onStop: () => void,
-  ): Promise<Array<HMSLocalTrack>>;
 
   trackUpdate(track: HMSLocalTrack): void;
 

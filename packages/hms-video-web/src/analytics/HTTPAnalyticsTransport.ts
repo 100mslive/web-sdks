@@ -1,3 +1,5 @@
+import AnalyticsEvent from './AnalyticsEvent';
+import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 import {
   CLIENT_ANAYLTICS_PROD_ENDPOINT,
   CLIENT_ANAYLTICS_QA_ENDPOINT,
@@ -6,8 +8,6 @@ import {
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 import { ENV } from '../utils/support';
-import AnalyticsEvent from './AnalyticsEvent';
-import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 interface ClientEventBody {
   event: string;
@@ -31,7 +31,7 @@ interface ClientEventBody {
 }
 
 class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
-  TAG = '[HTTPAnalyticsTransport]';
+  readonly TAG = '[HTTPAnalyticsTransport]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   isConnected = true;
   private env: null | ENV = null;

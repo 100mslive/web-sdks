@@ -1,25 +1,26 @@
 import {
-  HMSConfig,
-  HMSSimulcastLayer,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSLogLevel,
-  HMSVideoPlugin,
-  HMSAudioPlugin,
-  HMSPluginSupportResult,
   HLSTimedMetadata,
+  HMSAudioPlugin,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSLogLevel,
+  HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
+  HMSScreenShareConfig,
+  HMSVideoPlugin,
+  HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
+import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
+  HMSChangeMultiTrackStateParams,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
-  HMSChangeMultiTrackStateParams,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -61,13 +62,9 @@ export interface IHMSActions {
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
-   * @param config it can also be boolean to ensure backward compatibility where it stands
-   * for audioOnly flag
+   * @param config check the config object for details about the fields
    */
-  setScreenShareEnabled(
-    enabled: boolean,
-    config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean,
-  ): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
@@ -177,7 +174,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
@@ -186,11 +183,12 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
+
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

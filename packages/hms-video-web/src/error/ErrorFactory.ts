@@ -5,9 +5,9 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
-import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export enum HMSAction {
   NONE = 'NONE',
@@ -149,12 +149,16 @@ export const ErrorFactory = {
       );
     },
 
-    NothingToReturn(action: HMSAction, description = '') {
+    NothingToReturn(
+      action: HMSAction,
+      description = '',
+      message = `There is no media to return. Please select either video or audio or both.`,
+    ) {
       return new HMSException(
         ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
-        `There is no media to return. Please select either video or audio or both.`,
+        message,
         description,
       );
     },
@@ -216,6 +220,16 @@ export const ErrorFactory = {
         action,
         `Operating System denied permission to access capture device - ${deviceInfo}`,
         description,
+      );
+    },
+
+    CurrentTabNotShared() {
+      return new HMSException(
+        ErrorCodes.TracksErrors.CURRENT_TAB_NOT_SHARED,
+        'CurrentTabNotShared',
+        HMSAction.TRACK,
+        'The app requires you to share the current tab',
+        'You must screen share the current tab in order to proceed',
       );
     },
   },

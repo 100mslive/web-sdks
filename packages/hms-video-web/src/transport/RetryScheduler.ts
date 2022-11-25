@@ -1,9 +1,9 @@
+import { Dependencies as TFCDependencies, TransportFailureCategory as TFC } from './models/TransportFailureCategory';
+import { TransportState } from './models/TransportState';
 import { HMSException } from '../error/HMSException';
 import { MAX_TRANSPORT_RETRIES, MAX_TRANSPORT_RETRY_DELAY } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { PromiseWithCallbacks } from '../utils/promise';
-import { TransportFailureCategory as TFC, Dependencies as TFCDependencies } from './models/TransportFailureCategory';
-import { TransportState } from './models/TransportState';
 
 /**
  * Task which is executed by [RetryScheduler.schedule] until max retry count
@@ -18,8 +18,6 @@ import { TransportState } from './models/TransportState';
  */
 type RetryTask = () => Promise<boolean>;
 
-const TAG = '[RetryScheduler]';
-
 interface ScheduleTaskParams {
   category: TFC;
   error: HMSException;
@@ -30,6 +28,7 @@ interface ScheduleTaskParams {
 }
 
 export class RetryScheduler {
+  private readonly TAG = '[RetryScheduler]';
   private inProgress = new Map<TFC, PromiseWithCallbacks<number>>();
   private retryTaskIds: number[] = [];
 
@@ -65,13 +64,13 @@ export class RetryScheduler {
     maxFailedRetries = MAX_TRANSPORT_RETRIES,
     failedRetryCount = 0,
   }: ScheduleTaskParams & { failedRetryCount?: number }): Promise<void> {
-    HMSLogger.d(TAG, 'schedule: ', { category: TFC[category], error });
+    HMSLogger.d(this.TAG, 'schedule: ', { category: TFC[category], error });
 
     // First schedule call
     if (failedRetryCount === 0) {
       const inProgressTask = this.inProgress.get(category);
       if (inProgressTask) {
-        HMSLogger.d(TAG, `schedule: Already a task for ${TFC[category]} scheduled, waiting for its completion`);
+        HMSLogger.d(this.TAG, `schedule: Already a task for ${TFC[category]} scheduled, waiting for its completion`);
         await inProgressTask.promise;
         return;
       }
@@ -91,18 +90,18 @@ export class RetryScheduler {
         const dependencyTask = this.inProgress.get(dependency);
         if (dependencyTask) {
           HMSLogger.d(
-            TAG,
+            this.TAG,
             `schedule: Suspending retry task of ${TFC[category]}, waiting for ${TFC[dependency]} to recover`,
           );
           await dependencyTask.promise;
           HMSLogger.d(
-            TAG,
+            this.TAG,
             `schedule: Resuming retry task ${TFC[category]} as it's dependency ${TFC[dependency]} is recovered`,
           );
         }
       } catch (ex) {
         HMSLogger.d(
-          TAG,
+          this.TAG,
           `schedule: Stopping retry task of ${TFC[category]} as it's dependency ${TFC[dependency]} failed to recover`,
         );
         hasFailedDependency = true;
@@ -144,7 +143,7 @@ export class RetryScheduler {
     const delay = this.getDelayForRetryCount(category, failedRetryCount);
 
     HMSLogger.i(
-      TAG,
+      this.TAG,
       `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Scheduling retry task in ${delay}ms`,
     );
 
@@ -154,7 +153,7 @@ export class RetryScheduler {
     } catch (ex) {
       taskSucceeded = false;
       HMSLogger.w(
-        TAG,
+        this.TAG,
         `[${TFC[category]}] Un-caught exception ${(ex as HMSException).name} in retry-task, initiating retry`,
         ex,
       );
@@ -168,7 +167,7 @@ export class RetryScheduler {
       if (changeState && this.inProgress.size === 0) {
         this.onStateChange(originalState);
       }
-      HMSLogger.i(TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
+      HMSLogger.i(this.TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
       await this.scheduleTask({
         category,

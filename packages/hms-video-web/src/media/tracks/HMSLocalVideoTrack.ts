@@ -1,13 +1,19 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import { getVideoTrack } from '../../utils/track';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { EventBus } from '../../events/EventBus';
+import {
+  HMSSimulcastLayerDefinition,
+  HMSVideoTrackSettings as IHMSVideoTrackSettings,
+  ScreenCaptureHandle,
+} from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
-import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { EventBus } from '../../events/EventBus';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import HMSLogger from '../../utils/logger';
+import { getVideoTrack } from '../../utils/track';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -21,6 +27,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
+  private TAG = '[LocalVideoTrack]';
+
+  /**
+   * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
+   * at the point of writing this comment.
+   */
+  isCurrentTab = false;
 
   /**
    * @internal
@@ -52,6 +66,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
+  }
+
+  /** @internal */
+  setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
+    this._layerDefinitions = definitions;
+  }
+
+  /**
+   * Method to get available simulcast definitions for the track
+   * @returns {HMSSimulcastLayerDefinition[]}
+   */
+  getSimulcastDefinitions(): HMSSimulcastLayerDefinition[] {
+    return this._layerDefinitions;
   }
 
   /**
@@ -149,6 +176,43 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+  }
+
+  /**
+   * only for screenshare track to crop to a cropTarget
+   * @internal
+   */
+  async cropTo(cropTarget?: object) {
+    if (!cropTarget) {
+      return;
+    }
+    if (this.source !== 'screen') {
+      return;
+    }
+    try {
+      // @ts-ignore
+      if (this.nativeTrack.cropTo) {
+        // @ts-ignore
+        await this.nativeTrack.cropTo(cropTarget);
+      }
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'failed to crop screenshare capture - ', err);
+      throw ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, 'failed to crop screenshare capture');
+    }
+  }
+
+  /**
+   * only for screenshare track to get the captureHandle
+   * TODO: add an API for capturehandlechange event
+   * @internal
+   */
+  getCaptureHandle(): ScreenCaptureHandle | undefined {
+    // @ts-ignore
+    if (this.nativeTrack.getCaptureHandle) {
+      // @ts-ignore
+      return this.nativeTrack.getCaptureHandle();
+    }
+    return undefined;
   }
 
   /**
