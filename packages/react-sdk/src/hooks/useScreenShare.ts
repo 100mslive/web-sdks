@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import {
   HMSPeerID,
+  HMSScreenShareConfig,
   HMSTrackID,
   selectIsLocalScreenShared,
   selectPeerScreenSharing,
@@ -18,7 +19,7 @@ export interface useScreenShareResult {
   /**
    * toggle screenshare for the local user, will only be present if the user has the permission to toggle
    */
-  toggleScreenShare?: () => void;
+  toggleScreenShare?: (config?: HMSScreenShareConfig) => Promise<void>;
   /**
    * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
    * In case of multiple screenshares, the behaviour of which one is picked is not defined.
@@ -55,9 +56,9 @@ export const useScreenShare = (handleError: hooksErrHandler = logErrorHandler): 
   const screenShare = useHMSStore(selectScreenSharesByPeerId(screenSharePeer?.id));
 
   const toggleScreenShare = useCallback(
-    async (audioOnly = false) => {
+    async (config?: HMSScreenShareConfig) => {
       try {
-        await actions.setScreenShareEnabled(!amIScreenSharing, audioOnly);
+        await actions.setScreenShareEnabled(!amIScreenSharing, config);
       } catch (err) {
         handleError(err as Error, 'toggleScreenShare');
       }

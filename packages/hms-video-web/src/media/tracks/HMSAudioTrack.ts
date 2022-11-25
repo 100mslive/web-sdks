@@ -21,12 +21,12 @@ export class HMSAudioTrack extends HMSTrack {
     return this.gainNode ? this.volume : null;
   }
 
-  setVolume(value: number) {
+  async setVolume(value: number) {
     if (value < 0 || value > 100) {
       throw Error('Please pass a valid number between 0-100');
     }
     // Don't subscribe to audio when volume is 0
-    this.subscribeToAudio(value === 0 ? false : this.enabled);
+    await this.subscribeToAudio(value === 0 ? false : this.enabled);
     this.volume = value;
     if (this.gainNode) {
       this.gainNode.gain.value = value / 100;
@@ -63,9 +63,9 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  protected subscribeToAudio(value: boolean) {
+  protected async subscribeToAudio(value: boolean) {
     if (this.stream instanceof HMSRemoteStream) {
-      this.stream.setAudio(value);
+      await this.stream.setAudio(value, this.trackId, this.logIdentifier);
     }
   }
 }

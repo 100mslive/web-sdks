@@ -11,7 +11,6 @@ import { HMSPluginUnsupportedTypes } from '../audio';
 const DEFAULT_FRAME_RATE = 24;
 const DEFAULT_WIDTH = 320;
 const DEFAULT_HEIGHT = 240;
-const TAG = 'VideoPluginsManager';
 
 interface CanvasElement extends HTMLCanvasElement {
   captureStream(frameRate?: number): MediaStream;
@@ -39,6 +38,8 @@ interface CanvasElement extends HTMLCanvasElement {
  * @see HMSVideoPlugin
  */
 export class HMSVideoPluginsManager {
+  private readonly TAG = '[VideoPluginsManager]';
+
   /**
    * plugins loop is the loop in which all plugins are applied
    */
@@ -107,7 +108,7 @@ export class HMSVideoPluginsManager {
       return;
     }
     if (this.pluginsMap.has(name)) {
-      HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
+      HMSLogger.w(this.TAG, `plugin - ${plugin.getName()} already added.`);
       return;
     }
     //TODO: assuming this inputFrameRate from getMediaTrackSettings will not change once set
@@ -116,17 +117,17 @@ export class HMSVideoPluginsManager {
 
     let numFramesToSkip = 0;
     if (pluginFrameRate && pluginFrameRate > 0) {
-      HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
+      HMSLogger.i(this.TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
       if (pluginFrameRate < inputFrameRate) {
         numFramesToSkip = Math.ceil(inputFrameRate / pluginFrameRate) - 1;
       }
       this.analytics.added(name, inputFrameRate, pluginFrameRate);
     } else {
-      HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
+      HMSLogger.i(this.TAG, `adding plugin ${plugin.getName()}`);
       this.analytics.added(name, inputFrameRate);
     }
 
-    HMSLogger.i(TAG, 'numFrames to skip processing', numFramesToSkip);
+    HMSLogger.i(this.TAG, 'numFrames to skip processing', numFramesToSkip);
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
@@ -143,7 +144,7 @@ export class HMSVideoPluginsManager {
       }
       await this.startPluginsLoop(plugin.getContextType?.());
     } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin', err);
+      HMSLogger.e(this.TAG, 'failed to add plugin', err);
       await this.removePlugin(plugin);
       throw err;
     }
@@ -156,7 +157,7 @@ export class HMSVideoPluginsManager {
   validateAndThrow(name: string, plugin: HMSVideoPlugin) {
     const result = this.validatePlugin(plugin);
     if (result.isSupported) {
-      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+      HMSLogger.i(this.TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
       let error;
       switch (result.errType) {
@@ -181,13 +182,13 @@ export class HMSVideoPluginsManager {
   async removePlugin(plugin: HMSVideoPlugin) {
     const name = plugin.getName();
     if (!this.pluginsMap.get(name)) {
-      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
+      HMSLogger.w(this.TAG, `plugin - ${name} not found to remove.`);
       return;
     }
-    HMSLogger.i(TAG, `removing plugin ${name}`);
+    HMSLogger.i(this.TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
     if (this.pluginsMap.size === 0) {
-      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
+      HMSLogger.i(this.TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsLoop();
     }
     plugin.stop();
@@ -255,12 +256,12 @@ export class HMSVideoPluginsManager {
       await this.hmsTrack.setProcessedTrack(this.outputTrack);
     } catch (err) {
       this.pluginsLoopRunning = false;
-      HMSLogger.e(TAG, 'error in setting processed track', err);
+      HMSLogger.e(this.TAG, 'error in setting processed track', err);
       throw err;
     }
     // can't await on pluginsLoop as it'll run for a long long time
     this.pluginsLoop().then(() => {
-      HMSLogger.d(TAG, 'processLoop stopped');
+      HMSLogger.d(this.TAG, 'processLoop stopped');
     });
   }
 
@@ -300,7 +301,7 @@ export class HMSVideoPluginsManager {
         }
       } catch (err) {
         // TODO: handle failures properly, detect which plugin failed, stop it and notify back to the UI
-        HMSLogger.e(TAG, 'error in plugins loop', err);
+        HMSLogger.e(this.TAG, 'error in plugins loop', err);
       }
       this.pluginsLoopState = 'running';
       // take into account processing time to decide time to wait for the next loop
@@ -333,7 +334,7 @@ export class HMSVideoPluginsManager {
             try {
               await plugin.processVideoFrame(input, output, skipProcessing);
             } catch (err) {
-              HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+              HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
             }
           };
           if (!skipProcessing) {
@@ -357,7 +358,7 @@ export class HMSVideoPluginsManager {
         }
       } catch (err) {
         //TODO error happened on processing of plugin notify UI
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+        HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
         //remove plugin from loop and stop analytics for it
         await this.removePlugin(plugin);
       }

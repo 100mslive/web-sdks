@@ -16,7 +16,7 @@ import {
 } from '../HMSNotifications';
 
 export class RoomUpdateManager {
-  private TAG = 'RoomUpdateManager';
+  private readonly TAG = '[RoomUpdateManager]';
 
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 

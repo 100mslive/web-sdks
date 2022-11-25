@@ -32,6 +32,8 @@ jobs:
               - 'packages/hms-video-store/**/*.(test|spec).ts'
             noise-suppression:
               - 'packages/hms-noise-suppression/src/**'
+            hls-stats:
+              - 'packages/hls-stats/src/**'
             virtual-background:
               - 'packages/hms-virtual-background/src/**'
             cypress:

@@ -2,7 +2,7 @@ import HMSLogger from '../utils/logger';
 
 export class AudioContextManager {
   private audioContext: AudioContext;
-  private TAG = '[AudioContextManager]';
+  private readonly TAG = '[AudioContextManager]';
 
   constructor() {
     this.audioContext = new AudioContext();

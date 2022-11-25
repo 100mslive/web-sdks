@@ -17,9 +17,8 @@ function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>,
   };
 }
 
-const TAG = 'HMSLocalAudioTrack';
-
 export class HMSLocalAudioTrack extends HMSAudioTrack {
+  private readonly TAG = '[HMSLocalAudioTrack]';
   settings: HMSAudioTrackSettings;
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
@@ -179,7 +178,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (!this.context) {
       throw Error('call set context on audio track');
     }
-    HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
+    HMSLogger.d(this.TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
     this.audioLevelMonitor = new TrackAudioLevelMonitor(
       this,
       this.eventBus.trackAudioLevelUpdate,

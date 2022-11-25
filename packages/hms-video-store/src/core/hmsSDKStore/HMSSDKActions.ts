@@ -14,6 +14,7 @@ import {
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSScreenShareConfig,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
@@ -51,6 +52,7 @@ import {
 import {
   HMSRoleChangeRequest,
   selectHMSMessagesCount,
+  selectIsConnectedToRoom,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -62,7 +64,6 @@ import {
   selectPeerByID,
   selectPermissions,
   selectRolesMap,
-  selectRoomStarted,
   selectRoomState,
   selectTrackByID,
   selectTracksMap,
@@ -118,11 +119,11 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
-  setVolume(value: number, trackId?: HMSTrackID): void {
+  async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
-      this.setTrackVolume(value, trackId);
+      await this.setTrackVolume(value, trackId);
     } else {
-      this.sdk.getAudioOutput().setVolume(value);
+      await this.sdk.getAudioOutput().setVolume(value);
       this.syncRoomState('setOutputVolume');
     }
   }
@@ -136,14 +137,19 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        track.preferLayer(layer);
+        //@ts-ignore
+        if (layer === HMSSimulcastLayer.NONE) {
+          HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          return;
+        }
+        await track.setPreferredLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
-        HMSLogger.w(`track ${trackId} is not an video track`);
+        HMSLogger.w(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
@@ -191,17 +197,18 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async leave() {
-    const hasRoomStarted = this.store.getState(selectRoomStarted);
-    if (!hasRoomStarted) {
+    const isConnectedToRoom = this.store.getState(selectIsConnectedToRoom);
+    let notifyServer = true;
+    if (!isConnectedToRoom) {
+      notifyServer = false;
       this.logPossibleInconsistency('room leave is called when no room is connected');
-      return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
     this.setState(store => {
       store.room.roomState = HMSRoomState.Disconnecting;
     }, 'leaving');
     return this.sdk
-      .leave()
+      .leave(notifyServer)
       .then(() => {
         this.resetState('leave');
         HMSLogger.i('left room');
@@ -214,17 +221,14 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
-    const sdkConfig = { audioOnly: false, videoOnly: false };
-    if (typeof config === 'object') {
-      Object.assign(sdkConfig, config);
-    } else if (typeof config === 'boolean') {
-      // for backward compatibility
-      sdkConfig.audioOnly = config;
+  async setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig) {
+    // TODO: remove this, purely for backward compatibility
+    if (typeof config === 'boolean') {
+      config = { audioOnly: config };
     }
     try {
       if (enabled) {
-        await this.startScreenShare(sdkConfig);
+        await this.startScreenShare(config);
       } else {
         await this.stopScreenShare();
       }
@@ -737,7 +741,7 @@ export class HMSSDKActions implements IHMSActions {
     }, 'ConnectionQuality');
   }
 
-  private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
+  private async startScreenShare(config?: HMSScreenShareConfig) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
       await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);
@@ -760,7 +764,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
       this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
@@ -1092,11 +1096,14 @@ export class HMSSDKActions implements IHMSActions {
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
-        storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
+        storeTrack?.layer !== sdkTrack.getLayer() ||
+        storeTrack?.degraded !== sdkTrack.degraded ||
+        storeTrack?.preferredLayer !== sdkTrack.getPreferredLayer();
       if (hasFieldChanged) {
         this.setState(draft => {
           const track = draft.tracks[trackID] as HMSVideoTrack;
-          track.layer = sdkTrack.getSimulcastLayer();
+          track.layer = sdkTrack.getLayer();
+          track.preferredLayer = sdkTrack.getPreferredLayer();
           track.degraded = sdkTrack.degraded;
         }, action);
       }
@@ -1162,11 +1169,11 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
-  private setTrackVolume(value: number, trackId: HMSTrackID) {
+  private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
-        track.setVolume(value);
+        await track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
           if (track && track.type === 'audio') {

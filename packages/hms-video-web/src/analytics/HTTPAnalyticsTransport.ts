@@ -31,7 +31,7 @@ interface ClientEventBody {
 }
 
 class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
-  TAG = '[HTTPAnalyticsTransport]';
+  readonly TAG = '[HTTPAnalyticsTransport]';
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   isConnected = true;
   private env: null | ENV = null;

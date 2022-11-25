@@ -1,4 +1,4 @@
-import { HMSSimulcastLayer } from '../interfaces';
+import { VideoTrackLayerUpdate } from '../connection/channel-messages';
 import { HMSRole } from '../interfaces/role';
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
@@ -24,11 +24,7 @@ export interface TrackStateNotification {
 
 export interface OnTrackLayerUpdateNotification {
   tracks: {
-    [track_id: string]: {
-      current_layer: HMSSimulcastLayer;
-      expected_layer: HMSSimulcastLayer;
-      track_id: string;
-    };
+    [track_id: string]: VideoTrackLayerUpdate;
   };
 }
 

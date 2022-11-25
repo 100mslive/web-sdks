@@ -19,6 +19,7 @@ import { TypedEventEmitter } from '../utils/typed-event-emitter';
  *    - The audio and video tracks are passed to playlist manager to publish
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
+  private readonly TAG = '[PlaylistVideoManager]';
   private videoElement: HTMLVideoElement | null = null;
   private canvasContext: CanvasRenderingContext2D | null = null;
   private canvas!: HTMLCanvasElement;

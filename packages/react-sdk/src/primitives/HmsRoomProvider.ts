@@ -102,14 +102,13 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     providerProps.actions.setFrameworkInfo({
       type: 'react-web',
       version: React.version,
-      sdkVersion: require('../../package.json').version,
+      sdkVersion: process.env.REACT_SDK_VERSION,
     });
   }
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
       window.addEventListener('beforeunload', () => providerProps.actions.leave());
-      window.addEventListener('onunload', () => providerProps.actions.leave());
     }
   }, [leaveOnUnload]);
 
