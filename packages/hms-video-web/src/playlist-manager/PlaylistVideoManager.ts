@@ -28,7 +28,6 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private DEFAUL_FPS = 24;
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
-  private TAG = '[PlaylistVideoManager]';
 
   constructor(private audioContextManager: AudioContextManager) {
     super();
