@@ -119,11 +119,11 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
-  setVolume(value: number, trackId?: HMSTrackID): void {
+  async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
-      this.setTrackVolume(value, trackId);
+      await this.setTrackVolume(value, trackId);
     } else {
-      this.sdk.getAudioOutput().setVolume(value);
+      await this.sdk.getAudioOutput().setVolume(value);
       this.syncRoomState('setOutputVolume');
     }
   }
@@ -137,14 +137,19 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        track.preferLayer(layer);
+        //@ts-ignore
+        if (layer === HMSSimulcastLayer.NONE) {
+          HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          return;
+        }
+        await track.setPreferredLayer(layer);
         this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
-        HMSLogger.w(`track ${trackId} is not an video track`);
+        HMSLogger.w(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
@@ -759,7 +764,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
       this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
@@ -1091,11 +1096,14 @@ export class HMSSDKActions implements IHMSActions {
     if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
       const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
       const hasFieldChanged =
-        storeTrack?.layer !== sdkTrack.getSimulcastLayer() || storeTrack?.degraded !== sdkTrack.degraded;
+        storeTrack?.layer !== sdkTrack.getLayer() ||
+        storeTrack?.degraded !== sdkTrack.degraded ||
+        storeTrack?.preferredLayer !== sdkTrack.getPreferredLayer();
       if (hasFieldChanged) {
         this.setState(draft => {
           const track = draft.tracks[trackID] as HMSVideoTrack;
-          track.layer = sdkTrack.getSimulcastLayer();
+          track.layer = sdkTrack.getLayer();
+          track.preferredLayer = sdkTrack.getPreferredLayer();
           track.degraded = sdkTrack.degraded;
         }, action);
       }
@@ -1161,11 +1169,11 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
-  private setTrackVolume(value: number, trackId: HMSTrackID) {
+  private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
-        track.setVolume(value);
+        await track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
           if (track && track.type === 'audio') {

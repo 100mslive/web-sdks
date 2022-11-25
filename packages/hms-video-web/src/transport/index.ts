@@ -11,10 +11,10 @@ import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
-import HMSPublishConnection from '../connection/publish';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
-import HMSSubscribeConnection from '../connection/subscribe';
+import HMSPublishConnection from '../connection/publish/publishConnection';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
+import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { TrackDegradationController } from '../degradation';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
@@ -48,7 +48,6 @@ import {
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
-import { stringifyMediaStreamTrack } from '../utils/json';
 import HMSLogger from '../utils/logger';
 import { getNetworkInfo } from '../utils/network-info';
 import { PromiseCallbacks } from '../utils/promise';
@@ -66,7 +65,6 @@ interface NegotiateJoinParams {
   name: string;
   data: string;
   autoSubscribeVideo: boolean;
-  serverSubDegrade: boolean;
 }
 
 export default class HMSTransport implements ITransport {
@@ -249,12 +247,12 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrackAdd: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', stringifyMediaStreamTrack(track.nativeTrack));
+      HMSLogger.d(TAG, '[Subscribe] onTrackAdd', `${track}`);
       this.observer.onTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', stringifyMediaStreamTrack(track.nativeTrack));
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', `${track}`);
       this.observer.onTrackRemove(track);
     },
 
@@ -335,10 +333,9 @@ export default class HMSTransport implements ITransport {
 
       this.validateNotDisconnected('connect');
 
-      const isServerHandlingDegradation = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
       if (this.initConfig) {
         await this.waitForLocalRoleAvailability();
-        await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo, isServerHandlingDegradation);
+        await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo);
         await this.initRtcStatsMonitor();
 
         HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
@@ -699,7 +696,6 @@ export default class HMSTransport implements ITransport {
   private async createConnectionsAndNegotiateJoin(
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
-    isServerHandlingDegradation = true,
   ) {
     const isWebRTC = this.doesLocalPeerNeedWebRTC();
     if (isWebRTC) {
@@ -710,7 +706,6 @@ export default class HMSTransport implements ITransport {
       name: customData.name,
       data: customData.metaData,
       autoSubscribeVideo,
-      serverSubDegrade: isServerHandlingDegradation,
       isWebRTC,
     });
   }
@@ -740,11 +735,10 @@ export default class HMSTransport implements ITransport {
     name,
     data,
     autoSubscribeVideo,
-    serverSubDegrade,
     isWebRTC = true,
   }: NegotiateJoinParams & { isWebRTC: boolean }) {
     try {
-      await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });
+      await this.negotiateJoin({ name, data, autoSubscribeVideo, isWebRTC });
     } catch (error) {
       HMSLogger.e(TAG, 'Join negotiation failed ❌', error);
       const hmsError =
@@ -762,7 +756,7 @@ export default class HMSTransport implements ITransport {
         hmsError.isTerminal = false;
         const task = async () => {
           this.joinRetryCount++;
-          return await this.negotiateJoin({ name, data, autoSubscribeVideo, serverSubDegrade, isWebRTC });
+          return await this.negotiateJoin({ name, data, autoSubscribeVideo, isWebRTC });
         };
 
         await this.retryScheduler.schedule({
@@ -783,22 +777,16 @@ export default class HMSTransport implements ITransport {
     name,
     data,
     autoSubscribeVideo,
-    serverSubDegrade,
     isWebRTC = true,
   }: NegotiateJoinParams & { isWebRTC: boolean }): Promise<boolean> {
     if (isWebRTC) {
-      return await this.negotiateJoinWebRTC({ name, data, autoSubscribeVideo, serverSubDegrade });
+      return await this.negotiateJoinWebRTC({ name, data, autoSubscribeVideo });
     } else {
-      return await this.negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo, serverSubDegrade });
+      return await this.negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo });
     }
   }
 
-  private async negotiateJoinWebRTC({
-    name,
-    data,
-    autoSubscribeVideo,
-    serverSubDegrade,
-  }: NegotiateJoinParams): Promise<boolean> {
+  private async negotiateJoinWebRTC({ name, data, autoSubscribeVideo }: NegotiateJoinParams): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     if (!this.publishConnection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
@@ -806,7 +794,9 @@ export default class HMSTransport implements ITransport {
     }
     const offer = await this.publishConnection.createOffer();
     await this.publishConnection.setLocalDescription(offer);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, offer);
+    const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
+    const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
+    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -816,14 +806,11 @@ export default class HMSTransport implements ITransport {
     return !!answer;
   }
 
-  private async negotiateJoinNonWebRTC({
-    name,
-    data,
-    autoSubscribeVideo,
-    serverSubDegrade,
-  }: NegotiateJoinParams): Promise<boolean> {
+  private async negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo }: NegotiateJoinParams): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
-    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade);
+    const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
+    const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
+    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast);
     return !!response;
   }
 
@@ -925,6 +912,7 @@ export default class HMSTransport implements ITransport {
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
+      this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
       this.analyticsEventsService.flush();

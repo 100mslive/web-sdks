@@ -6,12 +6,12 @@ import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
+const TAG = '[HMSConnection]';
 interface RTCIceCandidatePair {
   local: RTCIceCandidate;
   remote: RTCIceCandidate;
 }
 
-const TAG = 'HMSConnection';
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;

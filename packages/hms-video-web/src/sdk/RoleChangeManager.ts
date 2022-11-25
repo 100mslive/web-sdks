@@ -1,6 +1,7 @@
 import { IStore } from './store';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
+import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
@@ -26,16 +27,23 @@ export default class RoleChangeManager {
       return;
     }
 
-    const wasPublishing = new Set(oldRole.publishParams.allowed || []);
-    const isPublishing = new Set(newRole.publishParams.allowed || []);
+    const wasPublishing = new Set(oldRole.publishParams.allowed);
+    const isPublishing = new Set(newRole.publishParams.allowed);
 
     const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
+    const videoHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.simulcast?.video,
+      newRole.publishParams.simulcast?.video,
+    );
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
     const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
-
-    await this.removeVideoTracks(removeVideo);
+    const screenHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.simulcast?.screen,
+      newRole.publishParams.simulcast?.screen,
+    );
     await this.removeAudioTrack(removeAudio);
-    await this.removeScreenTracks(removeScreen);
+    await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
+    await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
     this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
@@ -101,5 +109,15 @@ export default class RoleChangeManager {
 
   private removeTrack(wasPublishing: Set<string>, isPublishing: Set<string>, type: string) {
     return wasPublishing.has(type) && !isPublishing.has(type);
+  }
+
+  private hasSimulcastDifference(oldLayers?: SimulcastLayers, newLayers?: SimulcastLayers) {
+    if (!oldLayers && !newLayers) {
+      return false;
+    }
+    if (oldLayers?.layers?.length !== newLayers?.layers?.length) {
+      return true;
+    }
+    return false;
   }
 }

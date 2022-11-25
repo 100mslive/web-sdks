@@ -5,7 +5,6 @@ import { EventBus } from '../../events/EventBus';
 import { HMSLocalAudioTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
 
-const TAG = 'AudioPluginsManager';
 const DEFAULT_SAMPLE_RATE = 48000;
 
 //Handling sample rate error in case of firefox
@@ -27,6 +26,7 @@ const checkBrowserSupport = () => {
  * @see HMSAudioPlugin
  */
 export class HMSAudioPluginsManager {
+  private readonly TAG = '[AudioPluginsManager]';
   private readonly hmsTrack: HMSLocalAudioTrack;
   // Map maintains the insertion order
   private readonly pluginsMap: Map<string, HMSAudioPlugin>;
@@ -81,7 +81,7 @@ export class HMSAudioPluginsManager {
   private async addPluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
     if (this.pluginsMap.get(name)) {
-      HMSLogger.w(TAG, `plugin - ${name} already added.`);
+      HMSLogger.w(this.TAG, `plugin - ${name} already added.`);
       return;
     }
 
@@ -100,7 +100,7 @@ export class HMSAudioPluginsManager {
       await this.processPlugin(plugin);
       await this.connectToDestination();
     } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin', err);
+      HMSLogger.e(this.TAG, 'failed to add plugin', err);
       throw err;
     }
   }
@@ -112,7 +112,7 @@ export class HMSAudioPluginsManager {
   async validateAndThrow(name: string, plugin: HMSAudioPlugin) {
     const result = this.validatePlugin(plugin);
     if (result.isSupported) {
-      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+      HMSLogger.i(this.TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
       //Needed to re-add in the reprocess case, to send error message in case of failure
       this.analytics.added(name, this.audioContext!.sampleRate);
@@ -141,7 +141,7 @@ export class HMSAudioPluginsManager {
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes
       await this.cleanup();
-      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
+      HMSLogger.i(this.TAG, `No plugins left, stopping plugins loop`);
       await this.hmsTrack.setProcessedTrack(undefined);
     } else {
       // Reprocess the remaining plugins again because there is no way to connect
@@ -197,7 +197,7 @@ export class HMSAudioPluginsManager {
         try {
           await this.hmsTrack.setProcessedTrack(this.outputTrack);
         } catch (err) {
-          HMSLogger.e(TAG, 'error in setting processed track', err);
+          HMSLogger.e(this.TAG, 'error in setting processed track', err);
           throw err;
         }
       }
@@ -220,7 +220,7 @@ export class HMSAudioPluginsManager {
     } catch (err) {
       const name = plugin.getName();
       //TODO error happened on processing of plugin notify UI
-      HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+      HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
       //remove plugin from loop and stop analytics for it
       await this.removePluginInternal(plugin);
     }
@@ -232,17 +232,17 @@ export class HMSAudioPluginsManager {
         this.prevAudioNode.connect(this.destinationNode);
       }
     } catch (err) {
-      HMSLogger.e(TAG, 'error in connecting to destination node', err);
+      HMSLogger.e(this.TAG, 'error in connecting to destination node', err);
     }
   }
 
   private async removePluginInternal(plugin: HMSAudioPlugin) {
     const name = plugin.getName?.();
     if (!this.pluginsMap.get(name)) {
-      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
+      HMSLogger.w(this.TAG, `plugin - ${name} not found to remove.`);
       return;
     }
-    HMSLogger.i(TAG, `removing plugin ${name}`);
+    HMSLogger.i(this.TAG, `removing plugin ${name}`);
     this.pluginsMap.delete(name);
     plugin.stop();
     this.analytics.removed(name);

@@ -51,14 +51,10 @@ interface Props {
    * Number between 0 and 1 indication when the element is considered inView
    */
   threshold?: number;
-  /**
-   * Boolean indicating whether the element is visible or not
-   */
-  visible?: boolean;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, threshold, visible, ...props }) => {
-  const { videoRef } = useVideo({ trackId, attach, threshold, visible });
+export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, threshold, ...props }) => {
+  const { videoRef } = useVideo({ trackId, attach, threshold });
   return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
 };
 

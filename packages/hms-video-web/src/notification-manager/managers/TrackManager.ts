@@ -1,5 +1,6 @@
+import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSSimulcastLayer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
@@ -22,30 +23,10 @@ import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } fr
  * - TRACK_UPDATE comes before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
  */
 export class TrackManager {
+  private readonly TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
-
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
-
-  isTrackDegraded(prevLayer: HMSSimulcastLayer, newLayer: HMSSimulcastLayer): boolean {
-    const toInt = (layer: HMSSimulcastLayer): number => {
-      switch (layer) {
-        case HMSSimulcastLayer.HIGH:
-          return 3;
-        case HMSSimulcastLayer.MEDIUM:
-          return 2;
-        case HMSSimulcastLayer.LOW:
-          return 1;
-        case HMSSimulcastLayer.NONE:
-          return 0;
-      }
-    };
-
-    return toInt(newLayer) < toInt(prevLayer);
-  }
 
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
@@ -106,13 +87,7 @@ export class TrackManager {
       }
 
       if (track instanceof HMSRemoteVideoTrack) {
-        const isDegraded = this.isTrackDegraded(trackEntry.expected_layer, trackEntry.current_layer);
-        track.setLayerFromServer(trackEntry.current_layer, isDegraded);
-        if (isDegraded) {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
-        } else {
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
-        }
+        this.setLayer(track, trackEntry);
       }
     }
   };
@@ -177,6 +152,19 @@ export class TrackManager {
         : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
       this.tracksToProcess.delete(track.trackId);
     });
+  }
+
+  private setLayer(track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) {
+    const peer = this.store.getPeerByTrackId(track.trackId)!;
+    if (!peer) {
+      return;
+    }
+    const isDegraded = track.setLayerFromServer(layerUpdate);
+    if (isDegraded) {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, peer);
+    } else {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, peer);
+    }
   }
 
   private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {

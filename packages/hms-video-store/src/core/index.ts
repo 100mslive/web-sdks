@@ -17,6 +17,8 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
+  HMSSimulcastLayer,
+  simulcastMapping,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 
@@ -34,4 +36,5 @@ export type {
   HLSMeetingURLVariant,
   HMSScreenShareConfig,
   ScreenCaptureHandle,
+  HMSPreferredSimulcastLayer,
 } from './hmsSDKStore/sdkTypes';
