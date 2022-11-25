@@ -84,7 +84,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build for QA
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        if: github.event.inputs.env == 'qa'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
