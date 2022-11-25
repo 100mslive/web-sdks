@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { EventBus } from '../events/EventBus';
@@ -31,15 +30,12 @@ const INITIAL_STATE: AudioSinkState = {
 };
 
 export class AudioSinkManager {
-  private audioSink?: HTMLElement;
-  private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
   private readonly TAG = '[AudioSinkManager]:';
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
   private audio?: HTMLAudioElement;
   private stream?: MediaStream;
-  // private destination?: MediaStreamAudioDestinationNode;
 
   constructor(private store: IStore, private audioContextManager: AudioContextManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -70,30 +66,21 @@ export class AudioSinkManager {
     await this.audio?.play();
   }
 
-  init(elementId?: string) {
+  init() {
     if (this.state.initialized) {
       return;
     }
     this.state.initialized = true;
-    const audioSink = document.createElement('div');
-    audioSink.id = `HMS-SDK-audio-sink-${uuid()}`;
-    const userElement = elementId && document.getElementById(elementId);
-    const audioSinkParent = userElement || document.body;
-    audioSinkParent.append(audioSink);
-    this.audioSink = audioSink;
     this.stream = new MediaStream();
     this.audio = new Audio();
     this.audio.srcObject = this.stream;
   }
 
   cleanUp() {
-    this.audioSink?.remove();
-    this.audioSink = undefined;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.unsubscribe(this.handleAudioDeviceChange);
-    this.autoPausedTracks = new Set();
     this.state = { ...INITIAL_STATE };
   }
 
@@ -124,11 +111,9 @@ export class AudioSinkManager {
     if (event.error || !event.selection || event.type === 'video') {
       return;
     }
-    // this.audio?.play().catch(console.error);
   };
 
   private handleTrackRemove = (track: HMSRemoteAudioTrack) => {
-    this.autoPausedTracks.delete(track);
     this.stream?.removeTrack(track.nativeTrack);
     HMSLogger.d(this.TAG, 'Audio track removed', `${track}`);
   };
