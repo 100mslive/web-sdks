@@ -196,8 +196,7 @@ const ChatMessage = React.memo(
       if (rowRef.current) {
         setRowHeight(index, rowRef.current.clientHeight);
       }
-      // eslint-disable-next-line
-    }, [rowRef]);
+    }, [index, setRowHeight]);
 
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
@@ -316,7 +315,7 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
         scrollToBottom();
       }, 0);
     }
-  });
+  }, [messages.length, scrollToBottom]);
 
   return (
     <Box
