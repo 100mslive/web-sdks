@@ -22,16 +22,13 @@ import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HM
  *    - Track state change(enabled) as track update
  */
 export class PeerListManager {
+  private readonly TAG = '[PeerListManager]';
   constructor(
     private store: IStore,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
     public listener?: HMSUpdateListener,
   ) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any, isReconnecting: boolean) {
     if (method === HMSNotificationMethod.PEER_LIST) {

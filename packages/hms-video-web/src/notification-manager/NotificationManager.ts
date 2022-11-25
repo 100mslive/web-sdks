@@ -22,7 +22,7 @@ import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 
 export class NotificationManager {
-  private TAG = '[HMSNotificationManager]';
+  private readonly TAG = '[HMSNotificationManager]';
   private trackManager: TrackManager;
   private peerManager: PeerManager;
   private peerListManager: PeerListManager;
@@ -87,6 +87,7 @@ export class NotificationManager {
         HMSNotificationMethod.ACTIVE_SPEAKERS,
         HMSNotificationMethod.SFU_STATS,
         HMSNotificationMethod.CONNECTION_QUALITY,
+        undefined, // this is is to ignore notifications without any method
       ].includes(method)
     ) {
       HMSLogger.d(this.TAG, `Received notification - ${method}`, { notification });

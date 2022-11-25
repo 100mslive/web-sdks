@@ -34,7 +34,7 @@ export class DeviceManager implements HMSDeviceManager {
   hasWebcamPermission = false;
   hasMicrophonePermission = false;
 
-  private TAG = '[Device Manager]:';
+  private readonly TAG = '[Device Manager]:';
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;

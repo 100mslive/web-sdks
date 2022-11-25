@@ -5,8 +5,8 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
   HMSScreenShareConfig,
-  HMSSimulcastLayer,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
@@ -174,7 +174,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
@@ -183,11 +183,12 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
+
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.

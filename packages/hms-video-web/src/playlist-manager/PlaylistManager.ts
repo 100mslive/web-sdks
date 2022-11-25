@@ -46,7 +46,7 @@ export class PlaylistManager
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
-  private TAG = '[PlaylistManager]';
+  private readonly TAG = '[PlaylistManager]';
 
   constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();

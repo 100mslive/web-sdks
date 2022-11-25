@@ -58,9 +58,9 @@ jobs:
           echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
 
       # prod app can only be deployed to from a branch starting with production in its name
-      - name: Validate branch
-        if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
-        run: exit 1
+      # - name: Validate branch
+      #   if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
+      #   run: exit 1
 
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.10.0
@@ -70,21 +70,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: yarn packages cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: yarn packages cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       node_modules
+      #       */*/node_modules
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install packages
         run: yarn install --frozen-lockfile
 
       - name: Build for QA
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        if: github.event.inputs.env == 'qa'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
@@ -98,7 +98,7 @@ jobs:
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
       - name: Upload to QA S3 Bucket
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        if: github.event.inputs.env == 'qa'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
