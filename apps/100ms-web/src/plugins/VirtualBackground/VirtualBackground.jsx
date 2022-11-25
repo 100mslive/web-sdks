@@ -48,7 +48,7 @@ export const VirtualBackground = () => {
       window.HMS.virtualBackground = pluginRef.current;
       const { background, backgroundType } = getRandomVirtualBackground();
       await pluginRef.current.setBackground(background, backgroundType);
-      await hmsActions.addPluginToVideoTrack(pluginRef.current);
+      await hmsActions.addPluginToVideoTrack(pluginRef.current, 15);
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }
