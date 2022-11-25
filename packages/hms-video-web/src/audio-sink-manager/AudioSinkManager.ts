@@ -7,6 +7,7 @@ import { AudioContextManager } from '../playlist-manager/AudioContextManager';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { isMobile } from '../utils/support';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -74,9 +75,12 @@ export class AudioSinkManager {
     this.stream = new MediaStream();
     this.audio = new Audio();
     this.audio.srcObject = this.stream;
+    this.audio.addEventListener('pause', this.handlePause);
   }
 
   cleanUp() {
+    this.audio?.removeEventListener('pause', this.handlePause);
+    this.audio = undefined;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -116,5 +120,22 @@ export class AudioSinkManager {
   private handleTrackRemove = (track: HMSRemoteAudioTrack) => {
     this.stream?.removeTrack(track.nativeTrack);
     HMSLogger.d(this.TAG, 'Audio track removed', `${track}`);
+  };
+
+  /**
+   * When earphones are removed, the audio is autopaused. It needs to be played again
+   */
+  private handlePause = () => {
+    HMSLogger.w(this.TAG, 'audio playback paused, trying to play again');
+    const play = () => {
+      this.audio?.play().catch(error => {
+        HMSLogger.w(this.TAG, 'audio playback error', error.message);
+      });
+    };
+    if (isMobile()) {
+      setTimeout(() => play(), 500);
+    } else {
+      play();
+    }
   };
 }
