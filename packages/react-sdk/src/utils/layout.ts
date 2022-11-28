@@ -1,15 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-shadow */
-import {
-  HMSPeer,
-  HMSPreferredSimulcastLayer,
-  HMSScreenVideoTrack,
-  HMSSimulcastLayerDefinition,
-  HMSTrack,
-  HMSTrackID,
-  HMSVideoTrack,
-} from '@100mslive/hms-video-store';
+import { HMSPeer, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '@100mslive/hms-video-store';
 
 export const chunk = <T>(elements: T[], chunkSize: number, onlyOnePage: boolean) =>
   elements.reduce((resultArray: T[][], tile: T, index: number) => {
@@ -471,25 +463,4 @@ export const getVideoTracksFromPeers = (
     }
   }
   return peerTiles;
-};
-
-export const getClosestLayer = ({
-  layerDefinitions,
-  width,
-  height,
-}: {
-  layerDefinitions: HMSSimulcastLayerDefinition[];
-  width: number;
-  height: number;
-}): HMSPreferredSimulcastLayer => {
-  let diff = Number.MAX_VALUE;
-  let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
-  for (const { resolution, layer } of layerDefinitions) {
-    const currDiff = Math.abs(width - (resolution.width || 0)) + Math.abs(height - (resolution.height || 0));
-    if (currDiff < diff) {
-      diff = currDiff;
-      closestLayer = layer;
-    }
-  }
-  return closestLayer!;
 };

@@ -1,3 +1,4 @@
+import { HMSRemoteVideoElementManager } from './HMSRemoteVideoElementManager';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import {
@@ -15,6 +16,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+  private videoHandler: HMSRemoteVideoElementManager = new HMSRemoteVideoElementManager(this);
 
   public get degraded() {
     return this._degraded;
@@ -72,6 +74,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
     await this.updateLayer('addSink');
+    this.videoHandler?.setVideoElement(videoElement);
     this.pushInHistory(`uiSetLayer-high`);
   }
 
