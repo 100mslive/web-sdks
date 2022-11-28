@@ -330,7 +330,6 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
         style={{
           width: "90%",
           height: "100%",
-          overflow: "none !important",
         }}
       >
         {({ height, width }) => (
@@ -340,6 +339,9 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
             itemSize={getRowHeight}
             width={width}
             height={height}
+            style={{
+              overflowX: "hidden",
+            }}
           >
             {({ index, style }) => (
               <ChatMessage
