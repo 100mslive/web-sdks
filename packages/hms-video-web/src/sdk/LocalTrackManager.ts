@@ -473,11 +473,8 @@ export class LocalTrackManager {
     }
     const localPeer = this.store.getLocalPeer();
     const audioTrack = localPeer?.audioTrack;
-    const initialSettingsDevice = this.deviceManager.audioInput.find(
-      device => initialSettings.audioInputDeviceId === device.deviceId,
-    );
     // Get device from the tracks already added in preview
-    const audioDeviceId = audioTrack?.settings.deviceId || initialSettingsDevice?.deviceId;
+    const audioDeviceId = audioTrack?.settings.deviceId || initialSettings.audioInputDeviceId;
 
     return new HMSAudioTrackSettingsBuilder()
       .codec(publishParams.audio.codec as HMSAudioCodec)
@@ -493,11 +490,8 @@ export class LocalTrackManager {
     }
     const localPeer = this.store.getLocalPeer();
     const videoTrack = localPeer?.videoTrack;
-    const initialSettingsDevice = this.deviceManager.videoInput.find(
-      device => initialSettings.videoDeviceId === device.deviceId,
-    );
     // Get device from the tracks already added in preview
-    const videoDeviceId = videoTrack?.settings.deviceId || initialSettingsDevice?.deviceId;
+    const videoDeviceId = videoTrack?.settings.deviceId || initialSettings.videoDeviceId;
     const video = publishParams.video;
     return new HMSVideoTrackSettingsBuilder()
       .codec(video.codec as HMSVideoCodec)
