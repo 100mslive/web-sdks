@@ -167,15 +167,16 @@ const ChatActions = ({ onPin }) => {
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
-
-      <Dropdown.Content sideOffset={5} align="center" css={{ width: "$48" }}>
-        <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
-          <PinIcon />
-          <Text variant="sm" css={{ ml: "$4" }}>
-            Pin Message
-          </Text>
-        </Dropdown.Item>
-      </Dropdown.Content>
+      <Dropdown.Portal>
+        <Dropdown.Content sideOffset={5} align="end" css={{ width: "$48" }}>
+          <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
+            <PinIcon />
+            <Text variant="sm" css={{ ml: "$4" }}>
+              Pin Message
+            </Text>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 };
