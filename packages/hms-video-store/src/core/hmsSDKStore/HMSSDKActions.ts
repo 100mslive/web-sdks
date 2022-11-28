@@ -1163,8 +1163,8 @@ export class HMSSDKActions implements IHMSActions {
     const audioTrack = sdkPeer.audioTrack as SDKHMSLocalAudioTrack;
     const videoTrack = sdkPeer.videoTrack as SDKHMSLocalVideoTrack;
     return {
-      audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
-      videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
+      audioInputDeviceId: audioTrack?.getMediaTrackSettings().deviceId || settings.audioInputDeviceId,
+      videoInputDeviceId: videoTrack?.getMediaTrackSettings().deviceId || settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
     };
   }
