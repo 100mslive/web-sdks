@@ -156,12 +156,7 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <Box
-              css={{
-                display: "flex",
-                flexDirection: "row-reverse",
-              }}
-            >
+            <Box>
               <HorizontalMenuIcon />
             </Box>
           </Tooltip>
