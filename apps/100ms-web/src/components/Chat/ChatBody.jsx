@@ -295,10 +295,10 @@ const VirtualizedChatMessages = ({ messages, setPinnedMessage }) => {
     return rowHeights.current[index] + 16 || 72;
   }
 
-  function setRowHeight(index, size) {
+  const setRowHeight = useCallback((index, size) => {
     listRef.current.resetAfterIndex(0);
     rowHeights.current = { ...rowHeights.current, [index]: size };
-  }
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (listRef.current && listRef.current.scrollToItem) {
