@@ -70,21 +70,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # - name: yarn packages cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       node_modules
-      #       */*/node_modules
-      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-yarn-
+      - name: yarn packages cache
+        uses: actions/cache@v2
+        if: github.event.inputs.env != 'prod'
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install packages
         run: yarn install --frozen-lockfile
 
       - name: Build for QA
-        if: github.event.inputs.env == 'qa'
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
@@ -98,7 +99,7 @@ jobs:
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
       - name: Upload to QA S3 Bucket
-        if: github.event.inputs.env == 'qa'
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
