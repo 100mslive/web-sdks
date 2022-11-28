@@ -11,6 +11,7 @@ export const useEmojiPickerStyles = showing => {
           #root {
             --em-rgb-color: var(--hms-ui-colors-textPrimary);
             --em-rgb-input: var(--hms-ui-colors-textPrimary);
+            --em-color-border: var(--hms-ui-colors-surfaceDefault);
             --color-b: var(--hms-ui-colors-textPrimary);
             --rgb-background: transparent;
             color: var(--hms-ui-colors-textPrimary);
