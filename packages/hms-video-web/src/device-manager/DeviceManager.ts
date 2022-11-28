@@ -8,6 +8,7 @@ import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../m
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { debounce } from '../utils/timer-utils';
 
 export type SelectedDevices = {
   audioInput?: MediaDeviceInfo;
@@ -106,6 +107,7 @@ export class DeviceManager implements HMSDeviceManager {
 
   getCurrentSelection = (): SelectedDevices => {
     const localPeer = this.store.getLocalPeer();
+    console.log('EEE', localPeer?.audioTrack?.getMediaTrackSettings());
     const audioDevice = this.createIdentifier(localPeer?.audioTrack?.getMediaTrackSettings());
     const videoDevice = this.createIdentifier(localPeer?.videoTrack?.getMediaTrackSettings());
     const audioSelection = this.audioInput.find(device => {
@@ -166,7 +168,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = async () => {
+  private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
@@ -180,7 +182,7 @@ export class DeviceManager implements HMSDeviceManager {
         devices: this.getDevices(),
       }),
     );
-  };
+  }, 500).bind(this);
 
   /**
    * Function to get the device after device change
