@@ -107,7 +107,6 @@ export class DeviceManager implements HMSDeviceManager {
 
   getCurrentSelection = (): SelectedDevices => {
     const localPeer = this.store.getLocalPeer();
-    console.log('EEE', localPeer?.audioTrack?.getMediaTrackSettings());
     const audioDevice = this.createIdentifier(localPeer?.audioTrack?.getMediaTrackSettings());
     const videoDevice = this.createIdentifier(localPeer?.videoTrack?.getMediaTrackSettings());
     const audioSelection = this.audioInput.find(device => {
