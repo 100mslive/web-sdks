@@ -73,13 +73,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
-    await this.updateLayer('addSink');
-    this.videoHandler?.setVideoElement(videoElement);
+    this.videoHandler?.addVideoElement(videoElement);
     this.pushInHistory(`uiSetLayer-high`);
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
+    this.videoHandler?.removeVideoElement(videoElement);
     await this.updateLayer('removeSink');
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');

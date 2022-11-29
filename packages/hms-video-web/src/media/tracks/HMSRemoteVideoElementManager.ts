@@ -1,31 +1,48 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
-import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { HMSPreferredSimulcastLayer, HMSSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { isBrowser } from '../../utils/support';
 import { debounce } from '../../utils/timer-utils';
 
 export class HMSRemoteVideoElementManager {
   private DELTA_THRESHOLD = 0.5;
-  private resizeObserver?: ResizeObserver;
-  constructor(private track: HMSRemoteVideoTrack) {}
+  private resizeObserver: ResizeObserver;
+  private videoElements = new Set<HTMLVideoElement>();
+  private layerToIntMapping = {
+    [HMSSimulcastLayer.NONE]: -1,
+    [HMSSimulcastLayer.LOW]: 0,
+    [HMSSimulcastLayer.MEDIUM]: 1,
+    [HMSSimulcastLayer.HIGH]: 2,
+  };
+  constructor(private track: HMSRemoteVideoTrack) {
+    this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
+  }
 
-  setVideoElement(videoElement: HTMLVideoElement) {
+  addVideoElement(videoElement: HTMLVideoElement) {
     if (isBrowser && typeof window.ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
       this.resizeObserver.observe(videoElement, { box: 'border-box' });
     }
   }
 
   private handleResize = async (entries: ResizeObserverEntry[]) => {
+    let maxLayer!: HMSPreferredSimulcastLayer;
     for (const entry of entries) {
-      const layer = this.getClosestLayer({ width: entry.contentRect.height, height: entry.contentRect.height });
-      await this.track.setPreferredLayer(layer);
+      const { width, height } = entry.contentRect;
+      const layer = this.getClosestLayer({ width, height });
+      if (!maxLayer) {
+        maxLayer = layer;
+      } else {
+        maxLayer = this.layerToIntMapping[layer] > this.layerToIntMapping[maxLayer] ? layer : maxLayer;
+      }
     }
+    await this.track.setPreferredLayer(maxLayer);
   };
 
   private getClosestLayer = (dimensions: { width: number; height: number }): HMSPreferredSimulcastLayer => {
     let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
     const maxDimension = dimensions.width >= dimensions.height ? 'width' : 'height';
-    const layers = this.track.getSimulcastDefinitions().reverse();
+    const layers = this.track
+      .getSimulcastDefinitions()
+      .sort((a, b) => this.layerToIntMapping[a.layer] - this.layerToIntMapping[b.layer]);
     for (let i = 0; i < layers.length; i++) {
       const { resolution, layer } = layers[i];
       if (dimensions[maxDimension] <= resolution[maxDimension]) {
@@ -46,7 +63,8 @@ export class HMSRemoteVideoElementManager {
     return closestLayer!;
   };
 
-  cleanup() {
-    this.resizeObserver?.disconnect();
+  removeVideoElement(videoElement: HTMLVideoElement): void {
+    this.videoElements.delete(videoElement);
+    this.resizeObserver.unobserve(videoElement);
   }
 }
