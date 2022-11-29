@@ -194,8 +194,17 @@ export class HMSSdk implements HMSInterface {
         return;
       }
 
-      if (message.method === HMSNotificationMethod.POLICY_CHANGE) {
-        this.analyticsTimer.end(TimedEvent.ON_POLICY_CHANGE);
+      switch (message.method) {
+        case HMSNotificationMethod.POLICY_CHANGE:
+          this.analyticsTimer.end(TimedEvent.ON_POLICY_CHANGE);
+          break;
+        case HMSNotificationMethod.PEER_LIST:
+          this.analyticsTimer.end(TimedEvent.PEER_LIST);
+          break;
+        case HMSNotificationMethod.ROOM_STATE:
+          this.analyticsTimer.end(TimedEvent.ROOM_STATE);
+          break;
+        default:
       }
 
       this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
@@ -421,6 +430,7 @@ export class HMSSdk implements HMSInterface {
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       HMSAudioContextHandler.resumeContext();
+      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
@@ -1077,6 +1087,9 @@ export class HMSSdk implements HMSInterface {
           TimedEvent.ON_POLICY_CHANGE,
           TimedEvent.LOCAL_AUDIO_TRACK,
           TimedEvent.LOCAL_VIDEO_TRACK,
+          TimedEvent.PEER_LIST,
+          TimedEvent.ROOM_STATE,
+          TimedEvent.JOIN_RESPONSE,
         ),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
@@ -1094,6 +1107,8 @@ export class HMSSdk implements HMSInterface {
           TimedEvent.ON_POLICY_CHANGE,
           TimedEvent.LOCAL_AUDIO_TRACK,
           TimedEvent.LOCAL_VIDEO_TRACK,
+          TimedEvent.PEER_LIST,
+          TimedEvent.ROOM_STATE,
         ),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),

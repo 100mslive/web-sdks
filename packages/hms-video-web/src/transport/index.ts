@@ -706,6 +706,7 @@ export default class HMSTransport implements ITransport {
       this.createPeerConnections();
     }
 
+    this.analyticsTimer.start(TimedEvent.JOIN_RESPONSE);
     await this.negotiateJoinWithRetry({
       name: customData.name,
       data: customData.metaData,
@@ -713,6 +714,7 @@ export default class HMSTransport implements ITransport {
       serverSubDegrade: isServerHandlingDegradation,
       isWebRTC,
     });
+    this.analyticsTimer.end(TimedEvent.JOIN_RESPONSE);
   }
 
   private createPeerConnections() {
@@ -962,6 +964,7 @@ export default class HMSTransport implements ITransport {
     await this.signal.open(this.endpoint);
     this.analyticsTimer.end(TimedEvent.WEBSOCKET_CONNECT);
     this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
+    this.analyticsTimer.start(TimedEvent.ROOM_STATE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
