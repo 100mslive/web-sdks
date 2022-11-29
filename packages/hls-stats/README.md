@@ -5,6 +5,11 @@ A simple library for HLS stats for Hls.js.
 ## Installation
 
 ```shell
+yarn add @100mslive/hls-stats
+```
+or
+
+```shell
 npm install --save @100mslive/hls-stats
 ```
 
@@ -12,6 +17,9 @@ npm install --save @100mslive/hls-stats
 
 ### initialization
 ```javascript
+
+import Hls from "hls.js";
+
 /**
  * Initialize Hls.js and attach the video element.
  */
@@ -20,7 +28,7 @@ hlsInstance.loadSource(hlsUrl);
 hlsInstance.attachMedia(videoEl);
 
 /**
- * initiate HlsStats
+ * initialize HlsStats
  */
 const hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
@@ -31,7 +39,7 @@ The `interval` tells how frequent you want hls-stats to report back to you. Defa
 
 ```javascript
 const unsubscribe = hlsStats.subscribe(state => {
-    // profit
+    // ...
 });
 
 ```
