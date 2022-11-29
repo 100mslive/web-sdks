@@ -43,7 +43,7 @@ const unsubscribe = hlsStats.subscribe(state => {
 });
 
 ```
-the `subscribe()` also returns a reference to `unsubscribe()` function which could later be used to unsubsribe
+the `subscribe()` also returns a reference to `unsubscribe()` function which could later be used to unsubscribe
 from your subscription
 
 ## Exposed Stats
