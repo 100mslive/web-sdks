@@ -107,7 +107,6 @@ jobs:
         with:
           name: build-artifact
           path: apps/100ms-custom-app/build
-          retention-days: 5
 
   upload:
     needs: build
