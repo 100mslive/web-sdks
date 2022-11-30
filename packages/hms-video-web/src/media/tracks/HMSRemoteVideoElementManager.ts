@@ -5,7 +5,7 @@ import { debounce } from '../../utils/timer-utils';
 
 export class HMSRemoteVideoElementManager {
   private DELTA_THRESHOLD = 0.5;
-  private resizeObserver: ResizeObserver;
+  private resizeObserver?: ResizeObserver;
   private videoElements = new Set<HTMLVideoElement>();
   private layerToIntMapping = {
     [HMSSimulcastLayer.NONE]: -1,
@@ -14,12 +14,16 @@ export class HMSRemoteVideoElementManager {
     [HMSSimulcastLayer.HIGH]: 2,
   };
   constructor(private track: HMSRemoteVideoTrack) {
-    this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
+    if (isBrowser && typeof window.ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
+    }
   }
 
-  addVideoElement(videoElement: HTMLVideoElement) {
-    if (isBrowser && typeof window.ResizeObserver !== 'undefined') {
+  async addVideoElement(videoElement: HTMLVideoElement) {
+    if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, { box: 'border-box' });
+    } else {
+      this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
@@ -65,6 +69,6 @@ export class HMSRemoteVideoElementManager {
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
     this.videoElements.delete(videoElement);
-    this.resizeObserver.unobserve(videoElement);
+    this.resizeObserver?.unobserve(videoElement);
   }
 }
