@@ -125,6 +125,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifact
+          path: build
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Upload to Dev S3 Bucket
         if: github.event.inputs.env == 'dev'
@@ -132,8 +136,8 @@ jobs:
           BUCKET: ${{ secrets.S3_BUCKET_DEV }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./build s3://$BUCKET --include "index.html"
 
       - name: Upload to QA S3 Bucket
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
@@ -141,8 +145,8 @@ jobs:
           BUCKET: ${{ secrets.S3_BUCKET }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./build s3://$BUCKET --include "index.html"
 
       - name: Upload to Prod S3 Bucket
         if: github.event.inputs.env == 'prod'
@@ -150,8 +154,8 @@ jobs:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./build s3://$BUCKET --include "index.html"
 
       - name: Notify slack success
         if: github.event.inputs.env == 'prod' && success()
