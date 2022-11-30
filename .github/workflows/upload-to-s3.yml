@@ -127,9 +127,6 @@ jobs:
           name: build-artifact
           path: build
 
-      - name: Display structure of downloaded files
-        run: ls -R
-
       - name: Upload to Dev S3 Bucket
         if: github.event.inputs.env == 'dev'
         env:
