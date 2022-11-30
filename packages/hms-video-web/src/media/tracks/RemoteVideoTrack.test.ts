@@ -6,7 +6,7 @@ import HMSRemoteStream from '../streams/HMSRemoteStream';
 const streamId = '123';
 const trackId = '456';
 const nativeStream = { id: streamId } as MediaStream;
-const videoElement = { srcObject: null } as HTMLVideoElement;
+let videoElement!: HTMLVideoElement;
 
 describe('remoteVideoTrack', () => {
   let stream: HMSRemoteStream;
@@ -14,6 +14,7 @@ describe('remoteVideoTrack', () => {
   let track: HMSRemoteVideoTrack;
   let nativeTrack: MediaStreamTrack;
   beforeEach(() => {
+    videoElement = document.createElement('video');
     sendOverApiDataChannelWithResponse = jest.fn();
     const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
@@ -89,7 +90,7 @@ describe('remoteVideoTrack', () => {
   });
 
   test('multiple addsink and removesink', async () => {
-    const videoElement2 = { srcObject: null } as HTMLVideoElement;
+    const videoElement2 = document.createElement('video');
     await track.addSink(videoElement);
     await track.addSink(videoElement2);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
