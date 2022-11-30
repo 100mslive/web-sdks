@@ -8,6 +8,7 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
+import { isBrowser } from '../../utils/support';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
@@ -72,9 +73,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async addSink(videoElement: HTMLVideoElement) {
-    super.addSink(videoElement);
-    this.videoHandler?.addVideoElement(videoElement);
-    this.pushInHistory(`uiSetLayer-high`);
+    const visible = isBrowser && window.getComputedStyle(videoElement).visibility === 'visible';
+    if (visible) {
+      super.addSink(videoElement);
+      this.videoHandler?.addVideoElement(videoElement);
+      this.pushInHistory(`uiSetLayer-high`);
+    }
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
