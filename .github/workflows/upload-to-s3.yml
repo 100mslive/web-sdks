@@ -29,7 +29,7 @@ on:
       - '.github/**'
 
 jobs:
-  upload:
+  setup:
     runs-on: ubuntu-latest
     env:
       REACT_APP_TILE_SHAPE: '1-1'
@@ -84,19 +84,90 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
+  build-dev:
+    if: github.event.inputs.env == 'dev'
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build for Dev
+        if: github.event.inputs.env == 'dev'
+        run: yarn build
+        env:
+          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+      - name: 'Upload Dev Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: dev-build-artifact
+          path: ./apps/100ms-custom-app/build
+          retention-days: 5
+
+  build-qa:
+    if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Build for QA
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
           REACT_APP_ENABLE_WHITEBOARD: 'true'
+      - name: 'Upload QA Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: qa-build-artifact
+          path: ./apps/100ms-custom-app/build
+          retention-days: 5
 
+  build-prod:
+    if: github.event.inputs.env == 'prod'
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build for Production
+        if: github.event.inputs.env == 'prod'
+        run: yarn build
+        env:
+          REACT_APP_ENV: 'prod'
+      - name: 'Upload Prod Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-build-artifact
+          path: ./apps/100ms-custom-app/build
+          retention-days: 5
+
+  upload:
+    needs: [build-qa, build-dev, build-prod]
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.S3_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
+
+      - name: Download Dev artifact
+        if: github.event.inputs.env == 'dev'
+        uses: actions/download-artifact@v3
+        with:
+          name: dev-build-artifact
+
+      - name: Upload to Dev S3 Bucket
+        if: github.event.inputs.env == 'dev'
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET_DEV }}
+        # upload static folder first and then upload the rest to ensure index.html assets are all present
+        run: |
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+
+      - name: Download QA artifact
+        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+        uses: actions/download-artifact@v3
+        with:
+          name: qa-build-artifact
 
       - name: Upload to QA S3 Bucket
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
@@ -107,31 +178,16 @@ jobs:
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
 
-      - name: Build for Production
+      - name: Download Prod artifact
         if: github.event.inputs.env == 'prod'
-        run: yarn build
-        env:
-          REACT_APP_ENV: 'prod'
+        uses: actions/download-artifact@v3
+        with:
+          name: prod-build-artifact
 
       - name: Upload to Prod S3 Bucket
         if: github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
-        # upload static folder first and then upload the rest to ensure index.html assets are all present
-        run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
-
-      - name: Build for Dev
-        if: github.event.inputs.env == 'dev'
-        run: yarn build
-        env:
-          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
-
-      - name: Upload to Dev S3 Bucket
-        if: github.event.inputs.env == 'dev'
-        env:
-          BUCKET: ${{ secrets.S3_BUCKET_DEV }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
