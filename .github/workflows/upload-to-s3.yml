@@ -28,30 +28,29 @@ on:
       - 'internal-docs/**'
       - '.github/**'
 
-env:
-  REACT_APP_TILE_SHAPE: '1-1'
-  REACT_APP_THEME: 'dark'
-  REACT_APP_COLOR: '#2F80FF'
-  REACT_APP_LOGO: ''
-  REACT_APP_FONT: 'Roboto'
-  REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
-  REACT_APP_POLICY_CONFIG: ''
-  REACT_APP_WEBINAR_PROPS: '{}'
-  REACT_APP_DEFAULT_APP_DETAILS: '{}'
-  ENABLE_ROOT_PATH_BUILD_CACHE: '1'
-  REACT_APP_PUSHER_APP_KEY: ${{ secrets.PUSHER_KEY }}
-  REACT_APP_AMBIENT_MUSIC: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3'
-  REACT_APP_PUSHER_AUTHENDPOINT: 'https://whiteboard-server.vercel.app/api/pusher/auth'
-  REACT_APP_LOGROCKET_BLACKLIST: 'peakperformerapp.app.100ms.live,callrockethealth.app.100ms.live,buyume1.app.100ms.live,automation.app.100ms.live,juniorkoder.app.100ms.live,qaroy1.qa-app.100ms.live,kluster.app.100ms.live,pankhuriapp.app.100ms.live,leancrop.app.100ms.live,routes2roots-class.app.100ms.live,liveholofy.app.100ms.live,ulesson.app.100ms.live,truyoga.app.100ms.live'
-  REACT_APP_PORTRAIT_MODE_DOMAINS: 'whatmorelive-stage.app.100ms.live,arjun.app.100ms.live,koo.app.100ms.live,socialjawn.app.100ms.live'
-  REACT_APP_AUDIO_PLAYLIST: '[{"name":"Audio1","id":"audio1","metadata":{"description":"Artist1"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio1.mp3","type":"audio"},{"name":"Audio2","id":"audio2","metadata":{"description":"Artist2"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3","type":"audio"},{"name":"Audio3","id":"audio3","metadata":{"description":"Artist3"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio3.mp3","type":"audio"},{"name":"Audio4","id":"audio4","metadata":{"description":"Artist4"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio4.mp3","type":"audio"}]'
-  REACT_APP_VIDEO_PLAYLIST: '[{"name":"100ms-360P","id":"video1","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-360p.mp4","type":"video"},{"name":"100ms-720P","id":"video2","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-720p.mp4","type":"video"},{"name":"Big Buck Bunny","id":"video3","metadata":{"description":"Bunny"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/video2.mp4","type":"video"}]'
-  REACT_APP_HEADLESS_JOIN: false
-  REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
-
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_TILE_SHAPE: '1-1'
+      REACT_APP_THEME: 'dark'
+      REACT_APP_COLOR: '#2F80FF'
+      REACT_APP_LOGO: ''
+      REACT_APP_FONT: 'Roboto'
+      REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
+      REACT_APP_POLICY_CONFIG: ''
+      REACT_APP_WEBINAR_PROPS: '{}'
+      REACT_APP_DEFAULT_APP_DETAILS: '{}'
+      ENABLE_ROOT_PATH_BUILD_CACHE: '1'
+      REACT_APP_PUSHER_APP_KEY: ${{ secrets.PUSHER_KEY }}
+      REACT_APP_AMBIENT_MUSIC: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3'
+      REACT_APP_PUSHER_AUTHENDPOINT: 'https://whiteboard-server.vercel.app/api/pusher/auth'
+      REACT_APP_LOGROCKET_BLACKLIST: 'peakperformerapp.app.100ms.live,callrockethealth.app.100ms.live,buyume1.app.100ms.live,automation.app.100ms.live,juniorkoder.app.100ms.live,qaroy1.qa-app.100ms.live,kluster.app.100ms.live,pankhuriapp.app.100ms.live,leancrop.app.100ms.live,routes2roots-class.app.100ms.live,liveholofy.app.100ms.live,ulesson.app.100ms.live,truyoga.app.100ms.live'
+      REACT_APP_PORTRAIT_MODE_DOMAINS: 'whatmorelive-stage.app.100ms.live,arjun.app.100ms.live,koo.app.100ms.live,socialjawn.app.100ms.live'
+      REACT_APP_AUDIO_PLAYLIST: '[{"name":"Audio1","id":"audio1","metadata":{"description":"Artist1"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio1.mp3","type":"audio"},{"name":"Audio2","id":"audio2","metadata":{"description":"Artist2"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3","type":"audio"},{"name":"Audio3","id":"audio3","metadata":{"description":"Artist3"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio3.mp3","type":"audio"},{"name":"Audio4","id":"audio4","metadata":{"description":"Artist4"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio4.mp3","type":"audio"}]'
+      REACT_APP_VIDEO_PLAYLIST: '[{"name":"100ms-360P","id":"video1","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-360p.mp4","type":"video"},{"name":"100ms-720P","id":"video2","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-720p.mp4","type":"video"},{"name":"Big Buck Bunny","id":"video3","metadata":{"description":"Bunny"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/video2.mp4","type":"video"}]'
+      REACT_APP_HEADLESS_JOIN: false
+      REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
     steps:
       - name: log inputs
         run: |
@@ -84,81 +83,34 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
-      - name: 'Upload Setup Artifact'
-        uses: actions/upload-artifact@v3
-        with:
-          name: setup-artifact
-          path: .
-          retention-days: 1
-
-  build-dev:
-    if: github.event.inputs.env == 'dev'
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Setup artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: setup-artifact
       - name: Build for Dev
         if: github.event.inputs.env == 'dev'
         run: yarn build
         env:
           REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
-      - name: 'Upload Dev Artifact'
-        uses: actions/upload-artifact@v3
-        with:
-          name: dev-build-artifact
-          path: ./apps/100ms-custom-app/build
-          retention-days: 5
 
-  build-qa:
-    if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Setup artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: setup-artifact
-      - name: Test
-        run: ls
       - name: Build for QA
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
           REACT_APP_ENABLE_WHITEBOARD: 'true'
-      - name: 'Upload QA Artifact'
-        uses: actions/upload-artifact@v3
-        with:
-          name: qa-build-artifact
-          path: ./apps/100ms-custom-app/build
-          retention-days: 5
 
-  build-prod:
-    if: github.event.inputs.env == 'prod'
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Setup artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: setup-artifact
       - name: Build for Production
         if: github.event.inputs.env == 'prod'
         run: yarn build
         env:
           REACT_APP_ENV: 'prod'
-      - name: 'Upload Prod Artifact'
+
+      - name: 'Upload Build Artifact'
         uses: actions/upload-artifact@v3
         with:
-          name: prod-build-artifact
+          name: build-artifact
           path: ./apps/100ms-custom-app/build
           retention-days: 5
 
   upload:
-    needs: [build-qa, build-dev, build-prod]
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -169,11 +121,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
-      - name: Download Dev artifact
-        if: github.event.inputs.env == 'dev'
+      - name: Download Build artifact
         uses: actions/download-artifact@v3
         with:
-          name: dev-build-artifact
+          name: build-artifact
 
       - name: Upload to Dev S3 Bucket
         if: github.event.inputs.env == 'dev'
@@ -184,12 +135,6 @@ jobs:
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
 
-      - name: Download QA artifact
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-        uses: actions/download-artifact@v3
-        with:
-          name: qa-build-artifact
-
       - name: Upload to QA S3 Bucket
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         env:
@@ -198,12 +143,6 @@ jobs:
         run: |
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
-
-      - name: Download Prod artifact
-        if: github.event.inputs.env == 'prod'
-        uses: actions/download-artifact@v3
-        with:
-          name: prod-build-artifact
 
       - name: Upload to Prod S3 Bucket
         if: github.event.inputs.env == 'prod'
