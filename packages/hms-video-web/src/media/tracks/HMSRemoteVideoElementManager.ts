@@ -41,30 +41,32 @@ export class HMSRemoteVideoElementManager {
     await this.track.setPreferredLayer(maxLayer);
   };
 
-  private getClosestLayer = (dimensions: { width: number; height: number }): HMSPreferredSimulcastLayer => {
-    let closestLayer: HMSPreferredSimulcastLayer | undefined = undefined;
-    const maxDimension = dimensions.width >= dimensions.height ? 'width' : 'height';
+  private getClosestLayer = (videoResolution: { width: number; height: number }): HMSPreferredSimulcastLayer => {
+    let closestLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+    const maxDimension = videoResolution.width >= videoResolution.height ? 'width' : 'height';
     const layers = this.track
       .getSimulcastDefinitions()
       .sort((a, b) => this.layerToIntMapping[a.layer] - this.layerToIntMapping[b.layer]);
+    const videoDimesion = videoResolution[maxDimension];
     for (let i = 0; i < layers.length; i++) {
       const { resolution, layer } = layers[i];
-      if (dimensions[maxDimension] <= resolution[maxDimension]) {
+      const layerDimension = resolution[maxDimension];
+      if (videoDimesion <= layerDimension) {
         closestLayer = layer;
         break;
       } else {
         const nextLayer = layers[i + 1];
         const nextLayerDimension = nextLayer ? nextLayer.resolution[maxDimension] : Number.POSITIVE_INFINITY;
         // calculating which layer this dimension is closer to
-        const proximityPercent =
-          dimensions[maxDimension] - resolution[maxDimension] / (nextLayerDimension - resolution[maxDimension]);
+        const proximityPercent = (videoDimesion - layerDimension) / (nextLayerDimension - layerDimension);
         if (proximityPercent < this.DELTA_THRESHOLD) {
           // the element's dimension is closer to the current layer
           closestLayer = layer;
+          break;
         }
       }
     }
-    return closestLayer!;
+    return closestLayer;
   };
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
