@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { isBrowser } from '../utils/isBrowser';
 import HMSLogger from '../utils/logger';
 
 export interface useVideoInput {
@@ -54,11 +53,7 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
     // eslint-disable-next-line complexity
     (async () => {
       if (videoRef.current && track?.id) {
-        let visible = true;
-        if (isBrowser) {
-          visible = window.getComputedStyle(videoRef.current).visibility === 'visible';
-        }
-        if (inView && track.enabled && visible && attach !== false) {
+        if (inView && track.enabled && attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track.id, videoRef.current);
         } else {
