@@ -72,7 +72,7 @@ jobs:
 
       - name: yarn packages cache
         uses: actions/cache@v2
-        if: github.event.inputs.env != 'prod' || github.event.inputs.env == 'staging'
+        if: github.event.inputs.env != 'prod' || github.event.inputs.env != 'staging'
         with:
           path: |
             node_modules
