@@ -154,7 +154,7 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
       - name: Upload to Staging S3 Bucket
-        if: github.event.inputs.env == 'staging'
+        if: github.event.inputs.env == 'staging' || github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_STAGING }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
@@ -162,8 +162,28 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
+  upload-prod:
+    if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
+    environment:
+      name: ProductionWithPermissions
+    needs: upload
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.S3_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
+          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+
+      - name: Download Build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: build
+
       - name: Upload to Prod S3 Bucket
-        if: github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
@@ -172,7 +192,7 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
       - name: Notify slack success
-        if: github.event.inputs.env == 'prod' && success()
+        if: success()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
         uses: voxmedia/github-action-slack-notify-build@v1
@@ -182,7 +202,7 @@ jobs:
           color: good
 
       - name: Notify slack fail
-        if: github.event.inputs.env == 'prod' && failure()
+        if: failure()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
         uses: voxmedia/github-action-slack-notify-build@v1
