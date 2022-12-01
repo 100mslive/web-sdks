@@ -9,6 +9,7 @@ import { AudioLevelIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
 import { ToastManager } from "../components/Toast/ToastManager";
 import IconButton from "../IconButton";
+import { LyraPlugin } from "./LyraPlugin";
 import { FeatureFlags } from "../services/FeatureFlags";
 
 export const NoiseSuppression = () => {
@@ -17,19 +18,20 @@ export const NoiseSuppression = () => {
   const [disable, setDisabled] = useState(false);
   const [isNSSupported, setIsNSSupported] = useState(false);
   const isPluginPresent = useHMSStore(
-    selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
+    selectIsLocalAudioPluginPresent("LyraPlugin")
   );
   const { selectedDeviceIDs } = useDevices();
   const pluginActive = isPluginPresent && !disable;
 
   const createPlugin = useCallback(async () => {
     if (!pluginRef.current) {
-      const { HMSNoiseSuppressionPlugin } = await import(
-        "@100mslive/hms-noise-suppression"
-      );
-      pluginRef.current = new HMSNoiseSuppressionPlugin(
-        process.env.NS_DURATION_TIME_IN_MS
-      );
+      // const { HMSNoiseSuppressionPlugin } = await import(
+      //   "@100mslive/hms-noise-suppression"
+      // );
+      pluginRef.current = new LyraPlugin();
+      // new HMSNoiseSuppressionPlugin(
+      //   process.env.NS_DURATION_TIME_IN_MS
+      // );
     }
   }, []);
 
