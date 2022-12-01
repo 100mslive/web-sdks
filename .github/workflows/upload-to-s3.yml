@@ -116,6 +116,8 @@ jobs:
           path: apps/100ms-custom-app/build
 
   upload:
+    environment:
+      name: ProductionWithPermissions
     needs: build
     runs-on: ubuntu-latest
 
