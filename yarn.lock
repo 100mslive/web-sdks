@@ -13153,7 +13153,7 @@ lunr@^2.3.9:
 
 lyra-codec@raviteja83/lyra-js:
   version "1.0.10"
-  resolved "https://codeload.github.com/raviteja83/lyra-js/tar.gz/013c3eab9cf8b417fe763c361aebc5b4c3fd955d"
+  resolved "https://codeload.github.com/raviteja83/lyra-js/tar.gz/36b030bf5fc2e5a774acf995ef3125029bb8b9f6"
 
 lz-string@^1.4.4:
   version "1.4.4"
