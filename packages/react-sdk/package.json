@@ -19,8 +19,7 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc src/index.ts --plugin none",
-    "test": "jest --maxWorkers=1"
+    "docs": "typedoc src/index.ts --plugin none"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.3",
