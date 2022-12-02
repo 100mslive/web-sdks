@@ -1081,16 +1081,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.join({
         error,
-        ...this.analyticsTimer.getTimes(
-          TimedEvent.INIT,
-          TimedEvent.WEBSOCKET_CONNECT,
-          TimedEvent.ON_POLICY_CHANGE,
-          TimedEvent.LOCAL_AUDIO_TRACK,
-          TimedEvent.LOCAL_VIDEO_TRACK,
-          TimedEvent.PEER_LIST,
-          TimedEvent.ROOM_STATE,
-          TimedEvent.JOIN_RESPONSE,
-        ),
+        ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
       }),
@@ -1101,15 +1092,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.preview({
         error,
-        ...this.analyticsTimer.getTimes(
-          TimedEvent.INIT,
-          TimedEvent.WEBSOCKET_CONNECT,
-          TimedEvent.ON_POLICY_CHANGE,
-          TimedEvent.LOCAL_AUDIO_TRACK,
-          TimedEvent.LOCAL_VIDEO_TRACK,
-          TimedEvent.PEER_LIST,
-          TimedEvent.ROOM_STATE,
-        ),
+        ...this.analyticsTimer.getTimes(TimedEvent.ROOM_STATE),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),
     );

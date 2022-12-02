@@ -36,7 +36,16 @@ export class AnalyticsTimer {
   }
 
   getTimes(...eventNames: TimedEvent[]) {
-    return eventNames.reduce(
+    const defaultEventNames = [
+      TimedEvent.INIT,
+      TimedEvent.WEBSOCKET_CONNECT,
+      TimedEvent.ON_POLICY_CHANGE,
+      TimedEvent.LOCAL_AUDIO_TRACK,
+      TimedEvent.LOCAL_VIDEO_TRACK,
+      TimedEvent.PEER_LIST,
+      TimedEvent.ROOM_STATE,
+    ];
+    return [...defaultEventNames, ...eventNames].reduce(
       (timeObject, eventName) => ({ ...timeObject, [eventName]: this.getTimeTaken(eventName) }),
       {},
     );
