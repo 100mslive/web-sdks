@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import {
+  selectHMSMessagesCount,
   selectPermissions,
   selectSessionMetadata,
   useHMSActions,
@@ -56,27 +57,26 @@ export const Chat = () => {
     selection: "Everyone",
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
-  const bodyRef = useRef(null);
+  const listRef = useRef([]);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
 
-  const scrollToBottom = useCallback(
-    (instant = false) => {
-      if (!bodyRef.current) {
-        return;
-      }
-      bodyRef.current.scrollTo({
-        top: bodyRef.current.scrollHeight,
-        behavior: instant ? "instant" : "smooth",
-      });
-      hmsActions.setMessageRead(true);
-    },
-    [hmsActions]
-  );
+  const storeMessageSelector = selectHMSMessagesCount;
 
-  useEffect(() => {
-    scrollToBottom(true);
-  }, [scrollToBottom]);
+  const messagesCount = useHMSStore(storeMessageSelector) || 0;
+  const scrollToBottom = useCallback(
+    (unreadCount = 0) => {
+      if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
+        console.log("is scroool called ", messagesCount, unreadCount);
+        listRef.current?.scrollToItem(messagesCount, "end");
+        requestAnimationFrame(() => {
+          listRef.current?.scrollToItem(messagesCount, "end");
+        });
+        hmsActions.setMessageRead(true);
+      }
+    },
+    [hmsActions, messagesCount]
+  );
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>
@@ -102,12 +102,13 @@ export const Chat = () => {
           mr: "-$10",
           pr: "$10",
         }}
-        ref={bodyRef}
       >
         <ChatBody
           role={chatOptions.role}
           peerId={chatOptions.peerId}
           setPinnedMessage={setPinnedMessage}
+          scrollToBottom={scrollToBottom}
+          ref={listRef}
         />
         <ScrollHandler
           scrollToBottom={scrollToBottom}
@@ -118,7 +119,7 @@ export const Chat = () => {
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}
-        onSend={scrollToBottom}
+        onSend={() => scrollToBottom(1)}
       >
         {!isSelectorOpen && (
           <NewMessageIndicator
@@ -149,7 +150,7 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
     >
       <Button
         onClick={() => {
-          scrollToBottom();
+          scrollToBottom(unreadCount);
         }}
         css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}
       >
@@ -165,7 +166,7 @@ const ScrollHandler = ({ scrollToBottom, role, peerId }) => {
   const unreadCount = useUnreadCount({ role, peerId });
   useEffect(() => {
     if (inView && unreadCount) {
-      scrollToBottom();
+      scrollToBottom(unreadCount);
     }
   }, [inView, unreadCount, scrollToBottom]);
   return <div ref={ref} style={{ height: 1 }}></div>;
