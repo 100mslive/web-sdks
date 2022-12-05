@@ -114,7 +114,7 @@ export class HLSController {
   handleErrors() {
     this.hls.on(Hls.Events.ERROR, (_, data) => {
       console.error("[HLS ERROR]", data);
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR && !data.fatal) {
         setTimeout(() => {
           if (this.hls && this.hlsUrl) {
             this.hls.loadSource(this.hlsUrl);
