@@ -11,11 +11,14 @@ export class HLSController {
   videoRef;
   eventEmitter = new EventEmitter();
   isLive = true;
+  hlsUrl;
   constructor(hlsUrl, videoRef) {
+    this.hlsUrl = hlsUrl;
     this.hls = new Hls(this.getHLSConfig());
     this.videoRef = videoRef;
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
+    this.handleErrors();
     this.handleHLSTimedMetadataParsing();
     this.ControllerEvents = [
       HLS_TIMED_METADATA_LOADED,
@@ -95,8 +98,8 @@ export class HLSController {
   // listen for pause, play as well to show not live if paused
   enableTimeUpdateListener() {
     this.videoRef.current.addEventListener("timeupdate", _ => {
-      if (this.hls) {
-        const videoEl = this.videoRef.current;
+      const videoEl = this.videoRef.current;
+      if (this.hls && videoEl) {
         const allowedDelay =
           this.getHLSConfig().liveMaxLatencyDuration ||
           HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
@@ -105,6 +108,18 @@ export class HLSController {
         if (!this.isLive) {
           this.eventEmitter.emit(HLS_STREAM_NO_LONGER_LIVE);
         }
+      }
+    });
+  }
+  handleErrors() {
+    this.hls.on(Hls.Events.ERROR, (_, data) => {
+      console.error("[HLS ERROR]", data);
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+        setTimeout(() => {
+          if (this.hls && this.hlsUrl) {
+            this.hls.loadSource(this.hlsUrl);
+          }
+        }, 1000);
       }
     });
   }
