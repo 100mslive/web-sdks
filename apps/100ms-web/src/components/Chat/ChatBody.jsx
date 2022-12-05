@@ -282,7 +282,7 @@ const ChatMessage = React.memo(
   }
 );
 const VirtualizedChatMessages = React.forwardRef(
-  ({ messages, setPinnedMessage, scrollToBottom }, listRef) => {
+  ({ messages, setPinnedMessage }, listRef) => {
     const rowHeights = useRef({});
     function getRowHeight(index) {
       // 72 will be default row height for any message length
@@ -318,7 +318,7 @@ const VirtualizedChatMessages = React.forwardRef(
               itemCount={messages.length}
               itemSize={getRowHeight}
               width={width}
-              height={height}
+              height={height - 1}
               style={{
                 overflowX: "hidden",
               }}
@@ -342,7 +342,7 @@ const VirtualizedChatMessages = React.forwardRef(
 );
 
 export const ChatBody = React.forwardRef(
-  ({ role, peerId, setPinnedMessage, scrollToBottom }, listRef) => {
+  ({ role, peerId, setPinnedMessage }, listRef) => {
     const storeMessageSelector = role
       ? selectMessagesByRole(role)
       : peerId
@@ -372,7 +372,6 @@ export const ChatBody = React.forwardRef(
         <VirtualizedChatMessages
           messages={messages}
           setPinnedMessage={setPinnedMessage}
-          scrollToBottom={scrollToBottom}
           ref={listRef}
         />
       </Fragment>

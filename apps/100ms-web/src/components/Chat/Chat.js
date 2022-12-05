@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useInView } from "react-intersection-observer";
+import React, { useCallback, useRef, useState } from "react";
 import {
   selectHMSMessagesCount,
   selectPermissions,
@@ -67,7 +66,6 @@ export const Chat = () => {
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
       if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
-        console.log("is scroool called ", messagesCount, unreadCount);
         listRef.current?.scrollToItem(messagesCount, "end");
         requestAnimationFrame(() => {
           listRef.current?.scrollToItem(messagesCount, "end");
@@ -91,31 +89,13 @@ export const Chat = () => {
         }}
       />
       <PinnedMessage clearPinnedMessage={setPinnedMessage} />
-      <Flex
-        direction="column"
-        css={{
-          flex: "1 1 0",
-          overflowY: "auto",
-          pt: "$4",
-          position: "relative",
-          // Below two are for pushing scroll to the edge of the box
-          mr: "-$10",
-          pr: "$10",
-        }}
-      >
-        <ChatBody
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-          setPinnedMessage={setPinnedMessage}
-          scrollToBottom={scrollToBottom}
-          ref={listRef}
-        />
-        <ScrollHandler
-          scrollToBottom={scrollToBottom}
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-        />
-      </Flex>
+
+      <ChatBody
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        setPinnedMessage={setPinnedMessage}
+        ref={listRef}
+      />
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}
@@ -159,15 +139,4 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
       </Button>
     </Flex>
   );
-};
-
-const ScrollHandler = ({ scrollToBottom, role, peerId }) => {
-  const { ref, inView } = useInView({ threshold: 0.5 });
-  const unreadCount = useUnreadCount({ role, peerId });
-  useEffect(() => {
-    if (inView && unreadCount) {
-      scrollToBottom(unreadCount);
-    }
-  }, [inView, unreadCount, scrollToBottom]);
-  return <div ref={ref} style={{ height: 1 }}></div>;
 };
