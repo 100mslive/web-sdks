@@ -56,7 +56,7 @@ export const Chat = () => {
     selection: "Everyone",
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
-  const listRef = useRef([]);
+  const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
 
