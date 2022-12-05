@@ -6,10 +6,24 @@ export enum TimedEvent {
   INIT = 'init_response_time',
   WEBSOCKET_CONNECT = 'ws_connect_time',
   ON_POLICY_CHANGE = 'on_policy_change_time',
-  LOCAL_TRACKS = 'local_tracks_time',
+  LOCAL_AUDIO_TRACK = 'local_audio_track_time',
+  LOCAL_VIDEO_TRACK = 'local_video_track_time',
   JOIN = 'join_time',
   PREVIEW = 'preview_time',
+  PEER_LIST = 'peer_list_time',
+  ROOM_STATE = 'room_state_time',
+  JOIN_RESPONSE = 'join_response_time',
 }
+
+const defaultEventNames = [
+  TimedEvent.INIT,
+  TimedEvent.WEBSOCKET_CONNECT,
+  TimedEvent.ON_POLICY_CHANGE,
+  TimedEvent.LOCAL_AUDIO_TRACK,
+  TimedEvent.LOCAL_VIDEO_TRACK,
+  TimedEvent.PEER_LIST,
+  TimedEvent.ROOM_STATE,
+];
 
 export class AnalyticsTimer {
   private eventPerformanceMeasures: Partial<Record<TimedEvent, PerformanceMeasure>> = {};
@@ -32,7 +46,7 @@ export class AnalyticsTimer {
   }
 
   getTimes(...eventNames: TimedEvent[]) {
-    return eventNames.reduce(
+    return [...defaultEventNames, ...eventNames].reduce(
       (timeObject, eventName) => ({ ...timeObject, [eventName]: this.getTimeTaken(eventName) }),
       {},
     );

@@ -21,7 +21,9 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   private gifFramesIndex: number;
   private gifFrameImageData: any;
   private tempGifCanvas: HTMLCanvasElement;
-  private tempGifContext: any;
+  private tempGifContext: CanvasRenderingContext2D | null;
+  private prevResults?: MediaPipeResults;
+  private input?: HTMLCanvasElement;
 
   constructor(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
     this.background = background;
@@ -84,6 +86,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     if (!background) {
       throw new Error('Invalid background supplied, see the docs to check supported background type');
     }
+    this.prevResults = undefined;
     switch (backgroundType) {
       case HMSVirtualBackgroundTypes.NONE:
       case HMSVirtualBackgroundTypes.BLUR:
@@ -151,13 +154,15 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     if (!input || !output) {
       throw new Error('Plugin invalid input/output');
     }
-    if (skipProcessing) {
-      return;
-    }
+    this.input = input;
     output.width = input.width;
     output.height = input.height;
     this.outputCanvas = output;
     this.outputCtx = output.getContext('2d');
+    if (skipProcessing && this.prevResults) {
+      this.handleResults(this.prevResults);
+      return;
+    }
     if (this.backgroundType === HMSVirtualBackgroundTypes.NONE) {
       this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
       return;
@@ -193,6 +198,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         break;
     }
     this.outputCtx.restore();
+    this.prevResults = results;
   };
 
   private loadGIF(url: string): Promise<any> {
@@ -210,6 +216,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
 
   private renderBackground = (results: MediaPipeResults, background: HMSBackgroundInput) => {
     if (
+      !this.input ||
       !this.outputCanvas ||
       !this.outputCtx ||
       this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
@@ -239,7 +246,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     );
     // Only overwrite missing pixels.
     this.outputCtx.globalCompositeOperation = 'destination-atop';
-    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(this.input, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   };
 
   private renderBlur(results: MediaPipeResults) {
@@ -256,7 +263,12 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private renderGIF(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.GIF) {
+    if (
+      !this.outputCanvas ||
+      !this.outputCtx ||
+      !this.tempGifContext ||
+      this.backgroundType !== HMSVirtualBackgroundTypes.GIF
+    ) {
       return;
     }
     if (this.gifFrameImageData == null) {
