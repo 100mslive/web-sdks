@@ -16,9 +16,9 @@ export class HLSController {
     this.hlsUrl = hlsUrl;
     this.hls = new Hls(this.getHLSConfig());
     this.videoRef = videoRef;
+    this.handleErrors();
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
-    this.handleErrors();
     this.handleHLSTimedMetadataParsing();
     this.ControllerEvents = [
       HLS_TIMED_METADATA_LOADED,
