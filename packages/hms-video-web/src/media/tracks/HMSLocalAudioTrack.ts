@@ -221,7 +221,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      await this.replaceTrackWith(settings);
     }
   };
 
