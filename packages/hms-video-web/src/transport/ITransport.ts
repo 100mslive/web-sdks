@@ -33,6 +33,8 @@ export default interface ITransport {
 
   changeRole(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
 
+  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
+
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
 
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
