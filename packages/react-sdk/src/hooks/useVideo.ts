@@ -41,9 +41,6 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
       if (node) {
         videoRef.current = node;
         inViewRef(node);
-        // if (track?.layerDefinitions?.length) {
-        //   resizeRef.current = node;
-        // }
       }
     },
     [inViewRef],
