@@ -3,7 +3,7 @@ import { Results as MediaPipeResults, SelfieSegmentation } from '@mediapipe/self
 import { decompressFrames, parseGIF } from 'gifuct-js';
 import {
   HMSPluginSupportResult,
-  HMSPluginUnsupportedTypes,
+  // HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
@@ -43,16 +43,18 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   checkSupport(): HMSPluginSupportResult {
-    const browserResult = {} as HMSPluginSupportResult;
-    if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
-      browserResult.isSupported = true;
-    } else {
-      browserResult.isSupported = false;
-      browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
-      browserResult.errMsg = 'browser not supported for plugin, see docs';
-    }
+    // const browserResult = {} as HMSPluginSupportResult;
+    // if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
+    //   browserResult.isSupported = true;
+    // } else {
+    //   browserResult.isSupported = false;
+    //   browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
+    //   browserResult.errMsg = 'browser not supported for plugin, see docs';
+    // }
 
-    return browserResult;
+    return {
+      isSupported: true,
+    };
   }
 
   getName(): string {
