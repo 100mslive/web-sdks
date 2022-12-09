@@ -353,7 +353,7 @@ export class PlaylistManager
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
     this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
-    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
+    this.eventBus.localVideoEnabled.subscribe(this.handlePausePlaylist);
   }
 
   /**
