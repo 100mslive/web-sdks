@@ -6,7 +6,6 @@ import {
   HMSLogLevel,
   HMSPluginSupportResult,
   HMSPreferredSimulcastLayer,
-  HMSRole,
   HMSScreenShareConfig,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
@@ -256,7 +255,7 @@ export interface IHMSActions {
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
-  changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: HMSRoleName, force?: boolean): Promise<void>;
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName, force?: boolean): Promise<void>;
 
   /**
    * Accept the role change request received

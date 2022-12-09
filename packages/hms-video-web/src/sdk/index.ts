@@ -706,6 +706,7 @@ export class HMSSdk implements HMSInterface {
 
     await this.transport?.changeRoleOfPeersWithRoles(roles, toRole, force);
   }
+
   async acceptChangeRole(request: HMSRoleChangeRequest) {
     await this.transport?.acceptRoleChange(request);
   }

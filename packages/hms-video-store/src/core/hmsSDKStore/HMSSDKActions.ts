@@ -13,7 +13,6 @@ import {
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
-  HMSRole,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSScreenShareConfig,
   HMSSdk,
@@ -42,6 +41,7 @@ import {
   HMSPeer,
   HMSPeerID,
   HMSPlaylistType,
+  HMSRoleName,
   HMSRoomState,
   HMSStore,
   HMSTrack,
@@ -477,8 +477,9 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeRoleOfPeer(peer, toRole, force);
   }
 
-  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string, force: boolean) {
-    await this.sdk.changeRoleOfPeersWithRoles(roles, toRole, force);
+  async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName, force: boolean) {
+    const rolesToBeChanged = this.sdk.getRoles().filter(role => roles.includes(role.name));
+    await this.sdk.changeRoleOfPeersWithRoles(rolesToBeChanged, toRole, force);
   }
 
   // TODO: separate out role related things in another file
