@@ -21,6 +21,13 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
     return;
   }
 
+  for (let i = 0; i < videoElements.length; i++) {
+    console.table({
+      index: i,
+      width: videoElements[i].videoWidth,
+      height: videoElements[i].videoHeight,
+    });
+  }
   const numRows = numberOfTiles <= 2 ? 1 : 2;
   const numCols = Number(Math.ceil(numberOfTiles / numRows));
   fillGridTiles(numRows, numCols, videoElements, ctx, canvas, numberOfTiles);
@@ -47,15 +54,16 @@ function fillGridTiles(
   numberOfTiles
 ) {
   let videoElementPos = 0;
-  const renderTileWidth = 1280;
-  const renderTileHeight = 720;
-
+  let renderTileWidth = 320;
+  let renderTileHeight = 240;
   canvas.width = renderTileWidth * numCols;
   canvas.height = renderTileHeight * numRows;
 
   for (let row = 0; row < numRows; row++) {
     for (let col = 0; col < numCols; col++) {
       const video = videoElements[videoElementPos];
+      renderTileWidth = 320;
+      renderTileHeight = 240;
       /**
        * there are two dimensions here. One is the
        * dimension of the actual video and the other is
@@ -70,8 +78,9 @@ function fillGridTiles(
        */
       //the original aspect ratio of the video
       const originalAspectRatio = video.videoWidth / video.videoHeight;
+
       // the aspect ratio of the tile we are going to render the video
-      const renderTileAspectRatio = renderTileHeight / renderTileWidth;
+      const renderTileAspectRatio = renderTileWidth / renderTileHeight;
       let renderVideoWidth = renderTileWidth;
       let renderVideoHeight = renderTileHeight;
       /**
@@ -93,6 +102,7 @@ function fillGridTiles(
       } else {
         /**
          * if the aspect ratio of original video is less than or equal
+         * if the aspect ratio of original video is less than or equal
          * to the tile's aspect ratio, then to maintain aspect ratio, we have to
          * either shrink the width or increase the height. Since we
          * can't increase the tile height without affecting the canvas height,
@@ -106,20 +116,44 @@ function fillGridTiles(
 
       if (video && video.srcObject !== null) {
         const differenceInWidth = renderTileWidth - renderVideoWidth;
-        const differenceInHeight = renderTileHeight - renderVideoHeight;
+        // const differenceInHeight = renderTileHeight - renderVideoHeight;
         let startXOffset = differenceInWidth / 2;
-        const startYOffset = differenceInHeight / 2;
+        // const startYOffset = differenceInHeight / 2;
 
+        const totalCanvasWidth = renderTileWidth;
+        startXOffset = (totalCanvasWidth - renderVideoWidth) / 2;
+
+        tileStartX = tileStartX + startXOffset;
+        // tileStartY = tileStartY + startYOffset;
         /**
          * If the second column row has only one element,
          * align it to center.
          */
         if (row === 1 && numberOfTiles === 3) {
+          const differenceInWidth = renderTileWidth - renderVideoWidth;
+          // const differenceInHeight = renderTileHeight - renderVideoHeight;
+          let startXOffset = differenceInWidth / 2;
+          // const startYOffset = differenceInHeight / 2;
+
           const totalCanvasWidth = renderTileWidth * 2;
           startXOffset = (totalCanvasWidth - renderVideoWidth) / 2;
+
+          tileStartX = tileStartX + startXOffset;
+          // tileStartY = tileStartY + startYOffset;
         }
-        tileStartX = tileStartX + startXOffset;
-        tileStartY = tileStartY + startYOffset;
+        console.table({
+          videoElementPos,
+          tileStartX,
+          tileStartY,
+          videoWidth: video.videoWidth,
+          videoHeight: video.videoHeight,
+          originalAspectRatio,
+          renderTileAspectRatio,
+          renderTileWidth,
+          renderTileHeight,
+          renderVideoWidth,
+          renderVideoHeight,
+        });
         ctx.drawImage(
           video,
           tileStartX,
