@@ -58,7 +58,7 @@ const ToastTitle = styled(ToastPrimitives.Title, {
   color: '$textHighEmp',
   fontWeight: '$semiBold',
   display: 'flex',
-  alignItems: 'start',
+  alignItems: 'center',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -99,9 +99,10 @@ interface HMSToastProps extends ToastPrimitives.ToastProps {
   isClosable?: boolean;
   icon?: React.ReactNode;
   action?: React.ReactNode;
+  inlineAction?: React.ReactNode;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
+const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, inlineAction, ...props }) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -113,6 +114,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </Flex>
           {isClosable ? <DefaultClose /> : null}
+          {(!isClosable && inlineAction) ? inlineAction : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
