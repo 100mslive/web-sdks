@@ -30,6 +30,11 @@ export default interface HMS {
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
   refreshDevices(): Promise<void>;
 
+  /**
+   * @deprecated Use `changeRoleOfPeer` instead
+   */
+  changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+
   changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force?: boolean): void;
 
   changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string, force: boolean): void;

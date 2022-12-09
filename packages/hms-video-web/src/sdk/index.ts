@@ -691,6 +691,14 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager.setConnectionQualityListener(qualityListener);
   }
 
+  async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
+    if (!forPeer.role || forPeer.role.name === toRole) {
+      return;
+    }
+
+    await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
+  }
+
   async changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force = false) {
     if (!forPeer.role || forPeer.role.name === toRole) {
       return;
