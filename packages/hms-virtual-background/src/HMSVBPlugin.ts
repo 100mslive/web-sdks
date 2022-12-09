@@ -7,6 +7,7 @@ import {
   HMSVideoPlugin,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
+import { gauss_internal, makeGaussKernel } from './GaussianBlur';
 import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {
@@ -144,6 +145,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   stop(): void {
     if (this.backgroundType !== HMSVirtualBackgroundTypes.BLUR && this.background !== HMSVirtualBackgroundTypes.NONE) {
       this.segmentation?.reset();
+      this.segmentation?.close();
     }
     //gif related
     this.gifFrameImageData = null;
@@ -227,7 +229,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     ) {
       return;
     }
-    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    // this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.filter = 'none';
     this.outputCtx.imageSmoothingEnabled = true;
     this.outputCtx.imageSmoothingQuality = 'high';
@@ -247,22 +249,35 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       this.outputCanvas.width,
       this.outputCanvas.height,
     );
+    this.outputCtx.globalCompositeOperation = 'destination-out';
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     // Only overwrite missing pixels.
     this.outputCtx.globalCompositeOperation = 'destination-atop';
     this.outputCtx.drawImage(this.input, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   };
 
   private renderBlur(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
+    if (
+      !this.input ||
+      !this.outputCanvas ||
+      !this.outputCtx ||
+      this.backgroundType !== HMSVirtualBackgroundTypes.BLUR
+    ) {
       return;
     }
-    this.outputCtx!.filter = 'none';
-    this.outputCtx!.globalCompositeOperation = 'source-out';
-    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx!.globalCompositeOperation = 'destination-atop';
-    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx!.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
-    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    const pixels = this.outputCtx.getImageData(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    const kernel = makeGaussKernel(3);
+
+    // Blur a cahnnel (RGB or Grayscale)
+    for (let ch = 0; ch < 3; ch++) {
+      gauss_internal(pixels, kernel, ch);
+    }
+    this.outputCtx.putImageData(pixels, 0, 0);
+    this.outputCtx.globalCompositeOperation = 'destination-out';
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.globalCompositeOperation = 'destination-atop';
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   }
 
   private renderGIF(results: MediaPipeResults) {
