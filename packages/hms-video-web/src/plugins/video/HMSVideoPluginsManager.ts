@@ -389,7 +389,7 @@ export class HMSVideoPluginsManager {
     this.inputVideo.srcObject = new MediaStream([this.hmsTrack.nativeTrack]);
     this.inputVideo.muted = true;
     this.inputVideo.playsInline = true;
-    this.inputVideo.autoplay = true;
+    await this.inputVideo.play();
   }
 
   /**
