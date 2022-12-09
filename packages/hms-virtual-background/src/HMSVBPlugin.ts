@@ -114,6 +114,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         this.background.muted = true;
         this.background.loop = true;
         this.background.autoplay = true;
+        this.background.playsInline = true;
         this.background.oncanplaythrough = () => {
           this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
         };
