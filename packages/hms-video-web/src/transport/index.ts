@@ -514,11 +514,11 @@ export default class HMSTransport implements ITransport {
     });
   }
 
-  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string, force: boolean) {
+  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
     await this.signal.requestBulkRoleChange({
       roles: roles.map((role: HMSRole) => role.name),
       role: toRole,
-      force,
+      force: true,
     });
   }
 

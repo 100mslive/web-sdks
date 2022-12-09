@@ -707,12 +707,12 @@ export class HMSSdk implements HMSInterface {
     await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
   }
 
-  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string, force: boolean) {
+  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
     if (roles.length <= 0) {
       return;
     }
 
-    await this.transport?.changeRoleOfPeersWithRoles(roles, toRole, force);
+    await this.transport?.changeRoleOfPeersWithRoles(roles, toRole);
   }
 
   async acceptChangeRole(request: HMSRoleChangeRequest) {

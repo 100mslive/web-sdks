@@ -477,9 +477,9 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.changeRoleOfPeer(peer, toRole, force);
   }
 
-  async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName, force: boolean) {
+  async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName) {
     const rolesToBeChanged = this.sdk.getRoles().filter(role => roles.includes(role.name));
-    await this.sdk.changeRoleOfPeersWithRoles(rolesToBeChanged, toRole, force);
+    await this.sdk.changeRoleOfPeersWithRoles(rolesToBeChanged, toRole);
   }
 
   // TODO: separate out role related things in another file

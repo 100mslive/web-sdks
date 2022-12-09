@@ -253,9 +253,8 @@ export interface IHMSActions {
    * Request for a role change of a remote peer. Can be forced.
    * @param roles List of roles whose role needs to be changed
    * @param toRole The name of the new role.
-   * @param [force] this being true would mean that user won't get a request to accept role change
    */
-  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName, force?: boolean): Promise<void>;
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received

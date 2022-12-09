@@ -37,7 +37,7 @@ export default interface HMS {
 
   changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force?: boolean): void;
 
-  changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string, force: boolean): void;
+  changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string): void;
 
   acceptChangeRole(request: HMSRoleChangeRequest): void;
 
