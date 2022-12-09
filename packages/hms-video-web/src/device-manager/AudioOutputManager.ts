@@ -1,5 +1,6 @@
 import { DeviceManager } from '.';
 import { AudioSinkManager } from '../audio-sink-manager';
+import { HMSAudioContextHandler } from '../utils/media';
 
 export interface IAudioOutputManager {
   getDevice(): MediaDeviceInfo | undefined;
@@ -32,5 +33,6 @@ export class AudioOutputManager implements IAudioOutputManager {
 
   async unblockAutoplay() {
     await this.audioSinkManager.unblockAutoplay();
+    await HMSAudioContextHandler.resumeContext();
   }
 }
