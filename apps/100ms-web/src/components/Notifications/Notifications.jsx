@@ -70,8 +70,10 @@ export function Notifications() {
               title:
                 notification.data?.message ||
                 "We couldn’t reconnect you. When you’re back online, try joining the room.",
-              inlineAction: (
+              inlineAction: true,
+              action: (
                 <Button
+                  as="div"
                   variant="primary"
                   onClick={() => {
                     ToastManager.removeToast(toastId);

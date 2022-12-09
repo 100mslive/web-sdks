@@ -99,10 +99,18 @@ interface HMSToastProps extends ToastPrimitives.ToastProps {
   isClosable?: boolean;
   icon?: React.ReactNode;
   action?: React.ReactNode;
-  inlineAction?: React.ReactNode;
+  inlineAction?: boolean;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, inlineAction, ...props }) => {
+const HMSToast: React.FC<HMSToastProps> = ({
+  title,
+  description,
+  isClosable = true,
+  icon,
+  action,
+  inlineAction = false,
+  ...props
+}) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -114,7 +122,9 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </Flex>
           {isClosable ? <DefaultClose /> : null}
-          {(!isClosable && inlineAction) ? inlineAction : null}
+          {!isClosable && inlineAction && action ? (
+            <ToastAction altText={`${title}Action`}>{action}</ToastAction>
+          ) : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
@@ -123,7 +133,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </ToastDescription>
         ) : null}
-        {action ? (
+        {!inlineAction && action ? (
           <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
             {action}
           </ToastAction>
