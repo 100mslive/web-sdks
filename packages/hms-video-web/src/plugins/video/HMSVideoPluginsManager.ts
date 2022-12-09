@@ -237,6 +237,9 @@ export class HMSVideoPluginsManager {
     this.outputCanvas = document.createElement('canvas') as CanvasElement;
     if (!this.inputVideo) {
       this.inputVideo = document.createElement('video');
+      const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = this.hmsTrack.getMediaTrackSettings();
+      this.inputVideo.width = width;
+      this.inputVideo.height = height;
     }
     // FF issue https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
     this.inputCanvas.getContext('2d');
@@ -386,7 +389,7 @@ export class HMSVideoPluginsManager {
     this.inputVideo.srcObject = new MediaStream([this.hmsTrack.nativeTrack]);
     this.inputVideo.muted = true;
     this.inputVideo.playsInline = true;
-    await this.inputVideo.play();
+    this.inputVideo.autoplay = true;
   }
 
   /**
@@ -394,17 +397,20 @@ export class HMSVideoPluginsManager {
    * @private
    */
   private async updateInputCanvas() {
-    if (!this.inputCanvas || !this.inputVideo) {
+    if (!this.inputCanvas || !this.inputVideo || !this.inputVideo.videoWidth) {
       return;
     }
-    const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = this.hmsTrack.getMediaTrackSettings();
-    // TODO: should we reduce height/width to optimize?
-    if (this.inputCanvas.height !== height) {
-      this.inputCanvas.height = height;
+    const aspect = this.inputVideo.videoWidth / this.inputVideo.videoHeight;
+    let width, height;
+    if (this.inputVideo.width / this.inputVideo.height < aspect) {
+      width = this.inputVideo.width;
+      height = width / aspect;
+    } else {
+      height = this.inputVideo.height;
+      width = height * aspect;
     }
-    if (this.inputCanvas.width !== width) {
-      this.inputCanvas.width = width;
-    }
+    this.inputCanvas.width = width;
+    this.inputCanvas.height = height;
     const ctx = this.inputCanvas.getContext('2d');
     ctx!.drawImage(this.inputVideo, 0, 0, width, height);
   }
