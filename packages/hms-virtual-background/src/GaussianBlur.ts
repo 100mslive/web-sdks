@@ -227,6 +227,7 @@ function blurUp(src: Uint8ClampedArray, dest: Uint8ClampedArray, w: number, h: n
   }
 }
 
+let blurCanvas: HTMLCanvasElement | OffscreenCanvas;
 export function blurRect(ctx: CanvasRenderingContext2D, r: number, sv: number) {
   const canvas = ctx.canvas;
 
@@ -244,14 +245,15 @@ export function blurRect(ctx: CanvasRenderingContext2D, r: number, sv: number) {
 
   const resizeWidth = canvas.width >>> resizeFactor;
   const resizeHeight = canvas.height >>> resizeFactor;
-  let blurCanvas;
-  if (typeof OffscreenCanvas !== 'undefined') {
-    blurCanvas = new OffscreenCanvas(canvas.width, canvas.height);
-  } else {
-    blurCanvas = document.createElement('canvas');
-    blurCanvas.width = canvas.width;
-    blurCanvas.height = canvas.height;
+  if (!blurCanvas) {
+    if (typeof OffscreenCanvas !== 'undefined') {
+      blurCanvas = new OffscreenCanvas(canvas.width, canvas.height);
+    } else {
+      blurCanvas = document.createElement('canvas');
+    }
   }
+  blurCanvas.width = canvas.width;
+  blurCanvas.height = canvas.height;
   const blurCtx = blurCanvas.getContext('2d');
   if (!blurCtx) {
     return;
