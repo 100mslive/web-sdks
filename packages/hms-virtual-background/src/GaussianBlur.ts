@@ -1,3 +1,8 @@
+/**
+ * Code taken from the following
+ * https://github.com/keithwhor/canvasBlurRect
+ */
+
 function saturate(src: Uint8ClampedArray, w: number, h: number, sv: number) {
   let pos, i, j, offset;
 

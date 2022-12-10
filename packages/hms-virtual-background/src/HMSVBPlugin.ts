@@ -215,7 +215,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     ) {
       return;
     }
-    // this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.filter = 'none';
     this.outputCtx.imageSmoothingEnabled = true;
     this.outputCtx.imageSmoothingQuality = 'high';
@@ -223,7 +222,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.outputCtx.globalCompositeOperation = 'source-out';
     const bgWidth = background instanceof HTMLVideoElement ? background.videoWidth : background.width;
     const bgHeight = background instanceof HTMLVideoElement ? background.videoHeight : background.height;
-
     this.outputCtx.drawImage(
       background,
       0,
