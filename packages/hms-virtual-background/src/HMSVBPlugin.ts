@@ -1,13 +1,8 @@
 /* eslint-disable complexity */
 import { Results as MediaPipeResults, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 import { decompressFrames, parseGIF } from 'gifuct-js';
-import {
-  HMSPluginSupportResult,
-  // HMSPluginUnsupportedTypes,
-  HMSVideoPlugin,
-  HMSVideoPluginType,
-} from '@100mslive/hms-video';
-import { gauss_internal, makeGaussKernel } from './GaussianBlur';
+import { HMSPluginSupportResult, HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
+import { blurRect } from './GaussianBlur';
 import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {
@@ -44,15 +39,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   checkSupport(): HMSPluginSupportResult {
-    // const browserResult = {} as HMSPluginSupportResult;
-    // if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
-    //   browserResult.isSupported = true;
-    // } else {
-    //   browserResult.isSupported = false;
-    //   browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
-    //   browserResult.errMsg = 'browser not supported for plugin, see docs';
-    // }
-
     return {
       isSupported: true,
     };
@@ -266,14 +252,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       return;
     }
     this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    const pixels = this.outputCtx.getImageData(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    const kernel = makeGaussKernel(3);
-
-    // Blur a cahnnel (RGB or Grayscale)
-    for (let ch = 0; ch < 3; ch++) {
-      gauss_internal(pixels, kernel, ch);
-    }
-    this.outputCtx.putImageData(pixels, 0, 0);
+    blurRect(this.outputCtx, 1, 1);
     this.outputCtx.globalCompositeOperation = 'destination-out';
     this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.globalCompositeOperation = 'destination-atop';
