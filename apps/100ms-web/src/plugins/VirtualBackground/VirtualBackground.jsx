@@ -11,7 +11,7 @@ import {
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
 import IconButton from "../../IconButton";
-import { getRandomVirtualBackground } from "./vbutils";
+// import { getRandomVirtualBackground } from "./vbutils";
 
 export const VirtualBackground = () => {
   const pluginRef = useRef(null);
@@ -48,8 +48,11 @@ export const VirtualBackground = () => {
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
-      const { background, backgroundType } = getRandomVirtualBackground();
-      await pluginRef.current.setBackground(background, backgroundType);
+      // const { background, backgroundType } = getRandomVirtualBackground();
+      await pluginRef.current.setBackground(
+        "blur",
+        HMSVirtualBackgroundTypes.BLUR
+      );
       await hmsActions.addPluginToVideoTrack(
         pluginRef.current,
         Math.floor(role.publishParams.video.frameRate / 2)
