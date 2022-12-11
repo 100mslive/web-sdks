@@ -11,8 +11,10 @@ import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
+import { useSetUiSettings } from "../AppData/useUISettings";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 import { useUnreadCount } from "./useUnreadCount";
+import { APP_DATA } from "../../common/constants";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
@@ -50,10 +52,11 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 };
 
 export const Chat = () => {
+  const [storedRole, setStoredRole] = useSetUiSettings(APP_DATA.chatRole);
   const [chatOptions, setChatOptions] = useState({
-    role: "",
+    role: storedRole || "",
     peerId: "",
-    selection: "Everyone",
+    selection: storedRole || "Everyone",
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const listRef = useRef(null);
@@ -81,7 +84,14 @@ export const Chat = () => {
       <ChatHeader
         selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
-        onSelect={setChatOptions}
+        onSelect={({ role, peerId, selection }) => {
+          setChatOptions({
+            role,
+            peerId,
+            selection,
+          });
+          setStoredRole(role);
+        }}
         role={chatOptions.role}
         peerId={chatOptions.peerId}
         onToggle={() => {
