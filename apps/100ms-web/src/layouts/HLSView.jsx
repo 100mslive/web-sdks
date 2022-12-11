@@ -5,6 +5,7 @@ import Hls from "hls.js";
 import {
   selectAppData,
   selectHLSState,
+  useAutoplayError,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -20,6 +21,7 @@ import {
 import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
+import { HLSAutoplayBlockedPrompt } from "../components/HMSVideo/HLSAutoplayBlockedPrompt";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 import { ToastManager } from "../components/Toast/ToastManager";
 import {
@@ -45,6 +47,8 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
   const [currentSelectedQuality, setisCurrentSelectedQuality] = useState(null);
+  const [hlsAutoPlayError, setHlsAutoPlayError] = useState("");
+  const { error, resetError, unblockAudio } = useAutoplayError();
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -135,10 +139,23 @@ const HLSView = () => {
     };
   }, [enablHlsStats]);
 
+  const unblockAutoPlay = () => {
+    videoRef.current?.play();
+    if (hlsAutoPlayError !== "") {
+      setHlsAutoPlayError("");
+    }
+  };
+  const resetAutoPlayError = () => {
+    setHlsAutoPlayError("");
+  };
+
   /**
    * On mount. Add listeners for Video play/pause
    */
   useEffect(() => {
+    if (videoRef.current?.paused) {
+      setHlsAutoPlayError("autoPlayError");
+    }
     videoRef.current?.addEventListener("play", event => {
       setIsPaused(false);
     });
@@ -194,6 +211,11 @@ const HLSView = () => {
             "@lg": { height: "80%" },
           }}
         >
+          <HLSAutoplayBlockedPrompt
+            error={hlsAutoPlayError}
+            unblockAutoPlay={unblockAutoPlay}
+            resetAutoPlayError={resetAutoPlayError}
+          />
           <HMSVideoPlayer.Root ref={videoRef}>
             <HMSVideoPlayer.Progress videoRef={videoRef} />
             <HMSVideoPlayer.Controls.Root
