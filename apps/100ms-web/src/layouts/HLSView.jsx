@@ -5,7 +5,6 @@ import Hls from "hls.js";
 import {
   selectAppData,
   selectHLSState,
-  useAutoplayError,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -48,7 +47,6 @@ const HLSView = () => {
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
   const [currentSelectedQuality, setisCurrentSelectedQuality] = useState(null);
   const [hlsAutoPlayError, setHlsAutoPlayError] = useState("");
-  const { error, resetError, unblockAudio } = useAutoplayError();
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
