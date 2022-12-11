@@ -495,9 +495,6 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  /**
-   * @deprecated Use `changeRoleOfPeer`
-   */
   async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
     await this.signal.requestRoleChange({
       requested_for: forPeer.peerId,

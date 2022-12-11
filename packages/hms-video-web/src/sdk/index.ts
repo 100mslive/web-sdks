@@ -708,7 +708,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
-    if (roles.length <= 0) {
+    if (roles.length <= 0 || !toRole) {
       return;
     }
 
