@@ -23,6 +23,7 @@ import {
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
   RemovePeerRequest,
+  RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
   SessionMetadataUpdateParams,
   StartRTMPOrRecordingRequestParams,
@@ -281,6 +282,10 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async requestRoleChange(params: RequestForRoleChangeParams) {
+    await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+  }
+
+  async requestBulkRoleChange(params: RequestForBulkRoleChangeParams) {
     await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
   }
 

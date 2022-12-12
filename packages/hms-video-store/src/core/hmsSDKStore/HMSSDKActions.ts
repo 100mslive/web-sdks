@@ -41,6 +41,7 @@ import {
   HMSPeer,
   HMSPeerID,
   HMSPlaylistType,
+  HMSRoleName,
   HMSRoomState,
   HMSStore,
   HMSTrack,
@@ -463,7 +464,22 @@ export class HMSSDKActions implements IHMSActions {
       return;
     }
 
-    await this.sdk.changeRole(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+  }
+
+  async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
+    const peer = this.hmsSDKPeers[forPeerId];
+    if (!peer) {
+      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
+      return;
+    }
+
+    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+  }
+
+  async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName) {
+    const rolesToBeChanged = this.sdk.getRoles().filter(role => roles.includes(role.name));
+    await this.sdk.changeRoleOfPeersWithRoles(rolesToBeChanged, toRole);
   }
 
   // TODO: separate out role related things in another file
