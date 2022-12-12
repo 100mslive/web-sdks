@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          
       - name: Configure Git user
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -25,7 +26,6 @@ jobs:
           
       - name: yarn packages cache
         uses: actions/cache@v2
-        if: github.event.inputs.env != 'prod' || github.event.inputs.env != 'staging'
         with:
           path: |
             node_modules
