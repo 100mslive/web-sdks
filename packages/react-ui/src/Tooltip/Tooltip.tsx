@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import * as BaseTooltip from '@radix-ui/react-tooltip';
 import { styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
@@ -46,16 +46,19 @@ export const Tooltip: React.FC<
     outlined?: boolean;
     side?: sideTooltip;
     align?: alignTooltip;
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
+    disabled?: boolean;
   }>
-> = ({ children, title, outlined = true, side = 'bottom', align = 'center', open, onOpenChange }) => (
-  <BaseTooltip.Provider>
-    <TooltipRoot delayDuration={200} open={open} onOpenChange={onOpenChange}>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
-        {title}
-      </TooltipBox>
-    </TooltipRoot>
-  </BaseTooltip.Provider>
-);
+> = ({ children, title, outlined = true, side = 'bottom', align = 'center', disabled = false }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <BaseTooltip.Provider>
+      <TooltipRoot delayDuration={200} open={open && !disabled} onOpenChange={setOpen}>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
+          {title}
+        </TooltipBox>
+      </TooltipRoot>
+    </BaseTooltip.Provider>
+  );
+};
