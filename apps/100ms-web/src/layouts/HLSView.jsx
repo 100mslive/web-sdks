@@ -137,10 +137,14 @@ const HLSView = () => {
     };
   }, [enablHlsStats]);
 
-  const unblockAutoPlay = () => {
-    videoRef.current?.play();
-    if (hlsAutoPlayError !== "") {
+  const unblockAutoPlay = async () => {
+    try {
+      await videoRef.current?.play();
       setHlsAutoPlayError("");
+      console.log("Successfully started playing the stream.");
+      resetAutoPlayError();
+    } catch (e) {
+      console.error("Tried to unblock Autoplay failed with", e.toString());
     }
   };
   const resetAutoPlayError = () => {
@@ -151,9 +155,23 @@ const HLSView = () => {
    * On mount. Add listeners for Video play/pause
    */
   useEffect(() => {
-    if (videoRef.current?.paused) {
-      setHlsAutoPlayError("autoPlayError");
-    }
+    const playVideo = async () => {
+      try {
+        await videoRef.current?.play();
+      } catch (e) {
+        console.log("Browser blocked autoplay with error", e.toString());
+        console.log("asking user to play the video manually...");
+        if (e.toString().includes("NotAllowedError")) {
+          setHlsAutoPlayError("autoPlayError");
+        }
+      }
+    };
+    playVideo();
+    videoRef.current?.addEventListener("error", () => {
+      console.error(
+        `Error ${videoRef.current?.error.code}; details: ${videoRef.current?.error.message}`
+      );
+    });
     videoRef.current?.addEventListener("play", event => {
       setIsPaused(false);
     });
@@ -212,7 +230,6 @@ const HLSView = () => {
           <HLSAutoplayBlockedPrompt
             error={hlsAutoPlayError}
             unblockAutoPlay={unblockAutoPlay}
-            resetAutoPlayError={resetAutoPlayError}
           />
           <HMSVideoPlayer.Root ref={videoRef}>
             <HMSVideoPlayer.Progress videoRef={videoRef} />
