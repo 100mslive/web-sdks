@@ -94,11 +94,7 @@ export const Chat = () => {
             peerId,
             selection,
           });
-          if (peerId) {
-            setStoredSelector(peerId);
-          } else {
-            setStoredSelector(role);
-          }
+          setStoredSelector(peerId || role);
         }}
         role={chatOptions.role}
         peerId={chatOptions.peerId}
