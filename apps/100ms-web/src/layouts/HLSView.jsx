@@ -46,7 +46,7 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
   const [currentSelectedQuality, setisCurrentSelectedQuality] = useState(null);
-  const [hlsAutoPlayError, setHlsAutoPlayError] = useState("");
+  const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
 
   const [currentSelectedQualityText, setCurrentSelectedQualityText] =
     useState("");
@@ -140,15 +140,15 @@ const HLSView = () => {
   const unblockAutoPlay = async () => {
     try {
       await videoRef.current?.play();
-      setHlsAutoPlayError("");
-      console.log("Successfully started playing the stream.");
+      setIsHlsAutoplayBlocked(false);
+      console.debug("Successfully started playing the stream.");
       resetAutoPlayError();
-    } catch (e) {
-      console.error("Tried to unblock Autoplay failed with", e.toString());
+    } catch (error) {
+      console.error("Tried to unblock Autoplay failed with", error.toString());
     }
   };
   const resetAutoPlayError = () => {
-    setHlsAutoPlayError("");
+    setIsHlsAutoplayBlocked(false);
   };
 
   /**
@@ -158,20 +158,16 @@ const HLSView = () => {
     const playVideo = async () => {
       try {
         await videoRef.current?.play();
-      } catch (e) {
-        console.log("Browser blocked autoplay with error", e.toString());
-        console.log("asking user to play the video manually...");
-        if (e.toString().includes("NotAllowedError")) {
-          setHlsAutoPlayError("autoPlayError");
+      } catch (error) {
+        console.debug("Browser blocked autoplay with error", error.toString());
+        console.debug("asking user to play the video manually...");
+        if (error.name === "NotAllowedError") {
+          setIsHlsAutoplayBlocked(true);
         }
       }
     };
     playVideo();
-    videoRef.current?.addEventListener("error", () => {
-      console.error(
-        `Error ${videoRef.current?.error.code}; details: ${videoRef.current?.error.message}`
-      );
-    });
+
     videoRef.current?.addEventListener("play", event => {
       setIsPaused(false);
     });
@@ -228,7 +224,7 @@ const HLSView = () => {
           }}
         >
           <HLSAutoplayBlockedPrompt
-            error={hlsAutoPlayError}
+            open={isHlsAutoplayBlocked}
             unblockAutoPlay={unblockAutoPlay}
           />
           <HMSVideoPlayer.Root ref={videoRef}>

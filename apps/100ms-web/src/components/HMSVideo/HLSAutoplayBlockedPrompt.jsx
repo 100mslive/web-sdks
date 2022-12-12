@@ -2,10 +2,10 @@ import React from "react";
 import { Button, Dialog, Text } from "@100mslive/react-ui";
 import { DialogContent, DialogRow } from "../../primitives/DialogContent";
 
-export function HLSAutoplayBlockedPrompt({ error, unblockAutoPlay }) {
+export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }) {
   return (
     <Dialog.Root
-      open={!!error}
+      open={open}
       onOpenChange={value => {
         if (!value) {
           unblockAutoPlay();
