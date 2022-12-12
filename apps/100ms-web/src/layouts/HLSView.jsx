@@ -115,7 +115,7 @@ const HLSView = () => {
         : `${currentSelectedQuality.height}p`;
       setCurrentSelectedQualityText(levelText);
     }
-  }, [currentSelectedQuality]);
+  }, [currentSelectedQuality, isUserSelectedAuto]);
 
   /**
    * initialize and subscribe to hlsState

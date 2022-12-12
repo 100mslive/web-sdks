@@ -26,7 +26,7 @@ export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }) {
               unblockAutoPlay();
             }}
           >
-            play stream
+            Play stream
           </Button>
         </DialogRow>
       </DialogContent>
