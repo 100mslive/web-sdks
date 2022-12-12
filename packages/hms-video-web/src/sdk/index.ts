@@ -396,6 +396,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
+    HMSAudioContextHandler.resumeContext();
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -429,13 +430,12 @@ export class HMSSdk implements HMSInterface {
         config.autoVideoSubscribe,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      HMSAudioContextHandler.resumeContext();
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
-        this.publish(config.settings || defaultSettings).catch(error => {
+        await this.publish(config.settings || defaultSettings).catch(error => {
           HMSLogger.e(this.TAG, 'Error in publish', error);
           this.listener?.onError(error);
         });

@@ -151,7 +151,9 @@ export default abstract class HMSConnection {
   }
 
   removeTrack(sender: RTCRtpSender) {
-    this.nativeConnection.removeTrack(sender);
+    if (this.nativeConnection.signalingState !== 'closed') {
+      this.nativeConnection.removeTrack(sender);
+    }
   }
 
   async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
