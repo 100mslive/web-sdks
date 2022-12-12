@@ -116,7 +116,9 @@ export default class JsonRpcSignal implements ISignal {
   private notify(method: string, params: any) {
     const message = { method, params };
 
-    this.socket?.send(JSON.stringify(message));
+    if (this.socket?.readyState === WebSocket.OPEN) {
+      this.socket?.send(JSON.stringify(message));
+    }
   }
 
   open(uri: string): Promise<void> {
