@@ -61,7 +61,7 @@ const initialAppData = {
     METADATA_UPDATED: true,
   },
   [APP_DATA.chatOpen]: false,
-  [APP_DATA.chatRole]: "",
+  [APP_DATA.chatSelector]: "",
   [APP_DATA.chatDraft]: "",
   [APP_DATA.sidePane]: "",
   [APP_DATA.hlsStarted]: false,

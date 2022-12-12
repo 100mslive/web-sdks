@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import {
   selectHMSMessagesCount,
+  selectPeerNameByID,
   selectPermissions,
   selectSessionMetadata,
   useHMSActions,
@@ -52,11 +53,14 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 };
 
 export const Chat = () => {
-  const [storedRole, setStoredRole] = useSetUiSettings(APP_DATA.chatRole);
+  const [storedSelector, setStoredSelector] = useSetUiSettings(
+    APP_DATA.chatSelector
+  );
+  const peerName = useHMSStore(selectPeerNameByID(storedSelector));
   const [chatOptions, setChatOptions] = useState({
-    role: storedRole || "",
-    peerId: "",
-    selection: storedRole || "Everyone",
+    role: storedSelector || "",
+    peerId: storedSelector || "",
+    selection: storedSelector ? peerName || storedSelector : "Everyone",
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const listRef = useRef(null);
@@ -90,7 +94,11 @@ export const Chat = () => {
             peerId,
             selection,
           });
-          setStoredRole(role);
+          if (peerId) {
+            setStoredSelector(peerId);
+          } else {
+            setStoredSelector(role);
+          }
         }}
         role={chatOptions.role}
         peerId={chatOptions.peerId}
