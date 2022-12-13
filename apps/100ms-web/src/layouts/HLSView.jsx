@@ -152,8 +152,9 @@ const HLSView = () => {
    * On mount. Add listeners for Video play/pause
    */
   useEffect(() => {
-    const playEventHandler = event => setIsPaused(false);
-    const pauseEventHandler = event => setIsPaused(true);
+    const playEventHandler = () => setIsPaused(false);
+    const pauseEventHandler = () => setIsPaused(true);
+    const videoEl = videoRef.current;
     /**
      * we are doing all the modifications
      * to the video element after hlsUrl is loaded,
@@ -162,31 +163,30 @@ const HLSView = () => {
      * things before that, the videoRef.current will be
      * null.
      */
-    if (hlsUrl) {
-      const playVideo = async () => {
-        try {
-          if (videoRef.current?.paused) {
-            await videoRef.current?.play();
-          }
-        } catch (error) {
-          console.debug(
-            "Browser blocked autoplay with error",
-            error.toString()
-          );
-          console.debug("asking user to play the video manually...");
-          if (error.name === "NotAllowedError") {
-            setIsHlsAutoplayBlocked(true);
-          }
-        }
-      };
-      playVideo();
-
-      videoRef.current?.addEventListener("play", playEventHandler);
-      videoRef.current?.addEventListener("pause", pauseEventHandler);
+    if (!hlsUrl || !videoEl) {
+      return;
     }
+
+    const playVideo = async () => {
+      try {
+        if (videoEl.paused) {
+          await videoEl.play();
+        }
+      } catch (error) {
+        console.debug("Browser blocked autoplay with error", error.toString());
+        console.debug("asking user to play the video manually...");
+        if (error.name === "NotAllowedError") {
+          setIsHlsAutoplayBlocked(true);
+        }
+      }
+    };
+    playVideo();
+
+    videoEl.addEventListener("play", playEventHandler);
+    videoEl.addEventListener("pause", pauseEventHandler);
     return () => {
-      videoRef.current?.removeEventListener("play", playEventHandler);
-      videoRef.current?.removeEventListener("pause", pauseEventHandler);
+      videoEl.removeEventListener("play", playEventHandler);
+      videoEl.removeEventListener("pause", pauseEventHandler);
     };
   }, [hlsUrl]);
 
