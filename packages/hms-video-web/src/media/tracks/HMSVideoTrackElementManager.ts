@@ -14,7 +14,9 @@ export class HMSVideoTrackElementManager {
       if (typeof window.ResizeObserver !== 'undefined') {
         this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
       }
-      this.intersectionObserver = new IntersectionObserver(debounce(this.handleIntersection, 300));
+      if (typeof window.IntersectionObserver !== 'undefined') {
+        this.intersectionObserver = new IntersectionObserver(debounce(this.handleIntersection, 300));
+      }
     }
   }
 
@@ -22,7 +24,15 @@ export class HMSVideoTrackElementManager {
     if (this.videoElements.has(videoElement)) {
       return;
     }
-    this.intersectionObserver?.observe(videoElement);
+    if (this.intersectionObserver) {
+      this.intersectionObserver.observe(videoElement);
+    } else {
+      if (this.isElementInViewport(videoElement)) {
+        this.track.addSink(videoElement);
+      } else {
+        this.track.removeSink(videoElement);
+      }
+    }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, { box: 'border-box' });
       // @ts-ignore
