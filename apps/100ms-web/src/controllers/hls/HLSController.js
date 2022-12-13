@@ -85,7 +85,7 @@ export class HLSController {
     if (eventName === HLS_STREAM_NO_LONGER_LIVE) {
       this.enableTimeUpdateListener();
     }
-    if (this.ControllerEvents.indexOf(eventName) === -1) {
+    if (this.ControllerEvents.includes(eventName)) {
       this.hls.on(eventName, eventCallback);
     } else {
       this.eventEmitter.addListener(eventName, eventCallback);
@@ -93,7 +93,7 @@ export class HLSController {
   }
 
   off(eventName, eventCallback) {
-    if (this.ControllerEvents.indexOf(eventName === -1)) {
+    if (this.ControllerEvents.includes(eventName)) {
       this.hls?.off(eventName, eventCallback);
     } else {
       this.eventEmitter.removeListener(eventName, eventCallback);
