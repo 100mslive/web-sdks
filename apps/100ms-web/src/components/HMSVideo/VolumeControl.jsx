@@ -4,13 +4,21 @@ import { Flex, Slider } from "@100mslive/react-ui";
 
 export const VolumeControl = ({ videoRef }) => {
   const videoEl = videoRef.current;
-  const [volume, setVolume] = useState(
-    videoRef.current ? videoRef.current?.volume : 100
-  );
+  const [volume, setVolume] = useState(videoEl?.volume ?? 100);
+
+  if (!videoEl) {
+    return null;
+  }
 
   return (
     <Flex align="center" css={{ color: "$white" }}>
-      <SpeakerIcon style={{ cursor: "pointer" }} onClick={() => setVolume(0)} />
+      <SpeakerIcon
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          setVolume(0);
+          videoEl.volume = 0;
+        }}
+      />
       <Slider
         css={{
           mx: "$4",
