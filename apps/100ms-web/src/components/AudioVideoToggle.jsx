@@ -41,6 +41,7 @@ export const AudioVideoToggle = () => {
       }
     };
     const isIOS = parsedUserAgent.getOS().name.toLowerCase() === "ios";
+    console.log("is IOS ", isIOS, parsedUserAgent.getOS(), track);
     if (!isIOS) {
       return;
     }
