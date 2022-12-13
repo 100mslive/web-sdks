@@ -1,4 +1,3 @@
-import { HMSRemoteVideoElementManager } from './HMSRemoteVideoElementManager';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import {
@@ -8,7 +7,6 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import { isBrowser } from '../../utils/support';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
@@ -17,7 +15,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
-  private videoHandler: HMSRemoteVideoElementManager = new HMSRemoteVideoElementManager(this);
 
   public get degraded() {
     return this._degraded;
@@ -73,17 +70,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async addSink(videoElement: HTMLVideoElement) {
-    const visible = isBrowser && window.getComputedStyle(videoElement).visibility === 'visible';
-    if (visible) {
-      super.addSink(videoElement);
-      this.videoHandler?.addVideoElement(videoElement);
-      this.pushInHistory(`uiSetLayer-high`);
-    }
+    super.addSink(videoElement);
+    this.pushInHistory(`uiSetLayer-high`);
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
     super.removeSink(videoElement);
-    this.videoHandler?.removeVideoElement(videoElement);
     await this.updateLayer('removeSink');
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
