@@ -29,6 +29,7 @@ export const AudioVideoToggle = () => {
 
   useEffect(() => {
     const visibilityListener = ev => {
+      console.log("audio visibility ", track, document.visibilityState, ref);
       if (document.visibilityState === "hidden" && track?.deviceID) {
         ref.current = track?.deviceID;
       } else {
@@ -42,6 +43,7 @@ export const AudioVideoToggle = () => {
     };
     const isIOS = parsedUserAgent.getOS().name.toLowerCase() === "ios";
     console.log("is IOS ", isIOS, parsedUserAgent.getOS(), track);
+
     if (!isIOS) {
       return;
     }
