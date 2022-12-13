@@ -39,6 +39,7 @@ jobs:
       REACT_APP_LOGO: ''
       REACT_APP_FONT: 'Roboto'
       REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
+      REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
       REACT_APP_POLICY_CONFIG: ''
       REACT_APP_WEBINAR_PROPS: '{}'
       REACT_APP_DEFAULT_APP_DETAILS: '{}'

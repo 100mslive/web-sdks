@@ -14,7 +14,7 @@ if (
   setupLogRocketReact(LogRocket);
 }
 
-if (process.env.NODE_ENV === "production" && process.env.REACT_APP_ZIPY_KEY) {
+if (process.env.REACT_APP_ZIPY_KEY) {
   zipy.init(process.env.REACT_APP_ZIPY_KEY);
 }
 
