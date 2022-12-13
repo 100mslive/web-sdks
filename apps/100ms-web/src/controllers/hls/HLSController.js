@@ -103,8 +103,8 @@ export class HLSController {
   // listen for pause, play as well to show not live if paused
   enableTimeUpdateListener() {
     this.videoRef.current.addEventListener("timeupdate", _ => {
-      if (this.hls) {
-        const videoEl = this.videoRef.current;
+      const videoEl = this.videoRef.current;
+      if (this.hls && videoEl) {
         const allowedDelay =
           this.getHLSConfig().liveMaxLatencyDuration ||
           HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;

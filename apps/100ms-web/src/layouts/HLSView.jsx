@@ -102,6 +102,7 @@ const HLSView = () => {
       hlsStats = null;
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsController?.reset();
     };
   }, [hlsUrl]);
 
@@ -184,7 +185,6 @@ const HLSView = () => {
       videoRef.current?.addEventListener("pause", pauseEventHandler);
     }
     return () => {
-      hlsController?.reset();
       videoRef.current?.removeEventListener("play", playEventHandler);
       videoRef.current?.removeEventListener("pause", pauseEventHandler);
     };
