@@ -45,6 +45,7 @@ export const AudioVideoToggle = () => {
       return;
     }
     document.addEventListener("visibilitychange", visibilityListener);
+    return document.removeEventListener("visibilitychange", visibilityListener);
   }, [track?.deviceID, updateDevice]);
   return (
     <Fragment>
