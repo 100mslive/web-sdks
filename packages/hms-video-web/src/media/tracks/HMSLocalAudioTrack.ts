@@ -51,10 +51,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
     if (isIOS() && isBrowser) {
+      let prevDeviceId: string | undefined;
       document.addEventListener('visibilitychange', async () => {
-        console.error('visibilitychange', document.visibilityState, this.settings);
+        console.error('visibilitychange', document.visibilityState, this.settings, prevDeviceId);
         if (document.visibilityState === 'visible') {
-          await this.replaceTrackWith(this.settings);
+          if (prevDeviceId) {
+            await this.setSettings({ deviceId: prevDeviceId });
+          }
+        } else {
+          prevDeviceId = this.settings.deviceId;
         }
       });
     }
