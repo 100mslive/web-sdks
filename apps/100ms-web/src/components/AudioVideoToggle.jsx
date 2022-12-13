@@ -29,7 +29,7 @@ export const AudioVideoToggle = () => {
 
   useEffect(() => {
     const visibilityListener = ev => {
-      if (document.visibilityState === "hidden") {
+      if (document.visibilityState === "hidden" && track.deviceID) {
         ref.current = track.deviceID;
       } else {
         if (ref.current) {
@@ -46,7 +46,7 @@ export const AudioVideoToggle = () => {
     }
     document.addEventListener("visibilitychange", visibilityListener);
     return document.removeEventListener("visibilitychange", visibilityListener);
-  }, [updateDevice, track.deviceID]);
+  }, [track, updateDevice]);
   return (
     <Fragment>
       {toggleAudio ? (
