@@ -1,7 +1,9 @@
 import {
+  CheckboxItem,
   Content,
   Group,
   Item,
+  ItemIndicator,
   Label,
   Portal,
   Root,
@@ -99,6 +101,29 @@ const DropdownSubMenuContent = styled(SubContent, {
   zIndex: 20,
 });
 
+const DropdownCheckboxItem = styled(CheckboxItem, {
+  color: '$textPrimary',
+  p: '$8',
+  display: 'flex',
+  alignItems: 'center',
+  outline: 'none',
+  '&:hover': {
+    cursor: 'pointer',
+    bg: '$surfaceLighter',
+  },
+  '&:focus-visible': {
+    bg: '$surfaceLighter',
+  },
+  gap: '$2',
+});
+
+const DropdownItemIndicator = styled(ItemIndicator, {
+  w: '$10',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 export const Dropdown = {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
@@ -111,4 +136,6 @@ export const Dropdown = {
   Label: DropdownLabel,
   Group: DropdownGroup,
   ItemSeparator: DropdownItemSeparator,
+  CheckboxItem: DropdownCheckboxItem,
+  ItemIndicator: DropdownItemIndicator,
 };
