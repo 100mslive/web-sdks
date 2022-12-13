@@ -51,19 +51,15 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
     if (isIOS() && isBrowser) {
-      let prevDeviceId: string | undefined;
-      document.addEventListener('visibilitychange', async () => {
-        console.error('visibilitychange', document.visibilityState, this.settings, prevDeviceId);
-        if (document.visibilityState === 'visible') {
-          if (prevDeviceId) {
-            await this.setSettings({ deviceId: prevDeviceId });
-          }
-        } else {
-          prevDeviceId = this.settings.deviceId;
-        }
-      });
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      await this.replaceTrackWith(this.settings);
+    }
+  };
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
@@ -204,6 +200,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.closeContext();
     this.processedTrack?.stop();
     this.destroyAudioLevelMonitor();
+    if (isIOS() && isBrowser) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**
