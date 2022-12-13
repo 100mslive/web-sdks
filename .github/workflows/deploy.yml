@@ -1,4 +1,4 @@
-name: Upload to S3
+name: Deploy
 on:
   workflow_dispatch:
     inputs:
@@ -59,10 +59,10 @@ jobs:
         run: |
           echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
 
-      # prod app can only be deployed to from a branch starting with production in its name
-      # - name: Validate branch
-      #   if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
-      #   run: exit 1
+      #prod app can only be deployed to from a branch starting with production in its name
+      - name: Validate branch
+        if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
+        run: exit 1
 
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.10.0
@@ -110,7 +110,7 @@ jobs:
           name: build-artifact
           path: apps/100ms-custom-app/build
 
-  upload:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
 
@@ -128,7 +128,7 @@ jobs:
           name: build-artifact
           path: build
 
-      - name: Upload to Dev S3 Bucket
+      - name: Deploy to Dev
         if: github.event.inputs.env == 'dev'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_DEV }}
@@ -137,7 +137,7 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
-      - name: Upload to QA S3 Bucket
+      - name: Deploy to QA
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         env:
           BUCKET: ${{ secrets.S3_BUCKET }}
@@ -146,7 +146,7 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
-      - name: Upload to Staging S3 Bucket
+      - name: Deploy to Staging
         if: github.event.inputs.env == 'staging' || github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_STAGING }}
@@ -155,11 +155,11 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --exclude "index.html"
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
-  upload-prod:
+  deploy-prod:
     if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
     environment:
       name: ProductionWithPermissions
-    needs: upload
+    needs: deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -176,7 +176,7 @@ jobs:
           name: build-artifact
           path: build
 
-      - name: Upload to Prod S3 Bucket
+      - name: Deploy to Production
         env:
           BUCKET: ${{ secrets.S3_BUCKET_PROD }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
