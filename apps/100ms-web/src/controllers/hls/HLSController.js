@@ -94,7 +94,7 @@ export class HLSController {
 
   off(eventName, eventCallback) {
     if (this.ControllerEvents.indexOf(eventName === -1)) {
-      this.hls.off(eventName, eventCallback);
+      this.hls?.off(eventName, eventCallback);
     } else {
       this.eventEmitter.removeListener(eventName, eventCallback);
     }

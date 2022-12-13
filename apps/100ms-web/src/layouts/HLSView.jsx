@@ -140,42 +140,55 @@ const HLSView = () => {
   const unblockAutoPlay = async () => {
     try {
       await videoRef.current?.play();
-      setIsHlsAutoplayBlocked(false);
       console.debug("Successfully started playing the stream.");
-      resetAutoPlayError();
+      setIsHlsAutoplayBlocked(false);
     } catch (error) {
       console.error("Tried to unblock Autoplay failed with", error.toString());
     }
-  };
-  const resetAutoPlayError = () => {
-    setIsHlsAutoplayBlocked(false);
   };
 
   /**
    * On mount. Add listeners for Video play/pause
    */
   useEffect(() => {
-    const playVideo = async () => {
-      try {
-        await videoRef.current?.play();
-      } catch (error) {
-        console.debug("Browser blocked autoplay with error", error.toString());
-        console.debug("asking user to play the video manually...");
-        if (error.name === "NotAllowedError") {
-          setIsHlsAutoplayBlocked(true);
+    const playEventHandler = event => setIsPaused(false);
+    const pauseEventHandler = event => setIsPaused(true);
+    /**
+     * we are doing all the modifications
+     * to the video element after hlsUrl is loaded,
+     * this is because, <HMSVideo/> is conditionally
+     * rendered based on hlsUrl, so if we try to do
+     * things before that, the videoRef.current will be
+     * null.
+     */
+    if (hlsUrl) {
+      const playVideo = async () => {
+        try {
+          if (videoRef.current?.paused) {
+            await videoRef.current?.play();
+          }
+        } catch (error) {
+          console.debug(
+            "Browser blocked autoplay with error",
+            error.toString()
+          );
+          console.debug("asking user to play the video manually...");
+          if (error.name === "NotAllowedError") {
+            setIsHlsAutoplayBlocked(true);
+          }
         }
-      }
-    };
-    playVideo();
+      };
+      playVideo();
 
-    videoRef.current?.addEventListener("play", event => {
-      setIsPaused(false);
-    });
-    videoRef.current?.addEventListener("pause", event => {
-      setIsPaused(true);
-    });
-    return () => hlsController?.reset();
-  }, []);
+      videoRef.current?.addEventListener("play", playEventHandler);
+      videoRef.current?.addEventListener("pause", pauseEventHandler);
+    }
+    return () => {
+      hlsController?.reset();
+      videoRef.current?.removeEventListener("play", playEventHandler);
+      videoRef.current?.removeEventListener("pause", pauseEventHandler);
+    };
+  }, [hlsUrl]);
 
   const qualitySelectorHandler = useCallback(
     qualityLevel => {
