@@ -34,7 +34,6 @@ export class HMSVideoTrackElementManager {
 
   private handleIntersection = async (entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
-      console.error({ entry: entry });
       const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
       if (entry.isIntersecting && isVisibile) {
         this.track.addSink(entry.target as HTMLVideoElement);
