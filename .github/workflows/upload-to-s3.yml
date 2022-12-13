@@ -52,6 +52,7 @@ jobs:
       REACT_APP_VIDEO_PLAYLIST: '[{"name":"100ms-360P","id":"video1","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-360p.mp4","type":"video"},{"name":"100ms-720P","id":"video2","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-720p.mp4","type":"video"},{"name":"Big Buck Bunny","id":"video3","metadata":{"description":"Bunny"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/video2.mp4","type":"video"}]'
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
+      REACT_APP_ENABLE_WHITEBOARD: 'true'
     steps:
       - name: log inputs
         run: |
@@ -95,7 +96,6 @@ jobs:
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
-          REACT_APP_ENABLE_WHITEBOARD: 'true'
 
       - name: Build for Production
         if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
