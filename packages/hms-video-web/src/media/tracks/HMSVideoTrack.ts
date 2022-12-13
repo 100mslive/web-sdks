@@ -15,6 +15,10 @@ export class HMSVideoTrack extends HMSTrack {
     return this.sinkCount > 0;
   }
 
+  getSinks() {
+    return this.videoHandler.getVideoElements();
+  }
+
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
     if (track.kind !== 'video') {

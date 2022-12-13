@@ -24,6 +24,7 @@ export class HMSVideoTrackElementManager {
     if (this.videoElements.has(videoElement)) {
       return;
     }
+    this.videoElements.add(videoElement);
     if (this.intersectionObserver) {
       this.intersectionObserver.observe(videoElement);
     } else {
@@ -42,6 +43,17 @@ export class HMSVideoTrackElementManager {
     }
   }
 
+  removeVideoElement(videoElement: HTMLVideoElement): void {
+    this.track.removeSink(videoElement);
+    this.videoElements.delete(videoElement);
+    this.resizeObserver?.unobserve(videoElement);
+    this.intersectionObserver?.unobserve(videoElement);
+  }
+
+  getVideoElements(): HTMLVideoElement[] {
+    return Array.from(this.videoElements);
+  }
+
   private handleIntersection = async (entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
       const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
@@ -58,18 +70,12 @@ export class HMSVideoTrackElementManager {
     this.selectMaxLayer(entries.map(entry => entry.contentRect));
   };
 
-  removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.videoElements.delete(videoElement);
-    this.resizeObserver?.unobserve(videoElement);
-    this.intersectionObserver?.unobserve(videoElement);
-  }
-
   /**
    *  Taken from
    *  https://stackoverflow.com/a/125106/4321808
    */
   // eslint-disable-next-line complexity
-  isElementInViewport(el: HTMLElement) {
+  private isElementInViewport(el: HTMLElement) {
     let top = el.offsetTop;
     let left = el.offsetLeft;
     const width = el.offsetWidth;

@@ -98,6 +98,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       await this.replaceSender(track, value);
       this.nativeTrack = track;
+      this.updateSinks(track);
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
@@ -235,6 +236,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
       }
       this.processedTrack = undefined;
+      this.updateSinks(this.nativeTrack);
       return;
     }
     if (processedTrack !== this.processedTrack) {
@@ -246,6 +248,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
       }
       this.processedTrack = processedTrack;
+      this.updateSinks(processedTrack);
     }
   }
 
@@ -331,6 +334,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        this.updateSinks(track);
       }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
@@ -339,5 +343,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         });
       }
     }
+  };
+
+  private updateSinks = (track: MediaStreamTrack) => {
+    this.getSinks().forEach(sink => {
+      this.addSinkInternal(sink, track);
+    });
   };
 }

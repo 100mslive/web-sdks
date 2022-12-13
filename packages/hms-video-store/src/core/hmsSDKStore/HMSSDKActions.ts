@@ -382,7 +382,7 @@ export class HMSSDKActions implements IHMSActions {
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+      (sdkTrack as SDKHMSVideoTrack).detach(videoElement);
       this.updateVideoLayer(trackID, 'detachVideo');
     } else {
       if (videoElement) {
