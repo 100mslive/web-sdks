@@ -28,27 +28,46 @@ export const AudioVideoToggle = () => {
   const ref = useRef(null);
 
   useEffect(() => {
-    const visibilityListener = ev => {
-      console.log("audio visibility ", track, document.visibilityState, ref);
-      if (document.visibilityState === "hidden" && track?.deviceID) {
+    const visibilityListener = () => {
+      console.error(
+        "audio visibility ",
+        { deviceId: track?.deviceID },
+        document.visibilityState,
+        ref
+      );
+      if (document.visibilityState === "hidden") {
         ref.current = track?.deviceID;
-      } else {
-        if (ref.current) {
-          updateDevice({
+      } else if (ref.current) {
+        (async () => {
+          /*  await updateDevice({
+            deviceId: "default",
+            deviceType: DeviceType.audioInput,
+          });
+          console.log("device set to default"); */
+          await updateDevice({
             deviceId: ref.current,
             deviceType: DeviceType.audioInput,
           });
-        }
+          console.log("device set to prev selection");
+        })();
       }
     };
     const isIOS = parsedUserAgent.getOS().name.toLowerCase() === "ios";
-    console.log("is IOS ", isIOS, parsedUserAgent.getOS(), track);
+    console.log(
+      "is IOS ",
+      isIOS,
+      parsedUserAgent.getOS(),
+      "deviceId:",
+      track?.deviceID
+    );
 
     if (!isIOS) {
       return;
     }
     document.addEventListener("visibilitychange", visibilityListener);
-    return document.removeEventListener("visibilitychange", visibilityListener);
+    return () => {
+      document.removeEventListener("visibilitychange", visibilityListener);
+    };
   }, [track?.deviceID, updateDevice]);
   return (
     <Fragment>
