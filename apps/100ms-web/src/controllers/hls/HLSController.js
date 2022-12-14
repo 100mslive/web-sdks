@@ -48,7 +48,7 @@ export class HLSController {
   setCurrentLevel(currentLevel) {
     const newLevel = this.hls.levels.findIndex(
       level =>
-        level.height === currentLevel.height ||
+        level.height === currentLevel.height &&
         level.width === currentLevel.width
     );
     this.hls.currentLevel = newLevel;
