@@ -68,25 +68,26 @@ const HLSView = () => {
       setAvailableLevels(onlyVideoLevels);
       setCurrentSelectedQualityText("Auto");
     };
-    const levelUpdatedHandler = (_, { details, level }) => {
+    const levelUpdatedHandler = (_, { level }) => {
       const qualityLevel = hlsController.getHlsJsInstance().levels[level];
       setisCurrentSelectedQuality(qualityLevel);
+    };
+    const metadataLoadedHandler = ({ payload, ...rest }) => {
+      console.log(
+        `%c Payload: ${payload}`,
+        "color:#2b2d42; background:#d80032"
+      );
+      console.log(rest);
+      ToastManager.addToast({
+        title: `Payload from timed Metadata ${payload}`,
+      });
     };
 
     if (videoEl && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
-        const metadataLoadedHandler = ({ payload, ...rest }) => {
-          console.log(
-            `%c Payload: ${payload}`,
-            "color:#2b2d42; background:#d80032"
-          );
-          console.log(rest);
-          ToastManager.addToast({
-            title: `Payload from timed Metadata ${payload}`,
-          });
-        };
+
         hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
           setIsVideoLive(false);
         });
@@ -99,10 +100,12 @@ const HLSView = () => {
       }
     }
     return () => {
-      hlsStats = null;
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsController?.reset();
+      hlsStats = null;
+      hlsController = null;
     };
   }, [hlsUrl]);
 
@@ -111,9 +114,11 @@ const HLSView = () => {
    */
   useEffect(() => {
     if (currentSelectedQuality) {
-      const levelText = isUserSelectedAuto
-        ? `Auto(${currentSelectedQuality.height}p)`
-        : `${currentSelectedQuality.height}p`;
+      const res = Math.min(
+        currentSelectedQuality.height,
+        currentSelectedQuality.width
+      );
+      const levelText = isUserSelectedAuto ? `Auto(${res}p)` : `${res}p`;
       setCurrentSelectedQualityText(levelText);
     }
   }, [currentSelectedQuality, isUserSelectedAuto]);

@@ -15,7 +15,6 @@ export function HLSQualitySelector({
 
   return (
     <Dropdown.Root
-      css={{ margin: "0px" }}
       open={qualityDropDownOpen}
       onOpenChange={value => setQualityDropDownOpen(value)}
     >
@@ -98,4 +97,6 @@ export function HLSQualitySelector({
 }
 
 const getQualityText = level =>
-  `${level.height}p (${(Number(level.bitrate / 1024) / 1024).toFixed(2)} Mbps)`;
+  `${Math.min(level.height, level.width)}p (${(
+    Number(level.bitrate / 1024) / 1024
+  ).toFixed(2)} Mbps)`;
