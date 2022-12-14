@@ -250,9 +250,7 @@ const HLSView = () => {
           />
           <HMSVideoPlayer.Root ref={videoRef}>
             <HMSVideoPlayer.Progress videoRef={videoRef} />
-            <HMSVideoPlayer.Controls.Root
-              css={{ paddingLeft: "$8", paddingRight: "$8" }}
-            >
+            <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
               <HMSVideoPlayer.Controls.Left>
                 <HMSVideoPlayer.PlayButton
                   onClick={() => {
