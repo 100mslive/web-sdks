@@ -177,6 +177,9 @@ const ResetStreamingStart = () => {
       setRecordingStarted(false);
     }
   }, [isBrowserRecordingOn, recordingStarted, setRecordingStarted]);
+  /**
+   * Reset on leave
+   */
   useEffect(() => {
     if (roomState === HMSRoomState.Disconnected) {
       setHLSStarted(false);
