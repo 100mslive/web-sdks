@@ -83,14 +83,16 @@ const HLSView = () => {
       });
     };
 
+    const handleNoLongerLive = () => {
+      setIsVideoLive(false);
+    };
+
     if (videoEl && hlsUrl) {
       if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-          setIsVideoLive(false);
-        });
+        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
         hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
@@ -103,6 +105,7 @@ const HLSView = () => {
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
+      hlsController?.off(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
       hlsController?.reset();
       hlsStats = null;
       hlsController = null;
