@@ -45,12 +45,8 @@ const HLSView = () => {
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
-  const [currentSelectedQuality, setisCurrentSelectedQuality] = useState(null);
+  const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
-
-  const [currentSelectedQualityText, setCurrentSelectedQualityText] =
-    useState("");
-
   const [isPaused, setIsPaused] = useState(false);
 
   const [show, toggle] = useToggle(false);
@@ -66,11 +62,10 @@ const HLSView = () => {
     const manifestLoadedHandler = (_, { levels }) => {
       const onlyVideoLevels = removeAudioLevels(levels);
       setAvailableLevels(onlyVideoLevels);
-      setCurrentSelectedQualityText("Auto");
     };
     const levelUpdatedHandler = (_, { level }) => {
       const qualityLevel = hlsController.getHlsJsInstance().levels[level];
-      setisCurrentSelectedQuality(qualityLevel);
+      setCurrentSelectedQuality(qualityLevel);
     };
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       console.log(
@@ -111,20 +106,6 @@ const HLSView = () => {
       hlsController = null;
     };
   }, [hlsUrl]);
-
-  /**
-   * update quality level text whenever a level is changed
-   */
-  useEffect(() => {
-    if (currentSelectedQuality) {
-      const res = Math.min(
-        currentSelectedQuality.height,
-        currentSelectedQuality.width
-      );
-      const levelText = isUserSelectedAuto ? `Auto(${res}p)` : `${res}p`;
-      setCurrentSelectedQualityText(levelText);
-    }
-  }, [currentSelectedQuality, isUserSelectedAuto]);
 
   /**
    * initialize and subscribe to hlsState
@@ -198,7 +179,7 @@ const HLSView = () => {
     };
   }, [hlsUrl]);
 
-  const qualitySelectorHandler = useCallback(
+  const handleQuality = useCallback(
     qualityLevel => {
       if (hlsController) {
         setIsUserSelectedAuto(
@@ -267,6 +248,7 @@ const HLSView = () => {
                 {hlsController ? (
                   <IconButton
                     variant="standard"
+                    css={{ px: "$2" }}
                     onClick={() => {
                       hlsController.jumpToLive();
                       setIsVideoLive(true);
@@ -281,7 +263,7 @@ const HLSView = () => {
                             height: "$4",
                             width: "$4",
                             background: isVideoLive ? "$error" : "$white",
-                            borderRadius: "50%",
+                            r: "$1",
                           }}
                         />
                         <Text
@@ -289,16 +271,17 @@ const HLSView = () => {
                             "@sm": "xs",
                           }}
                         >
-                          {isVideoLive ? "Live" : "Go to Live"}{" "}
+                          {isVideoLive ? "LIVE" : "GO LIVE"}
                         </Text>
                       </Flex>
                     </Tooltip>
                   </IconButton>
                 ) : null}
                 <HLSQualitySelector
-                  availableLevels={availableLevels}
-                  currentSelectedQualityText={currentSelectedQualityText}
-                  qualitySelectorHandler={qualitySelectorHandler}
+                  levels={availableLevels}
+                  selection={currentSelectedQuality}
+                  onQualityChange={handleQuality}
+                  isAuto={isUserSelectedAuto}
                 />
                 <FullScreenButton
                   onToggle={toggle}
