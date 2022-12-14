@@ -98,5 +98,5 @@ export function HLSQualitySelector({
 
 const getQualityText = level =>
   `${Math.min(level.height, level.width)}p (${(
-    Number(level.bitrate / 1024) / 1024
+    Number(level.bitrate / 1000) / 1000
   ).toFixed(2)} Mbps)`;
