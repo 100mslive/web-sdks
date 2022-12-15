@@ -61,6 +61,9 @@
     "storybook": "cd packages/react-ui && yarn storybook",
     "build-storybook": "cd packages/react-ui && build-storybook"
   },
+  "resolutions": {
+    "loader-utils": "^2.0.4"
+  },
   "workspaces": [
     "packages/*",
     "apps/*",

@@ -10,6 +10,12 @@ export interface RequestForRoleChangeParams {
   role: string;
 }
 
+export interface RequestForBulkRoleChangeParams {
+  roles: string[];
+  force: boolean;
+  role: string;
+}
+
 /**
  * Parameters for accepting a role change request sent to the server.
  */
