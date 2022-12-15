@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-// import { HlsStats } from "@100mslive/hls-stats";
+import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import {
   selectAppData,
@@ -22,12 +22,12 @@ import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 import { HLSAutoplayBlockedPrompt } from "../components/HMSVideo/HLSAutoplayBlockedPrompt";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
-// import { ToastManager } from "../components/Toast/ToastManager";
-// import {
-//   HLS_STREAM_NO_LONGER_LIVE,
-//   HLS_TIMED_METADATA_LOADED,
-//   HLSController,
-// } from "../controllers/hls/HLSController";
+import { ToastManager } from "../components/Toast/ToastManager";
+import {
+  HLS_STREAM_NO_LONGER_LIVE,
+  HLS_TIMED_METADATA_LOADED,
+  HLSController,
+} from "../controllers/hls/HLSController";
 import { APP_DATA } from "../common/constants";
 
 let hlsController;
@@ -104,6 +104,13 @@ const HLSView = () => {
             console.log("HLS NEW TRACK ADDED", track);
             track.addEventListener("cuechange", function (cueChangeEvent) {
               console.log("HLS CUE CHANGED", cueChangeEvent, track);
+              console.log(
+                `%c SAFARI NATIVE PARSING WORKED`,
+                "color:#2b2d42; background:#d80032"
+              );
+              ToastManager.addToast({
+                title: `TIMED METADATA SUCCESSFULLY PARSED FOR SAFARI NATIVE`,
+              });
             });
           }
         );
