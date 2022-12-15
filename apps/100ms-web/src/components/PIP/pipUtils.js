@@ -40,8 +40,8 @@ export function dummyChangeInCanvas(canvas) {
  */
 function fillGridTiles(videoElements, ctx, canvas) {
   let videoElementPos = 0;
-  const offset = 6;
-  canvas.width = 640;
+  const offset = 8;
+  canvas.width = 480;
   canvas.height = 320;
 
   ctx.fillStyle = "#303740";
@@ -78,21 +78,21 @@ function fillGridTiles(videoElements, ctx, canvas) {
     ctx.drawImage(
       videoElements[videoElementPos++],
       offset,
-      offset,
+      offset / 2,
       canvas.width / 2 - offset,
       canvas.height / 2 - offset
     );
     ctx.drawImage(
       videoElements[videoElementPos++],
       canvas.width / 2 + offset,
-      offset,
+      offset / 2,
       canvas.width / 2 - offset,
       canvas.height / 2 - offset
     );
     ctx.drawImage(
       videoElements[videoElementPos],
       canvas.width / 4 + offset,
-      canvas.height / 2 + offset,
+      canvas.height / 2 + offset / 2,
       canvas.width / 2 - offset,
       canvas.height / 2 - offset
     );
@@ -101,30 +101,30 @@ function fillGridTiles(videoElements, ctx, canvas) {
     ctx.drawImage(
       videoElements[videoElementPos++],
       offset,
-      offset,
+      offset / 2,
       canvas.width / 2 - offset,
-      canvas.height / 2 - offset
+      canvas.height / 2 - offset / 2
     );
     ctx.drawImage(
       videoElements[videoElementPos++],
       canvas.width / 2 + offset,
-      offset,
+      offset / 2,
       canvas.width / 2 - offset,
-      canvas.height / 2 - offset
+      canvas.height / 2 - offset / 2
     );
     ctx.drawImage(
       videoElements[videoElementPos++],
       offset,
-      canvas.height / 2 + offset,
+      canvas.height / 2 + offset / 2,
       canvas.width / 2 - offset,
-      canvas.height / 2 - offset
+      canvas.height / 2 - offset / 2
     );
     ctx.drawImage(
       videoElements[videoElementPos],
       canvas.width / 2 + offset,
-      canvas.height / 2 + offset,
+      canvas.height / 2 + offset / 2,
       canvas.width / 2 - offset,
-      canvas.height / 2 - offset
+      canvas.height / 2 - offset / 2
     );
   }
 }
