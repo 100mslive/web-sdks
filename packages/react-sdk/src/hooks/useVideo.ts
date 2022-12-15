@@ -28,7 +28,7 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId }: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
@@ -51,7 +51,7 @@ export const useVideo = ({ trackId }: useVideoInput): useVideoOutput => {
   useEffect(() => {
     return () => {
       (async () => {
-        if (videoRef.current && track) {
+        if (videoRef.current && track && attach !== false) {
           try {
             // detach on unmount
             await actions.detachVideo(track.id, videoRef.current);
