@@ -2,8 +2,8 @@ import * as workerTimers from "worker-timers";
 import { drawVideoElementsOnCanvas, dummyChangeInCanvas } from "./pipUtils";
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
-const DEFAULT_CANVAS_WIDTH = 900;
-const DEFAULT_CANVAS_HEIGHT = 600;
+const DEFAULT_CANVAS_WIDTH = 640;
+const DEFAULT_CANVAS_HEIGHT = 240;
 const LEAVE_EVENT_NAME = "leavepictureinpicture";
 
 const PIPStates = {

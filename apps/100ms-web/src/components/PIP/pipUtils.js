@@ -7,30 +7,30 @@
  * All videos will respect their aspect ratios.
  */
 export function drawVideoElementsOnCanvas(videoElements, canvas) {
-  let numberOfTiles = videoElements.filter(
+  let videoTiles = videoElements.filter(
     videoElement => videoElement.srcObject !== null
-  ).length;
+  );
 
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "#303740";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (numberOfTiles === 0) {
+  if (videoTiles.length === 0) {
     // no tile to render, render black image
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     return;
   }
 
-  const numRows = numberOfTiles <= 2 ? 1 : 2;
-  const numCols = Number(Math.ceil(numberOfTiles / numRows));
-  fillGridTiles(numRows, numCols, videoElements, ctx, canvas, numberOfTiles);
+  // const numRows = numberOfTiles <= 2 ? 1 : 2;
+  // const numCols = Number(Math.ceil(numberOfTiles / numRows));
+  fillGridTiles(videoTiles.slice(0, 4), ctx, canvas);
 }
 
 // this is to send some data for stream and resolve video element's play for a
 // video element rendering this canvas' capture stream
 export function dummyChangeInCanvas(canvas) {
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "#303740";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -38,97 +38,93 @@ export function dummyChangeInCanvas(canvas) {
  * Imagine the canvas as a grid with passed in number of rows and columns. Go
  * over the tiles in the grid in order while drawing the videoElements upon them.
  */
-function fillGridTiles(
-  numRows,
-  numCols,
-  videoElements,
-  ctx,
-  canvas,
-  numberOfTiles
-) {
+function fillGridTiles(videoElements, ctx, canvas) {
   let videoElementPos = 0;
-  const renderTileWidth = 1280;
-  const renderTileHeight = 720;
+  const offset = 6;
+  canvas.width = 640;
+  canvas.height = 320;
 
-  canvas.width = renderTileWidth * numCols;
-  canvas.height = renderTileHeight * numRows;
+  ctx.fillStyle = "#303740";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let row = 0; row < numRows; row++) {
-    for (let col = 0; col < numCols; col++) {
-      const video = videoElements[videoElementPos];
-      /**
-       * there are two dimensions here. One is the
-       * dimension of the actual video and the other is
-       * the dimension of the tile where we render the video.
-       * Since we don't have control over what camera the user
-       * will use, it's impossible to render it in the tiles
-       * while still maintaining the aspect ratio.
-       *
-       * To circumvent that, we try to shrink either the width or height
-       * of the render tile based on the video's aspect ratio.
-       *
-       */
-      //the original aspect ratio of the video
-      const originalAspectRatio = video.videoWidth / video.videoHeight;
-      // the aspect ratio of the tile we are going to render the video
-      const renderTileAspectRatio = renderTileHeight / renderTileWidth;
-      let renderVideoWidth = renderTileWidth;
-      let renderVideoHeight = renderTileHeight;
-      /**
-       * Note: AspectRatio = width/height
-       * therefore,
-       * Width = aspectRatio * height;
-       * height = width / aspectRatio.
-       */
-      if (originalAspectRatio > renderTileAspectRatio) {
-        /**
-         * if original aspect ratio is greater than the tile's aspect ratio,
-         * that means, we have to either shrink the height of the render
-         * tile or increase the width of the render tile to maintain the aspect ratio.
-         * Since we can't increase the tile size without affecting the
-         * size of the canvas itself, we are choosing to shrink
-         * the height.
-         */
-        renderVideoHeight = renderTileWidth / originalAspectRatio;
-      } else {
-        /**
-         * if the aspect ratio of original video is less than or equal
-         * to the tile's aspect ratio, then to maintain aspect ratio, we have to
-         * either shrink the width or increase the height. Since we
-         * can't increase the tile height without affecting the canvas height,
-         * we shrink the width.
-         */
-        renderVideoWidth = renderTileHeight * originalAspectRatio;
-      }
+  if (videoElements.length === 1) {
+    ctx.drawImage(
+      videoElements[videoElementPos],
+      offset,
+      offset,
+      canvas.width - offset,
+      canvas.height - offset
+    );
+  }
 
-      let tileStartX = col * renderTileWidth;
-      let tileStartY = row * renderTileHeight;
+  if (videoElements.length === 2) {
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      canvas.width / 4 + offset,
+      offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos],
+      canvas.width / 4 + offset,
+      canvas.height / 2 + offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+  }
 
-      if (video && video.srcObject !== null) {
-        const differenceInWidth = renderTileWidth - renderVideoWidth;
-        const differenceInHeight = renderTileHeight - renderVideoHeight;
-        let startXOffset = differenceInWidth / 2;
-        const startYOffset = differenceInHeight / 2;
-
-        /**
-         * If the second column row has only one element,
-         * align it to center.
-         */
-        if (row === 1 && numberOfTiles === 3) {
-          const totalCanvasWidth = renderTileWidth * 2;
-          startXOffset = (totalCanvasWidth - renderVideoWidth) / 2;
-        }
-        tileStartX = tileStartX + startXOffset;
-        tileStartY = tileStartY + startYOffset;
-        ctx.drawImage(
-          video,
-          tileStartX,
-          tileStartY,
-          renderVideoWidth,
-          renderVideoHeight
-        );
-      }
-      videoElementPos++;
-    }
+  if (videoElements.length === 3) {
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      offset,
+      offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      canvas.width / 2 + offset,
+      offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos],
+      canvas.width / 4 + offset,
+      canvas.height / 2 + offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+  }
+  if (videoElements.length === 4) {
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      offset,
+      offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      canvas.width / 2 + offset,
+      offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos++],
+      offset,
+      canvas.height / 2 + offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
+    ctx.drawImage(
+      videoElements[videoElementPos],
+      canvas.width / 2 + offset,
+      canvas.height / 2 + offset,
+      canvas.width / 2 - offset,
+      canvas.height / 2 - offset
+    );
   }
 }
