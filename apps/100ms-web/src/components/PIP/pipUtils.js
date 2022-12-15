@@ -12,7 +12,7 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
   );
 
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#303740";
+  ctx.fillStyle = "#1E232A";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (videoTiles.length === 0) {
@@ -30,7 +30,7 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
 // video element rendering this canvas' capture stream
 export function dummyChangeInCanvas(canvas) {
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "#1E232A";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -42,6 +42,15 @@ function fillGridTiles(videoElements, ctx, canvas) {
   const offset = 8;
   canvas.width = 480;
   canvas.height = 320;
+  const strokeColor = "#2D3440";
+
+  ctx.fillStyle = "#1E232A";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (videoElements.length > 0) {
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = offset;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+  }
 
   if (videoElements.length === 1) {
     const video = videoElements[0];
@@ -67,6 +76,13 @@ function fillGridTiles(videoElements, ctx, canvas) {
       const yOffset = (canvas.height - height) / 2;
 
       ctx.drawImage(video, xOffset, yOffset, width, height);
+
+      if (index === 0) {
+        const path = new Path2D();
+        path.moveTo(canvas.width / 2, 0);
+        path.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke(path);
+      }
     });
   }
 
@@ -85,6 +101,15 @@ function fillGridTiles(videoElements, ctx, canvas) {
         (index < 2 ? 0 : canvas.height / 2) + (canvas.height / 2 - height) / 2;
 
       ctx.drawImage(video, xOffset, yOffset, width, height);
+      if (index === 0) {
+        const path = new Path2D();
+        path.moveTo(canvas.width / 2, 0);
+        path.lineTo(canvas.width / 2, canvas.height / 2);
+        ctx.stroke(path);
+        path.moveTo(0, canvas.height / 2);
+        path.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke(path);
+      }
     });
   }
   if (videoElements.length === 4) {
@@ -103,6 +128,15 @@ function fillGridTiles(videoElements, ctx, canvas) {
         (index < 2 ? 0 : canvas.height / 2) + (canvas.height / 2 - height) / 2;
 
       ctx.drawImage(video, xOffset, yOffset, width, height);
+      if (index === 0) {
+        const path = new Path2D();
+        path.moveTo(canvas.width / 2, 0);
+        path.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke(path);
+        path.moveTo(0, canvas.height / 2);
+        path.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke(path);
+      }
     });
   }
 }
