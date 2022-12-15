@@ -39,7 +39,6 @@ export function dummyChangeInCanvas(canvas) {
  * over the tiles in the grid in order while drawing the videoElements upon them.
  */
 function fillGridTiles(videoElements, ctx, canvas) {
-  let videoElementPos = 0;
   const offset = 8;
   canvas.width = 480;
   canvas.height = 320;
@@ -48,83 +47,101 @@ function fillGridTiles(videoElements, ctx, canvas) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (videoElements.length === 1) {
-    ctx.drawImage(
-      videoElements[videoElementPos],
-      offset,
-      offset,
+    const video = videoElements[0];
+    const { width, height } = getRenderDimensions(
+      video,
       canvas.width - offset,
       canvas.height - offset
+    );
+    ctx.drawImage(
+      video,
+      canvas.width / 2 - width / 2 + offset,
+      canvas.height / 2 - height / 2 + offset,
+      width,
+      height
     );
   }
 
   if (videoElements.length === 2) {
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      canvas.width / 4 + offset,
-      offset,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos],
-      canvas.width / 4 + offset,
-      canvas.height / 2 + offset,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset
-    );
+    videoElements.forEach((video, index) => {
+      const { width, height } = getRenderDimensions(
+        video,
+        canvas.width / 2 - offset,
+        canvas.height - offset
+      );
+      ctx.drawImage(
+        video,
+        (canvas.width / 2) * index + offset,
+        canvas.height / 2 - height / 2 + offset,
+        width,
+        height
+      );
+    });
   }
 
   if (videoElements.length === 3) {
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      offset,
-      offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      canvas.width / 2 + offset,
-      offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos],
-      canvas.width / 4 + offset,
-      canvas.height / 2 + offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset
-    );
+    videoElements.forEach((video, index) => {
+      const { width, height } = getRenderDimensions(
+        video,
+        canvas.width / 2 - offset,
+        canvas.height / 2 - offset
+      );
+      const xOffset =
+        offset +
+        (index < 2 ? (canvas.width / 2) * index : canvas.width / 2 - width / 2);
+      const yOffset = offset + (index < 2 ? 0 : canvas.height / 2);
+      ctx.drawImage(video, xOffset, yOffset, width, height);
+    });
   }
   if (videoElements.length === 4) {
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      offset,
-      offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset / 2
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      canvas.width / 2 + offset,
-      offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset / 2
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos++],
-      offset,
-      canvas.height / 2 + offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset / 2
-    );
-    ctx.drawImage(
-      videoElements[videoElementPos],
-      canvas.width / 2 + offset,
-      canvas.height / 2 + offset / 2,
-      canvas.width / 2 - offset,
-      canvas.height / 2 - offset / 2
-    );
+    videoElements.forEach((video, index) => {
+      const { width, height } = getRenderDimensions(
+        video,
+        canvas.width / 2 - offset,
+        canvas.height / 2 - offset
+      );
+      const xOffset =
+        offset +
+        (index < 2
+          ? (canvas.width / 2) * index
+          : (canvas.width / 2) * (3 - index));
+      const yOffset = offset + (index < 2 ? 0 : canvas.height / 2);
+      ctx.drawImage(video, xOffset, yOffset, width, height);
+    });
   }
+}
+
+function getRenderDimensions(video, renderTileWidth, renderTileHeight) {
+  const originalAspectRatio = video.videoWidth / video.videoHeight;
+  // the aspect ratio of the tile we are going to render the video
+  const renderTileAspectRatio = renderTileHeight / renderTileWidth;
+  let renderVideoWidth = renderTileWidth;
+  let renderVideoHeight = renderTileHeight;
+  /**
+   * Note: AspectRatio = width/height
+   * therefore,
+   * Width = aspectRatio * height;
+   * height = width / aspectRatio.
+   */
+  if (originalAspectRatio > renderTileAspectRatio) {
+    /**
+     * if original aspect ratio is greater than the tile's aspect ratio,
+     * that means, we have to either shrink the height of the render
+     * tile or increase the width of the render tile to maintain the aspect ratio.
+     * Since we can't increase the tile size without affecting the
+     * size of the canvas itself, we are choosing to shrink
+     * the height.
+     */
+    renderVideoHeight = renderTileWidth / originalAspectRatio;
+  } else {
+    /**
+     * if the aspect ratio of original video is less than or equal
+     * to the tile's aspect ratio, then to maintain aspect ratio, we have to
+     * either shrink the width or increase the height. Since we
+     * can't increase the tile height without affecting the canvas height,
+     * we shrink the width.
+     */
+    renderVideoWidth = renderTileHeight * originalAspectRatio;
+  }
+  return { width: renderVideoWidth, height: renderVideoHeight };
 }
