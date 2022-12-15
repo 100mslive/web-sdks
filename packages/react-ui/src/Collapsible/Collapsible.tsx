@@ -1,8 +1,4 @@
-import {
-  Content,
-  Root,
-  Trigger,
-} from '@radix-ui/react-collapsible';
+import { Content, Root, Trigger } from '@radix-ui/react-collapsible';
 import { styled } from '../Theme';
 import { slideDown, slideUp } from '../utils';
 
@@ -23,9 +19,12 @@ const CollapsibleContent = styled(Content, {
   w: '$80',
   r: '$1',
   overflowY: 'auto',
-  '&[data-state="open"]': { animation: `${slideDown("--radix-collapsible-content-height")} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,},
-  '&[data-state="closed"]': { animation: `${slideUp("--radix-collapsible-content-height")} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`, },
-
+  '&[data-state="open"]': {
+    animation: `${slideDown('--radix-collapsible-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+  },
+  '&[data-state="closed"]': {
+    animation: `${slideUp('--radix-collapsible-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+  },
 });
 
 export const Collapsible = {

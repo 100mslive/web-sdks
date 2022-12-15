@@ -1,5 +1,9 @@
 {
+  "version": "0.8.0",
+  "license": "MIT",
+  "main": "dist/index.cjs.js",
   "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -37,7 +41,11 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
+    "@100mslive/hms-video": "0.7.0",
+    "eventemitter2": "^6.4.7",
+    "immer": "^9.0.6",
     "reselect": "4.0.0",
+    "zustand": "3.5.7"
   },
   "devDependencies": {
     "ts-node": "^10.4.0",
