@@ -74,31 +74,39 @@ const HLSView = () => {
     };
 
     if (videoEl && hlsUrl) {
-      // if (Hls.isSupported()) {
-      //   hlsController = new HLSController(hlsUrl, videoRef);
-      //   hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
-      //   const metadataLoadedHandler = ({ payload, ...rest }) => {
-      //     console.log(
-      //       `%c Payload: ${payload}`,
-      //       "color:#2b2d42; background:#d80032"
-      //     );
-      //     console.log(rest);
-      //     ToastManager.addToast({
-      //       title: `Payload from timed Metadata ${payload}`,
-      //     });
-      //   };
-      //   hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-      //     setIsVideoLive(false);
-      //   });
-      //   hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
-      //
-      //   hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
-      //   hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
-      // } else
-      //IGNORE HLS JS FOR NOW FOR TESTING IN SAFARI. NOTE THE APP WILL NOW
-      // NOT STREAM IN OTHER BROWSERS BECAUSE WE REMOVED HLS.JS
-      if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+      if (Hls.isSupported()) {
+        hlsController = new HLSController(hlsUrl, videoRef);
+        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
+        const metadataLoadedHandler = ({ payload, ...rest }) => {
+          console.log(
+            `%c Payload: ${payload}`,
+            "color:#2b2d42; background:#d80032"
+          );
+          console.log(rest);
+          ToastManager.addToast({
+            title: `Payload from timed Metadata ${payload}`,
+          });
+        };
+        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
+          setIsVideoLive(false);
+        });
+        hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
+
+        hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
+        hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         videoEl.src = hlsUrl;
+        videoRef.current?.textTracks.addEventListener(
+          "addtrack",
+          function (addTrackEvent) {
+            var track = addTrackEvent.track;
+            track.mode = "hidden";
+            console.log("HLS NEW TRACK ADDED", track);
+            track.addEventListener("cuechange", function (cueChangeEvent) {
+              console.log("HLS CUE CHANGED", cueChangeEvent, track);
+            });
+          }
+        );
       }
     }
     return () => {
@@ -184,19 +192,6 @@ const HLSView = () => {
       }
     };
     playVideo();
-
-    console.log("CUE CHANGED", videoRef.current?.textTracks);
-    videoRef.current?.textTracks.addEventListener(
-      "addtrack",
-      function (addTrackEvent) {
-        var track = addTrackEvent.track;
-        track.mode = "hidden";
-
-        track.addEventListener("cuechange", function (cueChangeEvent) {
-          console.log("CUE CHANGED", cueChangeEvent, track);
-        });
-      }
-    );
 
     videoEl.addEventListener("play", playEventHandler);
     videoEl.addEventListener("pause", pauseEventHandler);
