@@ -102,9 +102,15 @@ export const RTMP_RECORD_DEFAULT_RESOLUTION = {
   height: 720,
 };
 
+export const CHAT_SELECTOR = {
+  PEER_ID: "peer_id",
+  ROLE: "role",
+};
+
 export const APP_DATA = {
   uiSettings: "uiSettings",
   chatOpen: "chatOpen",
+  chatSelector: "chatSelector",
   chatDraft: "chatDraft",
   appConfig: "appConfig",
   recordingUrl: "recordingUrl",
@@ -119,6 +125,7 @@ export const APP_DATA = {
   rtmpStarted: "rtmpStarted",
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
+  pinnedTrackId: "pinnedTrackId",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",

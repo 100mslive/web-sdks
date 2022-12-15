@@ -2,7 +2,11 @@ import { HMSVideoTrack } from './HMSVideoTrack';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings, ScreenCaptureHandle } from '../../interfaces';
+import {
+  HMSSimulcastLayerDefinition,
+  HMSVideoTrackSettings as IHMSVideoTrackSettings,
+  ScreenCaptureHandle,
+} from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
@@ -23,7 +27,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
-  private TAG = 'LocalVideoTrack';
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
+  private TAG = '[LocalVideoTrack]';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -54,13 +59,26 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.settings = settings;
-    // Replace the 'default' deviceId with the actual deviceId
+    // Replace the 'default' or invalid deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default' && track.enabled) {
+    if (settings.deviceId !== track.getSettings().deviceId && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
+  }
+
+  /** @internal */
+  setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
+    this._layerDefinitions = definitions;
+  }
+
+  /**
+   * Method to get available simulcast definitions for the track
+   * @returns {HMSSimulcastLayerDefinition[]}
+   */
+  getSimulcastDefinitions(): HMSSimulcastLayerDefinition[] {
+    return this._layerDefinitions;
   }
 
   /**

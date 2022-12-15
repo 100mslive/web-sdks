@@ -6,7 +6,7 @@ import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
 
 export class NetworkTestManager {
-  private TAG = 'NetworkTestManager';
+  private readonly TAG = '[NetworkTestManager]';
   private controller = new AbortController();
   private score?: number;
   constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
