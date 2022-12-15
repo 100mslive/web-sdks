@@ -109,37 +109,13 @@ function fillGridTiles(videoElements, ctx, canvas) {
   }
 }
 
-function getRenderDimensions(video, renderTileWidth, renderTileHeight) {
-  const originalAspectRatio = video.videoWidth / video.videoHeight;
-  // the aspect ratio of the tile we are going to render the video
-  const renderTileAspectRatio = renderTileHeight / renderTileWidth;
-  let renderVideoWidth = renderTileWidth;
-  let renderVideoHeight = renderTileHeight;
-  /**
-   * Note: AspectRatio = width/height
-   * therefore,
-   * Width = aspectRatio * height;
-   * height = width / aspectRatio.
-   */
-  if (originalAspectRatio > renderTileAspectRatio) {
-    /**
-     * if original aspect ratio is greater than the tile's aspect ratio,
-     * that means, we have to either shrink the height of the render
-     * tile or increase the width of the render tile to maintain the aspect ratio.
-     * Since we can't increase the tile size without affecting the
-     * size of the canvas itself, we are choosing to shrink
-     * the height.
-     */
-    renderVideoHeight = renderTileWidth / originalAspectRatio;
-  } else {
-    /**
-     * if the aspect ratio of original video is less than or equal
-     * to the tile's aspect ratio, then to maintain aspect ratio, we have to
-     * either shrink the width or increase the height. Since we
-     * can't increase the tile height without affecting the canvas height,
-     * we shrink the width.
-     */
-    renderVideoWidth = renderTileHeight * originalAspectRatio;
+function getRenderDimensions(video, width, height) {
+  let finalWidth = (video.videoWidth / video.videoHeight) * height;
+  let finalHeight = height;
+
+  if (finalWidth > width) {
+    finalWidth = width;
+    finalHeight = (video.videoHeight / video.videoWidth) * width;
   }
-  return { width: renderVideoWidth, height: renderVideoHeight };
+  return { width: finalWidth, height: finalHeight };
 }
