@@ -80,15 +80,6 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                       <Checkbox.Root
                         css={{ margin: "$2" }}
                         checked={selectedBulkRole.includes(role)}
-                        onCheckedChange={value =>
-                          setBulkRole(selection => {
-                            return value
-                              ? [...selection, role]
-                              : selection.filter(
-                                  selectedRole => selectedRole !== role
-                                );
-                          })
-                        }
                       >
                         <Checkbox.Indicator>
                           <CheckIcon width={16} height={16} />
