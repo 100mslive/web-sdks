@@ -43,9 +43,6 @@ function fillGridTiles(videoElements, ctx, canvas) {
   canvas.width = 480;
   canvas.height = 320;
 
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   if (videoElements.length === 1) {
     const video = videoElements[0];
     const { width, height } = getRenderDimensions(
@@ -81,8 +78,9 @@ function fillGridTiles(videoElements, ctx, canvas) {
         canvas.height / 2 - offset
       );
       const xOffset =
-        (canvas.width / 2 - width) / 2 +
-        (index < 2 ? (canvas.width / 2) * index : canvas.width / 2 - width / 2);
+        index < 2
+          ? (canvas.width / 2 - width) / 2 + (canvas.width / 2) * index
+          : canvas.width / 2 - width / 2;
       const yOffset =
         (index < 2 ? 0 : canvas.height / 2) + (canvas.height / 2 - height) / 2;
 
