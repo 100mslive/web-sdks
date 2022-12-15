@@ -83,7 +83,37 @@ const HLSView = () => {
     };
 
     if (videoEl && hlsUrl) {
-      if (Hls.isSupported()) {
+      if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+        console.log("PLAYING HLS NATIVELY");
+        videoEl.src = hlsUrl;
+
+        let metadataCueSize = 0;
+        videoRef.current?.textTracks.addEventListener(
+          "addtrack",
+          function (addTrackEvent) {
+            var track = addTrackEvent.track;
+            track.mode = "hidden";
+            // console.log("HLS NEW TRACK ADDED", track);
+            videoEl.addEventListener("timeupdate", function (cueChangeEvent) {
+              for (let i = 0; i < videoEl.textTracks.length; i++) {
+                if (videoEl.textTracks[i].kind === "metadata") {
+                  const totalCues = videoEl.textTracks[i].cues.length;
+                  if (totalCues === metadataCueSize) {
+                    return;
+                  }
+
+                  for (let j = 0; j < totalCues; j++) {
+                    console.log(
+                      `%c ${videoEl?.textTracks[i]?.cues[j]?.value?.data}`,
+                      "color:#2b2d42; background:#d80032"
+                    );
+                  }
+                }
+              }
+            });
+          }
+        );
+      } else if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
@@ -92,26 +122,6 @@ const HLSView = () => {
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
         hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
-      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = hlsUrl;
-        videoRef.current?.textTracks.addEventListener(
-          "addtrack",
-          function (addTrackEvent) {
-            var track = addTrackEvent.track;
-            track.mode = "hidden";
-            console.log("HLS NEW TRACK ADDED", track);
-            track.addEventListener("cuechange", function (cueChangeEvent) {
-              console.log("HLS CUE CHANGED", cueChangeEvent, track);
-              console.log(
-                `%c SAFARI NATIVE PARSING WORKED`,
-                "color:#2b2d42; background:#d80032"
-              );
-              ToastManager.addToast({
-                title: `TIMED METADATA SUCCESSFULLY PARSED FOR SAFARI NATIVE`,
-              });
-            });
-          }
-        );
       }
     }
     return () => {
