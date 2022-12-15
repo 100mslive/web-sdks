@@ -1,11 +1,14 @@
 import React from "react";
 import {
+  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectPeers,
+  selectRolesWithPublisher,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import { GridCenterView, GridSidePaneView } from "../components/gridView";
+import { NonPublisherView } from "./NonPublisherView";
 import { useAppLayout } from "../components/AppData/useAppLayout";
 import { useUISettings } from "../components/AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
@@ -17,6 +20,8 @@ export const MainGridView = () => {
   const peers = useHMSStore(selectPeers);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const publisableRoles = useHMSStore(selectRolesWithPublisher);
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
@@ -41,6 +46,13 @@ export const MainGridView = () => {
     showSidePane = itsOnlyMeInTheRoom || nooneIsPublishing;
   }
 
+  console.log(
+    "is allowed to pulbisj ",
+    isAllowedToPublish,
+    sidebarPeers,
+    peers,
+    publisableRoles
+  );
   return (
     <Flex
       css={{
@@ -51,16 +63,29 @@ export const MainGridView = () => {
         "@md": "column",
       }}
     >
-      <GridCenterView
-        peers={showSidePane ? centerPeers : peers}
-        maxTileCount={maxTileCount}
-        allowRemoteMute={false}
-        hideSidePane={!showSidePane}
-        totalPeers={peers.length}
-      />
-      {showSidePane && (
-        <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
-      )}
+      {publisableRoles.length === 0 &&
+        !isAllowedToPublish.audio &&
+        !isAllowedToPublish.video &&
+        !isAllowedToPublish.screen && <NonPublisherView />}
+      {isAllowedToPublish.audio &&
+        isAllowedToPublish.video &&
+        isAllowedToPublish.screen && (
+          <>
+            <GridCenterView
+              peers={showSidePane ? centerPeers : peers}
+              maxTileCount={maxTileCount}
+              allowRemoteMute={false}
+              hideSidePane={!showSidePane}
+              totalPeers={peers.length}
+            />
+            {showSidePane && (
+              <GridSidePaneView
+                peers={sidebarPeers}
+                totalPeers={peers.length}
+              />
+            )}
+          </>
+        )}
     </Flex>
   );
 };
