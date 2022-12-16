@@ -20,7 +20,7 @@ export const MainGridView = () => {
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
-
+  console.log(sidebarPeers, centerPeers);
   /**
    * If there are peers from many publishing roles, then it's possible to divide
    * them into two parts, those who show in center and those who show in sidepane.
