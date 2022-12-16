@@ -74,6 +74,7 @@ const HLSView = () => {
       );
       console.log(rest);
       ToastManager.addToast({
+        id: crypto.randomUUID(),
         title: `Payload from timed Metadata ${payload}`,
       });
     };

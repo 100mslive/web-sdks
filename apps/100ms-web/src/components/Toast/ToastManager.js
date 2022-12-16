@@ -2,7 +2,7 @@ export const ToastManager = {
   toasts: new Map(),
   listeners: new Map(),
   addToast(toast) {
-    const id = Date.now();
+    const id = toast.id ? toast.id : crypto.randomUUID();
     this.toasts.set(id, { id, ...toast });
     this.onChange();
     return id;
