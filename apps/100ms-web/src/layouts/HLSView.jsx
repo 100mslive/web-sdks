@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
 import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
+import { v4 } from "uuid";
 import {
   selectAppData,
   selectHLSState,
@@ -29,7 +30,6 @@ import {
   HLSController,
 } from "../controllers/hls/HLSController";
 import { APP_DATA } from "../common/constants";
-import { v4 } from "uuid";
 
 let hlsController;
 let hlsStats;
