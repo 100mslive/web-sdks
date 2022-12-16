@@ -1,11 +1,16 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useHMSActions } from "@100mslive/react-sdk";
-import { ChangeRoleIcon, CheckIcon } from "@100mslive/react-icons";
+import {
+  AlertTriangleIcon,
+  ChangeRoleIcon,
+  CheckIcon,
+} from "@100mslive/react-icons";
 import {
   Button,
   Checkbox,
   Dialog,
   Dropdown,
+  Flex,
   Loading,
   Text,
 } from "@100mslive/react-ui";
@@ -145,11 +150,14 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
             </Dropdown.Content>
           </Dropdown.Root>
         </DialogRow>
-        {errorMessage && (
-          <DialogRow>
-            <Text css={{ color: "#FF0000" }}>{errorMessage}</Text>
-          </DialogRow>
-        )}
+        <DialogRow>
+          {errorMessage && (
+            <Flex gap={2} css={{ c: "$error", w: "70%", ml: "auto" }}>
+              <AlertTriangleIcon />
+              <Text css={{ c: "inherit" }}>{errorMessage}</Text>
+            </Flex>
+          )}
+        </DialogRow>
         <DialogRow justify="end">
           <Button
             variant="primary"
