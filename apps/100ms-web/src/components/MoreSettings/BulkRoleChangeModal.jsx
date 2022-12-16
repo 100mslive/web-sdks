@@ -84,15 +84,16 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                     <Dropdown.CheckboxItem
                       key={role}
                       checked={selectedBulkRole.includes(role)}
-                      onCheckedChange={value =>
+                      onCheckedChange={value => {
                         setBulkRole(selection => {
                           return value
                             ? [...selection, role]
                             : selection.filter(
                                 selectedRole => selectedRole !== role
                               );
-                        })
-                      }
+                        });
+                        setErrorMessage("");
+                      }}
                     >
                       <Checkbox.Root
                         css={{ margin: "$2" }}
@@ -130,7 +131,13 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
               {roles &&
                 roles.map(role => {
                   return (
-                    <Dropdown.Item key={role} onSelect={() => setRole(role)}>
+                    <Dropdown.Item
+                      key={role}
+                      onSelect={() => {
+                        setRole(role);
+                        setErrorMessage("");
+                      }}
+                    >
                       {role}
                     </Dropdown.Item>
                   );
