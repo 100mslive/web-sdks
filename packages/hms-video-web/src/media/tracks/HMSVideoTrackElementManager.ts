@@ -10,20 +10,16 @@ export class HMSVideoTrackElementManager {
   private videoElements = new Set<HTMLVideoElement>();
 
   constructor(private track: HMSVideoTrack) {
-    if (isBrowser) {
-      if (typeof window.ResizeObserver !== 'undefined') {
-        this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
-      }
-      if (typeof window.IntersectionObserver !== 'undefined') {
-        this.intersectionObserver = new IntersectionObserver(debounce(this.handleIntersection, 300));
-      }
-    }
+    this.init();
   }
 
   async addVideoElement(videoElement: HTMLVideoElement) {
     if (this.videoElements.has(videoElement)) {
       return;
     }
+    // Call init again, to initialize again if for some reason it failed in constructor
+    // it will be a no-op if initialize already
+    this.init();
     this.videoElements.add(videoElement);
     if (this.intersectionObserver) {
       this.intersectionObserver.observe(videoElement);
@@ -37,7 +33,7 @@ export class HMSVideoTrackElementManager {
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, { box: 'border-box' });
       // @ts-ignore
-    } else if (this.track.setPreferredLayer) {
+    } else if (typeof this.track.setPreferredLayer === 'function') {
       // @ts-ignore
       this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
@@ -52,6 +48,17 @@ export class HMSVideoTrackElementManager {
 
   getVideoElements(): HTMLVideoElement[] {
     return Array.from(this.videoElements);
+  }
+
+  private init() {
+    if (isBrowser) {
+      if (typeof window.ResizeObserver !== 'undefined' && !this.resizeObserver) {
+        this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
+      }
+      if (typeof window.IntersectionObserver !== 'undefined' && !this.intersectionObserver) {
+        this.intersectionObserver = new IntersectionObserver(this.handleIntersection);
+      }
+    }
   }
 
   private handleIntersection = async (entries: IntersectionObserverEntry[]) => {
@@ -102,8 +109,9 @@ export class HMSVideoTrackElementManager {
 
   private async selectMaxLayer(dimensions: Array<{ width: number; height: number }>) {
     let maxLayer!: HMSPreferredSimulcastLayer;
+    // This is needed because it was causing circular import issue if remote track is imported here as it extends HMSVideoTrack
     // @ts-ignore
-    if (!this.track.setPreferredLayer) {
+    if (typeof this.track.setPreferredLayer !== 'function') {
       return;
     }
     for (const entry of dimensions) {
@@ -116,6 +124,7 @@ export class HMSVideoTrackElementManager {
         maxLayer = layerToIntMapping[layer] > layerToIntMapping[maxLayer] ? layer : maxLayer;
       }
     }
+
     // @ts-ignore
     await this.track.setPreferredLayer(maxLayer);
   }
