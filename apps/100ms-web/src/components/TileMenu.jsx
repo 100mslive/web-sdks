@@ -190,6 +190,7 @@ const SimulcastLayers = ({ trackId }) => {
   const currentLayer = track.layerDefinitions.find(
     layer => layer.layer === track.layer
   );
+  console.log("track.layer", track.layer);
   return (
     <Fragment>
       <StyledMenuTile.ItemButton
@@ -231,26 +232,30 @@ const SimulcastLayers = ({ trackId }) => {
           </StyledMenuTile.ItemButton>
         );
       })}
-      {currentLayer && (
-        <StyledMenuTile.ItemButton>
-          <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
-            Currently streaming:
-            <Text
-              as="span"
-              variant="xs"
-              css={{
-                fontWeight: "$semiBold",
-                textTransform: "capitalize",
-                color: "$textMedEmp",
-                ml: "$2",
-              }}
-            >
-              {track.layer} ({currentLayer.resolution.width}x
-              {currentLayer.resolution.height})
-            </Text>
+      <StyledMenuTile.ItemButton>
+        <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
+          Currently streaming:
+          <Text
+            as="span"
+            variant="xs"
+            css={{
+              fontWeight: "$semiBold",
+              textTransform: "capitalize",
+              color: "$textMedEmp",
+              ml: "$2",
+            }}
+          >
+            {currentLayer ? (
+              <>
+                {track.layer} ({currentLayer.resolution.width}x
+                {currentLayer.resolution.height})
+              </>
+            ) : (
+              "-"
+            )}
           </Text>
-        </StyledMenuTile.ItemButton>
-      )}
+        </Text>
+      </StyledMenuTile.ItemButton>
     </Fragment>
   );
 };
