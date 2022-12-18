@@ -1,5 +1,5 @@
-import { HMSSimulcastLayer, HMSSimulcastLayerDefinition } from '@100mslive/hms-video-store';
 import { getClosestLayer } from './trackUtils';
+import { HMSSimulcastLayer, HMSSimulcastLayerDefinition } from '../../interfaces';
 
 describe('test closest layer', () => {
   const layerDefinitions: HMSSimulcastLayerDefinition[] = [
