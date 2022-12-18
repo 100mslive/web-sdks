@@ -64,7 +64,9 @@ export class HMSVideoTrackElementManager {
   private handleIntersection = async (entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
       const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
-      if (entry.isIntersecting && isVisibile) {
+
+      // .contains check is needed for pip component as the video tiles are not mounted to dom element
+      if ((entry.isIntersecting && isVisibile) || !document.contains(entry.target)) {
         this.track.addSink(entry.target as HTMLVideoElement);
       } else {
         this.track.removeSink(entry.target as HTMLVideoElement);
