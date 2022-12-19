@@ -14,6 +14,7 @@ import {
   Box,
   Flex,
   IconButton,
+  styled,
   Text,
   Tooltip,
   useTheme,
@@ -33,6 +34,13 @@ import { APP_DATA } from "../common/constants";
 
 let hlsController;
 let hlsStats;
+
+const HTMLStyledVideo = styled("video", {
+  margin: "0 auto",
+  flex: "1 1 0",
+  minHeight: 0,
+  h: "100%",
+});
 
 const HLSView = () => {
   const videoRef = useRef(null);
@@ -85,7 +93,10 @@ const HLSView = () => {
     };
 
     if (videoEl && hlsUrl) {
-      if (Hls.isSupported()) {
+      if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+        console.log("USING NATIVE PLAYER");
+        videoEl.src = hlsUrl;
+      } else if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
@@ -94,8 +105,6 @@ const HLSView = () => {
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
         hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
-      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = hlsUrl;
       }
     }
     return () => {
@@ -197,24 +206,12 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  return (
-    <Flex
-      key="hls-viewer"
-      id={`hls-viewer-${themeType}`}
-      ref={hlsViewRef}
-      css={{
-        verticalAlign: "middle",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {hlsStatsState?.url && enablHlsStats ? (
-        <HlsStatsOverlay
-          hlsStatsState={hlsStatsState}
-          onClose={sfnOverlayClose}
-        />
-      ) : null}
-      {hlsUrl ? (
+  const getContent = () => {
+    const videoEl = videoRef.current;
+    if (hlsUrl && videoEl?.canPlayType("application/vnd.apple.mpegurl")) {
+      return <HTMLStyledVideo ref={videoRef} autoPlay controls playsInline />;
+    } else if (hlsUrl && Hls.isSupported()) {
+      return (
         <Flex
           id="hls-player-container"
           align="center"
@@ -293,13 +290,40 @@ const HLSView = () => {
             </HMSVideoPlayer.Controls.Root>
           </HMSVideoPlayer.Root>
         </Flex>
-      ) : (
+      );
+    } else {
+      return (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the stream to start...
           </Text>
         </Flex>
-      )}
+      );
+    }
+  };
+
+  return (
+    <Flex
+      key="hls-viewer"
+      id={`hls-viewer-${themeType}`}
+      ref={hlsViewRef}
+      css={{
+        verticalAlign: "middle",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {hlsStats && hlsStatsState?.url && enablHlsStats ? (
+        <HlsStatsOverlay
+          hlsStatsState={hlsStatsState}
+          onClose={sfnOverlayClose}
+        />
+      ) : null}
+      {/*<HLSAutoplayBlockedPrompt*/}
+      {/*  open={isHlsAutoplayBlocked}*/}
+      {/*  unblockAutoPlay={unblockAutoPlay}*/}
+      {/*/>*/}
+      {getContent()}
     </Flex>
   );
 };
