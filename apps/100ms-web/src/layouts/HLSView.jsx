@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
 import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
-import { v4 } from "uuid";
 import {
   selectAppData,
   selectHLSState,
@@ -14,7 +13,6 @@ import {
   Box,
   Flex,
   IconButton,
-  styled,
   Text,
   Tooltip,
   useTheme,
@@ -35,13 +33,6 @@ import { APP_DATA } from "../common/constants";
 let hlsController;
 let hlsStats;
 
-const HTMLStyledVideo = styled("video", {
-  margin: "0 auto",
-  flex: "1 1 0",
-  minHeight: 0,
-  h: "100%",
-});
-
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef(null);
@@ -57,6 +48,7 @@ const HLSView = () => {
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isNativePlayer, setIsNativePlayer] = useState(false);
 
   const [show, toggle] = useToggle(false);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -83,7 +75,6 @@ const HLSView = () => {
       );
       console.log(rest);
       ToastManager.addToast({
-        id: v4(),
         title: `Payload from timed Metadata ${payload}`,
       });
     };
@@ -94,8 +85,8 @@ const HLSView = () => {
 
     if (videoEl && hlsUrl) {
       if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        console.log("USING NATIVE PLAYER");
         videoEl.src = hlsUrl;
+        setIsNativePlayer(true);
       } else if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
@@ -206,12 +197,24 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  const getContent = () => {
-    const videoEl = videoRef.current;
-    if (hlsUrl && videoEl?.canPlayType("application/vnd.apple.mpegurl")) {
-      return <HTMLStyledVideo ref={videoRef} autoPlay controls playsInline />;
-    } else if (hlsUrl && Hls.isSupported()) {
-      return (
+  return (
+    <Flex
+      key="hls-viewer"
+      id={`hls-viewer-${themeType}`}
+      ref={hlsViewRef}
+      css={{
+        verticalAlign: "middle",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {hlsStatsState?.url && enablHlsStats ? (
+        <HlsStatsOverlay
+          hlsStatsState={hlsStatsState}
+          onClose={sfnOverlayClose}
+        />
+      ) : null}
+      {hlsUrl ? (
         <Flex
           id="hls-player-container"
           align="center"
@@ -243,87 +246,62 @@ const HLSView = () => {
                 <HMSVideoPlayer.Duration videoRef={videoRef} />
                 <HMSVideoPlayer.Volume videoRef={videoRef} />
               </HMSVideoPlayer.Controls.Left>
-              <HMSVideoPlayer.Controls.Right>
-                {hlsController ? (
-                  <IconButton
-                    variant="standard"
-                    css={{ px: "$2" }}
-                    onClick={() => {
-                      hlsController.jumpToLive();
-                      setIsVideoLive(true);
-                    }}
-                    key="jump-to-live_btn"
-                    data-testid="jump-to-live_btn"
-                  >
-                    <Tooltip title="Go to Live">
-                      <Flex justify="center" gap={2} align="center">
-                        <Box
-                          css={{
-                            height: "$4",
-                            width: "$4",
-                            background: isVideoLive ? "$error" : "$white",
-                            r: "$1",
-                          }}
-                        />
-                        <Text
-                          variant={{
-                            "@sm": "xs",
-                          }}
-                        >
-                          {isVideoLive ? "LIVE" : "GO LIVE"}
-                        </Text>
-                      </Flex>
-                    </Tooltip>
-                  </IconButton>
-                ) : null}
-                <HLSQualitySelector
-                  levels={availableLevels}
-                  selection={currentSelectedQuality}
-                  onQualityChange={handleQuality}
-                  isAuto={isUserSelectedAuto}
-                />
-                <FullScreenButton
-                  onToggle={toggle}
-                  icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                />
-              </HMSVideoPlayer.Controls.Right>
+              {!isNativePlayer && (
+                <HMSVideoPlayer.Controls.Right>
+                  {hlsController ? (
+                    <IconButton
+                      variant="standard"
+                      css={{ px: "$2" }}
+                      onClick={() => {
+                        hlsController.jumpToLive();
+                        setIsVideoLive(true);
+                      }}
+                      key="jump-to-live_btn"
+                      data-testid="jump-to-live_btn"
+                    >
+                      <Tooltip title="Go to Live">
+                        <Flex justify="center" gap={2} align="center">
+                          <Box
+                            css={{
+                              height: "$4",
+                              width: "$4",
+                              background: isVideoLive ? "$error" : "$white",
+                              r: "$1",
+                            }}
+                          />
+                          <Text
+                            variant={{
+                              "@sm": "xs",
+                            }}
+                          >
+                            {isVideoLive ? "LIVE" : "GO LIVE"}
+                          </Text>
+                        </Flex>
+                      </Tooltip>
+                    </IconButton>
+                  ) : null}
+                  <HLSQualitySelector
+                    levels={availableLevels}
+                    selection={currentSelectedQuality}
+                    onQualityChange={handleQuality}
+                    isAuto={isUserSelectedAuto}
+                  />
+                  <FullScreenButton
+                    onToggle={toggle}
+                    icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                  />
+                </HMSVideoPlayer.Controls.Right>
+              )}
             </HMSVideoPlayer.Controls.Root>
           </HMSVideoPlayer.Root>
         </Flex>
-      );
-    } else {
-      return (
+      ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
           <Text variant="md" css={{ textAlign: "center" }}>
             Waiting for the stream to start...
           </Text>
         </Flex>
-      );
-    }
-  };
-
-  return (
-    <Flex
-      key="hls-viewer"
-      id={`hls-viewer-${themeType}`}
-      ref={hlsViewRef}
-      css={{
-        verticalAlign: "middle",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {hlsStats && hlsStatsState?.url && enablHlsStats ? (
-        <HlsStatsOverlay
-          hlsStatsState={hlsStatsState}
-          onClose={sfnOverlayClose}
-        />
-      ) : null}
-      {/*<HLSAutoplayBlockedPrompt*/}
-      {/*  open={isHlsAutoplayBlocked}*/}
-      {/*  unblockAutoPlay={unblockAutoPlay}*/}
-      {/*/>*/}
-      {getContent()}
+      )}
     </Flex>
   );
 };
