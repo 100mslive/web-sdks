@@ -14,10 +14,10 @@ class PeersSorter {
     this.tilesPerPage = tilesPerPage;
   }
   //to be called on initiation of the PeersSorter
-  setPeersAndActiveSpeakers(peers, speaker) {
+  setPeersAndActiveSpeakers(peers, speaker, timePassed) {
     const tempPeerObj = { timeSpoken: 0, timeActive: 0 };
     const timePassedAfterLastSet = setInterval(() => {
-      this.timePassedSinceLastSetPeers += 1;
+      timePassed += 1;
     }, 1000);
     if (!this.LRUView.size) {
       peers.slice(0, this.tilesPerPage).forEach(peer => {
@@ -35,7 +35,7 @@ class PeersSorter {
         }
       });
     } else {
-      if (this.timePassedSinceLastSetPeers >= this.threshold) {
+      if (timePassed >= this.threshold) {
         const lastPeer = this.getLastPeerAfterThreshold();
         this.LRUView.delete(lastPeer.id);
         const newPeer = peers.find(peer => speaker.id === peer.id);
@@ -46,13 +46,29 @@ class PeersSorter {
         const newPeer = peers.find(peer => speaker.id === peer.id);
         this.LRUView.set(newPeer.id, tempPeerObj);
       }
-
       clearInterval(timePassedAfterLastSet);
     }
   }
 
   //will inherently have precendence i.e. aforementioned above. will return main view peers and side view peers
-  getSortedPeers() {}
+  getSortedPeers(peers, speaker) {
+    let sortedArray = [];
+    if (this.timePassedSinceLastSetPeers > this.threshold) {
+      sortedArray = Array.from(this.LRUView.entries()).sort((a, b) => {
+        return !(b.timeActive - a.timeActive ? 1 : b.timeSpoken - a.timeSpoken);
+      });
+    } else {
+      sortedArray = Array.from(this.LRUView.entries()).sort((a, b) => {
+        return !(b.timeSpoken - a.timeSpoken ? 1 : b.timeActive - a.timeActive);
+      });
+    }
+    let mainView = sortedArray.slice(0, this.tilesPerPage);
+    let sideView = sortedArray.slice(this.tilesPerPage);
+    return {
+      mainView,
+      sideView,
+    };
+  }
 
   //function to increment active time on LRU View
   incrementPeersTime(peers) {}
