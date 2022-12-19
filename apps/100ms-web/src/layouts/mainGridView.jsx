@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   selectIsAllowedToPublish,
   selectLocalPeerID,
+  selectLocalPeerRole,
   selectPeers,
-  selectRolesWithPublisher,
+  selectPeersByRoles,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
@@ -21,11 +22,44 @@ export const MainGridView = () => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const publisableRoles = useHMSStore(selectRolesWithPublisher);
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
+  const localRole = useHMSStore(selectLocalPeerRole);
+  const peersByRoles = useHMSStore(
+    selectPeersByRoles(localRole.subscribeParams.subscribeToRoles || [])
+  );
+  const [isRolesWithPublisher, setRolesWithPublisher] = useState(false);
+  const [isRoleSubscribing, setRoleSubscribing] = useState(false);
+  const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(false);
+  useEffect(() => {
+    const publishingPeers = peers.filter(
+      peer =>
+        peer?.audioTrack ||
+        peer?.videoTrack ||
+        (peer?.auxiliaryTracks && peer?.auxiliaryTracks.length > 0)
+    );
+    console.log(peers);
+    setRolesWithPublisher(publishingPeers.length > 0);
+  }, [peers, setRolesWithPublisher]);
 
+  useEffect(
+    () =>
+      setRoleSubscribing(
+        localRole.subscribeParams.subscribeToRoles?.length > 0
+      ),
+    [localRole, setRoleSubscribing]
+  );
+
+  useEffect(() => {
+    const publishingPeers = peersByRoles.filter(
+      peer =>
+        peer?.audioTrack ||
+        peer?.videoTrack ||
+        (peer?.auxiliaryTracks && peer?.auxiliaryTracks.length > 0)
+    );
+    setRoleSubscribingPublish(publishingPeers.length > 0);
+  }, [peersByRoles, setRoleSubscribingPublish]);
   /**
    * If there are peers from many publishing roles, then it's possible to divide
    * them into two parts, those who show in center and those who show in sidepane.
@@ -51,7 +85,9 @@ export const MainGridView = () => {
     isAllowedToPublish,
     sidebarPeers,
     peers,
-    publisableRoles
+    isRolesWithPublisher,
+    isRoleSubscribing,
+    isRoleSubscribingPublish
   );
   return (
     <Flex
@@ -63,29 +99,26 @@ export const MainGridView = () => {
         "@md": "column",
       }}
     >
-      {publisableRoles.length === 0 &&
-        !isAllowedToPublish.audio &&
-        !isAllowedToPublish.video &&
-        !isAllowedToPublish.screen && <NonPublisherView />}
-      {isAllowedToPublish.audio &&
-        isAllowedToPublish.video &&
-        isAllowedToPublish.screen && (
-          <>
-            <GridCenterView
-              peers={showSidePane ? centerPeers : peers}
-              maxTileCount={maxTileCount}
-              allowRemoteMute={false}
-              hideSidePane={!showSidePane}
-              totalPeers={peers.length}
-            />
-            {showSidePane && (
-              <GridSidePaneView
-                peers={sidebarPeers}
-                totalPeers={peers.length}
-              />
-            )}
-          </>
-        )}
+      {!isRolesWithPublisher ? (
+        <NonPublisherView message="None of the roles can publish video, audio or screen" />
+      ) : !isRoleSubscribing ? (
+        <NonPublisherView message="This role isn't subscribed to any role" />
+      ) : !isRoleSubscribingPublish ? (
+        <NonPublisherView message="This role subscribed to roles is not publishing" />
+      ) : (
+        <>
+          <GridCenterView
+            peers={showSidePane ? centerPeers : peers}
+            maxTileCount={maxTileCount}
+            allowRemoteMute={false}
+            hideSidePane={!showSidePane}
+            totalPeers={peers.length}
+          />
+          {showSidePane && (
+            <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
+          )}
+        </>
+      )}
     </Flex>
   );
 };

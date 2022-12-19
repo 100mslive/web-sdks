@@ -55,6 +55,7 @@ export { default as CloseIcon } from './CloseIcon';
 export { default as ClosedCaptionIcon } from './ClosedCaptionIcon';
 export { default as CodeIcon } from './CodeIcon';
 export { default as ColoredHandIcon } from './ColoredHandIcon';
+export { default as ColoredTimeIcon } from './ColoredTimeIcon';
 export { default as ComputerIcon } from './ComputerIcon';
 export { default as ConnectivityIcon } from './ConnectivityIcon';
 export { default as CookieIcon } from './CookieIcon';

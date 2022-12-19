@@ -1,8 +1,8 @@
 import React from "react";
-import { ShieldAlertIcon } from "@100mslive/react-icons";
+import { ColoredHandIcon } from "@100mslive/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
 
-export const NonPublisherView = React.memo(({ message }) => {
+export const WaitingView = React.memo(() => {
   return (
     <Box
       css={{
@@ -14,7 +14,7 @@ export const NonPublisherView = React.memo(({ message }) => {
         background: "#13161B",
         borderRadius: "$3",
       }}
-      data-testid="non_publisher_view"
+      data-testid="waiting_view"
     >
       <Flex
         align="center"
@@ -28,7 +28,7 @@ export const NonPublisherView = React.memo(({ message }) => {
           gap: "$8",
         }}
       >
-        <ShieldAlertIcon color="#C3D0E5" width="80px" height="80px" />
+        <ColoredHandIcon width="80px" height="80px" />
         <Flex
           direction="column"
           css={{
@@ -38,11 +38,10 @@ export const NonPublisherView = React.memo(({ message }) => {
           }}
         >
           <Text color="white" variant="h6" css={{ "@md": { fontSize: "$md" } }}>
-            {message}
+            Please wait
           </Text>
           <Text color="#E0ECFF" css={{ mt: "$4", "@md": { fontSize: "$sm" } }}>
-            Please go to dashboard and reconfigure role settings or contact the
-            role admin.
+            Sit back and relax till others let you join.
           </Text>
         </Flex>
       </Flex>

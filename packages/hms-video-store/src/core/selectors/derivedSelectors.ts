@@ -34,21 +34,6 @@ export const selectPeersWithAudioStatus = createSelector([selectPeersMap, select
   return participants;
 });
 
-export const selectRolesWithPublisher = createSelector([selectRolesMap], roleMap => {
-  const participants: HMSRole[] = Object.values(roleMap).filter(role => {
-    if (
-      role?.publishParams?.allowed &&
-      role.publishParams.allowed.includes('video') &&
-      role.publishParams.allowed.includes('audio') &&
-      role.publishParams.allowed.includes('screen')
-    ) {
-      return true;
-    }
-    return false;
-  });
-  return participants;
-});
-
 const selectRoleChangeStoreRequest = (store: HMSStore) => {
   return store.roleChangeRequests[0] || null;
 };

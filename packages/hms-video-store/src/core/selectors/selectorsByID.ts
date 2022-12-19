@@ -19,6 +19,7 @@ import {
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioTrack,
+  HMSPeer,
   HMSPeerID,
   HMSRoleName,
   HMSScreenVideoTrack,
@@ -453,6 +454,18 @@ export const selectPeersByRole = (role: HMSRoleName) =>
     return peers.filter(p => p.roleName === role);
   });
 
+/**
+ * Select an array of peers of a particular role
+ * @param roles HMSRoleName[]
+ * @returns HMSPeer[]
+ */
+export const selectPeersByRoles = (roles: HMSRoleName[]) =>
+  createSelector([selectPeers], (peers: HMSPeer[]) => {
+    return peers.filter((peer: HMSPeer) => {
+      const filteredRoles = roles.filter((role: HMSRoleName) => peer.roleName === role);
+      return filteredRoles.length > 0;
+    });
+  });
 /**
  * Selects the peer metadata for the passed in peer and returns it as JSON. If metadata is not present
  * or conversion to JSON gives an error, an empty object is returned.
