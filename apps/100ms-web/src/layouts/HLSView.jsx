@@ -84,10 +84,7 @@ const HLSView = () => {
     };
 
     if (videoEl && hlsUrl) {
-      if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = hlsUrl;
-        setIsNativePlayer(true);
-      } else if (Hls.isSupported()) {
+      if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
@@ -96,6 +93,9 @@ const HLSView = () => {
 
         hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
         hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+        videoEl.src = hlsUrl;
+        setIsNativePlayer(true);
       }
     }
     return () => {
