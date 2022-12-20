@@ -48,7 +48,7 @@ const HLSView = () => {
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isNativePlayer, setIsNativePlayer] = useState(false);
+  const [isMSENotSupported, setIsMSENotSupported] = useState(false);
 
   const [show, toggle] = useToggle(false);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -95,7 +95,7 @@ const HLSView = () => {
         hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         videoEl.src = hlsUrl;
-        setIsNativePlayer(true);
+        setIsMSENotSupported(true);
       }
     }
     return () => {
@@ -232,24 +232,27 @@ const HLSView = () => {
             unblockAutoPlay={unblockAutoPlay}
           />
           <HMSVideoPlayer.Root ref={videoRef}>
-            {!isNativePlayer && <HMSVideoPlayer.Progress videoRef={videoRef} />}
-            {!isNativePlayer && (
-              <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
-                <HMSVideoPlayer.Controls.Left>
-                  <HMSVideoPlayer.PlayButton
-                    onClick={() => {
-                      isPaused
-                        ? videoRef.current?.play()
-                        : videoRef.current?.pause();
-                    }}
-                    isPaused={isPaused}
-                  />
-                  <HMSVideoPlayer.Duration videoRef={videoRef} />
-                  <HMSVideoPlayer.Volume videoRef={videoRef} />
-                </HMSVideoPlayer.Controls.Left>
+            {!isMSENotSupported && (
+              <HMSVideoPlayer.Progress videoRef={videoRef} />
+            )}
 
-                <HMSVideoPlayer.Controls.Right>
-                  {hlsController ? (
+            <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
+              <HMSVideoPlayer.Controls.Left>
+                <HMSVideoPlayer.PlayButton
+                  onClick={() => {
+                    isPaused
+                      ? videoRef.current?.play()
+                      : videoRef.current?.pause();
+                  }}
+                  isPaused={isPaused}
+                />
+                <HMSVideoPlayer.Duration videoRef={videoRef} />
+                <HMSVideoPlayer.Volume videoRef={videoRef} />
+              </HMSVideoPlayer.Controls.Left>
+
+              <HMSVideoPlayer.Controls.Right>
+                {!isMSENotSupported && hlsController ? (
+                  <>
                     <IconButton
                       variant="standard"
                       css={{ px: "$2" }}
@@ -280,20 +283,20 @@ const HLSView = () => {
                         </Flex>
                       </Tooltip>
                     </IconButton>
-                  ) : null}
-                  <HLSQualitySelector
-                    levels={availableLevels}
-                    selection={currentSelectedQuality}
-                    onQualityChange={handleQuality}
-                    isAuto={isUserSelectedAuto}
-                  />
-                  <FullScreenButton
-                    onToggle={toggle}
-                    icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                  />
-                </HMSVideoPlayer.Controls.Right>
-              </HMSVideoPlayer.Controls.Root>
-            )}
+                    <HLSQualitySelector
+                      levels={availableLevels}
+                      selection={currentSelectedQuality}
+                      onQualityChange={handleQuality}
+                      isAuto={isUserSelectedAuto}
+                    />
+                  </>
+                ) : null}
+                <FullScreenButton
+                  onToggle={toggle}
+                  icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                />
+              </HMSVideoPlayer.Controls.Right>
+            </HMSVideoPlayer.Controls.Root>
           </HMSVideoPlayer.Root>
         </Flex>
       ) : (
