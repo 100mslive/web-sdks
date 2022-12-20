@@ -1,5 +1,5 @@
 import React from "react";
-import { ColoredHandIcon } from "@100mslive/react-icons";
+import { ColoredTimeIcon } from "@100mslive/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
 
 export const WaitingView = React.memo(() => {
@@ -28,7 +28,7 @@ export const WaitingView = React.memo(() => {
           gap: "$8",
         }}
       >
-        <ColoredHandIcon width="80px" height="80px" />
+        <ColoredTimeIcon width="80px" height="80px" />
         <Flex
           direction="column"
           css={{
