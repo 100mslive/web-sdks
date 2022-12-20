@@ -20,7 +20,7 @@ export const NonPublisherView = React.memo(({ message }) => {
         align="center"
         direction="column"
         css={{
-          w: "24rem",
+          w: "$96",
           textAlign: "center",
           margin: "auto",
           h: "100%",
@@ -32,7 +32,7 @@ export const NonPublisherView = React.memo(({ message }) => {
         <Flex
           direction="column"
           css={{
-            w: "20rem",
+            w: "$80",
             p: "$1",
             gap: "$4",
           }}
@@ -40,7 +40,10 @@ export const NonPublisherView = React.memo(({ message }) => {
           <Text color="white" variant="h6" css={{ "@md": { fontSize: "$md" } }}>
             {message}
           </Text>
-          <Text color="#E0ECFF" css={{ mt: "$4", "@md": { fontSize: "$sm" } }}>
+          <Text
+            color="$textMedEmp"
+            css={{ mt: "$4", "@md": { fontSize: "$sm" } }}
+          >
             Please go to dashboard and reconfigure role settings or contact the
             role admin.
           </Text>

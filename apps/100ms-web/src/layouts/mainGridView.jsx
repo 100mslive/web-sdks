@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectLocalPeerRole,
   selectPeers,
   selectPeersByRoles,
+  selectRolesMap,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
@@ -19,9 +19,9 @@ export const MainGridView = () => {
   const sidepaneRoles = useAppLayout("sidepane") || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const peers = useHMSStore(selectPeers);
+  const roles = useHMSStore(selectRolesMap);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const sidebarPeers = peers.filter(peer =>
     sidepaneRoles.includes(peer.roleName)
   );
@@ -33,15 +33,19 @@ export const MainGridView = () => {
   const [isRoleSubscribing, setRoleSubscribing] = useState(false);
   const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(false);
   useEffect(() => {
-    const publishingPeers = peers.filter(
-      peer =>
+    const publishingPeers = peers.filter(peer => {
+      // peer able to publish
+      if (peer.roleName && roles[peer.roleName]) {
+        return roles[peer.roleName].publishParams?.allowed.length > 0;
+      }
+      return (
         peer?.audioTrack ||
         peer?.videoTrack ||
         (peer?.auxiliaryTracks && peer?.auxiliaryTracks.length > 0)
-    );
-    console.log(peers);
+      );
+    });
     setRolesWithPublisher(publishingPeers.length > 0);
-  }, [peers, setRolesWithPublisher]);
+  }, [peers, roles, setRolesWithPublisher]);
 
   useEffect(
     () =>
@@ -80,15 +84,6 @@ export const MainGridView = () => {
     showSidePane = itsOnlyMeInTheRoom || nooneIsPublishing;
   }
 
-  console.log(
-    "is allowed to pulbisj ",
-    isAllowedToPublish,
-    sidebarPeers,
-    peers,
-    isRolesWithPublisher,
-    isRoleSubscribing,
-    isRoleSubscribingPublish
-  );
   return (
     <Flex
       css={{

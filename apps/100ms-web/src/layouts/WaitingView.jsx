@@ -20,7 +20,7 @@ export const WaitingView = React.memo(() => {
         align="center"
         direction="column"
         css={{
-          w: "24rem",
+          w: "$96",
           textAlign: "center",
           margin: "auto",
           h: "100%",
@@ -32,7 +32,7 @@ export const WaitingView = React.memo(() => {
         <Flex
           direction="column"
           css={{
-            w: "20rem",
+            w: "$80",
             p: "$1",
             gap: "$4",
           }}
@@ -40,7 +40,10 @@ export const WaitingView = React.memo(() => {
           <Text color="white" variant="h6" css={{ "@md": { fontSize: "$md" } }}>
             Please wait
           </Text>
-          <Text color="#E0ECFF" css={{ mt: "$4", "@md": { fontSize: "$sm" } }}>
+          <Text
+            color="$textMedEmp"
+            css={{ mt: "$4", "@md": { fontSize: "$sm" } }}
+          >
             Sit back and relax till others let you join.
           </Text>
         </Flex>

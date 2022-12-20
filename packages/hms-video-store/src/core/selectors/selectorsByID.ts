@@ -462,8 +462,7 @@ export const selectPeersByRole = (role: HMSRoleName) =>
 export const selectPeersByRoles = (roles: HMSRoleName[]) =>
   createSelector([selectPeers], (peers: HMSPeer[]) => {
     return peers.filter((peer: HMSPeer) => {
-      const filteredRoles = roles.filter((role: HMSRoleName) => peer.roleName === role);
-      return filteredRoles.length > 0;
+      return peer.roleName ? roles.includes(peer.roleName) : false;
     });
   });
 /**
