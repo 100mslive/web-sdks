@@ -8,19 +8,13 @@ import {
   HMSVideoTrack,
 } from '../schema';
 
-type trackCheck = (track: HMSTrack | undefined) => boolean | undefined;
-
-export function getPeerTracksByCondition(
-  tracks: Record<HMSTrackID, HMSTrack>,
-  peer: HMSPeer | null,
-  trackCheckFn: trackCheck = isScreenShare,
-) {
+export function getScreenSharesByPeer(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer | null) {
   let videoTrack = undefined;
   let audioTrack = undefined;
   if (peer) {
     for (const trackID of peer.auxiliaryTracks) {
       const track = tracks[trackID];
-      if (trackCheckFn(track)) {
+      if (isScreenShare(track)) {
         audioTrack = isAudio(track) ? track : audioTrack;
         videoTrack = isVideo(track) ? track : videoTrack;
       }

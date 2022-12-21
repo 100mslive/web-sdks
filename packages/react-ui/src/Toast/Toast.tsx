@@ -58,7 +58,7 @@ const ToastTitle = styled(ToastPrimitives.Title, {
   color: '$textHighEmp',
   fontWeight: '$semiBold',
   display: 'flex',
-  alignItems: 'start',
+  alignItems: 'center',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -99,9 +99,18 @@ interface HMSToastProps extends ToastPrimitives.ToastProps {
   isClosable?: boolean;
   icon?: React.ReactNode;
   action?: React.ReactNode;
+  inlineAction?: boolean;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
+const HMSToast: React.FC<HMSToastProps> = ({
+  title,
+  description,
+  isClosable = true,
+  icon,
+  action,
+  inlineAction = false,
+  ...props
+}) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -113,6 +122,9 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </Flex>
           {isClosable ? <DefaultClose /> : null}
+          {!isClosable && inlineAction && action ? (
+            <ToastAction altText={`${title}Action`}>{action}</ToastAction>
+          ) : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
@@ -121,7 +133,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </ToastDescription>
         ) : null}
-        {action ? (
+        {!inlineAction && action ? (
           <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
             {action}
           </ToastAction>

@@ -20,6 +20,7 @@ export const VirtualBackground = () => {
   const isVBPresent = useHMSStore(
     selectIsLocalVideoPluginPresent("HMSPosePlugin")
   );
+  // const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent("HMSVB"));
 
   async function createPlugin() {
     if (!pluginRef.current) {
@@ -27,6 +28,10 @@ export const VirtualBackground = () => {
         "@100mslive/hms-virtual-background"
       );
       pluginRef.current = new HMSPosePlugin();
+      // pluginRef.current = new HMSVBPlugin(
+      //   HMSVirtualBackgroundTypes.NONE,
+      //   HMSVirtualBackgroundTypes.NONE
+      // );
     }
   }
   useEffect(() => {
@@ -49,6 +54,12 @@ export const VirtualBackground = () => {
       // await pluginRef.current.setBackground(getRandomVirtualBackground());
       //Running VB on every alternate frame rate for optimized cpu usage
       await hmsActions.addPluginToVideoTrack(pluginRef.current, 15);
+      /* const { background, backgroundType } = getRandomVirtualBackground();
+      await pluginRef.current.setBackground(background, backgroundType);
+      await hmsActions.addPluginToVideoTrack(
+        pluginRef.current,
+        Math.floor(role.publishParams.video.frameRate / 2)
+      ); */
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }

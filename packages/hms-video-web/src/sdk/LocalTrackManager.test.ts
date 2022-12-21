@@ -52,11 +52,13 @@ const hostPublishParams: PublishParams = {
     height: 1080,
     bitRate: 400,
   },
-  videoSimulcastLayers: {
-    layers: [],
-  },
-  screenSimulcastLayers: {
-    layers: [],
+  simulcast: {
+    video: {
+      layers: [],
+    },
+    screen: {
+      layers: [],
+    },
   },
 };
 
@@ -328,7 +330,9 @@ describe('LocalTrackManager', () => {
       }
       for (const constraint in videoConstraints) {
         if (constraint in hostPublishParams.video) {
-          expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+          const constraintValue = videoConstraints[constraint];
+          const value = typeof constraintValue === 'object' ? constraintValue?.ideal : constraintValue;
+          expect(value).toEqual((hostPublishParams.video as any)[constraint]);
         }
       }
       for (const constraint in droppedConstraints.audio) {

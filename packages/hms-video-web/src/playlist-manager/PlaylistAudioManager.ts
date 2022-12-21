@@ -18,6 +18,7 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   private audioElement: HTMLAudioElement | null = null;
   private track?: MediaStreamTrack;
   private audioContextManager!: AudioContextManager;
+  private readonly TAG = '[PlaylistAudioManager]';
   // This is to handle audio playing when seekTo is called when audio is paused
   private seeked = false;
 
@@ -97,9 +98,5 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
     });
     this.audioContextManager = new AudioContextManager(audioElement);
     return audioElement;
-  }
-
-  private get TAG() {
-    return 'PlaylistAudioManager';
   }
 }

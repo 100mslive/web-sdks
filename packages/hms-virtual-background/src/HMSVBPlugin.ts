@@ -7,37 +7,35 @@ import {
   HMSVideoPlugin,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
-
-const TAG = '[VBProcessor]';
-type HMSBackgroundInput = HTMLImageElement | HTMLVideoElement | HTMLCanvasElement;
-export type HMSVirtualBackground = 'blur' | 'none' | HMSBackgroundInput;
-type HMSVirtualBackgroundType = 'blur' | 'none' | 'gif' | 'image' | 'video' | 'canvas';
+import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {
-  background: HMSVirtualBackground;
-  backgroundType: HMSVirtualBackgroundType = 'none';
-  segmentation!: SelfieSegmentation;
-  outputCanvas?: HTMLCanvasElement;
-  outputCtx?: CanvasRenderingContext2D | null;
+  private TAG = '[HMSVBPlugin]';
+  private background: HMSVirtualBackground;
+  private backgroundType: HMSVirtualBackgroundTypes = HMSVirtualBackgroundTypes.NONE;
+  private segmentation!: SelfieSegmentation;
+  private outputCanvas?: HTMLCanvasElement;
+  private outputCtx?: CanvasRenderingContext2D | null;
 
-  gifFrames: any;
-  gifFramesIndex: number;
-  gifFrameImageData: any;
-  tempGifCanvas: HTMLCanvasElement;
-  tempGifContext: any;
-  giflocalCount: number;
+  private gifFrames: any;
+  private gifFramesIndex: number;
+  private gifFrameImageData: any;
+  private tempGifCanvas: HTMLCanvasElement;
+  private tempGifContext: CanvasRenderingContext2D | null;
+  private prevResults?: MediaPipeResults;
+  private input?: HTMLCanvasElement;
 
-  constructor(background: HMSVirtualBackground) {
+  constructor(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
     this.background = background;
+    this.backgroundType = backgroundType;
     this.gifFrames = null;
     this.gifFramesIndex = 0;
     this.gifFrameImageData = null;
     this.tempGifCanvas = document.createElement('canvas');
     this.tempGifContext = this.tempGifCanvas.getContext('2d');
-    this.giflocalCount = 0;
 
-    this.log('Virtual Background plugin created');
-    this.setBackground(this.background);
+    this.setBackground(this.background, this.backgroundType);
+    this.log('Virtual background plugin initialised');
   }
 
   isSupported(): boolean {
@@ -77,76 +75,95 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     }
   }
 
-  async setBackground(bg: HMSVirtualBackground) {
-    if (!bg) {
+  /**
+   * For bgType HMSVirtualBackgroundTypes.IMAGE pass bg as an image element
+   * For bgType HMSVirtualBackgroundTypes.VIDEO pass video
+   * For bgType HMSVirtualBackgroundTypes.GIF pass the gif url
+   * @param {HMSVirtualBackground} background
+   * @param {HMSVirtualBackgroundTypes} backgroundType
+   */
+  async setBackground(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
+    if (!background) {
       throw new Error('Invalid background supplied, see the docs to check supported background type');
     }
-    if (bg === 'none' || bg === 'blur') {
-      this.background = bg;
-      this.backgroundType = bg;
-    } else if (bg instanceof HTMLImageElement) {
-      this.log('setting background to image', bg);
-      const img = await this.setImage(bg);
-      if (!img || !img.complete || !img.naturalHeight) {
-        throw new Error('Invalid image. Provide a valid and successfully loaded HTMLImageElement');
-      } else {
-        this.background = img;
-        this.backgroundType = 'image';
-      }
-    } else if (bg instanceof HTMLVideoElement) {
-      this.log('setting background to video', bg);
-      this.backgroundType = 'none';
-      this.background = bg;
-      this.background.crossOrigin = 'anonymous';
-      this.background.muted = true;
-      this.background.loop = true;
-      this.background.oncanplaythrough = async () => {
-        if (this.background) {
-          await (this.background as HTMLVideoElement).play();
-          this.backgroundType = 'video';
+    this.prevResults = undefined;
+    switch (backgroundType) {
+      case HMSVirtualBackgroundTypes.NONE:
+      case HMSVirtualBackgroundTypes.BLUR:
+        this.background = background;
+        this.backgroundType = backgroundType;
+        break;
+      case HMSVirtualBackgroundTypes.IMAGE:
+        this.log('setting background to image', background);
+        // eslint-disable-next-line no-case-declarations
+        const img = await this.setImage(background as HTMLImageElement);
+        if (!img || !img.complete || !img.naturalHeight) {
+          throw new Error('Invalid image. Provide a valid and successfully loaded HTMLImageElement');
+        } else {
+          this.background = img;
+          this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
         }
-      };
-    } else if (bg instanceof HTMLCanvasElement) {
-      this.background = bg;
-      this.backgroundType = 'canvas';
-    } else if (typeof bg === 'string') {
-      this.log('setting gif to background', bg);
-      this.backgroundType = 'none';
-      this.background = bg;
-      this.gifFrames = await this.loadGIF(bg);
-      if (this.gifFrames != null && this.gifFrames.length > 0) {
-        this.backgroundType = 'gif';
-      } else {
-        throw new Error('Invalid background supplied, see the docs to check supported background type');
-      }
+        break;
+      case HMSVirtualBackgroundTypes.VIDEO:
+        this.log('setting background to video', background);
+        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+        this.background = background as HTMLVideoElement;
+        this.background.crossOrigin = 'anonymous';
+        this.background.muted = true;
+        this.background.loop = true;
+        this.background.autoplay = true;
+        this.background.oncanplaythrough = () => {
+          this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+        };
+        break;
+      case HMSVirtualBackgroundTypes.CANVAS:
+        this.background = background;
+        this.backgroundType = HMSVirtualBackgroundTypes.CANVAS;
+        break;
+      case HMSVirtualBackgroundTypes.GIF:
+        this.log('setting gif to background', background);
+        this.backgroundType = HMSVirtualBackgroundTypes.NONE;
+        this.background = background as string;
+        this.gifFrames = await this.loadGIF(this.background);
+        if (this.gifFrames != null && this.gifFrames.length > 0) {
+          this.backgroundType = HMSVirtualBackgroundTypes.GIF;
+        } else {
+          throw new Error('Invalid background supplied, see the docs to check supported background type');
+        }
+        break;
+      default:
+        this.log(
+          `backgroundType did not match with any of the supported background types - ${HMSVirtualBackgroundTypes}`,
+        );
     }
   }
 
   stop(): void {
-    if (this.background !== 'blur' && this.background !== 'none') {
+    if (this.backgroundType !== HMSVirtualBackgroundTypes.BLUR && this.background !== HMSVirtualBackgroundTypes.NONE) {
       this.segmentation?.reset();
     }
     //gif related
     this.gifFrameImageData = null;
     this.gifFrames = null;
-    this.giflocalCount = 0;
     this.gifFramesIndex = 0;
-    this.background = 'none';
-    this.backgroundType = 'none';
+    this.background = HMSVirtualBackgroundTypes.NONE;
+    this.backgroundType = HMSVirtualBackgroundTypes.NONE;
   }
 
   async processVideoFrame(input: HTMLCanvasElement, output: HTMLCanvasElement, skipProcessing?: boolean) {
     if (!input || !output) {
       throw new Error('Plugin invalid input/output');
     }
-    if (skipProcessing) {
-      return;
-    }
+    this.input = input;
     output.width = input.width;
     output.height = input.height;
     this.outputCanvas = output;
     this.outputCtx = output.getContext('2d');
-    if (this.backgroundType === 'none') {
+    if (skipProcessing && this.prevResults) {
+      this.handleResults(this.prevResults);
+      return;
+    }
+    if (this.backgroundType === HMSVirtualBackgroundTypes.NONE) {
       this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
       return;
     }
@@ -168,19 +185,20 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.outputCtx.save();
     this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     switch (this.backgroundType) {
-      case 'image':
-      case 'canvas':
-      case 'video':
+      case HMSVirtualBackgroundTypes.IMAGE:
+      case HMSVirtualBackgroundTypes.CANVAS:
+      case HMSVirtualBackgroundTypes.VIDEO:
         this.renderBackground(results, this.background as HMSBackgroundInput);
         break;
-      case 'gif':
+      case HMSVirtualBackgroundTypes.GIF:
         this.renderGIF(results);
         break;
-      case 'blur':
+      case HMSVirtualBackgroundTypes.BLUR:
         this.renderBlur(results);
         break;
     }
     this.outputCtx.restore();
+    this.prevResults = results;
   };
 
   private loadGIF(url: string): Promise<any> {
@@ -193,25 +211,34 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private log(...data: any[]) {
-    console.debug(TAG, ...data);
+    console.debug(this.TAG, ...data);
   }
 
   private renderBackground = (results: MediaPipeResults, background: HMSBackgroundInput) => {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType === 'none' || this.backgroundType === 'blur') {
+    if (
+      !this.input ||
+      !this.outputCanvas ||
+      !this.outputCtx ||
+      this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
+      this.backgroundType === HMSVirtualBackgroundTypes.BLUR
+    ) {
       return;
     }
-    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.filter = 'none';
     this.outputCtx.imageSmoothingEnabled = true;
     this.outputCtx.imageSmoothingQuality = 'high';
     // Only overwrite existing pixels.
     this.outputCtx.globalCompositeOperation = 'source-out';
+    const bgWidth = background instanceof HTMLVideoElement ? background.videoWidth : background.width;
+    const bgHeight = background instanceof HTMLVideoElement ? background.videoHeight : background.height;
+
     this.outputCtx.drawImage(
       background,
       0,
       0,
-      background.width,
-      background.height,
+      bgWidth,
+      bgHeight,
       0,
       0,
       this.outputCanvas.width,
@@ -219,11 +246,11 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     );
     // Only overwrite missing pixels.
     this.outputCtx.globalCompositeOperation = 'destination-atop';
-    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(this.input, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   };
 
   private renderBlur(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'blur') {
+    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
       return;
     }
     this.outputCtx!.filter = 'none';
@@ -236,7 +263,12 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private renderGIF(results: MediaPipeResults) {
-    if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== 'gif') {
+    if (
+      !this.outputCanvas ||
+      !this.outputCtx ||
+      !this.tempGifContext ||
+      this.backgroundType !== HMSVirtualBackgroundTypes.GIF
+    ) {
       return;
     }
     if (this.gifFrameImageData == null) {

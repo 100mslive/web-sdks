@@ -7,7 +7,7 @@ import { Queue } from '../utils/queue';
 export abstract class AnalyticsTransport {
   abstract transportProvider: IAnalyticsTransportProvider;
   abstract failedEvents: Queue<AnalyticsEvent>;
-  private TAG = 'AnalyticsTransport';
+  private readonly TAG = '[AnalyticsTransport]';
 
   sendEvent(event: AnalyticsEvent) {
     try {
