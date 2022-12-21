@@ -2566,7 +2566,6 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
-<<<<<<< HEAD
 "@mediapipe/drawing_utils@^0.3.1620248257":
   version "0.3.1620248257"
   resolved "https://registry.yarnpkg.com/@mediapipe/drawing_utils/-/drawing_utils-0.3.1620248257.tgz#b39dfd235e7cf520e3e39d8b2bac2c5d717a7158"
@@ -2577,8 +2576,6 @@
   resolved "https://registry.yarnpkg.com/@mediapipe/pose/-/pose-0.5.1635988162.tgz#905e626cb07bce86c692d8ec057f04558ddd26fe"
   integrity sha512-t0dpl+iG/MTPtPPxEYHyVWo+X7G+qgYUYaB4y9pxavQRNzuQQeHeSmUnT+A8qOKnuB0ccxgyrrFmGUaaL0F3wQ==
 
-=======
->>>>>>> main
 "@mediapipe/selfie_segmentation@^0.1.1632777926":
   version "0.1.1632777926"
   resolved "https://registry.yarnpkg.com/@mediapipe/selfie_segmentation/-/selfie_segmentation-0.1.1632777926.tgz#67d37a53b0de89efc4a0e3b63332a4da3a6ad9c8"
