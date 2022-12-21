@@ -1,12 +1,7 @@
 /* eslint-disable complexity */
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Pose, POSE_CONNECTIONS, Results as MediaPipeResults } from '@mediapipe/pose';
-import {
-  HMSPluginSupportResult,
-  HMSPluginUnsupportedTypes,
-  HMSVideoPlugin,
-  HMSVideoPluginType,
-} from '@100mslive/hms-video';
+import { HMSPluginSupportResult, HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
 
 const TAG = '[PoseProcessor]';
 
@@ -24,16 +19,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
   }
 
   checkSupport(): HMSPluginSupportResult {
-    const browserResult = {} as HMSPluginSupportResult;
-    if (['Chrome', 'Firefox', 'Edg', 'Edge'].some(value => navigator.userAgent.indexOf(value) !== -1)) {
-      browserResult.isSupported = true;
-    } else {
-      browserResult.isSupported = false;
-      browserResult.errType = HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED;
-      browserResult.errMsg = 'browser not supported for plugin, see docs';
-    }
-
-    return browserResult;
+    return { isSupported: true };
   }
 
   getName(): string {
@@ -100,7 +86,6 @@ export class HMSPosePlugin implements HMSVideoPlugin {
     if (!this.outputCanvas || !this.outputCtx) {
       return;
     }
-    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.save();
     this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.globalCompositeOperation = 'destination-atop';
