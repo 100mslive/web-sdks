@@ -11,7 +11,7 @@ export const WaitingView = React.memo(() => {
         maxWidth: "96%",
         h: "100%",
         m: "auto",
-        background: "#13161B",
+        background: "$surfaceDefault",
         borderRadius: "$3",
       }}
       data-testid="waiting_view"

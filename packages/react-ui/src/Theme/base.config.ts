@@ -42,7 +42,7 @@ export const baseConfig = {
       textAccentMedium: '#FFFFFFB8',
       textAccentDisabled: '#FFFFFF7A',
 
-      surfaceDefault: '#14171C',
+      surfaceDefault: '#13161B',
       surfaceLight: '#1D2229',
       surfaceLighter: '#272E38',
       surfaceDark: '#0F1115',
