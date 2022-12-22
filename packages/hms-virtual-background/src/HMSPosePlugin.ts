@@ -85,7 +85,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
       return;
     }
     this.outputCtx.save();
-    this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    // this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.globalCompositeOperation = 'destination-atop';
     this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
 
