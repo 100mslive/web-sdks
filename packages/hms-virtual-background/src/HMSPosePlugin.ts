@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Pose, POSE_CONNECTIONS, Results as MediaPipeResults } from '@mediapipe/pose';
 import { HMSPluginSupportResult, HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
