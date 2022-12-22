@@ -2,7 +2,7 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Pose, POSE_CONNECTIONS, Results as MediaPipeResults } from '@mediapipe/pose';
 import { HMSPluginSupportResult, HMSVideoPlugin, HMSVideoPluginType } from '@100mslive/hms-video';
 
-const TAG = '[PoseProcessor]';
+const TAG = '[HMSPosePlugin]';
 
 export class HMSPosePlugin implements HMSVideoPlugin {
   segmentation!: Pose;
@@ -11,7 +11,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
   private prevResults?: MediaPipeResults;
 
   constructor() {
-    this.log('Virtual Background plugin created');
+    this.log(TAG, 'pose plugin created');
   }
 
   isSupported(): boolean {
@@ -57,6 +57,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
       throw new Error('Plugin invalid input/output');
     }
     if (skipProcessing && this.prevResults) {
+      console.log(TAG, 'processing skipped');
       this.handleResults(this.prevResults);
       return;
     }
