@@ -9,6 +9,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
   segmentation!: Pose;
   outputCanvas?: HTMLCanvasElement;
   outputCtx?: CanvasRenderingContext2D | null;
+  private prevResults?: MediaPipeResults;
 
   constructor() {
     this.log('Virtual Background plugin created');
@@ -52,13 +53,15 @@ export class HMSPosePlugin implements HMSVideoPlugin {
 
   stop(): void {
     this.segmentation?.reset();
+    this.prevResults = undefined;
   }
 
   async processVideoFrame(input: HTMLCanvasElement, output: HTMLCanvasElement, skipProcessing?: boolean) {
     if (!input || !output) {
       throw new Error('Plugin invalid input/output');
     }
-    if (skipProcessing) {
+    if (skipProcessing && this.prevResults) {
+      this.handleResults(this.prevResults);
       return;
     }
     output.width = input.width;
@@ -76,6 +79,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
     this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.renderBackground(results);
     this.outputCtx.restore();
+    this.prevResults = results;
   };
 
   private log(...data: any[]) {
