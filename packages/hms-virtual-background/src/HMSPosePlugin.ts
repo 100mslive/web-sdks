@@ -40,10 +40,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
       this.segmentation.setOptions({
         modelComplexity: 0,
         smoothLandmarks: true,
-        enableSegmentation: true,
-        smoothSegmentation: true,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5,
+        enableSegmentation: false,
         selfieMode: false,
       });
       this.segmentation.onResults(this.handleResults);
