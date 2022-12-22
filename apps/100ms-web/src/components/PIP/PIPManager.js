@@ -1,5 +1,9 @@
 import * as workerTimers from "worker-timers";
-import { drawVideoElementsOnCanvas, dummyChangeInCanvas } from "./pipUtils";
+import {
+  drawVideoElementsOnCanvas,
+  dummyChangeInCanvas,
+  resetPIPCanvasColors,
+} from "./pipUtils";
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const DEFAULT_CANVAS_WIDTH = 480;
@@ -32,6 +36,7 @@ class PipManager {
    */
   reset() {
     console.debug("resetting PIP state");
+    resetPIPCanvasColors();
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
     this.timeoutRef = null; // setTimeout reference so it can be cancelled

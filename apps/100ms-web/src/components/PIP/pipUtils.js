@@ -1,3 +1,23 @@
+let CANVAS_FILL_COLOR;
+let CANVAS_STROKE_COLOR;
+
+function setPIPCanvasColors() {
+  if (!CANVAS_FILL_COLOR) {
+    CANVAS_FILL_COLOR = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue("--hms-ui-colors-surfaceLight");
+  }
+  if (!CANVAS_STROKE_COLOR) {
+    CANVAS_STROKE_COLOR = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue("--hms-ui-colors-borderLight");
+  }
+}
+
+export function resetPIPCanvasColors() {
+  CANVAS_FILL_COLOR = "";
+  CANVAS_STROKE_COLOR = "";
+}
 /**
  * no tile - blank canvas, black image
  * 1 tile - takes full space on canvas
@@ -12,7 +32,8 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
   );
 
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#1E232A";
+  setPIPCanvasColors();
+  ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (videoTiles.length === 0) {
@@ -21,8 +42,6 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
     return;
   }
 
-  // const numRows = numberOfTiles <= 2 ? 1 : 2;
-  // const numCols = Number(Math.ceil(numberOfTiles / numRows));
   fillGridTiles(videoTiles.slice(0, 4), ctx, canvas);
 }
 
@@ -30,7 +49,8 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
 // video element rendering this canvas' capture stream
 export function dummyChangeInCanvas(canvas) {
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#1E232A";
+  setPIPCanvasColors();
+  ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -42,12 +62,11 @@ function fillGridTiles(videoElements, ctx, canvas) {
   const offset = 8;
   canvas.width = 480;
   canvas.height = 320;
-  const strokeColor = "#2D3440";
 
-  ctx.fillStyle = "#1E232A";
+  ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (videoElements.length > 0) {
-    ctx.strokeStyle = strokeColor;
+    ctx.strokeStyle = CANVAS_STROKE_COLOR;
     ctx.lineWidth = offset;
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
   }
