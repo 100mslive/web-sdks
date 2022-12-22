@@ -110,6 +110,7 @@ export default abstract class HMSConnection {
      *
      * For all peers joining after this peer, we have published and subscribed at the time of join itself
      * so we're able to log both publish and subscribe ice candidates.
+     * Added try catch for the whole section as the getSenders and getReceivers is throwing errors in load test
      */
     try {
       const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
