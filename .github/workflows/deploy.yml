@@ -40,7 +40,6 @@ jobs:
       REACT_APP_LOGO: ''
       REACT_APP_FONT: 'Roboto'
       REACT_APP_LOGROCKET_ID: ${{ secrets.LOGROCKET_ID }}
-      REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
       REACT_APP_POLICY_CONFIG: ''
       REACT_APP_WEBINAR_PROPS: '{}'
       REACT_APP_DEFAULT_APP_DETAILS: '{}'
@@ -92,18 +91,21 @@ jobs:
         run: yarn build
         env:
           REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+          REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
 
       - name: Build for QA
         if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
         run: yarn build
         env:
           REACT_APP_ENV: 'qa'
+          REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
 
       - name: Build for Production
         if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
         run: yarn build
         env:
           REACT_APP_ENV: 'prod'
+          REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'
         uses: actions/upload-artifact@v3
