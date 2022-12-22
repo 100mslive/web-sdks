@@ -75,10 +75,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
     if (!this.outputCanvas || !this.outputCtx) {
       return;
     }
-    this.outputCtx.save();
-    this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.renderBackground(results);
-    this.outputCtx.restore();
+    this.renderLandmarks(results);
     this.prevResults = results;
   };
 
@@ -86,7 +83,7 @@ export class HMSPosePlugin implements HMSVideoPlugin {
     console.debug(TAG, ...data);
   }
 
-  private renderBackground = (results: MediaPipeResults) => {
+  private renderLandmarks = (results: MediaPipeResults) => {
     if (!this.outputCanvas || !this.outputCtx) {
       return;
     }
