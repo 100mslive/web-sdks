@@ -83,7 +83,35 @@ export const MainGridView = () => {
     const nooneIsPublishing = sidebarPeers.length === 0;
     showSidePane = itsOnlyMeInTheRoom || nooneIsPublishing;
   }
-
+  let MainViewCompoenet;
+  if (!isRolesWithPublisher) {
+    MainViewCompoenet = () => (
+      <NonPublisherView message="None of the roles can publish video, audio or screen" />
+    );
+  } else if (!isRoleSubscribing) {
+    MainViewCompoenet = () => (
+      <NonPublisherView message="This role isn't subscribed to any role" />
+    );
+  } else if (!isRoleSubscribingPublish) {
+    MainViewCompoenet = () => (
+      <NonPublisherView message="This role subscribed to roles is not publishing" />
+    );
+  } else {
+    MainViewCompoenet = () => (
+      <>
+        <GridCenterView
+          peers={showSidePane ? centerPeers : peers}
+          maxTileCount={maxTileCount}
+          allowRemoteMute={false}
+          hideSidePane={!showSidePane}
+          totalPeers={peers.length}
+        />
+        {showSidePane && (
+          <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
+        )}
+      </>
+    );
+  }
   return (
     <Flex
       css={{
@@ -94,26 +122,7 @@ export const MainGridView = () => {
         "@md": "column",
       }}
     >
-      {!isRolesWithPublisher ? (
-        <NonPublisherView message="None of the roles can publish video, audio or screen" />
-      ) : !isRoleSubscribing ? (
-        <NonPublisherView message="This role isn't subscribed to any role" />
-      ) : !isRoleSubscribingPublish ? (
-        <NonPublisherView message="This role subscribed to roles is not publishing" />
-      ) : (
-        <>
-          <GridCenterView
-            peers={showSidePane ? centerPeers : peers}
-            maxTileCount={maxTileCount}
-            allowRemoteMute={false}
-            hideSidePane={!showSidePane}
-            totalPeers={peers.length}
-          />
-          {showSidePane && (
-            <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
-          )}
-        </>
-      )}
+      <MainViewCompoenet />
     </Flex>
   );
 };
