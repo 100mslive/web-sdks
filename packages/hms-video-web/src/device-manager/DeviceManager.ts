@@ -8,6 +8,7 @@ import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../m
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { debounce } from '../utils/timer-utils';
 
 export type SelectedDevices = {
   audioInput?: MediaDeviceInfo;
@@ -34,7 +35,7 @@ export class DeviceManager implements HMSDeviceManager {
   hasWebcamPermission = false;
   hasMicrophonePermission = false;
 
-  private TAG = '[Device Manager]:';
+  private readonly TAG = '[Device Manager]:';
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
@@ -166,21 +167,21 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = async () => {
+  private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.deviceChange({
-        selection: this.getCurrentSelection(),
-        type: 'list',
-        devices: this.getDevices(),
-      }),
-    );
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
     await this.setOutputDevice(true);
     await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
-  };
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.deviceChange({
+        selection: this.getCurrentSelection(),
+        type: 'change',
+        devices: this.getDevices(),
+      }),
+    );
+  }, 500).bind(this);
 
   /**
    * Function to get the device after device change
@@ -229,6 +230,13 @@ export class DeviceManager implements HMSDeviceManager {
     await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioOutput: this.outputDevice },
+          devices: this.getDevices(),
+          type: 'audioOutput',
+        }),
+      );
       this.eventBus.deviceChange.publish({
         selection: this.outputDevice,
         type: 'audioOutput',
@@ -249,6 +257,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.getNewAudioInputDevice();
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioInput: newSelection },
+          error: new Error('Audio device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'audioInput',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
@@ -272,6 +288,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
           devices: this.getDevices(),
+          type: 'audioInput',
           error: error as HMSException,
         }),
       );
@@ -296,6 +313,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.videoInput[0];
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { videoInput: newSelection },
+          error: new Error('Video device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'video',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Video device not found');
       return;
     }
@@ -324,6 +349,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
           devices: this.getDevices(),
+          type: 'video',
           error: error as HMSException,
         }),
       );

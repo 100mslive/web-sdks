@@ -1,12 +1,27 @@
 import { HMSRoleName } from './role';
-import { HMSSimulcastLayer, SimulcastLayerDefinition } from '../hmsSDKStore/sdkTypes';
+import {
+  HMSPreferredSimulcastLayer,
+  HMSSimulcastLayer,
+  HMSSimulcastLayerDefinition,
+  ScreenCaptureHandle,
+} from '../hmsSDKStore/sdkTypes';
 
-export type { SimulcastLayerDefinition, HMSSimulcastLayer };
+export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
-export type HMSTrackDisplaySurface = 'application' | 'browser' | 'monitor' | 'window';
+/**
+ * Use this to identify what is being screenshared, not all browsers will support
+ * everything.
+ *
+ * application - all windows of an application are shared
+ * window - a particular window is being shared
+ * monitor - full screen share of a monitor display
+ * browser - a browser tab is shared
+ * selfBrowser - the current browser tab is being shared
+ */
+export type HMSTrackDisplaySurface = 'application' | 'browser' | 'selfBrowser' | 'monitor' | 'window';
 export type HMSTrackFacingMode = 'user' | 'environment' | 'left' | 'right';
 
 /**
@@ -61,7 +76,8 @@ export interface HMSVideoTrack extends BaseTrack {
   type: 'video';
   facingMode?: HMSTrackFacingMode;
   layer?: HMSSimulcastLayer;
-  layerDefinitions?: SimulcastLayerDefinition[];
+  preferredLayer?: HMSPreferredSimulcastLayer;
+  layerDefinitions?: HMSSimulcastLayerDefinition[];
   height?: number;
   width?: number;
   degraded?: boolean;
@@ -70,6 +86,12 @@ export interface HMSVideoTrack extends BaseTrack {
 export interface HMSScreenVideoTrack extends Omit<HMSVideoTrack, 'facingMode'> {
   source: 'screen';
   displaySurface?: HMSTrackDisplaySurface;
+  /**
+   * this can be used to identify the shared tab, if
+   * the shared tab has set a captureHandle on its end as well as communicate
+   * with the tab for e.g. using broadcast channel.
+   */
+  captureHandle?: ScreenCaptureHandle;
 }
 
 export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack | HMSScreenAudioTrack;

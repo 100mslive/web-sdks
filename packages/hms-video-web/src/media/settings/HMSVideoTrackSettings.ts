@@ -100,10 +100,14 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     this.advanced = advanced;
   }
 
-  toConstraints(): MediaTrackConstraints {
+  toConstraints(isScreenShare?: boolean): MediaTrackConstraints {
+    let dimensionConstraintKey = 'ideal';
+    if (isScreenShare) {
+      dimensionConstraintKey = 'max';
+    }
     return {
-      width: this.width,
-      height: this.height,
+      width: { [dimensionConstraintKey]: this.width },
+      height: { [dimensionConstraintKey]: this.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
     };

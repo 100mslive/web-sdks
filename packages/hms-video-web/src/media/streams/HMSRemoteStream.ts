@@ -1,5 +1,5 @@
 import HMSMediaStream from './HMSMediaStream';
-import HMSSubscribeConnection from '../../connection/subscribe';
+import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 
@@ -14,13 +14,20 @@ export default class HMSRemoteStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  setAudio(enabled: boolean) {
+  async setAudio(enabled: boolean, trackId: string, identifier?: string) {
     if (this.audio === enabled) {
       return;
     }
 
     this.audio = enabled;
-    this.syncWithApiChannel(false);
+    HMSLogger.d(`[Remote stream] ${identifier || ''} ${this.id}`, `subscribing audio - ${this.audio}`);
+    await this.connection.sendOverApiDataChannelWithResponse({
+      params: {
+        subscribed: this.audio,
+        track_id: trackId,
+      },
+      method: 'prefer-audio-track-state',
+    });
   }
 
   /**
@@ -29,9 +36,9 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string) {
+  setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string, source: string) {
     this.video = layer;
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Setting layer field to - ${layer}`);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `source: ${source} Setting layer field to - ${layer}`);
   }
 
   /**
@@ -40,46 +47,31 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param layer is simulcast layer to be set
    * @param identifier is stream identifier to be printed in logs
    */
-  setVideoLayer(layer: HMSSimulcastLayer, identifier: string) {
-    this.setVideoLayerLocally(layer, identifier);
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `Switching to ${layer} layer`);
-    this.syncWithApiChannel();
+  setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+    this.setVideoLayerLocally(layer, identifier, source);
+    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `request ${layer} layer`);
+    return this.connection.sendOverApiDataChannelWithResponse({
+      params: {
+        max_spatial_layer: this.video,
+        track_id: trackId,
+      },
+      method: 'prefer-video-track-state',
+    });
   }
 
+  /**
+   * @deprecated
+   * @returns {HMSSimulcastLayer}
+   */
   getSimulcastLayer() {
+    return this.video;
+  }
+
+  getVideoLayer() {
     return this.video;
   }
 
   isAudioSubscribed() {
     return this.audio;
   }
-
-  /**
-   * send the expected state of the stream to SFU over data channel.
-   * the video field is optional from SFU's perspective but audio should be
-   * passed everytime.
-   * We don't pass in the video field, if only audio needs to subscribed/unsubscribed,
-   * else there is a chance of mismatch between states in case of degradation. If
-   * a degraded track is (audio) muted, a video layer false will be sent which to
-   * SFU will appear as if remove sink was called and the track will never be recovered.
-   * @private
-   */
-  private syncWithApiChannel(sendVideoLayer = true) {
-    const data: SubscriptionMessage = {
-      streamId: this.id,
-      audio: this.audio,
-    };
-    if (sendVideoLayer) {
-      data.video = this.video;
-      data.framerate = this.video;
-    }
-    this.connection.sendOverApiDataChannel(JSON.stringify(data));
-  }
-}
-
-interface SubscriptionMessage {
-  streamId: string;
-  audio: boolean;
-  framerate?: HMSSimulcastLayer;
-  video?: HMSSimulcastLayer;
 }

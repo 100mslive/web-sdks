@@ -6,6 +6,7 @@ import {
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
   RemovePeerRequest,
+  RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
   SessionMetadataUpdateParams,
   StartRTMPOrRecordingRequestParams,
@@ -29,6 +30,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     data: string,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    simulcast: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
@@ -49,6 +51,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   ping(timeout: number): Promise<number>;
 
   requestRoleChange(params: RequestForRoleChangeParams): Promise<void>;
+
+  requestBulkRoleChange(params: RequestForBulkRoleChangeParams): Promise<void>;
 
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): Promise<void>;
 

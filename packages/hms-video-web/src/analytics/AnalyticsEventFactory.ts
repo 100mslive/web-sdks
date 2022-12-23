@@ -52,7 +52,8 @@ export default class AnalyticsEventFactory {
     init_response_time?: number;
     ws_connect_time?: number;
     on_policy_change_time?: number;
-    local_tracks_time?: number;
+    local_audio_track_time?: number;
+    local_video_track_time?: number;
   }) {
     const name = this.eventNameFor('preview', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
@@ -73,7 +74,8 @@ export default class AnalyticsEventFactory {
     init_response_time?: number;
     ws_connect_time?: number;
     on_policy_change_time?: number;
-    local_tracks_time?: number;
+    local_audio_track_time?: number;
+    local_video_track_time?: number;
     retries_join?: number;
   }) {
     const name = this.eventNameFor('join', error === undefined);
@@ -125,7 +127,7 @@ export default class AnalyticsEventFactory {
     error,
   }: {
     selection: Partial<SelectedDevices>;
-    type?: 'change' | 'list';
+    type?: 'change' | 'list' | 'audioInput' | 'audioOutput' | 'video';
     devices: DeviceMap;
     error?: Error;
   }) {
@@ -190,22 +192,6 @@ export default class AnalyticsEventFactory {
       name: 'perf.networkquality.preview',
       level: properties.error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
       properties,
-    });
-  }
-
-  static HLSError(error: Error, start = true) {
-    return new AnalyticsEvent({
-      name: `hls.${start ? 'start' : 'stop'}.failed`,
-      level: AnalyticsEventLevel.ERROR,
-      properties: this.getPropertiesWithError(error),
-    });
-  }
-
-  static RTMPError(error: Error, start = true) {
-    return new AnalyticsEvent({
-      name: `rtmp.${start ? 'start' : 'stop'}.failed`,
-      level: AnalyticsEventLevel.ERROR,
-      properties: this.getPropertiesWithError(error),
     });
   }
 

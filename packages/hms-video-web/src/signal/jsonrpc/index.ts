@@ -23,6 +23,7 @@ import {
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
   RemovePeerRequest,
+  RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
   SessionMetadataUpdateParams,
   StartRTMPOrRecordingRequestParams,
@@ -116,7 +117,9 @@ export default class JsonRpcSignal implements ISignal {
   private notify(method: string, params: any) {
     const message = { method, params };
 
-    this.socket?.send(JSON.stringify(message));
+    if (this.socket?.readyState === WebSocket.OPEN) {
+      this.socket?.send(JSON.stringify(message));
+    }
   }
 
   open(uri: string): Promise<void> {
@@ -200,6 +203,7 @@ export default class JsonRpcSignal implements ISignal {
     data: string,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    simulcast: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
     if (!this.isConnected) {
@@ -208,7 +212,7 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to send join over WS connection',
       );
     }
-    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade };
+    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade, simulcast };
     const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
@@ -280,6 +284,10 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async requestRoleChange(params: RequestForRoleChangeParams) {
+    await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
+  }
+
+  async requestBulkRoleChange(params: RequestForBulkRoleChangeParams) {
     await this.call(HMSSignalMethod.ROLE_CHANGE_REQUEST, params);
   }
 

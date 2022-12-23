@@ -21,6 +21,7 @@ import {
   HMSRoleChangeStoreRequest,
   HMSRoleName,
   HMSRoom,
+  HMSScreenVideoTrack,
   HMSTrack,
   HMSTrackFacingMode,
   HMSVideoTrack,
@@ -74,6 +75,7 @@ export class SDKToHMS {
       if (track.source === 'screen') {
         // @ts-ignore
         track.displaySurface = mediaSettings.displaySurface;
+        SDKToHMS.enrichScreenTrack(track as HMSScreenVideoTrack, sdkTrack);
       } else if (track.source === 'regular') {
         (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
       }
@@ -94,10 +96,25 @@ export class SDKToHMS {
 
   static enrichVideoTrack(track: HMSVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      track.layer = sdkTrack.getSimulcastLayer();
+      track.layer = sdkTrack.getLayer();
+      track.preferredLayer = sdkTrack.getPreferredLayer();
       track.degraded = sdkTrack.degraded;
+    }
+    if (sdkTrack instanceof SDKHMSRemoteVideoTrack || sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
+      }
+    }
+  }
+
+  static enrichScreenTrack(track: HMSScreenVideoTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+      const newCaptureHandle = sdkTrack.getCaptureHandle?.();
+      if (newCaptureHandle?.handle !== track.captureHandle?.handle) {
+        track.captureHandle = newCaptureHandle;
+      }
+      if (sdkTrack.isCurrentTab) {
+        track.displaySurface = 'selfBrowser';
       }
     }
   }

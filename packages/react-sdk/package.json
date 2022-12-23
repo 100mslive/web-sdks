@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.4.5-alpha.5",
+  "version": "0.6.1",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -19,11 +19,13 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc src/index.ts --plugin none"
+    "docs": "typedoc src/index.ts --plugin none",
+    "test": "jest --maxWorkers=1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.3",
     "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-typescript": "^8.3.1",
     "@types/react": "^18.0.8",
     "react": "^18.1.0",
@@ -35,7 +37,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.6.5-alpha.5",
+    "@100mslive/hms-video-store": "0.8.1",
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"

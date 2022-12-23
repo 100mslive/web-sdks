@@ -67,6 +67,9 @@ export const ErrorCodes = {
 
     // Operating System denied permission
     SYSTEM_DENIED_PERMISSION: 3011,
+
+    // Current tab is not shared when forceCurrentTab was set to true for screenshare
+    CURRENT_TAB_NOT_SHARED: 3012,
   },
 
   WebrtcErrors: {
