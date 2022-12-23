@@ -52,7 +52,8 @@ export default class AnalyticsEventFactory {
     init_response_time?: number;
     ws_connect_time?: number;
     on_policy_change_time?: number;
-    local_tracks_time?: number;
+    local_audio_track_time?: number;
+    local_video_track_time?: number;
   }) {
     const name = this.eventNameFor('preview', error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
@@ -73,7 +74,8 @@ export default class AnalyticsEventFactory {
     init_response_time?: number;
     ws_connect_time?: number;
     on_policy_change_time?: number;
-    local_tracks_time?: number;
+    local_audio_track_time?: number;
+    local_video_track_time?: number;
     retries_join?: number;
   }) {
     const name = this.eventNameFor('join', error === undefined);

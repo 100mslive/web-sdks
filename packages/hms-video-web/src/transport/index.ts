@@ -503,6 +503,22 @@ export default class HMSTransport implements ITransport {
     });
   }
 
+  async changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean) {
+    await this.signal.requestRoleChange({
+      requested_for: forPeer.peerId,
+      role: toRole,
+      force,
+    });
+  }
+
+  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
+    await this.signal.requestBulkRoleChange({
+      roles: roles.map((role: HMSRole) => role.name),
+      role: toRole,
+      force: true,
+    });
+  }
+
   async acceptRoleChange(request: HMSRoleChangeRequest) {
     await this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
   }
@@ -702,12 +718,14 @@ export default class HMSTransport implements ITransport {
       this.createPeerConnections();
     }
 
+    this.analyticsTimer.start(TimedEvent.JOIN_RESPONSE);
     await this.negotiateJoinWithRetry({
       name: customData.name,
       data: customData.metaData,
       autoSubscribeVideo,
       isWebRTC,
     });
+    this.analyticsTimer.end(TimedEvent.JOIN_RESPONSE);
   }
 
   private createPeerConnections() {
@@ -958,6 +976,7 @@ export default class HMSTransport implements ITransport {
     await this.signal.open(this.endpoint);
     this.analyticsTimer.end(TimedEvent.WEBSOCKET_CONNECT);
     this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
+    this.analyticsTimer.start(TimedEvent.ROOM_STATE);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
@@ -1119,7 +1138,8 @@ export default class HMSTransport implements ITransport {
           init_response_time: this.analyticsTimer.getTimeTaken(TimedEvent.INIT),
           ws_connect_time: this.analyticsTimer.getTimeTaken(TimedEvent.WEBSOCKET_CONNECT),
           on_policy_change_time: this.analyticsTimer.getTimeTaken(TimedEvent.ON_POLICY_CHANGE),
-          local_tracks_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_TRACKS),
+          local_audio_track_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_AUDIO_TRACK),
+          local_video_track_time: this.analyticsTimer.getTimeTaken(TimedEvent.LOCAL_VIDEO_TRACK),
           retries_join: this.joinRetryCount,
         });
         break;

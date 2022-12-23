@@ -6,6 +6,7 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interface
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import HMSLogger from '../../utils/logger';
+import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -42,14 +43,23 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     stream.tracks.push(this);
 
     this.settings = settings;
-    // Replace the 'default' deviceId with the actual deviceId
+    // Replace the 'default' or invalid deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default' && !isEmptyTrack(track)) {
+    if (settings.deviceId !== track.getSettings().deviceId && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
+    if (isIOS() && isBrowser) {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      await this.replaceTrackWith(this.settings);
+    }
+  };
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
@@ -190,6 +200,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.closeContext();
     this.processedTrack?.stop();
     this.destroyAudioLevelMonitor();
+    if (isIOS() && isBrowser) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**
@@ -221,7 +234,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      await this.replaceTrackWith(settings);
     }
   };
 

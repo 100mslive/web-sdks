@@ -110,12 +110,13 @@ export default abstract class HMSConnection {
      *
      * For all peers joining after this peer, we have published and subscribed at the time of join itself
      * so we're able to log both publish and subscribe ice candidates.
+     * Added try catch for the whole section as the getSenders and getReceivers is throwing errors in load test
      */
-    const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
+    try {
+      const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
 
-    transmitters.forEach(transmitter => {
-      const kindOfTrack = transmitter.track?.kind;
-      try {
+      transmitters.forEach(transmitter => {
+        const kindOfTrack = transmitter.track?.kind;
         if (transmitter.transport) {
           const iceTransport = transmitter.transport.iceTransport;
 
@@ -140,18 +141,20 @@ export default abstract class HMSConnection {
           }
           logSelectedCandidate();
         }
-      } catch (error) {
-        HMSLogger.w(
-          TAG,
-          `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
-          error,
-        );
-      }
-    });
+      });
+    } catch (error) {
+      HMSLogger.w(
+        TAG,
+        `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
+        error,
+      );
+    }
   }
 
   removeTrack(sender: RTCRtpSender) {
-    this.nativeConnection.removeTrack(sender);
+    if (this.nativeConnection.signalingState !== 'closed') {
+      this.nativeConnection.removeTrack(sender);
+    }
   }
 
   async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {

@@ -59,9 +59,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super(stream, track, source);
     stream.tracks.push(this);
     this.settings = settings;
-    // Replace the 'default' deviceId with the actual deviceId
+    // Replace the 'default' or invalid deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default' && track.enabled) {
+    if (settings.deviceId !== track.getSettings().deviceId && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);

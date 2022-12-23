@@ -74,7 +74,8 @@ export class LocalTrackManager {
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
 
-    this.analyticsTimer.start(TimedEvent.LOCAL_TRACKS);
+    this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
+    this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
@@ -86,7 +87,8 @@ export class LocalTrackManager {
         localStream,
       );
     }
-    this.analyticsTimer.end(TimedEvent.LOCAL_TRACKS);
+    this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
+    this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
 
     /**
      * concat local tracks only if both are true which means it is either join or switched from a role

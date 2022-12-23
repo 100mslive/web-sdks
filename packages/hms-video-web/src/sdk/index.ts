@@ -194,8 +194,17 @@ export class HMSSdk implements HMSInterface {
         return;
       }
 
-      if (message.method === HMSNotificationMethod.POLICY_CHANGE) {
-        this.analyticsTimer.end(TimedEvent.ON_POLICY_CHANGE);
+      switch (message.method) {
+        case HMSNotificationMethod.POLICY_CHANGE:
+          this.analyticsTimer.end(TimedEvent.ON_POLICY_CHANGE);
+          break;
+        case HMSNotificationMethod.PEER_LIST:
+          this.analyticsTimer.end(TimedEvent.PEER_LIST);
+          break;
+        case HMSNotificationMethod.ROOM_STATE:
+          this.analyticsTimer.end(TimedEvent.ROOM_STATE);
+          break;
+        default:
       }
 
       this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
@@ -387,6 +396,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
+    HMSAudioContextHandler.resumeContext();
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -420,12 +430,12 @@ export class HMSSdk implements HMSInterface {
         config.autoVideoSubscribe,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      HMSAudioContextHandler.resumeContext();
+      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
-        this.publish(config.settings || defaultSettings).catch(error => {
+        await this.publish(config.settings || defaultSettings).catch(error => {
           HMSLogger.e(this.TAG, 'Error in publish', error);
           this.listener?.onError(error);
         });
@@ -686,7 +696,23 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    await this.transport?.changeRole(forPeer, toRole, force);
+    await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
+  }
+
+  async changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force = false) {
+    if (!forPeer.role || forPeer.role.name === toRole) {
+      return;
+    }
+
+    await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
+  }
+
+  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
+    if (roles.length <= 0 || !toRole) {
+      return;
+    }
+
+    await this.transport?.changeRoleOfPeersWithRoles(roles, toRole);
   }
 
   async acceptChangeRole(request: HMSRoleChangeRequest) {
@@ -1071,12 +1097,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.join({
         error,
-        ...this.analyticsTimer.getTimes(
-          TimedEvent.INIT,
-          TimedEvent.WEBSOCKET_CONNECT,
-          TimedEvent.ON_POLICY_CHANGE,
-          TimedEvent.LOCAL_TRACKS,
-        ),
+        ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
       }),
@@ -1087,12 +1108,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.preview({
         error,
-        ...this.analyticsTimer.getTimes(
-          TimedEvent.INIT,
-          TimedEvent.WEBSOCKET_CONNECT,
-          TimedEvent.ON_POLICY_CHANGE,
-          TimedEvent.LOCAL_TRACKS,
-        ),
+        ...this.analyticsTimer.getTimes(TimedEvent.ROOM_STATE),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),
     );

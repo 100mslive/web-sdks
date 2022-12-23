@@ -234,11 +234,27 @@ export interface IHMSActions {
 
   /**
    * Request for a role change of a remote peer. Can be forced.
+   * @deprecated Use `changeRoleOfPeer`
    * @param forPeerId The remote peer id whose role needs to be changed
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
   changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param roles List of roles whose role needs to be changed
+   * @param toRole The name of the new role.
+   */
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received
