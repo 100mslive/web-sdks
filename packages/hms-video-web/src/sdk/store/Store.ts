@@ -279,14 +279,6 @@ class Store implements IStore {
     await Promise.all(promises);
   }
 
-  getSubscribeDegradationParams() {
-    const params = this.getLocalPeer()?.role?.subscribeParams.subscribeDegradation;
-    if (params && Object.keys(params).length > 0) {
-      return params;
-    }
-    return undefined;
-  }
-
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     if (!this.simulcastEnabled) {
       return [];
