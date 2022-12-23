@@ -15,7 +15,6 @@ import { IPublishConnectionObserver } from '../connection/publish/IPublishConnec
 import HMSPublishConnection from '../connection/publish/publishConnection';
 import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConnectionObserver';
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
-import { TrackDegradationController } from '../degradation';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
@@ -76,7 +75,6 @@ export default class HMSTransport implements ITransport {
   private endpoint!: string;
   private joinParameters?: JoinParameters;
   private retryScheduler: RetryScheduler;
-  private trackDegradationController?: TrackDegradationController;
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
   private joinRetryCount = 0;
@@ -413,7 +411,6 @@ export default class HMSTransport implements ITransport {
     try {
       this.state = TransportState.Leaving;
       this.webrtcInternals?.cleanUp();
-      this.trackDegradationController?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (notifyServer) {
@@ -985,27 +982,6 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
-
-    // TODO: when server-side subscribe degradation is released, we can remove check on the client-side
-    //  as server will check in policy if subscribe degradation enabled from dashboard
-    if (this.store.getSubscribeDegradationParams()) {
-      if (!this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION)) {
-        await this.webrtcInternals?.start();
-        this.trackDegradationController = new TrackDegradationController(this.store, this.eventBus);
-        this.eventBus.statsUpdate.subscribe(stats => {
-          this.trackDegradationController?.handleRtcStatsChange(stats.getLocalPeerStats()?.subscribe?.packetsLost || 0);
-        });
-      }
-
-      this.eventBus.trackDegraded.subscribe(track => {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, true));
-        this.observer.onTrackDegrade(track);
-      });
-      this.eventBus.trackRestored.subscribe(track => {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.degradationStats(track, false));
-        this.observer.onTrackRestore(track);
-      });
-    }
   }
 
   /**
