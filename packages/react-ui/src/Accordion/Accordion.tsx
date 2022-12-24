@@ -1,10 +1,10 @@
 import React, { PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { CSS, keyframes } from '@stitches/react';
+import { CSS } from '@stitches/react';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
-import {slideDown,slideUp} from "../utils"
+import { slideDown, slideUp } from "../utils"
 
 
 const StyledAccordion = styled(BaseAccordion.Root, {
