@@ -68,6 +68,7 @@ import {
   selectRoomState,
   selectTrackByID,
   selectTracksMap,
+  selectVideoTrackByID,
 } from '../selectors';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
@@ -144,6 +145,11 @@ export class HMSSDKActions implements IHMSActions {
         //@ts-ignore
         if (layer === HMSSimulcastLayer.NONE) {
           HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          return;
+        }
+        const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
+        if (alreadyInSameState) {
+          HMSLogger.w(`preferred layer is already ${layer}`);
           return;
         }
         this.setState(draftStore => {
