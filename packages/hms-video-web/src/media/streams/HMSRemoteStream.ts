@@ -49,9 +49,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
    */
   setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
     HMSLogger.d(`[Remote stream] ${identifier} - ${this.id} source: ${source}`, `request ${layer} layer`);
+    this.setVideoLayerLocally(layer, identifier, source);
     return this.connection.sendOverApiDataChannelWithResponse({
       params: {
-        max_spatial_layer: layer,
+        max_spatial_layer: this.video,
         track_id: trackId,
       },
       method: 'prefer-video-track-state',
