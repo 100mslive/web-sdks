@@ -6,7 +6,7 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
-  private videoHandler: HMSVideoTrackElementManager = new HMSVideoTrackElementManager(this);
+  private videoHandler: HMSVideoTrackElementManager;
 
   /**
    * sink=video element rendering the video
@@ -24,6 +24,8 @@ export class HMSVideoTrack extends HMSTrack {
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
+    // @ts-ignore
+    this.videoHandler = new HMSVideoTrackElementManager(this);
   }
 
   attach(videoElement: HTMLVideoElement) {

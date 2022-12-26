@@ -1,5 +1,5 @@
-import { HMSVideoTrack } from './HMSVideoTrack';
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
+import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { isBrowser } from '../../utils/support';
 import { debounce } from '../../utils/timer-utils';
@@ -9,7 +9,7 @@ export class HMSVideoTrackElementManager {
   private intersectionObserver?: IntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
 
-  constructor(private track: HMSVideoTrack) {
+  constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
     this.init();
   }
 
@@ -32,9 +32,7 @@ export class HMSVideoTrackElementManager {
     }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, { box: 'border-box' });
-      // @ts-ignore
-    } else if (typeof this.track.setPreferredLayer === 'function') {
-      // @ts-ignore
+    } else if (this.track instanceof HMSRemoteVideoTrack) {
       this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
@@ -111,14 +109,11 @@ export class HMSVideoTrackElementManager {
 
   private async selectMaxLayer(dimensions: Array<{ width: number; height: number }>) {
     let maxLayer!: HMSPreferredSimulcastLayer;
-    // This is needed because it was causing circular import issue if remote track is imported here as it extends HMSVideoTrack
-    // @ts-ignore
-    if (typeof this.track.setPreferredLayer !== 'function') {
+    if (!(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
     for (const entry of dimensions) {
       const { width, height } = entry;
-      //@ts-ignore
       const layer = getClosestLayer(this.track.getSimulcastDefinitions(), { width, height });
       if (!maxLayer) {
         maxLayer = layer;
@@ -127,7 +122,6 @@ export class HMSVideoTrackElementManager {
       }
     }
 
-    // @ts-ignore
     await this.track.setPreferredLayer(maxLayer);
   }
 }
