@@ -25,10 +25,14 @@ const HMSEdtechTemplate = React.lazy(() =>
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;
-} else if (hostname.endsWith('dev-app.100ms.live') || hostname.endsWith('staging-app.100ms.live')) {
+} else if (hostname.endsWith('dev-app.100ms.live')) {
   // route dev-app appropriately to qa or prod
   const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
   hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+} else if (hostname.endsWith('staging-app.100ms.live')) {
+  // route staging-app appropriately to qa or prod
+  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  hostname = hostname.replace('staging-app.100ms.live', envSuffix);
 } else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
   hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
 }
