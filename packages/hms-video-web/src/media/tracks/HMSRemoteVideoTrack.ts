@@ -1,4 +1,5 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
+import { HMSVideoTrackElementManager } from './HMSVideoTrackElementManager';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import {
   HMSPreferredSimulcastLayer,
@@ -15,6 +16,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+
+  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
+    super(stream, track, source);
+    this.setVideoHandler(new HMSVideoTrackElementManager(this));
+  }
 
   public get degraded() {
     return this._degraded;

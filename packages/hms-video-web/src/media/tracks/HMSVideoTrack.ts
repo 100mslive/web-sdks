@@ -6,7 +6,7 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
-  private videoHandler: HMSVideoTrackElementManager;
+  private videoHandler?: HMSVideoTrackElementManager;
 
   /**
    * sink=video element rendering the video
@@ -16,7 +16,11 @@ export class HMSVideoTrack extends HMSTrack {
   }
 
   getSinks() {
-    return this.videoHandler.getVideoElements();
+    return this.videoHandler?.getVideoElements() || [];
+  }
+
+  setVideoHandler(videoHandler: HMSVideoTrackElementManager) {
+    this.videoHandler = videoHandler;
   }
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
@@ -24,16 +28,14 @@ export class HMSVideoTrack extends HMSTrack {
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
-    // @ts-ignore
-    this.videoHandler = new HMSVideoTrackElementManager(this);
   }
 
   attach(videoElement: HTMLVideoElement) {
-    this.videoHandler.addVideoElement(videoElement);
+    this.videoHandler?.addVideoElement(videoElement);
   }
 
   detach(videoElement: HTMLVideoElement) {
-    this.videoHandler.removeVideoElement(videoElement);
+    this.videoHandler?.removeVideoElement(videoElement);
   }
 
   /**
