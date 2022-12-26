@@ -3,7 +3,9 @@ export const ToastManager = {
   listeners: new Map(),
   addToast(toast) {
     const id = Date.now();
-    this.toasts.set(id, { id, ...toast });
+    const td = { id, ...toast };
+    console.log("TOAST", td);
+    this.toasts.set(id, td);
     this.onChange();
     return id;
   },
