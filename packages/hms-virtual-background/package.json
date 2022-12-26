@@ -1,5 +1,5 @@
 {
-  "version": "1.9.2-alpha.1",
+  "version": "1.9.2-alpha.2",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -30,7 +30,7 @@
   "author": "ashish17",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.7.2-alpha.1"
+    "@100mslive/hms-video": "0.7.2-alpha.2"
   },
   "dependencies": {
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
