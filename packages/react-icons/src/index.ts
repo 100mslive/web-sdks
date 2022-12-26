@@ -7,6 +7,7 @@ export { default as AlarmIcon } from './AlarmIcon';
 export { default as AlertOctagonIcon } from './AlertOctagonIcon';
 export { default as AlertRoundIcon } from './AlertRoundIcon';
 export { default as AlertTriangleIcon } from './AlertTriangleIcon';
+export { default as AlertTriangleSolidIcon } from './AlertTriangleSolidIcon';
 export { default as AllAppsIcon } from './AllAppsIcon';
 export { default as AlternativeHeadphonesIcon } from './AlternativeHeadphonesIcon';
 export { default as AndroidIcon } from './AndroidIcon';
