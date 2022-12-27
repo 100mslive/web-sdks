@@ -53,13 +53,13 @@ const StartHLS = () => {
             : undefined,
         });
       } catch (error) {
+        setHLSStarted(false);
         if (error.message.includes("invalid input")) {
           await startHLS([
             { meetingURL: recordingUrl || getDefaultMeetingUrl() },
           ]);
           return;
         }
-        setHLSStarted(false);
         setError(error.message);
       }
     },
