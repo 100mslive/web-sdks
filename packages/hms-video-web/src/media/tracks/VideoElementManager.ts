@@ -4,7 +4,7 @@ import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { isBrowser } from '../../utils/support';
 import { debounce } from '../../utils/timer-utils';
 
-export class HMSVideoTrackElementManager {
+export class VideoElementManager {
   private resizeObserver?: ResizeObserver;
   private intersectionObserver?: IntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();

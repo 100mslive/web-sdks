@@ -1,4 +1,5 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
+import { VideoElementManager } from './VideoElementManager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
@@ -57,6 +58,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
   ) {
     super(stream, track, source);
+    this.setVideoHandler(new VideoElementManager(this));
     stream.tracks.push(this);
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId

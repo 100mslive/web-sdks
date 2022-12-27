@@ -1,12 +1,12 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
-import { HMSVideoTrackElementManager } from './HMSVideoTrackElementManager';
+import { VideoElementManager } from './VideoElementManager';
 import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
-  private videoHandler?: HMSVideoTrackElementManager;
+  private videoHandler?: VideoElementManager;
 
   /**
    * sink=video element rendering the video
@@ -19,7 +19,7 @@ export class HMSVideoTrack extends HMSTrack {
     return this.videoHandler?.getVideoElements() || [];
   }
 
-  setVideoHandler(videoHandler: HMSVideoTrackElementManager) {
+  setVideoHandler(videoHandler: VideoElementManager) {
     this.videoHandler = videoHandler;
   }
 
