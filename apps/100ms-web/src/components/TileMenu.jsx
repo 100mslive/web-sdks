@@ -190,7 +190,6 @@ const SimulcastLayers = ({ trackId }) => {
   const currentLayer = track.layerDefinitions.find(
     layer => layer.layer === track.layer
   );
-  console.log("track.layer", track.layer);
   return (
     <Fragment>
       <StyledMenuTile.ItemButton
