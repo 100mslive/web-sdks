@@ -106,10 +106,18 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     });
   }
 
+  const beforeUnloadCallbackRef = React.useRef(() => providerProps.actions.leave());
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      const beforeUnloadCallback = beforeUnloadCallbackRef.current;
+      window.addEventListener('beforeunload', beforeUnloadCallback);
+
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadCallback);
+      };
     }
+
+    return () => {};
   }, [leaveOnUnload]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
