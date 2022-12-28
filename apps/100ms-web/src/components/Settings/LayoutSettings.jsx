@@ -15,7 +15,7 @@ import {
   UI_SETTINGS,
 } from "../../common/constants";
 
-export const LayoutSettings = ({ disabledOptions = [] }) => {
+export const LayoutSettings = ({ disabledOptions = {} }) => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -34,10 +34,6 @@ export const LayoutSettings = ({ disabledOptions = [] }) => {
     },
     [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings]
   );
-  const disabledOptionsMap = disabledOptions.reduce(
-    (map, key) => ({ ...map, [key]: true }),
-    {}
-  );
 
   return (
     <Box className={settingOverflow()}>
@@ -52,14 +48,14 @@ export const LayoutSettings = ({ disabledOptions = [] }) => {
         }}
         id="activeSpeakerMode"
         label="Active Speaker Mode"
-        disable={disabledOptionsMap["activeSpeakerMode"]}
+        hide={disabledOptions["activeSpeakerMode"]}
       />
       <SwitchWithLabel
         label="Audio Only Mode"
         id="audioOnlyMode"
         checked={isAudioOnly}
         onChange={toggleIsAudioOnly}
-        disable={disabledOptionsMap["audioOnlyMode"]}
+        hide={disabledOptions["audioOnlyMode"]}
       />
       <SwitchWithLabel
         label="Mirror Local Video"
@@ -70,7 +66,7 @@ export const LayoutSettings = ({ disabledOptions = [] }) => {
             [UI_SETTINGS.mirrorLocalVideo]: value,
           });
         }}
-        disable={disabledOptionsMap["mirrorMode"]}
+        hide={disabledOptions["mirrorMode"]}
       />
       <Flex
         align="center"
