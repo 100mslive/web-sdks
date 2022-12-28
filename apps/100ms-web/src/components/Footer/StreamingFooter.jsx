@@ -1,11 +1,15 @@
 import React from "react";
-import { Box, Flex, Footer as AppFooter } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  Footer as AppFooter,
+  PIPComponent,
+} from "@100mslive/react-ui";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { StreamActions } from "../Header/StreamActions";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
-import PIPComponent from "../PIP/PIPComponent";
 import { ScreenshareToggle } from "../ScreenShare";
 import { ChatToggle } from "./ChatToggle";
 

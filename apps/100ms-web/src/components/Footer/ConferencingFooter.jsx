@@ -6,14 +6,18 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { MusicIcon } from "@100mslive/react-icons";
-import { Flex, Footer as AppFooter, Tooltip } from "@100mslive/react-ui";
+import {
+  Flex,
+  Footer as AppFooter,
+  PIPComponent,
+  Tooltip,
+} from "@100mslive/react-ui";
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
-import PIPComponent from "../PIP/PIPComponent";
 import { ScreenshareToggle } from "../ScreenShare";
 import { ScreenShareHintModal } from "../ScreenshareHintModal";
 import { ChatToggle } from "./ChatToggle";
