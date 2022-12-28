@@ -16,10 +16,12 @@ import {
   Tabs,
   Text,
 } from "@100mslive/react-ui";
+import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import DeviceSettings from "./DeviceSettings";
 import { LayoutSettings } from "./LayoutSettings";
 import { NotificationSettings } from "./NotificationSettings";
 import { settingContent } from "./common.js";
+import { useHLSViewerRole } from "../AppData/useUISettings";
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -28,6 +30,10 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   const resetSelection = useCallback(() => {
     setSelection("");
   }, []);
+
+  const hlsViewerRole = useHLSViewerRole();
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const isHlsViewer = hlsViewerRole === localPeerRole;
 
   useEffect(() => {
     setSelection(isMobile ? "" : "devices");
@@ -65,15 +71,14 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               <Text variant="h5">Settings </Text>
               <Flex
                 direction="column"
-                css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto" }}
+                css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto", pt: "$10" }}
               >
-                <Tabs.Trigger
-                  value="devices"
-                  css={{ gap: "$8", mt: "$10", mb: "$4" }}
-                >
-                  <SettingsIcon />
-                  Device Settings
-                </Tabs.Trigger>
+                {!isHlsViewer && (
+                  <Tabs.Trigger value="devices" css={{ gap: "$8", mb: "$4" }}>
+                    <SettingsIcon />
+                    Device Settings
+                  </Tabs.Trigger>
+                )}
                 <Tabs.Trigger value="notifications" css={{ gap: "$8" }}>
                   <NotificationsIcon />
                   Notifications
@@ -103,15 +108,17 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                <Tabs.Content value="devices" className={settingContent()}>
-                  <SettingsContentHeader
-                    onBack={resetSelection}
-                    isMobile={isMobile}
-                  >
-                    Device Settings
-                  </SettingsContentHeader>
-                  <DeviceSettings />
-                </Tabs.Content>
+                {!isHlsViewer && (
+                  <Tabs.Content value="devices" className={settingContent()}>
+                    <SettingsContentHeader
+                      onBack={resetSelection}
+                      isMobile={isMobile}
+                    >
+                      Device Settings
+                    </SettingsContentHeader>
+                    <DeviceSettings />
+                  </Tabs.Content>
+                )}
                 <Tabs.Content
                   value="notifications"
                   className={settingContent()}
@@ -131,7 +138,11 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   >
                     Layout
                   </SettingsContentHeader>
-                  <LayoutSettings />
+                  <LayoutSettings
+                    disabledOptions={
+                      isHlsViewer ? ["activeSpeakerMode", "audioOnlyMode"] : []
+                    }
+                  />
                 </Tabs.Content>
               </Flex>
             )}
