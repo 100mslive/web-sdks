@@ -1,7 +1,14 @@
 import React from "react";
 import { Flex, Label, Switch } from "@100mslive/react-ui";
 
-const SwitchWithLabel = ({ label, icon, id, onChange, checked, disable = false }) => {
+const SwitchWithLabel = ({
+  label,
+  icon,
+  id,
+  onChange,
+  checked,
+  hide = false,
+}) => {
   return (
     <Flex
       align="center"
@@ -10,7 +17,7 @@ const SwitchWithLabel = ({ label, icon, id, onChange, checked, disable = false }
         py: "$8",
         w: "100%",
         borderBottom: "1px solid $borderDefault",
-        display: disable ? "none" : "flex",
+        display: hide ? "none" : "flex",
       }}
     >
       <Label
