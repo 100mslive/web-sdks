@@ -227,7 +227,6 @@ const BackSwipe = () => {
   const hmsActions = useHMSActions();
   useEffect(() => {
     const onRouteLeave = async () => {
-      console.error("on route leave", isConnectedToRoom);
       if (isConnectedToRoom) {
         await hmsActions.leave();
       }
