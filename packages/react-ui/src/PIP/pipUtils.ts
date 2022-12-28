@@ -1,5 +1,5 @@
-let CANVAS_FILL_COLOR;
-let CANVAS_STROKE_COLOR;
+let CANVAS_FILL_COLOR: string;
+let CANVAS_STROKE_COLOR: string;
 
 function setPIPCanvasColors() {
   if (!CANVAS_FILL_COLOR) {
@@ -26,10 +26,16 @@ export function resetPIPCanvasColors() {
  * 4 tiles - two rows two columns - all equal size
  * All videos will respect their aspect ratios.
  */
-export function drawVideoElementsOnCanvas(videoElements, canvas) {
-  let videoTiles = videoElements.filter(videoElement => videoElement.srcObject !== null);
+export function drawVideoElementsOnCanvas(videoElements: Array<HTMLVideoElement>, canvas: HTMLCanvasElement | null) {
+  const videoTiles = videoElements.filter(videoElement => videoElement.srcObject !== null);
+  if (!canvas) {
+    return;
+  }
 
   const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -45,8 +51,11 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
 
 // this is to send some data for stream and resolve video element's play for a
 // video element rendering this canvas' capture stream
-export function dummyChangeInCanvas(canvas) {
+export function dummyChangeInCanvas(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -56,7 +65,11 @@ export function dummyChangeInCanvas(canvas) {
  * Imagine the canvas as a grid with passed in number of rows and columns. Go
  * over the tiles in the grid in order while drawing the videoElements upon them.
  */
-function fillGridTiles(videoElements, ctx, canvas) {
+function fillGridTiles(
+  videoElements: Array<HTMLVideoElement>,
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+) {
   const offset = 8;
   canvas.width = 480;
   canvas.height = 320;
@@ -171,7 +184,11 @@ function fillGridTiles(videoElements, ctx, canvas) {
  * @param {number} height
  * @returns { width: number, height: number }
  */
-function getRenderDimensions(video, width, height) {
+function getRenderDimensions(
+  video: HTMLVideoElement,
+  width: number,
+  height: number,
+): { width: number; height: number } {
   let finalWidth = (video.videoWidth / video.videoHeight) * height;
   let finalHeight = height;
 

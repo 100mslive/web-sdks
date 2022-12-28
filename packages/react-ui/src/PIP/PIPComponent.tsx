@@ -10,7 +10,7 @@ import {
 import { PipIcon } from "@100mslive/react-icons";
 import { PictureInPicture } from "./PIPManager";
 import { MediaSession } from "./SetupMediaSession";
-import IconButton from "../../IconButton";
+import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
 
 const DEFAULT_HLS_VIEWER_ROLE = 'hls-viewer';
@@ -20,13 +20,13 @@ const DEFAULT_HLS_VIEWER_ROLE = 'hls-viewer';
  */
 export const PIPComponent = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const [isPipOn, setIsPipOn] = useState(PictureInPicture.isOn());
+  const [isPipOn, setIsPipOn] = useState<boolean>(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
   const store = useHMSVanillaStore();
 
   const onPipToggle = useCallback(() => {
     if (!isPipOn) {
-      PictureInPicture.start(hmsActions, setIsPipOn).catch(err =>
+      PictureInPicture.start(hmsActions, (value: boolean) => setIsPipOn(value)).catch(err =>
         console.error("error in starting pip", err)
       );
       MediaSession.setup(hmsActions, store);
@@ -66,7 +66,7 @@ export const PIPComponent = () => {
           <PipIcon />
         </IconButton>
       </Tooltip>
-      {isPipOn && <ActivatedPIP setIsPipOn={setIsPipOn} />}
+      {isPipOn && <ActivatedPIP  />}
     </>
   );
 };
