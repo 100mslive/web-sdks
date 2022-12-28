@@ -29,41 +29,40 @@ export const MainGridView = () => {
   const peersByRoles = useHMSStore(
     selectPeersByRoles(localRole.subscribeParams.subscribeToRoles || [])
   );
-  const [isRolesWithPublisher, setRolesWithPublisher] = useState(false);
-  const [isRoleSubscribing, setRoleSubscribing] = useState(false);
-  const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(false);
+  const [isRolesWithPublisher, setRolesWithPublisher] = useState(true);
+  const [isRoleSubscribing, setRoleSubscribing] = useState(true);
+  const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(true);
+
   useEffect(() => {
-    const publishingPeers = peers.filter(peer => {
+    const publishingPeers = peers.some(peer => {
       // peer able to publish
       if (peer.roleName && roles[peer.roleName]) {
-        return roles[peer.roleName].publishParams?.allowed.length > 0;
+        return !!roles[peer.roleName].publishParams?.allowed.length;
       }
-      return (
-        peer?.audioTrack ||
-        peer?.videoTrack ||
-        (peer?.auxiliaryTracks && peer?.auxiliaryTracks.length > 0)
-      );
+      return true;
     });
-    setRolesWithPublisher(publishingPeers.length > 0);
-  }, [peers, roles, setRolesWithPublisher]);
-
-  useEffect(
-    () =>
-      setRoleSubscribing(
-        localRole.subscribeParams.subscribeToRoles?.length > 0
-      ),
-    [localRole, setRoleSubscribing]
-  );
-
-  useEffect(() => {
-    const publishingPeers = peersByRoles.filter(
-      peer =>
-        peer?.audioTrack ||
-        peer?.videoTrack ||
-        (peer?.auxiliaryTracks && peer?.auxiliaryTracks.length > 0)
+    const subscriberPublishingPeer = peersByRoles.some(peer => {
+      if (peer.roleName && roles[peer.roleName]) {
+        return !!roles[peer.roleName].publishParams?.allowed.length;
+      }
+      return true;
+    });
+    console.log(
+      "peers roles ",
+      peers,
+      roles,
+      subscriberPublishingPeer,
+      publishingPeers
     );
-    setRoleSubscribingPublish(publishingPeers.length > 0);
-  }, [peersByRoles, setRoleSubscribingPublish]);
+    setRoleSubscribingPublish(subscriberPublishingPeer);
+    setRoleSubscribing(!!localRole.subscribeParams.subscribeToRoles?.length);
+    setRolesWithPublisher(publishingPeers);
+  }, [
+    localRole.subscribeParams.subscribeToRoles?.length,
+    peers,
+    peersByRoles,
+    roles,
+  ]);
   /**
    * If there are peers from many publishing roles, then it's possible to divide
    * them into two parts, those who show in center and those who show in sidepane.
