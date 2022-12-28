@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useMedia } from "react-use";
+import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import {
   ChevronLeftIcon,
   CrossIcon,
@@ -16,12 +17,11 @@ import {
   Tabs,
   Text,
 } from "@100mslive/react-ui";
-import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import DeviceSettings from "./DeviceSettings";
 import { LayoutSettings } from "./LayoutSettings";
 import { NotificationSettings } from "./NotificationSettings";
-import { settingContent } from "./common.js";
 import { useHLSViewerRole } from "../AppData/useUISettings";
+import { settingContent } from "./common.js";
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -34,6 +34,8 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   const hlsViewerRole = useHLSViewerRole();
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isHlsViewer = hlsViewerRole === localPeerRole;
+
+  const [hideDevicesSetting, setHideDevicesSetting] = useState(false);
 
   useEffect(() => {
     setSelection(isMobile ? "" : "devices");
@@ -73,7 +75,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 direction="column"
                 css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto", pt: "$10" }}
               >
-                {!isHlsViewer && (
+                {!hideDevicesSetting && (
                   <Tabs.Trigger value="devices" css={{ gap: "$8", mb: "$4" }}>
                     <SettingsIcon />
                     Device Settings
@@ -108,7 +110,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                {!isHlsViewer && (
+                {!hideDevicesSetting && (
                   <Tabs.Content value="devices" className={settingContent()}>
                     <SettingsContentHeader
                       onBack={resetSelection}
@@ -116,7 +118,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     >
                       Device Settings
                     </SettingsContentHeader>
-                    <DeviceSettings />
+                    <DeviceSettings setHideAll={setHideDevicesSetting} />
                   </Tabs.Content>
                 )}
                 <Tabs.Content
@@ -140,7 +142,9 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <LayoutSettings
                     disabledOptions={
-                      isHlsViewer ? ["activeSpeakerMode", "audioOnlyMode"] : []
+                      isHlsViewer
+                        ? { activeSpeakerMode: true, audioOnlyMode: true }
+                        : {}
                     }
                   />
                 </Tabs.Content>
