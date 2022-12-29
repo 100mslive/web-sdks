@@ -106,10 +106,9 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     });
   }
 
-  const beforeUnloadCallbackRef = React.useRef(() => providerProps.actions.leave());
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      const beforeUnloadCallback = beforeUnloadCallbackRef.current;
+      const beforeUnloadCallback = () => providerProps.actions.leave();
       window.addEventListener('beforeunload', beforeUnloadCallback);
 
       return () => {
