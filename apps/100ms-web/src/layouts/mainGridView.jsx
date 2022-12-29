@@ -34,29 +34,22 @@ export const MainGridView = () => {
   const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(true);
 
   useEffect(() => {
-    const publishingPeers = peers.some(peer => {
+    const hasPublishingPeers = peers.some(peer => {
       // peer able to publish
       if (peer.roleName && roles[peer.roleName]) {
         return !!roles[peer.roleName].publishParams?.allowed.length;
       }
       return true;
     });
-    const subscriberPublishingPeer = peersByRoles.some(peer => {
+    const hasSubscribedRolePublishing = peersByRoles.some(peer => {
       if (peer.roleName && roles[peer.roleName]) {
         return !!roles[peer.roleName].publishParams?.allowed.length;
       }
       return true;
     });
-    console.log(
-      "peers roles ",
-      peers,
-      roles,
-      subscriberPublishingPeer,
-      publishingPeers
-    );
-    setRoleSubscribingPublish(subscriberPublishingPeer);
+    setRoleSubscribingPublish(hasSubscribedRolePublishing);
     setRoleSubscribing(!!localRole.subscribeParams.subscribeToRoles?.length);
-    setRolesWithPublisher(publishingPeers);
+    setRolesWithPublisher(hasPublishingPeers);
   }, [
     localRole.subscribeParams.subscribeToRoles?.length,
     peers,
