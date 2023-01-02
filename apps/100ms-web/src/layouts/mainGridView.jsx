@@ -29,9 +29,7 @@ export const MainGridView = () => {
   const peersByRoles = useHMSStore(
     selectPeersByRoles(localRole.subscribeParams.subscribeToRoles || [])
   );
-  const [isRolesWithPublisher, setRolesWithPublisher] = useState(true);
-  const [isRoleSubscribing, setRoleSubscribing] = useState(true);
-  const [isRoleSubscribingPublish, setRoleSubscribingPublish] = useState(true);
+  const [placeholder, setPlaceholder] = useState("");
 
   useEffect(() => {
     const hasPublishingPeers = peers.some(peer => {
@@ -47,9 +45,15 @@ export const MainGridView = () => {
       }
       return true;
     });
-    setRoleSubscribingPublish(hasSubscribedRolePublishing);
-    setRoleSubscribing(!!localRole.subscribeParams.subscribeToRoles?.length);
-    setRolesWithPublisher(hasPublishingPeers);
+    if (!hasPublishingPeers) {
+      setPlaceholder("None of the roles can publish video, audio or screen");
+    } else if (!localRole.subscribeParams.subscribeToRoles?.length) {
+      setPlaceholder("This role isn't subscribed to any role");
+    } else if (!hasSubscribedRolePublishing) {
+      setPlaceholder("This role subscribed to roles is not publishing");
+    } else {
+      setPlaceholder("");
+    }
   }, [
     localRole.subscribeParams.subscribeToRoles?.length,
     peers,
@@ -75,35 +79,6 @@ export const MainGridView = () => {
     const nooneIsPublishing = sidebarPeers.length === 0;
     showSidePane = itsOnlyMeInTheRoom || nooneIsPublishing;
   }
-  let MainViewCompoenet;
-  if (!isRolesWithPublisher) {
-    MainViewCompoenet = () => (
-      <NonPublisherView message="None of the roles can publish video, audio or screen" />
-    );
-  } else if (!isRoleSubscribing) {
-    MainViewCompoenet = () => (
-      <NonPublisherView message="This role isn't subscribed to any role" />
-    );
-  } else if (!isRoleSubscribingPublish) {
-    MainViewCompoenet = () => (
-      <NonPublisherView message="This role subscribed to roles is not publishing" />
-    );
-  } else {
-    MainViewCompoenet = () => (
-      <>
-        <GridCenterView
-          peers={showSidePane ? centerPeers : peers}
-          maxTileCount={maxTileCount}
-          allowRemoteMute={false}
-          hideSidePane={!showSidePane}
-          totalPeers={peers.length}
-        />
-        {showSidePane && (
-          <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
-        )}
-      </>
-    );
-  }
   return (
     <Flex
       css={{
@@ -114,7 +89,22 @@ export const MainGridView = () => {
         "@md": "column",
       }}
     >
-      <MainViewCompoenet />
+      {placeholder ? (
+        <NonPublisherView message={placeholder} />
+      ) : (
+        <>
+          <GridCenterView
+            peers={showSidePane ? centerPeers : peers}
+            maxTileCount={maxTileCount}
+            allowRemoteMute={false}
+            hideSidePane={!showSidePane}
+            totalPeers={peers.length}
+          />
+          {showSidePane && (
+            <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
+          )}
+        </>
+      )}
     </Flex>
   );
 };
