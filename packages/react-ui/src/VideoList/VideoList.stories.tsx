@@ -49,7 +49,6 @@ export const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectR
     maxTileCount,
     aspectRatio,
   });
-  console.error({ peers });
   return (
     <StyledVideoList.Root css={{ height: '100vh', width: '100%' }} ref={ref}>
       <StyledVideoList.Container>
