@@ -40,7 +40,7 @@ interface VideoListProps {
   };
 }
 
-const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio }) => {
+export const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio }) => {
   const peers = useHMSStore(selectPeers);
   const [page] = useState(0);
   const { ref, pagesWithTiles } = useVideoList({
@@ -49,6 +49,7 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
     maxTileCount,
     aspectRatio,
   });
+  console.error({ peers });
   return (
     <StyledVideoList.Root css={{ height: '100vh', width: '100%' }} ref={ref}>
       <StyledVideoList.Container>
@@ -59,11 +60,12 @@ const VideoListStory: React.FC<VideoListProps> = ({ maxTileCount, aspectRatio })
                   left: getLeft(pageNo, page),
                   transition: 'left 0.3s ease-in-out',
                 }}
+                key={pageNo}
               >
-                {tiles.map((tile, i) =>
+                {tiles.map((tile) =>
                   tile.track?.source === 'screen' ? null : (
                     <VideoTile
-                      key={tile.track?.id || tile.peer.id + i}
+                      key={tile.peer.id}
                       width={tile.width}
                       height={tile.height}
                       trackId={tile.track?.id || ''}
