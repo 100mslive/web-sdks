@@ -1,7 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import mdx from './PIP.mdx';
 import { PIPComponent } from './PIPComponent';
+import { Box, Flex } from '../Layout';
 import { VideoListStory } from '../VideoList/VideoList.stories';
 
 export default {
@@ -16,7 +17,7 @@ export default {
 
 const Template: ComponentStory<typeof PIPComponent> = _args => {
   return (
-    <Fragment>
+    <Flex>
       <VideoListStory
         maxTileCount={2}
         aspectRatio={{
@@ -24,8 +25,10 @@ const Template: ComponentStory<typeof PIPComponent> = _args => {
           height: 1,
         }}
       />
-      <PIPComponent />;
-    </Fragment>
+      <Box css={{ maxHeight: 'max-content', mt: "$10"}}>
+        <PIPComponent />
+      </Box>
+    </Flex>
   );
 };
 
