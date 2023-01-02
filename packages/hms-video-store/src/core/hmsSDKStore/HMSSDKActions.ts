@@ -147,8 +147,18 @@ export class HMSSDKActions implements IHMSActions {
           HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
           return;
         }
+        const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
+        if (alreadyInSameState) {
+          HMSLogger.w(`preferred layer is already ${layer}`);
+          return;
+        }
+        this.setState(draftStore => {
+          const track = draftStore.tracks[trackId] as HMSVideoTrack;
+          if (track) {
+            track.preferredLayer = layer;
+          }
+        }, 'setPreferredLayer');
         await track.setPreferredLayer(layer);
-        this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not a remote video track`);
       }
@@ -384,7 +394,6 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
       (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
-      this.updateVideoLayer(trackID, 'detachVideo');
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
@@ -781,7 +790,6 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
-      this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
@@ -1101,29 +1109,6 @@ export class HMSSDKActions implements IHMSActions {
     // send notification
     this.hmsNotifications.sendError(error);
     HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
-  }
-
-  /**
-   * the layer gets updated on addsink/removesink/preferlayer calls, for simulcast there
-   * can be multiple layers, while for non simulcast there will be None and High.
-   */
-  private updateVideoLayer(trackID: string, action: string) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
-      const hasFieldChanged =
-        storeTrack?.layer !== sdkTrack.getLayer() ||
-        storeTrack?.degraded !== sdkTrack.degraded ||
-        storeTrack?.preferredLayer !== sdkTrack.getPreferredLayer();
-      if (hasFieldChanged) {
-        this.setState(draft => {
-          const track = draft.tracks[trackID] as HMSVideoTrack;
-          track.layer = sdkTrack.getLayer();
-          track.preferredLayer = sdkTrack.getPreferredLayer();
-          track.degraded = sdkTrack.degraded;
-        }, action);
-      }
-    }
   }
 
   private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
