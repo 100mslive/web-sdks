@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import LogRocket from "logrocket";
+import { logMessage } from "zipyai";
 import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
 import { ToastConfig } from "../Toast/ToastConfig";
 import { ToastManager } from "../Toast/ToastManager";
-import { logMessage } from "zipyai";
 
 const notificationTypes = [
   HMSNotificationTypes.RECONNECTED,
