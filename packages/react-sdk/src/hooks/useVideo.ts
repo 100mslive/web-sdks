@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useResizeDetector } from 'react-resize-detector';
 import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { isBrowser } from '../utils/isBrowser';
+import { getClosestLayer } from '../utils/layout';
 import HMSLogger from '../utils/logger';
 
 export interface useVideoInput {
@@ -35,21 +38,52 @@ export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): u
   const track = useHMSStore(selectVideoTrackByID(trackId));
 
   const { ref: inViewRef, inView } = useInView({ threshold });
+  const { width = 0, height = 0, ref: resizeRef } = useResizeDetector({ refreshMode: 'debounce', refreshRate: 300 });
+
+  // eslint-disable-next-line complexity
+  const setLayerByResolution = useCallback(async () => {
+    if (
+      width > 0 &&
+      height > 0 &&
+      inView &&
+      track?.layerDefinitions?.length &&
+      resizeRef.current &&
+      track?.enabled &&
+      !track?.degraded
+    ) {
+      const closestLayer = getClosestLayer({ layerDefinitions: track.layerDefinitions!, width, height });
+      await actions.setPreferredLayer(track?.id, closestLayer!);
+    }
+    // needed for layerDefinitions as the reference always changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height, track?.id, actions, track?.enabled, track?.degraded, resizeRef, inView]);
 
   const setRefs = useCallback(
     (node: HTMLVideoElement) => {
       if (node) {
         videoRef.current = node;
         inViewRef(node);
+        if (track?.layerDefinitions?.length) {
+          resizeRef.current = node;
+        }
       }
     },
-    [inViewRef],
+    [inViewRef, track?.layerDefinitions?.length, resizeRef],
   );
 
   useEffect(() => {
+    setLayerByResolution();
+  }, [setLayerByResolution]);
+
+  useEffect(() => {
+    // eslint-disable-next-line complexity
     (async () => {
       if (videoRef.current && track?.id) {
-        if (inView && track.enabled && attach !== false) {
+        let visible = true;
+        if (isBrowser) {
+          visible = window.getComputedStyle(videoRef.current).visibility === 'visible';
+        }
+        if (inView && track.enabled && visible && attach !== false) {
           // attach when in view and enabled
           await actions.attachVideo(track.id, videoRef.current);
         } else {

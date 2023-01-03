@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import {
-  getPeerTracksByCondition,
+  getScreenSharesByPeer,
   isAudioPlaylist,
   isDegraded,
   isTrackDisplayEnabled,
@@ -234,7 +234,7 @@ export const selectIsLocalVideoDisplayEnabled = (store: HMSStore) => {
  * Select a boolean denoting whether your screen is shared to remote peers in the room.
  */
 export const selectIsLocalScreenShared = createSelector(selectLocalPeer, selectTracksMap, (localPeer, tracksMap) => {
-  const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
+  const { video, audio } = getScreenSharesByPeer(tracksMap, localPeer);
   return !!(video || audio);
 });
 
@@ -245,7 +245,7 @@ export const selectPeerScreenSharing = createSelector(selectPeersMap, selectTrac
   let screensharePeer = undefined;
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       return peer;
     } else if (audio && !screensharePeer) {
@@ -268,7 +268,7 @@ export const selectIsSomeoneScreenSharing = createSelector(selectPeerScreenShari
 export const selectPeerSharingAudio = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
+    const { audio, video } = getScreenSharesByPeer(tracksMap, peer);
     if (!video && !!audio) {
       return peer;
     }
@@ -284,7 +284,7 @@ export const selectPeersScreenSharing = createSelector(selectPeersMap, selectTra
   const audioPeers = [];
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       videoPeers.push(peer);
     } else if (audio) {

@@ -5,7 +5,8 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSPluginSupportResult,
-  HMSSimulcastLayer,
+  HMSPreferredSimulcastLayer,
+  HMSScreenShareConfig,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
@@ -61,13 +62,9 @@ export interface IHMSActions {
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
-   * @param config it can also be boolean to ensure backward compatibility where it stands
-   * for audioOnly flag
+   * @param config check the config object for details about the fields
    */
-  setScreenShareEnabled(
-    enabled: boolean,
-    config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean,
-  ): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
@@ -177,7 +174,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
@@ -186,11 +183,12 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
+
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
@@ -236,11 +234,27 @@ export interface IHMSActions {
 
   /**
    * Request for a role change of a remote peer. Can be forced.
+   * @deprecated Use `changeRoleOfPeer`
    * @param forPeerId The remote peer id whose role needs to be changed
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
   changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param roles List of roles whose role needs to be changed
+   * @param toRole The name of the new role.
+   */
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received

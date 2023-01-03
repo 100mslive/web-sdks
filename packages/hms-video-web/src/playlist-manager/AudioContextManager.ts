@@ -4,6 +4,7 @@ export class AudioContextManager {
   private audioContext: AudioContext;
   private destinationNode?: MediaStreamAudioDestinationNode;
   private source: MediaElementAudioSourceNode;
+  private readonly TAG = '[AudioContextManager]';
 
   constructor(element: HTMLMediaElement) {
     this.audioContext = new AudioContext();
@@ -37,9 +38,5 @@ export class AudioContextManager {
     if (this.audioContext.state !== 'closed') {
       this.audioContext.close();
     }
-  }
-
-  private get TAG() {
-    return 'AudioContextManager';
   }
 }

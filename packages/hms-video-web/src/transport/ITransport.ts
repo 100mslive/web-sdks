@@ -6,7 +6,6 @@ import {
   HMSRoleChangeRequest,
   RTMPRecordingConfig,
 } from '../interfaces';
-import { HMSAudioTrackSettings, HMSVideoTrackSettings } from '../media/settings';
 import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
@@ -30,15 +29,14 @@ export default interface ITransport {
 
   unpublish(tracks: Array<HMSLocalTrack>): Promise<void>;
 
-  getLocalScreen(
-    videoSettings: HMSVideoTrackSettings,
-    audioSettings: HMSAudioTrackSettings,
-    onStop: () => void,
-  ): Promise<Array<HMSLocalTrack>>;
-
   trackUpdate(track: HMSLocalTrack): void;
 
+  /**
+   * @deprecated Use `changeRoleOfPeer`
+   */
   changeRole(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
+
+  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
 
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
 

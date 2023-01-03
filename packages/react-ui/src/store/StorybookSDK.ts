@@ -1,4 +1,3 @@
-import { HMSException } from '@100mslive/hms-video';
 import {
   DeviceMap,
   HMSActions,
@@ -6,13 +5,17 @@ import {
   HMSPeer,
   HMSRole,
   HMSRoom,
-  HMSSimulcastLayer,
+  HMSPreferredSimulcastLayer,
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrackSettings,
+  HMSAudioTrackSettings,
   IHMSStore,
   selectLocalPeerID,
   selectLocalVideoTrackID,
+  HMSException,
+  HMSRoomState,
+  HMSMessageInput,
 } from '@100mslive/react-sdk';
 import { StoryBookNotifications } from './StorybookNotifications';
 import { makeFakeMessage } from '../fixtures/chats';
@@ -35,7 +38,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.hmsNotifications = notifications;
   }
 
-  setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): void {
+  setPreferredLayer(_trackId: string, _layer: HMSPreferredSimulcastLayer): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
@@ -43,6 +46,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
     this.store.setState(store => {
       if (trackId) {
         const track = store.tracks[trackId];
+        console.log(track)
         if (track.type === 'audio') {
           track.volume = value;
         }
