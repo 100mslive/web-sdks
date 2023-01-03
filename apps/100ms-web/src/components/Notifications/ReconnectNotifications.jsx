@@ -6,6 +6,7 @@ import {
 } from "@100mslive/react-sdk";
 import { ToastConfig } from "../Toast/ToastConfig";
 import { ToastManager } from "../Toast/ToastManager";
+import { logMessage } from "zipyai";
 
 const notificationTypes = [
   HMSNotificationTypes.RECONNECTED,
@@ -17,12 +18,14 @@ export const ReconnectNotifications = () => {
   useEffect(() => {
     if (notification?.type === HMSNotificationTypes.RECONNECTED) {
       LogRocket.track("Reconnected");
+      logMessage("Reconnected");
       notificationId = ToastManager.replaceToast(
         notificationId,
         ToastConfig.RECONNECTED.single()
       );
     } else if (notification?.type === HMSNotificationTypes.RECONNECTING) {
       LogRocket.track("Reconnecting");
+      logMessage("Reconnecting");
       notificationId = ToastManager.replaceToast(
         notificationId,
         ToastConfig.RECONNECTING.single(notification.data.message)

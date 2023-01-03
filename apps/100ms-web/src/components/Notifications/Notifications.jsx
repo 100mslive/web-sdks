@@ -24,6 +24,7 @@ import {
 } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
+import { logMessage } from "zipyai";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -65,6 +66,7 @@ export function Notifications() {
             });
           } else {
             LogRocket.track("Disconnected");
+            logMessage("Disconnected");
             // show button action when the error is terminal
             const toastId = ToastManager.addToast({
               title:
