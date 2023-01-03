@@ -13,7 +13,7 @@ export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
   }
 
   identify(localPeer.id, {
-    customerName: localPeer.name,
+    customerName: `${localPeer.name} (${domain})`,
     email: domain,
     role: localPeer.roleName,
     sessionId,
