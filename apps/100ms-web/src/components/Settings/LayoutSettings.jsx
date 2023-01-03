@@ -15,7 +15,7 @@ import {
   UI_SETTINGS,
 } from "../../common/constants";
 
-export const LayoutSettings = ({ disabledOptions = {} }) => {
+export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
@@ -48,14 +48,12 @@ export const LayoutSettings = ({ disabledOptions = {} }) => {
         }}
         id="activeSpeakerMode"
         label="Active Speaker Mode"
-        hide={disabledOptions["activeSpeakerMode"]}
       />
       <SwitchWithLabel
         label="Audio Only Mode"
         id="audioOnlyMode"
         checked={isAudioOnly}
         onChange={toggleIsAudioOnly}
-        hide={disabledOptions["audioOnlyMode"]}
       />
       <SwitchWithLabel
         label="Mirror Local Video"
@@ -66,7 +64,6 @@ export const LayoutSettings = ({ disabledOptions = {} }) => {
             [UI_SETTINGS.mirrorLocalVideo]: value,
           });
         }}
-        hide={disabledOptions["mirrorMode"]}
       />
       <Flex
         align="center"

@@ -85,10 +85,12 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   <NotificationsIcon />
                   Notifications
                 </Tabs.Trigger>
-                <Tabs.Trigger value="layout" css={{ gap: "$8" }}>
-                  <GridFourIcon />
-                  Layout
-                </Tabs.Trigger>
+                {!isHlsViewer && (
+                  <Tabs.Trigger value="layout" css={{ gap: "$8" }}>
+                    <GridFourIcon />
+                    Layout
+                  </Tabs.Trigger>
+                )}
               </Flex>
             </Tabs.List>
             {selection && (
@@ -133,21 +135,17 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   </SettingsContentHeader>
                   <NotificationSettings />
                 </Tabs.Content>
-                <Tabs.Content value="layout" className={settingContent()}>
-                  <SettingsContentHeader
-                    onBack={resetSelection}
-                    isMobile={isMobile}
-                  >
-                    Layout
-                  </SettingsContentHeader>
-                  <LayoutSettings
-                    disabledOptions={
-                      isHlsViewer
-                        ? { activeSpeakerMode: true, audioOnlyMode: true }
-                        : {}
-                    }
-                  />
-                </Tabs.Content>
+                {!isHlsViewer && (
+                  <Tabs.Content value="layout" className={settingContent()}>
+                    <SettingsContentHeader
+                      onBack={resetSelection}
+                      isMobile={isMobile}
+                    >
+                      Layout
+                    </SettingsContentHeader>
+                    <LayoutSettings />
+                  </Tabs.Content>
+                )}
               </Flex>
             )}
           </Tabs.Root>
