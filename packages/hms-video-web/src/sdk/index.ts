@@ -1078,8 +1078,7 @@ export class HMSSdk implements HMSInterface {
     this.sendAnalyticsEvent(
       AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
     );
-    // @TODO: start sending if error is less frequent
-    // this.listener?.onError(error);
+    this.listener?.onError(error);
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {
