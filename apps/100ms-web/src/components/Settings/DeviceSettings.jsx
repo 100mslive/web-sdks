@@ -28,7 +28,7 @@ import { UI_SETTINGS } from "../../common/constants";
  * it'll give the user options to change input/output device as well as check speaker.
  * There is also another controlled way of using this by passing in open and onOpenChange.
  */
-const Settings = ({ setHideAll }) => {
+const Settings = ({ setHide }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
@@ -49,7 +49,7 @@ const Settings = ({ setHideAll }) => {
     !audioOutputFiltered?.length &&
     !audioInputFiltered?.length
   ) {
-    setHideAll(true);
+    setHide(true);
   }
 
   return (
