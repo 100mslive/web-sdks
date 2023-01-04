@@ -24,6 +24,7 @@ import { ChatToggle } from "./ChatToggle";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
+import { usePinnedTrack } from "../AppData/useUISettings";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
 
@@ -71,6 +72,17 @@ const ScreenshareAudio = () => {
   );
 };
 
+const PIP = () => {
+  const pinnedTrack = usePinnedTrack();
+
+  return (
+    <PIPComponent
+      peers={pinnedTrack ? [pinnedTrack.peerId] : undefined}
+      showLocalPeer={true}
+    />
+  );
+};
+
 export const ConferencingFooter = () => {
   return (
     <AppFooter.Root>
@@ -97,7 +109,7 @@ export const ConferencingFooter = () => {
       <AppFooter.Center>
         <AudioVideoToggle />
         <ScreenshareToggle />
-        <PIPComponent />
+        <PIP />
         <MoreSettings />
         <LeaveRoom />
         <Flex

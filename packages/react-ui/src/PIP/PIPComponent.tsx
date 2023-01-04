@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  HMSPeerID,
   selectLocalPeerRoleName,
+  selectPeers,
   selectRemotePeers,
   selectTracksMap,
   useHMSActions,
@@ -14,11 +16,24 @@ import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
 
 const DEFAULT_HLS_VIEWER_ROLE = 'hls-viewer';
+
+export interface PIPComponentProps {
+  /**
+   * If list of peers are passed only they will be shown. if the selected peers video is not on,
+   * they will not be shown
+   */
+  peers?: HMSPeerID[];
+  /**
+   * By default local peer is not shown in PIP. To include local peer, pass this flag
+   */
+  showLocalPeer?: boolean;
+}
 /**
  * shows a button which when clicked shows some videos in PIP, clicking
  * again turns it off.
+ * Note: Only a maximum of four tiles are shown at any given point
  */
-export const PIPComponent = () => {
+export const PIPComponent = ({ peers, showLocalPeer }: PIPComponentProps) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const [isPipOn, setIsPipOn] = useState<boolean>(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
@@ -66,7 +81,7 @@ export const PIPComponent = () => {
           <PipIcon />
         </IconButton>
       </Tooltip>
-      {isPipOn && <ActivatedPIP  />}
+      {isPipOn && <ActivatedPIP peers={peers} showLocalPeer={showLocalPeer} />}
     </>
   );
 };
@@ -75,15 +90,22 @@ export const PIPComponent = () => {
  * this is a separate component so it can be conditionally rendered and
  * the subscriptions to store are done only if required.
  */
-const ActivatedPIP = () => {
+const ActivatedPIP = ({ peers, showLocalPeer }: PIPComponentProps) => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const remotePeers = useHMSStore(selectRemotePeers);
+  const remotePeers = useHMSStore(showLocalPeer ? selectPeers : selectRemotePeers);
+  const [pipPeers, setPipPeers] = useState(remotePeers);
 
   useEffect(() => {
-    PictureInPicture.updatePeersAndTracks(remotePeers, tracksMap).catch(err => {
+    if(peers) {
+      setPipPeers(pipPeers => pipPeers.filter(peer => peers.includes(peer.id)));
+    }
+  }, [peers]);
+
+  useEffect(() => {
+    PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
       console.error("error in updating pip", err);
     });
-  }, [tracksMap, remotePeers]);
+  }, [tracksMap, pipPeers]);
 
   return null;
 };
