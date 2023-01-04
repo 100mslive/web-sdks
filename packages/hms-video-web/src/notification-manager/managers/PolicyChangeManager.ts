@@ -19,12 +19,13 @@ export class PolicyChangeManager {
       localPeer.updateRole(newRole);
     }
 
-    this.store.setKnownRoles(params.known_roles);
+    this.store.setKnownRoles(params);
     this.store.getRoom().templateId = params.template_id;
     // handle when role is not present in known_roles
-    const publishParams = params.known_roles[params.name]?.publishParams;
-    this.store.setPublishParams(publishParams);
+    // const publishParams = params.known_roles[params.name]?.publishParams;
+    // this.store.setPublishParams(publishParams);
 
+    // @TODO: on reconnection asRole is ignored and original role is set here which shouldn't happen in preview
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
       const oldRole = localPeer.role;

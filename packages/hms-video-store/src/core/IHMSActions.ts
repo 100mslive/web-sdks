@@ -39,7 +39,7 @@ import { HMSRoleChangeRequest } from './selectors';
  * @category Core
  */
 export interface IHMSActions {
-  preview(config: HMSConfig): Promise<void>;
+  preview(config: HMSConfig, asRole?: string): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.

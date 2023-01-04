@@ -18,7 +18,7 @@ import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSLogLevel } from '../utils/logger';
 
 export default interface HMS {
-  preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
+  preview(config: HMSConfig, listener: HMSPreviewListener, asRole?: string): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
 

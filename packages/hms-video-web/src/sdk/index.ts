@@ -277,7 +277,7 @@ export class HMSSdk implements HMSInterface {
     this.internalLeave(false);
   };
 
-  async preview(config: HMSConfig, listener: HMSPreviewListener) {
+  async preview(config: HMSConfig, listener: HMSPreviewListener, asRole?: string) {
     validateMediaDevicesExistence();
     validateRTCPeerConnection();
 
@@ -288,7 +288,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
-    this.setUpPreview(config, listener);
+    this.setUpPreview(config, listener, asRole);
 
     // Request permissions and populate devices before waiting for policy
     if (config.alwaysRequestPermissions) {
@@ -307,6 +307,11 @@ export class HMSSdk implements HMSInterface {
     }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
+        if (asRole) {
+          console.log('ASROLE UPDATE');
+          const newRole = this.store.getPolicyForRole(asRole);
+          newRole && this.localPeer?.updateRole(newRole);
+        }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
@@ -954,7 +959,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSConfig} config
    * @param {HMSPreviewListener} listener
    */
-  private setUpPreview(config: HMSConfig, listener: HMSPreviewListener) {
+  private setUpPreview(config: HMSConfig, listener: HMSPreviewListener, asRole?: string) {
     this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
@@ -962,7 +967,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
-    this.createAndAddLocalPeerToStore(config, role, userId);
+    this.createAndAddLocalPeerToStore(config, asRole || role, userId);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 

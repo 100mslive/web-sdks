@@ -58,6 +58,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
         setPreviewError(true);
       }
     },
+    asRole: "teacher",
   });
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({

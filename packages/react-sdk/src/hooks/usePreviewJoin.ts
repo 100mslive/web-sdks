@@ -39,6 +39,7 @@ export interface usePreviewInput {
    * 1-5 ranges from poor to good quality.
    */
   captureNetworkQualityInPreview?: boolean;
+  asRole?: string;
 }
 
 export interface usePreviewResult {
@@ -75,6 +76,7 @@ export const usePreviewJoin = ({
   initEndpoint,
   initialSettings,
   captureNetworkQualityInPreview,
+  asRole,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -104,11 +106,11 @@ export const usePreviewJoin = ({
       await actions.leave();
     }
     try {
-      await actions.preview(config);
+      await actions.preview(config, asRole);
     } catch (err) {
       handleError(err as Error, 'preview');
     }
-  }, [actions, handleError, token, roomState, config, isConnected]);
+  }, [actions, handleError, token, roomState, config, isConnected, asRole]);
 
   const join = useCallback(async () => {
     if (!token) {
