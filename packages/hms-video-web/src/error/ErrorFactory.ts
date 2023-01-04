@@ -284,6 +284,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    ICEDisconnected(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.ICE_DISCONNECTED,
+        'ICEDisconnected',
+        action,
+        `[${action.toString()}]: Ice connection state DISCONNECTED`,
+        description,
+      );
+    },
   },
 
   WebsocketMethodErrors: {

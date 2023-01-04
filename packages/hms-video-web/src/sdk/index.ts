@@ -44,7 +44,6 @@ import {
   HMSLocalTrack,
   HMSLocalVideoTrack,
   HMSRemoteTrack,
-  HMSRemoteVideoTrack,
   HMSTrackSource,
   HMSTrackType,
 } from '../media/tracks';
@@ -216,16 +215,6 @@ export class HMSSdk implements HMSInterface {
 
     onTrackRemove: (track: HMSRemoteTrack) => {
       this.notificationManager.handleTrackRemove(track);
-    },
-
-    onTrackDegrade: (track: HMSRemoteVideoTrack) => {
-      HMSLogger.d(this.TAG, 'Sending Track Update Track Degraded', track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_DEGRADED, track, this.store?.getPeerByTrackId(track.trackId)!);
-    },
-
-    onTrackRestore: (track: HMSRemoteVideoTrack) => {
-      HMSLogger.d(this.TAG, 'Sending Track Update Track Restored', track);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_RESTORED, track, this.store?.getPeerByTrackId(track.trackId)!);
     },
 
     onFailure: (exception: HMSException) => {
@@ -1089,8 +1078,7 @@ export class HMSSdk implements HMSInterface {
     this.sendAnalyticsEvent(
       AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
     );
-    // @TODO: start sending if error is less frequent
-    // this.listener?.onError(error);
+    this.listener?.onError(error);
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {

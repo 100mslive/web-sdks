@@ -108,8 +108,15 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      const beforeUnloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('beforeunload', beforeUnloadCallback);
+
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadCallback);
+      };
     }
+
+    return () => {};
   }, [leaveOnUnload]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);

@@ -2,7 +2,6 @@ import { Comparator } from './Comparator';
 import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
-import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import {
   HMSAudioTrack,
   HMSLocalTrack,
@@ -25,6 +24,7 @@ export interface IStore {
   getConfig(): HMSConfig | undefined;
   getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
+  getErrorListener(): IErrorListener | undefined;
 
   getComparator(): Comparator;
 
@@ -33,7 +33,6 @@ export interface IStore {
   getKnownRoles(): KnownRoles;
   setSimulcastEnabled(enabled: boolean): void;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
-  getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): HMSSimulcastLayerDefinition[];
 
   getLocalPeer(): HMSLocalPeer | undefined;
