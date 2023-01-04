@@ -87,27 +87,36 @@ const HLSView = () => {
         console.log("PLAYING HLS NATIVELY");
         videoEl.src = hlsUrl;
 
-        let metadataCueSize = 0;
         videoRef.current?.textTracks.addEventListener(
           "addtrack",
           function (addTrackEvent) {
             var track = addTrackEvent.track;
             track.mode = "hidden";
             // console.log("HLS NEW TRACK ADDED", track);
-            videoEl.addEventListener("timeupdate", function (cueChangeEvent) {
-              for (let i = 0; i < videoEl.textTracks.length; i++) {
-                if (videoEl.textTracks[i].kind === "metadata") {
-                  const totalCues = videoEl.textTracks[i].cues.length;
-                  if (totalCues === metadataCueSize) {
-                    return;
-                  }
+            videoEl.addEventListener("timeupdate", curChangeEvent => {
+              const textTrackListCount = videoEl.textTracks.length;
+              for (let i = 0; i < textTrackListCount; i++) {
+                const textTrack = videoEl.textTracks[i];
+                if (textTrack.kind !== "metadata") {
+                  // return;
+                  continue;
+                }
+                textTrack.mode = "showing";
+                const cuesLength = textTrack.cues.length;
+                let j = 0;
+                while (j < cuesLength) {
+                  const cue = textTrack.cues[j];
+                  // console.log("cue ", cue);
 
-                  for (let j = 0; j < totalCues; j++) {
-                    console.log(
-                      `%c ${videoEl?.textTracks[i]?.cues[j]?.value?.data}`,
-                      "color:#2b2d42; background:#d80032"
+                  if (!cue.fired) {
+                    setTimeout(
+                      () =>
+                        console.log(JSON.stringify(cue.value.data, null, "\t")),
+                      1000
                     );
+                    cue.fired = true;
                   }
+                  j++;
                 }
               }
             });
