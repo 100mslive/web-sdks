@@ -72,6 +72,12 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     setSelection(isMobile ? "" : "devices");
   }, [isMobile]);
 
+  useEffect(() => {
+    if (isHlsViewer) {
+      setShowSetting(prev => ({ ...prev, layout: false }));
+    }
+  }, [isHlsViewer]);
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
