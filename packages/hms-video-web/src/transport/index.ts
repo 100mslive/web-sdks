@@ -233,6 +233,16 @@ export default class HMSTransport implements ITransport {
         this.publishConnection?.logSelectedIceCandidatePairs();
       }
 
+      if (newState === 'disconnected') {
+        const error = ErrorFactory.WebrtcErrors.ICEDisconnected(
+          HMSAction.PUBLISH,
+          this.publishConnection?.selectedCandidatePair &&
+            JSON.stringify(this.publishConnection?.selectedCandidatePair),
+        );
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
+        this.store.getErrorListener()?.onError(error);
+      }
+
       if (newState === 'failed') {
         await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
       }
@@ -281,14 +291,18 @@ export default class HMSTransport implements ITransport {
         await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
       }
 
-      if (newState === 'connected') {
-        this.subscribeConnection?.logSelectedIceCandidatePairs();
-        const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-        this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+      if (newState === 'disconnected') {
+        const error = ErrorFactory.WebrtcErrors.ICEDisconnected(
+          HMSAction.SUBSCRIBE,
+          this.subscribeConnection?.selectedCandidatePair &&
+            JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
+        );
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
+        this.store.getErrorListener()?.onError(error);
+      }
 
-        if (callback) {
-          callback.promise.resolve(true);
-        }
+      if (newState === 'connected') {
+        this.handleSubscribeConnectionConnected();
       }
     },
   };
@@ -1078,6 +1092,16 @@ export default class HMSTransport implements ITransport {
 
     return ok;
   };
+
+  private handleSubscribeConnectionConnected() {
+    this.subscribeConnection?.logSelectedIceCandidatePairs();
+    const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+    this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+
+    if (callback) {
+      callback.promise.resolve(true);
+    }
+  }
 
   private setTransportStateForConnect() {
     if (this.state === TransportState.Failed) {

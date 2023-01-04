@@ -24,6 +24,7 @@ export interface IStore {
   getConfig(): HMSConfig | undefined;
   getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
+  getErrorListener(): IErrorListener | undefined;
 
   getComparator(): Comparator;
 
