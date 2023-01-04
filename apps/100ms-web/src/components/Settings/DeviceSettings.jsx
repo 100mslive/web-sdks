@@ -36,16 +36,13 @@ const Settings = ({ setHideAll }) => {
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = "setSinkId" in HTMLMediaElement.prototype;
-  console.log({ shouldShowAudioOutput });
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(videoTrackId);
   const track = useHMSStore(trackSelector);
 
-  console.log({ videoInput, audioInput, audioOutput });
   const videoInputFiltered = videoInput?.filter(item => !!item.label) ?? [];
   const audioInputFiltered = audioInput?.filter(item => !!item.label) ?? [];
   const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
-  console.log({ videoInputFiltered, audioInputFiltered, audioOutputFiltered });
 
   if (
     !videoInputFiltered?.length &&
