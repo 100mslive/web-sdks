@@ -35,7 +35,7 @@ export const selectErrors = (store: HMSStore): HMSException[] => store.errors;
 /**
  * It will help to get the all the error
  */
-export const selectRecentError = createSelector(selectErrors, error => (error.length === 0 ? null : error.at(-1)));
+export const selectRecentError = createSelector(selectErrors, errors => (errors.length === 0 ? null : errors.at(-1)));
 /**
  * Select the ID of the current room to which you are connected.
  */
