@@ -103,22 +103,21 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
-    const isDegraded = layerUpdate.subscriber_degraded;
-    // TODO: remove && check later when degraded status handling is updated. This is to keep in sink with android and ios
-    this._degraded = isDegraded && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
-    this._degradedAt = isDegraded ? new Date() : this._degradedAt;
+    this._degraded =
+      layerUpdate.expected_layer !== layerUpdate.current_layer && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
+    this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
       `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from sfu`,
       `currLayer=${layerUpdate.current_layer}, preferredLayer=${layerUpdate.expected_layer}`,
       `sub_degraded=${layerUpdate.subscriber_degraded}`,
       `pub_degraded=${layerUpdate.publisher_degraded}`,
-      `isDegraded=${isDegraded}`,
+      `isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
-    return isDegraded;
+    return this._degraded;
   }
 
   /**
