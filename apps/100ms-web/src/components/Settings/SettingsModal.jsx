@@ -23,19 +23,50 @@ import { NotificationSettings } from "./NotificationSettings";
 import { useHLSViewerRole } from "../AppData/useUISettings";
 import { settingContent } from "./common.js";
 
+const settingMap = {
+  devices: {
+    title: "Device Settings",
+    icon: SettingsIcon,
+    content: DeviceSettings,
+  },
+  notifications: {
+    title: "Notifications",
+    icon: NotificationsIcon,
+    content: NotificationSettings,
+  },
+  layout: {
+    title: "Layout",
+    icon: GridFourIcon,
+    content: LayoutSettings,
+  },
+};
+
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
-  const [selection, setSelection] = useState("");
-  const resetSelection = useCallback(() => {
-    setSelection("");
-  }, []);
 
   const hlsViewerRole = useHLSViewerRole();
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isHlsViewer = hlsViewerRole === localPeerRole;
 
-  const [hideDevicesSetting, setHideDevicesSetting] = useState(false);
+  const [showSetting, setShowSetting] = useState(() =>
+    Object.keys(settingMap).reduce((obj, key) => ({ ...obj, [key]: true }), {})
+  );
+
+  const [selection, setSelection] = useState(
+    () =>
+      Object.keys(showSetting)
+        .filter(key => showSetting[key])
+        .at(0) ?? ""
+  );
+  const resetSelection = useCallback(() => {
+    setSelection("");
+  }, []);
+
+  const setHideKey = useCallback(
+    key => hide => setShowSetting(prev => ({ ...prev, [key]: !hide })),
+    [setShowSetting]
+  );
 
   useEffect(() => {
     setSelection(isMobile ? "" : "devices");
@@ -75,22 +106,17 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 direction="column"
                 css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto", pt: "$10" }}
               >
-                {!hideDevicesSetting && (
-                  <Tabs.Trigger value="devices" css={{ gap: "$8", mb: "$4" }}>
-                    <SettingsIcon />
-                    Device Settings
-                  </Tabs.Trigger>
-                )}
-                <Tabs.Trigger value="notifications" css={{ gap: "$8" }}>
-                  <NotificationsIcon />
-                  Notifications
-                </Tabs.Trigger>
-                {!isHlsViewer && (
-                  <Tabs.Trigger value="layout" css={{ gap: "$8" }}>
-                    <GridFourIcon />
-                    Layout
-                  </Tabs.Trigger>
-                )}
+                {Object.keys(showSetting)
+                  .filter(key => showSetting[key])
+                  .map(key => {
+                    const Icon = settingMap[key].icon;
+                    return (
+                      <Tabs.Trigger key={key} value={key} css={{ gap: "$8" }}>
+                        <Icon />
+                        {settingMap[key].title}
+                      </Tabs.Trigger>
+                    );
+                  })}
               </Flex>
             </Tabs.List>
             {selection && (
@@ -112,40 +138,22 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                {!hideDevicesSetting && (
-                  <Tabs.Content value="devices" className={settingContent()}>
-                    <SettingsContentHeader
-                      onBack={resetSelection}
-                      isMobile={isMobile}
-                    >
-                      Device Settings
-                    </SettingsContentHeader>
-                    <DeviceSettings setHideAll={setHideDevicesSetting} />
-                  </Tabs.Content>
-                )}
-                <Tabs.Content
-                  value="notifications"
-                  className={settingContent()}
-                >
-                  <SettingsContentHeader
-                    onBack={resetSelection}
-                    isMobile={isMobile}
-                  >
-                    Notifications
-                  </SettingsContentHeader>
-                  <NotificationSettings />
-                </Tabs.Content>
-                {!isHlsViewer && (
-                  <Tabs.Content value="layout" className={settingContent()}>
-                    <SettingsContentHeader
-                      onBack={resetSelection}
-                      isMobile={isMobile}
-                    >
-                      Layout
-                    </SettingsContentHeader>
-                    <LayoutSettings />
-                  </Tabs.Content>
-                )}
+                {Object.keys(showSetting)
+                  .filter(key => showSetting[key])
+                  .map(key => {
+                    const Content = settingMap[key].content;
+                    return (
+                      <Tabs.Content value={key} className={settingContent()}>
+                        <SettingsContentHeader
+                          onBack={resetSelection}
+                          isMobile={isMobile}
+                        >
+                          {settingMap[key].title}
+                        </SettingsContentHeader>
+                        <Content setHide={setHideKey(key)} />
+                      </Tabs.Content>
+                    );
+                  })}
               </Flex>
             )}
           </Tabs.Root>
