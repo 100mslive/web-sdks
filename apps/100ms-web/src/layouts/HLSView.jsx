@@ -30,7 +30,6 @@ import {
   HLSController,
 } from "../controllers/hls/HLSController";
 import { APP_DATA } from "../common/constants";
-import { v4 } from "uuid";
 
 let hlsController;
 let hlsStats;
@@ -77,7 +76,6 @@ const HLSView = () => {
       );
       console.log(rest);
       ToastManager.addToast({
-        id: v4(),
         title: `Payload from timed Metadata ${payload}`,
       });
     };

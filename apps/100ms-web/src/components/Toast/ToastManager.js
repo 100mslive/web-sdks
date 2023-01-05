@@ -1,10 +1,11 @@
+import { v4 } from "uuid";
+
 export const ToastManager = {
   toasts: new Map(),
   listeners: new Map(),
   addToast(toast) {
-    const id = Date.now();
+    const id = toast.id ? toast.id : v4();
     const td = { id, ...toast };
-    console.log("TOAST", td);
     this.toasts.set(id, td);
     this.onChange();
     return id;
