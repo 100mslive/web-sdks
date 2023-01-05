@@ -5,8 +5,7 @@ export const ToastManager = {
   listeners: new Map(),
   addToast(toast) {
     const id = toast.id ? toast.id : v4();
-    const td = { id, ...toast };
-    this.toasts.set(id, td);
+    this.toasts.set(id, { ...toast, id });
     this.onChange();
     return id;
   },
