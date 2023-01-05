@@ -531,7 +531,11 @@ export default class HMSTransport implements ITransport {
   }
 
   async acceptRoleChange(request: HMSRoleChangeRequest) {
-    await this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
+    await this.signal.acceptRoleChangeRequest({
+      requested_for: request.requestedBy?.peerId,
+      role: request.role.name,
+      token: request.token,
+    });
   }
 
   async endRoom(lock: boolean, reason: string) {
