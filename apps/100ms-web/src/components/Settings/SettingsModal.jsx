@@ -23,23 +23,26 @@ import { NotificationSettings } from "./NotificationSettings";
 import { useHLSViewerRole } from "../AppData/useUISettings";
 import { settingContent } from "./common.js";
 
-const settingMap = {
-  devices: {
+const settings = [
+  {
+    tabName: "devices",
     title: "Device Settings",
     icon: SettingsIcon,
     content: DeviceSettings,
   },
-  notifications: {
+  {
+    tabName: "notifications",
     title: "Notifications",
     icon: NotificationsIcon,
     content: NotificationSettings,
   },
-  layout: {
+  {
+    tabName: "layout",
     title: "Layout",
     icon: GridFourIcon,
     content: LayoutSettings,
   },
-};
+];
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -49,14 +52,14 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isHlsViewer = hlsViewerRole === localPeerRole;
 
-  const [showSetting, setShowSetting] = useState(() =>
-    Object.keys(settingMap).reduce((obj, key) => ({ ...obj, [key]: true }), {})
+  const [settingsTabs, setSettingsTab] = useState(() =>
+    settings.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {})
   );
 
   const [selection, setSelection] = useState(
     () =>
-      Object.keys(showSetting)
-        .filter(key => showSetting[key])
+      Object.keys(settingsTabs)
+        .filter(key => settingsTabs[key])
         .at(0) ?? ""
   );
   const resetSelection = useCallback(() => {
@@ -64,8 +67,8 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   }, []);
 
   const setHideKey = useCallback(
-    key => hide => setShowSetting(prev => ({ ...prev, [key]: !hide })),
-    [setShowSetting]
+    key => hide => setSettingsTab(prev => ({ ...prev, [key]: !hide })),
+    [setSettingsTab]
   );
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
 
   useEffect(() => {
     if (isHlsViewer) {
-      setShowSetting(prev => ({ ...prev, layout: false }));
+      setSettingsTab(prev => ({ ...prev, layout: false }));
     }
   }, [isHlsViewer]);
 
@@ -112,14 +115,17 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 direction="column"
                 css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto", pt: "$10" }}
               >
-                {Object.keys(showSetting)
-                  .filter(key => showSetting[key])
-                  .map(key => {
-                    const Icon = settingMap[key].icon;
+                {settings
+                  .filter(({ tabName }) => settingsTabs[tabName])
+                  .map(({ icon: Icon, tabName, title }) => {
                     return (
-                      <Tabs.Trigger key={key} value={key} css={{ gap: "$8" }}>
+                      <Tabs.Trigger
+                        key={tabName}
+                        value={tabName}
+                        css={{ gap: "$8" }}
+                      >
                         <Icon />
-                        {settingMap[key].title}
+                        {title}
                       </Tabs.Trigger>
                     );
                   })}
@@ -144,19 +150,21 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                {Object.keys(showSetting)
-                  .filter(key => showSetting[key])
-                  .map(key => {
-                    const Content = settingMap[key].content;
+                {settings
+                  .filter(({ tabName }) => settingsTabs[tabName])
+                  .map(({ content: Content, title, tabName }) => {
                     return (
-                      <Tabs.Content value={key} className={settingContent()}>
+                      <Tabs.Content
+                        value={tabName}
+                        className={settingContent()}
+                      >
                         <SettingsContentHeader
                           onBack={resetSelection}
                           isMobile={isMobile}
                         >
-                          {settingMap[key].title}
+                          {title}
                         </SettingsContentHeader>
-                        <Content setHide={setHideKey(key)} />
+                        <Content setHide={setHideKey(tabName)} />
                       </Tabs.Content>
                     );
                   })}
