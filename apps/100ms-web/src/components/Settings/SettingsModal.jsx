@@ -52,34 +52,31 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isHlsViewer = hlsViewerRole === localPeerRole;
 
-  const [settingsTabs, setSettingsTab] = useState(() =>
+  const [showSetting, setShowSetting] = useState(() =>
     settings.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {})
   );
 
+  const hideSettingByTabName = useCallback(
+    key => hide => setShowSetting(prev => ({ ...prev, [key]: !hide })),
+    [setShowSetting]
+  );
+
+  useEffect(() => {
+    if (isHlsViewer) {
+      hideSettingByTabName("layout")(true);
+    }
+  }, [isHlsViewer]);
+
   const [selection, setSelection] = useState(
-    () =>
-      Object.keys(settingsTabs)
-        .filter(key => settingsTabs[key])
-        .at(0) ?? ""
+    () => Object.keys(showSetting).filter(key => showSetting[key])[0] ?? ""
   );
   const resetSelection = useCallback(() => {
     setSelection("");
   }, []);
 
-  const setHideKey = useCallback(
-    key => hide => setSettingsTab(prev => ({ ...prev, [key]: !hide })),
-    [setSettingsTab]
-  );
-
   useEffect(() => {
     setSelection(isMobile ? "" : "devices");
   }, [isMobile]);
-
-  useEffect(() => {
-    if (isHlsViewer) {
-      setSettingsTab(prev => ({ ...prev, layout: false }));
-    }
-  }, [isHlsViewer]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -116,7 +113,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 css={{ mx: isMobile ? "-$8" : 0, overflowY: "auto", pt: "$10" }}
               >
                 {settings
-                  .filter(({ tabName }) => settingsTabs[tabName])
+                  .filter(({ tabName }) => showSetting[tabName])
                   .map(({ icon: Icon, tabName, title }) => {
                     return (
                       <Tabs.Trigger
@@ -151,7 +148,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                 }}
               >
                 {settings
-                  .filter(({ tabName }) => settingsTabs[tabName])
+                  .filter(({ tabName }) => showSetting[tabName])
                   .map(({ content: Content, title, tabName }) => {
                     return (
                       <Tabs.Content
@@ -164,7 +161,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                         >
                           {title}
                         </SettingsContentHeader>
-                        <Content setHide={setHideKey(tabName)} />
+                        <Content setHide={hideSettingByTabName(tabName)} />
                       </Tabs.Content>
                     );
                   })}
