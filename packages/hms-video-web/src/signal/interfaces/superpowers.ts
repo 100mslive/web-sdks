@@ -20,6 +20,7 @@ export interface RequestForBulkRoleChangeParams {
  * Parameters for accepting a role change request sent to the server.
  */
 export interface AcceptRoleChangeParams {
+  requested_for?: string;
   role: string;
   token: string;
 }
