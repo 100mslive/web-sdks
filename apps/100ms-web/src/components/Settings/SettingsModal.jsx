@@ -75,7 +75,13 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   }, []);
 
   useEffect(() => {
-    setSelection(isMobile ? "" : "devices");
+    if (isMobile) {
+      setSelection("");
+    } else {
+      const firstNotHiddenTabName =
+        Object.keys(showSetting).filter(key => showSetting[key])[0] ?? "";
+      setSelection(firstNotHiddenTabName)
+    }
   }, [isMobile]);
 
   return (
