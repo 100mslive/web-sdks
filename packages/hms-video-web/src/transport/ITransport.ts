@@ -40,8 +40,6 @@ export default interface ITransport {
 
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
 
-  acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
-
   removePeer(peerId: string, reason: string): Promise<void>;
 
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
