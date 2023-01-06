@@ -92,14 +92,16 @@ export const PIPComponent = ({ peers, showLocalPeer }: PIPComponentProps) => {
  */
 const ActivatedPIP = ({ peers, showLocalPeer }: PIPComponentProps) => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const remotePeers = useHMSStore(showLocalPeer ? selectPeers : selectRemotePeers);
-  const [pipPeers, setPipPeers] = useState(remotePeers);
+  const storePeers = useHMSStore(showLocalPeer ? selectPeers : selectRemotePeers);
+  const [pipPeers, setPipPeers] = useState(storePeers);
 
   useEffect(() => {
     if(peers) {
       setPipPeers(pipPeers => pipPeers.filter(peer => peers.includes(peer.id)));
+    } else {
+      setPipPeers(storePeers);
     }
-  }, [peers]);
+  }, [peers, storePeers]);
 
   useEffect(() => {
     PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
