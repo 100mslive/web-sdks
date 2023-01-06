@@ -42,6 +42,7 @@ import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
+  ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
@@ -235,9 +236,9 @@ export default class HMSTransport implements ITransport {
 
       if (newState === 'disconnected') {
         // if state stays disconnected for 5 seconds, retry
-        setTimeout(async () => {
+        setTimeout(() => {
           if (this.publishConnection?.connectionState === 'disconnected') {
-            await this.handleIceConnectionFailure(
+            this.handleIceConnectionFailure(
               HMSConnectionRole.Publish,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.PUBLISH,
@@ -246,7 +247,7 @@ export default class HMSTransport implements ITransport {
               ),
             );
           }
-        }, 5000);
+        }, ICE_DISCONNECTION_TIMEOUT);
       }
 
       if (newState === 'failed') {
@@ -312,9 +313,9 @@ export default class HMSTransport implements ITransport {
       }
 
       if (newState === 'disconnected') {
-        setTimeout(async () => {
+        setTimeout(() => {
           if (this.subscribeConnection?.connectionState === 'disconnected') {
-            await this.handleIceConnectionFailure(
+            this.handleIceConnectionFailure(
               HMSConnectionRole.Subscribe,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.SUBSCRIBE,
@@ -323,7 +324,7 @@ export default class HMSTransport implements ITransport {
               ),
             );
           }
-        }, 5000);
+        }, ICE_DISCONNECTION_TIMEOUT);
       }
 
       if (newState === 'connected') {
