@@ -77,7 +77,9 @@ const PIP = () => {
 
   return (
     <PIPComponent
-      peers={pinnedTrack ? [pinnedTrack.peerId] : undefined}
+      peers={
+        pinnedTrack && pinnedTrack.enabled ? [pinnedTrack.peerId] : undefined
+      }
       showLocalPeer={true}
     />
   );
