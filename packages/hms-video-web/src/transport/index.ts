@@ -42,6 +42,7 @@ import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
+  ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
@@ -234,17 +235,28 @@ export default class HMSTransport implements ITransport {
       }
 
       if (newState === 'disconnected') {
-        const error = ErrorFactory.WebrtcErrors.ICEDisconnected(
-          HMSAction.PUBLISH,
-          this.publishConnection?.selectedCandidatePair &&
-            JSON.stringify(this.publishConnection?.selectedCandidatePair),
-        );
-        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
-        this.store.getErrorListener()?.onError(error);
+        // if state stays disconnected for 5 seconds, retry
+        setTimeout(() => {
+          if (this.publishConnection?.connectionState === 'disconnected') {
+            this.handleIceConnectionFailure(
+              HMSConnectionRole.Publish,
+              ErrorFactory.WebrtcErrors.ICEDisconnected(
+                HMSAction.PUBLISH,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+              ),
+            );
+          }
+        }, ICE_DISCONNECTION_TIMEOUT);
       }
 
       if (newState === 'failed') {
-        await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
+        await this.handleIceConnectionFailure(
+          HMSConnectionRole.Publish,
+          ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.PUBLISH,
+            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+          ),
+        );
       }
     },
   };
@@ -288,17 +300,27 @@ export default class HMSTransport implements ITransport {
       log(TAG, `Subscribe connection state change: ${newState}`);
 
       if (newState === 'failed') {
-        await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+        await this.handleIceConnectionFailure(
+          HMSConnectionRole.Subscribe,
+          ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.SUBSCRIBE,
+            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+          ),
+        );
       }
 
       if (newState === 'disconnected') {
-        const error = ErrorFactory.WebrtcErrors.ICEDisconnected(
-          HMSAction.SUBSCRIBE,
-          this.subscribeConnection?.selectedCandidatePair &&
-            JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
-        );
-        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
-        this.store.getErrorListener()?.onError(error);
+        setTimeout(() => {
+          if (this.subscribeConnection?.connectionState === 'disconnected') {
+            this.handleIceConnectionFailure(
+              HMSConnectionRole.Subscribe,
+              ErrorFactory.WebrtcErrors.ICEDisconnected(
+                HMSAction.SUBSCRIBE,
+                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+              ),
+            );
+          }
+        }, ICE_DISCONNECTION_TIMEOUT);
       }
 
       if (newState === 'connected') {
@@ -903,26 +925,28 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async handleIceConnectionFailure(role: HMSConnectionRole) {
+  private async handleIceConnectionFailure(role: HMSConnectionRole, error: HMSException) {
+    // retry is already in progress(from disconnect state)
+    const callback = this.callbacks.get(
+      role === HMSConnectionRole.Publish ? RENEGOTIATION_CALLBACK_ID : SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
+    );
+    const isIceRetryInProgress = callback && callback.action === HMSAction.RESTART_ICE;
+
+    if (isIceRetryInProgress) {
+      return;
+    }
+
     if (role === HMSConnectionRole.Publish) {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.PublishIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(
-          HMSAction.PUBLISH,
-          this.publishConnection?.selectedCandidatePair &&
-            JSON.stringify(this.publishConnection?.selectedCandidatePair),
-        ),
+        error,
         task: this.retryPublishIceFailedTask,
         originalState: TransportState.Joined,
       });
     } else {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.SubscribeIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(
-          HMSAction.SUBSCRIBE,
-          this.subscribeConnection?.selectedCandidatePair &&
-            JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
-        ),
+        error,
         task: this.retrySubscribeIceFailedTask,
         originalState: TransportState.Joined,
         maxFailedRetries: 1,
