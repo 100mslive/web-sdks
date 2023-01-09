@@ -129,7 +129,7 @@ export const selectAppDataByPath = (...keys: string[]) =>
  */
 export const selectPeerNameByID = byIDCurry(createSelector(selectPeerByIDBare, peer => peer?.name));
 
-export const selectPeerRoleNameByID = byIDCurry(createSelector(selectPeerByIDBare, peer => peer?.name));
+export const selectPeerRoleNameByID = byIDCurry(createSelector(selectPeerByIDBare, peer => peer?.roleName));
 
 /**
  * Select the {@link HMSTrack} object given a track ID.
