@@ -153,6 +153,10 @@ export const selectLocalPeerID = createSelector(selectRoom, room => {
   return room.localPeer;
 });
 
+export const selectPeerIDs = createSelector([selectRoom], room => {
+  return room.peers;
+});
+
 /**
  * Select the peer name of your local peer.
  */
@@ -196,6 +200,10 @@ export const selectLocalTrackIDs = createSelector(
  */
 export const selectRemotePeers = createSelector(selectPeers, peers => {
   return peers.filter(p => !p.isLocal);
+});
+
+export const selectRemotePeerIDs = createSelector(selectRemotePeers, peers => {
+  return peers.map(peer => peer.id);
 });
 
 /**
