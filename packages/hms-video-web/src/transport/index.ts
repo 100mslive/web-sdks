@@ -242,8 +242,7 @@ export default class HMSTransport implements ITransport {
               HMSConnectionRole.Publish,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.PUBLISH,
-                this.publishConnection?.selectedCandidatePair &&
-                  JSON.stringify(this.publishConnection?.selectedCandidatePair),
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
               ),
             );
           }
@@ -255,8 +254,7 @@ export default class HMSTransport implements ITransport {
           HMSConnectionRole.Publish,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.PUBLISH,
-            this.publishConnection?.selectedCandidatePair &&
-              JSON.stringify(this.publishConnection?.selectedCandidatePair),
+            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
           ),
         );
       }
@@ -306,8 +304,7 @@ export default class HMSTransport implements ITransport {
           HMSConnectionRole.Subscribe,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.SUBSCRIBE,
-            this.subscribeConnection?.selectedCandidatePair &&
-              JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
+            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
           ),
         );
       }
@@ -319,8 +316,7 @@ export default class HMSTransport implements ITransport {
               HMSConnectionRole.Subscribe,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.SUBSCRIBE,
-                this.subscribeConnection?.selectedCandidatePair &&
-                  JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
+                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
               ),
             );
           }
