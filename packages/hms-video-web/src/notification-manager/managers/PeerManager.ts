@@ -137,7 +137,7 @@ export class PeerManager {
     });
 
     this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer.toString());
+    HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({

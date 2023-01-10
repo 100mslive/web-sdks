@@ -128,11 +128,13 @@ export class TrackManager {
     tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
+        HMSLogger.w(this.TAG, 'TrackState not added to store');
         return;
       }
 
       const hmsPeer = this.store.getPeerById(state.peerId);
       if (!hmsPeer) {
+        HMSLogger.w(this.TAG, 'Peer not added to store');
         return;
       }
 
