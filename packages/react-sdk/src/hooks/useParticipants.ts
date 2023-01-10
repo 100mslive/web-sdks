@@ -1,23 +1,20 @@
 import {
-  HMSPeerID,
+  HMSPeer,
   HMSRoleName,
-  HMSStore,
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
-  selectPeerByID,
   selectPeerCount,
-  selectPeerIDs,
   selectPeerMetadata,
-  selectRemotePeerIDs,
+  selectPeers,
+  selectRemotePeers,
 } from '@100mslive/hms-video-store';
 import { useHMSStore, useHMSVanillaStore } from '../primitives/HmsRoomProvider';
-import { IHMSReactStore } from '../primitives/store';
 
 export interface useParticipantsResult {
   /**
    * list of participants that match the given filters
    */
-  participants: HMSPeerID[];
+  participants: HMSPeer[];
   /**
    * Total number of participants in the room
    */
@@ -44,39 +41,32 @@ export type useParticipantsParams = {
   search: string;
 };
 
-const getPeerData = (store: IHMSReactStore<HMSStore>, peerId: HMSPeerID) => {
-  return store.getState(selectPeerByID(peerId));
-};
-
 /**
  * This can be used to get the total count of participants in the room, participants
- * filtered by role or metadata with isHandRaised or the entire participants if no params are passed
- * @param {useParticipantsParams} params
- * @returns {useParticipantsResult}
+ * filtered by role or metadata with isHandRaised or the entire participants if no params are passed.
+ *
+ * Use `useParticipantList` for better performance
  */
 export const useParticipants = (params?: useParticipantsParams) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);
-  let participantList = useHMSStore(isConnected ? selectPeerIDs : selectRemotePeerIDs);
+  let participantList = useHMSStore(isConnected ? selectPeers : selectRemotePeers);
+  const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName)));
   const vanillaStore = useHMSVanillaStore();
-  const rolesWithParticipants = Array.from(
-    new Set(participantList.map(peerId => getPeerData(vanillaStore, peerId)!.roleName!)),
-  );
   if (params?.metadata?.isHandRaised) {
-    participantList = participantList.filter(peerId => {
-      return vanillaStore.getState(selectPeerMetadata(peerId)).isHandRaised;
+    participantList = participantList.filter(peer => {
+      return vanillaStore.getState(selectPeerMetadata(peer.id)).isHandRaised;
     });
   }
   if (params?.role && availableRoles.includes(params.role)) {
-    participantList = participantList.filter(peerId => getPeerData(vanillaStore, peerId)?.roleName === params.role);
+    participantList = participantList.filter(peer => peer.roleName === params.role);
   }
   if (params?.search) {
     const search = params.search.toLowerCase();
-    participantList = participantList.filter(peerId => {
-      const peer = getPeerData(vanillaStore, peerId);
-      return peer?.roleName?.toLowerCase().includes(search) || peer?.name.toLowerCase().includes(search);
-    });
+    participantList = participantList.filter(
+      peer => peer.roleName?.toLowerCase().includes(search) || peer.name.toLowerCase().includes(search),
+    );
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };

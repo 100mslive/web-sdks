@@ -11,7 +11,7 @@ import {
   selectPermissions,
   useHMSActions,
   useHMSStore,
-  useParticipants,
+  useParticipantList,
 } from "@100mslive/react-sdk";
 import {
   ChangeRoleIcon,
@@ -46,7 +46,7 @@ import { SIDE_PANE_OPTIONS } from "../../common/constants";
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount, rolesWithParticipants } =
-    useParticipants(filter);
+    useParticipantList(filter);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
