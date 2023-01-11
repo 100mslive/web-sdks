@@ -202,8 +202,8 @@ export const selectRemotePeers = createSelector(selectPeers, peers => {
   return peers.filter(p => !p.isLocal);
 });
 
-export const selectRemotePeerIDs = createSelector(selectRemotePeers, peers => {
-  return peers.map(peer => peer.id);
+export const selectRemotePeerIDs = createSelector(selectPeerIDs, selectLocalPeerID, (peerIDs, localPeerID) => {
+  return peerIDs.filter(peerId => peerId !== localPeerID);
 });
 
 /**
