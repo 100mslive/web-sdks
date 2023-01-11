@@ -45,7 +45,7 @@ export type useParticipantsParams = {
  * This can be used to get the total count of participants in the room, participants
  * filtered by role or metadata with isHandRaised or the entire participants if no params are passed.
  *
- * Use `useParticipantList` for better performance
+ * Use `usePeerList` for better performance
  */
 export const useParticipants = (params?: useParticipantsParams) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);

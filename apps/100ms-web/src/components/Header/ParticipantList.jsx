@@ -11,7 +11,7 @@ import {
   selectPermissions,
   useHMSActions,
   useHMSStore,
-  useParticipantList,
+  usePeerList,
 } from "@100mslive/react-sdk";
 import {
   ChangeRoleIcon,
@@ -45,8 +45,8 @@ import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
-  const { participants, isConnected, peerCount, rolesWithParticipants } =
-    useParticipantList(filter);
+  const { peerIDs, isConnected, peerCount, rolesWithPeers } =
+    usePeerList(filter);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
@@ -71,7 +71,7 @@ export const ParticipantList = () => {
             selection={filter}
             onSelection={setFilter}
             isConnected={isConnected}
-            roles={rolesWithParticipants}
+            roles={rolesWithPeers}
           />
           <IconButton
             onClick={toggleSidepane}
@@ -80,18 +80,18 @@ export const ParticipantList = () => {
             <CrossIcon />
           </IconButton>
         </Flex>
-        {!filter?.search && participants.length === 0 ? null : (
+        {!filter?.search && peerIDs.length === 0 ? null : (
           <ParticipantSearch onSearch={onSearch} />
         )}
-        {participants.length === 0 && (
+        {peerIDs.length === 0 && (
           <Flex align="center" justify="center" css={{ w: "100%", p: "$8 0" }}>
             <Text variant="sm">
               {!filter ? "No participants" : "No matching participants"}
             </Text>
           </Flex>
         )}
-        <VirtualizedParticipants
-          participants={participants}
+        <VirtualizedPeers
+          peers={peerIDs}
           isConnected={isConnected}
           setSelectedPeerId={setSelectedPeerId}
         />
@@ -146,8 +146,8 @@ export const ParticipantCount = () => {
   );
 };
 
-const VirtualizedParticipants = React.memo(
-  ({ participants, canChangeRole, isConnected, setSelectedPeerId }) => {
+const VirtualizedPeers = React.memo(
+  ({ peers, canChangeRole, isConnected, setSelectedPeerId }) => {
     const [ref, { width, height }] = useMeasure();
     return (
       <Box
@@ -159,15 +159,15 @@ const VirtualizedParticipants = React.memo(
       >
         <FixedSizeList
           itemSize={68}
-          itemCount={participants.length}
+          itemCount={peers.length}
           width={width}
           height={height}
         >
           {({ index, style }) => {
             return (
-              <div style={style} key={participants[index]}>
+              <div style={style} key={peers[index]}>
                 <Participant
-                  peerId={participants[index]}
+                  peerId={peers[index]}
                   canChangeRole={canChangeRole}
                   showActions={isConnected}
                   onParticipantAction={setSelectedPeerId}
