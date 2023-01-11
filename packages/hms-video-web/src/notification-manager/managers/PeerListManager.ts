@@ -149,6 +149,7 @@ export class PeerListManager {
   };
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {
+    HMSLogger.d(this.TAG, `removing track - ${trackId} from ${peer}`);
     if (peer.audioTrack?.trackId === trackId) {
       peer.audioTrack = undefined;
     } else if (peer.videoTrack?.trackId === trackId) {
