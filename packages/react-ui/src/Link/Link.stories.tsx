@@ -10,7 +10,7 @@ export default {
 
 const Template: ComponentStory<typeof Link> = props => {
   return (
-    <Link iconSide='left' color="highEmp" href="#" target="_blank">
+    <Link icon="ExternalLinkIcon" iconSide="right" color="highEmp" href="#" target="_blank">
       Link Text
     </Link>
   );

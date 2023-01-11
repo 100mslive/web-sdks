@@ -1,4 +1,4 @@
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import * as icons from '@100mslive/react-icons';
 import { styled } from '@stitches/react';
 import { Text } from '../Text';
@@ -27,17 +27,14 @@ const LinkComponent = styled('a', {
   },
 });
 
-export const Link = ({
-  iconSide = 'left',
-  icon,
-  color = 'primary',
-  children,
-  ...rest
-}: Omit<ComponentProps<'a'>, 'ref'> & {
+export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
+  as?: React.ElementType;
   iconSide?: 'left' | 'right';
   icon?: keyof typeof icons;
   color?: 'highEmp' | 'primary';
-}) => {
+}
+
+export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...rest }: LinkProps) => {
   const Icon = icon ? icons[icon] : React.Fragment;
   const renderedIcon = (
     <Flex as="span">
