@@ -1,6 +1,6 @@
 import React from 'react';
 import * as icons from '@100mslive/react-icons';
-import { styled } from '@stitches/react';
+import { styled } from '../Theme';
 import { Text } from '../Text';
 import { Flex } from '../Layout';
 
@@ -12,15 +12,21 @@ const LinkComponent = styled('a', {
   variants: {
     color: {
       highEmp: {
-        color: '#F5F9FFF2',
+        color: '$textHighEmp',
         '&:hover': {
-          color: '#E0ECFFCC',
+          color: '$textMedEmp',
         },
       },
       primary: {
-        color: '#66A1FF',
+        color: '$primaryLight',
         '&:hover': {
-          color: '#2672ED',
+          color: '$primaryDefault',
+        },
+      },
+      error: {
+        color: '$errorTint',
+        '&:hover': {
+          color: '$errorDark',
         },
       },
     },
@@ -31,16 +37,16 @@ export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
   as?: React.ElementType;
   iconSide?: 'left' | 'right';
   icon?: keyof typeof icons;
-  color?: 'highEmp' | 'primary';
+  color?: 'highEmp' | 'primary' | 'error';
 }
 
 export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...rest }: LinkProps) => {
   const Icon = icon ? icons[icon] : React.Fragment;
-  const renderedIcon = (
+  const renderedIcon = icon ? (
     <Flex as="span">
       <Icon style={{ height: '13.33px', width: '13.33px' }} />{' '}
     </Flex>
-  );
+  ) : null;
 
   const showLeft = iconSide === 'left';
   return (
