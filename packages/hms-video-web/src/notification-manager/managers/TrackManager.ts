@@ -125,7 +125,6 @@ export class TrackManager {
 
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
-
     tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
@@ -210,7 +209,6 @@ export class TrackManager {
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
     let eventType;
-    track.setEnabled(!trackState.mute);
     if (currentTrackState.mute !== trackState.mute) {
       eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
       track.type === HMSTrackType.AUDIO &&
