@@ -35,7 +35,7 @@ const LinkComponent = styled('a', {
 
 export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
   as?: React.ElementType;
-  iconSide?: 'left' | 'right';
+  iconSide?: 'left' | 'right' | 'none';
   icon?: keyof typeof icons;
   color?: 'highEmp' | 'primary' | 'error';
 }
@@ -48,14 +48,13 @@ export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...
     </Flex>
   ) : null;
 
-  const showLeft = iconSide === 'left';
   return (
     <LinkComponent {...rest} color={color}>
-      {showLeft && renderedIcon}
+      {iconSide === 'left' && renderedIcon}
       <Text as="span" variant="body2" css={{ color: 'inherit' }}>
         {children}
       </Text>
-      {!showLeft && renderedIcon}
+      {iconSide === 'right' && renderedIcon}
     </LinkComponent>
   );
 };
