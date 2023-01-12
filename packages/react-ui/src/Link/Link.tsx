@@ -1,8 +1,8 @@
 import React from 'react';
 import * as icons from '@100mslive/react-icons';
-import { styled } from '../Theme';
-import { Text } from '../Text';
 import { Flex } from '../Layout';
+import { Text } from '../Text';
+import { styled } from '../Theme';
 
 const LinkComponent = styled('a', {
   textDecoration: 'none',
