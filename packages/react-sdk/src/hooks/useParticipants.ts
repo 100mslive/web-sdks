@@ -47,12 +47,12 @@ export type useParticipantsParams = {
  *
  * Use `usePeerList` for better performance
  */
-export const useParticipants = (params?: useParticipantsParams) => {
+export const useParticipants = (params?: useParticipantsParams): useParticipantsResult => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);
   let participantList = useHMSStore(isConnected ? selectPeers : selectRemotePeers);
-  const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName)));
+  const rolesWithParticipants = Array.from(new Set(participantList.map(peer => peer.roleName!)));
   const vanillaStore = useHMSVanillaStore();
   if (params?.metadata?.isHandRaised) {
     participantList = participantList.filter(peer => {
@@ -68,5 +68,5 @@ export const useParticipants = (params?: useParticipantsParams) => {
       peer => peer.roleName?.toLowerCase().includes(search) || peer.name.toLowerCase().includes(search),
     );
   }
-  return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
+  return { participants: participantList, isConnected: !!isConnected, peerCount, rolesWithParticipants };
 };
