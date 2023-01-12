@@ -95,7 +95,7 @@ export class TrackManager {
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
-      HMSLogger.w(this.TAG, 'Track Update ignored - Peer not added to store');
+      HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
       return;
     }
 
@@ -128,13 +128,13 @@ export class TrackManager {
     tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
-        HMSLogger.w(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
+        HMSLogger.d(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
         return;
       }
 
       const hmsPeer = this.store.getPeerById(state.peerId);
       if (!hmsPeer) {
-        HMSLogger.w(this.TAG, 'Peer not added to store, peerId', state.peerId);
+        HMSLogger.d(this.TAG, 'Peer not added to store, peerId', state.peerId);
         return;
       }
 
