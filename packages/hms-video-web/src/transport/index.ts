@@ -9,6 +9,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
@@ -966,6 +967,7 @@ export default class HMSTransport implements ITransport {
         initEndpoint,
       });
       this.analyticsTimer.end(TimedEvent.INIT);
+      HTTPAnalyticsTransport.setWS(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
