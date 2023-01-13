@@ -132,6 +132,10 @@ export const ParticipantCount = () => {
   );
 };
 
+function itemKey(index, data) {
+  return data[index].id;
+}
+
 const VirtualizedParticipants = ({ participants }) => {
   const [ref, { width, height }] = useMeasure();
   return (
@@ -145,6 +149,7 @@ const VirtualizedParticipants = ({ participants }) => {
       <FixedSizeList
         itemSize={68}
         itemData={participants}
+        itemKey={itemKey}
         itemCount={participants.length}
         width={width}
         height={height}
