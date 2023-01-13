@@ -95,7 +95,7 @@ export class TrackManager {
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
-      HMSLogger.w(this.TAG, 'Track Update ignored - Peer not added to store');
+      HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
       return;
     }
 
@@ -125,17 +125,16 @@ export class TrackManager {
 
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
-
     tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
-        HMSLogger.w(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
+        HMSLogger.d(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
         return;
       }
 
       const hmsPeer = this.store.getPeerById(state.peerId);
       if (!hmsPeer) {
-        HMSLogger.w(this.TAG, 'Peer not added to store, peerId', state.peerId);
+        HMSLogger.d(this.TAG, 'Peer not added to store, peerId', state.peerId);
         return;
       }
 
@@ -210,7 +209,6 @@ export class TrackManager {
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
     let eventType;
-    track.setEnabled(!trackState.mute);
     if (currentTrackState.mute !== trackState.mute) {
       eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
       track.type === HMSTrackType.AUDIO &&

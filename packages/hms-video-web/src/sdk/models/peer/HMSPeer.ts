@@ -63,6 +63,8 @@ export class HMSPeer implements IHMSPeer {
       role: ${this.role?.name};
       peerId: ${this.peerId};
       customerUserId: ${this.customerUserId};
+      ${this.audioTrack ? `audioTrack: ${this.audioTrack?.trackId};` : ''}
+      ${this.videoTrack ? `videoTrack: ${this.videoTrack?.trackId};` : ''}
     }`;
   }
 }
