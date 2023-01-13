@@ -967,7 +967,7 @@ export default class HMSTransport implements ITransport {
         initEndpoint,
       });
       this.analyticsTimer.end(TimedEvent.INIT);
-      HTTPAnalyticsTransport.setWS(this.initConfig.endpoint);
+      HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
