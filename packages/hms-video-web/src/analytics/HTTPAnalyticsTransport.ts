@@ -26,6 +26,7 @@ interface ClientEventBody {
     session_id?: string;
   };
   timestamp: number;
+  ws_url: string;
   payload: Record<string, any>;
   device_id: string;
 }
@@ -35,10 +36,15 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   private failedEvents = new LocalStorage<AnalyticsEvent[]>('client-events');
   isConnected = true;
   private env: null | ENV = null;
+  private ws = '';
 
   setEnv(env: ENV) {
     this.env = env;
     this.flushFailedEvents();
+  }
+
+  setWebsocketEndpoint(ws: string) {
+    this.ws = ws;
   }
 
   sendEvent(event: AnalyticsEvent) {
@@ -53,6 +59,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       peer: event.metadata.peer,
       timestamp: event.timestamp,
       device_id: event.device_id,
+      ws_url: this.ws,
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
     fetch(url, {
