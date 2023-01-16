@@ -8,7 +8,7 @@ const LinkComponent = styled('a', {
   textDecoration: 'none',
   display: 'flex',
   alignItems: 'center',
-  gap: '11.3px',
+  gap: '$5',
   variants: {
     color: {
       highEmp: {
@@ -23,12 +23,6 @@ const LinkComponent = styled('a', {
           color: '$primaryDefault',
         },
       },
-      error: {
-        color: '$errorTint',
-        '&:hover': {
-          color: '$errorDark',
-        },
-      },
     },
   },
 });
@@ -37,14 +31,14 @@ export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
   as?: React.ElementType;
   iconSide?: 'left' | 'right' | 'none';
   icon?: keyof typeof icons;
-  color?: 'highEmp' | 'primary' | 'error';
+  color?: 'highEmp' | 'primary';
 }
 
 export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...rest }: LinkProps) => {
   const Icon = icon ? icons[icon] : React.Fragment;
   const renderedIcon = icon ? (
     <Flex as="span">
-      <Icon style={{ height: '13.33px', width: '13.33px' }} />{' '}
+      <Icon height={13.33} width={13.33} />{' '}
     </Flex>
   ) : null;
 
