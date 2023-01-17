@@ -42,7 +42,9 @@ const HLSView = () => {
   const hmsActions = useHMSActions();
   const { themeType } = useTheme();
   let [hlsStatsState, setHlsStatsState] = useState(null);
-  const hlsUrl = hlsState.variants[0]?.url;
+  const hlsUrl1 = hlsState.variants[0]?.url;
+  const hlsUrl = "http://100ms.web.local/20230117/1673953706081/master.m3u8";
+  const hlsUrl2 = "http://100ms.web.local/20230104/1672840633756/master.m3u8";
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
@@ -61,6 +63,20 @@ const HLSView = () => {
    */
   useEffect(() => {
     let videoEl = videoRef.current;
+    videoEl.addEventListener("timeupdate", () => {
+      if (videoEl.textTracks[0] && videoEl.textTracks[0].activeCues) {
+        for (let value in videoEl.textTracks[0].activeCues) {
+          console.log(
+            JSON.stringify({
+              start: videoEl.textTracks[0].activeCues[value].startTime,
+              end: videoEl.textTracks[0].activeCues[value].endTime,
+              data: videoEl.textTracks[0].activeCues[value].value,
+              current: videoEl.currentTime,
+            })
+          );
+        }
+      }
+    });
     const manifestLoadedHandler = (_, { levels }) => {
       const onlyVideoLevels = removeAudioLevels(levels);
       setAvailableLevels(onlyVideoLevels);
@@ -69,14 +85,25 @@ const HLSView = () => {
       const qualityLevel = hlsController.getHlsJsInstance().levels[level];
       setCurrentSelectedQuality(qualityLevel);
     };
+    const metadataPayloadParser = payload => {
+      try {
+        const data = window.atob(payload);
+        const parsedData = JSON.parse(data);
+        return parsedData;
+      } catch (e) {
+        return { payload };
+      }
+    };
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       console.log(
         `%c Payload: ${payload}`,
         "color:#2b2d42; background:#d80032"
       );
       console.log(rest);
+      // parse payload and extract start_time and payload
+      const data = metadataPayloadParser(payload);
       ToastManager.addToast({
-        title: `Payload from timed Metadata ${payload}`,
+        title: `Payload from timed Metadata ${data.payload}`,
       });
     };
 
@@ -88,7 +115,6 @@ const HLSView = () => {
       if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         console.log("PLAYING HLS NATIVELY");
         videoEl.src = hlsUrl;
-
         videoRef.current?.textTracks.addEventListener(
           "addtrack",
           function (addTrackEvent) {
@@ -108,13 +134,21 @@ const HLSView = () => {
                 let j = 0;
                 while (j < cuesLength) {
                   const cue = textTrack.cues[j];
-                  // console.log("cue ", cue);
-
                   if (!cue.fired) {
+                    const data = metadataPayloadParser(cue.value.data);
+                    const programData = videoEl.getStartDate();
+                    const startDate = data.start_date;
+                    const startTime =
+                      new Date(programData) -
+                      new Date(startDate) -
+                      videoEl.currentTime * 1000;
+                    console.log("fired time ", startTime);
                     setTimeout(
                       () =>
-                        console.log(JSON.stringify(cue.value.data, null, "\t")),
-                      1000
+                        ToastManager.addToast({
+                          title: `Payload from timed Metadata ${data.payload}`,
+                        }),
+                      startTime * 1000
                     );
                     cue.fired = true;
                   }

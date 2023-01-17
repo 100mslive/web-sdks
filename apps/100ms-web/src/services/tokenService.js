@@ -20,7 +20,7 @@ const fetchWithRetry = async (url, options) => {
 export default async function getToken(tokenEndpoint, userId, role, roomId) {
   try {
     const response = await fetchWithRetry(
-      `https://qa-in2.100ms.live/hmsapi/ram.qa-app.100ms.live/api/token`,
+      `https://qa-in2.100ms.live/hmsapi/amar.qa-app.100ms.live/api/token`,
       {
         method: "POST",
         body: JSON.stringify({
