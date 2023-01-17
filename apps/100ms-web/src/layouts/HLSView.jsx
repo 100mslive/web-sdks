@@ -121,18 +121,18 @@ const HLSView = () => {
                   if (!cue.fired) {
                     const data = metadataPayloadParser(cue.value.data);
                     const programData = videoEl.getStartDate();
-                    const startDate = data.start_date;
+                    const startDate = data.start_time;
                     const startTime =
-                      new Date(programData) -
                       new Date(startDate) -
+                      new Date(programData) -
                       videoEl.currentTime * 1000;
-                    console.log("fired time ", startTime);
+                    console.log("fired time ", startTime, videoEl.currentTime);
                     setTimeout(
                       () =>
                         ToastManager.addToast({
                           title: `Payload from timed Metadata ${data.payload}`,
                         }),
-                      startTime * 1000
+                      startTime
                     );
                     cue.fired = true;
                   }
