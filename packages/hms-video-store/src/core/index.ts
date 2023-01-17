@@ -38,3 +38,5 @@ export type {
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
 } from './hmsSDKStore/sdkTypes';
+
+export * from '../controller/beam/BeamController';

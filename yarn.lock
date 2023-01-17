@@ -18842,10 +18842,10 @@ zipy-rrweb@^0.0.2:
     mitt "^1.1.3"
     rrweb-snapshot "^1.1.14"
 
-zipyai@^1.3.21:
-  version "1.3.21"
-  resolved "https://registry.yarnpkg.com/zipyai/-/zipyai-1.3.21.tgz#d92b6e3790257c95dbde8d10897b271735aad0ee"
-  integrity sha512-bKMcYzS/py7jbe91P+NWgQJDkPPqA8d73zQLz2odOuSRu0X9RaggYxsDOeHDJoBoIuuW8CX1nYYx/SyieE8p8A==
+zipyai@^1.3.24:
+  version "1.3.24"
+  resolved "https://registry.yarnpkg.com/zipyai/-/zipyai-1.3.24.tgz#f7f4ed1df8c31e38ecec2961e40346e28064fa36"
+  integrity sha512-p2ojLk6iPAsRblymQSDPGWDefT5Rimpfu9+wKmkelQZ7JU7zMRIjaHF3HcKXwQWtq/fvlT+PMQ77aOhdqHbwvg==
   dependencies:
     uuid "^8.3.2"
     zipy-rrweb "^0.0.2"

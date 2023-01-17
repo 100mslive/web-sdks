@@ -6,7 +6,7 @@ import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
+import { HMSTrack } from '../media/tracks';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
 import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
@@ -17,10 +17,6 @@ const testObserver: ITransportObserver = {
   onTrackAdd(_: HMSTrack): void {},
 
   onTrackRemove(_: HMSTrack): void {},
-
-  onTrackDegrade(_: HMSRemoteVideoTrack): void {},
-
-  onTrackRestore(_: HMSRemoteVideoTrack): void {},
 
   onFailure(_: HMSException): void {
     // console.log('sdk Failure Callback', _s);
