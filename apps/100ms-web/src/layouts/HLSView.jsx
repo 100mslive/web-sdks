@@ -61,20 +61,6 @@ const HLSView = () => {
    */
   useEffect(() => {
     let videoEl = videoRef.current;
-    videoEl.addEventListener("timeupdate", () => {
-      if (videoEl.textTracks[0] && videoEl.textTracks[0].activeCues) {
-        for (let value in videoEl.textTracks[0].activeCues) {
-          console.log(
-            JSON.stringify({
-              start: videoEl.textTracks[0].activeCues[value].startTime,
-              end: videoEl.textTracks[0].activeCues[value].endTime,
-              data: videoEl.textTracks[0].activeCues[value].value,
-              current: videoEl.currentTime,
-            })
-          );
-        }
-      }
-    });
     const manifestLoadedHandler = (_, { levels }) => {
       const onlyVideoLevels = removeAudioLevels(levels);
       setAvailableLevels(onlyVideoLevels);
