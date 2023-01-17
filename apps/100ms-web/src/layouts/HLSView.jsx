@@ -42,9 +42,7 @@ const HLSView = () => {
   const hmsActions = useHMSActions();
   const { themeType } = useTheme();
   let [hlsStatsState, setHlsStatsState] = useState(null);
-  const hlsUrl1 = hlsState.variants[0]?.url;
-  const hlsUrl = "http://100ms.web.local/20230117/1673953706081/master.m3u8";
-  const hlsUrl2 = "http://100ms.web.local/20230104/1672840633756/master.m3u8";
+  const hlsUrl = hlsState.variants[0]?.url;
   const [availableLevels, setAvailableLevels] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
