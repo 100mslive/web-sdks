@@ -121,7 +121,7 @@ const HLSView = () => {
                   if (!cue.fired) {
                     const data = metadataPayloadParser(cue.value.data);
                     const programData = videoEl.getStartDate();
-                    const startDate = data.start_time;
+                    const startDate = data.start_date;
                     const startTime =
                       new Date(startDate) -
                       new Date(programData) -
