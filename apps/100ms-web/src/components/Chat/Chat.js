@@ -96,6 +96,7 @@ export const Chat = () => {
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
+      console.log("message count ", unreadCount, messagesCount);
       if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
         listRef.current?.scrollToItem(messagesCount, "end");
         requestAnimationFrame(() => {
@@ -106,6 +107,13 @@ export const Chat = () => {
     },
     [hmsActions, messagesCount]
   );
+
+  useEffect(() => {
+    if (listRef.current && listRef.current.scrollToItem) {
+      scrollToBottom(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listRef.current]);
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>
@@ -134,6 +142,7 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         setPinnedMessage={setPinnedMessage}
         ref={listRef}
+        scrollToBottom={scrollToBottom}
       />
       <ChatFooter
         role={chatOptions.role}
