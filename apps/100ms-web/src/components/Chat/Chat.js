@@ -96,7 +96,6 @@ export const Chat = () => {
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
-      console.log("message count ", unreadCount, messagesCount);
       if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
         listRef.current?.scrollToItem(messagesCount, "end");
         requestAnimationFrame(() => {
