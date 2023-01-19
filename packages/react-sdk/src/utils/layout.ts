@@ -370,12 +370,16 @@ export const getTileSizesWithRowAndColConstraint = ({
   tilesinLastPage = count % (rows * cols);
   isLastPageDifferentFromFirstPage = tilesinLastPage > 0 && count > rows * cols;
   if (isLastPageDifferentFromFirstPage) {
-    const rows = Math.min(
-      Math.ceil(Math.sqrt((tilesinLastPage * (aspectRatio.width / aspectRatio.height)) / (parentWidth / parentHeight))),
-      maxRowCount!,
+    const cols = Math.min(
+      Math.ceil(Math.sqrt((tilesinLastPage * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
+      maxCount,
     );
-    const height = parentHeight / rows;
-    const width = height * (aspectRatio.width / aspectRatio.height);
+    let width = parentWidth / cols;
+    let height = width / (aspectRatio.width / aspectRatio.height);
+    if (height > parentHeight) {
+      height = parentHeight;
+      width = height / (aspectRatio.height / aspectRatio.width);
+    }
     lastPageHeight = height;
     lastPageWidth = width;
   }
