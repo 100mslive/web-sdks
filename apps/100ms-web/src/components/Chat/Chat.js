@@ -141,7 +141,6 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         setPinnedMessage={setPinnedMessage}
         ref={listRef}
-        scrollToBottom={scrollToBottom}
       />
       <ChatFooter
         role={chatOptions.role}
