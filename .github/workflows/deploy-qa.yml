@@ -48,6 +48,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: yarn packages cache
+        uses: actions/cache@v2
         with:
           path: |
             node_modules
