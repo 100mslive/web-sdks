@@ -1,6 +1,18 @@
 name: Deploy QA
 run-name: ${{ github.event.head_commit.message }} ( qa )
 on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'which env to deploy - qa | dev | staging | prod'
+        type: 'choice'
+        required: true
+        default: qa
+        options:
+          - qa
+          - dev
+          - prod
+          - staging
   push:
     branches:
       - main
