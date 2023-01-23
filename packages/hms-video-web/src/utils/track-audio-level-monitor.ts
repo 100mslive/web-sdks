@@ -1,4 +1,5 @@
 import HMSLogger from './logger';
+import { HMSAudioContextHandler } from './media';
 import { Queue } from './queue';
 import { sleep } from './timer-utils';
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
@@ -143,7 +144,7 @@ export class TrackAudioLevelMonitor {
   }
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
-    const audioContext = new AudioContext();
+    const audioContext = HMSAudioContextHandler.getAudioContext();
     const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
