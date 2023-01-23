@@ -1,4 +1,4 @@
-name: Deploy-QA
+name: Deploy QA
 run-name: ${{ github.event.head_commit.message }} ( qa )
 on:
   push:

@@ -1,4 +1,4 @@
-name: Deploy-Dev
+name: Deploy Dev
 run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
   workflow_dispatch:
