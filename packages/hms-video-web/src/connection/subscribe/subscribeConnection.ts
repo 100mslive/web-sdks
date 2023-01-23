@@ -158,6 +158,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       if (error) {
         // Don't retry or do anything, track is already removed
         if (error.code === 404) {
+          HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
           break;
         }
         HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
