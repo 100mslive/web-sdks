@@ -310,7 +310,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrate(settings.maxBitrate, this);
+      await stream.setMaxBitrateAndFramerate(this);
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
