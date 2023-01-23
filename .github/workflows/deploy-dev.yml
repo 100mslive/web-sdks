@@ -1,9 +1,6 @@
 name: Deploy-Dev
-run-name: ${{ github.event.head_commit.message }} ( dev )
+run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
-  workflow_dispatch:
-    inputs:
-      buildEnvForDev: prod
   push:
     branches:
       - main
@@ -12,7 +9,8 @@ on:
       - 'playwright/**'
       - 'internal-docs/**'
       - '.github/**'
-
+env:
+  env: dev
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -66,7 +64,7 @@ jobs:
       - name: Build for Dev
         run: yarn build
         env:
-          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+          REACT_APP_ENV: prod
           REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'
