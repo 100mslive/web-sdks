@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: 'QA'
+        description: 'dev'
         type: 'choice'
         required: true
-        default: qa
+        default: dev
   push:
     branches:
       - main
