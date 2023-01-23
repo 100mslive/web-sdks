@@ -169,6 +169,7 @@ export default abstract class HMSConnection {
           params.encodings[0].maxBitrate = maxBitrate * 1000;
         }
         if (maxFramerate) {
+          // @ts-ignore
           params.encodings[0].maxFramerate = maxFramerate;
         }
       }
