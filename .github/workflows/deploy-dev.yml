@@ -1,6 +1,13 @@
 name: Deploy-Dev
 run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'QA'
+        type: 'choice'
+        required: true
+        default: qa
   push:
     branches:
       - main
