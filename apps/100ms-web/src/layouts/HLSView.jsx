@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import { HlsStats } from "@100mslive/hls-stats";
-import Hls from "hls.js";
+import { HLSController } from "@100mslve/hls-controllers";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -24,11 +23,6 @@ import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
 import { HLSAutoplayBlockedPrompt } from "../components/HMSVideo/HLSAutoplayBlockedPrompt";
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 import { ToastManager } from "../components/Toast/ToastManager";
-import {
-  HLS_STREAM_NO_LONGER_LIVE,
-  HLS_TIMED_METADATA_LOADED,
-  HLSController,
-} from "../controllers/hls/HLSController";
 import { APP_DATA } from "../common/constants";
 
 let hlsController;
@@ -62,12 +56,10 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
-      const onlyVideoLevels = removeAudioLevels(levels);
-      setAvailableLevels(onlyVideoLevels);
+      setAvailableLevels(levels);
     };
     const levelUpdatedHandler = (_, { level }) => {
-      const qualityLevel = hlsController.getHlsJsInstance().levels[level];
-      setCurrentSelectedQuality(qualityLevel);
+      setCurrentSelectedQuality(level);
     };
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       console.log(
@@ -80,30 +72,68 @@ const HLSView = () => {
       });
     };
 
-    const handleNoLongerLive = () => {
-      setIsVideoLive(false);
+    const handleNoLongerLive = ({ isLive }) => {
+      setIsVideoLive(isLive);
     };
 
+    const playEventHandler = (_, data) => setIsPaused(!data);
+    const pauseEventHandler = (_, data) => setIsPaused(data);
+    const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
+
     if (videoEl && hlsUrl) {
-      if (Hls.isSupported()) {
-        hlsController = new HLSController(hlsUrl, videoRef);
-        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
+      hlsController = new HLSController(hlsUrl, videoRef);
+      hlsController.on(
+        HLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+        handleNoLongerLive
+      );
+      hlsController.on(
+        HLSController.Events.HLS_TIMED_METADATA_LOADED,
+        metadataLoadedHandler
+      );
+      hlsController.on(HLSController.Events.HLS_PLAY, playEventHandler);
+      hlsController.on(HLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController.on(
+        HLSController.Events.HLS_AUTOPLAY_BLOCKED,
+        handleAutoplayBlock
+      );
 
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
-        hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
-
-        hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
-        hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      if (HLSController.isMSENotSupported()) {
+        hlsController.on(
+          HLSController.Events.HLS_MANIFEST_LOADED,
+          manifestLoadedHandler
+        );
+        hlsController.on(
+          HLSController.Events.HLS_LEVEL_UPDATED,
+          levelUpdatedHandler
+        );
       } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
         videoEl.src = hlsUrl;
         setIsMSENotSupported(true);
       }
     }
     return () => {
-      hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
-      hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
-      hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
-      hlsController?.off(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
+      hlsController?.off(
+        HLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+        handleNoLongerLive
+      );
+      hlsController?.off(
+        HLSController.Events.HLS_TIMED_METADATA_LOADED,
+        metadataLoadedHandler
+      );
+      hlsController?.off(HLSController.Events.HLS_PLAY, playEventHandler);
+      hlsController?.off(HLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController?.off(
+        HLSController.Events.HLS_AUTOPLAY_BLOCKED,
+        handleAutoplayBlock
+      );
+      hlsController?.off(
+        HLSController.Events.HLS_MANIFEST_LOADED,
+        manifestLoadedHandler
+      );
+      hlsController?.off(
+        HLSController.Events.HLS_LEVEL_UPDATED,
+        levelUpdatedHandler
+      );
       hlsController?.reset();
       hlsStats = null;
       hlsController = null;
@@ -119,7 +149,7 @@ const HLSView = () => {
     }
     let unsubscribe;
     if (enablHlsStats) {
-      unsubscribe = hlsStats.subscribe(state => {
+      unsubscribe = hlsController.subscribe(state => {
         setHlsStatsState(state);
       });
     } else {
@@ -139,48 +169,6 @@ const HLSView = () => {
       console.error("Tried to unblock Autoplay failed with", error.toString());
     }
   };
-
-  /**
-   * On mount. Add listeners for Video play/pause
-   */
-  useEffect(() => {
-    const playEventHandler = () => setIsPaused(false);
-    const pauseEventHandler = () => setIsPaused(true);
-    const videoEl = videoRef.current;
-    /**
-     * we are doing all the modifications
-     * to the video element after hlsUrl is loaded,
-     * this is because, <HMSVideo/> is conditionally
-     * rendered based on hlsUrl, so if we try to do
-     * things before that, the videoRef.current will be
-     * null.
-     */
-    if (!hlsUrl || !videoEl) {
-      return;
-    }
-
-    const playVideo = async () => {
-      try {
-        if (videoEl.paused) {
-          await videoEl.play();
-        }
-      } catch (error) {
-        console.debug("Browser blocked autoplay with error", error.toString());
-        console.debug("asking user to play the video manually...");
-        if (error.name === "NotAllowedError") {
-          setIsHlsAutoplayBlocked(true);
-        }
-      }
-    };
-    playVideo();
-
-    videoEl.addEventListener("play", playEventHandler);
-    videoEl.addEventListener("pause", pauseEventHandler);
-    return () => {
-      videoEl.removeEventListener("play", playEventHandler);
-      videoEl.removeEventListener("pause", pauseEventHandler);
-    };
-  }, [hlsUrl]);
 
   const handleQuality = useCallback(
     qualityLevel => {
@@ -312,23 +300,5 @@ const HLSView = () => {
     </Flex>
   );
 };
-
-/**
- *
- * This function is needed because HLSJS currently doesn't
- * support switching to audio rendition from a video rendition.
- * more on this here
- * https://github.com/video-dev/hls.js/issues/4881
- * https://github.com/video-dev/hls.js/issues/3480#issuecomment-778799541
- * https://github.com/video-dev/hls.js/issues/163#issuecomment-169773788
- *
- * @param {Array} levels array from hlsJS
- * @returns a new array with only video levels.
- */
-function removeAudioLevels(levels) {
-  return levels.filter(
-    ({ videoCodec, width, height }) => !!videoCodec || !!(width && height)
-  );
-}
 
 export default HLSView;

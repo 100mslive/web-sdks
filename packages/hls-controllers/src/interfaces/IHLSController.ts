@@ -1,6 +1,4 @@
-import { ControllerConfig } from './ControllerConfig';
-
-export interface HLSController {
+interface IHLSController {
   /**
    *
    * @returns returns a Number which represents current
@@ -16,12 +14,13 @@ export interface HLSController {
   /**
    * Provide the instance of HLS Controller
    */
-  getControllerInstance(): HLSController;
+  getControllerInstance(): IHLSController;
   /**
    * move the video to Live
    */
   jumpToLive(): void;
 
   handleHLSTimeMetadataParsing(): void;
-  getControllerConfig(isOptimized: boolean): ControllerConfig;
 }
+
+export default IHLSController;

@@ -1,9 +1,38 @@
 {
-  "name": "hls-controllers",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "@100mslve/hls-controllers",
+  "version": "0.0.1",
+  "description": "A library to which controls hls stream",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "prestart": "rm -rf dist && yarn types:build",
+    "start": "concurrently \"yarn dev\" \"yarn types\"",
+    "dev": "node ../../scripts/dev",
+    "build:only": "node ../../scripts/build",
+    "prebuild": "rm -rf dist",
+    "build": "yarn build:only && yarn types:build",
+    "types": "tsc -w",
+    "types:build": "tsc -p tsconfig.json",
+    "lint": "eslint -c ../../.eslintrc .",
+    "lint:fix": "yarn lint --fix"
+  },
+  "author": "Amar Kumar Bathwal",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
+    "@100mslive/hls-stats": "^0.0.3",
+    "eventemitter3": "^5.0.0",
     "hls.js": "^1.3.0"
   }
 }
