@@ -46,8 +46,8 @@ export class TrackAudioLevelMonitor {
    * positives.
    */
   detectSilence = async () => {
-    const tickInterval = 30;
-    const tickThreshold = 10;
+    const tickInterval = 20;
+    const tickThreshold = 30;
     let silenceCounter = 0;
 
     while (this.isMonitored) {

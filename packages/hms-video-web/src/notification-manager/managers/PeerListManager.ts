@@ -86,7 +86,9 @@ export class PeerListManager {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, `${peersToRemove}`);
+    if (peersToRemove.length > 0) {
+      HMSLogger.d(this.TAG, `${peersToRemove}`);
+    }
 
     // Send peer-leave updates to all the missing peers
     peersToRemove.forEach(peer => {
@@ -149,6 +151,7 @@ export class PeerListManager {
   };
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {
+    HMSLogger.d(this.TAG, `removing track - ${trackId} from ${peer}`);
     if (peer.audioTrack?.trackId === trackId) {
       peer.audioTrack = undefined;
     } else if (peer.videoTrack?.trackId === trackId) {

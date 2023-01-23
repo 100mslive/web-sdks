@@ -383,7 +383,6 @@ export class HMSSdk implements HMSInterface {
     const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.networkTestManager?.stop();
-    this.localPeer?.audioTrack?.destroyAudioLevelMonitor();
     this.listener = listener;
     this.commonSetup(config, roomId, listener);
     this.removeDevicesFromConfig(config);
@@ -851,6 +850,7 @@ export class HMSSdk implements HMSInterface {
   private async publish(initialSettings: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
+    this.localPeer?.audioTrack?.initAudioLevelMonitor();
     this.sdkState.published = true;
   }
 
