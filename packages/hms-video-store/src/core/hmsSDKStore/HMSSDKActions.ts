@@ -23,7 +23,12 @@ import {
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import {
+  areArraysEqual,
+  mergeNewPeersInDraft,
+  mergeNewTracksInDraft,
+  mergePreviewPeerInDraft,
+} from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
@@ -859,6 +864,7 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      mergePreviewPeerInDraft(draftStore, draftPeers);
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
