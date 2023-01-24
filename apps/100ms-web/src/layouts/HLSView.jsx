@@ -36,7 +36,7 @@ let hlsController;
 let hlsStats;
 
 const OSName = parsedUserAgent.getOS().name.toLowerCase();
-const isIOS = OSName === "ios" || OSName === "mac os";
+const isIOS = OSName === "ios";
 
 const HLSView = () => {
   const videoRef = useRef(null);
@@ -87,11 +87,6 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const metadataLoadedHandler = ({ payload, ...rest }) => {
-      console.log(
-        `%c Payload: ${payload}`,
-        "color:#2b2d42; background:#d80032"
-      );
-      console.log(rest);
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
       ToastManager.addToast({
@@ -129,12 +124,6 @@ const HLSView = () => {
                 new Date(programData) -
                 videoEl.currentTime * 1000;
               const duration = new Date(endDate) - new Date(startDate);
-              console.log(
-                "fired time ",
-                startTime,
-                videoEl.currentTime,
-                duration
-              );
               setTimeout(
                 () =>
                   ToastManager.addToast({
@@ -158,6 +147,7 @@ const HLSView = () => {
           "addtrack",
           handleTrackAddEvent
         );
+        setIsMSENotSupported(true);
       } else if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
         hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
