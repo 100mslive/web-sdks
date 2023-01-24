@@ -11,7 +11,7 @@ import { PolicyParams } from '../HMSNotifications';
 export class PolicyChangeManager {
   constructor(private store: IStore, private eventBus: EventBus) {}
 
-  handlePolicyChange(params: PolicyParams) {
+  handlePolicyChange(params: PolicyParams, isPreviewInProgress = false) {
     const localPeer = this.store.getLocalPeer();
 
     if (localPeer && !localPeer.role) {
@@ -26,7 +26,7 @@ export class PolicyChangeManager {
     // this.store.setPublishParams(publishParams);
 
     // @TODO: on reconnection asRole is ignored and original role is set here which shouldn't happen in preview
-    if (localPeer?.role && localPeer.role.name !== params.name) {
+    if (!isPreviewInProgress && localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
       const oldRole = localPeer.role;
       localPeer.updateRole(newRole);
