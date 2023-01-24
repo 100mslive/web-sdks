@@ -34,6 +34,7 @@ jobs:
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_ENV: 'qa'
     steps:
       - name: log inputs
         run: |
@@ -63,7 +64,6 @@ jobs:
       - name: Build for QA
         run: yarn build
         env:
-          REACT_APP_ENV: 'qa'
           REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'

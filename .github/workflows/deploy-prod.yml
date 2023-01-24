@@ -26,6 +26,7 @@ jobs:
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_ENV: 'prod'
     steps:
       - name: log inputs
         run: |
@@ -49,7 +50,6 @@ jobs:
       - name: Build for Production
         run: yarn build
         env:
-          REACT_APP_ENV: 'prod'
           REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'
