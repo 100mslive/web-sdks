@@ -28,7 +28,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
-  private TAG = '[LocalVideoTrack]';
+  private TAG = '[HMSLocalVideoTrack]';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
