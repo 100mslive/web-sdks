@@ -27,7 +27,6 @@ jobs:
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
       REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
-      REACT_APP_ENV: 'prod'
 
     steps:
       - name: log inputs
