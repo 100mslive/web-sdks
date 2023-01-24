@@ -1,6 +1,6 @@
 name: Deploy Prod
 on:
-  workflow-dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
 
       #prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
-       if: ${{ (!startsWith(github.ref_name, 'production')) }}
+        if: ${{ (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Cancel Previous Runs
