@@ -1,4 +1,5 @@
 import HMSLogger from './logger';
+import { HMSAudioContextHandler } from './media';
 import { Queue } from './queue';
 import { sleep } from './timer-utils';
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
@@ -47,7 +48,7 @@ export class TrackAudioLevelMonitor {
    */
   detectSilence = async () => {
     const tickInterval = 20;
-    const tickThreshold = 30;
+    const tickThreshold = 50;
     let silenceCounter = 0;
 
     while (this.isMonitored) {
@@ -143,7 +144,7 @@ export class TrackAudioLevelMonitor {
   }
 
   private createAnalyserNodeForStream(stream: MediaStream): AnalyserNode {
-    const audioContext = new AudioContext();
+    const audioContext = HMSAudioContextHandler.getAudioContext();
     const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
