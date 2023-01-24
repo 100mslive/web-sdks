@@ -270,8 +270,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
+    /*
+     * stop the previous only after acquiring the new track otherwise this can lead to
+     * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
+     */
+    prevTrack?.stop();
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
