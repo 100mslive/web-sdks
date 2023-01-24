@@ -1,14 +1,15 @@
 name: Deploy Dev
 on:
   workflow_dispatch:
-    buildEnvForDev:
-      description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
-      type: 'choice'
-      required: false
-      default: prod
-      options:
-        - prod
-        - qa
+    inputs:
+      buildEnvForDev:
+        description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+        type: 'choice'
+        required: false
+        default: prod
+        options:
+          - prod
+          - qa
 
 jobs:
   build:
@@ -42,7 +43,7 @@ jobs:
           echo "env: dev, branch: ${{ github.ref_name }}"
 
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.0
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
 
@@ -50,7 +51,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: yarn packages cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
