@@ -27,6 +27,7 @@ jobs:
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
       REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
+      REACT_APP_ENV: 'prod'
 
     steps:
       - name: log inputs
@@ -35,6 +36,7 @@ jobs:
 
       #prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
+       if: ${{ (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Cancel Previous Runs
