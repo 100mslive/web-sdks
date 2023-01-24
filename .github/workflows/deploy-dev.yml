@@ -1,5 +1,4 @@
 name: Deploy Dev
-run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
   workflow_dispatch:
     buildEnvForDev:
@@ -10,14 +9,6 @@ on:
       options:
         - prod
         - qa
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'cypress/**'
-      - 'playwright/**'
-      - 'internal-docs/**'
-      - '.github/**'
 env:
   env: dev
 jobs:

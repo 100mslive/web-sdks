@@ -1,13 +1,6 @@
 name: Deploy Prod
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'cypress/**'
-      - 'playwright/**'
-      - 'internal-docs/**'
-      - '.github/**'
+  workflow-dispatch:
 
 jobs:
   build:
