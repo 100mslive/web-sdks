@@ -9,8 +9,7 @@ on:
       options:
         - prod
         - qa
-env:
-  env: dev
+
 jobs:
   build:
     runs-on: ubuntu-latest
