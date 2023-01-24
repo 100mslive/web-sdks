@@ -276,6 +276,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    HMSLogger.d(this.TAG, 'Previous track stopped', prevTrack, 'newTrack', newTrack);
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });

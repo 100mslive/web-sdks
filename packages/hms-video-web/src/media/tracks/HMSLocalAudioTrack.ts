@@ -71,6 +71,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    HMSLogger.d(this.TAG, 'Previous track stopped', prevTrack, 'newTrack', newTrack);
     newTrack.enabled = prevState;
 
     const localStream = this.stream as HMSLocalStream;
