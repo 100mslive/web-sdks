@@ -10,6 +10,7 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
   useEffect(() => {
     const videoEl = videoRef.current;
     const timeupdateHandler = () => {
+      console.log("video element ", videoEl.currentTime, videoEl.duration);
       const videoProgress = Math.floor(
         getPercentage(videoEl.currentTime, videoEl.duration)
       );

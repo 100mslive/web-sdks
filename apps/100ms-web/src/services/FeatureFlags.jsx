@@ -3,8 +3,7 @@ import { useEffect } from "react";
 export class FeatureFlags {
   static enableTranscription =
     process.env.REACT_APP_ENABLE_TRANSCRIPTION === "true";
-  static enableStatsForNerds =
-    process.env.REACT_APP_ENABLE_STATS_FOR_NERDS === "true";
+  static enableStatsForNerds = true;
   static enableWhiteboard =
     process.env.REACT_APP_ENABLE_WHITEBOARD &&
     process.env.REACT_APP_PUSHER_APP_KEY &&

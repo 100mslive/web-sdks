@@ -1,3 +1,4 @@
+import { Level } from 'hls.js';
 interface IHLSController {
   /**
    *
@@ -10,7 +11,7 @@ interface IHLSController {
    * @param { Hls.Level } currentLevel - currentLevel we want to
    * set the stream to. -1 for Auto
    */
-  setCurrentLevel(currentLevel: number): void;
+  setCurrentLevel(currentLevel: Level): void;
   /**
    * Provide the instance of HLS Controller
    */

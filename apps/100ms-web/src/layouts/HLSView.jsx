@@ -56,6 +56,7 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
+      console.log("levels ", levels);
       setAvailableLevels(levels);
     };
     const levelUpdatedHandler = (_, { level }) => {
@@ -149,7 +150,9 @@ const HLSView = () => {
     }
     let unsubscribe;
     if (enablHlsStats) {
+      console.log("enalble ");
       unsubscribe = hlsController.subscribe(state => {
+        console.log("state ", state);
         setHlsStatsState(state);
       });
     } else {
