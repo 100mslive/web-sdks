@@ -28,8 +28,7 @@ import {
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
 
-// const env = process.env.REACT_APP_ENV;
-const env = "qa";
+const env = process.env.REACT_APP_ENV;
 const PreviewScreen = React.memo(({ getUserToken }) => {
   const navigate = useNavigation();
   const tokenEndpoint = useTokenEndpoint();

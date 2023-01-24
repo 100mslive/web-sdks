@@ -4,6 +4,7 @@ import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import screenfull from "screenfull";
 import {
+  parsedUserAgent,
   selectAppData,
   selectHLSState,
   useHMSActions,
@@ -34,6 +35,9 @@ import { APP_DATA } from "../common/constants";
 let hlsController;
 let hlsStats;
 
+const OSName = parsedUserAgent.getOS().name.toLowerCase();
+const isIOS = OSName === "ios" || OSName === "mac os";
+
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef(null);
@@ -59,25 +63,29 @@ const HLSView = () => {
   /**
    * initialize HLSController and add event listeners.
    */
+  const manifestLoadedHandler = (_, { levels }) => {
+    const onlyVideoLevels = removeAudioLevels(levels);
+    setAvailableLevels(onlyVideoLevels);
+  };
+  const levelUpdatedHandler = (_, { level }) => {
+    const qualityLevel = hlsController.getHlsJsInstance().levels[level];
+    setCurrentSelectedQuality(qualityLevel);
+  };
+  const metadataPayloadParser = payload => {
+    try {
+      const data = window.atob(payload);
+      const parsedData = JSON.parse(data);
+      return parsedData;
+    } catch (e) {
+      return { payload };
+    }
+  };
+
+  const handleNoLongerLive = () => {
+    setIsVideoLive(false);
+  };
   useEffect(() => {
     let videoEl = videoRef.current;
-    const manifestLoadedHandler = (_, { levels }) => {
-      const onlyVideoLevels = removeAudioLevels(levels);
-      setAvailableLevels(onlyVideoLevels);
-    };
-    const levelUpdatedHandler = (_, { level }) => {
-      const qualityLevel = hlsController.getHlsJsInstance().levels[level];
-      setCurrentSelectedQuality(qualityLevel);
-    };
-    const metadataPayloadParser = payload => {
-      try {
-        const data = window.atob(payload);
-        const parsedData = JSON.parse(data);
-        return parsedData;
-      } catch (e) {
-        return { payload };
-      }
-    };
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       console.log(
         `%c Payload: ${payload}`,
@@ -88,59 +96,67 @@ const HLSView = () => {
       const data = metadataPayloadParser(payload);
       ToastManager.addToast({
         title: `Payload from timed Metadata ${data.payload}`,
+        duration: rest.duration * 1000 || 3000,
       });
     };
-
-    const handleNoLongerLive = () => {
-      setIsVideoLive(false);
+    const handleTrackAddEvent = addTrackEvent => {
+      var track = addTrackEvent.track;
+      track.mode = "hidden";
+      videoEl.addEventListener("timeupdate", _ => {
+        const textTrackListCount = videoEl.textTracks.length;
+        for (
+          let trackIndex = 0;
+          trackIndex < textTrackListCount;
+          trackIndex++
+        ) {
+          const textTrack = videoEl.textTracks[trackIndex];
+          if (textTrack.kind !== "metadata") {
+            // return;
+            continue;
+          }
+          textTrack.mode = "showing";
+          const cuesLength = textTrack.cues.length;
+          let cueIndex = 0;
+          while (cueIndex < cuesLength) {
+            const cue = textTrack.cues[cueIndex];
+            if (!cue.fired) {
+              const data = metadataPayloadParser(cue.value.data);
+              const programData = videoEl.getStartDate();
+              const startDate = data.start_date;
+              const endDate = data.end_date;
+              const startTime =
+                new Date(startDate) -
+                new Date(programData) -
+                videoEl.currentTime * 1000;
+              const duration = new Date(endDate) - new Date(startDate);
+              console.log(
+                "fired time ",
+                startTime,
+                videoEl.currentTime,
+                duration
+              );
+              setTimeout(
+                () =>
+                  ToastManager.addToast({
+                    title: `Payload from timed Metadata ${data.payload}`,
+                    duration: duration,
+                  }),
+                startTime
+              );
+              cue.fired = true;
+            }
+            cueIndex++;
+          }
+        }
+      });
     };
-
     if (videoEl && hlsUrl) {
-      if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+      if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
         console.log("PLAYING HLS NATIVELY");
         videoEl.src = hlsUrl;
         videoRef.current?.textTracks.addEventListener(
           "addtrack",
-          function (addTrackEvent) {
-            var track = addTrackEvent.track;
-            track.mode = "hidden";
-            // console.log("HLS NEW TRACK ADDED", track);
-            videoEl.addEventListener("timeupdate", curChangeEvent => {
-              const textTrackListCount = videoEl.textTracks.length;
-              for (let i = 0; i < textTrackListCount; i++) {
-                const textTrack = videoEl.textTracks[i];
-                if (textTrack.kind !== "metadata") {
-                  // return;
-                  continue;
-                }
-                textTrack.mode = "showing";
-                const cuesLength = textTrack.cues.length;
-                let j = 0;
-                while (j < cuesLength) {
-                  const cue = textTrack.cues[j];
-                  if (!cue.fired) {
-                    const data = metadataPayloadParser(cue.value.data);
-                    const programData = videoEl.getStartDate();
-                    const startDate = data.start_date;
-                    const startTime =
-                      new Date(startDate) -
-                      new Date(programData) -
-                      videoEl.currentTime * 1000;
-                    console.log("fired time ", startTime, videoEl.currentTime);
-                    setTimeout(
-                      () =>
-                        ToastManager.addToast({
-                          title: `Payload from timed Metadata ${data.payload}`,
-                        }),
-                      startTime
-                    );
-                    cue.fired = true;
-                  }
-                  j++;
-                }
-              }
-            });
-          }
+          handleTrackAddEvent
         );
       } else if (Hls.isSupported()) {
         hlsController = new HLSController(hlsUrl, videoRef);
