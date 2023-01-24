@@ -1,34 +1,6 @@
-name: Deploy
-run-name: ${{ github.event.head_commit.message }} (${{ github.event.inputs.env }})
+name: Deploy Prod
 on:
-  workflow_dispatch:
-    inputs:
-      env:
-        description: 'which env to deploy - qa | dev | staging | prod'
-        type: 'choice'
-        required: true
-        default: qa
-        options:
-          - qa
-          - dev
-          - prod
-          - staging
-      buildEnvForDev:
-        description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
-        type: 'choice'
-        required: false
-        default: prod
-        options:
-          - prod
-          - qa
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'cypress/**'
-      - 'playwright/**'
-      - 'internal-docs/**'
-      - '.github/**'
+  workflow-dispatch:
 
 jobs:
   build:
@@ -54,14 +26,17 @@ jobs:
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
+      REACT_APP_ENV: 'prod'
+
     steps:
       - name: log inputs
         run: |
-          echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
+          echo "env: prod, branch: ${{ github.ref_name }}"
 
       #prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
-        if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
+       if: ${{ (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Cancel Previous Runs
@@ -72,40 +47,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: yarn packages cache
-        uses: actions/cache@v2
-        if: github.event.inputs.env != 'prod' || github.event.inputs.env != 'staging'
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
       - name: Install packages
         run: yarn install --frozen-lockfile
 
-      - name: Build for Dev
-        if: github.event.inputs.env == 'dev'
-        run: yarn build
-        env:
-          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
-          REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
-
-      - name: Build for QA
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-        run: yarn build
-        env:
-          REACT_APP_ENV: 'qa'
-          REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
-
       - name: Build for Production
-        if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
         run: yarn build
-        env:
-          REACT_APP_ENV: 'prod'
-          REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'
         uses: actions/upload-artifact@v3
@@ -131,26 +77,7 @@ jobs:
           name: build-artifact
           path: build
 
-      - name: Deploy to Dev
-        if: github.event.inputs.env == 'dev'
-        env:
-          BUCKET: ${{ secrets.S3_BUCKET_DEV }}
-        # upload static folder first and then upload the rest to ensure index.html assets are all present
-        run: |
-          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./build s3://$BUCKET --include "index.html"
-
-      - name: Deploy to QA
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-        env:
-          BUCKET: ${{ secrets.S3_BUCKET }}
-        # upload static folder first and then upload the rest to ensure index.html assets are all present
-        run: |
-          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./build s3://$BUCKET --include "index.html"
-
       - name: Deploy to Staging
-        if: github.event.inputs.env == 'staging' || github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_STAGING }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
@@ -159,7 +86,6 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
   deploy-prod:
-    if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
     environment:
       name: ProductionWithPermissions
     needs: deploy
