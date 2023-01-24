@@ -259,8 +259,8 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
 });
 
 const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
-  const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
-  const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
+  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } =
+    useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
   const actions = useHMSActions();
