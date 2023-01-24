@@ -36,11 +36,10 @@ jobs:
     steps:
       - name: log inputs
         run: |
-          echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
+          echo "env: prod, branch: ${{ github.ref_name }}"
 
       #prod app can only be deployed to from a branch starting with production in its name
       - name: Validate branch
-        if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
         run: exit 1
 
       - name: Cancel Previous Runs
@@ -55,7 +54,6 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build for Production
-        if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
         run: yarn build
         env:
           REACT_APP_ENV: 'prod'
@@ -86,7 +84,6 @@ jobs:
           path: build
 
       - name: Deploy to Staging
-        if: github.event.inputs.env == 'staging' || github.event.inputs.env == 'prod'
         env:
           BUCKET: ${{ secrets.S3_BUCKET_STAGING }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
@@ -95,7 +92,6 @@ jobs:
           aws s3 sync ./build s3://$BUCKET --include "index.html"
 
   deploy-prod:
-    if: github.event.inputs.env == 'prod' || github.event.inputs.env == 'staging'
     environment:
       name: ProductionWithPermissions
     needs: deploy
