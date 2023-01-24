@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { HMSConfig } from '@100mslive/hms-video';
+import { HMSPreviewConfig } from '@100mslive/hms-video';
 import {
   HMSConfigInitialSettings,
   HMSRoomState,
@@ -83,7 +83,7 @@ export const usePreviewJoin = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
   const enableJoin = roomState === HMSRoomState.Preview;
 
-  const config: HMSConfig = useMemo(() => {
+  const config: HMSPreviewConfig = useMemo(() => {
     return {
       userName: name,
       authToken: token,
@@ -91,9 +91,10 @@ export const usePreviewJoin = ({
       rememberDeviceSelection: true,
       settings: initialSettings,
       initEndpoint: initEndpoint,
+      asRole,
       captureNetworkQualityInPreview,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview]);
+  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole]);
 
   const preview = useCallback(async () => {
     if (!token) {
@@ -106,11 +107,11 @@ export const usePreviewJoin = ({
       await actions.leave();
     }
     try {
-      await actions.preview(config, asRole);
+      await actions.preview(config);
     } catch (err) {
       handleError(err as Error, 'preview');
     }
-  }, [actions, handleError, token, roomState, config, isConnected, asRole]);
+  }, [actions, handleError, token, roomState, config, isConnected]);
 
   const join = useCallback(async () => {
     if (!token) {

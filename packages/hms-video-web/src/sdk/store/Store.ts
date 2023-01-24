@@ -191,6 +191,7 @@ class Store implements IStore {
     }
     const publishParams = this.knownRoles[params.name]?.publishParams;
     this.videoLayers = this.convertSimulcastLayers(publishParams.simulcast?.video);
+    // this.screenshareLayers = this.convertSimulcastLayers(publishParams.simulcast?.screen);
     this.updatePeersPolicy();
   }
 

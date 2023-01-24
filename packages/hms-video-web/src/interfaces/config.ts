@@ -48,4 +48,8 @@ export interface HMSConfig {
   captureNetworkQualityInPreview?: boolean;
 }
 
+export interface HMSPreviewConfig extends HMSConfig {
+  asRole?: string;
+}
+
 export type { InitialSettings as HMSConfigInitialSettings };

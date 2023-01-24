@@ -167,7 +167,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async preview(config: sdkTypes.HMSConfig, asRole?: string) {
+  async preview(config: sdkTypes.HMSPreviewConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
       return; // ignore
@@ -182,7 +182,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'connecting');
-      await this.sdkPreviewWithListeners(config, asRole);
+      await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
@@ -737,21 +737,17 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig, asRole?: string) {
-    await this.sdk.preview(
-      config,
-      {
-        onPreview: this.onPreview.bind(this),
-        onError: this.onError.bind(this),
-        onReconnected: this.onReconnected.bind(this),
-        onReconnecting: this.onReconnecting.bind(this),
-        onDeviceChange: this.onDeviceChange.bind(this),
-        onRoomUpdate: this.onRoomUpdate.bind(this),
-        onPeerUpdate: this.onPeerUpdate.bind(this),
-        onNetworkQuality: this.onNetworkQuality.bind(this),
-      },
-      asRole,
-    );
+  private async sdkPreviewWithListeners(config: sdkTypes.HMSPreviewConfig) {
+    await this.sdk.preview(config, {
+      onPreview: this.onPreview.bind(this),
+      onError: this.onError.bind(this),
+      onReconnected: this.onReconnected.bind(this),
+      onReconnecting: this.onReconnecting.bind(this),
+      onDeviceChange: this.onDeviceChange.bind(this),
+      onRoomUpdate: this.onRoomUpdate.bind(this),
+      onPeerUpdate: this.onPeerUpdate.bind(this),
+      onNetworkQuality: this.onNetworkQuality.bind(this),
+    });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
     });

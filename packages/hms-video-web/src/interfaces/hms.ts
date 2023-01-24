@@ -1,5 +1,5 @@
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
-import { HMSConfig } from './config';
+import { HMSConfig, HMSPreviewConfig } from './config';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
@@ -18,7 +18,7 @@ import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSLogLevel } from '../utils/logger';
 
 export default interface HMS {
-  preview(config: HMSConfig, listener: HMSPreviewListener, asRole?: string): Promise<void>;
+  preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
 
