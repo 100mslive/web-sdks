@@ -1,6 +1,15 @@
 name: Deploy Dev
 run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
+  workflow_dispatch:
+    buildEnvForDev:
+      description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+      type: 'choice'
+      required: false
+      default: prod
+      options:
+        - prod
+        - qa
   push:
     branches:
       - main
@@ -64,7 +73,7 @@ jobs:
       - name: Build for Dev
         run: yarn build
         env:
-          REACT_APP_ENV: prod
+          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
           REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
 
       - name: 'Upload Build Artifact'
