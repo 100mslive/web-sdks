@@ -1,13 +1,6 @@
 name: Deploy Dev
 run-name: ${{ github.event.head_commit.message }} ( ${{ env.env }} )
 on:
-  workflow_dispatch:
-    inputs:
-      env:
-        description: 'dev'
-        type: 'choice'
-        required: true
-        default: dev
   push:
     branches:
       - main

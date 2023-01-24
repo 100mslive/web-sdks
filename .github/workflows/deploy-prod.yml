@@ -1,15 +1,5 @@
 name: Deploy Prod
 on:
-  workflow_dispatch:
-    inputs:
-      env:
-        description: 'which env to deploy - staging | prod'
-        type: 'choice'
-        required: true
-        default: staging
-        options:
-          - prod
-          - staging
   push:
     branches:
       - main
