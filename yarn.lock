@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@100mslive/hls-stats@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-stats/-/hls-stats-0.0.3.tgz#9acd810535dfd5a3f4786d0fd209352b133ee07b"
+  integrity sha512-i71wPfHmj77GTLiev0cQ+RdFBCI3XnGmR5j+s6VUNyeSI+dxpSlZoJHPiAMppb7kwYvZwS3EV4lAktyoch4h1g==
+
 "@adobe/css-tools@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.0.1.tgz#b38b444ad3aa5fedbb15f2f746dcd934226a12dd"

@@ -145,6 +145,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   };
 
+  // eslint-disable-next-line complexity
   private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
     if (this.apiChannel?.readyState !== 'open') {
       await this.eventEmitter.waitFor('open');
@@ -155,6 +156,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       response = await this.waitForResponse(requestId);
       const error = response.error;
       if (error) {
+        // Don't retry or do anything, track is already removed
+        if (error.code === 404) {
+          HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
+          break;
+        }
         HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
         const shouldRetry = error.code / 100 === 5 || error.code === 429;
         if (!shouldRetry) {
@@ -174,9 +180,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return value.includes(requestId);
     });
     const response = JSON.parse(res[0] as string);
-    if (response.error) {
-      throw response.error;
-    }
     HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
     return response;
   };
