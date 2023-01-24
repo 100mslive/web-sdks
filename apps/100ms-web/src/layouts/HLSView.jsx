@@ -84,6 +84,7 @@ const HLSView = () => {
   const handleNoLongerLive = () => {
     setIsVideoLive(false);
   };
+
   useEffect(() => {
     let videoEl = videoRef.current;
     const metadataLoadedHandler = ({ payload, ...rest }) => {
@@ -139,31 +140,30 @@ const HLSView = () => {
         }
       });
     };
-    if (videoEl && hlsUrl) {
-      if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
-        console.log("PLAYING HLS NATIVELY");
-        videoEl.src = hlsUrl;
-        videoRef.current?.textTracks.addEventListener(
-          "addtrack",
-          handleTrackAddEvent
-        );
-        setIsMSENotSupported(true);
-      } else if (Hls.isSupported()) {
-        hlsController = new HLSController(hlsUrl, videoRef);
-        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
+    if (!videoEl || !hlsUrl) {
+      return;
+    }
+    if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
+      console.log("PLAYING HLS NATIVELY");
+      videoEl.src = hlsUrl;
+      videoEl.textTracks.addEventListener("addtrack", handleTrackAddEvent);
+      setIsMSENotSupported(true);
+    } else if (Hls.isSupported()) {
+      hlsController = new HLSController(hlsUrl, videoRef);
+      hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
-        hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
+      hlsController.on(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
+      hlsController.on(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
 
-        hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
-        hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
-      }
+      hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
     }
     return () => {
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsController?.off(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
+      videoEl?.textTracks.addEventListener("addtrack", handleTrackAddEvent);
       hlsController?.reset();
       hlsStats = null;
       hlsController = null;
