@@ -1,14 +1,15 @@
 name: Deploy Dev
 on:
   workflow_dispatch:
-    buildEnvForDev:
-      description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
-      type: 'choice'
-      required: false
-      default: prod
-      options:
-        - prod
-        - qa
+    inputs:
+      buildEnvForDev:
+        description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+        type: 'choice'
+        required: false
+        default: prod
+        options:
+          - prod
+          - qa
 
 jobs:
   build:
