@@ -23,7 +23,7 @@ export default class HMSPublishConnection extends HMSConnection {
     this.observer = observer;
     this.transport = transport;
 
-    this.nativeConnection = new RTCPeerConnection(config);
+    this.nativeConnection = new RTCPeerConnection({ ...config, iceTransportPolicy: 'relay' });
     this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
       protocol: 'SCTP',
     });
