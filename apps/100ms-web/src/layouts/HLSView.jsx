@@ -163,7 +163,7 @@ const HLSView = () => {
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsController?.off(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
-      videoEl?.textTracks.addEventListener("addtrack", handleTrackAddEvent);
+      videoEl?.textTracks.removeEventListener("addtrack", handleTrackAddEvent);
       hlsController?.reset();
       hlsStats = null;
       hlsController = null;
