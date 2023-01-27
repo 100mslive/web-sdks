@@ -47,6 +47,7 @@ jobs:
 
       - name: copy over api reference
         run: |
+          cd ./100ms-docs/docs/api-reference/
           mkdir react 
           cd react
           mkdir hooks
