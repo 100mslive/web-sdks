@@ -48,7 +48,7 @@ jobs:
       - name: copy over api reference
         run: |
           cp -R ./packages/hms-video-store/docs ./100ms-docs/docs/api-reference/javascript
-          cp -R ./packages/react-sdk/docs ./100ms-docs/docs/api-reference/react-sdk
+          cp -R ./packages/react-sdk/docs ./100ms-docs/docs/api-reference/react/hooks
 
       - name: replace old api-reference
         working-directory: ./100ms-docs/docs/api-reference/javascript
