@@ -442,7 +442,7 @@ export interface IHMSActions {
    *            than a plain object (i.e) JSON.parse()able.
    *          - If set to true on non-plain objects, this is ignored.
    * @example
-   * assume appdata is initially
+   * assume appData is initially
    *  `{
    *     mySettings: {
    *       setting1: 'val1',

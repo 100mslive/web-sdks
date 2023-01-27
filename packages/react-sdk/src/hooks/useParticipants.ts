@@ -24,7 +24,7 @@ export interface useParticipantsResult {
    */
   isConnected: boolean;
   /**
-   * role names with atleast one participant present with that role
+   * role names with at least one participant present with that role
    */
   rolesWithParticipants: HMSRoleName[];
 }
