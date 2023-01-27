@@ -14,6 +14,7 @@ import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { BeamControllerStore } from '../../controller/beam/BeamController';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSStore } from '../schema';
@@ -23,6 +24,7 @@ import { HMSStats } from '../webrtc-stats';
 declare global {
   interface Window {
     __hms: HMSReactiveStore;
+    __beam: BeamControllerStore;
   }
 }
 
@@ -63,6 +65,7 @@ export class HMSReactiveStore {
 
     if (isBrowser) {
       window.__hms = this;
+      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
     }
   }
 

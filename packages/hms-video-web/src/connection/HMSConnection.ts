@@ -1,6 +1,6 @@
 import { HMSConnectionRole } from './model';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSLocalTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
@@ -157,13 +157,21 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
+  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
+    const maxBitrate = track.settings.maxBitrate;
+    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
     if (sender) {
       const params = sender.getParameters();
       if (params.encodings.length > 0) {
-        params.encodings[0].maxBitrate = maxBitrate * 1000;
+        if (maxBitrate) {
+          params.encodings[0].maxBitrate = maxBitrate * 1000;
+        }
+        if (maxFramerate) {
+          // @ts-ignore
+          params.encodings[0].maxFramerate = maxFramerate;
+        }
       }
       await sender.setParameters(params);
     } else {

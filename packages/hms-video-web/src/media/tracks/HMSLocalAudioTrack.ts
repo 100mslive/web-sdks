@@ -65,11 +65,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const prevTrack = this.nativeTrack;
     const prevState = this.enabled;
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
-    /**
-     * Stop has to be called before getting newTrack as it would cause NotReadableError
+    const newTrack = await getAudioTrack(settings);
+    /*
+     * stop the previous only after acquiring the new track otherwise this can lead to
+     * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
-    const newTrack = await getAudioTrack(settings);
+    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
     newTrack.enabled = prevState;
 
     const localStream = this.stream as HMSLocalStream;
@@ -230,7 +232,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrate(settings.maxBitrate, this);
+      await stream.setMaxBitrateAndFramerate(this);
     }
 
     if (hasPropertyChanged('advanced')) {
