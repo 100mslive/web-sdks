@@ -61,7 +61,7 @@ jobs:
       - name: replace old react-sdk api-reference
         working-directory: ./100ms-docs/docs/api-reference/react/hooks
         run: |
-          mv docs v2
+          mv docs .
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v3
