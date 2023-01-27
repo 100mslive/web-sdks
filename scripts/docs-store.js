@@ -34,6 +34,8 @@ const replaceTitleWithMetadata = content => {
   let title = firstLineParts.at(2) || firstLineParts.at(1);
   if (title === '@100mslive/hms-video-store') {
     title = 'Web SDK API Reference'; // for the root content.mdx
+  } else if (title === '@100mslive/react-sdk') {
+    title = 'React Hooks API Reference'; // for the root content.
   }
   const meta = `---\ntitle: ${title}\n---`;
   lines.splice(0, 1, meta);
