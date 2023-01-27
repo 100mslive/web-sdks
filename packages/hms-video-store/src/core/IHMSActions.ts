@@ -143,13 +143,13 @@ export interface IHMSActions {
   /**
    * Change settings of the local peer's audio track
    * @param settings HMSAudioTrackSettings
-   * ({ volume, codec, maxBitrate, deviceId, advanced })
+   * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
-   * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
+   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
 
@@ -339,14 +339,14 @@ export interface IHMSActions {
    * It is useful for defining timed metadata for interstitial regions such as advertisements,
    * but can be used to define any timed metadata needed by your stream.
    * usage (e.g)
-   * const metadataList = [{
+   * const metadataList = `[{
    *  payload: "some string 1",
    *  duration: 2
    * },
    * {
    *  payload: "some string 2",
    *  duration: 3
-   * }]
+   * }]`
    * sendHLSTimedMetadata(metadataList);
    */
   sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
@@ -443,19 +443,19 @@ export interface IHMSActions {
    *          - If set to true on non-plain objects, this is ignored.
    * @example
    * assume appdata is initially
-   *  {
+   *  `{
    *     mySettings: {
    *       setting1: 'val1',
    *       setting2: 'val2',
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * after calling,
-   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * `setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);`
    * it becomes
-   *  {
+   *  `{
    *     mySettings: {
    *       setting1: 'val1-edit',
    *       setting2: 'val2',
@@ -463,7 +463,7 @@ export interface IHMSActions {
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * Note: This is not suitable for keeping large data or data which updates
    * at a high frequency, it is recommended to use app side store for those
