@@ -93,7 +93,7 @@ export const useVideoList = ({
 }: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
-  // using vanilla store as we don't need re-rendering everytime something in a track changes
+  // using vanilla store as we don't need re-rendering every time something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
     peers,
