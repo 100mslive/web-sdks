@@ -65,7 +65,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     if (isHlsViewer) {
       hideSettingByTabName("layout")(true);
     }
-  }, [isHlsViewer]);
+  }, [isHlsViewer, hideSettingByTabName]);
 
   const [selection, setSelection] = useState(
     () => Object.keys(showSetting).filter(key => showSetting[key])[0] ?? ""
@@ -80,9 +80,9 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     } else {
       const firstNotHiddenTabName =
         Object.keys(showSetting).filter(key => showSetting[key])[0] ?? "";
-      setSelection(firstNotHiddenTabName)
+      setSelection(firstNotHiddenTabName);
     }
-  }, [isMobile]);
+  }, [isMobile, showSetting]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
