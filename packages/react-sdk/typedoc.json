@@ -8,7 +8,7 @@
   "excludeTags": ["@privateRemarks"],
   "hideBreadcrumbs": true,
   "hideInPageTOC": true,
-  "publicPath": "/api-reference/react/v2/",
+  "publicPath": "/api-reference/react/hooks/v2/",
   "githubPages": false,
   "excludeExternals": true,
   "externalPattern": [
