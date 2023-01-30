@@ -3,7 +3,7 @@ import { useFullscreen, useToggle } from "react-use";
 import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import screenfull from "screenfull";
-import { logMessage } from "zipyai";
+import { logError, logMessage } from "zipyai";
 import {
   selectAppData,
   selectHLSState,
@@ -78,15 +78,16 @@ const HLSView = () => {
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
+      const duration = rest.duration * 1000;
       const toast = {
         title: `Payload from timed Metadata ${data.payload}`,
-        duration: rest.duration * 1000 || 3000,
+        duration: duration || 3000,
       };
       logMessage("Added toast ", JSON.stringify(toast));
       ToastManager.addToast(toast);
     };
     const handleHLSError = error => {
-      logMessage("hls error ", error);
+      logError("hls error ", error);
     };
     const handleTimeUpdateListener = _ => {
       const textTrackListCount = videoEl.textTracks.length;
