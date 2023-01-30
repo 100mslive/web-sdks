@@ -66,7 +66,6 @@ const main = () => {
     const newContent = removeFileExtensionFromLinks(replaceTitleWithMetadata(replaceContentLinks(content)));
     if (newContent) {
       fs.writeFileSync(filePath, newContent);
-      // fs.renameSync(filePath, filePath.replace('.md', '.mdx'));
     }
   });
 };
