@@ -449,9 +449,6 @@ export class LocalTrackManager {
     const audioTrack = localTracks.find(t => t.type === HMSTrackType.AUDIO && t.source === 'regular') as
       | HMSLocalAudioTrack
       | undefined;
-    const screenTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
-      | HMSLocalVideoTrack
-      | undefined;
 
     if (trackSettings?.video) {
       await videoTrack?.setSettings(trackSettings.video);
@@ -459,10 +456,6 @@ export class LocalTrackManager {
 
     if (trackSettings?.audio) {
       await audioTrack?.setSettings(trackSettings.audio);
-    }
-
-    if (trackSettings?.screen) {
-      await screenTrack?.setSettings(trackSettings.screen);
     }
 
     return { videoTrack, audioTrack };
