@@ -85,6 +85,9 @@ const HLSView = () => {
       logMessage("Added toast ", JSON.stringify(toast));
       ToastManager.addToast(toast);
     };
+    const handleHLSError = error => {
+      logMessage("hls error ", error);
+    };
     const handleTimeUpdateListener = _ => {
       const textTrackListCount = videoEl.textTracks.length;
       for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
@@ -140,12 +143,14 @@ const HLSView = () => {
 
       hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsController.on(Hls.Events.ERROR, handleHLSError);
     }
     return () => {
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController?.off(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       hlsController?.off(HLS_TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsController?.off(HLS_STREAM_NO_LONGER_LIVE, handleNoLongerLive);
+      hlsController?.off(Hls.Events.ERROR, handleHLSError);
       videoEl.removeEventListener("timeupdate", handleTimeUpdateListener);
       hlsController?.reset();
       hlsStats = null;
