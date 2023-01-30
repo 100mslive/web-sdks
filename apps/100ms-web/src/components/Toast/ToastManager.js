@@ -6,6 +6,7 @@ export const ToastManager = {
   addToast(toast) {
     const id = toast.id ? toast.id : v4();
     this.toasts.set(id, { ...toast, id });
+    console.log("toast ", toast);
     this.onChange();
     return id;
   },
