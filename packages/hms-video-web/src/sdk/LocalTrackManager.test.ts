@@ -388,6 +388,11 @@ describe('LocalTrackManager', () => {
     beforeEach(() => {
       testStore = new Store();
       testEventBus = new EventBus();
+      localPeer = new HMSLocalPeer({
+        name: 'test',
+        role: hostRole,
+      });
+      testStore.addPeer(localPeer);
       mockGetUserMedia.mockClear();
     });
 
