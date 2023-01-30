@@ -3,6 +3,7 @@ import { useFullscreen, useToggle } from "react-use";
 import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import screenfull from "screenfull";
+import { logMessage } from "zipyai";
 import {
   selectAppData,
   selectHLSState,
@@ -77,10 +78,12 @@ const HLSView = () => {
     const metadataLoadedHandler = ({ payload, ...rest }) => {
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
-      ToastManager.addToast({
+      const toast = {
         title: `Payload from timed Metadata ${data.payload}`,
         duration: rest.duration * 1000 || 3000,
-      });
+      };
+      logMessage("Added toast ", JSON.stringify(toast));
+      ToastManager.addToast(toast);
     };
     const handleTimeUpdateListener = _ => {
       const textTrackListCount = videoEl.textTracks.length;
@@ -105,14 +108,14 @@ const HLSView = () => {
               new Date(programData) -
               videoEl.currentTime * 1000;
             const duration = new Date(endDate) - new Date(startDate);
-            setTimeout(
-              () =>
-                ToastManager.addToast({
-                  title: `Payload from timed Metadata ${data.payload}`,
-                  duration: duration,
-                }),
-              startTime
-            );
+            setTimeout(() => {
+              const toast = {
+                title: `Payload from timed Metadata ${data.payload}`,
+                duration: duration,
+              };
+              logMessage("Added toast ", JSON.stringify(toast));
+              ToastManager.addToast(toast);
+            }, startTime);
             cue.fired = true;
           }
           cueIndex++;
@@ -120,6 +123,7 @@ const HLSView = () => {
       }
     };
     if (!videoEl || !hlsUrl) {
+      logMessage("video element or hlsurl is not defined");
       return;
     }
     if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
