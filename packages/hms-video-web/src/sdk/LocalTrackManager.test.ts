@@ -7,9 +7,10 @@ import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
+import { PolicyParams } from '../notification-manager';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
-import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
+import { HMSLocalVideoTrack, HMSTrackType } from '..';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -28,35 +29,68 @@ const testObserver: ITransportObserver = {
 let testStore = new Store();
 let testEventBus = new EventBus();
 
-const hostPublishParams: PublishParams = {
-  allowed: ['audio', 'video', 'screen'],
-  audio: {
-    bitRate: 32,
-    codec: 'opus',
-  },
-  video: {
-    bitRate: 400,
-    codec: 'vp8',
-    frameRate: 30,
-    width: 640,
-    height: 480,
-  },
-  screen: {
-    codec: 'vp8',
-    frameRate: 10,
-    width: 1920,
-    height: 1080,
-    bitRate: 400,
-  },
-  simulcast: {
-    video: {
-      layers: [],
-    },
-    screen: {
-      layers: [],
+const policyParams: PolicyParams = {
+  name: 'host',
+  template_id: '1',
+  known_roles: {
+    host: {
+      name: 'host',
+      subscribeParams: {
+        maxSubsBitRate: 1000,
+        subscribeToRoles: ['host'],
+      },
+      priority: 1,
+      permissions: {
+        endRoom: false,
+        removeOthers: false,
+        unmute: false,
+        mute: false,
+        changeRole: false,
+        hlsStreaming: false,
+        rtmpStreaming: false,
+        browserRecording: false,
+      },
+      publishParams: {
+        allowed: ['audio', 'video', 'screen'],
+        audio: {
+          bitRate: 32,
+          codec: 'opus',
+        },
+        video: {
+          bitRate: 400,
+          codec: 'vp8',
+          frameRate: 30,
+          width: 640,
+          height: 480,
+        },
+        screen: {
+          codec: 'vp8',
+          frameRate: 10,
+          width: 1920,
+          height: 1080,
+          bitRate: 400,
+        },
+        simulcast: {
+          video: {
+            layers: [],
+          },
+          screen: {
+            layers: [],
+          },
+        },
+      },
     },
   },
 };
+
+const hostRole = policyParams.known_roles[policyParams.name];
+const publishParams = hostRole.publishParams;
+
+let localPeer = new HMSLocalPeer({
+  name: 'test',
+  role: hostRole,
+});
+testStore.addPeer(localPeer);
 
 const mockMediaStream = {
   id: 'native-stream-id',
@@ -177,6 +211,11 @@ describe('LocalTrackManager', () => {
   beforeEach(() => {
     testStore = new Store();
     testEventBus = new EventBus();
+    localPeer = new HMSLocalPeer({
+      name: 'test',
+      role: hostRole,
+    });
+    testStore.addPeer(localPeer);
   });
 
   it('instantiates without any issues', () => {
@@ -198,7 +237,7 @@ describe('LocalTrackManager', () => {
       testEventBus,
       new AnalyticsTimer(),
     );
-    testStore.setPublishParams(hostPublishParams);
+    testStore.setKnownRoles(policyParams);
     await manager.getTracksToPublish({});
 
     const constraints = mockGetUserMedia.mock.calls[0][0];
@@ -221,7 +260,7 @@ describe('LocalTrackManager', () => {
         new AnalyticsTimer(),
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
     });
 
     afterEach(() => {
@@ -320,15 +359,15 @@ describe('LocalTrackManager', () => {
       const droppedConstraints = mockOverConstrainedGetUserMedia.mock.calls[1][0];
 
       for (const constraint in audioContraints) {
-        if (constraint in hostPublishParams.audio) {
-          expect(audioContraints[constraint]).toEqual((hostPublishParams.audio as any)[constraint]);
+        if (constraint in publishParams.audio) {
+          expect(audioContraints[constraint]).toEqual((publishParams.audio as any)[constraint]);
         }
       }
       for (const constraint in videoConstraints) {
-        if (constraint in hostPublishParams.video) {
+        if (constraint in publishParams.video) {
           const constraintValue = videoConstraints[constraint];
           const value = typeof constraintValue === 'object' ? constraintValue?.ideal : constraintValue;
-          expect(value).toEqual((hostPublishParams.video as any)[constraint]);
+          expect(value).toEqual((publishParams.video as any)[constraint]);
         }
       }
       for (const constraint in droppedConstraints.audio) {
@@ -353,9 +392,6 @@ describe('LocalTrackManager', () => {
     });
 
     it('diffs the local tracks to publish', async () => {
-      const localPeer = new HMSLocalPeer({
-        name: 'test',
-      });
       const mockVideoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         {
@@ -368,7 +404,6 @@ describe('LocalTrackManager', () => {
       );
       localPeer.videoTrack = mockVideoTrack;
 
-      testStore.addPeer(localPeer);
       testStore.addTrack(mockVideoTrack);
 
       const manager = new LocalTrackManager(
@@ -378,7 +413,7 @@ describe('LocalTrackManager', () => {
         testEventBus,
         new AnalyticsTimer(),
       );
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 
       expect(mockGetUserMedia).toHaveBeenCalledTimes(1);
@@ -389,9 +424,6 @@ describe('LocalTrackManager', () => {
     });
 
     it("doesn't fetch tracks if already present", async () => {
-      const localPeer = new HMSLocalPeer({
-        name: 'test',
-      });
       localPeer.videoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         {
@@ -403,8 +435,6 @@ describe('LocalTrackManager', () => {
         testEventBus,
       );
 
-      testStore.addPeer(localPeer);
-
       const manager = new LocalTrackManager(
         testStore,
         testObserver,
@@ -412,7 +442,7 @@ describe('LocalTrackManager', () => {
         testEventBus,
         new AnalyticsTimer(),
       );
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 
       expect(mockGetUserMedia).toHaveBeenCalledTimes(1);

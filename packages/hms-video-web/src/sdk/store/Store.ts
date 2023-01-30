@@ -4,7 +4,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -221,15 +221,6 @@ class Store implements IStore {
     }
     this.config = config;
     this.setEnv();
-  }
-
-  setPublishParams(params: PublishParams) {
-    // this.publishParams = params;
-    if (!this.simulcastEnabled) {
-      return;
-    }
-    this.videoLayers = this.convertSimulcastLayers(params.simulcast?.video);
-    // this.screenshareLayers = this.convertSimulcastLayers(params.simulcast?.screen);
   }
 
   addPeer(peer: HMSPeer) {
