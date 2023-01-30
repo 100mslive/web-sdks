@@ -162,8 +162,8 @@ export const CREATE_ROOM_DOC_URL =
 export const REMOTE_STOP_SCREENSHARE_TYPE = "REMOTE_STOP_SCREENSHARE";
 
 export const isIOS = () =>
-  parsedUserAgent.getOS().name?.toLowerCase() === "ios";
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "ios";
 export const isMacOS = () =>
-  parsedUserAgent.getOS().name?.toLowerCase() === "mac os";
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid = () =>
-  parsedUserAgent.getOS().name?.toLowerCase() === "android";
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
