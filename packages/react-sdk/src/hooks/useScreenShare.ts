@@ -13,7 +13,7 @@ import { logErrorHandler } from '../utils/commons';
 
 export interface useScreenShareResult {
   /**
-   * true if the local user is screensharing, false otherwise
+   * true if the local user is sharing screen, false otherwise
    */
   amIScreenSharing: boolean;
   /**
@@ -21,12 +21,12 @@ export interface useScreenShareResult {
    */
   toggleScreenShare?: (config?: HMSScreenShareConfig) => Promise<void>;
   /**
-   * the id of the peer who is currently screensharing, will only be present if there is a screenshare in the room.
+   * the id of the peer who is currently sharing screen, will only be present if there is a screenshare in the room.
    * In case of multiple screenshares, the behaviour of which one is picked is not defined.
    */
   screenSharingPeerId?: HMSPeerID;
   /**
-   * the name of the peer who is currently screensharing. Will be undefined if no one is sharing the screen.
+   * the name of the peer who is currently sharing screen. Will be undefined if no one is sharing the screen.
    * In case of multiple screenshares, the behavior of which one is picked is not defined.
    */
   screenSharingPeerName?: string;

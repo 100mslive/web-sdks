@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "docs",
+  "disableSources": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeTags": ["@privateRemarks"],
+  "hideBreadcrumbs": true,
+  "hideInPageTOC": true,
+  "publicPath": "/api-reference/javascript/v2/react/",
+  "githubPages": false,
+  "excludeExternals": true,
+  "externalPattern": [
+    "**/node_modules/**",
+    "**/hms-video-store/**/*.ts",
+    "**/hms-video-web/**/*.ts",
+  ]
+}

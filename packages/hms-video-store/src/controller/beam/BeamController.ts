@@ -1,6 +1,10 @@
 import { HMSNotifications, IHMSNotifications, IHMSStore } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 import { IHMSStoreReadOnly } from '../../core/IHMSStore';
+
+/**
+ * @internal
+ */
 export class BeamControllerStore {
   // perform action to add, remove beam
   private readonly actions: IHMSActions;

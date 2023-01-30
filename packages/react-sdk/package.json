@@ -19,7 +19,7 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc src/index.ts --plugin none",
+    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store",
     "test": "jest --maxWorkers=1"
   },
   "devDependencies": {

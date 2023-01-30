@@ -175,7 +175,7 @@ export class HMSReactiveStore {
   /**
    * use shallow equality check by default for subscribe to optimize for array/object selectors.
    * by default zustand does only reference matching so something like, getPeers for eg. would trigger
-   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array everytime.
+   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array every time.
    * Although the array reference changes, the order of peers and peer objects don't themselves change in this case,
    * and a shallow check avoids that triggering.
    * @private
