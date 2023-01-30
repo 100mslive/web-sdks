@@ -1,5 +1,6 @@
 import {
   DeviceMap,
+  DeviceType,
   HLSConfig,
   HLSMeetingURLVariant,
   HLSTimedMetadata,
@@ -62,6 +63,7 @@ export {
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
   simulcastMapping,
+  DeviceType,
 };
 
 export type {

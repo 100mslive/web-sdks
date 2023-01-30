@@ -1,5 +1,5 @@
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
-import { DeviceChangeListener } from './device-change-listener';
+import { DeviceChangeListener } from './devices';
 import { HMSLeaveRoomRequest } from './leave-room-request';
 import { HMSMessage } from './message';
 import { HMSConnectionQuality } from './peer';

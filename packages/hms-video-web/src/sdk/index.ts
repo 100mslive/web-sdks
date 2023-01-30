@@ -29,7 +29,7 @@ import {
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
 } from '../interfaces';
-import { DeviceChangeListener } from '../interfaces/device-change-listener';
+import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
 import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import HMSInterface from '../interfaces/hms';
