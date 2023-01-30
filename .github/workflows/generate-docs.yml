@@ -56,7 +56,7 @@ jobs:
         run: |
           rm -r v2
           mv docs v2
-          mv react v2/react
+          mv react/docs v2/react
       
       - name: Create PR
         uses: peter-evans/create-pull-request@v3
