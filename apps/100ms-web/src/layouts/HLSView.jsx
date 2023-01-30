@@ -30,7 +30,7 @@ import {
   HLSController,
 } from "../controllers/hls/HLSController";
 import { metadataPayloadParser } from "../common/utils";
-import { APP_DATA, isIOS, isMacOS } from "../common/constants";
+import { APP_DATA, isIOS } from "../common/constants";
 
 let hlsController;
 let hlsStats;
@@ -122,11 +122,7 @@ const HLSView = () => {
     if (!videoEl || !hlsUrl) {
       return;
     }
-    if (
-      videoEl.canPlayType("application/vnd.apple.mpegurl") &&
-      isIOS &&
-      isMacOS
-    ) {
+    if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
       console.log("PLAYING HLS NATIVELY");
       videoEl.src = hlsUrl;
       videoEl.addEventListener("timeupdate", handleTimeUpdateListener);
