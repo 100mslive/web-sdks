@@ -105,7 +105,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
 
-    this.nativeConnection = new RTCPeerConnection({ ...config, iceTransportPolicy: 'relay' });
+    this.nativeConnection = new RTCPeerConnection({ ...config });
     this.initNativeConnectionCallbacks();
   }
 

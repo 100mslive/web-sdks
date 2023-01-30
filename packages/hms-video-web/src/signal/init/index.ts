@@ -72,8 +72,41 @@ export function getUrl(endpoint: string, peerId: string, userAgent: string, regi
 }
 
 export function transformInitConfig(config: any): InitConfig {
-  return {
+  let host = "test-turn.100ms.live"
+  let list = [ `turn:${host}`,`turn:${host}?transport=tcp`, `turn:${host}:443?transport=tcp`, `turns:${host}:443`]
+  
+  const c =  {
     ...config,
-    rtcConfiguration: { ...config.rtcConfiguration, iceServers: config.rtcConfiguration?.ice_servers },
+    rtcConfiguration: { 
+      ...config.rtcConfiguration, 
+      iceServers: config.rtcConfiguration?.ice_servers,
+      iceTransportPolicy: process.env.ONLY_RELAY == "true" ? "relay" : "all"
+    },
   };
+  c.rtcConfiguration.iceServers[0].urls = list
+  console.log(c)
+  return c
 }
+
+// export function transformInitConfig(config: any): InitConfig {
+//   let host = "test-turn.100ms.live"
+//   let list = [ `turn:${host}`,`turn:${host}?transport=tcp`, `turn:${host}:443?transport=tcp`, `turns:${host}:443`]
+//   const iceServers = []
+  
+//   for (let url of list) {
+//     let server = { ...config.rtcConfiguration?.ice_servers[0], urls: [url] }
+//     iceServers.push(server)
+//   }
+
+//   const c =  {
+//     ...config,
+//     rtcConfiguration: { 
+//       ...config.rtcConfiguration,
+//       iceServers,
+//       iceTransportPolicy: process.env.ONLY_RELAY == "true" ? "relay" : "all"
+//     },
+//   };
+
+//   console.log(c)
+//   return c
+// }
