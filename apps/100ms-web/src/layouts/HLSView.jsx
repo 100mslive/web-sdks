@@ -3,7 +3,6 @@ import { useFullscreen, useToggle } from "react-use";
 import { HlsStats } from "@100mslive/hls-stats";
 import Hls from "hls.js";
 import screenfull from "screenfull";
-import { logError, logMessage } from "zipyai";
 import {
   selectAppData,
   selectHLSState,
@@ -83,18 +82,17 @@ const HLSView = () => {
         title: `Payload from timed Metadata ${data.payload}`,
         duration: duration || 3000,
       };
-      logMessage("Added toast ", JSON.stringify(toast));
+      console.debug("Added toast ", JSON.stringify(toast));
       ToastManager.addToast(toast);
     };
     const handleHLSError = error => {
-      logError("hls error ", error);
+      console.error(error);
     };
     const handleTimeUpdateListener = _ => {
       const textTrackListCount = videoEl.textTracks.length;
       for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
         const textTrack = videoEl.textTracks[trackIndex];
         if (textTrack.kind !== "metadata") {
-          // return;
           continue;
         }
         textTrack.mode = "showing";
@@ -102,32 +100,33 @@ const HLSView = () => {
         let cueIndex = 0;
         while (cueIndex < cuesLength) {
           const cue = textTrack.cues[cueIndex];
-          if (!cue.fired) {
-            const data = metadataPayloadParser(cue.value.data);
-            const programData = videoEl.getStartDate();
-            const startDate = data.start_date;
-            const endDate = data.end_date;
-            const startTime =
-              new Date(startDate) -
-              new Date(programData) -
-              videoEl.currentTime * 1000;
-            const duration = new Date(endDate) - new Date(startDate);
-            setTimeout(() => {
-              const toast = {
-                title: `Payload from timed Metadata ${data.payload}`,
-                duration: duration,
-              };
-              logMessage("Added toast ", JSON.stringify(toast));
-              ToastManager.addToast(toast);
-            }, startTime);
-            cue.fired = true;
+          if (cue.fired) {
+            continue;
           }
+          const data = metadataPayloadParser(cue.value.data);
+          const programData = videoEl.getStartDate();
+          const startDate = data.start_date;
+          const endDate = data.end_date;
+          const startTime =
+            new Date(startDate) -
+            new Date(programData) -
+            videoEl.currentTime * 1000;
+          const duration = new Date(endDate) - new Date(startDate);
+          setTimeout(() => {
+            const toast = {
+              title: `Payload from timed Metadata ${data.payload}`,
+              duration: duration,
+            };
+            console.debug("Added toast ", JSON.stringify(toast));
+            ToastManager.addToast(toast);
+          }, startTime);
+          cue.fired = true;
           cueIndex++;
         }
       }
     };
     if (!videoEl || !hlsUrl) {
-      logMessage("video element or hlsurl is not defined");
+      console.debug("video element or hlsurl is not defined");
       return;
     }
     if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
