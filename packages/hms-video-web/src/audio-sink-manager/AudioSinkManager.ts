@@ -9,6 +9,7 @@ import { HMSRemotePeer } from '../sdk/models/peer';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { isMobile } from '../utils/support';
+import { sleep } from '../utils/timer-utils';
 
 /**
  * Following are the errors thrown when autoplay is blocked in different browsers
@@ -98,7 +99,7 @@ export class AudioSinkManager {
     this.state = { ...INITIAL_STATE };
   }
 
-  private handleAudioPaused = (event: any) => {
+  private handleAudioPaused = async (event: any) => {
     const audioEl = event.target as HTMLAudioElement;
     //@ts-ignore
     const track = audioEl.srcObject?.getAudioTracks()[0];
@@ -112,11 +113,10 @@ export class AudioSinkManager {
     if (audioTrack) {
       if (isMobile()) {
         // Play after a delay since mobile devices don't call onDevice change event
-        setTimeout(async () => {
-          if (audioTrack) {
-            await this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
-          }
-        }, 500);
+        await sleep(500);
+        if (audioTrack) {
+          this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
+        }
       } else {
         this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       }
@@ -141,7 +141,7 @@ export class AudioSinkManager {
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
 
-    audioEl.onerror = async () => {
+    audioEl.onerror = () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl);
