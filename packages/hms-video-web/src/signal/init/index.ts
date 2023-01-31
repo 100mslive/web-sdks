@@ -75,16 +75,27 @@ export function transformInitConfig(config: any): InitConfig {
   let host = "test-turn.100ms.live"
   let list = [ `turn:${host}`,`turn:${host}?transport=tcp`, `turn:${host}:443?transport=tcp`, `turns:${host}:443`]
   
+  
   const c =  {
     ...config,
     rtcConfiguration: { 
       ...config.rtcConfiguration, 
       iceServers: config.rtcConfiguration?.ice_servers,
-      iceTransportPolicy: process.env.ONLY_RELAY == "true" ? "relay" : "all"
+      
     },
   };
-  c.rtcConfiguration.iceServers[0].urls = list
-  console.log(c)
+
+  const relayConfig = process.env.ONLY_RELAY
+  switch(relayConfig) {
+    case "NO_RELAY": 
+      c.rtcConfiguration = {}
+      break; 
+    case "USE_RELAY":
+      c.rtcConfiguration.iceServers[0].urls = list;
+      c.rtcConfiguration.iceTransportPolicy = "relay";
+      break;
+  }
+  console.log(c.rtcConfiguration)
   return c
 }
 
