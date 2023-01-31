@@ -1,3 +1,4 @@
+import { parsedUserAgent } from "@100mslive/react-sdk";
 import { QUERY_PARAM_SKIP_PREVIEW } from "./constants";
 
 export function shadeColor(color, percent) {
@@ -86,3 +87,10 @@ export const metadataPayloadParser = payload => {
     return { payload };
   }
 };
+
+export const isIOS = () =>
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "ios";
+export const isMacOS = () =>
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
+export const isAndroid = () =>
+  parsedUserAgent.getOS()?.name?.toLowerCase() === "android";

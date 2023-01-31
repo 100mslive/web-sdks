@@ -30,8 +30,8 @@ import {
   HLS_TIMED_METADATA_LOADED,
   HLSController,
 } from "../controllers/hls/HLSController";
-import { metadataPayloadParser } from "../common/utils";
-import { APP_DATA, isIOS } from "../common/constants";
+import { isIOS, metadataPayloadParser } from "../common/utils";
+import { APP_DATA } from "../common/constants";
 
 let hlsController;
 let hlsStats;
