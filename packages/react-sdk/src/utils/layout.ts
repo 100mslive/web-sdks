@@ -338,12 +338,35 @@ export const getTileSizesWithRowConstraint = ({
   };
 };
 
+const getLayoutSizes = ({
+  tiles,
+  maxColCount,
+  aspectRatio,
+  parentWidth,
+  parentHeight,
+}: {
+  tiles: number;
+  maxColCount: number;
+  aspectRatio: { width: number; height: number };
+  parentHeight: number;
+  parentWidth: number;
+}) => {
+  const cols = Math.min(maxColCount!, Math.floor(Math.sqrt(tiles)));
+  const rows = Math.ceil(tiles / cols);
+  let height = parentHeight / rows;
+  let width = height * (aspectRatio.width / aspectRatio.height);
+  if (width * cols > parentWidth) {
+    width = parentWidth / cols;
+    height = width / (aspectRatio.width / aspectRatio.height);
+  }
+  return { width, height, rows, cols };
+};
+
 export const getTileSizesWithRowAndColConstraint = ({
   parentWidth,
   parentHeight,
   count,
   maxCount,
-  maxRowCount,
   maxColCount,
   aspectRatio,
 }: GetTileSizes) => {
@@ -354,32 +377,27 @@ export const getTileSizesWithRowAndColConstraint = ({
   let isLastPageDifferentFromFirstPage = false;
   let tilesInFirstPage = 0;
   let tilesinLastPage = 0;
-  const rows = Math.min(
-    Math.ceil(Math.sqrt((count * (aspectRatio.width / aspectRatio.height)) / (parentWidth / parentHeight))),
-    maxRowCount!,
-  );
-  const cols = Math.min(
-    Math.ceil(Math.sqrt((count * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
-    maxColCount!,
-  );
-  const height = parentHeight / rows;
-  const width = parentWidth / cols;
+  const tiles = Math.min(count, maxCount);
+  const { rows, cols, width, height } = getLayoutSizes({
+    tiles,
+    maxColCount: maxColCount!,
+    parentWidth,
+    parentHeight,
+    aspectRatio,
+  });
   defaultWidth = width;
   defaultHeight = height;
   tilesInFirstPage = Math.min(count, rows * cols, maxCount);
   tilesinLastPage = count % (rows * cols);
   isLastPageDifferentFromFirstPage = tilesinLastPage > 0 && count > rows * cols;
   if (isLastPageDifferentFromFirstPage) {
-    const cols = Math.min(
-      Math.ceil(Math.sqrt((tilesinLastPage * (parentWidth / parentHeight)) / (aspectRatio.width / aspectRatio.height))),
-      maxCount,
-    );
-    let width = parentWidth / cols;
-    let height = width / (aspectRatio.width / aspectRatio.height);
-    if (height > parentHeight) {
-      height = parentHeight;
-      width = height / (aspectRatio.height / aspectRatio.width);
-    }
+    const { width, height } = getLayoutSizes({
+      tiles: tilesinLastPage,
+      maxColCount: maxColCount!,
+      parentWidth,
+      parentHeight,
+      aspectRatio,
+    });
     lastPageHeight = height;
     lastPageWidth = width;
   }
@@ -421,7 +439,7 @@ export function calculateLayoutSizes({
     };
   }
 
-  if (maxTileCount && maxRowCount && maxColCount) {
+  if (maxTileCount && maxColCount) {
     ({
       tilesInFirstPage,
       defaultWidth,
