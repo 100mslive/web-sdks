@@ -29,7 +29,7 @@ import {
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
 } from '../interfaces';
-import { DeviceChangeListener } from '../interfaces/device-change-listener';
+import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
 import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import HMSInterface from '../interfaces/hms';
@@ -1075,10 +1075,11 @@ export class HMSSdk implements HMSInterface {
 
   private sendAudioPresenceFailed = () => {
     const error = ErrorFactory.TracksErrors.NoAudioDetected(HMSAction.PREVIEW);
-    this.sendAnalyticsEvent(
-      AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
-    );
-    this.listener?.onError(error);
+    HMSLogger.w(this.TAG, 'Audio Presence Failure', this.transportState, error);
+    // this.sendAnalyticsEvent(
+    //   AnalyticsEventFactory.audioDetectionFail(error, this.deviceManager.getCurrentSelection().audioInput),
+    // );
+    // this.listener?.onError(error);
   };
 
   private sendJoinAnalyticsEvent = (is_preview_called = false, error?: HMSException) => {

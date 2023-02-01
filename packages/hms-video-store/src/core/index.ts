@@ -19,6 +19,7 @@ export {
   parsedUserAgent,
   HMSSimulcastLayer,
   simulcastMapping,
+  DeviceType,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 

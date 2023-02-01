@@ -62,7 +62,7 @@ export interface usePreviewResult {
 }
 
 /**
- * This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
+ * This hook can be used to build a preview UI component, this lets you call preview every time the passed in
  * token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
  * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
  * Any device change or mute/unmute will be carried across to join.
