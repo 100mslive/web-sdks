@@ -40,7 +40,6 @@ export default class HMSPublishConnection extends HMSConnection {
 
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     this.nativeConnection.onconnectionstatechange = () => {
-      console.error('connectionstate', this.nativeConnection.connectionState);
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
     };
   }
