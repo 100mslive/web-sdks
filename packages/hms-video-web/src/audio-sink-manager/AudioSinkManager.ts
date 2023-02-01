@@ -114,9 +114,7 @@ export class AudioSinkManager {
       if (isMobile()) {
         // Play after a delay since mobile devices don't call onDevice change event
         await sleep(500);
-        if (audioTrack) {
-          this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
-        }
+        this.playAudioFor(audioTrack as HMSRemoteAudioTrack);
       } else {
         this.autoPausedTracks.add(audioTrack as HMSRemoteAudioTrack);
       }
@@ -146,7 +144,7 @@ export class AudioSinkManager {
       const ex = ErrorFactory.TracksErrors.AudioPlaybackError(`Audio playback error for track - ${track.trackId}`);
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
-        this.removeAudioElement(audioEl);
+        this.removeAudioElement(audioEl, track);
         this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
@@ -228,8 +226,7 @@ export class AudioSinkManager {
     this.autoPausedTracks.delete(track);
     const audioEl = document.getElementById(track.trackId) as HTMLAudioElement;
     if (audioEl) {
-      this.removeAudioElement(audioEl);
-      track.setAudioElement(null);
+      this.removeAudioElement(audioEl, track);
     }
     // Reset autoplay error thrown because if all tracks are removed and a new track is added
     // Autoplay error is thrown in safari
@@ -249,11 +246,12 @@ export class AudioSinkManager {
     await Promise.all(promises);
   };
 
-  private removeAudioElement = (audioEl: HTMLAudioElement) => {
+  private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
+      track.setAudioElement(null);
     }
   };
 }
