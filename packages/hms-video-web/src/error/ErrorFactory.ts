@@ -232,6 +232,16 @@ export const ErrorFactory = {
         'You must screen share the current tab in order to proceed',
       );
     },
+
+    AudioPlaybackError(description: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.AUDIO_PLAYBACK_ERROR,
+        'Audio playback error',
+        HMSAction.TRACK,
+        description,
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {

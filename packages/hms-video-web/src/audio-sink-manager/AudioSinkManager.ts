@@ -143,6 +143,8 @@ export class AudioSinkManager {
 
     audioEl.onerror = () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
+      const ex = ErrorFactory.TracksErrors.AudioPlaybackError(`Audio playback error for track - ${track.trackId}`);
+      this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl);
         this.handleTrackAdd({ track, peer, callListener: false });
