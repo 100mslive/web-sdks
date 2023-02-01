@@ -4,6 +4,7 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
+import useSortedPeers from "../common/useSortedPeers";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -20,6 +21,8 @@ const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
+  const sortedPeers = useSortedPeers(peers, maxTileCount);
+  console.log("render");
   return (
     <Fragment>
       <Box
@@ -30,9 +33,9 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
           "@md": { flex: "2 1 0" },
         }}
       >
-        {peers && peers.length > 0 ? (
+        {sortedPeers && sortedPeers.length > 0 ? (
           <VideoList
-            peers={peers}
+            peers={sortedPeers}
             maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
           />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
