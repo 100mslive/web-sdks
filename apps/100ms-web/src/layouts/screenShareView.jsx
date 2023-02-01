@@ -1,24 +1,24 @@
-import React, { useCallback, useMemo, Fragment } from "react";
+import React, { Fragment, useCallback, useMemo } from "react";
 import { useMedia } from "react-use";
 import {
-  useHMSStore,
+  selectLocalPeerID,
+  selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
   selectPeerSharingVideoPlaylist,
   selectScreenShareByPeerID,
-  selectLocalPeerID,
-  selectLocalPeerRoleName,
+  useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
+import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 import { ScreenshareDisplay } from "../components/ScreenshareDisplay";
 import ScreenshareTile from "../components/ScreenshareTile";
 import VideoList from "../components/VideoList";
 import VideoTile from "../components/VideoTile";
-import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 
 const ScreenShareView = () => {
   // for smaller screen we will show sidebar in bottom
-  const mediaQueryLg = cssConfig.media.lg;
+  const mediaQueryLg = cssConfig.media.xl;
   const showSidebarInBottom = useMedia(mediaQueryLg);
   const peers = useHMSStore(selectPeers);
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -57,7 +57,7 @@ const ScreenShareView = () => {
           overflow: "hidden",
           p: "$4 $8",
           flex: "0 0 20%",
-          "@lg": {
+          "@xl": {
             flex: "1 1 0",
           },
         }}
@@ -103,7 +103,6 @@ export const SidePane = ({
 };
 
 const ScreenShareComponent = ({
-  showStats,
   amIPresenting,
   peerPresenting,
   peerSharingPlaylist,
@@ -118,7 +117,7 @@ const ScreenShareComponent = ({
         css={{
           mx: "$8",
           flex: "3 1 0",
-          "@lg": {
+          "@xl": {
             flex: "2 1 0",
             display: "flex",
             alignItems: "center",
@@ -135,7 +134,7 @@ const ScreenShareComponent = ({
       css={{
         flex: "3 1 0",
         mx: "$8",
-        "@lg": { ml: "$4", maxHeight: "80%" },
+        "@xl": { ml: "$4", maxHeight: "80%", minHeight: 0 },
       }}
     >
       {peerPresenting &&

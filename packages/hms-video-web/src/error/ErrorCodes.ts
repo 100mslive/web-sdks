@@ -67,6 +67,12 @@ export const ErrorCodes = {
 
     // Operating System denied permission
     SYSTEM_DENIED_PERMISSION: 3011,
+
+    // Current tab is not shared when forceCurrentTab was set to true for screenshare
+    CURRENT_TAB_NOT_SHARED: 3012,
+
+    // any error that occurs while playing audio of remote audio tracks
+    AUDIO_PLAYBACK_ERROR: 3013,
   },
 
   WebrtcErrors: {
@@ -84,6 +90,9 @@ export const ErrorCodes = {
 
     // [{action}]: Ice connection state FAILED
     ICE_FAILURE: 4005,
+
+    // [{action}]: Ice connection state FAILED
+    ICE_DISCONNECTED: 4006,
   },
 
   WebsocketMethodErrors: {

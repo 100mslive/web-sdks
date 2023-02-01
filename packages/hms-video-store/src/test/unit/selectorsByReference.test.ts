@@ -1,10 +1,10 @@
-import { localAudio, localPeer, localVideo, makeFakeStore } from '../fakeStore';
 import {
   HMSStore,
-  selectIsLocalVideoPluginPresent,
-  selectIsLocalAudioPluginPresent,
   selectConnectionQualityByPeerID,
+  selectIsLocalAudioPluginPresent,
+  selectIsLocalVideoPluginPresent,
 } from '../../core';
+import { localAudio, localPeer, localVideo, makeFakeStore } from '../fakeStore';
 
 let fakeStore: HMSStore;
 

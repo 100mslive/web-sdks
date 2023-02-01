@@ -1,7 +1,7 @@
-import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
-import { HMSRemoteAudioTrack } from './HMSRemoteAudioTrack';
 import { HMSLocalAudioTrack } from './HMSLocalAudioTrack';
 import { HMSLocalVideoTrack } from './HMSLocalVideoTrack';
+import { HMSRemoteAudioTrack } from './HMSRemoteAudioTrack';
+import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 
 export type HMSRemoteTrack = HMSRemoteAudioTrack | HMSRemoteVideoTrack;
 export type HMSLocalTrack = HMSLocalAudioTrack | HMSLocalVideoTrack;

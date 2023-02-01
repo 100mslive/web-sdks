@@ -7,22 +7,23 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import {
-  HangUpIcon,
-  ExitIcon,
   AlertTriangleIcon,
+  ExitIcon,
+  HangUpIcon,
   VerticalMenuIcon,
 } from "@100mslive/react-icons";
 import {
+  Box,
   Button,
   Dialog,
-  Tooltip,
-  Box,
+  Dropdown,
+  Flex,
   IconButton,
   styled,
   Text,
-  Flex,
-  Dropdown,
+  Tooltip,
 } from "@100mslive/react-ui";
+import { ToastManager } from "./Toast/ToastManager";
 import {
   DialogCheckbox,
   DialogContent,
@@ -46,6 +47,7 @@ export const LeaveRoom = () => {
     } else {
       navigate("/leave/" + params.roomId);
     }
+    ToastManager.clearAllToast();
   };
 
   const leaveRoom = () => {

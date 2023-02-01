@@ -1,8 +1,8 @@
 import {
+  createDefaultStoreState,
   HMSReactiveStore,
   HMSStore,
   IHMSStore,
-  createDefaultStoreState,
   selectLocalPeer,
   selectPeers,
 } from '../../core';

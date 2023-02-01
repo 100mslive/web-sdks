@@ -1,7 +1,7 @@
+import { IStore } from './IStore';
 import { HMSTrack } from '../..';
 import { HMSTrackType } from '../../media/tracks';
 import { HMSPeer } from '../models/peer';
-import { IStore } from './IStore';
 
 /**
  * Function passed as argument to the sort method of the list.

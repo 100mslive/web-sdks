@@ -68,8 +68,6 @@ export const makeFakeStore = (): HMSStore => {
       name: 'test room',
       peers: ['1', '2', '3'],
       localPeer: '1',
-      shareableLink: '',
-      hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {
         browser: {

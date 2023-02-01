@@ -1,5 +1,6 @@
-import { AudioSinkManager } from '../audio-sink-manager';
 import { DeviceManager } from '.';
+import { AudioSinkManager } from '../audio-sink-manager';
+import { HMSAudioContextHandler } from '../utils/media';
 
 export interface IAudioOutputManager {
   getDevice(): MediaDeviceInfo | undefined;
@@ -32,5 +33,11 @@ export class AudioOutputManager implements IAudioOutputManager {
 
   async unblockAutoplay() {
     await this.audioSinkManager.unblockAutoplay();
+    /**
+     * similar to autoplay error when there's no user interaction,
+     * audio context is paused due to which empty audio tracks do not send any data and therefore it doesn't reach SFU.
+     * resume audio context on user interaction to enable empty audio tracks to send data and be forwarded to remote peers
+     */
+    await HMSAudioContextHandler.resumeContext();
   }
 }

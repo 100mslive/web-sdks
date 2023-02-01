@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@100mslive/react-icons";
-import { Text, Flex, Dropdown, textEllipsis } from "@100mslive/react-ui";
+import { Dropdown, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 
 const DialogDropdownTrigger = React.forwardRef(
   ({ title, css, open, icon, titleCSS = {} }, ref) => {
@@ -32,7 +32,7 @@ const DialogDropdownTrigger = React.forwardRef(
               color: "inherit",
               ...textEllipsis("90%"),
               flex: "1 1 0",
-              mx: "$6",
+              mx: icon ? "$6" : "0",
               ...titleCSS,
             }}
           >

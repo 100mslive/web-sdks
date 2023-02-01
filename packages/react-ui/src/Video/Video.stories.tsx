@@ -1,6 +1,6 @@
+import React from 'react';
 import { Video } from './Video';
 import VideoDocs from './Video.mdx';
-import React from 'react';
 
 const VideoComponent = () => {
   return <Video trackId="2" />;

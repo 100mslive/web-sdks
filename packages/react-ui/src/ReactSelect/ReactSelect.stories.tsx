@@ -1,10 +1,9 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from '@100mslive/react-icons';
-
-import { Text } from '../Text';
-import { Flex } from '../Layout';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Select } from './ReactSelect';
+import { Flex } from '../Layout';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/ReactSelect',

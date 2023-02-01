@@ -64,7 +64,7 @@ const AudioIndicator = styled('div', {
   width: '$13',
   height: '$13',
   mb: '5px',
-  ...flexCenter
+  ...flexCenter,
 });
 
 const FullScreenButton = styled('button', {

@@ -1,17 +1,17 @@
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
+import create from 'zustand';
 import {
-  HMSReactiveStore,
-  HMSStore,
   HMSActions,
   HMSNotificationInCallback,
   HMSNotifications,
-  HMSStatsStore,
-  HMSStats,
-  HMSStoreWrapper,
   HMSNotificationTypeParam,
+  HMSReactiveStore,
+  HMSStats,
+  HMSStatsStore,
+  HMSStore,
+  HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
-import create from 'zustand';
-import { HMSContextProviderProps, makeHMSStoreHook, hooksErrorMessage, makeHMSStatsStoreHook } from './store';
+import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
 export interface HMSRoomProviderProps {
@@ -102,15 +102,21 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     providerProps.actions.setFrameworkInfo({
       type: 'react-web',
       version: React.version,
-      sdkVersion: require('../../package.json').version,
+      sdkVersion: process.env.REACT_SDK_VERSION,
     });
   }
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
-      window.addEventListener('onunload', () => providerProps.actions.leave());
+      const beforeUnloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('beforeunload', beforeUnloadCallback);
+
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadCallback);
+      };
     }
+
+    return () => {};
   }, [leaveOnUnload]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);

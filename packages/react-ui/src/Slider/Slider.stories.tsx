@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Box } from '..';
 import { Slider } from './Slider';
+import { Box } from '..';
 
 export default {
   title: 'UI Components/Slider',
@@ -18,4 +18,4 @@ const Template: ComponentStory<typeof Slider> = () => {
 };
 
 export const Primary = Template.bind({});
-Primary.storyName = 'Slider'
+Primary.storyName = 'Slider';

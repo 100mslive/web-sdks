@@ -1,9 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-
 import { Fieldset } from '.';
-import { Label } from '../Label';
 import { Input } from '../Input';
+import { Label } from '../Label';
 import { Text } from '../Text';
 
 export default {

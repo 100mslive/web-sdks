@@ -1,8 +1,8 @@
+import { HMSPeer } from './peer';
 import { HMSRole } from '../../interfaces';
 import { HMSMessage } from '../../interfaces/message';
-import { ISignalParamsProvider } from '../../signal/ISignalSendParamsProvider';
 import { SendMessage } from '../../notification-manager';
-import { HMSPeer } from './peer';
+import { ISignalParamsProvider } from '../../signal/ISignalSendParamsProvider';
 
 export default class Message implements HMSMessage, ISignalParamsProvider<SendMessage> {
   sender?: HMSPeer;

@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect';
 import {
-  selectPeers,
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
+  selectPeers,
   selectRolesMap,
   selectRoom,
   selectTracksMap,

@@ -1,12 +1,12 @@
+import { useCallback } from 'react';
 import {
   selectIsAllowedToPublish,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
 } from '@100mslive/hms-video-store';
-import { useCallback } from 'react';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { hooksErrHandler } from '../hooks/types';
 
 export interface useAVToggleResult {
   /**

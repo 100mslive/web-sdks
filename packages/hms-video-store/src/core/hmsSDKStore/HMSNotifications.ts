@@ -1,29 +1,29 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import * as sdkTypes from './sdkTypes';
+import { IHMSStore } from '../IHMSStore';
+import {
+  HMSChangeMultiTrackStateRequest,
+  HMSChangeTrackStateRequest,
+  HMSDeviceChangeEvent,
+  HMSException,
+  HMSLeaveRoomRequest,
+  HMSMessage,
+  HMSNotification,
+  HMSNotificationSeverity,
+  HMSNotificationTypes,
+  HMSPeer,
+  HMSPlaylistItem,
+  HMSTrack,
+  HMSTrackID,
+} from '../schema';
 import {
   HMSNotificationCallback,
   HMSNotificationInCallback,
   HMSNotificationTypeParam,
   IHMSNotifications,
 } from '../schema/notification';
-import { IHMSStore } from '../IHMSStore';
 import { selectPeerByID, selectTrackByID } from '../selectors';
-import * as sdkTypes from './sdkTypes';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
-import {
-  HMSNotification,
-  HMSNotificationTypes,
-  HMSNotificationSeverity,
-  HMSPeer,
-  HMSException,
-  HMSMessage,
-  HMSTrack,
-  HMSTrackID,
-  HMSChangeTrackStateRequest,
-  HMSChangeMultiTrackStateRequest,
-  HMSLeaveRoomRequest,
-  HMSDeviceChangeEvent,
-  HMSPlaylistItem,
-} from '../schema';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 

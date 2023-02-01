@@ -1,7 +1,7 @@
-import HMSRemoteStream from '../streams/HMSRemoteStream';
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
-import HMSSubscribeConnection from '../../connection/subscribe';
+import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
+import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 const streamId = '123';
 const trackId = '456';
@@ -10,12 +10,12 @@ const videoElement = { srcObject: null } as HTMLVideoElement;
 
 describe('remoteVideoTrack', () => {
   let stream: HMSRemoteStream;
-  let sendOverApiDataChannel: jest.Mock;
+  let sendOverApiDataChannelWithResponse: jest.Mock;
   let track: HMSRemoteVideoTrack;
   let nativeTrack: MediaStreamTrack;
   beforeEach(() => {
-    sendOverApiDataChannel = jest.fn();
-    const connection = { sendOverApiDataChannel } as unknown as HMSSubscribeConnection;
+    sendOverApiDataChannelWithResponse = jest.fn();
+    const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
     nativeTrack = { id: trackId, kind: 'video', enabled: true } as MediaStreamTrack;
     track = new HMSRemoteVideoTrack(stream, nativeTrack, 'regular');
@@ -27,7 +27,7 @@ describe('remoteVideoTrack', () => {
 
   const expectDegradationLayerAndSink = (isDegraded: boolean, layer: HMSSimulcastLayer, hasSink: boolean) => {
     expect(track.degraded).toBe(isDegraded);
-    expect(track.getSimulcastLayer()).toBe(layer);
+    expect(track.getLayer()).toBe(layer);
     expect(track.hasSinks()).toBe(hasSink);
   };
 
@@ -36,8 +36,8 @@ describe('remoteVideoTrack', () => {
   const expectDegradedVisible = () => {
     expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
   };
-  const expectNonDegradedVisible = () => {
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.HIGH, true);
+  const expectNonDegradedVisible = (layer = HMSSimulcastLayer.HIGH) => {
+    expectDegradationLayerAndSink(false, layer, true);
   };
   const expectNonDegradedNotVisible = () => {
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
@@ -47,20 +47,32 @@ describe('remoteVideoTrack', () => {
    * expectation on layers sent over data channel since start of the test
    */
   const expectLayersSent = (layers: HMSSimulcastLayer[]) => {
-    const allCalls = sendOverApiDataChannel.mock.calls;
+    const allCalls = sendOverApiDataChannelWithResponse.mock.calls;
     expect(allCalls.length).toBe(layers.length);
     for (let i = 0; i < allCalls.length; i++) {
-      const data = JSON.parse(allCalls[i][0]);
-      expect(data.video).toBe(layers[i]);
+      const data = allCalls[i][0];
+      expect(data.params.max_spatial_layer).toBe(layers[i]);
     }
   };
 
   const sfuDegrades = () => {
-    track.setLayerFromServer(HMSSimulcastLayer.NONE, true);
+    track.setLayerFromServer({
+      subscriber_degraded: true,
+      expected_layer: HMSSimulcastLayer.HIGH,
+      current_layer: HMSSimulcastLayer.NONE,
+      publisher_degraded: false,
+      track_id: trackId,
+    });
   };
 
   const sfuRecovers = () => {
-    track.setLayerFromServer(HMSSimulcastLayer.HIGH, false);
+    track.setLayerFromServer({
+      subscriber_degraded: false,
+      expected_layer: HMSSimulcastLayer.HIGH,
+      current_layer: HMSSimulcastLayer.HIGH,
+      publisher_degraded: false,
+      track_id: trackId,
+    });
   };
 
   test('defaults are good', () => {
@@ -68,41 +80,41 @@ describe('remoteVideoTrack', () => {
     expectNonDegradedNotVisible();
   });
 
-  test('single addsink and remove sink', () => {
-    track.addSink(videoElement);
+  test('single addsink and remove sink', async () => {
+    await track.addSink(videoElement);
     expectNonDegradedVisible();
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
   });
 
-  test('multiple addsink and removesink', () => {
+  test('multiple addsink and removesink', async () => {
     const videoElement2 = { srcObject: null } as HTMLVideoElement;
-    track.addSink(videoElement);
-    track.addSink(videoElement2);
+    await track.addSink(videoElement);
+    await track.addSink(videoElement2);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
     expectNonDegradedVisible();
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
     expectNonDegradedVisible();
-    track.removeSink(videoElement2);
+    await track.removeSink(videoElement2);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
   });
 
-  test('prefer layer', () => {
+  test('prefer layer', async () => {
     expectNonDegradedNotVisible();
-    track.preferLayer(HMSSimulcastLayer.LOW);
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.LOW, false);
-    track.addSink(videoElement);
-    expectNonDegradedVisible();
-    track.preferLayer(HMSSimulcastLayer.MEDIUM);
+    await track.setPreferredLayer(HMSSimulcastLayer.LOW);
+    expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
+    await track.addSink(videoElement);
+    expectNonDegradedVisible(HMSSimulcastLayer.LOW);
+    await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.MEDIUM, true);
-    expectLayersSent([HMSSimulcastLayer.LOW, HMSSimulcastLayer.HIGH, HMSSimulcastLayer.MEDIUM]);
+    expectLayersSent([HMSSimulcastLayer.LOW, HMSSimulcastLayer.MEDIUM]);
   });
 
-  test('sdk degradation', () => {
-    track.addSink(videoElement);
+  test('sdk degradation', async () => {
+    await track.addSink(videoElement);
     expectNonDegradedVisible();
     track.setDegradedFromSdk(true);
     expectDegradedVisible();
@@ -110,7 +122,7 @@ describe('remoteVideoTrack', () => {
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.HIGH, true);
     track.setDegradedFromSdk(true);
 
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
     expectLayersSent([
       HMSSimulcastLayer.HIGH,
@@ -121,16 +133,16 @@ describe('remoteVideoTrack', () => {
     ]);
   });
 
-  test('sdk degradation + track mute', () => {
+  test('sdk degradation + track mute', async () => {
     expect(track.enabled).toBe(true);
-    track.addSink(videoElement);
+    await track.addSink(videoElement);
     expectNonDegradedVisible();
     track.setDegradedFromSdk(true);
     expectDegradedVisible();
     track.setEnabled(false);
     expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
     // video goes out of view
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE, HMSSimulcastLayer.NONE]);
   });
@@ -140,8 +152,8 @@ describe('remoteVideoTrack', () => {
    * and remove sink is called for the track on the first page, the
    * corresponding message must be sent to the SFU.
    */
-  test('sfu degradation with pagination', () => {
-    track.addSink(videoElement);
+  test('sfu degradation with pagination', async () => {
+    await track.addSink(videoElement);
     expectNonDegradedVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
@@ -152,7 +164,7 @@ describe('remoteVideoTrack', () => {
     sfuDegrades();
     expectLayersSent([HMSSimulcastLayer.HIGH]);
 
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
   });
@@ -161,9 +173,9 @@ describe('remoteVideoTrack', () => {
    * say a track is degraded post which it is muted. degraded should become
    * false and removesink message should be sent to the SFU.
    */
-  test('sfu degradation + track mute', () => {
+  test('sfu degradation + track mute', async () => {
     expect(track.enabled).toBe(true);
-    track.addSink(videoElement);
+    await track.addSink(videoElement);
     expectNonDegradedVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH]);
     sfuDegrades();
@@ -172,7 +184,7 @@ describe('remoteVideoTrack', () => {
     expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
     // video goes out of view or UI detaches
-    track.removeSink(videoElement);
+    await track.removeSink(videoElement);
     expectNonDegradedNotVisible();
     expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE]);
   });

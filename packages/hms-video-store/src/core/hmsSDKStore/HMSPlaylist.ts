@@ -1,8 +1,8 @@
-import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { HMSPlaylistManager } from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { IHMSStore } from '../IHMSStore';
-import { selectVideoPlaylist, selectAudioPlaylist } from '../selectors';
+import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
+import { selectAudioPlaylist, selectVideoPlaylist } from '../selectors';
 
 export class HMSPlaylist implements IHMSPlaylistActions {
   private type: HMSPlaylistType;

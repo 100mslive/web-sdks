@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { ComponentStory } from '@storybook/react';
 import { Toast } from './Toast';
 import ToastDocs from './Toast.mdx';
 import { Button } from '../Button';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
-import { ComponentStory } from '@storybook/react';
 
 const ToastStory = ({ ...props }) => {
   return (
@@ -39,10 +39,12 @@ const ToastComponent = ({ ...props }) => {
             <Text variant="sub1" css={{ c: 'inherit', wordBreak: 'break-word' }}>
               Hello from toast.
             </Text>
-          <Toast.Close />
+            <Toast.Close />
           </Flex>
         </Toast.Title>
-        <Toast.Description>This is a custom toast component using primitives with controlled open and close state using React state.</Toast.Description>
+        <Toast.Description>
+          This is a custom toast component using primitives with controlled open and close state using React state.
+        </Toast.Description>
       </Toast.Root>
       <Toast.Viewport css={{ bottom: '$24' }} />
     </>

@@ -3,12 +3,12 @@ import { styled } from '@stitches/react';
 import {
   DialogClose,
   DialogDefaultCloseIcon,
-  DialogTitle,
   DialogDescription,
+  DialogTitle,
   StyledDialogContent,
   StyledDialogOverlay,
-  StyledDialogTrigger,
   StyledDialogPortal,
+  StyledDialogTrigger,
 } from './DialogContent';
 
 const StyledDialog = styled(Root, {});

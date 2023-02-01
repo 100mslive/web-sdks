@@ -1,7 +1,7 @@
+import { ENV, isNode, parsedUserAgent } from './support';
 import { DomainCategory } from '../analytics/AnalyticsEventDomains';
 import { domainCategory } from '../analytics/domain-analytics';
 import { HMSFrameworkInfo } from '../interfaces';
-import { ENV, isNode, parsedUserAgent } from './support';
 
 const sdk_version = require('../../package.json').version;
 

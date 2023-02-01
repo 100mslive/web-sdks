@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Text } from "@100mslive/react-ui";
 import { ErrorDialog } from "../../primitives/DialogContent";
 
@@ -36,7 +36,8 @@ export const InitErrorModal = ({ notification }) => {
       title={info.title}
     >
       <Text variant="sm" css={{ wordBreak: "break-word" }}>
-        {info.description} Current URL - {window.location.href}
+        {info.description} <br />
+        Current URL - {window.location.href}
       </Text>
     </ErrorDialog>
   );

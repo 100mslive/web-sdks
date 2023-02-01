@@ -1,12 +1,12 @@
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
+import { PeerManager } from './PeerManager';
+import { TrackManager } from './TrackManager';
 import { HMSUpdateListener } from '../..';
 import { HMSTrackUpdate } from '../../interfaces';
 import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
-import { PeerManager } from './PeerManager';
-import { TrackManager } from './TrackManager';
 
 /**
  * Handles:
@@ -22,16 +22,13 @@ import { TrackManager } from './TrackManager';
  *    - Track state change(enabled) as track update
  */
 export class PeerListManager {
+  private readonly TAG = '[PeerListManager]';
   constructor(
     private store: IStore,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
     public listener?: HMSUpdateListener,
   ) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any, isReconnecting: boolean) {
     if (method === HMSNotificationMethod.PEER_LIST) {
@@ -89,7 +86,9 @@ export class PeerListManager {
     const currentPeerList = this.store.getRemotePeers();
     const peers = Object.values(peersMap);
     const peersToRemove = currentPeerList.filter(hmsPeer => !peersMap[hmsPeer.peerId]);
-    HMSLogger.d(this.TAG, `${peersToRemove}`);
+    if (peersToRemove.length > 0) {
+      HMSLogger.d(this.TAG, `${peersToRemove}`);
+    }
 
     // Send peer-leave updates to all the missing peers
     peersToRemove.forEach(peer => {
@@ -152,6 +151,7 @@ export class PeerListManager {
   };
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {
+    HMSLogger.d(this.TAG, `removing track - ${trackId} from ${peer}`);
     if (peer.audioTrack?.trackId === trackId) {
       peer.audioTrack = undefined;
     } else if (peer.videoTrack?.trackId === trackId) {

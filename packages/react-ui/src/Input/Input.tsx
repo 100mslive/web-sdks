@@ -1,8 +1,8 @@
 import React, { ComponentProps, PropsWithChildren, PropsWithRef } from 'react';
-import { styled } from '../Theme';
 import { CSS } from '@stitches/react';
-import { Flex } from '../Layout';
 import { CopyIcon, EyeCloseIcon, EyeOpenIcon } from '@100mslive/react-icons';
+import { Flex } from '../Layout';
+import { styled } from '../Theme';
 
 export const Input = styled('input', {
   fontFamily: '$sans',
@@ -53,7 +53,7 @@ const PasswordShowIcon: React.FC<ComponentProps<typeof Flex> & { showPassword?: 
 const PasswordCopyIcon: React.FC<ComponentProps<typeof Flex & { css?: CSS }>> = ({ css, ...props }) => {
   return (
     <Flex css={{ ...css }} {...props}>
-      <CopyIcon></CopyIcon>
+      <CopyIcon />
     </Flex>
   );
 };
@@ -92,7 +92,7 @@ const ReactInput: React.FC<PropsWithRef<ComponentProps<typeof Input> & { showPas
         type={showPassword ? 'text' : 'password'}
         {...props}
         ref={ref}
-      ></Input>
+      />
     );
   });
 

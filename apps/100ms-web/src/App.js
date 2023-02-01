@@ -1,32 +1,37 @@
-import React, { Suspense, useEffect, useCallback } from "react";
+import React, { Suspense, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
-  Routes,
-  Route,
   Navigate,
+  Route,
+  Routes,
   useParams,
 } from "react-router-dom";
-import { HMSRoomProvider } from "@100mslive/react-sdk";
-import { HMSThemeProvider, Box } from "@100mslive/react-ui";
-import { Notifications } from "./components/Notifications";
-import { Confetti } from "./plugins/confetti";
-import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
-import { ToastContainer } from "./components/Toast/ToastContainer";
-import FullPageProgress from "./components/FullPageProgress";
-import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
-import PostLeave from "./components/PostLeave";
+import {
+  HMSRoomProvider,
+  selectIsConnectedToRoom,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import { Box, HMSThemeProvider } from "@100mslive/react-ui";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Diagnostics from "./components/Diagnostics.js";
 import ErrorPage from "./components/ErrorPage";
+import FullPageProgress from "./components/FullPageProgress";
 import { Init } from "./components/init/Init";
+import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
+import { Notifications } from "./components/Notifications";
+import PostLeave from "./components/PostLeave";
+import { ToastContainer } from "./components/Toast/ToastContainer";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
+import { Confetti } from "./plugins/confetti";
+import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
+import { getRoutePrefix, shadeColor } from "./common/utils";
 import { FeatureFlags } from "./services/FeatureFlags";
 import {
-  getUserToken as defaultGetUserToken,
   getBackendEndpoint,
+  getUserToken as defaultGetUserToken,
 } from "./services/tokenService";
-import { getRoutePrefix, shadeColor } from "./common/utils";
 import "./base.css";
 import "./index.css";
 
@@ -219,11 +224,29 @@ const RouteList = ({ getUserToken, getDetails }) => {
   );
 };
 
+const BackSwipe = () => {
+  const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
+  const hmsActions = useHMSActions();
+  useEffect(() => {
+    const onRouteLeave = async () => {
+      if (isConnectedToRoom) {
+        await hmsActions.leave();
+      }
+    };
+    window.addEventListener("popstate", onRouteLeave);
+    return () => {
+      window.removeEventListener("popstate", onRouteLeave);
+    };
+  }, [hmsActions, isConnectedToRoom]);
+  return null;
+};
+
 function AppRoutes({ getUserToken, getDetails }) {
   return (
     <Router>
       <ToastContainer />
       <Notifications />
+      <BackSwipe />
       <Confetti />
       <RemoteStopScreenshare />
       <KeyboardHandler />

@@ -6,9 +6,9 @@
  * are exported as interfaces to include tsdoc comments with them.
  */
 
-import { HMSStore, HMSStatsStore } from './schema';
-import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
+import { State, StateSelector, StoreApi, Subscribe } from 'zustand/vanilla';
 import { NamedSetState } from './hmsSDKStore/internalTypes';
+import { HMSStatsStore, HMSStore } from './schema';
 
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors

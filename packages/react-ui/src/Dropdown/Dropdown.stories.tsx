@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { PeopleIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Box, Text, Avatar, textEllipsis, Flex } from '..';
+import { ChevronDownIcon, ChevronUpIcon, PeopleIcon } from '@100mslive/react-icons';
 import { Dropdown } from './Dropdown';
+import { Avatar, Box, Flex, Text, textEllipsis } from '..';
 
 export default {
   title: 'UI Components/Dropdown',
@@ -53,13 +53,13 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
               alignItems: 'flex-start',
             }}
           >
-            <Dropdown.Label css={{ w: "initial "}}>
-              <Text variant="md" data-testid={`role_student`}>
+            <Dropdown.Label css={{ w: 'initial ' }}>
+              <Text variant="md" data-testid="role_student">
                 {'Students '}({participants.length})
               </Text>
             </Dropdown.Label>
             {participants.map((peer, i) => (
-              <Dropdown.Item css={{ justifyContent: 'space-between' }} data-testid={'participant_' + i}>
+              <Dropdown.Item css={{ justifyContent: 'space-between' }} data-testid={`participant_${i}`}>
                 <Flex>
                   <Box css={{ width: '$16' }}>
                     <Avatar
@@ -91,4 +91,4 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
 };
 
 export const DropdownContent = Template.bind({});
-DropdownContent.storyName = 'Dropdown'
+DropdownContent.storyName = 'Dropdown';

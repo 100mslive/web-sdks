@@ -1,4 +1,18 @@
-import { Root, Trigger, Sub, SubTrigger, SubContent, Content, Item, Separator, Label, Group, Portal } from '@radix-ui/react-dropdown-menu';
+import {
+  CheckboxItem,
+  Content,
+  Group,
+  Item,
+  ItemIndicator,
+  Label,
+  Portal,
+  Root,
+  Separator,
+  Sub,
+  SubContent,
+  SubTrigger,
+  Trigger,
+} from '@radix-ui/react-dropdown-menu';
 import { styled } from '../Theme';
 
 const DropdownRoot = styled(Root, {});
@@ -74,7 +88,7 @@ const DropdownLabel = styled(Label, {
 
 const DropdownGroup = styled(Group, {});
 
-const DropdownSubMenu = styled(Sub, {})
+const DropdownSubMenu = styled(Sub, {});
 
 const DropdownSubMenuContent = styled(SubContent, {
   w: '$80',
@@ -85,19 +99,43 @@ const DropdownSubMenuContent = styled(SubContent, {
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
-})
+});
 
+const DropdownCheckboxItem = styled(CheckboxItem, {
+  color: '$textPrimary',
+  p: '$8',
+  display: 'flex',
+  alignItems: 'center',
+  outline: 'none',
+  '&:hover': {
+    cursor: 'pointer',
+    bg: '$surfaceLighter',
+  },
+  '&:focus-visible': {
+    bg: '$surfaceLighter',
+  },
+  gap: '$2',
+});
+
+const DropdownItemIndicator = styled(ItemIndicator, {
+  w: '$10',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
 
 export const Dropdown = {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
   TriggerItem: DropdownTriggerItem,
   Content: DropdownContent,
-  Portal: Portal, 
+  Portal: Portal,
   SubMenu: DropdownSubMenu,
   SubMenuContent: DropdownSubMenuContent,
   Item: DropdownItem,
   Label: DropdownLabel,
   Group: DropdownGroup,
   ItemSeparator: DropdownItemSeparator,
+  CheckboxItem: DropdownCheckboxItem,
+  ItemIndicator: DropdownItemIndicator,
 };

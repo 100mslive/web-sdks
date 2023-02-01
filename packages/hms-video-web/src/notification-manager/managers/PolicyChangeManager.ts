@@ -1,7 +1,6 @@
+import { EventBus } from '../../events/EventBus';
 import { IStore } from '../../sdk/store';
 import { PolicyParams } from '../HMSNotifications';
-import { PublishParams } from '../../interfaces';
-import { EventBus } from '../../events/EventBus';
 
 /**
  * Handles:
@@ -27,7 +26,6 @@ export class PolicyChangeManager {
     // handle when role is not present in known_roles
     const publishParams = params.known_roles[params.name]?.publishParams;
     this.store.setPublishParams(publishParams);
-    this.setSimulcastLayers(publishParams);
 
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
@@ -36,13 +34,5 @@ export class PolicyChangeManager {
       this.eventBus.localRoleUpdate.publish({ oldRole, newRole });
     }
     this.eventBus.policyChange.publish(params);
-  }
-
-  setSimulcastLayers(publishParams?: PublishParams) {
-    if (publishParams && Object.keys(publishParams).length > 0) {
-      const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
-      this.store.setVideoSimulcastLayers(videoSimulcastLayers);
-      this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
-    }
   }
 }

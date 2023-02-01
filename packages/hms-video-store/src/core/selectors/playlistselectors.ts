@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { HMSPlaylistType, HMSStore, HMSPlaylistSelector } from '../schema';
+import { HMSPlaylistSelector, HMSPlaylistType, HMSStore } from '../schema';
 
 /**
  * @internal

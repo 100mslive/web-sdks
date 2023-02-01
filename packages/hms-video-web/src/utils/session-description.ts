@@ -1,6 +1,6 @@
 import * as sdpTransform from 'sdp-transform';
-import { TrackState } from '../notification-manager';
 import { isPresent } from './validations';
+import { TrackState } from '../notification-manager';
 
 /**
  * @DISCUSS: Should we have a wrapper over RTCSessionDescriptionInit(SDP) and have these methods in it?

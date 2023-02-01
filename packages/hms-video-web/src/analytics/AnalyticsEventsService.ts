@@ -1,15 +1,14 @@
+import AnalyticsEvent from './AnalyticsEvent';
 import { HMSAnalyticsLevel } from './AnalyticsEventLevel';
+import { AnalyticsTransport } from './AnalyticsTransport';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
+import { IStore } from '../sdk/store';
 import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
-import AnalyticsEvent from './AnalyticsEvent';
-import { AnalyticsTransport } from './AnalyticsTransport';
-import { IStore } from '../sdk/store';
-import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
-
-const TAG = 'AnalyticsEventsService';
 
 export class AnalyticsEventsService {
   private bufferSize = ANALYTICS_BUFFER_SIZE;
+  private readonly TAG = '[AnalyticsEventsService]';
 
   private transport: AnalyticsTransport | null = null;
   private pendingEvents: AnalyticsEvent[] = [];
@@ -33,7 +32,7 @@ export class AnalyticsEventsService {
 
       if (this.pendingEvents.length > this.bufferSize) {
         const removedEvent = this.pendingEvents.shift();
-        HMSLogger.d(TAG, 'Max buffer size reached', 'Removed event to accommodate new events', removedEvent);
+        HMSLogger.d(this.TAG, 'Max buffer size reached', 'Removed event to accommodate new events', removedEvent);
       }
     }
     return this;
@@ -58,7 +57,7 @@ export class AnalyticsEventsService {
         }
       }
     } catch (error) {
-      HMSLogger.w(TAG, 'Flush Failed', error);
+      HMSLogger.w(this.TAG, 'Flush Failed', error);
     }
   }
 

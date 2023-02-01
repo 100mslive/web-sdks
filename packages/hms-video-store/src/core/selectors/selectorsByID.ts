@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { byIDCurry } from './common';
 import {
   selectFullAppData,
   selectHMSMessages,
@@ -8,25 +9,25 @@ import {
   selectTracksMap,
 } from './selectors';
 import {
+  getScreenSharesByPeer,
+  isAudio,
+  isAudioPlaylist,
+  isTrackEnabled,
+  isVideo,
+  isVideoPlaylist,
+} from './selectorUtils';
+import { HMSLogger } from '../../common/ui-logger';
+import {
+  HMSAudioTrack,
+  HMSPeer,
   HMSPeerID,
   HMSRoleName,
+  HMSScreenVideoTrack,
   HMSStore,
   HMSTrack,
   HMSTrackID,
-  HMSAudioTrack,
   HMSVideoTrack,
-  HMSScreenVideoTrack,
 } from '../schema';
-import {
-  getPeerTracksByCondition,
-  isAudio,
-  isVideoPlaylist,
-  isTrackEnabled,
-  isVideo,
-  isAudioPlaylist,
-} from './selectorUtils';
-import { byIDCurry } from './common';
-import { HMSLogger } from '../../common/ui-logger';
 
 const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID;
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
@@ -266,7 +267,7 @@ export const selectAudioPlaylistTrackByPeerID = byIDCurry(
 
 export const selectScreenSharesByPeerId = byIDCurry(
   createSelector(selectTracksMap, selectPeerByIDBare, (tracks, peer) => {
-    return getPeerTracksByCondition(tracks, peer);
+    return getScreenSharesByPeer(tracks, peer);
   }),
 );
 
@@ -453,6 +454,17 @@ export const selectPeersByRole = (role: HMSRoleName) =>
     return peers.filter(p => p.roleName === role);
   });
 
+/**
+ * Select an array of peers of a particular role
+ * @param roles HMSRoleName[]
+ * @returns HMSPeer[]
+ */
+export const selectPeersByRoles = (roles: HMSRoleName[]) =>
+  createSelector([selectPeers], (peers: HMSPeer[]) => {
+    return peers.filter((peer: HMSPeer) => {
+      return peer.roleName ? roles.includes(peer.roleName) : false;
+    });
+  });
 /**
  * Selects the peer metadata for the passed in peer and returns it as JSON. If metadata is not present
  * or conversion to JSON gives an error, an empty object is returned.

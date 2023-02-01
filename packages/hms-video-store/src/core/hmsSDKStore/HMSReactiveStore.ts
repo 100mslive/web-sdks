@@ -1,29 +1,30 @@
 import produce from 'immer';
+import shallow from 'zustand/shallow';
 import create, {
-  StateSelector,
-  StoreApi,
-  SetState,
-  StateSliceListener,
   EqualityChecker,
   PartialState,
+  SetState,
   State,
+  StateSelector,
+  StateSliceListener,
+  StoreApi,
 } from 'zustand/vanilla';
-import shallow from 'zustand/shallow';
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
-import { IHMSActions } from '../IHMSActions';
-import { HMSSDKActions } from './HMSSDKActions';
-import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../schema/notification';
+import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
-import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { BeamControllerStore } from '../../controller/beam/BeamController';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
+import { createDefaultStoreState, HMSStore } from '../schema';
+import { IHMSNotifications } from '../schema/notification';
+import { HMSStats } from '../webrtc-stats';
 
 declare global {
   interface Window {
     __hms: HMSReactiveStore;
+    __beam: BeamControllerStore;
   }
 }
 
@@ -64,6 +65,7 @@ export class HMSReactiveStore {
 
     if (isBrowser) {
       window.__hms = this;
+      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
     }
   }
 
@@ -173,7 +175,7 @@ export class HMSReactiveStore {
   /**
    * use shallow equality check by default for subscribe to optimize for array/object selectors.
    * by default zustand does only reference matching so something like, getPeers for eg. would trigger
-   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array everytime.
+   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array every time.
    * Although the array reference changes, the order of peers and peer objects don't themselves change in this case,
    * and a shallow check avoids that triggering.
    * @private

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { theme, createTheme } from './stitches.config';
-import type { Theme } from './stitches.config';
-import useSSR from './useSSR';
 import { useMedia } from 'react-use';
+import type { Theme } from './stitches.config';
+import { createTheme, theme } from './stitches.config';
+import useSSR from './useSSR';
 
 const defaultAspectRatio = {
   width: 1,
