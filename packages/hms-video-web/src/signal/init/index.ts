@@ -88,11 +88,14 @@ export function transformInitConfig(config: any): InitConfig {
   const relayConfig = process.env.ONLY_RELAY
   switch(relayConfig) {
     case "NO_RELAY": 
-      c.rtcConfiguration = {}
+      delete c.rtcConfiguration.iceServers
       break; 
     case "USE_RELAY":
       c.rtcConfiguration.iceServers[0].urls = list;
       c.rtcConfiguration.iceTransportPolicy = "relay";
+      break;
+    case "STUN":
+      c.rtcConfiguration.iceServers = [{ urls: ["stun:stun.l.google.com:19302"] }];
       break;
   }
   console.log(c.rtcConfiguration)
