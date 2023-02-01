@@ -14,8 +14,8 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, HMSThemeProvider } from "@100mslive/react-ui";
 import { AppData } from "./components/AppData/AppData.jsx";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 import Diagnostics from "./components/Diagnostics.js";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import FullPageProgress from "./components/FullPageProgress";
 import { Init } from "./components/init/Init";
