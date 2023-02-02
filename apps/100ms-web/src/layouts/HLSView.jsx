@@ -62,9 +62,6 @@ const HLSView = () => {
   };
 
   useEffect(() => {
-    /**
-     * initialize HLSController and add event listeners.
-     */
     const manifestLoadedHandler = (_, { levels }) => {
       const onlyVideoLevels = removeAudioLevels(levels);
       setAvailableLevels(onlyVideoLevels);
@@ -137,6 +134,9 @@ const HLSView = () => {
       return;
     }
     if (Hls.isSupported()) {
+      /**
+       * initialize HLSController and add event listeners.
+       */
       hlsController = new HLSController(hlsUrl, videoRef);
       hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
