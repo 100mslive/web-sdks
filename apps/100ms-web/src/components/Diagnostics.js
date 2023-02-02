@@ -10,7 +10,7 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
     return null;
   }
   return (
-    <Accordion.Item value={title} css={{ p: "$4 $8" }}>
+    <Accordion.Item value={properties.id} css={{ p: "$4 $8" }}>
       <Accordion.Header>
         <Flex align="center">
           <Text variant="body" css={{ mr: "$2" }}>
@@ -68,12 +68,13 @@ const Diagnostics = () => {
         <Accordion.Root
           type="single"
           defaultValue="WebRTC"
+          collapsible
           css={{ w: "50%", r: "$1", m: "$8" }}
         >
           {result.map(item => {
             return (
               <DiagnosticsItem
-                key={item.title}
+                key={item.id}
                 title={item.title}
                 properties={item}
               />

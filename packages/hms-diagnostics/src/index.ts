@@ -1,18 +1,18 @@
-import {
-  HMSException,
-  validateMediaDevicesExistence,
-  validateRTCPeerConnection,
-  HMSGetMediaActions,
-  BuildGetMediaError,
-  HMSSdk,
-} from '@100mslive/hms-video';
-import type { InitConfig } from '@100mslive/hms-video';
 import cloneDeep from 'lodash.clonedeep';
 import setInObject from 'lodash.set';
+import type { HMSConfig, InitConfig } from '@100mslive/hms-video';
+import {
+  BuildGetMediaError,
+  HMSException,
+  HMSGetMediaActions,
+  HMSSdk,
+  validateMediaDevicesExistence,
+  validateRTCPeerConnection,
+} from '@100mslive/hms-video';
 import { initialState } from './initial-state';
-import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
 import type { ConnectivityKeys } from './interfaces';
-import { getToken } from './utils';
+import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
+import { getToken, roomId, userName } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
@@ -104,22 +104,38 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       // If a srflx candidate was found, the STUN server works!
       if (candidate.type === 'srflx') {
         if (candidate.protocol === 'udp') {
-          this.updateStatus({ path: 'connectivity.stunUDP', info: candidate });
+          this.updateStatus({
+            path: `connectivity.stunUDP`,
+            id: `stunUDP-${candidate.address}:${candidate.port}`,
+            info: candidate,
+          });
         }
 
         if (candidate.protocol === 'tcp') {
-          this.updateStatus({ path: 'connectivity.stunTCP', info: candidate });
+          this.updateStatus({
+            path: `connectivity.stunTCP`,
+            id: `stunTCP-${candidate.address}:${candidate.port}`,
+            info: candidate,
+          });
         }
       }
 
       // If a relay candidate was found, the TURN server works!
       if (candidate.type === 'relay') {
         if (candidate.protocol === 'udp') {
-          this.updateStatus({ path: 'connectivity.turnUDP', info: candidate });
+          this.updateStatus({
+            path: `connectivity.turnUDP`,
+            id: `turnUDP-${candidate.address}:${candidate.port}`,
+            info: candidate,
+          });
         }
 
         if (candidate.protocol === 'tcp') {
-          this.updateStatus({ path: 'connectivity.turnTCP', info: candidate });
+          this.updateStatus({
+            path: `connectivity.turnTCP`,
+            id: `turnTCP-${candidate.address}:${candidate.port}`,
+            info: candidate,
+          });
         }
       }
     });
@@ -206,16 +222,18 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
   private updateStatus({
     path,
+    id = path,
     success = true,
     errorMessage = '',
     info,
   }: {
     path: string;
+    id?: string;
     success?: boolean;
     errorMessage?: string;
     info?: Record<string, any>;
   }) {
     setInObject(this.result, path, { success, errorMessage, info });
-    this.listener?.onUpdate({ success, errorMessage, info }, path);
+    this.listener?.onUpdate({ id, success, errorMessage, info }, path);
   }
 }

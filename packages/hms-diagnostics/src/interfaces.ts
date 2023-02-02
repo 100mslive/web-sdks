@@ -1,4 +1,5 @@
 export interface HMSDiagnosticsOutputValue {
+  id: string;
   success: boolean | null;
   errorMessage: string;
   info?: Record<string, any>;
