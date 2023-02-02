@@ -46,8 +46,8 @@ const Settings = ({ setHide }) => {
   const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
 
   if (
-    videoInput.length === 0 &&
-    audioInput.length === 0 &&
+    !videoInput?.length &&
+    !audioInput?.length &&
     !audioOutputFiltered?.length
   ) {
     setHide(true);
