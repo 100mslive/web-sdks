@@ -177,14 +177,20 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
   private async checkInit() {
     const sdk = new HMSSdk();
-    // @ts-ignore
-    sdk.initStoreAndManagers();
+
     const token = await getToken();
     if (!token) {
       this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: 'Failed to create token' });
       return;
     }
-    //@ts-ignore
+    const config: HMSConfig = {
+      authToken: token,
+      userName: userName,
+    };
+    // @ts-ignore
+    sdk.commonSetup(config, roomId);
+
+    // @ts-ignore
     const initConfig = await sdk.transport.connect(
       token,
       'https://qa-init.100ms.live/',
