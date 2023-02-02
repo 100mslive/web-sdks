@@ -29,7 +29,7 @@ import {
   HLS_TIMED_METADATA_LOADED,
   HLSController,
 } from "../controllers/hls/HLSController";
-import { isIOS, metadataPayloadParser } from "../common/utils";
+import { metadataPayloadParser } from "../common/utils";
 import { APP_DATA } from "../common/constants";
 
 let hlsController;
@@ -90,51 +90,53 @@ const HLSView = () => {
     };
     const handleTimeUpdateListener = _ => {
       const textTrackListCount = videoEl.textTracks.length;
+      let metaTextTrack;
       for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
         const textTrack = videoEl.textTracks[trackIndex];
         if (textTrack.kind !== "metadata") {
           continue;
         }
         textTrack.mode = "showing";
-        const cuesLength = textTrack.cues.length;
-        let cueIndex = 0;
-        while (cueIndex < cuesLength) {
-          const cue = textTrack.cues[cueIndex];
-          if (cue.fired) {
-            continue;
-          }
-          const data = metadataPayloadParser(cue.value.data);
-          const programData = videoEl.getStartDate();
-          const startDate = data.start_date;
-          const endDate = data.end_date;
-          const startTime =
-            new Date(startDate) -
-            new Date(programData) -
-            videoEl.currentTime * 1000;
-          const duration = new Date(endDate) - new Date(startDate);
-          setTimeout(() => {
-            const toast = {
-              title: `Payload from timed Metadata ${data.payload}`,
-              duration: duration,
-            };
-            console.debug("Added toast ", JSON.stringify(toast));
-            ToastManager.addToast(toast);
-          }, startTime);
-          cue.fired = true;
+        metaTextTrack = textTrack;
+        break;
+      }
+      if (!metaTextTrack) {
+        return;
+      }
+      const cuesLength = metaTextTrack.cues.length;
+      let cueIndex = 0;
+      while (cueIndex < cuesLength) {
+        const cue = metaTextTrack.cues[cueIndex];
+        if (cue.fired) {
           cueIndex++;
+          continue;
         }
+        const data = metadataPayloadParser(cue.value.data);
+        const programData = videoEl.getStartDate();
+        const startDate = data.start_date;
+        const endDate = data.end_date;
+        const startTime =
+          new Date(startDate) -
+          new Date(programData) -
+          videoEl.currentTime * 1000;
+        const duration = new Date(endDate) - new Date(startDate);
+        setTimeout(() => {
+          const toast = {
+            title: `Payload from timed Metadata ${data.payload}`,
+            duration: duration,
+          };
+          console.debug("Added toast ", JSON.stringify(toast));
+          ToastManager.addToast(toast);
+        }, startTime);
+        cue.fired = true;
+        cueIndex++;
       }
     };
     if (!videoEl || !hlsUrl) {
       console.debug("video element or hlsurl is not defined");
       return;
     }
-    if (videoEl.canPlayType("application/vnd.apple.mpegurl") && isIOS) {
-      console.log("PLAYING HLS NATIVELY");
-      videoEl.src = hlsUrl;
-      videoEl.addEventListener("timeupdate", handleTimeUpdateListener);
-      setIsMSENotSupported(true);
-    } else if (Hls.isSupported()) {
+    if (Hls.isSupported()) {
       hlsController = new HLSController(hlsUrl, videoRef);
       hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
 
@@ -144,6 +146,11 @@ const HLSView = () => {
       hlsController.on(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);
       hlsController.on(Hls.Events.LEVEL_UPDATED, levelUpdatedHandler);
       hlsController.on(Hls.Events.ERROR, handleHLSError);
+    } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
+      console.log("PLAYING HLS NATIVELY");
+      videoEl.src = hlsUrl;
+      videoEl.addEventListener("timeupdate", handleTimeUpdateListener);
+      setIsMSENotSupported(true);
     }
     return () => {
       hlsController?.off(Hls.Events.MANIFEST_LOADED, manifestLoadedHandler);

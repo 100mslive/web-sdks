@@ -8,7 +8,7 @@ import {
 } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
-import { isMacOS } from "../common/utils";
+import { isMacOS } from "../common/constants";
 
 export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =

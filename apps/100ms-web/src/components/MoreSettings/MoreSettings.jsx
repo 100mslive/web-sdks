@@ -40,9 +40,8 @@ import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
-import { isAndroid, isIOS, isMacOS } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import { APP_DATA } from "../../common/constants";
+import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
 
 const isMobileOS = isAndroid || isIOS;
 

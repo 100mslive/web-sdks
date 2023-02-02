@@ -6,8 +6,7 @@ import {
   useHMSActions,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import { isMacOS } from "../../common/utils";
-import { APP_DATA } from "../../common/constants";
+import { APP_DATA, isMacOS } from "../../common/constants";
 
 let isEvenListenersAttached = false;
 export class KeyboardInputManager {
