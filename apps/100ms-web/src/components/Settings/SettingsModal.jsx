@@ -68,7 +68,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   }, [isHlsViewer, hideSettingByTabName]);
 
   const [selection, setSelection] = useState(
-    () => Object.keys(showSetting).filter(key => showSetting[key])[0] ?? ""
+    () => Object.keys(showSetting).find(key => showSetting[key]) ?? ""
   );
   const resetSelection = useCallback(() => {
     setSelection("");
@@ -79,7 +79,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
       setSelection("");
     } else {
       const firstNotHiddenTabName =
-        Object.keys(showSetting).filter(key => showSetting[key])[0] ?? "";
+        Object.keys(showSetting).find(key => showSetting[key]) ?? "";
       setSelection(firstNotHiddenTabName);
     }
   }, [isMobile, showSetting]);

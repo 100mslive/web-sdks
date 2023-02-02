@@ -40,21 +40,22 @@ const Settings = ({ setHide }) => {
   const trackSelector = selectVideoTrackByID(videoTrackId);
   const track = useHMSStore(trackSelector);
 
-  const videoInputFiltered = videoInput?.filter(item => !!item.label) ?? [];
-  const audioInputFiltered = audioInput?.filter(item => !!item.label) ?? [];
+  /**
+   * Chromium browsers return an audioOutput with empty label when no permissions are given
+   */
   const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
 
   if (
-    !videoInputFiltered?.length &&
-    !audioOutputFiltered?.length &&
-    !audioInputFiltered?.length
+    videoInput.length === 0 &&
+    audioInput.length === 0 &&
+    !audioOutputFiltered?.length
   ) {
     setHide(true);
   }
 
   return (
     <Box className={settingOverflow()}>
-      {videoInputFiltered?.length ? (
+      {videoInput?.length ? (
         <Fragment>
           {isVideoOn && (
             <StyledVideoTile.Container
@@ -86,7 +87,7 @@ const Settings = ({ setHide }) => {
           />
         </Fragment>
       ) : null}
-      {audioInputFiltered?.length ? (
+      {audioInput?.length ? (
         <DeviceSelector
           title={shouldShowAudioOutput ? "Microphone" : "Audio"}
           icon={<MicOnIcon />}
