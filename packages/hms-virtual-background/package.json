@@ -1,5 +1,5 @@
 {
-  "version": "1.9.2-alpha.4",
+  "version": "1.9.2",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -24,13 +24,13 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.7.1"
+    "@100mslive/hms-video": "^0.7.2"
   },
   "name": "@100mslive/hms-virtual-background",
   "author": "ashish17",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.7.2-alpha.4"
+    "@100mslive/hms-video": "0.7.2"
   },
   "dependencies": {
     "@mediapipe/selfie_segmentation": "^0.1.1632777926",
