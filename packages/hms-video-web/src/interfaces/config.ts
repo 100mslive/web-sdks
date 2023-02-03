@@ -1,7 +1,7 @@
 import InitialSettings from './settings';
 
 /**
- * the config object tells the sdk options you want to join with
+ * the config object tells the SDK options you want to join with
  * @link https://docs.100ms.live/javascript/v2/features/preview
  * @link https://docs.100ms.live/javascript/v2/features/join
  */
@@ -28,7 +28,7 @@ export interface HMSConfig {
    */
   settings?: InitialSettings;
   /**
-   * highly recommended to pass this as true, this will make sdk use the local storage
+   * highly recommended to pass this as true, this will make SDK use the local storage
    * to remember any manual device selection for future joins.
    */
   rememberDeviceSelection?: boolean;
@@ -48,7 +48,12 @@ export interface HMSConfig {
   captureNetworkQualityInPreview?: boolean;
 }
 
+/**
+ * the config object tells the SDK options you want to preview with(use if you want preview and join with different roles)
+ * @link https://docs.100ms.live/javascript/v2/features/preview
+ */
 export interface HMSPreviewConfig extends HMSConfig {
+  /** the role that would be used for preview, note that the role from token would be used to join  */
   asRole?: string;
 }
 
