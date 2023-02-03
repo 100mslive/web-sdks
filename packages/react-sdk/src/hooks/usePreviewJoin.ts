@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { HMSPreviewConfig } from '@100mslive/hms-video';
 import {
   HMSConfigInitialSettings,
+  HMSPreviewConfig,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
