@@ -70,6 +70,9 @@ export const ErrorCodes = {
 
     // Current tab is not shared when forceCurrentTab was set to true for screenshare
     CURRENT_TAB_NOT_SHARED: 3012,
+
+    // any error that occurs while playing audio of remote audio tracks
+    AUDIO_PLAYBACK_ERROR: 3013,
   },
 
   WebrtcErrors: {

@@ -44,7 +44,9 @@ export class NetworkTestManager {
             }
           }
         } catch (error) {
-          HMSLogger.e(this.TAG, error);
+          if ((error as Error).name !== 'AbortError') {
+            HMSLogger.e(this.TAG, error);
+          }
         }
       };
 

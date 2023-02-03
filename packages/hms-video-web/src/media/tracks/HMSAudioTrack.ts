@@ -73,39 +73,6 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  /**
-   * removes the track from the audio element of the track
-   * @experimental - Not production ready
-   */
-  removeSink() {
-    // @ts-ignore
-    if (this.audioElement && window.HMS?.AUDIO_SINK) {
-      this.audioElement.srcObject = null;
-      this.subscribeToAudio(false);
-    }
-  }
-
-  /**
-   * add track if not already added
-   * @experimental - Not production ready
-   */
-  addSink() {
-    // @ts-ignore
-    if (!this.nativeTrack || !this.audioElement || !window.HMS?.AUDIO_SINK) {
-      return;
-    }
-    const srcObject = this.audioElement.srcObject;
-    if (srcObject instanceof MediaStream) {
-      const existingTrackID = srcObject.getAudioTracks()[0]?.id;
-      if (existingTrackID === this.nativeTrack.id) {
-        // it's already attached, no need to attach again
-        return;
-      }
-    }
-    this.audioElement.srcObject = new MediaStream([this.nativeTrack]);
-    this.subscribeToAudio(true);
-  }
-
   protected async subscribeToAudio(value: boolean) {
     if (this.stream instanceof HMSRemoteStream) {
       await this.stream.setAudio(value, this.trackId, this.logIdentifier);
