@@ -28,7 +28,7 @@ export interface HMSConfig {
    */
   settings?: InitialSettings;
   /**
-   * highly recommended to pass this as true, this will make sdk use the local storage
+   * highly recommended to pass this as true, this will make SDK use the local storage
    * to remember any manual device selection for future joins.
    */
   rememberDeviceSelection?: boolean;
