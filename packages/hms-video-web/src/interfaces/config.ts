@@ -48,7 +48,12 @@ export interface HMSConfig {
   captureNetworkQualityInPreview?: boolean;
 }
 
+/**
+ * the config object tells the sdk options you want to preview with another role
+ * @link https://docs.100ms.live/javascript/v2/features/preview
+ */
 export interface HMSPreviewConfig extends HMSConfig {
+  /** the role that would be used for preview, note that the role from token would be used to join  */
   asRole?: string;
 }
 
