@@ -1,7 +1,7 @@
 name: Docker Build Test
 
 on:
-  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -10,5 +10,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build Docker image 
+      - name: Build Docker image
         run: docker compose -f apps/100ms-web/docker-compose.yml build
