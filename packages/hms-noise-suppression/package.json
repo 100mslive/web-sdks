@@ -31,7 +31,7 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.7.1"
+    "@100mslive/hms-video": "^0.7.2"
   },
   "name": "@100mslive/hms-noise-suppression",
   "author": "vishaldhull09",
