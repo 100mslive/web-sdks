@@ -1,0 +1,14 @@
+name: Docker Build Test
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Docker image 
+        run: docker compose -f apps/100ms-web/docker-compose.yml build
