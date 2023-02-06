@@ -108,8 +108,10 @@ export const Chat = () => {
   );
 
   useEffect(() => {
+    console.log("called 2");
     if (listRef.current && listRef.current.scrollToItem) {
       scrollToBottom(1);
+      console.log("callled");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listRef.current]);
