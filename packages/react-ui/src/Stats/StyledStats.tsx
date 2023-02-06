@@ -3,11 +3,11 @@ import { styled } from '../Theme';
 export const Root = styled('div', {
   backgroundColor: '$statsBg',
   position: 'absolute',
-  top: '0.3rem',
-  left: '0.3rem',
-  zIndex: 10,
+  top: '$3',
+  left: '$3',
+  zIndex: 7,
   borderRadius: '$2',
-  padding: '5px',
+  padding: '$2',
   fontSize: '$xs',
   overflowY: 'auto',
   maxHeight: '75%',
@@ -19,7 +19,7 @@ export const Table = styled('table', {});
 export const Row = styled('tr', {
   width: '100%',
   '& > * + *': {
-    paddingLeft: '0.5rem',
+    px: '$4',
   },
   whiteSpace: 'nowrap',
   textAlign: 'left',
@@ -27,12 +27,16 @@ export const Row = styled('tr', {
 
 export const Label = styled('td', {
   color: '$textPrimary',
-  fontWeight: 400,
+  fontWeight: '$regular',
 });
 
 export const Value = styled('td', {
   color: '$textPrimary',
 });
+
+export const Gap = styled('tr', {
+  height: '$4',
+})
 
 interface StatsType {
   Root: typeof Root;
@@ -40,6 +44,7 @@ interface StatsType {
   Label: typeof Label;
   Value: typeof Value;
   Table: typeof Table;
+  Gap: typeof Gap;
 }
 
 export const Stats: StatsType = {
@@ -48,4 +53,5 @@ export const Stats: StatsType = {
   Label,
   Value,
   Table,
+  Gap
 };

@@ -20,12 +20,12 @@ export class HMSAudioTrack extends HMSTrack {
     return this.audioElement ? this.audioElement.volume * 100 : null;
   }
 
-  setVolume(value: number) {
+  async setVolume(value: number) {
     if (value < 0 || value > 100) {
       throw Error('Please pass a valid number between 0-100');
     }
     // Don't subscribe to audio when volume is 0
-    this.subscribeToAudio(value === 0 ? false : this.enabled);
+    await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
       this.audioElement.volume = value / 100;
     }
@@ -73,42 +73,9 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  /**
-   * removes the track from the audio element of the track
-   * @experimental - Not production ready
-   */
-  removeSink() {
-    // @ts-ignore
-    if (this.audioElement && window.HMS?.AUDIO_SINK) {
-      this.audioElement.srcObject = null;
-      this.subscribeToAudio(false);
-    }
-  }
-
-  /**
-   * add track if not already added
-   * @experimental - Not production ready
-   */
-  addSink() {
-    // @ts-ignore
-    if (!this.nativeTrack || !this.audioElement || !window.HMS?.AUDIO_SINK) {
-      return;
-    }
-    const srcObject = this.audioElement.srcObject;
-    if (srcObject instanceof MediaStream) {
-      const existingTrackID = srcObject.getAudioTracks()[0]?.id;
-      if (existingTrackID === this.nativeTrack.id) {
-        // it's already attached, no need to attach again
-        return;
-      }
-    }
-    this.audioElement.srcObject = new MediaStream([this.nativeTrack]);
-    this.subscribeToAudio(true);
-  }
-
-  protected subscribeToAudio(value: boolean) {
+  protected async subscribeToAudio(value: boolean) {
     if (this.stream instanceof HMSRemoteStream) {
-      this.stream.setAudio(value);
+      await this.stream.setAudio(value, this.trackId, this.logIdentifier);
     }
   }
 }

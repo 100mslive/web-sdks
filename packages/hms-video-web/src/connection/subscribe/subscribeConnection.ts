@@ -1,3 +1,5 @@
+import EventEmitter from 'eventemitter2';
+import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
@@ -6,8 +8,10 @@ import { ISignal } from '../../signal/ISignal';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
+import { sleep } from '../../utils/timer-utils';
+import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
+import HMSConnection from '../HMSConnection';
 import HMSDataChannel from '../HMSDataChannel';
-import HMSConnection from '../index';
 import { HMSConnectionRole } from '../model';
 
 export default class HMSSubscribeConnection extends HMSConnection {
@@ -15,12 +19,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
 
   private readonly observer: ISubscribeConnectionObserver;
+  private readonly MAX_RETRIES = 3;
 
   readonly nativeConnection: RTCPeerConnection;
 
   private pendingMessageQueue: string[] = [];
 
   private apiChannel?: HMSDataChannel;
+  private eventEmitter = new EventEmitter({ maxListeners: 15 });
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
@@ -42,6 +48,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
         e.channel,
         {
           onMessage: (value: string) => {
+            this.eventEmitter.emit('message', value);
             this.observer.onApiChannelMessage(value);
           },
         },
@@ -111,16 +118,69 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   }
 
+  async sendOverApiDataChannelWithResponse<T extends PreferAudioLayerParams | PreferVideoLayerParams>(
+    message: T,
+    requestId?: string,
+  ): Promise<PreferLayerResponse> {
+    const id = uuid();
+    const request = JSON.stringify({
+      id: requestId || id,
+      jsonrpc: '2.0',
+      ...message,
+    });
+    return this.sendMessage(request, id);
+  }
+
   async close() {
     await super.close();
     this.apiChannel?.close();
   }
 
   private handlePendingApiMessages = () => {
+    this.eventEmitter.emit('open', true);
     if (this.pendingMessageQueue.length > 0) {
       HMSLogger.d(this.TAG, 'Found pending message queue, sending messages');
       this.pendingMessageQueue.forEach(msg => this.sendOverApiDataChannel(msg));
       this.pendingMessageQueue.length = 0;
     }
+  };
+
+  // eslint-disable-next-line complexity
+  private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
+    if (this.apiChannel?.readyState !== 'open') {
+      await this.eventEmitter.waitFor('open');
+    }
+    let response: PreferLayerResponse;
+    for (let i = 0; i < this.MAX_RETRIES; i++) {
+      this.apiChannel!.send(request);
+      response = await this.waitForResponse(requestId);
+      const error = response.error;
+      if (error) {
+        // Don't retry or do anything, track is already removed
+        if (error.code === 404) {
+          HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
+          break;
+        }
+        HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
+        const shouldRetry = error.code / 100 === 5 || error.code === 429;
+        if (!shouldRetry) {
+          throw Error(`code=${error.code}, message=${error.message}`);
+        }
+        const delay = (2 + Math.random() * 2) * 1000;
+        await sleep(delay);
+      } else {
+        break;
+      }
+    }
+    return response!;
+  };
+
+  private waitForResponse = async (requestId: string): Promise<PreferLayerResponse> => {
+    const res = await this.eventEmitter.waitFor('message', function (value) {
+      return value.includes(requestId);
+    });
+    const response = JSON.parse(res[0] as string);
+    HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
+    return response;
   };
 }

@@ -5,8 +5,9 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
   HMSScreenShareConfig,
-  HMSSimulcastLayer,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
 } from '@100mslive/hms-video';
@@ -39,7 +40,7 @@ import { HMSRoleChangeRequest } from './selectors';
  * @category Core
  */
 export interface IHMSActions {
-  preview(config: HMSConfig): Promise<void>;
+  preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -143,13 +144,13 @@ export interface IHMSActions {
   /**
    * Change settings of the local peer's audio track
    * @param settings HMSAudioTrackSettings
-   * ({ volume, codec, maxBitrate, deviceId, advanced })
+   * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
-   * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
+   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
 
@@ -174,7 +175,7 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
@@ -183,11 +184,12 @@ export interface IHMSActions {
   setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
+
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
@@ -233,11 +235,27 @@ export interface IHMSActions {
 
   /**
    * Request for a role change of a remote peer. Can be forced.
+   * @deprecated Use `changeRoleOfPeer`
    * @param forPeerId The remote peer id whose role needs to be changed
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
   changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param roles List of roles whose role needs to be changed
+   * @param toRole The name of the new role.
+   */
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received
@@ -322,14 +340,14 @@ export interface IHMSActions {
    * It is useful for defining timed metadata for interstitial regions such as advertisements,
    * but can be used to define any timed metadata needed by your stream.
    * usage (e.g)
-   * const metadataList = [{
+   * const metadataList = `[{
    *  payload: "some string 1",
    *  duration: 2
    * },
    * {
    *  payload: "some string 2",
    *  duration: 3
-   * }]
+   * }]`
    * sendHLSTimedMetadata(metadataList);
    */
   sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
@@ -425,20 +443,20 @@ export interface IHMSActions {
    *            than a plain object (i.e) JSON.parse()able.
    *          - If set to true on non-plain objects, this is ignored.
    * @example
-   * assume appdata is initially
-   *  {
+   * assume appData is initially
+   *  `{
    *     mySettings: {
    *       setting1: 'val1',
    *       setting2: 'val2',
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * after calling,
-   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * `setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);`
    * it becomes
-   *  {
+   *  `{
    *     mySettings: {
    *       setting1: 'val1-edit',
    *       setting2: 'val2',
@@ -446,7 +464,7 @@ export interface IHMSActions {
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * Note: This is not suitable for keeping large data or data which updates
    * at a high frequency, it is recommended to use app side store for those

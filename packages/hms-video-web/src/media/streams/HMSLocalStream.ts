@@ -1,14 +1,13 @@
 import HMSMediaStream from './HMSMediaStream';
-import HMSPublishConnection from '../../connection/publish';
+import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { SimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
-const TAG = 'HMSLocalStream';
-
 export default class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
+  private readonly TAG = '[HMSLocalStream]';
   private connection: HMSPublishConnection | null = null;
 
   setConnection(connection: HMSPublishConnection) {
@@ -19,7 +18,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     const trackEncodings: RTCRtpEncodingParameters[] = [];
     if (track instanceof HMSLocalVideoTrack) {
       if (simulcastLayers.length > 0) {
-        HMSLogger.v(TAG, 'Simulcast enabled with layers', simulcastLayers);
+        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
         trackEncodings.push(...simulcastLayers);
       } else {
         const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
@@ -39,8 +38,8 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack): Promise<void> {
-    await this.connection?.setMaxBitrate(maxBitrate, track);
+  async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
+    await this.connection?.setMaxBitrateAndFramerate(track);
   }
 
   // @ts-ignore
@@ -74,7 +73,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     const sender = this.connection?.getSenders().find(sender => sender.track && sender.track!.id === track.id);
 
     if (sender === undefined) {
-      HMSLogger.w(TAG, `No sender found for trackId=${track.id}`);
+      HMSLogger.w(this.TAG, `No sender found for trackId=${track.id}`);
       return;
     }
     await sender.replaceTrack(withTrack);
@@ -92,12 +91,12 @@ export default class HMSLocalStream extends HMSMediaStream {
         if (toRemoveLocalTrackIdx !== -1) {
           this.tracks.splice(toRemoveLocalTrackIdx, 1);
         } else {
-          HMSLogger.e(TAG, `Cannot find ${track.trackId} in locally stored tracks`);
+          HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
         }
       }
     });
     if (removedSenderCount !== 1) {
-      HMSLogger.e(TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
+      HMSLogger.e(this.TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
   }
 

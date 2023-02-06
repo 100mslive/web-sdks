@@ -18,11 +18,8 @@ import { PeerNotification } from '../HMSNotifications';
  * we add it to the store and call TrackManager to process it when RTC Track comes in.
  */
 export class PeerManager {
+  private readonly TAG = '[PeerManager]';
   constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
-
-  private get TAG() {
-    return `[${this.constructor.name}]`;
-  }
 
   handleNotification(method: string, notification: any) {
     switch (method) {
@@ -129,18 +126,20 @@ export class PeerManager {
   }
 
   private makePeer(peer: PeerNotification) {
-    const hmsPeer = new HMSRemotePeer({
-      peerId: peer.peer_id,
-      name: peer.info.name,
-      customerUserId: peer.info.user_id,
-      metadata: peer.info.data,
-      role: this.store.getPolicyForRole(peer.role),
-      joinedAt: convertDateNumToDate(peer.joined_at),
-      fromRoomState: !!peer.is_from_room_state,
-    });
-
-    this.store.addPeer(hmsPeer);
-    HMSLogger.d(this.TAG, `adding to the peerList`, hmsPeer.toString());
+    let hmsPeer = this.store.getPeerById(peer.peer_id) as HMSRemotePeer;
+    if (!hmsPeer) {
+      hmsPeer = new HMSRemotePeer({
+        peerId: peer.peer_id,
+        name: peer.info.name,
+        customerUserId: peer.info.user_id,
+        metadata: peer.info.data,
+        role: this.store.getPolicyForRole(peer.role),
+        joinedAt: convertDateNumToDate(peer.joined_at),
+        fromRoomState: !!peer.is_from_room_state,
+      });
+      this.store.addPeer(hmsPeer);
+      HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
+    }
 
     for (const trackId in peer.tracks) {
       this.store.setTrackState({

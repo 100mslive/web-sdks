@@ -31,9 +31,12 @@ export default interface ITransport {
 
   trackUpdate(track: HMSLocalTrack): void;
 
+  /**
+   * @deprecated Use `changeRoleOfPeer`
+   */
   changeRole(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
 
-  acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
+  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
 
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
 

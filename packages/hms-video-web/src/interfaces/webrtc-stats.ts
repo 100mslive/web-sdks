@@ -3,6 +3,8 @@
  * Ref: https://www.w3.org/TR/webrtc-stats/#summary
  */
 
+import { RID } from './simulcast-layers';
+
 /**
  * @internal
  * Ref: https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats
@@ -28,6 +30,7 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
   qualityLimitationReason?: string;
   roundTripTime?: number;
   totalRoundTripTime?: number;
+  rid?: RID;
 }
 
 interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCommonStats {

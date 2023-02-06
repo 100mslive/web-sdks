@@ -1,4 +1,26 @@
 import LogRocket from "logrocket";
+import { identify } from "zipyai";
+
+const zipyKey = process.env.REACT_APP_ZIPY_KEY;
+export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
+  if (!zipyKey) {
+    return;
+  }
+
+  let domain;
+  if (typeof window !== "undefined") {
+    domain = window.location.hostname;
+  }
+
+  identify(localPeer.id, {
+    firstName: localPeer.name,
+    customerName: domain,
+    email: domain,
+    role: localPeer.roleName,
+    sessionId,
+    roomId,
+  });
+};
 
 const logRocketKey = process.env.REACT_APP_LOGROCKET_ID;
 let logRocketInitialised;

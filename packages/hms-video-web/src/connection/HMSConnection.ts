@@ -1,12 +1,17 @@
 import { HMSConnectionRole } from './model';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSLocalTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
-const TAG = 'HMSConnection';
+const TAG = '[HMSConnection]';
+interface RTCIceCandidatePair {
+  local: RTCIceCandidate;
+  remote: RTCIceCandidate;
+}
+
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;
@@ -23,6 +28,8 @@ export default abstract class HMSConnection {
    *  - [HMSSubscribeConnection] clears this list as soon as we call [addIceCandidate]
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
+
+  selectedCandidatePair?: RTCIceCandidatePair;
 
   protected constructor(role: HMSConnectionRole, signal: ISignal) {
     this.role = role;
@@ -103,12 +110,13 @@ export default abstract class HMSConnection {
      *
      * For all peers joining after this peer, we have published and subscribed at the time of join itself
      * so we're able to log both publish and subscribe ice candidates.
+     * Added try catch for the whole section as the getSenders and getReceivers is throwing errors in load test
      */
-    const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
+    try {
+      const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
 
-    transmitters.forEach(transmitter => {
-      const kindOfTrack = transmitter.track?.kind;
-      try {
+      transmitters.forEach(transmitter => {
+        const kindOfTrack = transmitter.track?.kind;
         if (transmitter.transport) {
           const iceTransport = transmitter.transport.iceTransport;
 
@@ -116,12 +124,12 @@ export default abstract class HMSConnection {
             // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
               // @ts-expect-error
-              const selectedCandidatePair = iceTransport.getSelectedCandidatePair();
+              this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
               HMSLogger.d(
                 TAG,
                 `${HMSConnectionRole[this.role]} connection`,
                 `selected ${kindOfTrack || 'unknown'} candidate pair`,
-                JSON.stringify(selectedCandidatePair, null, 2),
+                JSON.stringify(this.selectedCandidatePair, null, 2),
               );
             }
           };
@@ -133,27 +141,37 @@ export default abstract class HMSConnection {
           }
           logSelectedCandidate();
         }
-      } catch (error) {
-        HMSLogger.w(
-          TAG,
-          `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
-          error,
-        );
-      }
-    });
+      });
+    } catch (error) {
+      HMSLogger.w(
+        TAG,
+        `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
+        error,
+      );
+    }
   }
 
   removeTrack(sender: RTCRtpSender) {
-    this.nativeConnection.removeTrack(sender);
+    if (this.nativeConnection.signalingState !== 'closed') {
+      this.nativeConnection.removeTrack(sender);
+    }
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
+  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
+    const maxBitrate = track.settings.maxBitrate;
+    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
     if (sender) {
       const params = sender.getParameters();
       if (params.encodings.length > 0) {
-        params.encodings[0].maxBitrate = maxBitrate * 1000;
+        if (maxBitrate) {
+          params.encodings[0].maxBitrate = maxBitrate * 1000;
+        }
+        if (maxFramerate) {
+          // @ts-ignore
+          params.encodings[0].maxFramerate = maxFramerate;
+        }
       }
       await sender.setParameters(params);
     } else {

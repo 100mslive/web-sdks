@@ -1,16 +1,7 @@
-name: Upload to S3
+name: Deploy Dev
 on:
   workflow_dispatch:
     inputs:
-      env:
-        description: 'which env to deploy - qa | dev | prod'
-        type: 'choice'
-        required: true
-        default: qa
-        options:
-          - qa
-          - dev
-          - prod
       buildEnvForDev:
         description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
         type: 'choice'
@@ -19,17 +10,9 @@ on:
         options:
           - prod
           - qa
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'cypress/**'
-      - 'playwright/**'
-      - 'internal-docs/**'
-      - '.github/**'
 
 jobs:
-  upload:
+  build:
     runs-on: ubuntu-latest
     env:
       REACT_APP_TILE_SHAPE: '1-1'
@@ -51,19 +34,16 @@ jobs:
       REACT_APP_VIDEO_PLAYLIST: '[{"name":"100ms-360P","id":"video1","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-360p.mp4","type":"video"},{"name":"100ms-720P","id":"video2","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-720p.mp4","type":"video"},{"name":"Big Buck Bunny","id":"video3","metadata":{"description":"Bunny"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/video2.mp4","type":"video"}]'
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
-
+      REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+      REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
     steps:
       - name: log inputs
         run: |
-          echo "env: ${{ github.event.inputs.env }}, branch: ${{ github.ref_name }}"
-
-      # prod app can only be deployed to from a branch starting with production in its name
-      - name: Validate branch
-        if: ${{ (github.event.inputs.env == 'prod') && (!startsWith(github.ref_name, 'production')) }}
-        run: exit 1
+          echo "env: dev, branch: ${{ github.ref_name }}"
 
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.0
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           access_token: ${{ github.token }}
 
@@ -71,7 +51,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: yarn packages cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
@@ -83,13 +63,20 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
-      - name: Build for QA
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
+      - name: Build for Dev
         run: yarn build
-        env:
-          REACT_APP_ENV: 'qa'
-          REACT_APP_ENABLE_WHITEBOARD: 'true'
 
+      - name: 'Upload Build Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: apps/100ms-custom-app/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -97,61 +84,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
           aws-region: ${{ secrets.S3_BUCKET_REGION }}
 
-      - name: Upload to QA S3 Bucket
-        if: github.event.inputs.env == 'qa' || github.ref_name == 'main'
-        env:
-          BUCKET: ${{ secrets.S3_BUCKET }}
-        # upload static folder first and then upload the rest to ensure index.html assets are all present
-        run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
+      - name: Download Build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: build
 
-      - name: Build for Production
-        if: github.event.inputs.env == 'prod'
-        run: yarn build
-        env:
-          REACT_APP_ENV: 'prod'
-
-      - name: Upload to Prod S3 Bucket
-        if: github.event.inputs.env == 'prod'
-        env:
-          BUCKET: ${{ secrets.S3_BUCKET_PROD }}
-        # upload static folder first and then upload the rest to ensure index.html assets are all present
-        run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
-
-      - name: Build for Dev
-        if: github.event.inputs.env == 'dev'
-        run: yarn build
-        env:
-          REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
-
-      - name: Upload to Dev S3 Bucket
-        if: github.event.inputs.env == 'dev'
+      - name: Deploy to Dev
         env:
           BUCKET: ${{ secrets.S3_BUCKET_DEV }}
         # upload static folder first and then upload the rest to ensure index.html assets are all present
         run: |
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --exclude "index.html"
-          aws s3 sync ./apps/100ms-custom-app/build s3://$BUCKET --include "index.html"
-
-      - name: Notify slack success
-        if: github.event.inputs.env == 'prod' && success()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
-          status: Success
-          color: good
-
-      - name: Notify slack fail
-        if: github.event.inputs.env == 'prod' && failure()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
-        uses: voxmedia/github-action-slack-notify-build@v1
-        with:
-          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
-          status: Failed
-          color: danger
+          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./build s3://$BUCKET --include "index.html"

@@ -14,7 +14,7 @@ export { useScreenShare } from './hooks/useScreenShare';
 export { useRemoteAVToggle } from './hooks/useRemoteAVToggle';
 export { useVideoList } from './hooks/useVideoList';
 export { useAudioLevelStyles } from './hooks/useAudioLevelStyles';
-export { useDevices, DeviceType } from './hooks/useDevices';
+export { useDevices } from './hooks/useDevices';
 export { useParticipantList } from './hooks/useParticipantList';
 export { useRecordingStreaming } from './hooks/useRecordingStreaming';
 export { useAutoplayError } from './hooks/useAutoplayError';

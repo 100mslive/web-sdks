@@ -22,7 +22,7 @@ import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 
 export class NotificationManager {
-  private TAG = '[HMSNotificationManager]';
+  private readonly TAG = '[HMSNotificationManager]';
   private trackManager: TrackManager;
   private peerManager: PeerManager;
   private peerListManager: PeerListManager;
@@ -78,7 +78,7 @@ export class NotificationManager {
     this.connectionQualityManager.listener = qualityListener;
   }
 
-  handleNotification(message: { method: string; params: any }, isReconnecting = false) {
+  handleNotification(message: { method: string; params: any }, isReconnecting = false, isPreviewInProgress = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
@@ -87,6 +87,7 @@ export class NotificationManager {
         HMSNotificationMethod.ACTIVE_SPEAKERS,
         HMSNotificationMethod.SFU_STATS,
         HMSNotificationMethod.CONNECTION_QUALITY,
+        undefined, // this is is to ignore notifications without any method
       ].includes(method)
     ) {
       HMSLogger.d(this.TAG, `Received notification - ${method}`, { notification });
@@ -106,11 +107,11 @@ export class NotificationManager {
     this.requestManager.handleNotification(method, notification);
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
-    this.handleIsolatedMethods(method, notification);
+    this.handleIsolatedMethods(method, notification, isPreviewInProgress);
   }
 
   // eslint-disable-next-line complexity
-  handleIsolatedMethods(method: string, notification: any) {
+  handleIsolatedMethods(method: string, notification: any, isPreviewInProgress = false) {
     switch (method) {
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
         this.trackManager.handleTrackMetadataAdd(notification as TrackStateNotification);
@@ -133,7 +134,7 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
-        this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
+        this.policyChangeManager.handlePolicyChange(notification as PolicyParams, isPreviewInProgress);
         break;
 
       default:

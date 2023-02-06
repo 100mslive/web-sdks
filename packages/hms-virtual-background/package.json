@@ -1,5 +1,5 @@
 {
-  "version": "1.9.2-alpha.1",
+  "version": "1.9.3",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -24,17 +24,20 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.5.2"
+    "@100mslive/hms-video": "^0.7.2"
   },
   "name": "@100mslive/hms-virtual-background",
   "author": "ashish17",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.7.2-alpha.1"
+    "@100mslive/hms-video": "0.7.3"
   },
   "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1632777926",
+    "@tensorflow-models/body-segmentation": "^1.0.1",
     "@tensorflow/tfjs-backend-webgl": "^3.3.0",
-    "@tensorflow/tfjs-core": "^3.3.0",
+    "@tensorflow/tfjs-converter": "^3.19.0",
+    "@tensorflow/tfjs-core": "^3.19.0",
     "@webassemblyjs/helper-wasm-bytecode": "1.11.1",
     "@webassemblyjs/wasm-gen": "1.11.1",
     "gifuct-js": "^2.1.2",

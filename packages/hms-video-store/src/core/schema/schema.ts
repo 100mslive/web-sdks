@@ -29,11 +29,13 @@ export interface HMSStore {
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   sessionMetadata?: any;
+  preview: { peer?: HMSPeer };
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
 export interface HMSStatsStore {
-  trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  remoteTrackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  localTrackStats: Record<HMSTrackID, HMSTrackStats[] | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
   localPeer: {
     id: HMSPeerID;
@@ -107,6 +109,7 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     roles: {},
     roleChangeRequests: [],
+    preview: {},
     errors: [],
   };
 };
@@ -114,7 +117,8 @@ export const createDefaultStoreState = (): HMSStore => {
 export const createDefaultStatsStore = (): HMSStatsStore => {
   return {
     peerStats: {},
-    trackStats: {},
+    remoteTrackStats: {},
+    localTrackStats: {},
     localPeer: { id: '' },
   };
 };

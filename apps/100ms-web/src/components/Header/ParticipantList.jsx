@@ -16,6 +16,7 @@ import {
   CrossIcon,
   HandRaiseIcon,
   PeopleIcon,
+  RemoveUserIcon,
   SearchIcon,
   SpeakerIcon,
   VerticalMenuIcon,
@@ -144,9 +145,12 @@ export const ParticipantCount = () => {
   );
 };
 
+function itemKey(index, data) {
+  return data.participants[index].id;
+}
+
 const VirtualizedParticipants = ({
   participants,
-  canChangeRole,
   isConnected,
   setSelectedPeerId,
 }) => {
@@ -161,71 +165,70 @@ const VirtualizedParticipants = ({
     >
       <FixedSizeList
         itemSize={68}
+        itemData={{ participants, isConnected, setSelectedPeerId }}
+        itemKey={itemKey}
         itemCount={participants.length}
         width={width}
         height={height}
       >
-        {({ index, style }) => {
-          return (
-            <div style={style} key={participants[index].id}>
-              <Participant
-                peer={participants[index]}
-                canChangeRole={canChangeRole}
-                showActions={isConnected}
-                onParticipantAction={setSelectedPeerId}
-              />
-            </div>
-          );
-        }}
+        {VirtualisedParticipantListItem}
       </FixedSizeList>
     </Box>
   );
 };
 
-const Participant = ({
-  peer,
-  canChangeRole,
-  showActions,
-  onParticipantAction,
-}) => {
+const VirtualisedParticipantListItem = React.memo(({ style, index, data }) => {
   return (
-    <Flex
-      key={peer.id}
-      css={{ w: "100%", py: "$4", pr: "$10" }}
-      align="center"
-      data-testid={"participant_" + peer.name}
-    >
-      <Avatar
-        name={peer.name}
-        css={{
-          position: "unset",
-          transform: "unset",
-          mr: "$8",
-          fontSize: "$sm",
-          size: "$12",
-          p: "$4",
-        }}
+    <div style={style} key={data.participants[index].id}>
+      <Participant
+        peer={data.participants[index]}
+        isConnected={data.isConnected}
+        setSelectedPeerId={data.setSelectedPeerId}
       />
-      <Flex direction="column" css={{ flex: "1 1 0" }}>
-        <Text
-          variant="md"
-          css={{ ...textEllipsis(150), fontWeight: "$semiBold" }}
-        >
-          {peer.name}
-        </Text>
-        <Text variant="sub2">{peer.roleName}</Text>
-      </Flex>
-      {showActions && (
-        <ParticipantActions
-          peerId={peer.id}
-          role={peer.roleName}
-          onSettings={() => {
-            onParticipantAction(peer.id);
+    </div>
+  );
+});
+
+const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
+  return (
+    <Fragment>
+      <Flex
+        key={peer.id}
+        css={{ w: "100%", py: "$4", pr: "$10" }}
+        align="center"
+        data-testid={"participant_" + peer.name}
+      >
+        <Avatar
+          name={peer.name}
+          css={{
+            position: "unset",
+            transform: "unset",
+            mr: "$8",
+            fontSize: "$sm",
+            size: "$12",
+            p: "$4",
           }}
-          canChangeRole={canChangeRole}
         />
-      )}
-    </Flex>
+        <Flex direction="column" css={{ flex: "1 1 0" }}>
+          <Text
+            variant="md"
+            css={{ ...textEllipsis(150), fontWeight: "$semiBold" }}
+          >
+            {peer.name}
+          </Text>
+          <Text variant="sub2">{peer.roleName}</Text>
+        </Flex>
+        {isConnected && (
+          <ParticipantActions
+            peerId={peer.id}
+            role={peer.roleName}
+            onSettings={() => {
+              setSelectedPeerId(peer.id);
+            }}
+          />
+        )}
+      </Flex>
+    </Fragment>
   );
 };
 
@@ -256,7 +259,11 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
 });
 
 const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
-  const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
+  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } =
+    useHMSStore(selectPermissions);
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const isLocal = localPeerId === peerId;
+  const actions = useHMSActions();
   const [open, setOpen] = useState(false);
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
@@ -279,6 +286,22 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
             </Dropdown.Item>
           )}
           <ParticipantVolume peerId={peerId} />
+          {!isLocal && canRemoveOthers && (
+            <Dropdown.Item
+              onClick={async () => {
+                try {
+                  await actions.removePeer(peerId, "");
+                } catch (error) {
+                  // TODO: Toast here
+                }
+              }}
+            >
+              <RemoveUserIcon />
+              <Text css={{ ml: "$4", color: "$error" }}>
+                Remove Participant
+              </Text>
+            </Dropdown.Item>
+          )}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>

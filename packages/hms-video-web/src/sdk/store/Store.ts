@@ -4,13 +4,12 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
+  HMSSimulcastLayerDefinition,
   RID,
-  SimulcastDimensions,
   SimulcastLayer,
-  SimulcastLayerDefinition,
   SimulcastLayers,
   simulcastMapping,
 } from '../../interfaces/simulcast-layers';
@@ -23,6 +22,7 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
+import { PolicyParams } from '../../notification-manager';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
@@ -39,17 +39,21 @@ class Store implements IStore {
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
   private speakers: HMSSpeaker[] = [];
-  private videoLayers: SimulcastLayers | null = null;
-  private screenshareLayers: SimulcastLayers | null = null;
+  private videoLayers?: SimulcastLayers;
+  // private screenshareLayers?: SimulcastLayers;
   private config?: HMSConfig;
-  private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
+  private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
 
   getConfig() {
     return this.config;
+  }
+
+  setSimulcastEnabled(enabled: boolean) {
+    this.simulcastEnabled = enabled;
   }
 
   getEnv() {
@@ -57,7 +61,7 @@ class Store implements IStore {
   }
 
   getPublishParams() {
-    return this.publishParams;
+    return this.getLocalPeer()?.role?.publishParams;
   }
 
   getComparator() {
@@ -179,9 +183,15 @@ class Store implements IStore {
     this.room = room;
   }
 
-  setKnownRoles(knownRoles: KnownRoles) {
-    this.knownRoles = knownRoles;
+  setKnownRoles(params: PolicyParams) {
+    this.knownRoles = params.known_roles;
     this.roleDetailsArrived = true;
+    if (!this.simulcastEnabled) {
+      return;
+    }
+    const publishParams = this.knownRoles[params.name]?.publishParams;
+    this.videoLayers = this.convertSimulcastLayers(publishParams.simulcast?.video);
+    // this.screenshareLayers = this.convertSimulcastLayers(publishParams.simulcast?.screen);
     this.updatePeersPolicy();
   }
 
@@ -211,10 +221,6 @@ class Store implements IStore {
     }
     this.config = config;
     this.setEnv();
-  }
-
-  setPublishParams(params: PublishParams) {
-    this.publishParams = params;
   }
 
   addPeer(peer: HMSPeer) {
@@ -256,8 +262,10 @@ class Store implements IStore {
     this.speakers = speakers;
   }
 
-  updateAudioOutputVolume(value: number) {
-    this.getAudioTracks().forEach(track => track.setVolume(value));
+  async updateAudioOutputVolume(value: number) {
+    for (const track of this.getAudioTracks()) {
+      await track.setVolume(value);
+    }
   }
 
   async updateAudioOutputDevice(device: MediaDeviceInfo) {
@@ -268,29 +276,14 @@ class Store implements IStore {
     await Promise.all(promises);
   }
 
-  getSubscribeDegradationParams() {
-    const params = this.getLocalPeer()?.role?.subscribeParams.subscribeDegradation;
-    if (params && Object.keys(params).length > 0) {
-      return params;
-    }
-    return undefined;
-  }
-
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
+    if (!this.simulcastEnabled) {
+      return [];
+    }
     if (source === 'screen') {
-      return this.screenshareLayers?.layers || [];
+      return []; //this.screenshareLayers?.layers || []; uncomment this when screenshare simulcast supported
     }
     return this.videoLayers?.layers || [];
-  }
-
-  getSimulcastDimensions(source: HMSTrackSource): SimulcastDimensions {
-    const layers = source === 'screen' ? this.screenshareLayers : this.videoLayers;
-    const width = layers?.width;
-    const height = layers?.height;
-    return {
-      width,
-      height,
-    };
   }
 
   /**
@@ -299,7 +292,10 @@ class Store implements IStore {
    * @param simulcastLayers
    * @returns {SimulcastLayers}
    */
-  private convertSimulcastLayers(simulcastLayers: SimulcastLayers) {
+  private convertSimulcastLayers(simulcastLayers?: SimulcastLayers) {
+    if (!simulcastLayers) {
+      return;
+    }
     return {
       ...simulcastLayers,
       layers: (simulcastLayers.layers || []).map(layer => {
@@ -311,41 +307,42 @@ class Store implements IStore {
     };
   }
 
-  setVideoSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    this.videoLayers = this.convertSimulcastLayers(simulcastLayers);
-  }
-
-  setScreenshareSimulcastLayers(simulcastLayers: SimulcastLayers): void {
-    this.screenshareLayers = this.convertSimulcastLayers(simulcastLayers);
-  }
-
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource) {
-    if (!peer.role) {
+    // TODO: remove screen check when screenshare simulcast is supported
+    if ([!peer || !peer.role, source === 'screen', !this.simulcastEnabled].some(value => !!value)) {
       return [];
     }
 
-    const publishParams = this.getPolicyForRole(peer.role.name).publishParams;
+    const publishParams = this.getPolicyForRole(peer.role!.name).publishParams;
     let simulcastLayers: SimulcastLayers | undefined;
+    let width: number;
+    let height: number;
     if (source === 'regular') {
-      simulcastLayers = publishParams.videoSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.video;
+      width = publishParams.video.width;
+      height = publishParams.video.height;
     } else if (source === 'screen') {
-      simulcastLayers = publishParams.screenSimulcastLayers;
+      simulcastLayers = publishParams.simulcast?.screen;
+      width = publishParams.screen.width;
+      height = publishParams.screen.height;
     }
-    const width = simulcastLayers?.width;
-    const height = simulcastLayers?.height;
     return (
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];
         const resolution = {
-          width: width && value.scaleResolutionDownBy ? width / value.scaleResolutionDownBy : undefined,
-          height: height && value.scaleResolutionDownBy ? height / value.scaleResolutionDownBy : undefined,
+          width: width / value.scaleResolutionDownBy,
+          height: height / value.scaleResolutionDownBy,
         };
         return {
           layer,
           resolution,
-        } as SimulcastLayerDefinition;
+        } as HMSSimulcastLayerDefinition;
       }) || []
     );
+  }
+
+  getErrorListener() {
+    return this.errorListener;
   }
 
   cleanUp() {

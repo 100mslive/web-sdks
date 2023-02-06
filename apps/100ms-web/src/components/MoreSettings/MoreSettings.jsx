@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
+import Hls from "hls.js";
 import {
-  parsedUserAgent,
   selectAppData,
   selectIsAllowedToPublish,
   selectLocalPeerID,
@@ -12,6 +12,7 @@ import {
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import {
+  ChangeRoleIcon,
   CheckIcon,
   InfoIcon,
   MicOffIcon,
@@ -34,17 +35,16 @@ import { RoleChangeModal } from "../RoleChangeModal";
 import SettingsModal from "../Settings/SettingsModal";
 import StartRecording from "../Settings/StartRecording";
 import { StatsForNerds } from "../StatsForNerds";
+import { BulkRoleChangeModal } from "./BulkRoleChangeModal";
 import { ChangeNameModal } from "./ChangeNameModal";
 import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import { APP_DATA } from "../../common/constants";
+import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
 
-const OSName = parsedUserAgent.getOS().name.toLowerCase();
-const isMacOS = OSName === "mac os";
-const isMobileOS = OSName === "android" || OSName === "ios";
+const isMobileOS = isAndroid || isIOS;
 
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
@@ -57,6 +57,7 @@ export const MoreSettings = () => {
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showMuteAll, setShowMuteAll] = useState(false);
   const [showOpenUrl, setShowOpenUrl] = useState(false);
+  const [showBulkRoleChange, setShowBulkRoleChange] = useState(false);
   const [showDeviceSettings, setShowDeviceSettings] = useState(false);
   const [showStatsForNerds, setShowStatsForNerds] = useState(false);
   const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
@@ -104,6 +105,17 @@ export const MoreSettings = () => {
             </Text>
           </Dropdown.Item>
           <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
+          {permissions?.changeRole && (
+            <Dropdown.Item
+              onClick={() => setShowBulkRoleChange(true)}
+              data-testid="bulk_role_change_btn"
+            >
+              <ChangeRoleIcon />
+              <Text variant="sm" css={{ ml: "$4" }}>
+                Bulk Role Change
+              </Text>
+            </Dropdown.Item>
+          )}
           <FullScreenItem />
           {isAllowedToPublish.screen && (
             <EmbedUrl setShowOpenUrl={setShowOpenUrl} />
@@ -130,6 +142,7 @@ export const MoreSettings = () => {
             </Text>
           </Dropdown.Item>
           {FeatureFlags.enableStatsForNerds &&
+            Hls.isSupported() &&
             (localPeerRole === "hls-viewer" ? (
               <Dropdown.Item
                 onClick={() =>
@@ -172,6 +185,9 @@ export const MoreSettings = () => {
             ))}
         </Dropdown.Content>
       </Dropdown.Root>
+      {showBulkRoleChange && (
+        <BulkRoleChangeModal onOpenChange={setShowBulkRoleChange} />
+      )}
       {showMuteAll && <MuteAllModal onOpenChange={setShowMuteAll} />}
       {showChangeNameModal && (
         <ChangeNameModal onOpenChange={setShowChangeNameModal} />

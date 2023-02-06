@@ -46,7 +46,7 @@ export class PlaylistManager
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
-  private TAG = '[PlaylistManager]';
+  private readonly TAG = '[PlaylistManager]';
 
   constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();
@@ -353,7 +353,7 @@ export class PlaylistManager
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
     this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
-    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
+    this.eventBus.localVideoEnabled.subscribe(this.handlePausePlaylist);
   }
 
   /**
