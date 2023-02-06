@@ -108,7 +108,7 @@ export const Chat = () => {
   );
 
   useEffect(() => {
-    console.log("called 2");
+    console.log("called 2 ", listRef.current);
     if (listRef.current && listRef.current.scrollToItem) {
       scrollToBottom(1);
       console.log("callled");
