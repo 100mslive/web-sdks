@@ -63,7 +63,7 @@ const replaceContentLinks = content => {
 const main = () => {
   getFiles('docs').forEach(async filePath => {
     const content = fs.readFileSync(filePath, { encoding: 'utf8' });
-    const newContent = removeFileExtensionFromLinks(replaceTitleWithMetadata(replaceContentLinks(content)));
+    const newContent = removeFileExtensionFromLinks(replaceContentLinks(content));
     if (newContent) {
       fs.writeFileSync(filePath, newContent);
     }
