@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
+import Hls from "hls.js";
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -29,7 +30,6 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import Hls from "hls.js";
 import IconButton from "../../IconButton";
 import { RoleChangeModal } from "../RoleChangeModal";
 import SettingsModal from "../Settings/SettingsModal";
@@ -141,7 +141,8 @@ export const MoreSettings = () => {
               Settings
             </Text>
           </Dropdown.Item>
-          {FeatureFlags.enableStatsForNerds && Hls.isSupported() &&
+          {FeatureFlags.enableStatsForNerds &&
+            Hls.isSupported() &&
             (localPeerRole === "hls-viewer" ? (
               <Dropdown.Item
                 onClick={() =>
