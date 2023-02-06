@@ -35,7 +35,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    await super.setEnabled(value);
+    super.setEnabled(value);
+    this.videoHandler?.updateSinks();
   }
 
   async setPreferredLayer(layer: HMSPreferredSimulcastLayer) {

@@ -13,6 +13,16 @@ export class VideoElementManager {
     this.init();
   }
 
+  updateSinks() {
+    for (const videoElement of this.videoElements) {
+      if (this.track.enabled) {
+        this.track.addSink(videoElement);
+      } else {
+        this.track.removeSink(videoElement);
+      }
+    }
+  }
+
   async addVideoElement(videoElement: HTMLVideoElement) {
     if (this.videoElements.has(videoElement)) {
       return;
@@ -64,7 +74,7 @@ export class VideoElementManager {
       const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
 
       // .contains check is needed for pip component as the video tiles are not mounted to dom element
-      if ((entry.isIntersecting && isVisibile) || !document.contains(entry.target)) {
+      if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
         this.track.addSink(entry.target as HTMLVideoElement);
       } else {
         this.track.removeSink(entry.target as HTMLVideoElement);
@@ -74,7 +84,9 @@ export class VideoElementManager {
   };
 
   private handleResize = async (entries: ResizeObserverEntry[]) => {
-    this.selectMaxLayer(entries.map(entry => entry.contentRect));
+    if (this.track.enabled && this.track instanceof HMSRemoteVideoTrack) {
+      this.selectMaxLayer(entries.map(entry => entry.contentRect));
+    }
   };
 
   /**
