@@ -280,6 +280,18 @@ export const makeFakeStore = (): HMSStore => {
       audioOutput: [],
       videoInput: [],
     },
+    preview: {
+      peer: {
+        id: '1',
+        name: 'test1',
+        roleName: ROLES.HOST,
+        isLocal: true,
+        videoTrack: '101',
+        audioTrack: '102',
+        auxiliaryTracks: [],
+        metadata: '{}',
+      },
+    },
     errors: [],
   };
 
