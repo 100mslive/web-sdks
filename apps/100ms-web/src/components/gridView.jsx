@@ -5,6 +5,8 @@ import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
 import useSortedPeers from "../common/useSortedPeers";
+import { useUISettings } from "./AppData/useUISettings";
+import { UI_SETTINGS } from "../common/constants";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -21,8 +23,9 @@ const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
+  const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
   const sortedPeers = useSortedPeers(peers, maxTileCount);
-  console.log("render");
+
   return (
     <Fragment>
       <Box
@@ -33,9 +36,9 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
           "@md": { flex: "2 1 0" },
         }}
       >
-        {sortedPeers && sortedPeers.length > 0 ? (
+        {peers && peers.length > 0 ? (
           <VideoList
-            peers={sortedPeers}
+            peers={activeSpeakerSorting ? sortedPeers : peers}
             maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
           />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
@@ -65,6 +68,8 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 
 // Side pane shows smaller tiles
 export const GridSidePaneView = ({ peers }) => {
+  const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
+  const sortedPeers = useSortedPeers(peers, 2);
   return (
     <Flex
       direction="column"
@@ -81,7 +86,10 @@ export const GridSidePaneView = ({ peers }) => {
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
-          <VideoList peers={peers} maxColCount={2} />
+          <VideoList
+            peers={activeSpeakerSorting ? sortedPeers : peers}
+            maxColCount={2}
+          />
         )}
       </Flex>
     </Flex>

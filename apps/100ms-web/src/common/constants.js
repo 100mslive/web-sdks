@@ -135,6 +135,7 @@ export const UI_SETTINGS = {
   showStatsOnTiles: "showStatsOnTiles",
   enableAmbientMusic: "enableAmbientMusic",
   mirrorLocalVideo: "mirrorLocalVideo",
+  activeSpeakerSorting: "activeSpeakerSorting",
 };
 
 export const SIDE_PANE_OPTIONS = {

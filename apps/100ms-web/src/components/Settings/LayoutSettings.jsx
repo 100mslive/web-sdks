@@ -20,7 +20,13 @@ export const LayoutSettings = () => {
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
   const [
-    { isAudioOnly, uiViewMode, maxTileCount, mirrorLocalVideo },
+    {
+      isAudioOnly,
+      uiViewMode,
+      maxTileCount,
+      mirrorLocalVideo,
+      activeSpeakerSorting,
+    },
     setUISettings,
   ] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
@@ -50,10 +56,20 @@ export const LayoutSettings = () => {
         label="Active Speaker Mode"
       />
       <SwitchWithLabel
+        label="Active Speaker Sorting"
+        id="activeSpeakerSortingMode"
+        checked={activeSpeakerSorting}
+        onChange={toggleIsAudioOnly}
+      />
+      <SwitchWithLabel
         label="Audio Only Mode"
         id="audioOnlyMode"
         checked={isAudioOnly}
-        onChange={toggleIsAudioOnly}
+        onChange={value => {
+          setUISettings({
+            [UI_SETTINGS.activeSpeakerSorting]: value,
+          });
+        }}
       />
       <SwitchWithLabel
         label="Mirror Local Video"

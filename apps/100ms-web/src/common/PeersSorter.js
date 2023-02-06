@@ -28,20 +28,22 @@ class PeersSorter {
   }
 
   moveSpeakerToFront() {
-    console.log("moving speaker to front ");
     let sortedPeers = this.peers;
     if (this.lastSpokenPeer) {
       const dominantPeerIndex = this.peers.findIndex(
         peer => peer.id === this.lastSpokenPeer.id
       );
+
       if (dominantPeerIndex !== -1) {
-        const dominantPeer = this.peers[dominantPeerIndex];
-        this.peers.splice(dominantPeerIndex, 1);
-        sortedPeers = [dominantPeer].concat(this.peers);
+        sortedPeers = [this.peers[dominantPeerIndex]];
+        for (let peer of this.peers) {
+          if (peer.id !== this.peers[dominantPeerIndex].id) {
+            sortedPeers.push(peer);
+          }
+        }
       }
     }
     this.onPeersChange(sortedPeers);
-    console.log("moving speaker to front 2", sortedPeers);
   }
 
   onDominantSpeakerChange(speaker) {
