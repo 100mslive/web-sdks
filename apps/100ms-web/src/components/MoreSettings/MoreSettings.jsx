@@ -29,6 +29,7 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import Hls from "hls.js";
 import IconButton from "../../IconButton";
 import { RoleChangeModal } from "../RoleChangeModal";
 import SettingsModal from "../Settings/SettingsModal";
@@ -140,7 +141,7 @@ export const MoreSettings = () => {
               Settings
             </Text>
           </Dropdown.Item>
-          {FeatureFlags.enableStatsForNerds &&
+          {FeatureFlags.enableStatsForNerds && Hls.isSupported() &&
             (localPeerRole === "hls-viewer" ? (
               <Dropdown.Item
                 onClick={() =>
