@@ -9,6 +9,7 @@ import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
+import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
@@ -23,7 +24,7 @@ import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalTrack, HMSTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import Message from '../sdk/models/HMSMessage';
@@ -42,6 +43,7 @@ import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
+  ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
@@ -233,8 +235,29 @@ export default class HMSTransport implements ITransport {
         this.publishConnection?.logSelectedIceCandidatePairs();
       }
 
+      if (newState === 'disconnected') {
+        // if state stays disconnected for 5 seconds, retry
+        setTimeout(() => {
+          if (this.publishConnection?.connectionState === 'disconnected') {
+            this.handleIceConnectionFailure(
+              HMSConnectionRole.Publish,
+              ErrorFactory.WebrtcErrors.ICEDisconnected(
+                HMSAction.PUBLISH,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+              ),
+            );
+          }
+        }, ICE_DISCONNECTION_TIMEOUT);
+      }
+
       if (newState === 'failed') {
-        await this.handleIceConnectionFailure(HMSConnectionRole.Publish);
+        await this.handleIceConnectionFailure(
+          HMSConnectionRole.Publish,
+          ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.PUBLISH,
+            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+          ),
+        );
       }
     },
   };
@@ -278,17 +301,31 @@ export default class HMSTransport implements ITransport {
       log(TAG, `Subscribe connection state change: ${newState}`);
 
       if (newState === 'failed') {
-        await this.handleIceConnectionFailure(HMSConnectionRole.Subscribe);
+        await this.handleIceConnectionFailure(
+          HMSConnectionRole.Subscribe,
+          ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.SUBSCRIBE,
+            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+          ),
+        );
+      }
+
+      if (newState === 'disconnected') {
+        setTimeout(() => {
+          if (this.subscribeConnection?.connectionState === 'disconnected') {
+            this.handleIceConnectionFailure(
+              HMSConnectionRole.Subscribe,
+              ErrorFactory.WebrtcErrors.ICEDisconnected(
+                HMSAction.SUBSCRIBE,
+                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+              ),
+            );
+          }
+        }, ICE_DISCONNECTION_TIMEOUT);
       }
 
       if (newState === 'connected') {
-        this.subscribeConnection?.logSelectedIceCandidatePairs();
-        const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-        this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
-
-        if (callback) {
-          callback.promise.resolve(true);
-        }
+        this.handleSubscribeConnectionConnected();
       }
     },
   };
@@ -517,7 +554,11 @@ export default class HMSTransport implements ITransport {
   }
 
   async acceptRoleChange(request: HMSRoleChangeRequest) {
-    await this.signal.acceptRoleChangeRequest({ role: request.role.name, token: request.token });
+    await this.signal.acceptRoleChangeRequest({
+      requested_by: request.requestedBy?.peerId,
+      role: request.role.name,
+      token: request.token,
+    });
   }
 
   async endRoom(lock: boolean, reason: string) {
@@ -650,16 +691,17 @@ export default class HMSTransport implements ITransport {
     // add track to store after publish
     this.store.addTrack(track);
 
-    // @ts-ignore
-    const maxBitrate = track.settings.maxBitrate;
-    if (maxBitrate) {
-      await stream
-        .setMaxBitrate(maxBitrate, track)
-        .then(() => {
-          HMSLogger.d(TAG, `Setting maxBitrate for ${track.source} ${track.type} to ${maxBitrate} kpbs`);
-        })
-        .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate', error));
-    }
+    await stream
+      .setMaxBitrateAndFramerate(track)
+      .then(() => {
+        HMSLogger.d(
+          TAG,
+          `Setting maxBitrate=${track.settings.maxBitrate} kpbs${
+            track instanceof HMSLocalVideoTrack ? ` and maxFramerate=${track.settings.maxFramerate}` : ''
+          } for ${track.source} ${track.type} ${track.trackId}`,
+        );
+      })
+      .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
@@ -885,26 +927,28 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async handleIceConnectionFailure(role: HMSConnectionRole) {
+  private async handleIceConnectionFailure(role: HMSConnectionRole, error: HMSException) {
+    // retry is already in progress(from disconnect state)
+    const callback = this.callbacks.get(
+      role === HMSConnectionRole.Publish ? RENEGOTIATION_CALLBACK_ID : SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
+    );
+    const isIceRetryInProgress = callback && callback.action === HMSAction.RESTART_ICE;
+
+    if (isIceRetryInProgress) {
+      return;
+    }
+
     if (role === HMSConnectionRole.Publish) {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.PublishIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(
-          HMSAction.PUBLISH,
-          this.publishConnection?.selectedCandidatePair &&
-            JSON.stringify(this.publishConnection?.selectedCandidatePair),
-        ),
+        error,
         task: this.retryPublishIceFailedTask,
         originalState: TransportState.Joined,
       });
     } else {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.SubscribeIceConnectionFailed,
-        error: ErrorFactory.WebrtcErrors.ICEFailure(
-          HMSAction.SUBSCRIBE,
-          this.subscribeConnection?.selectedCandidatePair &&
-            JSON.stringify(this.subscribeConnection?.selectedCandidatePair),
-        ),
+        error,
         task: this.retrySubscribeIceFailedTask,
         originalState: TransportState.Joined,
         maxFailedRetries: 1,
@@ -924,6 +968,7 @@ export default class HMSTransport implements ITransport {
         initEndpoint,
       });
       this.analyticsTimer.end(TimedEvent.INIT);
+      HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
@@ -1078,6 +1123,16 @@ export default class HMSTransport implements ITransport {
 
     return ok;
   };
+
+  private handleSubscribeConnectionConnected() {
+    this.subscribeConnection?.logSelectedIceCandidatePairs();
+    const callback = this.callbacks.get(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+    this.callbacks.delete(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID);
+
+    if (callback) {
+      callback.promise.resolve(true);
+    }
+  }
 
   private setTransportStateForConnect() {
     if (this.state === TransportState.Failed) {

@@ -120,6 +120,14 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name: 'autoplayError', level: AnalyticsEventLevel.ERROR });
   }
 
+  static audioPlaybackError(error: HMSException) {
+    return new AnalyticsEvent({
+      name: 'audioPlaybackError',
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getErrorProperties(error),
+    });
+  }
+
   static deviceChange({
     selection,
     type,

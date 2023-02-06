@@ -1,5 +1,6 @@
 import {
   DeviceMap,
+  DeviceType,
   HLSConfig,
   HLSMeetingURLVariant,
   HLSTimedMetadata,
@@ -24,6 +25,7 @@ import {
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
   HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
   HMSRecording,
   HMSRemotePeer,
   HMSRemoteTrackStats,
@@ -62,6 +64,7 @@ export {
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
   simulcastMapping,
+  DeviceType,
 };
 
 export type {
@@ -72,6 +75,7 @@ export type {
   HMSSpeaker,
   HMSConfig,
   HMSConfigInitialSettings,
+  HMSPreviewConfig,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSRole,

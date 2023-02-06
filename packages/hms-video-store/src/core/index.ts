@@ -19,11 +19,13 @@ export {
   parsedUserAgent,
   HMSSimulcastLayer,
   simulcastMapping,
+  DeviceType,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 
 export type {
   HMSConfig,
+  HMSPreviewConfig,
   HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
@@ -38,3 +40,5 @@ export type {
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
 } from './hmsSDKStore/sdkTypes';
+
+export * from '../controller/beam/BeamController';

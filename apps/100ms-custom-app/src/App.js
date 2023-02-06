@@ -15,6 +15,7 @@ import {
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
 import LogRocket from 'logrocket';
+import { logError } from 'zipyai';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
@@ -105,6 +106,7 @@ const App = () => {
     const code = getRoomCodeFromUrl();
     if (!code) {
       LogRocket.track('roomIdNull', window.location.pathname);
+      logError('roomIdNull', '', undefined, { pathname: window.location.pathname });
       return;
     }
     const jwt = getAuthInfo().token;
@@ -186,6 +188,7 @@ const App = () => {
           body: errorMessage,
         };
         LogRocket.track('getDetailsError', error);
+        logError('getDetailsError', error.body);
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
