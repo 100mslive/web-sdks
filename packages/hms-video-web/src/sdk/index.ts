@@ -470,7 +470,7 @@ export class HMSSdk implements HMSInterface {
     this.store.cleanUp();
     this.listener = undefined;
     if (this.roleChangeManager) {
-      this.eventBus.localRoleUpdate.unsubscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
+      this.eventBus.localRoleUpdate.unsubscribe(this.handleLocalRoleUpdate);
     }
   }
 
