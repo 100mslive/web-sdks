@@ -157,6 +157,7 @@ export { default as NotificationsIcon } from './NotificationsIcon';
 export { default as OfferIcon } from './OfferIcon';
 export { default as OpenBookIcon } from './OpenBookIcon';
 export { default as PipIcon } from './PipIcon';
+export { default as PadLockOnIcon } from './PadLockOnIcon';
 export { default as PaletteIcon } from './PaletteIcon';
 export { default as PauseCircleIcon } from './PauseCircleIcon';
 export { default as PauseIcon } from './PauseIcon';
