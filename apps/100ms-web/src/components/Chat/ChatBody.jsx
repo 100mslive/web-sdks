@@ -29,6 +29,8 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import { useIsSidepaneTypeOpen } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -349,6 +351,10 @@ export const ChatBody = React.forwardRef(
       ? selectMessagesByPeerID(peerId)
       : selectHMSMessages;
     const messages = useHMSStore(storeMessageSelector) || [];
+    const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+    useEffect(() => {
+      console.log("is chat open ", isChatOpen, listRef);
+    }, [isChatOpen, listRef]);
 
     if (messages.length === 0) {
       return (
