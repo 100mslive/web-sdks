@@ -26,8 +26,8 @@ import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
   mergeNewPeersInDraft,
+  mergeNewPreviewInDraft,
   mergeNewTracksInDraft,
-  mergePreviewPeerInDraft,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
@@ -820,6 +820,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    const newPreview: HMSStore['preview'] = { auxiliaryTracks: [] };
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -840,8 +841,10 @@ export class HMSSDKActions implements IHMSActions {
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
-      if (hmsPeer.isLocal) {
-        Object.assign(newMediaSettings, this.getMediaSettings(sdkPeer));
+      if (sdkPeer.isLocal) {
+        const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
+        Object.assign(newPreview, this.getPreviewFields(localPeer));
+        Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
 
@@ -859,12 +862,12 @@ export class HMSSDKActions implements IHMSActions {
       // the order of below statements are important as merge functions are mutating
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
+      mergeNewPreviewInDraft(draftStore.preview, newPreview);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
-      mergePreviewPeerInDraft(draftStore, draftPeers);
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
@@ -1173,6 +1176,26 @@ export class HMSSDKActions implements IHMSActions {
       audioInputDeviceId: audioTrack?.settings.deviceId || settings.audioInputDeviceId,
       videoInputDeviceId: videoTrack?.settings.deviceId || settings.videoInputDeviceId,
       audioOutputDeviceId: this.sdk.getAudioOutput().getDevice()?.deviceId,
+    };
+  }
+
+  private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    /**
+     * asRole is present in preview(either original role or config.asRole)
+     * if asRole is absent then room is not in preview, so clear preview fields
+     */
+    if (!sdkLocalPeer.asRole) {
+      return { auxiliaryTracks: [] };
+    }
+
+    const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
+
+    return {
+      localPeer: hmsLocalPeer.id,
+      audioTrack: hmsLocalPeer.audioTrack,
+      videoTrack: hmsLocalPeer.videoTrack,
+      auxiliaryTracks: hmsLocalPeer.auxiliaryTracks || [],
+      asRole: sdkLocalPeer.asRole.name,
     };
   }
 

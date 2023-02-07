@@ -1,14 +1,5 @@
 import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
-import {
-  HMSPeer,
-  HMSPeerID,
-  HMSRoomState,
-  HMSScreenVideoTrack,
-  HMSStore,
-  HMSTrack,
-  HMSTrackID,
-  HMSVideoTrack,
-} from '../../schema';
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSStore, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
@@ -61,15 +52,13 @@ export const mergeNewTracksInDraft = (
   }
 };
 
-export const mergePreviewPeerInDraft = (draftStore: HMSStore, draftPeers: Record<HMSPeerID, HMSPeer>) => {
-  if (draftStore.room.roomState === HMSRoomState.Preview) {
-    if (!draftStore.preview.peer) {
-      draftStore.preview.peer = draftPeers[draftStore.room.localPeer];
-    } else {
-      Object.assign(draftStore.preview.peer, draftPeers[draftStore.room.localPeer]);
-    }
-  } else {
-    delete draftStore.preview.peer;
+export const mergeNewPreviewInDraft = (draftPreview: HMSStore['preview'], newPreview: HMSStore['preview']) => {
+  draftPreview.localPeer = newPreview.localPeer;
+  draftPreview.asRole = newPreview.asRole;
+  draftPreview.videoTrack = newPreview.videoTrack;
+  draftPreview.audioTrack = newPreview.audioTrack;
+  if (areArraysEqual(draftPreview.auxiliaryTracks, newPreview.auxiliaryTracks)) {
+    draftPreview.auxiliaryTracks = newPreview.auxiliaryTracks;
   }
 };
 
