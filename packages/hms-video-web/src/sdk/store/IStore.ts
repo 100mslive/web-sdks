@@ -10,7 +10,7 @@ import {
   HMSTrackSource,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { TrackState } from '../../notification-manager';
+import { PolicyParams, TrackState } from '../../notification-manager';
 import { ENV } from '../../utils/support';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
@@ -55,9 +55,8 @@ export interface IStore {
   getSpeakerPeers(): HMSPeer[];
 
   setRoom(room: HMSRoom): void;
-  setKnownRoles(knownRoles: KnownRoles): void;
+  setKnownRoles(params: PolicyParams): void;
   setConfig(config: HMSConfig): void;
-  setPublishParams(params: PublishParams): void;
   setErrorListener(listener: IErrorListener): void;
 
   addPeer(peer: HMSPeer): void;

@@ -25,6 +25,7 @@ export * from './webrtc-stats';
 
 export type {
   HMSConfig,
+  HMSPreviewConfig,
   HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,

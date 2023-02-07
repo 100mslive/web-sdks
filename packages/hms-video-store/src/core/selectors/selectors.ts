@@ -147,6 +147,11 @@ export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room,
 });
 
 /**
+ * Select the peer object used in preview
+ */
+export const selectPreviewPeer = (store: HMSStore) => store.preview.peer;
+
+/**
  * Select the peer ID of your local peer.
  */
 export const selectLocalPeerID = createSelector(selectRoom, room => {
