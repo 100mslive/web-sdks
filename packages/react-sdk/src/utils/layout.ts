@@ -351,7 +351,7 @@ const getLayoutSizes = ({
   parentHeight: number;
   parentWidth: number;
 }) => {
-  const cols = Math.min(maxColCount!, Math.floor(Math.sqrt(tiles)));
+  const cols = Math.min(maxColCount!, Math.ceil(Math.sqrt(tiles)));
   const rows = Math.ceil(tiles / cols);
   let height = parentHeight / rows;
   let width = height * (aspectRatio.width / aspectRatio.height);
@@ -377,6 +377,8 @@ export const getTileSizesWithRowAndColConstraint = ({
   let isLastPageDifferentFromFirstPage = false;
   let tilesInFirstPage = 0;
   let tilesinLastPage = 0;
+  let lastPageRows = 0;
+  let lastPageCols = 0;
   const tiles = Math.min(count, maxCount);
   const { rows, cols, width, height } = getLayoutSizes({
     tiles,
@@ -391,7 +393,7 @@ export const getTileSizesWithRowAndColConstraint = ({
   tilesinLastPage = count % (rows * cols);
   isLastPageDifferentFromFirstPage = tilesinLastPage > 0 && count > rows * cols;
   if (isLastPageDifferentFromFirstPage) {
-    const { width, height } = getLayoutSizes({
+    const { width, height, rows, cols } = getLayoutSizes({
       tiles: tilesinLastPage,
       maxColCount: maxColCount!,
       parentWidth,
@@ -400,6 +402,8 @@ export const getTileSizesWithRowAndColConstraint = ({
     });
     lastPageHeight = height;
     lastPageWidth = width;
+    lastPageRows = rows;
+    lastPageCols = cols;
   }
   return {
     tilesInFirstPage,
@@ -408,6 +412,10 @@ export const getTileSizesWithRowAndColConstraint = ({
     lastPageWidth,
     lastPageHeight,
     isLastPageDifferentFromFirstPage,
+    rows,
+    cols,
+    lastPageCols,
+    lastPageRows,
   };
 };
 
@@ -426,6 +434,10 @@ export function calculateLayoutSizes({
   let lastPageHeight = 0;
   let isLastPageDifferentFromFirstPage = false;
   let tilesInFirstPage = 0;
+  let rows = 0;
+  let cols = 0;
+  let lastPageCols = 0;
+  let lastPageRows = 0;
 
   if (count === 0) {
     // no tracks to show
@@ -447,6 +459,10 @@ export function calculateLayoutSizes({
       lastPageWidth,
       lastPageHeight,
       isLastPageDifferentFromFirstPage,
+      rows,
+      cols,
+      lastPageRows,
+      lastPageCols,
     } = getTileSizesWithRowAndColConstraint({
       parentWidth,
       parentHeight,
@@ -514,6 +530,10 @@ export function calculateLayoutSizes({
     lastPageWidth,
     lastPageHeight,
     isLastPageDifferentFromFirstPage,
+    rows,
+    cols,
+    lastPageRows,
+    lastPageCols,
   };
 }
 

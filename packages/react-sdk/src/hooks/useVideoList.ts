@@ -90,7 +90,7 @@ export const useVideoList = ({
   aspectRatio = DEFAULTS.aspectRatio,
   filterNonPublishingPeers = true,
   offsetY = 0,
-}: useVideoListInput): useVideoResult => {
+}: useVideoListInput) => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
   // using vanilla store as we don't need re-rendering every time something in a track changes
@@ -120,6 +120,10 @@ export const useVideoList = ({
     lastPageWidth,
     lastPageHeight,
     isLastPageDifferentFromFirstPage,
+    rows,
+    cols,
+    lastPageRows,
+    lastPageCols,
   } = useMemo(
     () =>
       calculateLayoutSizes({
@@ -157,6 +161,10 @@ export const useVideoList = ({
   );
   return {
     pagesWithTiles: chunkedTracksWithPeer,
+    rows,
+    cols,
+    lastPageRows,
+    lastPageCols,
     ref,
   };
 };
