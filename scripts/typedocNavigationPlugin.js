@@ -25,29 +25,31 @@ function load(app) {
   const countKey = Symbol('count');
   const hierarchy = {};
 
+  /**
+   * Calculate the hierarchy path of a given path array, this mutates the hierarchy variable
+   * @param {string[]} path - Path relative to the docs file e.g /foo/bar/file.md -> `['foo', 'bar']`
+   * @param {number[]} [pathNumber] - Accumulator for the path count
+   * @param {Object} [currentHierarchy] - The reference of the current traversed path
+   * @returns {string}
+   */
   function getLastKey(path, pathNumber = [], currentHierarchy = hierarchy) {
     if (!path.length) {
-      if (currentHierarchy[countKey] !== undefined) {
-        ++currentHierarchy[countKey];
-      } else {
-        currentHierarchy[countKey] = 1;
-      }
+      // reached the end of the path, increase the file count (countKey) on the last path element
+      currentHierarchy[countKey] = (currentHierarchy[countKey] ?? 0) + 1;
 
       pathNumber.push(currentHierarchy[countKey]);
       return pathNumber.join('.');
     } else {
-      if (currentHierarchy[countKey] === undefined) {
-        currentHierarchy[countKey] = 1;
-      }
-
+      // if path element doesn't exist, add the countKey and initialize the path element object
       const currentPath = path[0];
       if (!currentHierarchy[currentPath]) {
+        currentHierarchy[countKey] = (currentHierarchy[countKey] ?? 0) + 1;
         currentHierarchy[currentPath] = {};
-        currentHierarchy[countKey]++;
       }
 
       pathNumber.push(currentHierarchy[countKey]);
 
+      // traverse the hierarchy
       return getLastKey(path.slice(1), pathNumber, currentHierarchy[currentPath]);
     }
   }
@@ -76,10 +78,10 @@ function load(app) {
 
     if (title === '@100mslive/hms-video-store') {
       title = 'Web SDK API Reference'; // for the root content.mdx
-      nav += '.1'
+      nav += '.1';
     } else if (title === '@100mslive/react-sdk') {
       title = 'React Hooks API Reference'; // for the root content.
-      nav += '.1'
+      nav += '.1';
     }
 
     const frontmatterDataEntries = Object.entries({ title, nav });
