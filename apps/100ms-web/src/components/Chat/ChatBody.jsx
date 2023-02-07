@@ -294,8 +294,8 @@ const VirtualizedChatMessages = React.forwardRef(
 
     const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
     useEffect(() => {
-      console.log("is chat open ", isChatOpen, listRef);
-    }, [isChatOpen, listRef]);
+      console.log("is chat open ", isChatOpen, listRef, listRef.current);
+    }, [isChatOpen, listRef.current, listRef]);
 
     const setRowHeight = useCallback(
       (index, size) => {
