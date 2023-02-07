@@ -147,11 +147,6 @@ export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room,
 });
 
 /**
- * Select the peer object used in preview
- */
-export const selectPreviewPeer = (store: HMSStore) => store.preview.peer;
-
-/**
  * Select the peer ID of your local peer.
  */
 export const selectLocalPeerID = createSelector(selectRoom, room => {
@@ -396,6 +391,16 @@ export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMa
  */
 export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesMap], (localPeer, rolesMap) =>
   localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
+);
+
+export const selectPreviewRoleName = (store: HMSStore) => store.preview.asRole;
+
+/**
+ * Select the {@link HMSRole} used for preview.
+ *
+ */
+export const selectPreviewRole = createSelector([selectPreviewRoleName, selectRolesMap], (roleName, rolesMap) =>
+  roleName ? rolesMap[roleName] : null,
 );
 
 /**
