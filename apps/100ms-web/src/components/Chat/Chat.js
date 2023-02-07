@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -117,14 +111,6 @@ export const Chat = () => {
     },
     [hmsActions, messagesCount]
   );
-
-  useLayoutEffect(() => {
-    console.log("called 2 ", listRef.current);
-    if (isChatOpen && listRef.current && listRef.current.scrollToItem) {
-      console.log("callled");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listRef]);
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>

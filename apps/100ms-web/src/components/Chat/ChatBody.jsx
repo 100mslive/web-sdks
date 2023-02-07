@@ -296,10 +296,8 @@ const ChatList = React.forwardRef(
     listRef
   ) => {
     useLayoutEffect(() => {
-      console.log("chat boxy called 1", listRef);
       if (listRef.current && listRef.current.scrollToItem) {
         scrollToBottom(1);
-        console.log("callled");
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [listRef]);
