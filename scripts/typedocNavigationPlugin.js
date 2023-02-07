@@ -84,7 +84,7 @@ function load(app) {
       nav += '.1';
     }
 
-    const frontmatterDataEntries = Object.entries({ title, nav });
+    const frontmatterDataEntries = Object.entries({ title, nav: `"${nav}"` });
 
     let frontmatterStr = `---\n`;
 
