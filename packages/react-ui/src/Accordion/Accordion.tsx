@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
+import { ChevronUpIcon } from '@radix-ui/react-icons';
 import { CSS } from '@stitches/react';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
@@ -53,7 +53,7 @@ const StyledContent = styled(BaseAccordion.Content, {
   },
 });
 
-const StyledChevron = styled(ChevronDownIcon, {
+const StyledChevron = styled(ChevronUpIcon, {
   color: '$textPrimary',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=closed] &': { transform: 'rotate(180deg)' },
