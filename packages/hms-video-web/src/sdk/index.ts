@@ -297,9 +297,9 @@ export class HMSSdk implements HMSInterface {
     }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
-        if (this.localPeer && newRole) {
-          this.localPeer.asRole = newRole;
+        if (this.localPeer) {
+          const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+          this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
@@ -399,6 +399,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
       this.localPeer.metadata = config.metaData;
+      delete this.localPeer.asRole;
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -1022,7 +1023,8 @@ export class HMSSdk implements HMSInterface {
       customerUserId: userId,
       metadata: config.metaData || '',
       role: policy,
-      asRole: asRolePolicy,
+      // default value is the original role if user didn't pass asRole in config
+      asRole: asRolePolicy || policy,
     });
 
     this.store.addPeer(localPeer);
