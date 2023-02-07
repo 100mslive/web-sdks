@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -112,7 +118,7 @@ export const Chat = () => {
     [hmsActions, messagesCount]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.log("called 2 ", listRef.current);
     if (isChatOpen && listRef.current && listRef.current.scrollToItem) {
       scrollToBottom(1);
