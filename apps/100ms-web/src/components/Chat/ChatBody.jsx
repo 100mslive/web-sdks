@@ -292,6 +292,11 @@ const VirtualizedChatMessages = React.forwardRef(
       return rowHeights.current[index] + 16 || 72;
     }
 
+    const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+    useEffect(() => {
+      console.log("is chat open ", isChatOpen, listRef);
+    }, [isChatOpen, listRef]);
+
     const setRowHeight = useCallback(
       (index, size) => {
         listRef.current.resetAfterIndex(0);
@@ -351,10 +356,6 @@ export const ChatBody = React.forwardRef(
       ? selectMessagesByPeerID(peerId)
       : selectHMSMessages;
     const messages = useHMSStore(storeMessageSelector) || [];
-    const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-    useEffect(() => {
-      console.log("is chat open ", isChatOpen, listRef);
-    }, [isChatOpen, listRef]);
 
     if (messages.length === 0) {
       return (
