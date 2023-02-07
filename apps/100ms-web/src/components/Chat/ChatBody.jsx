@@ -2,6 +2,7 @@ import React, {
   Fragment,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -283,19 +284,52 @@ const ChatMessage = React.memo(
     );
   }
 );
+const ChatList = React.forwardRef(
+  (
+    { width, height, setRowHeight, getRowHeight, messages, setPinnedMessage },
+    listRef
+  ) => {
+    const chatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+    const isChatOpen = useCallback(() => chatOpen, [chatOpen]);
+    useLayoutEffect(() => {
+      const open = isChatOpen();
+      console.log("is chat open ", open, listRef);
+    }, [listRef]);
+
+    return (
+      <VariableSizeList
+        ref={listRef}
+        itemCount={messages.length}
+        itemSize={getRowHeight}
+        width={width}
+        height={height - 1}
+        style={{
+          overflowX: "hidden",
+        }}
+      >
+        {({ index, style }) => (
+          <ChatMessage
+            style={style}
+            index={index}
+            key={messages[index].id}
+            message={messages[index]}
+            setRowHeight={setRowHeight}
+            onPin={() => setPinnedMessage(messages[index])}
+          />
+        )}
+      </VariableSizeList>
+    );
+  }
+);
 const VirtualizedChatMessages = React.forwardRef(
   ({ messages, setPinnedMessage }, listRef) => {
     const rowHeights = useRef({});
+
     function getRowHeight(index) {
       // 72 will be default row height for any message length
       // 16 will add margin value as clientHeight don't include margin
       return rowHeights.current[index] + 16 || 72;
     }
-
-    const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-    useEffect(() => {
-      console.log("is chat open ", isChatOpen, listRef, listRef.current);
-    }, [isChatOpen, listRef.current, listRef]);
 
     const setRowHeight = useCallback(
       (index, size) => {
@@ -320,27 +354,15 @@ const VirtualizedChatMessages = React.forwardRef(
           }}
         >
           {({ height, width }) => (
-            <VariableSizeList
-              ref={listRef}
-              itemCount={messages.length}
-              itemSize={getRowHeight}
+            <ChatList
               width={width}
-              height={height - 1}
-              style={{
-                overflowX: "hidden",
-              }}
-            >
-              {({ index, style }) => (
-                <ChatMessage
-                  style={style}
-                  index={index}
-                  key={messages[index].id}
-                  message={messages[index]}
-                  setRowHeight={setRowHeight}
-                  onPin={() => setPinnedMessage(messages[index])}
-                />
-              )}
-            </VariableSizeList>
+              height={height}
+              messages={messages}
+              setPinnedMessage={setPinnedMessage}
+              setRowHeight={setRowHeight}
+              getRowHeight={getRowHeight}
+              ref={listRef}
+            />
           )}
         </AutoSizer>
       </Box>
