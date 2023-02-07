@@ -121,11 +121,10 @@ export const Chat = () => {
   useLayoutEffect(() => {
     console.log("called 2 ", listRef.current);
     if (isChatOpen && listRef.current && listRef.current.scrollToItem) {
-      scrollToBottom(1);
       console.log("callled");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listRef.current, isChatOpen]);
+  }, [listRef]);
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>
@@ -154,6 +153,7 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         setPinnedMessage={setPinnedMessage}
         ref={listRef}
+        scrollToBottom={scrollToBottom}
       />
       <ChatFooter
         role={chatOptions.role}

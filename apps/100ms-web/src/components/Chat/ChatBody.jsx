@@ -30,8 +30,6 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import { useIsSidepaneTypeOpen } from "../AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -286,14 +284,24 @@ const ChatMessage = React.memo(
 );
 const ChatList = React.forwardRef(
   (
-    { width, height, setRowHeight, getRowHeight, messages, setPinnedMessage },
+    {
+      width,
+      height,
+      setRowHeight,
+      getRowHeight,
+      messages,
+      setPinnedMessage,
+      scrollToBottom,
+    },
     listRef
   ) => {
-    const chatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-    const isChatOpen = useCallback(() => chatOpen, [chatOpen]);
     useLayoutEffect(() => {
-      const open = isChatOpen();
-      console.log("is chat open ", open, listRef);
+      console.log("chat boxy called 1", listRef);
+      if (listRef.current && listRef.current.scrollToItem) {
+        scrollToBottom(1);
+        console.log("callled");
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [listRef]);
 
     return (
@@ -322,7 +330,7 @@ const ChatList = React.forwardRef(
   }
 );
 const VirtualizedChatMessages = React.forwardRef(
-  ({ messages, setPinnedMessage }, listRef) => {
+  ({ messages, setPinnedMessage, scrollToBottom }, listRef) => {
     const rowHeights = useRef({});
 
     function getRowHeight(index) {
@@ -361,6 +369,7 @@ const VirtualizedChatMessages = React.forwardRef(
               setPinnedMessage={setPinnedMessage}
               setRowHeight={setRowHeight}
               getRowHeight={getRowHeight}
+              scrollToBottom={scrollToBottom}
               ref={listRef}
             />
           )}
@@ -371,7 +380,7 @@ const VirtualizedChatMessages = React.forwardRef(
 );
 
 export const ChatBody = React.forwardRef(
-  ({ role, peerId, setPinnedMessage }, listRef) => {
+  ({ role, peerId, setPinnedMessage, scrollToBottom }, listRef) => {
     const storeMessageSelector = role
       ? selectMessagesByRole(role)
       : peerId
@@ -401,6 +410,7 @@ export const ChatBody = React.forwardRef(
         <VirtualizedChatMessages
           messages={messages}
           setPinnedMessage={setPinnedMessage}
+          scrollToBottom={scrollToBottom}
           ref={listRef}
         />
       </Fragment>
