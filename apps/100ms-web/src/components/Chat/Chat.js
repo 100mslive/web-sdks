@@ -14,11 +14,10 @@ import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
-import { useIsSidepaneTypeOpen } from "../AppData/useSidepane";
 import { useSetSubscribedChatSelector } from "../AppData/useUISettings";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 import { useUnreadCount } from "./useUnreadCount";
-import { CHAT_SELECTOR, SIDE_PANE_OPTIONS } from "../../common/constants";
+import { CHAT_SELECTOR } from "../../common/constants";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
@@ -57,10 +56,6 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
 export const Chat = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  useEffect(() => {
-    console.log("ischar open ", isChatOpen);
-  }, [isChatOpen]);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(
     CHAT_SELECTOR.PEER_ID
   );
