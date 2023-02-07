@@ -297,9 +297,9 @@ export class HMSSdk implements HMSInterface {
     }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        if (config.asRole) {
-          const newRole = this.store.getPolicyForRole(config.asRole);
-          newRole && this.localPeer?.updateRole(newRole);
+        const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+        if (this.localPeer && newRole) {
+          this.localPeer.asRole = newRole;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
@@ -975,7 +975,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
-    this.createAndAddLocalPeerToStore(config, config.asRole || role, userId);
+    this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 
@@ -1014,13 +1014,15 @@ export class HMSSdk implements HMSInterface {
    * @param {string} role
    * @param {string} userId
    */
-  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string) {
+  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string, asRole?: string) {
     const policy = this.store.getPolicyForRole(role);
+    const asRolePolicy = asRole ? this.store.getPolicyForRole(asRole) : undefined;
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
       customerUserId: userId,
       metadata: config.metaData || '',
       role: policy,
+      asRole: asRolePolicy,
     });
 
     this.store.addPeer(localPeer);

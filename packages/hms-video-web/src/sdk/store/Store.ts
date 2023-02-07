@@ -61,7 +61,9 @@ class Store implements IStore {
   }
 
   getPublishParams() {
-    return this.getLocalPeer()?.role?.publishParams;
+    const peer = this.getLocalPeer();
+    const role = peer?.asRole || peer?.role;
+    return role?.publishParams;
   }
 
   getComparator() {
