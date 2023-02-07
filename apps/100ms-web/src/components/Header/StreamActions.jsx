@@ -257,13 +257,12 @@ export const StreamActions = () => {
         <RecordingStatus />
       </Flex>
       {isConnected && !isMobile ? <StartRecording /> : null}
-      {isConnected &&
-        (permissions.hlsStreaming || permissions.rtmpStreaming) && (
-          <Fragment>
-            <GoLiveButton />
-            <EndStream />
-          </Fragment>
-        )}
+      {isConnected && (permissions.hlsStreaming || permissions.rtmpStreaming) && (
+        <Fragment>
+          <GoLiveButton />
+          <EndStream />
+        </Fragment>
+      )}
     </Flex>
   );
 };
