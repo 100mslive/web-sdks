@@ -14,10 +14,11 @@ import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
+import { useIsSidepaneTypeOpen } from "../AppData/useSidepane";
 import { useSetSubscribedChatSelector } from "../AppData/useUISettings";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 import { useUnreadCount } from "./useUnreadCount";
-import { CHAT_SELECTOR } from "../../common/constants";
+import { CHAT_SELECTOR, SIDE_PANE_OPTIONS } from "../../common/constants";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
@@ -56,6 +57,10 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
 export const Chat = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  useEffect(() => {
+    console.log("ischar open ", isChatOpen);
+  }, [isChatOpen]);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(
     CHAT_SELECTOR.PEER_ID
   );
@@ -109,12 +114,12 @@ export const Chat = () => {
 
   useEffect(() => {
     console.log("called 2 ", listRef.current);
-    if (listRef.current && listRef.current.scrollToItem) {
+    if (isChatOpen && listRef.current && listRef.current.scrollToItem) {
       scrollToBottom(1);
       console.log("callled");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listRef.current]);
+  }, [listRef.current, isChatOpen]);
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>
