@@ -21,12 +21,12 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_LOGROCKET_ID)
   } else {
     LogRocket.init(process.env.REACT_APP_LOGROCKET_ID);
     setupLogRocketReact(LogRocket);
+    if (process.env.REACT_APP_ZIPY_KEY) {
+      init(process.env.REACT_APP_ZIPY_KEY);
+    }
   }
 }
 
-if (process.env.REACT_APP_ZIPY_KEY) {
-  init(process.env.REACT_APP_ZIPY_KEY);
-}
 
 const root = createRoot(document.getElementById('root'));
 root.render(
