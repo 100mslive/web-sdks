@@ -1,8 +1,10 @@
+import { interpret } from 'xstate';
 import { JoinParameters } from './models/JoinParameters';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import ITransport from './ITransport';
 import ITransportObserver from './ITransportObserver';
+import { RetryMachine } from './publishMachine';
 import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -182,14 +184,19 @@ export default class HMSTransport implements ITransport {
     },
 
     onOffline: async (reason: string) => {
-      HMSLogger.d(TAG, 'socket offline', TransportState[this.state]);
+      HMSLogger.d(TAG, 'socket offline', TransportState[this.state], reason);
       try {
         if (this.state !== TransportState.Leaving && this.joinParameters) {
-          this.retryScheduler.schedule({
-            category: TransportFailureCategory.SignalDisconnect,
-            error: ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+          // this.retryScheduler.schedule({
+          //   category: TransportFailureCategory.SignalDisconnect,
+          //   error: ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+          //   task: this.retrySignalDisconnectTask,
+          //   originalState: this.state,
+          // });
+          const service = interpret(RetryMachine).start();
+          service.send({
+            type: 'SCHEDULE',
             task: this.retrySignalDisconnectTask,
-            originalState: this.state,
           });
         }
       } catch (e) {
@@ -927,7 +934,7 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  private async handleIceConnectionFailure(role: HMSConnectionRole, error: HMSException) {
+  private async handleIceConnectionFailure(role: HMSConnectionRole, _error: HMSException) {
     // retry is already in progress(from disconnect state)
     const callback = this.callbacks.get(
       role === HMSConnectionRole.Publish ? RENEGOTIATION_CALLBACK_ID : SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
@@ -937,8 +944,13 @@ export default class HMSTransport implements ITransport {
     if (isIceRetryInProgress) {
       return;
     }
+    const service = interpret(RetryMachine).start();
+    service.send({
+      type: 'SCHEDULE',
+      task: role === HMSConnectionRole.Publish ? this.retryPublishIceFailedTask : this.retrySubscribeIceFailedTask,
+    });
 
-    if (role === HMSConnectionRole.Publish) {
+    /*  if (role === HMSConnectionRole.Publish) {
       this.retryScheduler.schedule({
         category: TransportFailureCategory.PublishIceConnectionFailed,
         error,
@@ -953,7 +965,7 @@ export default class HMSTransport implements ITransport {
         originalState: TransportState.Joined,
         maxFailedRetries: 1,
       });
-    }
+    } */
   }
 
   private async internalConnect(token: string, initEndpoint: string, peerId: string) {
@@ -1105,13 +1117,11 @@ export default class HMSTransport implements ITransport {
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
-      try {
-        await this.internalConnect(
-          this.joinParameters!.authToken,
-          this.joinParameters!.endpoint,
-          this.joinParameters!.peerId,
-        );
-      } catch (ex) {}
+      await this.internalConnect(
+        this.joinParameters!.authToken,
+        this.joinParameters!.endpoint,
+        this.joinParameters!.peerId,
+      );
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect
