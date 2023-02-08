@@ -10,7 +10,7 @@
   "hideBreadcrumbs": true,
   "hideInPageTOC": true,
   "hidePageTitle": true,
-  "publicPath": "/api-reference/javascript/v2/react/",
+  "publicPath": "/api-reference/javascript/v2/react-hooks/",
   "githubPages": false,
   "excludeExternals": true,
   "externalPattern": [
