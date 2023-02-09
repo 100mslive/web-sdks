@@ -1,4 +1,3 @@
-import { Comparator } from './Comparator';
 import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
@@ -25,8 +24,6 @@ export interface IStore {
   getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
   getErrorListener(): IErrorListener | undefined;
-
-  getComparator(): Comparator;
 
   getRoom(): HMSRoom;
   getPolicyForRole(role: string): HMSRole;

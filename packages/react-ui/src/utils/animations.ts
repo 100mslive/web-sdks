@@ -1,5 +1,17 @@
 import { keyframes } from '../Theme';
 
+export const slideDown = (controller: string) =>
+  keyframes({
+    from: { height: 0 },
+    to: { height: `var(${controller})` },
+  });
+
+export const slideUp = (controller: string) =>
+  keyframes({
+    from: { height: `var(${controller})` },
+    to: { height: 0 },
+  });
+
 export const dialogOpen = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
   '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },

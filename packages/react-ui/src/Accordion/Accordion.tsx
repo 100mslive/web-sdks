@@ -1,26 +1,16 @@
 import React, { PropsWithChildren } from 'react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { CSS, keyframes } from '@stitches/react';
+import { ChevronUpIcon } from '@radix-ui/react-icons';
+import { CSS } from '@stitches/react';
 import { Box } from '../Layout';
 import { styled } from '../Theme';
+import { slideDown, slideUp } from '../utils';
 
-const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: 'var(--radix-accordion-content-height)' },
-});
-
-const slideUp = keyframes({
-  from: { height: 'var(--radix-accordion-content-height)' },
-  to: { height: 0 },
-});
-
-const StyledAccordion = styled(BaseAccordion.Root, {
-});
+const StyledAccordion = styled(BaseAccordion.Root, {});
 
 const StyledItem = styled(BaseAccordion.Item, {
   marginTop: '$px',
-  display: "block",
+  display: 'block',
   '&:first-child': {
     marginTop: 0,
     borderTopLeftRadius: '$0',
@@ -51,19 +41,19 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
-  display: "contents",
+  display: 'contents',
   fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
   '&[data-state="open"]': {
-    animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
   '&[data-state="closed"]': {
-    animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideUp('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
 });
 
-const StyledChevron = styled(ChevronDownIcon, {
+const StyledChevron = styled(ChevronUpIcon, {
   color: '$textPrimary',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=closed] &': { transform: 'rotate(180deg)' },
