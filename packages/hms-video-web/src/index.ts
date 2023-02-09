@@ -9,6 +9,7 @@ export * from './media/tracks';
 export * from './utils/media';
 export * from './utils/device-error';
 export * from './utils/support';
+export * from './utils/jwt';
 export * from './error/HMSException';
 export * from './error/utils';
 export * from './interfaces';

@@ -54,7 +54,7 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
-import decodeJWT from '../utils/jwt';
+import { decodeJWT } from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 import { isNode } from '../utils/support';

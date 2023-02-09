@@ -6,7 +6,7 @@ export interface AuthToken {
   role: string;
 }
 
-export default function decodeJWT(token?: string): AuthToken {
+export function decodeJWT(token?: string): AuthToken {
   if (!token || token.length === 0) {
     throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(
       HMSAction.INIT,
