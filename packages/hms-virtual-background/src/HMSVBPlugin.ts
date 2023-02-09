@@ -113,8 +113,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         this.background.loop = true;
         this.background.playsInline = true;
         this.background.oncanplaythrough = async () => {
-          await (this.background as HTMLVideoElement).play();
-          this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+          if (this.background && this.background instanceof HTMLVideoElement) {
+            await this.background.play();
+            this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+          }
         };
         break;
       case HMSVirtualBackgroundTypes.CANVAS:
