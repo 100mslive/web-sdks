@@ -1,3 +1,5 @@
+import { ErrorWithSupportLink } from "../components/ErrorWithSupportLink";
+
 /**
  * @param {RequestInfo} url
  * @param {RequestInit} options
@@ -17,7 +19,7 @@ const fetchWithRetry = async (url, options) => {
   throw error;
 };
 
-export default async function getToken(tokenEndpoint, userId, role, roomId) {
+export async function getToken(tokenEndpoint, userId, role, roomId) {
   try {
     const response = await fetchWithRetry(`${tokenEndpoint}api/token`, {
       method: "POST",
@@ -82,6 +84,33 @@ export async function getUserToken(name) {
   const { token } = await response.json();
   return token;
 }
+
+export const convertTokenError = error => {
+  console.error("[error]", { error });
+  if (error.response && error.response.status === 404) {
+    return {
+      title: "Room does not exist",
+      body: ErrorWithSupportLink(
+        "We could not find a room corresponding to this link."
+      ),
+    };
+  } else if (error.response && error.response.status === 403) {
+    return {
+      title: "Accessing room using this link format is disabled",
+      body: ErrorWithSupportLink(
+        "You can re-enable this from the developer section in Dashboard."
+      ),
+    };
+  } else {
+    console.error("Token API Error", error);
+    return {
+      title: "Error fetching token",
+      body: ErrorWithSupportLink(
+        "An error occurred while fetching the app token. Please look into logs for more details."
+      ),
+    };
+  }
+};
 
 export function getBackendEndpoint() {
   let BASE_BACKEND_URL;

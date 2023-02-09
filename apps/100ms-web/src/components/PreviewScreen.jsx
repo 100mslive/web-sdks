@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
 import { v4 } from "uuid";
-import { Box, Flex, Loading, styled } from "@100mslive/react-ui";
+import { Box, Flex, Loading } from "@100mslive/react-ui";
 import PreviewContainer from "./Preview/PreviewContainer";
 import SidePane from "../layouts/SidePane";
 import { ErrorDialog } from "../primitives/DialogContent";
 import { Header } from "./Header";
 import { useSetUiSettings, useTokenEndpoint } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
-import getToken from "../services/tokenService";
+import { convertTokenError, getToken } from "../services/tokenService";
 import {
   QUERY_PARAM_AUTH_TOKEN,
   QUERY_PARAM_NAME,
@@ -68,7 +68,7 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
         setToken(token);
       })
       .catch(error => {
-        setError(convertPreviewError(error));
+        setError(convertTokenError(error));
       });
   }, [tokenEndpoint, urlRoomId, getUserToken, userRole, authToken]);
 
@@ -122,58 +122,5 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     </Flex>
   );
 });
-
-const convertPreviewError = error => {
-  console.error("[error]", { error });
-  if (error.response && error.response.status === 404) {
-    return {
-      title: "Room does not exist",
-      body: ErrorWithSupportLink(
-        "We could not find a room corresponding to this link."
-      ),
-    };
-  } else if (error.response && error.response.status === 403) {
-    return {
-      title: "Accessing room using this link format is disabled",
-      body: ErrorWithSupportLink(
-        "You can re-enable this from the developer section in Dashboard."
-      ),
-    };
-  } else {
-    console.error("Token API Error", error);
-    return {
-      title: "Error fetching token",
-      body: ErrorWithSupportLink(
-        "An error occurred while fetching the app token. Please look into logs for more details."
-      ),
-    };
-  }
-};
-
-const Link = styled("a", {
-  color: "#2f80e1",
-});
-
-export const ErrorWithSupportLink = errorMessage => (
-  <div>
-    {errorMessage} If you think this is a mistake on our side, please create{" "}
-    <Link
-      target="_blank"
-      href="https://github.com/100mslive/100ms-web/issues"
-      rel="noreferrer"
-    >
-      an issue
-    </Link>{" "}
-    or reach out over{" "}
-    <Link
-      target="_blank"
-      href="https://discord.com/invite/kGdmszyzq2"
-      rel="noreferrer"
-    >
-      Discord
-    </Link>
-    .
-  </div>
-);
 
 export default PreviewScreen;
