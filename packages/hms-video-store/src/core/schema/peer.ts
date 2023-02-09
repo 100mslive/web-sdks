@@ -60,6 +60,11 @@ interface BaseTrack {
   peerId?: string;
   deviceID?: string;
   plugins?: string[];
+  /**
+   * present only for local tracks to denote if a track has been published or not
+   * false for preview tracks
+   */
+  isPublished?: boolean;
 }
 
 export interface HMSAudioTrack extends BaseTrack {

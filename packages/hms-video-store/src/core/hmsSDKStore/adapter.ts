@@ -71,6 +71,7 @@ export class SDKToHMS {
       (track as HMSAudioTrack).volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
+    SDKToHMS.enrichLocalTrack(track, sdkTrack);
     if (track.type === 'video') {
       if (track.source === 'screen') {
         // @ts-ignore
@@ -84,6 +85,12 @@ export class SDKToHMS {
       SDKToHMS.enrichVideoTrack(track as HMSVideoTrack, sdkTrack);
     }
     SDKToHMS.enrichPluginsDetails(track, sdkTrack);
+  }
+
+  static enrichLocalTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack || sdkTrack instanceof SDKHMSLocalAudioTrack) {
+      track.isPublished = sdkTrack.isPublished;
+    }
   }
 
   static updateDeviceID(track: HMSTrack, sdkTrack: SDKHMSTrack) {
