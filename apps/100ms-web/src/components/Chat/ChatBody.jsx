@@ -300,7 +300,6 @@ const ChatList = React.forwardRef(
       <VariableSizeList
         ref={listRef}
         itemCount={messages.length}
-        itemData={{ messages, setRowHeight }}
         itemSize={getRowHeight}
         width={width}
         height={height - 1}
@@ -308,13 +307,13 @@ const ChatList = React.forwardRef(
           overflowX: "hidden",
         }}
       >
-        {({ index, style, data }) => (
+        {({ index, style }) => (
           <ChatMessage
             style={style}
             index={index}
-            key={data.messages[index].id}
-            message={data.messages[index]}
-            setRowHeight={data.setRowHeight}
+            key={messages[index].id}
+            message={messages[index]}
+            setRowHeight={setRowHeight}
             onPin={() => setPinnedMessage(messages[index])}
           />
         )}
