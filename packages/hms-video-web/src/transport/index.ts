@@ -703,6 +703,8 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    track.isPublished = true;
+
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
@@ -733,6 +735,7 @@ export default class HMSTransport implements ITransport {
     stream.removeSender(track);
     await p;
     await track.cleanup();
+    track.isPublished = false;
     // remove track from store on unpublish
     this.store.removeTrack(track.trackId);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
