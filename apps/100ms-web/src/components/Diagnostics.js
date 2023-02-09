@@ -1,7 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useSearchParam } from "react-use";
 import { HMSDiagnostics } from "@100mslive/hms-diagnostics";
+import { v4 } from "uuid";
 import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
 import { Accordion, Button, Flex, Text } from "@100mslive/react-ui";
+import { ErrorDialog } from "../primitives/DialogContent";
+import FullPageProgress from "./FullPageProgress";
+import { useTokenEndpoint } from "./AppData/useUISettings";
+import {
+  convertTokenError,
+  getToken,
+  getUserToken,
+} from "../services/tokenService";
+import { QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
 
 const diagnostics = new HMSDiagnostics();
 
@@ -45,6 +57,42 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
 const Diagnostics = () => {
   const [result, setResult] = useState([]);
   const [inProgress, setInProgress] = useState(false);
+
+  const tokenEndpoint = useTokenEndpoint();
+  const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
+  const [token, setToken] = useState(null);
+  const [error, setError] = useState({ title: "", body: "" });
+
+  let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
+
+  useEffect(() => {
+    if (authToken) {
+      setToken(authToken);
+      return;
+    }
+    if (!tokenEndpoint || !urlRoomId) {
+      return;
+    }
+    const getTokenFn = !userRole
+      ? () => getUserToken(v4())
+      : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
+    getTokenFn()
+      .then(token => {
+        setToken(token);
+      })
+      .catch(error => {
+        setError(convertTokenError(error));
+      });
+  }, [tokenEndpoint, urlRoomId, userRole, authToken]);
+
+  if (error.title) {
+    return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;
+  }
+
+  if (!token) {
+    return <FullPageProgress />;
+  }
+
   return (
     <Flex direction="column" css={{ size: "100%", overflowY: "auto" }}>
       <Button
@@ -53,13 +101,16 @@ const Diagnostics = () => {
         onClick={async () => {
           setResult([]);
           setInProgress(true);
-          await diagnostics.start({
-            onUpdate: (result, path) => {
-              setResult(res =>
-                res.concat({ ...result, title: path.split(".").at(-1) })
-              );
-            },
-          });
+          await diagnostics.start(
+            { authToken: token, initEndpoint: "https://qa-init.100ms.live/" },
+            {
+              onUpdate: (result, path) => {
+                setResult(res =>
+                  res.concat({ ...result, title: path.split(".").at(-1) })
+                );
+              },
+            }
+          );
         }}
       >
         Start Diagnostics

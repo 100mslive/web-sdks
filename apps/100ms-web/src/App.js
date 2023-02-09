@@ -210,7 +210,24 @@ const RouteList = ({ getUserToken, getDetails }) => {
         <Route path=":roomId/:role" element={<PostLeave />} />
         <Route path=":roomId" element={<PostLeave />} />
       </Route>
-      <Route path="diagnostics" element={<Diagnostics />} />
+      <Route path="diagnostics">
+        <Route
+          path=":roomId/:role"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Diagnostics />
+            </Suspense>
+          }
+        />
+        <Route
+          path=":roomId"
+          element={
+            <Suspense fallback={<FullPageProgress />}>
+              <Diagnostics />
+            </Suspense>
+          }
+        />
+      </Route>
       <Route
         path="/:roomId/:role"
         element={<RedirectToPreview getDetails={getDetails} />}
