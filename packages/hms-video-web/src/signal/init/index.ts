@@ -72,7 +72,11 @@ export function getUrl(endpoint: string, peerId: string, userAgent: string, regi
 }
 
 export function transformInitConfig(config: any): InitConfig {
-  let host = "test-turn.100ms.live"
+  let host = process.env.TURN_HOST;
+  if (!host) {
+    host = "test-turn.100ms.live";
+  }
+
   let list = [ `turn:${host}`,`turn:${host}?transport=tcp`, `turn:${host}:443?transport=tcp`, `turns:${host}:443`]
   
   
