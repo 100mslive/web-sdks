@@ -65,78 +65,74 @@ export const peerConnectionMachine = createMachine<{ connection: RTCPeerConnecti
 interface RetryContext {
   retryCount: number;
   error: HMSException | null;
-  task: null | (() => Promise<boolean>);
   success: boolean;
   maxRetries: number;
 }
 
 interface RetryEventObject {
   type: 'SCHEDULE';
-  task: () => Promise<boolean>;
   data?: HMSException;
 }
 
-export const RetryMachine = createMachine<RetryContext, RetryEventObject>({
-  id: 'retryMachine',
-  initial: 'idle',
-  context: {
-    retryCount: 0,
-    error: null,
-    success: false,
-    task: null,
-    maxRetries: 5,
-  },
-  states: {
-    idle: {
-      on: {
-        SCHEDULE: 'schedule',
-      },
+export const createRetryMachine = (task: () => Promise<any>) =>
+  createMachine<RetryContext, RetryEventObject>({
+    id: 'retryMachine',
+    initial: 'idle',
+    context: {
+      retryCount: 0,
+      error: null,
+      success: false,
+      maxRetries: 5,
     },
-    schedule: {
-      invoke: {
-        src: (context, event) => {
-          if (event.task) {
-            context.task = event.task;
-          }
-          return event.task();
+    states: {
+      idle: {
+        on: {
+          SCHEDULE: 'schedule',
         },
-        onDone: 'success',
-        onError: 'error',
       },
-    },
-    success: {
-      entry: assign({
-        success: true,
-        error: null,
-        retryCount: 0,
-      }),
-      type: 'final',
-    },
-    error: {
-      on: {
-        SCHEDULE: [
-          { target: 'schedule', cond: context => context.retryCount < context.maxRetries },
-          { target: 'failed', cond: context => context.retryCount < context.maxRetries },
+      schedule: {
+        invoke: {
+          src: () => task(),
+          onDone: 'success',
+          onError: 'error',
+        },
+      },
+      success: {
+        entry: assign({
+          success: true,
+          error: null,
+          retryCount: 0,
+        }),
+        type: 'final',
+      },
+      error: {
+        on: {
+          SCHEDULE: [
+            { target: 'schedule', cond: context => context.retryCount < context.maxRetries },
+            { target: 'failed', cond: context => context.retryCount >= context.maxRetries },
+          ],
+        },
+        entry: [
+          assign<RetryContext, RetryEventObject>({
+            success: false,
+            error: (_, event) => {
+              console.error('retry state error', event.data, event.data instanceof HMSException);
+              return event.data || null;
+            },
+            retryCount: context => context.retryCount + 1,
+          }),
+          send<RetryContext, RetryEventObject>(
+            () => {
+              return { type: 'SCHEDULE' };
+            },
+            {
+              delay: context => Math.pow(2, context.retryCount) * 1000,
+            },
+          ),
         ],
       },
-      entry: [
-        assign<RetryContext, RetryEventObject>({
-          success: false,
-          error: (_, event) => event.data || null,
-          retryCount: context => context.retryCount + 1,
-        }),
-        send<RetryContext, RetryEventObject>(
-          context => {
-            return { type: 'SCHEDULE', task: context.task };
-          },
-          {
-            delay: context => Math.pow(2, context.retryCount) * 1000,
-          },
-        ),
-      ],
+      failed: {
+        type: 'final',
+      },
     },
-    failed: {
-      type: 'final',
-    },
-  },
-});
+  });

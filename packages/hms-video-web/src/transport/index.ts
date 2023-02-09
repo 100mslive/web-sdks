@@ -4,7 +4,7 @@ import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import ITransport from './ITransport';
 import ITransportObserver from './ITransportObserver';
-import { RetryMachine } from './publishMachine';
+import { createRetryMachine } from './publishMachine';
 import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -174,11 +174,21 @@ export default class HMSTransport implements ITransport {
     onFailure: (error: HMSException) => {
       // @DISCUSS: Should we remove this? Pong failure would have already scheduled signal retry.
       if (this.joinParameters) {
-        this.retryScheduler.schedule({
-          category: TransportFailureCategory.SignalDisconnect,
-          error,
-          task: this.retrySignalDisconnectTask,
-          originalState: this.state,
+        // this.retryScheduler.schedule({
+        //   category: TransportFailureCategory.SignalDisconnect,
+        //   error,
+        //   task: this.retrySignalDisconnectTask,
+        //   originalState: this.state,
+        // });
+        this.sendErrorAnalyticsEvent(error, TransportFailureCategory.SignalDisconnect);
+        const service = interpret(createRetryMachine(this.retrySignalDisconnectTask)).start();
+        service.send({
+          type: 'SCHEDULE',
+        });
+        service.onDone(() => {
+          if (service.machine.context.error) {
+            this.sendErrorAnalyticsEvent(service.machine.context.error, TransportFailureCategory.SignalDisconnect);
+          }
         });
       }
     },
@@ -193,10 +203,18 @@ export default class HMSTransport implements ITransport {
           //   task: this.retrySignalDisconnectTask,
           //   originalState: this.state,
           // });
-          const service = interpret(RetryMachine).start();
+          this.sendErrorAnalyticsEvent(
+            ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+            TransportFailureCategory.SignalDisconnect,
+          );
+          const service = interpret(createRetryMachine(this.retrySignalDisconnectTask), { devTools: true }).start();
           service.send({
             type: 'SCHEDULE',
-            task: this.retrySignalDisconnectTask,
+          });
+          service.onDone(() => {
+            if (service.machine.context.error) {
+              this.sendErrorAnalyticsEvent(service.machine.context.error, TransportFailureCategory.SignalDisconnect);
+            }
           });
         }
       } catch (e) {
@@ -944,10 +962,13 @@ export default class HMSTransport implements ITransport {
     if (isIceRetryInProgress) {
       return;
     }
-    const service = interpret(RetryMachine).start();
+    const service = interpret(
+      createRetryMachine(
+        role === HMSConnectionRole.Publish ? this.retryPublishIceFailedTask : this.retrySubscribeIceFailedTask,
+      ),
+    ).start();
     service.send({
       type: 'SCHEDULE',
-      task: role === HMSConnectionRole.Publish ? this.retryPublishIceFailedTask : this.retrySubscribeIceFailedTask,
     });
 
     /*  if (role === HMSConnectionRole.Publish) {
