@@ -48,9 +48,7 @@ const StartHLS = () => {
         setError("");
         await hmsActions.startHLSStreaming({
           variants,
-          recording: record
-            ? { hlsVod: true, singleFilePerLayer: true }
-            : { hlsVod: false, singleFilePerLayer: false },
+          recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {
         if (error.message.includes("invalid input")) {
