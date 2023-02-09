@@ -43,15 +43,15 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   // @ts-ignore
-  setPreferredCodec(_transceiver: RTCRtpTransceiver, _kind: string) {
+  setPreferredCodec(transceiver: RTCRtpTransceiver, kind: string) {
     if ('setCodecPreferences' in RTCRtpTransceiver.prototype) {
       const capabilites = RTCRtpSender.getCapabilities('video');
-      if (capabilites) {
+      if (capabilites && kind === 'video') {
         const h264Codec = capabilites.codecs.find(codec => codec.mimeType.includes('video/H264'));
         const vp8Codec = capabilites.codecs.find(codec => codec.mimeType.includes('video/VP8'));
         console.log({ h264Codec, vp8Codec });
         if (h264Codec && vp8Codec) {
-          _transceiver.setCodecPreferences([h264Codec, vp8Codec]);
+          transceiver.setCodecPreferences([h264Codec, vp8Codec]);
         }
       }
     }
