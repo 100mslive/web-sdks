@@ -49,6 +49,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   publishedTrackId?: string;
 
+  /**
+   * will be false for preview tracks
+   */
+  isPublished = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
