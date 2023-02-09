@@ -50,7 +50,7 @@ const StartHLS = () => {
           variants,
           recording: record
             ? { hlsVod: true, singleFilePerLayer: true }
-            : undefined,
+            : { hlsVod: false, singleFilePerLayer: false },
         });
       } catch (error) {
         if (error.message.includes("invalid input")) {
