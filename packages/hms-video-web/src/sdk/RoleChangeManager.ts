@@ -6,27 +6,27 @@ import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/
 import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
 
-export type PublishConfig = {
-  publishAudio?: boolean;
-  publishVideo?: boolean;
-};
-
 export default class RoleChangeManager {
   constructor(
     private store: IStore,
     private transport: ITransport,
-    private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
+    private publish: (settings: InitialSettings) => Promise<void>,
     private removeAuxiliaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
   ) {}
 
-  public handleLocalPeerRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
+  handleLocalPeerRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     const localPeer = this.store.getLocalPeer();
 
     if (!localPeer) {
       return;
     }
 
+    await this.diffRolesAndPublishTracks({ oldRole, newRole });
+    this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
+  };
+
+  diffRolesAndPublishTracks = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     const wasPublishing = new Set(oldRole.publishParams.allowed);
     const isPublishing = new Set(newRole.publishParams.allowed);
 
@@ -54,8 +54,6 @@ export default class RoleChangeManager {
     };
     // call publish with new settings, local track manager will diff policies
     await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
-
-    this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
   private async removeVideoTracks(removeVideo: boolean) {

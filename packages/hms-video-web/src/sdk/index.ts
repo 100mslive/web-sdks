@@ -854,7 +854,7 @@ export class HMSSdk implements HMSInterface {
       const publishAction =
         oldRole && oldRole !== this.localPeer?.role?.name
           ? () =>
-              this.roleChangeManager?.handleLocalPeerRoleUpdate({
+              this.roleChangeManager?.diffRolesAndPublishTracks({
                 oldRole: this.store.getPolicyForRole(oldRole),
                 newRole: this.localPeer!.role!,
               })

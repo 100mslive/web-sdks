@@ -96,9 +96,6 @@ export class LocalTrackManager {
      * the reason we need this is for preview API to work, in case of preview we want to publish the same
      * tracks which were shown and are already part of the local peer instead of creating new ones.
      * */
-    // if (publishConfig.publishAudio && publishConfig.publishVideo) {
-    //   return tracks.concat(localTracks);
-    // }
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
       tracksToPublish.push(videoTrack);
     }
