@@ -1,8 +1,9 @@
 import cloneDeep from 'lodash.clonedeep';
 import setInObject from 'lodash.set';
-import type { HMSConfig, InitConfig } from '@100mslive/hms-video';
+import type { InitConfig } from '@100mslive/hms-video';
 import {
   BuildGetMediaError,
+  decodeJWT,
   HMSException,
   HMSGetMediaActions,
   HMSSdk,
@@ -10,9 +11,9 @@ import {
   validateRTCPeerConnection,
 } from '@100mslive/hms-video';
 import { initialState } from './initial-state';
-import type { ConnectivityKeys } from './interfaces';
+import type { ConnectivityKeys, HMSDiagnosticsConfig } from './interfaces';
 import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
-import { getToken, roomId, userName } from './utils';
+import { DEFAULT_DIAGNOSTICS_USERNAME, PROD_INIT_ENDPOINT } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
@@ -22,17 +23,21 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     this.result = cloneDeep(initialState);
   }
 
-  async start(listener: HMSDiagnosticUpdateListener) {
+  async start(config: HMSDiagnosticsConfig, listener: HMSDiagnosticUpdateListener) {
     this.listener = listener;
+
+    /**
+     * @TODO check WebRTC only for publishing and subscribing roles, check HMSTransport.doesRoleNeedWebRTC
+     */
     this.checkwebRTC();
-    await this.checkConnectivity();
+    await this.checkConnectivity(config);
     await this.checkDevices();
     return this.result;
   }
 
-  async checkConnectivity() {
+  async checkConnectivity(config: HMSDiagnosticsConfig) {
     try {
-      const initConfig = await this.checkInit();
+      const initConfig = await this.checkInit(config);
       await this.checkSTUNAndTURNConnectivity(initConfig);
     } catch (error) {
       this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: (error as Error).message });
@@ -191,25 +196,23 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     }
   }
 
-  private async checkInit() {
+  private async checkInit(config: HMSDiagnosticsConfig) {
     const sdk = new HMSSdk();
+    const { roomId } = decodeJWT(config.authToken);
 
-    const token = await getToken();
-    if (!token) {
-      this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: 'Failed to create token' });
-      return;
-    }
-    const config: HMSConfig = {
-      authToken: token,
-      userName: userName,
-    };
     // @ts-ignore
-    sdk.commonSetup(config, roomId);
+    sdk.commonSetup(
+      {
+        authToken: config.authToken,
+        userName: config.userName || DEFAULT_DIAGNOSTICS_USERNAME,
+      },
+      roomId,
+    );
 
     // @ts-ignore
     const initConfig = await sdk.transport.connect(
-      token,
-      'https://qa-init.100ms.live/',
+      config.authToken,
+      config.initEndpoint || PROD_INIT_ENDPOINT,
       Date.now(),
       { name: 'diagnostics' },
       false,

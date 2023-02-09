@@ -27,15 +27,24 @@ export interface HMSDiagnosticUpdateListener {
   onUpdate: (output: HMSDiagnosticsOutputValue, path: string) => void;
 }
 
+export interface HMSDiagnosticsConfig {
+  /**
+   * the token generated for a room and role which needs to be tested
+   */
+  authToken: string;
+  userName?: string;
+  initEndpoint?: string;
+}
+
 export interface HMSDiagnosticsInterface {
   /**
    * Start all the checks in 100ms followup
    */
-  start(listener: HMSDiagnosticUpdateListener): Promise<HMSDiagnosticsOutput>;
+  start(config: HMSDiagnosticsConfig, listener: HMSDiagnosticUpdateListener): Promise<HMSDiagnosticsOutput>;
   /**
    * start connectivity test - stun, turn, init etc.
    */
-  checkConnectivity(): Promise<HMSDiagnosticsOutput['connectivity']>;
+  checkConnectivity(config: HMSDiagnosticsConfig): Promise<HMSDiagnosticsOutput['connectivity']>;
   checkDevices(): Promise<HMSDiagnosticsOutput['devices']>;
   checkwebRTC(): HMSDiagnosticsOutput['webRTC'];
 }
