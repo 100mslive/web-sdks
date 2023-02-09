@@ -30,6 +30,7 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -284,17 +285,10 @@ const ChatMessage = React.memo(
 );
 const ChatList = React.forwardRef(
   (
-    {
-      width,
-      height,
-      setRowHeight,
-      getRowHeight,
-      messages,
-      setPinnedMessage,
-      scrollToBottom,
-    },
+    { width, height, setRowHeight, getRowHeight, messages, scrollToBottom },
     listRef
   ) => {
+    const { setPinnedMessage } = useSetPinnedMessage();
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
         scrollToBottom(1);
@@ -306,6 +300,7 @@ const ChatList = React.forwardRef(
       <VariableSizeList
         ref={listRef}
         itemCount={messages.length}
+        itemData={{ messages, setRowHeight }}
         itemSize={getRowHeight}
         width={width}
         height={height - 1}
@@ -313,13 +308,13 @@ const ChatList = React.forwardRef(
           overflowX: "hidden",
         }}
       >
-        {({ index, style }) => (
+        {({ index, style, data }) => (
           <ChatMessage
             style={style}
             index={index}
-            key={messages[index].id}
-            message={messages[index]}
-            setRowHeight={setRowHeight}
+            key={data.messages[index].id}
+            message={data.messages[index]}
+            setRowHeight={data.setRowHeight}
             onPin={() => setPinnedMessage(messages[index])}
           />
         )}
@@ -356,7 +351,6 @@ const VirtualizedChatMessages = React.forwardRef(
         <AutoSizer
           style={{
             width: "90%",
-            height: "100%",
           }}
         >
           {({ height, width }) => (
@@ -364,7 +358,6 @@ const VirtualizedChatMessages = React.forwardRef(
               width={width}
               height={height}
               messages={messages}
-              setPinnedMessage={setPinnedMessage}
               setRowHeight={setRowHeight}
               getRowHeight={getRowHeight}
               scrollToBottom={scrollToBottom}
@@ -378,7 +371,7 @@ const VirtualizedChatMessages = React.forwardRef(
 );
 
 export const ChatBody = React.forwardRef(
-  ({ role, peerId, setPinnedMessage, scrollToBottom }, listRef) => {
+  ({ role, peerId, scrollToBottom }, listRef) => {
     const storeMessageSelector = role
       ? selectMessagesByRole(role)
       : peerId
@@ -407,7 +400,6 @@ export const ChatBody = React.forwardRef(
       <Fragment>
         <VirtualizedChatMessages
           messages={messages}
-          setPinnedMessage={setPinnedMessage}
           scrollToBottom={scrollToBottom}
           ref={listRef}
         />
