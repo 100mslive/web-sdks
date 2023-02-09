@@ -52,7 +52,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private socket: WebSocket | null = null;
 
-  private callbacks = new Map<string, PromiseCallbacks<string>>();
+  private callbacks = new Map<string, PromiseCallbacks<string, { method: string }>>();
 
   private _isConnected = false;
   private id = 0;
@@ -100,7 +100,7 @@ export default class JsonRpcSignal implements ISignal {
 
     try {
       const response = await new Promise<any>((resolve, reject) => {
-        this.callbacks.set(id, { resolve, reject });
+        this.callbacks.set(id, { resolve, reject, metadata: { method } });
       });
 
       return response;
