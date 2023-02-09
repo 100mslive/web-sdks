@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "100ms_edtech_template": "0.1.4",
-    "@100mslive/react-icons": "0.6.4-alpha.3",
-    "@100mslive/react-ui": "0.6.4-alpha.3",
+    "@100mslive/react-icons": "0.6.4-alpha.4",
+    "@100mslive/react-ui": "0.6.4-alpha.4",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "lodash.merge": "^4.6.2",
