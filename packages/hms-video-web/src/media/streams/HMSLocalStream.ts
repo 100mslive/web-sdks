@@ -48,10 +48,8 @@ export default class HMSLocalStream extends HMSMediaStream {
       const capabilites = RTCRtpSender.getCapabilities('video');
       if (capabilites && kind === 'video') {
         const h264Codec = capabilites.codecs.find(codec => codec.mimeType.includes('video/H264'));
-        const vp8Codec = capabilites.codecs.find(codec => codec.mimeType.includes('video/VP8'));
-        console.log({ h264Codec, vp8Codec });
-        if (h264Codec && vp8Codec) {
-          transceiver.setCodecPreferences([h264Codec, vp8Codec]);
+        if (h264Codec) {
+          transceiver.setCodecPreferences([h264Codec]);
         }
       }
     }
