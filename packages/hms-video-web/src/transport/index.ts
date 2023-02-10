@@ -146,7 +146,7 @@ export default class HMSTransport implements ITransport {
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
-
+        this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
       }
     },
