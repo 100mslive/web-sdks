@@ -26,7 +26,6 @@ import { ToastManager } from "../components/Toast/ToastManager";
 import { APP_DATA } from "../common/constants";
 
 let hlsController;
-let hlsStats;
 
 const HLSView = () => {
   const videoRef = useRef(null);
@@ -49,7 +48,6 @@ const HLSView = () => {
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
-
   /**
    * initialize HLSController and add event listeners.
    */
@@ -136,7 +134,6 @@ const HLSView = () => {
         levelUpdatedHandler
       );
       hlsController?.reset();
-      hlsStats = null;
       hlsController = null;
     };
   }, [hlsUrl]);
@@ -145,14 +142,10 @@ const HLSView = () => {
    * initialize and subscribe to hlsState
    */
   useEffect(() => {
-    if (!hlsStats) {
-      return;
-    }
     let unsubscribe;
     if (enablHlsStats) {
       console.log("enalble ");
       unsubscribe = hlsController.subscribe(state => {
-        console.log("state ", state);
         setHlsStatsState(state);
       });
     } else {

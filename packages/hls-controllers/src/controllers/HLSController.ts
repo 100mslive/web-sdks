@@ -43,7 +43,6 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
   // HLSStats subscribe
   subscribe = (callback: (state: any) => void, interval = 2000) => {
     this._subscribeHlsStats = this.hlsStats.subscribe((state: any) => {
-      console.log('controller ', state);
       callback(state);
     }, interval);
     return this.unsubscribe;
