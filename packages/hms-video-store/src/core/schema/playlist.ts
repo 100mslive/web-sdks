@@ -106,7 +106,7 @@ export interface HMSPlaylistSelector {
    */
   list: <T>(store: HMSStore) => HMSPlaylistItem<T>[];
   /**
-   * This returns playlist selection with {id, hasNext, hasPrev}
+   * This returns playlist selection with `{ id, hasNext, hasPrev }`
    * @returns {HMSPlaylistSelection}
    */
   selection: (store: HMSStore) => HMSPlaylistSelection;

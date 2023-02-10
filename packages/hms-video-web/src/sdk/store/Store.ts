@@ -1,10 +1,9 @@
-import { Comparator } from './Comparator';
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker, PublishParams } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -22,13 +21,13 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../../media/tracks';
+import { PolicyParams } from '../../notification-manager';
 import { ENV } from '../../utils/support';
 import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
-  private readonly comparator: Comparator = new Comparator(this);
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -41,7 +40,6 @@ class Store implements IStore {
   private videoLayers?: SimulcastLayers;
   // private screenshareLayers?: SimulcastLayers;
   private config?: HMSConfig;
-  private publishParams?: PublishParams;
   private errorListener?: IErrorListener;
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
@@ -61,11 +59,7 @@ class Store implements IStore {
   }
 
   getPublishParams() {
-    return this.publishParams;
-  }
-
-  getComparator() {
-    return this.comparator;
+    return this.getLocalPeer()?.role?.publishParams;
   }
 
   getRoom() {
@@ -183,9 +177,15 @@ class Store implements IStore {
     this.room = room;
   }
 
-  setKnownRoles(knownRoles: KnownRoles) {
-    this.knownRoles = knownRoles;
+  setKnownRoles(params: PolicyParams) {
+    this.knownRoles = params.known_roles;
     this.roleDetailsArrived = true;
+    if (!this.simulcastEnabled) {
+      return;
+    }
+    const publishParams = this.knownRoles[params.name]?.publishParams;
+    this.videoLayers = this.convertSimulcastLayers(publishParams.simulcast?.video);
+    // this.screenshareLayers = this.convertSimulcastLayers(publishParams.simulcast?.screen);
     this.updatePeersPolicy();
   }
 
@@ -215,15 +215,6 @@ class Store implements IStore {
     }
     this.config = config;
     this.setEnv();
-  }
-
-  setPublishParams(params: PublishParams) {
-    this.publishParams = params;
-    if (!this.simulcastEnabled) {
-      return;
-    }
-    this.videoLayers = this.convertSimulcastLayers(params.simulcast?.video);
-    // this.screenshareLayers = this.convertSimulcastLayers(params.simulcast?.screen);
   }
 
   addPeer(peer: HMSPeer) {

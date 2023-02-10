@@ -1,14 +1,17 @@
+// @ts-nocheck
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter } from 'eventemitter3';
 import Hls, { HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSControllerEvents, IS_OPTIMIZED } from './constants';
 import { HlsControllerEventEmitter, HLSControllerListeners } from './events';
 import IHLSController from '../interfaces/IHLSController';
+import { metadataPayloadParser } from '../utilies/utils';
 
 export type { LevelParsed };
 
 export class HLSController implements IHLSController, HlsControllerEventEmitter {
   private hls: Hls;
+  private hlsUrl: string;
   private hlsStats: HlsStats;
   private videoRef: React.RefObject<HTMLVideoElement>;
   private _emitter: HlsControllerEventEmitter;
@@ -17,6 +20,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
   constructor(hlsUrl: string, videoRef: React.RefObject<HTMLVideoElement>) {
     this.hls = new Hls(this.getControllerConfig());
     this._emitter = new EventEmitter();
+    this.hlsUrl = hlsUrl;
     this.videoRef = videoRef;
     if (!videoRef || !videoRef.current) {
       throw new Error('video ref cannot be null');
@@ -228,6 +232,54 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
   pauseEventHandler = () => {
     this.trigger(HLSControllerEvents.HLS_PAUSE, true);
   };
+  private extractMetaTextTrack = (videoEl: HTMLVideoElement | null): TextTrack | null => {
+    const textTrackListCount = videoEl?.textTracks.length || 0;
+    for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
+      const textTrack = videoEl?.textTracks[trackIndex];
+      if (textTrack?.kind !== 'metadata') {
+        continue;
+      }
+      textTrack.mode = 'showing';
+      return textTrack;
+    }
+    return null;
+  };
+  private fireCues = (videoEl: HTMLVideoElement | null, cues: TextTrackCueList) => {
+    const cuesLength = cues.length;
+    let cueIndex = 0;
+    while (cueIndex < cuesLength) {
+      const cue: TextTrackCue = cues[cueIndex];
+      if (cue.fired) {
+        cueIndex++;
+        continue;
+      }
+      const data: { [key: string]: string } = metadataPayloadParser(cue.value.data);
+      const programData = videoEl?.getStartDate();
+      const startDate = data.start_date;
+      const endDate = data.end_date;
+      const startTime = new Date(startDate) - new Date(programData) - videoEl?.currentTime * 1000;
+      const duration = new Date(endDate) - new Date(startDate);
+      setTimeout(() => {
+        this.trigger(HLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
+          payload: data.payload,
+          duration,
+        });
+      }, startTime);
+      cue.fired = true;
+      cueIndex++;
+    }
+  };
+  handleTimeUpdateListener = (_: Event) => {
+    if (!this.videoRef) {
+      return;
+    }
+    const videoEl: HTMLVideoElement | null = this.videoRef.current;
+    const metaTextTrack: TextTrack | null = this.extractMetaTextTrack(videoEl);
+    if (!metaTextTrack || !metaTextTrack.cues) {
+      return;
+    }
+    this.fireCues(videoEl, metaTextTrack.cues);
+  };
   listenHLSEvent() {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
@@ -238,6 +290,8 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
     } else if (videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
+      videoEl.src = this.hlsUrl;
+      videoEl.addEventListener('timeupdate', this.handleTimeUpdateListener);
     }
 
     videoEl.addEventListener('play', this.playEventHandler);
@@ -304,7 +358,8 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
           const fragmentDuration = frag.end - frag.start;
 
           if (timeDifference < fragmentDuration) {
-            const payload = mt.value.data;
+            const data = mt.value.data;
+            const payload = metadataPayloadParser(data).payload;
             /**
              * we start a timeout for difference seconds.
              * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
@@ -326,7 +381,6 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
               this.trigger(HLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
                 payload,
                 duration,
-                metadata: mt,
               });
             }, timeDifference * 1000);
           }

@@ -1,5 +1,5 @@
 {
-  "version": "0.7.2-alpha.4",
+  "version": "0.7.4-alpha.4",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -31,12 +31,12 @@
     "format": "prettier --write src/**/*.ts"
   },
   "peerDependencies": {
-    "@100mslive/hms-video": "^0.7.1"
+    "@100mslive/hms-video": "^0.7.2"
   },
   "name": "@100mslive/hms-noise-suppression",
   "author": "vishaldhull09",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.7.2-alpha.4"
+    "@100mslive/hms-video": "0.7.4-alpha.4"
   }
 }

@@ -24,7 +24,7 @@ export interface useParticipantsResult {
    */
   isConnected: boolean;
   /**
-   * role names with atleast one participant present with that role
+   * role names with at least one participant present with that role
    */
   rolesWithParticipants: HMSRoleName[];
 }
@@ -33,7 +33,7 @@ export type useParticipantsParams = {
   /** To filter by particular role */
   role: HMSRoleName;
   /**
-   * To filter by particular by metadata. only supports { isHandRaised: true } for now
+   * To filter by particular by metadata. only supports `{ isHandRaised: true }` for now
    * @beta
    */
   metadata: Record<string, any>;

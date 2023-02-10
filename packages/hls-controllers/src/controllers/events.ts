@@ -33,7 +33,6 @@ export declare interface HLSStreamLive {
 export declare interface HLSTimedMetadataPayload {
   payload: string;
   duration: number;
-  metadata: any;
 }
 
 export declare interface HLSManifestLoaded {

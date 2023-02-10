@@ -1,5 +1,6 @@
 import { HMSTrackType } from './HMSTrackType';
 import { stringifyMediaStreamTrack } from '../../utils/json';
+import HMSLogger from '../../utils/logger';
 import HMSMediaStream from '../streams/HMSMediaStream';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
@@ -91,6 +92,7 @@ export abstract class HMSTrack {
    * 3. plugins related cleanups and stopping
    */
   cleanup() {
+    HMSLogger.d('[HMSTrack]', 'Stopping track', this.toString());
     this.nativeTrack?.stop();
   }
 

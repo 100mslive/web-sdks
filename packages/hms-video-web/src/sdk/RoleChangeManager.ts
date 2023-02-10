@@ -44,7 +44,6 @@ export default class RoleChangeManager {
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
-    this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
       isAudioMuted: true,
@@ -68,7 +67,11 @@ export default class RoleChangeManager {
     if (localPeer?.videoTrack) {
       // TODO: stop processed track and cleanup plugins loop non async
       // vb can throw change role off otherwise
-      await this.transport.unpublish([localPeer.videoTrack]);
+      if (localPeer.videoTrack.publishedTrackId) {
+        await this.transport.unpublish([localPeer.videoTrack]);
+      } else {
+        await localPeer.videoTrack.cleanup();
+      }
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = undefined;
     }
@@ -81,7 +84,11 @@ export default class RoleChangeManager {
     }
     const localPeer = this.store.getLocalPeer();
     if (localPeer?.audioTrack) {
-      await this.transport.unpublish([localPeer.audioTrack]);
+      if (localPeer.audioTrack.publishedTrackId) {
+        await this.transport.unpublish([localPeer.audioTrack]);
+      } else {
+        await localPeer.audioTrack.cleanup();
+      }
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = undefined;
     }
