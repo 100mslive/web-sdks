@@ -173,7 +173,7 @@ export const MoreSettings = () => {
                   </Flex>
                 </Dropdown.Item>
               ) : (
-                <></>
+                null
               )
             ) : (
               <Dropdown.Item
