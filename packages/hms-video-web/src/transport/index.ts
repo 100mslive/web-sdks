@@ -4,7 +4,7 @@ import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
 import ITransport from './ITransport';
 import ITransportObserver from './ITransportObserver';
-import { createRetryMachine } from './publishMachine';
+import { createRetryMachine, peerConnectionMachine } from './publishMachine';
 import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
@@ -82,6 +82,8 @@ export default class HMSTransport implements ITransport {
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
   private joinRetryCount = 0;
+  //@ts-ignore
+  private publishService;
 
   constructor(
     private observer: ITransportObserver,
@@ -155,6 +157,9 @@ export default class HMSTransport implements ITransport {
     },
 
     onTrickle: async (trickle: HMSTrickle) => {
+      if (trickle.target === HMSConnectionRole.Publish) {
+        this.publishService?.send({ type: 'trickle', iceCandidate: trickle.candidate });
+      }
       const connection =
         trickle.target === HMSConnectionRole.Publish ? this.publishConnection : this.subscribeConnection;
       if (!connection?.remoteDescription) {
@@ -698,6 +703,7 @@ export default class HMSTransport implements ITransport {
       `⏳ publishTrack: trackId=${track.trackId}, toPublishTrackId=${track.publishedTrackId}`,
       `${track}`,
     );
+    this.publishService?.send({ type: 'publish', track });
     this.trackStates.set(track.publishedTrackId, new TrackState(track));
     const p = new Promise<boolean>((resolve, reject) => {
       this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
@@ -862,30 +868,27 @@ export default class HMSTransport implements ITransport {
     isWebRTC = true,
   }: NegotiateJoinParams & { isWebRTC: boolean }): Promise<boolean> {
     if (isWebRTC) {
-      return await this.negotiateJoinWebRTC({ name, data, autoSubscribeVideo });
+      return await this.negotiateJoinWebRTC();
     } else {
       return await this.negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo });
     }
   }
 
-  private async negotiateJoinWebRTC({ name, data, autoSubscribeVideo }: NegotiateJoinParams): Promise<boolean> {
+  private async negotiateJoinWebRTC(): Promise<boolean> {
     HMSLogger.d(TAG, '⏳ join: Negotiating over PUBLISH connection');
     if (!this.publishConnection) {
       HMSLogger.e(TAG, 'Publish peer connection not found, cannot negotiate');
       return false;
     }
-    const offer = await this.publishConnection.createOffer();
-    await this.publishConnection.setLocalDescription(offer);
-    const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
-    const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
-    await this.publishConnection.setRemoteDescription(answer);
-    for (const candidate of this.publishConnection.candidates) {
-      await this.publishConnection.addIceCandidate(candidate);
-    }
-
-    this.publishConnection.initAfterJoin();
-    return !!answer;
+    const service = interpret(peerConnectionMachine(this.initConfig?.rtcConfiguration!, this.signal!)).start();
+    this.publishService = service;
+    return new Promise<boolean>(resolve => {
+      service.onEvent(event => {
+        if (event.type === 'joined') {
+          resolve(true);
+        }
+      });
+    });
   }
 
   private async negotiateJoinNonWebRTC({ name, data, autoSubscribeVideo }: NegotiateJoinParams): Promise<boolean> {

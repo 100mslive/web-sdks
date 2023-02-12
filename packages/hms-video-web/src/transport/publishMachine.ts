@@ -1,66 +1,153 @@
-import { assign, createMachine, send } from 'xstate';
-import HMSPublishConnection from '../connection/publish/publishConnection';
+import { assign, createMachine, interpret, send } from 'xstate';
+import { HMSConnectionRole } from '../connection/model';
 import { HMSException } from '../error/HMSException';
 import { TrackState } from '../notification-manager';
+import { ISignal } from '../signal/ISignal';
+import { API_DATA_CHANNEL } from '../utils/constants';
 
-interface PublishContext {
-  trackStates: Map<string, TrackState>;
-  publishConnection: HMSPublishConnection | null;
-}
-export const publishMachine = createMachine<PublishContext>({
-  id: 'publishMachine',
-  initial: 'idle',
-  context: {
-    trackStates: new Map<string, TrackState>(),
-    publishConnection: null,
-  },
-  states: {
-    idle: {
-      on: {
-        PUBLISH: {
-          target: 'publish',
-          actions(context, event) {
-            const track = event.track;
-            track.publishedTrackId = track.getTrackIDBeingSent();
-            context.trackStates.set(track.publishedTrackId, track);
+export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal) =>
+  createMachine<{
+    connection: RTCPeerConnection | null;
+    candidates: Set<RTCIceCandidateInit>;
+    trackStates: Map<string, TrackState>;
+  }>({
+    id: 'peerConnectionMachine',
+    initial: 'init',
+    context: {
+      connection: null,
+      candidates: new Set(),
+      trackStates: new Map<string, TrackState>(),
+    },
+    on: {
+      connected: 'connected',
+      disconnected: 'disconnected',
+      connecting: 'connecting',
+      closed: 'closed',
+      failed: 'failed',
+      trickle: {
+        actions: (context, event) => {
+          if (!context.connection?.remoteDescription) {
+            context.candidates.add(event.iceCandidate);
+          } else {
+            context.connection.addIceCandidate(event.iceCandidate);
+          }
+        },
+      },
+      join: 'join',
+      negotiate: 'negotiate',
+      publish: {
+        actions: async (context, event) => {
+          const { track } = event;
+          track.publishedTrackId = track.getTrackIDBeingSent();
+          context.trackStates.set(track.publishedTrackId, new TrackState(track));
+          console.error('publish called');
+          context.connection?.addTransceiver(track.nativeTrack, {
+            streams: [track.stream.nativeStream],
+            direction: 'sendonly',
+            sendEncodings: [{ active: true }],
+          });
+        },
+      },
+    },
+    states: {
+      init: {
+        invoke: {
+          src: context => async send => {
+            console.error({ config }, 'creating connection');
+            context.connection = new RTCPeerConnection(config);
+            context.connection.createDataChannel(API_DATA_CHANNEL, {
+              protocol: 'SCTP',
+            });
+            context.connection.onconnectionstatechange = () => {
+              console.error('connectionstate', context.connection?.connectionState);
+              send({ type: context.connection?.connectionState! });
+            };
+
+            context.connection.onicecandidate = ({ candidate }) => {
+              if (candidate) {
+                console.error({ candidate });
+                signal.trickle(HMSConnectionRole.Publish, candidate);
+              }
+            };
+            send({ type: 'join' });
+          },
+          onError: {
+            actions: (_, event) => {
+              console.error('error', event.data);
+            },
           },
         },
       },
-    },
-    publish: {},
-  },
-});
-
-export const peerConnectionMachine = createMachine<{ connection: RTCPeerConnection | null }>({
-  id: 'peerConnectionMachine',
-  initial: 'idle',
-  context: {
-    connection: null,
-  },
-  states: {
-    idle: {
-      on: {
-        connected: 'connected',
-        disconnected: 'disconnected',
-        connecting: 'connecting',
-        closed: 'closed',
-      },
-      invoke: {
-        src: (context, event) => send => {
-          const { config } = event;
-          context.connection = new RTCPeerConnection(config);
-          context.connection.onconnectionstatechange = () => {
-            send({ type: context.connection?.connectionState! });
-          };
+      connecting: {},
+      connected: {},
+      disconnected: {
+        invoke: {
+          src: () => send => {
+            const retryMachine = createRetryMachine(() => send({ type: 'negotiate', iceRestart: true }));
+            const service = interpret(retryMachine).start();
+            service.onDone(event => {
+              console.error('retry done', event);
+            });
+          },
         },
       },
+      failed: {
+        invoke: {
+          src: () => send => {
+            const retryMachine = createRetryMachine(() => send({ type: 'negotiate', iceRestart: true }));
+            const service = interpret(retryMachine).start();
+            service.onDone(event => {
+              console.error('retry done', event);
+            });
+          },
+        },
+      },
+      join: {
+        invoke: {
+          src: context => async send => {
+            if (!context.connection) {
+              return;
+            }
+            const offer = await context.connection.createOffer();
+            await context.connection.setLocalDescription(offer);
+            const answer = await signal.join('ravi', '', true, true, true, offer);
+            await context.connection.setRemoteDescription(answer);
+            context.candidates.forEach(candidate => {
+              context.connection?.addIceCandidate(candidate);
+              context.candidates.delete(candidate);
+            });
+            console.error('join called');
+            context.connection.onnegotiationneeded = () => {
+              console.error('negotiation needed');
+              send({ type: 'negotiate' });
+            };
+            send({ type: 'joined' });
+          },
+        },
+      },
+      negotiate: {
+        invoke: {
+          src: (context, event) => async () => {
+            if (!context.connection) {
+              console.error('publishNegotiation called');
+              return;
+            }
+            console.error('publishNegotiation called');
+            const offer = await context.connection.createOffer(event.iceRestart ? { iceRestart: true } : undefined);
+            await context.connection.setLocalDescription(offer);
+            const answer = await signal.offer(offer, context.trackStates);
+            await context.connection.setRemoteDescription(answer);
+          },
+        },
+      },
+      closed: {
+        entry: assign({
+          connection: null,
+          candidates: new Set(),
+        }),
+      },
     },
-    connecting: {},
-    connected: {},
-    disconnected: {},
-    closed: {},
-  },
-});
+  });
 
 interface RetryContext {
   retryCount: number;
@@ -74,7 +161,7 @@ interface RetryEventObject {
   data?: HMSException;
 }
 
-export const createRetryMachine = (task: () => Promise<any>) =>
+export const createRetryMachine = (task: () => Promise<any> | any) =>
   createMachine<RetryContext, RetryEventObject>({
     id: 'retryMachine',
     initial: 'idle',
@@ -116,15 +203,12 @@ export const createRetryMachine = (task: () => Promise<any>) =>
           assign<RetryContext, RetryEventObject>({
             success: false,
             error: (_, event) => {
-              console.error('retry state error', event.data, event.data instanceof HMSException);
               return event.data || null;
             },
             retryCount: context => context.retryCount + 1,
           }),
           send<RetryContext, RetryEventObject>(
-            () => {
-              return { type: 'SCHEDULE' };
-            },
+            { type: 'SCHEDULE' },
             {
               delay: context => Math.pow(2, context.retryCount) * 1000,
             },
