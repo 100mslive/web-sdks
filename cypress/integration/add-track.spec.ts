@@ -87,14 +87,14 @@ describe('add/remove track api', () => {
             .should('be.calledThrice')
             .then(() => {
               const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks[0]).to.equal(videoTrack.id);
-              expect(localPeer.videoTrack).to.not.equal(videoTrack.id);
+              expect(localPeer?.auxiliaryTracks[0]).to.equal(videoTrack.id);
+              expect(localPeer?.videoTrack).to.not.equal(videoTrack.id);
               return actions.removeTrack(videoTrack.id);
             })
             .then(() => {
               const localPeer = store.getState(selectLocalPeer);
-              expect(localPeer.auxiliaryTracks.length).to.equal(0);
-              expect(localPeer.videoTrack).to.not.equal(undefined);
+              expect(localPeer?.auxiliaryTracks.length).to.equal(0);
+              expect(localPeer?.videoTrack).to.not.equal(undefined);
             });
         });
     });
