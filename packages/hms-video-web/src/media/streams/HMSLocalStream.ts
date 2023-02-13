@@ -91,8 +91,4 @@ export default class HMSLocalStream extends HMSMediaStream {
       HMSLogger.e(this.TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
   }
-
-  trackUpdate(track: HMSLocalTrack) {
-    this.connection?.trackUpdate(track);
-  }
 }

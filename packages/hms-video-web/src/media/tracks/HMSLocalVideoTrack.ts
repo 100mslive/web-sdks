@@ -109,7 +109,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
-    (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
   /**
