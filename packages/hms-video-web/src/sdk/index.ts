@@ -642,7 +642,7 @@ export class HMSSdk implements HMSInterface {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
-  async removeTrack(trackId: string) {
+  async removeTrack(trackId: string, internal = false) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot removeTrack');
     }
@@ -655,10 +655,8 @@ export class HMSSdk implements HMSInterface {
         await track.cleanup();
       }
       // Stop local playback when playlist track is removed
-      if (track.source === 'audioplaylist') {
-        this.playlistManager.stop(HMSPlaylistType.audio);
-      } else if (track.source === 'videoplaylist') {
-        this.playlistManager.stop(HMSPlaylistType.video);
+      if (!internal) {
+        this.stopPlaylist(track);
       }
       this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
@@ -1130,4 +1128,12 @@ export class HMSSdk implements HMSInterface {
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
     this.analyticsEventsService.queue(event).flush();
   };
+
+  private stopPlaylist(track: HMSLocalTrack) {
+    if (track.source === 'audioplaylist') {
+      this.playlistManager.stop(HMSPlaylistType.audio);
+    } else if (track.source === 'videoplaylist') {
+      this.playlistManager.stop(HMSPlaylistType.video);
+    }
+  }
 }
