@@ -195,7 +195,7 @@ export class DeviceManager implements HMSDeviceManager {
       // false positives when device is removed, because the other available device
       // get's the deviceId as default once this device is removed
       const nextDevice = this.audioInput.find(device => {
-        return device.label !== defaultDevice.label && defaultDevice.label.includes(device.label);
+        return defaultDevice.label.includes(device.label);
       });
       return nextDevice;
     }
