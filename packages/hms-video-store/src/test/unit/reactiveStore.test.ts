@@ -79,7 +79,7 @@ describe('test reactive store', () => {
     const oldPeer = store.getState(selectLocalPeer);
     store.setState(draft => {
       if (oldPeer?.name) {
-        draft.peers[localPeer.id].name = oldPeer?.name;
+        draft.peers[localPeer.id].name = oldPeer.name;
       }
     });
     doUnrelatedChange();

@@ -731,7 +731,7 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+      if (localPeer?.id) {
         Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
       }
     }, 'deviceChange');
