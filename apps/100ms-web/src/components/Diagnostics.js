@@ -54,10 +54,10 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
   );
 };
 
+const env = process.env.REACT_APP_ENV;
 const Diagnostics = () => {
   const [result, setResult] = useState([]);
   const [inProgress, setInProgress] = useState(false);
-
   const tokenEndpoint = useTokenEndpoint();
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const [token, setToken] = useState(null);
@@ -102,7 +102,10 @@ const Diagnostics = () => {
           setResult([]);
           setInProgress(true);
           await diagnostics.start(
-            { authToken: token, initEndpoint: "https://qa-init.100ms.live/" },
+            {
+              authToken: token,
+              initEndpoint: `https://${env}-init.100ms.live/`,
+            },
             {
               onUpdate: (result, path) => {
                 setResult(res =>
