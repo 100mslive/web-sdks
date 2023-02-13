@@ -51,8 +51,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     if (!this.hasSinks()) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Track does not have any sink, saving ${layer}, source=${this.source}`,
+        `[Remote Track] ${this.logIdentifier}
+        streamId=${this.stream.id} 
+        trackId=${this.trackId}
+        saving ${layer}, source=${this.source}
+        Track does not have any sink`,
       );
       return;
     }
@@ -116,11 +119,15 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
-      `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from sfu`,
-      `currLayer=${layerUpdate.current_layer}, preferredLayer=${layerUpdate.expected_layer}`,
-      `sub_degraded=${layerUpdate.subscriber_degraded}`,
-      `pub_degraded=${layerUpdate.publisher_degraded}`,
-      `isDegraded=${this._degraded}`,
+      `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id} 
+      trackId=${this.trackId}
+      layer update from sfu
+      currLayer=${layerUpdate.current_layer}
+      preferredLayer=${layerUpdate.expected_layer}
+      sub_degraded=${layerUpdate.subscriber_degraded}
+      pub_degraded=${layerUpdate.publisher_degraded}
+      isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
@@ -162,12 +169,20 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         this.logIdentifier,
         source,
       );
-      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${this.source}`);
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Requested layer ${layer}, source=${this.source}`,
+      );
       return response;
     } catch (error) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Failed to set layer ${layer}, source=${this.source}
+      error=${(error as Error).message}`,
       );
       throw error;
     }
