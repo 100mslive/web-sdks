@@ -258,6 +258,7 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
     const newSelection = this.getNewAudioInputDevice();
+    console.error('audio input change device', newSelection);
     if (!newSelection || !newSelection.deviceId) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
