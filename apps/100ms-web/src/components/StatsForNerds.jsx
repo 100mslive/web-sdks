@@ -211,8 +211,8 @@ const LocalPeerStats = () => {
       <StatsRow
         label="Round Trip Time"
         value={(
-          ((stats.publish?.totalRoundTripTime || "") +
-            (stats.subscribe?.totalRoundTripTime || "")) /
+          ((stats.publish?.currentRoundTripTime || "") +
+            (stats.subscribe?.currentRoundTripTime || "")) /
           2
         ).toFixed(3)}
       />
