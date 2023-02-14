@@ -159,7 +159,6 @@ interface RetryContext {
   retryCount: number;
   error: HMSException | null;
   success: boolean;
-  maxRetries: number;
 }
 
 interface RetryEventObject {
@@ -167,7 +166,7 @@ interface RetryEventObject {
   data?: HMSException;
 }
 
-export const createRetryMachine = (task: () => Promise<any> | any) =>
+export const createRetryMachine = (task: () => Promise<any> | any, maxRetries = 5) =>
   createMachine<RetryContext, RetryEventObject>({
     id: 'retryMachine',
     initial: 'idle',
@@ -175,7 +174,6 @@ export const createRetryMachine = (task: () => Promise<any> | any) =>
       retryCount: 0,
       error: null,
       success: false,
-      maxRetries: 5,
     },
     states: {
       idle: {
@@ -201,8 +199,8 @@ export const createRetryMachine = (task: () => Promise<any> | any) =>
       error: {
         on: {
           SCHEDULE: [
-            { target: 'schedule', cond: context => context.retryCount < context.maxRetries },
-            { target: 'failed', cond: context => context.retryCount >= context.maxRetries },
+            { target: 'schedule', cond: context => context.retryCount < maxRetries },
+            { target: 'failed', cond: context => context.retryCount >= maxRetries },
           ],
         },
         entry: [
