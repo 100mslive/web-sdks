@@ -10,7 +10,7 @@ import {
   HMSVideoTrack,
 } from '../schema';
 
-export function getScreenSharesByPeer(tracks: Record<HMSTrackID, HMSTrack>, peer: HMSPeer | null) {
+export function getScreenSharesByPeer(tracks: Record<HMSTrackID, HMSTrack>, peer?: HMSPeer | null) {
   let videoTrack = undefined;
   let audioTrack = undefined;
   if (peer) {

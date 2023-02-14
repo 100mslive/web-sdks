@@ -102,6 +102,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         track = await this.replaceTrackWithBlank();
       }
       await this.replaceSender(track, value);
+      this.nativeTrack?.stop();
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
