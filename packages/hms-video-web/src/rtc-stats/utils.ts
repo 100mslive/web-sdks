@@ -2,9 +2,11 @@ import { HMSWebrtcStats } from './HMSWebrtcStats';
 import {
   HMSPeerStats,
   HMSTrackStats,
+  MissingInboundStats,
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
@@ -17,11 +19,14 @@ export const getLocalTrackStats = async (
 ): Promise<Record<string, HMSTrackStats> | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   const trackStats: Record<string, HMSTrackStats> = {};
+  if (!(track.stream as HMSLocalStream).hasSender(track)) {
+    return;
+  }
   try {
     trackReport = await getStats['publish']?.(track.getTrackBeingSent());
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
-    const inbound: Record<string, RTCInboundRtpStreamStats> = {};
+    const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
     trackReport?.forEach(stat => {
       switch (stat.type) {
         case 'outbound-rtp':
@@ -52,13 +57,15 @@ export const getLocalTrackStats = async (
         bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
         packetsLost: inStats?.packetsLost,
         jitter: inStats?.jitter,
+        roundTripTime: inStats?.roundTripTime,
+        totalRoundTripTime: inStats?.totalRoundTripTime,
         peerName,
         peerID: track.peerId,
         codec,
       };
     });
   } catch (err) {
-    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err, (err as Error).name);
   }
   return trackStats;
 };
