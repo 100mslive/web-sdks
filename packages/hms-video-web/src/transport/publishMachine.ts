@@ -10,6 +10,7 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
     connection: RTCPeerConnection | null;
     candidates: Set<RTCIceCandidateInit>;
     trackStates: Map<string, TrackState>;
+    connectionState: RTCPeerConnectionState;
   }>({
     id: 'peerConnectionMachine',
     initial: 'init',
@@ -17,13 +18,16 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
       connection: null,
       candidates: new Set(),
       trackStates: new Map<string, TrackState>(),
+      connectionState: 'new',
     },
     on: {
-      connected: 'connected',
-      disconnected: 'disconnected',
-      connecting: 'connecting',
-      closed: 'closed',
-      failed: 'failed',
+      connectionState: {
+        actions: context => {
+          if (context.connection) {
+            context.connectionState = context.connection.connectionState;
+          }
+        },
+      },
       trickle: {
         actions: (context, event) => {
           if (!context.connection?.remoteDescription) {
@@ -33,7 +37,9 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
           }
         },
       },
+      retry: 'retry',
       join: 'join',
+      failure: 'failure',
       negotiate: 'negotiate',
       publish: {
         actions: async (context, event) => {
@@ -59,13 +65,25 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
               protocol: 'SCTP',
             });
             context.connection.onconnectionstatechange = () => {
-              console.error('connectionstate', context.connection?.connectionState);
-              send({ type: context.connection?.connectionState! });
+              if (context.connection) {
+                console.error('connectionstate', context.connection.connectionState);
+                send({ type: 'connectionState' });
+                switch (context.connection.connectionState) {
+                  case 'disconnected':
+                  case 'failed':
+                    send({ type: 'retry' });
+                    break;
+                  case 'closed':
+                    send({ type: 'failure' });
+                    break;
+                  default:
+                    break;
+                }
+              }
             };
 
             context.connection.onicecandidate = ({ candidate }) => {
               if (candidate) {
-                console.error({ candidate });
                 signal.trickle(HMSConnectionRole.Publish, candidate);
               }
             };
@@ -78,20 +96,7 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
           },
         },
       },
-      connecting: {},
-      connected: {},
-      disconnected: {
-        invoke: {
-          src: () => send => {
-            const retryMachine = createRetryMachine(() => send({ type: 'negotiate', iceRestart: true }));
-            const service = interpret(retryMachine).start();
-            service.onDone(event => {
-              console.error('retry done', event);
-            });
-          },
-        },
-      },
-      failed: {
+      retry: {
         invoke: {
           src: () => send => {
             const retryMachine = createRetryMachine(() => send({ type: 'negotiate', iceRestart: true }));
@@ -140,7 +145,8 @@ export const peerConnectionMachine = (config: RTCConfiguration, signal: ISignal)
           },
         },
       },
-      closed: {
+      failure: {
+        type: 'final',
         entry: assign({
           connection: null,
           candidates: new Set(),
