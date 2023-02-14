@@ -210,11 +210,11 @@ const LocalPeerStats = () => {
       />
       <StatsRow
         label="Round Trip Time"
-        value={stats.publish?.totalRoundTripTime}
-      />
-      <StatsRow
-        label="Round Trip Time"
-        value={stats.subscribe?.totalRoundTripTime}
+        value={(
+          ((stats.publish?.totalRoundTripTime || "") +
+            (stats.subscribe?.totalRoundTripTime || "")) /
+          2
+        ).toFixed(3)}
       />
     </Flex>
   );
