@@ -6,6 +6,7 @@ import {
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
@@ -18,6 +19,9 @@ export const getLocalTrackStats = async (
 ): Promise<Record<string, HMSTrackStats> | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   const trackStats: Record<string, HMSTrackStats> = {};
+  if (!(track.stream as HMSLocalStream).hasSender(track)) {
+    return;
+  }
   try {
     trackReport = await getStats['publish']?.(track.getTrackBeingSent());
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
