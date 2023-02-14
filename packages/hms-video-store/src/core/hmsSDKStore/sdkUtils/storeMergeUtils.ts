@@ -1,5 +1,5 @@
 import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
-import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSStore, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
@@ -49,16 +49,6 @@ export const mergeNewTracksInDraft = (
     } else if (isEntityAdded(oldTrack, newTrack)) {
       draftTracks[trackID] = newTrack as HMSTrack;
     }
-  }
-};
-
-export const mergeNewPreviewInDraft = (draftPreview: HMSStore['preview'], newPreview: HMSStore['preview']) => {
-  draftPreview.localPeer = newPreview.localPeer;
-  draftPreview.asRole = newPreview.asRole;
-  draftPreview.videoTrack = newPreview.videoTrack;
-  draftPreview.audioTrack = newPreview.audioTrack;
-  if (areArraysEqual(draftPreview.auxiliaryTracks, newPreview.auxiliaryTracks)) {
-    draftPreview.auxiliaryTracks = newPreview.auxiliaryTracks;
   }
 };
 

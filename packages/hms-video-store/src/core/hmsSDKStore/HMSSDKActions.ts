@@ -23,12 +23,7 @@ import {
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import {
-  areArraysEqual,
-  mergeNewPeersInDraft,
-  mergeNewPreviewInDraft,
-  mergeNewTracksInDraft,
-} from './sdkUtils/storeMergeUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
@@ -59,6 +54,7 @@ import {
   HMSRoleChangeRequest,
   selectHMSMessagesCount,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -820,7 +816,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
-    const newPreview: HMSStore['preview'] = { auxiliaryTracks: [] };
+    const newPreview: HMSStore['preview'] = {};
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -862,9 +858,18 @@ export class HMSSDKActions implements IHMSActions {
       // the order of below statements are important as merge functions are mutating
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
-      mergeNewPreviewInDraft(draftStore.preview, newPreview);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+
+      /**
+       * if preview is already present merge,
+       * else set as is(which will create/delete)
+       */
+      if (draftStore.preview?.localPeer && newPreview.localPeer) {
+        Object.assign(draftStore.preview, newPreview);
+      } else {
+        draftStore.preview = newPreview;
+      }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
@@ -1180,12 +1185,10 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
-    /**
-     * asRole is present in preview(either original role or config.asRole)
-     * if asRole is absent then room is not in preview, so clear preview fields
-     */
-    if (!sdkLocalPeer.asRole) {
-      return { auxiliaryTracks: [] };
+    // if room is not in preview, clear preview fields
+    const isInPreview = this.store.getState(selectIsInPreview);
+    if (!isInPreview) {
+      return;
     }
 
     const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
@@ -1194,8 +1197,7 @@ export class HMSSDKActions implements IHMSActions {
       localPeer: hmsLocalPeer.id,
       audioTrack: hmsLocalPeer.audioTrack,
       videoTrack: hmsLocalPeer.videoTrack,
-      auxiliaryTracks: hmsLocalPeer.auxiliaryTracks || [],
-      asRole: sdkLocalPeer.asRole.name,
+      asRole: sdkLocalPeer.asRole?.name || sdkLocalPeer.role?.name,
     };
   }
 
