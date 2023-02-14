@@ -190,7 +190,6 @@ export class DeviceManager implements HMSDeviceManager {
    */
   getNewAudioInputDevice() {
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
-    console.error('default device', defaultDevice);
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
       // false positives when device is removed, because the other available device
@@ -198,8 +197,6 @@ export class DeviceManager implements HMSDeviceManager {
       const nextDevice = this.audioInput.find(device => {
         return device.deviceId !== 'default' && defaultDevice.label.includes(device.label);
       });
-      console.error('next device', nextDevice);
-
       return nextDevice;
     }
     return this.audioInput[0];
@@ -258,7 +255,6 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
     const newSelection = this.getNewAudioInputDevice();
-    console.error('audio input change device', newSelection);
     if (!newSelection || !newSelection.deviceId) {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
