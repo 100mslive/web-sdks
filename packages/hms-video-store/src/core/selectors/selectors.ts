@@ -393,7 +393,7 @@ export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesM
   localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
 );
 
-export const selectPreviewRoleName = (store: HMSStore) => store.preview.asRole;
+export const selectPreviewRoleName = (store: HMSStore) => store.preview?.asRole;
 
 /**
  * Select the {@link HMSRole} used for preview.

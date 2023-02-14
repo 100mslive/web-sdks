@@ -61,7 +61,7 @@ interface BaseTrack {
   deviceID?: string;
   plugins?: string[];
   /**
-   * present only for local tracks to denote if a track has been published or not
+   * only applicable for local tracks - to denote if a track has been published or not
    * false for preview tracks
    */
   isPublished?: boolean;

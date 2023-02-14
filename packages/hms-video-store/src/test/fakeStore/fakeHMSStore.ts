@@ -285,7 +285,6 @@ export const makeFakeStore = (): HMSStore => {
       asRole: ROLES.HOST,
       videoTrack: '101',
       audioTrack: '102',
-      auxiliaryTracks: [],
     },
     errors: [],
   };
