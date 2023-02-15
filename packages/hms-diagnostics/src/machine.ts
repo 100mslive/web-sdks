@@ -2,7 +2,13 @@ import { createMachine } from 'xstate';
 import { decodeJWT, HMSSdk, validateMediaDevicesExistence, validateRTCPeerConnection } from '@100mslive/hms-video';
 import { initialState } from './initial-state';
 import { DiagnosticContext } from './interfaces';
-import { checkCamera, DEFAULT_DIAGNOSTICS_USERNAME, getIceCandidateType, PROD_INIT_ENDPOINT } from './utils';
+import {
+  checkCamera,
+  checkMicrophone,
+  DEFAULT_DIAGNOSTICS_USERNAME,
+  getIceCandidateType,
+  PROD_INIT_ENDPOINT,
+} from './utils';
 
 export const diagnosticsMachine = (sdk: HMSSdk) =>
   createMachine<DiagnosticContext>({
@@ -103,7 +109,7 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
             pc.onicecandidateerror = e => console.error(e);
             pc.onicegatheringstatechange = () => {
               if (pc.iceGatheringState === 'complete') {
-                send({ type: 'STOP' });
+                send({ type: 'NEXT' });
               }
             };
             pc.onicecandidate = e => {
@@ -133,8 +139,8 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
               context.results.devices.success = true;
               const camera = await checkCamera();
               context.results.devices.camera = { ...camera, id: 'camera' };
-              const microphone = await checkCamera();
-              context.results.devices.camera = { ...microphone, id: 'microphone' };
+              const microphone = await checkMicrophone();
+              context.results.devices.microphone = { ...microphone, id: 'microphone' };
               send({ type: 'STOP' });
             } catch (error) {
               context.results.devices.success = false;
