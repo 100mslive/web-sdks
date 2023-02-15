@@ -816,7 +816,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
-    const newPreview: HMSStore['preview'] = {};
+    let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -839,7 +839,7 @@ export class HMSSDKActions implements IHMSActions {
 
       if (sdkPeer.isLocal) {
         const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
-        Object.assign(newPreview, this.getPreviewFields(localPeer));
+        newPreview = this.getPreviewFields(localPeer);
         Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
@@ -865,7 +865,7 @@ export class HMSSDKActions implements IHMSActions {
        * if preview is already present merge,
        * else set as is(which will create/delete)
        */
-      if (draftStore.preview?.localPeer && newPreview.localPeer) {
+      if (draftStore.preview?.localPeer && newPreview?.localPeer) {
         Object.assign(draftStore.preview, newPreview);
       } else {
         draftStore.preview = newPreview;
