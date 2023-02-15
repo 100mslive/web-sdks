@@ -5,12 +5,25 @@ export interface HMSDiagnosticsOutputValue {
   info?: Record<string, any>;
 }
 
+export enum iceConnectionTypes {
+  stunUDP = 'stunUDP',
+  stunTCP = 'stunTCP',
+  turnUDP = 'turnUDP',
+  turnTCP = 'turnTCP',
+}
+
+export interface DiagnosticContext {
+  results: HMSDiagnosticsOutput;
+  config: HMSDiagnosticsConfig;
+  initConfig: { endpoint: string; rtcConfiguration: RTCConfiguration };
+}
+
 export interface HMSDiagnosticsOutput {
   connectivity: {
-    stunUDP: HMSDiagnosticsOutputValue;
-    stunTCP: HMSDiagnosticsOutputValue;
-    turnUDP: HMSDiagnosticsOutputValue;
-    turnTCP: HMSDiagnosticsOutputValue;
+    [iceConnectionTypes.stunUDP]: HMSDiagnosticsOutputValue;
+    [iceConnectionTypes.stunTCP]: HMSDiagnosticsOutputValue;
+    [iceConnectionTypes.turnUDP]: HMSDiagnosticsOutputValue;
+    [iceConnectionTypes.turnTCP]: HMSDiagnosticsOutputValue;
     init: HMSDiagnosticsOutputValue;
     websocket: HMSDiagnosticsOutputValue;
   };
@@ -24,7 +37,7 @@ export interface HMSDiagnosticsOutput {
 }
 
 export interface HMSDiagnosticUpdateListener {
-  onUpdate: (output: HMSDiagnosticsOutputValue, path: string) => void;
+  onUpdate: (output: HMSDiagnosticsOutput) => void;
 }
 
 export interface HMSDiagnosticsConfig {

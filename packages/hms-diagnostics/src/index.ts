@@ -1,11 +1,10 @@
 import cloneDeep from 'lodash.clonedeep';
 import setInObject from 'lodash.set';
+import { interpret } from 'xstate';
 import type { InitConfig } from '@100mslive/hms-video';
 import {
-  BuildGetMediaError,
   decodeJWT,
   HMSException,
-  HMSGetMediaActions,
   HMSSdk,
   validateMediaDevicesExistence,
   validateRTCPeerConnection,
@@ -13,11 +12,13 @@ import {
 import { initialState } from './initial-state';
 import type { ConnectivityKeys, HMSDiagnosticsConfig } from './interfaces';
 import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
+import { diagnosticsMachine } from './machine';
 import { DEFAULT_DIAGNOSTICS_USERNAME, PROD_INIT_ENDPOINT } from './utils';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
   private listener?: HMSDiagnosticUpdateListener;
+  private service = interpret(diagnosticsMachine(new HMSSdk())).start();
 
   constructor() {
     this.result = cloneDeep(initialState);
@@ -29,10 +30,22 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     /**
      * @TODO check WebRTC only for publishing and subscribing roles, check HMSTransport.doesRoleNeedWebRTC
      */
-    this.checkwebRTC();
+    /* this.checkwebRTC();
     await this.checkConnectivity(config);
     await this.checkDevices();
-    return this.result;
+    return this.result; */
+
+    this.service.onTransition(state => {
+      console.error(state.context.results);
+      this.listener?.onUpdate(state.context.results);
+    });
+    console.error(this.service.initialState);
+    this.service.send({ type: 'START', config });
+    return new Promise<HMSDiagnosticsOutput>(resolve => {
+      this.service.onDone(() => {
+        resolve(this.service.machine.context.results);
+      });
+    });
   }
 
   async checkConnectivity(config: HMSDiagnosticsConfig) {
@@ -55,8 +68,8 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     try {
       validateMediaDevicesExistence();
       this.updateStatus({ path: 'devices' });
-      await this.checkCamera();
-      await this.checkMicrophone();
+      // await this.checkCamera();
+      // await this.checkMicrophone();
     } catch (error) {
       this.updateStatus({
         path: 'devices',
@@ -146,56 +159,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     });
   }
 
-  private async checkCamera() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const videoTrack = stream.getVideoTracks()[0];
-      const settings = videoTrack.getSettings();
-      this.updateStatus({
-        path: 'devices.camera',
-        info: {
-          deviceId: settings.deviceId,
-          groupId: settings.groupId,
-          label: videoTrack.label,
-        },
-      });
-      videoTrack.stop();
-    } catch (error) {
-      const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
-      this.updateStatus({
-        path: 'devices.camera',
-        info: exception,
-        errorMessage: exception.message,
-        success: false,
-      });
-    }
-  }
-
-  private async checkMicrophone() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioTrack = stream.getAudioTracks()[0];
-      const settings = audioTrack.getSettings();
-      this.updateStatus({
-        path: 'devices.microphone',
-        info: {
-          deviceId: settings.deviceId,
-          groupId: settings.groupId,
-          label: audioTrack.label,
-        },
-      });
-      audioTrack.stop();
-    } catch (error) {
-      const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
-      this.updateStatus({
-        path: 'devices.microphone',
-        success: false,
-        errorMessage: exception.message,
-        info: exception,
-      });
-    }
-  }
-
   private async checkInit(config: HMSDiagnosticsConfig) {
     const sdk = new HMSSdk();
     const { roomId } = decodeJWT(config.authToken);
@@ -225,7 +188,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
   private updateStatus({
     path,
-    id = path,
     success = true,
     errorMessage = '',
     info,
@@ -237,6 +199,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     info?: Record<string, any>;
   }) {
     setInObject(this.result, path, { success, errorMessage, info });
-    this.listener?.onUpdate({ id, success, errorMessage, info }, path);
+    // this.listener?.onUpdate({ id, success, errorMessage, info });
   }
 }

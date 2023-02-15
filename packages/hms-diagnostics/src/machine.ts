@@ -1,21 +1,15 @@
-import cloneDeep from 'lodash.clonedeep';
 import { createMachine } from 'xstate';
-import { decodeJWT, HMSSdk, validateRTCPeerConnection } from '@100mslive/hms-video';
+import { decodeJWT, HMSSdk, validateMediaDevicesExistence, validateRTCPeerConnection } from '@100mslive/hms-video';
 import { initialState } from './initial-state';
-import { HMSDiagnosticsConfig, HMSDiagnosticsOutput } from './interfaces';
-import { DEFAULT_DIAGNOSTICS_USERNAME, PROD_INIT_ENDPOINT } from './utils';
+import { DiagnosticContext } from './interfaces';
+import { checkCamera, DEFAULT_DIAGNOSTICS_USERNAME, getIceCandidateType, PROD_INIT_ENDPOINT } from './utils';
 
-interface DiagnosticContext {
-  results: HMSDiagnosticsOutput;
-  config: HMSDiagnosticsConfig;
-  initConfig: { endpoint: string; rtcConfiguration: RTCConfiguration };
-}
 export const diagnosticsMachine = (sdk: HMSSdk) =>
   createMachine<DiagnosticContext>({
     id: 'diagnostics',
     initial: 'idle',
     context: {
-      results: cloneDeep(initialState),
+      results: initialState,
       config: {
         authToken: '',
         initEndpoint: '',
@@ -41,6 +35,9 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
         },
       },
       webrtc: {
+        on: {
+          NEXT: 'connectivity',
+        },
         invoke: {
           src: context => send => {
             let success = false;
@@ -51,7 +48,7 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
               context.results.webRTC.errorMessage = (error as Error).message;
             }
             context.results.webRTC.success = success;
-            send('connectivity');
+            send({ type: 'NEXT' });
           },
         },
       },
@@ -60,7 +57,7 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
           NEXT: 'iceConnection',
         },
         invoke: {
-          src: context => send => {
+          src: context => async send => {
             const { config } = context;
             const { roomId } = decodeJWT(config.authToken);
             // @ts-ignore
@@ -85,6 +82,7 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
               context.results.connectivity.init.info = initConfig;
               context.initConfig.endpoint = initConfig.endpoint;
               context.initConfig.rtcConfiguration = initConfig.rtcConfiguration;
+              context.results.connectivity.websocket.success = true;
               send({ type: 'NEXT' });
             } catch (err) {
               context.results.connectivity.init.success = false;
@@ -94,8 +92,57 @@ export const diagnosticsMachine = (sdk: HMSSdk) =>
           },
         },
       },
-      iceConnection: {},
-      devices: {},
+      iceConnection: {
+        on: {
+          NEXT: 'devices',
+        },
+        invoke: {
+          src: context => async send => {
+            const pc = new RTCPeerConnection(context.initConfig.rtcConfiguration);
+            pc.createDataChannel('');
+            pc.onicecandidateerror = e => console.error(e);
+            pc.onicegatheringstatechange = () => {
+              if (pc.iceGatheringState === 'complete') {
+                send({ type: 'STOP' });
+              }
+            };
+            pc.onicecandidate = e => {
+              if (!e.candidate) {
+                return;
+              }
+              const iceCandidateType = getIceCandidateType(e.candidate);
+              if (iceCandidateType) {
+                context.results.connectivity[iceCandidateType] = {
+                  info: e.candidate,
+                  success: true,
+                  errorMessage: '',
+                  id: e.candidate.candidate,
+                };
+              }
+            };
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+          },
+        },
+      },
+      devices: {
+        invoke: {
+          src: context => async send => {
+            try {
+              validateMediaDevicesExistence();
+              context.results.devices.success = true;
+              const camera = await checkCamera();
+              context.results.devices.camera = { ...camera, id: 'camera' };
+              const microphone = await checkCamera();
+              context.results.devices.camera = { ...microphone, id: 'microphone' };
+              send({ type: 'STOP' });
+            } catch (error) {
+              context.results.devices.success = false;
+              context.results.devices.errorMessage = (error as Error).message;
+            }
+          },
+        },
+      },
       stop: {
         type: 'final',
       },

@@ -17,6 +17,7 @@ import { QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
 
 const diagnostics = new HMSDiagnostics();
 
+// eslint-disable-next-line no-unused-vars
 const DiagnosticsItem = ({ title, properties } = {}) => {
   if (!title || !properties) {
     return null;
@@ -94,7 +95,10 @@ const Diagnostics = () => {
   }
 
   return (
-    <Flex direction="column" css={{ size: "100%", overflowY: "auto" }}>
+    <Flex
+      direction="column"
+      css={{ size: "100%", overflowY: "auto", color: "$white" }}
+    >
       <Button
         disabled={inProgress}
         css={{ width: 200, m: "$8" }}
@@ -107,10 +111,8 @@ const Diagnostics = () => {
               initEndpoint: `https://${env}-init.100ms.live/`,
             },
             {
-              onUpdate: (result, path) => {
-                setResult(res =>
-                  res.concat({ ...result, title: path.split(".").at(-1) })
-                );
+              onUpdate: results => {
+                setResult({ ...results });
               },
             }
           );
@@ -118,24 +120,7 @@ const Diagnostics = () => {
       >
         Start Diagnostics
       </Button>
-      {result && (
-        <Accordion.Root
-          type="single"
-          defaultValue="WebRTC"
-          collapsible
-          css={{ w: "50%", r: "$1", m: "$8" }}
-        >
-          {result.map(item => {
-            return (
-              <DiagnosticsItem
-                key={item.id}
-                title={item.title}
-                properties={item}
-              />
-            );
-          })}
-        </Accordion.Root>
-      )}
+      {result && <pre>{JSON.stringify(result, null, 4)}</pre>}
     </Flex>
   );
 };
