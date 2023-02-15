@@ -382,7 +382,7 @@ export class HMSSdk implements HMSInterface {
 
     const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
-    const previewRole = this.localPeer?.asRole?.name;
+    const previewRole = this.localPeer?.asRole?.name || this.localPeer?.role?.name;
     this.networkTestManager?.stop();
     this.listener = listener;
     this.commonSetup(config, roomId, listener);
