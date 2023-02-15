@@ -142,7 +142,7 @@ const selectTracks = createSelector(selectTracksMap, storeTracks => {
 /**
  * Select the local peer object object assigned to you.
  */
-export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers) => {
+export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers): HMSPeer | undefined => {
   return peers[room.localPeer];
 });
 
@@ -189,7 +189,7 @@ const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => pee
 export const selectLocalTrackIDs = createSelector(
   [selectLocalAudioTrackID, selectLocalVideoTrackID, selectLocalAuxiliaryTrackIDs],
   (audioTrackID, videoTrackID, auxiliaryTrackIDs) => {
-    const trackIDs: string[] = [...auxiliaryTrackIDs];
+    const trackIDs: string[] = auxiliaryTrackIDs ? [...auxiliaryTrackIDs] : [];
     audioTrackID && trackIDs.unshift(audioTrackID);
     videoTrackID && trackIDs.unshift(videoTrackID);
     return trackIDs;
