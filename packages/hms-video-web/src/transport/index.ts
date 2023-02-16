@@ -138,7 +138,7 @@ export default class HMSTransport implements ITransport {
         this.signal.answer(answer);
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
-        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌');
+        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
         this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
@@ -146,9 +146,8 @@ export default class HMSTransport implements ITransport {
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
-
+        this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
-        throw ex;
       }
     },
 
