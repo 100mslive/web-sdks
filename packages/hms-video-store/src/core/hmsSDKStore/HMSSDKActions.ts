@@ -731,8 +731,8 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (this.hmsSDKPeers[localPeer?.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -1201,7 +1201,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private localAndVideoUnmuting(trackID: string) {
     const localPeer = this.store.getState(selectLocalPeer);
-    if (localPeer.videoTrack !== trackID) {
+    if (localPeer?.videoTrack !== trackID) {
       return false;
     }
     const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);
