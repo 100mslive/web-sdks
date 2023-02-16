@@ -28,7 +28,7 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
         settings.brand_color
       }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
         apiBasePath + window.location.hostname
-      }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
+      }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\n`;
     },
     [settings.tile_shape, settings.brand_color, settings.theme, settings.font],
   );
