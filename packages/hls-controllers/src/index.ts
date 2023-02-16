@@ -1,4 +1,4 @@
-import { HLSControllerEvents } from './controllers/constants';
-import { HLSController, LevelParsed } from './controllers/HLSController';
-export type { LevelParsed, HLSControllerEvents };
-export { HLSController };
+import { HMSHLSControllerEvents } from './controllers/constants';
+import { HMSHLSController, LevelParsed } from './controllers/HLSController';
+export type { LevelParsed, HMSHLSControllerEvents };
+export { HMSHLSController };

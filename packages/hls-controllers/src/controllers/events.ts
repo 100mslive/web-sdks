@@ -1,28 +1,31 @@
 import { LevelParsed } from 'hls.js';
-import { HLSControllerEvents } from './constants';
+import { HMSHLSControllerEvents } from './constants';
 
-export declare interface HLSControllerListeners {
-  [HLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE]: (
-    event: HLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE,
+export declare interface HMSHLSControllerListeners {
+  [HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE]: (
+    event: HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE,
     data: HLSStreamLive,
   ) => void;
-  [HLSControllerEvents.HLS_TIMED_METADATA_LOADED]: (
-    event: HLSControllerEvents.HLS_TIMED_METADATA_LOADED,
+  [HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED]: (
+    event: HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED,
     data: HLSTimedMetadataPayload,
   ) => void;
 
-  [HLSControllerEvents.HLS_PLAY]: (event: HLSControllerEvents.HLS_PLAY, data: boolean) => void;
-  [HLSControllerEvents.HLS_PAUSE]: (event: HLSControllerEvents.HLS_PAUSE, data: boolean) => void;
-  [HLSControllerEvents.HLS_CURRENT_TIME]: (event: HLSControllerEvents.HLS_CURRENT_TIME, data: number) => void;
-  [HLSControllerEvents.HLS_AUTOPLAY_BLOCKED]: (event: HLSControllerEvents.HLS_AUTOPLAY_BLOCKED, data: boolean) => void;
+  [HMSHLSControllerEvents.HLS_PLAY]: (event: HMSHLSControllerEvents.HLS_PLAY, data: boolean) => void;
+  [HMSHLSControllerEvents.HLS_PAUSE]: (event: HMSHLSControllerEvents.HLS_PAUSE, data: boolean) => void;
+  [HMSHLSControllerEvents.HLS_CURRENT_TIME]: (event: HMSHLSControllerEvents.HLS_CURRENT_TIME, data: number) => void;
+  [HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED]: (
+    event: HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED,
+    data: boolean,
+  ) => void;
 
-  [HLSControllerEvents.HLS_MANIFEST_LOADED]: (
-    event: HLSControllerEvents.HLS_MANIFEST_LOADED,
+  [HMSHLSControllerEvents.HLS_MANIFEST_LOADED]: (
+    event: HMSHLSControllerEvents.HLS_MANIFEST_LOADED,
     data: HLSManifestLoaded,
   ) => void;
 
-  [HLSControllerEvents.HLS_LEVEL_UPDATED]: (
-    event: HLSControllerEvents.HLS_LEVEL_UPDATED,
+  [HMSHLSControllerEvents.HLS_LEVEL_UPDATED]: (
+    event: HMSHLSControllerEvents.HLS_LEVEL_UPDATED,
     data: HLSLevelUpdated,
   ) => void;
 }
@@ -41,31 +44,31 @@ export declare interface HLSManifestLoaded {
 export declare interface HLSLevelUpdated {
   level: LevelParsed;
 }
-export interface HlsControllerEventEmitter {
-  on<E extends keyof HLSControllerListeners, Context = undefined>(
+export interface HMSHLSControllerEventEmitter {
+  on<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener: HLSControllerListeners[E],
+    listener: HMSHLSControllerListeners[E],
     context?: Context,
   ): void;
-  once<E extends keyof HLSControllerListeners, Context = undefined>(
+  once<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener: HLSControllerListeners[E],
+    listener: HMSHLSControllerListeners[E],
     context?: Context,
   ): void;
 
-  removeAllListeners<E extends keyof HLSControllerListeners>(event?: E): void;
-  off<E extends keyof HLSControllerListeners, Context = undefined>(
+  removeAllListeners<E extends keyof HMSHLSControllerListeners>(event?: E): void;
+  off<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener?: HLSControllerListeners[E],
+    listener?: HMSHLSControllerListeners[E],
     context?: Context,
     once?: boolean,
   ): void;
 
-  listeners<E extends keyof HLSControllerListeners>(event: E): HLSControllerListeners[E][];
-  emit<E extends keyof HLSControllerListeners>(
+  listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][];
+  emit<E extends keyof HMSHLSControllerListeners>(
     event: E,
     name: E,
-    eventObject: Parameters<HLSControllerListeners[E]>[1],
+    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
   ): boolean;
-  listenerCount<E extends keyof HLSControllerListeners>(event: E): number;
+  listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number;
 }

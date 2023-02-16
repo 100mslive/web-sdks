@@ -1,5 +1,5 @@
 import { Level } from 'hls.js';
-interface IHLSController {
+interface IHMSHLSController {
   /**
    *
    * @returns returns a Number which represents current
@@ -18,4 +18,4 @@ interface IHLSController {
   jumpToLive(): void;
 }
 
-export default IHLSController;
+export default IHMSHLSController;

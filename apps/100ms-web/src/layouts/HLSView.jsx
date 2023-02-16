@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import { HLSController } from "@100mslve/hls-controllers";
+import { HMSHLSController } from "@100mslve/hls-controllers";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -49,7 +49,7 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   /**
-   * initialize HLSController and add event listeners.
+   * initialize HMSHLSController and add event listeners.
    */
   useEffect(() => {
     let videoEl = videoRef.current;
@@ -73,34 +73,34 @@ const HLSView = () => {
     const pauseEventHandler = (_, data) => setIsPaused(data);
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
     if (videoEl && hlsUrl) {
-      hlsController = new HLSController(hlsUrl, videoRef);
+      hlsController = new HMSHLSController(hlsUrl, videoRef);
       hlsController.on(
-        HLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+        HMSHLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
         handleNoLongerLive
       );
       hlsController.on(
-        HLSController.Events.HLS_TIMED_METADATA_LOADED,
+        HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController.on(HLSController.Events.HLS_PLAY, playEventHandler);
-      hlsController.on(HLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController.on(HMSHLSController.Events.HLS_PLAY, playEventHandler);
+      hlsController.on(HMSHLSController.Events.HLS_PAUSE, pauseEventHandler);
       hlsController.on(
-        HLSController.Events.HLS_AUTOPLAY_BLOCKED,
+        HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
         handleAutoplayBlock
       );
 
-      if (HLSController.isMSESupported()) {
+      if (HMSHLSController.isMSESupported()) {
         hlsController.on(
-          HLSController.Events.HLS_MANIFEST_LOADED,
+          HMSHLSController.Events.HLS_MANIFEST_LOADED,
           manifestLoadedHandler
         );
         hlsController.on(
-          HLSController.Events.HLS_LEVEL_UPDATED,
+          HMSHLSController.Events.HLS_LEVEL_UPDATED,
           levelUpdatedHandler
         );
       }
       if (
-        !HLSController.isMSESupported() &&
+        !HMSHLSController.isMSESupported() &&
         videoEl.canPlayType("application/vnd.apple.mpegurl")
       ) {
         setIsMSENotSupported(true);
@@ -108,25 +108,25 @@ const HLSView = () => {
     }
     return () => {
       hlsController?.off(
-        HLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+        HMSHLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
         handleNoLongerLive
       );
       hlsController?.off(
-        HLSController.Events.HLS_TIMED_METADATA_LOADED,
+        HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController?.off(HLSController.Events.HLS_PLAY, playEventHandler);
-      hlsController?.off(HLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController?.off(HMSHLSController.Events.HLS_PLAY, playEventHandler);
+      hlsController?.off(HMSHLSController.Events.HLS_PAUSE, pauseEventHandler);
       hlsController?.off(
-        HLSController.Events.HLS_AUTOPLAY_BLOCKED,
+        HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
         handleAutoplayBlock
       );
       hlsController?.off(
-        HLSController.Events.HLS_MANIFEST_LOADED,
+        HMSHLSController.Events.HLS_MANIFEST_LOADED,
         manifestLoadedHandler
       );
       hlsController?.off(
-        HLSController.Events.HLS_LEVEL_UPDATED,
+        HMSHLSController.Events.HLS_LEVEL_UPDATED,
         levelUpdatedHandler
       );
       hlsController?.reset();

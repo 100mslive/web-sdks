@@ -1,19 +1,19 @@
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter } from 'eventemitter3';
 import Hls, { HlsConfig, Level, LevelParsed } from 'hls.js';
-import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSControllerEvents, IS_OPTIMIZED } from './constants';
-import { HlsControllerEventEmitter, HLSControllerListeners } from './events';
-import IHLSController from '../interfaces/IHLSController';
+import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HMSHLSControllerEvents, IS_OPTIMIZED } from './constants';
+import { HMSHLSControllerEventEmitter, HMSHLSControllerListeners } from './events';
+import IHMSHLSController from '../interfaces/IHLSController';
 import { metadataPayloadParser } from '../utilies/utils';
 
 export type { LevelParsed };
 
-export class HLSController implements IHLSController, HlsControllerEventEmitter {
+export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEventEmitter {
   private hls: Hls;
   private hlsUrl: string;
   private hlsStats: HlsStats;
   private videoRef: React.RefObject<HTMLVideoElement>;
-  private _emitter: HlsControllerEventEmitter;
+  private _emitter: HMSHLSControllerEventEmitter;
   private _subscribeHlsStats?: (() => void) | null = null;
   private isLive: boolean;
   constructor(hlsUrl: string, videoRef: React.RefObject<HTMLVideoElement>) {
@@ -36,8 +36,8 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     this.jumpToLive();
   }
 
-  static get Events(): typeof HLSControllerEvents {
-    return HLSControllerEvents;
+  static get Events(): typeof HMSHLSControllerEvents {
+    return HMSHLSControllerEvents;
   }
   // HLSStats subscribe
   subscribe = (callback: (state: any) => void, interval = 2000) => {
@@ -65,7 +65,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       this.unsubscribe();
     }
 
-    if (HLSController.isMSESupported()) {
+    if (HMSHLSController.isMSESupported()) {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
     }
@@ -123,54 +123,54 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
   }
 
-  on<E extends keyof HLSControllerListeners, Context = undefined>(
+  on<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener: HLSControllerListeners[E],
+    listener: HMSHLSControllerListeners[E],
     context: Context = this as any,
   ) {
     this._emitter.on(event, listener, context);
   }
 
-  once<E extends keyof HLSControllerListeners, Context = undefined>(
+  once<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener: HLSControllerListeners[E],
+    listener: HMSHLSControllerListeners[E],
     context: Context = this as any,
   ) {
     this._emitter.once(event, listener, context);
   }
 
-  removeAllListeners<E extends keyof HLSControllerListeners>(event?: E | undefined) {
+  removeAllListeners<E extends keyof HMSHLSControllerListeners>(event?: E | undefined) {
     this._emitter.removeAllListeners(event);
   }
 
-  off<E extends keyof HLSControllerListeners, Context = undefined>(
+  off<E extends keyof HMSHLSControllerListeners, Context = undefined>(
     event: E,
-    listener?: HLSControllerListeners[E] | undefined,
+    listener?: HMSHLSControllerListeners[E] | undefined,
     context: Context = this as any,
     once?: boolean | undefined,
   ) {
     this._emitter.off(event, listener, context, once);
   }
 
-  listeners<E extends keyof HLSControllerListeners>(event: E): HLSControllerListeners[E][] {
+  listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][] {
     return this._emitter.listeners(event);
   }
 
-  emit<E extends keyof HLSControllerListeners>(
+  emit<E extends keyof HMSHLSControllerListeners>(
     event: E,
     name: E,
-    eventObject: Parameters<HLSControllerListeners[E]>[1],
+    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
   ): boolean {
     return this._emitter.emit(event, name, eventObject);
   }
 
-  listenerCount<E extends keyof HLSControllerListeners>(event: E): number {
+  listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number {
     return this._emitter.listenerCount(event);
   }
 
-  trigger<E extends keyof HLSControllerListeners>(
+  trigger<E extends keyof HMSHLSControllerListeners>(
     event: E,
-    eventObject: Parameters<HLSControllerListeners[E]>[1],
+    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
   ): boolean {
     try {
       return this.emit(event, event, eventObject);
@@ -184,13 +184,13 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
   }
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     this.removeAudioLevels(levels);
-    this.trigger(HLSControllerEvents.HLS_MANIFEST_LOADED, {
+    this.trigger(HMSHLSControllerEvents.HLS_MANIFEST_LOADED, {
       levels,
     });
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLevel: Level = this.hls.levels[level];
-    this.trigger(HLSControllerEvents.HLS_LEVEL_UPDATED, {
+    this.trigger(HMSHLSControllerEvents.HLS_LEVEL_UPDATED, {
       level: {
         attrs: qualityLevel.attrs,
         audioCodec: qualityLevel.audioCodec,
@@ -230,16 +230,16 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       console.debug('Browser blocked autoplay with error', error.toString());
       console.debug('asking user to play the video manually...');
       if (error.name === 'NotAllowedError') {
-        this.trigger(HLSControllerEvents.HLS_AUTOPLAY_BLOCKED, true);
+        this.trigger(HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED, true);
       }
     }
   };
   private playEventHandler = async () => {
     await this.playVideo();
-    this.trigger(HLSControllerEvents.HLS_PLAY, true);
+    this.trigger(HMSHLSControllerEvents.HLS_PLAY, true);
   };
   private pauseEventHandler = () => {
-    this.trigger(HLSControllerEvents.HLS_PAUSE, true);
+    this.trigger(HMSHLSControllerEvents.HLS_PAUSE, true);
   };
   private extractMetaTextTrack = (videoEl: HTMLVideoElement | null): TextTrack | null => {
     const textTrackListCount = videoEl?.textTracks.length || 0;
@@ -273,7 +273,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
         new Date(startDate).getTime() - new Date(programData).getTime() - (videoEl?.currentTime || 0) * 1000;
       const duration = new Date(endDate).getTime() - new Date(startDate).getTime();
       setTimeout(() => {
-        this.trigger(HLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
+        this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
           payload: data.payload,
           duration,
         });
@@ -284,7 +284,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
   };
   private handleTimedMetaData = (videoEl: HTMLVideoElement) => {
-    if (HLSController.isMSESupported() || !videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
+    if (HMSHLSController.isMSESupported() || !videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       return;
     }
     // extracct timed metadata text track
@@ -302,11 +302,11 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
     // handling timed metadata for non mse supported devices.
     this.handleTimedMetaData(videoEl);
-    this.trigger(HLSControllerEvents.HLS_CURRENT_TIME, videoEl.currentTime);
+    this.trigger(HMSHLSControllerEvents.HLS_CURRENT_TIME, videoEl.currentTime);
     const allowedDelay = this.getControllerConfig().liveMaxLatencyDuration || HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
     this.isLive = this.hls.liveSyncPosition ? this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay : false;
     if (!this.isLive) {
-      this.trigger(HLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE, {
+      this.trigger(HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE, {
         isLive: this.isLive,
       });
     }
@@ -316,7 +316,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     if (!videoEl) {
       throw new Error('Video element is not defined');
     }
-    if (HLSController.isMSESupported()) {
+    if (HMSHLSController.isMSESupported()) {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
     } else if (videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
@@ -385,7 +385,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
                * finally emit event letting the user know its time to
                * do whatever they want with the payload
                */
-              this.trigger(HLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
+              this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
                 payload,
                 duration,
               });

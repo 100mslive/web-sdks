@@ -1,7 +1,7 @@
 export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3;
 export const IS_OPTIMIZED = false;
 
-export enum HLSControllerEvents {
+export enum HMSHLSControllerEvents {
   HLS_TIMED_METADATA_LOADED = 'hls-timed-metadata',
   HLS_STREAM_NO_LONGER_LIVE = 'hls-stream-no-longer-live',
 
