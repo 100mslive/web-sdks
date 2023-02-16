@@ -52,7 +52,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private socket: WebSocket | null = null;
 
-  private callbacks = new Map<string, PromiseCallbacks<string, { method: string }>>();
+  private callbacks = new Map<string, PromiseCallbacks<string, { method: HMSSignalMethod }>>();
 
   private _isConnected = false;
   private id = 0;
@@ -72,6 +72,7 @@ export default class JsonRpcSignal implements ISignal {
     if (this._isConnected && !newValue) {
       // went offline
       this._isConnected = newValue;
+      this.rejectPendingCalls(reason);
       this.observer.onOffline(reason);
     } else if (!this._isConnected && newValue) {
       // went online
@@ -100,16 +101,20 @@ export default class JsonRpcSignal implements ISignal {
 
     try {
       const response = await new Promise<any>((resolve, reject) => {
-        this.callbacks.set(id, { resolve, reject, metadata: { method } });
+        this.callbacks.set(id, { resolve, reject, metadata: { method: method as HMSSignalMethod } });
       });
 
       return response;
     } catch (ex) {
-      const error = ex as HMSException;
+      if (ex instanceof HMSException) {
+        ex.action = convertSignalMethodtoErrorAction(method as HMSSignalMethod);
+        throw ex;
+      }
+
       throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
-        Number((error as HMSException).code),
+        Number((ex as HMSException).code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),
-        (error as HMSException).message,
+        (ex as HMSException).message,
       );
     }
   }
@@ -393,6 +398,18 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onNotification(response);
         break;
     }
+  }
+
+  private rejectPendingCalls(reason = '') {
+    this.callbacks.forEach((callback, id) => {
+      if (callback.metadata?.method !== HMSSignalMethod.PING) {
+        console.error(`rejecting ${callback.metadata?.method}, id=${id}`);
+        callback.reject(
+          ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+        );
+        this.callbacks.delete(id);
+      }
+    });
   }
 
   private async pingPongLoop(id: number) {
