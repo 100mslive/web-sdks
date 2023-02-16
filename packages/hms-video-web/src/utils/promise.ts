@@ -1,7 +1,7 @@
 export interface PromiseCallbacks<T, K = void> {
   resolve: (value: T) => void;
   reject: (reason?: any) => void;
-  metadata: K;
+  metadata?: K;
 }
 
 export class PromiseWithCallbacks<T> {
