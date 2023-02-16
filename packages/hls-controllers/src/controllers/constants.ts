@@ -13,5 +13,3 @@ export enum HLSControllerEvents {
   HLS_MANIFEST_LOADED = 'hls-manifest-loaded',
   HLS_LEVEL_UPDATED = 'hls-level-updated',
 }
-
-export const HLSControllerError = {};

@@ -75,8 +75,8 @@ const HLSView = () => {
       setIsVideoLive(isLive);
     };
 
-    const playEventHandler = (_, data) => setIsPaused(!data);
-    const pauseEventHandler = (_, data) => setIsPaused(data);
+    const playEventHandler = (_, data) => setIsPaused(true);
+    const pauseEventHandler = (_, data) => setIsPaused(false);
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
 
     if (videoEl && hlsUrl) {

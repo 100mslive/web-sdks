@@ -32,7 +32,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     this.hls.attachMedia(videoRef.current);
     this.isLive = true;
     this.hlsStats = new HlsStats(this.hls, videoRef.current);
-    this.handleHLSTimeMetadataParsing();
+    this.onHLSTimeMetadataParsing();
     this.enableTimeUpdateListener();
     this.listenHLSEvent();
   }
@@ -103,10 +103,6 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       this.hls.currentLevel = current;
     }
     return;
-  }
-
-  getControllerInstance(): HLSController {
-    return this;
   }
 
   jumpToLive() {
@@ -319,7 +315,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
     videoEl.addEventListener('timeupdate', this.handleTimeupdate);
   }
-  handleHLSTimeMetadataParsing() {
+  onHLSTimeMetadataParsing() {
     /**
      * Metadata are automatically parsed and added to the video element's
      * textTrack cue by hlsjs as they come through the stream.

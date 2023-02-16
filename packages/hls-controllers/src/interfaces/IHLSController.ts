@@ -13,10 +13,6 @@ interface IHLSController {
    */
   setCurrentLevel(currentLevel: Level): void;
   /**
-   * Provide the instance of HLS Controller
-   */
-  getControllerInstance(): IHLSController;
-  /**
    * move the video to Live
    */
   jumpToLive(): void;
