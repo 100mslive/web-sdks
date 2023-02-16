@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter } from 'eventemitter3';
 import Hls, { HlsConfig, Level, LevelParsed } from 'hls.js';
@@ -32,9 +31,9 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     this.hls.attachMedia(videoRef.current);
     this.isLive = true;
     this.hlsStats = new HlsStats(this.hls, videoRef.current);
-    this.onHLSTimeMetadataParsing();
-    this.enableTimeUpdateListener();
     this.listenHLSEvent();
+    this.onHLSTimeMetadataParsing();
+    this.jumpToLive();
   }
 
   static get Events(): typeof HLSControllerEvents {
@@ -51,7 +50,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
    * MSE - media source extension is required to run hls.js
    * @returns return if mse is supported or not
    */
-  static isMSENotSupported(): boolean {
+  static isMSESupported(): boolean {
     return Hls.isSupported();
   }
   unsubscribe = () => {
@@ -66,14 +65,14 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       this.unsubscribe();
     }
 
-    if (HLSController.isMSENotSupported()) {
+    if (HLSController.isMSESupported()) {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
     }
     if (this.videoRef && this.videoRef.current) {
       this.videoRef.current.removeEventListener('play', this.playEventHandler);
       this.videoRef.current.removeEventListener('pause', this.pauseEventHandler);
-      this.videoRef.current.addEventListener('timeupdate', this.handleTimeupdate);
+      this.videoRef.current.removeEventListener('timeupdate', this.handleTimeUpdateListener);
     }
   }
   getIsLive(): boolean {
@@ -183,13 +182,13 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
     return false;
   }
-  manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
+  private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     this.removeAudioLevels(levels);
     this.trigger(HLSControllerEvents.HLS_MANIFEST_LOADED, {
       levels,
     });
   };
-  levelUpdatedHandler = (_: any, { level }: { level: number }) => {
+  private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLevel: Level = this.hls.levels[level];
     this.trigger(HLSControllerEvents.HLS_LEVEL_UPDATED, {
       level: {
@@ -206,6 +205,17 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
         name: qualityLevel.name || '',
       },
     });
+  };
+  /**
+   * It will update the video element current time
+   * @param interval Pass currentTime in second
+   */
+  seek = (interval: number) => {
+    const videoEl = this.videoRef.current;
+    if (!videoEl) {
+      throw new Error('Video element is not defined');
+    }
+    videoEl.currentTime = interval;
   };
   playVideo = async () => {
     const videoEl = this.videoRef.current;
@@ -224,11 +234,11 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
       }
     }
   };
-  playEventHandler = async () => {
+  private playEventHandler = async () => {
     await this.playVideo();
     this.trigger(HLSControllerEvents.HLS_PLAY, true);
   };
-  pauseEventHandler = () => {
+  private pauseEventHandler = () => {
     this.trigger(HLSControllerEvents.HLS_PAUSE, true);
   };
   private extractMetaTextTrack = (videoEl: HTMLVideoElement | null): TextTrack | null => {
@@ -248,76 +258,74 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     let cueIndex = 0;
     while (cueIndex < cuesLength) {
       const cue: TextTrackCue = cues[cueIndex];
+      // @ts-ignore
       if (cue.fired) {
         cueIndex++;
         continue;
       }
+      // @ts-ignore
       const data: { [key: string]: string } = metadataPayloadParser(cue.value.data);
+      // @ts-ignore
       const programData = videoEl?.getStartDate();
       const startDate = data.start_date;
       const endDate = data.end_date;
-      const startTime = new Date(startDate) - new Date(programData) - videoEl?.currentTime * 1000;
-      const duration = new Date(endDate) - new Date(startDate);
+      const startTime =
+        new Date(startDate).getTime() - new Date(programData).getTime() - (videoEl?.currentTime || 0) * 1000;
+      const duration = new Date(endDate).getTime() - new Date(startDate).getTime();
       setTimeout(() => {
         this.trigger(HLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
           payload: data.payload,
           duration,
         });
       }, startTime);
+      // @ts-ignore
       cue.fired = true;
       cueIndex++;
     }
   };
-  handleTimeUpdateListener = (_: Event) => {
-    if (!this.videoRef) {
+  private handleTimedMetaData = (videoEl: HTMLVideoElement) => {
+    if (HLSController.isMSESupported() || !videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       return;
     }
-    const videoEl: HTMLVideoElement | null = this.videoRef.current;
+    // extracct timed metadata text track
     const metaTextTrack: TextTrack | null = this.extractMetaTextTrack(videoEl);
     if (!metaTextTrack || !metaTextTrack.cues) {
       return;
     }
+    // fire cue for timed meta data extract
     this.fireCues(videoEl, metaTextTrack.cues);
   };
-  listenHLSEvent() {
+  private handleTimeUpdateListener = (_: Event) => {
+    const videoEl: HTMLVideoElement | null = this.videoRef.current;
+    if (!videoEl) {
+      return;
+    }
+    // handling timed metadata for non mse supported devices.
+    this.handleTimedMetaData(videoEl);
+    this.trigger(HLSControllerEvents.HLS_CURRENT_TIME, videoEl.currentTime);
+    const allowedDelay = this.getControllerConfig().liveMaxLatencyDuration || HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
+    this.isLive = this.hls.liveSyncPosition ? this.hls.liveSyncPosition - videoEl.currentTime <= allowedDelay : false;
+    if (!this.isLive) {
+      this.trigger(HLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE, {
+        isLive: this.isLive,
+      });
+    }
+  };
+  private listenHLSEvent() {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
       throw new Error('Video element is not defined');
     }
-    if (HLSController.isMSENotSupported()) {
+    if (HLSController.isMSESupported()) {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
     } else if (videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       videoEl.src = this.hlsUrl;
-      videoEl.addEventListener('timeupdate', this.handleTimeUpdateListener);
     }
-
+    videoEl.addEventListener('timeupdate', this.handleTimeUpdateListener);
     videoEl.addEventListener('play', this.playEventHandler);
     videoEl.addEventListener('pause', this.pauseEventHandler);
-  }
-  handleTimeupdate = () => {
-    const videoEl = this.videoRef.current;
-    if (this.hls && videoEl) {
-      this.trigger(HLSControllerEvents.HLS_CURRENT_TIME, videoEl.currentTime);
-      const allowedDelay = this.getControllerConfig().liveMaxLatencyDuration || HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
-      this.isLive = this.hls.liveSyncPosition
-        ? this.hls.liveSyncPosition - videoEl?.currentTime <= allowedDelay
-        : false;
-      if (!this.isLive) {
-        this.trigger(HLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE, {
-          isLive: this.isLive,
-        });
-      }
-    }
-  };
-  // listen for pause, play as well to show not live if paused
-  enableTimeUpdateListener() {
-    const videoEl = this.videoRef.current;
-    if (!videoEl) {
-      throw new Error('Video element is not defined');
-    }
-    videoEl.addEventListener('timeupdate', this.handleTimeupdate);
   }
   /**
    * Metadata are automatically parsed and added to the video element's
@@ -325,7 +333,7 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
    * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
    * when the current fragment has a metadata to play.
    */
-  onHLSTimeMetadataParsing() {
+  private onHLSTimeMetadataParsing() {
     const videoEle = this.videoRef.current;
     if (!videoEle) {
       throw new Error('Video element is not defined');
@@ -393,12 +401,14 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
   getControllerConfig(isOptimized: boolean = IS_OPTIMIZED): Partial<HlsConfig> {
     if (isOptimized) {
       // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
+      // optimezed version is not working disable seeks
       return {
         enableWorker: true,
         liveSyncDuration: 1,
         liveMaxLatencyDuration: 5,
-        liveDurationInfinity: true,
         highBufferWatchdogPeriod: 1,
+        maxBufferLength: 20,
+        backBufferLength: 10,
       };
     }
     return {
@@ -424,13 +434,3 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     return levels.filter(({ videoCodec, width, height }) => !!videoCodec || !!(width && height));
   }
 }
-
-// Controller(hlsUrl, videoRef)
-// will expose
-// 1. Play/Pause
-// 2. Duration -> getCurrentTime
-// 3. Volume.
-// 4. HLSStats -> subscribe, and unsuscribe.
-// 5. autoPlay handling.
-// 6. Go Live
-// 7. Event -> HLS_STREAM_NO_LONGER_LIVE, HLS_TIMED_METADATA_LOADED, LEVEL_UPDATED

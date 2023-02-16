@@ -40,7 +40,6 @@ export const VideoProgress = ({ onValueChange, videoRef }) => {
     const videoEl = videoRef.current;
     const currentTime = (progress * videoEl.duration) / 100;
 
-    videoEl.currentTime = currentTime;
     if (onValueChange) {
       onValueChange(currentTime);
     }

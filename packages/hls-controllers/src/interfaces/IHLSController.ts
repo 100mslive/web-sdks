@@ -16,8 +16,6 @@ interface IHLSController {
    * move the video to Live
    */
   jumpToLive(): void;
-
-  handleHLSTimeMetadataParsing(): void;
 }
 
 export default IHLSController;

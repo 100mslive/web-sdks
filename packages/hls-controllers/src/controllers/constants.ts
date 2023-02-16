@@ -1,5 +1,5 @@
 export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3;
-export const IS_OPTIMIZED = true;
+export const IS_OPTIMIZED = false;
 
 export enum HLSControllerEvents {
   HLS_TIMED_METADATA_LOADED = 'hls-timed-metadata',

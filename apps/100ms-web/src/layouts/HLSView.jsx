@@ -54,20 +54,14 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
-      console.log("levels ", levels);
       setAvailableLevels(levels);
     };
     const levelUpdatedHandler = (_, { level }) => {
       setCurrentSelectedQuality(level);
     };
-    const metadataLoadedHandler = ({ payload, ...rest }) => {
-      console.log(
-        `%c Payload: ${payload}`,
-        "color:#2b2d42; background:#d80032"
-      );
-      console.log(rest);
+    const metadataLoadedHandler = (_, data) => {
       ToastManager.addToast({
-        title: `Payload from timed Metadata ${payload}`,
+        title: `Payload from timed Metadata ${data.payload}`,
       });
     };
 
@@ -75,10 +69,9 @@ const HLSView = () => {
       setIsVideoLive(isLive);
     };
 
-    const playEventHandler = (_, data) => setIsPaused(true);
-    const pauseEventHandler = (_, data) => setIsPaused(false);
+    const playEventHandler = (_, data) => setIsPaused(!data);
+    const pauseEventHandler = (_, data) => setIsPaused(data);
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
-
     if (videoEl && hlsUrl) {
       hlsController = new HLSController(hlsUrl, videoRef);
       hlsController.on(
@@ -96,7 +89,7 @@ const HLSView = () => {
         handleAutoplayBlock
       );
 
-      if (HLSController.isMSENotSupported()) {
+      if (HLSController.isMSESupported()) {
         hlsController.on(
           HLSController.Events.HLS_MANIFEST_LOADED,
           manifestLoadedHandler
@@ -105,8 +98,11 @@ const HLSView = () => {
           HLSController.Events.HLS_LEVEL_UPDATED,
           levelUpdatedHandler
         );
-      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = hlsUrl;
+      }
+      if (
+        !HLSController.isMSESupported() &&
+        videoEl.canPlayType("application/vnd.apple.mpegurl")
+      ) {
         setIsMSENotSupported(true);
       }
     }
@@ -144,7 +140,6 @@ const HLSView = () => {
   useEffect(() => {
     let unsubscribe;
     if (enablHlsStats) {
-      console.log("enalble ");
       unsubscribe = hlsController.subscribe(state => {
         setHlsStatsState(state);
       });
@@ -218,7 +213,12 @@ const HLSView = () => {
           />
           <HMSVideoPlayer.Root ref={videoRef}>
             {!isMSENotSupported && (
-              <HMSVideoPlayer.Progress videoRef={videoRef} />
+              <HMSVideoPlayer.Progress
+                onValueChange={currentTime => {
+                  hlsController.seek(currentTime);
+                }}
+                videoRef={videoRef}
+              />
             )}
 
             <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
