@@ -734,7 +734,6 @@ export default class HMSTransport implements ITransport {
     stream.removeSender(track);
     await p;
     await track.cleanup();
-    track.isPublished = false;
     // remove track from store on unpublish
     this.store.removeTrack(track.trackId);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);

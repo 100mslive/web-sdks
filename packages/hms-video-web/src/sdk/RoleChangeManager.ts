@@ -65,7 +65,7 @@ export default class RoleChangeManager {
     if (localPeer?.videoTrack) {
       // TODO: stop processed track and cleanup plugins loop non async
       // vb can throw change role off otherwise
-      if (localPeer.videoTrack.publishedTrackId) {
+      if (localPeer.videoTrack.isPublished) {
         await this.transport.unpublish([localPeer.videoTrack]);
       } else {
         await localPeer.videoTrack.cleanup();
@@ -82,7 +82,7 @@ export default class RoleChangeManager {
     }
     const localPeer = this.store.getLocalPeer();
     if (localPeer?.audioTrack) {
-      if (localPeer.audioTrack.publishedTrackId) {
+      if (localPeer.audioTrack.isPublished) {
         await this.transport.unpublish([localPeer.audioTrack]);
       } else {
         await localPeer.audioTrack.cleanup();

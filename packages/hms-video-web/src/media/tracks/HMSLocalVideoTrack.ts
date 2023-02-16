@@ -182,6 +182,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+    this.isPublished = false;
   }
 
   /**

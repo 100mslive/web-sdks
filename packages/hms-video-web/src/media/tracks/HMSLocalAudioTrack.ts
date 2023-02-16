@@ -206,6 +206,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
     this.processedTrack?.stop();
+    this.isPublished = false;
     this.destroyAudioLevelMonitor();
     if (isIOS() && isBrowser) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);

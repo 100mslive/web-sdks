@@ -649,7 +649,7 @@ export class HMSSdk implements HMSInterface {
     const trackIndex = this.localPeer.auxiliaryTracks.findIndex(t => t.trackId === trackId);
     if (trackIndex > -1) {
       const track = this.localPeer.auxiliaryTracks[trackIndex];
-      if (track.publishedTrackId) {
+      if (track.isPublished) {
         await this.transport!.unpublish([track]);
       } else {
         await track.cleanup();
