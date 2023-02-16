@@ -47,6 +47,10 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }, interval);
     return this.unsubscribe;
   };
+  /**
+   * MSE - media source extension is required to run hls.js
+   * @returns return if mse is supported or not
+   */
   static isMSENotSupported(): boolean {
     return Hls.isSupported();
   }
@@ -315,13 +319,13 @@ export class HLSController implements IHLSController, HlsControllerEventEmitter 
     }
     videoEl.addEventListener('timeupdate', this.handleTimeupdate);
   }
+  /**
+   * Metadata are automatically parsed and added to the video element's
+   * textTrack cue by hlsjs as they come through the stream.
+   * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
+   * when the current fragment has a metadata to play.
+   */
   onHLSTimeMetadataParsing() {
-    /**
-     * Metadata are automatically parsed and added to the video element's
-     * textTrack cue by hlsjs as they come through the stream.
-     * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
-     * when the current fragment has a metadata to play.
-     */
     const videoEle = this.videoRef.current;
     if (!videoEle) {
       throw new Error('Video element is not defined');
