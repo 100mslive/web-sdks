@@ -7,14 +7,14 @@ import '100ms_edtech_template/dist/index.css';
 import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_ZIPY_KEY) {
-  const shouldBlacklistDomainForLogRocket = () => {
-    if (process.env.REACT_APP_LOGROCKET_BLACKLIST) {
-      const domains = process.env.REACT_APP_LOGROCKET_BLACKLIST.split(',');
+  const shouldBlacklistDomainForZipy = () => {
+    if (process.env.REACT_APP_ZIPY_BLACKLIST) {
+      const domains = process.env.REACT_APP_ZIPY_BLACKLIST.split(',');
       return domains.includes(window.location.hostname);
     }
   };
 
-  if (shouldBlacklistDomainForLogRocket()) {
+  if (shouldBlacklistDomainForZipy()) {
     console.debug(`Not initializing zipy for ${window.location.hostname}`);
   } else {
       init(process.env.REACT_APP_ZIPY_KEY);
