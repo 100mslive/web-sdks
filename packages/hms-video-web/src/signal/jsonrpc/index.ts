@@ -107,7 +107,6 @@ export default class JsonRpcSignal implements ISignal {
       return response;
     } catch (ex) {
       if (ex instanceof HMSException) {
-        ex.action = convertSignalMethodtoErrorAction(method as HMSSignalMethod);
         throw ex;
       }
 
@@ -403,9 +402,14 @@ export default class JsonRpcSignal implements ISignal {
   private rejectPendingCalls(reason = '') {
     this.callbacks.forEach((callback, id) => {
       if (callback.metadata?.method !== HMSSignalMethod.PING) {
-        console.error(`rejecting ${callback.metadata?.method}, id=${id}`);
+        HMSLogger.e(this.TAG, `rejecting pending callback ${callback.metadata?.method}, id=${id}`);
         callback.reject(
-          ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(HMSAction.RECONNECT_SIGNAL, reason),
+          ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+            callback.metadata?.method
+              ? convertSignalMethodtoErrorAction(callback.metadata?.method)
+              : HMSAction.RECONNECT_SIGNAL,
+            reason,
+          ),
         );
         this.callbacks.delete(id);
       }
