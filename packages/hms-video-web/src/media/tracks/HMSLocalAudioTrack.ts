@@ -114,7 +114,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const newSettings = this.buildNewSettings(settings);
 
     if (isEmptyTrack(this.nativeTrack)) {
-      // if it is an empty track or is not enabled, cache the settings for when it is unmuted
+      // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
