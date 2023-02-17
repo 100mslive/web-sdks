@@ -1,15 +1,22 @@
+import { isBrowser } from './support';
+
 export interface HMSIntersectionObserverCallback {
   (entry: IntersectionObserverEntry): void;
 }
 
 class HMSIntersectionObserverWrapper {
-  private intersectionObserver: IntersectionObserver;
+  private intersectionObserver!: IntersectionObserver;
   private listeners = new Map<HTMLElement, Set<HMSIntersectionObserverCallback>>();
   constructor() {
-    this.intersectionObserver = new IntersectionObserver(this.handleIntersection);
+    this.createObserver();
+  }
+
+  isSupported() {
+    return isBrowser && typeof window.IntersectionObserver !== 'undefined';
   }
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
+    this.createObserver();
     this.intersectionObserver.observe(element);
     let currentListeners = this.listeners.get(element);
     if (!currentListeners) {
@@ -23,6 +30,12 @@ class HMSIntersectionObserverWrapper {
     this.intersectionObserver.unobserve(element);
     if (this.listeners.has(element)) {
       this.listeners.get(element)?.delete(onIntersection);
+    }
+  };
+
+  private createObserver = () => {
+    if (this.isSupported() && !this.intersectionObserver) {
+      this.intersectionObserver = new IntersectionObserver(this.handleIntersection);
     }
   };
 

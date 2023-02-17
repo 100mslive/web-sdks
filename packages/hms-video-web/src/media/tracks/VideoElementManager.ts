@@ -33,7 +33,7 @@ export class VideoElementManager {
     // it will be a no-op if initialize already
     this.init();
     this.videoElements.add(videoElement);
-    if (this.intersectionObserver) {
+    if (this.intersectionObserver?.isSupported()) {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else {
       if (this.isElementInViewport(videoElement)) {
@@ -65,9 +65,7 @@ export class VideoElementManager {
       if (typeof window.ResizeObserver !== 'undefined' && !this.resizeObserver) {
         this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
       }
-      if (typeof window.IntersectionObserver !== 'undefined' && !this.intersectionObserver) {
-        this.intersectionObserver = HMSIntersectionObserver;
-      }
+      this.intersectionObserver = HMSIntersectionObserver;
     }
   }
 
