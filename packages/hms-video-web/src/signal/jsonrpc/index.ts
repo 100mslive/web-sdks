@@ -110,10 +110,11 @@ export default class JsonRpcSignal implements ISignal {
         throw ex;
       }
 
+      const error = ex as JsonRpcResponse['error'];
       throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
-        Number((ex as HMSException).code),
+        Number(error.code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),
-        (ex as HMSException).message,
+        error.message,
       );
     }
   }
