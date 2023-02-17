@@ -5,7 +5,7 @@ export interface HMSIntersectionObserverCallback {
 }
 
 class HMSIntersectionObserverWrapper {
-  private intersectionObserver!: IntersectionObserver;
+  private intersectionObserver?: IntersectionObserver;
   private listeners = new Map<HTMLElement, Set<HMSIntersectionObserverCallback>>();
   constructor() {
     this.createObserver();
@@ -17,7 +17,7 @@ class HMSIntersectionObserverWrapper {
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
     this.createObserver();
-    this.intersectionObserver.observe(element);
+    this.intersectionObserver?.observe(element);
     let currentListeners = this.listeners.get(element);
     if (!currentListeners) {
       currentListeners = new Set();
@@ -27,7 +27,7 @@ class HMSIntersectionObserverWrapper {
   };
 
   unobserve = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
-    this.intersectionObserver.unobserve(element);
+    this.intersectionObserver?.unobserve(element);
     if (this.listeners.has(element)) {
       this.listeners.get(element)?.delete(onIntersection);
     }

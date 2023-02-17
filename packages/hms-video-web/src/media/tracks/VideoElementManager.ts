@@ -25,6 +25,7 @@ export class VideoElementManager {
     }
   }
 
+  // eslint-disable-next-line complexity
   async addVideoElement(videoElement: HTMLVideoElement) {
     if (this.videoElements.has(videoElement)) {
       return;
@@ -35,7 +36,7 @@ export class VideoElementManager {
     this.videoElements.add(videoElement);
     if (this.intersectionObserver?.isSupported()) {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
-    } else {
+    } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
         this.track.addSink(videoElement);
       } else {
